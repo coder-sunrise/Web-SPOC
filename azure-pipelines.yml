@@ -11,8 +11,11 @@ pool:
 
 steps:
 - script: 
-    npm install | npm run build
-  displayName: 'npm install and build'
+    npm install
+  displayName: 'npm install'
+- script: 
+    npm run build
+  displayName: 'npm build'
 - task: S3Upload@1
   inputs:
     awsCredentials: 'semr2-dev-deployment'
