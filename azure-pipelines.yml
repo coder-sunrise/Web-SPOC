@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  agent: 'ubuntu-latest'
+  agent: 'uat-emr-com-sg-01'
 
 steps:
 - task: NodeTool@0
