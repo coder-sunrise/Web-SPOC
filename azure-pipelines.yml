@@ -10,10 +10,7 @@ pool:
   agent: 'uat-emr-com-sg-01'
 
 steps:
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+
 - task: S3Upload@1
   inputs:
     awsCredentials: 'semr2-dev-deployment'
