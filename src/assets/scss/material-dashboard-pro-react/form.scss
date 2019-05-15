@@ -1,0 +1,82 @@
+.buttonContainer {
+  // padding: 10px;
+  // padding-top:20px;
+  text-align: center;
+  > button {
+    margin: 0px 10px;
+    // svg{
+    //     margin-right: 10px;
+    //     width: 17px;
+    //     height: 17px;
+    // }
+  }
+}
+
+.ant-affix {
+  z-index: 1000 !important;
+  // > div{
+  //     margin-top: 100px;
+  // }
+}
+
+.css-1ep9fjw,
+.css-1uq0kb5 {
+  padding: 5px 0 4px 0 !important;
+}
+.css-1tna5xz {
+  margin-left: 0px;
+  input {
+    margin-left: -2px;
+  }
+}
+
+.rdtPickerOpenUpwards {
+  position: relative;
+}
+
+.rdtPickerOpenUpwards .rdtPicker {
+  top: auto;
+  bottom: 100%;
+  &:before {
+    content: none;
+  }
+  &:after {
+    border-bottom: .4em solid #ffffff;
+    border-right: .4em solid transparent;
+    border-left: .4em solid transparent;
+    content: "";
+    display: inline-block;
+    position: absolute;
+    bottom: -5px;
+    left: 230px;
+  }
+}
+
+.rdtPickerOverlap .rdt {
+  position: relative;
+}
+
+.centerizedContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.centerredLoading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  opacity: 1;
+}
+
+.topSpacing {
+  margin-top: 15px !important;
+}
+
+.bottomSpacing {
+  margin-bottom: 15px !important;
+}
+
+.noPadding {
+  padding: 0px !important;
+}
