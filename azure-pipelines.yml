@@ -14,3 +14,10 @@ steps:
     npm install
     npm run build
   displayName: 'npm install and build'
+- task: S3Upload@1
+  inputs:
+    awsCredentials: 'semr2-dev-deployment'
+    regionName: 'ap-southeast-1'
+    bucketName: 'semr2-frontend-dev'
+    sourceFolder: './dist'
+    globExpressions: '**'
