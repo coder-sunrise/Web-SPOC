@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- dev
 
 pool:
   agent: 'uat-emr-com-sg-01'
