@@ -24,6 +24,7 @@ export default createFormViewModel({
           dispatch({
             type: 'updateState',
             payload: {
+              fullscreen: true,
               showPatientInfoPanel: true,
             },
           })

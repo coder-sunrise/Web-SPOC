@@ -5,7 +5,7 @@ const url = '/api/patient'
 module.exports = {
   remove: (params) => service.remove(url, params),
   query: (params) => {
-    return service.query(`${url}/${params.id}`)
+    return service.query(url, params)
   },
   upsert: (params) => {
     return service.upsert(url, params)

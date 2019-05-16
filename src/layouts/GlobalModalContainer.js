@@ -46,6 +46,7 @@ class GlobalModalContainer extends PureComponent {
                 type: 'global/updateAppState',
                 payload: {
                   showPatientInfoPanel: false,
+                  fullscreen: false,
                   currentPatientId: null,
                 },
               })

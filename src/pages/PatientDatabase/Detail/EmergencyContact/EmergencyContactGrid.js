@@ -10,6 +10,7 @@ import {
   Button,
   CommonModal,
   notification,
+  ProgressButton,
 } from '@/components'
 import { Tooltip, withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
@@ -17,13 +18,15 @@ import Add from '@material-ui/icons/Add'
 import { titles } from '@/utils/codes'
 import { PagingPanel } from '@devexpress/dx-react-grid-material-ui'
 import Loading from '@/components/PageLoading/index'
+import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
 @connect(({ emergencyContact, loading }) => {
   return { emergencyContact, loading }
 })
 @withFormik({
-  mapPropsToValues: ({ emergencyContact }) => {
-    return emergencyContact.entity || emergencyContact.default
+  mapPropsToValues: ({ patient }) => {
+    return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
     patientEmergencyContact: Yup.array().of(
@@ -34,42 +37,7 @@ import Loading from '@/components/PageLoading/index'
     ),
   }),
 
-  handleSubmit: (values, component) => {
-    console.log(component)
-    const { props, setValues } = component
-    // console.log(values)
-    // return
-    // props
-    //   .dispatch({
-    //     type: 'demographic/submit',
-    //     payload: values,
-    //   })
-    //   .then((r) => {
-    //     console.log(r)
-    //     if (r) {
-    //       notification.success({
-    //         // duration:0,
-    //         message: r.id ? 'Created' : 'Saved',
-    //       })
-    //       if (r.id) {
-    //         props.history.push(
-    //           getAppendUrl(
-    //             {
-    //               pid: r.id,
-    //             },
-    //             getRemovedUrl([
-    //               'new',
-    //             ]),
-    //           ),
-    //         )
-    //       } else {
-    //         setCurrentPatient(props, setValues)
-    //       }
-
-    //       if (props.onConfirm) props.onConfirm()
-    //     }
-    //   })
-  },
+  handleSubmit,
   displayName: 'EmergencyContact',
 })
 class Grid extends PureComponent {
@@ -227,7 +195,7 @@ class Grid extends PureComponent {
                   return
                 }
                 dispatch({
-                  type: 'emergencyContact/add',
+                  type: 'emergencyContact/localAdd',
                   payload: [
                     {
                       patientProfileFk: o.id,
@@ -238,7 +206,10 @@ class Grid extends PureComponent {
                       address: o.contact.contactAddress[0].line1,
                     },
                   ],
-                }).then(this.toggleModal)
+                }).then((items) => {
+                  setArrayValue(items)
+                  this.toggleModal()
+                })
               })
             }}
             justIcon
@@ -266,6 +237,10 @@ class Grid extends PureComponent {
         )
       },
     })
+  }
+
+  componentDidUpdate = (prevProps) => {
+    componentDidUpdate(this.props, prevProps)
   }
 
   toggleModal = () => {
@@ -301,6 +276,9 @@ class Grid extends PureComponent {
             errors={errors.patientEmergencyContact}
             {...this.tableParas}
           />
+          {getFooter({
+            ...this.props,
+          })}
         </CardContainer>
         <CommonModal
           open={this.state.showModal}
