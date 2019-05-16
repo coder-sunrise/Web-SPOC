@@ -8,7 +8,7 @@ trigger:
 - dev
 
 pool:
-  agent: 'uat-emr-com-sg-01'
+  agent: 'uat-machine2'
 
 steps:
 - script: 
