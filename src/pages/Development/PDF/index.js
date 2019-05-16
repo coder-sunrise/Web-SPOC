@@ -104,7 +104,7 @@ class DevelopmentPage extends PureComponent {
 
   getCodeTable = () => {
     const codetableName = 'Country'
-    const url = 'http://dev01.cloudplus.com.sg:6001/api/CodeTable?ctnames='
+    const url = 'http://localhost:55314/api/CodeTable?ctnames='
     const method = 'GET'
     caches.open('test').then((cache) => {
       // axios({
