@@ -18,14 +18,11 @@ export default createFormViewModel({
     effects: {
       *getToken ({ payload }, { call, put }) {
         const response = yield call(login, payload)
-        yield put({
+
+        return yield put({
           type: 'updateLoginStatus',
           payload: response,
         })
-
-        if (response.status === 200) {
-          yield put(router.push('reception/queue'))
-        }
       },
     },
     reducers: {
@@ -35,6 +32,7 @@ export default createFormViewModel({
           const { data } = payload
           sessionStorage.setItem('token', data.access_token)
         }
+
         return { ...state, isInvalidLogin }
       },
     },

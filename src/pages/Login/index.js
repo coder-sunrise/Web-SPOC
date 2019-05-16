@@ -35,14 +35,14 @@ class LoginPage extends PureComponent {
       type: 'loginSEMR/getToken',
       payload: credential,
     })
-    // .then((props) => {
-    //   const { payload } = props
-    //   console.log('payload', payload)
-    //   payload.status === 200 && router.push('/reception/queue')
-    // })
-    // .catch((error) => {
-    //   console.log('error', error)
-    // })
+      .then((props) => {
+        const { payload } = props
+        console.log('payload', payload)
+        payload.status === 200 && router.push('/reception/queue')
+      })
+      .catch((error) => {
+        console.log('error', error)
+      })
   }
 
   render () {

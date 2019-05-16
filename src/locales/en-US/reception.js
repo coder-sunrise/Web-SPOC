@@ -55,6 +55,7 @@ export default {
   'reception.queue.dispense.visit': 'Visit',
   'reception.queue.viewDispense': 'View Dispense',
   'reception.queue.editVisit': 'Edit Visit Registration',
+  'reception.queue.removeVisit': 'Remove Visit',
   'reception.queue.expandQueueLog': 'Expand Queue Log',
   'reception.queue.dispense.unitPrice': 'Unit Price',
   'reception.queue.dispense.scheme': 'Scheme',
@@ -107,6 +108,8 @@ export default {
 
   'reception.queue.dispense.total': 'Total',
 
+  'reception.queue.registerVisitTextBox':
+    'Register Visit (Patient Name, ID, Phone No.)',
   'reception.queue.patientName': 'Patient Name',
   'reception.queue.search': 'Search',
   'reception.queue.patientSearch.registerNewPatient': 'Register New Patient',

@@ -1,23 +1,13 @@
 import React, { PureComponent } from 'react'
-import classNames from 'classnames'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi/locale'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { Stop, Create } from '@material-ui/icons'
+import { PersonAdd, Create } from '@material-ui/icons'
 // custom components
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardText,
-  GridContainer,
-  GridItem,
-  TextField,
-} from '@/components'
+import { Button, GridContainer, GridItem, TextField } from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
 
@@ -44,74 +34,54 @@ const styles = () => ({
   },
 })
 
-@withFormik({
-  mapPropsToValues: () => ({
-    SessionNo: '190410-01-1.0',
-  }),
-})
 class DetailsActionBar extends PureComponent {
+  state = {
+    currentSearchPatient: '',
+  }
+
+  onSearchPatientChange = (event) => {
+    const { value } = event.target
+    this.setState({ currentSearchPatient: value })
+  }
+
+  onRegisterVisitClick = () => {
+    const { togglePatientSearch } = this.props
+    togglePatientSearch(this.state.currentSearchPatient)
+  }
+
   render () {
-    const options = [
-      { name: 'All doctor', value: 'all' },
-      { name: 'Cheah', value: 'cheah' },
-      { name: 'Joseph', value: 'Joseph' },
-    ]
-    const { classes, togglePatientSearch } = this.props
-    const sessionNo = '190321-02'
+    const { currentSearchPatient } = this.state
+    const { classes, togglePatientSearch, toggleNewPatient } = this.props
     return (
       <GridContainer classes={{ grid: classes.actionBar }} spacing={8}>
+        {/**  
         <GridItem xs md={3}>
-          <FastField
-            name='PatientName'
-            render={(args) => (
+            
               <TextField
-                {...args}
+                value={currentSearchPatient}
+                onChange={this.onSearchPatientChange}
                 label={formatMessage({
-                  id: 'reception.queue.patientName',
+                  id: 'reception.queue.registerVisitTextBox',
                 })}
               />
-            )}
-          />
-        </GridItem>
-        <GridItem xs md={1} container alignItems='center'>
-          <Button color='primary' onClick={togglePatientSearch}>
+            
+          </GridItem>
+        */}
+        <GridItem xs md={3} container alignItems='center'>
+          <Button size='sm' color='info' onClick={togglePatientSearch}>
             <Create />
             <FormattedMessage id='reception.queue.registerVisit' />
           </Button>
+          <Button size='sm' color='primary' onClick={toggleNewPatient}>
+            <PersonAdd />
+            <FormattedMessage id='reception.queue.createPatient' />
+          </Button>
         </GridItem>
-        <GridItem xs md={8} container justify='flex-end' alignItems='center'>
+        <GridItem xs md={9} container justify='flex-end' alignItems='center'>
           <StatisticIndicator />
         </GridItem>
       </GridContainer>
     )
-    // return (
-    //   <GridContainer className={classNames(classes.spacing)}>
-    //     <GridItem xs md={4}>
-    //       <FastField
-    //         name='SessionNo'
-    //         render={(args) => (
-    //           <TextField
-    //             {...args}
-    //             readOnly
-    //             prefixProps={{
-    //               disableTypography: true,
-    //               style: { width: '25%' },
-    //             }}
-    //             prefix={formatMessage({
-    //               id: 'reception.queue.sessionNo',
-    //             })}
-    //           />
-    //         )}
-    //       />
-    //     </GridItem>
-    //     <GridItem xs md={8} container justify='flex-end' alignItems='center'>
-    //       <Button color='danger' onClick={this.toggleDrawer}>
-    //         <Stop />
-    //         <FormattedMessage id='reception.queue.endSession' />
-    //       </Button>
-    //     </GridItem>
-    //   </GridContainer>
-    // )
   }
 }
 

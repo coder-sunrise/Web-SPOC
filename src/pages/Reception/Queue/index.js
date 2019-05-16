@@ -214,6 +214,7 @@ class Queue extends PureComponent {
               <React.Fragment>
                 <DetailsActionBar
                   togglePatientSearch={this.togglePatientSearch}
+                  toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
                   onViewDispenseClick={this.toggleDispense}

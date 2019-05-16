@@ -9,7 +9,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { formatMessage } from 'umi/locale'
 // material ui
 import { Tooltip, withStyles } from '@material-ui/core'
-import { Pageview, Edit, Fullscreen } from '@material-ui/icons'
+import { Pageview, Edit, Remove, Fullscreen } from '@material-ui/icons'
 // custom components
 import { Button, CommonModal, CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
@@ -144,19 +144,22 @@ class DetailsGrid extends PureComponent {
     if (tableProps.column.name === 'Action') {
       return (
         <Table.Cell {...tableProps}>
-          <Tooltip
-            title={formatMessage({ id: 'reception.queue.viewDispense' })}
-            placement='bottom'
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <div style={{ display: 'inline-block' }}>
-              <GridButton
-                row={tableProps.row}
-                Icon={<Pageview />}
-                onClick={this.onViewDispenseClick}
-              />
-            </div>
-          </Tooltip>
+          {/**
+            <Tooltip
+              title={formatMessage({ id: 'reception.queue.viewDispense' })}
+              placement='bottom'
+              classes={{ tooltip: classes.tooltip }}
+            >
+              <div style={{ display: 'inline-block' }}>
+                <GridButton
+                  row={tableProps.row}
+                  Icon={<Pageview />}
+                  onClick={this.onViewDispenseClick}
+                />
+              </div>
+            </Tooltip>
+          */}
+
           <Tooltip
             title={formatMessage({ id: 'reception.queue.editVisit' })}
             placement='bottom'
@@ -166,6 +169,20 @@ class DetailsGrid extends PureComponent {
               <GridButton
                 row={tableProps.row}
                 Icon={<Edit />}
+                onClick={this.onEditVisitClick}
+              />
+            </div>
+          </Tooltip>
+          <Tooltip
+            title={formatMessage({ id: 'reception.queue.removeVisit' })}
+            placement='bottom'
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <div style={{ display: 'inline-block' }}>
+              <GridButton
+                row={tableProps.row}
+                Icon={<Remove />}
+                color='danger'
                 onClick={this.onEditVisitClick}
               />
             </div>
