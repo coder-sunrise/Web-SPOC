@@ -24,7 +24,7 @@ class EditableTableGrid extends PureComponent {
     // console.log(editingRowIds, errors)
     if (errors.length > 0) {
       errors.forEach((error, i) => {
-        if (error) {
+        if (error && rows[i]) {
           console.log(rows, error)
           newErrowRows.push(rows[i].id)
         }

@@ -38,6 +38,7 @@ export default createFormViewModel({
             website: '',
           },
         },
+        patientEmergencyContact: [],
       },
     },
     subscriptions: ({ dispatch, history }) => {

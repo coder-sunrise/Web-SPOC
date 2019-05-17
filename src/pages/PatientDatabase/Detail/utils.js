@@ -23,17 +23,17 @@ import Replay from '@material-ui/icons/Replay'
 import Clear from '@material-ui/icons/Clear'
 
 import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
-
+console.log('util')
 module.exports = {
-  componentDidUpdate: (props, prevProps) => {
+  componentDidUpdate: (props, prevProps, cb = (f) => false) => {
     const { patient } = props
     // console.log(patient.entity, prevProps.values.id)
-    if (patient.entity && patient.entity.id !== prevProps.values.id) {
-      props.setValues(patient.entity)
+    if (patient.entity && (patient.entity.id !== prevProps.values.id || cb())) {
+      props.resetForm(patient.entity)
     }
   },
   handleSubmit: (values, component) => {
-    const { props, setValues } = component
+    const { props, resetForm } = component
     // console.log(values)
     // return
     props
@@ -70,8 +70,8 @@ module.exports = {
                 },
               })
               .then((value) => {
-                // console.log(value)
-                setValues(value)
+                console.log(value)
+                resetForm(value)
               })
           }
           if (props.onConfirm) props.onConfirm()
@@ -83,7 +83,9 @@ module.exports = {
     theme,
     handleSubmit,
     resetForm,
+    resetable = true,
     values,
+    touched,
     dispatch,
     extraBtn,
   }) => (
@@ -91,17 +93,20 @@ module.exports = {
       style={{
         position: 'relative',
         textAlign: 'center',
-        marginTop: theme.spacing.unit,
+        marginTop: theme.spacing.unit * 2,
       }}
     >
       {values &&
-      values.id && (
+      values.id &&
+      resetable && (
         <Button
           // className={classes.modalCloseButton}
           key='reset'
           aria-label='Reset'
           color='danger'
-          onClick={resetForm}
+          onClick={() => {
+            resetForm()
+          }}
           style={{ left: 0, position: 'absolute' }}
         >
           <Replay />
@@ -128,7 +133,10 @@ module.exports = {
         <Clear />
         Cancel
       </Button>
-      <ProgressButton onClick={handleSubmit} />
+      <ProgressButton
+        onClick={handleSubmit}
+        disabled={Object.values(touched).length === 0}
+      />
       {extraBtn}
     </div>
   ),
