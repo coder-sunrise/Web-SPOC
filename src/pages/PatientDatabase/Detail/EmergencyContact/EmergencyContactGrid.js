@@ -297,7 +297,7 @@ class Grid extends PureComponent {
   render () {
     const { values, type, loading, errors, patientSearch } = this.props
     const { SearchPatient = (f) => f } = this
-    console.log(this.props)
+    // console.log(this.props)
     // console.log(values)
     return (
       <div>

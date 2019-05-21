@@ -88,7 +88,9 @@ module.exports = {
     dirty,
     touched,
     dispatch,
+    history,
     extraBtn,
+    disabled = Object.values(touched).length === 0 && !dirty,
   }) => (
     <div
       style={{
@@ -120,24 +122,28 @@ module.exports = {
         aria-label='Cancel'
         color='danger'
         onClick={() => {
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              showPatientInfoPanel: false,
-              fullscreen: false,
-              currentPatientId: null,
-            },
-          })
+          const f = () => {
+            dispatch({
+              type: 'global/closePatientModal',
+              history,
+            })
+          }
+          if (!disabled) {
+            confirm({
+              title: 'Do you want to discard your changes?',
+              onOk: f,
+              onCancel () {},
+            })
+          } else {
+            f()
+          }
         }}
         style={{ marginRight: theme.spacing.unit }}
       >
         <Clear />
         Cancel
       </Button>
-      <ProgressButton
-        onClick={handleSubmit}
-        disabled={Object.values(touched).length === 0 && !dirty}
-      />
+      <ProgressButton onClick={handleSubmit} disabled={disabled} />
       {extraBtn}
     </div>
   ),
