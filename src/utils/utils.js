@@ -422,6 +422,21 @@ const convertToQuery = (
   // console.log(returnVal)
   return returnVal
 }
+
+const updateGlobalVariable = (key, value) => {
+  if (!window.medisys) {
+    window.medisys = {}
+  }
+  window.medisys[key] = value
+}
+
+const getGlobalVariable = (key) => {
+  if (!window.medisys) {
+    window.medisys = {}
+  }
+  return window.medisys[key]
+}
+
 module.exports = {
   ...cdrssUtil,
   sleep,
@@ -430,5 +445,7 @@ module.exports = {
   getAppendUrl,
   getRemovedUrl,
   convertToQuery,
+  updateGlobalVariable,
+  getGlobalVariable,
   ...module.exports,
 }

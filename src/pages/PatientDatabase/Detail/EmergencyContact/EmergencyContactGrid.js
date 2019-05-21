@@ -29,7 +29,7 @@ import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
     return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
-    patientEmergencyContact: Yup.array().of(
+    patientEmergencyContact: Yup.array().compact((v) => v.isDeleted).of(
       Yup.object().shape({
         salutationFk: Yup.string().required(),
         name: Yup.string().required(),

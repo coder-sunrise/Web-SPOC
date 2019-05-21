@@ -85,6 +85,7 @@ module.exports = {
     resetForm,
     resetable = true,
     values,
+    dirty,
     touched,
     dispatch,
     extraBtn,
@@ -135,7 +136,7 @@ module.exports = {
       </Button>
       <ProgressButton
         onClick={handleSubmit}
-        disabled={Object.values(touched).length === 0}
+        disabled={Object.values(touched).length === 0 && !dirty}
       />
       {extraBtn}
     </div>
