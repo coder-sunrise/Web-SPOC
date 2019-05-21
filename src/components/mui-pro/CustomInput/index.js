@@ -166,7 +166,7 @@ class CustomInput extends React.PureComponent {
 
   _onChange = (event) => {
     const { props } = this
-    console.log(event)
+    // console.log(event)
     const value = event.target.value
     if (props.readOnly) return
     this.setState({
@@ -234,7 +234,7 @@ class CustomInput extends React.PureComponent {
   }
 
   _onBlur = () => {
-    console.log('b')
+    // console.log('b')
     this.setState({ shrink: !!this.state.value })
   }
 
