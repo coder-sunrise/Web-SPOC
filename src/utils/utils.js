@@ -238,6 +238,7 @@ export function isAntdPro () {
 export function extendFunc (...args) {
   const funcNew = function () {
     for (let i = 0; i < args.length; i++) {
+      console.log(args[i])
       if (args[i]) args[i].apply(this, arguments)
     }
   }

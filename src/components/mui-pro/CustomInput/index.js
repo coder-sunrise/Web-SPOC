@@ -48,18 +48,24 @@ class CustomInput extends React.PureComponent {
     super(props)
     // this.myRef = React.createRef()
 
-    const { field, form, inputProps = {} } = props
+    const { field, form, inputProps = {}, defaultValue = '' } = props
     // console.log(props)
     inputProps.onChange = extendFunc(inputProps.onChange, this._onChange)
-
-    inputProps.onFocus = extendFunc(inputProps.onFocus, this._onFocus)
-
-    inputProps.onBlur = extendFunc(inputProps.onBlur, this._onBlur)
+    inputProps.onFocus = extendFunc(
+      inputProps.onFocus,
+      props.onFocus,
+      this._onFocus,
+    )
+    inputProps.onBlur = extendFunc(
+      inputProps.onBlur,
+      props.onBlur,
+      this._onBlur,
+    )
     if (field && form) {
       inputProps.name = field.name
       inputProps.onBlur = extendFunc(inputProps.onBlur, field.onBlur)
     }
-    let value = ''
+    let value = defaultValue
     if (props.value !== undefined) {
       value = this.props.value
     } else if (this.props.field) {
@@ -160,7 +166,7 @@ class CustomInput extends React.PureComponent {
 
   _onChange = (event) => {
     const { props } = this
-    // console.log(event)
+    console.log(event)
     const value = event.target.value
     if (props.readOnly) return
     this.setState({
@@ -228,6 +234,7 @@ class CustomInput extends React.PureComponent {
   }
 
   _onBlur = () => {
+    console.log('b')
     this.setState({ shrink: !!this.state.value })
   }
 

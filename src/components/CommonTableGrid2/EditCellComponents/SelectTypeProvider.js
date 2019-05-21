@@ -58,9 +58,9 @@ const SelectDisplay = (columnExtensions, state) => ({
     ) || {}
   // console.log(cfg, restProps, state)
 
-  // console.log(value, columnName, restProps)
+  console.log(value, columnName, restProps)
   const v = (cfg.options || state[`${columnName}Option`] || [])
-    .find((o) => o.value === value || o.id === value)
+    .find((o) => (o.value && o.value === value) || (o.id && o.id === value))
   return <span>{v ? v.name : ''}</span>
 }
 

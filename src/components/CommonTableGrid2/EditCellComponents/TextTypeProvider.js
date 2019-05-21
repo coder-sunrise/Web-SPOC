@@ -31,6 +31,7 @@ const TextEditorBase = React.memo(
     const { errors = [], ...restConfig } = cfg
     const error = errors.find((o) => o.index === row.rowIndex) || {}
     const submitValue = (e) => {
+      console.log(e.target.value, value)
       if (value !== e.target.value) onValueChange(e.target.value)
     }
     return (
