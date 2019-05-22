@@ -108,7 +108,6 @@ class CommonModal extends React.Component {
       theme,
       disableBackdropClick = false,
     } = this.props
-    console.log({ loading })
     // console.log(bodyNoPadding)
     if (
       navigator.platform.indexOf('Win') > -1 &&

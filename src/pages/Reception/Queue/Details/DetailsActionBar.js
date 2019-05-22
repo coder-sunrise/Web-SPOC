@@ -1,13 +1,12 @@
 import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 // umi locale
-import { FormattedMessage, formatMessage } from 'umi/locale'
-// formik
-import { FastField } from 'formik'
+import { FormattedMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
 import { PersonAdd, Create } from '@material-ui/icons'
 // custom components
-import { Button, GridContainer, GridItem, TextField } from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
 
@@ -51,9 +50,15 @@ class DetailsActionBar extends PureComponent {
 
   render () {
     const { currentSearchPatient } = this.state
-    const { classes, togglePatientSearch, toggleNewPatient } = this.props
+    const {
+      classes,
+      togglePatientSearch,
+      toggleNewPatient,
+      currentFilter,
+      handleStatusChange,
+    } = this.props
     return (
-      <GridContainer classes={{ grid: classes.actionBar }} spacing={8}>
+      <GridContainer className={classnames(classes.actionBar)} spacing={8}>
         {/**  
         <GridItem xs md={3}>
             
@@ -78,7 +83,10 @@ class DetailsActionBar extends PureComponent {
           </Button>
         </GridItem>
         <GridItem xs md={9} container justify='flex-end' alignItems='center'>
-          <StatisticIndicator />
+          <StatisticIndicator
+            filter={currentFilter}
+            handleStatusClick={handleStatusChange}
+          />
         </GridItem>
       </GridContainer>
     )

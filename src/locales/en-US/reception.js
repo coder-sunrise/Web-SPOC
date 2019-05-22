@@ -23,6 +23,7 @@ export default {
   'reception.queue.createPatient': 'Create New Patient',
   'reception.queue.deleteVisit': 'Delete Visit',
   'reception.queue.printTotal': 'Print Total',
+  'reception.queue.refreshQueue': 'Refresh Queue',
   'reception.queue.endSession': 'End Session',
 
   'reception.common.remarks': 'Remarks',

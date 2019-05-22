@@ -211,6 +211,7 @@ class DetailsGrid extends PureComponent {
     }
     const { classes } = this.props
     const { isFullscreen } = this.state
+    console.log('detailsgrid render')
     return (
       <div>
         <WithFullscreenModal

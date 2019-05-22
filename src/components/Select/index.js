@@ -76,8 +76,6 @@ function Placeholder (props) {
 }
 
 function SingleValue (props) {
-  // console.log('s',props)c
-
   return (
     <Typography
       className={classNames({
@@ -175,6 +173,7 @@ function Control (props) {
   const cfg = {
     ...(endAdornment ? { endAdornment } : {}),
   }
+
   return (
     <Input
       fullWidth
@@ -234,13 +233,15 @@ class CustomSelect extends React.Component {
     } = this.props
 
     this.selectStyles = {
-      input: (base) => ({
-        ...base,
-        color: theme.palette.text.primary,
-        '& input': {
-          font: 'inherit',
-        },
-      }),
+      input: (base) => {
+        return {
+          ...base,
+          color: theme.palette.text.primary,
+          '& input': {
+            font: 'inherit',
+          },
+        }
+      },
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     }
     this.onFocus = extendFunc(onFocus, () => {
@@ -333,6 +334,7 @@ class CustomSelect extends React.Component {
           // [classes.simple]: simple,
           // [classes.whiteUnderline]: white,
           // console.log(newOpts, this.state.value)
+
           return (
             <Select
               {...inputProps}

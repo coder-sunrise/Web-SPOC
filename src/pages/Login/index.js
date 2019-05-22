@@ -37,7 +37,6 @@ class LoginPage extends PureComponent {
     })
       .then((props) => {
         const { payload } = props
-        console.log('payload', payload)
         payload.status === 200 && router.push('/reception/queue')
       })
       .catch((error) => {
