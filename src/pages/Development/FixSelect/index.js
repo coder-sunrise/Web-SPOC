@@ -10,7 +10,10 @@ import {
   Select,
   TextField,
   ANTDSelect,
+  DatePicker,
 } from '@/components'
+import ANTDatePicker from '@/components/DatePicker/ANTDatepicker'
+import ANTRangePicker from '@/components/DatePicker/ANTRangePicker'
 
 const options = [
   { name: 'test', value: 'test' },
@@ -78,12 +81,29 @@ class FixSelect extends React.PureComponent {
             />
           </GridItem>
         </GridContainer>
+
         <GridContainer>
           <GridItem xs md={2}>
             <FastField
-              name='Test1'
+              name='TestDatePicker'
               render={(args) => (
-                <Select {...args} options={antDOptions} label='Test1' />
+                <ANTDatePicker {...args} label='Test DatePicker' />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
+              name='TestDateRange'
+              render={(args) => (
+                <ANTRangePicker {...args} label='Range Picker' />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={3}>
+            <FastField
+              name='CurrentDatePicker'
+              render={(args) => (
+                <DatePicker {...args} label='Current Date Picker' />
               )}
             />
           </GridItem>

@@ -25,7 +25,7 @@ const STYLES = (theme) => {
         border: 'none',
         boxShadow: 'none !important',
         borderRadius: 0,
-        borderBottom: '1px solid',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
         marginLeft: 5,
         marginRight: 5,
       },
@@ -52,7 +52,7 @@ const STYLES = (theme) => {
         transform: 'translate(0, 28px) scale(1)',
       },
       '& .ant-form-item-label > label': {
-        color: 'rgba(0, 0, 0, 0.54)',
+        color: 'rgba(0, 0, 0, 0.4)',
         fontSize: '1rem',
       },
     },
@@ -125,13 +125,15 @@ class AntDSelect extends React.PureComponent {
   handleValueChange = (value) => {
     const { form, field, onChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, value === undefined ? '' : value)
+      form.setFieldValue(field.name, value)
     }
 
     if (onChange) {
       const { name } = this.props
       onChange(name, value)
     }
+
+    value === undefined && this.handleBlur()
   }
 
   handleFocus = () => {
@@ -165,7 +167,7 @@ class AntDSelect extends React.PureComponent {
       if (selectValue) shouldShrink = shrink || selectValue.length !== 0
       else shouldShrink = shrink
     }
-
+    console.log('shoulshrink', shouldShrink)
     const labelClass = {
       [classes.label]: true,
       [classes.labelAnimation]: true,
@@ -180,13 +182,13 @@ class AntDSelect extends React.PureComponent {
             className={classnames(classes.selectContainer)}
             allowClear
             showSearch
-            clearIcon={
-              <RemoveCircle
-                className={classnames(classes.clearButton)}
-                fontSize='small'
-                color='error'
-              />
-            }
+            // clearIcon={
+            //   <RemoveCircle
+            //     className={classnames(classes.clearButton)}
+            //     fontSize='small'
+            //     color='error'
+            //   />
+            // }
             size={size}
             disabled={disabled}
             onFocus={this.handleFocus}
