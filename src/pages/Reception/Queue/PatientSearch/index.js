@@ -124,12 +124,6 @@ class PatientSearch extends PureComponent {
               columnExtensions={columnExtensions}
               ActionProps={ActionProps}
               columns={columns}
-              LoadingProps={{
-                isLoading: !!loading.effects['queueLog/fetchPatientListByName'],
-                loadingMessage: (
-                  <FormattedMessage id='reception.queue.patientSearch.retrieving' />
-                ),
-              }}
               getRowId={this.gridGetRowID}
               FuncProps={{ pager: false }}
             />

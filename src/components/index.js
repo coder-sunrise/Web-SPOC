@@ -15,6 +15,7 @@ export NumberField from './NumberInput'
 
 export Select from './Select'
 export CodeSelect from './Select/CodeSelect'
+export ANTDSelect from './Select/AntDSelect.js'
 export notification from './Notification'
 export CommonModal from './CommonModal'
 export CommonHeader from './CommonHeader'
