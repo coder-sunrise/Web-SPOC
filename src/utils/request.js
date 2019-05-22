@@ -8,7 +8,7 @@ import { isAntdPro } from './utils'
 
 // const baseUrl = 'http://localhost:55314'
 // export const baseUrl = 'http://localhost:55314'
-export const baseUrl = 'http://semr2dev2010.emr.com.sg'
+export const baseUrl = 'https://semr2dev2010.emr.com.sg'
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
