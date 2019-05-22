@@ -36,12 +36,15 @@ function GridContainer ({ ...props }) {
   // console.log(newChildren)
   return (
     <Grid container {...rest} className={`${classes.grid} ${className}`}>
-      {newChildren.map((o, i) =>
-        React.cloneElement(o, {
+      {newChildren.map((o, i) => {
+        // console.log(o, i)
+        const { children: c, ...restProps } = o.props
+        return React.cloneElement(o, {
           key: i,
           gutter,
-        }),
-      )}
+          ...restProps,
+        })
+      })}
     </Grid>
   )
 }

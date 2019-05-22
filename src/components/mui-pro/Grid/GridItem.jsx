@@ -10,16 +10,24 @@ const innerStyle = (theme) => ({
   },
 })
 
-function GridItem ({ ...props }) {
-  const {
-    classes,
-    theme,
-    children,
-    className,
-    gutter = theme.spacing.unit,
-    style,
-    ...rest
-  } = props
+function GridItem ({
+  classes,
+  theme,
+  children,
+  className,
+  gutter = theme.spacing.unit,
+  style,
+  ...rest
+}) {
+  // console.log(
+  //   classes,
+  //   theme,
+  //   children,
+  //   className,
+  //   gutter,
+  //   style,
+  //   ...rest,
+  // )
   return (
     <Grid
       item
