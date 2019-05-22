@@ -170,8 +170,6 @@ export default function request (url, option) {
   }
   // console.log(newOptions)
   try {
-    caches.open('test').then((cache) => {})
-
     let r = $.when(
       $.ajax({
         ...newOptions,

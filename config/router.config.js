@@ -258,6 +258,11 @@ export default [
             mini: 'MS',
             component: './Development/Masonry',
           },
+          {
+            path: '/development/fixSelect',
+            name: 'Select',
+            component: './Development/FixSelect',
+          },
         ],
       },
       //

@@ -9,14 +9,14 @@ class GridButton extends PureComponent {
   }
 
   render () {
-    const { Icon } = this.props
+    const { Icon, color = 'primary' } = this.props
     return (
       <Button
         size='sm'
         onClick={this.handleClick}
         justIcon
         round
-        color='primary'
+        color={color}
         // style={{ marginRight: 5 }}
       >
         {Icon}

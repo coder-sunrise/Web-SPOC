@@ -1,4 +1,14 @@
+import localforage from 'localforage'
+import moment from 'moment'
 import request from './request'
+
+localforage.config({
+  driver: localforage.INDEXEDDB,
+  name: 'SEMR2Web',
+  storeName: 'Codetable',
+})
+
+const _dateFormat = 'DD-MM-YYYY HH:mm:ss'
 
 const paymentMethods = [
   { name: 'Cash', value: 'cash' },
@@ -490,18 +500,81 @@ const addressTypes = [
   { label: 'Primary Address', value: '2' },
 ]
 const localCodes = {}
-export async function getCodes (code) {
-  if (!localCodes[code]) {
-    const r = await request(`/api/CodeTable?ctnames=${code}`)
-    if (r.status === '200') {
-      // console.log(r)
-      localCodes[code] = r.data[code] || []
-    } else {
-      localCodes[code] = []
-    }
+
+const existInLocal = async (CTName) => {
+  const keys = await localforage.keys().then((key) => key)
+  return keys.includes(CTName)
+}
+
+/**
+ * save codetable to IndexedDB , returning a promise.
+ *
+ * @param  {string} CTName   The codetable name, as key in IndexedDB
+ * @param  {object} ctValue  The codetable value { value: [ ], timestamp: ''}
+ * @return {bool} isSavedSuccess A boolean flag indicating save success or not
+ */
+const saveCodetable = async (CTName, codetableValue) => {
+  let success = false
+  const exist = await existInLocal(CTName)
+  // TODO: compare timestamp
+
+  if (!exist) {
+    // not exist then save
+    success = await localforage
+      .setItem(CTName, codetableValue)
+      .then(() => {
+        return true
+      })
+      .catch((error) => {
+        console.log('Save codetable error', error)
+        return false
+      })
   }
-  // console.log(localCodes[code])
-  return localCodes[code]
+  return success
+}
+
+export async function getCodes (code) {
+  // check with IndexedDB,
+  // if exist no need to make request call
+  const exist = await existInLocal(code)
+  if (exist) {
+    const returnVal = await localforage
+      .getItem(code)
+      .then((item) => {
+        if (item.value) return item.value
+        return item
+      })
+      .catch((error) => {
+        console.log(`retrieve item error: ${error}`)
+      })
+
+    return returnVal
+  }
+
+  console.log(`${code} not exist, making Codetable request call`)
+
+  const response = await request(`/api/CodeTable?ctnames=${code}`)
+  if (response && response.status === '200') {
+    // save to IndexedDB
+    const codetable = {
+      value: response.data[code],
+      timestamp: moment().format(_dateFormat),
+    }
+    const saveSuccess = await saveCodetable(code, codetable)
+    return saveSuccess ? response.data[code] : []
+  }
+  return []
+
+  // if (!localCodes[code]) {
+  //   const r = await request(`/api/CodeTable?ctnames=${code}`)
+  //   if (r.status === '200') {
+  //     // console.log(r)
+  //     localCodes[code] = r.data[code] || []
+  //   } else {
+  //     localCodes[code] = []
+  //   }
+  // }
+  // return localCodes[code]
 }
 
 module.exports = {
