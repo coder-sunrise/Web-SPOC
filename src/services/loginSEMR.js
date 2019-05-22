@@ -17,9 +17,9 @@ const FORM_DATA = {
 }
 
 export async function login (credential) {
-  //const getTokenURL = 'http://dev01.cloudplus.com.sg:6001/connect/token'
-  const getTokenURL = 'https://semr2dev2010.emr.com.sg/connect/token'
-  
+  const getTokenURL = 'http://dev01.cloudplus.com.sg:6001/connect/token'
+  // const getTokenURL = 'http://semr2dev2010.emr.com.sg/connect/token'
+  //
   const requestBody = {
     ...FORM_DATA,
     ...credential,

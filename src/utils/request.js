@@ -6,8 +6,8 @@ import queryString from 'query-string'
 import $ from 'jquery'
 import { isAntdPro } from './utils'
 
-//const baseUrl = 'http://dev01.cloudplus.com.sg:6001'
-const baseUrl = 'https://semr2dev2010.emr.com.sg'
+const baseUrl = 'http://dev01.cloudplus.com.sg:6001'
+// const baseUrl = 'http://semr2dev2010.emr.com.sg'
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
