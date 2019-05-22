@@ -520,7 +520,9 @@ class BasicLayout extends React.PureComponent {
               {(params) => (
                 <Context.Provider value={this.getContext()}>
                   <ErrorBoundary>
-                    <div className={cx(params)}>{layout}</div>
+                    {!global.fullscreen && (
+                      <div className={cx(params)}>{layout}</div>
+                    )}
                     <GlobalModalContainer {...props} />
                   </ErrorBoundary>
                 </Context.Provider>

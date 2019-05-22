@@ -40,7 +40,7 @@ const menus = [
       md: 'pt',
       cmt: 'ec',
     },
-    component: Allergies,
+    component: EmergencyContact,
   },
   {
     name: 'Allergies',
@@ -48,7 +48,7 @@ const menus = [
       md: 'pt',
       cmt: 'mi',
     },
-    component: EmergencyContact,
+    component: Allergies,
   },
   {
     name: 'Schemes',
@@ -185,11 +185,17 @@ class PatientDetail extends PureComponent {
               >
                 <MenuList>
                   {menus.map((o) => (
-                    <Link key={o.name} to={getAppendUrl(o.url)} {...linkProps}>
+                    <Link
+                      key={o.name}
+                      onClick={(e) => (!currentId ? e.preventDefault() : true)}
+                      to={getAppendUrl(o.url)}
+                      {...linkProps}
+                    >
                       <MenuItem
                         key={o.name}
                         className={classes.menuItem}
                         selected={currentMenu.name === o.name}
+                        disabled={!currentId}
                         onClick={(e) => {
                           onMenuClick(e, o)
                         }}
@@ -205,7 +211,13 @@ class PatientDetail extends PureComponent {
         </GridItem>
         <GridItem xs={12} sm={12} md={10}>
           <div
-            style={height > 0 ? { height: height - 20, overflow: 'auto' } : {}}
+            style={
+              height > 0 ? (
+                { height: height - 20, overflow: 'auto', padding: '0 2px' }
+              ) : (
+                { padding: '0 2px' }
+              )
+            }
           >
             {/* <CurrentComponent {...resetProps} /> */}
             {menus.map((o) => {

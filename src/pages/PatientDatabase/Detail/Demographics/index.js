@@ -48,6 +48,7 @@ import { titles, finTypes, gender } from '@/utils/codes'
 import { standardRowHeight } from 'mui-pro-jss'
 // import model from '../models/demographic'
 import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 import Address from './Address'
 
 // window.g_app.replaceModel(model)
@@ -56,23 +57,8 @@ const styles = () => ({
     lineHeight: standardRowHeight,
     textAlign: 'right',
   },
-  collectPaymentBtn: { float: 'right', marginTop: '22px', marginRight: '10px' },
 })
-const setCurrentPatient = (props, setValues, cb) => {
-  // eslint-disable-next-line no-undef
-  props
-    .dispatch({
-      type: 'patient/query',
-      payload: {
-        id: props.patient.currentId,
-      },
-    })
-    .then((value) => {
-      // console.log(value)
-      setValues(value)
-      if (cb) cb()
-    })
-}
+
 @connect(({ patient }) => ({
   patient,
 }))
@@ -98,54 +84,14 @@ const setCurrentPatient = (props, setValues, cb) => {
     }),
   }),
 
-  handleSubmit: (values, component) => {
-    const { props, setValues } = component
-    // console.log(values)
-    // return
-    props
-      .dispatch({
-        type: 'patient/upsert',
-        payload: values,
-      })
-      .then((r) => {
-        // console.log(r)
-        // console.debug(123)
-        if (r) {
-          notification.success({
-            // duration:0,
-            message: r.id ? 'Created' : 'Saved',
-          })
-
-          if (r.id) {
-            props.history.push(
-              getRemovedUrl(
-                [
-                  'new',
-                ],
-                getAppendUrl({
-                  pid: r.id,
-                }),
-              ),
-            )
-          } else {
-            setCurrentPatient(props, setValues)
-          }
-
-          //  else {
-          //   setCurrentPatient(props, setValues)
-          // }
-
-          if (props.onConfirm) props.onConfirm()
-        }
-      })
-  },
+  handleSubmit,
   displayName: 'Demographic',
 })
 class Demographic extends PureComponent {
   state = {}
 
   componentDidMount () {
-    // const { props, value } = this
+    const { props, value } = this
 
     // if (props.patient.currentId) {
     //   setCurrentPatient(props, props.setValues, () => {
@@ -157,8 +103,12 @@ class Demographic extends PureComponent {
     //   props.setValues(props.demographic.default)
     // }
     console.log('c Demographic')
-    // console.log(props.patient.entity)
+    console.log(props.patient.entity)
     // props.setValues(props.patient.entity)
+  }
+
+  componentDidUpdate = (prevProps) => {
+    componentDidUpdate(this.props, prevProps)
   }
 
   isValidDate = (current) => {
@@ -168,7 +118,7 @@ class Demographic extends PureComponent {
 
   addAddress = () => {
     this.arrayHelpers.push({
-      id: getUniqueGUID(),
+      // id: getUniqueGUID(),
       contactFk: this.props.values.contact.id,
       line1: '',
       line2: '',
@@ -187,10 +137,6 @@ class Demographic extends PureComponent {
     // console.log(this.props)
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
-    if (patient.entity && values.id !== patient.entity.id) {
-      setValues(patient.entity)
-    }
-    // console.log(values)
     return (
       <CardContainer title='Demographic'>
         <GridContainer gutter={0}>
@@ -462,42 +408,22 @@ class Demographic extends PureComponent {
             )
           }}
         />
-
-        <div
-          style={{
-            position: 'relative',
-            textAlign: 'center',
-            marginTop: theme.spacing.unit,
-          }}
-        >
-          {values &&
-          values.id && (
+        {getFooter({
+          ...props,
+          extraBtn: (
             <Button
               // className={classes.modalCloseButton}
-              key='reset'
+              key='addAddress'
               aria-label='Reset'
-              color='danger'
-              onClick={this.onReset}
-              style={{ left: 0, position: 'absolute' }}
+              color='primary'
+              onClick={this.addAddress}
+              style={{ right: 0, position: 'absolute' }}
             >
-              <Clear />
-              Reset
+              <Add />
+              Add Address
             </Button>
-          )}
-
-          <ProgressButton onClick={props.handleSubmit} />
-          <Button
-            // className={classes.modalCloseButton}
-            key='addAddress'
-            aria-label='Reset'
-            color='primary'
-            onClick={this.addAddress}
-            style={{ right: 0, position: 'absolute' }}
-          >
-            <Add />
-            Add Address
-          </Button>
-        </div>
+          ),
+        })}
       </CardContainer>
     )
   }

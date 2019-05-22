@@ -60,30 +60,19 @@ class DatePicker extends PureComponent {
         openCalendar,
       )
     }
-    const _onBlur = (_props, openCalendar, closeCalendar) => (e) => {
-      if (!_props.value) return
 
-      let v = e.currentTarget.value
-      if (moment(v, _dateFormat, true).isValid()) {
-        if (!isValidDate(moment(e.currentTarget.value, _dateFormat))) {
-          this.onChange(_props.value)
-        }
-      } else {
-        this.onChange(_props.value)
-      }
-    }
     const _onChange = (_props, openCalendar, closeCalendar) => (e) => {
       // console.log(e)
-      if (e.currentTarget.value.length > _dateFormat.length) return false
+      if (e.target.value.length > _dateFormat.length) return false
       this.setState({
-        displayValue: e.currentTarget.value,
+        displayValue: e.target.value,
       })
-      if (moment(e.currentTarget.value, _dateFormat, true).isValid()) {
-        if (isValidDate(moment(e.currentTarget.value, _dateFormat))) {
+      if (moment(e.target.value, _dateFormat, true).isValid()) {
+        if (isValidDate(moment(e.target.value, _dateFormat))) {
           _props.onChange({
-            target: { value: e.currentTarget.value },
+            target: { value: e.target.value },
           })
-          this.onChange(e.currentTarget.value)
+          this.onChange(e.target.value)
         }
       }
 
@@ -100,6 +89,23 @@ class DatePicker extends PureComponent {
           _props.onChange({ target: { value: '' } })
         },
       )
+    }
+    const _onBlur = (_props, openCalendar, closeCalendar) => (e) => {
+      let v = e.target.value
+      // console.log(v)
+      if (!_props.value && !v) {
+        return
+      }
+
+      if (moment(v, _dateFormat, true).isValid()) {
+        if (!isValidDate(moment(e.target.value, _dateFormat))) {
+          this.onChange(_props.value)
+        }
+      } else if (_props.value) {
+        this.onChange(_props.value)
+      } else {
+        _onClear(_props, openCalendar, closeCalendar)()
+      }
     }
     this.renderInput = (realTimeProps) => (
       _props,

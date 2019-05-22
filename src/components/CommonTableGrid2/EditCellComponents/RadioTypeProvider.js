@@ -1,22 +1,23 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { FastField } from 'formik'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Radio } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import debounce from 'lodash/debounce'
-import {
-  TextField,
-  TextTypeProvider as TextTypeProviderOrg,
-} from '@/components'
+
+// import {
+//   TextField,
+//   TextTypeProvider as TextTypeProviderOrg,
+// } from '@/components'
 
 const styles = (theme) => ({})
 
-const TextEditorBase = React.memo(
+const RadioEditorBase = React.memo(
   (props) => {
     const {
       column: { name: columnName },
       value,
-      onValueChange,
+      onValueChange = (f) => f,
       columnExtensions,
       classes,
       config = {},
@@ -28,34 +29,37 @@ const TextEditorBase = React.memo(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
     // console.log(cfg)
-    const { errors = [], ...restConfig } = cfg
+    const {
+      errors = [],
+      onRadioChange,
+      checkedValue = true,
+      uncheckedValue = false,
+      ...restConfig
+    } = cfg
     const error = errors.find((o) => o.index === row.rowIndex) || {}
     const submitValue = (e) => {
-      // console.log(e.target.value, value)
       if (value !== e.target.value) onValueChange(e.target.value)
     }
-    return (
-      <TextField
-        showErrorIcon
-        noWrapper
-        defaultValue={value}
-        onBlur={submitValue}
-        onCommit={submitValue}
-        // onChange={debounce(submitValue, 2000)}
-        error={error.error}
-        {...restConfig}
+    return row.id ? (
+      <Radio
+        value={value}
+        checked={row[columnName] === checkedValue}
+        onChange={(e, checked) => {
+          console.log(e.target, checked)
+          onRadioChange(row, e.target, checked)
+          onValueChange(checked ? checkedValue : uncheckedValue)
+        }}
       />
-    )
+    ) : null
   },
   (prevProps, nextProps) => {
-    // prevProps === nextProps || prevProps.value === nextProps.value
-    return true
+    prevProps === nextProps || prevProps.value === nextProps.value
   },
 )
 
-export const TextEditor = withStyles(styles)(TextEditorBase)
+export const RadioEditor = withStyles(styles)(RadioEditorBase)
 
-class TextTypeProvider extends PureComponent {
+class RadioTypeProvider extends PureComponent {
   static propTypes = {
     for: PropTypes.array.isRequired,
     columnExtensions: PropTypes.array,
@@ -63,8 +67,8 @@ class TextTypeProvider extends PureComponent {
 
   constructor (props) {
     super(props)
-    this.TextEditor = (columns) => (editorProps) => {
-      return <TextEditor columnExtensions={columns} {...editorProps} />
+    this.RadioEditor = (columns) => (editorProps) => {
+      return <RadioEditor columnExtensions={columns} {...editorProps} />
     }
   }
 
@@ -79,21 +83,20 @@ class TextTypeProvider extends PureComponent {
       .filter(
         (o) =>
           [
-            'number',
-            'select',
-            'date',
-          ].indexOf(o.type) < 0,
+            'radio',
+          ].indexOf(o.type) >= 0,
       )
       .map((o) => o.columnName)
     // console.log(columns)
     return (
-      <TextTypeProviderOrg
+      <DataTypeProvider
         for={columns}
-        editorComponent={this.TextEditor(columnExtensions)}
+        editorComponent={this.RadioEditor(columnExtensions)}
+        formatterComponent={this.RadioEditor(columnExtensions)}
         {...this.props}
       />
     )
   }
 }
 
-export default TextTypeProvider
+export default RadioTypeProvider

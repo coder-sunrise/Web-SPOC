@@ -39,7 +39,7 @@ const styles = (theme) => ({
 })
 class FilterBar extends PureComponent {
   render () {
-    const { classes } = this.props
+    const { classes, disableAdd } = this.props
 
     return (
       <div className={classes.filterBar}>
@@ -102,22 +102,24 @@ class FilterBar extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={() => {
-                  this.props.history.push(
-                    getAppendUrl({
-                      md: 'pt',
-                      cmt: 'dmgp',
-                      new: 1,
-                    }),
-                  )
-                }}
-              >
-                <PermIdentity />
-                New Patient
-              </Button>
+              {!disableAdd && (
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={() => {
+                    this.props.history.push(
+                      getAppendUrl({
+                        md: 'pt',
+                        cmt: 'dmgp',
+                        new: 1,
+                      }),
+                    )
+                  }}
+                >
+                  <PermIdentity />
+                  New Patient
+                </Button>
+              )}
             </div>
           </GridItem>
         </GridContainer>

@@ -6,8 +6,9 @@ import queryString from 'query-string'
 import $ from 'jquery'
 import { isAntdPro } from './utils'
 
-const baseUrl = 'http://dev01.cloudplus.com.sg:6001'
-// const baseUrl = 'http://semr2dev2010.emr.com.sg'
+// const baseUrl = 'http://localhost:55314'
+// export const baseUrl = 'http://localhost:55314'
+export const baseUrl = 'http://semr2dev2010.emr.com.sg'
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -43,6 +44,7 @@ const checkStatus = async (response) => {
     isJson = true
   } catch (error) {}
   const errortext = returnObj.title || returnObj.message
+  notification.destroy()
   notification.error({
     message: (
       <div>
@@ -134,26 +136,26 @@ export default function request (url, option) {
     // }
   }
 
-  const expirys = options.expirys && 60
-  // options.expirys !== false, return the cache,
-  if (options.expirys !== false) {
-    console.log('options.expirys', options)
-    const cached = sessionStorage.getItem(hashcode)
-    const whenCached = sessionStorage.getItem(`${hashcode}:timestamp`)
-    if (cached !== null && whenCached !== null) {
-      const age = (Date.now() - whenCached) / 1000
-      if (age < expirys) {
-        const response = new Response(
-          new Blob([
-            cached,
-          ]),
-        )
-        return response.json()
-      }
-      sessionStorage.removeItem(hashcode)
-      sessionStorage.removeItem(`${hashcode}:timestamp`)
-    }
-  }
+  // const expirys = options.expirys && 60
+  // // options.expirys !== false, return the cache,
+  // if (options.expirys !== false) {
+  //   console.log('options.expirys', options)
+  //   const cached = sessionStorage.getItem(hashcode)
+  //   const whenCached = sessionStorage.getItem(`${hashcode}:timestamp`)
+  //   if (cached !== null && whenCached !== null) {
+  //     const age = (Date.now() - whenCached) / 1000
+  //     if (age < expirys) {
+  //       const response = new Response(
+  //         new Blob([
+  //           cached,
+  //         ]),
+  //       )
+  //       return response.json()
+  //     }
+  //     sessionStorage.removeItem(hashcode)
+  //     sessionStorage.removeItem(`${hashcode}:timestamp`)
+  //   }
+  // }
   // const isProd = process.env.NODE_ENV === 'production'
   // if (isProd) url = `/prod${url}`
   if (options.uat) console.log(url)
@@ -248,6 +250,7 @@ export default function request (url, option) {
             } catch (error) {}
             const errortext =
               returnObj.title || returnObj.message || returnObj.statusText
+            notification.destroy()
             notification.error({
               message: (
                 <div>

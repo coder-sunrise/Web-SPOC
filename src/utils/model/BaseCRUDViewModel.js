@@ -6,7 +6,7 @@ import {
   decrypt,
 } from 'medisys-util'
 import update from 'immutability-helper'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueGUID } from '@/utils/utils'
 
 const { prefix, openPages } = cfg
 
@@ -71,7 +71,7 @@ export default class BaseCRUDViewModel {
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {
-        // console.log(namespace, queryFnName, payload)
+        console.log(namespace, queryFnName, payload)
         if (!service || !service[queryFnName]) return
         let filter = yield select((st) => st[namespace].filter)
         let exclude = yield select((st) => st[namespace].exclude)
@@ -186,7 +186,7 @@ export default class BaseCRUDViewModel {
               items: {
                 $unshift: payload.map((o) => {
                   return {
-                    id: getUniqueId(),
+                    id: getUniqueGUID(),
                     ...o,
                   }
                 }),

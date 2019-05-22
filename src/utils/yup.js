@@ -112,6 +112,42 @@ Yup.date = () => {
   return r
 }
 
+// const orgShape = Yup.object().shape
+// console.log(orgShape)
+// Yup.object().shape = () => {
+//   const r = orgShape().transform((value, originalValue) => {
+//     console.log(value, originalValue)
+//     // if (this.isType(value)) return value
+//     // // the default coercion transform failed so lets try it with Moment instead
+//     // value = Moment(originalValue, parseFormats)
+//     // if (
+//     //   parseFormats.find(
+//     //     (format) =>
+//     //       Moment(originalValue, format).format(format) === originalValue,
+//     //   )
+//     // ) {
+//     //   return value.toDate()
+//     // }
+//     // return invalidDate
+//     return value
+//     // return value.isValid() ? value.toDate() : invalidDate
+//   })
+//   return r
+// }
+
+// ({
+//   salutationFk: Yup.string().required(),
+//   name: Yup.string().required(),
+// }),
+// validationSchema: Yup.object().shape({
+//   patientEmergencyContact: Yup.array().of(
+//     Yup.object().shape({
+//       salutationFk: Yup.string().required(),
+//       name: Yup.string().required(),
+//     }),
+//   ),
+// }),
+
 export default Yup
 
 // module.exports = Yup.date().transform(function (value, originalValue) {
