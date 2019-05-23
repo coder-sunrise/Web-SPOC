@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 import { connect } from 'dva'
 import { FastField, withFormik } from 'formik'
 import * as Yup from 'yup'
@@ -17,6 +18,7 @@ import {
   Danger,
   Transition,
   ProgressButton,
+  Select,
 } from '@/components'
 
 import loginPageStyle from '../../assets/jss/material-dashboard-pro-react/views/loginPageStyle'
@@ -36,11 +38,24 @@ const styles = (theme) => ({
     marginRight: 'auto',
     marginLeft: 'auto',
   },
+  body: {
+    marginBottom: '15px',
+  },
 })
 
 const cardAnimationDuration = 350
 
 const submitKey = 'loginSEMR/getToken'
+
+const APPLICATIONS = {
+  CMS: 'CMS',
+  EMR: 'EMR',
+}
+
+const optsApplication = [
+  { name: 'CMS', value: 'CMS' },
+  { name: 'EMR', value: 'EMR' },
+]
 
 const LoginSchema = Yup.object().shape({
   username: Yup.string().trim().required('Please enter Username'),
@@ -51,12 +66,13 @@ const LoginSchema = Yup.object().shape({
   mapPropsToValues: () => ({
     username: 'medisys',
     password: 'Medi$y$Innovati0n',
+    application: 'CMS',
   }),
   handleSubmit: (values, { props }) => {
-    const { username, password } = values
+    const { username, password, application } = values
     const { handleLogin } = props
 
-    handleLogin(username, password)
+    handleLogin(username, password, application)
   },
   validationSchema: LoginSchema,
 })
@@ -94,6 +110,10 @@ class LoginCard extends PureComponent {
     }
   }
 
+  handleApplicationChange = (name, value) => {
+    console.log('handleApplicationChange', name, value)
+  }
+
   onEnterPressed = () => {
     const { handleSubmit } = this.props
     handleSubmit()
@@ -105,7 +125,7 @@ class LoginCard extends PureComponent {
     const { cardAnimation } = this.state
 
     return (
-      <div className={classes.container}>
+      <div className={classnames(classes.container)}>
         <GridContainer justify='center'>
           <GridItem xs={12} sm={6} md={4}>
             <Card login className={classes[cardAnimation]}>
@@ -119,7 +139,7 @@ class LoginCard extends PureComponent {
                 </p>
               </CardHeader>
 
-              <CardBody>
+              <CardBody className={classnames(classes.body)}>
                 {isInvalidLogin && (
                   <Transition show={isInvalidLogin}>
                     <div style={{ textAlign: 'center' }}>
@@ -153,8 +173,19 @@ class LoginCard extends PureComponent {
                     />
                   )}
                 />
+                <FastField
+                  name='application'
+                  render={(args) => (
+                    <Select
+                      {...args}
+                      label='Application'
+                      options={optsApplication}
+                      allowClear={false}
+                    />
+                  )}
+                />
               </CardBody>
-              <CardFooter className={classes.justifyContentCenter}>
+              <CardFooter className={classnames(classes.justifyContentCenter)}>
                 <ProgressButton
                   submitKey={submitKey}
                   text='Enter'
@@ -174,4 +205,6 @@ class LoginCard extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(LoginCard)
+export default withStyles(styles, { withTheme: true, name: 'LoginCard' })(
+  LoginCard,
+)

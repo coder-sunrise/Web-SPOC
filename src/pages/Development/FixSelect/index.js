@@ -65,7 +65,7 @@ class FixSelect extends React.PureComponent {
 
   render () {
     const { showModal } = this.state
-
+    console.log('fixselect', this.props)
     return (
       <CommonHeader Icon={<Assignment />}>
         <GridContainer>

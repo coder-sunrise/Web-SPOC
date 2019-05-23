@@ -89,16 +89,16 @@ class AntDSelect extends React.PureComponent {
     options: PropTypes.array.isRequired,
     // conditionally required
     name: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
+      const { handleChange } = props
+      if (handleChange && props[propName] === undefined)
         return new Error(
           `prop { name } is REQUIRED for ${componentName} but not supplied`,
         )
       return ''
     },
     value: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
+      const { handleChange } = props
+      if (handleChange && props[propName] === undefined)
         return new Error(
           `prop ${propName} is REQUIRED for ${componentName} but not supplied`,
         )
@@ -108,7 +108,7 @@ class AntDSelect extends React.PureComponent {
     loading: PropTypes.bool,
     disabled: PropTypes.bool,
     multiple: PropTypes.bool,
-    onChange: PropTypes.func,
+    handleChange: PropTypes.func,
     label: PropTypes.string,
     labelField: PropTypes.string,
     valueField: PropTypes.string,
@@ -130,14 +130,15 @@ class AntDSelect extends React.PureComponent {
   }
 
   handleValueChange = (value) => {
-    const { form, field, onChange } = this.props
+    console.log('handlevaluechange', value)
+    const { form, field, handleChange } = this.props
     if (form && field) {
       form.setFieldValue(field.name, value)
     }
 
-    if (onChange) {
+    if (handleChange) {
       const { name } = this.props
-      onChange(name, value)
+      handleChange(name, value)
     }
   }
 

@@ -16,12 +16,12 @@ export default createFormViewModel({
     },
     subscriptions: {},
     effects: {
-      *getToken ({ payload }, { call, put }) {
-        const response = yield call(login, payload)
+      *getToken ({ credentialPayload, application }, { call, put }) {
+        const response = yield call(login, credentialPayload)
 
         return yield put({
           type: 'updateLoginStatus',
-          payload: response,
+          payload: { ...response, application },
         })
       },
     },
@@ -29,8 +29,9 @@ export default createFormViewModel({
       updateLoginStatus (state, { payload }) {
         const isInvalidLogin = payload.status !== 200
         if (!isInvalidLogin) {
-          const { data } = payload
-          sessionStorage.setItem('token', data.access_token)
+          const { data, application } = payload
+          localStorage.setItem('token', data.access_token)
+          localStorage.setItem('application', application)
         }
 
         return { ...state, isInvalidLogin }
