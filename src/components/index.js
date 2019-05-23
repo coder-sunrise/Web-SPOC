@@ -26,6 +26,8 @@ export EditableTableGrid from './CommonTableGrid/EditableTableGrid'
 export EditableTableGrid2 from './CommonTableGrid2/EditableTableGrid'
 export NumberTypeProvider2 from './CommonTableGrid2/EditCellComponents/NumberTypeProvider'
 
+export AntdInput from './Antd/AntdInput'
+
 export SimpleAlert from './SimpleAlert'
 export SimpleModal from './SimpleModal'
 export confirm from './SimpleModal/confirm'

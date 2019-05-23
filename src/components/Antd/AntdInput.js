@@ -5,9 +5,13 @@ import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import RemoveCircle from '@material-ui/icons/RemoveCircle'
 // ant
-import { Select, Form } from 'antd'
-import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
+import { Input, Select } from 'antd'
+import { extendFunc, currencyFormat } from '@/utils/utils'
 
+import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
+import AntdWrapper from './AntdWrapper'
+
+const Option = Select.Option
 const STYLES = (theme) => {
   return {
     ...inputStyle(theme),
@@ -82,10 +86,8 @@ const STYLES = (theme) => {
   }
 }
 
-class AntDSelect extends React.PureComponent {
+class AntdInput extends React.PureComponent {
   static propTypes = {
-    // required props
-    options: PropTypes.array.isRequired,
     // conditionally required
     name: (props, propName, componentName) => {
       const { onChange } = props
@@ -106,7 +108,6 @@ class AntDSelect extends React.PureComponent {
     // optional props
     loading: PropTypes.bool,
     disabled: PropTypes.bool,
-    multiple: PropTypes.bool,
     onChange: PropTypes.func,
     label: PropTypes.string,
     size: PropTypes.string,
@@ -115,7 +116,6 @@ class AntDSelect extends React.PureComponent {
   static defaultProps = {
     label: 'Select',
     loading: false,
-    multiple: false,
     disabled: false,
     size: 'default',
   }
@@ -157,63 +157,30 @@ class AntDSelect extends React.PureComponent {
       value,
       loading,
       size,
+      children,
       ...restProps
     } = this.props
 
-    const selectValue = form && field ? field.value : value
-    let shouldShrink = shrink || !!selectValue
-
-    if (multiple) {
-      if (selectValue) shouldShrink = shrink || selectValue.length !== 0
-      else shouldShrink = shrink
-    }
-
-    const labelClass = {
-      [classes.label]: true,
-      [classes.labelAnimation]: true,
-      [classes.labelShrink]: shouldShrink,
-      [classes.labelFocused]: shrink,
-    }
-
     return (
-      <Form layout='vertical' className={classnames(classes.control)}>
-        <Form.Item label={label} className={classnames(labelClass)}>
-          <Select
-            className={classnames(classes.selectContainer)}
-            allowClear
-            showSearch
-            clearIcon={
-              <RemoveCircle
-                className={classnames(classes.clearButton)}
-                fontSize='small'
-                color='error'
-              />
-            }
-            size={size}
-            disabled={disabled}
-            onFocus={this.handleFocus}
-            onBlur={this.handleBlur}
-            loading={loading}
-            mode={multiple ? 'multiple' : 'default'}
-            value={selectValue}
-            onChange={this.handleValueChange}
-            {...restProps}
-          >
-            {options.map((option) => (
-              <Select.Option
-                key={option.value}
-                title={option.name}
-                value={option.value}
-                disabled={!!options.disabled}
-              >
-                {option.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-      </Form>
+      <AntdWrapper {...this.props}>
+        <Select
+          defaultValue='lucy'
+          style={{ width: 120 }}
+          onChange={(e) => {
+            console.log(e)
+          }}
+          {...restProps}
+        >
+          <Option value='jack'>Jack</Option>
+          <Option value='lucy'>Lucy</Option>
+          <Option value='disabled' disabled>
+            Disabled
+          </Option>
+          <Option value='Yiminghe'>yiminghe</Option>
+        </Select>
+      </AntdWrapper>
     )
   }
 }
 
-export default withStyles(STYLES, { name: 'AntDesignSelect' })(AntDSelect)
+export default withStyles(STYLES, { name: 'AntdInput' })(AntdInput)

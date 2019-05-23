@@ -32,8 +32,15 @@ const plugins = [
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {
-              include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
-              exclude: ['@babel/runtime'],
+              include: [
+                'dva',
+                'dva/router',
+                'dva/saga',
+                'dva/fetch',
+              ],
+              exclude: [
+                '@babel/runtime',
+              ],
             },
             hardSource: true,
           }
@@ -67,7 +74,11 @@ export default {
   // Theme for antd
   // https://ant.design/docs/react/customize-theme-cn
   theme: {
-    'primary-color': defaultSettings.primaryColor,
+    'primary-color': '#9c27b0',
+    'font-family': 'Roboto, Helvetica, Arial, sans-serif',
+    'border-radius-base': '0px',
+    'border-radius-sm': '0px',
+    'component-background': 'transparent',
   },
   externals: {
     '@antv/data-set': 'DataSet',
@@ -100,8 +111,8 @@ export default {
         const antdProPath = match[1].replace('.less', '').replace('.scss', '')
         const arr = antdProPath
           .split('/')
-          .map(a => a.replace(/([A-Z])/g, '-$1'))
-          .map(a => a.toLowerCase())
+          .map((a) => a.replace(/([A-Z])/g, '-$1'))
+          .map((a) => a.toLowerCase())
         return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-')
       }
       return localName

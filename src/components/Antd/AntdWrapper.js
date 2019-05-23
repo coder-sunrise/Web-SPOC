@@ -7,6 +7,7 @@ import RemoveCircle from '@material-ui/icons/RemoveCircle'
 // ant
 import { Select, Form } from 'antd'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
+import { extendFunc, currencyFormat } from '@/utils/utils'
 
 const STYLES = (theme) => {
   return {
@@ -122,18 +123,14 @@ class AntDSelect extends React.PureComponent {
 
   state = {
     shrink: false,
+    value: '',
   }
 
-  handleValueChange = (value) => {
-    const { form, field, onChange } = this.props
-    if (form && field) {
-      form.setFieldValue(field.name, value === undefined ? '' : value)
-    }
-
-    if (onChange) {
-      const { name } = this.props
-      onChange(name, value)
-    }
+  handleValueChange = (e) => {
+    console.log(e)
+    this.setState({
+      value: e.target.value,
+    })
   }
 
   handleFocus = () => {
@@ -148,25 +145,20 @@ class AntDSelect extends React.PureComponent {
     const { shrink } = this.state
     const {
       classes,
-      disabled,
+      // disabled,
       form,
       field,
       label,
-      multiple,
-      options,
-      value,
-      loading,
-      size,
+      // multiple,
+      // options,
+      // loading,
+      // size,
+      children,
+      onChange,
       ...restProps
     } = this.props
 
-    const selectValue = form && field ? field.value : value
-    let shouldShrink = shrink || !!selectValue
-
-    if (multiple) {
-      if (selectValue) shouldShrink = shrink || selectValue.length !== 0
-      else shouldShrink = shrink
-    }
+    let shouldShrink = shrink || !!this.state.value
 
     const labelClass = {
       [classes.label]: true,
@@ -178,38 +170,10 @@ class AntDSelect extends React.PureComponent {
     return (
       <Form layout='vertical' className={classnames(classes.control)}>
         <Form.Item label={label} className={classnames(labelClass)}>
-          <Select
-            className={classnames(classes.selectContainer)}
-            allowClear
-            showSearch
-            clearIcon={
-              <RemoveCircle
-                className={classnames(classes.clearButton)}
-                fontSize='small'
-                color='error'
-              />
-            }
-            size={size}
-            disabled={disabled}
-            onFocus={this.handleFocus}
-            onBlur={this.handleBlur}
-            loading={loading}
-            mode={multiple ? 'multiple' : 'default'}
-            value={selectValue}
-            onChange={this.handleValueChange}
-            {...restProps}
-          >
-            {options.map((option) => (
-              <Select.Option
-                key={option.value}
-                title={option.name}
-                value={option.value}
-                disabled={!!options.disabled}
-              >
-                {option.name}
-              </Select.Option>
-            ))}
-          </Select>
+          {React.cloneElement(children, {
+            onChange: extendFunc(this.handleValueChange, onChange),
+            ...restProps,
+          })}
         </Form.Item>
       </Form>
     )

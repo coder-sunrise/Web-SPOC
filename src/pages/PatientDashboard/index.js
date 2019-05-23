@@ -12,18 +12,22 @@ import {
   CardAvatar,
   CardBody,
   Transition,
+  TextField,
+  AntdInput,
 } from '@/components'
-import { Icon, Input, AutoComplete } from 'antd'
+import { Icon, Input, AutoComplete, Form } from 'antd'
 
 import avatar from '@/assets/img/faces/marc.jpg'
 import { getAppendUrl } from '@/utils/utils'
 
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
+import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 
 import Banner from './Banner'
 
 const styles = (theme) => ({
+  ...inputStyle(theme),
   hide: {
     display: 'none',
   },
@@ -105,12 +109,24 @@ class PatientDashboard extends PureComponent {
     const { patientDashboard, global, history } = resetProps
     if (!patientDashboard) return null
     const { currentComponent, currentId } = patientDashboard
-
+    // const labelClass = {
+    //   [classes.label]: true,
+    //   [classes.labelAnimation]: true,
+    //   [classes.labelShrink]: shouldShrink,
+    //   [classes.labelFocused]: shrink,
+    // }
     return (
       <div>
         <Banner />
         <Divider light />
         <AutoComplete dataSource={dataSource} />
+        <Input placeholder='Basic usage' />
+        <TextField label='Basic usage' />
+        <AntdInput label='Basic usage' />
+
+        <Form.Item label='E-mail'>
+          <Input />
+        </Form.Item>
       </div>
       // <GridContainer>
       //   <GridItem xs={12} sm={12} md={2} style={{ paddingTop: 20 }}>
