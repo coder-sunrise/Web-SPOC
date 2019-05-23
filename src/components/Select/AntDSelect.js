@@ -3,12 +3,14 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
-import RemoveCircle from '@material-ui/icons/RemoveCircle'
 // ant
 import { Select, Form } from 'antd'
 
 const STYLES = (theme) => {
   return {
+    dropdownMenu: {
+      zIndex: 1310,
+    },
     container: {
       width: '100%',
     },
@@ -41,15 +43,21 @@ const STYLES = (theme) => {
         paddingTop: 3,
       },
     },
+    fixSelectContentHeight: {
+      '& > div': {
+        height: 31,
+      },
+    },
     label: {
+      marginBottom: '0 !important',
       '& .ant-form-item-label': {
         pointerEvents: 'none',
         position: 'absolute',
         top: 4,
         left: 5,
-        zIndex: 999,
+        zIndex: 20,
         paddingBottom: 0,
-        transform: 'translate(0, 28px) scale(1)',
+        transform: 'translate(0, 26px) scale(1)',
       },
       '& .ant-form-item-label > label': {
         color: 'rgba(0, 0, 0, 0.4)',
@@ -71,11 +79,6 @@ const STYLES = (theme) => {
       '& .ant-form-item-label': {
         transition: `color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms`,
       },
-    },
-    clearButton: {
-      position: 'absolute',
-      top: '-4px',
-      right: '-5px',
     },
   }
 }
@@ -107,11 +110,15 @@ class AntDSelect extends React.PureComponent {
     multiple: PropTypes.bool,
     onChange: PropTypes.func,
     label: PropTypes.string,
+    labelField: PropTypes.string,
+    valueField: PropTypes.string,
     size: PropTypes.string,
   }
 
   static defaultProps = {
     label: 'Select',
+    labelField: 'name',
+    valueField: 'value',
     loading: false,
     multiple: false,
     disabled: false,
@@ -132,21 +139,20 @@ class AntDSelect extends React.PureComponent {
       const { name } = this.props
       onChange(name, value)
     }
-
-    value === undefined && this.handleBlur()
   }
 
-  handleFocus = () => {
-    this.setState({ shrink: true })
+  handleVisibleChange = (status) => {
+    this.setState({ shrink: status })
   }
 
-  handleBlur = () => {
-    this.setState({ shrink: false })
-  }
+  handleFilter = (input, option) =>
+    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 
   render () {
     const { shrink } = this.state
     const {
+      labelField,
+      valueField,
       classes,
       disabled,
       form,
@@ -167,39 +173,42 @@ class AntDSelect extends React.PureComponent {
       if (selectValue) shouldShrink = shrink || selectValue.length !== 0
       else shouldShrink = shrink
     }
-    console.log('shoulshrink', shouldShrink)
-    const labelClass = {
+    const classForLabel = {
       [classes.label]: true,
       [classes.labelAnimation]: true,
       [classes.labelShrink]: shouldShrink,
       [classes.labelFocused]: shrink,
     }
+    const classForSelect = {
+      [classes.selectContainer]: true,
+      [classes.fixSelectContentHeight]: !multiple,
+    }
+
+    const newOptions = options.map((s) => ({
+      ...s,
+      value: s[valueField],
+      label: s[labelField],
+    }))
 
     return (
       <Form layout='vertical' className={classnames(classes.control)}>
-        <Form.Item label={label} className={classnames(labelClass)}>
+        <Form.Item label={label} className={classnames(classForLabel)}>
           <Select
-            className={classnames(classes.selectContainer)}
+            className={classnames(classForSelect)}
+            dropdownClassName={classnames(classes.dropdownMenu)}
             allowClear
             showSearch
-            // clearIcon={
-            //   <RemoveCircle
-            //     className={classnames(classes.clearButton)}
-            //     fontSize='small'
-            //     color='error'
-            //   />
-            // }
             size={size}
             disabled={disabled}
-            onFocus={this.handleFocus}
-            onBlur={this.handleBlur}
             loading={loading}
             mode={multiple ? 'multiple' : 'default'}
             value={selectValue}
+            onDropdownVisibleChange={this.handleVisibleChange}
+            filterOption={this.handleFilter}
             onChange={this.handleValueChange}
             {...restProps}
           >
-            {options.map((option) => (
+            {newOptions.map((option) => (
               <Select.Option
                 key={option.value}
                 title={option.name}

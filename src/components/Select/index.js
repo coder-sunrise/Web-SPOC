@@ -316,6 +316,7 @@ class CustomSelect extends React.Component {
       value: s[valueField],
       label: s[labelField],
     }))
+    console.log('select', { newOpts })
     // console.log(this.state.value, options, restProps)
     return (
       <CustomInput {...restProps} shrink={this.state.shrink}>

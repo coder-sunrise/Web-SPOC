@@ -7,6 +7,9 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import { DatePicker, Form } from 'antd'
 
 const styles = (theme) => ({
+  dropdownMenu: {
+    zIndex: 1310,
+  },
   container: {
     width: '100%',
   },
@@ -17,12 +20,13 @@ const styles = (theme) => ({
     },
   },
   label: {
+    marginBottom: '0 !important',
     '& .ant-form-item-label': {
       pointerEvents: 'none',
       position: 'absolute',
       top: 4,
       left: 0,
-      zIndex: 999,
+      zIndex: 1305,
       paddingBottom: 0,
       transform: 'translate(0, 27px) scale(1)',
     },
@@ -57,6 +61,7 @@ const styles = (theme) => ({
       borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
       paddingLeft: 0,
       fontSize: '1rem',
+      height: 31,
     },
   },
 })
@@ -102,7 +107,6 @@ class ANTRangePicker extends PureComponent {
   }
 
   handleValueChange = (date, dateString) => {
-    console.log({ date, dateString })
     const { form, field, onChange } = this.props
     if (form && field) {
       form.setFieldValue(field.name, dateString)
@@ -162,6 +166,7 @@ class ANTRangePicker extends PureComponent {
         <Form.Item label={label} className={classnames(labelClass)}>
           <DatePicker.RangePicker
             className={classnames(classes.datepickerContainer)}
+            dropdownClassName={classnames(classes.dropdownMenu)}
             allowClear
             disabled={disabled}
             size={size}

@@ -1,12 +1,30 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import moment from 'moment'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
 // ant design
 import { DatePicker, Form } from 'antd'
 
+const _dateFormat = 'YYYY-MM-DD'
+
+const _toMoment = (value) => {
+  if (!value) return value
+  try {
+    if (moment(value, _dateFormat).isValid()) return moment(value, _dateFormat)
+
+    return null
+  } catch (error) {
+    console.error(`Parse date to moment error ${error}`)
+    return null
+  }
+}
+
 const styles = (theme) => ({
+  dropdownMenu: {
+    zIndex: 1305,
+  },
   container: {
     width: '100%',
   },
@@ -17,12 +35,13 @@ const styles = (theme) => ({
     },
   },
   label: {
+    marginBottom: '0 !important',
     '& .ant-form-item-label': {
       pointerEvents: 'none',
       position: 'absolute',
       top: 4,
       left: 0,
-      zIndex: 999,
+      zIndex: 1305,
       paddingBottom: 0,
       transform: 'translate(0, 27px) scale(1)',
     },
@@ -57,6 +76,7 @@ const styles = (theme) => ({
       borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
       paddingLeft: 0,
       fontSize: '1rem',
+      height: 31,
     },
   },
 })
@@ -109,15 +129,10 @@ class ANTDatePicker extends PureComponent {
       const { name } = this.props
       onChange(name, dateString)
     }
-    dateString === '' && this.handleBlur()
   }
 
-  handleFocus = () => {
-    this.setState({ shrink: true })
-  }
-
-  handleBlur = () => {
-    this.setState({ shrink: false })
+  handleOpenChange = (status) => {
+    this.setState({ shrink: status })
   }
 
   render () {
@@ -139,7 +154,7 @@ class ANTDatePicker extends PureComponent {
     const labelClass = {
       [classes.label]: true,
       [classes.labelAnimation]: true,
-      [classes.labelShrink]: shrink || !!selectValue,
+      [classes.labelShrink]: shrink || !!_toMoment(selectValue),
       [classes.labelFocused]: shrink,
     }
 
@@ -148,14 +163,15 @@ class ANTDatePicker extends PureComponent {
         <Form.Item label={label} className={classnames(labelClass)}>
           <DatePicker
             className={classnames(classes.datepickerContainer)}
+            dropdownClassName={classnames(classes.dropdownMenu)}
             allowClear
             disabled={disabled}
             size={size}
             format={format}
             placeholder=''
+            value={_toMoment(selectValue)}
             onChange={this.handleValueChange}
-            onFocus={this.handleFocus}
-            onBlur={this.handleBlur}
+            onOpenChange={this.handleOpenChange}
             {...restDefaultProps}
           />
         </Form.Item>

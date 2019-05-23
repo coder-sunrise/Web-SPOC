@@ -4,16 +4,19 @@ import { FastField, withFormik } from 'formik'
 // material ui
 import { Assignment } from '@material-ui/icons'
 import {
+  Button,
   CommonHeader,
+  CommonModal,
   GridContainer,
   GridItem,
   Select,
   TextField,
-  ANTDSelect,
-  DatePicker,
+  // ANTDSelect,
+  // DatePicker,
+  DateRangePicker,
 } from '@/components'
-import ANTDatePicker from '@/components/DatePicker/ANTDatepicker'
-import ANTRangePicker from '@/components/DatePicker/ANTRangePicker'
+import CustomDatePicker from '@/components/DatePicker/ANTDatePicker'
+import { Select as ANTDSelect, DatePicker as ANTDatePicker } from 'antd'
 
 const options = [
   { name: 'test', value: 'test' },
@@ -45,10 +48,24 @@ const antDOptions = [
   { name: 'Indo', value: 'indo' },
 ]
 
-@withFormik({ mapPropsToValues: () => ({}) })
+@withFormik({
+  mapPropsToValues: () => ({
+    TestDatePicker2: '20192205',
+  }),
+})
 class FixSelect extends React.PureComponent {
+  state = {
+    showModal: false,
+  }
+
+  toggleModal = () => {
+    const { showModal } = this.state
+    this.setState({ showModal: !showModal })
+  }
+
   render () {
-    console.log('fixselect', this.props)
+    const { showModal } = this.state
+
     return (
       <CommonHeader Icon={<Assignment />}>
         <GridContainer>
@@ -58,20 +75,19 @@ class FixSelect extends React.PureComponent {
               render={(args) => <TextField {...args} label='Test1' />}
             />
           </GridItem>
-
           <GridItem xs md={2}>
             <FastField
-              name='Test2'
+              name='TestSelect'
               render={(args) => (
-                <ANTDSelect {...args} options={antDOptions} label='Test2' />
+                <Select {...args} options={antDOptions} label='Test Select' />
               )}
             />
           </GridItem>
           <GridItem xs md={4}>
             <FastField
-              name='TestMultiple'
+              name='multipleNation'
               render={(args) => (
-                <ANTDSelect
+                <Select
                   {...args}
                   options={antDOptions}
                   multiple
@@ -83,11 +99,16 @@ class FixSelect extends React.PureComponent {
         </GridContainer>
 
         <GridContainer>
+          <GridItem>
+            <Button color='primary' onClick={this.toggleModal}>
+              Open Modal
+            </Button>
+          </GridItem>
           <GridItem xs md={2}>
             <FastField
               name='TestDatePicker'
               render={(args) => (
-                <ANTDatePicker {...args} label='Test DatePicker' />
+                <CustomDatePicker {...args} label='Test DatePicker' />
               )}
             />
           </GridItem>
@@ -95,7 +116,7 @@ class FixSelect extends React.PureComponent {
             <FastField
               name='TestDateRange'
               render={(args) => (
-                <ANTRangePicker {...args} label='Range Picker' />
+                <DateRangePicker {...args} label='Range Picker' />
               )}
             />
           </GridItem>
@@ -103,11 +124,57 @@ class FixSelect extends React.PureComponent {
             <FastField
               name='CurrentDatePicker'
               render={(args) => (
-                <DatePicker {...args} label='Current Date Picker' />
+                <CustomDatePicker {...args} label='Current Date Picker' />
               )}
             />
           </GridItem>
+          <GridItem>
+            <ANTDatePicker />
+          </GridItem>
         </GridContainer>
+        <CommonModal
+          open={showModal}
+          title='Test Select'
+          bodyNoPadding
+          onClose={this.toggleModal}
+        >
+          <GridContainer>
+            <GridItem xs md={2}>
+              <FastField
+                name='Test2'
+                render={(args) => (
+                  <Select {...args} options={antDOptions} label='Test2' />
+                )}
+              />
+            </GridItem>
+
+            <GridItem xs md={2}>
+              <FastField
+                name='TestDatePicker2'
+                render={(args) => (
+                  <CustomDatePicker {...args} label='Test DatePicker' />
+                )}
+              />
+            </GridItem>
+            <GridItem>
+              <ANTDatePicker />
+            </GridItem>
+
+            <GridItem xs md={4}>
+              <FastField
+                name='TestMultiple'
+                render={(args) => (
+                  <Select
+                    {...args}
+                    options={antDOptions}
+                    multiple
+                    label='Multiple select'
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+        </CommonModal>
       </CommonHeader>
     )
   }
