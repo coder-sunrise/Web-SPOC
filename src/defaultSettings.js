@@ -8,7 +8,6 @@ module.exports = {
   // fixSiderbar: false, // sticky siderbar
   navTheme: 'dark',
   // "primaryColor": "#1890FF",
-  primaryColor: '#9c27b0',
   layout: 'sidemenu',
   contentWidth: 'Fluid',
   fixedHeader: false,

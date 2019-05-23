@@ -3,15 +3,17 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
+import RemoveCircle from '@material-ui/icons/RemoveCircle'
 // ant
-import { Select, Form } from 'antd'
-import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
+import { Input, Select } from 'antd'
+import { extendFunc, currencyFormat } from '@/utils/utils'
 
+import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
+import AntdWrapper from './AntdWrapper'
+
+const Option = Select.Option
 const STYLES = (theme) => {
   return {
-    dropdownMenu: {
-      zIndex: 1310,
-    },
     ...inputStyle(theme),
     container: {
       width: '100%',
@@ -29,7 +31,7 @@ const STYLES = (theme) => {
         border: 'none',
         boxShadow: 'none !important',
         borderRadius: 0,
-        borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
+        borderBottom: '1px solid',
         marginLeft: 5,
         marginRight: 5,
       },
@@ -43,11 +45,6 @@ const STYLES = (theme) => {
         fontSize: '1rem',
         fontWeight: 400,
         paddingTop: 3,
-      },
-    },
-    fixSelectContentHeight: {
-      '& > div': {
-        height: 31,
       },
     },
     // label: {
@@ -89,22 +86,20 @@ const STYLES = (theme) => {
   }
 }
 
-class AntDSelect extends React.PureComponent {
+class AntdInput extends React.PureComponent {
   static propTypes = {
-    // required props
-    options: PropTypes.array.isRequired,
     // conditionally required
     name: (props, propName, componentName) => {
-      const { handleChange } = props
-      if (handleChange && props[propName] === undefined)
+      const { onChange } = props
+      if (onChange && props[propName] === undefined)
         return new Error(
           `prop { name } is REQUIRED for ${componentName} but not supplied`,
         )
       return ''
     },
     value: (props, propName, componentName) => {
-      const { handleChange } = props
-      if (handleChange && props[propName] === undefined)
+      const { onChange } = props
+      if (onChange && props[propName] === undefined)
         return new Error(
           `prop ${propName} is REQUIRED for ${componentName} but not supplied`,
         )
@@ -113,20 +108,14 @@ class AntDSelect extends React.PureComponent {
     // optional props
     loading: PropTypes.bool,
     disabled: PropTypes.bool,
-    multiple: PropTypes.bool,
-    handleChange: PropTypes.func,
+    onChange: PropTypes.func,
     label: PropTypes.string,
-    labelField: PropTypes.string,
-    valueField: PropTypes.string,
     size: PropTypes.string,
   }
 
   static defaultProps = {
     label: 'Select',
-    labelField: 'name',
-    valueField: 'value',
     loading: false,
-    multiple: false,
     disabled: false,
     size: 'default',
   }
@@ -136,30 +125,28 @@ class AntDSelect extends React.PureComponent {
   }
 
   handleValueChange = (value) => {
-    console.log('handlevaluechange', value)
-    const { form, field, handleChange } = this.props
+    const { form, field, onChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, value)
+      form.setFieldValue(field.name, value === undefined ? '' : value)
     }
 
-    if (handleChange) {
+    if (onChange) {
       const { name } = this.props
-      handleChange(name, value)
+      onChange(name, value)
     }
   }
 
-  handleVisibleChange = (status) => {
-    this.setState({ shrink: status })
+  handleFocus = () => {
+    this.setState({ shrink: true })
   }
 
-  handleFilter = (input, option) =>
-    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  handleBlur = () => {
+    this.setState({ shrink: false })
+  }
 
   render () {
     const { shrink } = this.state
     const {
-      labelField,
-      valueField,
       classes,
       disabled,
       form,
@@ -170,66 +157,30 @@ class AntDSelect extends React.PureComponent {
       value,
       loading,
       size,
+      children,
       ...restProps
     } = this.props
 
-    const selectValue = form && field ? field.value : value
-    let shouldShrink = shrink || !!selectValue
-
-    if (multiple) {
-      if (selectValue) shouldShrink = shrink || selectValue.length !== 0
-      else shouldShrink = shrink
-    }
-    const classForLabel = {
-      [classes.label]: true,
-      [classes.labelAnimation]: true,
-      [classes.labelShrink]: shouldShrink,
-      [classes.labelFocused]: shrink,
-    }
-    const classForSelect = {
-      [classes.selectContainer]: true,
-      [classes.fixSelectContentHeight]: !multiple,
-    }
-
-    const newOptions = options.map((s) => ({
-      ...s,
-      value: s[valueField],
-      label: s[labelField],
-    }))
-
     return (
-      <Form layout='vertical' className={classnames(classes.control)}>
-        <Form.Item label={label} className={classnames(classForLabel)}>
-          <Select
-            className={classnames(classForSelect)}
-            dropdownClassName={classnames(classes.dropdownMenu)}
-            allowClear
-            showSearch
-            size={size}
-            disabled={disabled}
-            loading={loading}
-            mode={multiple ? 'multiple' : 'default'}
-            value={selectValue}
-            onDropdownVisibleChange={this.handleVisibleChange}
-            filterOption={this.handleFilter}
-            onChange={this.handleValueChange}
-            {...restProps}
-          >
-            {newOptions.map((option) => (
-              <Select.Option
-                key={option.value}
-                title={option.name}
-                value={option.value}
-                disabled={!!options.disabled}
-              >
-                {option.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-      </Form>
+      <AntdWrapper {...this.props}>
+        <Select
+          defaultValue='lucy'
+          style={{ width: 120 }}
+          onChange={(e) => {
+            console.log(e)
+          }}
+          {...restProps}
+        >
+          <Option value='jack'>Jack</Option>
+          <Option value='lucy'>Lucy</Option>
+          <Option value='disabled' disabled>
+            Disabled
+          </Option>
+          <Option value='Yiminghe'>yiminghe</Option>
+        </Select>
+      </AntdWrapper>
     )
   }
 }
 
-export default withStyles(STYLES, { name: 'AntDesignSelect' })(AntDSelect)
+export default withStyles(STYLES, { name: 'AntdInput' })(AntdInput)
