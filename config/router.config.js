@@ -20,14 +20,8 @@ export default [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
-    authority: [
-      'admin',
-      'user',
-      'guest',
-    ],
+    Routes: [ 'src/pages/Authorized' ],
+    authority: [ 'admin', 'user', 'guest' ],
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue', system: 'CMS' },
@@ -234,7 +228,7 @@ export default [
           {
             path: '/inventory/pd',
             name: 'pd',
-            // component: './Inventory/PurchaseReceving',
+            component: './Inventory/PurchaseDelivery',
             mini: 'PD',
           },
         ],
