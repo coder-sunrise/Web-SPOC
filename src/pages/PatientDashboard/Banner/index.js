@@ -83,7 +83,7 @@ class Banner extends PureComponent {
     const { props, state } = this
     const { values, patientDashboard, theme, classes, setValues } = props
     return (
-      <div style={{ margin: theme.spacing.unit, maxHeight: 80 }}>
+      <div style={{ marginBottom: theme.spacing.unit }}>
         <GridContainer>
           <GridItem xs={6} md={1} gutter={1}>
             <CardAvatar testimonial square>

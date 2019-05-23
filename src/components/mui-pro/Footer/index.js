@@ -1,13 +1,13 @@
-import React from "react"
-import PropTypes from "prop-types"
-import cx from "classnames"
+import React from 'react'
+import PropTypes from 'prop-types'
+import cx from 'classnames'
 
 // @material-ui/core components
-import withStyles from "@material-ui/core/styles/withStyles"
-import List from "@material-ui/core/List"
-import ListItem from "@material-ui/core/ListItem"
+import withStyles from '@material-ui/core/styles/withStyles'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
 
-import footerStyle from "mui-pro-jss/material-dashboard-pro-react/components/footerStyle"
+import footerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/footerStyle'
 
 function Footer ({ ...props }) {
   const { classes, fluid, white, rtlActive } = props
@@ -19,7 +19,7 @@ function Footer ({ ...props }) {
   let anchor =
     classes.a +
     cx({
-      [` ${  classes.whiteColor}`]: white,
+      [` ${classes.whiteColor}`]: white,
     })
   let block = cx({
     [classes.block]: true,
@@ -31,30 +31,30 @@ function Footer ({ ...props }) {
         <div className={classes.left}>
           <List className={classes.list}>
             <ListItem className={classes.inlineBlock}>
-              <a href="#home" className={block}>
-              Home
+              <a href='#home' className={block}>
+                Home
               </a>
             </ListItem>
             <ListItem className={classes.inlineBlock}>
-              <a href="#company" className={block}>
-              Company
+              <a href='#company' className={block}>
+                Company
               </a>
             </ListItem>
             <ListItem className={classes.inlineBlock}>
-              <a href="#portfolio" className={block}>
-              Portfolio
+              <a href='#portfolio' className={block}>
+                Portfolio
               </a>
             </ListItem>
             <ListItem className={classes.inlineBlock}>
-              <a href="#blog" className={block}>
-              Blog
+              <a href='#blog' className={block}>
+                Blog
               </a>
             </ListItem>
           </List>
         </div>
         <p className={classes.right}>
-          &copy; {1900 + new Date().getYear()}{" "}
-          <a href="http://medinno.com" className={anchor}>
+          &copy; {1900 + new Date().getYear()}{' '}
+          <a href='http://medinno.com' className={anchor}>
             Medisys Innovation
           </a>
           , your trusted clinical solution provider
