@@ -3,10 +3,8 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
-import RemoveCircle from '@material-ui/icons/RemoveCircle'
 // ant
-import { Input } from 'antd'
-import { extendFunc, currencyFormat } from '@/utils/utils'
+import { Select } from 'antd'
 
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import AntdWrapper from './AntdWrapper'
@@ -17,12 +15,6 @@ const STYLES = (theme) => {
     container: {
       width: '100%',
     },
-    control: {
-      '& .ant-form-item': {
-        paddingTop: '24px',
-        transformOrigin: 'top left',
-      },
-    },
     selectContainer: {
       width: '100%',
       '& > div': {
@@ -30,9 +22,7 @@ const STYLES = (theme) => {
         border: 'none',
         boxShadow: 'none !important',
         borderRadius: 0,
-        borderBottom: '1px solid',
-        marginLeft: 5,
-        marginRight: 5,
+        borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
       },
       '& .ant-select-selection--multiple': {
         // to match the same line
@@ -46,28 +36,14 @@ const STYLES = (theme) => {
         paddingTop: 3,
       },
     },
+    control: {},
   }
 }
 
-class AntdInput extends React.PureComponent {
+class AntdSelect extends React.PureComponent {
   static propTypes = {
-    // conditionally required
-    name: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
-        return new Error(
-          `prop { name } is REQUIRED for ${componentName} but not supplied`,
-        )
-      return ''
-    },
-    value: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
-        return new Error(
-          `prop ${propName} is REQUIRED for ${componentName} but not supplied`,
-        )
-      return ''
-    },
+    // required props
+    options: PropTypes.array,
     // optional props
     onChange: PropTypes.func,
     disabled: PropTypes.bool,
@@ -80,12 +56,32 @@ class AntdInput extends React.PureComponent {
   }
 
   render () {
+    const { options, classes, form, field, value } = this.props
+
+    const selectValue = form && field ? field.value : value
+
     return (
       <AntdWrapper {...this.props}>
-        <Input />
+        <Select
+          className={classnames(classes.selectContainer)}
+          allowClear
+          showSearch
+          value={selectValue}
+        >
+          {options.map((option) => (
+            <Select.Option
+              key={option.value}
+              title={option.name}
+              value={option.value}
+              disabled={!!option.disabled}
+            >
+              {option.name}
+            </Select.Option>
+          ))}
+        </Select>
       </AntdWrapper>
     )
   }
 }
 
-export default withStyles(STYLES, { name: 'AntdInput' })(AntdInput)
+export default withStyles(STYLES, { name: 'AntdSelect' })(AntdSelect)

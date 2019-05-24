@@ -1,4 +1,5 @@
 import React from 'react'
+import * as Yup from 'yup'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
@@ -13,10 +14,12 @@ import {
   TextField,
   // ANTDSelect,
   // DatePicker,
+  AntdInput,
   DateRangePicker,
 } from '@/components'
+import AntdSelect from '@/components/Antd/AntdSelect'
 import CustomDatePicker from '@/components/DatePicker/ANTDatePicker'
-import { Select as ANTDSelect, DatePicker as ANTDatePicker } from 'antd'
+import { DatePicker as ANTDatePicker } from 'antd'
 
 const options = [
   { name: 'test', value: 'test' },
@@ -48,7 +51,14 @@ const antDOptions = [
   { name: 'Indo', value: 'indo' },
 ]
 
+const ValidationSchema = Yup.object().shape({
+  AntdInputError: Yup.string().required(),
+  Test: Yup.string().required(),
+  selectLocation: Yup.string().required(),
+})
+
 @withFormik({
+  validationSchema: ValidationSchema,
   mapPropsToValues: () => ({
     TestDatePicker2: '20192205',
   }),
@@ -56,6 +66,7 @@ const antDOptions = [
 class FixSelect extends React.PureComponent {
   state = {
     showModal: false,
+    testAntdInput: '',
   }
 
   toggleModal = () => {
@@ -63,8 +74,13 @@ class FixSelect extends React.PureComponent {
     this.setState({ showModal: !showModal })
   }
 
+  handleChange = (event) => {
+    console.log('fixSelect handleChange', event.target.value)
+    this.setState({ testAntdInput: event.target.value })
+  }
+
   render () {
-    const { showModal } = this.state
+    const { showModal, testAntdInput } = this.state
     console.log('fixselect', this.props)
     return (
       <CommonHeader Icon={<Assignment />}>
@@ -106,6 +122,52 @@ class FixSelect extends React.PureComponent {
           </GridItem>
           <GridItem xs md={2}>
             <FastField
+              name='AntdInput'
+              render={(args) => <AntdInput {...args} label='Antd Input' />}
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
+              name='AntdInputError'
+              render={(args) => (
+                <AntdInput {...args} label='Antd Input Error' />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
+              name='selectLocation'
+              render={(args) => (
+                <AntdSelect
+                  {...args}
+                  options={antDOptions}
+                  label='Antd Select'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <AntdSelect
+              options={antDOptions}
+              value='penang'
+              label='Antd Select'
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
+              name='testMultipleSelect'
+              render={(args) => (
+                <AntdSelect
+                  options={antDOptions}
+                  label='Antd Select'
+                  mode='multiple'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
               name='TestDatePicker'
               render={(args) => (
                 <CustomDatePicker {...args} label='Test DatePicker' />
@@ -119,17 +181,6 @@ class FixSelect extends React.PureComponent {
                 <DateRangePicker {...args} label='Range Picker' />
               )}
             />
-          </GridItem>
-          <GridItem xs md={3}>
-            <FastField
-              name='CurrentDatePicker'
-              render={(args) => (
-                <CustomDatePicker {...args} label='Current Date Picker' />
-              )}
-            />
-          </GridItem>
-          <GridItem>
-            <ANTDatePicker />
           </GridItem>
         </GridContainer>
         <CommonModal
@@ -155,9 +206,6 @@ class FixSelect extends React.PureComponent {
                   <CustomDatePicker {...args} label='Test DatePicker' />
                 )}
               />
-            </GridItem>
-            <GridItem>
-              <ANTDatePicker />
             </GridItem>
 
             <GridItem xs md={4}>

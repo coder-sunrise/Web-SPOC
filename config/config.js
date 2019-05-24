@@ -78,7 +78,7 @@ export default {
     'font-family': 'Roboto, Helvetica, Arial, sans-serif',
     'border-radius-base': '0px',
     'border-radius-sm': '0px',
-    'component-background': 'transparent',
+    'component-background': 'white',
   },
   externals: {
     '@antv/data-set': 'DataSet',

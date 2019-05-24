@@ -22,6 +22,11 @@ const STYLES = (theme) => {
         transformOrigin: 'top left',
       },
     },
+    selectUnderline: {
+      '& .ant-select-selection:after': {
+        transform: 'scaleX(1) !important',
+      },
+    },
     selectContainer: {
       width: '100%',
       '& > div': {
@@ -187,6 +192,7 @@ class AntDSelect extends React.PureComponent {
       [classes.labelFocused]: shrink,
     }
     const classForSelect = {
+      [classes.selectUnderline]: shrink,
       [classes.selectContainer]: true,
       [classes.fixSelectContentHeight]: !multiple,
     }

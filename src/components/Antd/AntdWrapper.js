@@ -10,75 +10,65 @@ import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import { extendFunc, currencyFormat } from '@/utils/utils'
 
 const STYLES = (theme) => {
+  console.log('theme', theme)
   return {
-    ...inputStyle(theme),
-    container: {
-      width: '100%',
-    },
+    // ...inputStyle(theme),
+
     control: {
-      '& .ant-form-item': {
-        paddingTop: '24px',
-        transformOrigin: 'top left',
+      position: 'relative',
+      paddingTop: '24px',
+      transformOrigin: 'top left',
+    },
+    controlUnderline: {
+      '& .antdwrapper:after': {
+        transform: 'scaleX(1) !important',
       },
     },
-    selectContainer: {
-      width: '100%',
-      '& > div': {
-        // erase all border, and boxShadow
-        border: 'none',
-        boxShadow: 'none !important',
-        borderRadius: 0,
-        borderBottom: '1px solid',
-        marginLeft: 5,
-        marginRight: 5,
-      },
-      '& .ant-select-selection--multiple': {
-        // to match the same line
-        // with ant-select-select--single
-        paddingBottom: 0,
-      },
-      '& .ant-select-selection > div': {
-        marginLeft: 0,
-        fontSize: '1rem',
-        fontWeight: 400,
-        paddingTop: 3,
-      },
-    },
-    // label: {
-    //   '& .ant-form-item-label': {
-    //     pointerEvents: 'none',
-    //     position: 'absolute',
-    //     top: 4,
-    //     left: 5,
-    //     zIndex: 999,
-    //     paddingBottom: 0,
-    //     transform: 'translate(0, 28px) scale(1)',
-    //   },
-    //   '& .ant-form-item-label > label': {
-    //     color: 'rgba(0, 0, 0, 0.54)',
-    //     fontSize: '1rem',
-    //   },
-    // },
-    // labelFocused: {
-    //   '& .ant-form-item-label > label': {
-    //     color: theme.palette.primary.main,
-    //   },
-    // },
-    // labelShrink: {
-    //   '& .ant-form-item-label': {
-    //     transform: 'translate(0, 5px) scale(0.8)',
-    //     transformOrigin: 'top left',
-    //   },
-    // },
-    // labelAnimation: {
-    //   '& .ant-form-item-label': {
-    //     transition: `color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms`,
-    //   },
-    // },
-    clearButton: {
+    label: {
+      pointerEvents: 'none',
       position: 'absolute',
-      top: '-4px',
-      right: '-5px',
+      color: 'rgba(0, 0, 0, 0.54)',
+      top: 3,
+      left: 2,
+      zIndex: 999,
+      paddingBottom: 0,
+      transform: 'translate(0, 28px) scale(1)',
+    },
+    mediumLabel: {
+      fontSize: '1rem',
+    },
+    largeLabel: {
+      fontSize: '1.2rem',
+    },
+    smallLabel: {
+      fontSize: '0.875rem',
+    },
+    labelFocused: {
+      color: theme.palette.primary.main,
+    },
+    inputError: {
+      color: `${theme.palette.error.main} !important`,
+    },
+    underlineError: {
+      '& .antdwrapper:after': {
+        borderBottomColor: theme.palette.error.main,
+      },
+    },
+    labelShrink: {
+      transform: 'translate(0, 5px) scale(0.8)',
+      transformOrigin: 'top left',
+    },
+    labelAnimation: {
+      transition: `color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms`,
+    },
+    helpText: {
+      color: 'rgba(0, 0, 0, 0.54)',
+      fontSize: '0.75rem',
+      margin: 0,
+      marginTop: 4,
+      minHeight: '1em',
+      lineHeight: '1em',
+      textAlign: 'left',
     },
   }
 }
@@ -86,16 +76,8 @@ const STYLES = (theme) => {
 class AntDSelect extends React.PureComponent {
   static propTypes = {
     // required props
-    options: PropTypes.array.isRequired,
+
     // conditionally required
-    name: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
-        return new Error(
-          `prop { name } is REQUIRED for ${componentName} but not supplied`,
-        )
-      return ''
-    },
     value: (props, propName, componentName) => {
       const { onChange } = props
       if (onChange && props[propName] === undefined)
@@ -105,32 +87,43 @@ class AntDSelect extends React.PureComponent {
       return ''
     },
     // optional props
-    loading: PropTypes.bool,
-    disabled: PropTypes.bool,
-    multiple: PropTypes.bool,
     onChange: PropTypes.func,
     label: PropTypes.string,
-    size: PropTypes.string,
   }
 
-  static defaultProps = {
-    label: 'Select',
-    loading: false,
-    multiple: false,
-    disabled: false,
-    size: 'default',
-  }
+  static defaultProps = {}
 
   state = {
     shrink: false,
-    value: '',
   }
 
-  handleValueChange = (e) => {
-    console.log(e)
-    this.setState({
-      value: e.target.value,
-    })
+  handleValueChange = (event) => {
+    console.log('handlevaluechange', event)
+
+    const { form, field } = this.props
+    let returnValue
+    if (event) {
+      returnValue = event.target ? event.target.value : event
+    } else {
+      returnValue = event
+    }
+    if (form && field) {
+      // field.onChange &&
+      //   field.onChange(
+      //     {
+      //       target: {
+      //         value: returnValue === undefined ? '' : returnValue,
+      //         name: field.name,
+      //       },
+      //     },
+      //     this.props,
+      //   )
+      form.setFieldValue(
+        field.name,
+        returnValue === undefined ? '' : returnValue,
+      )
+      form.setFieldTouched(field.name, true)
+    }
   }
 
   handleFocus = () => {
@@ -142,42 +135,92 @@ class AntDSelect extends React.PureComponent {
   }
 
   render () {
-    const { shrink } = this.state
     const {
       classes,
-      // disabled,
-      form,
-      field,
       label,
-      // multiple,
-      // options,
-      // loading,
-      // size,
       children,
       onChange,
+      size,
+      value,
+      form,
+      field,
+      helpText,
       ...restProps
     } = this.props
 
-    let shouldShrink = shrink || !!this.state.value
+    const { shrink } = this.state
+
+    const inputValue = form && field ? field.value : value
+    let shouldShrink = shrink || !!inputValue
+
+    if (restProps.mode === 'multiple') {
+      if (inputValue) shouldShrink = shrink || inputValue.length !== 0
+      else shouldShrink = shrink
+    }
+
+    // error indicator
+    let showError = false
+    let errorText = ''
+    if (form) {
+      showError =
+        form.errors[field.name] !== undefined && form.touched[field.name]
+      errorText = form.errors[field.name]
+    }
 
     const labelClass = {
       [classes.label]: true,
       [classes.labelAnimation]: true,
       [classes.labelShrink]: shouldShrink,
       [classes.labelFocused]: shrink,
+      [classes.mediumLabel]: size === 'default',
+      [classes.smallLabel]: size === 'small',
+      [classes.largeLabel]: size === 'large',
+      [classes.inputError]: showError,
+    }
+    const classForControl = {
+      [classes.control]: true,
+      [classes.controlUnderline]: shrink,
+      [classes.underlineError]: showError,
+    }
+    const classForHelpText = {
+      [classes.helpText]: true,
+      [classes.inputError]: showError,
+    }
+
+    // return (
+    //   <Form layout='vertical' className={classnames(classes.control)}>
+    //     <Form.Item label={label} className={classnames(labelClass)}>
+    //       {React.cloneElement(children, {
+    //         onChange: extendFunc(this.handleValueChange, onChange),
+    //         ...restProps,
+    //       })}
+    //     </Form.Item>
+    //   </Form>
+    // )
+
+    let extendedOnBlur = this.handleBlur
+    if (form && field) {
+      extendedOnBlur = extendFunc(this.handleBlur, field.onBlur)
     }
 
     return (
-      <Form layout='vertical' className={classnames(classes.control)}>
-        <Form.Item label={label} className={classnames(labelClass)}>
+      <div className={classnames(classForControl)}>
+        <span className={classnames(labelClass)}>{label}</span>
+        <div className='antdwrapper'>
           {React.cloneElement(children, {
-            onChange: extendFunc(this.handleValueChange, onChange),
+            onChange: extendFunc(onChange, this.handleValueChange),
+            onFocus: this.handleFocus,
+            onBlur: this.handleBlur,
+            value: inputValue,
             ...restProps,
           })}
-        </Form.Item>
-      </Form>
+        </div>
+        <p className={classnames(classForHelpText)}>
+          {showError ? errorText : helpText}
+        </p>
+      </div>
     )
   }
 }
 
-export default withStyles(STYLES, { name: 'AntDesignSelect' })(AntDSelect)
+export default withStyles(STYLES, { name: 'AntdWrapper' })(AntDSelect)
