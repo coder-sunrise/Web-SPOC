@@ -231,6 +231,12 @@ export default [
             component: './Inventory/PurchaseDelivery',
             mini: 'PD',
           },
+          {
+            path: '/inventory/pd/detail',
+            name: 'pd.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseDelivery/Detail',
+          },
         ],
       },
       //

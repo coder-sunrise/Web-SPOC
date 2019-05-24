@@ -58,6 +58,7 @@ export default {
 
   'menu.inventory': 'Inventory',
   'menu.inventory.pd': 'PO & DO',
+  'menu.inventory.pd.detail': 'PO & DO Detail',
   'menu.inventory.master': 'Inventory Master',
   'menu.inventory.consumable.detail': 'Consumable Detail',
   'menu.inventory.medication.detail': 'Medication Detail',
