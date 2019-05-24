@@ -120,7 +120,7 @@ function CustomInputWrapper ({ field, form, classes, ...props }) {
   }
   // console.log(label)
   return noWrapper ? (
-    newChildren
+    <div style={style}>{newChildren}</div>
   ) : (
     <FormControl
       fullWidth={fullWidth}

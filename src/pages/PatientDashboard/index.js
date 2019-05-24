@@ -38,6 +38,7 @@ import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import Banner from './Banner'
+import Orders from './Orders'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -49,7 +50,6 @@ const styles = (theme) => ({
     display: 'none',
   },
   note: {
-    color: '#c0c1c2',
     fontSize: 10,
     fontWeight: 400,
     marginTop: -10,
@@ -65,6 +65,9 @@ const styles = (theme) => ({
   listItemDate: {
     position: 'absolute',
     right: '21%',
+  },
+  paragraph: {
+    marginLeft: theme.spacing.unit,
   },
 })
 const dataSource = [
@@ -277,7 +280,7 @@ class PatientDashboard extends PureComponent {
                 style={{ maxWidth: 300 }}
               />
               <h5>Chief Complaints</h5>
-              <Typography component='div'>
+              <Typography component='div' className={classes.paragraph}>
                 <p>A *paragraph* of text</p>
                 <p>A _second_ row of text</p>
               </Typography>
@@ -285,6 +288,7 @@ class PatientDashboard extends PureComponent {
               <h5>Plan</h5>
               <h5>Diagnosis</h5>
               <h5>Orders</h5>
+              <Orders />
             </CardContainer>
           </GridItem>
         </GridContainer>
