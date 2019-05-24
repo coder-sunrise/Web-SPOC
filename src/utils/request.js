@@ -7,7 +7,7 @@ import $ from 'jquery'
 import { isAntdPro } from './utils'
 
 // const baseUrl = 'http://localhost:55314'
-// const baseUrl = 'http://semr2dev2010.emr.com.sg'
+// export const baseUrl = 'http://localhost:55314'
 export const baseUrl = 'https://semr2dev2010.emr.com.sg'
 let dynamicURL=baseUrl
 
@@ -53,6 +53,7 @@ const checkStatus = async (response) => {
     isJson = true
   } catch (error) {}
   const errortext = returnObj.title || returnObj.message
+  notification.destroy()
   notification.error({
     message: (
       <div>
@@ -258,6 +259,7 @@ export default function request (url, option) {
             } catch (error) {}
             const errortext =
               returnObj.title || returnObj.message || returnObj.statusText
+            notification.destroy()
             notification.error({
               message: (
                 <div>
