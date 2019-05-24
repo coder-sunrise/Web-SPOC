@@ -10,7 +10,6 @@ import {
   CommonModal,
   GridContainer,
   GridItem,
-  Select,
   TextField,
   // ANTDSelect,
   // DatePicker,
@@ -18,8 +17,10 @@ import {
   DateRangePicker,
 } from '@/components'
 import AntdSelect from '@/components/Antd/AntdSelect'
+import AntdDatePicker from '@/components/Antd/AntdDatePicker'
+import AntdDateRangePicker from '@/components/Antd/AntdDateRangePicker'
 import CustomDatePicker from '@/components/DatePicker/ANTDatePicker'
-import { DatePicker as ANTDatePicker } from 'antd'
+// import { DatePicker as ANTDatePicker } from 'antd'
 
 const options = [
   { name: 'test', value: 'test' },
@@ -60,7 +61,11 @@ const ValidationSchema = Yup.object().shape({
 @withFormik({
   validationSchema: ValidationSchema,
   mapPropsToValues: () => ({
-    TestDatePicker2: '20192205',
+    TestDatePicker2: '20190522',
+    TestDateRange: [
+      '20190522',
+      '20190525',
+    ],
   }),
 })
 class FixSelect extends React.PureComponent {
@@ -91,27 +96,6 @@ class FixSelect extends React.PureComponent {
               render={(args) => <TextField {...args} label='Test1' />}
             />
           </GridItem>
-          <GridItem xs md={2}>
-            <FastField
-              name='TestSelect'
-              render={(args) => (
-                <Select {...args} options={antDOptions} label='Test Select' />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={4}>
-            <FastField
-              name='multipleNation'
-              render={(args) => (
-                <Select
-                  {...args}
-                  options={antDOptions}
-                  multiple
-                  label='Multiple select'
-                />
-              )}
-            />
-          </GridItem>
         </GridContainer>
 
         <GridContainer>
@@ -126,31 +110,13 @@ class FixSelect extends React.PureComponent {
               render={(args) => <AntdInput {...args} label='Antd Input' />}
             />
           </GridItem>
-          <GridItem xs md={2}>
-            <FastField
-              name='AntdInputError'
-              render={(args) => (
-                <AntdInput {...args} label='Antd Input Error' />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={2}>
-            <FastField
-              name='selectLocation'
-              render={(args) => (
-                <AntdSelect
-                  {...args}
-                  options={antDOptions}
-                  label='Antd Select'
-                />
-              )}
-            />
-          </GridItem>
+
           <GridItem xs md={2}>
             <AntdSelect
               options={antDOptions}
               value='penang'
               label='Antd Select'
+              disabled
             />
           </GridItem>
           <GridItem xs md={2}>
@@ -178,7 +144,15 @@ class FixSelect extends React.PureComponent {
             <FastField
               name='TestDateRange'
               render={(args) => (
-                <DateRangePicker {...args} label='Range Picker' />
+                <AntdDateRangePicker {...args} label='Range Picker' />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
+              name='antdDatePicker'
+              render={(args) => (
+                <AntdDatePicker {...args} label='AntdDatePicker' />
               )}
             />
           </GridItem>
@@ -192,9 +166,21 @@ class FixSelect extends React.PureComponent {
           <GridContainer>
             <GridItem xs md={2}>
               <FastField
-                name='Test2'
+                name='AntdInputError'
                 render={(args) => (
-                  <Select {...args} options={antDOptions} label='Test2' />
+                  <AntdInput {...args} label='Antd Input Error' />
+                )}
+              />
+            </GridItem>
+            <GridItem xs md={2}>
+              <FastField
+                name='selectLocation'
+                render={(args) => (
+                  <AntdSelect
+                    {...args}
+                    options={antDOptions}
+                    label='Antd Select'
+                  />
                 )}
               />
             </GridItem>
@@ -203,21 +189,7 @@ class FixSelect extends React.PureComponent {
               <FastField
                 name='TestDatePicker2'
                 render={(args) => (
-                  <CustomDatePicker {...args} label='Test DatePicker' />
-                )}
-              />
-            </GridItem>
-
-            <GridItem xs md={4}>
-              <FastField
-                name='TestMultiple'
-                render={(args) => (
-                  <Select
-                    {...args}
-                    options={antDOptions}
-                    multiple
-                    label='Multiple select'
-                  />
+                  <AntdDatePicker {...args} label='Test DatePicker' />
                 )}
               />
             </GridItem>

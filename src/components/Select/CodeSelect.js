@@ -1,6 +1,6 @@
 import React from 'react'
 // import Select from './index'
-import Select from './AntDSelect'
+import Select from '../Antd/AntdSelect'
 import { getCodes } from '@/utils/codes'
 
 const codetables = {}

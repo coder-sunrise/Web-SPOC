@@ -5,15 +5,12 @@ import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 // ant
 import { Select } from 'antd'
-
-import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import AntdWrapper from './AntdWrapper'
 
-const STYLES = (theme) => {
+const STYLES = () => {
   return {
-    ...inputStyle(theme),
-    container: {
-      width: '100%',
+    dropdownMenu: {
+      zIndex: 1310,
     },
     selectContainer: {
       width: '100%',
@@ -36,7 +33,6 @@ const STYLES = (theme) => {
         paddingTop: 3,
       },
     },
-    control: {},
   }
 }
 
@@ -45,30 +41,50 @@ class AntdSelect extends React.PureComponent {
     // required props
     options: PropTypes.array,
     // optional props
+    labelField: PropTypes.string,
+    valueField: PropTypes.string,
     onChange: PropTypes.func,
     disabled: PropTypes.bool,
     size: PropTypes.string,
   }
 
   static defaultProps = {
+    labelField: 'name',
+    valueField: 'value',
     disabled: false,
     size: 'default',
   }
 
+  handleFilter = (input, option) =>
+    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+
   render () {
-    const { options, classes, form, field, value } = this.props
+    const {
+      valueField,
+      labelField,
+      options,
+      classes,
+      ...restProps
+    } = this.props
+    const { form, field, value } = restProps
 
     const selectValue = form && field ? field.value : value
-
+    const newOptions = options.map((s) => ({
+      ...s,
+      value: s[valueField],
+      label: s[labelField],
+    }))
     return (
-      <AntdWrapper {...this.props}>
+      <AntdWrapper {...restProps}>
         <Select
           className={classnames(classes.selectContainer)}
+          dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
           showSearch
           value={selectValue}
+          filterOption={this.handleFilter}
         >
-          {options.map((option) => (
+          {newOptions.map((option) => (
             <Select.Option
               key={option.value}
               title={option.name}
