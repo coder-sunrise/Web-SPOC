@@ -12,14 +12,12 @@ import AntdWrapper from './AntdWrapper'
 
 const _dateFormat = 'YYYY-MM-DD'
 
-const _toMoment = (value) => {
+const _toMoment = (value, format) => {
   if (!value) return value
   try {
-    if (moment(value, _dateFormat).isValid()) return moment(value, _dateFormat)
-
+    if (moment(value, format).isValid()) return moment(value, format)
     return null
   } catch (error) {
-    console.error(`Parse date to moment error ${error}`)
     return null
   }
 }
@@ -60,13 +58,13 @@ class AntdDatePicker extends React.PureComponent {
 
     if (onChange) {
       const { name } = this.props
-      onChange(name, dateString)
+      onChange(dateString, name)
     }
   }
 
   render () {
     const { classes, ...restProps } = this.props
-    const { form, field, value } = restProps
+    const { format, form, field, value } = restProps
     const selectValue = form && field ? field.value : value
 
     // date picker component dont pass formik props into wrapper
@@ -79,7 +77,7 @@ class AntdDatePicker extends React.PureComponent {
           allowClear
           placeholder=''
           onChange={this.handleChange}
-          value={_toMoment(selectValue)}
+          value={_toMoment(selectValue, format)}
         />
       </AntdWrapper>
     )

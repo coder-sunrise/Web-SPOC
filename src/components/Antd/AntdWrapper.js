@@ -114,6 +114,7 @@ class AntdWrapper extends React.PureComponent {
     const classForHelpText = {
       [classes.helpText]: true,
       [classes.inputError]: showError,
+      [classes.hiddenHelpText]: !showError,
     }
 
     return (

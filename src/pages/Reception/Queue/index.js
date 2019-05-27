@@ -179,7 +179,7 @@ class Queue extends PureComponent {
       currentFilter,
     } = this.state
     const sessionNo = '190410-01-1.0'
-    console.log('queue render: ', showPatientSearch)
+
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}

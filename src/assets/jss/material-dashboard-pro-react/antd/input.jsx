@@ -91,6 +91,9 @@ const inputStyle = (theme) => ({
     lineHeight: '1em',
     textAlign: 'left',
   },
+  hiddenHelpText: {
+    display: 'none',
+  },
 })
 
 export default inputStyle

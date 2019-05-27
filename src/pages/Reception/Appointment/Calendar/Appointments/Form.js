@@ -100,12 +100,18 @@ const DATETIME_KEY = {
   END: 'end',
 }
 
+const _dateTimeFormat = 'DD MMM YYYY'
+
 const Form = ({ classes, values, onDateChange, onTimeChange }) => {
-  const onStartDateChange = (value) => onDateChange(DATETIME_KEY.START, value)
+  const onStartDateChange = (value) => {
+    onDateChange(DATETIME_KEY.START, value)
+  }
   const onStartTimeChange = ({ target }) =>
     onTimeChange(DATETIME_KEY.START, target.value)
 
-  const onEndDateChange = (value) => onDateChange(DATETIME_KEY.END, value)
+  const onEndDateChange = (value) => {
+    onDateChange(DATETIME_KEY.END, value)
+  }
   const onEndTimeChange = ({ target }) =>
     onTimeChange(DATETIME_KEY.END, target.value)
 
@@ -203,6 +209,7 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
                 render={(args) => (
                   <DatePicker
                     {...args}
+                    format={_dateTimeFormat}
                     onChange={onStartDateChange}
                     label={formatMessage({
                       id: 'reception.appt.form.startDate',
@@ -229,6 +236,10 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
               />
             </GridItem>
           </GridItem>
+          <GridItem xs md={12}>
+            <p>{values.startDate}</p>
+          </GridItem>
+
           <GridItem
             container
             xs
@@ -241,7 +252,8 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
                 render={(args) => (
                   <DatePicker
                     {...args}
-                    oonChange={onEndDateChange}
+                    format={_dateTimeFormat}
+                    onChange={onEndDateChange}
                     label={formatMessage({ id: 'reception.appt.form.endDate' })}
                   />
                 )}
@@ -262,6 +274,9 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
                 )}
               />
             </GridItem>
+          </GridItem>
+          <GridItem xs md={12}>
+            <p>{values.endDate}</p>
           </GridItem>
 
           <GridItem xs md={12}>

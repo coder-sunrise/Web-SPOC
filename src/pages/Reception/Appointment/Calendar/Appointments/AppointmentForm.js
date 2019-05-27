@@ -153,22 +153,24 @@ const _dateTimeFormat = 'DD MMM YYYY HH:mm'
 class AppointmentFormContainerBasic extends PureComponent {
   onDateChange = (name, value) => {
     const { setFieldValue, values } = this.props
-    const key = `${name}Date`
-
+    const dateKey = `${name}Date`
+    const timeKey = `${name}Time`
     if (value === '') {
-      setFieldValue(key, value)
+      setFieldValue(dateKey, value)
       return
     }
 
-    const startTime = moment(values[key], _dateTimeFormat)
-      .format('HH:mm')
-      .toString()
-    const newDate = moment(value, 'DD-MM-YYYY').format('DD MMM YYYY')
-    let result = moment(`${newDate} ${startTime}`, _dateTimeFormat).format(
+    // const startTime = moment(values[key], _dateTimeFormat)
+    //   .format('HH:mm')
+    //   .toString()
+    const time = values[timeKey] !== '' ? values[timeKey] : '00:00'
+
+    // const newDate = moment(value, 'DD MM YYYY').format('DD MMM YYYY')
+    let result = moment(`${value} ${time}`, _dateTimeFormat).format(
       'DD MMM YYYY HH:mm',
     )
 
-    setFieldValue(key, result)
+    setFieldValue(dateKey, result)
   }
 
   onTimeChange = (name, value) => {
@@ -182,7 +184,7 @@ class AppointmentFormContainerBasic extends PureComponent {
     )
 
     setFieldValue(timeKey, value)
-    setFieldValue(dateKey, newDateTime)
+    moment(newDateTime).isValid() && setFieldValue(dateKey, newDateTime)
   }
 
   determineConflict = () => {}
