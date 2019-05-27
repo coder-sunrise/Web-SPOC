@@ -14,9 +14,13 @@ const applyFilter = (data, filter) => {
   let returnData = [
     ...data,
   ]
-  // filter by color
-  const { colors } = filter
-  returnData = data.filter((aptData) => colors.includes(aptData.colorTag))
+  // filter by appointment type
+  const { appointmentType } = filter
+  if (appointmentType.length !== 0) {
+    returnData = returnData.filter((aptData) =>
+      appointmentType.includes(aptData.appointmentType),
+    )
+  }
 
   // filter by query
   const { searchQuery } = filter
@@ -30,18 +34,6 @@ const applyFilter = (data, filter) => {
   }
 
   return returnData
-}
-
-const addNewColorIfNotSelected = (added, colors) => {
-  const newFilterColor = colors.includes(added.colorTag)
-    ? [
-        ...colors,
-      ]
-    : [
-        ...colors,
-        added.colorTag,
-      ]
-  return newFilterColor
 }
 
 const todayDate = moment(new Date()).format(_dateFormat).toString()
@@ -60,10 +52,14 @@ export default createListViewModel({
 
       aptData: [],
       displayData: [],
-      selectedDoctors: [],
       filter: {
         searchQuery: '',
-        colors: [],
+        appointmentType: [
+          'all',
+        ],
+        doctors: [
+          'all',
+        ],
       },
       showAll: false,
     },
@@ -106,9 +102,6 @@ export default createListViewModel({
       commitChanges (state, { added, changed, deleted }) {
         let { aptData: data } = state
         const { filter } = state
-        let newColorsFilter = [
-          ...filter.colors,
-        ]
 
         if (added) {
           const startingAddedId =
@@ -121,15 +114,12 @@ export default createListViewModel({
               ...added,
             },
           ]
-
-          newColorsFilter = addNewColorIfNotSelected(added, newColorsFilter)
         }
         if (changed) {
           data = data.map(
             (appointment) =>
               appointment.id === changed.id ? { ...changed } : appointment,
           )
-          newColorsFilter = addNewColorIfNotSelected(changed, newColorsFilter)
         }
 
         if (deleted >= 0) {
@@ -138,9 +128,6 @@ export default createListViewModel({
 
         const newFilter = {
           ...filter,
-          colors: [
-            ...newColorsFilter,
-          ],
         }
         const displayData = applyFilter(data, newFilter)
 
@@ -150,50 +137,21 @@ export default createListViewModel({
           aptData: [
             ...data,
           ],
-          filter: {
-            ...state.filter,
-            colors: [
-              ...newColorsFilter,
-            ],
-          },
         }
       },
-      updateSelectedDoctors (state, { selected }) {
-        const displayData = applyFilter(state.aptData, selected)
-        return {
-          ...state,
-          displayData,
-          showAll: selected.length === 0,
-          selectedDoctors: [
-            ...selected,
-          ],
-        }
-      },
-      updateFilterColors (state, { selected }) {
-        const hasDefault = selected.find((color) => color === 'default')
-        // sort 'default' always at position 0
-        const newSelected = hasDefault
-          ? [
-              hasDefault,
-              ...selected.filter((color) => color !== hasDefault),
-            ]
-          : [
-              ...selected,
-            ]
-
-        const filter = {
-          ...state.filter,
-          colors: newSelected,
-        }
+      updateFilterDoctor (state, { doctors }) {
+        const filter = { ...state.filter, doctors }
         const displayData = applyFilter(state.aptData, filter)
-        return {
-          ...state,
-          displayData,
-          filter,
-        }
+
+        return { ...state, displayData, filter }
+      },
+      updateFilterAppointmentType (state, { appointmentType }) {
+        const filter = { ...state.filter, appointmentType }
+        const displayData = applyFilter(state.aptData, filter)
+
+        return { ...state, displayData, filter }
       },
       updateFilterQuery (state, { searchQuery }) {
-        console.log('updateFilterQuery')
         const { filter } = state
         const newFilter = {
           ...filter,

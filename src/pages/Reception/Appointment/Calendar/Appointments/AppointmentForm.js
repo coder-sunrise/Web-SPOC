@@ -50,6 +50,17 @@ const styles = (theme) => ({
   },
   actionButtons: {
     marginTop: theme.spacing.unit * 2,
+    marginLeft: theme.spacing.unit * 2,
+    marginRight: theme.spacing.unit * 2,
+  },
+  cancelAppointmentBtn: {
+    textAlign: 'left',
+    display: 'inline-block',
+    width: '20%',
+  },
+  otherBtn: { textAlign: 'right', display: 'inline-block', width: '80%' },
+  btnNoMargin: {
+    marginRight: '0px !important',
   },
   blink: {
     animation: 'blink-animation 1s alternate infinite',
@@ -66,17 +77,17 @@ const styles = (theme) => ({
       backgroundColor: '#e53935',
     },
   },
-  '@-webkit-keyframes blink-animation': {
-    '0%': {
-      backgroundColor: '#e57373',
-    },
-    '50%': {
-      backgroundColor: '#f44336',
-    },
-    '100%': {
-      backgroundColor: '#e53935',
-    },
-  },
+  // '@-webkit-keyframes blink-animation': {
+  //   '0%': {
+  //     backgroundColor: '#e57373',
+  //   },
+  //   '50%': {
+  //     backgroundColor: '#f44336',
+  //   },
+  //   '100%': {
+  //     backgroundColor: '#e53935',
+  //   },
+  // },
 })
 
 const RECURRENCE_RANGE = {
@@ -117,10 +128,10 @@ const _dateTimeFormat = 'DD MMM YYYY HH:mm'
 
     const title = `${values.patientName}(PT-000001A), ${values.contactNo}`
     const type = isNewAppointment ? 'added' : 'changed'
-    const colorTag = values.colorTag === '' ? 'default' : values.colorTag
+
     const data = !isNewAppointment
-      ? { ...values, allDay: false, title, colorTag, id: appointmentData.id }
-      : { ...values, allDay: false, title, colorTag }
+      ? { ...values, allDay: false, title, id: appointmentData.id }
+      : { ...values, allDay: false, title }
 
     commitChanges({ [type]: data })
     resetForm()
@@ -235,24 +246,32 @@ class AppointmentFormContainerBasic extends PureComponent {
               </div>
             </Paper>
           )}
-          <GridItem
-            className={classnames(classes.actionButtons)}
-            xs
-            container
-            justify='flex-end'
-            alignItems='center'
-          >
-            <Button color='danger' onClick={visibleChange}>
-              <FormattedMessage id='reception.common.cancel' />
-            </Button>
-            <Button color='primary' onClick={submitForm}>
-              {isNewAppointment ? (
-                <FormattedMessage id='reception.common.add' />
-              ) : (
-                <FormattedMessage id='reception.common.save' />
-              )}
-            </Button>
-          </GridItem>
+          <div className={classnames(classes.actionButtons)}>
+            <div className={classnames(classes.cancelAppointmentBtn)}>
+              <Button color='danger'>
+                <FormattedMessage id='reception.appt.form.cancelAppointment' />
+              </Button>
+            </div>
+            <div className={classnames(classes.otherBtn)}>
+              <Button color='danger' onClick={visibleChange}>
+                <FormattedMessage id='reception.common.cancel' />
+              </Button>
+              <Button color='info' onClick={visibleChange}>
+                <FormattedMessage id='reception.appt.form.validate' />
+              </Button>
+              <Button
+                color='primary'
+                onClick={submitForm}
+                className={classnames(classes.btnNoMargin)}
+              >
+                {isNewAppointment ? (
+                  <FormattedMessage id='reception.common.add' />
+                ) : (
+                  <FormattedMessage id='reception.common.save' />
+                )}
+              </Button>
+            </div>
+          </div>
         </AppointmentForm.Container>
       </AppointmentForm.Popup>
     )

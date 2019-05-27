@@ -41,14 +41,17 @@ class AntdSelect extends React.PureComponent {
     // required props
     options: PropTypes.array,
     // optional props
+    label: PropTypes.string,
     labelField: PropTypes.string,
     valueField: PropTypes.string,
     onChange: PropTypes.func,
     disabled: PropTypes.bool,
     size: PropTypes.string,
+    renderDropdown: PropTypes.func,
   }
 
   static defaultProps = {
+    label: 'Select',
     labelField: 'name',
     valueField: 'value',
     disabled: false,
@@ -64,6 +67,8 @@ class AntdSelect extends React.PureComponent {
       labelField,
       options,
       classes,
+      defaultValue,
+      renderDropdown,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -82,18 +87,23 @@ class AntdSelect extends React.PureComponent {
           allowClear
           showSearch
           value={selectValue}
+          defaultValue={defaultValue}
           filterOption={this.handleFilter}
         >
-          {newOptions.map((option) => (
-            <Select.Option
-              key={option.value}
-              title={option.name}
-              value={option.value}
-              disabled={!!option.disabled}
-            >
-              {option.name}
-            </Select.Option>
-          ))}
+          {renderDropdown !== undefined ? (
+            newOptions.map((option) => renderDropdown(option))
+          ) : (
+            newOptions.map((option) => (
+              <Select.Option
+                key={option.value}
+                title={option.name}
+                value={option.value}
+                disabled={!!option.disabled}
+              >
+                {option.name}
+              </Select.Option>
+            ))
+          )}
         </Select>
       </AntdWrapper>
     )

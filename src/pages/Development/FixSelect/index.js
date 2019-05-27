@@ -96,6 +96,27 @@ class FixSelect extends React.PureComponent {
               render={(args) => <TextField {...args} label='Test1' />}
             />
           </GridItem>
+          <GridItem xs md={2}>
+            <AntdSelect
+              options={antDOptions}
+              value='penang'
+              label='Antd Select'
+              disabled
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
+              name='testMultipleSelect'
+              render={(args) => (
+                <AntdSelect
+                  options={antDOptions}
+                  label='Antd Select'
+                  mode='multiple'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
         </GridContainer>
 
         <GridContainer>

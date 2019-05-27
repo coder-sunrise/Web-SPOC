@@ -6,9 +6,10 @@ import { formatMessage } from 'umi/locale'
 import { FastField, Field } from 'formik'
 // devexpress-react-scheduler
 // material ui
-import { Chip, Paper, withStyles } from '@material-ui/core'
+import { Paper, withStyles } from '@material-ui/core'
 // custom component
 import {
+  Button,
   DatePicker,
   GridContainer,
   GridItem,
@@ -19,13 +20,8 @@ import {
   RadioGroup,
 } from '@/components'
 // custom components
-import {
-  defaultColorOpts,
-  colorNameOptions,
-  getColorMapping,
-  getColorClassByColorName,
-  reduceColorToClass,
-} from '../ColorMapping'
+import AppointmentTypeSelector from './AppointmentTypeSelector'
+import { defaultColorOpts } from '../setting'
 
 const doctors = [
   { value: 'bao', name: 'Bao' },
@@ -71,29 +67,17 @@ const styles = (theme) => ({
       backgroundColor: defaultColorOpts.activeColor,
     },
   },
+  dateTimePreview: {
+    fontSize: '1rem',
+    textAlign: 'center',
+  },
+  buttonGroup: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
-
-const chipStyle = () => ({
-  ...getColorMapping().reduce(reduceColorToClass, {}),
-})
-
-const ColorChipBase = ({ classes, value }) => {
-  return (
-    <Chip
-      color='primary'
-      key={value}
-      label='SAMPLE'
-      className={classnames([
-        classes.chip,
-        value === ''
-          ? classes.defaultColor
-          : getColorClassByColorName(value, classes),
-      ])}
-    />
-  )
-}
-
-const ColorChip = withStyles(chipStyle, { name: 'ColorChip' })(ColorChipBase)
 
 const DATETIME_KEY = {
   START: 'start',
@@ -122,7 +106,7 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
         alignItems='flex-start'
       >
         <GridItem container xs md={7}>
-          <GridItem xs md={12}>
+          <GridItem xs md={7}>
             <Field
               name='patientName'
               render={(args) => (
@@ -135,7 +119,17 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
+          <GridItem xs md={5}>
+            <div className={classnames(classes.buttonGroup)}>
+              <Button size='sm' color='primary'>
+                Search
+              </Button>
+              <Button size='sm' color='primary'>
+                Create Patient
+              </Button>
+            </div>
+          </GridItem>
+          <GridItem xs md={7}>
             <FastField
               name='contactNo'
               render={(args) => (
@@ -162,7 +156,7 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             />
           </GridItem>
 
-          <GridItem xs md={5}>
+          <GridItem xs md={6}>
             <FastField
               name='doctor'
               render={(args) => (
@@ -175,24 +169,13 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             />
           </GridItem>
 
-          <GridItem xs md={5}>
+          <GridItem xs md={6}>
             <FastField
-              name='colorTag'
+              name='appointmentType'
               render={(args) => (
-                <Select
-                  {...args}
-                  options={colorNameOptions}
-                  label={formatMessage({ id: 'reception.appt.form.colorTag' })}
-                />
+                <AppointmentTypeSelector {...args} label='Appointment Type' />
               )}
             />
-          </GridItem>
-          <GridItem
-            xs
-            md={2}
-            className={classnames(classes.colorChipContainer)}
-          >
-            <ColorChip value={values.colorTag} />
           </GridItem>
         </GridItem>
 
@@ -237,7 +220,9 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             </GridItem>
           </GridItem>
           <GridItem xs md={12}>
-            <p>{values.startDate}</p>
+            <p className={classnames(classes.dateTimePreview)}>
+              {values.startDate}
+            </p>
           </GridItem>
 
           <GridItem
@@ -276,7 +261,9 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             </GridItem>
           </GridItem>
           <GridItem xs md={12}>
-            <p>{values.endDate}</p>
+            <p className={classnames(classes.dateTimePreview)}>
+              {values.endDate}
+            </p>
           </GridItem>
 
           <GridItem xs md={12}>
@@ -302,7 +289,6 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
                     <RadioGroup
                       {...args}
                       simple
-                      defaultValue={values.recurrenceRange}
                       options={[
                         {
                           value: RECURRENCE_RANGE.AFTER,

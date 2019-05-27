@@ -25,6 +25,7 @@ class AntdWrapper extends React.PureComponent {
     // optional props
     onChange: PropTypes.func,
     label: PropTypes.string,
+    helpText: PropTypes.string,
   }
 
   static defaultProps = {}
@@ -111,10 +112,13 @@ class AntdWrapper extends React.PureComponent {
       [classes.controlUnderline]: shrink,
       [classes.underlineError]: showError,
     }
+
+    let hideHelpText = helpText === undefined
+    if (showError) hideHelpText = false
     const classForHelpText = {
       [classes.helpText]: true,
       [classes.inputError]: showError,
-      [classes.hiddenHelpText]: !showError,
+      [classes.hiddenHelpText]: hideHelpText,
     }
 
     return (

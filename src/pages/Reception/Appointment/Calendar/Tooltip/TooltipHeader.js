@@ -4,23 +4,23 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core'
 // dx-react-scheduler-material-ui
 import { AppointmentTooltip } from '@devexpress/dx-react-scheduler-material-ui'
-// color mapping
+// settings
 import {
-  getColorMapping,
-  getColorClassByColorName,
-  reduceColorToClass,
-} from '../ColorMapping'
+  getColorClassByAppointmentType,
+  AppointmentTypeAsStyles,
+} from '../setting'
 
 const styles = () => ({
-  ...getColorMapping().reduce(reduceColorToClass, {}),
+  ...AppointmentTypeAsStyles,
 })
 
 const TooltipHeader = ({ classes, appointmentData, children }) => {
-  const colorClass = getColorClassByColorName(
-    appointmentData.colorTag,
+  const colorClass = getColorClassByAppointmentType(
+    appointmentData.appointmentType,
     classes,
     { hover: false },
   )
+
   return (
     <AppointmentTooltip.Header
       className={classnames(colorClass)}

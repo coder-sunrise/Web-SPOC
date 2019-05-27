@@ -162,6 +162,7 @@ export default {
   'reception.appt.form.remarks': 'Remarks',
   'reception.appt.form.doctor': 'Doctor',
   'reception.appt.form.colorTag': 'Color Tag',
+  'reception.appt.form.appointmentType': 'Appointment Type',
   'reception.appt.form.startDate': 'Start Date',
   'reception.appt.form.startTime': 'Start Timing',
   'reception.appt.form.endDate': 'End Date',
@@ -172,4 +173,6 @@ export default {
   'reception.appt.form.endBy': 'End By',
   'reception.appt.form.occurence': 'Ocurrence',
   'reception.appt.form.stopDate': 'Stop Date',
+  'reception.appt.form.validate': 'Validate',
+  'reception.appt.form.cancelAppointment': 'Cancel Appointment',
 }
