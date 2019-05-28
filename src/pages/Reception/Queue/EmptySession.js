@@ -21,39 +21,45 @@ const STYLES = () => ({
   },
 })
 
-class EmptySession extends PureComponent {
-  state = {
-    isLoading: false,
-  }
+const LOADING_KEY = {
+  GET_SESSION_INFO: 'queueLog/getSessionInfo',
+  START_SESSION: 'queueLog/startSession',
+}
 
+class EmptySession extends PureComponent {
   onStartClick = () => {
     const { handleStartSession } = this.props
-    this.setState(
-      {
-        isLoading: true,
-      },
-      () => setTimeout(handleStartSession, 2000),
-    )
+    handleStartSession()
   }
 
   render () {
-    const { isLoading } = this.state
-    const { classes } = this.props
+    const { classes, loadingProps } = this.props
+
     return (
       <div className={classnames(classes.emptyStateContainer)}>
         <div className={classnames(classes.content)}>
-          <h3>
-            <FormattedMessage id='reception.queue.emptyState' />
-          </h3>
-          {!isLoading ? (
-            <Button color='primary' onClick={this.onStartClick}>
-              <PlayCircleOutline />
-              <FormattedMessage id='reception.queue.startSession' />
-            </Button>
-          ) : (
+          {loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] && (
+            <React.Fragment>
+              <LinearProgress />
+              <FormattedMessage id='reception.queue.gettingSessionInfo' />
+            </React.Fragment>
+          )}
+          {loadingProps.effects[LOADING_KEY.START_SESSION] && (
             <React.Fragment>
               <LinearProgress />
               <FormattedMessage id='reception.queue.startingASession' />
+            </React.Fragment>
+          )}
+          {!loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] &&
+          !loadingProps.effects[LOADING_KEY.START_SESSION] && (
+            <React.Fragment>
+              <h3>
+                <FormattedMessage id='reception.queue.emptyState' />
+              </h3>
+              <Button color='primary' onClick={this.onStartClick}>
+                <PlayCircleOutline />
+                <FormattedMessage id='reception.queue.startSession' />
+              </Button>
             </React.Fragment>
           )}
         </div>

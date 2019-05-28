@@ -9,6 +9,7 @@ import { DatePicker } from 'antd'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
 import AntdWrapper from './AntdWrapper'
+import { extendFunc } from '@/utils/utils'
 
 const _dateFormat = 'YYYY-MM-DD'
 
@@ -63,7 +64,7 @@ class AntdDatePicker extends React.PureComponent {
   }
 
   render () {
-    const { classes, ...restProps } = this.props
+    const { classes, onChange, ...restProps } = this.props
     const { format, form, field, value } = restProps
     const selectValue = form && field ? field.value : value
 
@@ -76,7 +77,7 @@ class AntdDatePicker extends React.PureComponent {
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
           placeholder=''
-          onChange={this.handleChange}
+          onChange={extendFunc(onChange, this.handleChange)}
           value={_toMoment(selectValue, format)}
         />
       </AntdWrapper>

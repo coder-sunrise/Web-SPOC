@@ -5,7 +5,6 @@ import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 // ant
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
-import { extendFunc } from '@/utils/utils'
 
 const STYLES = (theme) => ({
   ...inputStyle(theme),
@@ -13,18 +12,12 @@ const STYLES = (theme) => ({
 
 class AntdWrapper extends React.PureComponent {
   static propTypes = {
-    // conditionally required
-    value: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
-        return new Error(
-          `prop ${propName} is REQUIRED for ${componentName} but not supplied`,
-        )
-      return ''
-    },
     // optional props
-    onChange: PropTypes.func,
     label: PropTypes.string,
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array,
+    ]),
     helpText: PropTypes.string,
   }
 
@@ -32,23 +25,6 @@ class AntdWrapper extends React.PureComponent {
 
   state = {
     shrink: false,
-  }
-
-  handleValueChange = (event) => {
-    const { form, field } = this.props
-    let returnValue = event
-
-    if (event) {
-      returnValue = event.target ? event.target.value : event
-    }
-
-    if (form && field) {
-      form.setFieldValue(
-        field.name,
-        returnValue === undefined ? '' : returnValue,
-      )
-      form.setFieldTouched(field.name, true)
-    }
   }
 
   handleFocus = () => {
@@ -120,7 +96,6 @@ class AntdWrapper extends React.PureComponent {
       [classes.inputError]: showError,
       [classes.hiddenHelpText]: hideHelpText,
     }
-
     return (
       <div className={classnames(classForControl)}>
         <span className={classnames(classForLabel)}>{label}</span>
@@ -132,10 +107,8 @@ class AntdWrapper extends React.PureComponent {
             })
           ) : (
             React.cloneElement(children, {
-              onChange: extendFunc(onChange, this.handleValueChange),
               onFocus: this.handleFocus,
               onBlur: this.handleBlur,
-              // value: inputValue,
               ...restProps,
             })
           )}

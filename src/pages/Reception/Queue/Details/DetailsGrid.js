@@ -9,7 +9,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { formatMessage } from 'umi/locale'
 // material ui
 import { Tooltip, withStyles } from '@material-ui/core'
-import { Pageview, Edit, Remove, Fullscreen } from '@material-ui/icons'
+import { Edit, Remove, Fullscreen } from '@material-ui/icons'
 // custom components
 import { Button, CommonModal, CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
@@ -45,13 +45,7 @@ const generateRowData = () => {
   return data
 }
 
-const WithFullscreenModal = ({
-  show,
-  onClose,
-  onConfirm,
-  children,
-  ...props
-}) => {
+const WithFullscreenModal = ({ show, onClose, onConfirm, children }) => {
   return show ? (
     <CommonModal
       open={show}
@@ -209,9 +203,10 @@ class DetailsGrid extends PureComponent {
     const ActionProps = {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
-    const { classes } = this.props
+    const { classes, queueLog } = this.props
     const { isFullscreen } = this.state
-    console.log('detailsgrid render')
+    const { patientList } = queueLog
+
     return (
       <div>
         <WithFullscreenModal
@@ -221,7 +216,7 @@ class DetailsGrid extends PureComponent {
         >
           <CommonTableGrid2
             height={isFullscreen ? undefined : 380}
-            rows={generateRowData()}
+            rows={patientList}
             {...tableParams}
             ActionProps={ActionProps}
           />

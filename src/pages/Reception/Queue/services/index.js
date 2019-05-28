@@ -1,5 +1,5 @@
 import { stringify } from 'qs'
-import request from '@/utils/request'
+import request, { axiosRequest } from '@/utils/request'
 
 export async function queryList (params) {
   const entities = await request(`/api/fake_list?${stringify(params)}`)
@@ -9,6 +9,25 @@ export async function queryList (params) {
       filter: {},
     },
   }
+}
+
+export const startSession = async () => {
+  const response = await axiosRequest('/api/bizsession/', { method: 'POST' })
+  return response
+}
+
+export const endSession = async (sessionID) => {
+  const response = await axiosRequest(`/api/bizsession/${sessionID}`, {
+    method: 'PUT',
+  })
+  return response
+}
+
+export const getSessionInfo = async (sessionID) => {
+  const response = await axiosRequest(`/api/bizsession/${sessionID}`, {
+    method: 'GET',
+  })
+  return response
 }
 
 export async function fetchPatientInfoByPatientID (patientID) {

@@ -174,16 +174,27 @@ class LoginCard extends PureComponent {
                   )}
                 />
                 <FastField
-                  name='application'
+                  name='clinicCode'
                   render={(args) => (
-                    <Select
+                    <TextField
                       {...args}
-                      label='Application'
-                      options={optsApplication}
-                      allowClear={false}
+                      label={formatMessage({ id: 'app.login.clinicCode' })}
                     />
                   )}
                 />
+                {/*
+                  <FastField
+                    name='application'
+                    render={(args) => (
+                      <Select
+                        {...args}
+                        label='Application'
+                        options={optsApplication}
+                        allowClear={false}
+                      />
+                    )}
+                  />
+                */}
               </CardBody>
               <CardFooter className={classnames(classes.justifyContentCenter)}>
                 <ProgressButton

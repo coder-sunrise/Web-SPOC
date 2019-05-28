@@ -5,6 +5,7 @@ export default {
     'There is no session now. Would you like to start one?',
   'reception.queue.startSession': 'Start Session',
   'reception.queue.startingASession': 'Starting a session',
+  'reception.queue.gettingSessionInfo': 'Getting Session Info...',
   'reception.queue.doctor': 'Doctor',
 
   'reception.queue.summaryOfSession': 'Summary of Session',

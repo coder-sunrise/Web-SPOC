@@ -8,7 +8,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 // table grid component
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // material ui
-import { IconButton, withStyles, LinearProgress } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { Search, PersonAdd } from '@material-ui/icons'
 // custom component
 import {
@@ -83,7 +83,7 @@ class PatientSearch extends PureComponent {
 
   render () {
     const { columns, columnExtensions } = this.state
-    const { classes, queueLog, loading, onViewRegisterPatient } = this.props
+    const { classes, queueLog, onViewRegisterPatient } = this.props
     const ActionProps = { TableCellComponent: this.TableCell }
 
     return (

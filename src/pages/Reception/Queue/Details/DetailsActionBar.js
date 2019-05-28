@@ -1,12 +1,18 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 // umi locale
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
 import { PersonAdd, Create } from '@material-ui/icons'
 // custom components
-import { Button, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  TextField,
+  AntdInput,
+} from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
 
@@ -38,6 +44,12 @@ class DetailsActionBar extends PureComponent {
     currentSearchPatient: '',
   }
 
+  onEnterPressed = () => {
+    const { currentSearchPatient } = this.state
+    const { togglePatientSearch } = this.props
+    currentSearchPatient !== '' && togglePatientSearch()
+  }
+
   onSearchPatientChange = (event) => {
     const { value } = event.target
     this.setState({ currentSearchPatient: value })
@@ -52,37 +64,30 @@ class DetailsActionBar extends PureComponent {
     const { currentSearchPatient } = this.state
     const {
       classes,
-      togglePatientSearch,
       toggleNewPatient,
       currentFilter,
       handleStatusChange,
     } = this.props
     return (
       <GridContainer className={classnames(classes.actionBar)} spacing={8}>
-        {/**  
         <GridItem xs md={3}>
-            
-              <TextField
-                value={currentSearchPatient}
-                onChange={this.onSearchPatientChange}
-                label={formatMessage({
-                  id: 'reception.queue.registerVisitTextBox',
-                })}
-              />
-            
-          </GridItem>
-        */}
-        <GridItem xs md={3} container alignItems='center'>
-          <Button size='sm' color='info' onClick={togglePatientSearch}>
-            <Create />
-            <FormattedMessage id='reception.queue.registerVisit' />
-          </Button>
+          <AntdInput
+            value={currentSearchPatient}
+            onChange={this.onSearchPatientChange}
+            onPressEnter={this.onEnterPressed}
+            label={formatMessage({
+              id: 'reception.queue.registerVisitTextBox',
+            })}
+          />
+        </GridItem>
+
+        <GridItem xs md={2} container alignItems='center'>
           <Button size='sm' color='primary' onClick={toggleNewPatient}>
             <PersonAdd />
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </GridItem>
-        <GridItem xs md={9} container justify='flex-end' alignItems='center'>
+        <GridItem xs md={7} container justify='flex-end' alignItems='center'>
           <StatisticIndicator
             filter={currentFilter}
             handleStatusClick={handleStatusChange}

@@ -17,7 +17,7 @@ const styles = (theme) => ({
 @connect(({ loginSEMR }) => ({ loginSEMR }))
 class LoginPage extends PureComponent {
   componentDidMount = () => {
-    const haveToken = sessionStorage.getItem('token')
+    const haveToken = localStorage.getItem('token')
     haveToken && router.push('reception/queue')
   }
 

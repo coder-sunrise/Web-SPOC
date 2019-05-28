@@ -6,6 +6,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 // ant
 import { Select } from 'antd'
 import AntdWrapper from './AntdWrapper'
+import { extendFunc } from '@/utils/utils'
 
 const STYLES = () => {
   return {
@@ -61,6 +62,23 @@ class AntdSelect extends React.PureComponent {
   handleFilter = (input, option) =>
     option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 
+  handleValueChange = (event) => {
+    const { form, field } = this.props
+    let returnValue = event
+
+    if (event) {
+      returnValue = event.target ? event.target.value : event
+    }
+
+    if (form && field) {
+      form.setFieldValue(
+        field.name,
+        returnValue === undefined ? '' : returnValue,
+      )
+      form.setFieldTouched(field.name, true)
+    }
+  }
+
   render () {
     const {
       valueField,
@@ -69,6 +87,7 @@ class AntdSelect extends React.PureComponent {
       classes,
       defaultValue,
       renderDropdown,
+      onChange,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -79,6 +98,7 @@ class AntdSelect extends React.PureComponent {
       value: s[valueField],
       label: s[labelField],
     }))
+
     return (
       <AntdWrapper {...restProps}>
         <Select
@@ -86,6 +106,7 @@ class AntdSelect extends React.PureComponent {
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
           showSearch
+          onChange={extendFunc(onChange, this.handleValueChange)}
           value={selectValue}
           defaultValue={defaultValue}
           filterOption={this.handleFilter}

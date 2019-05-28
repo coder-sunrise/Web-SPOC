@@ -74,8 +74,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog }) => ({
+@connect(({ queueLog, loading }) => ({
   queueLog,
+  loading,
 }))
 @withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends PureComponent {
@@ -87,8 +88,14 @@ class Queue extends PureComponent {
     showEndSessionConfirm: false,
     showEndSessionSummary: false,
     visitPatientID: '',
-    noSession: false,
     currentFilter: StatusIndicator.ALL,
+  }
+
+  componentWillMount = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'queueLog/getSessionInfo',
+    })
   }
 
   showVisitRegistration = (patientID = '') => {
@@ -137,24 +144,29 @@ class Queue extends PureComponent {
   }
 
   onStartSession = () => {
-    this.setState({
-      noSession: false,
+    const { dispatch } = this.props
+    dispatch({
+      type: 'queueLog/startSession',
     })
   }
 
   onEndSessionClick = () => {
     const { showEndSessionConfirm } = this.state
+
     this.setState({
       showEndSessionConfirm: !showEndSessionConfirm,
     })
   }
 
   onConfirmEndSession = () => {
-    this.setState({
-      showEndSessionConfirm: false,
-      showEndSessionSummary: true,
-      noSession: true,
+    const { dispatch } = this.props
+    dispatch({
+      type: 'queueLog/endSession',
     })
+    // this.setState({
+    //   showEndSessionConfirm: false,
+    //   showEndSessionSummary: true,
+    // })
   }
 
   onEndSessionSummaryClose = () => {
@@ -166,7 +178,7 @@ class Queue extends PureComponent {
   }
 
   render () {
-    const { classes, ...restProps } = this.props
+    const { classes, queueLog, loading, ...restProps } = this.props
     const {
       showNewVisit,
       showPatientSearch,
@@ -175,10 +187,10 @@ class Queue extends PureComponent {
       showEndSessionConfirm,
       showEndSessionSummary,
       visitPatientID,
-      noSession,
       currentFilter,
     } = this.state
-    const sessionNo = '190410-01-1.0'
+
+    const { sessionNo, isClinicSessionClosed } = queueLog.sessionInfo
 
     return (
       <PageHeaderWrapper
@@ -199,7 +211,7 @@ class Queue extends PureComponent {
               <FormattedMessage id='reception.queue.sessionNo' />
               {sessionNo}
             </h4>
-            {!noSession && (
+            {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
                 <Button
                   size='sm'
@@ -223,8 +235,11 @@ class Queue extends PureComponent {
           </CardHeader>
 
           <CardBody>
-            {noSession ? (
-              <EmptySession handleStartSession={this.onStartSession} />
+            {isClinicSessionClosed ? (
+              <EmptySession
+                handleStartSession={this.onStartSession}
+                loadingProps={loading}
+              />
             ) : (
               <React.Fragment>
                 <DetailsActionBar
@@ -235,7 +250,7 @@ class Queue extends PureComponent {
                 />
                 <DetailsGrid
                   onViewDispenseClick={this.toggleDispense}
-                  {...restProps}
+                  queueLog={queueLog}
                 />
                 <DetailsFooter
                   onViewPatientProfile={this.toggleViewPatientProfile}
