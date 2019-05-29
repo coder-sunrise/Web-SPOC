@@ -41,9 +41,9 @@ function GridContainer ({ ...props }) {
           key: i,
           gutter,
           gridLayout,
-          ...restProps,
-        })
-      })}
+          ...rest,
+        }),
+      )}
     </Grid>
   )
 }
