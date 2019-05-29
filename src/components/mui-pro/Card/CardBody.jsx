@@ -23,12 +23,12 @@ function CardBody ({ ...props }) {
     color,
     profile,
     calendar,
-    sm,
+    size,
     ...rest
   } = props
   const cardBodyClasses = classNames({
     [classes.cardBody]: true,
-    [classes.cardBodySm]: sm,
+    [classes.cardBodySm]: size === 'sm',
     [classes.cardBodyBackground]: background,
     [classes.cardBodyPlain]: plain,
     [classes.cardBodyFormHorizontal]: formHorizontal,

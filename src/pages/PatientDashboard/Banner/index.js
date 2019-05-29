@@ -45,17 +45,9 @@ import DraftsIcon from '@material-ui/icons/Drafts'
 import SendIcon from '@material-ui/icons/Send'
 import avatar from '@/assets/img/faces/marc.jpg'
 import { titles, finTypes, gender } from '@/utils/codes'
-import { standardRowHeight } from 'mui-pro-jss'
+import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 // import model from '../models/demographic'
 import Block from './Block'
-
-// window.g_app.replaceModel(model)
-const styles = () => ({
-  btnContainer: {
-    lineHeight: standardRowHeight,
-    textAlign: 'right',
-  },
-})
 
 @connect(({ patientDashboard }) => ({
   patientDashboard,
@@ -78,19 +70,30 @@ class Banner extends PureComponent {
     // props.setValues(props.patientDashboard.entity)
   }
 
+  startConsultation = () => {
+    this.props.history.push('/patientdashboard/consultation/new')
+  }
+
   render () {
     // console.log(this.props)
     const { props, state } = this
-    const { values, patientDashboard, theme, classes, setValues } = props
+    const { theme, classes, setValues, extraCmt } = props
     return (
-      <div style={{ marginBottom: theme.spacing.unit }}>
+      // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
+      <Paper
+        style={{
+          position: 'sticky',
+          top: 57,
+          zIndex: 1000,
+        }}
+      >
         <GridContainer>
-          <GridItem xs={6} md={1} gutter={1}>
+          <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
               <img src={avatar} alt='...' />
             </CardAvatar>
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <Block h3='Mr John Smith' body='G512345R, Malaysian' />
           </GridItem>
           <GridItem xs={6} md={2}>
@@ -102,13 +105,14 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block header='Medical Problem' body='Asthma' />
           </GridItem>
-          <GridItem xs={6} md={2} style={{ lineHeight: '60px' }}>
-            <Button color='primary'>Start Consultation</Button>
+          <GridItem xs={6} md={3}>
+            {extraCmt}
           </GridItem>
         </GridContainer>
-      </div>
+      </Paper>
+      // </Affix>
     )
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Banner)
+export default Banner

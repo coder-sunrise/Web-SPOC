@@ -84,6 +84,7 @@ class HeaderLinks extends React.Component {
           aria-label='edit'
           justIcon
           round
+          size='sm'
           className={searchButton}
         >
           <Search

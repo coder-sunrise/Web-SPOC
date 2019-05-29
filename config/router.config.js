@@ -20,8 +20,14 @@ export default [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [ 'src/pages/Authorized' ],
-    authority: [ 'admin', 'user', 'guest' ],
+    Routes: [
+      'src/pages/Authorized',
+    ],
+    authority: [
+      'admin',
+      'user',
+      'guest',
+    ],
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue', system: 'CMS' },
@@ -361,7 +367,7 @@ export default [
       {
         path: '/queuelisting',
         system: 'EMR',
-        icon: 'library_books',
+        icon: 'local_hospital',
         name: 'queuelisting',
         // component: './QueueListing',
       },
@@ -370,7 +376,19 @@ export default [
         system: 'EMR',
         icon: 'group',
         name: 'patientdashboard',
-        component: './PatientDashboard',
+        routes: [
+          {
+            path: '/patientdashboard',
+            name: 'patientdashboard',
+            component: './PatientDashboard',
+          },
+          {
+            path: '/patientdashboard/consultation/:id',
+            name: 'consultation',
+            hideInMenu: true,
+            component: './PatientDashboard/Consultation',
+          },
+        ],
       },
       // // Patient View
       // {

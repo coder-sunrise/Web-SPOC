@@ -392,8 +392,8 @@ const buttonStyle = {
     borderRadius: '0.2rem',
   },
   sm: {
-    padding: '0.40625rem 1.25rem',
-    fontSize: '0.6875rem',
+    padding: '3px 10px',
+    fontSize: '0.7rem',
     lineHeight: '1.5',
     borderRadius: '0.2rem',
   },
@@ -412,8 +412,9 @@ const buttonStyle = {
   },
 
   justIcon: {
-    paddingLeft: '12px',
-    paddingRight: '12px',
+    // paddingLeft: '12px',
+    // paddingRight: '12px',
+    padding: 0,
     fontSize: '20px',
     height: '41px',
     // minWidth: '41px',
@@ -436,16 +437,16 @@ const buttonStyle = {
       },
     },
     '&$sm': {
-      height: '26px',
-      minWidth: '26px',
-      width: '26px',
+      height: '24px',
+      minWidth: '24px',
+      width: '24px',
       '& .fab,& .fas,& .far,& .fal,& .material-icons': {
-        fontSize: '16px',
-        lineHeight: '25px',
+        fontSize: '15px',
+        lineHeight: '23px',
       },
       '& svg': {
-        width: '14px',
-        height: '14px',
+        width: '18px',
+        height: '18px',
       },
     },
   },

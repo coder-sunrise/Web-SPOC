@@ -89,12 +89,12 @@ class PatientDetail extends PureComponent {
   }
 
   componentDidMount () {
-    if (navigator.platform.indexOf('Win') > -1 && this.refs.sidebarWrapper) {
-      ps = new PerfectScrollbar(this.refs.sidebarWrapper, {
-        suppressScrollX: true,
-        suppressScrollY: false,
-      })
-    }
+    // if (navigator.platform.indexOf('Win') > -1 && this.refs.sidebarWrapper) {
+    //   ps = new PerfectScrollbar(this.refs.sidebarWrapper, {
+    //     suppressScrollX: true,
+    //     suppressScrollY: false,
+    //   })
+    // }
     if (this.props.patient.currentId) {
       this.props.dispatch({
         type: 'patient/query',

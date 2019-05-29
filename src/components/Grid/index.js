@@ -21,15 +21,15 @@ import {
 
 const currencyFormat = '$0,0.00'
 const qtyFormat = '0.0'
-function NumberFormatter ({ column, ...prop }) {
-  // console.log(prop, this)
+function NumberFormatter (p) {
+  const { column } = p
   let config
   if (this) {
     config = this.config[column.name] || {}
   }
-  let propConvert = prop
-  if (typeof prop === 'number') {
-    propConvert = { value: prop }
+  let propConvert = p
+  if (typeof p === 'number') {
+    propConvert = { value: p }
   }
   let { value, color = 'darkblue', text } = propConvert
 
@@ -37,10 +37,10 @@ function NumberFormatter ({ column, ...prop }) {
     color = 'red'
   if (config && config.currency) {
     if (text) return numeral(value).format(currencyFormat)
-    return <b style={{ color }}>{numeral(value).format(currencyFormat)}</b>
+    return <b style={{ color }}>${numeral(value).format(currencyFormat)}</b>
   }
   if (text) return numeral(value).format(qtyFormat)
-  return <b style={{ color }}>{numeral(value).format(qtyFormat)}</b>
+  return <b style={{ color }}>${numeral(value).format(qtyFormat)}</b>
 }
 export function TextfieldEditor (props) {
   // console.log('textfieldeditor', props)

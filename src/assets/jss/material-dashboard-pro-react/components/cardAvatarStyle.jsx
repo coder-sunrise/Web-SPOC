@@ -1,5 +1,7 @@
 const cardAvatarStyle = {
   cardAvatar: {
+    marginLeft: '0 !important',
+    marginRight: '0 !important',
     '&$cardAvatarProfile img,&$cardAvatarTestimonial img': {
       width: '100%',
       height: 'auto',

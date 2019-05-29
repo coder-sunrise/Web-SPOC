@@ -67,4 +67,5 @@ export default {
   'menu.queuelisting': 'Queue Listing',
 
   'menu.patientdashboard': 'Patient Dashboard',
+  'menu.patientdashboard.consultation': 'Consultation',
 }

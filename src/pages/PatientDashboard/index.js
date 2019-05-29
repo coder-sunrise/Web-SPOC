@@ -28,6 +28,7 @@ import {
   AntdInput,
   Select,
   Accordion,
+  Button,
 } from '@/components'
 import { Icon, Input, AutoComplete, Form } from 'antd'
 
@@ -39,20 +40,19 @@ import Loading from '@/components/PageLoading/index'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import Banner from './Banner'
 import Orders from './Orders'
+import ConsultationDocument from './ConsultationDocument'
+import ResultHistory from './ResultHistory'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
-  root: {
-    marginRight: -10,
-    marginLeft: -10,
-  },
+  root: {},
   hide: {
     display: 'none',
   },
   note: {
     fontSize: 10,
     fontWeight: 400,
-    marginTop: -10,
+    marginTop: -3,
     lineHeight: '10px',
   },
   listRoot: {
@@ -68,6 +68,11 @@ const styles = (theme) => ({
   },
   paragraph: {
     marginLeft: theme.spacing.unit,
+  },
+  rightPanel: {
+    '& h6': {
+      textDecoration: 'underline',
+    },
   },
 })
 const dataSource = [
@@ -204,6 +209,10 @@ class PatientDashboard extends PureComponent {
     </List>
   )
 
+  startConsultation = () => {
+    this.props.history.push('/patientdashboard/consultation/new')
+  }
+
   render () {
     const {
       theme,
@@ -233,8 +242,18 @@ class PatientDashboard extends PureComponent {
 
     return (
       <div className={classes.root}>
-        <Banner />
-        <Divider light />
+        <Banner
+          extraCmt={
+            <Button
+              color='primary'
+              onClick={this.startConsultation}
+              style={{ marginTop: 25 }}
+            >
+              Start Consultation
+            </Button>
+          }
+          {...this.props}
+        />
         {/* <AutoComplete dataSource={dataSource} />
         <Input placeholder='Basic usage' />
         <TextField label='Basic usage' />
@@ -243,9 +262,9 @@ class PatientDashboard extends PureComponent {
         <Form.Item label='E-mail'>
           <Input />
         </Form.Item> */}
-        <GridContainer gutter={4}>
+        <GridContainer gutter={4} gridLayout>
           <GridItem sm={12} md={3}>
-            <CardContainer hideHeader sm>
+            <CardContainer hideHeader size='sm'>
               <Accordion
                 active={0}
                 collapses={[
@@ -270,7 +289,8 @@ class PatientDashboard extends PureComponent {
           <GridItem sm={12} md={9}>
             <CardContainer
               hideHeader
-              sm
+              size='sm'
+              className={classes.rightPanel}
               // style={{ marginLeft: theme.spacing.unit * 2 }}
             >
               <Select
@@ -279,16 +299,20 @@ class PatientDashboard extends PureComponent {
                 label='Filter By'
                 style={{ maxWidth: 300 }}
               />
-              <h5>Chief Complaints</h5>
-              <Typography component='div' className={classes.paragraph}>
+              <h6>Chief Complaints</h6>
+              <div className={classes.paragraph}>
                 <p>A *paragraph* of text</p>
                 <p>A _second_ row of text</p>
-              </Typography>
+              </div>
 
-              <h5>Plan</h5>
-              <h5>Diagnosis</h5>
-              <h5>Orders</h5>
+              <h6>Plan</h6>
+              <h6>Diagnosis</h6>
+              <h6>Orders</h6>
               <Orders />
+              <h6>Consultation Document</h6>
+              <ConsultationDocument />
+              <h6>Result History</h6>
+              <ResultHistory />
             </CardContainer>
           </GridItem>
         </GridContainer>

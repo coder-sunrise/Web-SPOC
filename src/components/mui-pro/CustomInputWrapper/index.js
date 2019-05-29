@@ -68,12 +68,12 @@ function CustomInputWrapper ({ field, form, classes, ...props }) {
   })
   let formControlClasses
   if (formControlProps !== undefined) {
-    formControlClasses = classNames({
+    formControlClasses = `${classNames({
       [formControlProps.className]: true,
       [classes.formControl]: true,
       [classes.noLabel]: !label,
       [props.className]: true,
-    })
+    })} non-dragable`
   } else {
     formControlClasses = classes.formControl
   }
@@ -120,7 +120,9 @@ function CustomInputWrapper ({ field, form, classes, ...props }) {
   }
   // console.log(label)
   return noWrapper ? (
-    <div style={style}>{newChildren}</div>
+    <div className='non-dragable' style={style}>
+      {newChildren}
+    </div>
   ) : (
     <FormControl
       fullWidth={fullWidth}
