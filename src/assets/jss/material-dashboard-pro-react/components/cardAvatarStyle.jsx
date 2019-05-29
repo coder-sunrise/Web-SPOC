@@ -38,10 +38,6 @@ const cardAvatarStyle = {
     marginBottom: '-50px',
     marginTop: '10px',
   },
-  cardAvatarSquare: {
-    marginTop: 0,
-    borderRadius: 3,
-  },
 }
 
 export default cardAvatarStyle

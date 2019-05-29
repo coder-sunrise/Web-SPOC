@@ -9,7 +9,7 @@ import { withFormik } from 'formik'
 import classNames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { Refresh, Queue as QueueIcon, Stop } from '@material-ui/icons'
+import { Queue as QueueIcon, Stop } from '@material-ui/icons'
 // custom components
 import {
   Card,
@@ -19,6 +19,9 @@ import {
   CommonModal,
   SimpleModal,
   PageHeaderWrapper,
+  CommonHeader,
+  GridContainer,
+  GridItem,
   Button,
 } from '@/components'
 
@@ -33,9 +36,6 @@ import PatientSearchModal from './PatientSearch'
 import NewPatient from '../../PatientDatabase/New'
 import ViewPatient from '../../PatientDatabase/Detail'
 import EndSessionSummary from './Details/EndSessionSummary'
-
-// variables
-import { StatusIndicator } from './variables'
 
 const drawerWidth = 400
 
@@ -88,13 +88,12 @@ class Queue extends PureComponent {
     showEndSessionSummary: false,
     visitPatientID: '',
     noSession: false,
-    currentFilter: StatusIndicator.ALL,
   }
 
   showVisitRegistration = (patientID = '') => {
     const { showNewVisit } = this.state
     const { dispatch } = this.props
-
+    console.log('togglevisitregistration', patientID)
     patientID !== '' &&
       dispatch({
         type: 'queueLog/fetchPatientInfoByPatientID',
@@ -161,10 +160,6 @@ class Queue extends PureComponent {
     this.setState({ showEndSessionSummary: false })
   }
 
-  onStatusChange = (newStatus) => {
-    this.setState({ currentFilter: newStatus })
-  }
-
   render () {
     const { classes, ...restProps } = this.props
     const {
@@ -176,10 +171,9 @@ class Queue extends PureComponent {
       showEndSessionSummary,
       visitPatientID,
       noSession,
-      currentFilter,
     } = this.state
     const sessionNo = '190410-01-1.0'
-    console.log('queue render: ', showPatientSearch)
+
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
@@ -202,15 +196,6 @@ class Queue extends PureComponent {
             {!noSession && (
               <div className={classNames(classes.toolBtns)}>
                 <Button
-                  size='sm'
-                  color='info'
-                  classes={{ justIcon: classes.icon }}
-                >
-                  <Refresh />
-                  <FormattedMessage id='reception.queue.refreshQueue' />
-                </Button>
-                <Button
-                  size='sm'
                   color='danger'
                   classes={{ justIcon: classes.icon }}
                   onClick={this.onEndSessionClick}
@@ -228,10 +213,7 @@ class Queue extends PureComponent {
             ) : (
               <React.Fragment>
                 <DetailsActionBar
-                  currentFilter={currentFilter}
-                  handleStatusChange={this.onStatusChange}
                   togglePatientSearch={this.togglePatientSearch}
-                  toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
                   onViewDispenseClick={this.toggleDispense}
@@ -242,24 +224,20 @@ class Queue extends PureComponent {
                 />
               </React.Fragment>
             )}
-
             <CommonModal
               open={showPatientSearch}
-              title='Search Patient'
+              title={formatMessage({ id: 'reception.queue.patientSearch' })}
               onClose={this.togglePatientSearch}
               onConfirm={this.togglePatientSearch}
               maxWidth='md'
               fluidHeight
               showFooter={false}
             >
-              {showPatientSearch ? (
-                <PatientSearchModal
-                  onViewRegisterVisit={this.showVisitRegistration}
-                  onViewRegisterPatient={this.toggleRegisterNewPatient}
-                />
-              ) : null}
+              <PatientSearchModal
+                onViewRegisterVisit={this.showVisitRegistration}
+                onViewRegisterPatient={this.toggleRegisterNewPatient}
+              />
             </CommonModal>
-
             <CommonModal
               open={showNewVisit}
               title={formatMessage({
@@ -271,9 +249,7 @@ class Queue extends PureComponent {
               fluidHeight
               showFooter={false}
             >
-              {showNewVisit ? (
-                <NewVisitModal visitPatientID={visitPatientID} />
-              ) : null}
+              <NewVisitModal visitPatientID={visitPatientID} />
             </CommonModal>
             <CommonModal
               open={showRegisterNewPatient}

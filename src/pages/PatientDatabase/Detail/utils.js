@@ -23,17 +23,17 @@ import Replay from '@material-ui/icons/Replay'
 import Clear from '@material-ui/icons/Clear'
 
 import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
-console.log('util')
+
 module.exports = {
-  componentDidUpdate: (props, prevProps, cb = (f) => false) => {
+  componentDidUpdate: (props, prevProps) => {
     const { patient } = props
     // console.log(patient.entity, prevProps.values.id)
-    if (patient.entity && (patient.entity.id !== prevProps.values.id || cb())) {
-      props.resetForm(patient.entity)
+    if (patient.entity && patient.entity.id !== prevProps.values.id) {
+      props.setValues(patient.entity)
     }
   },
   handleSubmit: (values, component) => {
-    const { props, resetForm } = component
+    const { props, setValues } = component
     // console.log(values)
     // return
     props
@@ -70,8 +70,8 @@ module.exports = {
                 },
               })
               .then((value) => {
-                console.log(value)
-                resetForm(value)
+                // console.log(value)
+                setValues(value)
               })
           }
           if (props.onConfirm) props.onConfirm()
@@ -83,33 +83,25 @@ module.exports = {
     theme,
     handleSubmit,
     resetForm,
-    resetable = true,
     values,
-    dirty,
-    touched,
     dispatch,
-    history,
     extraBtn,
-    disabled = Object.values(touched).length === 0 && !dirty,
   }) => (
     <div
       style={{
         position: 'relative',
         textAlign: 'center',
-        marginTop: theme.spacing.unit * 2,
+        marginTop: theme.spacing.unit,
       }}
     >
       {values &&
-      values.id &&
-      resetable && (
+      values.id && (
         <Button
           // className={classes.modalCloseButton}
           key='reset'
           aria-label='Reset'
           color='danger'
-          onClick={() => {
-            resetForm()
-          }}
+          onClick={resetForm}
           style={{ left: 0, position: 'absolute' }}
         >
           <Replay />
@@ -122,28 +114,21 @@ module.exports = {
         aria-label='Cancel'
         color='danger'
         onClick={() => {
-          const f = () => {
-            dispatch({
-              type: 'global/closePatientModal',
-              history,
-            })
-          }
-          if (!disabled) {
-            confirm({
-              title: 'Do you want to discard your changes?',
-              onOk: f,
-              onCancel () {},
-            })
-          } else {
-            f()
-          }
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              showPatientInfoPanel: false,
+              fullscreen: false,
+              currentPatientId: null,
+            },
+          })
         }}
         style={{ marginRight: theme.spacing.unit }}
       >
         <Clear />
         Cancel
       </Button>
-      <ProgressButton onClick={handleSubmit} disabled={disabled} />
+      <ProgressButton onClick={handleSubmit} />
       {extraBtn}
     </div>
   ),

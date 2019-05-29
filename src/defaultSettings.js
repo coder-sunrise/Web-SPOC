@@ -6,13 +6,13 @@ module.exports = {
   // fixedHeader: false, // sticky header
   // autoHideHeader: false, // auto hide header
   // fixSiderbar: false, // sticky siderbar
-  navTheme: 'dark',
-  // "primaryColor": "#1890FF",
-  layout: 'sidemenu',
-  contentWidth: 'Fluid',
-  fixedHeader: false,
-  autoHideHeader: false,
-  fixSiderbar: false,
-  collapse: true,
-  ui: 'mui',
+    "navTheme": "dark",
+    "primaryColor": "#1890FF",
+    "layout": "sidemenu",
+    "contentWidth": "Fluid",
+    "fixedHeader": false,
+    "autoHideHeader": false,
+    "fixSiderbar": false,
+    "collapse": true,
+    "ui": "mui",
 }

@@ -185,17 +185,11 @@ class PatientDetail extends PureComponent {
               >
                 <MenuList>
                   {menus.map((o) => (
-                    <Link
-                      key={o.name}
-                      onClick={(e) => (!currentId ? e.preventDefault() : true)}
-                      to={getAppendUrl(o.url)}
-                      {...linkProps}
-                    >
+                    <Link key={o.name} to={getAppendUrl(o.url)} {...linkProps}>
                       <MenuItem
                         key={o.name}
                         className={classes.menuItem}
                         selected={currentMenu.name === o.name}
-                        disabled={!currentId}
                         onClick={(e) => {
                           onMenuClick(e, o)
                         }}

@@ -18,7 +18,7 @@ const accordionStyle = (theme) => ({
     minHeight: 'auto !important',
     backgroundColor: 'transparent',
     borderBottom: '1px solid #ddd',
-    padding: '10px 10px 5px 0px',
+    padding: '25px 10px 5px 0px',
     borderTopLeftRadius: '3px',
     borderTopRightRadius: '3px',
     color: '#3C4858',

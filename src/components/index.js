@@ -15,7 +15,6 @@ export NumberField from './NumberInput'
 
 export Select from './Select'
 export CodeSelect from './Select/CodeSelect'
-export ANTDSelect from './Select/AntDSelect.js'
 export notification from './Notification'
 export CommonModal from './CommonModal'
 export CommonHeader from './CommonHeader'
@@ -25,8 +24,6 @@ export Tooltip from './CommonToolTip'
 export EditableTableGrid from './CommonTableGrid/EditableTableGrid'
 export EditableTableGrid2 from './CommonTableGrid2/EditableTableGrid'
 export NumberTypeProvider2 from './CommonTableGrid2/EditCellComponents/NumberTypeProvider'
-
-export AntdInput from './Antd/AntdInput'
 
 export SimpleAlert from './SimpleAlert'
 export SimpleModal from './SimpleModal'

@@ -47,37 +47,19 @@ class CustomInput extends React.PureComponent {
   constructor (props) {
     super(props)
     // this.myRef = React.createRef()
-
-    const { field, form, inputProps = {}, defaultValue = '' } = props
-    // console.log(props)
-    inputProps.onChange = extendFunc(inputProps.onChange, this._onChange)
-    inputProps.onFocus = extendFunc(
-      inputProps.onFocus,
-      props.onFocus,
-      this._onFocus,
-    )
-    inputProps.onBlur = extendFunc(
-      inputProps.onBlur,
-      props.onBlur,
-      this._onBlur,
-    )
-    if (field && form) {
-      inputProps.name = field.name
-      inputProps.onBlur = extendFunc(inputProps.onBlur, field.onBlur)
-    }
-    let value = defaultValue
-    if (props.value !== undefined) {
-      value = this.props.value
-    } else if (this.props.field) {
-      value = this.props.field.value
-    }
     this.state = {
-      value,
-      onChange: inputProps.onChange,
-      onFocus: inputProps.onFocus,
-      onBlur: inputProps.onBlur,
+      value: undefined,
+      control: 1,
     }
-    // console.log(this.state)
+    if (props.value !== undefined) {
+      this.state = {
+        value: this.props.value,
+      }
+    } else if (this.props.field) {
+      this.state = {
+        value: this.props.field.value,
+      }
+    }
   }
 
   // componentDidMount (){
@@ -109,16 +91,18 @@ class CustomInput extends React.PureComponent {
   // }
 
   static getDerivedStateFromProps (nextProps, preState) {
-    const { value, field } = nextProps
+    const { value, field, control = 1 } = nextProps
     if (value !== undefined) {
       return {
         value,
+        control,
       }
     }
     if (field) {
       return {
         value: field.value,
         // shrink: !!field.value,
+        control,
       }
     }
     return null
@@ -234,7 +218,6 @@ class CustomInput extends React.PureComponent {
   }
 
   _onBlur = () => {
-    // console.log('b')
     this.setState({ shrink: !!this.state.value })
   }
 
@@ -353,18 +336,25 @@ class CustomInput extends React.PureComponent {
       shrink = false,
     } = props
     // console.log(this.state, this.state.value)
-    if (this.state) {
-      inputProps = {
-        ...inputProps,
-        ...this.state,
-      }
-      if (this.state.value === undefined) {
-        delete inputProps.value
-      }
+    if (this.state && this.state.value !== undefined) {
+      inputProps.value = this.state.value
     }
+    inputProps.onChange = extendFunc(inputProps.onFocus, this._onChange)
 
-    // console.log(inputProps)
+    inputProps.onFocus = extendFunc(inputProps.onFocus, this._onFocus)
+
+    inputProps.onBlur = extendFunc(inputProps.onBlur, this._onBlur)
+    // console.log(this.props)
     if (field && form) {
+      inputProps.name = field.name
+
+      // inputProps.onChange = extendFunc(inputProps.onChange, field.onChange) // field.onChange
+
+      // inputProps.onBlur = extendFunc(inputProps.onBlur, (e)=>{
+      //   if(!realtime)field.onChange(e)
+      //   field.onBlur(e)
+      // })
+      inputProps.onBlur = extendFunc(inputProps.onBlur, field.onBlur)
       const shouldShow =
         Object.byString(form.touched, field.name) || form.submitCount > 0
       // console.log(shouldShow)

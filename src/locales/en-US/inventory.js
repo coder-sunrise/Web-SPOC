@@ -18,8 +18,4 @@ export default {
   'inventory.master.package.code': 'Package Code',
   'inventory.master.package.name': 'Package Name',
   'inventory.master.package.status': 'Status',
-
-  'inventory.pd.code': 'PO No.',
-  'inventory.pd.status': 'Status',
-  'inventory.pd.supplier': 'Supplier',
 }

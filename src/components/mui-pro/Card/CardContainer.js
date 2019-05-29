@@ -36,7 +36,7 @@ function CardContainer ({
           <h4>{typeof title === 'function' ? title() : title}</h4>
         </CardHeader>
       )}
-      <CardBody {...props}>{children}</CardBody>
+      <CardBody>{children}</CardBody>
     </Card>
   )
 }

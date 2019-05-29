@@ -252,8 +252,9 @@ class BasicLayout extends React.PureComponent {
     // }
 
     // check token, logout if token not exist
-    const hasToken = sessionStorage.getItem('token')
-    !hasToken && router.push('/login')
+    // const hasToken = sessionStorage.getItem('token')
+
+    // !hasToken && router.push('/login')
 
     window.addEventListener('resize', this.resizeFunction)
 

@@ -57,7 +57,7 @@ class Address extends Component {
       title: 'Do you want to remove this address?',
       // content:
       //   'When clicked the OK button, this dialog will be closed after 1 second',
-      onOk: () => {
+      onOk () {
         this.props.arrayHelpers.remove(i)
       },
       onCancel () {},

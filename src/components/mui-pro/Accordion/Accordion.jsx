@@ -1,33 +1,31 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from "react";
+import PropTypes from "prop-types";
 
 // @material-ui/core components
-import withStyles from '@material-ui/core/styles/withStyles'
-import ExpansionPanel from '@material-ui/core/ExpansionPanel'
-import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
-import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
+import withStyles from "@material-ui/core/styles/withStyles";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
 // @material-ui/icons
-import ExpandMore from '@material-ui/icons/ExpandMore'
+import ExpandMore from "@material-ui/icons/ExpandMore";
 
-import accordionStyle from 'mui-pro-jss/material-dashboard-pro-react/components/accordionStyle.jsx'
+import accordionStyle from "mui-pro-jss/material-dashboard-pro-react/components/accordionStyle.jsx";
 
 class Accordion extends React.Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      active: props.active,
-    }
+      active: props.active
+    };
   }
-
-  handleChange = (panel) => (event, expanded) => {
+  handleChange = panel => (event, expanded) => {
     this.setState({
-      active: expanded ? panel : -1,
-    })
-  }
-
-  render () {
-    const { classes, collapses } = this.props
+      active: expanded ? panel : -1
+    });
+  };
+  render() {
+    const { classes, collapses } = this.props;
     return (
       <div className={classes.root}>
         {collapses.map((prop, key) => {
@@ -38,7 +36,7 @@ class Accordion extends React.Component {
               key={key}
               classes={{
                 root: classes.expansionPanel,
-                expanded: classes.expansionPanelExpanded,
+                expanded: classes.expansionPanelExpanded
               }}
             >
               <ExpansionPanelSummary
@@ -47,29 +45,25 @@ class Accordion extends React.Component {
                   root: classes.expansionPanelSummary,
                   expanded: classes.expansionPanelSummaryExpaned,
                   content: classes.expansionPanelSummaryContent,
-                  expandIcon: classes.expansionPanelSummaryExpandIcon,
+                  expandIcon: classes.expansionPanelSummaryExpandIcon
                 }}
               >
-                {prop.title === 'string' ? (
-                  <h4 className={classes.title}>{prop.title}</h4>
-                ) : (
-                  prop.title
-                )}
+                <h4 className={classes.title}>{prop.title}</h4>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails className={classes.expansionPanelDetails}>
                 {prop.content}
               </ExpansionPanelDetails>
             </ExpansionPanel>
-          )
+          );
         })}
       </div>
-    )
+    );
   }
 }
 
 Accordion.defaultProps = {
-  active: -1,
-}
+  active: -1
+};
 
 Accordion.propTypes = {
   classes: PropTypes.object.isRequired,
@@ -78,9 +72,9 @@ Accordion.propTypes = {
   collapses: PropTypes.arrayOf(
     PropTypes.shape({
       title: PropTypes.string,
-      content: PropTypes.node,
-    }),
-  ).isRequired,
-}
+      content: PropTypes.node
+    })
+  ).isRequired
+};
 
-export default withStyles(accordionStyle)(Accordion)
+export default withStyles(accordionStyle)(Accordion);

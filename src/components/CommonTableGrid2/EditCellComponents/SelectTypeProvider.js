@@ -12,14 +12,7 @@ const SelectEditor = (columnExtensions) =>
       columnExtensions.find(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
-    const {
-      type,
-      code,
-      errors = [],
-      disabled,
-      isDisabled = (f) => false,
-      ...restProps
-    } = cfg
+    const { type, code, errors = [], ...restProps } = cfg
     const error = errors.find((o) => o.index === row.rowIndex) || {}
     // console.log(cfg, value, props)
     const onChange = (option) => {
@@ -30,7 +23,6 @@ const SelectEditor = (columnExtensions) =>
       showErrorIcon: true,
       error: error.error,
       onChange,
-      disabled: disabled || isDisabled(row),
       defaultValue: value,
       ...restProps,
     }
@@ -60,7 +52,7 @@ const SelectDisplay = (columnExtensions, state) => ({
 
   // console.log(value, columnName, restProps)
   const v = (cfg.options || state[`${columnName}Option`] || [])
-    .find((o) => (o.value && o.value === value) || (o.id && o.id === value))
+    .find((o) => o.value === value || o.id === value)
   return <span>{v ? v.name : ''}</span>
 }
 

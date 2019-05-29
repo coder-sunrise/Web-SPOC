@@ -120,9 +120,7 @@ function CustomInputWrapper ({ field, form, classes, ...props }) {
   }
   // console.log(label)
   return noWrapper ? (
-    <div className='non-dragable' style={style}>
-      {newChildren}
-    </div>
+    <div style={style}>{newChildren}</div>
   ) : (
     <FormControl
       fullWidth={fullWidth}

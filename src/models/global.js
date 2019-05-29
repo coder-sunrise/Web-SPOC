@@ -1,6 +1,5 @@
 import { queryNotices } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
-import { sleep, getRemovedUrl } from '@/utils/utils'
 
 export default createFormViewModel({
   namespace: 'global',
@@ -36,24 +35,6 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *closePatientModal ({ history }, { call, put, select }) {
-        yield put({
-          type: 'updateAppState',
-          payload: {
-            showPatientInfoPanel: false,
-            fullscreen: false,
-            currentPatientId: null,
-          },
-        })
-        history.push(
-          getRemovedUrl([
-            'md',
-            'cmt',
-            'pid',
-            'new',
-          ]),
-        )
-      },
       *fetchNotices (_, { call, put, select }) {
         const data = yield call(queryNotices)
         yield put({

@@ -148,16 +148,12 @@ class CommonModal extends React.Component {
         </DialogActions>
       )
     }
-    const childrenWithProps = children ? (
-      React.Children.map(children, (child) =>
-        React.cloneElement(child, {
-          footer,
-          onConfirm: this.props.onConfirm,
-          height: this.state.height,
-        }),
-      )
-    ) : (
-      <div />
+    const childrenWithProps = React.Children.map(children, (child) =>
+      React.cloneElement(child, {
+        footer,
+        onConfirm: this.props.onConfirm,
+        height: this.state.height,
+      }),
     )
 
     return (
