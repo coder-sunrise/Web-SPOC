@@ -53,6 +53,7 @@ import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
+import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 
 const sizeConfig = {
