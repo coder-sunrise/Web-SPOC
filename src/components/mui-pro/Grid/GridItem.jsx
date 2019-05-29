@@ -29,15 +29,7 @@ function GridItem ({
   gridLayout = false,
   ...rest
 }) {
-  // console.log(
-  //   classes,
-  //   theme,
-  //   children,
-  //   className,
-  //   gutter,
-  //   style,
-  //   ...rest,
-  // )
+  // console.log(classes, theme, children, className, gutter, style, rest)
   const cls = cx({
     [classes.grid]: true,
     [classes.noStartEndPadding]: gridLayout,

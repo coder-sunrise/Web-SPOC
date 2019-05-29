@@ -30,6 +30,7 @@ function Card ({ ...props }) {
   } = props
   const cardClasses = classNames({
     [classes.card]: true,
+    [classes.cardsm]: props.size === 'sm',
     [classes.cardPlain]: plain,
     [classes.cardProfile]: profile || testimonial,
     [classes.cardBlog]: blog,

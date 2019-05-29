@@ -25,7 +25,15 @@ const style = {
 }
 
 function GridContainer ({ ...props }) {
-  const { classes, children, className, gutter, gridLayout, ...rest } = props
+  const {
+    theme,
+    classes,
+    children,
+    className,
+    gutter,
+    gridLayout,
+    ...rest
+  } = props
 
   let newChildren = []
   if (!Array.isArray(children)) {
@@ -41,11 +49,11 @@ function GridContainer ({ ...props }) {
           key: i,
           gutter,
           gridLayout,
-          ...rest,
+          ...o.props,
         }),
       )}
     </Grid>
   )
 }
 
-export default withStyles(style)(GridContainer)
+export default withStyles(style, { withTheme: true })(GridContainer)
