@@ -71,7 +71,7 @@ const inputStyle = (theme) => ({
     color: theme.palette.primary.main,
   },
   labelShrink: {
-    transform: 'translate(0, 5px) scale(0.8)',
+    transform: 'translate(0, 7px) scale(0.8)',
     transformOrigin: 'top left',
   },
   labelAnimation: {
