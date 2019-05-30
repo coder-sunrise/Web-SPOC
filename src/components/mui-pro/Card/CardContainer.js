@@ -23,21 +23,20 @@ function CardContainer ({
   className,
   hideHeader = false,
   simple = false,
+  icon = <Assignment />,
   ...props
 }) {
   return simple ? (
     children
   ) : (
-    <Card {...props}>
+    <Card className={className} {...props}>
       {!hideHeader && (
         <CardHeader color='primary' icon>
-          <CardIcon color='primary'>
-            <Assignment />
-          </CardIcon>
+          {icon && <CardIcon color='primary'>{icon}</CardIcon>}
           <h4>{typeof title === 'function' ? title() : title}</h4>
         </CardHeader>
       )}
-      <CardBody>{children}</CardBody>
+      <CardBody {...props}>{children}</CardBody>
     </Card>
   )
 }

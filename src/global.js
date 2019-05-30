@@ -1,13 +1,14 @@
-import { Modal, message } from 'antd';
-import { formatMessage } from 'umi/locale';
+import { Modal, message } from 'antd'
+import { formatMessage } from 'umi/locale'
 
 // Notify user if offline now
 window.addEventListener('sw.offline', () => {
-  message.warning(formatMessage({ id: 'app.pwa.offline' }));
-});
+  message.warning(formatMessage({ id: 'app.pwa.offline' }))
+})
 
 // Pop up a prompt on the page asking the user if they want to use the latest version
-window.addEventListener('sw.updated', e => {
+window.addEventListener('sw.updated', (e) => {
+  console.log(e)
   Modal.confirm({
     title: formatMessage({ id: 'app.pwa.serviceworker.updated' }),
     content: formatMessage({ id: 'app.pwa.serviceworker.updated.hint' }),
@@ -15,25 +16,27 @@ window.addEventListener('sw.updated', e => {
     onOk: async () => {
       // Check if there is sw whose state is waiting in ServiceWorkerRegistration
       // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration
-      const worker = e.detail && e.detail.waiting;
+      const worker = e.detail && e.detail.waiting
       if (!worker) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
       // Send skip-waiting event to waiting SW with MessageChannel
       await new Promise((resolve, reject) => {
-        const channel = new MessageChannel();
-        channel.port1.onmessage = event => {
+        const channel = new MessageChannel()
+        channel.port1.onmessage = (event) => {
           if (event.data.error) {
-            reject(event.data.error);
+            reject(event.data.error)
           } else {
-            resolve(event.data);
+            resolve(event.data)
           }
-        };
-        worker.postMessage({ type: 'skip-waiting' }, [channel.port2]);
-      });
+        }
+        worker.postMessage({ type: 'skip-waiting' }, [
+          channel.port2,
+        ])
+      })
       // Refresh current page to use the updated HTML and other assets after SW has skiped waiting
-      window.location.reload(true);
-      return true;
+      window.location.reload(true)
+      return true
     },
-  });
-});
+  })
+})

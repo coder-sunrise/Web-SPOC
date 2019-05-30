@@ -17,11 +17,13 @@ class AntdInput extends Component {
     const currentDateValue = form && field ? field.value : value
     const nextDateValue = nextForm && nextField ? nextField.value : nextValue
 
-    return (
-      nextDateValue !== currentDateValue ||
-      form.errors[field.name] !== nextForm.errors[nextField.name] ||
-      form.touched[field.name] !== nextForm.touched[nextField.name]
-    )
+    if (form && nextForm)
+      return (
+        nextDateValue !== currentDateValue ||
+        form.errors[field.name] !== nextForm.errors[nextField.name] ||
+        form.touched[field.name] !== nextForm.touched[nextField.name]
+      )
+    return nextDateValue !== currentDateValue
   }
 
   handleValueChange = (event) => {

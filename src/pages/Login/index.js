@@ -36,13 +36,14 @@ class LoginPage extends PureComponent {
       credentialPayload: credential,
       application,
     })
-      .then((props) => {
-        const { payload } = props
-        payload.status === 200 && router.push('/reception/queue')
-      })
-      .catch((error) => {
-        console.log('error', error)
-      })
+    // .then((props) => {
+    //   const { payload } = props
+    //   console.log('payload', payload)
+    //   payload.status === 200 && router.push('/reception/queue')
+    // })
+    // .catch((error) => {
+    //   console.log('error', error)
+    // })
   }
 
   render () {

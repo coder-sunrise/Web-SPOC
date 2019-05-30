@@ -1,24 +1,24 @@
-import React from "react"
-import PropTypes from "prop-types"
-import cx from "classnames"
+import React from 'react'
+import PropTypes from 'prop-types'
+import cx from 'classnames'
 import { FormattedMessage } from 'umi/locale'
 
 // @material-ui/core components
-import withStyles from "@material-ui/core/styles/withStyles"
-import AppBar from "@material-ui/core/AppBar"
-import Toolbar from "@material-ui/core/Toolbar"
-import Hidden from "@material-ui/core/Hidden"
+import withStyles from '@material-ui/core/styles/withStyles'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Hidden from '@material-ui/core/Hidden'
 
 // material-ui icons
-import Menu from "@material-ui/icons/Menu"
-import MoreVert from "@material-ui/icons/MoreVert"
-import ViewList from "@material-ui/icons/ViewList"
+import Menu from '@material-ui/icons/Menu'
+import MoreVert from '@material-ui/icons/MoreVert'
+import ViewList from '@material-ui/icons/ViewList'
 
 // core components
-import Button from "mui-pro-components/CustomButtons"
+import Button from 'mui-pro-components/CustomButtons'
 
-import headerStyle from "mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx"
-import HeaderLinks from "./HeaderLinks"
+import headerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx'
+import HeaderLinks from './HeaderLinks'
 
 import PageHeader from '@/components/PageHeader'
 import Link from 'umi/link'
@@ -43,32 +43,30 @@ function Header ({ ...props }) {
   //   })
   //   if(name){
   //     return name
-  //   } 
+  //   }
   //     return "Default Brand Name"
-    
+
   // }
   const { classes, color, rtlActive } = props
   const appBarClasses = cx({
-    [` ${  classes[color]}`]: color,
+    [` ${classes[color]}`]: color,
   })
-  const sidebarMinimize =
-    `${classes.sidebarMinimize 
-    } ${ 
-    cx({
-      [classes.sidebarMinimizeRTL]: rtlActive,
-    })}`
+  const sidebarMinimize = `${classes.sidebarMinimize} ${cx({
+    [classes.sidebarMinimizeRTL]: rtlActive,
+  })}`
 
-  const {children, contentWidth, wrapperClassName, top, ...restProps} = props
+  const { children, contentWidth, wrapperClassName, top, ...restProps } = props
   return (
     <AppBar className={classes.appBar + appBarClasses}>
       <Toolbar className={classes.container}>
-        <Hidden smDown implementation="css">
+        <Hidden smDown implementation='css'>
           <div className={sidebarMinimize}>
             {props.miniActive ? (
               <Button
                 justIcon
+                size='sm'
                 round
-                color="white"
+                color='white'
                 onClick={props.sidebarMinimize}
               >
                 <ViewList className={classes.sidebarMiniIcon} />
@@ -77,7 +75,8 @@ function Header ({ ...props }) {
               <Button
                 justIcon
                 round
-                color="white"
+                size='sm'
+                color='white'
                 onClick={props.sidebarMinimize}
               >
                 <MoreVert className={classes.sidebarMiniIcon} />
@@ -92,36 +91,41 @@ function Header ({ ...props }) {
           </Button> */}
 
           <MenuContext.Consumer>
-            {value => (
+            {(value) => (
               <PageHeader
                 wide={contentWidth === 'Fixed'}
-                home={<FormattedMessage id="menu.home" defaultMessage="Home" />}
+                home={<FormattedMessage id='menu.home' defaultMessage='Home' />}
                 {...value}
-                key="pageheader"
+                key='pageheader'
                 {...restProps}
                 // linkElement={Link}
-                itemRender={(item,isLast) => {
-            if (isLast && sessionStorage.getItem(location.pathname)) {
-              return sessionStorage.getItem(location.pathname) 
-            }if(item.locale){
-              return <FormattedMessage id={item.locale} defaultMessage={item.title} />
-
-            }
-            return item.title
-          }}
+                itemRender={(item, isLast) => {
+                  if (isLast && sessionStorage.getItem(location.pathname)) {
+                    return sessionStorage.getItem(location.pathname)
+                  }
+                  if (item.locale) {
+                    return (
+                      <FormattedMessage
+                        id={item.locale}
+                        defaultMessage={item.title}
+                      />
+                    )
+                  }
+                  return item.title
+                }}
               />
-      )}
+            )}
           </MenuContext.Consumer>
         </div>
-        <Hidden smDown implementation="css">
+        <Hidden smDown implementation='css'>
           <HeaderLinks rtlActive={rtlActive} />
         </Hidden>
-        <Hidden mdUp implementation="css">
+        <Hidden mdUp implementation='css'>
           <Button
             className={classes.appResponsive}
-            color="transparent"
+            color='transparent'
             justIcon
-            aria-label="open drawer"
+            aria-label='open drawer'
             onClick={props.handleDrawerToggle}
           >
             <Menu />
@@ -134,7 +138,13 @@ function Header ({ ...props }) {
 
 Header.propTypes = {
   classes: PropTypes.object.isRequired,
-  color: PropTypes.oneOf(["primary", "info", "success", "warning", "danger"]),
+  color: PropTypes.oneOf([
+    'primary',
+    'info',
+    'success',
+    'warning',
+    'danger',
+  ]),
   rtlActive: PropTypes.bool,
 }
 

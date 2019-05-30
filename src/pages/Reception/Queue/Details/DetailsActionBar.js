@@ -80,6 +80,34 @@ class DetailsActionBar extends PureComponent {
         </GridItem>
       </GridContainer>
     )
+    // return (
+    //   <GridContainer className={classNames(classes.spacing)}>
+    //     <GridItem xs md={4}>
+    //       <FastField
+    //         name='SessionNo'
+    //         render={(args) => (
+    //           <TextField
+    //             {...args}
+    //             readOnly
+    //             prefixProps={{
+    //               disableTypography: true,
+    //               style: { width: '25%' },
+    //             }}
+    //             prefix={formatMessage({
+    //               id: 'reception.queue.sessionNo',
+    //             })}
+    //           />
+    //         )}
+    //       />
+    //     </GridItem>
+    //     <GridItem xs md={8} container justify='flex-end' alignItems='center'>
+    //       <Button color='danger' onClick={this.toggleDrawer}>
+    //         <Stop />
+    //         <FormattedMessage id='reception.queue.endSession' />
+    //       </Button>
+    //     </GridItem>
+    //   </GridContainer>
+    // )
   }
 }
 

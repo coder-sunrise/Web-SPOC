@@ -10,6 +10,7 @@ import { isAntdPro } from './utils'
 // const baseUrl = 'http://localhost:55314'
 // export const baseUrl = 'http://localhost/SEMR_V2'
 export const baseUrl = 'https://semr2dev2010.emr.com.sg'
+let dynamicURL = baseUrl
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -27,6 +28,14 @@ const codeMessage = {
   502: '网关错误。',
   503: '服务不可用，服务器暂时过载或维护。',
   504: '网关超时。',
+}
+
+export function updateAPIType (type) {
+  if (type === 'PROD') {
+    dynamicURL = baseUrl
+  } else {
+    dynamicURL = 'localhost:8000'
+  }
 }
 
 const checkStatus = async (response) => {
@@ -202,10 +211,12 @@ export default function request (url, option) {
       '/api/currentUser',
     ].indexOf(url) < 0
   ) {
-    newUrl = baseUrl + newUrl
+    newUrl = dynamicURL + newUrl
   }
   // console.log(newOptions)
   try {
+    caches.open('test').then((cache) => {})
+
     let r = $.when(
       $.ajax({
         ...newOptions,

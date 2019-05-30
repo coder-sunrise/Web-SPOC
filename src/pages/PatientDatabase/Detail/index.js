@@ -89,12 +89,12 @@ class PatientDetail extends PureComponent {
   }
 
   componentDidMount () {
-    if (navigator.platform.indexOf('Win') > -1 && this.refs.sidebarWrapper) {
-      ps = new PerfectScrollbar(this.refs.sidebarWrapper, {
-        suppressScrollX: true,
-        suppressScrollY: false,
-      })
-    }
+    // if (navigator.platform.indexOf('Win') > -1 && this.refs.sidebarWrapper) {
+    //   ps = new PerfectScrollbar(this.refs.sidebarWrapper, {
+    //     suppressScrollX: true,
+    //     suppressScrollY: false,
+    //   })
+    // }
     if (this.props.patient.currentId) {
       this.props.dispatch({
         type: 'patient/query',
@@ -185,17 +185,11 @@ class PatientDetail extends PureComponent {
               >
                 <MenuList>
                   {menus.map((o) => (
-                    <Link
-                      key={o.name}
-                      onClick={(e) => (!currentId ? e.preventDefault() : true)}
-                      to={getAppendUrl(o.url)}
-                      {...linkProps}
-                    >
+                    <Link key={o.name} to={getAppendUrl(o.url)} {...linkProps}>
                       <MenuItem
                         key={o.name}
                         className={classes.menuItem}
                         selected={currentMenu.name === o.name}
-                        disabled={!currentId}
                         onClick={(e) => {
                           onMenuClick(e, o)
                         }}

@@ -24,6 +24,7 @@ import {
   roseColor,
   grayColor,
   fontColor,
+  hoverColor,
 } from 'mui-pro-jss'
 import Sidebar from 'mui-pro-components/Sidebar'
 // import logo from '../assets/logo.svg'
@@ -112,6 +113,31 @@ const theme = createMuiTheme({
         },
       },
     },
+    MuiIconButton: {
+      root: {
+        padding: 3,
+        color: 'rgba(0, 0, 0, 0.8)',
+        fontSize: '1.2rem',
+        borderRadius: 4,
+      },
+    },
+    MuiTouchRipple: {
+      child: {
+        borderRadius: 4,
+      },
+    },
+    MuiList: {
+      root: {
+        color: primaryColor,
+      },
+    },
+    MuiListItem: {
+      button: {
+        '&:hover,&:focus': {
+          backgroundColor: hoverColor,
+        },
+      },
+    },
     // MuiTableCell: {
     //   root: {
     //     '&:last-child': {
@@ -120,24 +146,12 @@ const theme = createMuiTheme({
     //     },
     //   },
     // },
-    MuiTableRow: {
-      root: {
-        // overflow: 'hidden',
-      },
-    },
-    TableFixedCell: {
-      fixedCell: {
-        overflow: 'visible',
-        backgroundColor: 'inherit',
-      },
-    },
-    Table: {
-      stickyTable: {
-        ' & > thead > tr': {
-          backgroundColor: '#ffffff',
-        },
-      },
-    },
+    // MuiTableRow: {
+    //   root: {
+    //     // overflow: 'hidden',
+    //   },
+    // },
+
     // MuiSwitch: {
     //   switchBase: {
     //     height: 'auto',
@@ -248,9 +262,9 @@ class BasicLayout extends React.PureComponent {
     // dispatch({
     //   type: 'user/fetchCurrent',
     // })
-    dispatch({
-      type: 'setting/getSetting',
-    })
+    // dispatch({
+    //   type: 'setting/getSetting',
+    // })
   }
 
   componentWillUnmount () {

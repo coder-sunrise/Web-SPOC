@@ -18,17 +18,17 @@ function CardAvatar ({ ...props }) {
     plain,
     profile,
     testimonial,
-    square,
     testimonialFooter,
+    square,
     ...rest
   } = props
   const cardAvatarClasses = classNames({
     [classes.cardAvatar]: true,
     [classes.cardAvatarProfile]: profile,
     [classes.cardAvatarPlain]: plain,
-    [classes.cardAvatarSquare]: square,
     [classes.cardAvatarTestimonial]: testimonial,
     [classes.cardAvatarTestimonialFooter]: testimonialFooter,
+    [classes.cardAvatarSquare]: square,
     [className]: className !== undefined,
   })
   return (

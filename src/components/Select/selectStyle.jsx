@@ -23,6 +23,9 @@ const selectStyle = (theme) => ({
   },
   selectRootWithWrapper: {
     // top: '-4px',
+    '& > div > div > div': {
+      padding: '4px 0 2px 0 !important',
+    },
   },
   valueContainer: {
     display: 'flex',

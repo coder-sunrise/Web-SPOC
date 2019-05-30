@@ -30,7 +30,7 @@ export default [
     ],
     routes: [
       // dashboard
-      { path: '/', redirect: '/reception/queue', system: 'CMS' },
+      { path: '/', redirect: '/reception/queue' },
       // {
       //   path: '/login',
       //   name: 'login',
@@ -42,7 +42,6 @@ export default [
         name: 'dashboard',
         icon: 'dashboard',
         hideInMenu: true,
-        system: 'CMS',
         routes: [
           {
             path: '/dashboard/analysis',
@@ -69,7 +68,6 @@ export default [
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
-        system: 'CMS',
         routes: [
           {
             path: '/reception/queue',
@@ -132,7 +130,6 @@ export default [
         path: '/patientdb',
         icon: 'group',
         name: 'patient',
-        system: 'CMS',
         routes: [
           {
             path: '/patientdb/new',
@@ -177,7 +174,6 @@ export default [
         path: '/sms',
         icon: 'sms',
         name: 'SMS',
-        system: 'CMS',
         hideInMenu: true,
         routes: [
           {
@@ -198,7 +194,6 @@ export default [
         path: '/inventory',
         icon: 'kitchen',
         name: 'inventory',
-        system: 'CMS',
         // component: './inventory',
         routes: [
           {
@@ -258,11 +253,6 @@ export default [
             mini: 'MS',
             component: './Development/Masonry',
           },
-          {
-            path: '/development/fixSelect',
-            name: 'Select',
-            component: './Development/FixSelect',
-          },
         ],
       },
       //
@@ -272,7 +262,6 @@ export default [
         path: '/finance',
         icon: 'attach_money',
         name: 'finance',
-        system: 'CMS',
         routes: [
           {
             path: '/finance/invoice',
@@ -357,17 +346,15 @@ export default [
       // Report
       {
         path: '/report',
-        system: 'CMS',
         icon: 'library_books',
         name: 'Report',
         // component: './Report',
       },
 
-      // EMR
       {
         path: '/queuelisting',
         system: 'EMR',
-        icon: 'library_books',
+        icon: 'local_hospital',
         name: 'queuelisting',
         // component: './QueueListing',
       },
@@ -376,7 +363,19 @@ export default [
         system: 'EMR',
         icon: 'group',
         name: 'patientdashboard',
-        component: './PatientDashboard',
+        routes: [
+          {
+            path: '/patientdashboard',
+            name: 'patientdashboard',
+            component: './PatientDashboard',
+          },
+          {
+            path: '/patientdashboard/consultation/:id',
+            name: 'consultation',
+            hideInMenu: true,
+            component: './PatientDashboard/Consultation',
+          },
+        ],
       },
       // // Patient View
       // {

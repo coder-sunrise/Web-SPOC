@@ -24,7 +24,7 @@ const styles = () => ({
   },
 })
 
-@connect(({ queueLog }) => ({ queueLog }))
+@connect(({ queueLog, loading }) => ({ queueLog, loading }))
 class PatientSearch extends PureComponent {
   state = {
     searchQuery: this.props.searchPatientName,
@@ -75,18 +75,12 @@ class PatientSearch extends PureComponent {
   }
 
   onSearchQueryChange = (event) => {
-    console.log('onsearchquerychange')
     this.setState({ searchQuery: event.target.value })
   }
 
   render () {
     const { columns, columnExtensions, searchQuery } = this.state
-    const {
-      classes,
-      queueLog,
-      handleQueryChange,
-      onViewRegisterPatient,
-    } = this.props
+    const { classes, queueLog, onViewRegisterPatient, loading } = this.props
     const ActionProps = { TableCellComponent: this.TableCell }
 
     return (
@@ -123,6 +117,12 @@ class PatientSearch extends PureComponent {
               columnExtensions={columnExtensions}
               ActionProps={ActionProps}
               columns={columns}
+              LoadingProps={{
+                isLoading: !!loading.effects['queueLog/fetchPatientListByName'],
+                loadingMessage: (
+                  <FormattedMessage id='reception.queue.patientSearch.retrieving' />
+                ),
+              }}
               getRowId={this.gridGetRowID}
               FuncProps={{ pager: false }}
             />

@@ -103,42 +103,43 @@ class DevelopmentPage extends PureComponent {
   }
 
   getCodeTable = () => {
-    // const codetableName = 'Country'
-    // const url = 'http://localhost:55314/api/CodeTable?ctnames='
-    // const method = 'GET'
-    // caches.open('test').then((cache) => {
-    //   // axios({
-    //   //   method,
-    //   //   url: `${url}${codetableName}`,
-    //   // })
-    //   //   .then((response) => {
-    //   //     const toSave = new Response(response.body)
-    //   //     // cache.put('CT_Country', response)
-    //   //     console.log('saved response', toSave)
-    //   //     return toSave
-    //   //   })
-    //   fetch(`${url}${codetableName}`, {
-    //     method,
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   }).then((response) => {
-    //     cache.put('CT_Country', response)
-    //   })
-    // })
+    const codetableName = 'Country'
+    const url = 'http://localhost:55314/api/CodeTable?ctnames='
+    const method = 'GET'
+    caches.open('test').then((cache) => {
+      // axios({
+      //   method,
+      //   url: `${url}${codetableName}`,
+      // })
+      //   .then((response) => {
+      //     const toSave = new Response(response.body)
+      //     // cache.put('CT_Country', response)
+
+      //     console.log('saved response', toSave)
+      //     return toSave
+      //   })
+      fetch(`${url}${codetableName}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((response) => {
+        cache.put('CT_Country', response)
+      })
+    })
   }
 
   getCache = () => {
-    // caches.open('test').then((cache) => {
-    //   cache.match('CT_Country').then((response) => {
-    //     console.log('cached response', response)
-    //     if (response) {
-    //       response.json().then((data) => {
-    //         console.log('json data', data)
-    //       })
-    //     }
-    //   })
-    // })
+    caches.open('test').then((cache) => {
+      cache.match('CT_Country').then((response) => {
+        console.log('cached response', response)
+        if (response) {
+          response.json().then((data) => {
+            console.log('json data', data)
+          })
+        }
+      })
+    })
   }
 
   render () {

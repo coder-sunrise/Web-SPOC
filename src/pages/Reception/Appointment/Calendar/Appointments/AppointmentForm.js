@@ -368,7 +368,7 @@ class AppointmentFormContainerBasic extends PureComponent {
               fullScreen
               showFooter={false}
             >
-              {showNewPatientModal && <NewPatient />}
+              {showNewPatientModal ? <NewPatient /> : null}
             </CommonModal>
             <CommonModal
               open={showSearchPatientModal}
@@ -378,7 +378,7 @@ class AppointmentFormContainerBasic extends PureComponent {
               maxWidth='md'
               showFooter={false}
             >
-              {showSearchPatientModal && (
+              {showSearchPatientModal ? (
                 <PatientSearchModal
                   searchPatientName={values.patientName}
                   patientList={appointment.patientList}
@@ -386,7 +386,7 @@ class AppointmentFormContainerBasic extends PureComponent {
                   onSelectClick={this.handleSelectPatient}
                   dispatch={dispatch}
                 />
-              )}
+              ) : null}
             </CommonModal>
           </div>
         </AppointmentForm.Container>

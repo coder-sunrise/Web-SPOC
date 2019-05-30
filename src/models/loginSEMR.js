@@ -23,6 +23,10 @@ export default createFormViewModel({
           type: 'updateLoginStatus',
           payload: { ...response, application },
         })
+
+        // if (response.status === 200) {
+        //   yield put(router.push('reception/queue'))
+        // }
       },
     },
     reducers: {
@@ -33,7 +37,6 @@ export default createFormViewModel({
           localStorage.setItem('token', data.access_token)
           localStorage.setItem('application', application)
         }
-
         return { ...state, isInvalidLogin }
       },
     },

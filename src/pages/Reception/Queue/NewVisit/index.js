@@ -47,7 +47,6 @@ class NewVisit extends PureComponent {
   }
 
   render () {
-    console.log('newvisit render')
     const { footer, classes, handleSubmit, loading } = this.props
     return (
       <React.Fragment>

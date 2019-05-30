@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react'
 // nodejs library that concatenates classes
-import classNames from "classnames";
+import classNames from 'classnames'
 // nodejs library to set properties for components
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 // @material-ui/core components
-import withStyles from "@material-ui/core/styles/withStyles";
+import withStyles from '@material-ui/core/styles/withStyles'
 // @material-ui/icons
 
 // core components
-import cardBodyStyle from "mui-pro-jss/material-dashboard-pro-react/components/cardBodyStyle.jsx";
+import cardBodyStyle from 'mui-pro-jss/material-dashboard-pro-react/components/cardBodyStyle.jsx'
 
-function CardBody({ ...props }) {
+function CardBody ({ ...props }) {
   const {
     classes,
     className,
@@ -23,10 +23,12 @@ function CardBody({ ...props }) {
     color,
     profile,
     calendar,
+    size,
     ...rest
-  } = props;
+  } = props
   const cardBodyClasses = classNames({
     [classes.cardBody]: true,
+    [classes.cardBodySm]: size === 'sm',
     [classes.cardBodyBackground]: background,
     [classes.cardBodyPlain]: plain,
     [classes.cardBodyFormHorizontal]: formHorizontal,
@@ -35,13 +37,13 @@ function CardBody({ ...props }) {
     [classes.cardBodyColor]: color,
     [classes.cardBodyProfile]: profile,
     [classes.cardBodyCalendar]: calendar,
-    [className]: className !== undefined
-  });
+    [className]: className !== undefined,
+  })
   return (
     <div className={cardBodyClasses} {...rest}>
       {children}
     </div>
-  );
+  )
 }
 
 CardBody.propTypes = {
@@ -54,7 +56,7 @@ CardBody.propTypes = {
   signup: PropTypes.bool,
   color: PropTypes.bool,
   profile: PropTypes.bool,
-  calendar: PropTypes.bool
-};
+  calendar: PropTypes.bool,
+}
 
-export default withStyles(cardBodyStyle)(CardBody);
+export default withStyles(cardBodyStyle)(CardBody)

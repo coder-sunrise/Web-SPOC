@@ -23,19 +23,21 @@ class PatientSearch extends PureComponent {
   constructor (props) {
     super(props)
     // console.log(this)
+
+    const showPatient = (row) => {
+      this.props.history.push(
+        getAppendUrl({
+          md: 'pt',
+          cmt: 'dmgp',
+          pid: row.id,
+        }),
+      )
+    }
     this.defaultAction = (row) => (
       <Tooltip title='Detail' placement='bottom'>
         <Button
           size='sm'
-          onClick={() => {
-            this.props.history.push(
-              getAppendUrl({
-                md: 'pt',
-                cmt: 'dmgp',
-                pid: row.id,
-              }),
-            )
-          }}
+          onClick={() => showPatient(row)}
           justIcon
           round
           color='primary'
@@ -45,6 +47,7 @@ class PatientSearch extends PureComponent {
         </Button>
       </Tooltip>
     )
+    this.defaultOnDblClick = showPatient
     // props.dispatch({
     //   type: 'patientSearch/query',
     // })
@@ -61,14 +64,20 @@ class PatientSearch extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, renderActionFn = this.defaultAction, ...restProps } = props
+    const {
+      classes,
+      renderActionFn = this.defaultAction,
+      onRowDblClick = this.defaultOnDblClick,
+      ...restProps
+    } = props
     return (
-      <CardContainer
-        title={formatMessage({ id: 'patient.search.title' })}
-        {...restProps}
-      >
+      <CardContainer hideHeader>
         <FilterBar {...restProps} />
-        <Grid renderActionFn={renderActionFn} {...restProps} />
+        <Grid
+          renderActionFn={renderActionFn}
+          onRowDblClick={onRowDblClick}
+          {...restProps}
+        />
       </CardContainer>
     )
   }

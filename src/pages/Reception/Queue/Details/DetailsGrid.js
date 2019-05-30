@@ -138,22 +138,19 @@ class DetailsGrid extends PureComponent {
     if (tableProps.column.name === 'Action') {
       return (
         <Table.Cell {...tableProps}>
-          {/**
-            <Tooltip
-              title={formatMessage({ id: 'reception.queue.viewDispense' })}
-              placement='bottom'
-              classes={{ tooltip: classes.tooltip }}
-            >
-              <div style={{ display: 'inline-block' }}>
-                <GridButton
-                  row={tableProps.row}
-                  Icon={<Pageview />}
-                  onClick={this.onViewDispenseClick}
-                />
-              </div>
-            </Tooltip>
-          */}
-
+          <Tooltip
+            title={formatMessage({ id: 'reception.queue.viewDispense' })}
+            placement='bottom'
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <div style={{ display: 'inline-block' }}>
+              <GridButton
+                row={tableProps.row}
+                Icon={<Pageview />}
+                onClick={this.onViewDispenseClick}
+              />
+            </div>
+          </Tooltip>
           <Tooltip
             title={formatMessage({ id: 'reception.queue.editVisit' })}
             placement='bottom'
@@ -163,20 +160,6 @@ class DetailsGrid extends PureComponent {
               <GridButton
                 row={tableProps.row}
                 Icon={<Edit />}
-                onClick={this.onEditVisitClick}
-              />
-            </div>
-          </Tooltip>
-          <Tooltip
-            title={formatMessage({ id: 'reception.queue.removeVisit' })}
-            placement='bottom'
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <div style={{ display: 'inline-block' }}>
-              <GridButton
-                row={tableProps.row}
-                Icon={<Remove />}
-                color='danger'
                 onClick={this.onEditVisitClick}
               />
             </div>

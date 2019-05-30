@@ -24,12 +24,10 @@ class SimpleModal extends React.Component {
 
   static getDerivedStateFromProps (nextProps, preState) {
     // console.log(nextProps, preState)
-
     if (
       nextProps.status &&
       nextProps.status.submissionStatus === 'done' &&
-      !preState.done &&
-      preState.status.submissionStatus === 'pending'
+      !preState.done
     ) {
       return {
         done: true,
@@ -47,7 +45,7 @@ class SimpleModal extends React.Component {
   onConfirm = () => {
     this.setState(
       {
-        hide: true,
+        done: true,
       },
       () => {
         if (this.props.onOk) this.props.onOk()
@@ -59,6 +57,7 @@ class SimpleModal extends React.Component {
     this.setState(
       {
         hide: true,
+        done: true,
       },
       () => {
         if (this.props.onCancel) this.props.onCancel()
@@ -72,7 +71,7 @@ class SimpleModal extends React.Component {
     const { onCancel, onOk, ...resetProps } = this.props
 
     if (this.state.hide) return null
-    console.log(this.state)
+
     if (this.state.done) {
       return (
         <ModalWrapper>

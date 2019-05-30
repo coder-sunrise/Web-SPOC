@@ -57,6 +57,7 @@ const styles = () => ({
     lineHeight: standardRowHeight,
     textAlign: 'right',
   },
+  collectPaymentBtn: { float: 'right', marginTop: '22px', marginRight: '10px' },
 })
 
 @connect(({ patient }) => ({
@@ -116,7 +117,7 @@ class Demographic extends PureComponent {
 
   addAddress = () => {
     this.arrayHelpers.push({
-      // id: getUniqueGUID(),
+      id: getUniqueGUID(),
       contactFk: this.props.values.contact.id,
       line1: '',
       line2: '',

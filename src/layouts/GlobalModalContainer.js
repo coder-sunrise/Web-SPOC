@@ -34,9 +34,21 @@ class GlobalModalContainer extends PureComponent {
             open={global.showPatientInfoPanel}
             title='Patient Profile'
             onClose={(e) => {
+              history.push(
+                getRemovedUrl([
+                  'md',
+                  'cmt',
+                  'pid',
+                  'new',
+                ]),
+              )
               dispatch({
-                type: 'global/closePatientModal',
-                history,
+                type: 'global/updateAppState',
+                payload: {
+                  showPatientInfoPanel: false,
+                  fullscreen: false,
+                  currentPatientId: null,
+                },
               })
             }}
             // onConfirm={this.toggleModal}

@@ -20,6 +20,10 @@ const cardStyle = {
     fontSize: '.875rem',
     textAlign: 'left',
   },
+  cardsm: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
   cardPlain: {
     background: 'transparent',
     boxShadow: 'none',
