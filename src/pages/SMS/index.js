@@ -8,7 +8,7 @@ import { compare } from '@/layouts'
 import { getAppendUrl } from '@/utils/utils'
 import { compose } from 'redux'
 import MessageListing from './Reminder/MessageListing'
-import { CommonModal, Button, CommonHeader } from '@/components'
+import { CommonModal, Button, CommonHeader, CardContainer } from '@/components'
 import Grid from './Grid'
 import New from './New'
 import FilterBar from './FilterBar'
@@ -20,7 +20,10 @@ const styles = {
 }
 
 const SMS = (props) => {
-  const [ showMessageModal, setShowMessageModal ] = useState(false)
+  const [
+    showMessageModal,
+    setShowMessageModal,
+  ] = useState(false)
   const { classes } = props
   const newMessageProps = {
     onSend: (value) => {
@@ -48,7 +51,7 @@ const SMS = (props) => {
     },
   }
   return (
-    <CommonHeader titleId='finance.statement.statementNo'>
+    <CardContainer hideHeader>
       {/* <Button
         variant='contained'
         color='primary'
@@ -71,7 +74,7 @@ const SMS = (props) => {
       >
         {showMessageModal ? <MessageListing /> : null}
       </CommonModal>
-    </CommonHeader>
+    </CardContainer>
   )
 }
 export default compose(withStyles(styles, { withTheme: true }), React.memo)(SMS)
