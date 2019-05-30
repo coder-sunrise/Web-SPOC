@@ -24,7 +24,7 @@ const styles = (theme) => ({
 })
 
 class Transfer extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { items } = props
     this.state = {
@@ -79,8 +79,8 @@ class Transfer extends React.Component {
     })
   }
 
-  render () {
-    const { classes } = this.props
+  render() {
+    const { classes,type } = this.props
     const { addedList, removedList } = this.state
 
     return (
@@ -135,7 +135,8 @@ class Transfer extends React.Component {
                       button
                       onClick={this.removeClick(index)}
                     >
-                      <ListItemText primary={`${value}`} />
+                      {`${type}` === 'Setting' && <ListItemText primary={'Precaution ' + `${index + 1}`} />}
+                      <ListItemText primary={value} />
                       <ListItemSecondaryAction>
                         <Button
                           size='sm'
