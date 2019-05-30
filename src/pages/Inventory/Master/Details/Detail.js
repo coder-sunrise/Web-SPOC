@@ -6,7 +6,7 @@ import { Paper, Divider } from '@material-ui/core'
 import { compare } from '@/layouts'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
-import { status, suppliers, dispUOMs } from '@/utils/codes'
+import { status, suppliers, dispUOMs,SDDDescription } from '@/utils/codes'
 
 import {
   CardContainer,
@@ -48,10 +48,11 @@ const styles = () => ({})
   displayName: 'InventoryMasterDetail',
 })
 class Detail extends PureComponent {
-  render () {
+  render() {
     const { props } = this
     const { classes, theme, modelType, type, ...restProps } = props
     const submitKey = `${modelType}/submitDetail`
+
     return (
       <CardContainer
         hideHeader
@@ -122,6 +123,32 @@ class Detail extends PureComponent {
                   }}
                 />
               </GridItem>
+              {`${type}` === 'Medication' ?
+                (<GridItem xs={12}>
+                  <FastField
+                    name='SDDID'
+                    render={(args) => {
+                      return <TextField label='SDD ID' {...args} />
+                    }}
+                  />
+                </GridItem>)
+                : <div></div>
+              }
+              {`${type}` === 'Medication' ?
+                (<GridItem xs={12}>
+                  <FastField
+                    name='SDDDescription'
+                    render={(args) => {
+                      const label = `${type} SDD Description`
+                      const p = { ...args, label }
+                      return <Select options={SDDDescription} {...p} />
+                    }}
+                  />
+                </GridItem>
+                )
+                : <div></div>
+              }
+
             </GridContainer>
           </GridItem>
           <GridItem xs={12} md={2} />
