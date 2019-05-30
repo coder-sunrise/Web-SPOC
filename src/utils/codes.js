@@ -105,6 +105,11 @@ const dispUOMs = [
   { name: 'Tube', value: 'Tube' },
 ]
 
+const SDDDescription = [
+  { name: 'A', value: '1' },
+  { name: 'B', value: '2' },
+]
+
 const yesNo = [
   { name: 'Yes', value: '1' },
   { name: 'No', value: '0' },
@@ -519,6 +524,7 @@ module.exports = {
   packageTypes,
   suppliers,
   dispUOMs,
+  SDDDescription,
   yesNo,
   gender,
   getCodes,
