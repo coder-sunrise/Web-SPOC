@@ -172,18 +172,18 @@ export default [
         icon: 'sms',
         name: 'SMS',
         system: 'CMS',
-        hideInMenu: true,
         routes: [
           {
-            path: '/sms/reminder',
+            path: '/sms',
             name: 'Reminder',
-            // component: './sms/Reminder',
+            component: './sms',
+            mini: 'RM',
           },
-          {
-            path: '/sms/adhoc',
-            name: 'Adhoc',
-            // component: './sms/adhoc',
-          },
+          // {
+          //   path: '/sms/adhoc',
+          //   name: 'Adhoc',
+          //   // component: './sms/adhoc',
+          // },
         ],
       },
       //
