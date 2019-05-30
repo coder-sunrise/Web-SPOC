@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent, Component } from 'react'
 import { connect } from 'dva'
 import { Editor } from 'react-draft-wysiwyg'
 
@@ -9,7 +9,12 @@ window.g_app.replaceModel(model)
 @connect(({ clinicalnotes }) => ({
   clinicalnotes,
 }))
-class ClinicalNotes extends Component {
+class ClinicalNotes extends PureComponent {
+  constructor (props) {
+    super(props)
+    // console.log(this.state, props)
+  }
+
   render () {
     const editorCfg = {
       toolbar: {

@@ -60,6 +60,7 @@ class CustomInput extends React.PureComponent {
         value: this.props.field.value,
       }
     }
+    // console.log(this.state, props)
   }
 
   // componentDidMount (){

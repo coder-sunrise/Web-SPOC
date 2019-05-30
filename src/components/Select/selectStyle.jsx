@@ -20,6 +20,9 @@ const selectStyle = (theme) => ({
   },
   selectRoot: {
     // top: '-3px',
+    '& > div > div > div': {
+      padding: '4px 0 2px 0 !important',
+    },
   },
   selectRootWithWrapper: {
     // top: '-4px',

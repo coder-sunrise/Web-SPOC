@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
@@ -26,7 +26,7 @@ import {
   confirm,
 } from '@/components'
 import { withStyles, Divider, Paper } from '@material-ui/core'
-
+import { compare } from '@/layouts'
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import model from './models'
@@ -35,6 +35,7 @@ window.g_app.replaceModel(model)
 
 const styles = (theme) => ({})
 
+@compare('diagnosis')
 @connect(({ diagnosis }) => ({
   diagnosis,
 }))
@@ -64,6 +65,11 @@ const styles = (theme) => ({})
   displayName: 'Diagnosis',
 })
 class Diagnosis extends Component {
+  constructor (props) {
+    super(props)
+    // console.log(this.state, props)
+  }
+
   render () {
     const { theme } = this.props
     return (

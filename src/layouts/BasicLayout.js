@@ -479,17 +479,17 @@ class BasicLayout extends React.PureComponent {
             isMobile={isMobile}
             {...props}
           /> */}
-          <Affix target={() => window.mainPanel}>
-            <Header
-              sidebarMinimize={this.sidebarMinimize}
-              miniActive={this.state.miniActive}
-              menuData={menuData}
-              breadcrumbNameMap={this.breadcrumbNameMap}
-              // routes={dashboardRoutes}
-              handleDrawerToggle={this.handleDrawerToggle}
-              {...props}
-            />
-          </Affix>
+          {/* <Affix target={() => window.mainPanel}> */}
+          <Header
+            sidebarMinimize={this.sidebarMinimize}
+            miniActive={this.state.miniActive}
+            menuData={menuData}
+            breadcrumbNameMap={this.breadcrumbNameMap}
+            // routes={dashboardRoutes}
+            handleDrawerToggle={this.handleDrawerToggle}
+            {...props}
+          />
+          {/* </Affix> */}
 
           {this.getRoute() ? (
             <div className={classes.content}>
