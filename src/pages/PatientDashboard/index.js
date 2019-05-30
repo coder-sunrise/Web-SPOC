@@ -68,7 +68,6 @@ class PatientDashboard extends PureComponent {
         },
       })
     }
-    console.log('c PatientDashboard')
     // dispatch({
     //   type: 'updateState',
     //   payload: {

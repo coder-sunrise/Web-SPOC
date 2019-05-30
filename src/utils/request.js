@@ -8,7 +8,7 @@ import $ from 'jquery'
 import { isAntdPro } from './utils'
 
 // const baseUrl = 'http://localhost:55314'
-// export const baseUrl = 'http://localhost:55314'
+// export const baseUrl = 'http://localhost/SEMR_V2'
 export const baseUrl = 'https://semr2dev2010.emr.com.sg'
 
 const codeMessage = {
@@ -102,9 +102,17 @@ export const axiosRequest = (url, option) => {
       return status
     })
     .catch((error) => {
-      console.error('axios error', error.response)
-      const { data } = error.response
-      showErrorNotification('', data.message)
+      console.log('axios error', error.response)
+      const {
+        data = { message: 'An error occured' },
+        status,
+        statusText,
+      } = error.response
+
+      status === 401
+        ? showErrorNotification('', statusText)
+        : showErrorNotification('', data.message)
+
       return false
     })
 }

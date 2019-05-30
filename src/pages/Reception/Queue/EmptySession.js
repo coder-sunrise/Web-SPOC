@@ -40,14 +40,18 @@ class EmptySession extends PureComponent {
         <div className={classnames(classes.content)}>
           {loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] && (
             <React.Fragment>
+              <h3>
+                <FormattedMessage id='reception.queue.gettingSessionInfo' />
+              </h3>
               <LinearProgress />
-              <FormattedMessage id='reception.queue.gettingSessionInfo' />
             </React.Fragment>
           )}
           {loadingProps.effects[LOADING_KEY.START_SESSION] && (
             <React.Fragment>
+              <h3>
+                <FormattedMessage id='reception.queue.startingASession' />
+              </h3>
               <LinearProgress />
-              <FormattedMessage id='reception.queue.startingASession' />
             </React.Fragment>
           )}
           {!loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] &&

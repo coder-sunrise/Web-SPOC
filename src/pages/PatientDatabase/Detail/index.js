@@ -103,7 +103,7 @@ class PatientDetail extends PureComponent {
         },
       })
     }
-    console.log('c PatientDetail')
+
     // dispatch({
     //   type: 'updateState',
     //   payload: {

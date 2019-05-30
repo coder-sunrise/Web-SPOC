@@ -62,7 +62,16 @@ class StatisticIndicator extends PureComponent {
   }
 
   render () {
-    const { classes, filter } = this.props
+    const {
+      classes,
+      filter,
+      statistic: { all, waiting, inProgress, completed } = {
+        all: 0,
+        waiting: 0,
+        inProgress: 0,
+        completed: 0,
+      },
+    } = this.props
     return (
       <React.Fragment>
         <Paper elevation={6} className={classnames(classes.container)}>
@@ -72,7 +81,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusAll,
             ])}
           >
-            6
+            {all}
           </h4>
           <Divider variant='fullWidth' />
           <Button
@@ -92,7 +101,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusWaiting,
             ])}
           >
-            1
+            {waiting}
           </h4>
           <Divider variant='fullWidth' />
           <Button
@@ -112,7 +121,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusInProgress,
             ])}
           >
-            1
+            {inProgress}
           </h4>
           <Divider variant='fullWidth' />
 
@@ -133,7 +142,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusCompleted,
             ])}
           >
-            4
+            {completed}
           </h4>
           <Divider variant='fullWidth' />
           <Button

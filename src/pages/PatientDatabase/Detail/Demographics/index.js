@@ -102,8 +102,6 @@ class Demographic extends PureComponent {
     // } else {
     //   props.setValues(props.demographic.default)
     // }
-    console.log('c Demographic')
-    console.log(props.patient.entity)
     // props.setValues(props.patient.entity)
   }
 

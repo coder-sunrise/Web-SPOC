@@ -35,7 +35,6 @@ export async function fetchPatientInfoByPatientID (patientID) {
   const response = await request(`/api/patient/${patientID}`, {
     method: 'GET',
   })
-  console.log('fetchPatientInfoByPatientID', response)
   return response
 }
 
@@ -48,7 +47,7 @@ export async function fetchPatientListByName (patientName) {
   const criteria = [
     { prop: 'name', val: patientName, opr: 'like' },
   ]
-  const response = await request('/api/patient', {
+  const response = await axiosRequest('/api/patient', {
     method: 'GET',
     data: stringify({ criteria }),
   })

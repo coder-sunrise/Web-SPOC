@@ -26,7 +26,7 @@ const styles = () => ({
   },
 })
 
-@connect(({ queueLog, loading }) => ({ queueLog, loading }))
+@connect(({ loading }) => ({ loading }))
 @withFormik({
   mapPropsToValues: () => {},
   handleSubmit: (values, { props, setSubmitting }) => {
@@ -39,8 +39,8 @@ const styles = () => ({
 })
 class NewVisit extends PureComponent {
   getAge = () => {
-    const { queueLog } = this.props
-    const { dateOfBirth } = queueLog.visitPatientInfo
+    const { visitPatientInfo } = this.props
+    const { dateOfBirth } = visitPatientInfo
 
     const age = moment().diff(dateOfBirth, 'years')
     return age

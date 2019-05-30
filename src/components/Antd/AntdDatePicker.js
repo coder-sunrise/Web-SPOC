@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import moment from 'moment'
 import classnames from 'classnames'
 // material ui
@@ -43,12 +43,26 @@ const STYLES = (theme) => ({
   },
 })
 
-class AntdDatePicker extends React.PureComponent {
+class AntdDatePicker extends Component {
   static defaultProps = {
     label: 'Select date',
     format: 'YYYY-MM-DD',
     disabled: false,
     size: 'default',
+  }
+
+  shouldComponentUpdate = (nextProps) => {
+    const { form, field, value } = this.props
+    const { form: nextForm, field: nextField, value: nextValue } = nextProps
+
+    const currentDateValue = form && field ? field.value : value
+    const nextDateValue = nextForm && nextField ? nextField.value : nextValue
+
+    return (
+      nextDateValue !== currentDateValue ||
+      form.errors[field.name] !== nextForm.errors[nextField.name] ||
+      form.touched[field.name] !== nextForm.touched[nextField.name]
+    )
   }
 
   handleChange = (date, dateString) => {

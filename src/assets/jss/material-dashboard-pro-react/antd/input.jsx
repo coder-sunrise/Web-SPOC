@@ -57,12 +57,15 @@ const inputStyle = (theme) => ({
   },
   mediumLabel: {
     fontSize: '1rem',
+    transform: 'translate(0, 28px) scale(1)',
   },
   largeLabel: {
     fontSize: '1.2rem',
+    transform: 'translate(0, 26px) scale(1)',
   },
   smallLabel: {
     fontSize: '0.875rem',
+    transform: 'translate(0, 30px) scale(1)',
   },
   labelFocused: {
     color: theme.palette.primary.main,

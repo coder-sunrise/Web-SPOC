@@ -205,7 +205,7 @@ class DetailsGrid extends PureComponent {
     }
     const { classes, queueLog } = this.props
     const { isFullscreen } = this.state
-    const { patientList } = queueLog
+    const { queueListing } = queueLog
 
     return (
       <div>
@@ -216,7 +216,7 @@ class DetailsGrid extends PureComponent {
         >
           <CommonTableGrid2
             height={isFullscreen ? undefined : 380}
-            rows={patientList}
+            rows={queueListing}
             {...tableParams}
             ActionProps={ActionProps}
           />

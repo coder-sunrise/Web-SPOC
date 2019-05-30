@@ -107,6 +107,7 @@ class CommonModal extends React.Component {
       bodyNoPadding = false,
       theme,
       disableBackdropClick = false,
+      keepMounted = true,
     } = this.props
     // console.log(bodyNoPadding)
     if (
@@ -172,7 +173,7 @@ class CommonModal extends React.Component {
         fullWidth={adaptFullWidth}
         maxWidth={maxWidth}
         TransitionComponent={Transition}
-        keepMounted
+        keepMounted={keepMounted}
         onClose={this.onClose}
         aria-labelledby='classic-modal-slide-title'
         aria-describedby='classic-modal-slide-description'

@@ -1,19 +1,22 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
+import { connect } from 'dva'
 import moment from 'moment'
 // yup
 import * as Yup from 'yup'
 // formik
 import { withFormik } from 'formik'
 // umi
-import { FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi/locale'
 // devexpress-react-scheduler
 import { AppointmentForm } from '@devexpress/dx-react-scheduler-material-ui'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 // custom component
-import { Button, GridItem } from '@/components'
+import { Button, CommonModal } from '@/components'
+import NewPatient from '../../../../PatientDatabase/New'
+import PatientSearchModal from '../PatientSearch'
 import Form from './Form'
 import { getDateValue } from '../../utils'
 
@@ -118,11 +121,11 @@ const AppointmentSchema = Yup.object().shape({
 
 const _dateTimeFormat = 'DD MMM YYYY HH:mm'
 
+@connect(({ appointment, loading }) => ({ appointment, loading }))
 @withFormik({
   enableReinitialize: true,
-  validationSchema: AppointmentSchema,
   handleSubmit: (values, { props, resetForm }) => {
-    const { visibleChange, commitChanges, appointmentData } = props
+    const { visibleChange, commitChanges, appointmentData, dispatch } = props
 
     const isNewAppointment = appointmentData.id === undefined
 
@@ -133,12 +136,31 @@ const _dateTimeFormat = 'DD MMM YYYY HH:mm'
       ? { ...values, allDay: false, title, id: appointmentData.id }
       : { ...values, allDay: false, title }
 
+    // clear current search patient info
+    dispatch({
+      type: 'appointment/updateSelectedPatientInfo',
+      payload: {},
+    })
+    // clear searching patient list
+    dispatch({
+      type: 'appointment/updatePatientList',
+      payload: [],
+    })
+    // commit changes to appointment data in calendar
     commitChanges({ [type]: data })
     resetForm()
     visibleChange()
   },
   mapPropsToValues: (props) => {
-    const { appointmentData } = props
+    const { appointmentData, appointment } = props
+    const { currentSearchPatientInfo: { name, contact } } = appointment
+
+    const patientName = name !== undefined ? name : ''
+    let contactNumber = ''
+    if (contact) {
+      const { mobileContactNumber } = contact
+      contactNumber = mobileContactNumber.number
+    }
 
     const startDateValue = getDateValue(appointmentData.startDate)
     const endDateValue = getDateValue(appointmentData.endDate)
@@ -150,8 +172,9 @@ const _dateTimeFormat = 'DD MMM YYYY HH:mm'
 
     return {
       ...initialAptInfo,
+      patientName,
+      contactNo: contactNumber,
       ...appointmentData,
-
       startDate: moment(`${startDateValue} ${startTime}`).format(
         _dateTimeFormat,
       ),
@@ -160,8 +183,14 @@ const _dateTimeFormat = 'DD MMM YYYY HH:mm'
       endTime,
     }
   },
+  validationSchema: AppointmentSchema,
 })
 class AppointmentFormContainerBasic extends PureComponent {
+  state = {
+    showNewPatientModal: false,
+    showSearchPatientModal: false,
+  }
+
   onDateChange = (name, value) => {
     const { setFieldValue, values } = this.props
     const dateKey = `${name}Date`
@@ -170,13 +199,7 @@ class AppointmentFormContainerBasic extends PureComponent {
       setFieldValue(dateKey, value)
       return
     }
-
-    // const startTime = moment(values[key], _dateTimeFormat)
-    //   .format('HH:mm')
-    //   .toString()
     const time = values[timeKey] !== '' ? values[timeKey] : '00:00'
-
-    // const newDate = moment(value, 'DD MM YYYY').format('DD MMM YYYY')
     let result = moment(`${value} ${time}`, _dateTimeFormat).format(
       'DD MMM YYYY HH:mm',
     )
@@ -200,18 +223,75 @@ class AppointmentFormContainerBasic extends PureComponent {
 
   determineConflict = () => {}
 
-  render () {
+  toggleNewPatientModal = () => {
+    const { showNewPatientModal } = this.state
+    this.setState({ showNewPatientModal: !showNewPatientModal })
+  }
+
+  openSearchPatientModal = () => {
+    const { dispatch, values } = this.props
+    dispatch({
+      type: 'appointment/fetchPatientListByName',
+      payload: values.patientName,
+    })
+    this.setState({ showSearchPatientModal: true })
+  }
+
+  closeSearchPatientModal = () => {
+    this.setState({ showSearchPatientModal: false })
+  }
+
+  handleSelectPatient = (patientID) => {
+    const { dispatch } = this.props
+
+    this.closeSearchPatientModal()
+    dispatch({
+      type: 'appointment/fetchPatientInfoByPatientID',
+      payload: patientID,
+    })
+  }
+
+  onCancelAppointmentClick = () => {
     const {
+      visibleChange,
+      commitChanges,
+      appointmentData,
+      dispatch,
+      resetForm,
+    } = this.props
+    const type = 'deleted'
+    // clear current search patient info
+    dispatch({
+      type: 'appointment/updateSelectedPatientInfo',
+      payload: {},
+    })
+    // clear searching patient list
+    dispatch({
+      type: 'appointment/updatePatientList',
+      payload: [],
+    })
+    // commit changes to appointment data in calendar
+    commitChanges({ [type]: appointmentData.id })
+    resetForm()
+    visibleChange()
+  }
+
+  render () {
+    const { showNewPatientModal, showSearchPatientModal } = this.state
+    const {
+      appointment,
+      loading,
       classes,
       visible,
       visibleChange,
       appointmentData,
       submitForm,
       values,
+      dispatch,
     } = this.props
     const isNewAppointment = appointmentData.id === undefined
-    const isConflict = false
-
+    const isConflict = false // TODO check if appointment conflict with another
+    console.log('appointmentform', this.props)
     return (
       <AppointmentForm.Popup visible={visible}>
         <AppointmentForm.Container className={classes.container}>
@@ -221,6 +301,7 @@ class AppointmentFormContainerBasic extends PureComponent {
               className={classes.closeButton}
               simple
               justIcon
+              color='danger'
               onClick={visibleChange}
             >
               <Close color='danger' />
@@ -229,6 +310,9 @@ class AppointmentFormContainerBasic extends PureComponent {
 
           <Form
             values={values}
+            isLoading={loading.models.appointment}
+            handleCreatePatientClick={this.toggleNewPatientModal}
+            handleSearchClick={this.openSearchPatientModal}
             appointmentData={appointmentData}
             onDateChange={this.onDateChange}
             onTimeChange={this.onTimeChange}
@@ -248,10 +332,13 @@ class AppointmentFormContainerBasic extends PureComponent {
           )}
           <div className={classnames(classes.actionButtons)}>
             <div className={classnames(classes.cancelAppointmentBtn)}>
-              <Button color='danger'>
-                <FormattedMessage id='reception.appt.form.cancelAppointment' />
-              </Button>
+              {!isNewAppointment && (
+                <Button color='danger' onClick={this.onCancelAppointmentClick}>
+                  <FormattedMessage id='reception.appt.form.cancelAppointment' />
+                </Button>
+              )}
             </div>
+
             <div className={classnames(classes.otherBtn)}>
               <Button color='danger' onClick={visibleChange}>
                 <FormattedMessage id='reception.common.cancel' />
@@ -271,6 +358,36 @@ class AppointmentFormContainerBasic extends PureComponent {
                 )}
               </Button>
             </div>
+            <CommonModal
+              open={showNewPatientModal}
+              title={formatMessage({
+                id: 'reception.queue.patientSearch.registerNewPatient',
+              })}
+              onClose={this.toggleNewPatientModal}
+              onConfirm={this.toggleNewPatientModal}
+              fullScreen
+              showFooter={false}
+            >
+              {showNewPatientModal && <NewPatient />}
+            </CommonModal>
+            <CommonModal
+              open={showSearchPatientModal}
+              title='Search Patient'
+              onClose={this.closeSearchPatientModal}
+              onConfirm={this.closeSearchPatientModal}
+              maxWidth='md'
+              showFooter={false}
+            >
+              {showSearchPatientModal && (
+                <PatientSearchModal
+                  searchPatientName={values.patientName}
+                  patientList={appointment.patientList}
+                  onBackClick={this.closeSearchPatientModal}
+                  onSelectClick={this.handleSelectPatient}
+                  dispatch={dispatch}
+                />
+              )}
+            </CommonModal>
           </div>
         </AppointmentForm.Container>
       </AppointmentForm.Popup>

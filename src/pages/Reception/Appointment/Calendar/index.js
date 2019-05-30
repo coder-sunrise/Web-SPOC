@@ -3,7 +3,8 @@ import classnames from 'classnames'
 import moment from 'moment'
 import { connect } from 'dva'
 // material ui
-import { Paper, LinearProgress, withStyles } from '@material-ui/core'
+import { Paper, withStyles } from '@material-ui/core'
+import { Add } from '@material-ui/icons'
 // dx-react-scheduler
 import { connectProps } from '@devexpress/dx-react-core'
 import { ViewState, EditingState } from '@devexpress/dx-react-scheduler'
@@ -16,6 +17,8 @@ import {
   WeekView,
   MonthView,
 } from '@devexpress/dx-react-scheduler-material-ui'
+// custom components
+import { Button, Tooltip } from '@/components'
 // sub component
 import {
   AptFormPopUp,
@@ -29,34 +32,39 @@ import EditButton from './Tooltip/EditButton'
 import { CALENDAR_VIEWS } from '../utils'
 
 const styles = (theme) => ({
-  container: {
-    borderRadius: '5px',
+  addNewBtn: {
+    position: 'fixed',
+    bottom: '3%',
+    right: '3%',
   },
-  flexibleSpace: {
-    margin: '0 auto 0 0',
-  },
-  flexibleSpaceContent: {
-    display: 'flex',
-    minWidth: '450px',
-  },
-  doctorSelector: {
-    marginLeft: theme.spacing.unit * 2,
-    minWidth: 300,
-  },
-  doctorSelectorItem: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-  chip: {
-    margin: theme.spacing.unit / 4,
-  },
-  showAllBtn: {
-    paddingLeft: '10px',
-  },
+  // container: {
+  //   borderRadius: '5px',
+  // },
+  // flexibleSpace: {
+  //   margin: '0 auto 0 0',
+  // },
+  // flexibleSpaceContent: {
+  //   display: 'flex',
+  //   minWidth: '450px',
+  // },
+  // doctorSelector: {
+  //   marginLeft: theme.spacing.unit * 2,
+  //   minWidth: 300,
+  // },
+  // doctorSelectorItem: {
+  //   display: 'flex',
+  //   alignItems: 'center',
+  // },
+  // chips: {
+  //   display: 'flex',
+  //   flexWrap: 'wrap',
+  // },
+  // chip: {
+  //   margin: theme.spacing.unit / 4,
+  // },
+  // showAllBtn: {
+  //   paddingLeft: '10px',
+  // },
 })
 
 const _dateFormat = 'DD MMM YYYY'
@@ -66,7 +74,6 @@ class Calendar extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      isLoading: false,
       showOverlay: false,
       aptFormVisible: false,
       addedAppointment: {},
@@ -95,6 +102,7 @@ class Calendar extends PureComponent {
       return {
         visible: aptFormVisible,
         appointmentData,
+        toggleNewPatient: this.toggleNewPatientModal,
         commitChanges: this.handleCommitChanges,
         visibleChange: this.toggleAptFormVisibility,
         onEditingAptIDChange: this.onEditingAppointmentIdChange,
@@ -161,9 +169,9 @@ class Calendar extends PureComponent {
 
   render () {
     const { aptFormVisible } = this.state
-    const { appointment } = this.props
-    const { displayData, currentView, filter } = appointment
-    console.log('appointment state', filter)
+    const { appointment, classes } = this.props
+    const { displayData, currentView } = appointment
+
     return (
       <React.Fragment>
         <Paper>
@@ -211,6 +219,17 @@ class Calendar extends PureComponent {
               popupComponent={this._AptFormComponent}
             />
           </Scheduler>
+          <Tooltip title='Add appointment' placement='bottom-end'>
+            <Button
+              className={classnames(classes.addNewBtn)}
+              onClick={this.toggleAptFormVisibility}
+              color='primary'
+              justIcon
+              round
+            >
+              <Add />
+            </Button>
+          </Tooltip>
         </Paper>
       </React.Fragment>
     )

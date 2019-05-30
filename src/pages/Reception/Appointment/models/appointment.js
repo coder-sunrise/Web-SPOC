@@ -14,6 +14,14 @@ const applyFilter = (data, filter) => {
   let returnData = [
     ...data,
   ]
+
+  // filter by doctor
+  const { doctors } = filter
+  if (doctors.length !== 0 && !doctors.includes('all'))
+    returnData = returnData.filter((aptData) =>
+      doctors.includes(aptData.doctor),
+    )
+
   // filter by appointment type
   const { appointmentType } = filter
   if (appointmentType.length !== 0) {
@@ -49,14 +57,13 @@ export default createListViewModel({
       currentView: CALENDAR_VIEWS.DAY,
       currentDate: todayDate,
       displayDate: todayDate,
-
+      patientList: [],
+      currentSearchPatientInfo: {},
       aptData: [],
       displayData: [],
       filter: {
         searchQuery: '',
-        appointmentType: [
-          'all',
-        ],
+        appointmentType: [],
         doctors: [
           'all',
         ],
@@ -64,7 +71,40 @@ export default createListViewModel({
       showAll: false,
     },
     subscriptions: {},
-    effects: {},
+    effects: {
+      *fetchPatientListByName ({ payload }, { call, put }) {
+        const response = !payload
+          ? yield call(service.fetchPatientList)
+          : yield call(service.fetchPatientListByName, payload)
+        if (response) {
+          const { data: { data = [] } } = response
+
+          return yield put({
+            type: 'updatePatientList',
+            payload: [
+              ...data,
+            ],
+          })
+        }
+        return false
+      },
+      *fetchPatientInfoByPatientID ({ payload }, { call, put }) {
+        const response = yield call(
+          service.fetchPatientInfoByPatientID,
+          payload,
+        )
+        if (response) {
+          return yield put({
+            type: 'updateSelectedPatientInfo',
+            payload: {
+              ...response.data,
+            },
+          })
+        }
+
+        return false
+      },
+    },
     reducers: {
       viewChange (state, { view }) {
         let { displayDate } = state
@@ -102,7 +142,6 @@ export default createListViewModel({
       commitChanges (state, { added, changed, deleted }) {
         let { aptData: data } = state
         const { filter } = state
-
         if (added) {
           const startingAddedId =
             data.length > 0 ? data[data.length - 1].id + 1 : 0
@@ -140,7 +179,21 @@ export default createListViewModel({
         }
       },
       updateFilterDoctor (state, { doctors }) {
-        const filter = { ...state.filter, doctors }
+        const newItemAll = doctors.indexOf('all') === doctors.length - 1
+
+        let newDoctorsFilter = doctors
+        if (newItemAll) {
+          // new item === 'all', clear list and left 'all' only
+          newDoctorsFilter = doctors.filter((doc) => doc === 'all')
+        } else {
+          // new item !== 'all'
+          newDoctorsFilter =
+            doctors.includes('all') && doctors.length > 1
+              ? doctors.filter((doc) => doc !== 'all')
+              : doctors
+        }
+
+        const filter = { ...state.filter, doctors: newDoctorsFilter }
         const displayData = applyFilter(state.aptData, filter)
 
         return { ...state, displayData, filter }
@@ -162,7 +215,7 @@ export default createListViewModel({
         return {
           ...state,
           displayData,
-          filter: { ...newFilter },
+          // filter: { ...newFilter },
         }
       },
       showAll (state) {
@@ -172,6 +225,17 @@ export default createListViewModel({
           showAll: !showAll,
           selectedDoctors: !showAll ? [] : selectedDoctors,
         }
+      },
+      updatePatientList (state, { payload }) {
+        return {
+          ...state,
+          patientList: [
+            ...payload,
+          ],
+        }
+      },
+      updateSelectedPatientInfo (state, { payload }) {
+        return { ...state, currentSearchPatientInfo: { ...payload } }
       },
     },
   },

@@ -1,18 +1,13 @@
 import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi/locale'
 // material ui
-import { withStyles } from '@material-ui/core'
-import { PersonAdd, Create } from '@material-ui/icons'
+import { CircularProgress, withStyles } from '@material-ui/core'
+import { PersonAdd } from '@material-ui/icons'
 // custom components
-import {
-  Button,
-  GridContainer,
-  GridItem,
-  TextField,
-  AntdInput,
-} from '@/components'
+import { Button, GridContainer, GridItem, AntdInput } from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
 
@@ -40,41 +35,31 @@ const styles = () => ({
 })
 
 class DetailsActionBar extends PureComponent {
-  state = {
-    currentSearchPatient: '',
-  }
-
-  onEnterPressed = () => {
-    const { currentSearchPatient } = this.state
-    const { togglePatientSearch } = this.props
-    currentSearchPatient !== '' && togglePatientSearch()
-  }
-
-  onSearchPatientChange = (event) => {
-    const { value } = event.target
-    this.setState({ currentSearchPatient: value })
-  }
-
-  onRegisterVisitClick = () => {
-    const { togglePatientSearch } = this.props
-    togglePatientSearch(this.state.currentSearchPatient)
+  static propTypes = {
+    onRegisterVisitEnterPressed: PropTypes.func,
+    toggleNewPatient: PropTypes.func,
+    handleStatusChange: PropTypes.func,
   }
 
   render () {
-    const { currentSearchPatient } = this.state
     const {
       classes,
       toggleNewPatient,
       currentFilter,
+      currentSearchPatient,
       handleStatusChange,
+      handleQueryChange,
+      onRegisterVisitEnterPressed,
+      isFetching,
     } = this.props
     return (
       <GridContainer className={classnames(classes.actionBar)} spacing={8}>
         <GridItem xs md={3}>
           <AntdInput
+            suffix={isFetching && <CircularProgress size={16} />}
             value={currentSearchPatient}
-            onChange={this.onSearchPatientChange}
-            onPressEnter={this.onEnterPressed}
+            onChange={handleQueryChange}
+            onPressEnter={onRegisterVisitEnterPressed}
             label={formatMessage({
               id: 'reception.queue.registerVisitTextBox',
             })}

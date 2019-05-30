@@ -2,6 +2,7 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 import { notification } from '@/components'
+import Error, { showErrorNotification } from '@/utils/error'
 
 const MessageWrapper = ({ children }) => (
   <div>
@@ -33,6 +34,7 @@ export default createListViewModel({
     state: {
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
+      queueListing: [],
       visitPatientInfo: {},
     },
     subscriptions: {},
@@ -40,13 +42,17 @@ export default createListViewModel({
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)
         const { data } = response
-        if (data.id) {
+        if (data && data.id) {
           // start session successfully
           _saveSessionID(data.id)
+          return yield put({
+            type: 'updateSessionInfo',
+            payload: { ...data },
+          })
         }
         return yield put({
           type: 'updateSessionInfo',
-          payload: { ...data },
+          payload: { ...InitialSessionInfo },
         })
       },
       *endSession (_, { call, put }) {
@@ -65,14 +71,18 @@ export default createListViewModel({
         try {
           const sessionID = localStorage.getItem('_sessionID')
           const response = yield call(service.getSessionInfo, sessionID)
-          const { data = { ...InitialSessionInfo } } = response
+          // data = null when get session failed
+          const { data } = response
 
-          return yield put({
-            type: 'updateSessionInfo',
-            payload: { ...data },
-          })
+          if (data)
+            return yield put({
+              type: 'updateSessionInfo',
+              payload: { ...data },
+            })
+          throw Error('Failed to get session info', 400)
         } catch (error) {
           console.log('error', error)
+          error.message && showErrorNotification(error.message, '')
           return false
         }
       },

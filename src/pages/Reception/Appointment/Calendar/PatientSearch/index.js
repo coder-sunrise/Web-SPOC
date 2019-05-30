@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import classNames from 'classnames'
-import { connect } from 'dva'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // table grid component
@@ -15,8 +14,9 @@ import {
   Button,
   TextField,
   CommonTableGrid2,
+  Danger,
 } from '@/components'
-import ViewDetailsButton from './ViewDetailsBtn'
+import ActionButton from './GridActionButton'
 
 const styles = () => ({
   spacing: {
@@ -24,70 +24,63 @@ const styles = () => ({
   },
 })
 
-@connect(({ queueLog }) => ({ queueLog }))
 class PatientSearch extends PureComponent {
   state = {
     searchQuery: this.props.searchPatientName,
+    selectedPatient: [],
+    showError: false,
     columns: [
       { name: 'name', title: 'Name' },
       { name: 'patientAccountNo', title: 'ID' },
       { name: 'gender', title: 'Gender' },
       { name: 'age', title: 'Age' },
       { name: 'mobileNo', title: 'Contact' },
-      { name: 'Action', title: 'Action' },
     ],
     columnExtensions: [
       { columnName: 'name', width: 200 },
-      { columnName: 'Action', align: 'center' },
     ],
-  }
-
-  viewPatientInfo = (patientID) => {
-    const { onViewRegisterVisit } = this.props
-    onViewRegisterVisit(patientID)
-  }
-
-  Cell = (props) => {
-    const { column, row } = props
-    if (column.name === 'Action') {
-      return (
-        <Table.Cell {...props}>
-          <ViewDetailsButton row={row} onClick={this.viewPatientInfo} />
-        </Table.Cell>
-      )
-    }
-    return <Table.Cell {...props} />
-  }
-
-  TableCell = (props) => {
-    return this.Cell({ ...props })
   }
 
   gridGetRowID = (row) => row.id
 
   searchPatient = () => {
-    const { dispatch, searchPatientName } = this.props
+    const { searchQuery } = this.state
+    const { dispatch } = this.props
 
     dispatch({
-      type: 'queueLog/fetchPatientListByName',
-      payload: searchPatientName,
+      type: 'appointment/fetchPatientListByName',
+      payload: searchQuery,
     })
   }
 
   onSearchQueryChange = (event) => {
-    console.log('onsearchquerychange')
     this.setState({ searchQuery: event.target.value })
   }
 
+  handleSelectionChange = (selection) => {
+    const { selectedPatient } = this.state
+    const filtered = selection.filter(
+      (patientID) => !selectedPatient.includes(patientID),
+    )
+    this.setState({ selectedPatient: filtered })
+  }
+
+  onSelectClick = () => {
+    const { onSelectClick } = this.props
+    const { selectedPatient } = this.state
+    selectedPatient.length === 1 && onSelectClick(selectedPatient[0])
+    this.setState({ showError: selectedPatient.length === 0 })
+  }
+
   render () {
-    const { columns, columnExtensions, searchQuery } = this.state
     const {
-      classes,
-      queueLog,
-      handleQueryChange,
-      onViewRegisterPatient,
-    } = this.props
-    const ActionProps = { TableCellComponent: this.TableCell }
+      columns,
+      columnExtensions,
+      searchQuery,
+      selectedPatient,
+      showError,
+    } = this.state
+    const { classes, onBackClick, patientList } = this.props
 
     return (
       <React.Fragment>
@@ -108,24 +101,37 @@ class PatientSearch extends PureComponent {
               <FormattedMessage id='reception.queue.search' />
             </Button>
           </GridItem>
-          <GridItem xs md={4} container justify='flex-end' alignItems='center'>
-            <Button color='primary' onClick={onViewRegisterPatient}>
-              <PersonAdd />
-              <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
-            </Button>
-          </GridItem>
         </GridContainer>
         <GridContainer>
+          <GridItem xs md={12}>
+            {showError && (
+              <Danger>
+                <h3>Please select a patient</h3>
+              </Danger>
+            )}
+          </GridItem>
           <GridItem xs md={12} style={{ marginBottom: '5px' }}>
             <CommonTableGrid2
-              height={400}
-              rows={queueLog.patientList}
+              rows={patientList}
               columnExtensions={columnExtensions}
-              ActionProps={ActionProps}
               columns={columns}
               getRowId={this.gridGetRowID}
-              FuncProps={{ pager: false }}
+              selection={selectedPatient}
+              onSelectionChange={this.handleSelectionChange}
+              FuncProps={{ selectable: true }}
             />
+          </GridItem>
+        </GridContainer>
+        <GridContainer justify='flex-end' alignItems='center'>
+          <GridItem>
+            <Button color='danger' onClick={onBackClick}>
+              Back
+            </Button>
+          </GridItem>
+          <GridItem>
+            <Button color='primary' onClick={this.onSelectClick}>
+              Select
+            </Button>
           </GridItem>
         </GridContainer>
       </React.Fragment>

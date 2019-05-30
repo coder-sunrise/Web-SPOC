@@ -126,18 +126,37 @@ class FixSelect extends React.PureComponent {
             </Button>
           </GridItem>
           <GridItem xs md={2}>
-            <FastField
-              name='AntdInput'
-              render={(args) => <AntdInput {...args} label='Antd Input' />}
+            <AntdInput
+              onChange={this.handleChange}
+              value={testAntdInput}
+              label='Antd Input'
             />
           </GridItem>
 
           <GridItem xs md={2}>
-            <AntdSelect
-              options={antDOptions}
-              value='penang'
-              label='Antd Select'
-              disabled
+            <FastField
+              name='testSelect'
+              render={(args) => (
+                <AntdSelect
+                  {...args}
+                  size='small'
+                  options={antDOptions}
+                  label='Small Antd Select'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={2}>
+            <FastField
+              name='testSelectLarge'
+              render={(args) => (
+                <AntdSelect
+                  {...args}
+                  size='large'
+                  options={antDOptions}
+                  label='Large Antd Select'
+                />
+              )}
             />
           </GridItem>
           <GridItem xs md={2}>

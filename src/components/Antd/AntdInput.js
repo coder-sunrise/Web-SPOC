@@ -1,13 +1,27 @@
-import React from 'react'
+import React, { Component } from 'react'
 // ant
 import { Input } from 'antd'
 import AntdWrapper from './AntdWrapper'
 import { extendFunc } from '@/utils/utils'
 
-class AntdInput extends React.PureComponent {
+class AntdInput extends Component {
   static defaultProps = {
     disabled: false,
     size: 'default',
+  }
+
+  shouldComponentUpdate = (nextProps) => {
+    const { form, field, value } = this.props
+    const { form: nextForm, field: nextField, value: nextValue } = nextProps
+
+    const currentDateValue = form && field ? field.value : value
+    const nextDateValue = nextForm && nextField ? nextField.value : nextValue
+
+    return (
+      nextDateValue !== currentDateValue ||
+      form.errors[field.name] !== nextForm.errors[nextField.name] ||
+      form.touched[field.name] !== nextForm.touched[nextField.name]
+    )
   }
 
   handleValueChange = (event) => {
@@ -28,11 +42,12 @@ class AntdInput extends React.PureComponent {
   }
 
   render () {
-    const { value, form, field, onChange, onPressEnter } = this.props
+    const { value, form, field, onChange, onPressEnter, suffix } = this.props
     const inputValue = form && field ? field.value : value
     return (
       <AntdWrapper {...this.props}>
         <Input
+          suffix={suffix}
           value={inputValue}
           onPressEnter={onPressEnter}
           onChange={extendFunc(onChange, this.handleValueChange)}

@@ -29,7 +29,7 @@ const STYLES = () => {
       },
       '& .ant-select-selection > div': {
         marginLeft: 0,
-        fontSize: '1rem',
+        // fontSize: '1rem',
         fontWeight: 400,
         paddingTop: 3,
       },
