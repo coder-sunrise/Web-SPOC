@@ -1,4 +1,5 @@
 import fetch from 'dva/fetch'
+import axios from 'axios'
 import { notification } from '@/components'
 import router from 'umi/router'
 import hash from 'hash.js'
@@ -7,7 +8,7 @@ import $ from 'jquery'
 import { isAntdPro } from './utils'
 
 // const baseUrl = 'http://localhost:55314'
-// export const baseUrl = 'http://localhost:55314'
+// export const baseUrl = 'http://localhost/SEMR_V2'
 export const baseUrl = 'https://semr2dev2010.emr.com.sg'
 let dynamicURL = baseUrl
 
@@ -73,21 +74,56 @@ const checkStatus = async (response) => {
   throw error
 }
 
-const cachedSave = (response, hashcode) => {
-  console.log('cachedSave', response)
-  /**
-   * Clone a response data and store it in sessionStorage
-   * Does not support data other than json, Cache only json
-   */
-  const contentType = response.headers.get('Content-Type')
-  if (contentType && contentType.match(/application\/json/i)) {
-    // All data is saved as text
-    response.clone().text().then((content) => {
-      sessionStorage.setItem(hashcode, content)
-      sessionStorage.setItem(`${hashcode}:timestamp`, Date.now())
-    })
+const showErrorNotification = (header, message) => {
+  notification.destroy()
+  notification.error({
+    message: (
+      <div>
+        <h4>{header}</h4>
+        <p>{message}</p>
+      </div>
+    ),
+    duration: 0,
+  })
+}
+
+export const axiosRequest = (url, option) => {
+  const token = localStorage.getItem('token')
+  const headerConfig = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
   }
-  return response
+  const apiUrl = baseUrl + url
+  return axios({
+    url: apiUrl,
+    ...option,
+    ...headerConfig,
+  })
+    .then((response) => {
+      const { data, status } = response
+      console.log('axios response', response)
+      if (status >= 200 && status < 300) {
+        const { data: nestedData } = data
+        return { status, data: nestedData !== undefined ? nestedData : data }
+      }
+      return status
+    })
+    .catch((error) => {
+      console.log('axios error', error.response)
+      const {
+        data = { message: 'An error occured' },
+        status,
+        statusText,
+      } = error.response
+
+      status === 401
+        ? showErrorNotification('', statusText)
+        : showErrorNotification('', data.message)
+
+      return false
+    })
 }
 
 /**
@@ -111,7 +147,7 @@ export default function request (url, option) {
   let newUrl = url
 
   // const token = 'CfDJ8NIVLAbYTRpOk2IDmBBb9nQ09BNeoyGSs_wHHE4tfcY_d_w5lgvxw6gKmNhohjJ3vpZohASGm5XG997uWe1fXzuzLYtRzoDTmq7d40T-VSaQkUc2beqjFQNqL4D2xhgJC5-cPIGRGpuCXu1BbmEYThuk89P4aHiKA5WoZy4TNUVaUchuNHfi69qaqgCqWPhi1AMYpRf2isqFAt-dIkk0Z-yXcdFLNoylnQSVPjMtF5ahmWD0_ix-qkM3U15klptxPENvmB9-7gVCp5n-bS9YibPT-rWgudAmgVv5_LzG8OKtUKWHY_CNvoGeqgEKq4GojzGMFzHTl5DHeIlq6bb6YLple9unPtWJylgOgq9SdmiIzHAa5zkNCVaXTpEvNVrA0rFdB4zgWJOy-uDwb6qTGAhG_qqmICwITsTKe6DA7KYcZUP1kUERGoPAK3AtzsUl30aRaVzUo1VtfRy1hWe7lBE0K_7EQxrga7I871jO8s2vmdWIdUEw807vjxvuf7s0km5xbmEn-Watlpqbuken-ZzMGkXJju65mYB2_jm6NfqHDvSRmUB6Sc3SLWTukH3xsC8xIFw71bwT8KLy8UyAVCC7KGI1lhPg3MnIXVeeyhL2AT_-CWsg26h7IKfUmw_HP591Tr046-sDNukuqJwmjUpky2eU8kF6AeHxBm9fPtWQ79WFvO4vi2bxrmz29e-9NmbRd3WwLzivRIFSYRNIJhGyY5EPlJ01Cn2WbWr-hAKhqmucB66KxTtDcnMuxFeJ2EnxQhLtUEgGprgQ8LSqoJGV9BPEbkDcn_4XyYqWoqLAILE1Z2jNCo5rU-e0o9ya9Pwwhq0sgrQkiXAMAVsCvBiNPSBkSq-AJbejB3YXB3EY3Z_FmdFwO_1fgpJeoWkTKD4dYBEDHHgxHBOEGJRc9-chkYJfeFSX93iqD2VG6K68'
-  const token = sessionStorage.getItem('token')
+  const token = localStorage.getItem('token')
   const defaultOptions = {
     credentials: 'include',
     headers: {

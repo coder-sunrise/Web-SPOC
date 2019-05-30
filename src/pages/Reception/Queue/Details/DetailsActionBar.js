@@ -1,23 +1,13 @@
 import React, { PureComponent } from 'react'
-import classNames from 'classnames'
+import PropTypes from 'prop-types'
+import classnames from 'classnames'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi/locale'
-// formik
-import { FastField, withFormik } from 'formik'
 // material ui
-import { withStyles } from '@material-ui/core'
-import { Stop, Create } from '@material-ui/icons'
+import { CircularProgress, withStyles } from '@material-ui/core'
+import { PersonAdd } from '@material-ui/icons'
 // custom components
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardText,
-  GridContainer,
-  GridItem,
-  TextField,
-} from '@/components'
+import { Button, GridContainer, GridItem, AntdInput } from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
 
@@ -44,43 +34,49 @@ const styles = () => ({
   },
 })
 
-@withFormik({
-  mapPropsToValues: () => ({
-    SessionNo: '190410-01-1.0',
-  }),
-})
 class DetailsActionBar extends PureComponent {
+  static propTypes = {
+    onRegisterVisitEnterPressed: PropTypes.func,
+    toggleNewPatient: PropTypes.func,
+    handleStatusChange: PropTypes.func,
+  }
+
   render () {
-    const options = [
-      { name: 'All doctor', value: 'all' },
-      { name: 'Cheah', value: 'cheah' },
-      { name: 'Joseph', value: 'Joseph' },
-    ]
-    const { classes, togglePatientSearch } = this.props
-    const sessionNo = '190321-02'
+    const {
+      classes,
+      toggleNewPatient,
+      currentFilter,
+      currentSearchPatient,
+      handleStatusChange,
+      handleQueryChange,
+      onRegisterVisitEnterPressed,
+      isFetching,
+    } = this.props
     return (
-      <GridContainer classes={{ grid: classes.actionBar }} spacing={8}>
+      <GridContainer className={classnames(classes.actionBar)} spacing={8}>
         <GridItem xs md={3}>
-          <FastField
-            name='PatientName'
-            render={(args) => (
-              <TextField
-                {...args}
-                label={formatMessage({
-                  id: 'reception.queue.patientName',
-                })}
-              />
-            )}
+          <AntdInput
+            suffix={isFetching && <CircularProgress size={16} />}
+            value={currentSearchPatient}
+            onChange={handleQueryChange}
+            onPressEnter={onRegisterVisitEnterPressed}
+            label={formatMessage({
+              id: 'reception.queue.registerVisitTextBox',
+            })}
           />
         </GridItem>
-        <GridItem xs md={1} container alignItems='center'>
-          <Button color='primary' onClick={togglePatientSearch}>
-            <Create />
-            <FormattedMessage id='reception.queue.registerVisit' />
+
+        <GridItem xs md={2} container alignItems='center'>
+          <Button size='sm' color='primary' onClick={toggleNewPatient}>
+            <PersonAdd />
+            <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </GridItem>
-        <GridItem xs md={8} container justify='flex-end' alignItems='center'>
-          <StatisticIndicator />
+        <GridItem xs md={7} container justify='flex-end' alignItems='center'>
+          <StatisticIndicator
+            filter={currentFilter}
+            handleStatusClick={handleStatusChange}
+          />
         </GridItem>
       </GridContainer>
     )

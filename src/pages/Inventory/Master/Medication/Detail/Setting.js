@@ -37,6 +37,7 @@ class Setting extends React.Component {
         'Avoid contact with eyes',
         'Complete whole course of medicine',
       ],
+      type:'Setting',
     }
     return (
       <GridContainer>
@@ -124,7 +125,10 @@ class Setting extends React.Component {
           </Card>
         </GridItem>
         <GridItem xs={12}>
-          <div />
+        <p style={{textAlign:'Center'}}>
+        1 Dispense UOM = <u>1.00</u> Prescribing UOM
+        </p>
+
         </GridItem>
         <GridItem xs={12}>
           <Card className='Test'>

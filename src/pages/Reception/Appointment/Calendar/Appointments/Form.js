@@ -1,14 +1,16 @@
 import React from 'react'
 import classnames from 'classnames'
+import moment from 'moment'
 // umi formatMessage
 import { formatMessage } from 'umi/locale'
 // formik
 import { FastField, Field } from 'formik'
 // devexpress-react-scheduler
 // material ui
-import { Chip, Paper, withStyles } from '@material-ui/core'
+import { CircularProgress, Paper, withStyles } from '@material-ui/core'
 // custom component
 import {
+  Button,
   DatePicker,
   GridContainer,
   GridItem,
@@ -16,16 +18,14 @@ import {
   OutlinedTextField,
   Select,
   TextField,
+  AntdInput,
   RadioGroup,
+  Primary,
+  Danger,
 } from '@/components'
 // custom components
-import {
-  defaultColorOpts,
-  colorNameOptions,
-  getColorMapping,
-  getColorClassByColorName,
-  reduceColorToClass,
-} from '../ColorMapping'
+import AppointmentTypeSelector from './AppointmentTypeSelector'
+import { defaultColorOpts } from '../setting'
 
 const doctors = [
   { value: 'bao', name: 'Bao' },
@@ -51,6 +51,19 @@ const RECURRENCE_RANGE = {
 }
 
 const styles = (theme) => ({
+  loading: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    width: '100%',
+    zIndex: 99999,
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  },
   formContent: {
     padding: `${theme.spacing.unit}px 0`,
   },
@@ -71,57 +84,106 @@ const styles = (theme) => ({
       backgroundColor: defaultColorOpts.activeColor,
     },
   },
+  dateTimePreview: {
+    fontSize: '1rem',
+    textAlign: 'center',
+  },
+  buttonGroup: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
-
-const chipStyle = () => ({
-  ...getColorMapping().reduce(reduceColorToClass, {}),
-})
-
-const ColorChipBase = ({ classes, value }) => {
-  return (
-    <Chip
-      color='primary'
-      key={value}
-      label='SAMPLE'
-      className={classnames([
-        classes.chip,
-        value === ''
-          ? classes.defaultColor
-          : getColorClassByColorName(value, classes),
-      ])}
-    />
-  )
-}
-
-const ColorChip = withStyles(chipStyle, { name: 'ColorChip' })(ColorChipBase)
 
 const DATETIME_KEY = {
   START: 'start',
   END: 'end',
 }
 
-const Form = ({ classes, values, onDateChange, onTimeChange }) => {
-  const onStartDateChange = (value) => onDateChange(DATETIME_KEY.START, value)
+const _dateTimeFormat = 'DD MMM YYYY'
+
+const Form = ({
+  classes,
+  values,
+  onDateChange,
+  onTimeChange,
+  handleCreatePatientClick,
+  handleSearchClick,
+  isLoading,
+}) => {
+  const onStartDateChange = (value) => {
+    onDateChange(DATETIME_KEY.START, value)
+  }
   const onStartTimeChange = ({ target }) =>
     onTimeChange(DATETIME_KEY.START, target.value)
 
-  const onEndDateChange = (value) => onDateChange(DATETIME_KEY.END, value)
+  const onEndDateChange = (value) => {
+    onDateChange(DATETIME_KEY.END, value)
+  }
   const onEndTimeChange = ({ target }) =>
     onTimeChange(DATETIME_KEY.END, target.value)
 
+  const startDateValidation = (value) => {
+    if (value === '') return 'Start date is required'
+    if (!moment(value).isValid()) return 'Invalid date'
+
+    // start date should be lower than end date
+    const endDate = moment(values.endDate).isValid()
+      ? moment(values.endDate)
+      : ''
+    if (endDate === '') return ''
+
+    if (endDate.isBefore(moment(value)))
+      return 'Start Date must be before End Date'
+
+    return ''
+  }
+
+  const endDateValidation = (value) => {
+    if (value === '') return 'End Date is required'
+    if (!moment(value).isValid()) return 'Invalid date'
+
+    // end date should be greater than start date
+    const startDate = moment(values.startDate).isValid()
+      ? moment(values.startDate)
+      : ''
+    if (startDate === '') return ''
+
+    if (startDate.isAfter(moment(value)))
+      return 'End Date must be after Start Date'
+
+    return ''
+  }
+
+  const invalidStartDate = !moment(values.startDate).isValid()
+  const invalidEndDate = !moment(values.endDate).isValid()
+  console.log({ invalidStartDate, invalidEndDate })
   return (
     <Paper className={classnames(classes.content)}>
+      {isLoading && (
+        <div className={classnames(classes.loading)}>
+          <CircularProgress />
+          <Primary>
+            <h3 style={{ fontWeight: 400 }}>Populating patient info...</h3>
+          </Primary>
+        </div>
+      )}
+
       <GridContainer
         className={classnames(classes.formContent)}
         alignItems='flex-start'
       >
         <GridItem container xs md={7}>
-          <GridItem xs md={12}>
+          <GridItem xs md={7}>
             <Field
               name='patientName'
               render={(args) => (
-                <TextField
+                <AntdInput
                   {...args}
+                  autoFocus
+                  onPressEnter={handleSearchClick}
+                  helpText='Press enter to search'
                   label={formatMessage({
                     id: 'reception.appt.form.patientName',
                   })}
@@ -129,11 +191,25 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
-            <FastField
+          <GridItem xs md={5}>
+            <div className={classnames(classes.buttonGroup)}>
+              <Button size='sm' color='primary' onClick={handleSearchClick}>
+                Search
+              </Button>
+              <Button
+                size='sm'
+                color='primary'
+                onClick={handleCreatePatientClick}
+              >
+                Create Patient
+              </Button>
+            </div>
+          </GridItem>
+          <GridItem xs md={7}>
+            <Field
               name='contactNo'
               render={(args) => (
-                <TextField
+                <AntdInput
                   {...args}
                   label={formatMessage({ id: 'reception.appt.form.contactNo' })}
                 />
@@ -156,7 +232,7 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             />
           </GridItem>
 
-          <GridItem xs md={5}>
+          <GridItem xs md={6}>
             <FastField
               name='doctor'
               render={(args) => (
@@ -169,24 +245,13 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             />
           </GridItem>
 
-          <GridItem xs md={5}>
+          <GridItem xs md={6}>
             <FastField
-              name='colorTag'
+              name='appointmentType'
               render={(args) => (
-                <Select
-                  {...args}
-                  options={colorNameOptions}
-                  label={formatMessage({ id: 'reception.appt.form.colorTag' })}
-                />
+                <AppointmentTypeSelector {...args} label='Appointment Type' />
               )}
             />
-          </GridItem>
-          <GridItem
-            xs
-            md={2}
-            className={classnames(classes.colorChipContainer)}
-          >
-            <ColorChip value={values.colorTag} />
           </GridItem>
         </GridItem>
 
@@ -200,9 +265,11 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             <GridItem xs md={7}>
               <Field
                 name='startDate'
+                validate={startDateValidation}
                 render={(args) => (
                   <DatePicker
                     {...args}
+                    format={_dateTimeFormat}
                     onChange={onStartDateChange}
                     label={formatMessage({
                       id: 'reception.appt.form.startDate',
@@ -229,6 +296,20 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
               />
             </GridItem>
           </GridItem>
+          <GridItem xs md={12}>
+            {invalidStartDate ? (
+              <Danger>
+                <p className={classnames(classes.dateTimePreview)}>
+                  {values.startDate}
+                </p>
+              </Danger>
+            ) : (
+              <p className={classnames(classes.dateTimePreview)}>
+                {values.startDate}
+              </p>
+            )}
+          </GridItem>
+
           <GridItem
             container
             xs
@@ -238,10 +319,12 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
             <GridItem xs md={7}>
               <Field
                 name='endDate'
+                validate={endDateValidation}
                 render={(args) => (
                   <DatePicker
                     {...args}
-                    oonChange={onEndDateChange}
+                    format={_dateTimeFormat}
+                    onChange={onEndDateChange}
                     label={formatMessage({ id: 'reception.appt.form.endDate' })}
                   />
                 )}
@@ -262,6 +345,19 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
                 )}
               />
             </GridItem>
+          </GridItem>
+          <GridItem xs md={12}>
+            {invalidEndDate ? (
+              <Danger>
+                <p className={classnames(classes.dateTimePreview)}>
+                  {values.endDate}
+                </p>
+              </Danger>
+            ) : (
+              <p className={classnames(classes.dateTimePreview)}>
+                {values.endDate}
+              </p>
+            )}
           </GridItem>
 
           <GridItem xs md={12}>
@@ -287,7 +383,6 @@ const Form = ({ classes, values, onDateChange, onTimeChange }) => {
                     <RadioGroup
                       {...args}
                       simple
-                      defaultValue={values.recurrenceRange}
                       options={[
                         {
                           value: RECURRENCE_RANGE.AFTER,

@@ -103,8 +103,6 @@ class Demographic extends PureComponent {
     // } else {
     //   props.setValues(props.demographic.default)
     // }
-    console.log('c Demographic')
-    console.log(props.patient.entity)
     // props.setValues(props.patient.entity)
   }
 
@@ -139,7 +137,7 @@ class Demographic extends PureComponent {
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
     return (
-      <CardContainer title='Demographic'>
+      <CardContainer title='Demographic' hideHeader>
         <GridContainer gutter={0}>
           <GridItem xs={12} md={5}>
             <GridContainer>

@@ -5,6 +5,7 @@ export default {
     'There is no session now. Would you like to start one?',
   'reception.queue.startSession': 'Start Session',
   'reception.queue.startingASession': 'Starting a session',
+  'reception.queue.gettingSessionInfo': 'Getting Session Info...',
   'reception.queue.doctor': 'Doctor',
 
   'reception.queue.summaryOfSession': 'Summary of Session',
@@ -111,6 +112,8 @@ export default {
   'reception.queue.search': 'Search',
   'reception.queue.patientSearch.registerNewPatient': 'Register New Patient',
   'reception.queue.patientSearch.registerVisit': 'Register Visit',
+  'reception.queue.registerVisitTextBox':
+    'Register Visit (Patient Name, ID, Phone No.)',
   'reception.queue.patientSearch': 'Search Patient',
   'reception.queue.patientSearch.retrieving': 'Retrieving patient list',
   'reception.queue.visitRegistration': 'Visit Registration',
@@ -158,6 +161,7 @@ export default {
   'reception.appt.form.remarks': 'Remarks',
   'reception.appt.form.doctor': 'Doctor',
   'reception.appt.form.colorTag': 'Color Tag',
+  'reception.appt.form.appointmentType': 'Appointment Type',
   'reception.appt.form.startDate': 'Start Date',
   'reception.appt.form.startTime': 'Start Timing',
   'reception.appt.form.endDate': 'End Date',
@@ -168,4 +172,6 @@ export default {
   'reception.appt.form.endBy': 'End By',
   'reception.appt.form.occurence': 'Ocurrence',
   'reception.appt.form.stopDate': 'Stop Date',
+  'reception.appt.form.validate': 'Validate',
+  'reception.appt.form.cancelAppointment': 'Cancel Appointment',
 }

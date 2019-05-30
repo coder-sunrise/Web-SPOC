@@ -60,8 +60,6 @@ class PatientSearch extends PureComponent {
         type: 'patientSearch/query',
       })
     }
-
-    console.log('c PatientSearch', this.props.disableQueryOnLoad)
   }
 
   render () {

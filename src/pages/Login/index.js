@@ -17,7 +17,7 @@ const styles = (theme) => ({
 @connect(({ loginSEMR }) => ({ loginSEMR }))
 class LoginPage extends PureComponent {
   componentDidMount = () => {
-    const haveToken = sessionStorage.getItem('token')
+    const haveToken = localStorage.getItem('token')
     haveToken && router.push('reception/queue')
   }
 
@@ -28,21 +28,21 @@ class LoginPage extends PureComponent {
     }
   }
 
-  onLogin = (username, password) => {
+  onLogin = (username, password, application) => {
     const { dispatch } = this.props
     const credential = { username, password }
     dispatch({
       type: 'loginSEMR/getToken',
-      payload: credential,
+      credentialPayload: credential,
+      application,
     })
-    // .then((props) => {
-    //   const { payload } = props
-    //   console.log('payload', payload)
-    //   payload.status === 200 && router.push('/reception/queue')
-    // })
-    // .catch((error) => {
-    //   console.log('error', error)
-    // })
+      .then((props) => {
+        const { payload } = props
+        payload.status === 200 && router.push('/reception/queue')
+      })
+      .catch((error) => {
+        console.log('error', error)
+      })
   }
 
   render () {

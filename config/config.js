@@ -68,6 +68,13 @@ export default {
   // https://ant.design/docs/react/customize-theme-cn
   theme: {
     'primary-color': defaultSettings.primaryColor,
+    'font-family': 'Roboto, Helvetica, Arial, sans-serif',
+    'border-radius-base': '0px',
+    'border-radius-sm': '0px',
+    'component-background': 'white',
+    'font-size-base': '1rem',
+    'font-size-lg': '1.2rem',
+    'font-size-sm': '0.8rem',
   },
   externals: {
     '@antv/data-set': 'DataSet',
