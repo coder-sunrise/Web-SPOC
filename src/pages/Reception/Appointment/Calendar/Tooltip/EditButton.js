@@ -1,14 +1,13 @@
 import React from 'react'
-import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 // dx-react-scheduler-material-ui
 import { AppointmentTooltip } from '@devexpress/dx-react-scheduler-material-ui'
-// color mapping
-import { reduceColorToClass, getColorMapping } from '../ColorMapping'
+// settings
+import { AppointmentTypeAsStyles } from '../setting'
 
 const styles = () => ({
-  ...getColorMapping().reduce(reduceColorToClass, {}),
+  ...AppointmentTypeAsStyles,
 })
 
 const EditButton = ({ classes, id, ...restProps }) => (

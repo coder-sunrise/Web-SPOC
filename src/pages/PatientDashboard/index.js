@@ -111,7 +111,6 @@ class PatientDashboard extends PureComponent {
         },
       })
     }
-    console.log('c PatientDashboard')
     // dispatch({
     //   type: 'updateState',
     //   payload: {
@@ -295,7 +294,7 @@ class PatientDashboard extends PureComponent {
             >
               <Select
                 noWrapper
-                option={[]}
+                options={[]}
                 label='Filter By'
                 style={{ maxWidth: 300 }}
               />

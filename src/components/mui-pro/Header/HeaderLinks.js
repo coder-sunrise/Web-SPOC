@@ -51,7 +51,7 @@ class HeaderLinks extends React.Component {
   }
 
   logout = () => {
-    sessionStorage.removeItem('token')
+    localStorage.removeItem('token')
     location.href = '/login'
   }
 

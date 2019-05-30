@@ -3,13 +3,15 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
-import RemoveCircle from '@material-ui/icons/RemoveCircle'
 // ant
 import { Select, Form } from 'antd'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 
 const STYLES = (theme) => {
   return {
+    dropdownMenu: {
+      zIndex: 1310,
+    },
     ...inputStyle(theme),
     container: {
       width: '100%',
@@ -20,6 +22,11 @@ const STYLES = (theme) => {
         transformOrigin: 'top left',
       },
     },
+    selectUnderline: {
+      '& .ant-select-selection:after': {
+        transform: 'scaleX(1) !important',
+      },
+    },
     selectContainer: {
       width: '100%',
       '& > div': {
@@ -27,7 +34,7 @@ const STYLES = (theme) => {
         border: 'none',
         boxShadow: 'none !important',
         borderRadius: 0,
-        borderBottom: '1px solid',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
         marginLeft: 5,
         marginRight: 5,
       },
@@ -41,6 +48,11 @@ const STYLES = (theme) => {
         fontSize: '1rem',
         fontWeight: 400,
         paddingTop: 3,
+      },
+    },
+    fixSelectContentHeight: {
+      '& > div': {
+        height: 31,
       },
     },
     // label: {
@@ -88,16 +100,16 @@ class AntDSelect extends React.PureComponent {
     options: PropTypes.array.isRequired,
     // conditionally required
     name: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
+      const { handleChange } = props
+      if (handleChange && props[propName] === undefined)
         return new Error(
           `prop { name } is REQUIRED for ${componentName} but not supplied`,
         )
       return ''
     },
     value: (props, propName, componentName) => {
-      const { onChange } = props
-      if (onChange && props[propName] === undefined)
+      const { handleChange } = props
+      if (handleChange && props[propName] === undefined)
         return new Error(
           `prop ${propName} is REQUIRED for ${componentName} but not supplied`,
         )
@@ -107,13 +119,17 @@ class AntDSelect extends React.PureComponent {
     loading: PropTypes.bool,
     disabled: PropTypes.bool,
     multiple: PropTypes.bool,
-    onChange: PropTypes.func,
+    handleChange: PropTypes.func,
     label: PropTypes.string,
+    labelField: PropTypes.string,
+    valueField: PropTypes.string,
     size: PropTypes.string,
   }
 
   static defaultProps = {
     label: 'Select',
+    labelField: 'name',
+    valueField: 'value',
     loading: false,
     multiple: false,
     disabled: false,
@@ -125,28 +141,30 @@ class AntDSelect extends React.PureComponent {
   }
 
   handleValueChange = (value) => {
-    const { form, field, onChange } = this.props
+    console.log('handlevaluechange', value)
+    const { form, field, handleChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, value === undefined ? '' : value)
+      form.setFieldValue(field.name, value)
     }
 
-    if (onChange) {
+    if (handleChange) {
       const { name } = this.props
-      onChange(name, value)
+      handleChange(name, value)
     }
   }
 
-  handleFocus = () => {
-    this.setState({ shrink: true })
+  handleVisibleChange = (status) => {
+    this.setState({ shrink: status })
   }
 
-  handleBlur = () => {
-    this.setState({ shrink: false })
-  }
+  handleFilter = (input, option) =>
+    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 
   render () {
     const { shrink } = this.state
     const {
+      labelField,
+      valueField,
       classes,
       disabled,
       form,
@@ -167,39 +185,43 @@ class AntDSelect extends React.PureComponent {
       if (selectValue) shouldShrink = shrink || selectValue.length !== 0
       else shouldShrink = shrink
     }
-
-    const labelClass = {
+    const classForLabel = {
       [classes.label]: true,
       [classes.labelAnimation]: true,
       [classes.labelShrink]: shouldShrink,
       [classes.labelFocused]: shrink,
     }
+    const classForSelect = {
+      [classes.selectUnderline]: shrink,
+      [classes.selectContainer]: true,
+      [classes.fixSelectContentHeight]: !multiple,
+    }
+
+    const newOptions = options.map((s) => ({
+      ...s,
+      value: s[valueField],
+      label: s[labelField],
+    }))
 
     return (
       <Form layout='vertical' className={classnames(classes.control)}>
-        <Form.Item label={label} className={classnames(labelClass)}>
+        <Form.Item label={label} className={classnames(classForLabel)}>
           <Select
-            className={classnames(classes.selectContainer)}
+            className={classnames(classForSelect)}
+            dropdownClassName={classnames(classes.dropdownMenu)}
             allowClear
             showSearch
-            clearIcon={
-              <RemoveCircle
-                className={classnames(classes.clearButton)}
-                fontSize='small'
-                color='error'
-              />
-            }
             size={size}
             disabled={disabled}
-            onFocus={this.handleFocus}
-            onBlur={this.handleBlur}
             loading={loading}
             mode={multiple ? 'multiple' : 'default'}
             value={selectValue}
+            onDropdownVisibleChange={this.handleVisibleChange}
+            filterOption={this.handleFilter}
             onChange={this.handleValueChange}
             {...restProps}
           >
-            {options.map((option) => (
+            {newOptions.map((option) => (
               <Select.Option
                 key={option.value}
                 title={option.name}
