@@ -63,11 +63,15 @@ const LoginSchema = Yup.object().shape({
 })
 @connect(({ loginSEMR }) => ({ loginSEMR }))
 @withFormik({
-  mapPropsToValues: () => ({
-    username: 'medisys',
-    password: 'Medi$y$Innovati0n',
-    application: 'CMS',
-  }),
+  mapPropsToValues: () => {
+    if (process.env.NODE_ENV === 'development')
+      return {
+        username: 'medisys',
+        password: 'Medi$y$Innovati0n',
+        application: 'CMS',
+      }
+    return { username: '', password: '', application: '' }
+  },
   handleSubmit: (values, { props }) => {
     const { username, password, application } = values
     const { handleLogin } = props
