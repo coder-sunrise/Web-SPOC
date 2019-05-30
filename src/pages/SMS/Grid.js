@@ -30,7 +30,7 @@ const Grid = (props) => {
   const Cell = ({ column, row, dispatch, classes, ...p }) => {
     if (column.name === 'Action') {
       return (
-        <Table.Cell {...props}>
+        <Table.Cell {...p}>
           <Tooltip title='View SMS History' placement='bottom'>
             <Button
               size='sm'
@@ -80,7 +80,8 @@ const Grid = (props) => {
   }
 
   const colExtensions = [
-    { columnName: 'Action', width: 110, align: 'center' },
+    { columnName: 'Action', align: 'center' },
+    // { columnName: 'Action', width: 110, align: 'center' },
     // { columnName: 'payments', type: 'number', currency: true },
     // { columnName: 'expenseAmount', type: 'number', currency: true },
   ]
