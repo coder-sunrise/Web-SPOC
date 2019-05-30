@@ -13,6 +13,7 @@ export default createFormViewModel({
     service,
     state: {
       isInvalidLogin: false,
+      userInfo: {},
     },
     subscriptions: {},
     effects: {

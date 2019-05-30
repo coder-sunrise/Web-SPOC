@@ -13,6 +13,7 @@ import {
 const styles = (theme) => ({})
 
 const StatusTypeBase = (props) => {
+  console.log('statustypebase', props)
   const {
     column: { name: columnName },
     value,
@@ -25,6 +26,7 @@ const StatusTypeBase = (props) => {
     ({ columnName: currentColumnName }) => currentColumnName === columnName,
   )
   let color
+
   switch (value) {
     case 'REGISTERED':
       color = 'primary'
@@ -73,6 +75,7 @@ class StatusTypeProvider extends PureComponent {
   render () {
     const { columnExtensions } = this.props
     const columns = columnExtensions.reduce(this.filterTypeStatusOnly, [])
+
     return (
       <DataTypeProvider
         for={columns}

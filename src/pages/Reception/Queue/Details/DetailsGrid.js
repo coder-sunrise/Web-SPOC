@@ -9,7 +9,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { formatMessage } from 'umi/locale'
 // material ui
 import { Tooltip, withStyles } from '@material-ui/core'
-import { Edit, Remove, Fullscreen } from '@material-ui/icons'
+import { Edit, Pageview, Remove, Fullscreen } from '@material-ui/icons'
 // custom components
 import { Button, CommonModal, CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
@@ -28,7 +28,7 @@ const styles = () => ({
 
 const generateRowData = () => {
   const data = []
-  for (let i = 0; i < 55; i += 1) {
+  for (let i = 0; i < 5; i += 1) {
     data.push({
       Id: `row-${i}-data`,
       queueNo: i,
@@ -128,17 +128,42 @@ class DetailsGrid extends PureComponent {
     router.push(href)
   }
 
-  onEditVisitClick = (queue) => {
-    console.log('edit visit', queue)
+  onEditVisitClick = (queue) => {}
+
+  onViewPatientDashboardClick = () => {
+    router.push('/emr/queue/patientdashboard')
   }
 
   Cell = (props) => {
     // const { column, row, classes, ...restProps } = props
     const { classes, ...tableProps } = props
+    const { location } = this.props
     if (tableProps.column.name === 'Action') {
+      if (location.path === '/emr/queue')
+        return (
+          <Table.Cell {...tableProps}>
+            <Tooltip
+              title={formatMessage({
+                id: 'reception.queue.viewPatientDashboard',
+              })}
+              placement='bottom'
+              classes={{ tooltip: classes.tooltip }}
+            >
+              <div style={{ display: 'inline-block' }}>
+                <GridButton
+                  row={tableProps.row}
+                  Icon={<Pageview />}
+                  onClick={this.onViewPatientDashboardClick}
+                />
+              </div>
+            </Tooltip>
+          </Table.Cell>
+        )
+      // path === '/queue'
       return (
         <Table.Cell {...tableProps}>
-          <Tooltip
+          {/*
+            <Tooltip
             title={formatMessage({ id: 'reception.queue.viewDispense' })}
             placement='bottom'
             classes={{ tooltip: classes.tooltip }}
@@ -151,6 +176,7 @@ class DetailsGrid extends PureComponent {
               />
             </div>
           </Tooltip>
+          */}
           <Tooltip
             title={formatMessage({ id: 'reception.queue.editVisit' })}
             placement='bottom'
@@ -161,6 +187,19 @@ class DetailsGrid extends PureComponent {
                 row={tableProps.row}
                 Icon={<Edit />}
                 onClick={this.onEditVisitClick}
+              />
+            </div>
+          </Tooltip>
+          <Tooltip
+            title={formatMessage({ id: 'reception.queue.cancelVisit' })}
+            placement='bottom'
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <div style={{ display: 'inline-block' }}>
+              <GridButton
+                row={tableProps.row}
+                color='danger'
+                Icon={<Remove />}
               />
             </div>
           </Tooltip>
@@ -188,8 +227,8 @@ class DetailsGrid extends PureComponent {
     }
     const { classes, queueLog } = this.props
     const { isFullscreen } = this.state
-    const { queueListing } = queueLog
-
+    // const { queueListing } = queueLog
+    console.log('this.props', this.props)
     return (
       <div>
         <WithFullscreenModal
@@ -199,7 +238,7 @@ class DetailsGrid extends PureComponent {
         >
           <CommonTableGrid2
             height={isFullscreen ? undefined : 380}
-            rows={queueListing}
+            rows={generateRowData()}
             {...tableParams}
             ActionProps={ActionProps}
           />

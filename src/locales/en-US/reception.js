@@ -56,6 +56,8 @@ export default {
   'reception.queue.dispense.visit': 'Visit',
   'reception.queue.viewDispense': 'View Dispense',
   'reception.queue.editVisit': 'Edit Visit Registration',
+  'reception.queue.cancelVisit': 'Cancel Visit',
+  'reception.queue.viewPatientDashboard': 'View Visit',
   'reception.queue.expandQueueLog': 'Expand Queue Log',
   'reception.queue.dispense.unitPrice': 'Unit Price',
   'reception.queue.dispense.scheme': 'Scheme',

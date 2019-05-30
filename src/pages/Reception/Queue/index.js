@@ -54,6 +54,7 @@ const styles = (theme) => ({
     justifyContent: 'flex-start',
   },
   sessionNo: {
+    marginTop: 0,
     float: 'left',
     color: 'black',
   },
@@ -210,7 +211,7 @@ class Queue extends PureComponent {
 
     const { sessionInfo } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    console.log('queuelisting state', this.state)
+    console.log('queuelisting state', this.props)
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
@@ -223,10 +224,9 @@ class Queue extends PureComponent {
                 <FormattedMessage id='reception.queue.queueLog' />
               </h4>
             */}
-            <h4 className={classNames(classes.sessionNo)}>
-              <FormattedMessage id='reception.queue.sessionNo' />
-              {sessionNo}
-            </h4>
+            <h3 className={classNames(classes.sessionNo)}>
+              {`Queue (Session No.: ${sessionNo})`}
+            </h3>
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
                 <Button color='info' classes={{ justIcon: classes.icon }}>
@@ -265,6 +265,7 @@ class Queue extends PureComponent {
                   togglePatientSearch={this.togglePatientSearch}
                 />
                 <DetailsGrid
+                  location={this.props.match}
                   onViewDispenseClick={this.toggleDispense}
                   queueLog={queueLog}
                 />

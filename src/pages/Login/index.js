@@ -4,6 +4,7 @@ import router from 'umi/router'
 import { withStyles } from '@material-ui/core'
 // Login Component
 import LoginCard from './LoginCard'
+import ApplicationCard from './ApplicationCard'
 import NavBar from './NavBar'
 import Footer from './Footer'
 
@@ -16,6 +17,10 @@ const styles = (theme) => ({
 })
 @connect(({ loginSEMR }) => ({ loginSEMR }))
 class LoginPage extends PureComponent {
+  state = {
+    step: 0,
+  }
+
   componentDidMount = () => {
     const haveToken = localStorage.getItem('token')
     haveToken && router.push('reception/queue')
@@ -38,14 +43,27 @@ class LoginPage extends PureComponent {
     })
       .then((props) => {
         const { payload } = props
-        payload.status === 200 && router.push('/reception/queue')
+        // const { application } = payload
+        // payload.status === 200 && router.push('/reception/queue')
+        payload.status === 200 && this.setState({ step: 1 })
       })
       .catch((error) => {
         console.log('error', error)
       })
   }
 
+  onLogout = () => {
+    localStorage.removeItem('token')
+    this.setState({ step: 0 })
+  }
+
+  onContinue = (application) => {
+    if (application === 'CMS') router.push('/reception/queue')
+    else router.push('/emr')
+  }
+
   render () {
+    const { step } = this.state
     const { classes, ...rest } = this.props
     return (
       <div className={classes.wrapper}>
@@ -55,7 +73,13 @@ class LoginPage extends PureComponent {
             className={classes.fullPage}
             style={{ backgroundImage: `url(${this.getBgImage()})` }}
           >
-            <LoginCard handleLogin={this.onLogin} />
+            {step === 0 && <LoginCard handleLogin={this.onLogin} />}
+            {step === 1 && (
+              <ApplicationCard
+                handeLogoutClick={this.onLogout}
+                handleContinue={this.onContinue}
+              />
+            )}
             <Footer fluid />
           </div>
         </div>

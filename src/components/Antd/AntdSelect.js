@@ -17,6 +17,7 @@ const STYLES = () => {
       width: '100%',
       '& > div': {
         // erase all border, and boxShadow
+        height: 31,
         border: 'none',
         boxShadow: 'none !important',
         borderRadius: 0,
