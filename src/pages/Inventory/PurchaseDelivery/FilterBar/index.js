@@ -35,7 +35,7 @@ const FilterBar = (props) => {
     const { setFieldValue } = props
     setFieldValue(name, value)
   }
-  const { classes, theme, values } = props
+  const { classes, theme, values, history } = props
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -111,7 +111,7 @@ const FilterBar = (props) => {
               variant='contained'
               color='primary'
               onClick={() => {
-                // this.props.history.push('/inventory/master/consumable')
+                history.push('/inventory/pd/detail')
               }}
             >
               <Add />

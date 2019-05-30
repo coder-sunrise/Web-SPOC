@@ -11,7 +11,7 @@ import settings from './en-US/settings'
 import pwa from './en-US/pwa'
 import patient from './en-US/patient'
 import inventory from './en-US/inventory'
-
+import sms from './en-US/sms'
 import finance from './en-US/finance'
 import reception from './en-US/reception'
 
@@ -39,4 +39,5 @@ export default {
   ...finance,
   ...reception,
   ...inventory,
+  ...sms,
 }

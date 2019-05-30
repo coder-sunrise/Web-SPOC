@@ -20,14 +20,8 @@ export default [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
-    authority: [
-      'admin',
-      'user',
-      'guest',
-    ],
+    Routes: [ 'src/pages/Authorized' ],
+    authority: [ 'admin', 'user', 'guest' ],
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue' },
@@ -174,18 +168,19 @@ export default [
         path: '/sms',
         icon: 'sms',
         name: 'SMS',
-        hideInMenu: true,
+        system: 'CMS',
         routes: [
           {
-            path: '/sms/reminder',
+            path: '/sms',
             name: 'Reminder',
-            // component: './sms/Reminder',
+            component: './sms',
+            mini: 'RM',
           },
-          {
-            path: '/sms/adhoc',
-            name: 'Adhoc',
-            // component: './sms/adhoc',
-          },
+          // {
+          //   path: '/sms/adhoc',
+          //   name: 'Adhoc',
+          //   // component: './sms/adhoc',
+          // },
         ],
       },
       //
@@ -231,6 +226,12 @@ export default [
             name: 'pd',
             // component: './Inventory/PurchaseReceving',
             mini: 'PD',
+          },
+          {
+            path: '/inventory/pd/detail',
+            name: 'pd.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseDelivery/Detail',
           },
         ],
       },
