@@ -51,6 +51,7 @@ class AntdWrapper extends React.PureComponent {
       onChange,
       size,
       value,
+      style,
       ...restProps
     } = this.props
 
@@ -96,9 +97,9 @@ class AntdWrapper extends React.PureComponent {
       [classes.inputError]: showError,
       [classes.hiddenHelpText]: hideHelpText,
     }
-
+    console.log('antdwrapper', this.props)
     return (
-      <div className={classnames(classForControl)}>
+      <div className={classnames(classForControl)} style={{ ...style }}>
         <span className={classnames(classForLabel)}>{label}</span>
         <div className='antdwrapper'>
           {isChildDatePicker ? (
