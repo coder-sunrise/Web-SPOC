@@ -1,18 +1,16 @@
 import React from 'react'
 import classnames from 'classnames'
-import { connect } from 'dva'
 // dx-react-scheduler
 import { Appointments } from '@devexpress/dx-react-scheduler-material-ui'
 // material ui
 import { withStyles } from '@material-ui/core'
 import { Assignment } from '@material-ui/icons'
-// color mapping
+// settings
 import {
-  reduceColorToClass,
-  getColorClassByColorName,
-  getColorMapping,
   defaultColorOpts,
-} from '../ColorMapping'
+  getColorClassByAppointmentType,
+  AppointmentTypeAsStyles,
+} from '../setting'
 
 const styles = () => ({
   content: {
@@ -24,7 +22,7 @@ const styles = () => ({
       backgroundColor: defaultColorOpts.activeColor,
     },
   },
-  ...getColorMapping().reduce(reduceColorToClass, {}),
+  ...AppointmentTypeAsStyles,
 })
 
 const RecurringIconComponent = () => <Assignment />
@@ -32,16 +30,17 @@ const RecurringIconComponent = () => <Assignment />
 const AppointmentContentComponent = withStyles(styles, {
   name: 'AppointmentComponentContent',
 })(({ classes, data, children }) => {
-  const hasColorTag =
-    data.colorTag && data.colorTag !== undefined && data.colorTag !== ''
-  const colorClass = getColorClassByColorName(data.colorTag, classes)
+  const colorClass = getColorClassByAppointmentType(
+    data.appointmentType,
+    classes,
+  )
 
   return (
     <Appointments.AppointmentContent
       data={data}
       className={classnames([
         classes.content,
-        hasColorTag ? colorClass : classes.defaultColor,
+        data.appointmentType ? colorClass : classes.defaultColor,
       ])}
       recurringIconComponent={RecurringIconComponent}
     >

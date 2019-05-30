@@ -63,4 +63,9 @@ export default {
   'menu.inventory.medication.detail': 'Medication Detail',
   'menu.inventory.vaccination.detail': 'Vaccination Detail',
   'menu.inventory.package.detail': 'Package Detail',
+
+  'menu.queuelisting': 'Queue Listing',
+
+  'menu.patientdashboard': 'Patient Dashboard',
+  'menu.patientdashboard.consultation': 'Consultation',
 }

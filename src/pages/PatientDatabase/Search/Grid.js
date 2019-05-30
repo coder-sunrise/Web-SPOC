@@ -78,7 +78,12 @@ class Grid extends PureComponent {
   // }
 
   render () {
-    const { patientSearch, dispatch, renderActionFn } = this.props
+    const {
+      patientSearch,
+      dispatch,
+      renderActionFn,
+      onRowDblClick,
+    } = this.props
     const { tableParas, isDeposit, showDepositRefundModal } = this.state
 
     const TableCell = (p) => this.Cell({ ...p, dispatch, renderActionFn })
@@ -92,6 +97,7 @@ class Grid extends PureComponent {
           entity={patientSearch}
           ActionProps={ActionProps}
           FuncProps={{ pager: true, filter: true }}
+          onRowDoubleClick={onRowDblClick}
           {...tableParas}
         />
         <CommonModal

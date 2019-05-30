@@ -18,8 +18,8 @@
 // // // Variables - Styles that are used on more than one component
 // #############################
 
-const hexToRgb = input => {
-  input = input + ''
+const hexToRgb = (input) => {
+  input += ''
   input = input.replace('#', '')
   let hexRegex = /[0-9A-Fa-f]/g
   if (!hexRegex.test(input) || (input.length !== 3 && input.length !== 6)) {
@@ -35,20 +35,24 @@ const hexToRgb = input => {
   let first = input[0] + input[1]
   let second = input[2] + input[3]
   let last = input[4] + input[5]
-  return parseInt(first, 16) + ', ' + parseInt(second, 16) + ', ' + parseInt(last, 16)
+  return `${parseInt(first, 16)}, ${parseInt(second, 16)}, ${parseInt(
+    last,
+    16,
+  )}`
 }
 
 const drawerWidth = 260
 
 const drawerMiniWidth = 80
+const headerHeight = 56
 
 const transition = {
   transition: 'all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)',
 }
 
 const containerFluid = {
-  paddingRight: '15px',
-  paddingLeft: '15px',
+  paddingRight: '5px',
+  paddingLeft: '5px',
   marginRight: 'auto',
   marginLeft: 'auto',
   '&:before,&:after': {
@@ -113,6 +117,7 @@ const successColor = '#25bc29'
 const infoColor = '#00acc1'
 const roseColor = '#e91e63'
 const grayColor = '#999999'
+const hoverColor = '#f9efff'
 const grayColors = [
   '#999',
   '#777',
@@ -136,7 +141,8 @@ const grayColors = [
 ]
 const blackColor = '#000'
 const whiteColor = '#FFF'
-
+const borderColor = 'rgba(0, 0, 0, 0.12)'
+const border = `1px solid ${borderColor}`
 const primaryBoxShadow = {
   boxShadow:
     '0 12px 20px -10px rgba(156, 39, 176, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(156, 39, 176, 0.2)',
@@ -158,7 +164,8 @@ const dangerBoxShadow = {
     '0 12px 20px -10px rgba(244, 67, 54, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(244, 67, 54, 0.2)',
 }
 const roseBoxShadow = {
-  boxShadow: '0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(233, 30, 99, 0.4)',
+  boxShadow:
+    '0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(233, 30, 99, 0.4)',
 }
 
 // old card headers
@@ -321,6 +328,7 @@ export {
   grayColors,
   blackColor,
   whiteColor,
+  hoverColor,
   primaryBoxShadow,
   infoBoxShadow,
   successBoxShadow,
@@ -349,4 +357,7 @@ export {
   cardSubtitle,
   cardLink,
   standardRowHeight,
+  borderColor,
+  border,
+  headerHeight,
 }

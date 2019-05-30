@@ -9,19 +9,15 @@ import { withFormik } from 'formik'
 import classNames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { Queue as QueueIcon, Stop } from '@material-ui/icons'
+import { Queue as QueueIcon, Refresh, Stop } from '@material-ui/icons'
 // custom components
 import {
   Card,
   CardHeader,
   CardBody,
-  CardIcon,
   CommonModal,
   SimpleModal,
   PageHeaderWrapper,
-  CommonHeader,
-  GridContainer,
-  GridItem,
   Button,
 } from '@/components'
 
@@ -32,10 +28,10 @@ import DetailsGrid from './Details/DetailsGrid'
 import DetailsFooter from './Details/DetailsFooter'
 import NewVisitModal from './NewVisit'
 import PatientSearchModal from './PatientSearch'
-
 import NewPatient from '../../PatientDatabase/New'
 import ViewPatient from '../../PatientDatabase/Detail'
 import EndSessionSummary from './Details/EndSessionSummary'
+import { StatusIndicator } from './variables'
 
 const drawerWidth = 400
 
@@ -63,7 +59,7 @@ const styles = (theme) => ({
   },
   toolBtns: {
     float: 'right',
-    marginTop: '10px',
+    // marginTop: '10px',
   },
   icon: {
     paddingTop: '0.5px',
@@ -74,8 +70,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog }) => ({
+@connect(({ queueLog, loading }) => ({
   queueLog,
+  loading,
 }))
 @withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends PureComponent {
@@ -87,7 +84,15 @@ class Queue extends PureComponent {
     showEndSessionConfirm: false,
     showEndSessionSummary: false,
     visitPatientID: '',
-    noSession: false,
+    currentFilter: StatusIndicator.ALL,
+    currentQuery: '',
+  }
+
+  componentWillMount = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'queueLog/getSessionInfo',
+    })
   }
 
   showVisitRegistration = (patientID = '') => {
@@ -131,59 +136,88 @@ class Queue extends PureComponent {
   }
 
   togglePatientSearch = () => {
+    // const { dispatch } = this.props
+    // dispatch({
+    //   type: 'queueLog/togglePatientSearch',
+    // })
     const { showPatientSearch } = this.state
     this.setState({ showPatientSearch: !showPatientSearch })
   }
 
   onStartSession = () => {
-    this.setState({
-      noSession: false,
+    const { dispatch } = this.props
+    dispatch({
+      type: 'queueLog/startSession',
     })
   }
 
   onEndSessionClick = () => {
     const { showEndSessionConfirm } = this.state
+
     this.setState({
       showEndSessionConfirm: !showEndSessionConfirm,
     })
   }
 
   onConfirmEndSession = () => {
-    this.setState({
-      showEndSessionConfirm: false,
-      showEndSessionSummary: true,
-      noSession: true,
+    const { dispatch } = this.props
+    dispatch({
+      type: 'queueLog/endSession',
     })
+    // this.setState({
+    //   showEndSessionConfirm: false,
+    //   showEndSessionSummary: true,
+    // })
   }
 
   onEndSessionSummaryClose = () => {
     this.setState({ showEndSessionSummary: false })
   }
 
+  onStatusChange = (newStatus) => {
+    this.setState({ currentFilter: newStatus })
+  }
+
+  onQueryChanged = (event) => {
+    const { value } = event.target
+    this.setState({ currentQuery: value })
+  }
+
+  onEnterPressed = () => {
+    const { dispatch } = this.props
+    const { currentQuery } = this.state
+    currentQuery !== '' &&
+      dispatch({
+        type: 'queueLog/fetchPatientListByName',
+        payload: currentQuery,
+      }).then((response) => {
+        this.setState({ showPatientSearch: true })
+      })
+  }
+
   render () {
-    const { classes, ...restProps } = this.props
+    const { classes, queueLog, loading } = this.props
     const {
       showNewVisit,
-      showPatientSearch,
       showRegisterNewPatient,
       showViewPatientProfile,
       showEndSessionConfirm,
       showEndSessionSummary,
-      visitPatientID,
-      noSession,
+      showPatientSearch,
+      currentFilter,
+      currentQuery,
     } = this.state
-    const sessionNo = '190410-01-1.0'
 
+    const { sessionInfo } = queueLog
+    const { sessionNo, isClinicSessionClosed } = sessionInfo
+    console.log('queuelisting state', this.state)
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
         <Card>
-          <CardHeader color='primary' icon>
-            <CardIcon color='primary'>
-              <QueueIcon />
-            </CardIcon>
+          <CardHeader icon>
             {/*
               <h4 className={classNames(classes.cardIconTitle)}>
                 <FormattedMessage id='reception.queue.queueLog' />
@@ -193,8 +227,12 @@ class Queue extends PureComponent {
               <FormattedMessage id='reception.queue.sessionNo' />
               {sessionNo}
             </h4>
-            {!noSession && (
+            {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
+                <Button color='info' classes={{ justIcon: classes.icon }}>
+                  <Refresh />
+                  Refresh
+                </Button>
                 <Button
                   color='danger'
                   classes={{ justIcon: classes.icon }}
@@ -208,16 +246,27 @@ class Queue extends PureComponent {
           </CardHeader>
 
           <CardBody>
-            {noSession ? (
-              <EmptySession handleStartSession={this.onStartSession} />
+            {isClinicSessionClosed ? (
+              <EmptySession
+                handleStartSession={this.onStartSession}
+                loadingProps={loading}
+              />
             ) : (
               <React.Fragment>
                 <DetailsActionBar
+                  isFetching={
+                    loading.effects['queueLog/fetchPatientListByName']
+                  }
+                  currentFilter={currentFilter}
+                  currentSearchPatient={currentQuery}
+                  handleQueryChange={this.onQueryChanged}
+                  handleStatusChange={this.onStatusChange}
+                  onRegisterVisitEnterPressed={this.onEnterPressed}
                   togglePatientSearch={this.togglePatientSearch}
                 />
                 <DetailsGrid
                   onViewDispenseClick={this.toggleDispense}
-                  {...restProps}
+                  queueLog={queueLog}
                 />
                 <DetailsFooter
                   onViewPatientProfile={this.toggleViewPatientProfile}
@@ -233,10 +282,13 @@ class Queue extends PureComponent {
               fluidHeight
               showFooter={false}
             >
-              <PatientSearchModal
-                onViewRegisterVisit={this.showVisitRegistration}
-                onViewRegisterPatient={this.toggleRegisterNewPatient}
-              />
+              {showPatientSearch ? (
+                <PatientSearchModal
+                  searchPatientName={currentQuery}
+                  onViewRegisterVisit={this.showVisitRegistration}
+                  onViewRegisterPatient={this.toggleRegisterNewPatient}
+                />
+              ) : null}
             </CommonModal>
             <CommonModal
               open={showNewVisit}
@@ -249,7 +301,9 @@ class Queue extends PureComponent {
               fluidHeight
               showFooter={false}
             >
-              <NewVisitModal visitPatientID={visitPatientID} />
+              {showNewVisit ? (
+                <NewVisitModal visitPatientInfo={queueLog.visitPatientInfo} />
+              ) : null}
             </CommonModal>
             <CommonModal
               open={showRegisterNewPatient}
@@ -261,7 +315,7 @@ class Queue extends PureComponent {
               fullScreen
               showFooter={false}
             >
-              <NewPatient />
+              {showRegisterNewPatient ? <NewPatient /> : null}
             </CommonModal>
             <CommonModal
               open={showViewPatientProfile}
@@ -273,16 +327,16 @@ class Queue extends PureComponent {
               fullScreen
               showFooter={false}
             >
-              <ViewPatient />
+              {showViewPatientProfile ? <ViewPatient /> : null}
             </CommonModal>
-            {showEndSessionConfirm && (
+            {showEndSessionConfirm ? (
               <SimpleModal
                 title={`Are you sure to end current session (${sessionNo})`}
                 open={showEndSessionConfirm}
                 onCancel={this.onEndSessionClick}
                 onConfirm={this.onConfirmEndSession}
               />
-            )}
+            ) : null}
             {showEndSessionSummary && (
               <CommonModal
                 open={showEndSessionSummary}
@@ -293,7 +347,7 @@ class Queue extends PureComponent {
                 onConfirm={this.onEndSessionSummaryClose}
                 disableBackdropClick
               >
-                <EndSessionSummary />
+                {showEndSessionSummary ? <EndSessionSummary /> : null}
               </CommonModal>
             )}
           </CardBody>

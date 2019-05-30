@@ -1,5 +1,6 @@
 import React from 'react'
-import Select from './index'
+// import Select from './index'
+import Select from '../Antd/AntdSelect'
 import { getCodes } from '@/utils/codes'
 
 const codetables = {}
@@ -15,9 +16,10 @@ class CodeSelect extends React.Component {
     if (this.props.code) {
       if (!codetables[this.props.code]) {
         setTimeout(async () => {
-          codetables[this.props.code] = await getCodes(this.props.code)
+          const codetable = await getCodes(this.props.code)
+
           this.setState({
-            options: codetables[this.props.code],
+            options: codetable,
           })
         }, 0)
       } else {

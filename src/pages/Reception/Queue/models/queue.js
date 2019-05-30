@@ -2,6 +2,7 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 import { notification } from '@/components'
+import Error, { showErrorNotification } from '@/utils/error'
 
 const MessageWrapper = ({ children }) => (
   <div>
@@ -9,6 +10,19 @@ const MessageWrapper = ({ children }) => (
     <h4>{children}</h4>
   </div>
 )
+
+const InitialSessionInfo = {
+  isClinicSessionClosed: true,
+  id: '',
+  sessionNo: '',
+  sessionNoPrefix: '',
+  sessionStartDate: '',
+  sessionCloseDate: '',
+}
+
+const _saveSessionID = (sessionID) => {
+  localStorage.setItem('_sessionID', sessionID)
+}
 
 export default createListViewModel({
   namespace: 'queueLog',
@@ -18,11 +32,60 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      sessionInfo: { ...InitialSessionInfo },
       patientList: [],
+      queueListing: [],
       visitPatientInfo: {},
     },
     subscriptions: {},
     effects: {
+      *startSession (_, { call, put }) {
+        const response = yield call(service.startSession)
+        const { data } = response
+        if (data && data.id) {
+          // start session successfully
+          _saveSessionID(data.id)
+          return yield put({
+            type: 'updateSessionInfo',
+            payload: { ...data },
+          })
+        }
+        return yield put({
+          type: 'updateSessionInfo',
+          payload: { ...InitialSessionInfo },
+        })
+      },
+      *endSession (_, { call, put }) {
+        const sessionID = localStorage.getItem('_sessionID')
+        const response = yield call(service.endSession, sessionID)
+        const { status } = response
+        if (status === 204)
+          // end session successfully, reset session info
+          yield put({
+            type: 'updateSessionInfo',
+            payload: { ...InitialSessionInfo },
+          })
+        return true
+      },
+      *getSessionInfo (_, { call, put }) {
+        try {
+          const sessionID = localStorage.getItem('_sessionID')
+          const response = yield call(service.getSessionInfo, sessionID)
+          // data = null when get session failed
+          const { data } = response
+
+          if (data)
+            return yield put({
+              type: 'updateSessionInfo',
+              payload: { ...data },
+            })
+          throw Error('Failed to get session info', 400)
+        } catch (error) {
+          console.log('error', error)
+          error.message && showErrorNotification(error.message, '')
+          return false
+        }
+      },
       *fetchPatientListByName ({ payload }, { call, put }) {
         try {
           const response = !payload
@@ -71,6 +134,9 @@ export default createListViewModel({
       },
     },
     reducers: {
+      updateSessionInfo (state, { payload }) {
+        return { ...state, sessionInfo: { ...payload } }
+      },
       updateVisitPatientInfo (state, { payload }) {
         return {
           ...state,

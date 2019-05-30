@@ -1,14 +1,12 @@
 import React, { PureComponent } from 'react'
 import classNames from 'classnames'
 import { connect } from 'dva'
-// formik
-import { FastField, withFormik } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // table grid component
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // material ui
-import { IconButton, withStyles, LinearProgress } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { Search, PersonAdd } from '@material-ui/icons'
 // custom component
 import {
@@ -27,13 +25,9 @@ const styles = () => ({
 })
 
 @connect(({ queueLog, loading }) => ({ queueLog, loading }))
-@withFormik({
-  mapPropsToValues: () => ({
-    patientName: '',
-  }),
-})
 class PatientSearch extends PureComponent {
   state = {
+    searchQuery: this.props.searchPatientName,
     columns: [
       { name: 'name', title: 'Name' },
       { name: 'patientAccountNo', title: 'ID' },
@@ -72,35 +66,34 @@ class PatientSearch extends PureComponent {
   gridGetRowID = (row) => row.id
 
   searchPatient = () => {
-    const { dispatch, values } = this.props
-    const { patientName } = values
+    const { dispatch, searchPatientName } = this.props
 
     dispatch({
       type: 'queueLog/fetchPatientListByName',
-      payload: patientName,
+      payload: searchPatientName,
     })
   }
 
+  onSearchQueryChange = (event) => {
+    this.setState({ searchQuery: event.target.value })
+  }
+
   render () {
-    const { columns, columnExtensions } = this.state
-    const { classes, queueLog, loading, onViewRegisterPatient } = this.props
+    const { columns, columnExtensions, searchQuery } = this.state
+    const { classes, queueLog, onViewRegisterPatient, loading } = this.props
     const ActionProps = { TableCellComponent: this.TableCell }
 
     return (
       <React.Fragment>
         <GridContainer className={classNames(classes.spacing)}>
           <GridItem xs md={6}>
-            <FastField
-              name='patientName'
-              render={(args) => (
-                <TextField
-                  {...args}
-                  help='Leave blank to list all patient'
-                  label={formatMessage({
-                    id: 'reception.queue.patientName',
-                  })}
-                />
-              )}
+            <TextField
+              value={searchQuery}
+              onChange={this.onSearchQueryChange}
+              help='Leave blank to list all patient'
+              label={formatMessage({
+                id: 'reception.queue.patientName',
+              })}
             />
           </GridItem>
           <GridItem xs md={2} container alignItems='center'>

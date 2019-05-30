@@ -25,7 +25,15 @@ const style = {
 }
 
 function GridContainer ({ ...props }) {
-  const { classes, children, className, gutter, ...rest } = props
+  const {
+    theme,
+    classes,
+    children,
+    className,
+    gutter,
+    gridLayout,
+    ...rest
+  } = props
 
   let newChildren = []
   if (!Array.isArray(children)) {
@@ -40,10 +48,12 @@ function GridContainer ({ ...props }) {
         React.cloneElement(o, {
           key: i,
           gutter,
+          gridLayout,
+          ...o.props,
         }),
       )}
     </Grid>
   )
 }
 
-export default withStyles(style)(GridContainer)
+export default withStyles(style, { withTheme: true })(GridContainer)

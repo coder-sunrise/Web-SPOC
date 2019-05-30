@@ -3,6 +3,7 @@ export default {
   'app.login.username': 'Username',
   'app.login.email': 'Email',
   'app.login.password': 'Password',
+  'app.login.clinicCode': 'Clinic Code',
   'app.login.loginBtn.enter': `Enter`,
   'app.login.message-invalid-credentials': 'Invalid username or password',
   'app.login.message-invalid-credentials-info':

@@ -352,10 +352,30 @@ export default [
       },
 
       {
-        path: '/emr',
-        icon: 'library_books',
-        name: 'EMR',
-        // component: './EMR',
+        path: '/queuelisting',
+        system: 'EMR',
+        icon: 'local_hospital',
+        name: 'queuelisting',
+        // component: './QueueListing',
+      },
+      {
+        path: '/patientdashboard',
+        system: 'EMR',
+        icon: 'group',
+        name: 'patientdashboard',
+        routes: [
+          {
+            path: '/patientdashboard',
+            name: 'patientdashboard',
+            component: './PatientDashboard',
+          },
+          {
+            path: '/patientdashboard/consultation/:id',
+            name: 'consultation',
+            hideInMenu: true,
+            component: './PatientDashboard/Consultation',
+          },
+        ],
       },
       // // Patient View
       // {

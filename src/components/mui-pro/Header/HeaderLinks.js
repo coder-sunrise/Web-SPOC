@@ -25,15 +25,25 @@ import Button from 'mui-pro-components/CustomButtons'
 
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 
+import { updateAPIType } from '@/utils/request'
+
 class HeaderLinks extends React.Component {
   state = {
     openNotification: false,
     openAccount: false,
+    openDomain:false,
+    title:'PROD',
   }
 
   handleClick = (key) => () => {
-    this.setState({ [`open${key}`]: !this.state[`open${key}`] })
+    this.setState({ [`open${key}`]: !this.state[`open${key}`]})
   }
+  
+  handleAPIDomainSelection= (key,type) => () => {
+    updateAPIType(type)
+    this.setState({ [`open${key}`]: !this.state[`open${key}`],title:type})
+  }
+
 
   handleClose = (key, cb) => () => {
     this.setState({ [`open${key}`]: false })
@@ -41,13 +51,19 @@ class HeaderLinks extends React.Component {
   }
 
   logout = () => {
-    sessionStorage.removeItem('token')
+    localStorage.removeItem('token')
     location.href = '/login'
   }
 
+  updateAPIType (type) {
+    updateAPIType(type)
+  }
+
+
   render () {
     const { classes, rtlActive } = this.props
-    const { openNotification, openAccount } = this.state
+    const { openNotification, openAccount,openDomain,title } = this.state
+    
     // console.log(openNotification, openAccount)
     const searchButton = `${classes.top} ${classes.searchButton} ${classNames({
       [classes.searchRTL]: rtlActive,
@@ -84,6 +100,7 @@ class HeaderLinks extends React.Component {
           aria-label='edit'
           justIcon
           round
+          size='sm'
           className={searchButton}
         >
           <Search
@@ -277,7 +294,67 @@ class HeaderLinks extends React.Component {
               </Grow>
             )}
           </Popper>
-        </div>
+        </div>  
+        <div className={managerClasses}>
+          <Button
+            color='transparent'
+            aria-label='Domain'
+            aria-owns={openDomain ? 'menu-list' : null}
+            aria-haspopup='true'
+            onClick={this.handleClick('Domain')}
+            className={rtlActive ? classes.buttonLinkRTL : classes.buttonLink}
+            muiClasses={{
+              label: rtlActive ? classes.labelRTL : '',
+            }}
+            buttonRef={(node) => {
+              this.anchorElAccount = node
+            }}
+          >
+            <span className={classes.linkText}>
+              {this.state.title}
+            </span>
+
+          </Button>
+          <Popper
+            open={openDomain}
+            anchorEl={this.anchorElAccount}
+            transition
+            disablePortal
+            placement='bottom'
+            className={classNames({
+              [classes.popperClose]: !openDomain,
+              [classes.pooperResponsive]: true,
+              [classes.pooperNav]: true,
+            })}
+          >
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                id='menu-list'
+                style={{ transformOrigin: '0 0 0' }}
+              >
+                <Paper className={classes.dropdown}>
+                  <ClickAwayListener onClickAway={this.handleClose('Domain')}>
+                    <MenuList role='menu'>
+                      <MenuItem
+                        onClick={this.handleAPIDomainSelection('Domain','UAT')}
+                        className={dropdownItem}
+                      >
+                        UAT
+                      </MenuItem>
+                      <MenuItem
+                        onClick={this.handleAPIDomainSelection('Domain', 'PROD')}
+                        className={dropdownItem}
+                      >
+                        Production
+                      </MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
+        </div>  
       </div>
     )
   }
