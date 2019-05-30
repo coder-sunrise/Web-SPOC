@@ -231,6 +231,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.ant-select-disabled .ant-select-selection {
+  cursor: text;
+  background: transparent;
+}
+
+.ant-input-disabled {
+  background: transparent;
+}
+.ant-input[disabled] {
+  background: transparent;
+}
+
 .ant-select-selection--multiple::before {
   display: table;
   content: none;

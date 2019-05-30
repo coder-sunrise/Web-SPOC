@@ -1,26 +1,23 @@
 import React from 'react'
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
-import { Assignment } from '@material-ui/icons'
 
 // import Custom components
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardIcon,
-  PageHeaderWrapper,
-} from '@/components'
+import { Card, CardBody, CardHeader, PageHeaderWrapper } from '@/components'
 
 const styles = () => ({
   cardIconTitle: {
     color: 'black',
   },
+  header: {
+    marginTop: 0,
+  },
 })
 
 const CommonHeader = ({
-  Icon = <Assignment />,
+  // Icon = <Assignment />,
   titleId = 'Title',
   postFix,
   classes,
@@ -32,11 +29,10 @@ const CommonHeader = ({
   >
     <Card>
       <CardHeader color='primary' icon>
-        <CardIcon color='primary'>{Icon}</CardIcon>
-        <h4 className={classes ? classes.cardIconTitle : ''}>
+        <h3 className={classnames(classes.header)}>
           <FormattedMessage id={titleId} />
           {postFix !== undefined ? ` - ${postFix}` : ''}
-        </h4>
+        </h3>
       </CardHeader>
       <CardBody>{children}</CardBody>
     </Card>
@@ -44,7 +40,7 @@ const CommonHeader = ({
 )
 
 CommonHeader.propTypes = {
-  Icon: PropTypes.object,
+  // Icon: PropTypes.object,
   titleId: PropTypes.string.isRequired,
   children: PropTypes.oneOfType([
     PropTypes.object,

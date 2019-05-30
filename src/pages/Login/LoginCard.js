@@ -47,16 +47,6 @@ const cardAnimationDuration = 350
 
 const submitKey = 'loginSEMR/getToken'
 
-const APPLICATIONS = {
-  CMS: 'CMS',
-  EMR: 'EMR',
-}
-
-const optsApplication = [
-  { name: 'CMS', value: 'CMS' },
-  { name: 'EMR', value: 'EMR' },
-]
-
 const LoginSchema = Yup.object().shape({
   username: Yup.string().trim().required('Please enter Username'),
   password: Yup.string().trim().required('Please enter Password'),

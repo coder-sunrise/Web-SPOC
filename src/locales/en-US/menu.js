@@ -68,4 +68,9 @@ export default {
 
   'menu.patientdashboard': 'Patient Dashboard',
   'menu.patientdashboard.consultation': 'Consultation',
+  'menu.queue': 'Queue',
+  'menu.patientdb': 'Patient Database',
+  'menu.forms': 'Forms',
+  'menu.labsresult': 'Labs Result',
+  'menu.settings': 'Settings',
 }

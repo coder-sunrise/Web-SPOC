@@ -10,13 +10,103 @@ export default [
       { path: '/user/register-result', component: './User/RegisterResult' },
     ],
   },
+  //
   // login
   {
     path: '/login',
     component: './Login',
     hideInMenu: true,
   },
-  // app
+  // login
+  //
+  // EMR
+  {
+    path: '/emr',
+    component: '../layouts/BasicLayout',
+    Routes: [
+      'src/pages/Authorized',
+    ],
+    authority: [
+      'admin',
+      'user',
+      'guest',
+    ],
+    routes: [
+      { path: '/emr', redirect: '/emr/queue' },
+      // queue
+      {
+        path: '/emr/queue',
+        name: 'queue',
+        system: 'emr',
+        component: './Reception/Queue',
+        icon: 'queue',
+        exact: true,
+      },
+      {
+        hideInMenu: true,
+        path: '/emr/queue/patientdashboard',
+        name: 'patientdashboard',
+        component: './PatientDashboard',
+      },
+      {
+        path: '/emr/queue/patientdashboard/consultation/:id',
+        name: 'consultation',
+        hideInMenu: true,
+        component: './PatientDashboard/Consultation',
+      },
+      {
+        path: '/emr/patientdb',
+        icon: 'account_box',
+        name: 'patientdb',
+        // component: '',
+      },
+      {
+        path: '/emr/forms',
+        icon: 'assignment',
+        name: 'forms',
+        // component: '',
+      },
+      {
+        path: '/emr/labsresult',
+        icon: 'poll',
+        name: 'labsresult',
+        // component: '',
+      },
+      {
+        path: '/emr/settings',
+        icon: 'settings',
+        name: 'settings',
+        // component: '',
+      },
+      // queue
+      //
+      // patient dashboard
+      // {
+      //   path: '/emr/patientdashboard',
+      //   system: 'EMR',
+      //   icon: 'group',
+      //   name: 'patientdashboard',
+      //   routes: [
+      //     {
+      //       path: '/emr/patientdashboard',
+      //       name: 'patientdashboard',
+      //       component: './PatientDashboard',
+      //     },
+      //     {
+      //       path: '/emr/patientdashboard/consultation/:id',
+      //       name: 'consultation',
+      //       hideInMenu: true,
+      //       component: './PatientDashboard/Consultation',
+      //     },
+      //   ],
+      // },
+      // patiend dashboard
+      //
+    ],
+  },
+  // EMR
+  //
+  // CMS
   {
     path: '/',
     component: '../layouts/BasicLayout',
@@ -31,12 +121,6 @@ export default [
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue' },
-      // {
-      //   path: '/login',
-      //   name: 'login',
-      //   component: './Login',
-      //   hideInMenu: true,
-      // },
       {
         path: '/dashboard',
         name: 'dashboard',
@@ -256,7 +340,6 @@ export default [
         ],
       },
       //
-
       // Finance
       {
         path: '/finance',
@@ -358,6 +441,8 @@ export default [
         name: 'queuelisting',
         // component: './QueueListing',
       },
+      //
+      // EMR
       {
         path: '/patientdashboard',
         system: 'EMR',
@@ -377,6 +462,8 @@ export default [
           },
         ],
       },
+      // EMR
+      //
       // // Patient View
       // {
       //   path: '/patient',
