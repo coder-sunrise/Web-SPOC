@@ -427,8 +427,14 @@ class Consultation extends PureComponent {
       className: classes.layout,
       rowHeight: state.rowHeight,
       layouts: {
-        lg: this.pageDefaultWidgets.map((o) => o.config.lg),
-        md: this.pageDefaultWidgets.map((o) => o.config.md),
+        lg: this.pageDefaultWidgets.map((o) => ({
+          ...o.config.lg,
+          static: this.state.mode === 'default',
+        })),
+        md: this.pageDefaultWidgets.map((o) => ({
+          ...o.config.md,
+          static: this.state.mode === 'default',
+        })),
       },
       breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
