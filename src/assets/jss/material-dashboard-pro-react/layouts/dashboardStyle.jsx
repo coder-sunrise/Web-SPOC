@@ -38,7 +38,7 @@ const appStyle = (theme) => ({
   },
   content: {
     padding: '0px',
-    marginTop: headerHeight,
+    // marginTop: headerHeight,
     minHeight: `calc(100vh - ${headerHeight}px)`,
   },
   container: { ...containerFluid },

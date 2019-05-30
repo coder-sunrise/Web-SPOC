@@ -83,7 +83,7 @@ class Banner extends PureComponent {
       <Paper
         style={{
           position: 'sticky',
-          top: 57,
+          top: headerHeight,
           zIndex: 1000,
         }}
       >

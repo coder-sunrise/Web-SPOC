@@ -9,6 +9,7 @@ window.addEventListener('sw.offline', () => {
 // Pop up a prompt on the page asking the user if they want to use the latest version
 window.addEventListener('sw.updated', (e) => {
   console.log(e)
+  if (!e) return
   Modal.confirm({
     title: formatMessage({ id: 'app.pwa.serviceworker.updated' }),
     content: formatMessage({ id: 'app.pwa.serviceworker.updated.hint' }),
