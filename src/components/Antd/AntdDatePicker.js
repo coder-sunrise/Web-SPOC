@@ -38,7 +38,7 @@ const STYLES = (theme) => ({
       borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
       paddingLeft: 0,
       fontSize: '1rem',
-      height: 31,
+      height: 30,
     },
   },
 })

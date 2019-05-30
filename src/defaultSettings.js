@@ -7,10 +7,11 @@ module.exports = {
   // autoHideHeader: false, // auto hide header
   // fixSiderbar: false, // sticky siderbar
   navTheme: 'dark',
-  primaryColor: '#1890FF',
+  // "primaryColor": "#1890FF",
+  primaryColor: '#9c27b0',
   layout: 'sidemenu',
   contentWidth: 'Fluid',
-  fixedHeader: true,
+  fixedHeader: false,
   autoHideHeader: false,
   fixSiderbar: false,
   collapse: true,

@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { Select, CodeSelect, TextField } from '@/components'
+import { MUISelect, MUICodeSelect, CodeSelect, TextField } from '@/components'
 import { getCodes } from '@/utils/codes'
 
 const SelectEditor = (columnExtensions) =>
@@ -26,13 +26,14 @@ const SelectEditor = (columnExtensions) =>
       defaultValue: value,
       ...restProps,
     }
+
     // console.log(error)
     if (columnName) {
       if (type === 'select') {
-        return <Select {...commonCfg} />
+        return <MUISelect {...commonCfg} />
       }
       if (type === 'codeSelect') {
-        return <CodeSelect {...commonCfg} code={code} />
+        return <MUICodeSelect {...commonCfg} code={code} />
       }
       return null
     }

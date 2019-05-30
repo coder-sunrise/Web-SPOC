@@ -72,4 +72,9 @@ export default {
 
   'menu.SMS': 'SMS',
   'menu.SMS.Reminder': 'Reminder',
+  'menu.queue': 'Queue',
+  'menu.patientdb': 'Patient Database',
+  'menu.forms': 'Forms',
+  'menu.labsresult': 'Labs Result',
+  'menu.settings': 'Settings',
 }

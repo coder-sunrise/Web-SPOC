@@ -53,11 +53,11 @@ const inputStyle = (theme) => ({
     left: 0,
     zIndex: 999,
     paddingBottom: 0,
-    transform: 'translate(0, 28px) scale(1)',
+    // transform: 'translate(0, 30px) scale(1)',
   },
   mediumLabel: {
     fontSize: '1rem',
-    transform: 'translate(0, 28px) scale(1)',
+    transform: 'translate(0, 30px) scale(1)',
   },
   largeLabel: {
     fontSize: '1.2rem',
@@ -65,7 +65,7 @@ const inputStyle = (theme) => ({
   },
   smallLabel: {
     fontSize: '0.875rem',
-    transform: 'translate(0, 30px) scale(1)',
+    transform: 'translate(0, 31px) scale(1)',
   },
   labelFocused: {
     color: theme.palette.primary.main,
