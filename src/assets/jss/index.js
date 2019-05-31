@@ -110,6 +110,7 @@ const defaultFont = {
 }
 const fontColor = 'rgba(0, 0, 0, 0.87)'
 
+// const primaryColor = '#2196f3'
 const primaryColor = '#9c27b0'
 const warningColor = '#ff9800'
 const dangerColor = '#f44336'

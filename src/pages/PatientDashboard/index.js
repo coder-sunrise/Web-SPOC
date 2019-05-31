@@ -209,7 +209,7 @@ class PatientDashboard extends PureComponent {
   )
 
   startConsultation = () => {
-    this.props.history.push('/patientdashboard/consultation/new')
+    this.props.history.push('/emr/queue/patientdashboard/consultation/new')
   }
 
   render () {

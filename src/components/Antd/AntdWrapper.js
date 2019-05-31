@@ -97,7 +97,7 @@ class AntdWrapper extends React.PureComponent {
       [classes.inputError]: showError,
       [classes.hiddenHelpText]: hideHelpText,
     }
-    console.log('antdwrapper', this.props)
+
     return (
       <div className={classnames(classForControl)} style={{ ...style }}>
         <span className={classnames(classForLabel)}>{label}</span>

@@ -26,7 +26,6 @@ const styles = () => ({
   },
 })
 
-@connect(({ loading }) => ({ loading }))
 @withFormik({
   mapPropsToValues: () => {},
   handleSubmit: (values, { props, setSubmitting }) => {
@@ -47,7 +46,7 @@ class NewVisit extends PureComponent {
   }
 
   render () {
-    const { footer, classes, handleSubmit, loading } = this.props
+    const { footer, classes, handleSubmit } = this.props
     return (
       <React.Fragment>
         <GridContainer>
@@ -75,25 +74,21 @@ class NewVisit extends PureComponent {
             */}
             <PatientInfoCard />
           </GridItem>
-          {loading.effects['queueLog/fetchPatientInfoByPatientID'] ? (
-            <Spin size='large' className='centerredLoading' />
-          ) : (
-            <React.Fragment>
-              <GridItem xs sm={12} md={5} container direction='row'>
-                <GridItem xs sm={12} md={12}>
-                  <VisitInfoCard />
-                </GridItem>
-                <GridItem xs sm={12} md={12}>
-                  <SchemesCard />
-                </GridItem>
+          <React.Fragment>
+            <GridItem xs sm={12} md={5} container direction='row'>
+              <GridItem xs sm={12} md={12}>
+                <VisitInfoCard />
               </GridItem>
-              <GridItem xs sm={12} md={4} container direction='row'>
-                <GridItem xs sm={12} md={12}>
-                  <VitalSignCard />
-                </GridItem>
+              <GridItem xs sm={12} md={12}>
+                <SchemesCard />
               </GridItem>
-            </React.Fragment>
-          )}
+            </GridItem>
+            <GridItem xs sm={12} md={4} container direction='row'>
+              <GridItem xs sm={12} md={12}>
+                <VitalSignCard />
+              </GridItem>
+            </GridItem>
+          </React.Fragment>
         </GridContainer>
         {footer &&
           footer({

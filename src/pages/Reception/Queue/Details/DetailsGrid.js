@@ -228,7 +228,7 @@ class DetailsGrid extends PureComponent {
     const { classes, queueLog } = this.props
     const { isFullscreen } = this.state
     // const { queueListing } = queueLog
-    console.log('this.props', this.props)
+
     return (
       <div>
         <WithFullscreenModal
@@ -237,10 +237,11 @@ class DetailsGrid extends PureComponent {
           onConfirm={this.toggleFullscreen}
         >
           <CommonTableGrid2
-            height={isFullscreen ? undefined : 380}
+            height={isFullscreen ? undefined : 600}
             rows={generateRowData()}
             {...tableParams}
             ActionProps={ActionProps}
+            FuncProps={{ pager: false }}
           />
         </WithFullscreenModal>
 

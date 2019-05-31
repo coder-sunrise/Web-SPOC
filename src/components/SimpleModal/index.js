@@ -16,6 +16,7 @@ class SimpleModal extends React.Component {
     this.state = {
       done: false,
       hide: true,
+      error: false,
     }
     if (props.defaultOpen) {
       this.state.hide = false
@@ -43,14 +44,23 @@ class SimpleModal extends React.Component {
   }
 
   onConfirm = () => {
-    this.setState(
-      {
-        done: true,
-      },
-      () => {
-        if (this.props.onOk) this.props.onOk()
-      },
-    )
+    if (this.props.onOk) {
+      this.props.onOk((r) => {
+        // console.log(r, 's')
+        if (r) {
+          this.setState({
+            done: true,
+          })
+        }
+      })
+    } else {
+      this.setState(
+        {
+          done: true,
+        },
+        () => {},
+      )
+    }
   }
 
   hideAlert = () => {
@@ -82,6 +92,20 @@ class SimpleModal extends React.Component {
             onConfirm={this.hideAlert}
             onCancel={this.hideAlert}
             confirmBtnCssClass={`${classes.button} ${classes.success}`}
+          />
+        </ModalWrapper>
+      )
+    }
+    if (this.state.error) {
+      return (
+        <ModalWrapper>
+          <SweetAlert
+            error
+            // style={{ display: "block", marginTop: "-100px" }}
+            title='Error!'
+            onConfirm={this.hideAlert}
+            onCancel={this.hideAlert}
+            confirmBtnCssClass={`${classes.button} ${classes.error}`}
           />
         </ModalWrapper>
       )

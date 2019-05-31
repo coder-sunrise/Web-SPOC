@@ -17,6 +17,10 @@ const styles = () => ({})
 
 @connect(({ queueLog, loading }) => ({ queueLog, loading }))
 class PatientInfoCard extends PureComponent {
+  state = {
+    ctGender: [],
+  }
+
   componentDidMount () {
     // TODO: enhance this part to store codetable and keep track of updating date
     // getCodes('Nationality')
@@ -30,17 +34,18 @@ class PatientInfoCard extends PureComponent {
     //   .catch((error) => {
     //     console.log('error occured', error)
     //   })
-    // getCodes('Gender')
-    //   .then((response) => {
-    //     if (!response && !response.data) return
-    //     const data = [
-    //       ...response.data.Gender,
-    //     ]
-    //     localStorage.setItem('CT_Gender', JSON.stringify(data))
-    //   })
-    //   .catch((error) => {
-    //     console.log('error occured', error)
-    //   })
+    getCodes('Gender')
+      .then((response) => {
+        if (!response && !response.data) return
+        console.log('response', response)
+        const data = [
+          ...response,
+        ]
+        this.setState({ ctGender: data })
+      })
+      .catch((error) => {
+        console.log('error occured', error)
+      })
   }
 
   getAge = () => {
@@ -62,6 +67,16 @@ class PatientInfoCard extends PureComponent {
     const nationality = nationalities.find((item) => item.id === nationalityFk)
 
     return nationality ? nationality.name : ''
+  }
+
+  getGender = () => {
+    const { ctGender } = this.state
+    const { queueLog } = this.props
+    const { genderFk } = queueLog.visitPatientInfo
+    const gender = ctGender.find((item) => item.id === genderFk)
+    if (gender) return gender.name
+
+    return ''
   }
 
   render () {
@@ -94,7 +109,7 @@ class PatientInfoCard extends PureComponent {
                 <h5>
                   {`${moment(dob).format(
                     'DD-MMM-YYYY',
-                  )}, (${this.getAge()}, ${gender})`}
+                  )}, (${this.getAge()}, ${this.getGender()})`}
                 </h5>
               </React.Fragment>
             </CardBody>
