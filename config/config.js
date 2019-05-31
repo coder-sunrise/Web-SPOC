@@ -17,18 +17,18 @@ const plugins = [
       },
       locale: {
         enable: true, // default false
-        default: 'zh-CN', // default zh-CN
+        default: 'en-US', // default zh-CN
         baseNavigator: true, // default true, when it is true, will use `navigator.language` overwrite default
       },
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
       },
-      // pwa: {
-      //   workboxPluginMode: 'InjectManifest',
-      //   workboxOptions: {
-      //     importWorkboxFrom: 'local',
-      //   },
-      // },
+      pwa: {
+        workboxPluginMode: 'InjectManifest',
+        workboxOptions: {
+          importWorkboxFrom: 'local',
+        },
+      },
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {

@@ -25,6 +25,7 @@ window.addEventListener('sw.updated', (e) => {
       await new Promise((resolve, reject) => {
         const channel = new MessageChannel()
         channel.port1.onmessage = (event) => {
+          console.log(event)
           if (event.data.error) {
             reject(event.data.error)
           } else {
