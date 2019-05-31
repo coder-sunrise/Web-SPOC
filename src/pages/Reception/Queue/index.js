@@ -273,6 +273,7 @@ class Queue extends PureComponent {
                   handleStatusChange={this.onStatusChange}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   togglePatientSearch={this.togglePatientSearch}
+                  toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
                   location={this.props.match}

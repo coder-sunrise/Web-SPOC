@@ -73,12 +73,13 @@ export default createListViewModel({
         const response = yield call(service.getActiveSession)
         const { data } = response
         // data = null when get session failed
-
-        if (data) {
+        console.log('data', data)
+        if (data.totalRecords === 1) {
+          const { data: sessionData } = data
           _saveSessionID(data.id)
           return yield put({
             type: 'updateSessionInfo',
-            payload: { ...data },
+            payload: { ...sessionData[0] },
           })
         }
 
@@ -89,6 +90,7 @@ export default createListViewModel({
       },
       *fetchPatientListByName ({ payload }, { call, put }) {
         try {
+          console.log('payload', payload)
           const response = !payload
             ? yield call(service.fetchPatientList)
             : yield call(service.fetchPatientListByName, payload)
