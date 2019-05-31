@@ -13,7 +13,12 @@ import {
 import FilterBar from './FilterBar'
 import CorporateBillingGrid from './CorporateBillingGrid'
 
-const styles = () => ({})
+const styles = () => ({
+  header: {
+    marginTop: 0,
+    color: 'black',
+  },
+})
 
 class CorporateBilling extends PureComponent {
   render () {
@@ -24,15 +29,10 @@ class CorporateBilling extends PureComponent {
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
         <Card>
-          <CardHeader color='primary' icon>
-            <CardIcon color='primary'>
-              <Assignment />
-            </CardIcon>
+          <CardBody>
             <h4 className={classes.cardIconTitle}>
               {formatMessage({ id: 'finance.corporate-billing.title' })}
             </h4>
-          </CardHeader>
-          <CardBody>
             <FilterBar />
             <CorporateBillingGrid />
           </CardBody>
