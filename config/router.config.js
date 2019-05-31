@@ -1,4 +1,4 @@
-export default [
+const routes = [
   // user
   {
     path: '/user',
@@ -327,25 +327,7 @@ export default [
       },
       //
       // Test Component
-      {
-        // hideInMenu: true,
-        path: '/development',
-        name: 'Development',
-        routes: [
-          {
-            path: '/development/pdf',
-            name: 'pdf',
-            component: './Development/PDF',
-            mini: 'PDF',
-          },
-          {
-            path: '/development/masonry',
-            name: 'Masonry',
-            mini: 'MS',
-            component: './Development/Masonry',
-          },
-        ],
-      },
+
       //
       // Finance
       {
@@ -450,25 +432,25 @@ export default [
       // },
       //
       // EMR
-      {
-        path: '/patientdashboard',
-        system: 'EMR',
-        icon: 'group',
-        name: 'patientdashboard',
-        routes: [
-          {
-            path: '/patientdashboard',
-            name: 'patientdashboard',
-            component: './PatientDashboard',
-          },
-          {
-            path: '/patientdashboard/consultation/:id',
-            name: 'consultation',
-            hideInMenu: true,
-            component: './PatientDashboard/Consultation',
-          },
-        ],
-      },
+      // {
+      //   path: '/patientdashboard',
+      //   system: 'EMR',
+      //   icon: 'group',
+      //   name: 'patientdashboard',
+      //   routes: [
+      //     {
+      //       path: '/patientdashboard',
+      //       name: 'patientdashboard',
+      //       component: './PatientDashboard',
+      //     },
+      //     {
+      //       path: '/patientdashboard/consultation/:id',
+      //       name: 'consultation',
+      //       hideInMenu: true,
+      //       component: './PatientDashboard/Consultation',
+      //     },
+      //   ],
+      // },
       // EMR
       //
       // // Patient View
@@ -709,3 +691,30 @@ export default [
     ],
   },
 ]
+if (process.env.NODE_ENV !== 'production') {
+  const developmentRoutes = [
+    {
+      // hideInMenu: true,
+      path: '/development',
+      name: 'Development',
+      routes: [
+        {
+          path: '/development/pdf',
+          name: 'pdf',
+          component: './Development/PDF',
+          mini: 'PDF',
+        },
+        {
+          path: '/development/masonry',
+          name: 'Masonry',
+          mini: 'MS',
+          component: './Development/Masonry',
+        },
+      ],
+    },
+  ]
+
+  routes.concat(developmentRoutes)
+}
+
+export default routes

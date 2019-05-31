@@ -23,10 +23,21 @@ export const endSession = async (sessionID) => {
   return response
 }
 
+export const getActiveSession = async () => {
+  const response = await axiosRequest('/api/bizsession/', { method: 'GET' })
+  console.log('response', response)
+  return response
+}
+
 export const getSessionInfo = async (sessionID) => {
   const response = await axiosRequest(`/api/bizsession/${sessionID}`, {
     method: 'GET',
   })
+  return response
+}
+
+export const getQueueListing = async () => {
+  const response = await request(`/api/queue`)
   return response
 }
 

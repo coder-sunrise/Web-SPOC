@@ -171,7 +171,7 @@ class Calendar extends PureComponent {
     const { aptFormVisible } = this.state
     const { appointment, classes } = this.props
     const { displayData, currentView } = appointment
-
+    console.log('appointments', appointment.aptData, appointment.displayData)
     return (
       <React.Fragment>
         <Paper>

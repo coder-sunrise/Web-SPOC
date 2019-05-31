@@ -158,7 +158,7 @@ const Form = ({
 
   const invalidStartDate = !moment(values.startDate).isValid()
   const invalidEndDate = !moment(values.endDate).isValid()
-  console.log({ invalidStartDate, invalidEndDate })
+
   return (
     <Paper className={classnames(classes.content)}>
       {isLoading && (

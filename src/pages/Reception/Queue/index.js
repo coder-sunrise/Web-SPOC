@@ -19,6 +19,7 @@ import {
   SimpleModal,
   PageHeaderWrapper,
   Button,
+  confirm,
 } from '@/components'
 
 // current page sub components
@@ -153,17 +154,26 @@ class Queue extends PureComponent {
   }
 
   onEndSessionClick = () => {
-    const { showEndSessionConfirm } = this.state
-
-    this.setState({
-      showEndSessionConfirm: !showEndSessionConfirm,
+    // const { showEndSessionConfirm } = this.state
+    const { queueLog } = this.props
+    const { sessionInfo } = queueLog
+    const { sessionNo } = sessionInfo
+    // this.setState({
+    //   showEndSessionConfirm: !showEndSessionConfirm,
+    // })
+    confirm({
+      title: `Are you sure to end current session (${sessionNo})`,
+      onOk: this.onConfirmEndSession,
+      // onDone:
     })
   }
 
-  onConfirmEndSession = () => {
+  onConfirmEndSession = (doneCb) => {
     const { dispatch } = this.props
     dispatch({
       type: 'queueLog/endSession',
+    }).then((r) => {
+      if (doneCb) doneCb(r)
     })
     // this.setState({
     //   showEndSessionConfirm: false,
@@ -202,7 +212,7 @@ class Queue extends PureComponent {
       showNewVisit,
       showRegisterNewPatient,
       showViewPatientProfile,
-      showEndSessionConfirm,
+      // showEndSessionConfirm,
       showEndSessionSummary,
       showPatientSearch,
       currentFilter,
@@ -211,7 +221,7 @@ class Queue extends PureComponent {
 
     const { sessionInfo } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    console.log('queuelisting state', this.props)
+    // console.log('queuelisting state', this.props)
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
@@ -269,9 +279,11 @@ class Queue extends PureComponent {
                   onViewDispenseClick={this.toggleDispense}
                   queueLog={queueLog}
                 />
-                <DetailsFooter
-                  onViewPatientProfile={this.toggleViewPatientProfile}
-                />
+                {/*
+                  <DetailsFooter
+                    onViewPatientProfile={this.toggleViewPatientProfile}
+                  />
+                */}
               </React.Fragment>
             )}
             <CommonModal
@@ -330,14 +342,14 @@ class Queue extends PureComponent {
             >
               {showViewPatientProfile ? <ViewPatient /> : null}
             </CommonModal>
-            {showEndSessionConfirm ? (
+            {/* {showEndSessionConfirm ? (
               <SimpleModal
                 title={`Are you sure to end current session (${sessionNo})`}
                 open={showEndSessionConfirm}
                 onCancel={this.onEndSessionClick}
                 onConfirm={this.onConfirmEndSession}
               />
-            ) : null}
+            ) : null} */}
             {showEndSessionSummary && (
               <CommonModal
                 open={showEndSessionSummary}
