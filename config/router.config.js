@@ -39,7 +39,7 @@ export default [
         name: 'queue',
         system: 'emr',
         component: './Reception/Queue',
-        icon: 'queue',
+        icon: 'local_hospital',
         exact: true,
       },
       {
@@ -110,8 +110,14 @@ export default [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [ 'src/pages/Authorized' ],
-    authority: [ 'admin', 'user', 'guest' ],
+    Routes: [
+      'src/pages/Authorized',
+    ],
+    authority: [
+      'admin',
+      'user',
+      'guest',
+    ],
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue' },
@@ -435,13 +441,13 @@ export default [
         // component: './Report',
       },
 
-      {
-        path: '/queuelisting',
-        system: 'EMR',
-        icon: 'local_hospital',
-        name: 'queuelisting',
-        // component: './QueueListing',
-      },
+      // {
+      //   path: '/queuelisting',
+      //   system: 'EMR',
+      //   icon: 'local_hospital',
+      //   name: 'queuelisting',
+      //   // component: './QueueListing',
+      // },
       //
       // EMR
       {
