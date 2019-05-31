@@ -39,7 +39,7 @@ export default [
         name: 'queue',
         system: 'emr',
         component: './Reception/Queue',
-        icon: 'queue',
+        icon: 'local_hospital',
         exact: true,
       },
       {
@@ -258,18 +258,19 @@ export default [
         path: '/sms',
         icon: 'sms',
         name: 'SMS',
-        hideInMenu: true,
+        system: 'CMS',
         routes: [
           {
-            path: '/sms/reminder',
+            path: '/sms',
             name: 'Reminder',
-            // component: './sms/Reminder',
+            component: './sms',
+            mini: 'RM',
           },
-          {
-            path: '/sms/adhoc',
-            name: 'Adhoc',
-            // component: './sms/adhoc',
-          },
+          // {
+          //   path: '/sms/adhoc',
+          //   name: 'Adhoc',
+          //   // component: './sms/adhoc',
+          // },
         ],
       },
       //
@@ -315,6 +316,12 @@ export default [
             name: 'pd',
             // component: './Inventory/PurchaseReceving',
             mini: 'PD',
+          },
+          {
+            path: '/inventory/pd/detail',
+            name: 'pd.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseDelivery/Detail',
           },
         ],
       },
@@ -434,13 +441,13 @@ export default [
         // component: './Report',
       },
 
-      {
-        path: '/queuelisting',
-        system: 'EMR',
-        icon: 'local_hospital',
-        name: 'queuelisting',
-        // component: './QueueListing',
-      },
+      // {
+      //   path: '/queuelisting',
+      //   system: 'EMR',
+      //   icon: 'local_hospital',
+      //   name: 'queuelisting',
+      //   // component: './QueueListing',
+      // },
       //
       // EMR
       {

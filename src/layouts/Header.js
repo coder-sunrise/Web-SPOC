@@ -6,7 +6,7 @@ import { connect } from 'dva'
 import router from 'umi/router'
 import GlobalHeader from '@/components/GlobalHeader'
 import TopNavHeader from '@/components/TopNavHeader'
-import {toast} from '@/components'
+import { toast } from '@/components'
 import styles from './Header.less'
 
 const { Header } = Layout
@@ -14,7 +14,7 @@ const { Header } = Layout
 class HeaderView extends PureComponent {
   state = {
     visible: true,
-  };
+  }
 
   static getDerivedStateFromProps (props, state) {
     if (!props.autoHideHeader && !state.visible) {
@@ -40,29 +40,34 @@ class HeaderView extends PureComponent {
       return '100%'
     }
     return collapsed ? 'calc(100% - 80px)' : 'calc(100% - 256px)'
-  };
+  }
 
-  handleNoticeClear = type => {
+  handleNoticeClear = (type) => {
     const { setting } = this.props
-    if(setting.ui==='mui'){
-      toast.success(`${formatMessage({ id: 'component.noticeIcon.cleared' })} ${formatMessage({
-        id: `component.globalHeader.${type}`,
-      })}`)
-    }else{
-      message.success(
-        `${formatMessage({ id: 'component.noticeIcon.cleared' })} ${formatMessage({
+    if (setting.ui === 'mui') {
+      toast.success(
+        `${formatMessage({
+          id: 'component.noticeIcon.cleared',
+        })} ${formatMessage({
           id: `component.globalHeader.${type}`,
-        })}`
+        })}`,
+      )
+    } else {
+      message.success(
+        `${formatMessage({
+          id: 'component.noticeIcon.cleared',
+        })} ${formatMessage({
+          id: `component.globalHeader.${type}`,
+        })}`,
       )
     }
-
 
     const { dispatch } = this.props
     dispatch({
       type: 'global/clearNotices',
       payload: type,
     })
-  };
+  }
 
   handleMenuClick = ({ key }) => {
     const { dispatch } = this.props
@@ -83,16 +88,16 @@ class HeaderView extends PureComponent {
         type: 'login/logout',
       })
     }
-  };
+  }
 
-  handleNoticeVisibleChange = visible => {
+  handleNoticeVisibleChange = (visible) => {
     if (visible) {
       const { dispatch } = this.props
       dispatch({
         type: 'global/fetchNotices',
       })
     }
-  };
+  }
 
   handScroll = () => {
     const { autoHideHeader } = this.props
@@ -100,7 +105,8 @@ class HeaderView extends PureComponent {
     if (!autoHideHeader) {
       return
     }
-    const scrollTop = document.body.scrollTop + document.documentElement.scrollTop
+    const scrollTop =
+      document.body.scrollTop + document.documentElement.scrollTop
     if (!this.ticking) {
       this.ticking = true
       requestAnimationFrame(() => {
@@ -123,7 +129,7 @@ class HeaderView extends PureComponent {
         this.ticking = false
       })
     }
-  };
+  }
 
   render () {
     const { isMobile, handleMenuCollapse, setting } = this.props
@@ -132,11 +138,14 @@ class HeaderView extends PureComponent {
     const isTop = layout === 'topmenu'
     const width = this.getHeadWidth()
     const HeaderDom = visible ? (
-      <Header style={{ padding: 0, width }} className={fixedHeader ? styles.fixedHeader : ''}>
+      <Header
+        style={{ padding: 0, width }}
+        className={fixedHeader ? styles.fixedHeader : ''}
+      >
         {isTop && !isMobile ? (
           <TopNavHeader
             theme={navTheme}
-            mode="horizontal"
+            mode='horizontal'
             onCollapse={handleMenuCollapse}
             onNoticeClear={this.handleNoticeClear}
             onMenuClick={this.handleMenuClick}
@@ -155,7 +164,7 @@ class HeaderView extends PureComponent {
       </Header>
     ) : null
     return (
-      <Animate component="" transitionName="fade">
+      <Animate component='' transitionName='fade'>
         {HeaderDom}
       </Animate>
     )

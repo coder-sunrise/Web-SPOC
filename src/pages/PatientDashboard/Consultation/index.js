@@ -1,5 +1,6 @@
 import React, { PureComponent, Suspense } from 'react'
 import _ from 'lodash'
+import $ from 'jquery'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
@@ -125,7 +126,6 @@ const widgets = [
     },
   },
 ]
-
 const ResponsiveGridLayout = WidthProvider(Responsive)
 // let layout = {
 //   lg: [
@@ -138,6 +138,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
   root: {
     position: 'relative',
+  },
+  hide: {
+    display: 'none',
   },
   layout: {
     marginLeft: -2,
@@ -171,12 +174,12 @@ const styles = (theme) => ({
     // boxSizing: 'content-box',
     // height: 'calc(100% + 10px)',
     height: '100%',
-    overflow: 'auto',
+    overflow: 'hidden',
     // paddingTop: 30,
-    '&> div': {
-      overflow: 'auto',
-      // height: '100%',
-    },
+    // '&> div': {
+    //   overflow: 'auto',
+    //   // height: '100%',
+    // },
     // padding: 10,
   },
   moreWidgetsBtn: {
@@ -198,60 +201,20 @@ const styles = (theme) => ({
       marginLeft: 10,
     },
   },
+  widgetPopper: {
+    zIndex: 101,
+    width: 300,
+  },
 })
 
-const pageDefaultWidgets = [
-  {
-    id: '00001',
-    key: 'a',
-    widgetFk: 1,
-    config: {
-      lg: { i: 'a', x: 0, y: 0, w: 6, h: 6, static: true },
-      md: { i: 'a', x: 0, y: 0, w: 5, h: 6, static: true },
-    },
-  },
-  {
-    id: '00002',
-    key: 'b',
-    widgetFk: 2,
-    config: {
-      lg: { i: 'b', x: 6, y: 0, w: 6, h: 4 },
-      md: { i: 'b', x: 5, y: 0, w: 5, h: 4 },
-    },
-  },
-  {
-    id: '00003',
-    key: 'c',
-    widgetFk: 3,
-    config: {
-      lg: { i: 'c', x: 6, y: 4, w: 6, h: 2 },
-      md: { i: 'c', x: 5, y: 4, w: 5, h: 2 },
-    },
-  },
-  {
-    id: '00004',
-    key: 'd',
-    widgetFk: 4,
-    config: {
-      lg: { i: 'd', x: 0, y: 6, w: 6, h: 6 },
-      md: { i: 'd', x: 0, y: 6, w: 5, h: 6 },
-    },
-  },
-  {
-    id: '00005',
-    key: 'e',
-    widgetFk: 5,
-    config: {
-      lg: { i: 'e', x: 6, y: 6, w: 6, h: 6 },
-      md: { i: 'e', x: 5, y: 6, w: 5, h: 6 },
-    },
-  },
-]
-const getLayoutRowHeight = () => (window.innerHeight - headerHeight - 106) / 6
-let myConfig = JSON.parse(localStorage.getItem('myConfig') || '{}')
-if (Object.values(myConfig).length === 0) {
-  myConfig = pageDefaultWidgets
-}
+const getLayoutRowHeight = () => (window.innerHeight - headerHeight - 107) / 6
+// let myConfig = JSON.parse(localStorage.getItem('myConfig') || '{}')
+// if (Object.values(myConfig).length === 0) {
+//   myConfig = pageDefaultWidgets
+// }
+
+let lasActivedWidgetId = null
+let lasActivedWidget = null
 
 class Consultation extends PureComponent {
   constructor (props) {
@@ -263,9 +226,58 @@ class Consultation extends PureComponent {
     this.state = {
       mode: 'default',
       rowHeight: getLayoutRowHeight(),
+      menuOpen: false,
     }
     this.delayedResize = _.debounce(this.resize, 1000)
     window.addEventListener('resize', this.delayedResize)
+
+    this.pageDefaultWidgets = [
+      {
+        id: '00001',
+        key: 'a',
+        widgetFk: 1,
+        config: {
+          lg: { i: 'a', x: 0, y: 0, w: 6, h: 6, static: true },
+          md: { i: 'a', x: 0, y: 0, w: 5, h: 6, static: true },
+        },
+      },
+      {
+        id: '00002',
+        key: 'b',
+        widgetFk: 2,
+        config: {
+          lg: { i: 'b', x: 6, y: 0, w: 6, h: 4 },
+          md: { i: 'b', x: 5, y: 0, w: 5, h: 4 },
+        },
+      },
+      {
+        id: '00003',
+        key: 'c',
+        widgetFk: 3,
+        config: {
+          lg: { i: 'c', x: 6, y: 4, w: 6, h: 2 },
+          md: { i: 'c', x: 5, y: 4, w: 5, h: 2 },
+        },
+      },
+      {
+        id: '00004',
+        key: 'd',
+        widgetFk: 4,
+        config: {
+          lg: { i: 'd', x: 0, y: 6, w: 6, h: 6 },
+          md: { i: 'd', x: 0, y: 6, w: 5, h: 6 },
+        },
+      },
+      {
+        id: '00005',
+        key: 'e',
+        widgetFk: 5,
+        config: {
+          lg: { i: 'e', x: 6, y: 6, w: 6, h: 6 },
+          md: { i: 'e', x: 5, y: 6, w: 5, h: 6 },
+        },
+      },
+    ]
   }
 
   componentDidMount () {
@@ -280,6 +292,20 @@ class Consultation extends PureComponent {
     console.log(e)
     this.setState({
       rowHeight: getLayoutRowHeight(),
+    })
+  }
+
+  showWidgetManagePanel = (event) => {
+    this.setState({
+      anchorEl: event.currentTarget,
+      menuOpen: true,
+    })
+  }
+
+  closeWidgetManagePanel = () => {
+    this.setState({
+      anchorEl: null,
+      menuOpen: false,
     })
   }
 
@@ -311,14 +337,13 @@ class Consultation extends PureComponent {
           <MoreVert />
         </IconButton>
         <Popper
-          id={uid}
           anchorEl={anchorEl}
           open={menuOpen}
           transition
           onClose={handleClose}
           PaperProps={{
             style: {
-              maxHeight: ITEM_HEIGHT * 4.5,
+              // maxHeight: ITEM_HEIGHT * 4.5,
               width: 200,
             },
           }}
@@ -363,12 +388,25 @@ class Consultation extends PureComponent {
       classes: {
         root: classes.paperRoot,
       },
-      // onMouseOver: (e) => {
-      //   // console.log(cfg, e)
-      //   // elevation[cfg.id] = 3
-      //   // this.setState({ elevation })
-      // },
+      className: 'widget-container',
+      onMouseOver: (e) => {
+        // console.log(cfg, e.target)
+        // console.log($(e.target).parent('.widget-container')[0])
+        // elevation[cfg.id] = 3
+        // this.setState({ elevation })
+        if (lasActivedWidgetId === cfg.id) return
+        if (lasActivedWidget) {
+          lasActivedWidget.css('overflow', 'hidden')
+        }
+        lasActivedWidget = $($(e.target).parents('.widget-container')[0])
+        if (lasActivedWidget.length > 0) {
+          lasActivedWidgetId = cfg.id
+          lasActivedWidget.css('overflow', 'auto')
+        }
+      },
       // onMouseOut: (e) => {
+      //   console.log(e.target)
+
       //   // elevation[cfg.id] = 0
       //   // this.setState({ elevation })
       // },
@@ -383,14 +421,20 @@ class Consultation extends PureComponent {
 
   render () {
     const { props, state } = this
-    const { classes, ...resetProps } = this.props
-
+    const { classes, theme, ...resetProps } = this.props
+    // console.log(props)
     const layoutCfg = {
       className: classes.layout,
       rowHeight: state.rowHeight,
       layouts: {
-        lg: pageDefaultWidgets.map((o) => o.config.lg),
-        md: pageDefaultWidgets.map((o) => o.config.md),
+        lg: this.pageDefaultWidgets.map((o) => ({
+          ...o.config.lg,
+          static: this.state.mode === 'default',
+        })),
+        md: this.pageDefaultWidgets.map((o) => ({
+          ...o.config.md,
+          static: this.state.mode === 'default',
+        })),
       },
       breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
@@ -401,7 +445,7 @@ class Consultation extends PureComponent {
       ],
       draggableCancel: '.non-dragable',
       draggableHandle: '.dragable',
-      isResizable: this.state.mode == 'edit',
+      isResizable: this.state.mode === 'edit',
       onBreakpointChange: (newBreakpoint, newCols) => {
         console.log(newBreakpoint, newCols)
       },
@@ -443,11 +487,12 @@ class Consultation extends PureComponent {
           
         </CardContainer> */}
         <ResponsiveGridLayout {...layoutCfg}>
-          {pageDefaultWidgets.map((o) => {
+          {this.pageDefaultWidgets.map((o) => {
             const w = widgets.find((wg) => wg.id === o.widgetFk)
             const LoadableComponent = w.component
+            // console.log(o)
             return (
-              <div className={classes.block} {...o}>
+              <div className={classes.block} key={o.key}>
                 <Paper {...this.generateConfig(o)}>
                   {this.state.mode === 'edit' && (
                     <div className={`${classes.blockHeader} dragable`}>
@@ -462,15 +507,15 @@ class Consultation extends PureComponent {
                             <CompareArrows />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title='Full-screen'>
-                          <IconButton
-                            aria-label='Full-screen'
-                            className={classes.margin}
-                            size='small'
-                          >
-                            <Fullscreen />
-                          </IconButton>
-                        </Tooltip>
+                        {/* <Tooltip title='Full-screen'>
+                        <IconButton
+                          aria-label='Full-screen'
+                          className={classes.margin}
+                          size='small'
+                        >
+                          <Fullscreen />
+                        </IconButton>
+                      </Tooltip> */}
                         <Tooltip title='Delete'>
                           <IconButton
                             aria-label='Delete'
@@ -500,23 +545,7 @@ class Consultation extends PureComponent {
               </div>
             )
           })}
-          {/* <Paper key='a' {...paperCfg}>
-            <LoadableComponent />
-          </Paper>
-          <Paper key='b' {...paperCfg}>
-            b
-          </Paper>
-          <Paper key='c' {...paperCfg}>
-            c
-          </Paper> */}
         </ResponsiveGridLayout>
-        {/* <Paper
-          elevation={0}
-          className={`${classes.actionContainer} ${classes.actionBtn}`}
-        >
-          <ProgressButton onClick={props.handleSubmit} />
-          
-        </Paper> */}
         <div className={classes.fabContainer}>
           {this.state.mode === 'default' && (
             <Fab
@@ -534,14 +563,56 @@ class Consultation extends PureComponent {
                   color='primary'
                   className={classes.fab}
                   style={{ marginRight: 8 }}
+                  onClick={this.showWidgetManagePanel}
                 >
                   <Add />
                 </Fab>
-                <Fab
-                  color='danger'
-                  className={classes.fab}
-                  onClick={this.toggleMode}
+                <Popper
+                  anchorEl={state.anchorEl}
+                  open={state.menuOpen}
+                  transition
+                  disablePortal
+                  onClose={this.closeWidgetManagePanel}
+                  className={classes.widgetPopper}
+                  PaperProps={{
+                    style: {
+                      // maxHeight: ITEM_HEIGHT * 4.5,
+                      zIndex: 100,
+                      width: 200,
+                    },
+                  }}
                 >
+                  {({ TransitionProps }) => (
+                    <Fade {...TransitionProps} timeout={350}>
+                      <ClickAwayListener
+                        onClickAway={this.closeWidgetManagePanel}
+                      >
+                        <Paper
+                          style={{
+                            paddingLeft: theme.spacing.unit * 2,
+                            paddingTop: theme.spacing.unit,
+                          }}
+                        >
+                          <CheckboxGroup
+                            label='Selected Widgets'
+                            vertical
+                            simple
+                            defaultValue={[
+                              '1',
+                            ]}
+                            valueField='id'
+                            textField='name'
+                            options={widgets}
+                            onChange={(e) => {
+                              console.log(e)
+                            }}
+                          />
+                        </Paper>
+                      </ClickAwayListener>
+                    </Fade>
+                  )}
+                </Popper>
+                <Fab className={classes.fab} onClick={this.toggleMode}>
                   <Clear />
                 </Fab>
               </div>

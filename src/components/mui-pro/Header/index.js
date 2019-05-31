@@ -24,7 +24,7 @@ import PageHeader from '@/components/PageHeader'
 import Link from 'umi/link'
 import MenuContext from '@/layouts/MenuContext'
 
-function Header ({ ...props }) {
+function Header ({ isMobile, collapsed, setting, ...props }) {
   // function makeBrand () {
   //   let name
   //   props.menuData.map((prop, key) => {
@@ -54,6 +54,12 @@ function Header ({ ...props }) {
   const sidebarMinimize = `${classes.sidebarMinimize} ${cx({
     [classes.sidebarMinimizeRTL]: rtlActive,
   })}`
+
+  // const { fixedHeader, layout } = setting
+  //   if (isMobile || !fixedHeader || layout === 'topmenu') {
+  //     return '100%'
+  //   }
+  //   const width = collapsed ? 'calc(100% - 80px)' : 'calc(100% - 256px)'
 
   const { children, contentWidth, wrapperClassName, top, ...restProps } = props
   return (

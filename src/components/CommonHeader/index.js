@@ -13,6 +13,7 @@ const styles = () => ({
   },
   header: {
     marginTop: 0,
+    color: 'black',
   },
 })
 

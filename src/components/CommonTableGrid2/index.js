@@ -209,15 +209,28 @@ class CommonTableGrid2 extends React.Component {
       summaryConfig: {},
     }
 
+    const cellStyle = {
+      cell: {
+        borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+        borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
+      },
+    }
     this.theme = createMuiTheme({
       overrides: {
         TableFixedCell: {
           fixedCell: {
+            zIndex: 1,
             overflow: 'visible',
             backgroundColor: 'inherit',
           },
         },
+        TableCell: cellStyle,
+        EditCell: cellStyle,
+        TableHeaderCell: cellStyle,
         Table: {
+          table: {
+            borderCollapse: 'collapse',
+          },
           stickyTable: {
             ' & > thead > tr': {
               backgroundColor: '#ffffff',
@@ -519,12 +532,12 @@ class CommonTableGrid2 extends React.Component {
               <CustomPaging totalCount={this.state.pagination.totalRecords} />
             )}
             {selectable && <IntegratedSelection />}
-            <StatusTypeProvider columnExtensions={newColumExtensions} />
             <TextTypeProvider columnExtensions={newColumExtensions} />
             <SelectTypeProvider columnExtensions={newColumExtensions} />
             <NumberTypeProvider columnExtensions={newColumExtensions} />
             <DateTypeProvider columnExtensions={newColumExtensions} />
             <RadioTypeProvider columnExtensions={newColumExtensions} />
+            <StatusTypeProvider columnExtensions={newColumExtensions} />
 
             {grouping && <DragDropProvider />}
 
