@@ -228,7 +228,7 @@ class DetailsGrid extends PureComponent {
     const { classes, queueLog } = this.props
     const { isFullscreen } = this.state
     // const { queueListing } = queueLog
-    console.log('this.props', this.props)
+
     return (
       <div>
         <WithFullscreenModal

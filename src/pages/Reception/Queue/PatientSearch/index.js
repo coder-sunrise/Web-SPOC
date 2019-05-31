@@ -66,11 +66,11 @@ class PatientSearch extends PureComponent {
   gridGetRowID = (row) => row.id
 
   searchPatient = () => {
-    const { dispatch, searchPatientName } = this.props
-
+    const { dispatch } = this.props
+    const { searchQuery } = this.state
     dispatch({
       type: 'queueLog/fetchPatientListByName',
-      payload: searchPatientName,
+      payload: searchQuery,
     })
   }
 
