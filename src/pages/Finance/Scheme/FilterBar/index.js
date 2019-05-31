@@ -133,7 +133,7 @@ class FilterBar extends PureComponent {
               name='Status'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
                       id: 'finance.scheme.search.status',
                     })}

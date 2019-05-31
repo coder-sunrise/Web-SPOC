@@ -532,12 +532,12 @@ class CommonTableGrid2 extends React.Component {
               <CustomPaging totalCount={this.state.pagination.totalRecords} />
             )}
             {selectable && <IntegratedSelection />}
-            <StatusTypeProvider columnExtensions={newColumExtensions} />
             <TextTypeProvider columnExtensions={newColumExtensions} />
             <SelectTypeProvider columnExtensions={newColumExtensions} />
             <NumberTypeProvider columnExtensions={newColumExtensions} />
             <DateTypeProvider columnExtensions={newColumExtensions} />
             <RadioTypeProvider columnExtensions={newColumExtensions} />
+            <StatusTypeProvider columnExtensions={newColumExtensions} />
 
             {grouping && <DragDropProvider />}
 

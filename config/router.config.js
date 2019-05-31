@@ -39,7 +39,7 @@ const routes = [
         name: 'queue',
         system: 'emr',
         component: './Reception/Queue',
-        icon: 'queue',
+        icon: 'local_hospital',
         exact: true,
       },
       {
@@ -423,13 +423,13 @@ const routes = [
         // component: './Report',
       },
 
-      {
-        path: '/queuelisting',
-        system: 'EMR',
-        icon: 'local_hospital',
-        name: 'queuelisting',
-        // component: './QueueListing',
-      },
+      // {
+      //   path: '/queuelisting',
+      //   system: 'EMR',
+      //   icon: 'local_hospital',
+      //   name: 'queuelisting',
+      //   // component: './QueueListing',
+      // },
       //
       // EMR
       {

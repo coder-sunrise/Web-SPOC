@@ -17,7 +17,12 @@ import {
 import FilterBar from './FilterBar'
 import Grid from './Grid'
 
-const styles = () => ({})
+const styles = () => ({
+  header: {
+    marginTop: 0,
+    color: 'black',
+  },
+})
 @connect(({ deposit }) => ({
   deposit,
 }))
@@ -28,7 +33,10 @@ class Deposit extends PureComponent {
     const { props } = this
     const { classes, ...restProps } = props
     return (
-      <CardContainer title={formatMessage({ id: 'finance.deposit.title' })}>
+      <CardContainer hideHeader>
+        <h4 className={classes.header}>
+          {formatMessage({ id: 'finance.deposit.title' })}
+        </h4>
         <FilterBar {...restProps} />
         <Grid {...restProps} />
       </CardContainer>
