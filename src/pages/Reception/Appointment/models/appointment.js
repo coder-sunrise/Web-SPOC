@@ -10,6 +10,92 @@ import {
   getDateValue,
 } from '../utils'
 
+const patientNames = [
+  'Annie Leonhart',
+  'Blackwater',
+  'Lincoln',
+  'Mario',
+  'John Kennedy',
+]
+
+const doctor = [
+  'levinne',
+  'cheah',
+  'tan',
+  'peck',
+  'lim',
+]
+
+const contactNumber = [
+  '12345678',
+  '11223344',
+  '55667788',
+  '13579246',
+  '24681357',
+]
+const appointmentTypes = [
+  'checkup',
+  'dental',
+  'pillChecks',
+  'checkup',
+  'urgent',
+]
+const _todayDate = moment().format('DD MMM YYYY')
+const dates = [
+  {
+    startDate: `${_todayDate} 08:15`,
+    endDate: `${_todayDate} 08:30`,
+    startTime: '08:15',
+    endTime: '08:30',
+  },
+  {
+    startDate: `${_todayDate} 08:15`,
+    endDate: `${_todayDate} 08:30`,
+    startTime: '08:15',
+    endTime: '08:30',
+  },
+  {
+    startDate: `${_todayDate} 08:30`,
+    endDate: `${_todayDate} 08:45`,
+    startTime: '08:30',
+    endTime: '08:45',
+  },
+  {
+    startDate: `${_todayDate} 09:15`,
+    endDate: `${_todayDate} 09:30`,
+    startTime: '09:15',
+    endTime: '09:30',
+  },
+  {
+    startDate: `${_todayDate} 09:15`,
+    endDate: `${_todayDate} 09:45`,
+    startTime: '09:15',
+    endTime: '09:45',
+  },
+]
+
+const generateData = () => {
+  const data = []
+  for (let i = 0; i < 5; i += 1) {
+    data.push({
+      id: i,
+      allDay: false,
+      appointmentType: appointmentTypes[i],
+      bookBy: '',
+      bookDate: '',
+      contactNo: contactNumber[i],
+      doctor: doctor[i],
+      patientName: patientNames[i],
+      startDate: dates[i].startDate,
+      endDate: dates[i].endDate,
+      startTime: dates[i].startTime,
+      endTime: dates[i].endTime,
+      title: `${patientNames[i]}(PT-00001A), ${contactNumber[i]}`,
+    })
+  }
+  return data
+}
+
 const applyFilter = (data, filter) => {
   let returnData = [
     ...data,
@@ -59,8 +145,8 @@ export default createListViewModel({
       displayDate: todayDate,
       patientList: [],
       currentSearchPatientInfo: {},
-      aptData: [],
-      displayData: [],
+      aptData: generateData(),
+      displayData: generateData(),
       filter: {
         searchQuery: '',
         appointmentType: [],
@@ -68,6 +154,7 @@ export default createListViewModel({
           'all',
         ],
       },
+
       showAll: false,
     },
     subscriptions: {},
@@ -142,40 +229,43 @@ export default createListViewModel({
       commitChanges (state, { added, changed, deleted }) {
         let { aptData: data } = state
         const { filter } = state
-        if (added) {
-          const startingAddedId =
-            data.length > 0 ? data[data.length - 1].id + 1 : 0
+        try {
+          if (added) {
+            const startingAddedId =
+              data.length > 0 ? data[data.length - 1].id + 1 : 0
 
-          data = [
-            ...data,
-            {
-              id: startingAddedId,
-              ...added,
-            },
-          ]
-        }
-        if (changed) {
-          data = data.map(
-            (appointment) =>
-              appointment.id === changed.id ? { ...changed } : appointment,
-          )
-        }
+            data = [
+              ...data,
+              {
+                id: startingAddedId,
+                ...added,
+              },
+            ]
+          }
+          if (changed) {
+            data = data.map(
+              (appointment) =>
+                appointment.id === changed.id ? { ...changed } : appointment,
+            )
+          }
 
-        if (deleted >= 0) {
-          data = data.filter((appointment) => appointment.id !== deleted)
-        }
+          if (deleted >= 0) {
+            data = data.filter((appointment) => appointment.id !== deleted)
+          }
 
-        const newFilter = {
-          ...filter,
-        }
-        const displayData = applyFilter(data, newFilter)
-
-        return {
-          ...state,
-          displayData,
-          aptData: [
-            ...data,
-          ],
+          const newFilter = {
+            ...filter,
+          }
+          const displayData = applyFilter(data, newFilter)
+          return {
+            ...state,
+            displayData,
+            aptData: [
+              ...data,
+            ],
+          }
+        } catch (error) {
+          return { ...state }
         }
       },
       updateFilterDoctor (state, { doctors }) {

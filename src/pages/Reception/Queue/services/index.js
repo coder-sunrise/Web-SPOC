@@ -23,10 +23,27 @@ export const endSession = async (sessionID) => {
   return response
 }
 
+export const getActiveSession = async () => {
+  const criteria = [
+    { prop: 'IsClinicSessionClosed', val: false, opr: 'eql' },
+  ]
+  const response = await request('/api/bizsession/', {
+    method: 'GET',
+    data: stringify({ criteria }),
+  })
+  console.log('response', response)
+  return response
+}
+
 export const getSessionInfo = async (sessionID) => {
   const response = await axiosRequest(`/api/bizsession/${sessionID}`, {
     method: 'GET',
   })
+  return response
+}
+
+export const getQueueListing = async () => {
+  const response = await request(`/api/queue`)
   return response
 }
 
@@ -47,7 +64,7 @@ export async function fetchPatientListByName (patientName) {
   const criteria = [
     { prop: 'name', val: patientName, opr: 'like' },
   ]
-  const response = await axiosRequest('/api/patient', {
+  const response = await request('/api/patient', {
     method: 'GET',
     data: stringify({ criteria }),
   })

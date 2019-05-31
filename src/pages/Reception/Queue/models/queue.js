@@ -68,26 +68,29 @@ export default createListViewModel({
         return status === 204
       },
       *getSessionInfo (_, { call, put }) {
-        try {
-          const sessionID = localStorage.getItem('_sessionID')
-          const response = yield call(service.getSessionInfo, sessionID)
-          // data = null when get session failed
-          const { data } = response
-
-          if (data)
-            return yield put({
-              type: 'updateSessionInfo',
-              payload: { ...data },
-            })
-          throw Error('Failed to get session info', 400)
-        } catch (error) {
-          console.log('error', error)
-          error.message && showErrorNotification(error.message, '')
-          return false
+        const sessionID = localStorage.getItem('_sessionID')
+        // const response = yield call(service.getSessionInfo, sessionID)
+        const response = yield call(service.getActiveSession)
+        const { data } = response
+        // data = null when get session failed
+        console.log('data', data)
+        if (data.totalRecords === 1) {
+          const { data: sessionData } = data
+          _saveSessionID(data.id)
+          return yield put({
+            type: 'updateSessionInfo',
+            payload: { ...sessionData[0] },
+          })
         }
+
+        return yield put({
+          type: 'updateSessionInfo',
+          payload: { ...InitialSessionInfo },
+        })
       },
       *fetchPatientListByName ({ payload }, { call, put }) {
         try {
+          console.log('payload', payload)
           const response = !payload
             ? yield call(service.fetchPatientList)
             : yield call(service.fetchPatientListByName, payload)
