@@ -53,6 +53,7 @@ class AntdSelect extends React.PureComponent {
   }
 
   static defaultProps = {
+    options: [],
     label: 'Select',
     labelField: 'name',
     valueField: 'value',

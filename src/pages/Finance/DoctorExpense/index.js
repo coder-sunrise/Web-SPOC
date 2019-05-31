@@ -26,6 +26,10 @@ const styles = (theme) => ({
   buttonContainer: {
     padding: '0 10px',
   },
+  header: {
+    marginTop: 0,
+    color: 'black',
+  },
 })
 
 @connect(({ doctorExpense }) => ({
@@ -62,15 +66,10 @@ class DoctorExpense extends PureComponent {
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
         <Card>
-          <CardHeader color='primary' icon>
-            <CardIcon color='primary'>
-              <Assignment />
-            </CardIcon>
-            <h4 className={classes.cardIconTitle}>
-              {formatMessage({ id: 'finance.doctor-expense.title' })}
-            </h4>
-          </CardHeader>
           <CardBody>
+            <h3 className={classes.header}>
+              {formatMessage({ id: 'finance.doctor-expense.title' })}
+            </h3>
             <SearchBar onAddExpense={this.toggleShowAddExpense} />
             <DoctorExpenseGrid
               onShowDetails={this.toggleShowExpenseDetail}

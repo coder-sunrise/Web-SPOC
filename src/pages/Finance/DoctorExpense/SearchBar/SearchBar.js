@@ -14,9 +14,12 @@ import { DatePicker, Select } from '@/components'
 const styles = {
   addNewBtn: {
     textAlign: 'right',
+    marginTop: 10,
+    marginBottom: 10,
   },
   deButtonContainer: {
-    marginBottom: '10px',
+    marginTop: 10,
+    marginBottom: 10,
   },
 }
 
@@ -62,7 +65,7 @@ class SearchBar extends PureComponent {
             render={(args) => {
               return (
                 <Select
-                  multiple
+                  mode='multiple'
                   label={formatMessage({
                     id: 'finance.doctor-expense.doctorName',
                   })}
