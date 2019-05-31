@@ -1,4 +1,4 @@
-export default [
+const routes = [
   // user
   {
     path: '/user',
@@ -110,8 +110,14 @@ export default [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [ 'src/pages/Authorized' ],
-    authority: [ 'admin', 'user', 'guest' ],
+    Routes: [
+      'src/pages/Authorized',
+    ],
+    authority: [
+      'admin',
+      'user',
+      'guest',
+    ],
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue' },
@@ -321,25 +327,7 @@ export default [
       },
       //
       // Test Component
-      {
-        // hideInMenu: true,
-        path: '/development',
-        name: 'Development',
-        routes: [
-          {
-            path: '/development/pdf',
-            name: 'pdf',
-            component: './Development/PDF',
-            mini: 'PDF',
-          },
-          {
-            path: '/development/masonry',
-            name: 'Masonry',
-            mini: 'MS',
-            component: './Development/Masonry',
-          },
-        ],
-      },
+
       //
       // Finance
       {
@@ -703,3 +691,30 @@ export default [
     ],
   },
 ]
+if (process.env.NODE_ENV !== 'production') {
+  const developmentRoutes = [
+    {
+      // hideInMenu: true,
+      path: '/development',
+      name: 'Development',
+      routes: [
+        {
+          path: '/development/pdf',
+          name: 'pdf',
+          component: './Development/PDF',
+          mini: 'PDF',
+        },
+        {
+          path: '/development/masonry',
+          name: 'Masonry',
+          mini: 'MS',
+          component: './Development/Masonry',
+        },
+      ],
+    },
+  ]
+
+  routes.concat(developmentRoutes)
+}
+
+export default routes
