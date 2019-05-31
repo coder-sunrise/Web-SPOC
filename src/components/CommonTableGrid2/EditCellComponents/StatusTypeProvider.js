@@ -13,7 +13,7 @@ import {
 const styles = (theme) => ({})
 
 const StatusTypeBase = (props) => {
-  console.log('statustypebase', props)
+  // console.log('statustypebase', props)
   const {
     column: { name: columnName },
     value,

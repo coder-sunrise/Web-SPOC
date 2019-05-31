@@ -221,7 +221,7 @@ class Queue extends PureComponent {
 
     const { sessionInfo } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    console.log('queuelisting state', this.props)
+    // console.log('queuelisting state', this.props)
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
@@ -279,9 +279,11 @@ class Queue extends PureComponent {
                   onViewDispenseClick={this.toggleDispense}
                   queueLog={queueLog}
                 />
-                <DetailsFooter
-                  onViewPatientProfile={this.toggleViewPatientProfile}
-                />
+                {/*
+                  <DetailsFooter
+                    onViewPatientProfile={this.toggleViewPatientProfile}
+                  />
+                */}
               </React.Fragment>
             )}
             <CommonModal
