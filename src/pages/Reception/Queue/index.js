@@ -19,6 +19,7 @@ import {
   SimpleModal,
   PageHeaderWrapper,
   Button,
+  confirm,
 } from '@/components'
 
 // current page sub components
@@ -153,17 +154,26 @@ class Queue extends PureComponent {
   }
 
   onEndSessionClick = () => {
-    const { showEndSessionConfirm } = this.state
-
-    this.setState({
-      showEndSessionConfirm: !showEndSessionConfirm,
+    // const { showEndSessionConfirm } = this.state
+    const { queueLog } = this.props
+    const { sessionInfo } = queueLog
+    const { sessionNo } = sessionInfo
+    // this.setState({
+    //   showEndSessionConfirm: !showEndSessionConfirm,
+    // })
+    confirm({
+      title: `Are you sure to end current session (${sessionNo})`,
+      onOk: this.onConfirmEndSession,
+      // onDone:
     })
   }
 
-  onConfirmEndSession = () => {
+  onConfirmEndSession = (doneCb) => {
     const { dispatch } = this.props
     dispatch({
       type: 'queueLog/endSession',
+    }).then((r) => {
+      if (doneCb) doneCb(r)
     })
     // this.setState({
     //   showEndSessionConfirm: false,
@@ -202,7 +212,7 @@ class Queue extends PureComponent {
       showNewVisit,
       showRegisterNewPatient,
       showViewPatientProfile,
-      showEndSessionConfirm,
+      // showEndSessionConfirm,
       showEndSessionSummary,
       showPatientSearch,
       currentFilter,
@@ -330,14 +340,14 @@ class Queue extends PureComponent {
             >
               {showViewPatientProfile ? <ViewPatient /> : null}
             </CommonModal>
-            {showEndSessionConfirm ? (
+            {/* {showEndSessionConfirm ? (
               <SimpleModal
                 title={`Are you sure to end current session (${sessionNo})`}
                 open={showEndSessionConfirm}
                 onCancel={this.onEndSessionClick}
                 onConfirm={this.onConfirmEndSession}
               />
-            ) : null}
+            ) : null} */}
             {showEndSessionSummary && (
               <CommonModal
                 open={showEndSessionSummary}

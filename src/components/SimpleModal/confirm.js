@@ -134,7 +134,7 @@ export default function confirm (config) {
   let div = document.createElement('div')
   document.body.appendChild(div)
   let currentConfig = _extends({}, config, { close })
-  console.log(currentConfig)
+  // console.log(currentConfig)
   function close () {
     for (
       var _len = arguments.length, args = Array(_len), _key = 0;

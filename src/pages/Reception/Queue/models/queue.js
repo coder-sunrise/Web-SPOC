@@ -65,7 +65,7 @@ export default createListViewModel({
             type: 'updateSessionInfo',
             payload: { ...InitialSessionInfo },
           })
-        return true
+        return status === 204
       },
       *getSessionInfo (_, { call, put }) {
         try {
