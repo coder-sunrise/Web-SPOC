@@ -109,7 +109,7 @@ class SchemesGrid extends PureComponent {
     }
 
     return (
-      <CardContainer title={this.titleComponent}>
+      <CardContainer title={this.titleComponent} hideHeader>
         <EditableTableGrid2
           rows={items.filter(o => o.type === type)}
           onRowDoubleClick={this.onRowDoubleClick}

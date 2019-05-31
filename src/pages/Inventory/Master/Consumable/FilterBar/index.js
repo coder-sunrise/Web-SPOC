@@ -131,7 +131,7 @@ class FilterBar extends PureComponent {
                 <Add />
                 Add New
               </Button>
-              <Button
+              {/* <Button
                 variant='contained'
                 color='primary'
                 onClick={() => {
@@ -145,11 +145,11 @@ class FilterBar extends PureComponent {
               >
                 <GridOn />
                 Batch Edit
-              </Button>
+              </Button> */}
             </div>
           </GridItem>
         </GridContainer>
-        <CommonModal
+        {/* <CommonModal
           open={consumable.showBatchEditModal}
           title='Batch Edit'
           bodyNoPadding
@@ -166,7 +166,7 @@ class FilterBar extends PureComponent {
           showFooter={false}
         >
           <ExcelGrid />
-        </CommonModal>
+        </CommonModal> */}
       </div>
     )
   }

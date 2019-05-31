@@ -71,9 +71,11 @@ const styles = () => ({
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     dob: Yup.date().required(),
+    patientAccountNoTypeFk: Yup.string().required(),
     patientAccountNo: Yup.string().required(),
     genderFk: Yup.string().required(),
     dialect: Yup.string().required(),
+    //contact.mobileContactNumber.number:Yup.string().render(),
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
         Yup.object().shape({
@@ -82,6 +84,9 @@ const styles = () => ({
           countryFk: Yup.string().required(),
         }),
       ),
+      mobileContactNumber: Yup.object().shape({
+        number: Yup.string().required()
+      })
     }),
   }),
 
@@ -91,7 +96,7 @@ const styles = () => ({
 class Demographic extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     const { props, value } = this
 
     // if (props.patient.currentId) {
@@ -132,7 +137,7 @@ class Demographic extends PureComponent {
     this.props.resetForm()
   }
 
-  render () {
+  render() {
     // console.log(this.props)
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
@@ -385,44 +390,71 @@ class Demographic extends PureComponent {
             </GridContainer>
           </GridItem>
         </GridContainer>
-        <FieldArray
-          name='contact.contactAddress'
-          render={(arrayHelpers) => {
-            this.arrayHelpers = arrayHelpers
-            if (!values || !values.contact) return null
-            return (
-              <div>
-                {values.contact.contactAddress.map((c, i) => {
-                  return (
-                    <Address
-                      addressIndex={i}
-                      // form={form}
-                      theme={theme}
-                      arrayHelpers={arrayHelpers}
-                      {...props}
-                    />
-                  )
-                })}
-              </div>
-            )
+        <Paper
+          style={{
+            padding: theme.spacing.unit,
+            marginTop: theme.spacing.unit,
+            marginBottom: theme.spacing.unit,
           }}
-        />
-        {getFooter({
-          ...props,
-          extraBtn: (
-            <Button
-              // className={classes.modalCloseButton}
-              key='addAddress'
-              aria-label='Reset'
-              color='primary'
-              onClick={this.addAddress}
-              style={{ right: 0, position: 'absolute' }}
-            >
-              <Add />
-              Add Address
+        >
+          <GridContainer>
+            <GridItem xs={12}>
+              <FieldArray
+                name='contact.contactAddress'
+                render={(arrayHelpers) => {
+                  this.arrayHelpers = arrayHelpers
+                  if (!values || !values.contact) return null
+                  return (
+                    <div>
+                      {values.contact.contactAddress.map((c, i) => {
+                        return (
+                          <Address
+                            addressIndex={i}
+                            // form={form}
+                            theme={theme}
+                            arrayHelpers={arrayHelpers}
+                            {...props}
+                          />
+                        )
+                      })}
+                    </div>
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={3} md={5}>
+              <Button link
+              href = ""
+                // className={classes.modalCloseButton}
+                key='addAddress'
+                aria-label='Reset'
+                color='danger'
+                onClick={this.addAddress}
+                
+              >
+               <Add/> 
+                Add Address
             </Button>
-          ),
-        })}
+            </GridItem >
+          </GridContainer>
+          </Paper>
+          {getFooter({
+            ...props,
+            // extraBtn: (
+            //   <Button
+            //     // className={classes.modalCloseButton}
+            //     key='addAddress'
+            //     aria-label='Reset'
+            //     color='primary'
+            //     onClick={this.addAddress}
+            //     style={{ right: 0, position: 'absolute' }}
+            //   >
+            //     <Add />
+            //     Add Address
+            //   </Button>
+            // ),
+          })}
+        
       </CardContainer>
     )
   }

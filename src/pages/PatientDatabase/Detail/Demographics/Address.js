@@ -75,13 +75,13 @@ class Address extends Component {
     } = this.props
     // console.log(values, addressIndex)
     return (
-      <Paper
-        style={{
-          padding: theme.spacing.unit,
-          marginTop: theme.spacing.unit,
-          marginBottom: theme.spacing.unit,
-        }}
-      >
+      <div
+      style={{
+        padding: theme.spacing.unit,
+        marginTop: theme.spacing.unit,
+        marginBottom: theme.spacing.unit,
+      }}
+    >
         <GridContainer>
           <GridItem md={1}>
             <Button
@@ -177,7 +177,7 @@ class Address extends Component {
             />
           </GridItem>
         </GridContainer>
-      </Paper>
+      </div>
     )
   }
 }

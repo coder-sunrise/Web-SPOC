@@ -255,7 +255,7 @@ class Grid extends PureComponent {
     // console.log(errors)
     return (
       <div>
-        <CardContainer title={this.titleComponent}>
+        <CardContainer title={this.titleComponent} hideHeader>
           <EditableTableGrid2
             rows={values.patientEmergencyContact}
             onRowDoubleClick={this.onRowDoubleClick}
