@@ -70,10 +70,6 @@ class Banner extends PureComponent {
     // props.setValues(props.patientDashboard.entity)
   }
 
-  startConsultation = () => {
-    this.props.history.push('/patientdashboard/consultation/new')
-  }
-
   render () {
     // console.log(this.props)
     const { props, state } = this

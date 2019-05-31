@@ -432,25 +432,25 @@ const routes = [
       // },
       //
       // EMR
-      {
-        path: '/patientdashboard',
-        system: 'EMR',
-        icon: 'group',
-        name: 'patientdashboard',
-        routes: [
-          {
-            path: '/patientdashboard',
-            name: 'patientdashboard',
-            component: './PatientDashboard',
-          },
-          {
-            path: '/patientdashboard/consultation/:id',
-            name: 'consultation',
-            hideInMenu: true,
-            component: './PatientDashboard/Consultation',
-          },
-        ],
-      },
+      // {
+      //   path: '/patientdashboard',
+      //   system: 'EMR',
+      //   icon: 'group',
+      //   name: 'patientdashboard',
+      //   routes: [
+      //     {
+      //       path: '/patientdashboard',
+      //       name: 'patientdashboard',
+      //       component: './PatientDashboard',
+      //     },
+      //     {
+      //       path: '/patientdashboard/consultation/:id',
+      //       name: 'consultation',
+      //       hideInMenu: true,
+      //       component: './PatientDashboard/Consultation',
+      //     },
+      //   ],
+      // },
       // EMR
       //
       // // Patient View
