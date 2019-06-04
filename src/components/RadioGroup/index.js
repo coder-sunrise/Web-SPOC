@@ -10,35 +10,35 @@ class RadioGroup extends React.Component {
     selectedValue: this.props.defaultValue,
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
-    const { field, value } = nextProps
+  // static getDerivedStateFromProps (nextProps, preState) {
+  //   const { field, value } = nextProps
 
-    if (field) {
-      return {
-        selectedValue: field.value || nextProps.defaultValue,
-      }
-    }
-    if (value) {
-      return {
-        selectedValue: value,
-      }
-    }
-    return null
-  }
+  //   // if (field) {
+  //   //   return {
+  //   //     selectedValue: field.value || nextProps.defaultValue,
+  //   //   }
+  //   // }
+
+  //   if (value) {
+  //     return {
+  //       selectedValue: value,
+  //     }
+  //   }
+  //   return null
+  // }
 
   handleChange = (event) => {
     this.setState({ selectedValue: event.target.value })
-
     const { form, field, onChange } = this.props
     const v = {
       target: {
         value: event.target.value,
+        name: field.name,
       },
     }
     if (form && field) {
       field.onChange({
         ...v,
-        name: field.name,
       })
     } else if (onChange) {
       onChange(v)
