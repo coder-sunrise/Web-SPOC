@@ -77,6 +77,7 @@ const New = (props) => {
           }}
         />
       </GridItem>
+      <GridItem md={12}>{values.message ? values.message.length : 0}/160</GridItem>
     </GridContainer>
   )
 }
