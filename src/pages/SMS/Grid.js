@@ -10,7 +10,7 @@ const generateRowData = () => {
   let data = []
   for (let i = 0; i < 10; i++) {
     data.push({
-      Id: `row-${i}-data`,
+      id: `row-${i}-data`,
       patientName: `Tan ${i}`,
       contactNo: `1234567${i}`,
       upComingAppt: moment().format('DD-MMM-YYYY HH:MM'),
@@ -26,7 +26,13 @@ const Grid = (props) => {
   // useEffect(() ={
   // },[])
   const { showSMSHistory } = props
-  console.log(showSMSHistory)
+  const [ selectedRows, setSelectedRows ] = useState([])
+
+  const handleSelectionChange = (selection) => {
+    setSelectedRows(selection)
+  }
+
+  const gridGetRowID = (row) => row.id
   const Cell = ({ column, row, dispatch, classes, ...p }) => {
     if (column.name === 'Action') {
       return (
@@ -94,10 +100,13 @@ const Grid = (props) => {
   return (
     <React.Fragment>
       <CommonTableGrid2
+        getRowId={gridGetRowID}
         rows={generateRowData()}
+        onSelectionChange={handleSelectionChange}
+        selection={selectedRows}
         columnExtensions={colExtensions}
         ActionProps={ActionProps}
-        FuncProps={{ pager: true }}
+        FuncProps={{ selectable: true }}
         {...tableParas}
       />
     </React.Fragment>

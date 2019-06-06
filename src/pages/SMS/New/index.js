@@ -4,19 +4,20 @@ import { Send } from '@material-ui/icons'
 import { FastField, withFormik } from 'formik'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
+import * as Yup from 'yup'
+import lodash from 'lodash'
+
 import {
   GridContainer,
   GridItem,
   Select,
   OutlinedTextField,
   Button,
-  Card,
-  CardBody,
 } from '@/components'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 
 const New = (props) => {
-  const { values, onSend, setFieldValue } = props
+  const { values, onSend, setFieldValue, errors } = props
   const SMSTemplate = [
     {
       name: 'Appointment Reminder',
@@ -51,7 +52,9 @@ const New = (props) => {
       </GridItem>
       <GridItem md={3} style={{ margin: 'auto' }}>
         <Button
-          disabled={!values.message || !values.template}
+          disabled={
+            !values.message || !values.template || !lodash.isEmpty(errors)
+          }
           variant='contained'
           color='primary'
           onClick={handleClick}
@@ -77,13 +80,18 @@ const New = (props) => {
           }}
         />
       </GridItem>
-      <GridItem md={12}>{values.message ? values.message.length : 0}/160</GridItem>
+      <GridItem md={12}>
+        {values.message ? values.message.length : 0}/160
+      </GridItem>
     </GridContainer>
   )
 }
 
 export default compose(
   withFormik({
+    validationSchema: Yup.object().shape({
+      message: Yup.string().max(20, 'Exceed Message Length'),
+    }),
     mapPropsToValues: () => {},
   }),
   // React.memo,
