@@ -75,11 +75,7 @@ const styles = (theme) => ({
     },
   },
 })
-const dataSource = [
-  '12345',
-  '23456',
-  '34567',
-]
+const dataSource = [ '12345', '23456', '34567' ]
 @connect(({ patientDashboard, global }) => ({
   patientDashboard,
   global,
