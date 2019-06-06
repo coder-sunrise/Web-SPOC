@@ -21,7 +21,7 @@ const modalStyle = (theme) => {
         borderRadius: '0px',
       },
       // marginTop: "100px !important",
-      overflow: 'visible',
+      overflow: 'hidden',
       maxHeight: 'unset',
       position: 'relative',
       // height: "fit-content",
@@ -61,7 +61,7 @@ const modalStyle = (theme) => {
     },
     modalBody: {
       position: 'relative',
-      overflow: 'auto',
+      overflow: 'hidden',
       boxSizing: 'border-box',
     },
     modalBodyPadding: {

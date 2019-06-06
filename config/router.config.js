@@ -422,7 +422,56 @@ const routes = [
         name: 'Report',
         // component: './Report',
       },
-
+      // Report
+      //
+      // Human Resource
+      {
+        path: '/hr',
+        icon: 'perm_identity',
+        name: 'humanResource',
+        // component: './Report',
+      },
+      // Human Resource
+      //
+      // Settings
+      {
+        path: '/settings',
+        icon: 'settings',
+        name: 'settings',
+        // component: './Report',
+      },
+      // Settings
+      //
+      // Development
+      process.env.NODE_ENV === 'development'
+        ? {
+            // hideInMenu: true,
+            path: '/development',
+            name: 'Development',
+            routes: [
+              {
+                path: '/development/pdf',
+                name: 'pdf',
+                component: './Development/PDF',
+                mini: 'PDF',
+              },
+              {
+                path: '/development/masonry',
+                name: 'Masonry',
+                mini: 'MS',
+                component: './Development/Masonry',
+              },
+              {
+                path: '/development/react-big-calendar',
+                name: 'Big Calendar',
+                mini: 'MS',
+                component: './Development/BigCalendar',
+              },
+            ],
+          }
+        : {},
+      // Development
+      //
       // {
       //   path: '/queuelisting',
       //   system: 'EMR',
@@ -685,6 +734,7 @@ const routes = [
       //     },
       //   ],
       // },
+
       {
         component: '404',
       },
@@ -709,6 +759,12 @@ if (process.env.NODE_ENV !== 'production') {
           name: 'Masonry',
           mini: 'MS',
           component: './Development/Masonry',
+        },
+        {
+          path: '/development/button',
+          name: 'Masonry',
+          mini: 'MS',
+          component: './Development/FixSelect',
         },
       ],
     },

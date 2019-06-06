@@ -7,7 +7,13 @@ import { FormattedMessage, formatMessage } from 'umi/locale'
 import { CircularProgress, withStyles } from '@material-ui/core'
 import { PersonAdd } from '@material-ui/icons'
 // custom components
-import { Button, GridContainer, GridItem, AntdInput } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  AntdInput,
+  TextField,
+} from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
 
@@ -55,11 +61,11 @@ class DetailsActionBar extends PureComponent {
     return (
       <GridContainer className={classnames(classes.actionBar)} spacing={8}>
         <GridItem xs md={3}>
-          <AntdInput
+          <TextField
             suffix={isFetching && <CircularProgress size={16} />}
             value={currentSearchPatient}
             onChange={handleQueryChange}
-            onPressEnter={onRegisterVisitEnterPressed}
+            onEnterPressed={onRegisterVisitEnterPressed}
             label={formatMessage({
               id: 'reception.queue.registerVisitTextBox',
             })}

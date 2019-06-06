@@ -77,4 +77,5 @@ export default {
   'menu.forms': 'Forms',
   'menu.labsresult': 'Labs Result',
   'menu.settings': 'Settings',
+  'menu.humanResource': 'Human Resource',
 }

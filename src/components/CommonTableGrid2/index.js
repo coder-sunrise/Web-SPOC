@@ -17,6 +17,7 @@ import {
   grayColor,
   fontColor,
   hoverColor,
+  tableEvenRowColor,
 } from 'mui-pro-jss'
 import classNames from 'classnames'
 import { connect } from 'dva'
@@ -84,14 +85,14 @@ const styles = (theme) => ({
       backgroundColor: '#ffffff',
     },
     '& > tbody > tr:nth-of-type(even)': {
-      backgroundColor: hoverColor,
+      backgroundColor: tableEvenRowColor,
     },
     '& > tbody > tr:hover': {
       // backgroundColor: colorManipulator.fade(
       //   theme.palette.secondary.main,
       //   0.05,
       // ),
-      backgroundColor: '#e3bdf9',
+      backgroundColor: hoverColor,
     },
   },
   paperContainer: {

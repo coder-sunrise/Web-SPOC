@@ -97,37 +97,36 @@ class PatientSearch extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={2} container alignItems='center'>
-            <Button color='primary' onClick={this.searchPatient}>
+            <Button color='primary' size='sm' onClick={this.searchPatient}>
               <Search />
               <FormattedMessage id='reception.queue.search' />
             </Button>
           </GridItem>
           <GridItem xs md={4} container justify='flex-end' alignItems='center'>
-            <Button color='primary' onClick={onViewRegisterPatient}>
+            <Button color='primary' size='sm' onClick={onViewRegisterPatient}>
               <PersonAdd />
               <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
             </Button>
           </GridItem>
         </GridContainer>
-        <GridContainer>
-          <GridItem xs md={12} style={{ marginBottom: '5px' }}>
-            <CommonTableGrid2
-              height={400}
-              rows={queueLog.patientList}
-              columnExtensions={columnExtensions}
-              ActionProps={ActionProps}
-              columns={columns}
-              LoadingProps={{
-                isLoading: !!loading.effects['queueLog/fetchPatientListByName'],
-                loadingMessage: (
-                  <FormattedMessage id='reception.queue.patientSearch.retrieving' />
-                ),
-              }}
-              getRowId={this.gridGetRowID}
-              FuncProps={{ pager: false }}
-            />
-          </GridItem>
-        </GridContainer>
+
+        <div style={{ marginBottom: '5px' }}>
+          <CommonTableGrid2
+            height={400}
+            rows={queueLog.patientList}
+            columnExtensions={columnExtensions}
+            ActionProps={ActionProps}
+            columns={columns}
+            LoadingProps={{
+              isLoading: !!loading.effects['queueLog/fetchPatientListByName'],
+              loadingMessage: (
+                <FormattedMessage id='reception.queue.patientSearch.retrieving' />
+              ),
+            }}
+            getRowId={this.gridGetRowID}
+            FuncProps={{ pager: false }}
+          />
+        </div>
       </React.Fragment>
     )
   }

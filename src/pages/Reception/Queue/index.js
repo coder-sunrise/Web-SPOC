@@ -8,7 +8,7 @@ import { withFormik } from 'formik'
 // class names
 import classNames from 'classnames'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { Divider, withStyles } from '@material-ui/core'
 import { Queue as QueueIcon, Refresh, Stop } from '@material-ui/icons'
 // custom components
 import {
@@ -16,7 +16,6 @@ import {
   CardHeader,
   CardBody,
   CommonModal,
-  SimpleModal,
   PageHeaderWrapper,
   Button,
   confirm,
@@ -56,12 +55,13 @@ const styles = (theme) => ({
   },
   sessionNo: {
     marginTop: 0,
+    marginBottom: 0,
     float: 'left',
     color: 'black',
   },
   toolBtns: {
     float: 'right',
-    // marginTop: '10px',
+    paddingTop: 5,
   },
   icon: {
     paddingTop: '0.5px',
@@ -100,22 +100,22 @@ class Queue extends PureComponent {
   showVisitRegistration = (patientID = '') => {
     const { showNewVisit } = this.state
     const { dispatch } = this.props
-    console.log('togglevisitregistration', patientID)
+
     patientID !== '' &&
       dispatch({
         type: 'queueLog/fetchPatientInfoByPatientID',
         payload: { patientID },
+      }).then((response) => {
+        console.log('response', response)
       })
     this.setState({
       showNewVisit: true,
-      visitPatientID: patientID,
     })
   }
 
   closeVisitRegistration = () => {
     this.setState({
       showNewVisit: false,
-      visitPatientID: '',
     })
   }
 
@@ -239,12 +239,17 @@ class Queue extends PureComponent {
             </h3>
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
-                <Button color='info' classes={{ justIcon: classes.icon }}>
+                <Button
+                  color='info'
+                  size='sm'
+                  classes={{ justIcon: classes.icon }}
+                >
                   <Refresh />
                   Refresh
                 </Button>
                 <Button
                   color='danger'
+                  size='sm'
                   classes={{ justIcon: classes.icon }}
                   onClick={this.onEndSessionClick}
                 >
@@ -255,6 +260,7 @@ class Queue extends PureComponent {
             )}
           </CardHeader>
 
+          <Divider />
           <CardBody>
             {isClinicSessionClosed ? (
               <EmptySession

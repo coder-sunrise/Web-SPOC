@@ -31,7 +31,6 @@ export const getActiveSession = async () => {
     method: 'GET',
     data: stringify({ criteria }),
   })
-  console.log('response', response)
   return response
 }
 
