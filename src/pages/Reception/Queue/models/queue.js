@@ -71,10 +71,11 @@ export default createListViewModel({
         const sessionID = localStorage.getItem('_sessionID')
         // const response = yield call(service.getSessionInfo, sessionID)
         const response = yield call(service.getActiveSession)
+
         const { data } = response
         // data = null when get session failed
-        console.log('data', data)
-        if (data.totalRecords === 1) {
+
+        if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
           _saveSessionID(data.id)
           return yield put({
