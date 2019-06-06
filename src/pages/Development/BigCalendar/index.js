@@ -2,9 +2,9 @@ import React from 'react'
 import moment from 'moment'
 import * as Yup from 'yup'
 // formik
-import { FastField, withFormik } from 'formik'
+import { withFormik } from 'formik'
 // material ui
-import { IconButton, Button as MUIButton, withStyles } from '@material-ui/core'
+import { IconButton, withStyles } from '@material-ui/core'
 import { Assignment, ChevronLeft, ChevronRight } from '@material-ui/icons'
 // big calendar
 import BigCalendar from 'react-big-calendar'
@@ -19,9 +19,6 @@ import {
   CustomDropdown,
   GridContainer,
   GridItem,
-  TextField,
-  AntdInput,
-  DateRangePicker,
 } from '@/components'
 // import { DatePicker as ANTDatePicker } from 'antd'
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
@@ -41,36 +38,6 @@ const styles = (theme) => ({
   ...AppointmentTypeAsColor,
 })
 
-const options = [
-  { name: 'test', value: 'test' },
-  { name: 'test1', value: 'test1' },
-]
-
-const antDOptions = [
-  { name: 'Penang', value: 'penang' },
-  { name: 'Singapore', value: 'singapore' },
-  { name: 'United States', value: 'us' },
-  { name: 'Canada', value: 'canada' },
-  { name: 'Switzerland', value: 'switzerland' },
-  { name: 'Chang Jiang', value: 'changjiang' },
-  { name: 'Malaysia', value: 'malaysia' },
-  { name: 'Vietnam', value: 'vietnam' },
-  { name: 'Thailand', value: 'thailand' },
-  { name: 'england', value: 'england' },
-  { name: 'Denmark', value: 'denmark' },
-  { name: 'Indonesia', value: 'indonesia' },
-  { name: 'Brazil', value: 'brazil' },
-  { name: 'Argentina', value: 'argentina' },
-  { name: 'Roma', value: 'roma' },
-  { name: 'Egypt', value: 'egypt' },
-  { name: 'China', value: 'china' },
-  { name: 'Taiwan', value: 'taiwan' },
-  { name: 'Korea', value: 'korea' },
-  { name: 'Japan', value: 'japan' },
-  { name: 'South Korea', value: 'southkorea' },
-  { name: 'Indo', value: 'indo' },
-]
-
 const ValidationSchema = Yup.object().shape({
   AntdInputError: Yup.string().required(),
   Test: Yup.string().required(),
@@ -81,10 +48,9 @@ const localizer = BigCalendar.momentLocalizer(moment)
 const today = new Date()
 
 const resources = [
-  { resourceId: 1, resourceTitle: 'Board room' },
-  { resourceId: 2, resourceTitle: 'Training room' },
-  { resourceId: 3, resourceTitle: 'Meeting room 1' },
-  { resourceId: 4, resourceTitle: 'Meeting room 2' },
+  { resourceId: 'medisys', resourceTitle: 'Medisys' },
+  { resourceId: 'levinne', resourceTitle: 'Levinne' },
+  { resourceId: 'cheah', resourceTitle: 'Cheah' },
 ]
 
 const DATE_NAVIGATOR_ACTION = {
@@ -197,21 +163,9 @@ class FixSelect extends React.PureComponent {
     this.setState({ view })
   }
 
-  jumpToDate = (date, fromView, toView) => {
+  jumpToDate = (date) => {
     this.setState({
       date,
-    })
-  }
-
-  selectedEvent = (event) => {
-    console.log('selectedevent', event)
-  }
-
-  addNewEventAlert = (slotInfo) => {
-    console.log('slotInfo', slotInfo)
-    this.setState({
-      slotInfo,
-      showAppointmentForm: true,
     })
   }
 
@@ -222,11 +176,6 @@ class FixSelect extends React.PureComponent {
 
   eventColors = (event, start, end, isSelected) => {
     const { classes } = this.props
-    // let backgroundColor = 'event-'
-    // event.color
-    //   ? (backgroundColor = backgroundColor + event.color)
-    //   : (backgroundColor = backgroundColor + 'default')
-
     const bg = 'background-'
     const hover = 'hover-'
     const eventClassName = event.color
@@ -236,7 +185,6 @@ class FixSelect extends React.PureComponent {
         ].join(' ')
       : classes.defaultColor
 
-    console.log({ event, eventClassName })
     return {
       className: eventClassName,
     }
@@ -272,22 +220,6 @@ class FixSelect extends React.PureComponent {
     })
   }
 
-  resizeEvent = ({ event, start, end }) => {
-    const { events } = this.state
-
-    const nextEvents = events.map((existingEvent) => {
-      return existingEvent.id === event.id
-        ? { ...existingEvent, start, end }
-        : existingEvent
-    })
-
-    this.setState({
-      events: nextEvents,
-    })
-
-    // alert(`${event.title} was resized to ${start}-${end}`)
-  }
-
   newEvent = (event) => {
     let idList = this.state.events.map((a) => a.id)
     let newId = Math.max(...idList) + 1
@@ -304,14 +236,6 @@ class FixSelect extends React.PureComponent {
       slotInfo: hour,
       showAppointmentForm: true,
     })
-    // this.toggleModal()
-    // const { events: oldEvents } = this.state
-    // this.setState({
-    //   events: [
-    //     ...oldEvents,
-    //     hour,
-    //   ],
-    // })
   }
 
   addEvent = (newEvent) => {
@@ -327,10 +251,16 @@ class FixSelect extends React.PureComponent {
     })
   }
 
+  handleSelectEvent = (event) => {
+    this.setState({
+      slotInfo: { ...event },
+      showAppointmentForm: true,
+    })
+  }
+
   render () {
     const { showAppointmentForm } = this.state
-    const { values, classes } = this.props
-    console.log('classes', classes)
+    console.log('index', this.state)
     return (
       <CommonHeader Icon={<Assignment />}>
         {/*  
@@ -374,18 +304,14 @@ class FixSelect extends React.PureComponent {
           resources={resources}
           resourceIdAccessor='resourceId'
           resourceTitleAccessor='resourceTitle'
-          tooltipAccessor={(event) => {
-            console.log('tooltipaccessor', event)
-            return 'sometooltip'
-          }}
           // --- resources ---
           // --- event handlers ---
           onEventDrop={this.moveEvent}
           onSelectSlot={this.newEvent}
-          // onEventResize={this.resizeEvent}
           // onDragStart={console.log}
           onNavigate={this.jumpToDate}
           onView={this.onViewChange}
+          onSelectEvent={this.handleSelectEvent}
           onDoubleClickEvent={this.toggleModal}
           eventPropGetter={this.eventColors}
           // --- event handlers ---

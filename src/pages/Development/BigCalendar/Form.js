@@ -29,7 +29,8 @@ import AppointmentTypeSelector from '../../Reception/Appointment/Calendar/Appoin
 import { defaultColorOpts, getColorByAppointmentType } from './setting'
 
 const doctors = [
-  { value: 'bao', name: 'Bao' },
+  { value: 'medisys', name: 'Medisys' },
+  { value: 'levinne', name: 'Levinne' },
   { value: 'cheah', name: 'Cheah' },
   { value: 'tan', name: 'Tan' },
   { value: 'tan1', name: 'Tan1' },
@@ -170,6 +171,7 @@ const DATETIME_KEY = {
       end: _nativeEndDate,
       title: `${patientName}(${contactNo})`,
       color: getColorByAppointmentType(appointmentType),
+      ...values,
     })
     resetForm()
 
@@ -189,8 +191,9 @@ const DATETIME_KEY = {
     )
     const endTime = moment(slotInfo.end, _slotInfoDateFormat).format('hh:mm a')
     const _dateStartDate = new Date(startDate)
-    console.log({ startDate, startTime, _dateStartDate })
+
     return {
+      ...slotInfo,
       startDate,
       startTime,
       endDate,
@@ -209,7 +212,7 @@ class Form extends React.PureComponent {
       values,
       handleSubmit,
     } = this.props
-    console.log('formvalues', values)
+
     return (
       <Paper className={classnames(classes.content)}>
         {isLoading && (
