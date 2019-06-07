@@ -1,4 +1,5 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
+import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 import { notification } from '@/components'
@@ -12,9 +13,9 @@ const MessageWrapper = ({ children }) => (
 )
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: true,
+  isClinicSessionClosed: false,
   id: '',
-  sessionNo: '',
+  sessionNo: `${moment().format('YYMMDD')}-01`,
   sessionNoPrefix: '',
   sessionStartDate: '',
   sessionCloseDate: '',
