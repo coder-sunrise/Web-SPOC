@@ -53,12 +53,14 @@ export const defaultTheme = createMuiTheme({
     MuiInputLabel: {
       root: {
         fontSize: defaultFontSize,
+        fontWeight: 300,
       },
       formControl: {
         transform: 'translate(0, 22px) scale(1)',
       },
       shrink: {
         transform: 'translate(0, 3px) scale(0.8)',
+        fontWeight: 'inherit',
       },
     },
     AntdSelect: {
@@ -118,12 +120,14 @@ export const smallTheme = createMuiTheme({
       root: {
         fontSize: smallFontSize,
         lineHeight: '0.95rem',
+        fontWeight: 300,
       },
       formControl: {
         transform: 'translate(0, 11px) scale(1)',
       },
       shrink: {
         transform: 'translate(0, -4px) scale(0.8)',
+        fontWeight: 'inherit',
       },
     },
   },
@@ -175,12 +179,14 @@ export const largeTheme = createMuiTheme({
       root: {
         fontSize: largeFontSize,
         lineHeight: '1rem',
+        fontWeight: 300,
       },
       formControl: {
         transform: 'translate(0, 30px) scale(1)',
       },
       shrink: {
         transform: 'translate(0, 6px) scale(0.8)',
+        fontWeight: 'inherit',
       },
     },
   },

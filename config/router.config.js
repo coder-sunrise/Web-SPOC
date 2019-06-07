@@ -423,7 +423,7 @@ const routes = [
         // component: './Report',
       },
       {
-        // hideInMenu: true,
+        hideInMenu: true,
         path: '/development',
         name: 'Development',
         routes: [

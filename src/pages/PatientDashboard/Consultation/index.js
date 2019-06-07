@@ -1,4 +1,5 @@
 import React, { PureComponent, Suspense } from 'react'
+import { connect } from 'dva'
 import _ from 'lodash'
 import $ from 'jquery'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
@@ -50,6 +51,7 @@ import {
   ProgressButton,
   Checkbox,
   NumberFormatter,
+  confirm,
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 
@@ -61,7 +63,7 @@ import Banner from '../Banner'
 
 const widgets = [
   {
-    id: 1,
+    id: '1',
     name: 'Clinical Notes',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
@@ -76,7 +78,7 @@ const widgets = [
     },
   },
   {
-    id: 2,
+    id: '2',
     name: 'Diagnosis',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Diagnosis'),
@@ -91,7 +93,7 @@ const widgets = [
     },
   },
   {
-    id: 3,
+    id: '3',
     name: 'Consultation Document',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ConsultationDocument'),
@@ -100,7 +102,7 @@ const widgets = [
     layoutConfig: {},
   },
   {
-    id: 4,
+    id: '4',
     name: 'Patient History',
     component: Loadable({
       loader: () => import('@/pages/Widgets/PatientHistory'),
@@ -113,7 +115,7 @@ const widgets = [
     },
   },
   {
-    id: 5,
+    id: '5',
     name: 'Orders',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Orders'),
@@ -123,6 +125,17 @@ const widgets = [
       style: {
         padding: '0 5px',
       },
+    },
+  },
+  {
+    id: '6',
+    name: 'Test Widget',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/TestWidget'),
+      loading: Loading,
+    }),
+    layoutConfig: {
+      style: {},
     },
   },
 ]
@@ -216,6 +229,10 @@ const getLayoutRowHeight = () => (window.innerHeight - headerHeight - 107) / 6
 let lasActivedWidgetId = null
 let lasActivedWidget = null
 
+@connect(({ consultation, global }) => ({
+  consultation,
+  global,
+}))
 class Consultation extends PureComponent {
   constructor (props) {
     super(props)
@@ -223,61 +240,78 @@ class Consultation extends PureComponent {
     // console.log(this.container)
     // console.log(window.innerHeight)
     // console.log(props)
-    this.state = {
-      mode: 'default',
-      rowHeight: getLayoutRowHeight(),
-      menuOpen: false,
-    }
+
     this.delayedResize = _.debounce(this.resize, 1000)
     window.addEventListener('resize', this.delayedResize)
+    console.log(localStorage.getItem('consultationLayout'))
+    console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
     this.pageDefaultWidgets = [
       {
         id: '00001',
-        key: 'a',
-        widgetFk: 1,
+        widgetFk: '1',
         config: {
-          lg: { i: 'a', x: 0, y: 0, w: 6, h: 6, static: true },
-          md: { i: 'a', x: 0, y: 0, w: 5, h: 6, static: true },
+          lg: { x: 0, y: 0, w: 6, h: 6, static: true },
+          md: { x: 0, y: 0, w: 5, h: 6, static: true },
         },
       },
       {
         id: '00002',
-        key: 'b',
-        widgetFk: 2,
+        widgetFk: '2',
         config: {
-          lg: { i: 'b', x: 6, y: 0, w: 6, h: 4 },
-          md: { i: 'b', x: 5, y: 0, w: 5, h: 4 },
+          lg: { x: 6, y: 0, w: 6, h: 4 },
+          md: { x: 5, y: 0, w: 5, h: 4 },
         },
       },
       {
         id: '00003',
-        key: 'c',
-        widgetFk: 3,
+        widgetFk: '3',
         config: {
-          lg: { i: 'c', x: 6, y: 4, w: 6, h: 2 },
-          md: { i: 'c', x: 5, y: 4, w: 5, h: 2 },
+          lg: { x: 6, y: 4, w: 6, h: 2 },
+          md: { x: 5, y: 4, w: 5, h: 2 },
         },
       },
       {
         id: '00004',
-        key: 'd',
-        widgetFk: 4,
+        widgetFk: '4',
         config: {
-          lg: { i: 'd', x: 0, y: 6, w: 6, h: 6 },
-          md: { i: 'd', x: 0, y: 6, w: 5, h: 6 },
+          lg: { x: 0, y: 6, w: 6, h: 6 },
+          md: { x: 0, y: 6, w: 5, h: 6 },
         },
       },
       {
         id: '00005',
-        key: 'e',
-        widgetFk: 5,
+        widgetFk: '5',
         config: {
-          lg: { i: 'e', x: 6, y: 6, w: 6, h: 6 },
-          md: { i: 'e', x: 5, y: 6, w: 5, h: 6 },
+          lg: { x: 6, y: 6, w: 6, h: 6 },
+          md: { x: 5, y: 6, w: 5, h: 6 },
         },
       },
     ]
+    let defaultLayout
+
+    if (!localStorage.getItem('consultationLayout')) {
+      defaultLayout = {
+        keys: this.pageDefaultWidgets.map((o) => o.id),
+        lg: this.pageDefaultWidgets.map((o) => ({
+          ...o.config.lg,
+          i: o.id,
+        })),
+        md: this.pageDefaultWidgets.map((o) => ({
+          ...o.config.md,
+          i: o.id,
+        })),
+      }
+    } else {
+      defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
+    }
+
+    this.state = {
+      mode: 'edit',
+      rowHeight: getLayoutRowHeight(),
+      menuOpen: false,
+      defaultLayout,
+    }
   }
 
   componentDidMount () {
@@ -309,78 +343,32 @@ class Consultation extends PureComponent {
     })
   }
 
-  title = () => {
-    const { anchorEl, menuOpen } = this.state
-    const { theme } = this.props
-    const ITEM_HEIGHT = 48
-    const uid = getUniqueId()
-    const handleClose = () => {
-      this.setState({
-        anchorEl: null,
-        menuOpen: false,
-      })
+  removeWidget = (id) => {
+    const { defaultLayout } = this.state
+    const keys = defaultLayout.keys.filter((o) => o.id !== id)
+    const sizes = [
+      'lg',
+      'md',
+      'sm',
+    ]
+    const layout = {
+      keys,
     }
-    return (
-      <div>
-        <IconButton
-          aria-label='More'
-          aria-owns={this.state.menuOpen ? uid : undefined}
-          aria-haspopup='true'
-          onClick={(event) => {
-            this.setState({
-              anchorEl: event.currentTarget,
-              menuOpen: true,
-            })
-          }}
-          className={this.props.classes.moreWidgetsBtn}
-        >
-          <MoreVert />
-        </IconButton>
-        <Popper
-          anchorEl={anchorEl}
-          open={menuOpen}
-          transition
-          onClose={handleClose}
-          PaperProps={{
-            style: {
-              // maxHeight: ITEM_HEIGHT * 4.5,
-              width: 200,
-            },
-          }}
-        >
-          {({ TransitionProps }) => (
-            <Fade {...TransitionProps} timeout={350}>
-              <ClickAwayListener onClickAway={handleClose}>
-                <Paper
-                  style={{
-                    paddingLeft: theme.spacing.unit * 2,
-                    paddingTop: theme.spacing.unit,
-                  }}
-                >
-                  <CheckboxGroup
-                    label='Selected Widgets'
-                    vertical
-                    simple
-                    defaultValue={[
-                      '1',
-                    ]}
-                    valueField='id'
-                    textField='name'
-                    options={widgets}
-                    onChange={(e) => {
-                      console.log(e)
-                    }}
-                  />
-                </Paper>
-              </ClickAwayListener>
-            </Fade>
-          )}
-        </Popper>
-      </div>
+    sizes.forEach((s) => {
+      layout[s] = defaultLayout[s]
+    })
+
+    this.setState(
+      {
+        defaultLayout: layout,
+      },
+      () => {
+        localStorage.setItem('consultationLayout', JSON.stringify(layout))
+      },
     )
   }
 
-  generateConfig = (cfg) => {
+  generateConfig = (id) => {
     const { classes, ...resetProps } = this.props
     const { elevation } = this.state
     return {
@@ -394,13 +382,13 @@ class Consultation extends PureComponent {
         // console.log($(e.target).parent('.widget-container')[0])
         // elevation[cfg.id] = 3
         // this.setState({ elevation })
-        if (lasActivedWidgetId === cfg.id) return
+        if (lasActivedWidgetId === id) return
         if (lasActivedWidget) {
           lasActivedWidget.css('overflow', 'hidden')
         }
         lasActivedWidget = $($(e.target).parents('.widget-container')[0])
         if (lasActivedWidget.length > 0) {
-          lasActivedWidgetId = cfg.id
+          lasActivedWidgetId = id
           lasActivedWidget.css('overflow', 'auto')
         }
       },
@@ -421,21 +409,12 @@ class Consultation extends PureComponent {
 
   render () {
     const { props, state } = this
-    const { classes, theme, ...resetProps } = this.props
+    const { classes, theme, dispatch, consultation, ...resetProps } = this.props
     // console.log(props)
     const layoutCfg = {
       className: classes.layout,
       rowHeight: state.rowHeight,
-      layouts: {
-        lg: this.pageDefaultWidgets.map((o) => ({
-          ...o.config.lg,
-          static: this.state.mode === 'default',
-        })),
-        md: this.pageDefaultWidgets.map((o) => ({
-          ...o.config.md,
-          static: this.state.mode === 'default',
-        })),
-      },
+      layouts: state.defaultLayout,
       breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       useCSSTransforms: false,
@@ -450,9 +429,11 @@ class Consultation extends PureComponent {
         console.log(newBreakpoint, newCols)
       },
       onLayoutChange: (currentLayout, allLayouts) => {
+        console.log(allLayouts)
         localStorage.setItem('consultationLayout', JSON.stringify(allLayouts))
       },
     }
+    console.log(state.defaultLayout)
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
@@ -487,13 +468,15 @@ class Consultation extends PureComponent {
           
         </CardContainer> */}
         <ResponsiveGridLayout {...layoutCfg}>
-          {this.pageDefaultWidgets.map((o) => {
-            const w = widgets.find((wg) => wg.id === o.widgetFk)
+          {state.defaultLayout.keys.map((id) => {
+            const dw = this.pageDefaultWidgets.find((m) => m.id === id)
+            if (!dw) return <div />
+            const w = widgets.find((wg) => wg.id === dw.widgetFk)
             const LoadableComponent = w.component
             // console.log(o)
             return (
-              <div className={classes.block} key={o.key}>
-                <Paper {...this.generateConfig(o)}>
+              <div className={classes.block} key={id}>
+                <Paper {...this.generateConfig(id)}>
                   {this.state.mode === 'edit' && (
                     <div className={`${classes.blockHeader} dragable`}>
                       <div>
@@ -521,6 +504,14 @@ class Consultation extends PureComponent {
                             aria-label='Delete'
                             className={classes.margin}
                             size='small'
+                            onClick={() => {
+                              confirm({
+                                title: 'Do you want to remove this widget?',
+                                onOk: () => {
+                                  this.removeWidget(id)
+                                },
+                              })
+                            }}
                           >
                             <Clear />
                           </IconButton>
@@ -597,24 +588,32 @@ class Consultation extends PureComponent {
                             label='Selected Widgets'
                             vertical
                             simple
-                            defaultValue={[
-                              '1',
-                            ]}
+                            value={consultation.selectedWidgets}
                             valueField='id'
                             textField='name'
                             options={widgets}
                             onChange={(e) => {
                               console.log(e)
+                              dispatch({
+                                type: 'consultation/updateState',
+                                payload: {
+                                  selectedWidgets: e.target.value,
+                                },
+                              })
                             }}
                           />
+                          <Divider />
+                          <Button onClick={() => {}} size='sm'>
+                            Reset
+                          </Button>
                         </Paper>
                       </ClickAwayListener>
                     </Fade>
                   )}
                 </Popper>
-                <Fab className={classes.fab} onClick={this.toggleMode}>
+                {/* <Fab className={classes.fab} onClick={this.toggleMode}>
                   <Clear />
-                </Fab>
+                </Fab> */}
               </div>
             </Slide>
           )}

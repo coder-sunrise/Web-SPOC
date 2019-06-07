@@ -1,11 +1,11 @@
 import React from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
-import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
+import CustomInput from 'mui-pro-components/CustomInput'
 import { FormLabel, Checkbox, FormControlLabel } from '@material-ui/core'
 import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 
-class CheckboxGroup extends React.Component {
+class CheckboxGroup extends React.PureComponent {
   state = {
     selectedValue: this.props.defaultValue || [],
   }
@@ -15,7 +15,7 @@ class CheckboxGroup extends React.Component {
 
     if (field) {
       return {
-        selectedValue: field.value || nextProps.defaultValue,
+        selectedValue: field.value,
       }
     }
     if (value) {
@@ -27,18 +27,20 @@ class CheckboxGroup extends React.Component {
   }
 
   handleChange = (event) => {
+    console.log(event.target.value)
     let { selectedValue = [] } = this.state
+    let newSv = selectedValue.slice()
     if (selectedValue.find((o) => o === event.target.value)) {
-      selectedValue = selectedValue.filter((o) => o !== event.target.value)
+      newSv = selectedValue.filter((o) => o !== event.target.value)
     } else {
-      selectedValue.push(event.target.value)
+      newSv.push(event.target.value)
     }
-    this.setState({ selectedValue })
+    this.setState({ selectedValue: newSv })
 
     const { form, field, onChange } = this.props
     const v = {
       target: {
-        value: selectedValue,
+        value: newSv,
       },
     }
     if (form && field) {
@@ -63,6 +65,7 @@ class CheckboxGroup extends React.Component {
       textField = 'label',
       ...resetProps
     } = this.props
+    console.log(this.state.selectedValue)
     return (
       <div>
         {options.map((o) => {
@@ -107,7 +110,7 @@ class CheckboxGroup extends React.Component {
   render () {
     const { classes, ...restProps } = this.props
     return (
-      <BaseInput
+      <CustomInput
         inputComponent={this.getComponent}
         {...restProps}
         value={this.state.selectedValue}

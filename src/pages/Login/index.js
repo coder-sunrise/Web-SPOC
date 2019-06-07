@@ -7,7 +7,7 @@ import LoginCard from './LoginCard'
 import ApplicationCard from './ApplicationCard'
 import NavBar from './NavBar'
 import Footer from './Footer'
-
+import { SizeContainer } from '@/components'
 // Import static files
 import authStyle from '../../assets/jss/material-dashboard-pro-react/layouts/authStyle'
 import loginBackground from '../../assets/img/login.jpeg'
@@ -67,22 +67,24 @@ class LoginPage extends PureComponent {
     const { classes, ...rest } = this.props
     return (
       <div className={classes.wrapper}>
-        <NavBar {...rest} />
-        <div className={classes.content}>
-          <div
-            className={classes.fullPage}
-            style={{ backgroundImage: `url(${this.getBgImage()})` }}
-          >
-            {step === 0 && <LoginCard handleLogin={this.onLogin} />}
-            {step === 1 && (
-              <ApplicationCard
-                handeLogoutClick={this.onLogout}
-                handleContinue={this.onContinue}
-              />
-            )}
-            <Footer fluid />
+        <SizeContainer>
+          <NavBar {...rest} />
+          <div className={classes.content}>
+            <div
+              className={classes.fullPage}
+              style={{ backgroundImage: `url(${this.getBgImage()})` }}
+            >
+              {step === 0 && <LoginCard handleLogin={this.onLogin} />}
+              {step === 1 && (
+                <ApplicationCard
+                  handeLogoutClick={this.onLogout}
+                  handleContinue={this.onContinue}
+                />
+              )}
+              <Footer fluid />
+            </div>
           </div>
-        </div>
+        </SizeContainer>
       </div>
     )
   }

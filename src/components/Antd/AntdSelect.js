@@ -21,6 +21,7 @@ const STYLES = () => {
       width: '100%',
       boxSizing: 'content-box',
       lineHeight: '1rem',
+      color: 'currentColor',
 
       '& > div': {
         // erase all border, and boxShadow

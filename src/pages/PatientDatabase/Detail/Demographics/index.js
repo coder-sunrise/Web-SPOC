@@ -86,8 +86,8 @@ const styles = () => ({
         }),
       ),
       mobileContactNumber: Yup.object().shape({
-        number: Yup.string().required()
-      })
+        number: Yup.string().required(),
+      }),
     }),
   }),
 
@@ -97,7 +97,7 @@ const styles = () => ({
 class Demographic extends PureComponent {
   state = {}
 
-  componentDidMount() {
+  componentDidMount () {
     const { props, value } = this
 
     // if (props.patient.currentId) {
@@ -138,8 +138,8 @@ class Demographic extends PureComponent {
     this.props.resetForm()
   }
 
-  render() {
-    // console.log(this.props)
+  render () {
+    console.log(this.props)
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
     return (
@@ -424,38 +424,37 @@ class Demographic extends PureComponent {
               />
             </GridItem>
             <GridItem xs={3} md={5}>
-              <Button link
-              href = ""
+              <Button
+                link
+                href=''
                 // className={classes.modalCloseButton}
                 key='addAddress'
                 aria-label='Reset'
                 color='danger'
                 onClick={this.addAddress}
-                
               >
-               <Add/> 
+                <Add />
                 Add Address
-            </Button>
-            </GridItem >
+              </Button>
+            </GridItem>
           </GridContainer>
-          </Paper>
-          {getFooter({
-            ...props,
-            // extraBtn: (
-            //   <Button
-            //     // className={classes.modalCloseButton}
-            //     key='addAddress'
-            //     aria-label='Reset'
-            //     color='primary'
-            //     onClick={this.addAddress}
-            //     style={{ right: 0, position: 'absolute' }}
-            //   >
-            //     <Add />
-            //     Add Address
-            //   </Button>
-            // ),
-          })}
-        
+        </Paper>
+        {getFooter({
+          ...props,
+          // extraBtn: (
+          //   <Button
+          //     // className={classes.modalCloseButton}
+          //     key='addAddress'
+          //     aria-label='Reset'
+          //     color='primary'
+          //     onClick={this.addAddress}
+          //     style={{ right: 0, position: 'absolute' }}
+          //   >
+          //     <Add />
+          //     Add Address
+          //   </Button>
+          // ),
+        })}
       </CardContainer>
     )
   }

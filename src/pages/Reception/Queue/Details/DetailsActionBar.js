@@ -53,8 +53,8 @@ class DetailsActionBar extends PureComponent {
       isFetching,
     } = this.props
     return (
-      <GridContainer className={classnames(classes.actionBar)} spacing={8}>
-        <GridItem xs md={3}>
+      <GridContainer className={classnames(classes.actionBar)}>
+        <GridItem xs md={4}>
           <AntdInput
             suffix={isFetching && <CircularProgress size={16} />}
             value={currentSearchPatient}
@@ -72,7 +72,7 @@ class DetailsActionBar extends PureComponent {
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </GridItem>
-        <GridItem xs md={7} container justify='flex-end' alignItems='center'>
+        <GridItem xs md={6} container justify='flex-end' alignItems='center'>
           <StatisticIndicator
             filter={currentFilter}
             handleStatusClick={handleStatusChange}
