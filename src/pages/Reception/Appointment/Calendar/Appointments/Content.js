@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import moment from 'moment'
 // dx-react-scheduler
 import { Appointments } from '@devexpress/dx-react-scheduler-material-ui'
 // material ui
@@ -11,6 +12,7 @@ import {
   getColorClassByAppointmentType,
   AppointmentTypeAsStyles,
 } from '../setting'
+import { getDateValue } from '../../utils'
 
 const styles = () => ({
   content: {
@@ -27,6 +29,15 @@ const styles = () => ({
 
 const RecurringIconComponent = () => <Assignment />
 
+const _formatDate = (date) => {
+  if (moment(date).isValid()) {
+    const time = moment(date).format('hh:mm A').toString()
+    return time
+  }
+
+  return ''
+}
+
 const AppointmentContentComponent = withStyles(styles, {
   name: 'AppointmentComponentContent',
 })(({ classes, data, children }) => {
@@ -42,6 +53,7 @@ const AppointmentContentComponent = withStyles(styles, {
         classes.content,
         data.appointmentType ? colorClass : classes.defaultColor,
       ])}
+      formatDate={_formatDate}
       recurringIconComponent={RecurringIconComponent}
     >
       {children}

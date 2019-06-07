@@ -103,7 +103,7 @@ class AllergyGrid extends PureComponent {
       onCommitChanges: this.commitChanges,
     }
     return (
-      <CardContainer title={this.titleComponent}>
+      <CardContainer title={this.titleComponent} hideHeader>
         <CommonTableGrid2
           // height={height}
           rows={items.filter((o) => o.type === type)}

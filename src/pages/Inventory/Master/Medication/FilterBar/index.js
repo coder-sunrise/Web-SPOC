@@ -152,7 +152,7 @@ class FilterBar extends PureComponent {
                 Add New
               </Button>
 
-              <Button
+              {/* <Button
                 variant='contained'
                 color='primary'
                 onClick={() => {
@@ -167,7 +167,7 @@ class FilterBar extends PureComponent {
               >
                 <GridOn />
                 Batch Edit
-              </Button>
+              </Button> */}
             </div>
           </GridItem>
         </GridContainer>

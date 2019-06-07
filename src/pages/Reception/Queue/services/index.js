@@ -25,13 +25,22 @@ export const endSession = async (sessionID) => {
 
 export const getActiveSession = async () => {
   const criteria = [
-    { prop: 'IsClinicSessionClosed', val: false, opr: 'eql' },
+    {
+      prop: 'IsClinicSessionClosed',
+      val: false,
+      opr: 'eql',
+    },
   ]
-  const response = await request('/api/bizsession/', {
+
+  // const sort = [
+  //   { sortby: 'sessionno', order: 'asc' },
+  // ]
+
+  const response = await request('/api/bizsession', {
     method: 'GET',
     data: stringify({ criteria }),
   })
-  console.log('response', response)
+
   return response
 }
 
