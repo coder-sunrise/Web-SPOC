@@ -1,33 +1,58 @@
 import React from 'react'
 import moment from 'moment'
+import classnames from 'classnames'
 import * as Yup from 'yup'
 // formik
 import { withFormik } from 'formik'
 // material ui
-import { IconButton, withStyles } from '@material-ui/core'
+import {
+  Popover,
+  Popper,
+  Paper,
+  Fade,
+  IconButton,
+  Typography,
+  withStyles,
+} from '@material-ui/core'
 import { Assignment, ChevronLeft, ChevronRight } from '@material-ui/icons'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
+// react-datetime
+import Datetime from 'react-datetime'
 // events data
 import { dndEvents } from './events'
+// view
+// import CalendarView from './components/CalendarView'
+import Event from './components/Event'
 import Form from './Form'
+
 import {
   Button,
+  Card,
+  CardHeader,
+  CardBody,
   CommonHeader,
   CommonModal,
   CustomDropdown,
   GridContainer,
   GridItem,
+  DatePicker,
 } from '@/components'
+
 // import { DatePicker as ANTDatePicker } from 'antd'
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
 
 const DragAndDropCalendar = withDragAndDrop(BigCalendar)
 
 const styles = (theme) => ({
-  'event-checkup': {
-    backgroundColor: theme.palette.error.main,
+  typography: {
+    padding: theme.spacing.unit,
+  },
+  dateButton: {
+    // marginTop: theme.spacing.unit,
+    fontSize: '1.5rem',
+    paddingBottom: '8px !important',
   },
   defaultColor: {
     background: defaultColorOpts.value,
@@ -51,6 +76,7 @@ const resources = [
   { resourceId: 'medisys', resourceTitle: 'Medisys' },
   { resourceId: 'levinne', resourceTitle: 'Levinne' },
   { resourceId: 'cheah', resourceTitle: 'Cheah' },
+  { resourceId: 'other', resourceTitle: 'Other' },
 ]
 
 const DATE_NAVIGATOR_ACTION = {
@@ -59,21 +85,29 @@ const DATE_NAVIGATOR_ACTION = {
   BACK_TO_TODAY: 'today',
 }
 
+const CalendarViews = [
+  BigCalendar.Views.DAY,
+  BigCalendar.Views.WEEK,
+  BigCalendar.Views.MONTH,
+]
+
+const type = {
+  [BigCalendar.Views.DAY]: 'days',
+  [BigCalendar.Views.WEEK]: 'weeks',
+  [BigCalendar.Views.MONTH]: 'months',
+}
+
 @withFormik({
   validationSchema: ValidationSchema,
-  mapPropsToValues: () => ({
-    TestDatePicker2: '20190522',
-    TestDateRange: [
-      '20190522',
-      '20190525',
-    ],
-  }),
+  mapPropsToValues: () => ({}),
 })
 class FixSelect extends React.PureComponent {
   state = {
     view: BigCalendar.Views.DAY,
     showAppointmentForm: false,
+    showDateOverlay: false,
     events: dndEvents,
+    anchor: null,
     date: new Date(),
     minTime: new Date(
       today.getFullYear(),
@@ -94,13 +128,25 @@ class FixSelect extends React.PureComponent {
     slotInfo: {},
   }
 
-  changeDate = (action) => {
-    const type = {
-      [BigCalendar.Views.DAY]: 'days',
-      [BigCalendar.Views.WEEK]: 'weeks',
-      [BigCalendar.Views.MONTH]: 'months',
-    }
+  eventColors = (event) => {
+    // eventPropGetters = (event, start ,end, isSelected) => {}
 
+    const { classes } = this.props
+    const bg = 'background-'
+    const hover = 'hover-'
+    const eventClassName = event.color
+      ? [
+          classes[`${bg}${event.color}`],
+          classes[`${hover}${event.color}`],
+        ].join(' ')
+      : classes.defaultColor
+
+    return {
+      className: eventClassName,
+    }
+  }
+
+  changeDate = (action) => {
     let newDate = moment(new Date())
     const { view: currentView, date: currentDate } = this.state
     if (action === DATE_NAVIGATOR_ACTION.ADD) {
@@ -120,8 +166,24 @@ class FixSelect extends React.PureComponent {
 
   returnToday = () => this.changeDate(DATE_NAVIGATOR_ACTION.BACK_TO_TODAY)
 
-  Toolbar = (toolbarProps) => {
-    const { label, view, views } = toolbarProps
+  onDateButtonClick = (event) => {
+    this.setState({ showDateOverlay: true, anchor: event.target })
+  }
+
+  onDateOverlayClose = () => {
+    this.setState({
+      showDateOverlay: false,
+      anchor: null,
+    })
+  }
+
+  onDateChange = (newDate) => {
+    this.setState({ date: newDate.toDate() })
+  }
+
+  Toolbar = ({ label, view, ...props }) => {
+    const { classes } = this.props
+    const { showDateOverlay, anchor } = this.state
     return (
       <GridContainer>
         <GridItem xs md={2}>
@@ -137,10 +199,36 @@ class FixSelect extends React.PureComponent {
             </IconButton>
           </div>
         </GridItem>
-        <GridItem xs md={8}>
-          <Button block color='primary' simple>
-            <h4 style={{ fontWeight: 500 }}>{label}</h4>
+        <GridItem xs md={8} container justify='center'>
+          <Button
+            block
+            simple
+            size='lg'
+            className={classnames(classes.dateButton)}
+            color='primary'
+            onClick={this.onDateButtonClick}
+          >
+            {label}
           </Button>
+          <Popover
+            id='react-datetime'
+            open={showDateOverlay}
+            anchorEl={anchor}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            onClose={this.onDateOverlayClose}
+            style={{ width: 500, height: 500 }}
+          >
+            <Datetime
+              onChange={this.onDateChange}
+              value={moment(this.state.date)}
+              dateFormat='YYYY-MM-DD'
+              timeFormat={false}
+              input={false}
+            />
+          </Popover>
         </GridItem>
         <GridItem xs md={2} container justify='flex-end'>
           <div>
@@ -151,7 +239,7 @@ class FixSelect extends React.PureComponent {
                 simple: true,
               }}
               onClick={this.onViewChange}
-              dropdownList={views}
+              dropdownList={CalendarViews}
             />
           </div>
         </GridItem>
@@ -172,22 +260,6 @@ class FixSelect extends React.PureComponent {
   toggleModal = () => {
     const { showAppointmentForm } = this.state
     this.setState({ showAppointmentForm: !showAppointmentForm })
-  }
-
-  eventColors = (event, start, end, isSelected) => {
-    const { classes } = this.props
-    const bg = 'background-'
-    const hover = 'hover-'
-    const eventClassName = event.color
-      ? [
-          classes[`${bg}${event.color}`],
-          classes[`${hover}${event.color}`],
-        ].join(' ')
-      : classes.defaultColor
-
-    return {
-      className: eventClassName,
-    }
   }
 
   moveEvent = ({
@@ -230,8 +302,9 @@ class FixSelect extends React.PureComponent {
       start: event.start,
       end: event.end,
       resourceId: event.resourceId,
+      type: 'add',
     }
-    console.log('slotInfo', hour)
+
     this.setState({
       slotInfo: hour,
       showAppointmentForm: true,
@@ -240,7 +313,7 @@ class FixSelect extends React.PureComponent {
 
   addEvent = (newEvent) => {
     const { events } = this.state
-    console.log({ newEvent })
+
     this.setState({
       events: [
         ...events,
@@ -251,39 +324,71 @@ class FixSelect extends React.PureComponent {
     })
   }
 
-  handleSelectEvent = (event) => {
+  updateEvent = (updatedEvent) => {
+    const { events } = this.state
     this.setState({
-      slotInfo: { ...event },
-      showAppointmentForm: true,
+      events: [
+        ...events.filter((event) => event.id !== updatedEvent.id),
+        updatedEvent,
+      ],
+      showAppointmentForm: false,
+      slotInfo: {},
     })
   }
 
+  handleSelectEvent = (_, syntheticEvent) => {
+    this.setState({
+      showPopup: true,
+      popupAnchor: syntheticEvent.currentTarget,
+    })
+  }
+
+  handleClosePopover = () => {
+    this.setState({ showPopup: false })
+  }
+
   render () {
-    const { showAppointmentForm } = this.state
-    console.log('index', this.state)
+    const { showPopup, popupAnchor, showAppointmentForm } = this.state
+    // console.log('index', this.state)
+    const { classes } = this.props
     return (
       <CommonHeader Icon={<Assignment />}>
-        {/*  
-        <BigCalendar
-          localizer={localizer}
-          min={this.state.minTime}
-          max={this.state.maxTime}
-          selectable
-          events={this.state.events}
-          defaultView='day'
-          // resources={resources}
-          // resourceIdAccessor='resourceId'
-          // resourceTitleAccessor='resourceTitle'
-          defaultDate={today}
-          onSelectEvent={this.selectedEvent}
-          onSelectSlot={this.addNewEventAlert}
-          eventPropGetter={this.eventColors}
-        />
-      */}
-
+        <Popover
+          id='event-popup'
+          open={showPopup}
+          anchorEl={popupAnchor}
+          onClose={this.handleClosePopover}
+          placement='top-start'
+          anchorOrigin={{
+            vertical: 'center',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'center',
+            horizontal: 'center',
+          }}
+        >
+          <CardHeader>
+            <Typography className={classes.typography}>
+              The content of the Popper.
+            </Typography>
+          </CardHeader>
+          <CardBody>
+            <Typography className={classes.typography}>
+              The content of the Popper.
+            </Typography>
+            <Typography className={classes.typography}>
+              The content of the Popper.
+            </Typography>
+            <Typography className={classes.typography}>
+              The content of the Popper.
+            </Typography>
+          </CardBody>
+        </Popover>
         <DragAndDropCalendar
           components={{
             toolbar: this.Toolbar,
+            event: Event,
           }}
           // --- values props ---
           date={this.state.date}
@@ -292,7 +397,8 @@ class FixSelect extends React.PureComponent {
           max={this.state.maxTime}
           events={this.state.events}
           view={this.state.view}
-          // step={15}
+          step={15}
+          timeslots={2}
           // --- values props ---
 
           // --- functional props ---
@@ -316,6 +422,7 @@ class FixSelect extends React.PureComponent {
           eventPropGetter={this.eventColors}
           // --- event handlers ---
         />
+
         <CommonModal
           open={showAppointmentForm}
           title='Appointment Form'
@@ -324,10 +431,14 @@ class FixSelect extends React.PureComponent {
           // maxWidth='md'
           showFooter={false}
         >
-          <Form
-            slotInfo={this.state.slotInfo}
-            handleAddEvents={this.addEvent}
-          />
+          {showAppointmentForm ? (
+            <Form
+              resources={resources}
+              slotInfo={this.state.slotInfo}
+              handleAddEvents={this.addEvent}
+              handleUpdateEvents={this.updateEvent}
+            />
+          ) : null}
         </CommonModal>
       </CommonHeader>
     )

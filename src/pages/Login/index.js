@@ -44,8 +44,8 @@ class LoginPage extends PureComponent {
       .then((props) => {
         const { payload } = props
         // const { application } = payload
-        // payload.status === 200 && router.push('/reception/queue')
-        payload.status === 200 && this.setState({ step: 1 })
+        payload.status === 200 && router.push('/reception/queue')
+        // payload.status === 200 && this.setState({ step: 1 })
       })
       .catch((error) => {
         console.log('error', error)
@@ -74,12 +74,7 @@ class LoginPage extends PureComponent {
             style={{ backgroundImage: `url(${this.getBgImage()})` }}
           >
             {step === 0 && <LoginCard handleLogin={this.onLogin} />}
-            {step === 1 && (
-              <ApplicationCard
-                handeLogoutClick={this.onLogout}
-                handleContinue={this.onContinue}
-              />
-            )}
+
             <Footer fluid />
           </div>
         </div>

@@ -73,7 +73,7 @@ button.rbc-input::-moz-focus-inner {
   text-align: right;
   vertical-align: middle;
   font-weight: bold;
-  font-size: 1em;
+  font-size: 1rem;
   min-height: 0;
   border-bottom: 1px solid #ddd;
   color: #999999;
@@ -417,7 +417,7 @@ button.rbc-input::-moz-focus-inner {
 }
 .rbc-timeslot-group {
   border-bottom: 1px solid #ddd;
-  min-height: 60px;
+  min-height: 40px;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -453,7 +453,7 @@ button.rbc-input::-moz-focus-inner {
   display: -ms-flexbox;
   display: flex;
   max-height: 100%;
-  min-height: 30px;
+  min-height: 20px;
   -webkit-flex-flow: column wrap;
   -ms-flex-flow: column wrap;
   flex-flow: column wrap;

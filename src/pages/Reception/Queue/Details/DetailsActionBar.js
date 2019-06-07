@@ -59,7 +59,7 @@ class DetailsActionBar extends PureComponent {
       isFetching,
     } = this.props
     return (
-      <GridContainer className={classnames(classes.actionBar)} spacing={8}>
+      <GridContainer className={classnames(classes.actionBar)}>
         <GridItem xs md={3}>
           <TextField
             suffix={isFetching && <CircularProgress size={16} />}

@@ -1,5 +1,3 @@
-import { primaryColor } from 'mui-pro-jss'
-
 export const AppointmentTypeOptions = [
   {
     name: 'Checkup',
@@ -59,8 +57,8 @@ export const AppointmentTypeOptions = [
 
 export const defaultColorOpts = {
   name: 'default',
-  value: primaryColor,
-  active: primaryColor,
+  value: '#ab47bc',
+  active: '#8e24aa',
 }
 
 export const reduceToColorClass = (acc, { value, colorValue, colorActive }) => {
