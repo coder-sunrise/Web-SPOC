@@ -26,6 +26,7 @@ function RegularButton ({ ...props }) {
     pureIcon,
     className,
     muiClasses,
+    variant = 'outlined',
     ...rest
   } = props
   // console.log(simple)
@@ -44,7 +45,12 @@ function RegularButton ({ ...props }) {
     [className]: className,
   })
   return (
-    <Button {...rest} classes={muiClasses} className={btnClasses}>
+    <Button
+      variant={variant}
+      {...rest}
+      classes={muiClasses}
+      className={btnClasses}
+    >
       {children}
     </Button>
   )

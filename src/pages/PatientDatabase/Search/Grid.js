@@ -3,7 +3,6 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 import { Tooltip, withStyles } from '@material-ui/core'
 import { AccountCircle } from '@material-ui/icons'
-import Modal from './Modal'
 import { getAppendUrl } from '@/utils/utils'
 import { status } from '@/utils/codes'
 
@@ -11,7 +10,6 @@ import { Button, CommonModal, CommonTableGrid2 } from '@/components'
 
 class Grid extends PureComponent {
   state = {
-    showDepositRefundModal: false,
     tableParas: {
       columns: [
         { name: 'patientReferenceNo', title: 'Reference No.' },
@@ -84,11 +82,10 @@ class Grid extends PureComponent {
       renderActionFn,
       onRowDblClick,
     } = this.props
-    const { tableParas, isDeposit, showDepositRefundModal } = this.state
+    const { tableParas } = this.state
 
     const TableCell = (p) => this.Cell({ ...p, dispatch, renderActionFn })
     const ActionProps = { TableCellComponent: TableCell }
-    // console.log(patientSearch)
     return (
       <React.Fragment>
         <CommonTableGrid2
@@ -100,16 +97,6 @@ class Grid extends PureComponent {
           onRowDoubleClick={onRowDblClick}
           {...tableParas}
         />
-        <CommonModal
-          open={showDepositRefundModal}
-          title={isDeposit ? 'PatientSearch' : 'Refund'}
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-          maxWidth='sm'
-          showFooter={false}
-        >
-          <Modal isDeposit={isDeposit} />
-        </CommonModal>
       </React.Fragment>
     )
   }

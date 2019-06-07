@@ -29,12 +29,13 @@ module.exports = {
     const { patient } = props
     // console.log(patient.entity, prevProps.values.id)
     if (patient.entity && patient.entity.id !== prevProps.values.id) {
-      props.setValues(patient.entity)
+      console.log(patient.entity)
+      props.resetForm(patient.entity)
     }
   },
   handleSubmit: (values, component) => {
     const { props, setValues } = component
-    // console.log(values)
+    console.log(values)
     // return
     props
       .dispatch({
@@ -86,6 +87,7 @@ module.exports = {
     values,
     dispatch,
     extraBtn,
+    patient,
   }) => (
     <div
       style={{
@@ -101,7 +103,9 @@ module.exports = {
           key='reset'
           aria-label='Reset'
           color='danger'
-          onClick={resetForm}
+          onClick={() => {
+            resetForm(patient.entity)
+          }}
           style={{ left: 0, position: 'absolute' }}
         >
           <Replay />

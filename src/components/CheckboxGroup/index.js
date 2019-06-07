@@ -1,6 +1,6 @@
 import React from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
-import CustomInput from 'mui-pro-components/CustomInput'
+import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
 import { FormLabel, Checkbox, FormControlLabel } from '@material-ui/core'
 import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
@@ -105,11 +105,10 @@ class CheckboxGroup extends React.Component {
   }
 
   render () {
-    const { inputProps = {}, classes, ...restProps } = this.props
-    inputProps.inputComponent = this.getComponent
+    const { classes, ...restProps } = this.props
     return (
-      <CustomInput
-        inputProps={inputProps}
+      <BaseInput
+        inputComponent={this.getComponent}
         {...restProps}
         value={this.state.selectedValue}
       />

@@ -1,4 +1,5 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
+import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 import { notification } from '@/components'
@@ -12,9 +13,9 @@ const MessageWrapper = ({ children }) => (
 )
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: true,
+  isClinicSessionClosed: false,
   id: '',
-  sessionNo: '',
+  sessionNo: `${moment().format('YYMMDD')}-01`,
   sessionNoPrefix: '',
   sessionStartDate: '',
   sessionCloseDate: '',
@@ -71,10 +72,11 @@ export default createListViewModel({
         // const sessionID = localStorage.getItem('_sessionID')
         // const response = yield call(service.getSessionInfo, sessionID)
         const response = yield call(service.getActiveSession)
+
         const { data } = response
         // data = null when get session failed
 
-        if (data.totalRecords === 1) {
+        if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
           _saveSessionID(data.id)
           return yield put({

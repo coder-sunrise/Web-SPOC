@@ -2,7 +2,13 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import { MUISelect, MUICodeSelect, CodeSelect, TextField } from '@/components'
+import {
+  MUISelect,
+  MUICodeSelect,
+  CodeSelect,
+  Select,
+  TextField,
+} from '@/components'
 import { getCodes } from '@/utils/codes'
 
 const SelectEditor = (columnExtensions) =>
@@ -15,8 +21,9 @@ const SelectEditor = (columnExtensions) =>
     const { type, code, errors = [], ...restProps } = cfg
     const error = errors.find((o) => o.index === row.rowIndex) || {}
     // console.log(cfg, value, props)
-    const onChange = (option) => {
-      onValueChange(option.target ? option.target.value : '')
+    const onChange = (val) => {
+      console.log(val)
+      onValueChange(val)
     }
     const commonCfg = {
       noWrapper: true,
@@ -30,10 +37,10 @@ const SelectEditor = (columnExtensions) =>
     // console.log(error)
     if (columnName) {
       if (type === 'select') {
-        return <MUISelect {...commonCfg} />
+        return <Select {...commonCfg} />
       }
       if (type === 'codeSelect') {
-        return <MUICodeSelect {...commonCfg} code={code} />
+        return <CodeSelect {...commonCfg} code={code} />
       }
       return null
     }

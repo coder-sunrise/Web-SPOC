@@ -325,6 +325,7 @@ const sidebarStyle = (theme) => ({
     display: 'inherit',
     transition: 'transform 300ms ease 0s, opacity 300ms ease 0s',
     fontSize: '14px',
+    paddingLeft: '32px',
   },
   collapseItemMiniRTL: {
     float: 'right',
@@ -342,6 +343,7 @@ const sidebarStyle = (theme) => ({
     display: 'block',
     transition: 'transform 300ms ease 0s, opacity 300ms ease 0s',
     fontSize: '14px',
+    paddingLeft: '64px',
   },
   collapseItemTextRTL: {
     textAlign: 'right',

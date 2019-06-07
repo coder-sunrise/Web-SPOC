@@ -44,6 +44,7 @@ class Grid extends PureComponent {
   state = {
     editingRowIds: [],
     rowChanges: {},
+    showModal: false,
   }
 
   tableParas = {
@@ -61,9 +62,48 @@ class Grid extends PureComponent {
         columnName: 'salutationFk',
         type: 'codeSelect',
         code: 'Salutation',
+        isDisabled: (row) => !!row.nokPatientProfileFk,
+      },
+      {
+        columnName: 'priority',
+        type: 'radio',
+        checkedValue: 1,
+        uncheckedValue: 0,
+        onRadioChange: (row, e, checked) => {
+          console.log(this)
+          if (checked) {
+            const { values, setFieldValue, setFieldTouched } = this.props
+            const { patientEmergencyContact } = values
+            patientEmergencyContact.forEach((pec) => {
+              pec.priority = 0
+            })
+            const r = patientEmergencyContact.find((o) => o.id === row.id)
+            if (r) {
+              r.priority = 1
+            }
+            setFieldValue('patientEmergencyContact', patientEmergencyContact)
+            setFieldTouched('patientEmergencyContact', true)
+          }
+        },
       },
     ],
   }
+
+  SearchPatient = Loadable({
+    loader: () => import('@/pages/PatientDatabase/Search'),
+    loading: Loading,
+    render: (loaded, p) => {
+      let Component = loaded.default
+      return (
+        <Component
+          renderActionFn={this.renderActionFn}
+          simple
+          disableAdd
+          disableQueryOnLoad
+        />
+      )
+    },
+  })
 
   constructor (props) {
     super(props)
@@ -103,54 +143,6 @@ class Grid extends PureComponent {
         })
       }
     }
-    const setArrayValue = (items) => {
-      // runValidationSchema('patientEmergencyContact', items)
-      // resetForm()
-      setFieldValue('patientEmergencyContact', items)
-      validateForm()
-      // console.log(props.errors)
-      // console.log(v)
-      // // setFieldValue('patientEmergencyContact', items)
-    }
-    this.commitChanges = ({ added, changed, deleted }) => {
-      // console.log(added, changed, deleted)
-      // console.log(this)
-      const { values } = props
-      const { patientEmergencyContact } = values
-
-      if (added) {
-        props
-          .dispatch({
-            type: `emergencyContact/localAdd`,
-            payload: added.map((o) => {
-              return {
-                type,
-                ...o,
-              }
-            }),
-          })
-          .then(setArrayValue)
-      }
-
-      if (changed) {
-        props
-          .dispatch({
-            type: `emergencyContact/localChange`,
-            payload: changed,
-          })
-          .then(setArrayValue)
-      }
-
-      if (deleted) {
-        dispatch({
-          type: `emergencyContact/localDelete`,
-          payload: deleted,
-        }).then(setArrayValue)
-      }
-
-      return false
-    }
-
     this.PagerContent = (me) => (p) => {
       return (
         <div style={{ position: 'relative' }}>
@@ -168,75 +160,6 @@ class Grid extends PureComponent {
         </div>
       )
     }
-
-    const renderActionFn = (row) => {
-      return (
-        <Tooltip title='Add' placement='bottom'>
-          <Button
-            size='sm'
-            onClick={() => {
-              dispatch({
-                type: 'emergencyContact/query',
-                payload: {
-                  id: row.id,
-                },
-              }).then((o) => {
-                // console.log(props)
-                const { values: { patientEmergencyContact = [] } } = props
-
-                if (
-                  patientEmergencyContact.find(
-                    (m) => m.patientProfileFk === o.id,
-                  )
-                ) {
-                  notification.warn({
-                    message: 'This contact person already existed',
-                  })
-                  return
-                }
-                dispatch({
-                  type: 'emergencyContact/localAdd',
-                  payload: [
-                    {
-                      patientProfileFk: o.id,
-                      salutationFk: o.salutationFk,
-                      name: o.name,
-                      relationship: '',
-                      nokPatientProfileFk: o.id,
-                      address: o.contact.contactAddress[0].line1,
-                    },
-                  ],
-                }).then((items) => {
-                  setArrayValue(items)
-                  this.toggleModal()
-                })
-              })
-            }}
-            justIcon
-            round
-            color='primary'
-            style={{ marginRight: 5 }}
-          >
-            <Add />
-          </Button>
-        </Tooltip>
-      )
-    }
-
-    this.SearchPatient = Loadable({
-      loader: () => import('@/pages/PatientDatabase/Search'),
-      loading: Loading,
-      render (loaded, p) {
-        let Component = loaded.default
-        return (
-          <Component
-            renderActionFn={renderActionFn}
-            simple
-            disableQueryOnLoad
-          />
-        )
-      },
-    })
   }
 
   componentDidUpdate = (prevProps) => {
@@ -249,6 +172,121 @@ class Grid extends PureComponent {
     }))
   }
 
+  setArrayValue = (items) => {
+    const { setFieldValue, validateForm } = this.props
+    // runValidationSchema('patientEmergencyContact', items)
+    // resetForm()
+    setFieldValue('patientEmergencyContact', items)
+    validateForm()
+    // console.log(props.errors)
+    // console.log(v)
+    // // setFieldValue('patientEmergencyContact', items)
+  }
+
+  commitChanges = ({ added, changed, deleted }) => {
+    console.log(added, changed, deleted)
+    // console.log(this)
+    const { values } = this.props
+    let { patientEmergencyContact = [] } = values
+    // console.log(patientEmergencyContact)
+    if (added) {
+      patientEmergencyContact = patientEmergencyContact.concat(
+        added.map((o) => {
+          return {
+            id: getUniqueGUID(),
+            ...o,
+          }
+        }),
+      )
+      // console.log(patientEmergencyContact)
+      // props
+      //   .dispatch({
+      //     type: `emergencyContact/localAdd`,
+      //     payload: added.map((o) => {
+      //       return {
+      //         type,
+      //         ...o,
+      //       }
+      //     }),
+      //   })
+      //   .then(setArrayValue)
+    }
+
+    if (changed) {
+      // props
+      //   .dispatch({
+      //     type: `emergencyContact/localChange`,
+      //     payload: changed,
+      //   })
+      //   .then(setArrayValue)
+
+      patientEmergencyContact = patientEmergencyContact.map((row) => {
+        const n = changed[row.id] ? { ...row, ...changed[row.id] } : row
+        return n
+      })
+    }
+
+    if (deleted) {
+      // dispatch({
+      //   type: `emergencyContact/localDelete`,
+      //   payload: deleted,
+      // }).then(setArrayValue)
+
+      patientEmergencyContact = patientEmergencyContact.filter(
+        (row) => !deleted.find((o) => o === row.id) && row.id,
+      )
+    }
+    this.setArrayValue(patientEmergencyContact)
+  }
+
+  renderActionFn = (row) => {
+    const { props } = this
+    const { dispatch, values } = props
+    return (
+      <Tooltip title='Add' placement='bottom'>
+        <Button
+          size='sm'
+          onClick={() => {
+            dispatch({
+              type: 'emergencyContact/query',
+              payload: {
+                id: row.id,
+              },
+            }).then((o) => {
+              // console.log(props)
+              const { values: { patientEmergencyContact = [] } } = props
+
+              if (
+                patientEmergencyContact.find((m) => m.patientProfileFk === o.id)
+              ) {
+                notification.warn({
+                  message: 'This contact person already existed',
+                })
+                return
+              }
+              patientEmergencyContact.push({
+                patientProfileFk: o.id,
+                salutationFk: o.salutationFk,
+                name: o.name,
+                relationship: '',
+                nokPatientProfileFk: o.id,
+                address: o.contact.contactAddress[0].line1,
+              })
+              this.setArrayValue(patientEmergencyContact)
+              this.toggleModal()
+            })
+          }}
+          justIcon
+          round
+          color='primary'
+          style={{ marginRight: 5 }}
+        >
+          <Add />
+        </Button>
+      </Tooltip>
+    )
+  }
+
   render () {
     const { values, type, loading, errors, patientSearch } = this.props
     const { SearchPatient = (f) => f } = this
@@ -257,7 +295,7 @@ class Grid extends PureComponent {
       <div>
         <CardContainer title={this.titleComponent} hideHeader>
           <EditableTableGrid2
-            rows={values.patientEmergencyContact}
+            rows={values.patientEmergencyContact.filter((o) => !o.isDeleted)}
             onRowDoubleClick={this.onRowDoubleClick}
             FuncProps={{
               edit: true,
@@ -277,6 +315,7 @@ class Grid extends PureComponent {
             {...this.tableParas}
           />
           {getFooter({
+            resetable: true,
             ...this.props,
           })}
         </CardContainer>
@@ -287,7 +326,7 @@ class Grid extends PureComponent {
           showFooter={false}
           onConfirm={this.toggleModal}
         >
-          <SearchPatient />
+          {this.state.showModal && <SearchPatient />}
         </CommonModal>
       </div>
     )

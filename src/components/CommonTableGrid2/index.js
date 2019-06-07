@@ -238,6 +238,16 @@ class CommonTableGrid2 extends React.Component {
             },
           },
         },
+        MuiTableCell: {
+          root: {
+            padding: '10px 8px 10px 8px',
+          },
+        },
+        PrivateSwitchBase: {
+          root: {
+            padding: 0,
+          },
+        },
         ...sizeConfig[props.size],
       },
     })

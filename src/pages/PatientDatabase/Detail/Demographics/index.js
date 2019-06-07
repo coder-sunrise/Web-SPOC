@@ -31,6 +31,7 @@ import {
   CardAvatar,
   CardBody,
   TextField,
+  BaseInput,
   notification,
   Select,
   CodeSelect,

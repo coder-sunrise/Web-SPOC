@@ -52,15 +52,15 @@ const customInputStyle = {
     },
   },
   labelRoot: {
-    ...defaultFont,
+    // ...defaultFont,
     // color: '#AAAAAA !important',
     // fontWeight: '400',
     // fontSize: '14px',
-    lineHeight: '1.42857',
+    // lineHeight: '1.42857',
     // top: '5px',
-    '& + $underline': {
-      marginTop: '0px',
-    },
+    // '& + $underline': {
+    //   marginTop: '0px',
+    // },
   },
   labelRootError: {
     color: `${dangerColor} !important`,
@@ -69,13 +69,20 @@ const customInputStyle = {
     color: `${successColor} !important`,
   },
   formControl: {
-    margin: '6px 0 5px 0',
-    paddingTop: '20px',
     position: 'relative',
     verticalAlign: 'unset',
+    margin: '6px 0 5px 0',
     // "& svg,& .fab,& .far,& .fal,& .fas,& .material-icons": {
     //   color: "#495057",
     // },
+  },
+  medium: {
+    margin: '6px 0 5px 0',
+    paddingTop: 20,
+  },
+  small: {
+    margin: '2px 0 2px 0',
+    paddingTop: 5,
   },
   noLabel: {
     paddingTop: 0,
@@ -89,7 +96,7 @@ const customInputStyle = {
     },
   },
   input: {
-    color: '#495057',
+    // color: '#495057',
     // "&,&::placeholder": {
     //   fontSize: "14px",
     //   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
