@@ -19,6 +19,8 @@ export { default as CustomButtons } from './CustomButtons'
 export { default as CustomDropdown } from './CustomDropdown/CustomDropdown'
 export { default as CustomInput } from './CustomInput' // TODO Change CustomInput to TextField
 export { default as TextField } from './CustomInput' // TODO Change CustomInput to TextField
+export { default as BaseInput } from './CustomInput/BaseInput' // TODO Change CustomInput to TextField
+
 export { default as CustomInputWrapper } from './CustomInputWrapper'
 export {
   default as CustomLinearProgress,

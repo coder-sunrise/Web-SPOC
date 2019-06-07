@@ -55,25 +55,25 @@ const inputStyle = (theme) => ({
     paddingBottom: 0,
     // transform: 'translate(0, 30px) scale(1)',
   },
-  mediumLabel: {
-    fontSize: '1rem',
-    transform: 'translate(0, 30px) scale(1)',
-  },
-  largeLabel: {
-    fontSize: '1.2rem',
-    transform: 'translate(0, 26px) scale(1)',
-  },
-  smallLabel: {
-    fontSize: '0.875rem',
-    transform: 'translate(0, 31px) scale(1)',
-  },
+  // mediumLabel: {
+  //   fontSize: '1rem',
+  //   transform: 'translate(0, 30px) scale(1)',
+  // },
+  // largeLabel: {
+  //   fontSize: '1.2rem',
+  //   transform: 'translate(0, 26px) scale(1)',
+  // },
+  // smallLabel: {
+  //   fontSize: '0.875rem',
+  //   transform: 'translate(0, 31px) scale(1)',
+  // },
   labelFocused: {
     color: theme.palette.primary.main,
   },
-  labelShrink: {
-    transform: 'translate(0, 7px) scale(0.8)',
-    transformOrigin: 'top left',
-  },
+  // labelShrink: {
+  //   transform: 'translate(0, 7px) scale(0.8)',
+  //   transformOrigin: 'top left',
+  // },
   labelAnimation: {
     transition: `color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms`,
   },

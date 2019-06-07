@@ -31,19 +31,18 @@ class HeaderLinks extends React.Component {
   state = {
     openNotification: false,
     openAccount: false,
-    openDomain:false,
-    title:'PROD',
+    openDomain: false,
+    title: 'PROD',
   }
 
   handleClick = (key) => () => {
-    this.setState({ [`open${key}`]: !this.state[`open${key}`]})
-  }
-  
-  handleAPIDomainSelection= (key,type) => () => {
-    updateAPIType(type)
-    this.setState({ [`open${key}`]: !this.state[`open${key}`],title:type})
+    this.setState({ [`open${key}`]: !this.state[`open${key}`] })
   }
 
+  handleAPIDomainSelection = (key, type) => () => {
+    updateAPIType(type)
+    this.setState({ [`open${key}`]: !this.state[`open${key}`], title: type })
+  }
 
   handleClose = (key, cb) => () => {
     this.setState({ [`open${key}`]: false })
@@ -59,11 +58,10 @@ class HeaderLinks extends React.Component {
     updateAPIType(type)
   }
 
-
   render () {
     const { classes, rtlActive } = this.props
-    const { openNotification, openAccount,openDomain,title } = this.state
-    
+    const { openNotification, openAccount, openDomain, title } = this.state
+
     // console.log(openNotification, openAccount)
     const searchButton = `${classes.top} ${classes.searchButton} ${classNames({
       [classes.searchRTL]: rtlActive,
@@ -294,7 +292,7 @@ class HeaderLinks extends React.Component {
               </Grow>
             )}
           </Popper>
-        </div>  
+        </div>
         <div className={managerClasses}>
           <Button
             color='transparent'
@@ -310,10 +308,7 @@ class HeaderLinks extends React.Component {
               this.anchorElAccount = node
             }}
           >
-            <span className={classes.linkText}>
-              {this.state.title}
-            </span>
-
+            <span className={classes.linkText}>{this.state.title}</span>
           </Button>
           <Popper
             open={openDomain}
@@ -337,13 +332,16 @@ class HeaderLinks extends React.Component {
                   <ClickAwayListener onClickAway={this.handleClose('Domain')}>
                     <MenuList role='menu'>
                       <MenuItem
-                        onClick={this.handleAPIDomainSelection('Domain','UAT')}
+                        onClick={this.handleAPIDomainSelection('Domain', 'UAT')}
                         className={dropdownItem}
                       >
                         UAT
                       </MenuItem>
                       <MenuItem
-                        onClick={this.handleAPIDomainSelection('Domain', 'PROD')}
+                        onClick={this.handleAPIDomainSelection(
+                          'Domain',
+                          'PROD',
+                        )}
                         className={dropdownItem}
                       >
                         Production
@@ -354,7 +352,7 @@ class HeaderLinks extends React.Component {
               </Grow>
             )}
           </Popper>
-        </div>  
+        </div>
       </div>
     )
   }

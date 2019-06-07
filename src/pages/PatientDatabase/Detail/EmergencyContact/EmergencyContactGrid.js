@@ -61,6 +61,29 @@ class Grid extends PureComponent {
         columnName: 'salutationFk',
         type: 'codeSelect',
         code: 'Salutation',
+        isDisabled: (row) => !!row.nokPatientProfileFk,
+      },
+      {
+        columnName: 'priority',
+        type: 'radio',
+        checkedValue: 1,
+        uncheckedValue: 0,
+        onRadioChange: (row, e, checked) => {
+          console.log(this)
+          if (checked) {
+            const { values, setFieldValue, setFieldTouched } = this.props
+            const { patientEmergencyContact } = values
+            patientEmergencyContact.forEach((pec) => {
+              pec.priority = 0
+            })
+            const r = patientEmergencyContact.find((o) => o.id === row.id)
+            if (r) {
+              r.priority = 1
+            }
+            setFieldValue('patientEmergencyContact', patientEmergencyContact)
+            setFieldTouched('patientEmergencyContact', true)
+          }
+        },
       },
     ],
   }
@@ -111,44 +134,6 @@ class Grid extends PureComponent {
       // console.log(props.errors)
       // console.log(v)
       // // setFieldValue('patientEmergencyContact', items)
-    }
-    this.commitChanges = ({ added, changed, deleted }) => {
-      // console.log(added, changed, deleted)
-      // console.log(this)
-      const { values } = props
-      const { patientEmergencyContact } = values
-
-      if (added) {
-        props
-          .dispatch({
-            type: `emergencyContact/localAdd`,
-            payload: added.map((o) => {
-              return {
-                type,
-                ...o,
-              }
-            }),
-          })
-          .then(setArrayValue)
-      }
-
-      if (changed) {
-        props
-          .dispatch({
-            type: `emergencyContact/localChange`,
-            payload: changed,
-          })
-          .then(setArrayValue)
-      }
-
-      if (deleted) {
-        dispatch({
-          type: `emergencyContact/localDelete`,
-          payload: deleted,
-        }).then(setArrayValue)
-      }
-
-      return false
     }
 
     this.PagerContent = (me) => (p) => {
@@ -226,12 +211,13 @@ class Grid extends PureComponent {
     this.SearchPatient = Loadable({
       loader: () => import('@/pages/PatientDatabase/Search'),
       loading: Loading,
-      render (loaded, p) {
+      render: (loaded, p) => {
         let Component = loaded.default
         return (
           <Component
-            renderActionFn={renderActionFn}
+            renderActionFn={this.renderActionFn}
             simple
+            disableAdd
             disableQueryOnLoad
           />
         )
@@ -249,6 +235,62 @@ class Grid extends PureComponent {
     }))
   }
 
+  commitChanges = ({ added, changed, deleted }) => {
+    console.log(added, changed, deleted)
+    // console.log(this)
+    const { values } = this.props
+    let { patientEmergencyContact = [] } = values
+    console.log(patientEmergencyContact)
+    if (added) {
+      patientEmergencyContact = patientEmergencyContact.concat(
+        added.map((o) => {
+          return {
+            id: getUniqueGUID(),
+            ...o,
+          }
+        }),
+      )
+      console.log(patientEmergencyContact)
+      // props
+      //   .dispatch({
+      //     type: `emergencyContact/localAdd`,
+      //     payload: added.map((o) => {
+      //       return {
+      //         type,
+      //         ...o,
+      //       }
+      //     }),
+      //   })
+      //   .then(setArrayValue)
+    }
+
+    if (changed) {
+      // props
+      //   .dispatch({
+      //     type: `emergencyContact/localChange`,
+      //     payload: changed,
+      //   })
+      //   .then(setArrayValue)
+
+      patientEmergencyContact = patientEmergencyContact.map((row) => {
+        const n = changed[row.id] ? { ...row, ...changed[row.id] } : row
+        return n
+      })
+    }
+
+    if (deleted) {
+      // dispatch({
+      //   type: `emergencyContact/localDelete`,
+      //   payload: deleted,
+      // }).then(setArrayValue)
+
+      patientEmergencyContact = patientEmergencyContact.filter(
+        (row) => !deleted.find((o) => o === row.id),
+      )
+    }
+    this.setArrayValue(patientEmergencyContact)
+  }
+
   render () {
     const { values, type, loading, errors, patientSearch } = this.props
     const { SearchPatient = (f) => f } = this
@@ -257,7 +299,7 @@ class Grid extends PureComponent {
       <div>
         <CardContainer title={this.titleComponent}>
           <EditableTableGrid2
-            rows={values.patientEmergencyContact}
+            rows={values.patientEmergencyContact.filter((o) => !o.isDeleted)}
             onRowDoubleClick={this.onRowDoubleClick}
             FuncProps={{
               edit: true,
@@ -277,6 +319,7 @@ class Grid extends PureComponent {
             {...this.tableParas}
           />
           {getFooter({
+            resetable: true,
             ...this.props,
           })}
         </CardContainer>
@@ -287,7 +330,7 @@ class Grid extends PureComponent {
           showFooter={false}
           onConfirm={this.toggleModal}
         >
-          <SearchPatient />
+          {this.state.showModal && <SearchPatient />}
         </CommonModal>
       </div>
     )

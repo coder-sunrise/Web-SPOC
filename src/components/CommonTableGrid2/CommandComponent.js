@@ -1,6 +1,7 @@
 import React from 'react'
 import { Pageview, Delete, Save, Edit, Cancel } from '@material-ui/icons'
 import { Button } from '@/components'
+import { updateGlobalVariable } from '@/utils/utils'
 
 const EditButton = ({ onExecute }) => (
   <Button
@@ -18,7 +19,10 @@ const EditButton = ({ onExecute }) => (
 const CancelButton = ({ onExecute }) => (
   <Button
     size='sm'
-    onClick={onExecute}
+    onClick={(e) => {
+      updateGlobalVariable('gridIgnoreValidation', true)
+      onExecute(e)
+    }}
     justIcon
     round
     color='danger'
@@ -31,7 +35,10 @@ const CancelButton = ({ onExecute }) => (
 const DeleteButton = ({ onExecute }) => (
   <Button
     size='sm'
-    onClick={onExecute}
+    onClick={(e) => {
+      updateGlobalVariable('gridIgnoreValidation', true)
+      onExecute(e)
+    }}
     justIcon
     round
     color='primary'
@@ -43,7 +50,14 @@ const DeleteButton = ({ onExecute }) => (
 
 const AddButton = ({ onExecute }) => (
   <div style={{ textAlign: 'center' }}>
-    <Button color='primary' onClick={onExecute} title='Create new row'>
+    <Button
+      color='primary'
+      onClick={(e) => {
+        updateGlobalVariable('gridIgnoreValidation', false)
+        onExecute(e)
+      }}
+      title='Create new row'
+    >
       New
     </Button>
   </div>
@@ -52,9 +66,12 @@ const AddButton = ({ onExecute }) => (
 const CommitButton = ({ onExecute }) => (
   <Button
     size='sm'
-    onClick={onExecute}
+    onClick={(e) => {
+      updateGlobalVariable('gridIgnoreValidation', false)
+      onExecute(e)
+    }}
     justIcon
-    data-button-type="progress"
+    data-button-type='progress'
     round
     color='primary'
     title='Save'

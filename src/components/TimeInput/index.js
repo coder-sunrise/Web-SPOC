@@ -6,7 +6,7 @@ import { Error } from '@material-ui/icons'
 // cleave js
 import Cleave from 'cleave.js/react'
 // custom component
-import BaseInput from './BaseInput'
+import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
 
 const styles = () => ({})
 
@@ -88,14 +88,14 @@ class TimeInput extends PureComponent {
       form && field ? form.errors[field.name] !== undefined : false
     const helpText = hasError ? form.errors[field.name] : ''
 
-    let inputProps = {
+    let cfg = {
       value: field ? field.value : value,
       name: field ? field.name : '',
     }
 
     if (hasError && showErrorIcon) {
-      inputProps = {
-        ...inputProps,
+      cfg = {
+        ...cfg,
         endAdornment: (
           <ErrorIcon key={`${field.name}-errorIcon`} errorMessage={helpText} />
         ),
@@ -107,8 +107,8 @@ class TimeInput extends PureComponent {
         formControlProps={{
           fullWidth: true,
         }}
-        inputProps={{
-          ...inputProps,
+        {...{
+          ...cfg,
           inputComponent: this.CleaveComponent,
           onBlur: this._onBlur,
           onChange: this.onChange,

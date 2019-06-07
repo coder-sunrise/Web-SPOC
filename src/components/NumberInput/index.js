@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import { DateRange, Clear } from '@material-ui/icons'
-import CustomInput from 'mui-pro-components/CustomInput'
+import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
 
 import classNames from 'classnames'
 import Cleave from 'cleave.js/react'
@@ -204,14 +204,12 @@ class NumberInput extends React.PureComponent {
       shrink = shrink || errors[name]
     }
 
-    inputProps.inputComponent = this.getComponent
-
     return (
-      <CustomInput
+      <BaseInput
         labelProps={{
           shrink,
         }}
-        inputProps={inputProps}
+        inputComponent={this.getComponent}
         {...restProps}
       />
     )

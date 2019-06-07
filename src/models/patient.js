@@ -12,6 +12,7 @@ export default createFormViewModel({
       currentComponent: 'dmgp',
       default: {
         patientAccountNo: '',
+        patientEmergencyContact: [],
         // dob: new Date(),
         contact: {
           contactAddress: [

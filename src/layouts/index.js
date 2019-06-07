@@ -30,8 +30,8 @@ const compare = (...props) => (Component) => {
   // console.log(props)
   return class BasicComponent extends React.Component {
     shouldComponentUpdate (nextProps, nextStates) {
-      console.log(this.props)
-      console.log(nextProps)
+      // console.log(this.props)
+      // console.log(nextProps)
 
       // console.log(this.state)
 
@@ -47,12 +47,12 @@ const compare = (...props) => (Component) => {
           nextProps[props[i]] !== this.props[props[i]] &&
           !lodash.isEqual(nextProps[props[i]], this.props[props[i]])
         ) {
-          console.log(
-            props[i],
-            nextProps[props[i]],
-            this.props[props[i]],
-            lodash.isEqual(nextProps[props[i]], this.props[props[i]]),
-          )
+          // console.log(
+          //   props[i],
+          //   nextProps[props[i]],
+          //   this.props[props[i]],
+          //   lodash.isEqual(nextProps[props[i]], this.props[props[i]]),
+          // )
           return true
         }
       }
@@ -60,7 +60,7 @@ const compare = (...props) => (Component) => {
     }
 
     render () {
-      console.log(props, Component)
+      // console.log(props, Component)
       return <Component {...this.props} />
     }
   }

@@ -2,6 +2,7 @@ import React from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
 import { FormLabel, Radio, FormControlLabel } from '@material-ui/core'
+import { Formik, Field } from 'formik'
 import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 
@@ -33,13 +34,11 @@ class RadioGroup extends React.Component {
     const v = {
       target: {
         value: event.target.value,
+        name: field ? field.name : '',
       },
     }
     if (form && field) {
-      field.onChange({
-        ...v,
-        name: field.name,
-      })
+      field.onChange(v)
     } else if (onChange) {
       onChange(v)
     }
@@ -59,8 +58,9 @@ class RadioGroup extends React.Component {
     } = this.props
     return (
       <div>
-        {options.map((o) => {
+        {options.map((o, i) => {
           const v = `${o[valueField]}`
+
           return (
             <div
               className={`${classes.checkboxAndRadio} ${vertical
@@ -71,7 +71,7 @@ class RadioGroup extends React.Component {
               <FormControlLabel
                 control={
                   <Radio
-                    checked={state.selectedValue === v}
+                    checked={this.state.selectedValue === v}
                     onChange={this.handleChange}
                     value={v}
                     icon={
@@ -99,11 +99,10 @@ class RadioGroup extends React.Component {
   }
 
   render () {
-    const { inputProps = {}, classes, ...restProps } = this.props
-    inputProps.inputComponent = this.getComponent
+    const { classes, ...restProps } = this.props
     return (
       <CustomInput
-        inputProps={inputProps}
+        inputComponent={this.getComponent}
         {...restProps}
         value={this.state.selectedValue}
       />
