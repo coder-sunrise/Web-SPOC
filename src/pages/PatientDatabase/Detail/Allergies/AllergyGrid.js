@@ -18,9 +18,10 @@ class AllergyGrid extends PureComponent {
   tableParas = {
     columns: [
       { name: 'allergyName', title: 'Allergy Name' },
-      { name: 'description', title: 'Allergy Reaction' },
-      { name: 'status', title: 'Status' },
+      { name: 'description', title: 'Allergic Reaction' },
       { name: 'date', title: 'Date' },
+      { name: 'status', title: 'Status' },
+      { name: 'Action', title: 'Action' },
     ],
     columnExtensions: [
       {
@@ -103,7 +104,7 @@ class AllergyGrid extends PureComponent {
       onCommitChanges: this.commitChanges,
     }
     return (
-      <CardContainer title={this.titleComponent} hideHeader>
+      // <CardContainer title={this.titleComponent} hideHeader>
         <CommonTableGrid2
           // height={height}
           rows={items.filter((o) => o.type === type)}
@@ -112,7 +113,7 @@ class AllergyGrid extends PureComponent {
           EditingProps={EditingProps}
           {...this.tableParas}
         />
-      </CardContainer>
+      // </CardContainer>
     )
   }
 }

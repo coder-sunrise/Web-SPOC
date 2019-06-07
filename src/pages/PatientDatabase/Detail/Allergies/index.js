@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withFormik, FastField } from 'formik'
 import * as Yup from 'yup'
 import { withStyles } from '@material-ui/core'
-import { notification, Checkbox } from '@/components'
+import { notification, Checkbox,CardContainer,CommonHeader } from '@/components'
 
 import allergyModal from '../models/allergy'
 import AllergyGrid from './AllergyGrid'
@@ -88,26 +88,8 @@ class Allergies extends PureComponent {
     const { classes, allergy, dispatch } = this.props
 
     return (
-      <div
-        ref={(divElement) => {
-          this.divElement = divElement
-        }}
-        className={classes.container}
-      >
-        <div className={classes.item}>
-          <AllergyGrid
-            type='Allergy'
-            entity={allergy.entity}
-            dispatch={dispatch}
-            title='Allergy'
-            titleChildren={
-              <div
-                style={{
-                  right: 0,
-                  top: 0,
-                  position: 'absolute',
-                }}
-              >
+<CardContainer title={this.titleComponent} hideHeader>
+        <div  className={classes.item}>
                 <FastField
                   name='HasAllergy'
                   render={(args) => {
@@ -121,11 +103,25 @@ class Allergies extends PureComponent {
                   }}
                 />
               </div>
-            }
+              <div className={classes.item}>            <h4 className={classes.cardIconTitle}>
+             Allergy
+            </h4></div>
+
+        <div className={classes.item} style={{marginTop:8}}>
+          <AllergyGrid
+            type='Allergy'
+            entity={allergy.entity}
+            dispatch={dispatch}
+            title='Allergy'
             height={height}
           />
         </div>
-        <div className={classes.item}>
+
+<div className={classes.item}>            <h4 className={classes.cardIconTitle} style={{marginTop:20}}>
+              Medical Alert
+            </h4></div>
+
+        <div className={classes.item} style={{marginTop:8}}>
           <AllergyGrid
             type='Alert'
             entity={allergy.entity}
@@ -134,7 +130,7 @@ class Allergies extends PureComponent {
             height={height}
           />
         </div>
-      </div>
+        </CardContainer>
     )
   }
 }
