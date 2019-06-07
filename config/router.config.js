@@ -170,42 +170,9 @@ const routes = [
           {
             path: '/reception/appointment',
             name: 'appointment',
-            mini: 'APT',
+            mini: 'AP',
             component: './Reception/Appointment',
-          } /* ,
-          {
-            path: '/form/step-form',
-            name: 'stepform',
-            // component: './Forms/StepForm',
-            hideChildrenInMenu: true,
-            routes: [
-              {
-                path: '/form/step-form',
-                redirect: '/form/step-form/info',
-              },
-              {
-                path: '/form/step-form/info',
-                name: 'info',
-                // component: './Forms/StepForm/Step1',
-              },
-              {
-                path: '/form/step-form/confirm',
-                name: 'confirm',
-                // component: './Forms/StepForm/Step2',
-              },
-              {
-                path: '/form/step-form/result',
-                name: 'result',
-                // component: './Forms/StepForm/Step3',
-              },
-            ],
           },
-          {
-            path: '/form/advanced-form',
-            name: 'advancedform',
-            authority: ['admin'],
-            // component: './Forms/AdvancedForm',
-          }, */,
         ],
       },
       //
@@ -255,16 +222,15 @@ const routes = [
       //
       // SMS
       {
-        path: '/sms',
+        path: '/communication',
         icon: 'sms',
-        name: 'SMS',
+        name: 'communication',
         system: 'CMS',
         routes: [
           {
-            path: '/sms',
-            name: 'Reminder',
+            path: '/communication/sms',
+            name: 'sms',
             component: './sms',
-            mini: 'RM',
           },
           // {
           //   path: '/sms/adhoc',
@@ -351,6 +317,7 @@ const routes = [
           {
             path: '/finance/note',
             name: 'credit/debitnote',
+            hideInMenu: true,
             component: './Finance/CreditDebitNote',
             mini: 'CD',
           },
@@ -413,17 +380,72 @@ const routes = [
           },
         ],
       },
-
+      // Forms
+      {
+        path: '/forms',
+        icon: 'assignment',
+        name: 'forms',
+        // component: './Forms',
+      },
+      // Forms
+      //
+      // Lab Report
+      {
+        path: '/labsresult',
+        icon: 'poll',
+        name: 'labsresult',
+        // component: '',
+      },
+      // Lab Report
       //
       // Report
       {
         path: '/report',
         icon: 'library_books',
-        name: 'Report',
+        name: 'report',
         // component: './Report',
       },
+      // Report
+      //
+      // Human Resource
       {
-        // hideInMenu: true,
+        path: '/human-resource',
+        icon: 'account_box',
+        name: 'humanResource',
+        // component: '',
+      },
+      // Human Resource
+      //
+      // Settings
+      {
+        path: '/setting',
+        icon: 'settings',
+        name: 'setting',
+        routes: [
+          {
+            path: '/setting/clinic-setting',
+            mini: 'CS',
+            name: 'clinicSetting',
+            // component: '',
+          },
+          {
+            path: '/setting/system-setting',
+            mini: 'SS',
+            name: 'systemSetting',
+            // component: '',
+          },
+          {
+            path: '/setting/print-setting',
+            mini: 'PS',
+            name: 'printSetting',
+            // component: '',
+          },
+        ],
+        // component: '',
+      },
+      // Settings
+      {
+        hideInMenu: process.env.NODE_ENV === 'production',
         path: '/development',
         name: 'Development',
         routes: [
@@ -453,12 +475,4 @@ const routes = [
     ],
   },
 ]
-// if (process.env.NODE_ENV !== 'production') {
-//   const developmentRoutes = [
-
-//   ]
-
-//   routes.find((o) => o.path === '/').routes.concat(developmentRoutes)
-// }
-
 export default routes
