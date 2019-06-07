@@ -44,6 +44,7 @@ class Grid extends PureComponent {
   state = {
     editingRowIds: [],
     rowChanges: {},
+    showModal: false,
   }
 
   tableParas = {
@@ -88,6 +89,22 @@ class Grid extends PureComponent {
     ],
   }
 
+  SearchPatient = Loadable({
+    loader: () => import('@/pages/PatientDatabase/Search'),
+    loading: Loading,
+    render: (loaded, p) => {
+      let Component = loaded.default
+      return (
+        <Component
+          renderActionFn={this.renderActionFn}
+          simple
+          disableAdd
+          disableQueryOnLoad
+        />
+      )
+    },
+  })
+
   constructor (props) {
     super(props)
 
@@ -126,16 +143,6 @@ class Grid extends PureComponent {
         })
       }
     }
-    const setArrayValue = (items) => {
-      // runValidationSchema('patientEmergencyContact', items)
-      // resetForm()
-      setFieldValue('patientEmergencyContact', items)
-      validateForm()
-      // console.log(props.errors)
-      // console.log(v)
-      // // setFieldValue('patientEmergencyContact', items)
-    }
-
     this.PagerContent = (me) => (p) => {
       return (
         <div style={{ position: 'relative' }}>
@@ -153,76 +160,6 @@ class Grid extends PureComponent {
         </div>
       )
     }
-
-    const renderActionFn = (row) => {
-      return (
-        <Tooltip title='Add' placement='bottom'>
-          <Button
-            size='sm'
-            onClick={() => {
-              dispatch({
-                type: 'emergencyContact/query',
-                payload: {
-                  id: row.id,
-                },
-              }).then((o) => {
-                // console.log(props)
-                const { values: { patientEmergencyContact = [] } } = props
-
-                if (
-                  patientEmergencyContact.find(
-                    (m) => m.patientProfileFk === o.id,
-                  )
-                ) {
-                  notification.warn({
-                    message: 'This contact person already existed',
-                  })
-                  return
-                }
-                dispatch({
-                  type: 'emergencyContact/localAdd',
-                  payload: [
-                    {
-                      patientProfileFk: o.id,
-                      salutationFk: o.salutationFk,
-                      name: o.name,
-                      relationship: '',
-                      nokPatientProfileFk: o.id,
-                      address: o.contact.contactAddress[0].line1,
-                    },
-                  ],
-                }).then((items) => {
-                  setArrayValue(items)
-                  this.toggleModal()
-                })
-              })
-            }}
-            justIcon
-            round
-            color='primary'
-            style={{ marginRight: 5 }}
-          >
-            <Add />
-          </Button>
-        </Tooltip>
-      )
-    }
-
-    this.SearchPatient = Loadable({
-      loader: () => import('@/pages/PatientDatabase/Search'),
-      loading: Loading,
-      render: (loaded, p) => {
-        let Component = loaded.default
-        return (
-          <Component
-            renderActionFn={this.renderActionFn}
-            simple
-            disableAdd
-            disableQueryOnLoad
-          />
-        )
-      },
-    })
   }
 
   componentDidUpdate = (prevProps) => {
@@ -235,12 +172,23 @@ class Grid extends PureComponent {
     }))
   }
 
+  setArrayValue = (items) => {
+    const { setFieldValue, validateForm } = this.props
+    // runValidationSchema('patientEmergencyContact', items)
+    // resetForm()
+    setFieldValue('patientEmergencyContact', items)
+    validateForm()
+    // console.log(props.errors)
+    // console.log(v)
+    // // setFieldValue('patientEmergencyContact', items)
+  }
+
   commitChanges = ({ added, changed, deleted }) => {
     console.log(added, changed, deleted)
     // console.log(this)
     const { values } = this.props
     let { patientEmergencyContact = [] } = values
-    console.log(patientEmergencyContact)
+    // console.log(patientEmergencyContact)
     if (added) {
       patientEmergencyContact = patientEmergencyContact.concat(
         added.map((o) => {
@@ -250,7 +198,7 @@ class Grid extends PureComponent {
           }
         }),
       )
-      console.log(patientEmergencyContact)
+      // console.log(patientEmergencyContact)
       // props
       //   .dispatch({
       //     type: `emergencyContact/localAdd`,
@@ -285,10 +233,58 @@ class Grid extends PureComponent {
       // }).then(setArrayValue)
 
       patientEmergencyContact = patientEmergencyContact.filter(
-        (row) => !deleted.find((o) => o === row.id),
+        (row) => !deleted.find((o) => o === row.id) && row.id,
       )
     }
     this.setArrayValue(patientEmergencyContact)
+  }
+
+  renderActionFn = (row) => {
+    const { props } = this
+    const { dispatch, values } = props
+    return (
+      <Tooltip title='Add' placement='bottom'>
+        <Button
+          size='sm'
+          onClick={() => {
+            dispatch({
+              type: 'emergencyContact/query',
+              payload: {
+                id: row.id,
+              },
+            }).then((o) => {
+              // console.log(props)
+              const { values: { patientEmergencyContact = [] } } = props
+
+              if (
+                patientEmergencyContact.find((m) => m.patientProfileFk === o.id)
+              ) {
+                notification.warn({
+                  message: 'This contact person already existed',
+                })
+                return
+              }
+              patientEmergencyContact.push({
+                patientProfileFk: o.id,
+                salutationFk: o.salutationFk,
+                name: o.name,
+                relationship: '',
+                nokPatientProfileFk: o.id,
+                address: o.contact.contactAddress[0].line1,
+              })
+              this.setArrayValue(patientEmergencyContact)
+              this.toggleModal()
+            })
+          }}
+          justIcon
+          round
+          color='primary'
+          style={{ marginRight: 5 }}
+        >
+          <Add />
+        </Button>
+      </Tooltip>
+    )
   }
 
   render () {
