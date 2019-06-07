@@ -216,7 +216,7 @@ export default class BaseCRUDViewModel {
       *localDelete ({ payload }, { put, select }) {
         let st = yield select((s) => s[namespace])
         let { items } = st
-
+        // console.log(items)
         const newItems = items.filter(
           (row) => !payload.find((o) => o === row.id),
         )

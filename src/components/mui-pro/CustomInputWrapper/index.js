@@ -21,7 +21,7 @@ const _config = {
   },
 }
 
-function CustomInputWrapper ({ field, form, classes, ...props }) {
+function CustomInputWrapper ({ classes, ...props }) {
   // console.log(props)
   // formControlProps.fullWidth =fullWidth || formControlProps.fullWidth
   for (const key in _config) {
@@ -52,53 +52,32 @@ function CustomInputWrapper ({ field, form, classes, ...props }) {
     children,
     style,
     noWrapper = false,
+    size = 'medium',
   } = props
-  // console.log(props)
-  if (form) {
-    inputProps.name = field.name
-    inputProps.value = field.value
-
-    inputProps.onChange = extendFunc(inputProps.onChange, field.onChange)
-    inputProps.onBlur = extendFunc(inputProps.onBlur, field.onBlue)
-  }
 
   const labelClasses = classNames({
     [` ${classes.labelRootError}`]: error,
     [` ${classes.labelRootSuccess}`]: success && !error,
+    [classes.labelRoot]: true,
+    // [classes.labelMedium]:
+    //   size === 'default' || size === 'medium' || size === 'md',
+    // [classes.labelSmall]: size === 'small' || size === 'sm',
+    // [classes.labelLarge]: size === 'large' || size === 'lg',
   })
-  let formControlClasses
-  if (formControlProps !== undefined) {
-    formControlClasses = `${classNames({
-      [formControlProps.className]: true,
-      [classes.formControl]: true,
-      [classes.noLabel]: !label,
-      [props.className]: true,
-    })} non-dragable`
-  } else {
-    formControlClasses = classes.formControl
-  }
+  const formControlClasses = classNames({
+    [formControlProps.className]: true,
+    [classes.formControl]: true,
+    [classes.noLabel]: !label,
+    [props.className]: true,
+    // [classes.medium]: size === 'default' || size === 'medium' || size === 'md',
+    // [classes.small]: size === 'small' || size === 'sm',
+    // [classes.large]: size === 'large' || size === 'lg',
+  })
   let helpTextClasses = classNames({
     [classes.labelRootError]: error,
     [classes.labelRootSuccess]: success && !error,
   })
 
-  const underlineClasses = classNames({
-    [classes.underlineError]: error,
-    [classes.underlineSuccess]: success && !error,
-    [classes.underline]: true,
-    [classes.whiteUnderline]: white,
-  })
-  // console.log(underlineClasses)
-  const marginTop = classNames({
-    [inputRootCustomClasses]: inputRootCustomClasses !== undefined,
-  })
-  const inputClasses = classNames({
-    [classes.input]: true,
-    [classes.whiteInput]: white,
-  })
-
-  // console.log(labelProps)
-  // console.log(typeof children)
   let newChildren
   switch (typeof children) {
     case 'function':
@@ -118,7 +97,6 @@ function CustomInputWrapper ({ field, form, classes, ...props }) {
       newChildren = children
       break
   }
-  // console.log(label)
   return noWrapper ? (
     <div style={style}>{newChildren}</div>
   ) : (
@@ -130,11 +108,7 @@ function CustomInputWrapper ({ field, form, classes, ...props }) {
     >
       <React.Fragment>
         {label !== undefined ? (
-          <InputLabel
-            className={`${classes.labelRoot} ${labelClasses}`}
-            htmlFor={id}
-            {...labelProps}
-          >
+          <InputLabel className={labelClasses} htmlFor={id} {...labelProps}>
             {label}
           </InputLabel>
         ) : null}

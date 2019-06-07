@@ -4,7 +4,7 @@ import { EditingState } from '@devexpress/dx-react-grid'
 import { TableEditColumn } from '@devexpress/dx-react-grid-material-ui'
 import { Getter } from '@devexpress/dx-react-core'
 import CommandComponent from './CommandComponent'
-
+import { getGlobalVariable } from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index'
 import EditPlugin from './EditPlugin'
@@ -22,9 +22,9 @@ class EditableTableGrid extends PureComponent {
     const { errorRows } = preState
     const newErrowRows = []
     // console.log(editingRowIds, errors)
-    if (errors.length > 0) {
+    if (errors.length > 0 && !getGlobalVariable('gridIgnoreValidation')) {
       errors.forEach((error, i) => {
-        if (error) {
+        if (error && rows[i]) {
           console.log(rows, error)
           newErrowRows.push(rows[i].id)
         }

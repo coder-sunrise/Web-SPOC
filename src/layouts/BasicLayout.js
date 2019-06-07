@@ -16,6 +16,8 @@ import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
 import Authorized from '@/utils/Authorized'
 import PerfectScrollbar from 'perfect-scrollbar'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
+
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import {
@@ -60,16 +62,7 @@ const theme = createMuiTheme({
     // },
   },
   overrides: {
-    MuiInputBase: {
-      root: {
-        alignItems: 'start',
-        // fontSize: 14,
-      },
-      input: {
-        padding: '4px 0 1px',
-        minHeight: 24,
-      },
-    },
+    ...defaultTheme.overrides,
     MuiInput: {
       underline: {
         '&:hover:not($disabled):not($focused):not($error):before': {

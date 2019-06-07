@@ -3,9 +3,13 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
+import Input from '@material-ui/core/Input'
+
 // ant
 import { Select } from 'antd'
 import AntdWrapper from './AntdWrapper'
+import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
+
 import { extendFunc } from '@/utils/utils'
 
 const STYLES = () => {
@@ -15,15 +19,29 @@ const STYLES = () => {
     },
     selectContainer: {
       width: '100%',
+      boxSizing: 'content-box',
+      lineHeight: '1rem',
+
       '& > div': {
         // erase all border, and boxShadow
-        height: 31,
+        // height: 31,
         border: 'none',
         boxShadow: 'none !important',
         borderRadius: 0,
-        borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
+        // borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
+      },
+      '& .ant-select-selection': {
+        background: 'none',
+      },
+      '& .ant-select-selection__rendered': {
+        lineHeight: 'inherit',
+        marginRight: 0,
+      },
+      '& .ant-select-selection--single': {
+        height: '100%',
       },
       '& .ant-select-selection--multiple': {
+        height: '100%',
         // to match the same line
         // with ant-select-select--single
         paddingBottom: 0,
@@ -31,8 +49,8 @@ const STYLES = () => {
       '& .ant-select-selection > div': {
         marginLeft: 0,
         // fontSize: '1rem',
-        fontWeight: 400,
-        paddingTop: 3,
+        // fontWeight: 400,
+        // paddingTop: 3,
       },
     },
   }
@@ -61,8 +79,20 @@ class AntdSelect extends React.PureComponent {
     size: 'default',
   }
 
+  state = {
+    shrink: false,
+  }
+
   handleFilter = (input, option) =>
     option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+
+  handleFocus = () => {
+    this.setState({ shrink: true })
+  }
+
+  handleBlur = () => {
+    this.setState({ shrink: false })
+  }
 
   handleValueChange = (event) => {
     const { form, field } = this.props
@@ -81,7 +111,7 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  render () {
+  getComponent = ({ inputRef, ...props }) => {
     const {
       valueField,
       labelField,
@@ -90,28 +120,38 @@ class AntdSelect extends React.PureComponent {
       defaultValue,
       renderDropdown,
       onChange,
+      onFocus,
+      onBlur,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
 
-    const selectValue = form && field ? field.value : value
     const newOptions = options.map((s) => ({
       ...s,
       value: s[valueField],
       label: s[labelField],
     }))
-
+    const selectValue = form && field ? field.value : value
+    const cfg = {}
+    if (selectValue !== undefined) {
+      cfg.value = selectValue
+    }
+    // console.log(selectValue)
     return (
-      <AntdWrapper {...restProps}>
+      <div style={{ width: '100%' }} {...props}>
         <Select
           className={classnames(classes.selectContainer)}
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
           showSearch
+          // defaultOpen
           onChange={extendFunc(onChange, this.handleValueChange)}
-          value={selectValue}
+          onFocus={extendFunc(onFocus, this.handleFocus)}
+          onBlur={extendFunc(onBlur, this.handleBlur)}
           defaultValue={defaultValue}
           filterOption={this.handleFilter}
+          {...cfg}
+          {...restProps}
         >
           {renderDropdown !== undefined ? (
             newOptions.map((option) => renderDropdown(option))
@@ -128,7 +168,23 @@ class AntdSelect extends React.PureComponent {
             ))
           )}
         </Select>
-      </AntdWrapper>
+      </div>
+    )
+  }
+
+  render () {
+    const { classes, ...restProps } = this.props
+    const { form, field, value } = restProps
+    const selectValue = form && field ? field.value : value
+    const labelProps = {
+      shrink: !!selectValue || this.state.shrink,
+    }
+    return (
+      <CustomInput
+        labelProps={labelProps}
+        inputComponent={this.getComponent}
+        {...restProps}
+      />
     )
   }
 }

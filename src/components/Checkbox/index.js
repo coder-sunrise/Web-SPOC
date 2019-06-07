@@ -2,7 +2,7 @@ import React from 'react'
 // nodejs library to set properties for components
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
-import CustomInput from 'mui-pro-components/CustomInput'
+import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
 
 import {
   FormLabel,
@@ -100,13 +100,12 @@ class Checkbox extends React.Component {
   }
 
   render () {
-    const { inputProps = {}, classes, label, ...restProps } = this.props
+    const { classes, label, ...restProps } = this.props
     const { simple } = restProps
-    inputProps.inputComponent = this.getCheckboxComponent
     return (
-      <CustomInput
+      <BaseInput
         label={simple ? '' : ' '}
-        inputProps={inputProps}
+        inputComponent={this.getCheckboxComponent}
         noUnderline
         {...restProps}
       />

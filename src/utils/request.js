@@ -5,11 +5,11 @@ import router from 'umi/router'
 import hash from 'hash.js'
 import queryString from 'query-string'
 import $ from 'jquery'
-import { isAntdPro } from './utils'
+import { isAntdPro, updateLoadingState } from './utils'
 
-// const baseUrl = 'http://localhost:55314'
+export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
-export const baseUrl = 'https://semr2dev2010.emr.com.sg'
+// export const baseUrl = 'https://semr2dev2010.emr.com.sg'
 let dynamicURL = baseUrl
 
 const codeMessage = {
@@ -296,6 +296,7 @@ export default function request (url, option) {
             const errortext =
               returnObj.title || returnObj.message || returnObj.statusText
             notification.destroy()
+            updateLoadingState()
             notification.error({
               message: (
                 <div>

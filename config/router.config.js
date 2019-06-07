@@ -422,299 +422,43 @@ const routes = [
         name: 'Report',
         // component: './Report',
       },
-
-      // {
-      //   path: '/queuelisting',
-      //   system: 'EMR',
-      //   icon: 'local_hospital',
-      //   name: 'queuelisting',
-      //   // component: './QueueListing',
-      // },
-      //
-      // EMR
-      // {
-      //   path: '/patientdashboard',
-      //   system: 'EMR',
-      //   icon: 'group',
-      //   name: 'patientdashboard',
-      //   routes: [
-      //     {
-      //       path: '/patientdashboard',
-      //       name: 'patientdashboard',
-      //       component: './PatientDashboard',
-      //     },
-      //     {
-      //       path: '/patientdashboard/consultation/:id',
-      //       name: 'consultation',
-      //       hideInMenu: true,
-      //       component: './PatientDashboard/Consultation',
-      //     },
-      //   ],
-      // },
-      // EMR
-      //
-      // // Patient View
-      // {
-      //   path: '/patient',
-      //   icon: 'group',
-      //   name: 'patient',
-      //   hideInMenu: true,
-      //   routes: [
-      //     {
-      //       path: '/patient/detail',
-      //       name: 'Patient Detail',
-      //       mini: 'NP',
-      //       component: './Patient',
-      //       hideChildrenInMenu: true,
-      //       routes: [
-      //         {
-      //           path: '/patientdb/new/personal',
-      //           name: 'Personal Info',
-      //           // component: './PatientDatabase/Personal',
-      //         },
-      //         {
-      //           path: '/patientdb/new/emergency',
-      //           name: 'Emergency Contact',
-      //           // component: './PatientDatabase/EmergencyContact',
-      //         },
-      //         {
-      //           path: '/patientdb/new/allergies',
-      //           name: 'Allergies',
-      //           component: './PatientDatabase/Allergies',
-      //         },
-      //         {
-      //           path: '/patientdb/new/schemes',
-      //           name: 'Schemes',
-      //           // component: './PatientDatabase/Schemes',
-      //         },
-      //       ],
-      //     },
-      //     {
-      //       path: '/patientdb/search',
-      //       name: 'search',
-      //       mini: 'SP',
-      //       // component: './PatientDatabase/Search',
-      //     },
-      //   ],
-      // },
-      //
-      // Human Resource
-      // {
-      //   path: '/humanresource',
-      //   icon: 'humanresource',
-      //   name: 'Human Resource',
-      //   // component: './HumanResource',
-      // },
-      // //
-      // // Settings
-      // {
-      //   path: '/settings',
-      //   icon: 'Settings',
-      //   name: 'Settings',
-      //   // component: './Settings',
-      // },
-      // // list
-      // {
-      //   path: '/list',
-      //   icon: 'table',
-      //   hideInMenu: true,
-
-      //   name: 'list',
-      //   routes: [
-      //     {
-      //       path: '/list/table-list',
-      //       name: 'searchtable',
-      //       component: './List/TableList',
-      //     },
-      //     {
-      //       path: '/list/basic-list',
-      //       name: 'basiclist',
-      //       component: './List/BasicList',
-      //     },
-      //     {
-      //       path: '/list/card-list',
-      //       name: 'cardlist',
-      //       component: './List/CardList',
-      //     },
-      //     {
-      //       path: '/list/search',
-      //       name: 'searchlist',
-      //       component: './List/List',
-      //       routes: [
-      //         {
-      //           path: '/list/search',
-      //           redirect: '/list/search/articles',
-      //         },
-      //         {
-      //           path: '/list/search/articles',
-      //           name: 'articles',
-      //           component: './List/Articles',
-      //         },
-      //         {
-      //           path: '/list/search/projects',
-      //           name: 'projects',
-      //           component: './List/Projects',
-      //         },
-      //         {
-      //           path: '/list/search/applications',
-      //           name: 'applications',
-      //           component: './List/Applications',
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // },
-      // {
-      //   path: '/profile',
-      //   name: 'profile',
-      //   icon: 'profile',
-      //   routes: [
-      //     // profile
-      //     {
-      //       path: '/profile/basic',
-      //       name: 'basic',
-      //       // component: './Profile/BasicProfile',
-      //     },
-      //     {
-      //       path: '/profile/advanced',
-      //       name: 'advanced',
-      //       authority: [
-      //         'admin',
-      //       ],
-      //       // component: './Profile/AdvancedProfile',
-      //     },
-      //   ],
-      // },
-      // {
-      //   name: 'result',
-      //   icon: 'check-circle-o',
-      //   path: '/result',
-      //   routes: [
-      //     // result
-      //     {
-      //       path: '/result/success',
-      //       name: 'success',
-      //       component: './Result/Success',
-      //     },
-      //     { path: '/result/fail', name: 'fail', component: './Result/Error' },
-      //   ],
-      // },
-      // {
-      //   name: 'exception',
-      //   icon: 'warning',
-      //   path: '/exception',
-      //   routes: [
-      //     // exception
-      //     {
-      //       path: '/exception/403',
-      //       name: 'not-permission',
-      //       component: './Exception/403',
-      //     },
-      //     {
-      //       path: '/exception/404',
-      //       name: 'not-find',
-      //       component: './Exception/404',
-      //     },
-      //     {
-      //       path: '/exception/500',
-      //       name: 'server-error',
-      //       component: './Exception/500',
-      //     },
-      //     {
-      //       path: '/exception/trigger',
-      //       name: 'trigger',
-      //       hideInMenu: true,
-      //       component: './Exception/TriggerException',
-      //     },
-      //   ],
-      // },
-      // {
-      //   name: 'account',
-      //   icon: 'user',
-      //   path: '/account',
-      //   routes: [
-      //     {
-      //       path: '/account/center',
-      //       name: 'center',
-      //       component: './Account/Center/Center',
-      //       routes: [
-      //         {
-      //           path: '/account/center',
-      //           redirect: '/account/center/articles',
-      //         },
-      //         {
-      //           path: '/account/center/articles',
-      //           component: './Account/Center/Articles',
-      //         },
-      //         {
-      //           path: '/account/center/applications',
-      //           component: './Account/Center/Applications',
-      //         },
-      //         {
-      //           path: '/account/center/projects',
-      //           component: './Account/Center/Projects',
-      //         },
-      //       ],
-      //     },
-      //     {
-      //       path: '/account/settings',
-      //       name: 'settings',
-      //       component: './Account/Settings/Info',
-      //       routes: [
-      //         {
-      //           path: '/account/settings',
-      //           redirect: '/account/settings/base',
-      //         },
-      //         {
-      //           path: '/account/settings/base',
-      //           component: './Account/Settings/BaseView',
-      //         },
-      //         {
-      //           path: '/account/settings/security',
-      //           component: './Account/Settings/SecurityView',
-      //         },
-      //         {
-      //           path: '/account/settings/binding',
-      //           component: './Account/Settings/BindingView',
-      //         },
-      //         {
-      //           path: '/account/settings/notification',
-      //           component: './Account/Settings/NotificationView',
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // },
+      {
+        // hideInMenu: true,
+        path: '/development',
+        name: 'Development',
+        routes: [
+          {
+            path: '/development/pdf',
+            name: 'pdf',
+            component: './Development/PDF',
+            mini: 'PDF',
+          },
+          {
+            path: '/development/masonry',
+            name: 'Masonry',
+            mini: 'MS',
+            component: './Development/Masonry',
+          },
+          {
+            path: '/development/control',
+            name: 'Control',
+            mini: 'C',
+            component: './Development/Control',
+          },
+        ],
+      },
       {
         component: '404',
       },
     ],
   },
 ]
-if (process.env.NODE_ENV !== 'production') {
-  const developmentRoutes = [
-    {
-      // hideInMenu: true,
-      path: '/development',
-      name: 'Development',
-      routes: [
-        {
-          path: '/development/pdf',
-          name: 'pdf',
-          component: './Development/PDF',
-          mini: 'PDF',
-        },
-        {
-          path: '/development/masonry',
-          name: 'Masonry',
-          mini: 'MS',
-          component: './Development/Masonry',
-        },
-      ],
-    },
-  ]
+// if (process.env.NODE_ENV !== 'production') {
+//   const developmentRoutes = [
 
-  routes.concat(developmentRoutes)
-}
+//   ]
+
+//   routes.find((o) => o.path === '/').routes.concat(developmentRoutes)
+// }
 
 export default routes

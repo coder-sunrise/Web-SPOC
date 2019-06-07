@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import { DateRange, Check } from '@material-ui/icons'
-import CustomInput from 'mui-pro-components/CustomInput'
+import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
 
 import classNames from 'classnames'
 import {
@@ -77,8 +77,9 @@ class Switch extends React.Component {
 
   render () {
     const { inputProps = {}, classes, label, ...restProps } = this.props
-    inputProps.inputComponent = this.getCheckboxComponent
-    return <CustomInput inputProps={inputProps} {...restProps} />
+    return (
+      <BaseInput inputComponent={this.getCheckboxComponent} {...restProps} />
+    )
   }
 }
 

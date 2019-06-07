@@ -422,6 +422,38 @@ const convertToQuery = (
   // console.log(returnVal)
   return returnVal
 }
+
+const updateGlobalVariable = (key, value) => {
+  if (!window.medisys) {
+    window.medisys = {}
+  }
+  window.medisys[key] = value
+}
+
+const getGlobalVariable = (key) => {
+  if (!window.medisys) {
+    window.medisys = {}
+  }
+  return window.medisys[key]
+}
+
+const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
+  const { dispatch, getState } = window.g_app._store
+  const { loading } = getState()
+  if (loading) {
+    Object.keys(loading.effects).forEach((o) => {
+      if (loading.effects[o]) {
+        dispatch({
+          type,
+          payload: {
+            namespace: o.substr(0, o.indexOf('/')),
+            actionType: o,
+          },
+        })
+      }
+    })
+  }
+}
 module.exports = {
   ...cdrssUtil,
   sleep,
@@ -430,5 +462,8 @@ module.exports = {
   getAppendUrl,
   getRemovedUrl,
   convertToQuery,
+  updateLoadingState,
+  updateGlobalVariable,
+  getGlobalVariable,
   ...module.exports,
 }
