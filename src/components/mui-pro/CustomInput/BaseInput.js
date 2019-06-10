@@ -11,7 +11,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import { InputAdornment, Grid } from '@material-ui/core'
 import numeral from 'numeral'
-import { Error } from '@material-ui/icons'
+import Error from '@material-ui/icons/Error'
 import Tooltip from '@material-ui/core/Tooltip'
 
 import Input from '@material-ui/core/Input'
@@ -213,7 +213,7 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
-    console.log(inputProps, cfg)
+    // console.log(inputProps, cfg)
     const element = (
       <CustomInputWrapper
         id={inputIdPrefix + inputIdCounter}

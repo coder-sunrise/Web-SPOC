@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
-import { Send } from '@material-ui/icons'
+import Send from '@material-ui/icons/Send'
 import { FastField, withFormik } from 'formik'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'

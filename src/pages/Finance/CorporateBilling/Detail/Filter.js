@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles, Paper, Typography, Divider } from '@material-ui/core'
-import { FilterList } from '@material-ui/icons'
+import FilterList from '@material-ui/icons/FilterList'
 import {
   Button,
   Checkbox,

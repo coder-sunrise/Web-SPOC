@@ -4,8 +4,8 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 
 // nodejs library that concatenates classes
-import { CircularProgress } from '@material-ui/core'
-import { Refresh, Save } from '@material-ui/icons'
+import Save from '@material-ui/icons/Save'
+import Refresh from '@material-ui/icons/Refresh'
 
 import green from '@material-ui/core/colors/green'
 import classNames from 'classnames'

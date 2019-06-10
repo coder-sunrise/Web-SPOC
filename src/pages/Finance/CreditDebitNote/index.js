@@ -4,7 +4,7 @@ import { formatMessage } from 'umi/locale'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
-import { Book } from '@material-ui/icons'
+import Book from '@material-ui/icons/Book'
 // custom components
 import { NavPills, CommonHeader, RadioGroup } from '@/components'
 // sub components

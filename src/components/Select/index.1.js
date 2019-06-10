@@ -11,7 +11,7 @@ import {
   Input,
   TextField,
 } from '@material-ui/core'
-import { DateRange, Clear } from '@material-ui/icons'
+import Clear from '@material-ui/icons/Clear'
 import CustomInputWrapper from 'mui-pro-components/CustomInputWrapper'
 
 // react component plugin for creating a beautiful datetime dropdown picker

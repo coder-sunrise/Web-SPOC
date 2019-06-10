@@ -1,9 +1,9 @@
 import React, { PureComponent, Suspense } from 'react'
 import { Layout } from 'antd'
+import { compose } from 'recompose'
 import Link from 'umi/link'
 import cx from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
-
 import Drawer from '@material-ui/core/Drawer'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -21,12 +21,12 @@ import styles from './index.less'
 
 const BaseMenu = React.lazy(() => import('./BaseMenu'))
 const { Sider } = Layout
-
 class SiderMenu extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
       openKeys: getDefaultCollapsedSubMenus(props),
+      miniActive: props.miniActive,
     }
   }
 
@@ -59,13 +59,17 @@ class SiderMenu extends PureComponent {
   // };
 
   render () {
-    let { collapsed, miniActive, onCollapse, fixSiderbar, theme } = this.props
+    let {
+      width,
+      collapsed,
+      miniActive,
+      onCollapse,
+      fixSiderbar,
+      theme,
+      ...restProps
+    } = this.props
     // if(this.state.miniActive)collapsed= this.state.miniActive
     const { openKeys } = this.state
-    let shouldCollapse = collapsed
-    if (miniActive) shouldCollapse = collapsed && this.state.miniActive
-    // console.log(shouldCollapse)
-    const defaultProps = shouldCollapse ? {} : { openKeys }
 
     const siderClassName = cx(styles.sider, {
       [styles.fixSiderbar]: fixSiderbar,
@@ -81,7 +85,13 @@ class SiderMenu extends PureComponent {
       routes,
       bgColor,
       rtlActive,
+      isMobile,
     } = this.props
+    let shouldCollapse = collapsed
+    if (miniActive) shouldCollapse = collapsed && this.state.miniActive
+    if (isMobile) shouldCollapse = false
+    // console.log(shouldCollapse)
+    const defaultProps = shouldCollapse ? {} : { openKeys }
     const drawerPaper = `${classes.drawerPaper} ${cx({
       [classes.drawerPaperMini]: shouldCollapse,
       [classes.drawerPaperRTL]: rtlActive,
@@ -118,9 +128,9 @@ class SiderMenu extends PureComponent {
               keepMounted: true, // Better open performance on mobile.
             }}
           >
-            <Logo {...this.props} />
+            <Logo {...this.props} collapsed={shouldCollapse} />
             <SidebarWrapper className={sidebarWrapper}>
-              <User {...this.props} />
+              <User {...this.props} collapsed={shouldCollapse} />
               <Suspense fallback={null}>
                 {/* <BaseMenu
             {...this.props}
@@ -130,7 +140,7 @@ class SiderMenu extends PureComponent {
             style={{ padding: '16px 0', width: '100%' }}
             {...defaultProps}
           /> */}
-                <BaseMenu {...this.props} />
+                <BaseMenu {...restProps} collapsed={shouldCollapse} />
               </Suspense>
             </SidebarWrapper>
             {image !== undefined ? (
@@ -168,7 +178,7 @@ class SiderMenu extends PureComponent {
             style={{ padding: '16px 0', width: '100%' }}
             {...defaultProps}
           /> */}
-                <BaseMenu {...this.props} collapsed={shouldCollapse} />
+                <BaseMenu {...restProps} collapsed={shouldCollapse} />
               </Suspense>
             </SidebarWrapper>
             {image !== undefined ? (
@@ -184,4 +194,8 @@ class SiderMenu extends PureComponent {
   }
 }
 
-export default withStyles(sidebarStyle)(SiderMenu)
+// const enhance = compose(
+//   withStyles(sidebarStyle, { withTheme: true }),
+//   withWidth(),
+// )
+export default withStyles(sidebarStyle, { withTheme: true })(SiderMenu)

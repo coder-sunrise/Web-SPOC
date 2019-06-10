@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { extendFunc } from '@/utils/utils'
-import { Error } from '@material-ui/icons'
+import Error from '@material-ui/icons/Error'
 import {
   InputAdornment,
   TextField,

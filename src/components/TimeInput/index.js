@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 // material ui
 import { InputAdornment, withStyles, Tooltip } from '@material-ui/core'
-import { Error } from '@material-ui/icons'
+import Error from '@material-ui/icons/Error'
 // cleave js
 import Cleave from 'cleave.js/react'
 // custom component
