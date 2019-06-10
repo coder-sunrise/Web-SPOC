@@ -42,6 +42,7 @@ import Banner from './Banner'
 import Orders from './Orders'
 import ConsultationDocument from './ConsultationDocument'
 import ResultHistory from './ResultHistory'
+import Invoice from './Invoice'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -75,11 +76,7 @@ const styles = (theme) => ({
     },
   },
 })
-const dataSource = [
-  '12345',
-  '23456',
-  '34567',
-]
+const dataSource = [ '12345', '23456', '34567' ]
 @connect(({ patientDashboard, global }) => ({
   patientDashboard,
   global,
@@ -310,6 +307,8 @@ class PatientDashboard extends PureComponent {
               <ConsultationDocument />
               <h6>Result History</h6>
               <ResultHistory />
+              <h6>Invoice</h6>
+              <Invoice />
             </CardContainer>
           </GridItem>
         </GridContainer>
