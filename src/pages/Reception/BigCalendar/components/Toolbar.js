@@ -25,6 +25,18 @@ const CalendarViews = [
   BigCalendar.Views.MONTH,
 ]
 
+const type = {
+  [BigCalendar.Views.DAY]: 'days',
+  [BigCalendar.Views.WEEK]: 'weeks',
+  [BigCalendar.Views.MONTH]: 'months',
+}
+
+const DATE_NAVIGATOR_ACTION = {
+  ADD: 'add',
+  SUBTRACT: 'subtract',
+  BACK_TO_TODAY: 'today',
+}
+
 class CalendarToolbar extends React.PureComponent {
   state = {
     showDateOverlay: false,
@@ -43,53 +55,44 @@ class CalendarToolbar extends React.PureComponent {
   }
 
   onDateChange = (newDate) => {
-    // this.setState({ date: newDate.toDate() })
     const { handleDateChange } = this.props
     handleDateChange(newDate.toDate())
   }
 
-  // changeDate = (action) => {
-  //   let newDate = moment(new Date())
-  //   const { view: currentView, date: currentDate } = this.state
-  //   if (action === DATE_NAVIGATOR_ACTION.ADD) {
-  //     newDate = moment(currentDate).add(1, type[currentView])
-  //   } else if (action === DATE_NAVIGATOR_ACTION.SUBTRACT) {
-  //     newDate = moment(currentDate).subtract(1, type[currentView])
-  //   }
+  changeDate = (action) => {
+    const { handleDateChange } = this.props
+    let newDate = moment(new Date())
+    const { view: currentView, displayDate: currentDate } = this.props
 
-  //   this.setState({
-  //     date: new Date(newDate.toString()),
-  //   })
-  // }
-  // addDate = () => this.changeDate(DATE_NAVIGATOR_ACTION.ADD)
+    if (action === DATE_NAVIGATOR_ACTION.ADD) {
+      newDate = moment(currentDate).add(1, type[currentView])
+    } else if (action === DATE_NAVIGATOR_ACTION.SUBTRACT) {
+      newDate = moment(currentDate).subtract(1, type[currentView])
+    }
 
-  // subtractDate = () => this.changeDate(DATE_NAVIGATOR_ACTION.SUBTRACT)
+    handleDateChange(newDate.toDate())
+  }
 
-  // returnToday = () => this.changeDate(DATE_NAVIGATOR_ACTION.BACK_TO_TODAY)
+  addDate = () => this.changeDate(DATE_NAVIGATOR_ACTION.ADD)
+
+  subtractDate = () => this.changeDate(DATE_NAVIGATOR_ACTION.SUBTRACT)
+
+  returnToday = () => this.changeDate(DATE_NAVIGATOR_ACTION.BACK_TO_TODAY)
 
   render () {
-    const {
-      classes,
-      label,
-      view,
-      displayDate,
-      handlePrevDateClick,
-      handleNextDateClick,
-      handleReturnToday,
-      handleViewChange,
-    } = this.props
+    const { classes, label, view, displayDate, handleViewChange } = this.props
     const { showDateOverlay, anchor } = this.state
     return (
       <GridContainer>
         <GridItem xs md={2}>
           <div>
-            <IconButton color='primary' onClick={handlePrevDateClick}>
+            <IconButton color='primary' onClick={this.subtractDate}>
               <ChevronLeft />
             </IconButton>
-            <Button simple color='primary' onClick={handleReturnToday}>
+            <Button simple color='primary' onClick={this.returnToday}>
               Today
             </Button>
-            <IconButton color='primary' onClick={handleNextDateClick}>
+            <IconButton color='primary' onClick={this.addDate}>
               <ChevronRight />
             </IconButton>
           </div>

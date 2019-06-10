@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core'
 import { Select as OriAntdSelect } from 'antd'
 // custom components
-import { AntdSelect } from '@/components'
+import { Select } from '@/components'
 import {
   AppointmentTypeOptions,
   getColorClassByAppointmentType,
@@ -33,7 +33,7 @@ class AppointmentTypeSelector extends PureComponent {
     const { label, classes, ...restProps } = this.props
 
     return (
-      <AntdSelect
+      <Select
         label={label}
         options={AppointmentTypeOptions}
         renderDropdown={(option) => {

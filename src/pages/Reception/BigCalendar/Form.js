@@ -12,9 +12,11 @@ import { CircularProgress, Paper, withStyles } from '@material-ui/core'
 // custom component
 import {
   Button,
+  CommonModal,
   DatePicker,
   GridContainer,
   GridItem,
+  SizeContainer,
   NumberInput,
   OutlinedTextField,
   Select,
@@ -26,19 +28,24 @@ import {
   TimePicker,
 } from '@/components'
 // custom components
-import AppointmentTypeSelector from '../../Reception/Appointment/Calendar/Appointments/AppointmentTypeSelector'
+import AppointmentTypeSelector from '../Appointment/Calendar/Appointments/AppointmentTypeSelector'
+import NewPatient from '../../PatientDatabase/New'
+import PatientSearchModal from './PatientSearch'
+// services
+import {
+  fetchPatientListByName,
+  fetchPatientInfoByPatientID,
+} from './service/appointment'
+
 import { defaultColorOpts, getColorByAppointmentType } from './setting'
 
 const doctors = [
   { value: 'medisys', name: 'Medisys' },
-  { value: 'levinne', name: 'Levinne' },
-  { value: 'cheah', name: 'Cheah' },
-  { value: 'tan', name: 'Tan' },
-  { value: 'tan1', name: 'Tan1' },
-  { value: 'tan2', name: 'Tan2' },
-  { value: 'tan3', name: 'Tan3' },
-  { value: 'tan4', name: 'Tan4' },
-  { value: 'tan5', name: 'Tan5' },
+  { value: 'levinne', name: 'Dr Levinne' },
+  { value: 'cheah', name: 'Dr Cheah' },
+  { value: 'tan', name: 'Dr Tan' },
+  { value: 'lim', name: 'Dr Lim' },
+  { value: 'liu', name: 'Dr Liu' },
 ]
 
 const recurrencePattern = [
@@ -125,7 +132,7 @@ const styles = (theme) => ({
   apptSubLabel: {
     textAlign: 'right',
     fontSize: '.85rem',
-    paddingTop: theme.spacing.unit,
+    paddingTop: 12,
   },
 })
 
@@ -238,6 +245,70 @@ const initialAptInfo = {
   },
 })
 class Form extends React.PureComponent {
+  state = {
+    showNewPatientModal: false,
+    showSearchPatientModal: false,
+    patientList: [],
+    patientInfo: {},
+  }
+
+  toggleNewPatientModal = () => {
+    const { showNewPatientModal } = this.state
+    this.setState({ showNewPatientModal: !showNewPatientModal })
+  }
+
+  openSearchPatientModal = () => {
+    // const { dispatch, values } = this.props
+    // dispatch({
+    //   type: 'appointment/fetchPatientListByName',
+    //   payload: values.patientName,
+    // })
+
+    this.setState({ showSearchPatientModal: true })
+  }
+
+  closeSearchPatientModal = () => {
+    this.setState({ showSearchPatientModal: false })
+  }
+
+  onSearchPatient = () => {
+    const { values } = this.props
+
+    fetchPatientListByName(values.patientName).then((response) => {
+      if (response) {
+        const { data: { data = [] } } = response
+        this.setState({
+          patientList: [
+            ...data,
+          ],
+          showSearchPatientModal: true,
+        })
+      }
+    })
+  }
+
+  handleSelectPatient = (patientID) => {
+    fetchPatientInfoByPatientID(patientID).then((response) => {
+      if (response) {
+        const patientInfo = { ...response.data }
+        const { contact } = patientInfo
+        let contactNumber = ''
+        if (contact) {
+          const { mobileContactNumber } = contact
+          contactNumber = mobileContactNumber.number
+        }
+        const { setFieldValue, setFieldTouched } = this.props
+
+        setFieldValue('contactNo', contactNumber)
+        setFieldTouched('contactNo', true)
+
+        this.setState({
+          showSearchPatientModal: false,
+        })
+      }
+    })
+  }
+
   render () {
     const {
       classes,
@@ -249,9 +320,17 @@ class Form extends React.PureComponent {
       slotInfo,
       values,
     } = this.props
-    // console.log('values', { err: this.props.errors, values })
+
+    const {
+      showNewPatientModal,
+      showSearchPatientModal,
+      patientList,
+    } = this.state
+
+    console.log('values', { err: this.props.errors, values })
+
     return (
-      <React.Fragment>
+      <SizeContainer>
         <Paper className={classnames(classes.content)}>
           {isLoading && (
             <div className={classnames(classes.loading)}>
@@ -275,8 +354,7 @@ class Form extends React.PureComponent {
                       <AntdInput
                         {...args}
                         autoFocus
-                        onPressEnter={handleSearchClick}
-                        helpText='Press enter to search'
+                        onEnterPressed={this.onSearchPatient}
                         label={formatMessage({
                           id: 'reception.appt.form.patientName',
                         })}
@@ -287,13 +365,17 @@ class Form extends React.PureComponent {
               </GridItem>
               <GridItem xs md={5}>
                 <div className={classnames(classes.buttonGroup)}>
-                  <Button size='sm' color='primary' onClick={handleSearchClick}>
+                  <Button
+                    size='sm'
+                    color='primary'
+                    onClick={this.onSearchPatient}
+                  >
                     Search
                   </Button>
                   <Button
                     size='sm'
                     color='primary'
-                    onClick={handleCreatePatientClick}
+                    onClick={this.toggleNewPatientModal}
                   >
                     Create Patient
                   </Button>
@@ -471,7 +553,35 @@ class Form extends React.PureComponent {
             Confirm
           </Button>
         </div>
-      </React.Fragment>
+
+        <CommonModal
+          open={showNewPatientModal}
+          title='Register New Patient'
+          onClose={this.toggleNewPatientModal}
+          onConfirm={this.toggleNewPatientModal}
+          fullScreen
+          showFooter={false}
+        >
+          {showNewPatientModal ? <NewPatient /> : null}
+        </CommonModal>
+        <CommonModal
+          open={showSearchPatientModal}
+          title='Search Patient'
+          onClose={this.closeSearchPatientModal}
+          onConfirm={this.closeSearchPatientModal}
+          maxWidth='md'
+          showFooter={false}
+        >
+          {showSearchPatientModal ? (
+            <PatientSearchModal
+              searchPatientName={values.patientName}
+              patientList={patientList}
+              onBackClick={this.closeSearchPatientModal}
+              onSelectClick={this.handleSelectPatient}
+            />
+          ) : null}
+        </CommonModal>
+      </SizeContainer>
     )
   }
 }

@@ -45,7 +45,7 @@ const STYLES = (theme) => ({
 
 class AntdDatePicker extends Component {
   static defaultProps = {
-    label: 'Select date',
+    // label: 'Select date',
     format: 'YYYY-MM-DD',
     disabled: false,
     size: 'default',

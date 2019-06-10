@@ -42,7 +42,7 @@ export const defaultTheme = createMuiTheme({
           top: '52%',
         },
         '& .ant-calendar-picker': {
-          top: -4,
+          top: 3,
         },
         '& .ant-select-selection--single': {
           marginTop: 4,

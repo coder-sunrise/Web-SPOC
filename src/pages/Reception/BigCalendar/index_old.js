@@ -151,6 +151,7 @@ class FixSelect extends React.PureComponent {
   changeDate = (action) => {
     let newDate = moment(new Date())
     const { view: currentView, date: currentDate } = this.state
+
     if (action === DATE_NAVIGATOR_ACTION.ADD) {
       newDate = moment(currentDate).add(1, type[currentView])
     } else if (action === DATE_NAVIGATOR_ACTION.SUBTRACT) {
