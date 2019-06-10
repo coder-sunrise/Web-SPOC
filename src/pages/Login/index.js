@@ -56,13 +56,8 @@ class LoginPage extends PureComponent {
               className={classes.fullPage}
               style={{ backgroundImage: `url(${this.getBgImage()})` }}
             >
-              {step === 0 && <LoginCard handleLogin={this.onLogin} />}
-              {step === 1 && (
-                <ApplicationCard
-                  handeLogoutClick={this.onLogout}
-                  handleContinue={this.onContinue}
-                />
-              )}
+              <LoginCard handleLogin={this.onLogin} />
+
               <Footer fluid />
             </div>
           </div>
