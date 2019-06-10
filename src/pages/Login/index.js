@@ -8,12 +8,7 @@ import LoginCard from './LoginCard'
 import ApplicationCard from './ApplicationCard'
 import NavBar from './NavBar'
 import Footer from './Footer'
-<<<<<<< HEAD
 import { SizeContainer } from '@/components'
-=======
-// theme
-import { defaultTheme } from '@/utils/theme'
->>>>>>> 0c0defabbc35347c8bd361810b8749c97186cc07
 // Import static files
 import authStyle from '../../assets/jss/material-dashboard-pro-react/layouts/authStyle'
 import loginBackground from '../../assets/img/login.jpeg'
