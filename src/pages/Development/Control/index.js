@@ -53,7 +53,17 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
-
+const doctors = [
+  { value: 'all', name: 'All' },
+  { value: 'bao', name: 'Bao' },
+  { value: 'cheah', name: 'Cheah' },
+  { value: 'tan', name: 'Tan' },
+  { value: 'tan1', name: 'Tan1' },
+  { value: 'tan2', name: 'Tan2' },
+  { value: 'tan3', name: 'Tan3' },
+  { value: 'tan4', name: 'Tan4' },
+  { value: 'tan5', name: 'Tan5' },
+]
 const ResponsiveGridLayout = WidthProvider(Responsive)
 // let layout = {
 //   lg: [
@@ -229,6 +239,19 @@ class ControlTest extends PureComponent {
                 )}
               />
             </GridItem>
+            <GridItem sm={3}>
+              <FastField
+                name='doctor'
+                render={(args) => (
+                  <Select
+                    label='Filter by Doctor'
+                    mode='multiple'
+                    options={doctors}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
           </GridContainer>
         </SizeContainer>
 
@@ -253,6 +276,19 @@ class ControlTest extends PureComponent {
               render={(args) => <DatePicker label='DOB' code='dob' {...args} />}
             />
           </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='doctor'
+              render={(args) => (
+                <Select
+                  label='Filter by Doctor'
+                  mode='multiple'
+                  options={doctors}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
         </GridContainer>
         <SizeContainer size='sm'>
           <GridContainer>
@@ -275,6 +311,19 @@ class ControlTest extends PureComponent {
                 name='dob'
                 render={(args) => (
                   <DatePicker label='DOB' code='dob' {...args} />
+                )}
+              />
+            </GridItem>
+            <GridItem sm={3}>
+              <FastField
+                name='doctor'
+                render={(args) => (
+                  <Select
+                    label='Filter by Doctor'
+                    mode='multiple'
+                    options={doctors}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>

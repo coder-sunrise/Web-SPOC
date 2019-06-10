@@ -24,12 +24,16 @@ export const defaultTheme = createMuiTheme({
           fontSize: defaultFontSize,
           color: defaultColor,
         },
+        '& .ant-select-remove-icon': {
+          fontSize: 'inherit',
+        },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
           fontSize: '1.1rem',
         },
         '& .ant-select-selection__clear': {
           right: 14,
+          top: 12,
         },
         '& .ant-calendar-picker-clear': {
           right: 11,
@@ -37,6 +41,12 @@ export const defaultTheme = createMuiTheme({
         },
         '& .ant-calendar-picker': {
           top: -4,
+        },
+        '& .ant-select-selection--single': {
+          marginTop: 4,
+        },
+        '& .ant-select-selection--single .ant-select-selection__clear': {
+          top: 5,
         },
       },
     },
@@ -63,11 +73,6 @@ export const defaultTheme = createMuiTheme({
         fontWeight: 'inherit',
       },
     },
-    AntdSelect: {
-      selectContainer: {
-        marginTop: 4,
-      },
-    },
   },
 })
 
@@ -90,18 +95,30 @@ export const smallTheme = createMuiTheme({
           fontSize: smallFontSize,
           color: defaultColor,
         },
+        '& .ant-select-remove-icon': {
+          fontSize: 'inherit',
+        },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
           fontSize: '1rem',
         },
         '& .ant-select-selection__clear': {
           right: 13,
+          top: 8,
+        },
+        '& .ant-select-selection--single .ant-select-selection__clear': {
+          top: 6,
         },
         '& .ant-calendar-picker': {
           fontSize: smallFontSize,
         },
         '& .ant-calendar-picker-input': {
           paddingTop: 3,
+        },
+        '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
+          height: '21px',
+          lineHeight: '21px',
+          marginTop: 0,
         },
       },
     },
@@ -152,12 +169,19 @@ export const largeTheme = createMuiTheme({
           fontSize: largeFontSize,
           color: defaultColor,
         },
+        '& .ant-select-remove-icon': {
+          fontSize: 'inherit',
+        },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
           fontSize: '1.3rem',
         },
         '& .ant-select-selection__clear': {
           right: 17,
+          top: 10,
+        },
+        '& .ant-select-selection--single .ant-select-selection__clear': {
+          top: 5,
         },
         '& .ant-calendar-picker': {
           fontSize: largeFontSize,
