@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { withStyles, Divider, Paper } from '@material-ui/core'
-import { Remove } from '@material-ui/icons'
+import Remove from '@material-ui/icons/Remove'
 
 import { Button, GridContainer, GridItem, CommonModal } from '@/components'
 import AddPayment from '../../Invoice/Detail/Payment/AddPayment'

@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
 import DateTime from 'react-datetime'
-import { DateRange, Clear } from '@material-ui/icons'
+import DateRange from '@material-ui/icons/DateRange'
+
 import { InputAdornment, withStyles } from '@material-ui/core'
 import classNames from 'classnames'
 

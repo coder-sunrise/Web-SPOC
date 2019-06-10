@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Tooltip, withStyles } from '@material-ui/core'
-import { Textsms, Search } from '@material-ui/icons'
+import Textsms from '@material-ui/icons/Textsms'
 import { Button, CommonTableGrid2 } from '@/components'
 import { compose } from 'redux'
 import moment from 'moment'

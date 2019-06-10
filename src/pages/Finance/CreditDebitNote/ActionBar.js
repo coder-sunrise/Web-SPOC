@@ -6,7 +6,7 @@ import { FormattedMessage, formatMessage } from 'umi/locale'
 import { FastField, withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 // custom component
 import {
   Button,

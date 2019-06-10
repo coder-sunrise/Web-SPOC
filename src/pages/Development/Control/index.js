@@ -193,6 +193,43 @@ class ControlTest extends PureComponent {
       },
     }
     console.log(this.props)
+    const testComponents = (
+      <GridContainer>
+        <GridItem sm={3}>
+          <FastField
+            name='name'
+            render={(args) => <TextField label='Name' {...args} />}
+          />
+        </GridItem>
+        <GridItem sm={3}>
+          <FastField
+            name='genderFk'
+            render={(args) => (
+              <CodeSelect label='Salutation' code='Salutation' {...args} />
+            )}
+          />
+        </GridItem>
+        <GridItem sm={3}>
+          <FastField
+            name='dob'
+            render={(args) => <DatePicker label='DOB' code='dob' {...args} />}
+          />
+        </GridItem>
+        <GridItem sm={3}>
+          <FastField
+            name='doctor'
+            render={(args) => (
+              <Select
+                label='Filter by Doctor'
+                mode='multiple'
+                options={doctors}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+      </GridContainer>
+    )
     return (
       <CardContainer
         // hideHeader
@@ -215,120 +252,10 @@ class ControlTest extends PureComponent {
             />
           )}
         />
-        <SizeContainer size='lg'>
-          <GridContainer>
-            <GridItem sm={3}>
-              <FastField
-                name='name'
-                render={(args) => <TextField label='Name' {...args} />}
-              />
-            </GridItem>
-            <GridItem sm={3}>
-              <FastField
-                name='genderFk'
-                render={(args) => (
-                  <CodeSelect label='Salutation' code='Salutation' {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem sm={3}>
-              <FastField
-                name='dob'
-                render={(args) => (
-                  <DatePicker label='DOB' code='dob' {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem sm={3}>
-              <FastField
-                name='doctor'
-                render={(args) => (
-                  <Select
-                    label='Filter by Doctor'
-                    mode='multiple'
-                    options={doctors}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-        </SizeContainer>
+        <SizeContainer size='lg'>{testComponents}</SizeContainer>
 
-        <GridContainer>
-          <GridItem sm={3}>
-            <FastField
-              name='name'
-              render={(args) => <TextField label='Name' {...args} />}
-            />
-          </GridItem>
-          <GridItem sm={3}>
-            <FastField
-              name='genderFk'
-              render={(args) => (
-                <CodeSelect label='Salutation' code='Salutation' {...args} />
-              )}
-            />
-          </GridItem>
-          <GridItem sm={3}>
-            <FastField
-              name='dob'
-              render={(args) => <DatePicker label='DOB' code='dob' {...args} />}
-            />
-          </GridItem>
-          <GridItem sm={3}>
-            <FastField
-              name='doctor'
-              render={(args) => (
-                <Select
-                  label='Filter by Doctor'
-                  mode='multiple'
-                  options={doctors}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <SizeContainer size='sm'>
-          <GridContainer>
-            <GridItem sm={3}>
-              <FastField
-                name='name'
-                render={(args) => <TextField label='Name' {...args} />}
-              />
-            </GridItem>
-            <GridItem sm={3}>
-              <FastField
-                name='genderFk'
-                render={(args) => (
-                  <CodeSelect label='Salutation' code='Salutation' {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem sm={3}>
-              <FastField
-                name='dob'
-                render={(args) => (
-                  <DatePicker label='DOB' code='dob' {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem sm={3}>
-              <FastField
-                name='doctor'
-                render={(args) => (
-                  <Select
-                    label='Filter by Doctor'
-                    mode='multiple'
-                    options={doctors}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-        </SizeContainer>
+        {testComponents}
+        <SizeContainer size='sm'>{testComponents}</SizeContainer>
 
         <RadioGroup
           label='Ttest'
