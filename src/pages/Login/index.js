@@ -8,8 +8,7 @@ import LoginCard from './LoginCard'
 import ApplicationCard from './ApplicationCard'
 import NavBar from './NavBar'
 import Footer from './Footer'
-// theme
-import { defaultTheme } from '@/utils/theme'
+import { SizeContainer } from '@/components'
 // Import static files
 import authStyle from '../../assets/jss/material-dashboard-pro-react/layouts/authStyle'
 import loginBackground from '../../assets/img/login.jpeg'
@@ -49,8 +48,8 @@ class LoginPage extends PureComponent {
   render () {
     const { classes, ...rest } = this.props
     return (
-      <MuiThemeProvider theme={defaultTheme}>
-        <div className={classes.wrapper}>
+      <div className={classes.wrapper}>
+        <SizeContainer>
           <NavBar {...rest} />
           <div className={classes.content}>
             <div
@@ -58,11 +57,12 @@ class LoginPage extends PureComponent {
               style={{ backgroundImage: `url(${this.getBgImage()})` }}
             >
               <LoginCard handleLogin={this.onLogin} />
+
               <Footer fluid />
             </div>
           </div>
-        </div>
-      </MuiThemeProvider>
+        </SizeContainer>
+      </div>
     )
   }
 }

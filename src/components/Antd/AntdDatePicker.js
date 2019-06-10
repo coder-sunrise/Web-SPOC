@@ -33,6 +33,7 @@ const STYLES = (theme) => ({
     width: '100%',
     boxSizing: 'content-box',
     lineHeight: '1rem',
+    color: 'currentColor',
     '& > div > input': {
       border: 'none',
       boxShadow: 'none !important',

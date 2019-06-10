@@ -26,12 +26,16 @@ export const defaultTheme = createMuiTheme({
           fontSize: defaultFontSize,
           color: defaultColor,
         },
+        '& .ant-select-remove-icon': {
+          fontSize: 'inherit',
+        },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
           fontSize: '1.1rem',
         },
         '& .ant-select-selection__clear': {
           right: 14,
+          top: 12,
         },
         '& .ant-calendar-picker-clear': {
           right: 11,
@@ -39,6 +43,12 @@ export const defaultTheme = createMuiTheme({
         },
         '& .ant-calendar-picker': {
           top: -4,
+        },
+        '& .ant-select-selection--single': {
+          marginTop: 4,
+        },
+        '& .ant-select-selection--single .ant-select-selection__clear': {
+          top: 5,
         },
       },
     },
@@ -55,17 +65,14 @@ export const defaultTheme = createMuiTheme({
     MuiInputLabel: {
       root: {
         fontSize: defaultFontSize,
+        fontWeight: 300,
       },
       formControl: {
         transform: 'translate(0, 22px) scale(1)',
       },
       shrink: {
         transform: 'translate(0, 3px) scale(0.8)',
-      },
-    },
-    AntdSelect: {
-      selectContainer: {
-        marginTop: 4,
+        fontWeight: 'inherit',
       },
     },
   },
@@ -90,18 +97,30 @@ export const smallTheme = createMuiTheme({
           fontSize: smallFontSize,
           color: defaultColor,
         },
+        '& .ant-select-remove-icon': {
+          fontSize: 'inherit',
+        },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
           fontSize: '1rem',
         },
         '& .ant-select-selection__clear': {
           right: 13,
+          top: 8,
+        },
+        '& .ant-select-selection--single .ant-select-selection__clear': {
+          top: 6,
         },
         '& .ant-calendar-picker': {
           fontSize: smallFontSize,
         },
         '& .ant-calendar-picker-input': {
           paddingTop: 3,
+        },
+        '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
+          height: '21px',
+          lineHeight: '21px',
+          marginTop: 0,
         },
       },
     },
@@ -120,12 +139,14 @@ export const smallTheme = createMuiTheme({
       root: {
         fontSize: smallFontSize,
         lineHeight: '0.95rem',
+        fontWeight: 300,
       },
       formControl: {
         transform: 'translate(0, 11px) scale(1)',
       },
       shrink: {
         transform: 'translate(0, -4px) scale(0.8)',
+        fontWeight: 'inherit',
       },
     },
   },
@@ -150,12 +171,19 @@ export const largeTheme = createMuiTheme({
           fontSize: largeFontSize,
           color: defaultColor,
         },
+        '& .ant-select-remove-icon': {
+          fontSize: 'inherit',
+        },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
           fontSize: '1.3rem',
         },
         '& .ant-select-selection__clear': {
           right: 17,
+          top: 10,
+        },
+        '& .ant-select-selection--single .ant-select-selection__clear': {
+          top: 5,
         },
         '& .ant-calendar-picker': {
           fontSize: largeFontSize,
@@ -177,12 +205,14 @@ export const largeTheme = createMuiTheme({
       root: {
         fontSize: largeFontSize,
         lineHeight: '1rem',
+        fontWeight: 300,
       },
       formControl: {
         transform: 'translate(0, 30px) scale(1)',
       },
       shrink: {
         transform: 'translate(0, 6px) scale(0.8)',
+        fontWeight: 'inherit',
       },
     },
   },

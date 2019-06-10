@@ -21,6 +21,7 @@ const STYLES = () => {
       width: '100%',
       boxSizing: 'content-box',
       lineHeight: '1rem',
+      color: 'currentColor',
 
       '& > div': {
         // erase all border, and boxShadow
@@ -42,9 +43,12 @@ const STYLES = () => {
       },
       '& .ant-select-selection--multiple': {
         height: '100%',
+        minHeight: '20px',
         // to match the same line
         // with ant-select-select--single
         paddingBottom: 0,
+        position: 'relative',
+        top: -4,
       },
       '& .ant-select-selection > div': {
         marginLeft: 0,
@@ -91,7 +95,9 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleBlur = () => {
-    this.setState({ shrink: false })
+    if (this.state.value === undefined || this.state.value.length === 0) {
+      this.setState({ shrink: false })
+    }
   }
 
   handleValueChange = (event) => {
@@ -109,6 +115,10 @@ class AntdSelect extends React.PureComponent {
       )
       form.setFieldTouched(field.name, true)
     }
+    this.setState({
+      shrink: returnValue !== undefined,
+      value: returnValue,
+    })
   }
 
   getComponent = ({ inputRef, ...props }) => {

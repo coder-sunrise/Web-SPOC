@@ -64,7 +64,7 @@ const checkStatus = async (response) => {
         {JSON.stringify(returnObj.errors)}
       </div>
     ),
-    duration: 0,
+    duration: 5000,
   })
 
   const error = new Error(errortext)
@@ -83,7 +83,7 @@ const showErrorNotification = (header, message) => {
         <p>{message}</p>
       </div>
     ),
-    duration: 0,
+    duration: 5000,
   })
 }
 
@@ -307,7 +307,7 @@ export default function request (url, option) {
                   {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
                 </div>
               ),
-              duration: 0,
+              duration: 5000,
             })
 
             // const error = new Error(errortext)
