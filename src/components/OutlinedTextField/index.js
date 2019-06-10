@@ -231,11 +231,13 @@ class OutlinedTextField extends PureComponent {
 
       const shouldShow =
         Object.byString(form.touched, field.name) || form.submitCount > 0
+
       if (!error) {
         error = shouldShow && !!Object.byString(form.errors, field.name)
       }
       if (error) {
         if (inputProps) inputProps.autoFocus = true
+
         help =
           !showErrorIcon && shouldShow
             ? Object.byString(form.errors, field.name)
@@ -276,6 +278,8 @@ class OutlinedTextField extends PureComponent {
     const element = (
       <CustomInputWrapper
         labelProps={{ shrink: this.state.shrink || !!this.state.value }}
+        help={help}
+        error={error}
         {...props}
       >
         {(typeof children === 'function'

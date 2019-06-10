@@ -14,11 +14,12 @@ class RadioGroup extends React.Component {
   static getDerivedStateFromProps (nextProps, preState) {
     const { field, value } = nextProps
 
-    if (field) {
-      return {
-        selectedValue: field.value || nextProps.defaultValue,
-      }
-    }
+    // if (field) {
+    //   return {
+    //     selectedValue: field.value || nextProps.defaultValue,
+    //   }
+    // }
+
     if (value) {
       return {
         selectedValue: value,
@@ -29,7 +30,6 @@ class RadioGroup extends React.Component {
 
   handleChange = (event) => {
     this.setState({ selectedValue: event.target.value })
-
     const { form, field, onChange } = this.props
     const v = {
       target: {
