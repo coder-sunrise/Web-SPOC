@@ -79,6 +79,7 @@ class HeaderLinks extends React.Component {
     })
     return (
       <div className={wrapper}>
+        {/*
         <CustomInput
           rtlActive={rtlActive}
           formControlProps={{
@@ -93,6 +94,7 @@ class HeaderLinks extends React.Component {
             },
           }}
         />
+        
         <Button
           color='white'
           aria-label='edit'
@@ -105,6 +107,7 @@ class HeaderLinks extends React.Component {
             className={`${classes.headerLinksSvg} ${classes.searchIcon}`}
           />
         </Button>
+        
         <Button
           color='transparent'
           simple
@@ -126,6 +129,7 @@ class HeaderLinks extends React.Component {
             </span>
           </Hidden>
         </Button>
+        
         <div className={managerClasses}>
           <Button
             color='transparent'
@@ -226,6 +230,7 @@ class HeaderLinks extends React.Component {
             )}
           </Popper>
         </div>
+        */}
         <div className={managerClasses}>
           <Button
             color='transparent'

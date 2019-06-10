@@ -40,7 +40,7 @@ const _formatDate = (date) => {
 
 const AppointmentContentComponent = withStyles(styles, {
   name: 'AppointmentComponentContent',
-})(({ classes, data, children }) => {
+})(({ classes, data, children, ...restProps }) => {
   const colorClass = getColorClassByAppointmentType(
     data.appointmentType,
     classes,
@@ -55,6 +55,7 @@ const AppointmentContentComponent = withStyles(styles, {
       ])}
       formatDate={_formatDate}
       recurringIconComponent={RecurringIconComponent}
+      {...restProps}
     >
       {children}
     </Appointments.AppointmentContent>

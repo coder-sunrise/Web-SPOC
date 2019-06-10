@@ -16,6 +16,7 @@ import {
   Scheduler,
   WeekView,
   MonthView,
+  DragDropProvider,
 } from '@devexpress/dx-react-scheduler-material-ui'
 // custom components
 import { Button, Tooltip } from '@/components'
@@ -131,6 +132,7 @@ class Calendar extends PureComponent {
   }
 
   handleCommitChanges = ({ added, changed, deleted }) => {
+    console.log({ added, changed, deleted })
     const { dispatch } = this.props
     dispatch({
       type: 'appointment/commitChanges',
@@ -218,6 +220,7 @@ class Calendar extends PureComponent {
               onVisibilityChange={this.toggleAptFormVisibility}
               popupComponent={this._AptFormComponent}
             />
+            <DragDropProvider />
           </Scheduler>
           <Tooltip title='Add appointment' placement='bottom-end'>
             <Button

@@ -4,13 +4,13 @@ import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
 // ant
-import { DatePicker } from 'antd'
+import { DatePicker, TimePicker } from 'antd'
 // assets
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
 import AntdWrapper from './AntdWrapper'
 import { extendFunc } from '@/utils/utils'
-import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
+import { CustomInput } from '@/components'
 
 const _dateFormat = 'YYYY-MM-DD'
 
@@ -29,24 +29,24 @@ const STYLES = (theme) => ({
   dropdownMenu: {
     zIndex: 1305,
   },
-  datepickerContainer: {
+  timePickerContainer: {
     width: '100%',
-    boxSizing: 'content-box',
-    lineHeight: '1rem',
-    color: 'currentColor',
-    '& > div > input': {
+    '& > input': {
+      // erase all border, and box-shadow
       border: 'none',
       boxShadow: 'none !important',
       borderRadius: 0,
+      // borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
       paddingLeft: 0,
+      fontSize: '1rem',
+      height: 24,
     },
   },
 })
 
-class AntdDatePicker extends Component {
+class AntdTimePicker extends Component {
   static defaultProps = {
-    // label: 'Select date',
-    format: 'YYYY-MM-DD',
+    format: 'HH:mm',
     disabled: false,
     size: 'default',
   }
@@ -72,50 +72,17 @@ class AntdDatePicker extends Component {
     return nextDateValue !== currentDateValue
   }
 
-  handleChange = (date, dateString) => {
+  handleChange = (time, timeString) => {
     const { form, field, onChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, dateString)
+      form.setFieldValue(field.name, timeString)
     }
 
     if (onChange) {
       const { name } = this.props
-      onChange(dateString, name)
+      onChange(timeString, name)
     }
   }
-
-  handleDatePickerOpenChange = (status) => {
-    this.setState({ shrink: status })
-  }
-
-  handleFocus = () => {
-    this.setState({ shrink: true })
-  }
-
-  handleBlur = () => {
-    this.setState({ shrink: false })
-  }
-
-  // render () {
-  //   const { classes, onChange, ...restProps } = this.props
-  //   const { format, form, field, value } = restProps
-  //   const selectValue = form && field ? field.value : value
-
-  //   // date picker component dont pass formik props into wrapper
-  //   // date picker component should handle the value change event itself
-  //   return (
-  //     <AntdWrapper {...restProps} isChildDatePicker>
-  //       <DatePicker
-  //         className={classnames(classes.datepickerContainer)}
-  //         dropdownClassName={classnames(classes.dropdownMenu)}
-  //         allowClear
-  //         placeholder=''
-  //         onChange={extendFunc(onChange, this.handleChange)}
-  //         value={_toMoment(selectValue, format)}
-  //       />
-  //     </AntdWrapper>
-  //   )
-  // }
 
   getComponent = ({ inputRef, ...props }) => {
     const {
@@ -133,18 +100,14 @@ class AntdDatePicker extends Component {
     // date picker component should handle the value change event itself
     return (
       <div style={{ width: '100%' }} {...props}>
-        <DatePicker
-          className={classnames(classes.datepickerContainer)}
-          dropdownClassName={classnames(classes.dropdownMenu)}
+        <TimePicker
+          className={classnames(classes.timePickerContainer)}
+          // dropdownClassName={classnames(classes.dropdownMenu)}
+          popupStyle={{ zIndex: 1400 }}
           allowClear
           placeholder=''
+          defaultOpenValue={moment('00:00', 'HH:mm')}
           onChange={extendFunc(onChange, this.handleChange)}
-          onFocus={extendFunc(onFocus, this.handleFocus)}
-          onBlur={extendFunc(onBlur, this.handleBlur)}
-          onOpenChange={extendFunc(
-            onOpenChange,
-            this.handleDatePickerOpenChange,
-          )}
           value={_toMoment(selectValue, format)}
         />
       </div>
@@ -153,11 +116,13 @@ class AntdDatePicker extends Component {
 
   render () {
     const { classes, ...restProps } = this.props
-    const { form, field, value } = restProps
+    const { format, form, field, value } = restProps
     const selectValue = form && field ? field.value : value
     const labelProps = {
       shrink: !!selectValue || this.state.shrink,
     }
+    // date picker component dont pass formik props into wrapper
+    // date picker component should handle the value change event itself
     return (
       <CustomInput
         labelProps={labelProps}
@@ -169,4 +134,4 @@ class AntdDatePicker extends Component {
   }
 }
 
-export default withStyles(STYLES, { name: 'AntdDatePicker' })(AntdDatePicker)
+export default withStyles(STYLES, { name: 'AntdDatePicker' })(AntdTimePicker)

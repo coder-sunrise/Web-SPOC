@@ -69,7 +69,7 @@ export default createListViewModel({
         return status === 204
       },
       *getSessionInfo (_, { call, put }) {
-        const sessionID = localStorage.getItem('_sessionID')
+        // const sessionID = localStorage.getItem('_sessionID')
         // const response = yield call(service.getSessionInfo, sessionID)
         const response = yield call(service.getActiveSession)
 
@@ -92,7 +92,6 @@ export default createListViewModel({
       },
       *fetchPatientListByName ({ payload }, { call, put }) {
         try {
-          console.log('payload', payload)
           const response = !payload
             ? yield call(service.fetchPatientList)
             : yield call(service.fetchPatientListByName, payload)

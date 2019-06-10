@@ -171,7 +171,7 @@ const routes = [
             path: '/reception/appointment',
             name: 'appointment',
             mini: 'AP',
-            component: './Reception/Appointment',
+            component: './Reception/BigCalendar',
           },
         ],
       },
@@ -410,7 +410,7 @@ const routes = [
       // Human Resource
       {
         path: '/human-resource',
-        icon: 'account_box',
+        icon: 'perm_identity',
         name: 'humanResource',
         // component: '',
       },
@@ -466,6 +466,12 @@ const routes = [
             name: 'Control',
             mini: 'C',
             component: './Development/Control',
+          },
+          {
+            path: '/development/new-calendar',
+            name: 'Calendar',
+            mini: 'CA',
+            // component: './Development/BigCalendar',
           },
         ],
       },

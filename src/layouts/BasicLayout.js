@@ -22,6 +22,7 @@ import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import {
   primaryColor,
+  secondaryColor,
   dangerColor,
   roseColor,
   grayColor,

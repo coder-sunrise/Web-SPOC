@@ -83,13 +83,13 @@ blockquote p {
 }
 
 a {
-  color: #9c27b0;
+  color: $brand-primary;
   text-decoration: none;
 }
 
 a:hover,
 a:focus {
-  color: #89229b;
+  color: $brand-info;
   text-decoration: none;
 }
 

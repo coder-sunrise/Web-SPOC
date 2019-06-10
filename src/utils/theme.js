@@ -1,5 +1,5 @@
 import { MuiThemeProvider, createMuiTheme, withStyles } from '@material-ui/core'
-
+import { secondaryColor } from 'mui-pro-jss'
 const defaultFontSize = '1rem'
 const smallFontSize = '0.9rem'
 const largeFontSize = '1.2rem'
@@ -16,10 +16,13 @@ export const defaultTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedClasses,
+
     MuiFormControl: {
       root: {
         paddingTop: 15,
-
+        '& .ant-input': {
+          height: 'auto',
+        },
         '& .anticon': {
           fontSize: defaultFontSize,
           color: defaultColor,
@@ -40,7 +43,7 @@ export const defaultTheme = createMuiTheme({
           top: '52%',
         },
         '& .ant-calendar-picker': {
-          top: -4,
+          top: 3,
         },
         '& .ant-select-selection--single': {
           marginTop: 4,

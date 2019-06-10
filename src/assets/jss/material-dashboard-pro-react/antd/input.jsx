@@ -40,6 +40,9 @@ const inputStyle = (theme) => ({
     paddingTop: '24px',
     transformOrigin: 'top left',
   },
+  controlNoLabel: {
+    paddingTop: '0px !important',
+  },
   controlUnderline: {
     '& .antdwrapper:after': {
       transform: 'scaleX(1) !important',
@@ -67,6 +70,9 @@ const inputStyle = (theme) => ({
   //   fontSize: '0.875rem',
   //   transform: 'translate(0, 31px) scale(1)',
   // },
+  noLabel: {
+    display: 'none',
+  },
   labelFocused: {
     color: theme.palette.primary.main,
   },

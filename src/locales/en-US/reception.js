@@ -166,6 +166,8 @@ export default {
   'reception.appt.form.appointmentType': 'Appointment Type',
   'reception.appt.form.startDate': 'Start Date',
   'reception.appt.form.startTime': 'Start Timing',
+  'reception.appt.form.appointmentTime': 'Appointment Time',
+
   'reception.appt.form.endDate': 'End Date',
   'reception.appt.form.endTime': 'End Timing',
   'reception.appt.form.recurrencePattern': 'Recurrence Pattern',

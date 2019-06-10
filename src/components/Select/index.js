@@ -102,7 +102,12 @@ function ValueContainer (props) {
 }
 
 function MultiValue (props) {
-  // console.log('m',props)
+  console.log('multivalue', props)
+  // return (
+  //   <div className={props.selectProps.classes.valueContainer}>
+  //     {props.children}
+  //   </div>
+  // )
   return (
     <Chip
       tabIndex={-1}
