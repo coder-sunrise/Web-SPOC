@@ -19,7 +19,9 @@ export const defaultTheme = createMuiTheme({
     MuiFormControl: {
       root: {
         paddingTop: 15,
-
+        '& .ant-input': {
+          height: 'auto',
+        },
         '& .anticon': {
           fontSize: defaultFontSize,
           color: defaultColor,

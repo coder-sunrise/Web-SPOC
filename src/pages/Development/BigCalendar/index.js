@@ -25,6 +25,7 @@ import { dndEvents } from './events'
 // view
 // import CalendarView from './components/CalendarView'
 import Event from './components/Event'
+import FilterBar from './components/FilterBar'
 import Form from './Form'
 
 import {
@@ -38,6 +39,7 @@ import {
   GridContainer,
   GridItem,
   DatePicker,
+  SizeContainer,
 } from '@/components'
 
 // import { DatePicker as ANTDatePicker } from 'antd'
@@ -353,93 +355,96 @@ class FixSelect extends React.PureComponent {
     const { classes } = this.props
     return (
       <CommonHeader Icon={<Assignment />}>
-        <Popover
-          id='event-popup'
-          open={showPopup}
-          anchorEl={popupAnchor}
-          onClose={this.handleClosePopover}
-          placement='top-start'
-          anchorOrigin={{
-            vertical: 'center',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'center',
-            horizontal: 'center',
-          }}
-        >
-          <CardHeader>
-            <Typography className={classes.typography}>
-              The content of the Popper.
-            </Typography>
-          </CardHeader>
-          <CardBody>
-            <Typography className={classes.typography}>
-              The content of the Popper.
-            </Typography>
-            <Typography className={classes.typography}>
-              The content of the Popper.
-            </Typography>
-            <Typography className={classes.typography}>
-              The content of the Popper.
-            </Typography>
-          </CardBody>
-        </Popover>
-        <DragAndDropCalendar
-          components={{
-            toolbar: this.Toolbar,
-            event: Event,
-          }}
-          // --- values props ---
-          date={this.state.date}
-          localizer={localizer}
-          min={this.state.minTime}
-          max={this.state.maxTime}
-          events={this.state.events}
-          view={this.state.view}
-          step={15}
-          timeslots={2}
-          // --- values props ---
+        <SizeContainer>
+          <Popover
+            id='event-popup'
+            open={showPopup}
+            anchorEl={popupAnchor}
+            onClose={this.handleClosePopover}
+            placement='top-start'
+            anchorOrigin={{
+              vertical: 'center',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'center',
+              horizontal: 'center',
+            }}
+          >
+            <CardHeader>
+              <Typography className={classes.typography}>
+                The content of the Popper.
+              </Typography>
+            </CardHeader>
+            <CardBody>
+              <Typography className={classes.typography}>
+                The content of the Popper.
+              </Typography>
+              <Typography className={classes.typography}>
+                The content of the Popper.
+              </Typography>
+              <Typography className={classes.typography}>
+                The content of the Popper.
+              </Typography>
+            </CardBody>
+          </Popover>
+          <FilterBar />
+          <DragAndDropCalendar
+            components={{
+              toolbar: this.Toolbar,
+              event: Event,
+            }}
+            // --- values props ---
+            date={this.state.date}
+            localizer={localizer}
+            min={this.state.minTime}
+            max={this.state.maxTime}
+            events={this.state.events}
+            view={this.state.view}
+            step={15}
+            timeslots={2}
+            // --- values props ---
 
-          // --- functional props ---
-          selectable
-          resizable={false}
-          // --- functional props ---
+            // --- functional props ---
+            selectable
+            resizable={false}
+            // --- functional props ---
 
-          // --- resources ---
-          resources={resources}
-          resourceIdAccessor='resourceId'
-          resourceTitleAccessor='resourceTitle'
-          // --- resources ---
-          // --- event handlers ---
-          onEventDrop={this.moveEvent}
-          onSelectSlot={this.newEvent}
-          // onDragStart={console.log}
-          onNavigate={this.jumpToDate}
-          onView={this.onViewChange}
-          onSelectEvent={this.handleSelectEvent}
-          onDoubleClickEvent={this.toggleModal}
-          eventPropGetter={this.eventColors}
-          // --- event handlers ---
-        />
+            // --- resources ---
+            resources={resources}
+            resourceIdAccessor='resourceId'
+            resourceTitleAccessor='resourceTitle'
+            // --- resources ---
+            // --- event handlers ---
+            onEventDrop={this.moveEvent}
+            onSelectSlot={this.newEvent}
+            // onDragStart={console.log}
+            onNavigate={this.jumpToDate}
+            onView={this.onViewChange}
+            onSelectEvent={this.handleSelectEvent}
+            onDoubleClickEvent={this.toggleModal}
+            eventPropGetter={this.eventColors}
+            // --- event handlers ---
+          />
 
-        <CommonModal
-          open={showAppointmentForm}
-          title='Appointment Form'
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-          // maxWidth='md'
-          showFooter={false}
-        >
-          {showAppointmentForm ? (
-            <Form
-              resources={resources}
-              slotInfo={this.state.slotInfo}
-              handleAddEvents={this.addEvent}
-              handleUpdateEvents={this.updateEvent}
-            />
-          ) : null}
-        </CommonModal>
+          <CommonModal
+            open={showAppointmentForm}
+            title='Appointment Form'
+            onClose={this.toggleModal}
+            onConfirm={this.toggleModal}
+            // maxWidth='md'
+            showFooter={false}
+          >
+            {showAppointmentForm ? (
+              <Form
+                resources={resources}
+                slotInfo={this.state.slotInfo}
+                handleAddEvents={this.addEvent}
+                handleUpdateEvents={this.updateEvent}
+              />
+            ) : null}
+          </CommonModal>
+        </SizeContainer>
       </CommonHeader>
     )
   }

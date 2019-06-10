@@ -14,6 +14,7 @@ class Event extends PureComponent {
       <div onClick={this.handleOpen}>
         <span>
           <strong>{event.patientName}</strong>
+          {event.title}
         </span>
         <span style={{ display: 'block' }}>{event.contactNo}</span>
         {event.appointmentType && (

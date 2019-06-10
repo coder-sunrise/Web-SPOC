@@ -46,6 +46,7 @@ import {
   BaseInput,
   RadioGroup,
   SizeContainer,
+  AntdSelect,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -223,6 +224,12 @@ class ControlTest extends PureComponent {
             </GridItem>
             <GridItem sm={3}>
               <FastField
+                name='testSelect'
+                render={(args) => <Select label='Salutation' {...args} />}
+              />
+            </GridItem>
+            <GridItem sm={3}>
+              <FastField
                 name='dob'
                 render={(args) => (
                   <DatePicker label='DOB' code='dob' {...args} />
@@ -247,10 +254,26 @@ class ControlTest extends PureComponent {
               )}
             />
           </GridItem>
+
           <GridItem sm={3}>
             <FastField
               name='dob'
               render={(args) => <DatePicker label='DOB' code='dob' {...args} />}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='testSelect'
+              render={(args) => (
+                <AntdSelect
+                  label='Salutation'
+                  mode='multiple'
+                  options={[
+                    { name: '123', value: '123' },
+                  ]}
+                  {...args}
+                />
+              )}
             />
           </GridItem>
         </GridContainer>

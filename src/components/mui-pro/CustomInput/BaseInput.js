@@ -51,6 +51,10 @@ class BaseInput extends React.PureComponent {
 
   _onKeyDown = (e) => {
     if (e.which === 13) {
+      // onEnterPressed
+      const { onEnterPressed } = this.props
+      if (onEnterPressed) onEnterPressed(e)
+
       let loop = 0
       let target = $(e.target)
       while (loop < 100) {
