@@ -8,7 +8,7 @@ import { formatMessage } from 'umi/locale'
 import { FastField, Field, withFormik } from 'formik'
 // devexpress-react-scheduler
 // material ui
-import { CircularProgress, Paper, withStyles } from '@material-ui/core'
+import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 // custom component
 import {
   Button,
@@ -21,10 +21,7 @@ import {
   OutlinedTextField,
   Select,
   AntdInput,
-  RadioGroup,
   Primary,
-  Danger,
-  DateRangePicker,
   Checkbox,
   TimePicker,
 } from '@/components'
@@ -133,6 +130,10 @@ const styles = (theme) => ({
     textAlign: 'right',
     fontSize: '.85rem',
     paddingTop: 12,
+  },
+  divider: {
+    marginTop: 15,
+    marginBottom: 10,
   },
 })
 
@@ -549,6 +550,7 @@ class Form extends React.PureComponent {
               </p>
             </GridItem>
             <GridItem xs md={12}>
+              <Divider className={classnames(classes.divider)} />
               <FastField
                 name='enableRecurrence'
                 render={(args) => {
