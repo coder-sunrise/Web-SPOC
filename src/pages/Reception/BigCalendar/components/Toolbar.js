@@ -7,12 +7,28 @@ import Datetime from 'react-datetime'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 // material ui
-import { Popover, IconButton, withStyles } from '@material-ui/core'
+import {
+  ClickAwayListener,
+  Popover,
+  IconButton,
+  withStyles,
+  MenuList,
+  MenuItem,
+  Paper,
+  Popper,
+  Grow,
+} from '@material-ui/core'
 import { ChevronLeft, ChevronRight } from '@material-ui/icons'
 // components
 import { Button, CustomDropdown, GridContainer, GridItem } from '@/components'
 
 const styles = () => ({
+  btnContainer: {
+    display: 'flex',
+  },
+  container: {
+    marginBottom: 15,
+  },
   dateButton: {
     fontSize: '1.5rem',
     paddingBottom: '8px !important',
@@ -79,11 +95,18 @@ class CalendarToolbar extends React.PureComponent {
 
   returnToday = () => this.changeDate(DATE_NAVIGATOR_ACTION.BACK_TO_TODAY)
 
+  handleClick = (event) => {
+    const { currentTarget } = event
+    const { handleViewChange } = this.props
+    currentTarget && handleViewChange(currentTarget.id)
+  }
+
   render () {
-    const { classes, label, view, displayDate, handleViewChange } = this.props
+    const { classes, label, view, displayDate } = this.props
     const { showDateOverlay, anchor } = this.state
+
     return (
-      <GridContainer>
+      <GridContainer className={classnames(classes.container)}>
         <GridItem xs md={2}>
           <div>
             <IconButton color='primary' onClick={this.subtractDate}>
@@ -129,16 +152,18 @@ class CalendarToolbar extends React.PureComponent {
           </Popover>
         </GridItem>
         <GridItem xs md={2} container justify='flex-end'>
-          <div>
-            <CustomDropdown
-              buttonText={view}
-              buttonProps={{
-                color: 'primary',
-                simple: true,
-              }}
-              onClick={handleViewChange}
-              dropdownList={CalendarViews}
-            />
+          <div className={classnames(classes.btnContainer)}>
+            {CalendarViews.map((cv) => (
+              <Button
+                simple={view !== cv}
+                // size='sm'
+                color='primary'
+                id={cv}
+                onClick={this.handleClick}
+              >
+                {cv}
+              </Button>
+            ))}
           </div>
         </GridItem>
       </GridContainer>
