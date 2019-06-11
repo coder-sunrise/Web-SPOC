@@ -24,6 +24,7 @@ const plugins = [
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
       },
+      // pwa: {},
       // pwa: {
       //   workboxPluginMode: 'InjectManifest',
       //   workboxOptions: {

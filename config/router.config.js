@@ -161,6 +161,18 @@ const routes = [
             exact: true,
           },
           {
+            hideInMenu: true,
+            path: '/reception/queue/patientdashboard',
+            name: 'patientdashboard',
+            component: './PatientDashboard',
+          },
+          {
+            path: '/reception/queue/patientdashboard/consultation/:id',
+            name: 'consultation',
+            hideInMenu: true,
+            component: './PatientDashboard/Consultation',
+          },
+          {
             path: '/reception/queue/dispense/:visitRefNo',
             name: 'dispense',
             hideInMenu: true,
