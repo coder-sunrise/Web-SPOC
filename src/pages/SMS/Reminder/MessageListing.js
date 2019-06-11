@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { connect } from 'dva'
-import { Assignment, Close, TrainOutlined } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compose } from 'redux'
@@ -54,7 +53,10 @@ const styles = (theme) => ({
 })
 
 const MessageListing = (props) => {
-  const [ list, setList ] = useState([
+  const [
+    list,
+    setList,
+  ] = useState([
     {
       date: '2019-05-01 21:37',
       text: 'Hi Tan Ah Kow',

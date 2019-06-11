@@ -12,8 +12,6 @@ import CardHeader from './CardHeader'
 import CardIcon from './CardIcon'
 import CardBody from './CardBody'
 
-// @material-ui/icons
-
 // core components
 
 function CardContainer ({

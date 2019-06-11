@@ -158,7 +158,7 @@ class Appointment extends React.PureComponent {
 
   onSelectEvent = (selectedEvent) => {
     this.setState({
-      selectedSlot: { ...selectedEvent },
+      selectedSlot: { ...selectedEvent, type: 'update' },
       showAppointmentForm: true,
     })
   }
@@ -248,7 +248,7 @@ class Appointment extends React.PureComponent {
             resources={resources}
             handleSelectSlot={this.onSelectSlot}
             handleSelectEvent={this.onSelectEvent}
-            handleDoubleClick={this.toggleAppointmentForm}
+            // handleDoubleClick={this.onSelectEvent}
             handleMoveEvent={this.moveEvent}
             handleEventMouseOver={this.onEventMouseOver}
             handleOnDragStart={this.handleOnDragStart}

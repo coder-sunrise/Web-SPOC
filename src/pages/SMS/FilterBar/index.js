@@ -42,7 +42,7 @@ const FilterBar = (props) => {
             name='SearchBy'
             render={(args) => (
               <RadioGroup
-                label='Search By'
+                label=''
                 simple
                 defaultValue='appointment'
                 options={[

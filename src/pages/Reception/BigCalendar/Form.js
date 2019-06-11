@@ -202,6 +202,7 @@ const initialAptInfo = {
       color: getColorByAppointmentType(appointmentType),
       resourceId,
     }
+    console.log('handlesubmit', { slotInfo })
     switch (slotInfo.type) {
       case 'update':
         handleUpdateEvents(event)

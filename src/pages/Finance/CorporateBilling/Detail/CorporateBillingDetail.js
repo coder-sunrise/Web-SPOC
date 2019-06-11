@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { Assignment, FilterList } from '@material-ui/icons'
+import Assignment from '@material-ui/icons/Assignment'
+import FilterList from '@material-ui/icons/FilterList'
+
 import { withStyles } from '@material-ui/core'
 import { Affix } from 'antd'
 import { formatMessage } from 'umi/locale'

@@ -1,6 +1,11 @@
 import { queryNotices } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
 
+// console.log(
+//   localStorage.getItem('menuCollapsed') !== undefined,
+//   Boolean(localStorage.getItem('menuCollapsed')),
+//   localStorage.getItem('menuCollapsed'),
+// )
 export default createFormViewModel({
   namespace: 'global',
   config: {
@@ -9,7 +14,10 @@ export default createFormViewModel({
   param: {
     // service,
     state: {
-      collapsed: false,
+      collapsed:
+        localStorage.getItem('menuCollapsed') !== undefined
+          ? localStorage.getItem('menuCollapsed') === '1'
+          : true,
       notices: [],
     },
     setting: {
@@ -94,6 +102,7 @@ export default createFormViewModel({
     },
     reducers: {
       changeLayoutCollapsed (state, { payload }) {
+        localStorage.setItem('menuCollapsed', payload ? 1 : 0)
         return {
           ...state,
           collapsed: payload,

@@ -12,7 +12,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import { InputAdornment, Grid } from '@material-ui/core'
 import numeral from 'numeral'
-import { Error } from '@material-ui/icons'
+
 import Tooltip from '@material-ui/core/Tooltip'
 
 import Input from '@material-ui/core/Input'
@@ -33,7 +33,7 @@ class FormikTextField extends React.PureComponent {
     this.state = {
       value: field.value,
     }
-    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 2000)
+    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
   }
 
   onChange = (event) => {

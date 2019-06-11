@@ -115,16 +115,16 @@ const fontColor = 'rgba(0, 0, 0, 0.87)'
 const warningColor = '#ff9800'
 // const dangerColor = '#f44336'
 // const successColor = '#25bc29'
-// const infoColor = '#14bace'
+const infoColor = '#14bace'
 const roseColor = '#e91e63'
 const grayColor = '#999999'
 // const hoverColor = '#f9efff'
 
 // new color
 const primaryColor = '#597ef7'
+const secondaryColor = '#1890ff'
 const successColor = '#52c41a'
 const dangerColor = '#f5222d'
-const infoColor = '#1890ff'
 const hoverColor = '#d6e4ff'
 const tableEvenRowColor = '#f0f5ff'
 
@@ -329,6 +329,7 @@ export {
   defaultFont,
   fontColor,
   primaryColor,
+  secondaryColor,
   warningColor,
   dangerColor,
   successColor,

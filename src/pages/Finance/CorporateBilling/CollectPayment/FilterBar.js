@@ -4,7 +4,7 @@ import { FastField, withFormik } from 'formik'
 import { withStyles, Paper } from '@material-ui/core'
 
 import { GridContainer, GridItem, DatePicker, Button } from '@/components'
-import { FilterList } from '@material-ui/icons'
+import FilterList from '@material-ui/icons/FilterList'
 
 const styles = () => ({
   filterBar: {

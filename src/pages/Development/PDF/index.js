@@ -4,7 +4,7 @@ import moment from 'moment'
 import * as Yup from 'yup'
 import classNames from 'classnames'
 import { FastField, Field, withFormik } from 'formik'
-import { Lock } from '@material-ui/icons'
+import Lock from '@material-ui/icons/Lock'
 import { FormControl, InputLabel, Input, withStyles } from '@material-ui/core'
 import { DatePicker } from 'antd'
 import {

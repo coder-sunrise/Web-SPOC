@@ -22,6 +22,7 @@ import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import {
   primaryColor,
+  secondaryColor,
   dangerColor,
   roseColor,
   grayColor,
@@ -46,7 +47,7 @@ import PageLoading from '@/components/PageLoading'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
-const theme = createMuiTheme({
+const _theme = createMuiTheme({
   typography: {
     useNextVariants: true,
   },
@@ -189,7 +190,7 @@ class BasicLayout extends React.PureComponent {
     super(props)
     this.state = {
       mobileOpen: false,
-      miniActive: false,
+      miniActive: props.collapsed,
     }
     this.resizeFunction = this.resizeFunction.bind(this)
 
@@ -403,8 +404,8 @@ class BasicLayout extends React.PureComponent {
   }
 
   render () {
-    const { classes, loading, ...props } = this.props
-
+    const { classes, loading, theme, ...props } = this.props
+    // console.log(props.collapsed)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
@@ -520,7 +521,7 @@ class BasicLayout extends React.PureComponent {
     // console.log(this)
     return (
       <React.Fragment>
-        <MuiThemeProvider theme={theme}>
+        <MuiThemeProvider theme={_theme}>
           <CssBaseline />
           <DocumentTitle title={this.getPageTitle(pathname)}>
             <ContainerQuery query={query}>

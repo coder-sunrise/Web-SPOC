@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'umi/locale'
 
-import { Create } from '@material-ui/icons'
+import Create from '@material-ui/icons/Create'
 
 // custom component
 import { Button } from '@/components'

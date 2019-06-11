@@ -1,5 +1,5 @@
 import { MuiThemeProvider, createMuiTheme, withStyles } from '@material-ui/core'
-
+import { secondaryColor } from 'mui-pro-jss'
 const defaultFontSize = '1rem'
 const smallFontSize = '0.9rem'
 const largeFontSize = '1.2rem'
@@ -16,6 +16,7 @@ export const defaultTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedClasses,
+
     MuiFormControl: {
       root: {
         paddingTop: 15,
@@ -49,6 +50,11 @@ export const defaultTheme = createMuiTheme({
         },
         '& .ant-select-selection--single .ant-select-selection__clear': {
           top: 5,
+        },
+        '& .ant-select-selection--multiple .ant-select-selection__rendered': {
+          height: '28px !important',
+          overflowY: 'auto',
+          marginRight: 28,
         },
       },
     },
@@ -116,6 +122,11 @@ export const smallTheme = createMuiTheme({
         },
         '& .ant-calendar-picker-input': {
           paddingTop: 3,
+        },
+        '& .ant-select-selection--multiple .ant-select-selection__rendered': {
+          height: '21px !important',
+          overflowY: 'auto',
+          marginRight: 27,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
           height: '21px',
@@ -187,6 +198,11 @@ export const largeTheme = createMuiTheme({
         },
         '& .ant-calendar-picker': {
           fontSize: largeFontSize,
+        },
+        '& .ant-select-selection--multiple .ant-select-selection__rendered': {
+          height: '28px !important',
+          overflowY: 'auto',
+          marginRight: 30,
         },
       },
     },
