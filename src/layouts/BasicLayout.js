@@ -52,9 +52,10 @@ const _theme = createMuiTheme({
     useNextVariants: true,
   },
   palette: {
-    primary: {
-      main: primaryColor,
-    },
+    ...defaultTheme.palette,
+    // primary: {
+    //   main: primaryColor,
+    // },
     // secondary: {
     //   light: '#ff7961',
     //   main: '#f44336',
@@ -64,94 +65,6 @@ const _theme = createMuiTheme({
   },
   overrides: {
     ...defaultTheme.overrides,
-    MuiInput: {
-      underline: {
-        '&:hover:not($disabled):not($focused):not($error):before': {
-          borderBottomWidth: '1px',
-        },
-        '&:after': {
-          borderBottomColor: primaryColor,
-          // borderBottomWidth:'1px',
-        },
-        // "&:before": {
-        //   borderBottom: '10px solid rgba(0, 0, 0, 0.42)',
-        // },
-        '&$focused': {
-          '&:after': {
-            transform: 'scaleX(1) !important',
-          },
-        },
-      },
-    },
-    MuiInputAdornment: {
-      root: {
-        color: fontColor,
-        fontSize: '1rem',
-        whiteSpace: 'nowrap',
-        '& > p': {
-          fontWeight: 300,
-        },
-      },
-      positionStart: {
-        marginTop: 15,
-      },
-      positionEnd: {
-        marginTop: 15,
-      },
-    },
-    MuiGrid: {
-      'direction-xs-column': {
-        '& > div': {
-          paddingLeft: 0,
-          paddingRight: 0,
-        },
-      },
-    },
-    MuiIconButton: {
-      root: {
-        padding: 3,
-        color: 'rgba(0, 0, 0, 0.8)',
-        fontSize: '1.2rem',
-        borderRadius: 4,
-      },
-    },
-    MuiTouchRipple: {
-      child: {
-        borderRadius: 4,
-      },
-    },
-    MuiList: {
-      root: {
-        color: primaryColor,
-      },
-    },
-    MuiListItem: {
-      button: {
-        '&:hover,&:focus': {
-          backgroundColor: hoverColor,
-        },
-      },
-    },
-    // MuiTableCell: {
-    //   root: {
-    //     '&:last-child': {
-    //       paddingLeft: 'inherit',
-    //       paddingRight: 'inherit',
-    //     },
-    //   },
-    // },
-    // MuiTableRow: {
-    //   root: {
-    //     // overflow: 'hidden',
-    //   },
-    // },
-
-    // MuiSwitch: {
-    //   switchBase: {
-    //     height: 'auto',
-    //     padding: '5px 4px 4px 4px',
-    //   },
-    // },
   },
 })
 

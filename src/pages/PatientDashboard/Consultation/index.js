@@ -52,6 +52,7 @@ import {
   Checkbox,
   NumberFormatter,
   confirm,
+  SizeContainer,
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 
@@ -147,6 +148,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 //     { i: 'c', x: 6, y: 0, w: 6, h: 2 },
 //   ],
 // }
+// console.log(basicStyle)
 const styles = (theme) => ({
   ...basicStyle(theme),
   root: {
@@ -377,7 +379,7 @@ class Consultation extends PureComponent {
         root: classes.paperRoot,
       },
       className: 'widget-container',
-      onMouseOver: (e) => {
+      onMouseEnter: (e) => {
         // console.log(cfg, e.target)
         // console.log($(e.target).parent('.widget-container')[0])
         // elevation[cfg.id] = 3
@@ -445,7 +447,7 @@ class Consultation extends PureComponent {
                 <Button size='sm' color='danger'>
                   Discard
                 </Button>
-                <ProgressButton size='sm' color='primary' icon={null}>
+                <ProgressButton size='sm' color='info' icon={null}>
                   Save Changes
                 </ProgressButton>
                 <ProgressButton size='sm' color='primary' icon={null}>
@@ -467,6 +469,7 @@ class Consultation extends PureComponent {
         >
           
         </CardContainer> */}
+
         <ResponsiveGridLayout {...layoutCfg}>
           {state.defaultLayout.keys.map((id) => {
             const dw = this.pageDefaultWidgets.find((m) => m.id === id)
@@ -530,20 +533,19 @@ class Consultation extends PureComponent {
                     </div>
                   )}
                   <div className='non-dragable' style={w.layoutConfig.style}>
-                    <LoadableComponent />
+                    <SizeContainer size='sm'>
+                      <LoadableComponent />
+                    </SizeContainer>
                   </div>
                 </Paper>
               </div>
             )
           })}
         </ResponsiveGridLayout>
+
         <div className={classes.fabContainer}>
           {this.state.mode === 'default' && (
-            <Fab
-              color='primary'
-              className={classes.fab}
-              onClick={this.toggleMode}
-            >
+            <Fab color='info' className={classes.fab} onClick={this.toggleMode}>
               <Edit />
             </Fab>
           )}
@@ -551,7 +553,7 @@ class Consultation extends PureComponent {
             <Slide direction='up' in={this.state.mode === 'edit'} mountOnEnter>
               <div>
                 <Fab
-                  color='primary'
+                  color='secondary'
                   className={classes.fab}
                   style={{ marginRight: 8 }}
                   onClick={this.showWidgetManagePanel}
@@ -578,13 +580,11 @@ class Consultation extends PureComponent {
                       <ClickAwayListener
                         onClickAway={this.closeWidgetManagePanel}
                       >
-                        <Paper
-                          style={{
-                            paddingLeft: theme.spacing.unit * 2,
-                            paddingTop: theme.spacing.unit,
-                          }}
-                        >
+                        <Paper>
                           <CheckboxGroup
+                            style={{
+                              margin: theme.spacing(1),
+                            }}
                             label='Selected Widgets'
                             vertical
                             simple
@@ -603,9 +603,15 @@ class Consultation extends PureComponent {
                             }}
                           />
                           <Divider />
-                          <Button onClick={() => {}} size='sm'>
-                            Reset
-                          </Button>
+                          <div
+                            style={{
+                              padding: theme.spacing(1),
+                            }}
+                          >
+                            <Button onClick={() => {}} color='danger' size='sm'>
+                              Reset
+                            </Button>
+                          </div>
                         </Paper>
                       </ClickAwayListener>
                     </Fade>

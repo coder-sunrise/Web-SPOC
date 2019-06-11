@@ -24,6 +24,7 @@ import {
   ProgressButton,
   CardContainer,
   confirm,
+  Checkbox,
 } from '@/components'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 import { compare } from '@/layouts'
@@ -113,9 +114,11 @@ class Diagnosis extends Component {
           </GridItem>
           <GridItem xs={6}>
             <FastField
-              name='test'
+              name='isPersist'
               render={(args) => {
-                return <TextField label='Test' {...args} />
+                return (
+                  <Checkbox label='Persist' labelPlacement='start' {...args} />
+                )
               }}
             />
           </GridItem>

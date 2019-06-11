@@ -450,12 +450,6 @@ const routes = [
         name: 'Development',
         routes: [
           {
-            path: '/development/pdf',
-            name: 'pdf',
-            component: './Development/PDF',
-            mini: 'PDF',
-          },
-          {
             path: '/development/masonry',
             name: 'Masonry',
             mini: 'MS',

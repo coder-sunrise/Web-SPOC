@@ -1,21 +1,122 @@
 import { MuiThemeProvider, createMuiTheme, withStyles } from '@material-ui/core'
-import { secondaryColor } from 'mui-pro-jss'
+import primaryColor from '@material-ui/core/colors/indigo'
+import secondaryColor from '@material-ui/core/colors/blueGrey'
+
+import {
+  // primaryColor,
+  // secondaryColor,
+  dangerColor,
+  roseColor,
+  grayColor,
+  fontColor,
+  hoverColor,
+} from 'mui-pro-jss'
+
 const defaultFontSize = '1rem'
 const smallFontSize = '0.9rem'
 const largeFontSize = '1.2rem'
 
+const smallIconWidth = '0.95em'
+
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
-const sharedClasses = {
+const sharedPalette = {
+  primary: primaryColor,
+  secondary: secondaryColor,
+}
+const sharedOverrides = {
   // CustomInputWrapper: {
   //   labelRoot: {
   //     zIndex: 1,
   //   },
   // },
+  MuiInput: {
+    underline: {
+      '&:hover:not($disabled):not($focused):not($error):before': {
+        borderBottomWidth: '1px',
+      },
+      '&:after': {
+        // borderBottomColor: primaryColor,
+        // borderBottomWidth:'1px',
+      },
+      // "&:before": {
+      //   borderBottom: '10px solid rgba(0, 0, 0, 0.42)',
+      // },
+      '&$focused': {
+        '&:after': {
+          transform: 'scaleX(1) !important',
+        },
+      },
+    },
+  },
+  MuiFormControlLabel: {
+    label: {
+      fontSize: 'inherit',
+      fontWeight: 'inherit',
+      lineHeight: 'inherit',
+      letterSpacing: 'inherit',
+    },
+    labelPlacementStart: {
+      marginLeft: 0,
+    },
+  },
+  MuiInputAdornment: {
+    root: {
+      color: fontColor,
+      fontSize: '1rem',
+      whiteSpace: 'nowrap',
+      '& > p': {
+        fontWeight: 300,
+      },
+    },
+    positionStart: {
+      marginTop: 15,
+    },
+    positionEnd: {
+      marginTop: 15,
+    },
+  },
+  MuiGrid: {
+    'direction-xs-column': {
+      '& > div': {
+        paddingLeft: 0,
+        paddingRight: 0,
+      },
+    },
+  },
+  MuiIconButton: {
+    root: {
+      padding: 3,
+      color: 'rgba(0, 0, 0, 0.8)',
+      fontSize: '1.2rem',
+      borderRadius: 4,
+    },
+  },
+  MuiTouchRipple: {
+    child: {
+      borderRadius: 4,
+    },
+  },
+  MuiList: {
+    root: {
+      color: primaryColor,
+    },
+  },
+  MuiListItem: {
+    button: {
+      '&:hover,&:focus': {
+        backgroundColor: hoverColor,
+      },
+    },
+  },
 }
+
 export const defaultTheme = createMuiTheme({
+  palette: {
+    ...sharedPalette,
+  },
   props: {},
   overrides: {
-    ...sharedClasses,
+    ...sharedOverrides,
 
     MuiFormControl: {
       root: {
@@ -85,9 +186,24 @@ export const defaultTheme = createMuiTheme({
 })
 
 export const smallTheme = createMuiTheme({
+  palette: {
+    ...sharedPalette,
+  },
   props: {},
   overrides: {
-    ...sharedClasses,
+    ...sharedOverrides,
+    MuiSvgIcon: {
+      root: {
+        width: smallIconWidth,
+        height: smallIconWidth,
+      },
+    },
+    PrivateSwitchBase: {
+      root: {
+        margin: '0px 4px',
+        padding: 0,
+      },
+    },
     MuiFormControl: {
       root: {
         paddingTop: 6,
@@ -164,9 +280,12 @@ export const smallTheme = createMuiTheme({
 })
 
 export const largeTheme = createMuiTheme({
+  palette: {
+    ...sharedPalette,
+  },
   props: {},
   overrides: {
-    ...sharedClasses,
+    ...sharedOverrides,
     MuiFormControl: {
       root: {
         paddingTop: 20,

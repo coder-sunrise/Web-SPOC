@@ -2,7 +2,7 @@ import React from 'react'
 // nodejs library to set properties for components
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
-import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
+import CustomInput from 'mui-pro-components/CustomInput'
 
 import {
   FormLabel,
@@ -40,16 +40,18 @@ class Checkbox extends React.Component {
       isSwitch,
       field,
       label,
+      labelPlacement = 'end',
       form,
       simple,
       controlStyle,
       onChange,
       notCentered = false,
+
       ...resetProps
     } = this.props
-    // console.log(label)
     const opts = {
       tabIndex: -1,
+      color: 'primary',
       // checkedIcon={<Check />} //className={classes.checkedIcon}
       onChange: (event, checked) => {
         this.setState({
@@ -77,33 +79,37 @@ class Checkbox extends React.Component {
         control={
           isSwitch ? (
             <Switch
-              classes={{
-                checked: classes.checked,
-                switchBase: classes.switchBase,
-                root: classes.switchRoot,
-              }}
+              // classes={{
+              //   checked: classes.checked,
+              //   switchBase: classes.switchBase,
+              //   root: classes.switchRoot,
+              // }}
               {...opts}
             />
           ) : (
             <MUICheckbox
-              classes={{
-                checked: classes.checked,
-                root: classes.checkRoot,
-              }}
+              // classes={{
+              //   checked: classes.checked,
+              //   root: classes.checkRoot,
+              // }}
               {...opts}
             />
           )
         }
+        // classes={{
+        //   root: classes.labelRoot,
+        // }}
+        labelPlacement={labelPlacement}
         label={label}
       />
     )
   }
 
   render () {
-    const { classes, label, ...restProps } = this.props
+    const { label, ...restProps } = this.props
     const { simple } = restProps
     return (
-      <BaseInput
+      <CustomInput
         label={simple ? '' : ' '}
         inputComponent={this.getCheckboxComponent}
         noUnderline
@@ -115,4 +121,4 @@ class Checkbox extends React.Component {
 
 Checkbox.propTypes = {}
 
-export default withStyles(regularFormsStyle, { withTheme: true })(Checkbox)
+export default Checkbox

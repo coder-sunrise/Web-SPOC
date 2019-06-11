@@ -1,6 +1,6 @@
 ﻿import React from 'react'
 import classnames from 'classnames'
-import moment from 'moment-timezone'
+import moment from 'moment'
 import update from 'immutability-helper'
 import lodash from 'lodash'
 import * as diff from 'diff'
