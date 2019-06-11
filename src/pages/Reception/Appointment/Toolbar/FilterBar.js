@@ -12,12 +12,12 @@ import { GridContainer, GridItem, TextField, AntdSelect } from '@/components'
 import AppointmentTypeSelector from '../Calendar/Appointments/AppointmentTypeSelector'
 
 const styles = () => ({
-  searchField: {
-    paddingTop: 22,
-  },
-  addPadding: {
-    paddingTop: '15px !important',
-  },
+  // searchField: {
+  //   paddingTop: 22,
+  // },
+  // addPadding: {
+  //   paddingTop: '15px !important',
+  // },
   selectorContainer: {
     textAlign: 'left',
   },
@@ -114,7 +114,7 @@ class FilterBar extends PureComponent {
 
     return (
       <GridContainer>
-        <GridItem className={classnames(classes.searchField)} xs md={4}>
+        <GridItem xs md={4}>
           <TextField
             value={searchQuery}
             onChange={this.onSearchQueryChange}
