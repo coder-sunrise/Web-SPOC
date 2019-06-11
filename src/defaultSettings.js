@@ -16,4 +16,5 @@ module.exports = {
   fixSiderbar: false,
   collapse: true,
   ui: 'mui',
+  pwa: false,
 }
