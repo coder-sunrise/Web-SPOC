@@ -131,7 +131,7 @@ class DetailsGrid extends PureComponent {
   onEditVisitClick = (queue) => {}
 
   onViewPatientDashboardClick = () => {
-    router.push('/emr/queue/patientdashboard')
+    router.push('/reception/queue/patientdashboard')
   }
 
   Cell = (props) => {
@@ -162,9 +162,10 @@ class DetailsGrid extends PureComponent {
       // path === '/queue'
       return (
         <Table.Cell {...tableProps}>
-          {/*
-            <Tooltip
-            title={formatMessage({ id: 'reception.queue.viewDispense' })}
+          <Tooltip
+            title={formatMessage({
+              id: 'reception.queue.viewPatientDashboard',
+            })}
             placement='bottom'
             classes={{ tooltip: classes.tooltip }}
           >
@@ -172,24 +173,25 @@ class DetailsGrid extends PureComponent {
               <GridButton
                 row={tableProps.row}
                 Icon={<Pageview />}
-                onClick={this.onViewDispenseClick}
+                onClick={this.onViewPatientDashboardClick}
               />
             </div>
           </Tooltip>
+          {/*
+            <Tooltip
+              title={formatMessage({ id: 'reception.queue.editVisit' })}
+              placement='bottom'
+              classes={{ tooltip: classes.tooltip }}
+            >
+              <div style={{ display: 'inline-block' }}>
+                <GridButton
+                  row={tableProps.row}
+                  Icon={<Edit />}
+                  onClick={this.onEditVisitClick}
+                />
+              </div>
+            </Tooltip>
           */}
-          <Tooltip
-            title={formatMessage({ id: 'reception.queue.editVisit' })}
-            placement='bottom'
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <div style={{ display: 'inline-block' }}>
-              <GridButton
-                row={tableProps.row}
-                Icon={<Edit />}
-                onClick={this.onEditVisitClick}
-              />
-            </div>
-          </Tooltip>
           <Tooltip
             title={formatMessage({ id: 'reception.queue.cancelVisit' })}
             placement='bottom'

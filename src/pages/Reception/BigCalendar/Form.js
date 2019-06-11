@@ -8,7 +8,7 @@ import { formatMessage } from 'umi/locale'
 import { FastField, Field, withFormik } from 'formik'
 // devexpress-react-scheduler
 // material ui
-import { CircularProgress, Paper, withStyles } from '@material-ui/core'
+import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 // custom component
 import {
   Button,
@@ -21,10 +21,8 @@ import {
   OutlinedTextField,
   Select,
   AntdInput,
-  RadioGroup,
   Primary,
-  Danger,
-  DateRangePicker,
+  Checkbox,
   TimePicker,
 } from '@/components'
 // custom components
@@ -49,7 +47,6 @@ const doctors = [
 ]
 
 const recurrencePattern = [
-  { name: 'None', value: 'none' },
   { name: 'Daily', value: 'daily' },
   { name: 'Weekly', value: 'weekly' },
   { name: 'Monthly', value: 'wonthly' },
@@ -134,6 +131,10 @@ const styles = (theme) => ({
     fontSize: '.85rem',
     paddingTop: 12,
   },
+  divider: {
+    marginTop: 15,
+    marginBottom: 10,
+  },
 })
 
 const DATETIME_KEY = {
@@ -156,7 +157,8 @@ const initialAptInfo = {
   bookBy: '',
   bookDate: '',
   remarks: '',
-  recurrencePattern: 'none',
+  enableRecurrence: false,
+  recurrencePattern: 'daily',
   recurrenceRange: RECURRENCE_RANGE.AFTER,
   occurence: '',
 }
@@ -202,7 +204,7 @@ const initialAptInfo = {
       color: getColorByAppointmentType(appointmentType),
       resourceId,
     }
-    console.log('handlesubmit', { slotInfo })
+
     switch (slotInfo.type) {
       case 'update':
         handleUpdateEvents(event)
@@ -292,7 +294,8 @@ class Form extends React.PureComponent {
     fetchPatientInfoByPatientID(patientID).then((response) => {
       if (response) {
         const patientInfo = { ...response.data }
-        const { contact } = patientInfo
+        const { name, contact } = patientInfo
+        const patientName = name !== undefined ? name : ''
         let contactNumber = ''
         if (contact) {
           const { mobileContactNumber } = contact
@@ -300,7 +303,10 @@ class Form extends React.PureComponent {
         }
         const { setFieldValue, setFieldTouched } = this.props
 
+        setFieldValue('patientName', patientName)
         setFieldValue('contactNo', contactNumber)
+
+        setFieldTouched('patientName', true)
         setFieldTouched('contactNo', true)
 
         this.setState({
@@ -543,6 +549,86 @@ class Form extends React.PureComponent {
                 ).format('dddd')}`}
               </p>
             </GridItem>
+            <GridItem xs md={12}>
+              <Divider className={classnames(classes.divider)} />
+              <FastField
+                name='enableRecurrence'
+                render={(args) => {
+                  return <Checkbox simple label='Enable Recurrence' {...args} />
+                }}
+              />
+            </GridItem>
+            {values.enableRecurrence && (
+              <React.Fragment>
+                <GridItem xs md={4}>
+                  <FastField
+                    name='recurrencePattern'
+                    render={(args) => (
+                      <Select
+                        {...args}
+                        options={recurrencePattern}
+                        label={formatMessage({
+                          id: 'reception.appt.form.recurrencePattern',
+                        })}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs md={4}>
+                  <FastField
+                    name='recurrenceRange'
+                    render={(args) => (
+                      <Select
+                        {...args}
+                        label='Range of Recurrence'
+                        options={[
+                          {
+                            value: RECURRENCE_RANGE.AFTER,
+                            name: formatMessage({
+                              id: 'reception.appt.form.endAfter',
+                            }),
+                          },
+                          {
+                            value: RECURRENCE_RANGE.BY,
+                            name: formatMessage({
+                              id: 'reception.appt.form.endBy',
+                            }),
+                          },
+                        ]}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs md={4}>
+                  {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
+                    <Field
+                      name='occurence'
+                      render={(args) => (
+                        <NumberInput
+                          {...args}
+                          label={formatMessage({
+                            id: 'reception.appt.form.occurence',
+                          })}
+                        />
+                      )}
+                    />
+                  )}
+                  {values.recurrenceRange === RECURRENCE_RANGE.BY && (
+                    <FastField
+                      name='stopDate'
+                      render={(args) => (
+                        <DatePicker
+                          {...args}
+                          label={formatMessage({
+                            id: 'reception.appt.form.stopDate',
+                          })}
+                        />
+                      )}
+                    />
+                  )}
+                </GridItem>
+              </React.Fragment>
+            )}
           </GridContainer>
         </Paper>
         <div className={classnames(classes.actionsBtnGroup)}>

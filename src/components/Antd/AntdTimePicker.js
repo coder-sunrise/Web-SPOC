@@ -106,6 +106,7 @@ class AntdTimePicker extends Component {
           popupStyle={{ zIndex: 1400 }}
           allowClear
           placeholder=''
+          format={format}
           defaultOpenValue={moment('00:00', 'HH:mm')}
           onChange={extendFunc(onChange, this.handleChange)}
           value={_toMoment(selectValue, format)}
@@ -116,7 +117,7 @@ class AntdTimePicker extends Component {
 
   render () {
     const { classes, ...restProps } = this.props
-    const { format, form, field, value } = restProps
+    const { form, field, value } = restProps
     const selectValue = form && field ? field.value : value
     const labelProps = {
       shrink: !!selectValue || this.state.shrink,

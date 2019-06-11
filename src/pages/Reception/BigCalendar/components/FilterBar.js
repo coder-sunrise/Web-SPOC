@@ -17,9 +17,6 @@ import {
 import AppointmentTypeSelector from '../../../Reception/Appointment/Calendar/Appointments/AppointmentTypeSelector'
 
 const styles = () => ({
-  searchField: {
-    paddingTop: '6px !important',
-  },
   selectorContainer: {
     textAlign: 'left',
   },
@@ -105,7 +102,7 @@ class FilterBar extends PureComponent {
     return (
       <SizeContainer>
         <GridContainer>
-          <GridItem className={classnames(classes.searchField)} xs md={4}>
+          <GridItem xs md={4}>
             <TextField
               value={searchQuery}
               onChange={this.onSearchQueryChange}
