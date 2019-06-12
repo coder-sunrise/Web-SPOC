@@ -92,6 +92,23 @@ const widgets = [
         padding: '0 5px',
       },
     },
+    toolbarAddon: (
+      <Tooltip title='Replace'>
+        <IconButton
+          style={{ float: 'left' }}
+          onClick={() => {
+            window.g_app._store.dispatch({
+              type: 'diagnosis/updateState',
+              payload: {
+                shouldAddNew: true,
+              },
+            })
+          }}
+        >
+          <Add />
+        </IconButton>
+      </Tooltip>
+    ),
   },
   {
     id: '3',
@@ -180,10 +197,10 @@ const styles = (theme) => ({
     backgroundColor: '#ffffff',
   },
   blockName: {
-    position: 'absolute',
-    left: 7,
     lineHeight: '30px',
     fontWeight: 400,
+    float: 'left',
+    marginLeft: theme.spacing(1),
   },
   paperRoot: {
     // boxSizing: 'content-box',
@@ -293,17 +310,7 @@ class Consultation extends PureComponent {
     let defaultLayout
 
     if (!localStorage.getItem('consultationLayout')) {
-      defaultLayout = {
-        keys: this.pageDefaultWidgets.map((o) => o.id),
-        lg: this.pageDefaultWidgets.map((o) => ({
-          ...o.config.lg,
-          i: o.id,
-        })),
-        md: this.pageDefaultWidgets.map((o) => ({
-          ...o.config.md,
-          i: o.id,
-        })),
-      }
+      defaultLayout = this.getDefaultLayout()
     } else {
       defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
     }
@@ -312,7 +319,7 @@ class Consultation extends PureComponent {
       mode: 'edit',
       rowHeight: getLayoutRowHeight(),
       menuOpen: false,
-      defaultLayout,
+      currentLayout: defaultLayout,
     }
   }
 
@@ -346,8 +353,8 @@ class Consultation extends PureComponent {
   }
 
   removeWidget = (id) => {
-    const { defaultLayout } = this.state
-    const keys = defaultLayout.keys.filter((o) => o.id !== id)
+    const { currentLayout } = this.state
+    const keys = currentLayout.keys.filter((o) => o !== id)
     const sizes = [
       'lg',
       'md',
@@ -357,17 +364,36 @@ class Consultation extends PureComponent {
       keys,
     }
     sizes.forEach((s) => {
-      layout[s] = defaultLayout[s]
+      layout[s] = currentLayout[s]
     })
+    console.log(layout)
+    this.changeLayout(layout)
+  }
 
+  changeLayout = (layout) => {
     this.setState(
       {
-        defaultLayout: layout,
+        currentLayout: layout,
       },
       () => {
         localStorage.setItem('consultationLayout', JSON.stringify(layout))
       },
     )
+  }
+
+  getDefaultLayout = () => {
+    const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
+    return {
+      keys: defaultWidgets.map((o) => o.id),
+      lg: defaultWidgets.map((o) => ({
+        ...o.config.lg,
+        i: o.id,
+      })),
+      md: defaultWidgets.map((o) => ({
+        ...o.config.md,
+        i: o.id,
+      })),
+    }
   }
 
   generateConfig = (id) => {
@@ -416,7 +442,7 @@ class Consultation extends PureComponent {
     const layoutCfg = {
       className: classes.layout,
       rowHeight: state.rowHeight,
-      layouts: state.defaultLayout,
+      layouts: state.currentLayout,
       breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       useCSSTransforms: false,
@@ -432,10 +458,11 @@ class Consultation extends PureComponent {
       },
       onLayoutChange: (currentLayout, allLayouts) => {
         console.log(allLayouts)
-        localStorage.setItem('consultationLayout', JSON.stringify(allLayouts))
+        // localStorage.setItem('consultationLayout', JSON.stringify(allLayouts))
+        this.changeLayout(allLayouts)
       },
     }
-    console.log(state.defaultLayout)
+    console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
@@ -471,7 +498,7 @@ class Consultation extends PureComponent {
         </CardContainer> */}
 
         <ResponsiveGridLayout {...layoutCfg}>
-          {state.defaultLayout.keys.map((id) => {
+          {state.currentLayout.keys.map((id) => {
             const dw = this.pageDefaultWidgets.find((m) => m.id === id)
             if (!dw) return <div />
             const w = widgets.find((wg) => wg.id === dw.widgetFk)
@@ -484,6 +511,7 @@ class Consultation extends PureComponent {
                     <div className={`${classes.blockHeader} dragable`}>
                       <div>
                         <span className={classes.blockName}>{w.name}</span>
+                        {w.toolbarAddon}
                         <Tooltip title='Replace'>
                           <IconButton
                             aria-label='Replace'
@@ -608,7 +636,13 @@ class Consultation extends PureComponent {
                               padding: theme.spacing(1),
                             }}
                           >
-                            <Button onClick={() => {}} color='danger' size='sm'>
+                            <Button
+                              onClick={() => {
+                                this.changeLayout(this.getDefaultLayout())
+                              }}
+                              color='danger'
+                              size='sm'
+                            >
                               Reset
                             </Button>
                           </div>

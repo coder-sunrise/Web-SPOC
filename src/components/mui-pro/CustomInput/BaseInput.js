@@ -17,7 +17,6 @@ import Tooltip from '@material-ui/core/Tooltip'
 import Input from '@material-ui/core/Input'
 import customInputStyle from 'mui-pro-jss/material-dashboard-pro-react/components/customInputStyle.jsx'
 import { extendFunc, currencyFormat } from '@/utils/utils'
-// import NumberFormat from 'react-number-format'
 import CustomInputWrapper from '../CustomInputWrapper'
 import FormatInput from './FormatInput'
 
@@ -49,6 +48,8 @@ class BaseInput extends React.PureComponent {
   }
 
   _onKeyDown = (e) => {
+    // console.log(e.target.tagName==='TEXTAREA')
+    if (e.target.tagName === 'TEXTAREA') return
     if (e.which === 13) {
       // onEnterPressed
       const { onEnterPressed } = this.props

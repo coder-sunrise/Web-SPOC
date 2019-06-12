@@ -147,13 +147,14 @@ export function QtyFormatter ({ value }) {
 //   console.log(value)
 //   return '123213' // moment.isMoment(value) ? value.format('LLL') : value
 // }
-let _dateFormat = 'DD-MMM-YYYY'
+let dateFormatLong = 'DD-MMM-YYYY'
+let dateFormat = 'DD-MM-YYYY'
 const DateFormatter = (columnExtensions) => ({ value }) => {
   // console.log(value)
   if (!value) return null
   return moment.isMoment(value)
-    ? v.format(_dateFormat)
-    : moment(value).isValid() ? moment(value).format(_dateFormat) : value
+    ? v.format(dateFormatLong)
+    : moment(value).isValid() ? moment(value).format(dateFormatLong) : value
 }
 
 const DateTypeProvider = (props) => {
@@ -205,5 +206,7 @@ module.exports = {
   NumberFormatter,
   currencyFormat,
   qtyFormat,
+  dateFormat,
+  dateFormatLong,
   ...module.exports,
 }

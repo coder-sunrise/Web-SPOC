@@ -67,6 +67,7 @@ class Orders extends Component {
   render () {
     const { state, props } = this
     const { theme } = props
+    console.log('order')
     return (
       <div>
         <GridContainer>

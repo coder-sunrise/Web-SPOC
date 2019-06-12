@@ -17,7 +17,6 @@ import Tooltip from '@material-ui/core/Tooltip'
 
 import Input from '@material-ui/core/Input'
 import { extendFunc, currencyFormat } from '@/utils/utils'
-// import NumberFormat from 'react-number-format'
 import CustomInputWrapper from '../CustomInputWrapper'
 import FormatInput from './FormatInput'
 import BaseInput from './BaseInput'

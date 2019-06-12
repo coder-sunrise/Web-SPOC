@@ -146,7 +146,8 @@ export const defaultTheme = createMuiTheme({
     },
     MuiFormControl: {
       root: {
-        paddingTop: 15,
+        margin: '5px 0 5px 0',
+        paddingTop: 0,
         '& .ant-input': {
           height: 'auto',
         },
@@ -195,6 +196,14 @@ export const defaultTheme = createMuiTheme({
         padding: '4px 0 1px',
         minHeight: 24,
       },
+      multiline: {
+        padding: 0,
+        '& textarea': {
+          position: 'relative',
+          top: 6,
+          paddingBottom: 5,
+        },
+      },
     },
     MuiInputLabel: {
       root: {
@@ -239,7 +248,8 @@ export const smallTheme = createMuiTheme({
     },
     MuiFormControl: {
       root: {
-        paddingTop: 11,
+        margin: '5px 0 4px 0',
+        paddingTop: 0,
         '& .ant-input': {
           height: 'auto',
         },
@@ -295,6 +305,14 @@ export const smallTheme = createMuiTheme({
         minHeight: 20,
         height: '1rem',
       },
+      multiline: {
+        padding: 0,
+        '& textarea': {
+          position: 'relative',
+          top: 3,
+          paddingBottom: 3,
+        },
+      },
     },
     MuiInputLabel: {
       root: {
@@ -303,10 +321,10 @@ export const smallTheme = createMuiTheme({
         fontWeight: 300,
       },
       formControl: {
-        transform: 'translate(0, 16px) scale(1)',
+        transform: 'translate(0, 20px) scale(1)',
       },
       shrink: {
-        transform: 'translate(0, -1px) scale(0.8)',
+        transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
       },
     },
@@ -340,7 +358,8 @@ export const largeTheme = createMuiTheme({
     },
     MuiFormControl: {
       root: {
-        paddingTop: 20,
+        margin: '6px 0 6px 0',
+        paddingTop: 4,
         '& .ant-input': {
           height: 'auto',
         },
@@ -387,6 +406,14 @@ export const largeTheme = createMuiTheme({
         padding: '6px 0 3px',
         minHeight: 25,
         height: '1rem',
+      },
+      multiline: {
+        padding: 0,
+        '& textarea': {
+          position: 'relative',
+          top: 6,
+          paddingBottom: 9,
+        },
       },
     },
     MuiInputLabel: {

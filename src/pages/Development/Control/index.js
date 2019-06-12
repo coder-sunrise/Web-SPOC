@@ -222,13 +222,28 @@ class ControlTest extends PureComponent {
         </GridItem>
         <GridItem sm={3}>
           <FastField
+            name='name'
+            render={(args) => {
+              return (
+                <TextField
+                  label='Multiline Name'
+                  multiline
+                  rowsMax={6}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem sm={3}>
+          <FastField
             name='genderFk'
             render={(args) => (
               <CodeSelect label='Salutation' code='Salutation' {...args} />
             )}
           />
         </GridItem>
-        <GridItem sm={6}>
+        <GridItem sm={3}>
           <FastField
             name='dob'
             render={(args) => <DatePicker label='DOB' code='dob' {...args} />}

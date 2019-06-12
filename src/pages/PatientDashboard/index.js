@@ -76,7 +76,11 @@ const styles = (theme) => ({
     },
   },
 })
-const dataSource = [ '12345', '23456', '34567' ]
+const dataSource = [
+  '12345',
+  '23456',
+  '34567',
+]
 @connect(({ patientDashboard, global }) => ({
   patientDashboard,
   global,
@@ -206,7 +210,9 @@ class PatientDashboard extends PureComponent {
   )
 
   startConsultation = () => {
-    this.props.history.push('/emr/queue/patientdashboard/consultation/new')
+    this.props.history.push(
+      '/reception/queue/patientdashboard/consultation/new',
+    )
   }
 
   render () {
