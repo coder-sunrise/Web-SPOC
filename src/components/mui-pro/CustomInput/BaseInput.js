@@ -46,7 +46,6 @@ let inputIdCounter = 0
 class BaseInput extends React.PureComponent {
   constructor (props) {
     super(props)
-    inputIdCounter += 1
   }
 
   _onKeyDown = (e) => {
@@ -177,6 +176,8 @@ class BaseInput extends React.PureComponent {
       realtime = true,
       focus = false,
     } = props
+    inputIdCounter += 1
+
     // console.log(this.state, this.state.value)
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value

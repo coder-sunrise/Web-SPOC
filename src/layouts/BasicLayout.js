@@ -4,7 +4,6 @@ import NProgress from 'nprogress'
 // import { Panel } from '@sencha/ext-modern'
 import router from 'umi/router'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import { Layout, Affix } from 'antd'
 import DocumentTitle from 'react-document-title'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
@@ -15,21 +14,20 @@ import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
 import Authorized from '@/utils/Authorized'
-import PerfectScrollbar from 'perfect-scrollbar'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import {
-  primaryColor,
-  secondaryColor,
-  dangerColor,
-  roseColor,
-  grayColor,
-  fontColor,
-  hoverColor,
-} from 'mui-pro-jss'
-import Sidebar from 'mui-pro-components/Sidebar'
+// import {
+//   primaryColor,
+//   secondaryColor,
+//   dangerColor,
+//   roseColor,
+//   grayColor,
+//   fontColor,
+//   hoverColor,
+// } from 'mui-pro-jss'
+// import Sidebar from 'mui-pro-components/Sidebar'
 // import logo from '../assets/logo.svg'
 import image from 'assets/img/sidebar-2.jpg'
 import logo from 'assets/img/logo-white.svg'
@@ -43,7 +41,7 @@ import Footer from 'mui-pro-components/Footer'
 import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
 import Exception403 from '../pages/Exception/403'
-import PageLoading from '@/components/PageLoading'
+// import PageLoading from '@/components/PageLoading'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
@@ -68,10 +66,6 @@ const _theme = createMuiTheme({
   },
 })
 
-// lazy load SettingDrawer
-const SettingDrawer = React.lazy(() => import('@/components/SettingDrawer'))
-
-const { Content } = Layout
 // let ps
 const query = {
   'screen-xs': {

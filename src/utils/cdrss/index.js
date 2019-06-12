@@ -391,7 +391,7 @@ const deepDiffMapper = {
   VALUE_UPDATED: 'updated',
   VALUE_DELETED: 'deleted',
   VALUE_UNCHANGED: 'unchanged',
-  map (obj1, obj2) {
+  map (obj1, obj2, changesOnly = false, k) {
     if (this.isFunction(obj1) || this.isFunction(obj2)) {
       throw new {
         error: 'Invalid argument. Function given, object expected.',
@@ -399,7 +399,7 @@ const deepDiffMapper = {
     }
     if (this.isValue(obj1) || this.isValue(obj2)) {
       return {
-        type: this.compareValues(obj1, obj2),
+        type: this.compareValues(obj1, obj2, k),
         data: obj1 === undefined ? obj2 : obj1,
       }
     }
@@ -414,18 +414,24 @@ const deepDiffMapper = {
       if (typeof obj2[key] !== 'undefined') {
         value2 = obj2[key]
       }
-      diffObj[key] = this.map(obj1[key], value2)
+      const r = this.map(obj1[key], value2, changesOnly, key)
+      if (r.type !== this.VALUE_UNCHANGED || !changesOnly) {
+        diffObj[key] = r
+      }
     }
     for (let key in obj2) {
       if (this.isFunction(obj2[key]) || typeof diffObj[key] !== 'undefined') {
         continue
       }
-      diffObj[key] = this.map(undefined, obj2[key])
+      const r = this.map(undefined, obj2[key], changesOnly, key)
+      if (r.type !== this.VALUE_UNCHANGED || !changesOnly) {
+        diffObj[key] = r
+      }
     }
 
     return diffObj
   },
-  compareValues (value1, value2) {
+  compareValues (value1, value2, k) {
     if (value1 === value2) {
       return this.VALUE_UNCHANGED
     }
@@ -436,13 +442,14 @@ const deepDiffMapper = {
     ) {
       return this.VALUE_UNCHANGED
     }
-    if (typeof value1 === 'undefined') {
+    if (typeof value1 === 'undefined' && typeof value2 !== 'undefined') {
+      // console.log(value1, value2, k)
+
       return this.VALUE_CREATED
     }
-    if (typeof value2 === 'undefined') {
+    if (typeof value2 === 'undefined' && typeof value1 !== 'undefined') {
       return this.VALUE_DELETED
     }
-
     return this.VALUE_UPDATED
   },
   isFunction (obj) {
@@ -985,6 +992,7 @@ module.exports = {
   confirmAction,
   getDiffString,
   addPropToChild,
+  deepDiffMapper,
   defaultFormBehavior,
   defaultContainerBehavior,
   sortAll,

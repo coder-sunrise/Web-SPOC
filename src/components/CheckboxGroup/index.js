@@ -5,55 +5,79 @@ import { FormLabel, Checkbox, FormControlLabel } from '@material-ui/core'
 import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 
-class CheckboxGroup extends React.PureComponent {
-  state = {
-    selectedValue: this.props.defaultValue || [],
+class CheckboxGroup extends React.Component {
+  state = {}
+
+  constructor (props) {
+    super(props)
+    const { options = [], valueField = 'value' } = props
+    const v = {}
+    options.forEach((o) => {
+      v[`${o[valueField]}`] = false
+    })
+    this.state = v
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
-    const { field, value } = nextProps
-
+    const { options, field, value, valueField = 'value' } = nextProps
+    const v = preState
+    // console.log(field.value)
     if (field) {
-      return {
-        selectedValue: field.value,
-      }
+      options.forEach((o) => {
+        v[`${o[valueField]}`] = false
+      })
+      ;(field.value || []).forEach((e) => {
+        v[`${e}`] = true
+      })
+      return v
     }
     if (value) {
       return {
-        selectedValue: value,
+        selectedValue: value || [],
       }
     }
     return null
   }
 
-  handleChange = (event) => {
-    console.log(event.target.value)
-    let { selectedValue = [] } = this.state
-    let newSv = selectedValue.slice()
-    if (selectedValue.find((o) => o === event.target.value)) {
-      newSv = selectedValue.filter((o) => o !== event.target.value)
-    } else {
-      newSv.push(event.target.value)
+  handleChange = (name) => (event) => {
+    // console.log(event.target.value)
+    const newVal = {
+      [name]: event.target.checked,
     }
-    this.setState({ selectedValue: newSv })
-
-    const { form, field, onChange } = this.props
+    this.setState(newVal)
+    const newSt = {
+      ...this.state,
+      ...newVal,
+    }
+    const { form, field, onChange, onSelectedChange } = this.props
     const v = {
       target: {
-        value: newSv,
+        value: Object.keys(newSt)
+          .map((o) => ({
+            v: o,
+            selected: newSt[o],
+          }))
+          .filter((n) => n.selected)
+          .map((n) => n.v),
       },
     }
     if (form && field) {
-      field.onChange({
-        ...v,
-        name: field.name,
-      })
+      v.target.name = field.name
+      field.onChange(v)
     } else if (onChange) {
       onChange(v)
     }
+    // let { selectedValue = [] } = this.state
+    // let newSv = selectedValue.slice()
+    // if (selectedValue.find((o) => o === event.target.value)) {
+    //   newSv = selectedValue.filter((o) => o !== event.target.value)
+    // } else {
+    //   newSv.push(event.target.value)
+    // }
+    // this.setState({ selectedValue: newSv })
   }
 
-  getComponent = () => {
+  getComponent = ({ inputRef, onChange, ...props }) => {
     const { state } = this
     const {
       classes,
@@ -63,13 +87,14 @@ class CheckboxGroup extends React.PureComponent {
       vertical,
       valueField = 'value',
       textField = 'label',
+      labelClass,
       ...resetProps
     } = this.props
-    console.log(this.state.selectedValue)
     return (
-      <div>
+      <div style={{ width: '100%', height: 'auto' }} {...props}>
         {options.map((o) => {
           const v = `${o[valueField]}`
+          // const checked = .selectedValue.find((m) => m === v)
           return (
             <div
               className={`${classes.checkboxAndRadio} ${vertical
@@ -80,24 +105,25 @@ class CheckboxGroup extends React.PureComponent {
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={state.selectedValue.find((m) => m === v)}
-                    onChange={this.handleChange}
+                    checked={state[v]}
+                    onChange={this.handleChange(v)}
                     value={v}
+                    color='primary'
                     // icon={
                     //   <FiberManualRecord className={classes.uncheckedIcon} />
                     // }
                     // checkedIcon={
                     //   <FiberManualRecord className={classes.checkedIcon} />
                     // }
-                    classes={{
-                      checked: classes.checked,
-                      root: classes.checkRoot,
-                    }}
+                    // classes={{
+                    //   checked: classes.checked,
+                    //   root: classes.checkRoot,
+                    // }}
                   />
                 }
-                classes={{
-                  label: classes.label,
-                }}
+                // classes={{
+                //   root: true,
+                // }}
                 label={o[textField]}
               />
             </div>
@@ -112,8 +138,12 @@ class CheckboxGroup extends React.PureComponent {
     return (
       <CustomInput
         inputComponent={this.getComponent}
+        labelProps={{
+          shrink: true,
+        }}
+        noUnderline
         {...restProps}
-        value={this.state.selectedValue}
+        // value={this.state.selectedValue}
       />
     )
   }

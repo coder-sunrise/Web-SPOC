@@ -32,6 +32,9 @@ const customInputStyle = {
     '&:hover:not($disabled):before,&:before': {
       borderWidth: '0px !important',
     },
+    '&:hover:not($disabled):after,&:after': {
+      borderWidth: '0px !important',
+    },
   },
   inputRoot: {
     marginTop: '0 !important',

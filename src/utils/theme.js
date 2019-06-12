@@ -16,9 +16,23 @@ const defaultFontSize = '1rem'
 const smallFontSize = '0.9rem'
 const largeFontSize = '1.2rem'
 
-const smallIconWidth = '0.95em'
+const defaultIconWidth = '0.9em'
+const smallIconWidth = '0.82em'
+const largeIconWidth = '0.95em'
 
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
+
+const sharedFormControlLabel = {
+  label: {
+    fontSize: 'inherit',
+    fontWeight: 'inherit',
+    lineHeight: 'inherit',
+    letterSpacing: 'inherit',
+  },
+  labelPlacementStart: {
+    marginLeft: 0,
+  },
+}
 const sharedPalette = {
   primary: primaryColor,
   secondary: secondaryColor,
@@ -48,17 +62,6 @@ const sharedOverrides = {
       },
     },
   },
-  MuiFormControlLabel: {
-    label: {
-      fontSize: 'inherit',
-      fontWeight: 'inherit',
-      lineHeight: 'inherit',
-      letterSpacing: 'inherit',
-    },
-    labelPlacementStart: {
-      marginLeft: 0,
-    },
-  },
   MuiInputAdornment: {
     root: {
       color: fontColor,
@@ -75,6 +78,12 @@ const sharedOverrides = {
       marginTop: 15,
     },
   },
+  // RadioGroup: {
+  //   label: {
+  //     fontSize: 'inherit',
+  //     fontWeight: 'inherit',
+  //   },
+  // },
   MuiGrid: {
     'direction-xs-column': {
       '& > div': {
@@ -117,7 +126,24 @@ export const defaultTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedOverrides,
-
+    MuiFormControlLabel: {
+      ...sharedFormControlLabel,
+      root: {
+        marginLeft: -10,
+      },
+    },
+    MuiSvgIcon: {
+      root: {
+        width: defaultIconWidth,
+        height: defaultIconWidth,
+      },
+    },
+    PrivateSwitchBase: {
+      root: {
+        margin: '0px 6px',
+        padding: 1,
+      },
+    },
     MuiFormControl: {
       root: {
         paddingTop: 15,
@@ -155,6 +181,7 @@ export const defaultTheme = createMuiTheme({
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
           height: '28px !important',
           overflowY: 'auto',
+          overflowX: 'hidden',
           marginRight: 28,
         },
       },
@@ -192,6 +219,12 @@ export const smallTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedOverrides,
+    MuiFormControlLabel: {
+      ...sharedFormControlLabel,
+      root: {
+        marginLeft: -7,
+      },
+    },
     MuiSvgIcon: {
       root: {
         width: smallIconWidth,
@@ -206,7 +239,7 @@ export const smallTheme = createMuiTheme({
     },
     MuiFormControl: {
       root: {
-        paddingTop: 6,
+        paddingTop: 11,
         '& .ant-input': {
           height: 'auto',
         },
@@ -242,6 +275,7 @@ export const smallTheme = createMuiTheme({
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
           height: '21px !important',
           overflowY: 'auto',
+          overflowX: 'hidden',
           marginRight: 27,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
@@ -269,10 +303,10 @@ export const smallTheme = createMuiTheme({
         fontWeight: 300,
       },
       formControl: {
-        transform: 'translate(0, 11px) scale(1)',
+        transform: 'translate(0, 16px) scale(1)',
       },
       shrink: {
-        transform: 'translate(0, -4px) scale(0.8)',
+        transform: 'translate(0, -1px) scale(0.8)',
         fontWeight: 'inherit',
       },
     },
@@ -286,6 +320,24 @@ export const largeTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedOverrides,
+    MuiFormControlLabel: {
+      ...sharedFormControlLabel,
+      root: {
+        marginLeft: -12,
+      },
+    },
+    MuiSvgIcon: {
+      root: {
+        width: largeIconWidth,
+        height: largeIconWidth,
+      },
+    },
+    PrivateSwitchBase: {
+      root: {
+        margin: '0px 8px',
+        padding: 1,
+      },
+    },
     MuiFormControl: {
       root: {
         paddingTop: 20,
@@ -321,6 +373,7 @@ export const largeTheme = createMuiTheme({
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
           height: '28px !important',
           overflowY: 'auto',
+          overflowX: 'hidden',
           marginRight: 30,
         },
       },

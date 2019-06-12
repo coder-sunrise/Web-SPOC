@@ -201,7 +201,6 @@ class FormikTextField extends React.PureComponent {
 }
 
 FormikTextField.propTypes = {
-  classes: PropTypes.object.isRequired,
   label: PropTypes.node,
   labelProps: PropTypes.object,
   inputProps: PropTypes.object,
