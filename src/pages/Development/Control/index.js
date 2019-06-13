@@ -6,6 +6,7 @@ import { deepDiffMapper } from '@/utils/cdrss'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
+import numeral from 'numeral'
 
 import {
   FormControl,
@@ -47,6 +48,7 @@ import {
   RadioGroup,
   SizeContainer,
   AntdSelect,
+  NumberInput,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -121,6 +123,7 @@ const initValues = {
     doctor: Yup.array().of(Yup.string().required()).required(),
     doctorRadio: Yup.string().required(),
     isPersist: Yup.boolean().required(),
+    numberField: Yup.number().required(),
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
         Yup.object().shape({
@@ -144,11 +147,11 @@ class ControlTest extends PureComponent {
 
   state = {}
 
-  componentDidUpdate (prevProps, prevState, snapshot) {
-    console.log(this.props, prevProps)
+  // componentDidUpdate (prevProps, prevState, snapshot) {
+  //   console.log(this.props, prevProps)
 
-    console.log(deepDiffMapper.map(this.props, prevProps, true))
-  }
+  //   console.log(deepDiffMapper.map(this.props, prevProps, true))
+  // }
 
   componentDidMount () {
     // create an instance
@@ -178,7 +181,7 @@ class ControlTest extends PureComponent {
   render () {
     const { props, state } = this
     const { classes, ...resetProps } = this.props
-
+    console.log(this.props)
     const testConfig = {
       onFocus: (e) => {
         console.log(1)
@@ -332,6 +335,20 @@ class ControlTest extends PureComponent {
                 {...args}
               />
             )}
+          />
+        </GridItem>
+        <GridItem sm={3}>
+          <FastField
+            name='numberField'
+            render={(args) => (
+              <NumberInput label='Number Input' step={0.5} currency {...args} />
+            )}
+          />
+        </GridItem>
+        <GridItem sm={3}>
+          <FastField
+            name='numberField'
+            render={(args) => <TextField label='Text Input' {...args} />}
           />
         </GridItem>
       </GridContainer>

@@ -1,6 +1,6 @@
 import React, { PureComponent, Component } from 'react'
 import { connect } from 'dva'
-import { Editor } from 'react-draft-wysiwyg'
+import { RichEditor } from '@/components'
 
 import model from './models'
 
@@ -10,44 +10,22 @@ window.g_app.replaceModel(model)
   clinicalnotes,
 }))
 class ClinicalNotes extends PureComponent {
-  constructor (props) {
-    super(props)
-    // console.log(this.state, props)
-  }
+  // constructor (props) {
+  //   super(props)
+  //   // console.log(this.state, props)
+  // }
 
   render () {
-    const editorCfg = {
-      toolbar: {
-        options: [
-          'inline',
-          'blockType',
-          // 'fontSize',
-          'list',
-          'textAlign',
-          // 'colorPicker',
-          'link',
-          'embedded',
-          // 'emoji',
-          // 'image',
-          'remove',
-          'history',
-        ],
-        inline: { inDropdown: true },
-        list: { inDropdown: true },
-        textAlign: { inDropdown: true },
-        link: { inDropdown: true },
-      },
-    }
     return (
       <div>
         <h6>Clinical Notes</h6>
-        <Editor {...editorCfg} />
+        <RichEditor />
 
         <h6 style={{ marginTop: 10 }}>Chief Complaints</h6>
-        <Editor {...editorCfg} />
+        <RichEditor />
 
         <h6 style={{ marginTop: 10 }}>Plan</h6>
-        <Editor {...editorCfg} />
+        <RichEditor />
 
         <h6 style={{ marginTop: 10 }}>Attachment</h6>
         <p>

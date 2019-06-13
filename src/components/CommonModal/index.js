@@ -26,8 +26,12 @@ let ps
 function Transition (props) {
   return <Slide direction='up' {...props} />
 }
+function getContainerHeight (props) {
+  return window.innerHeight - 44 - (props.showFooter ? 63 : 0)
+}
+
 @connect(({ loading }) => ({ loading }))
-class CommonModal extends React.Component {
+class CommonModal extends React.PureComponent {
   state = {
     // open: false,
     fullWidth: true,
@@ -35,11 +39,46 @@ class CommonModal extends React.Component {
     height: 0,
   }
 
+  constructor (props) {
+    super(props)
+    // console.log(this.state, props)
+    const { loading, classes, theme } = props
+    this.footer = ({
+      onConfirm,
+      confirmProps = {},
+      cancelProps,
+      confirmBtnText = 'Confirm',
+    }) => {
+      const { disabled = false } = confirmProps
+      return (
+        <DialogActions className={classes.modalFooter}>
+          <Button
+            onClick={this.onClose}
+            color='danger'
+            disabled={loading.global}
+            {...cancelProps}
+          >
+            Cancel
+          </Button>
+          <Button
+            color='primary'
+            onClick={onConfirm}
+            {...confirmProps}
+            style={{ marginLeft: theme.spacing.unit }}
+            disabled={disabled || loading.global}
+          >
+            {loading.global ? 'Processing...' : `${confirmBtnText}`}
+          </Button>
+        </DialogActions>
+      )
+    }
+  }
+
   static getDerivedStateFromProps (nextProps, preState) {
     const { open } = nextProps
     if (open) {
       return {
-        height: window.innerHeight - 44,
+        height: getContainerHeight(nextProps),
       }
     }
     return null
@@ -77,19 +116,20 @@ class CommonModal extends React.Component {
     }
   }
 
-  onConfim = (e) => {
+  onConfim = (cb) => {
     if (this.props.onConfim) {
-      this.props.onConfim(e)
+      this.props.onConfim()
     }
+    if (cb) cb()
   }
 
   handleMaxWidthChange = (event) => {
     this.setState({ maxWidth: event.target.value })
   }
 
-  resize () {
+  resize = () => {
     this.setState({
-      height: window.innerHeight - 44,
+      height: getContainerHeight(this.props),
       width: window.innerWidth,
     })
   }
@@ -100,7 +140,7 @@ class CommonModal extends React.Component {
       open = false,
       title,
       children,
-      showFooter,
+      showFooter = false,
       loading,
       adaptFullWidth = true,
       maxWidth = 'md',
@@ -108,6 +148,7 @@ class CommonModal extends React.Component {
       theme,
       disableBackdropClick = false,
       keepMounted = true,
+      footProps = {},
     } = this.props
     if (!children) return null
     // console.log(bodyNoPadding)
@@ -121,39 +162,11 @@ class CommonModal extends React.Component {
         suppressScrollY: false,
       })
     }
-    const footer = ({
-      onConfirm,
-      confirmProps,
-      cancelProps,
-      confirmBtnText = 'Confirm',
-    }) => {
-      const { disabled = false } = confirmProps
-      return (
-        <DialogActions className={classes.modalFooter}>
-          <Button
-            onClick={this.onClose}
-            color='danger'
-            disabled={loading.global}
-            {...cancelProps}
-          >
-            Cancel
-          </Button>
-          <Button
-            color='success'
-            onClick={onConfirm}
-            {...confirmProps}
-            style={{ marginLeft: theme.spacing.unit }}
-            disabled={disabled || loading.global}
-          >
-            {loading.global ? 'Processing...' : `${confirmBtnText}`}
-          </Button>
-        </DialogActions>
-      )
-    }
+
     const childrenWithProps = React.Children.map(children, (child) =>
       React.cloneElement(child, {
-        footer,
-        onConfirm: this.props.onConfirm,
+        footer: this.footer,
+        onConfirm: this.props.onConfirm || this.onConfim,
         height: this.state.height,
       }),
     )
@@ -161,7 +174,7 @@ class CommonModal extends React.Component {
     return (
       <Dialog
         classes={{
-          root: `${classes.center} ${classes.modalRoot}`,
+          root: `${classes.modalRoot}`,
           paper: classes.modal,
         }}
         disableBackdropClick={disableBackdropClick}
@@ -221,20 +234,13 @@ class CommonModal extends React.Component {
           >
             
           </div> */}
-          <div
-            ref={(divElement) => {
-              this.divElement = divElement
-            }}
-          >
-            {childrenWithProps}
-          </div>
+          {open ? childrenWithProps : null}
         </DialogContent>
-        {/* 
-          showFooter &&
-          footer({
+        {showFooter &&
+          this.footer({
             onConfirm: this.props.onConfirm,
-          }) 
-        */}
+            ...footProps,
+          })}
       </Dialog>
     )
   }

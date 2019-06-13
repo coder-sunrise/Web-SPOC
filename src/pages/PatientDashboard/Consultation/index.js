@@ -3,8 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import $ from 'jquery'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
-import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
+import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
 import { Affix } from 'antd'
 import {
@@ -62,101 +61,6 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
 
-const widgets = [
-  {
-    id: '1',
-    name: 'Clinical Notes',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ClinicalNotes'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '2',
-    name: 'Diagnosis',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/Diagnosis'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '0 5px',
-      },
-    },
-    toolbarAddon: (
-      <Tooltip title='Replace'>
-        <IconButton
-          style={{ float: 'left' }}
-          onClick={() => {
-            window.g_app._store.dispatch({
-              type: 'diagnosis/updateState',
-              payload: {
-                shouldAddNew: true,
-              },
-            })
-          }}
-        >
-          <Add />
-        </IconButton>
-      </Tooltip>
-    ),
-  },
-  {
-    id: '3',
-    name: 'Consultation Document',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ConsultationDocument'),
-      loading: Loading,
-    }),
-    layoutConfig: {},
-  },
-  {
-    id: '4',
-    name: 'Patient History',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/PatientHistory'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '5',
-    name: 'Orders',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/Orders'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '6',
-    name: 'Test Widget',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/TestWidget'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {},
-    },
-  },
-]
 const ResponsiveGridLayout = WidthProvider(Responsive)
 // let layout = {
 //   lg: [
@@ -201,6 +105,7 @@ const styles = (theme) => ({
     fontWeight: 400,
     float: 'left',
     marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   paperRoot: {
     // boxSizing: 'content-box',
@@ -595,13 +500,6 @@ class Consultation extends PureComponent {
                   disablePortal
                   onClose={this.closeWidgetManagePanel}
                   className={classes.widgetPopper}
-                  PaperProps={{
-                    style: {
-                      // maxHeight: ITEM_HEIGHT * 4.5,
-                      zIndex: 100,
-                      width: 200,
-                    },
-                  }}
                 >
                   {({ TransitionProps }) => (
                     <Fade {...TransitionProps} timeout={350}>

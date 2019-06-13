@@ -30,22 +30,37 @@ class FormikTextField extends React.PureComponent {
     const { field = {}, form, inputProps = {} } = props
     // console.log(this.state, props)
     this.state = {
-      value: field.value,
+      value: field.value !== undefined && field.value !== '' ? field.value : '',
     }
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
   }
 
-  onChange = (event) => {
-    this.setState({
-      value: event.target.value,
-    })
-    this.debouncedOnChange(event.target.value)
+  // static getDerivedStateFromProps (nextProps, preState) {
+  //   const { field } = nextProps
+  //   if (field && field.value !== preState.value) {
+  //     console.log(field.value, preState.value)
+  //     return {
+  //       value: field.value,
+  //     }
+  //   }
+  //   return null
+  // }
+
+  componentWillReceiveProps (nextProps) {
+    const { field } = nextProps
+    if (field) {
+      this.setState({
+        value:
+          field.value !== undefined && field.value !== '' ? field.value : '',
+      })
+    }
   }
 
   debouncedOnChange = (value) => {
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
+    console.log('base c', value)
     const v = {
       target: {
         value,
@@ -58,6 +73,13 @@ class FormikTextField extends React.PureComponent {
     if (onChange) {
       onChange(v)
     }
+  }
+
+  onChange = (event) => {
+    this.setState({
+      value: event.target.value,
+    })
+    this.debouncedOnChange(event.target.value)
   }
 
   _onKeyDown = (e) => {
@@ -95,26 +117,6 @@ class FormikTextField extends React.PureComponent {
 
   shouldFocus = (error) => {
     return error && this.props.form.submitCount !== this.validationCount
-  }
-
-  // static getDerivedStateFromProps (nextProps, preState) {
-  //   const { field } = nextProps
-  //   if (field && field.value !== preState.value) {
-  //     console.log(field.value, preState.value)
-  //     return {
-  //       value: field.value,
-  //     }
-  //   }
-  //   return null
-  // }
-
-  componentWillReceiveProps (nextProps) {
-    const { field } = nextProps
-    if (field) {
-      this.setState({
-        value: field.value,
-      })
-    }
   }
 
   render () {
