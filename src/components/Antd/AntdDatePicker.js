@@ -94,10 +94,7 @@ class AntdDatePicker extends PureComponent {
       form.setFieldValue(field.name, date ? date.utc().format() : '')
     }
 
-    if (onChange) {
-      const { name } = this.props
-      onChange(dateString, name)
-    }
+
   }
 
   handleDatePickerOpenChange = (status) => {
