@@ -121,7 +121,7 @@ const grayColor = '#999999'
 // const hoverColor = '#f9efff'
 
 // new color
-const primaryColor = '#597ef7'
+const primaryColor = '#3f51b5'
 const secondaryColor = '#1890ff'
 const successColor = '#52c41a'
 const dangerColor = '#f5222d'

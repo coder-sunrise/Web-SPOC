@@ -11,14 +11,14 @@ const customInputStyle = {
   //     // borderColor: "transparent !important",
   //   },
   // },
-  multiline: {
-    padding: '0px',
-    paddingBottom: '4px',
-    '& textarea': {
-      marginTop: '6px',
-      minHeight: '19px',
-    },
-  },
+  // multiline: {
+  //   padding: '0px',
+  //   paddingBottom: '4px',
+  //   '& textarea': {
+  //     marginTop: '6px',
+  //     minHeight: '19px',
+  //   },
+  // },
   underline: {
     '&:hover:not($disabled):before,&:before': {
       // borderColor: "#D2D2D2 !important",
@@ -32,10 +32,13 @@ const customInputStyle = {
     '&:hover:not($disabled):before,&:before': {
       borderWidth: '0px !important',
     },
+    '&:hover:not($disabled):after,&:after': {
+      borderWidth: '0px !important',
+    },
   },
-  inputRoot: {
-    marginTop: '0 !important',
-  },
+  // inputRoot: {
+  //   marginTop: '0 !important',
+  // },
   disabled: {
     '&:before': {
       borderBottomStyle: 'dotted',
@@ -71,7 +74,7 @@ const customInputStyle = {
   formControl: {
     position: 'relative',
     verticalAlign: 'unset',
-    margin: '6px 0 5px 0',
+    // margin: '5px 0 5px 0',
     // "& svg,& .fab,& .far,& .fal,& .fas,& .material-icons": {
     //   color: "#495057",
     // },

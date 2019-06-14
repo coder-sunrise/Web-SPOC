@@ -1,6 +1,6 @@
 import React, { PureComponent, Suspense } from 'react'
 import { Layout } from 'antd'
-import { compose } from 'recompose'
+// import { compose } from 'recompose'
 import Link from 'umi/link'
 import cx from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'

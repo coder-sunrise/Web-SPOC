@@ -2,8 +2,7 @@ import React from 'react'
 // nodejs library to set properties for components
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
-import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
-
+import CustomInput from 'mui-pro-components/CustomInput'
 import {
   FormLabel,
   Checkbox as MUICheckbox,
@@ -28,28 +27,31 @@ class Checkbox extends React.Component {
     }
     if (field) {
       return {
-        checked: field.value,
+        checked: !!field.value,
       }
     }
     return null
   }
 
-  getCheckboxComponent = () => {
+  getCheckboxComponent = ({ inputRef, onChange: inputOnChange, ...props }) => {
     const {
       classes,
       isSwitch,
       field,
+      mode = 'input',
       label,
+      labelPlacement = 'end',
       form,
       simple,
       controlStyle,
       onChange,
       notCentered = false,
+
       ...resetProps
     } = this.props
-    // console.log(label)
     const opts = {
       tabIndex: -1,
+      color: 'primary',
       // checkedIcon={<Check />} //className={classes.checkedIcon}
       onChange: (event, checked) => {
         this.setState({
@@ -68,45 +70,55 @@ class Checkbox extends React.Component {
         }
       },
       checked: this.state.checked,
-      ...resetProps,
+      // ...resetProps,
     }
     const style = { margin: '0 auto' }
     return (
-      <FormControlLabel
-        style={notCentered ? style : null}
-        control={
-          isSwitch ? (
-            <Switch
-              classes={{
-                checked: classes.checked,
-                switchBase: classes.switchBase,
-                root: classes.switchRoot,
-              }}
-              {...opts}
-            />
-          ) : (
-            <MUICheckbox
-              classes={{
-                checked: classes.checked,
-                root: classes.checkRoot,
-              }}
-              {...opts}
-            />
-          )
-        }
-        label={label}
-      />
+      <div style={{ width: '100%' }} {...props}>
+        <FormControlLabel
+          style={notCentered ? style : null}
+          control={
+            isSwitch ? (
+              <Switch
+                // classes={{
+                //   checked: classes.checked,
+                //   switchBase: classes.switchBase,
+                //   root: classes.switchRoot,
+                // }}
+                {...opts}
+              />
+            ) : (
+              <MUICheckbox
+                checked={this.state.checked}
+                // classes={{
+                //   checked: classes.checked,
+                //   root: classes.checkRoot,
+                // }}
+                {...opts}
+              />
+            )
+          }
+          // classes={{
+          //   root: classes.labelRoot,
+          // }}
+          labelPlacement={labelPlacement}
+          label={label}
+        />
+      </div>
     )
   }
 
   render () {
-    const { classes, label, ...restProps } = this.props
+    const { label, inputLabel, mode = 'input', ...restProps } = this.props
     const { simple } = restProps
     return (
-      <BaseInput
-        label={simple ? '' : ' '}
+      <CustomInput
+        label={inputLabel}
         inputComponent={this.getCheckboxComponent}
         noUnderline
+        labelProps={{
+          shrink: true,
+        }}
         {...restProps}
       />
     )
@@ -115,4 +127,4 @@ class Checkbox extends React.Component {
 
 Checkbox.propTypes = {}
 
-export default withStyles(regularFormsStyle, { withTheme: true })(Checkbox)
+export default Checkbox

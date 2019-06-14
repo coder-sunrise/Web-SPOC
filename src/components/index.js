@@ -44,5 +44,5 @@ export OutlinedTextField from './OutlinedTextField'
 export PageHeaderWrapper from './PageHeaderWrapper'
 export SizeContainer from './Size'
 
-export * from './PDF'
+// export * from './PDF'
 export * from './mui-pro'
