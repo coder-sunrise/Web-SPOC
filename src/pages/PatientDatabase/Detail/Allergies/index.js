@@ -3,10 +3,11 @@ import { connect } from 'dva'
 import { withFormik, FastField } from 'formik'
 import * as Yup from 'yup'
 import { withStyles } from '@material-ui/core'
-import { notification, Checkbox,CardContainer,CommonHeader } from '@/components'
+import { notification, Checkbox, CardContainer, CommonHeader, Select, GridContainer, GridItem } from '@/components'
 
 import allergyModal from '../models/allergy'
 import AllergyGrid from './AllergyGrid'
+import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
 window.g_app.replaceModel(allergyModal)
 
@@ -61,20 +62,20 @@ class Allergies extends PureComponent {
     height: 0,
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  onReset () {
+  onReset() {
     console.log(this, 'Allergy-onReset')
   }
 
-  resize () {
+  resize() {
     if (this.divElement) {
       const height = this.divElement.clientHeight
       if (height > 0) {
@@ -83,54 +84,76 @@ class Allergies extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { height } = this.state
     const { classes, allergy, dispatch } = this.props
 
     return (
-<CardContainer title={this.titleComponent} hideHeader>
-        <div  className={classes.item}>
-                <FastField
-                  name='HasAllergy'
-                  render={(args) => {
-                    return (
-                      <Checkbox
-                        simple
-                        label={"This patient doesn't has any allergy"}
-                        {...args}
-                      />
-                    )
-                  }}
+      <CardContainer title={this.titleComponent} hideHeader>
+        <GridContainer
+          alignItems='flex-start'>
+          <GridItem xs md={12}>
+            <FastField
+              name='HasAllergy'
+              render={(args) => {
+                return (
+                  <Checkbox
+                    simple
+                    label={"This patient doesn't has any allergy"}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs md={3} style={{ marginTop: -10 }}>
+            <FastField
+              name='G6PD'
+              render={(args) => (
+                <Select
+                  {...args}
+                  options={[
+                    { name: 'Yes', value: 1 },
+                    { name: 'No', value: 0 },
+                  ]}
+                  label={"G6PD Deficiency"}
                 />
-              </div>
-              <div className={classes.item}>            <h4 className={classes.cardIconTitle}>
-             Allergy
-            </h4></div>
+              )}
+            />
+          </GridItem>
 
-        <div className={classes.item} style={{marginTop:8}}>
-          <AllergyGrid
-            type='Allergy'
-            entity={allergy.entity}
-            dispatch={dispatch}
-            title='Allergy'
-            height={height}
-          />
-        </div>
+          <GridItem xs md={12}>  <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
+            Allergy
+            </h4></GridItem>
+          <GridItem xs md={12} style={{ marginTop: 8 }}>
+            <AllergyGrid
+              type='Allergy'
+              entity={allergy.entity}
+              dispatch={dispatch}
+              title='Allergy'
+              height={height}
+            />
+          </GridItem>
 
-<div className={classes.item}>            <h4 className={classes.cardIconTitle} style={{marginTop:20}}>
-              Medical Alert
-            </h4></div>
+          <GridItem xs md={12}>  <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
+            Medical Alert
+            </h4></GridItem>
 
-        <div className={classes.item} style={{marginTop:8}}>
-          <AllergyGrid
-            type='Alert'
-            entity={allergy.entity}
-            dispatch={dispatch}
-            title='Medical Alert'
-            height={height}
-          />
-        </div>
-        </CardContainer>
+          <GridItem xs md={12} style={{ marginTop: 8 }}>
+            <AllergyGrid
+              type='Alert'
+              entity={allergy.entity}
+              dispatch={dispatch}
+              title='Medical Alert'
+              height={height}
+            />
+          </GridItem>
+        </GridContainer>
+        {getFooter({
+            resetable: true,
+            ...this.props,
+          })}
+      </CardContainer>
     )
   }
 }

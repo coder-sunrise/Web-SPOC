@@ -10,6 +10,8 @@ import payersModal from '../models/payers'
 
 import SchemesGrid from './SchemesGrid'
 import PayersGrid from './PayersGrid'
+import {  CardContainer, CommonHeader, GridContainer, GridItem } from '@/components'
+
 
 window.g_app.replaceModel(schemesModal)
 window.g_app.replaceModel(payersModal)
@@ -62,13 +64,13 @@ class Schemes extends PureComponent {
     const { height } = this.state
 
     return (
-      <div
-        ref={(divElement) => {
-          this.divElement = divElement
-        }}
-        className={classes.container}
-      >
-        <div className={classes.item}>
+      <CardContainer title={this.titleComponent} hideHeader>
+                <GridContainer
+          alignItems='flex-start'>
+             <GridItem xs md={12}>  <h4 className={classes.cardIconTitle} >
+            Schemes
+            </h4></GridItem>
+         <GridItem xs md={12} style={{ marginTop: 8 }}>
           <SchemesGrid
             type='Schemes'
             entity={schemes.entity}
@@ -76,9 +78,11 @@ class Schemes extends PureComponent {
             title='Schemes'
             height={height}
           />
-        </div>
-
-        <div className={classes.item}>
+        </GridItem>
+        <GridItem xs md={12}>  <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
+            Payers
+            </h4></GridItem>
+        <GridItem xs md={12} style={{ marginTop: 8 }}>
           <PayersGrid
             type='Payers'
             entity={payers.entity}
@@ -86,8 +90,9 @@ class Schemes extends PureComponent {
             title='Payers'
             height={height}
           />
-        </div>
-      </div>
+        </GridItem>
+        </GridContainer>
+        </CardContainer>
     )
   }
 }

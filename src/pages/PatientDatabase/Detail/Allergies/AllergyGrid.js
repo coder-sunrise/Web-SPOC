@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-
+import { PagingPanel } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import {
   Button,
@@ -20,8 +20,7 @@ class AllergyGrid extends PureComponent {
       { name: 'allergyName', title: 'Allergy Name' },
       { name: 'description', title: 'Allergic Reaction' },
       { name: 'date', title: 'Date' },
-      { name: 'status', title: 'Status' },
-      { name: 'Action', title: 'Action' },
+      { name: 'status', title: 'Status' }
     ],
     columnExtensions: [
       {
@@ -89,6 +88,21 @@ class AllergyGrid extends PureComponent {
         })
       }
     }
+
+    this.PagerContent = (me) => (p) => {
+      return (
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              position: 'absolute'
+            
+            }}
+          >
+          </div>
+          <PagingPanel.Container {...p} />
+        </div>
+      )
+    }
   }
 
   render () {
@@ -105,12 +119,24 @@ class AllergyGrid extends PureComponent {
     }
     return (
       // <CardContainer title={this.titleComponent} hideHeader>
-        <CommonTableGrid2
+        <EditableTableGrid2
           // height={height}
           rows={items.filter((o) => o.type === type)}
           onRowDoubleClick={this.onRowDoubleClick}
-          FuncProps={{ edit: true }}
-          EditingProps={EditingProps}
+          FuncProps={{
+            edit: true,
+            pagerConfig: {
+              containerComponent: this.PagerContent(this),
+            },
+          }}
+          EditingProps={{
+            showAddCommand: true,
+            editingRowIds: this.state.editingRowIds,
+            rowChanges: this.state.rowChanges,
+            onEditingRowIdsChange: this.changeEditingRowIds,
+            onRowChangesChange: this.changeRowChanges,
+            onCommitChanges: this.commitChanges,
+          }}
           {...this.tableParas}
         />
       // </CardContainer>

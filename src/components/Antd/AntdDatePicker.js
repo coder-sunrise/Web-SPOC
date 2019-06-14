@@ -77,10 +77,7 @@ class AntdDatePicker extends Component {
       form.setFieldValue(field.name, dateString)
     }
 
-    if (onChange) {
-      const { name } = this.props
-      onChange(dateString, name)
-    }
+
   }
 
   handleDatePickerOpenChange = (status) => {
