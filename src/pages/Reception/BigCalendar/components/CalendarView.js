@@ -155,10 +155,11 @@ class CalendarView extends React.PureComponent {
         events={calendarEvents}
         // --- values props ---
         // --- functional props ---
-        selectable
+        selectable='ignoreEvents'
         resizable={false}
         step={15}
         timeslots={2}
+        longPressThreshold={500}
         tooltipAccessor={null}
         // --- functional props ---
         // --- resources ---
@@ -175,6 +176,7 @@ class CalendarView extends React.PureComponent {
         onSelectEvent={handleSelectEvent}
         onDoubleClickEvent={handleDoubleClick}
         onDragStart={handleOnDragStart}
+
         // --- event handlers ---
       />
     )

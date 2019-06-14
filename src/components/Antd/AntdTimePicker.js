@@ -91,6 +91,8 @@ class AntdTimePicker extends Component {
       onFocus,
       onBlur,
       onOpenChange,
+      use12Hours = true,
+      minuteStep = 15,
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
@@ -107,6 +109,8 @@ class AntdTimePicker extends Component {
           allowClear
           placeholder=''
           format={format}
+          use12Hours={use12Hours}
+          minuteStep={minuteStep}
           defaultOpenValue={moment('00:00', 'HH:mm')}
           onChange={extendFunc(onChange, this.handleChange)}
           value={_toMoment(selectValue, format)}

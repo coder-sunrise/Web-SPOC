@@ -24,18 +24,20 @@ import {
   Primary,
   Checkbox,
   TimePicker,
+  confirm,
 } from '@/components'
 // custom components
-import AppointmentTypeSelector from '../Appointment/Calendar/Appointments/AppointmentTypeSelector'
-import NewPatient from '../../PatientDatabase/New'
-import PatientSearchModal from './PatientSearch'
+import AppointmentTypeSelector from '../../../Appointment/Calendar/Appointments/AppointmentTypeSelector'
+import NewPatient from '../../../../PatientDatabase/New'
+import PatientSearchModal from '../../PatientSearch'
+import DeleteConfirmation from './DeleteConfirmation'
 // services
 import {
   fetchPatientListByName,
   fetchPatientInfoByPatientID,
-} from './service/appointment'
-
-import { defaultColorOpts, getColorByAppointmentType } from './setting'
+} from '../../service/appointment'
+import { getColorByAppointmentType } from '../../setting'
+import styles from './style'
 
 const doctors = [
   { value: 'medisys', name: 'Medisys' },
@@ -67,75 +69,6 @@ const getDateValue = (v) => {
   }
   return moment(v).isValid() ? moment(v).format(_dateFormat) : v
 }
-
-const styles = (theme) => ({
-  loading: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-    width: '100%',
-    zIndex: 99999,
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-  },
-  formContent: {
-    padding: `${theme.spacing.unit}px 0`,
-  },
-  content: {
-    margin: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
-    padding: `0px ${theme.spacing.unit}px`,
-  },
-  rowContainer: {
-    padding: '0px !important',
-  },
-  colorChipContainer: {
-    marginTop: 'auto',
-    marginBottom: '10px',
-  },
-  defaultColor: {
-    background: defaultColorOpts.value,
-    '&:hover': {
-      backgroundColor: defaultColorOpts.activeColor,
-    },
-  },
-  remarksField: {
-    marginTop: theme.spacing.unit * 2,
-  },
-  dateTimePreview: {
-    fontSize: '1rem',
-    textAlign: 'left',
-    paddingLeft: theme.spacing.unit * 9,
-    paddingTop: theme.spacing.unit,
-  },
-  buttonGroup: {
-    height: '100%',
-    display: 'flex',
-    justifyContent: 'start',
-    alignItems: 'center',
-  },
-  actionsBtnGroup: {
-    textAlign: 'right',
-    paddingRight: theme.spacing.unit,
-  },
-  apptLabel: {
-    textAlign: 'left',
-    paddingLeft: theme.spacing.unit,
-    marginTop: theme.spacing.unit * 2,
-  },
-  apptSubLabel: {
-    textAlign: 'right',
-    fontSize: '.85rem',
-    paddingTop: 12,
-  },
-  divider: {
-    marginTop: 15,
-    marginBottom: 10,
-  },
-})
 
 const DATETIME_KEY = {
   START: 'start',
@@ -193,7 +126,7 @@ const initialAptInfo = {
       (resource) => resource.resourceId === doctor,
     )
     let resourceId = assignedResource ? assignedResource.resourceId : 'other'
-
+    console.log({ _nativeStartDate, _nativeEndDate })
     const event = {
       ...slotInfo,
       ...values,
@@ -251,8 +184,8 @@ class Form extends React.PureComponent {
   state = {
     showNewPatientModal: false,
     showSearchPatientModal: false,
+    showDeleteConfirmationModal: false,
     patientList: [],
-    patientInfo: {},
   }
 
   toggleNewPatientModal = () => {
@@ -261,12 +194,6 @@ class Form extends React.PureComponent {
   }
 
   openSearchPatientModal = () => {
-    // const { dispatch, values } = this.props
-    // dispatch({
-    //   type: 'appointment/fetchPatientListByName',
-    //   payload: values.patientName,
-    // })
-
     this.setState({ showSearchPatientModal: true })
   }
 
@@ -288,6 +215,40 @@ class Form extends React.PureComponent {
         })
       }
     })
+  }
+
+  startDateValidation = (value) => {
+    const { values } = this.props
+
+    if (value === '') return 'Start date is required'
+    if (!moment(value).isValid()) return 'Invalid date'
+
+    // start date should be lower than end date
+    const endDate = moment(values.endDate).isValid()
+      ? moment(values.endDate)
+      : ''
+    if (endDate === '') return ''
+    if (endDate.isBefore(moment(value)))
+      return 'Start Date must be before End Date'
+
+    return ''
+  }
+
+  endDateValidation = (value) => {
+    const { values } = this.props
+    if (value === '') return 'End Date is required'
+    if (!moment(value).isValid()) return 'Invalid date'
+
+    // end date should be greater than start date
+    const startDate = moment(values.startDate).isValid()
+      ? moment(values.startDate)
+      : ''
+    if (startDate === '') return ''
+
+    if (startDate.isAfter(moment(value)))
+      return 'End Date must be after Start Date'
+
+    return ''
   }
 
   handleSelectPatient = (patientID) => {
@@ -316,25 +277,50 @@ class Form extends React.PureComponent {
     })
   }
 
+  closeDeleteConfirmation = () => {
+    this.setState({
+      showDeleteConfirmationModal: false,
+    })
+  }
+
+  onCancelAppointmentClick = () => {
+    this.setState({
+      showDeleteConfirmationModal: true,
+    })
+  }
+
+  onConfirmCancelAppointment = ({ deleteType, reasonType, reason }) => {
+    const { handleDeleteEvent, slotInfo } = this.props
+    this.setState(
+      {
+        showDeleteConfirmationModal: false,
+      },
+      () => {
+        handleDeleteEvent(slotInfo.id)
+      },
+    )
+  }
+
   render () {
     const {
       classes,
       onConfirm,
-      handleCreatePatientClick,
-      handleSearchClick,
+      slotInfo,
       isLoading,
       handleSubmit,
-      slotInfo,
       values,
     } = this.props
 
     const {
       showNewPatientModal,
       showSearchPatientModal,
+      showDeleteConfirmationModal,
       patientList,
     } = this.state
 
-    console.log('values', { err: this.props.errors, values })
+    const hideCancelAppointmentClass = {
+      [classes.hideCancelAppointmentBtn]: slotInfo.type === 'add',
+    }
 
     return (
       <SizeContainer>
@@ -455,24 +441,15 @@ class Form extends React.PureComponent {
             <GridItem xs md={3}>
               <Field
                 name='startDate'
-                // validate={startDateValidation}
+                validate={this.startDateValidation}
                 render={(args) => (
-                  <DatePicker
-                    noLabel
-                    {...args}
-                    format={_dateFormat}
-                    // onChange={onStartDateChange}
-                    // label={formatMessage({
-                    //   id: 'reception.appt.form.appointmentTime',
-                    // })}
-                  />
+                  <DatePicker noLabel {...args} format={_dateFormat} />
                 )}
               />
             </GridItem>
             <GridItem xs md={2}>
               <Field
                 name='startTime'
-                // validate={startDateValidation}
                 render={(args) => (
                   <TimePicker
                     {...args}
@@ -490,16 +467,15 @@ class Form extends React.PureComponent {
             <GridItem xs md={3}>
               <Field
                 name='endDate'
-                // validate={startDateValidation}
-                render={(args) => (
-                  <DatePicker noLabel {...args} format={_dateFormat} />
-                )}
+                validate={this.endDateValidation}
+                render={(args) => {
+                  return <DatePicker noLabel {...args} format={_dateFormat} />
+                }}
               />
             </GridItem>
             <GridItem xs md={2}>
               <Field
                 name='endTime'
-                // validate={startDateValidation}
                 render={(args) => (
                   <TimePicker
                     {...args}
@@ -512,41 +488,17 @@ class Form extends React.PureComponent {
               />
             </GridItem>
             <GridItem xs md={6}>
-              {/* invalidEndDate ? (
-                <Danger>
-                  <p className={classnames(classes.dateTimePreview)}>
-                    {values.endDate}
-                  </p>
-                </Danger>
-              ) : (
-                <p className={classnames(classes.dateTimePreview)}>
-                  {values.endDate}
-                </p>
-              ) */}
               <p className={classnames(classes.dateTimePreview)}>
-                {`${values.startDate} ${values.startTime}, ${moment(
-                  values.startDate,
-                  _dateFormat,
-                ).format('dddd')}`}
+                {` ${moment(values.startDate, _dateFormat).format(
+                  'dddd',
+                )}, ${values.startDate} ${values.startTime}`}
               </p>
             </GridItem>
             <GridItem xs md={6}>
-              {/* invalidEndDate ? (
-                <Danger>
-                  <p className={classnames(classes.dateTimePreview)}>
-                    {values.endDate}
-                  </p>
-                </Danger>
-              ) : (
-                <p className={classnames(classes.dateTimePreview)}>
-                  {values.endDate}
-                </p>
-              ) */}
               <p className={classnames(classes.dateTimePreview)}>
-                {`${values.endDate} ${values.endTime}, ${moment(
-                  values.endDate,
-                  _dateFormat,
-                ).format('dddd')}`}
+                {`${moment(values.endDate, _dateFormat).format(
+                  'dddd',
+                )}, ${values.endDate} ${values.endTime}`}
               </p>
             </GridItem>
             <GridItem xs md={12}>
@@ -631,14 +583,28 @@ class Form extends React.PureComponent {
             )}
           </GridContainer>
         </Paper>
-        <div className={classnames(classes.actionsBtnGroup)}>
-          <Button onClick={onConfirm} color='danger'>
-            Cancel
-          </Button>
-          <Button color='success'>Save Draft</Button>
-          <Button onClick={handleSubmit} color='primary'>
-            Confirm
-          </Button>
+        <div className={classnames(classes.footer)}>
+          <GridContainer>
+            <GridItem xs md={4} container justify='flex-start'>
+              <Button
+                color='danger'
+                className={classnames(hideCancelAppointmentClass)}
+                onClick={this.onCancelAppointmentClick}
+              >
+                Cancel Appointment
+              </Button>
+            </GridItem>
+
+            <GridItem xs md={8} container justify='flex-end'>
+              <Button onClick={onConfirm} color='danger'>
+                Cancel
+              </Button>
+              <Button color='success'>Save Draft</Button>
+              <Button onClick={handleSubmit} color='primary'>
+                Confirm
+              </Button>
+            </GridItem>
+          </GridContainer>
         </div>
 
         <CommonModal
@@ -667,6 +633,15 @@ class Form extends React.PureComponent {
               onSelectClick={this.handleSelectPatient}
             />
           ) : null}
+        </CommonModal>
+        <CommonModal
+          open={showDeleteConfirmationModal}
+          title='Alert'
+          onClose={this.closeDeleteConfirmation}
+          onConfirm={this.onConfirmCancelAppointment}
+          maxWidth='sm'
+        >
+          <DeleteConfirmation />
         </CommonModal>
       </SizeContainer>
     )

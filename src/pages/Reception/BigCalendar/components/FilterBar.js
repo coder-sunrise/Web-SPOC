@@ -7,6 +7,7 @@ import { formatMessage } from 'umi/locale'
 import { CircularProgress, withStyles } from '@material-ui/core'
 // custom component
 import {
+  Button,
   GridContainer,
   GridItem,
   TextField,
@@ -14,7 +15,7 @@ import {
   SizeContainer,
 } from '@/components'
 // sub components
-import AppointmentTypeSelector from '../../../Reception/Appointment/Calendar/Appointments/AppointmentTypeSelector'
+import AppointmentTypeSelector from './AppointmentTypeSelector'
 
 const styles = () => ({
   selectorContainer: {
@@ -102,7 +103,7 @@ class FilterBar extends PureComponent {
     return (
       <SizeContainer>
         <GridContainer>
-          <GridItem xs md={4}>
+          <GridItem xs md={2}>
             <TextField
               value={searchQuery}
               onChange={this.onSearchQueryChange}
@@ -121,15 +122,19 @@ class FilterBar extends PureComponent {
               onChange={this.onFilterByDoctorChange}
             />
           </GridItem>
-          <GridItem xs md={4}>
-            <GridItem className={classnames(classes.selectorContainer)}>
-              <AppointmentTypeSelector
-                label='Filter by Appointment Type'
-                value={filter.appointmentType}
-                onChange={this.onFilterAppointmentTypeChange}
-                // helpText='Leave blank to show all appointment type'
-                mode='multiple'
-              />
+          <GridItem xs md={3} className={classnames(classes.selectorContainer)}>
+            <AppointmentTypeSelector
+              label='Filter by Appointment Type'
+              value={filter.appointmentType}
+              onChange={this.onFilterAppointmentTypeChange}
+              // helpText='Leave blank to show all appointment type'
+              mode='multiple'
+            />
+          </GridItem>
+
+          <GridItem xs md={5} container justify='flex-end'>
+            <GridItem>
+              <Button color='info'>Doctor Event</Button>
             </GridItem>
           </GridItem>
         </GridContainer>

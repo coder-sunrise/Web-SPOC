@@ -145,6 +145,7 @@ class AntdDatePicker extends Component {
             onOpenChange,
             this.handleDatePickerOpenChange,
           )}
+          format={format}
           value={_toMoment(selectValue, format)}
         />
       </div>

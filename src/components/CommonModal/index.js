@@ -154,6 +154,7 @@ class CommonModal extends React.Component {
       React.cloneElement(child, {
         footer,
         onConfirm: this.props.onConfirm,
+        onClose: this.props.onClose,
         height: this.state.height,
       }),
     )
