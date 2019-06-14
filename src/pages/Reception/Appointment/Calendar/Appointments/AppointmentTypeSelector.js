@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { Select as AntdSelect } from 'antd'
+import { Select as OriAntdSelect } from 'antd'
 // custom components
 import { Select } from '@/components'
 import {
@@ -38,7 +38,7 @@ class AppointmentTypeSelector extends PureComponent {
         options={AppointmentTypeOptions}
         renderDropdown={(option) => {
           return (
-            <AntdSelect.Option
+            <OriAntdSelect.Option
               key={option.value}
               title={option.name}
               value={option.value}
@@ -51,7 +51,7 @@ class AppointmentTypeSelector extends PureComponent {
                 ])}
               />
               <span>{option.name}</span>
-            </AntdSelect.Option>
+            </OriAntdSelect.Option>
           )
         }}
         {...restProps}

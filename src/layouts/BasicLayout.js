@@ -4,7 +4,6 @@ import NProgress from 'nprogress'
 // import { Panel } from '@sencha/ext-modern'
 import router from 'umi/router'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import { Layout, Affix } from 'antd'
 import DocumentTitle from 'react-document-title'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
@@ -15,20 +14,20 @@ import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
 import Authorized from '@/utils/Authorized'
-import PerfectScrollbar from 'perfect-scrollbar'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import {
-  primaryColor,
-  dangerColor,
-  roseColor,
-  grayColor,
-  fontColor,
-  hoverColor,
-} from 'mui-pro-jss'
-import Sidebar from 'mui-pro-components/Sidebar'
+// import {
+//   primaryColor,
+//   secondaryColor,
+//   dangerColor,
+//   roseColor,
+//   grayColor,
+//   fontColor,
+//   hoverColor,
+// } from 'mui-pro-jss'
+// import Sidebar from 'mui-pro-components/Sidebar'
 // import logo from '../assets/logo.svg'
 import image from 'assets/img/sidebar-2.jpg'
 import logo from 'assets/img/logo-white.svg'
@@ -42,18 +41,19 @@ import Footer from 'mui-pro-components/Footer'
 import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
 import Exception403 from '../pages/Exception/403'
-import PageLoading from '@/components/PageLoading'
+// import PageLoading from '@/components/PageLoading'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
-const theme = createMuiTheme({
+const _theme = createMuiTheme({
   typography: {
     useNextVariants: true,
   },
   palette: {
-    primary: {
-      main: primaryColor,
-    },
+    ...defaultTheme.palette,
+    // primary: {
+    //   main: primaryColor,
+    // },
     // secondary: {
     //   light: '#ff7961',
     //   main: '#f44336',
@@ -63,101 +63,9 @@ const theme = createMuiTheme({
   },
   overrides: {
     ...defaultTheme.overrides,
-    MuiInput: {
-      underline: {
-        '&:hover:not($disabled):not($focused):not($error):before': {
-          borderBottomWidth: '1px',
-        },
-        '&:after': {
-          borderBottomColor: primaryColor,
-          // borderBottomWidth:'1px',
-        },
-        // "&:before": {
-        //   borderBottom: '10px solid rgba(0, 0, 0, 0.42)',
-        // },
-        '&$focused': {
-          '&:after': {
-            transform: 'scaleX(1) !important',
-          },
-        },
-      },
-    },
-    MuiInputAdornment: {
-      root: {
-        color: fontColor,
-        fontSize: '1rem',
-        whiteSpace: 'nowrap',
-        '& > p': {
-          fontWeight: 300,
-        },
-      },
-      positionStart: {
-        marginTop: 15,
-      },
-      positionEnd: {
-        marginTop: 15,
-      },
-    },
-    MuiGrid: {
-      'direction-xs-column': {
-        '& > div': {
-          paddingLeft: 0,
-          paddingRight: 0,
-        },
-      },
-    },
-    MuiIconButton: {
-      root: {
-        padding: 3,
-        color: 'rgba(0, 0, 0, 0.8)',
-        fontSize: '1.2rem',
-        borderRadius: 4,
-      },
-    },
-    MuiTouchRipple: {
-      child: {
-        borderRadius: 4,
-      },
-    },
-    MuiList: {
-      root: {
-        color: primaryColor,
-      },
-    },
-    MuiListItem: {
-      button: {
-        '&:hover,&:focus': {
-          backgroundColor: hoverColor,
-        },
-      },
-    },
-    // MuiTableCell: {
-    //   root: {
-    //     '&:last-child': {
-    //       paddingLeft: 'inherit',
-    //       paddingRight: 'inherit',
-    //     },
-    //   },
-    // },
-    // MuiTableRow: {
-    //   root: {
-    //     // overflow: 'hidden',
-    //   },
-    // },
-
-    // MuiSwitch: {
-    //   switchBase: {
-    //     height: 'auto',
-    //     padding: '5px 4px 4px 4px',
-    //   },
-    // },
   },
 })
 
-// lazy load SettingDrawer
-const SettingDrawer = React.lazy(() => import('@/components/SettingDrawer'))
-
-const { Content } = Layout
 // let ps
 const query = {
   'screen-xs': {
@@ -189,7 +97,7 @@ class BasicLayout extends React.PureComponent {
     super(props)
     this.state = {
       mobileOpen: false,
-      miniActive: false,
+      miniActive: props.collapsed,
     }
     this.resizeFunction = this.resizeFunction.bind(this)
 
@@ -403,8 +311,8 @@ class BasicLayout extends React.PureComponent {
   }
 
   render () {
-    const { classes, loading, ...props } = this.props
-
+    const { classes, loading, theme, ...props } = this.props
+    // console.log(props.collapsed)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
@@ -520,7 +428,7 @@ class BasicLayout extends React.PureComponent {
     // console.log(this)
     return (
       <React.Fragment>
-        <MuiThemeProvider theme={theme}>
+        <MuiThemeProvider theme={_theme}>
           <CssBaseline />
           <DocumentTitle title={this.getPageTitle(pathname)}>
             <ContainerQuery query={query}>

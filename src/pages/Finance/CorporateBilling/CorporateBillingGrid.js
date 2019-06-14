@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // material ui
-import { Pageview } from '@material-ui/icons'
+import Pageview from '@material-ui/icons/Pageview'
 // dev grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom component

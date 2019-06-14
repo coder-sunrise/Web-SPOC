@@ -291,9 +291,9 @@ class AppointmentFormContainerBasic extends PureComponent {
     } = this.props
     const isNewAppointment = appointmentData.id === undefined
     const isConflict = false // TODO check if appointment conflict with another
-    console.log('appointmentform', this.props)
+
     return (
-      <AppointmentForm.Popup visible={visible}>
+      <AppointmentForm.Popup visible={visible} onBackdropClick={visibleChange}>
         <AppointmentForm.Container className={classes.container}>
           <div className={classes.header}>
             <h4 className={classes.title}>Add appointment</h4>

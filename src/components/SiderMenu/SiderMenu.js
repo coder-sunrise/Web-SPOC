@@ -1,21 +1,16 @@
 import React, { PureComponent, Suspense } from 'react'
 import { Layout } from 'antd'
-import classNames from 'classnames'
+// import { compose } from 'recompose'
 import Link from 'umi/link'
-
-
-
- 
-import cx from "classnames"
-import withStyles from "@material-ui/core/styles/withStyles"
-
-import Drawer from "@material-ui/core/Drawer"
-import List from "@material-ui/core/List"
-import ListItem from "@material-ui/core/ListItem"
-import ListItemIcon from "@material-ui/core/ListItemIcon"
-import ListItemText from "@material-ui/core/ListItemText"
-import Hidden from "@material-ui/core/Hidden"
-import sidebarStyle from "mui-pro-jss/material-dashboard-pro-react/components/sidebarStyle.jsx"
+import cx from 'classnames'
+import withStyles from '@material-ui/core/styles/withStyles'
+import Drawer from '@material-ui/core/Drawer'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
+import Hidden from '@material-ui/core/Hidden'
+import sidebarStyle from 'mui-pro-jss/material-dashboard-pro-react/components/sidebarStyle.jsx'
 import SidebarWrapper from './SidebarWrapper'
 import Links from './Links'
 import Logo from './Logo'
@@ -26,25 +21,24 @@ import styles from './index.less'
 
 const BaseMenu = React.lazy(() => import('./BaseMenu'))
 const { Sider } = Layout
-
 class SiderMenu extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
       openKeys: getDefaultCollapsedSubMenus(props),
+      miniActive: props.miniActive,
     }
   }
 
-  // static getDerivedStateFromProps (props, state) {
-  //   const { pathname } = state
-  //   if (props.location.pathname !== pathname) {
-  //     return {
-  //       pathname: props.location.pathname,
-  //       openKeys: getDefaultCollapsedSubMenus(props),
-  //     }
-  //   }
-  //   return null
-  // }
+  static getDerivedStateFromProps (props, state) {
+    const { miniActive } = props
+    if (miniActive !== state.miniActive) {
+      return {
+        miniActive,
+      }
+    }
+    return null
+  }
 
   // isMainMenu = key => {
   //   const { menuData } = this.props
@@ -64,15 +58,18 @@ class SiderMenu extends PureComponent {
   // };
 
   render () {
-    let {  collapsed, miniActive, onCollapse, fixSiderbar, theme } = this.props
+    let {
+      width,
+      collapsed,
+      miniActive,
+      onCollapse,
+      fixSiderbar,
+      theme,
+      ...restProps
+    } = this.props
     // if(this.state.miniActive)collapsed= this.state.miniActive
     const { openKeys } = this.state
-    let  shouldCollapse=collapsed 
-    if(miniActive) shouldCollapse=collapsed && this.state.miniActive
-    // console.log(shouldCollapse)
-    const defaultProps = shouldCollapse ? {} : { openKeys }
-
-    const siderClassName = classNames(styles.sider, {
+    const siderClassName = cx(styles.sider, {
       [styles.fixSiderbar]: fixSiderbar,
       [styles.light]: theme === 'light',
     })
@@ -86,23 +83,21 @@ class SiderMenu extends PureComponent {
       routes,
       bgColor,
       rtlActive,
+      isMobile,
     } = this.props
-    const drawerPaper =
-    `${classes.drawerPaper 
-    } ${ 
-    cx({
-      [classes.drawerPaperMini]:
-      shouldCollapse,
+    let shouldCollapse = collapsed
+    if (miniActive) shouldCollapse = collapsed && this.state.miniActive
+    if (isMobile) shouldCollapse = false
+    // console.log(shouldCollapse)
+    const defaultProps = shouldCollapse ? {} : { openKeys }
+    const drawerPaper = `${classes.drawerPaper} ${cx({
+      [classes.drawerPaperMini]: shouldCollapse,
       [classes.drawerPaperRTL]: rtlActive,
     })}`
-  const sidebarWrapper =
-    `${classes.sidebarWrapper 
-    } ${ 
-    cx({
-      [classes.drawerPaperMini]:
-      shouldCollapse,
+    const sidebarWrapper = `${classes.sidebarWrapper} ${cx({
+      [classes.drawerPaperMini]: shouldCollapse,
       [classes.sidebarWrapperWithPerfectScrollbar]:
-        navigator.platform.indexOf("Win") > -1,
+        navigator.platform.indexOf('Win') > -1,
     })}`
     return (
       // <Sider
@@ -115,67 +110,24 @@ class SiderMenu extends PureComponent {
       //   theme={theme}
       //   className={siderClassName}
       // >
-        
+
       // </Sider>
-      <div ref="mainPanel">
-        <Hidden mdUp implementation="css">
+      <div ref='mainPanel'>
+        <Hidden mdUp implementation='css'>
           <Drawer
-            variant="temporary"
-            anchor={rtlActive ? "left" : "right"}
+            variant='temporary'
+            anchor={rtlActive ? 'left' : 'right'}
             open={this.props.open}
             classes={{
-              paper: `${drawerPaper  } ${  classes[`${bgColor  }Background`]}`,
+              paper: `${drawerPaper} ${classes[`${bgColor}Background`]}`,
             }}
             onClose={this.props.handleDrawerToggle}
             ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          >
-            <Logo {...this.props} />
-            <SidebarWrapper
-              className={sidebarWrapper}
-            >
-          
-              <User {...this.props} />
-              <Suspense fallback={null}>
-                {/* <BaseMenu
-            {...this.props}
-            mode="inline"
-            handleOpenChange={this.handleOpenChange}
-            onOpenChange={this.handleOpenChange}
-            style={{ padding: '16px 0', width: '100%' }}
-            {...defaultProps}
-          /> */}
-                <BaseMenu {...this.props} />
-              </Suspense>
-            </SidebarWrapper>
-            {image !== undefined ? (
-              <div
-                className={classes.background}
-                style={{ backgroundImage: `url(${  image  })` }}
-              />
-          ) : null}
-          </Drawer>
-        </Hidden>
-        <Hidden smDown implementation="css">
-          <Drawer
-            onMouseOver={() => {
-              this.setState({ miniActive: false })
+              keepMounted: true, // Better open performance on mobile.
             }}
-            onMouseOut={() => {
-              this.setState({ miniActive: true })
-            }}
-            anchor={rtlActive ? "right" : "left"}
-            variant="permanent"
-            open
-            classes={{
-            paper: `${drawerPaper  } ${  classes[`${bgColor  }Background`]}`,
-          }}
           >
             <Logo {...this.props} collapsed={shouldCollapse} />
-            <SidebarWrapper
-              className={sidebarWrapper}
-            >
+            <SidebarWrapper className={sidebarWrapper}>
               <User {...this.props} collapsed={shouldCollapse} />
               <Suspense fallback={null}>
                 {/* <BaseMenu
@@ -186,16 +138,53 @@ class SiderMenu extends PureComponent {
             style={{ padding: '16px 0', width: '100%' }}
             {...defaultProps}
           /> */}
-                <BaseMenu {...this.props} collapsed={shouldCollapse} />
-
+                <BaseMenu {...restProps} collapsed={shouldCollapse} />
               </Suspense>
             </SidebarWrapper>
             {image !== undefined ? (
               <div
                 className={classes.background}
-                style={{ backgroundImage: `url(${  image  })` }}
+                style={{ backgroundImage: `url(${image})` }}
               />
-          ) : null}
+            ) : null}
+          </Drawer>
+        </Hidden>
+        <Hidden smDown implementation='css'>
+          <Drawer
+            onMouseEnter={() => {
+              this.setState({ miniActive: false })
+            }}
+            onMouseLeave={() => {
+              this.setState({ miniActive: true })
+            }}
+            anchor={rtlActive ? 'right' : 'left'}
+            variant='permanent'
+            open
+            classes={{
+              paper: `${drawerPaper} ${classes[`${bgColor}Background`]}`,
+            }}
+          >
+            <Logo {...this.props} collapsed={shouldCollapse} />
+            <SidebarWrapper className={sidebarWrapper}>
+              <User {...this.props} collapsed={shouldCollapse} />
+              <Suspense fallback={null}>
+                {/* <BaseMenu
+            {...this.props}
+            mode="inline"
+            handleOpenChange={this.handleOpenChange}
+            onOpenChange={this.handleOpenChange}
+            style={{ padding: '16px 0', width: '100%' }}
+            {...defaultProps}
+          /> */}
+                <BaseMenu {...restProps} collapsed={shouldCollapse} />
+              </Suspense>
+            </SidebarWrapper>
+            {image !== undefined ? (
+              <div
+                className={classes.background}
+                style={{ backgroundImage: `url(${image})` }}
+              />
+            ) : null}
           </Drawer>
         </Hidden>
       </div>
@@ -203,4 +192,8 @@ class SiderMenu extends PureComponent {
   }
 }
 
-export default withStyles(sidebarStyle)(SiderMenu)
+// const enhance = compose(
+//   withStyles(sidebarStyle, { withTheme: true }),
+//   withWidth(),
+// )
+export default withStyles(sidebarStyle, { withTheme: true })(SiderMenu)

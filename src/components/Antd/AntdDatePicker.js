@@ -10,9 +10,12 @@ import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
 import AntdWrapper from './AntdWrapper'
 import { extendFunc } from '@/utils/utils'
-import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
-
-const _dateFormat = 'YYYY-MM-DD'
+import {
+  CustomInputWrapper,
+  BaseInput,
+  CustomInput,
+  dateFormat,
+} from '@/components'
 
 const _toMoment = (value, format) => {
   if (!value) return value
@@ -33,6 +36,7 @@ const STYLES = (theme) => ({
     width: '100%',
     boxSizing: 'content-box',
     lineHeight: '1rem',
+    color: 'currentColor',
     '& > div > input': {
       border: 'none',
       boxShadow: 'none !important',
@@ -43,12 +47,12 @@ const STYLES = (theme) => ({
 })
 
 class AntdDatePicker extends Component {
-  static defaultProps = {
-    label: 'Select date',
-    format: 'YYYY-MM-DD',
-    disabled: false,
-    size: 'default',
-  }
+  // static defaultProps = {
+  //   // label: 'Select date',
+  //   format: dateFormat,
+  //   disabled: false,
+  //   size: 'default',
+  // }
 
   state = {
     shrink: false,
@@ -122,7 +126,7 @@ class AntdDatePicker extends Component {
       onOpenChange,
       ...restProps
     } = this.props
-    const { format, form, field, value } = restProps
+    const { format = dateFormat, form, field, value } = restProps
     const selectValue = form && field ? field.value : value
 
     // date picker component dont pass formik props into wrapper
@@ -141,6 +145,7 @@ class AntdDatePicker extends Component {
             onOpenChange,
             this.handleDatePickerOpenChange,
           )}
+          format={format}
           value={_toMoment(selectValue, format)}
         />
       </div>

@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Replay } from '@material-ui/icons'
+import Replay from '@material-ui/icons/Replay'
 
 import { GridContainer, GridItem, Select, Button } from '@/components'
 import { withStyles, Tooltip } from '@material-ui/core'

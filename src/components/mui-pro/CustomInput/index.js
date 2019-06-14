@@ -12,12 +12,11 @@ import InputLabel from '@material-ui/core/InputLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
 import { InputAdornment, Grid } from '@material-ui/core'
 import numeral from 'numeral'
-import { Error } from '@material-ui/icons'
+
 import Tooltip from '@material-ui/core/Tooltip'
 
 import Input from '@material-ui/core/Input'
 import { extendFunc, currencyFormat } from '@/utils/utils'
-// import NumberFormat from 'react-number-format'
 import CustomInputWrapper from '../CustomInputWrapper'
 import FormatInput from './FormatInput'
 import BaseInput from './BaseInput'
@@ -33,7 +32,7 @@ class FormikTextField extends React.PureComponent {
     this.state = {
       value: field.value,
     }
-    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 2000)
+    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
   }
 
   onChange = (event) => {
@@ -58,6 +57,39 @@ class FormikTextField extends React.PureComponent {
     }
     if (onChange) {
       onChange(v)
+    }
+  }
+
+  _onKeyDown = (e) => {
+    if (e.which === 13) {
+      // onEnterPressed
+      const { onEnterPressed } = this.props
+      if (onEnterPressed) onEnterPressed(e)
+
+      let loop = 0
+      let target = $(e.target)
+      while (loop < 100) {
+        const newTarget = $(target.parents('div,tr')[0])
+        if (newTarget.length === 0) break
+        const btn = newTarget.find("button[data-button-type='progress']")
+        if (btn.length > 0) {
+          if (this.props.onCommit) {
+            this.props.onCommit({
+              target: {
+                value: this.state.value,
+              },
+            })
+            setTimeout(() => {
+              btn.trigger('click')
+            }, 200)
+          } else {
+            btn.trigger('click')
+          }
+          break
+        }
+        target = newTarget
+        loop += 1
+      }
     }
   }
 
@@ -168,7 +200,6 @@ class FormikTextField extends React.PureComponent {
 }
 
 FormikTextField.propTypes = {
-  classes: PropTypes.object.isRequired,
   label: PropTypes.node,
   labelProps: PropTypes.object,
   inputProps: PropTypes.object,

@@ -83,13 +83,13 @@ blockquote p {
 }
 
 a {
-  color: #9c27b0;
+  color: $brand-primary;
   text-decoration: none;
 }
 
 a:hover,
 a:focus {
-  color: #89229b;
+  color: $brand-info;
   text-decoration: none;
 }
 
@@ -131,12 +131,12 @@ output {
   line-height: 1.42857;
 }
 
-label {
-  font-size: 14px;
-  line-height: 1.42857;
-  // color: #aaaaaa;
-  font-weight: 400;
-}
+// label {
+//   font-size: 14px;
+//   line-height: 1.42857;
+//   // color: #aaaaaa;
+//   font-weight: 400;
+// }
 
 footer {
   padding: 15px 0;

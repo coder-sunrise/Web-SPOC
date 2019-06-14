@@ -7,9 +7,9 @@ import queryString from 'query-string'
 import $ from 'jquery'
 import { isAntdPro, updateLoadingState } from './utils'
 
-export const baseUrl = 'http://localhost:9300'
+// export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
-// export const baseUrl = 'https://semr2dev2010.emr.com.sg'
+export const baseUrl = 'https://semr2dev2010.emr.com.sg'
 let dynamicURL = baseUrl
 
 const codeMessage = {
@@ -64,7 +64,7 @@ const checkStatus = async (response) => {
         {JSON.stringify(returnObj.errors)}
       </div>
     ),
-    duration: 0,
+    duration: 5000,
   })
 
   const error = new Error(errortext)
@@ -83,7 +83,7 @@ const showErrorNotification = (header, message) => {
         <p>{message}</p>
       </div>
     ),
-    duration: 0,
+    duration: 5000,
   })
 }
 
@@ -307,7 +307,7 @@ export default function request (url, option) {
                   {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
                 </div>
               ),
-              duration: 0,
+              duration: 5000,
             })
 
             // const error = new Error(errortext)

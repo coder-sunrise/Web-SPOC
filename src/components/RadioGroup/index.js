@@ -8,7 +8,7 @@ import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/re
 
 class RadioGroup extends React.Component {
   state = {
-    selectedValue: this.props.defaultValue,
+    selectedValue: this.props.defaultValue || '',
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
@@ -16,12 +16,13 @@ class RadioGroup extends React.Component {
 
     if (field) {
       return {
-        selectedValue: field.value || nextProps.defaultValue,
+        selectedValue: field.value || '',
       }
     }
+
     if (value) {
       return {
-        selectedValue: value,
+        selectedValue: value || '',
       }
     }
     return null
@@ -29,7 +30,6 @@ class RadioGroup extends React.Component {
 
   handleChange = (event) => {
     this.setState({ selectedValue: event.target.value })
-
     const { form, field, onChange } = this.props
     const v = {
       target: {
@@ -44,7 +44,7 @@ class RadioGroup extends React.Component {
     }
   }
 
-  getComponent = () => {
+  getComponent = ({ inputRef, onChange, ...props }) => {
     const { state } = this
     const {
       classes,
@@ -56,8 +56,9 @@ class RadioGroup extends React.Component {
       textField = 'label',
       ...resetProps
     } = this.props
+    // console.log(this.state.selectedValue)
     return (
-      <div>
+      <div style={{ width: '100%', height: 'auto' }} {...props}>
         {options.map((o, i) => {
           const v = `${o[valueField]}`
 
@@ -73,22 +74,23 @@ class RadioGroup extends React.Component {
                   <Radio
                     checked={this.state.selectedValue === v}
                     onChange={this.handleChange}
+                    color='primary'
                     value={v}
-                    icon={
-                      <FiberManualRecord className={classes.radioUnchecked} />
-                    }
-                    checkedIcon={
-                      <FiberManualRecord className={classes.radioChecked} />
-                    }
-                    classes={{
-                      checked: classes.radio,
-                      root: classes.radioRoot,
-                    }}
+                    // icon={
+                    //   <FiberManualRecord className={classes.radioUnchecked} />
+                    // }
+                    // checkedIcon={
+                    //   <FiberManualRecord className={classes.radioChecked} />
+                    // }
+                    // classes={{
+                    //   checked: classes.radio,
+                    //   root: classes.radioRoot,
+                    // }}
                   />
                 }
-                classes={{
-                  label: classes.label,
-                }}
+                // classes={{
+                //   label: classes.label,
+                // }}
                 label={o[textField]}
               />
             </div>
@@ -103,6 +105,10 @@ class RadioGroup extends React.Component {
     return (
       <CustomInput
         inputComponent={this.getComponent}
+        noUnderline
+        labelProps={{
+          shrink: true,
+        }}
         {...restProps}
         value={this.state.selectedValue}
       />

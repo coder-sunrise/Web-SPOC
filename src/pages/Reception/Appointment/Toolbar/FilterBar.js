@@ -7,17 +7,17 @@ import { formatMessage } from 'umi/locale'
 // material ui
 import { CircularProgress, withStyles } from '@material-ui/core'
 // custom component
-import { GridContainer, GridItem, TextField, Select } from '@/components'
+import { GridContainer, GridItem, TextField, AntdSelect } from '@/components'
 // sub components
 import AppointmentTypeSelector from '../Calendar/Appointments/AppointmentTypeSelector'
 
 const styles = () => ({
-  searchField: {
-    paddingTop: 22,
-  },
-  addPadding: {
-    paddingTop: '15px !important',
-  },
+  // searchField: {
+  //   paddingTop: 22,
+  // },
+  // addPadding: {
+  //   paddingTop: '15px !important',
+  // },
   selectorContainer: {
     textAlign: 'left',
   },
@@ -37,6 +37,14 @@ const doctors = [
   { value: 'tan4', name: 'Tan4' },
   { value: 'tan5', name: 'Tan5' },
 ]
+
+const getTagCount = (values = []) => {
+  const value = `${values.length} Tags Selected`
+  const result = [
+    value,
+  ]
+  return result
+}
 
 @connect(({ appointment }) => ({ appointment }))
 class FilterBar extends PureComponent {
@@ -87,12 +95,13 @@ class FilterBar extends PureComponent {
     })
   }
 
-  onFilterByDoctorChange = (values) => {
+  onFilterByDoctorChange = (event) => {
+    const { target } = event
     const { dispatch } = this.props
 
     dispatch({
       type: 'appointment/updateFilterDoctor',
-      doctors: values,
+      doctors: target !== undefined ? target : event,
     })
   }
 
@@ -101,9 +110,11 @@ class FilterBar extends PureComponent {
     const { classes, appointment } = this.props
     const { filter } = appointment
 
+    const doctorsFilter = getTagCount(filter.doctors)
+
     return (
       <GridContainer>
-        <GridItem className={classnames(classes.searchField)} xs md={4}>
+        <GridItem xs md={4}>
           <TextField
             value={searchQuery}
             onChange={this.onSearchQueryChange}
@@ -114,11 +125,11 @@ class FilterBar extends PureComponent {
           />
         </GridItem>
         <GridItem xs md={2}>
-          <Select
+          <AntdSelect
             label='Filter by Doctor'
-            mode='multiple'
+            mode='tags'
             options={doctors}
-            value={filter.doctors}
+            value={doctorsFilter}
             onChange={this.onFilterByDoctorChange}
           />
         </GridItem>

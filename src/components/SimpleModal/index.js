@@ -44,14 +44,20 @@ class SimpleModal extends React.Component {
   }
 
   onConfirm = () => {
-    if (this.props.onOk) {
-      this.props.onOk((r) => {
+    if (this.props.onAsyncOk) {
+      this.props.onAsyncOk((r) => {
         // console.log(r, 's')
         if (r) {
           this.setState({
             done: true,
           })
         }
+      })
+    } else if (this.props.onOk) {
+      this.props.onOk()
+      this.setState({
+        done: true,
+        hide: true,
       })
     } else {
       this.setState(

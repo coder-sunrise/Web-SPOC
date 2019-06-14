@@ -1,7 +1,6 @@
 import React, { PureComponent, useState } from 'react'
 import { connect } from 'dva'
 import { FormattedMessage, formatMessage } from 'umi/locale'
-import { Assignment, Close } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
 import { Paper } from '@material-ui/core'
 import { compare } from '@/layouts'

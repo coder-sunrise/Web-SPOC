@@ -4,7 +4,12 @@ import { connect } from 'dva'
 import { Appointments } from '@devexpress/dx-react-scheduler-material-ui'
 import { CALENDAR_VIEWS } from '../../utils'
 
-const AppointmentContainerComponent = ({ appointment, style, children }) => {
+const AppointmentContainerComponent = ({
+  appointment,
+  style,
+  children,
+  ...restProps
+}) => {
   const { currentView } = appointment
 
   const newWidth = parseFloat(style.width) * 0.9
@@ -18,12 +23,12 @@ const AppointmentContainerComponent = ({ appointment, style, children }) => {
           width: `${newWidth}%`,
           left: `${newLeft}%`,
         }
-
   return (
     <Appointments.Container
       style={{
         ...newStyle,
       }}
+      {...restProps}
     >
       {children}
     </Appointments.Container>

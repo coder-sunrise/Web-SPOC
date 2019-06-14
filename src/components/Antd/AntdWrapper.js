@@ -44,6 +44,7 @@ class AntdWrapper extends React.PureComponent {
       classes,
       children,
       label,
+      noLabel,
       form,
       field,
       helpText,
@@ -83,9 +84,11 @@ class AntdWrapper extends React.PureComponent {
       [classes.smallLabel]: size === 'small',
       [classes.largeLabel]: size === 'large',
       [classes.inputError]: showError,
+      [classes.noLabel]: noLabel,
     }
     const classForControl = {
       [classes.control]: true,
+      [classes.controlNoLabel]: noLabel,
       [classes.controlUnderline]: shrink,
       [classes.underlineError]: showError,
     }

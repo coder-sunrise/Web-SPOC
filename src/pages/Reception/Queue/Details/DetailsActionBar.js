@@ -7,7 +7,13 @@ import { FormattedMessage, formatMessage } from 'umi/locale'
 import { CircularProgress, withStyles } from '@material-ui/core'
 import { PersonAdd } from '@material-ui/icons'
 // custom components
-import { Button, GridContainer, GridItem, AntdInput } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  AntdInput,
+  TextField,
+} from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
 
@@ -53,13 +59,13 @@ class DetailsActionBar extends PureComponent {
       isFetching,
     } = this.props
     return (
-      <GridContainer className={classnames(classes.actionBar)} spacing={8}>
-        <GridItem xs md={3}>
+      <GridContainer className={classnames(classes.actionBar)}>
+        <GridItem xs md={4}>
           <AntdInput
             suffix={isFetching && <CircularProgress size={16} />}
             value={currentSearchPatient}
             onChange={handleQueryChange}
-            onPressEnter={onRegisterVisitEnterPressed}
+            onEnterPressed={onRegisterVisitEnterPressed}
             label={formatMessage({
               id: 'reception.queue.registerVisitTextBox',
             })}
@@ -72,7 +78,7 @@ class DetailsActionBar extends PureComponent {
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </GridItem>
-        <GridItem xs md={7} container justify='flex-end' alignItems='center'>
+        <GridItem xs md={6} container justify='flex-end' alignItems='center'>
           <StatisticIndicator
             filter={currentFilter}
             handleStatusClick={handleStatusChange}

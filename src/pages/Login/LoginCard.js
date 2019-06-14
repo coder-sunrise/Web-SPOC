@@ -19,6 +19,7 @@ import {
   Transition,
   ProgressButton,
   Select,
+  SizeContainer,
 } from '@/components'
 
 import loginPageStyle from '../../assets/jss/material-dashboard-pro-react/views/loginPageStyle'
@@ -176,19 +177,6 @@ class LoginCard extends PureComponent {
                     />
                   )}
                 />
-                {/*
-                  <FastField
-                    name='application'
-                    render={(args) => (
-                      <Select
-                        {...args}
-                        label='Application'
-                        options={optsApplication}
-                        allowClear={false}
-                      />
-                    )}
-                  />
-                */}
               </CardBody>
               <CardFooter className={classnames(classes.justifyContentCenter)}>
                 <ProgressButton

@@ -3,6 +3,7 @@ import os from 'os'
 import pageRoutes from './router.config'
 import webpackPlugin from './plugin.config'
 import defaultSettings from '../src/defaultSettings'
+// import { primaryColor } from '../src/assets/jss/index'
 
 const plugins = [
   [
@@ -23,6 +24,7 @@ const plugins = [
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
       },
+      // pwa: {},
       // pwa: {
       //   workboxPluginMode: 'InjectManifest',
       //   workboxOptions: {

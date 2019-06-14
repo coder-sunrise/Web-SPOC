@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { DateRange, Clear } from '@material-ui/icons'
 import BaseInput from 'mui-pro-components/CustomInput/BaseInput'
 
 import classNames from 'classnames'

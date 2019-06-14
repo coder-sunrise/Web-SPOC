@@ -21,7 +21,6 @@ import { extendFunc } from '@/utils/utils'
 import CustomInput from 'mui-pro-components/CustomInput'
 
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { DateRange, Clear } from '@material-ui/icons'
 import CustomInputWrapper from 'mui-pro-components/CustomInputWrapper'
 
 // react component plugin for creating a beautiful datetime dropdown picker
@@ -103,7 +102,12 @@ function ValueContainer (props) {
 }
 
 function MultiValue (props) {
-  // console.log('m',props)
+  console.log('multivalue', props)
+  // return (
+  //   <div className={props.selectProps.classes.valueContainer}>
+  //     {props.children}
+  //   </div>
+  // )
   return (
     <Chip
       tabIndex={-1}

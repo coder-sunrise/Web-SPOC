@@ -37,7 +37,6 @@ class PatientInfoCard extends PureComponent {
     getCodes('Gender')
       .then((response) => {
         if (!response && !response.data) return
-        console.log('response', response)
         const data = [
           ...response,
         ]

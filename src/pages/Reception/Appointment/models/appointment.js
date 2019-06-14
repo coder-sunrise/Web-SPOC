@@ -151,6 +151,7 @@ export default createListViewModel({
         searchQuery: '',
         appointmentType: [],
         doctors: [
+          // { value: 'all', name: 'All', label: 'All' },
           'all',
         ],
       },
