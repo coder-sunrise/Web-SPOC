@@ -21,22 +21,10 @@ import {
   RichEditor,
 } from '@/components'
 
-class MedicalCertificate extends PureComponent {
-  onDaysChange = (e) => {
-    const { values, setFieldValue } = this.props
-    console.log(e.target.value)
-    if (e.target.value) {
-      const startDate = moment(values.fromto[0])
-      setFieldValue('fromto', [
-        startDate,
-        startDate.clone().add(e.target.value, 'days'),
-      ])
-    }
-  }
-
+class CertificateAttendance extends PureComponent {
   render () {
     const { theme, classes, consultationDocument, rowHeight } = this.props
-    console.log('MedicalCertificate')
+    console.log('CertificateAttendance')
     return (
       <div>
         <GridContainer>
@@ -52,23 +40,7 @@ class MedicalCertificate extends PureComponent {
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='days'
-              render={(args) => {
-                return (
-                  <NumberInput
-                    step={0.5}
-                    min={1}
-                    label='Day(s)'
-                    onChange={this.onDaysChange}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6}>
-            <FastField
-              name='fromto'
+              name='fromtotime'
               render={(args) => {
                 return <DateRangePicker label='From' label2='To' {...args} />
               }}
@@ -76,9 +48,9 @@ class MedicalCertificate extends PureComponent {
           </GridItem>
           <GridItem xs={12}>
             <FastField
-              name='description'
+              name='accompaniedBy'
               render={(args) => {
-                return <CodeSelect label='Description' {...args} />
+                return <TextField label='Accompanied By' {...args} />
               }}
             />
           </GridItem>
@@ -91,4 +63,4 @@ class MedicalCertificate extends PureComponent {
     )
   }
 }
-export default MedicalCertificate
+export default CertificateAttendance

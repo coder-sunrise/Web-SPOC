@@ -21,14 +21,14 @@ class CheckboxGroup extends React.Component {
   static getDerivedStateFromProps (nextProps, preState) {
     const { options, field, value, valueField = 'value' } = nextProps
     const v = preState
-    // console.log(field.value)
-    if (field) {
+    if (field && Array.isArray(field.value)) {
       options.forEach((o) => {
         v[`${o[valueField]}`] = false
       })
-      ;(field.value || []).forEach((e) => {
+      field.value.forEach((e) => {
         v[`${e}`] = true
       })
+
       return v
     }
     if (value) {
@@ -134,7 +134,8 @@ class CheckboxGroup extends React.Component {
   }
 
   render () {
-    const { classes, ...restProps } = this.props
+    const { classes, form, field, onChange, ...restProps } = this.props
+    // console.log('check', restProps)
     return (
       <CustomInput
         inputComponent={this.getComponent}
@@ -142,6 +143,8 @@ class CheckboxGroup extends React.Component {
           shrink: true,
         }}
         noUnderline
+        preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
         {...restProps}
         // value={this.state.selectedValue}
       />

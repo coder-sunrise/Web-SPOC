@@ -39,6 +39,9 @@ const STYLES = () => {
       '& .ant-input-number-handler-down': {
         borderTop: `0px solid rgba(0.4, 0, 0.2, 1)`,
       },
+      '& .ant-input-number-handler-up-inner, .ant-input-number-handler-down-inner': {
+        right: 6,
+      },
       // '& > div': {
       //   // erase all border, and boxShadow
       //   // height: 31,
@@ -105,9 +108,9 @@ class AntdNumberInput extends React.PureComponent {
 
   componentWillReceiveProps (nextProps) {
     const { field } = nextProps
-    if (field && typeof field.value === 'number') {
+    if (field) {
       this.setState({
-        value: field.value,
+        value: field.value === undefined ? '' : field.value,
       })
     }
   }
@@ -143,7 +146,7 @@ class AntdNumberInput extends React.PureComponent {
   debouncedOnChange = (value) => {
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
-    console.log('c', value)
+    // console.log('c', value)
     if (readOnly || loadOnChange) return
     // const { formatter } = this.props
     // if (formatter) {
@@ -241,7 +244,7 @@ class AntdNumberInput extends React.PureComponent {
         } /* else if (nVal.indexOf('.') > 0) {
           return this.state.value
         }
-        return numeral(v).format('$0,0')*/
+        return numeral(v).format('$0,0') */
         return v
       }
       extraCfg.parser = (v) => {
@@ -274,7 +277,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   render () {
-    const { classes, onChange, form, field, ...restProps } = this.props
+    const { classes, onChange, ...restProps } = this.props
     const labelProps = {
       shrink:
         !(this.state.value === undefined || this.state.value === '') ||

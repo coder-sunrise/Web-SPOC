@@ -178,9 +178,7 @@ export const defaultTheme = createMuiTheme({
           right: 11,
           top: '52%',
         },
-        '& .ant-calendar-picker': {
-          top: 3,
-        },
+
         '& .ant-select-selection--single': {
           marginTop: 4,
         },

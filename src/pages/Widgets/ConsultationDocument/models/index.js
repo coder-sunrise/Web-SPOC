@@ -1,4 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
+import moment from 'moment'
 // import * as service from '../services'
 
 export default createFormViewModel({
@@ -13,6 +14,11 @@ export default createFormViewModel({
         type: '1',
         from: 'Dr Johhy',
         referenceNo: 'MC203918-29',
+        days: 1,
+        fromto: [
+          moment(),
+          moment(),
+        ],
       },
     },
     // subscriptions: ({ dispatch, history }) => {

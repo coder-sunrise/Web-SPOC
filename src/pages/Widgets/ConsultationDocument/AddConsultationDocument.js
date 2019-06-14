@@ -80,6 +80,17 @@ const types = [
     from: Yup.string().required(),
     date: Yup.date().required(),
     subject: Yup.string().required(),
+
+    //3->MC
+
+    days: Yup.number().when('type', {
+      is: (val) => val === '3',
+      then: Yup.number().required(),
+    }),
+    fromto: Yup.array().when('type', {
+      is: (val) => val === '3',
+      then: Yup.array().of(Yup.date().min(2)).required(),
+    }),
   }),
 
   handleSubmit: () => {},
@@ -120,7 +131,14 @@ class AddConsultationDocument extends PureComponent {
               <FastField
                 name='type'
                 render={(args) => {
-                  return <Select label='Type' options={types} {...args} />
+                  return (
+                    <Select
+                      label='Type'
+                      options={types}
+                      allowClear={false}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
