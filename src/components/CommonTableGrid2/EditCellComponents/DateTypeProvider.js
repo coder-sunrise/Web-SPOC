@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
-import {FastField } from 'formik'
 
 import {
   DatePicker,
@@ -37,20 +36,6 @@ const DateEditorBase = (columnExtensions) =>
           {...commonCfg}
           {...restProps}
         />
-
-        // <FastField
-        //           name='sys123'
-        //           render={(args) => (
-        //             <DatePicker
-        //             noWrapper
-        //             timeFormat={false}
-        //             defaultValue={value}
-        //             {...commonCfg}
-        //             {...restProps}
-        //             {...args}
-        //             />
-        //           )}
-        //         />
       )
     },
     (prevProps, nextProps) => {
