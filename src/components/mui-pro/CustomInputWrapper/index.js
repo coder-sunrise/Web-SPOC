@@ -117,7 +117,7 @@ function CustomInputWrapper ({ classes, ...props }) {
           <InputLabel
             className={labelClasses}
             {...labelProps}
-            style={{ left: '47%' }}
+            style={{ left: '44%', marginLeft: 20 }}
           >
             {label2}
           </InputLabel>

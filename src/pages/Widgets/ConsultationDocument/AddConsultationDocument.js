@@ -29,6 +29,7 @@ import {
 import ReferralLetter from './ReferralLetter'
 import Memo from './Memo'
 import MedicalCertificate from './MedicalCertificate'
+import CertificateAttendance from './CertificateAttendance'
 
 const styles = (theme) => ({
   editor: {
@@ -146,6 +147,7 @@ class AddConsultationDocument extends PureComponent {
           {type === '1' && <ReferralLetter {...cfg} />}
           {type === '2' && <Memo {...cfg} />}
           {type === '3' && <MedicalCertificate {...cfg} />}
+          {type === '4' && <CertificateAttendance {...cfg} />}
         </div>
         {footer &&
           footer({

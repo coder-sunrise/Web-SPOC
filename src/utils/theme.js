@@ -155,7 +155,7 @@ export const defaultTheme = createMuiTheme({
           fontSize: defaultFontSize,
           color: defaultColor,
         },
-        '& .ant-input-number': {
+        '& .ant-input-number, .ant-time-picker': {
           fontSize: defaultFontSize,
           height: 'auto',
           // '& .ant-input-number-handler-wrap': {
@@ -264,7 +264,7 @@ export const smallTheme = createMuiTheme({
           minHeight: 20,
           padding: '3px 0 0px',
         },
-        '& .ant-input-number': {
+        '& .ant-input-number, .ant-time-picker': {
           fontSize: smallFontSize,
           height: 'auto',
         },
@@ -378,7 +378,7 @@ export const largeTheme = createMuiTheme({
           minHeight: 25,
           padding: '3px 0 0px',
         },
-        '& .ant-input-number': {
+        '& .ant-input-number, .ant-time-picker': {
           fontSize: largeFontSize,
           height: 'auto',
         },
