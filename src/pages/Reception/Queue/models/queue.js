@@ -13,9 +13,10 @@ const MessageWrapper = ({ children }) => (
 )
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: false,
+  isClinicSessionClosed: true,
   id: '',
-  sessionNo: `${moment().format('YYMMDD')}-01`,
+  // sessionNo: `${moment().format('YYMMDD')}-01`,
+  sessionNo: 'N/A',
   sessionNoPrefix: '',
   sessionStartDate: '',
   sessionCloseDate: '',
@@ -45,7 +46,7 @@ export default createListViewModel({
         const { data } = response
         if (data && data.id) {
           // start session successfully
-          _saveSessionID(data.id)
+          // _saveSessionID(data.id)
           return yield put({
             type: 'updateSessionInfo',
             payload: { ...data },
@@ -56,8 +57,8 @@ export default createListViewModel({
           payload: { ...InitialSessionInfo },
         })
       },
-      *endSession (_, { call, put }) {
-        const sessionID = localStorage.getItem('_sessionID')
+      *endSession ({ sessionID }, { call, put }) {
+        // const sessionID = localStorage.getItem('_sessionID')
         const response = yield call(service.endSession, sessionID)
         const { status } = response
         if (status === 204)
@@ -78,7 +79,7 @@ export default createListViewModel({
 
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
-          _saveSessionID(data.id)
+          // _saveSessionID(sessionData.id)
           return yield put({
             type: 'updateSessionInfo',
             payload: { ...sessionData[0] },
