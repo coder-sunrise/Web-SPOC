@@ -33,9 +33,6 @@ const _toMoment = (value, format) => {
 
 const STYLES = (theme) => ({
   ...inputStyle(theme),
-  dropdownMenu: {
-    zIndex: 1305,
-  },
   datepickerContainer: {
     width: '100%',
     boxSizing: 'content-box',
@@ -93,8 +90,6 @@ class AntdDatePicker extends PureComponent {
 
       form.setFieldValue(field.name, date ? date.utc().format() : '')
     }
-
-
   }
 
   handleDatePickerOpenChange = (status) => {

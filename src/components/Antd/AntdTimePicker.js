@@ -27,7 +27,7 @@ const _toMoment = (value, format) => {
 const STYLES = (theme) => ({
   ...inputStyle(theme),
   dropdownMenu: {
-    zIndex: 1305,
+    zIndex: 1410,
   },
   timePickerContainer: {
     width: '100%',
@@ -43,6 +43,9 @@ const STYLES = (theme) => ({
     },
     '& .ant-time-picker-icon': {
       marginTop: -9,
+    },
+    '& .ant-time-picker-input': {
+      fontSize: 'inherit',
     },
   },
 })

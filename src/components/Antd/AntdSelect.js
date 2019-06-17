@@ -147,7 +147,7 @@ class AntdSelect extends React.PureComponent {
     if (selectValue !== undefined) {
       cfg.value = selectValue
     }
-    console.log(selectValue)
+    // console.log(selectValue)
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select

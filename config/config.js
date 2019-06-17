@@ -84,6 +84,12 @@ export default {
     'font-size-base': '1rem',
     'font-size-lg': '1.2rem',
     'font-size-sm': '0.8rem',
+    'zindex-notification': 2010,
+    'zindex-message': 2010,
+    'zindex-popover': 2030,
+    'zindex-picker': 2050,
+    'zindex-dropdown': 2050,
+    'zindex-tooltip': 2060,
   },
   externals: {
     '@antv/data-set': 'DataSet',

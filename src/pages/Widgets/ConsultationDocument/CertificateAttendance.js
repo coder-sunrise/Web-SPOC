@@ -19,6 +19,7 @@ import {
   SizeContainer,
   NumberInput,
   RichEditor,
+  TimePicker,
 } from '@/components'
 
 class CertificateAttendance extends PureComponent {
@@ -40,9 +41,17 @@ class CertificateAttendance extends PureComponent {
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='fromtotime'
+              name='fromtime'
               render={(args) => {
-                return <DateRangePicker label='From' label2='To' {...args} />
+                return <TimePicker label='From' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6}>
+            <FastField
+              name='totime'
+              render={(args) => {
+                return <TimePicker label='To' {...args} />
               }}
             />
           </GridItem>
