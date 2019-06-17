@@ -13,7 +13,7 @@ import {
 
 const styles = (theme) => ({
   reasonTextBox: {
-    paddingTop: `${theme.spacing.unit * 3.5}px !important`,
+    paddingTop: `${theme.spacing.unit * 4.75}px !important`,
   },
 })
 

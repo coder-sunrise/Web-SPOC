@@ -49,7 +49,6 @@ const styles = (theme) => ({
     justifyContent: 'start',
     alignItems: 'center',
   },
-
   footer: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -76,6 +75,10 @@ const styles = (theme) => ({
   divider: {
     marginTop: 15,
     marginBottom: 10,
+  },
+  enableOccurenceCheckbox: {
+    textAlign: 'left',
+    paddingLeft: '16px !important',
   },
 })
 

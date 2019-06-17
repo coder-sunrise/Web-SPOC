@@ -9,6 +9,7 @@ import FilterBar from './components/FilterBar'
 import CalendarView from './components/CalendarView'
 import PopoverContent from './components/PopoverContent'
 import Form from './components/form/Form'
+import DoctorEventForm from './components/form/DoctorEvent'
 // settings
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
 // events data variable
@@ -80,6 +81,7 @@ class Appointment extends React.PureComponent {
   state = {
     showPopup: false,
     showAppointmentForm: false,
+    showDoctorEventModal: false,
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: [
@@ -223,12 +225,18 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  handleDoctorEventClick = () => {
+    const { showDoctorEventModal } = this.state
+    this.setState({ showDoctorEventModal: !showDoctorEventModal })
+  }
+
   render () {
     const { classes } = this.props
     const {
       showPopup,
       popupAnchor,
       showAppointmentForm,
+      showDoctorEventModal,
       calendarEvents,
       selectedSlot,
       resources,
@@ -260,7 +268,11 @@ class Appointment extends React.PureComponent {
           <PopoverContent popoverEvent={popoverEvent} />
         </Popover>
 
-        <FilterBar filter={filter} handleUpdateFilter={this.onFilterUpdate} />
+        <FilterBar
+          filter={filter}
+          handleUpdateFilter={this.onFilterUpdate}
+          onDoctorEventClick={this.handleDoctorEventClick}
+        />
         <div>
           <CalendarView
             calendarEvents={applyFilter(calendarEvents, filter)}
@@ -290,6 +302,14 @@ class Appointment extends React.PureComponent {
               handleDeleteEvent={this.deleteEvent}
             />
           ) : null}
+        </CommonModal>
+        <CommonModal
+          open={showDoctorEventModal}
+          title='Doctor Event'
+          onClose={this.handleDoctorEventClick}
+          onConfirm={this.handleDoctorEventClick}
+        >
+          {showDoctorEventModal && <DoctorEventForm />}
         </CommonModal>
       </CommonHeader>
     )

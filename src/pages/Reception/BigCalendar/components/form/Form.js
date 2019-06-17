@@ -126,7 +126,7 @@ const initialAptInfo = {
       (resource) => resource.resourceId === doctor,
     )
     let resourceId = assignedResource ? assignedResource.resourceId : 'other'
-    console.log({ _nativeStartDate, _nativeEndDate })
+
     const event = {
       ...slotInfo,
       ...values,
@@ -203,8 +203,11 @@ class Form extends React.PureComponent {
 
   onSearchPatient = () => {
     const { values } = this.props
+    this.searchPatient(values.patientName)
+  }
 
-    fetchPatientListByName(values.patientName).then((response) => {
+  searchPatient = (patientName) => {
+    fetchPatientListByName(patientName).then((response) => {
       if (response) {
         const { data: { data = [] } } = response
         this.setState({
@@ -501,7 +504,11 @@ class Form extends React.PureComponent {
                 )}, ${values.endDate} ${values.endTime}`}
               </p>
             </GridItem>
-            <GridItem xs md={12}>
+            <GridItem
+              xs
+              md={12}
+              className={classnames(classes.enableOccurenceCheckbox)}
+            >
               <Divider className={classnames(classes.divider)} />
               <FastField
                 name='enableRecurrence'
@@ -629,6 +636,7 @@ class Form extends React.PureComponent {
             <PatientSearchModal
               searchPatientName={values.patientName}
               patientList={patientList}
+              handleSearchPatient={this.searchPatient}
               onBackClick={this.closeSearchPatientModal}
               onSelectClick={this.handleSelectPatient}
             />

@@ -167,5 +167,5 @@ export default (config) => {
     // ]
   })
   // config.plugins.delete('extract-css')
-  console.log(config.toString())
+  // console.log(config.toString())
 }

@@ -7,7 +7,7 @@ export async function fetchPatientListByName (patientName) {
   ]
   const response = await request('/api/patient', {
     method: 'GET',
-    data: stringify({ criteria }),
+    data: patientName === '' ? {} : stringify({ criteria }),
   })
 
   return response

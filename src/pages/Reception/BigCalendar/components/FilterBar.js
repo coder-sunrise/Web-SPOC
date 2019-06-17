@@ -96,7 +96,7 @@ class FilterBar extends PureComponent {
 
   render () {
     const { searchQuery, isTyping } = this.state
-    const { classes, filter } = this.props
+    const { classes, filter, onDoctorEventClick } = this.props
 
     // const doctorsFilter = getTagCount(filter.doctors)
 
@@ -134,7 +134,9 @@ class FilterBar extends PureComponent {
 
           <GridItem xs md={5} container justify='flex-end'>
             <GridItem>
-              <Button color='info'>Doctor Event</Button>
+              <Button color='info' onClick={onDoctorEventClick}>
+                Doctor Event
+              </Button>
             </GridItem>
           </GridItem>
         </GridContainer>
