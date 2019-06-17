@@ -4,6 +4,9 @@ import classnames from 'classnames'
 import { FormattedMessage } from 'umi/locale'
 // material ui
 import { Divider, Paper, withStyles } from '@material-ui/core'
+// common component
+import { Button } from '@/components'
+import { StatusIndicator } from '../variables'
 
 const StatisticStyles = () => ({
   container: {
@@ -33,10 +36,17 @@ const StatisticStyles = () => ({
 })
 
 class StatisticIndicator extends PureComponent {
+  onButtonClick = (event) => {
+    const { handleStatusClick } = this.props
+    const { id } = event.currentTarget
+    handleStatusClick(id)
+  }
+
   render () {
     const {
       classes,
       filter,
+      handleStatusClick,
       statistic: { all, waiting, inProgress, completed } = {
         all: 0,
         waiting: 0,
@@ -56,9 +66,16 @@ class StatisticIndicator extends PureComponent {
             {all}
           </h4>
           <Divider variant='fullWidth' />
-          <p className={classnames(classes.status)}>
-            <FormattedMessage id='reception.queue.status.all' />
-          </p>
+          <Button
+            color='primary'
+            size='sm'
+            block
+            id={StatusIndicator.ALL}
+            onClick={this.onButtonClick}
+            simple={filter !== StatusIndicator.ALL}
+          >
+            {StatusIndicator.ALL}
+          </Button>
         </Paper>
         <Paper elevation={6} className={classnames(classes.container)}>
           <h4
@@ -70,9 +87,16 @@ class StatisticIndicator extends PureComponent {
             {waiting}
           </h4>
           <Divider variant='fullWidth' />
-          <p className={classnames(classes.status)}>
-            <FormattedMessage id='reception.queue.status.waiting' />
-          </p>
+          <Button
+            color='primary'
+            size='sm'
+            block
+            id={StatusIndicator.WAITING}
+            onClick={this.onButtonClick}
+            simple={filter !== StatusIndicator.WAITING}
+          >
+            {StatusIndicator.WAITING}
+          </Button>
         </Paper>
         <Paper elevation={6} className={classnames(classes.container)}>
           <h4
@@ -84,9 +108,16 @@ class StatisticIndicator extends PureComponent {
             {inProgress}
           </h4>
           <Divider variant='fullWidth' />
-          <p className={classnames(classes.status)}>
-            <FormattedMessage id='reception.queue.status.inProgress' />
-          </p>
+          <Button
+            color='primary'
+            size='sm'
+            block
+            id={StatusIndicator.IN_PROGRESS}
+            onClick={this.onButtonClick}
+            simple={filter !== StatusIndicator.IN_PROGRESS}
+          >
+            {StatusIndicator.IN_PROGRESS}
+          </Button>
         </Paper>
         <Paper elevation={6} className={classnames(classes.container)}>
           <h4
@@ -98,9 +129,16 @@ class StatisticIndicator extends PureComponent {
             {completed}
           </h4>
           <Divider variant='fullWidth' />
-          <p className={classnames(classes.status)}>
-            <FormattedMessage id='reception.queue.status.completed' />
-          </p>
+          <Button
+            color='primary'
+            size='sm'
+            block
+            onClick={this.onButtonClick}
+            id={StatusIndicator.COMPLETED}
+            simple={filter !== StatusIndicator.COMPLETED}
+          >
+            {StatusIndicator.COMPLETED}
+          </Button>
         </Paper>
       </React.Fragment>
     )

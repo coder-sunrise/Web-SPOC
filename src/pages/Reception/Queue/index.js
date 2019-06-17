@@ -281,6 +281,7 @@ class Queue extends PureComponent {
                 />
                 <DetailsGrid
                   location={this.props.match}
+                  currentFilter={currentFilter}
                   onViewDispenseClick={this.toggleDispense}
                   queueLog={queueLog}
                 />

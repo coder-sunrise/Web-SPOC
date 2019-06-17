@@ -25,20 +25,27 @@ const StatusTypeBase = (props) => {
   const cfg = columnExtensions.find(
     ({ columnName: currentColumnName }) => currentColumnName === columnName,
   )
-  let color
+  let color = 'primary'
 
-  switch (value) {
-    case 'REGISTERED':
+  // WAITING, TO DISPENSE, IN CONS, PAUSED, OVERPAID, COMPLETED
+  switch (value.toUpperCase()) {
+    case 'WAITING':
       color = 'primary'
       break
-    case 'INVOICED':
+    case 'IN CONS':
+      color = 'info'
+      break
+    case 'TO DISPENSE':
       color = 'rose'
       break
-    case 'CANCELLED':
+    case 'PAUSED':
+      color = 'warning'
+      break
+    case 'OVERPAID':
       color = 'danger'
       break
-    case 'PLANNED':
-      color = 'gray'
+    case 'COMPLETED':
+      color = 'success'
       break
     default:
       color = 'primary'

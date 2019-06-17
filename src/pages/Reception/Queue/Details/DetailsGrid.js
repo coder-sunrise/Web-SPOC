@@ -15,6 +15,7 @@ import { Button, CommonModal, CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
 // assets
 import { tooltip } from '@/assets/jss/index'
+import { StatusIndicator } from '../variables'
 
 const styles = () => ({
   tooltip,
@@ -26,13 +27,22 @@ const styles = () => ({
   },
 })
 
+const visitStatusCode = [
+  'WAITING',
+  'TO DISPENSE',
+  'IN CONS',
+  'PAUSED',
+  'OVERPAID',
+  'COMPLETED',
+]
+
 const generateRowData = () => {
   const data = []
-  for (let i = 0; i < 5; i += 1) {
+  for (let i = 0; i < 10; i += 1) {
     data.push({
       Id: `row-${i}-data`,
       queueNo: i,
-      visitStatus: 'REGISTERED',
+      visitStatus: visitStatusCode[i % 6],
       roomNo: '',
       doctor: 'Cheah',
       refNo: `PT-0000${i}`,
@@ -43,6 +53,31 @@ const generateRowData = () => {
     })
   }
   return data
+}
+const filterMap = {
+  [StatusIndicator.ALL]: [
+    ...visitStatusCode,
+  ],
+  [StatusIndicator.WAITING]: [
+    'WAITING',
+  ],
+  [StatusIndicator.IN_PROGRESS]: [
+    'TO DISPENSE',
+    'IN CONS',
+    'PAUSED',
+  ],
+  [StatusIndicator.COMPLETED]: [
+    'OVERPAID',
+    'COMPLETED',
+  ],
+}
+
+const filterData = (filter, data) => {
+  let newData = data.filter((eachRow) => {
+    return filterMap[filter].includes(eachRow.visitStatus)
+  })
+
+  return newData
 }
 
 const WithFullscreenModal = ({ show, onClose, onConfirm, children }) => {
@@ -68,17 +103,18 @@ const WithFullscreenModal = ({ show, onClose, onConfirm, children }) => {
 class DetailsGrid extends PureComponent {
   state = {
     isFullscreen: false,
+    rowData: generateRowData(),
     tableParams: {
       columns: [
         { name: 'visitStatus', title: 'Status' },
         { name: 'queueNo', title: 'Q. No.' },
-        { name: 'roomNo', title: 'Room No.' },
+        { name: 'patientName', title: 'Patient Name' },
         { name: 'doctor', title: 'Doctor' },
+        { name: 'roomNo', title: 'Room No.' },
         { name: 'refNo', title: 'Ref. No.' },
         { name: 'timeIn', title: 'Time In' },
         { name: 'timeOut', title: 'Time Out' },
         { name: 'appointmentTime', title: 'Appt. Time' },
-        { name: 'patientName', title: 'Patient Name' },
         { name: 'identityNo', title: 'Identity No.' },
         { name: 'gender', title: 'Gender' },
         { name: 'age', title: 'Age' },
@@ -97,6 +133,7 @@ class DetailsGrid extends PureComponent {
       ],
       leftColumns: [
         'visitStatus',
+        'queueNo',
       ],
       columnExtensions: [
         { columnName: 'visitStatus', type: 'status' },
@@ -227,8 +264,8 @@ class DetailsGrid extends PureComponent {
     const ActionProps = {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
-    const { classes, queueLog } = this.props
-    const { isFullscreen } = this.state
+    const { classes, queueLog, currentFilter } = this.props
+    const { isFullscreen, rowData } = this.state
     // const { queueListing } = queueLog
 
     return (
@@ -240,7 +277,7 @@ class DetailsGrid extends PureComponent {
         >
           <CommonTableGrid2
             height={isFullscreen ? undefined : 600}
-            rows={generateRowData()}
+            rows={filterData(currentFilter, rowData)}
             {...tableParams}
             ActionProps={ActionProps}
             FuncProps={{ pager: false }}
