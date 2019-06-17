@@ -147,7 +147,7 @@ class AntdSelect extends React.PureComponent {
     if (selectValue !== undefined) {
       cfg.value = selectValue
     }
-    // console.log(selectValue)
+    console.log(selectValue)
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -184,10 +184,10 @@ class AntdSelect extends React.PureComponent {
 
   render () {
     const { classes, form, field, onChange, ...restProps } = this.props
-    const { value } = restProps
+    const { value = [] } = restProps
     const selectValue = form && field ? field.value : value
     const labelProps = {
-      shrink: !!selectValue || this.state.shrink,
+      shrink: (!!selectValue && selectValue.length > 0) || this.state.shrink,
     }
     return (
       <CustomInput

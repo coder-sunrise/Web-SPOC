@@ -49,18 +49,20 @@ class LoginPage extends PureComponent {
     const { classes, ...rest } = this.props
     return (
       <div className={classes.wrapper}>
-        <SizeContainer>
-          <NavBar {...rest} />
-          <div className={classes.content}>
-            <div
-              className={classes.fullPage}
-              style={{ backgroundImage: `url(${this.getBgImage()})` }}
-            >
-              <LoginCard handleLogin={this.onLogin} />
+        <SizeContainer size='lg'>
+          <React.Fragment>
+            <NavBar {...rest} />
+            <div className={classes.content}>
+              <div
+                className={classes.fullPage}
+                style={{ backgroundImage: `url(${this.getBgImage()})` }}
+              >
+                <LoginCard handleLogin={this.onLogin} />
 
-              <Footer fluid />
+                <Footer fluid />
+              </div>
             </div>
-          </div>
+          </React.Fragment>
         </SizeContainer>
       </div>
     )
