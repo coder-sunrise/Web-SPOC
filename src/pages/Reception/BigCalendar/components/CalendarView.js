@@ -7,7 +7,11 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // material ui
 import { withStyles } from '@material-ui/core'
 // setting
-import { defaultColorOpts, AppointmentTypeAsColor } from '../setting'
+import {
+  defaultColorOpts,
+  doctorEventColorOpts,
+  AppointmentTypeAsColor,
+} from '../setting'
 // sub component
 import CalendarToolbar from './Toolbar'
 import Event from './Event'
@@ -20,6 +24,12 @@ const styles = () => ({
     background: defaultColorOpts.value,
     '&:hover': {
       backgroundColor: defaultColorOpts.activeColor,
+    },
+  },
+  doctorEvent: {
+    background: doctorEventColorOpts.value,
+    '&:hover': {
+      backgroundColor: doctorEventColorOpts.activeColor,
     },
   },
   ...AppointmentTypeAsColor,
@@ -51,10 +61,12 @@ class CalendarView extends React.PureComponent {
 
   _eventColors = (event) => {
     // eventPropGetters = (event, start ,end, isSelected) => {}
-
     const { classes } = this.props
     const bg = 'background-'
     const hover = 'hover-'
+    if (event.isDoctorEvent) {
+      return { className: classes.doctorEvent }
+    }
     const eventClassName = event.color
       ? [
           classes[`${bg}${event.color}`],

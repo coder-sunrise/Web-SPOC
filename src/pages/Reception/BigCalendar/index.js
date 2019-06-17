@@ -230,6 +230,24 @@ class Appointment extends React.PureComponent {
     this.setState({ showDoctorEventModal: !showDoctorEventModal })
   }
 
+  addDoctorEvent = (newDoctorEvent) => {
+    const { calendarEvents } = this.state
+    const idList = this.state.calendarEvents.map((a) => a.id)
+    const newId = Math.max(...idList) + 1
+    const newCalendarEvents = [
+      ...calendarEvents,
+      { ...newDoctorEvent, id: newId },
+    ]
+
+    this.setState({
+      selectedSlot: {},
+      showDoctorEventModal: false,
+      calendarEvents: [
+        ...newCalendarEvents,
+      ],
+    })
+  }
+
   render () {
     const { classes } = this.props
     const {
@@ -263,8 +281,6 @@ class Appointment extends React.PureComponent {
           }}
           disableRestoreFocus
         >
-          {/*<ClickAwayListener onClickAway={this.handleClosePopover}>
-        </ClickAwayListener>*/}
           <PopoverContent popoverEvent={popoverEvent} />
         </Popover>
 
@@ -308,8 +324,11 @@ class Appointment extends React.PureComponent {
           title='Doctor Event'
           onClose={this.handleDoctorEventClick}
           onConfirm={this.handleDoctorEventClick}
+          maxWidth='sm'
         >
-          {showDoctorEventModal && <DoctorEventForm />}
+          {showDoctorEventModal && (
+            <DoctorEventForm handleAddDoctorEvent={this.addDoctorEvent} />
+          )}
         </CommonModal>
       </CommonHeader>
     )

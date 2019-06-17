@@ -13,8 +13,9 @@ class Event extends PureComponent {
 
   render () {
     const { event } = this.props
-
-    return (
+    const { isDoctorEvent } = event
+    console.log({ isDoctorEvent })
+    return !isDoctorEvent ? (
       <div
         style={{ height: '100%' }}
         onMouseEnter={this._handleMouseEnter}
@@ -24,6 +25,17 @@ class Event extends PureComponent {
           <strong>{event.patientName}</strong>
         </span>
         <span style={{ display: 'block' }}>{event.contactNo}</span>
+      </div>
+    ) : (
+      <div
+        style={{ height: '100%' }}
+        onMouseEnter={this._handleMouseEnter}
+        onMouseLeave={this._handleMouseLeave}
+      >
+        <span>
+          <strong>{event.doctor}</strong>
+        </span>
+        <span style={{ display: 'block' }}>{event.eventType}</span>
       </div>
     )
   }
