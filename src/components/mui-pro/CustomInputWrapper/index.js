@@ -39,6 +39,7 @@ function CustomInputWrapper ({ classes, ...props }) {
   let {
     formControlProps = {},
     label,
+    label2,
     noFloatLabel,
     id,
     labelProps,
@@ -110,6 +111,15 @@ function CustomInputWrapper ({ classes, ...props }) {
         {label !== undefined ? (
           <InputLabel className={labelClasses} htmlFor={id} {...labelProps}>
             {label}
+          </InputLabel>
+        ) : null}
+        {label2 !== undefined ? (
+          <InputLabel
+            className={labelClasses}
+            {...labelProps}
+            style={{ left: '44%', marginLeft: 20 }}
+          >
+            {label2}
           </InputLabel>
         ) : null}
         {newChildren}

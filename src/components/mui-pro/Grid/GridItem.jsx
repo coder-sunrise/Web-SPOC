@@ -33,14 +33,16 @@ function GridItem ({
   const cls = cx({
     [classes.grid]: true,
     [classes.noStartEndPadding]: gridLayout,
+    [className]: true,
   })
+  // console.log(className, cls)
   return (
     <Grid
       item
       // justify='flex-end'
       // direction='column'
       {...rest}
-      className={`${cls} ${className}`}
+      className={cls}
       style={{
         padding: `0 ${gutter}px`,
         ...style,

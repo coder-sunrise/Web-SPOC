@@ -1,5 +1,5 @@
 import { stringify } from 'qs'
-import request, { axiosRequest } from '@/utils/request'
+import request from '@/utils/request'
 
 export async function fetchPatientListByName (patientName) {
   const criteria = [

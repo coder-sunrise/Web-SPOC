@@ -155,6 +155,14 @@ export const defaultTheme = createMuiTheme({
           fontSize: defaultFontSize,
           color: defaultColor,
         },
+        '& .ant-input-number, .ant-time-picker': {
+          fontSize: defaultFontSize,
+          height: 'auto',
+          // '& .ant-input-number-handler-wrap': {
+          //   height: 30,
+          //   top: -5,
+          // },
+        },
         '& .ant-select-remove-icon': {
           fontSize: 'inherit',
         },
@@ -170,9 +178,7 @@ export const defaultTheme = createMuiTheme({
           right: 11,
           top: '52%',
         },
-        '& .ant-calendar-picker': {
-          top: 3,
-        },
+
         '& .ant-select-selection--single': {
           marginTop: 4,
         },
@@ -248,7 +254,7 @@ export const smallTheme = createMuiTheme({
     },
     MuiFormControl: {
       root: {
-        margin: '5px 0 4px 0',
+        margin: '3px 0 3px 0',
         paddingTop: 0,
         '& .ant-input': {
           height: 'auto',
@@ -257,6 +263,10 @@ export const smallTheme = createMuiTheme({
           fontSize: smallFontSize,
           minHeight: 20,
           padding: '3px 0 0px',
+        },
+        '& .ant-input-number, .ant-time-picker': {
+          fontSize: smallFontSize,
+          height: 'auto',
         },
         '& .anticon': {
           fontSize: smallFontSize,
@@ -358,7 +368,7 @@ export const largeTheme = createMuiTheme({
     },
     MuiFormControl: {
       root: {
-        margin: '6px 0 6px 0',
+        margin: '6px 0 5px 0',
         paddingTop: 4,
         '& .ant-input': {
           height: 'auto',
@@ -367,6 +377,10 @@ export const largeTheme = createMuiTheme({
           fontSize: largeFontSize,
           minHeight: 25,
           padding: '3px 0 0px',
+        },
+        '& .ant-input-number, .ant-time-picker': {
+          fontSize: largeFontSize,
+          height: 'auto',
         },
         '& .anticon': {
           fontSize: largeFontSize,

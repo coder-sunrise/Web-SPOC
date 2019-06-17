@@ -313,8 +313,9 @@ const cardLink = {
     marginLeft: '1.25rem',
   },
 }
-
-const standardRowHeight = '60px'
+const smallRowHeight = '45px'
+const standardRowHeight = '55px'
+const largeRowHeight = '65px'
 
 export {
   hexToRgb,
@@ -368,6 +369,8 @@ export {
   cardSubtitle,
   cardLink,
   standardRowHeight,
+  smallRowHeight,
+  largeRowHeight,
   borderColor,
   border,
   headerHeight,

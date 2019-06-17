@@ -42,7 +42,7 @@ const CommonHeader = ({
 
 CommonHeader.propTypes = {
   // Icon: PropTypes.object,
-  titleId: PropTypes.string.isRequired,
+  // titleId: PropTypes.string.isRequired,
   children: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.array,

@@ -17,7 +17,7 @@ const modalStyle = (theme) => {
 
       borderRadius: '6px',
       [theme.breakpoints.down('lg')]: {
-        minHeight: '600px',
+        // minHeight: '600px',
         borderRadius: '0px',
       },
       // marginTop: "100px !important",
@@ -33,6 +33,7 @@ const modalStyle = (theme) => {
       paddingBottom: '5px',
       paddingLeft: '12px',
       minHeight: '16.43px',
+      textAlign: 'center',
     },
     modalTitle: {
       margin: '0',
@@ -53,7 +54,7 @@ const modalStyle = (theme) => {
       lineHeight: '1',
       float: 'right',
       right: '-8px',
-      top: '6px',
+      top: 5,
     },
     modalClose: {
       width: '16px',
@@ -62,13 +63,11 @@ const modalStyle = (theme) => {
     modalBody: {
       position: 'relative',
       overflow: 'hidden',
+      overflowY: 'auto',
       boxSizing: 'border-box',
     },
     modalBodyPadding: {
-      paddingTop: '12px',
-      paddingRight: '12px',
-      paddingBottom: '8px',
-      paddingLeft: '12px',
+      padding: theme.spacing(1),
     },
     modalBodyNoPadding: {
       padding: 0,

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import moment from 'moment'
 import classnames from 'classnames'
 // material ui
@@ -36,51 +36,80 @@ const STYLES = (theme) => ({
       border: 'none',
       boxShadow: 'none !important',
       borderRadius: 0,
-      // borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
-      paddingLeft: 0,
-      fontSize: '1rem',
-      height: 24,
+      background: 'none',
+      height: 'auto',
+      lineHeight: '1rem',
+      padding: 0,
+    },
+    '& .ant-time-picker-icon': {
+      marginTop: -9,
     },
   },
 })
 
-class AntdTimePicker extends Component {
+class AntdTimePicker extends PureComponent {
   static defaultProps = {
     format: 'HH:mm',
     disabled: false,
     size: 'default',
   }
 
-  state = {
-    shrink: false,
+  constructor (props) {
+    super(props)
+    const { field = {}, format } = props
+    this.state = {
+      shrink: field.value !== undefined && field.value !== '',
+      value:
+        field.value !== undefined && field.value !== ''
+          ? _toMoment(field.value, format)
+          : '',
+    }
   }
 
-  shouldComponentUpdate = (nextProps) => {
-    const { form, field, value } = this.props
-    const { form: nextForm, field: nextField, value: nextValue } = nextProps
-
-    const currentDateValue = form && field ? field.value : value
-    const nextDateValue = nextForm && nextField ? nextField.value : nextValue
-
-    if (form && nextForm)
-      return (
-        nextDateValue !== currentDateValue ||
-        form.errors[field.name] !== nextForm.errors[nextField.name] ||
-        form.touched[field.name] !== nextForm.touched[nextField.name]
-      )
-
-    return nextDateValue !== currentDateValue
+  componentWillReceiveProps (nextProps) {
+    const { field, format } = nextProps
+    if (field) {
+      this.setState({
+        value:
+          field.value !== undefined && field.value !== ''
+            ? _toMoment(field.value, format)
+            : '',
+      })
+    }
   }
+
+  // shouldComponentUpdate = (nextProps) => {
+  //   const { form, field, value } = this.props
+  //   const { form: nextForm, field: nextField, value: nextValue } = nextProps
+
+  //   const currentDateValue = form && field ? field.value : value
+  //   const nextDateValue = nextForm && nextField ? nextField.value : nextValue
+
+  //   if (form && nextForm)
+  //     return (
+  //       nextDateValue !== currentDateValue ||
+  //       form.errors[field.name] !== nextForm.errors[nextField.name] ||
+  //       form.touched[field.name] !== nextForm.touched[nextField.name]
+  //     )
+
+  //   return nextDateValue !== currentDateValue
+  // }
 
   handleChange = (time, timeString) => {
-    const { form, field, onChange } = this.props
+    console.log(time, timeString)
+    this.setState({
+      value: time,
+    })
+    const { form, field, format, onChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, timeString)
+      form.setFieldValue(
+        field.name,
+        moment.isMoment(time) ? time.format(format) : '',
+      )
     }
 
     if (onChange) {
-      const { name } = this.props
-      onChange(timeString, name)
+      onChange(time, timeString)
     }
   }
 
@@ -96,7 +125,6 @@ class AntdTimePicker extends Component {
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
-    const selectValue = form && field ? field.value : value
 
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
@@ -112,15 +140,15 @@ class AntdTimePicker extends Component {
           use12Hours={use12Hours}
           minuteStep={minuteStep}
           defaultOpenValue={moment('00:00', 'HH:mm')}
-          onChange={extendFunc(onChange, this.handleChange)}
-          value={_toMoment(selectValue, format)}
+          onChange={this.handleChange}
+          value={this.state.value}
         />
       </div>
     )
   }
 
   render () {
-    const { classes, ...restProps } = this.props
+    const { classes, onChange, ...restProps } = this.props
     const { form, field, value } = restProps
     const selectValue = form && field ? field.value : value
     const labelProps = {
@@ -132,8 +160,9 @@ class AntdTimePicker extends Component {
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
+        preventDefaultChangeEvent
         {...restProps}
-        value={this.state.selectValue}
+        // value={this.state.selectValue}
       />
     )
   }

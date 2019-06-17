@@ -50,7 +50,6 @@ class Checkbox extends React.Component {
       ...resetProps
     } = this.props
     const opts = {
-      tabIndex: -1,
       color: 'primary',
       // checkedIcon={<Check />} //className={classes.checkedIcon}
       onChange: (event, checked) => {

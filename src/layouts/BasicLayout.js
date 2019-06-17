@@ -294,11 +294,10 @@ class BasicLayout extends React.PureComponent {
   }
 
   sidebarMinimize = () => {
-    this.setState({ miniActive: !this.state.miniActive })
     const { dispatch } = this.props
     dispatch({
       type: 'global/changeLayoutCollapsed',
-      payload: !this.state.miniActive,
+      payload: !this.props.collapsed,
     })
   }
 
@@ -324,12 +323,13 @@ class BasicLayout extends React.PureComponent {
       location: { pathname },
       isMobile,
       menuData,
+      collapsed,
     } = this.props
     // console.log(this.props)
     const isTop = PropsLayout === 'topmenu'
     const routerConfig = this.matchParamsPath(pathname)
     const mainPanel = `${classes.mainPanel} ${cx({
-      [classes.mainPanelSidebarMini]: this.state.miniActive,
+      [classes.mainPanelSidebarMini]: collapsed,
     })}`
     // console.log(this.props)
     const layout = (
@@ -349,7 +349,6 @@ class BasicLayout extends React.PureComponent {
             color='blue'
             bgColor='black'
             handleDrawerToggle={this.handleDrawerToggle}
-            miniActive={this.state.miniActive}
             {...props}
           />
           // <Sidebar
@@ -361,7 +360,7 @@ class BasicLayout extends React.PureComponent {
           //   open={this.state.mobileOpen}
           //   color="blue"
           //   bgColor="black"
-          //   miniActive={this.state.miniActive}
+          //   miniActive={collapsed}
           //   {...this.props}
           // />
         )}
@@ -382,7 +381,7 @@ class BasicLayout extends React.PureComponent {
           {/* <Affix target={() => window.mainPanel}> */}
           <Header
             sidebarMinimize={this.sidebarMinimize}
-            miniActive={this.state.miniActive}
+            miniActive={collapsed}
             menuData={menuData}
             breadcrumbNameMap={this.breadcrumbNameMap}
             // routes={dashboardRoutes}

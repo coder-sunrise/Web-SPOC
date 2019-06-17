@@ -95,7 +95,6 @@ class PayersGrid extends PureComponent {
     }
 
     return (
-      <CardContainer title={this.titleComponent} hideHeader>
         <EditableTableGrid2
           rows={items.filter(o => o.type === type)}
           onRowDoubleClick={this.onRowDoubleClick}
@@ -103,7 +102,6 @@ class PayersGrid extends PureComponent {
           EditingProps={EditingProps}
           {...this.tableParas}
         />
-      </CardContainer>
     )
   }
 }

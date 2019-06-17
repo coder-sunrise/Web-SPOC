@@ -43,13 +43,15 @@ const _config = {
 const inputIdPrefix = 'medsysinput'
 let inputIdCounter = 0
 class BaseInput extends React.PureComponent {
-  constructor (props) {
-    super(props)
-  }
+  // constructor (props) {
+  //   super(props)
+  // }
 
   _onKeyDown = (e) => {
     // console.log(e.target.tagName==='TEXTAREA')
+    if (this.props.preventDefaultKeyDownEvent) return
     if (e.target.tagName === 'TEXTAREA') return
+    // console.log(e, this)
     if (e.which === 13) {
       // onEnterPressed
       const { onEnterPressed } = this.props
@@ -176,6 +178,7 @@ class BaseInput extends React.PureComponent {
       colon = true,
       realtime = true,
       focus = false,
+      preventDefaultKeyDownEvent,
     } = props
     inputIdCounter += 1
 
@@ -201,6 +204,9 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
+    if (!preventDefaultKeyDownEvent) {
+      cfg.onKeyDown = this._onKeyDown
+    }
     // console.log(error, showErrorIcon)
     if (error && showErrorIcon) {
       cfg.endAdornment = (
@@ -219,7 +225,6 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
-    // console.log(inputProps, cfg)
     const element = (
       <CustomInputWrapper
         id={inputIdPrefix + inputIdCounter}
@@ -245,7 +250,6 @@ class BaseInput extends React.PureComponent {
             classes={this.getClass(classes)}
             fullWidth
             inputRef={this.getRef}
-            onKeyDown={this._onKeyDown}
             {...cfg}
             {...inputProps}
           />

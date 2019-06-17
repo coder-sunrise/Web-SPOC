@@ -6,7 +6,6 @@ import * as Yup from 'yup'
 import { formatMessage } from 'umi/locale'
 // formik
 import { FastField, Field, withFormik } from 'formik'
-// devexpress-react-scheduler
 // material ui
 import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 // custom component
@@ -21,10 +20,8 @@ import {
   OutlinedTextField,
   Select,
   AntdInput,
-  Primary,
   Checkbox,
   TimePicker,
-  confirm,
 } from '@/components'
 // custom components
 import AppointmentTypeSelector from '../../../Appointment/Calendar/Appointments/AppointmentTypeSelector'
@@ -103,14 +100,18 @@ const initialAptInfo = {
     const {
       patientName,
       contactNo,
-      startDate,
-      endDate,
+      startDate: _utcStartDate,
+      endDate: _utcEndDate,
       startTime,
       endTime,
       appointmentType = '',
       doctor,
     } = values
     const { handleAddEvents, handleUpdateEvents, slotInfo, resources } = props
+
+    const startDate = moment(_utcStartDate).format(_dateFormat)
+    const endDate = moment(_utcEndDate).format(_dateFormat)
+
     const _momentStartDate = moment(
       `${startDate} ${startTime}`,
       `${_dateFormat} hh:mm a`,
@@ -122,10 +123,13 @@ const initialAptInfo = {
       `${_dateFormat} hh:mm a`,
     )
     const _nativeEndDate = _momentEndDate.toDate()
+
     const assignedResource = resources.find(
       (resource) => resource.resourceId === doctor,
     )
     let resourceId = assignedResource ? assignedResource.resourceId : 'other'
+
+    if (!_momentStartDate.isValid() && !_momentEndDate.isValid()) return
 
     const event = {
       ...slotInfo,
@@ -325,332 +329,342 @@ class Form extends React.PureComponent {
       [classes.hideCancelAppointmentBtn]: slotInfo.type === 'add',
     }
 
+    console.log({ values })
+
     return (
       <SizeContainer>
-        <Paper className={classnames(classes.content)}>
-          {isLoading && (
-            <div className={classnames(classes.loading)}>
-              <CircularProgress />
-              <Primary>
+        <React.Fragment>
+          <Paper className={classnames(classes.content)}>
+            {isLoading && (
+              <div className={classnames(classes.loading)}>
+                <CircularProgress />
                 <h3 style={{ fontWeight: 400 }}>Populating patient info...</h3>
-              </Primary>
-            </div>
-          )}
+              </div>
+            )}
 
-          <GridContainer
-            className={classnames(classes.formContent)}
-            alignItems='flex-start'
-          >
-            <GridItem container xs md={12}>
-              <GridItem xs md={7}>
-                <Field
-                  name='patientName'
-                  render={(args) => {
-                    return (
+            <GridContainer
+              className={classnames(classes.formContent)}
+              alignItems='flex-start'
+            >
+              <GridItem container xs md={12}>
+                <GridItem xs md={7}>
+                  <Field
+                    name='patientName'
+                    render={(args) => {
+                      return (
+                        <AntdInput
+                          {...args}
+                          autoFocus
+                          onEnterPressed={this.onSearchPatient}
+                          label={formatMessage({
+                            id: 'reception.appt.form.patientName',
+                          })}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs md={5}>
+                  <div className={classnames(classes.buttonGroup)}>
+                    <Button
+                      size='sm'
+                      color='primary'
+                      onClick={this.onSearchPatient}
+                    >
+                      Search
+                    </Button>
+                    <Button
+                      size='sm'
+                      color='primary'
+                      onClick={this.toggleNewPatientModal}
+                    >
+                      Create Patient
+                    </Button>
+                  </div>
+                </GridItem>
+                <GridItem xs md={7}>
+                  <Field
+                    name='contactNo'
+                    render={(args) => (
                       <AntdInput
                         {...args}
-                        autoFocus
-                        onEnterPressed={this.onSearchPatient}
                         label={formatMessage({
-                          id: 'reception.appt.form.patientName',
+                          id: 'reception.appt.form.contactNo',
                         })}
                       />
+                    )}
+                  />
+                </GridItem>
+
+                <GridItem
+                  xs
+                  md={12}
+                  className={classnames(classes.remarksField)}
+                >
+                  <FastField
+                    name='remarks'
+                    render={(args) => (
+                      <OutlinedTextField
+                        {...args}
+                        multiline
+                        rowsMax={6}
+                        rows={4}
+                        label={formatMessage({
+                          id: 'reception.appt.form.remarks',
+                        })}
+                      />
+                    )}
+                  />
+                </GridItem>
+
+                <GridItem xs md={6}>
+                  <FastField
+                    name='doctor'
+                    render={(args) => (
+                      <Select
+                        {...args}
+                        options={doctors}
+                        label={formatMessage({
+                          id: 'reception.appt.form.doctor',
+                        })}
+                      />
+                    )}
+                  />
+                </GridItem>
+
+                <GridItem xs md={6}>
+                  <FastField
+                    name='appointmentType'
+                    render={(args) => (
+                      <AppointmentTypeSelector
+                        {...args}
+                        label='Appointment Type'
+                      />
+                    )}
+                  />
+                </GridItem>
+              </GridItem>
+              <GridItem xs md={12}>
+                <p className={classnames(classes.apptLabel)}>
+                  Appointment Time
+                </p>
+              </GridItem>
+              <GridItem xs md={1}>
+                <p className={classnames(classes.apptSubLabel)}>From</p>
+              </GridItem>
+              <GridItem xs md={3}>
+                <Field
+                  name='startDate'
+                  validate={this.startDateValidation}
+                  render={(args) => (
+                    <DatePicker noLabel {...args} format={_dateFormat} />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs md={2}>
+                <Field
+                  name='startTime'
+                  render={(args) => (
+                    <TimePicker
+                      {...args}
+                      noLabel
+                      format='hh:mm a'
+                      use12Hours
+                      minuteStep={15}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs md={1}>
+                <p className={classnames(classes.apptSubLabel)}>To</p>
+              </GridItem>
+              <GridItem xs md={3}>
+                <Field
+                  name='endDate'
+                  validate={this.endDateValidation}
+                  render={(args) => {
+                    return <DatePicker noLabel {...args} format={_dateFormat} />
+                  }}
+                />
+              </GridItem>
+              <GridItem xs md={2}>
+                <Field
+                  name='endTime'
+                  render={(args) => (
+                    <TimePicker
+                      {...args}
+                      noLabel
+                      format='hh:mm a'
+                      use12Hours
+                      minuteStep={15}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs md={6}>
+                <p className={classnames(classes.dateTimePreview)}>
+                  {` ${moment(values.startDate).format('dddd')}, ${moment(
+                    values.startDate,
+                  ).format(_dateFormat)} ${values.startTime}`}
+                </p>
+              </GridItem>
+              <GridItem xs md={6}>
+                <p className={classnames(classes.dateTimePreview)}>
+                  {`${moment(values.endDate).format('dddd')}, ${moment(
+                    values.endDate,
+                  ).format(_dateFormat)} ${values.endTime}`}
+                </p>
+              </GridItem>
+              <GridItem
+                xs
+                md={12}
+                className={classnames(classes.enableOccurenceCheckbox)}
+              >
+                <Divider className={classnames(classes.divider)} />
+                <FastField
+                  name='enableRecurrence'
+                  render={(args) => {
+                    return (
+                      <Checkbox simple label='Enable Recurrence' {...args} />
                     )
                   }}
                 />
               </GridItem>
-              <GridItem xs md={5}>
-                <div className={classnames(classes.buttonGroup)}>
-                  <Button
-                    size='sm'
-                    color='primary'
-                    onClick={this.onSearchPatient}
-                  >
-                    Search
-                  </Button>
-                  <Button
-                    size='sm'
-                    color='primary'
-                    onClick={this.toggleNewPatientModal}
-                  >
-                    Create Patient
-                  </Button>
-                </div>
-              </GridItem>
-              <GridItem xs md={7}>
-                <Field
-                  name='contactNo'
-                  render={(args) => (
-                    <AntdInput
-                      {...args}
-                      label={formatMessage({
-                        id: 'reception.appt.form.contactNo',
-                      })}
-                    />
-                  )}
-                />
-              </GridItem>
-
-              <GridItem xs md={12} className={classnames(classes.remarksField)}>
-                <FastField
-                  name='remarks'
-                  render={(args) => (
-                    <OutlinedTextField
-                      {...args}
-                      multiline
-                      rowsMax={6}
-                      rows={4}
-                      label={formatMessage({
-                        id: 'reception.appt.form.remarks',
-                      })}
-                    />
-                  )}
-                />
-              </GridItem>
-
-              <GridItem xs md={6}>
-                <FastField
-                  name='doctor'
-                  render={(args) => (
-                    <Select
-                      {...args}
-                      options={doctors}
-                      label={formatMessage({
-                        id: 'reception.appt.form.doctor',
-                      })}
-                    />
-                  )}
-                />
-              </GridItem>
-
-              <GridItem xs md={6}>
-                <FastField
-                  name='appointmentType'
-                  render={(args) => (
-                    <AppointmentTypeSelector
-                      {...args}
-                      label='Appointment Type'
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridItem>
-            <GridItem xs md={12}>
-              <p className={classnames(classes.apptLabel)}>Appointment Time</p>
-            </GridItem>
-            <GridItem xs md={1}>
-              <p className={classnames(classes.apptSubLabel)}>From</p>
-            </GridItem>
-            <GridItem xs md={3}>
-              <Field
-                name='startDate'
-                validate={this.startDateValidation}
-                render={(args) => (
-                  <DatePicker noLabel {...args} format={_dateFormat} />
-                )}
-              />
-            </GridItem>
-            <GridItem xs md={2}>
-              <Field
-                name='startTime'
-                render={(args) => (
-                  <TimePicker
-                    {...args}
-                    noLabel
-                    format='hh:mm a'
-                    use12Hours
-                    minuteStep={15}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs md={1}>
-              <p className={classnames(classes.apptSubLabel)}>To</p>
-            </GridItem>
-            <GridItem xs md={3}>
-              <Field
-                name='endDate'
-                validate={this.endDateValidation}
-                render={(args) => {
-                  return <DatePicker noLabel {...args} format={_dateFormat} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs md={2}>
-              <Field
-                name='endTime'
-                render={(args) => (
-                  <TimePicker
-                    {...args}
-                    noLabel
-                    format='hh:mm a'
-                    use12Hours
-                    minuteStep={15}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs md={6}>
-              <p className={classnames(classes.dateTimePreview)}>
-                {` ${moment(values.startDate, _dateFormat).format(
-                  'dddd',
-                )}, ${values.startDate} ${values.startTime}`}
-              </p>
-            </GridItem>
-            <GridItem xs md={6}>
-              <p className={classnames(classes.dateTimePreview)}>
-                {`${moment(values.endDate, _dateFormat).format(
-                  'dddd',
-                )}, ${values.endDate} ${values.endTime}`}
-              </p>
-            </GridItem>
-            <GridItem
-              xs
-              md={12}
-              className={classnames(classes.enableOccurenceCheckbox)}
-            >
-              <Divider className={classnames(classes.divider)} />
-              <FastField
-                name='enableRecurrence'
-                render={(args) => {
-                  return <Checkbox simple label='Enable Recurrence' {...args} />
-                }}
-              />
-            </GridItem>
-            {values.enableRecurrence && (
-              <React.Fragment>
-                <GridItem xs md={4}>
-                  <FastField
-                    name='recurrencePattern'
-                    render={(args) => (
-                      <Select
-                        {...args}
-                        options={recurrencePattern}
-                        label={formatMessage({
-                          id: 'reception.appt.form.recurrencePattern',
-                        })}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem xs md={4}>
-                  <FastField
-                    name='recurrenceRange'
-                    render={(args) => (
-                      <Select
-                        {...args}
-                        label='Range of Recurrence'
-                        options={[
-                          {
-                            value: RECURRENCE_RANGE.AFTER,
-                            name: formatMessage({
-                              id: 'reception.appt.form.endAfter',
-                            }),
-                          },
-                          {
-                            value: RECURRENCE_RANGE.BY,
-                            name: formatMessage({
-                              id: 'reception.appt.form.endBy',
-                            }),
-                          },
-                        ]}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem xs md={4}>
-                  {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
-                    <Field
-                      name='occurence'
-                      render={(args) => (
-                        <NumberInput
-                          {...args}
-                          label={formatMessage({
-                            id: 'reception.appt.form.occurence',
-                          })}
-                        />
-                      )}
-                    />
-                  )}
-                  {values.recurrenceRange === RECURRENCE_RANGE.BY && (
+              {values.enableRecurrence && (
+                <React.Fragment>
+                  <GridItem xs md={4}>
                     <FastField
-                      name='stopDate'
+                      name='recurrencePattern'
                       render={(args) => (
-                        <DatePicker
+                        <Select
                           {...args}
+                          options={recurrencePattern}
                           label={formatMessage({
-                            id: 'reception.appt.form.stopDate',
+                            id: 'reception.appt.form.recurrencePattern',
                           })}
                         />
                       )}
                     />
-                  )}
-                </GridItem>
-              </React.Fragment>
-            )}
-          </GridContainer>
-        </Paper>
-        <div className={classnames(classes.footer)}>
-          <GridContainer>
-            <GridItem xs md={4} container justify='flex-start'>
-              <Button
-                color='danger'
-                className={classnames(hideCancelAppointmentClass)}
-                onClick={this.onCancelAppointmentClick}
-              >
-                Cancel Appointment
-              </Button>
-            </GridItem>
+                  </GridItem>
+                  <GridItem xs md={4}>
+                    <FastField
+                      name='recurrenceRange'
+                      render={(args) => (
+                        <Select
+                          {...args}
+                          label='Range of Recurrence'
+                          options={[
+                            {
+                              value: RECURRENCE_RANGE.AFTER,
+                              name: formatMessage({
+                                id: 'reception.appt.form.endAfter',
+                              }),
+                            },
+                            {
+                              value: RECURRENCE_RANGE.BY,
+                              name: formatMessage({
+                                id: 'reception.appt.form.endBy',
+                              }),
+                            },
+                          ]}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem xs md={4}>
+                    {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
+                      <Field
+                        name='occurence'
+                        render={(args) => (
+                          <NumberInput
+                            {...args}
+                            label={formatMessage({
+                              id: 'reception.appt.form.occurence',
+                            })}
+                          />
+                        )}
+                      />
+                    )}
+                    {values.recurrenceRange === RECURRENCE_RANGE.BY && (
+                      <FastField
+                        name='stopDate'
+                        render={(args) => (
+                          <DatePicker
+                            {...args}
+                            label={formatMessage({
+                              id: 'reception.appt.form.stopDate',
+                            })}
+                          />
+                        )}
+                      />
+                    )}
+                  </GridItem>
+                </React.Fragment>
+              )}
+            </GridContainer>
+          </Paper>
+          <div className={classnames(classes.footer)}>
+            <GridContainer>
+              <GridItem xs md={4} container justify='flex-start'>
+                <Button
+                  color='danger'
+                  className={classnames(hideCancelAppointmentClass)}
+                  onClick={this.onCancelAppointmentClick}
+                >
+                  Cancel Appointment
+                </Button>
+              </GridItem>
 
-            <GridItem xs md={8} container justify='flex-end'>
-              <Button onClick={onConfirm} color='danger'>
-                Cancel
-              </Button>
-              <Button color='success'>Save Draft</Button>
-              <Button onClick={handleSubmit} color='primary'>
-                Confirm
-              </Button>
-            </GridItem>
-          </GridContainer>
-        </div>
+              <GridItem xs md={8} container justify='flex-end'>
+                <Button onClick={onConfirm} color='danger'>
+                  Cancel
+                </Button>
+                <Button color='success'>Save Draft</Button>
+                <Button onClick={handleSubmit} color='primary'>
+                  Confirm
+                </Button>
+              </GridItem>
+            </GridContainer>
+          </div>
 
-        <CommonModal
-          open={showNewPatientModal}
-          title='Register New Patient'
-          onClose={this.toggleNewPatientModal}
-          onConfirm={this.toggleNewPatientModal}
-          fullScreen
-          showFooter={false}
-        >
-          {showNewPatientModal ? <NewPatient /> : null}
-        </CommonModal>
-        <CommonModal
-          open={showSearchPatientModal}
-          title='Search Patient'
-          onClose={this.closeSearchPatientModal}
-          onConfirm={this.closeSearchPatientModal}
-          maxWidth='md'
-          showFooter={false}
-        >
-          {showSearchPatientModal ? (
-            <PatientSearchModal
-              searchPatientName={values.patientName}
-              patientList={patientList}
-              handleSearchPatient={this.searchPatient}
-              onBackClick={this.closeSearchPatientModal}
-              onSelectClick={this.handleSelectPatient}
-            />
-          ) : null}
-        </CommonModal>
-        <CommonModal
-          open={showDeleteConfirmationModal}
-          title='Alert'
-          onClose={this.closeDeleteConfirmation}
-          onConfirm={this.onConfirmCancelAppointment}
-          maxWidth='sm'
-        >
-          <DeleteConfirmation />
-        </CommonModal>
+          <CommonModal
+            open={showNewPatientModal}
+            title='Register New Patient'
+            onClose={this.toggleNewPatientModal}
+            onConfirm={this.toggleNewPatientModal}
+            fullScreen
+            showFooter={false}
+          >
+            {showNewPatientModal ? <NewPatient /> : null}
+          </CommonModal>
+          <CommonModal
+            open={showSearchPatientModal}
+            title='Search Patient'
+            onClose={this.closeSearchPatientModal}
+            onConfirm={this.closeSearchPatientModal}
+            maxWidth='md'
+            showFooter={false}
+          >
+            {showSearchPatientModal ? (
+              <PatientSearchModal
+                searchPatientName={values.patientName}
+                patientList={patientList}
+                handleSearchPatient={this.searchPatient}
+                onBackClick={this.closeSearchPatientModal}
+                onSelectClick={this.handleSelectPatient}
+              />
+            ) : null}
+          </CommonModal>
+          <CommonModal
+            open={showDeleteConfirmationModal}
+            title='Alert'
+            onClose={this.closeDeleteConfirmation}
+            onConfirm={this.onConfirmCancelAppointment}
+            maxWidth='sm'
+          >
+            <DeleteConfirmation />
+          </CommonModal>
+        </React.Fragment>
       </SizeContainer>
     )
   }

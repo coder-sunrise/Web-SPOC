@@ -97,6 +97,9 @@ const styles = (theme) => ({
   },
   paperContainer: {
     margin: '0 5px',
+    '& > div': {
+      width: '100%',
+    },
   },
 })
 
@@ -218,6 +221,11 @@ class CommonTableGrid2 extends React.Component {
     }
     this.theme = createMuiTheme({
       overrides: {
+        RootBase: {
+          root: {
+            width: '100%',
+          },
+        },
         TableFixedCell: {
           fixedCell: {
             zIndex: 1,
@@ -471,14 +479,14 @@ class CommonTableGrid2 extends React.Component {
       })
     }
     return (
-      <Paper
-        className={classNames({
-          [classes.paperContainer]: true,
-          [this.props.className]: true,
-        })}
-        style={this.props.style}
-      >
-        <MuiThemeProvider theme={this.theme}>
+      <MuiThemeProvider theme={this.theme}>
+        <Paper
+          className={classNames({
+            [classes.paperContainer]: true,
+            [this.props.className]: true,
+          })}
+          style={this.props.style}
+        >
           {isLoading && (
             <div>
               <LinearProgress />
@@ -601,8 +609,8 @@ class CommonTableGrid2 extends React.Component {
             />
             {extraGetter.map((o) => o)}
           </DevGrid>
-        </MuiThemeProvider>
-      </Paper>
+        </Paper>
+      </MuiThemeProvider>
     )
   }
 }

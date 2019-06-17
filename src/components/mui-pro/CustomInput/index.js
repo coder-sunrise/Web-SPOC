@@ -30,71 +30,9 @@ class FormikTextField extends React.PureComponent {
     const { field = {}, form, inputProps = {} } = props
     // console.log(this.state, props)
     this.state = {
-      value: field.value,
+      value: field.value !== undefined && field.value !== '' ? field.value : '',
     }
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
-  }
-
-  onChange = (event) => {
-    this.setState({
-      value: event.target.value,
-    })
-    this.debouncedOnChange(event.target.value)
-  }
-
-  debouncedOnChange = (value) => {
-    const { props } = this
-    const { loadOnChange, readOnly, onChange } = props
-    if (readOnly || loadOnChange) return
-    const v = {
-      target: {
-        value,
-        name: props.field.name,
-      },
-    }
-    if (props.field && props.field.onChange) {
-      props.field.onChange(v)
-    }
-    if (onChange) {
-      onChange(v)
-    }
-  }
-
-  _onKeyDown = (e) => {
-    if (e.which === 13) {
-      // onEnterPressed
-      const { onEnterPressed } = this.props
-      if (onEnterPressed) onEnterPressed(e)
-
-      let loop = 0
-      let target = $(e.target)
-      while (loop < 100) {
-        const newTarget = $(target.parents('div,tr')[0])
-        if (newTarget.length === 0) break
-        const btn = newTarget.find("button[data-button-type='progress']")
-        if (btn.length > 0) {
-          if (this.props.onCommit) {
-            this.props.onCommit({
-              target: {
-                value: this.state.value,
-              },
-            })
-            setTimeout(() => {
-              btn.trigger('click')
-            }, 200)
-          } else {
-            btn.trigger('click')
-          }
-          break
-        }
-        target = newTarget
-        loop += 1
-      }
-    }
-  }
-
-  shouldFocus = (error) => {
-    return error && this.props.form.submitCount !== this.validationCount
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -112,9 +50,40 @@ class FormikTextField extends React.PureComponent {
     const { field } = nextProps
     if (field) {
       this.setState({
-        value: field.value,
+        value:
+          field.value !== undefined && field.value !== '' ? field.value : '',
       })
     }
+  }
+
+  debouncedOnChange = (value) => {
+    const { props } = this
+    const { loadOnChange, readOnly, onChange } = props
+    if (readOnly || loadOnChange) return
+    console.log('base c', value, props)
+    const v = {
+      target: {
+        value,
+        name: props.field.name,
+      },
+    }
+    if (props.field && props.field.onChange) {
+      props.field.onChange(v)
+    }
+    if (onChange) {
+      onChange(v)
+    }
+  }
+
+  onChange = (event) => {
+    this.setState({
+      value: event.target.value,
+    })
+    this.debouncedOnChange(event.target.value)
+  }
+
+  shouldFocus = (error) => {
+    return error && this.props.form.submitCount !== this.validationCount
   }
 
   render () {
@@ -152,7 +121,7 @@ class FormikTextField extends React.PureComponent {
       shrink = false,
       field,
       form,
-      onChange,
+      preventDefaultChangeEvent,
       value,
     } = props
     // console.log(this.state, this.state.value)
@@ -164,7 +133,9 @@ class FormikTextField extends React.PureComponent {
     if (field && form) {
       cfg.value = state.value
       cfg.name = field.name
-      cfg.onChange = this.onChange
+      if (!preventDefaultChangeEvent) {
+        cfg.onChange = this.onChange
+      }
       // if(field.value){
       //   cfg.labelProps = {
       //     shrink: !!field.value,
