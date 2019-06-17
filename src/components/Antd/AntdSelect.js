@@ -142,7 +142,9 @@ class AntdSelect extends React.PureComponent {
       value: s[valueField],
       label: s[labelField],
     }))
+
     const selectValue = form && field ? field.value : value
+
     const cfg = {}
     if (selectValue !== undefined) {
       cfg.value = selectValue

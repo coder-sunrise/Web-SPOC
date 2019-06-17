@@ -17,43 +17,80 @@ const styles = () => ({
   },
 })
 
+const DoctorEventContent = ({ popoverEvent, classes }) => {
+  return (
+    <GridContainer direction='column' justify='center' alignItems='center'>
+      <GridItem className={classnames(classes.timeRow)}>
+        <AccessTime className={classnames(classes.clockIcon)} />
+        <span>
+          {popoverEvent.startTime} - {popoverEvent.endTime}
+        </span>
+      </GridItem>
+      <GridItem>
+        <TextField disabled label='Doctor' value={popoverEvent.doctor} />
+      </GridItem>
+      <GridItem>
+        <TextField disabled label='Event Type' value={popoverEvent.eventType} />
+      </GridItem>
+      <GridItem>
+        <TextField disabled label='Subject' value={popoverEvent.subject} />
+      </GridItem>
+      <GridItem>
+        <TextField
+          disabled
+          label='Description'
+          value={popoverEvent.description}
+        />
+      </GridItem>
+    </GridContainer>
+  )
+}
+
 class PopoverContent extends React.PureComponent {
   render () {
     const { popoverEvent, classes } = this.props
     return (
       <CardBody>
-        <GridContainer direction='column' justify='center' alignItems='center'>
-          <GridItem className={classnames(classes.timeRow)}>
-            <AccessTime className={classnames(classes.clockIcon)} />
-            <span>
-              {popoverEvent.startTime} - {popoverEvent.endTime}
-            </span>
-          </GridItem>
-          <GridItem>
-            <TextField
-              disabled
-              label='Patient Name'
-              value={popoverEvent.patientName}
-            />
-          </GridItem>
-          <GridItem>
-            <TextField
-              disabled
-              label='Contact No.'
-              value={popoverEvent.contactNo}
-            />
-          </GridItem>
-          <GridItem>
-            <TextField disabled label='Doctor' value={popoverEvent.doctor} />
-          </GridItem>
-          <GridItem>
-            <TextField
-              disabled
-              label='Appointment Type'
-              value={popoverEvent.appointmentType}
-            />
-          </GridItem>
-        </GridContainer>
+        {popoverEvent.isDoctorEvent ? (
+          <DoctorEventContent {...this.props} />
+        ) : (
+          <GridContainer
+            direction='column'
+            justify='center'
+            alignItems='center'
+          >
+            <GridItem className={classnames(classes.timeRow)}>
+              <AccessTime className={classnames(classes.clockIcon)} />
+              <span>
+                {popoverEvent.startTime} - {popoverEvent.endTime}
+              </span>
+            </GridItem>
+            <GridItem>
+              <TextField
+                disabled
+                label='Patient Name'
+                value={popoverEvent.patientName}
+              />
+            </GridItem>
+            <GridItem>
+              <TextField
+                disabled
+                label='Contact No.'
+                value={popoverEvent.contactNo}
+              />
+            </GridItem>
+            <GridItem>
+              <TextField disabled label='Doctor' value={popoverEvent.doctor} />
+            </GridItem>
+            <GridItem>
+              <TextField
+                disabled
+                label='Appointment Type'
+                value={popoverEvent.appointmentType}
+              />
+            </GridItem>
+          </GridContainer>
+        )}
       </CardBody>
     )
   }

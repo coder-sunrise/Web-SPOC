@@ -5,6 +5,7 @@ import debounce from 'lodash/debounce'
 import { formatMessage } from 'umi/locale'
 // material ui
 import { CircularProgress, withStyles } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
 // custom component
 import {
   Button,
@@ -102,44 +103,53 @@ class FilterBar extends PureComponent {
 
     return (
       <SizeContainer>
-        <GridContainer>
-          <GridItem xs md={2}>
-            <TextField
-              value={searchQuery}
-              onChange={this.onSearchQueryChange}
-              label={formatMessage({
-                id: 'reception.appt.searchByPatientName',
-              })}
-              suffix={isTyping && <CircularProgress size={16} />}
-            />
-          </GridItem>
-          <GridItem xs md={2}>
-            <Select
-              label='Filter by Doctor'
-              mode='multiple'
-              options={doctors}
-              value={filter.doctors}
-              onChange={this.onFilterByDoctorChange}
-            />
-          </GridItem>
-          <GridItem xs md={3} className={classnames(classes.selectorContainer)}>
-            <AppointmentTypeSelector
-              label='Filter by Appointment Type'
-              value={filter.appointmentType}
-              onChange={this.onFilterAppointmentTypeChange}
-              // helpText='Leave blank to show all appointment type'
-              mode='multiple'
-            />
-          </GridItem>
-
-          <GridItem xs md={5} container justify='flex-end'>
-            <GridItem>
-              <Button color='info' onClick={onDoctorEventClick}>
-                Doctor Event
-              </Button>
+        <React.Fragment>
+          <GridContainer>
+            <GridItem xs md={3}>
+              <TextField
+                value={searchQuery}
+                onChange={this.onSearchQueryChange}
+                label={formatMessage({
+                  id: 'reception.appt.searchByPatientName',
+                })}
+                suffix={isTyping && <CircularProgress size={16} />}
+              />
             </GridItem>
-          </GridItem>
-        </GridContainer>
+
+            <GridItem xs md={9} container justify='flex-end'>
+              <GridItem>
+                <Button color='info' onClick={onDoctorEventClick}>
+                  <AddIcon />
+                  Doctor Event
+                </Button>
+              </GridItem>
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem xs md={3}>
+              <Select
+                label='Filter by Doctor'
+                mode='multiple'
+                options={doctors}
+                value={filter.doctors}
+                onChange={this.onFilterByDoctorChange}
+              />
+            </GridItem>
+            <GridItem
+              xs
+              md={3}
+              className={classnames(classes.selectorContainer)}
+            >
+              <AppointmentTypeSelector
+                label='Filter by Appointment Type'
+                value={filter.appointmentType}
+                onChange={this.onFilterAppointmentTypeChange}
+                // helpText='Leave blank to show all appointment type'
+                mode='multiple'
+              />
+            </GridItem>
+          </GridContainer>
+        </React.Fragment>
       </SizeContainer>
     )
   }
