@@ -1,14 +1,15 @@
 import React from 'react'
 // material ui
-import { Popover, Typography, withStyles } from '@material-ui/core'
+import { Popover, ClickAwayListener, withStyles } from '@material-ui/core'
 import { Assignment } from '@material-ui/icons'
 // common component
-import { CardHeader, CardBody, CommonHeader, CommonModal } from '@/components'
+import { CommonHeader, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import CalendarView from './components/CalendarView'
 import PopoverContent from './components/PopoverContent'
-import Form from './Form'
+import Form from './components/form/Form'
+import DoctorEventForm from './components/form/DoctorEvent'
 // settings
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
 // events data variable
@@ -80,6 +81,7 @@ class Appointment extends React.PureComponent {
   state = {
     showPopup: false,
     showAppointmentForm: false,
+    showDoctorEventModal: false,
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: [
@@ -132,8 +134,21 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  deleteEvent = (eventID) => {
+    const { calendarEvents } = this.state
+    const newCalendarEvents = calendarEvents.filter(
+      (event) => event.id !== eventID,
+    )
+    this.setState({
+      calendarEvents: [
+        ...newCalendarEvents,
+      ],
+      showAppointmentForm: false,
+      selectedSlot: {},
+    })
+  }
+
   moveEvent = (newCalendarEvents) => {
-    // console.log({ newCalendarEvents })
     this.setState({ calendarEvents: newCalendarEvents, isDragging: false })
   }
 
@@ -152,12 +167,17 @@ class Appointment extends React.PureComponent {
 
     this.setState({
       selectedSlot: { ...hour },
+      isDragging: false,
       showAppointmentForm: true,
     })
   }
 
   onSelectEvent = (selectedEvent) => {
     this.setState({
+      showPopup: false,
+      isDragging: false,
+      popoverEvent: { ...InitialPopoverEvent },
+      popupAnchor: null,
       selectedSlot: { ...selectedEvent, type: 'update' },
       showAppointmentForm: true,
     })
@@ -190,7 +210,7 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  handleOnDragStart = () => {
+  handleOnDragStart = ({ ...dragProps }) => {
     this.setState({
       showPopup: false,
       popoverEvent: { ...InitialPopoverEvent },
@@ -200,10 +220,14 @@ class Appointment extends React.PureComponent {
   }
 
   onFilterUpdate = (newFilter) => {
-    // apply filter to display events
     this.setState({
       filter: { ...newFilter },
     })
+  }
+
+  handleDoctorEventClick = () => {
+    const { showDoctorEventModal } = this.state
+    this.setState({ showDoctorEventModal: !showDoctorEventModal })
   }
 
   render () {
@@ -212,6 +236,7 @@ class Appointment extends React.PureComponent {
       showPopup,
       popupAnchor,
       showAppointmentForm,
+      showDoctorEventModal,
       calendarEvents,
       selectedSlot,
       resources,
@@ -229,8 +254,8 @@ class Appointment extends React.PureComponent {
           onClose={this.handleClosePopover}
           placement='top-start'
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
+            vertical: 'center',
+            horizontal: 'right',
           }}
           transformOrigin={{
             vertical: 'center',
@@ -238,10 +263,16 @@ class Appointment extends React.PureComponent {
           }}
           disableRestoreFocus
         >
+          {/*<ClickAwayListener onClickAway={this.handleClosePopover}>
+        </ClickAwayListener>*/}
           <PopoverContent popoverEvent={popoverEvent} />
         </Popover>
 
-        <FilterBar filter={filter} handleUpdateFilter={this.onFilterUpdate} />
+        <FilterBar
+          filter={filter}
+          handleUpdateFilter={this.onFilterUpdate}
+          onDoctorEventClick={this.handleDoctorEventClick}
+        />
         <div>
           <CalendarView
             calendarEvents={applyFilter(calendarEvents, filter)}
@@ -268,8 +299,17 @@ class Appointment extends React.PureComponent {
               slotInfo={selectedSlot}
               handleAddEvents={this.addEvent}
               handleUpdateEvents={this.updateEvent}
+              handleDeleteEvent={this.deleteEvent}
             />
           ) : null}
+        </CommonModal>
+        <CommonModal
+          open={showDoctorEventModal}
+          title='Doctor Event'
+          onClose={this.handleDoctorEventClick}
+          onConfirm={this.handleDoctorEventClick}
+        >
+          {showDoctorEventModal && <DoctorEventForm />}
         </CommonModal>
       </CommonHeader>
     )

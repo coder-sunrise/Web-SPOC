@@ -4,23 +4,14 @@ import classnames from 'classnames'
 import moment from 'moment'
 // react-datetime
 import Datetime from 'react-datetime'
+import { DatePicker, Calendar } from 'antd'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 // material ui
-import {
-  ClickAwayListener,
-  Popover,
-  IconButton,
-  withStyles,
-  MenuList,
-  MenuItem,
-  Paper,
-  Popper,
-  Grow,
-} from '@material-ui/core'
+import { Popover, IconButton, withStyles } from '@material-ui/core'
 import { ChevronLeft, ChevronRight } from '@material-ui/icons'
 // components
-import { Button, CustomDropdown, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 
 const styles = () => ({
   btnContainer: {
@@ -72,6 +63,7 @@ class CalendarToolbar extends React.PureComponent {
 
   onDateChange = (newDate) => {
     const { handleDateChange } = this.props
+    this.onDateOverlayClose()
     handleDateChange(newDate.toDate())
   }
 
@@ -139,16 +131,20 @@ class CalendarToolbar extends React.PureComponent {
               vertical: 'bottom',
               horizontal: 'center',
             }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
             onClose={this.onDateOverlayClose}
-            style={{ width: 500, height: 500 }}
+            // style={{ width: 500, height: 500 }}
           >
-            <Datetime
-              onChange={this.onDateChange}
-              value={moment(displayDate)}
-              dateFormat='YYYY-MM-DD'
-              timeFormat={false}
-              input={false}
-            />
+            <div style={{ width: 400, height: '100%' }}>
+              <Calendar
+                fullscreen={false}
+                defaultValue={moment(displayDate)}
+                onSelect={this.onDateChange}
+              />
+            </div>
           </Popover>
         </GridItem>
         <GridItem xs md={2} container justify='flex-end'>

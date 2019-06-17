@@ -28,7 +28,7 @@ export EditableTableGrid from './CommonTableGrid/EditableTableGrid'
 export EditableTableGrid2 from './CommonTableGrid2/EditableTableGrid'
 export NumberTypeProvider2 from './CommonTableGrid2/EditCellComponents/NumberTypeProvider'
 
-export AntdInput from './mui-pro/CustomInput' // Antd/AntdInput'
+export { default as AntdInput } from './mui-pro/CustomInput' // Antd/AntdInput'
 export { default as Select } from './Antd/AntdSelect'
 export { default as DatePicker } from './Antd/AntdDatePicker'
 export { default as DateRangePicker } from './Antd/AntdDateRangePicker'

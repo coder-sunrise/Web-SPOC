@@ -45,8 +45,8 @@ class PatientSearch extends PureComponent {
 
   searchPatient = () => {
     const { searchQuery } = this.state
-    const { dispatch } = this.props
-
+    const { handleSearchPatient } = this.props
+    handleSearchPatient(searchQuery)
     // dispatch({
     //   type: 'appointment/fetchPatientListByName',
     //   payload: searchQuery,
@@ -80,6 +80,7 @@ class PatientSearch extends PureComponent {
       selectedPatient,
       showError,
     } = this.state
+
     const { classes, onBackClick, patientList } = this.props
 
     return (

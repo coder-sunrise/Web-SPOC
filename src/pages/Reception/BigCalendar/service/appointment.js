@@ -1,5 +1,5 @@
 import { stringify } from 'qs'
-import request, { axiosRequest } from '@/utils/request'
+import request from '@/utils/request'
 
 export async function fetchPatientListByName (patientName) {
   const criteria = [
@@ -7,7 +7,7 @@ export async function fetchPatientListByName (patientName) {
   ]
   const response = await request('/api/patient', {
     method: 'GET',
-    data: stringify({ criteria }),
+    data: patientName === '' ? {} : stringify({ criteria }),
   })
 
   return response
