@@ -23,14 +23,8 @@ const routes = [
   {
     path: '/emr',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
-    authority: [
-      'admin',
-      'user',
-      'guest',
-    ],
+    Routes: [ 'src/pages/Authorized' ],
+    authority: [ 'admin', 'user', 'guest' ],
     routes: [
       { path: '/emr', redirect: '/emr/queue' },
       // queue
@@ -110,14 +104,8 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
-    authority: [
-      'admin',
-      'user',
-      'guest',
-    ],
+    Routes: [ 'src/pages/Authorized' ],
+    authority: [ 'admin', 'user', 'guest' ],
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue' },
@@ -269,38 +257,38 @@ const routes = [
             path: '/inventory/master/consumable',
             name: 'consumable.detail',
             hideInMenu: true,
-            component: './Inventory/Master/Consumable/Detail',
+            component: './Inventory/Master/Consumable/ConsumableDetails',
           },
           {
             path: '/inventory/master/medication',
             name: 'medication.detail',
             hideInMenu: true,
-            component: './Inventory/Master/Medication/Detail',
+            component: './Inventory/Master/Medication/MedicationDetails',
           },
-          {
-            path: '/inventory/master/vaccination',
-            name: 'vaccination.detail',
-            hideInMenu: true,
-            component: './Inventory/Master/Vaccination/Detail',
-          },
-          {
-            path: '/inventory/master/package',
-            name: 'package.detail',
-            hideInMenu: true,
-            component: './Inventory/Master/Package/Detail',
-          },
-          {
-            path: '/inventory/pd',
-            name: 'pd',
-            // component: './Inventory/PurchaseReceving',
-            mini: 'PD',
-          },
-          {
-            path: '/inventory/pd/detail',
-            name: 'pd.detail',
-            hideInMenu: true,
-            component: './Inventory/PurchaseDelivery/Detail',
-          },
+          // {
+          //   path: '/inventory/master/vaccination',
+          //   name: 'vaccination.detail',
+          //   hideInMenu: true,
+          //   component: './Inventory/Master/Vaccination/Detail',
+          // },
+          // {
+          //   path: '/inventory/master/package',
+          //   name: 'package.detail',
+          //   hideInMenu: true,
+          //   component: './Inventory/Master/Package/Detail',
+          // },
+          // {
+          //   path: '/inventory/pd',
+          //   name: 'pd',
+          //   // component: './Inventory/PurchaseReceving',
+          //   mini: 'PD',
+          // },
+          // {
+          //   path: '/inventory/pd/detail',
+          //   name: 'pd.detail',
+          //   hideInMenu: true,
+          //   component: './Inventory/PurchaseDelivery/Detail',
+          // },
         ],
       },
       //

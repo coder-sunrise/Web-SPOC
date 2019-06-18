@@ -6,7 +6,7 @@ import { getAppendUrl } from '@/utils/utils'
 
 import { NavPills } from '@/components'
 
-import DetailPanel from '../../Details/Detail'
+import DetailPanel from './Detail'
 import Pricing from '../../Details/Pricing'
 import Stock from '../../Details/Stock'
 import Setting from './Setting'

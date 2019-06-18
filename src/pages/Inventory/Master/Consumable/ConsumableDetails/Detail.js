@@ -158,32 +158,6 @@ class Detail extends PureComponent {
                   }}
                 />
               </GridItem>
-              {`${type}` === 'Medication' ? (
-                <GridItem xs={12}>
-                  <FastField
-                    name='SDDID'
-                    render={(args) => {
-                      return <TextField label='SDD ID' {...args} />
-                    }}
-                  />
-                </GridItem>
-              ) : (
-                <div />
-              )}
-              {`${type}` === 'Medication' ? (
-                <GridItem xs={12}>
-                  <FastField
-                    name='SDDDescription'
-                    render={(args) => {
-                      const label = `${type} SDD Description`
-                      const p = { ...args, label }
-                      return <Select options={SDDDescription} {...p} />
-                    }}
-                  />
-                </GridItem>
-              ) : (
-                <div />
-              )}
             </GridContainer>
           </GridItem>
           <GridItem xs={12} md={2} />

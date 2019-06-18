@@ -1,6 +1,6 @@
 import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+// import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'vaccination',
@@ -8,7 +8,7 @@ export default createListViewModel({
     queryOnLoad: false,
   },
   param: {
-    service,
+    // service,
     state: {
       collectPaymentList: [],
       currentTab: 0,
@@ -45,9 +45,7 @@ export default createListViewModel({
       updateCollectPaymentList (state, { payload }) {
         return {
           ...state,
-          collectPaymentList: [
-            ...payload,
-          ],
+          collectPaymentList: [ ...payload ],
         }
       },
     },

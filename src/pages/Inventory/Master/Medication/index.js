@@ -1,94 +1,68 @@
-import React, { PureComponent } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'dva'
-import { FormattedMessage, formatMessage } from 'umi/locale'
-import { Assignment } from '@material-ui/icons'
+import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
-import { compare } from '@/layouts'
 import { CardContainer } from '@/components'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
-import { status, suppliers, dispUOMs } from '@/utils/codes'
 
 const styles = () => ({})
-@connect(({ medication }) => ({
-  medication,
-}))
-@compare('medication')
-class Medication extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.state = {
-      tableParas: {
-        columns: [
-          { name: 'refNo', title: 'Code' },
-          { name: 'patientName', title: 'Name' },
-          { name: 'supplier', title: 'Supplier' },
-          { name: 'category', title: 'Category' },
-          { name: 'group', title: 'Group' },
-          { name: 'status', title: 'Status' },
-          { name: 'dispUOM', title: 'Disp. UOM' },
-          { name: 'prescrUOM', title: 'Prescr. UOM' },
-          { name: 'disPrescUOM', title: '1 Dis = Prescr. UOM' },
-          { name: 'stock', title: 'Stock' },
-          { name: 'payments', title: 'Avg Cost Price' },
-          { name: 'expenseAmount', title: 'Selling Price' },
-          { name: 'Action', title: 'Action' },
-        ],
-        // selectColumns: [
-        //   'supplier',
-        //   'dispUOM',
-        // ],
-        // selectColumnsConfigs: {
-        //   supplier: {
-        //     options: suppliers,
-        //     label: 'Supplier',
-        //   },
-        //   dispUOM: {
-        //     options: dispUOMs,
-        //     label: 'DispUOM',
-        //   },
-        // },
-        // currencyColumns: [
-        //   'payments',
-        //   'expenseAmount',
-        // ],
-        leftColumns: [],
+
+const Medication = (props) => {
+  const tableParas = {
+    columns: [
+      { name: 'code', title: 'Code' },
+      { name: 'displayValue', title: 'Name' },
+      { name: 'supplier', title: 'Supplier' },
+      { name: 'revenueCategory', title: 'Category' },
+      { name: 'group', title: 'Group' },
+      { name: 'status', title: 'Status' },
+      { name: 'dispenseUOM', title: 'Disp. UOM' },
+      { name: 'prescribeUOM', title: 'Prescr. UOM' },
+      {
+        name: 'dispenseUOMtoPrescribeUOMMeasurement',
+        title: '1 Dis = Prescr. UOM',
       },
-    }
+      { name: 'stock', title: 'Stock' },
+      { name: 'averageCostPrice', title: 'Avg Cost Price' },
+      { name: 'suggestSellingPrice', title: 'Selling Price' },
+      { name: 'Action', title: 'Action' },
+    ],
+    leftColumns: [],
+  }
+  const { classes, ...restProps } = props
+  const colExtensions = [
+    { columnName: 'Action', width: 110, align: 'center' },
+    // { columnName: 'dispenseUOMtoPrescribeUOMMeasurement', type: 'number' },
+    // { columnName: 'stock', type: 'number' },
+    { columnName: 'averageCostPrice', type: 'number', currency: true },
+    { columnName: 'suggestSellingPrice', type: 'number', currency: true },
+  ]
+
+  const combineProps = {
+    type: 'medication',
+    ...restProps,
+    tableParas,
+    colExtensions,
   }
 
-  render () {
-    const { props } = this
-    const { classes, ...restProps } = props
-    const { tableParas } = this.state
-    const colExtensions = [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'disPrescUOM', type: 'number' },
-      { columnName: 'stock', type: 'number' },
-      { columnName: 'payments', type: 'number', currency: true },
-      { columnName: 'expenseAmount', type: 'number', currency: true },
-    ]
-
-    const combineProps = {
-      type: 'medication',
-      ...restProps,
-      tableParas,
-      colExtensions,
-    }
-
-    return (
-      <CardContainer
-        hideHeader
-        style={{
-          marginLeft: 5,
-          marginRight: 5,
-        }}
-      >
-        <FilterBar {...restProps} />
-        <Grid {...combineProps} />
-      </CardContainer>
-    )
-  }
+  return (
+    <CardContainer
+      hideHeader
+      style={{
+        marginLeft: 5,
+        marginRight: 5,
+      }}
+    >
+      <FilterBar {...restProps} />
+      <Grid {...combineProps} />
+    </CardContainer>
+  )
 }
 
-export default withStyles(styles)(Medication)
+export default compose(
+  withStyles(styles),
+  connect(({ medication }) => ({
+    medication,
+  })),
+)(Medication)

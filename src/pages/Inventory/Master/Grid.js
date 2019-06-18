@@ -1,58 +1,30 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Tooltip, withStyles } from '@material-ui/core'
+import { Tooltip } from '@material-ui/core'
 import { Edit, Search } from '@material-ui/icons'
-// import tooltipsStyle from 'assets/jss/material-kit-pro-react/tooltipsStyle.jsx'
 import { Button, CommonTableGrid2 } from '@/components'
 
-class Grid extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.state = {
-      pageSizes: [
-        5,
-        10,
-        15,
-      ],
-      selection: [],
-      showDepositRefundModal: false,
-    }
-  }
-
-  componentDidMount () {
-    const { type, dispatch } = this.props
+const Grid = (props) => {
+  useEffect(() => {
+    const { type, dispatch } = props
     dispatch({
       type: `${type}/query`,
     })
+  }, [])
+
+  const showDetail = (row, vmode) => () => {
+    const { type, history } = props
+    history.push(`/inventory/master/${type}?uid=${row.id}`)
   }
 
-  showDetail = (row, vmode) => () => {
-    const { type } = this.props
-    this.props.history.push(
-      `/inventory/master/${type}?uid=${row.Id}&vmode=${vmode}`,
-    )
-  }
-
-  Cell = ({ column, row, dispatch, classes, ...props }) => {
+  const Cell = ({ column, row, dispatch, classes, ...p }) => {
     if (column.name === 'Action') {
       return (
-        <Table.Cell {...props}>
+        <Table.Cell {...p}>
           <Tooltip title='Detail' placement='bottom'>
             <Button
               size='sm'
-              onClick={this.showDetail(row)}
-              justIcon
-              round
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <Search />
-            </Button>
-          </Tooltip>
-          <Tooltip title='Edit' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={this.showDetail(row, 1)}
+              onClick={showDetail(row)}
               justIcon
               round
               color='primary'
@@ -64,27 +36,24 @@ class Grid extends PureComponent {
         </Table.Cell>
       )
     }
-    return <Table.Cell {...props} />
+    return <Table.Cell {...p} />
   }
 
-  render () {
-    const { tableParas, colExtensions, type, dispatch } = this.props
-    const { list } = this.props[type]
-    const TableCell = (p) => this.Cell({ ...p, dispatch })
-    const ActionProps = { TableCellComponent: TableCell }
+  const { tableParas, colExtensions, type, dispatch } = props
+  const { list } = props[type]
+  const TableCell = (pr) => Cell({ ...pr, dispatch })
+  const ActionProps = { TableCellComponent: TableCell }
 
-    return (
-      <React.Fragment>
-        <CommonTableGrid2
-          rows={list}
-          columnExtensions={colExtensions}
-          ActionProps={ActionProps}
-          FuncProps={{ pager: true }}
-          {...tableParas}
-        />
-      </React.Fragment>
-    )
-  }
+  return (
+    <React.Fragment>
+      <CommonTableGrid2
+        rows={list}
+        columnExtensions={colExtensions}
+        ActionProps={ActionProps}
+        FuncProps={{ pager: true }}
+        {...tableParas}
+      />
+    </React.Fragment>
+  )
 }
-
 export default Grid
