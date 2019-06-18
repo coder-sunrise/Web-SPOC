@@ -1,6 +1,6 @@
 import React, { PureComponent, Suspense } from 'react'
 import { Layout } from 'antd'
-import { compose } from 'recompose'
+// import { compose } from 'recompose'
 import Link from 'umi/link'
 import cx from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -26,19 +26,19 @@ class SiderMenu extends PureComponent {
     super(props)
     this.state = {
       openKeys: getDefaultCollapsedSubMenus(props),
-      miniActive: props.miniActive,
+      miniActive: props.collapsed,
     }
   }
 
-  static getDerivedStateFromProps (props, state) {
-    const { miniActive } = props
-    if (miniActive !== state.miniActive) {
-      return {
-        miniActive,
-      }
-    }
-    return null
-  }
+  // static getDerivedStateFromProps (props, state) {
+  //   const { miniActive } = props
+  //   if (miniActive !== state.miniActive) {
+  //     return {
+  //       miniActive,
+  //     }
+  //   }
+  //   return null
+  // }
 
   // isMainMenu = key => {
   //   const { menuData } = this.props
@@ -86,9 +86,8 @@ class SiderMenu extends PureComponent {
       isMobile,
     } = this.props
     let shouldCollapse = collapsed
-    if (miniActive) shouldCollapse = collapsed && this.state.miniActive
+    if (collapsed) shouldCollapse = this.state.miniActive
     if (isMobile) shouldCollapse = false
-    // console.log(shouldCollapse)
     const defaultProps = shouldCollapse ? {} : { openKeys }
     const drawerPaper = `${classes.drawerPaper} ${cx({
       [classes.drawerPaperMini]: shouldCollapse,

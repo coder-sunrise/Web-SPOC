@@ -121,10 +121,10 @@ const grayColor = '#999999'
 // const hoverColor = '#f9efff'
 
 // new color
-const primaryColor = '#597ef7'
+const primaryColor = '#3f51b5'
 const secondaryColor = '#1890ff'
-const successColor = '#52c41a'
-const dangerColor = '#f5222d'
+const successColor = '#389e0d'
+const dangerColor = '#cf1322'
 const hoverColor = '#d6e4ff'
 const tableEvenRowColor = '#f0f5ff'
 
@@ -313,8 +313,9 @@ const cardLink = {
     marginLeft: '1.25rem',
   },
 }
-
-const standardRowHeight = '60px'
+const smallRowHeight = '45px'
+const standardRowHeight = '55px'
+const largeRowHeight = '65px'
 
 export {
   hexToRgb,
@@ -368,6 +369,8 @@ export {
   cardSubtitle,
   cardLink,
   standardRowHeight,
+  smallRowHeight,
+  largeRowHeight,
   borderColor,
   border,
   headerHeight,

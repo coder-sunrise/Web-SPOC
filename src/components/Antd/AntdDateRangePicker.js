@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import moment from 'moment'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -8,146 +7,216 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import { DatePicker } from 'antd'
 // assets
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
+// wrapper
+import AntdWrapper from './AntdWrapper'
+import { extendFunc } from '@/utils/utils'
+import {
+  CustomInputWrapper,
+  BaseInput,
+  CustomInput,
+  dateFormat,
+} from '@/components'
 
-const _dateFormat = 'YYYY-MM-DD'
-
-const _toMoment = (value) => {
+const _toMoment = (value, format) => {
+  if (!value) return ''
+  // console.log(value, format)
+  // console.log(moment.zone())
+  return moment(value)
   if (!value) return value
   try {
-    if (moment(value, _dateFormat).isValid()) return moment(value, _dateFormat)
-
+    if (moment(value, format).isValid()) return moment(value, format)
     return null
   } catch (error) {
-    console.error(`Parse date to moment error ${error}`)
     return null
   }
 }
 
 const STYLES = (theme) => ({
-  ...inputStyle(theme),
   dropdownMenu: {
     zIndex: 1305,
   },
   datepickerContainer: {
     width: '100%',
+    boxSizing: 'content-box',
+    lineHeight: '1rem',
+    color: 'currentColor',
     '& > div > input': {
-      // erase all border, and boxShadow
       border: 'none',
       boxShadow: 'none !important',
       borderRadius: 0,
-      borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
       paddingLeft: 0,
-      fontSize: '1rem',
-      height: 31,
+    },
+    '& .ant-input': {
+      borderBottomWidth: 0,
+    },
+    '& .ant-calendar-range-picker-input': {
+      height: 'auto',
+      textAlign: 'left',
+    },
+    '& .ant-calendar-range-picker-separator': {
+      marginRight: 10,
     },
   },
 })
 
-class AntdDateRangePicker extends React.PureComponent {
-  state = {
-    shrink: false,
+class AntdDateRangePicker extends PureComponent {
+  constructor (props) {
+    super(props)
+    const { field = {}, form, inputProps = {}, formatter, parser } = props
+    this.state = {
+      shrink: field.value !== undefined && field.value.length > 0,
+      value:
+        field.value !== undefined && field.value.length > 0
+          ? field.value.map((o) => _toMoment(o))
+          : [],
+    }
   }
 
-  static defaultProps = {
-    label: 'Select date',
-    format: 'YYYY-MM-DD',
-    disabled: false,
-    size: 'default',
-    separator: '-',
+  // shouldComponentUpdate = (nextProps) => {
+  //   const { form, field, value } = this.props
+  //   const { form: nextForm, field: nextField, value: nextValue } = nextProps
+
+  //   const currentDateValue = form && field ? field.value : value
+  //   const nextDateValue = nextForm && nextField ? nextField.value : nextValue
+
+  //   if (form && nextForm)
+  //     return (
+  //       nextDateValue !== currentDateValue ||
+  //       form.errors[field.name] !== nextForm.errors[nextField.name] ||
+  //       form.touched[field.name] !== nextForm.touched[nextField.name]
+  //     )
+
+  //   return nextDateValue !== currentDateValue
+  // }
+
+  componentWillReceiveProps (nextProps) {
+    const { field } = nextProps
+    if (field) {
+      this.setState({
+        value:
+          field.value === undefined ? [] : field.value.map((o) => _toMoment(o)),
+      })
+    }
   }
 
-  handleChange = (date, dateString) => {
+  handleChange = (dateArray, dateString) => {
+    // console.log(dateArray, dateString)
+    this.setState({
+      value: dateArray,
+    })
+    if (Array.isArray(dateArray)) {
+      dateArray.forEach((o) => o.utcOffset())
+    }
     const { form, field, onChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, dateString)
+      // console.log(date.format())
+      // console.log(date.utcOffset())
+
+      // console.log(date.utc().format())
+
+      form.setFieldValue(
+        field.name,
+        Array.isArray(dateArray) ? dateArray.map((o) => o.format()) : [],
+      )
     }
 
     if (onChange) {
       const { name } = this.props
-      onChange(name, dateString)
+      onChange(dateArray, dateString)
     }
   }
 
-  handleCalendarOpenChange = (status) => {
+  handleDatePickerOpenChange = (status) => {
     this.setState({ shrink: status })
   }
 
-  render () {
+  handleFocus = () => {
+    this.setState({ shrink: true })
+  }
+
+  handleBlur = () => {
+    if (this.state.value === undefined || this.state.value.length === 0) {
+      this.setState({ shrink: false })
+    }
+  }
+
+  // render () {
+  //   const { classes, onChange, ...restProps } = this.props
+  //   const { format, form, field, value } = restProps
+  //   const selectValue = form && field ? field.value : value
+
+  //   // date picker component dont pass formik props into wrapper
+  //   // date picker component should handle the value change event itself
+  //   return (
+  //     <AntdWrapper {...restProps} isChildDatePicker>
+  //       <DatePicker
+  //         className={classnames(classes.datepickerContainer)}
+  //         dropdownClassName={classnames(classes.dropdownMenu)}
+  //         allowClear
+  //         placeholder=''
+  //         onChange={extendFunc(onChange, this.handleChange)}
+  //         value={_toMoment(selectValue, format)}
+  //       />
+  //     </AntdWrapper>
+  //   )
+  // }
+
+  getComponent = ({ inputRef, ...props }) => {
     const {
       classes,
-      disabled,
-      label,
-      helpText,
-      separator,
-      format,
-      form,
-      field,
-      value,
-      size,
+      onChange,
+      onFocus,
+      onBlur,
+      onOpenChange,
+      nowOnwards,
+      ...restProps
     } = this.props
+    const { format = dateFormat, form, field, value } = restProps
+    const selectValue = form && field ? field.value : value
 
-    const { shrink } = this.state
-
-    let inputValue = form && field ? field.value : value
-    if (inputValue === undefined) inputValue = []
-
-    let shouldShrink = shrink
-    if (inputValue && inputValue.length === 2) {
-      shouldShrink = shrink || (inputValue[0] !== '' && inputValue[1] !== '')
-    }
-
-    // error indicator
-    let showError = false
-    let errorText = ''
-    if (form) {
-      showError =
-        form.errors[field.name] !== undefined && form.touched[field.name]
-      errorText = form.errors[field.name]
-    }
-
-    // dont show separator when label is not shrunk
-    const _separator = !shouldShrink ? ' ' : separator
-
-    const classForLabel = {
-      [classes.label]: true,
-      [classes.labelAnimation]: true,
-      [classes.labelShrink]: shouldShrink,
-      [classes.labelFocused]: shrink,
-      [classes.mediumLabel]: size === 'default',
-      [classes.smallLabel]: size === 'small',
-      [classes.largeLabel]: size === 'large',
-      [classes.inputError]: showError,
-    }
-    const classForControl = {
-      [classes.control]: true,
-      [classes.controlUnderline]: shrink,
-      [classes.underlineError]: showError,
-    }
-    const classForHelpText = {
-      [classes.helpText]: true,
-      [classes.inputError]: showError,
-    }
-
+    const cfg = {}
+    //     if(nowOnwards){
+    // cfg.disabledDate=()=>{
+    //   return current && current < moment().endOf('day');
+    // }
+    //     }
+    // date picker component dont pass formik props into wrapper
+    // date picker component should handle the value change event itself
     return (
-      <div className={classnames(classForControl)}>
-        <span className={classnames(classForLabel)}>{label}</span>
+      <div style={{ width: '100%' }} {...props}>
         <DatePicker.RangePicker
           className={classnames(classes.datepickerContainer)}
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
           placeholder=''
-          disabled={disabled}
-          size={size}
+          onChange={extendFunc(onChange, this.handleChange)}
+          onFocus={extendFunc(onFocus, this.handleFocus)}
+          onBlur={extendFunc(onBlur, this.handleBlur)}
+          onOpenChange={extendFunc(
+            onOpenChange,
+            this.handleDatePickerOpenChange,
+          )}
           format={format}
-          separator={_separator}
-          onChange={this.handleChange}
-          value={inputValue.map((date) => _toMoment(date))}
-          onOpenChange={this.handleCalendarOpenChange}
+          value={this.state.value}
+          {...restProps}
         />
-        <p className={classnames(classForHelpText)}>
-          {showError ? errorText : helpText}
-        </p>
       </div>
+    )
+  }
+
+  render () {
+    const { classes, onChange, ...restProps } = this.props
+    // const { value } = restProps
+    const labelProps = {
+      shrink: this.state.value.length > 0 || this.state.shrink,
+    }
+    // console.log(this.state.value)
+    return (
+      <CustomInput
+        labelProps={labelProps}
+        inputComponent={this.getComponent}
+        {...restProps}
+      />
     )
   }
 }

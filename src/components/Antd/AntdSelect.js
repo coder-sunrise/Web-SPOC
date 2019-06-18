@@ -107,7 +107,7 @@ class AntdSelect extends React.PureComponent {
     if (event) {
       returnValue = event.target ? event.target.value : event
     }
-
+    console.log(returnValue)
     if (form && field) {
       form.setFieldValue(
         field.name,
@@ -132,6 +132,7 @@ class AntdSelect extends React.PureComponent {
       onChange,
       onFocus,
       onBlur,
+      allowClear = true,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -141,7 +142,9 @@ class AntdSelect extends React.PureComponent {
       value: s[valueField],
       label: s[labelField],
     }))
+
     const selectValue = form && field ? field.value : value
+
     const cfg = {}
     if (selectValue !== undefined) {
       cfg.value = selectValue
@@ -152,7 +155,6 @@ class AntdSelect extends React.PureComponent {
         <Select
           className={classnames(classes.selectContainer)}
           dropdownClassName={classnames(classes.dropdownMenu)}
-          allowClear
           showSearch
           // defaultOpen
           onChange={extendFunc(onChange, this.handleValueChange)}
@@ -183,16 +185,18 @@ class AntdSelect extends React.PureComponent {
   }
 
   render () {
-    const { classes, ...restProps } = this.props
-    const { form, field, value } = restProps
+    const { classes, form, field, onChange, ...restProps } = this.props
+    const { value = [] } = restProps
     const selectValue = form && field ? field.value : value
     const labelProps = {
-      shrink: !!selectValue || this.state.shrink,
+      shrink: (!!selectValue && selectValue.length > 0) || this.state.shrink,
     }
     return (
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
+        preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
         {...restProps}
       />
     )

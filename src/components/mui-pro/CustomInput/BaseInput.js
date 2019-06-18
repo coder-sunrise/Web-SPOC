@@ -17,7 +17,6 @@ import Tooltip from '@material-ui/core/Tooltip'
 import Input from '@material-ui/core/Input'
 import customInputStyle from 'mui-pro-jss/material-dashboard-pro-react/components/customInputStyle.jsx'
 import { extendFunc, currencyFormat } from '@/utils/utils'
-// import NumberFormat from 'react-number-format'
 import CustomInputWrapper from '../CustomInputWrapper'
 import FormatInput from './FormatInput'
 
@@ -44,12 +43,15 @@ const _config = {
 const inputIdPrefix = 'medsysinput'
 let inputIdCounter = 0
 class BaseInput extends React.PureComponent {
-  constructor (props) {
-    super(props)
-    inputIdCounter += 1
-  }
+  // constructor (props) {
+  //   super(props)
+  // }
 
   _onKeyDown = (e) => {
+    // console.log(e.target.tagName==='TEXTAREA')
+    if (this.props.preventDefaultKeyDownEvent) return
+    if (e.target.tagName === 'TEXTAREA') return
+    // console.log(e, this)
     if (e.which === 13) {
       // onEnterPressed
       const { onEnterPressed } = this.props
@@ -176,7 +178,10 @@ class BaseInput extends React.PureComponent {
       colon = true,
       realtime = true,
       focus = false,
+      preventDefaultKeyDownEvent,
     } = props
+    inputIdCounter += 1
+
     // console.log(this.state, this.state.value)
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
@@ -199,6 +204,9 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
+    if (!preventDefaultKeyDownEvent) {
+      cfg.onKeyDown = this._onKeyDown
+    }
     // console.log(error, showErrorIcon)
     if (error && showErrorIcon) {
       cfg.endAdornment = (
@@ -217,7 +225,6 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
-    // console.log(inputProps, cfg)
     const element = (
       <CustomInputWrapper
         id={inputIdPrefix + inputIdCounter}
@@ -243,7 +250,6 @@ class BaseInput extends React.PureComponent {
             classes={this.getClass(classes)}
             fullWidth
             inputRef={this.getRef}
-            onKeyDown={this._onKeyDown}
             {...cfg}
             {...inputProps}
           />

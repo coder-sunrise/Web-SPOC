@@ -2,10 +2,11 @@ import React, { PureComponent, Suspense } from 'react'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
-import { getUniqueId } from '@/utils/utils'
+import { deepDiffMapper } from '@/utils/cdrss'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
+import numeral from 'numeral'
 
 import {
   FormControl,
@@ -20,6 +21,7 @@ import {
   MenuItem,
   Popper,
   Fade,
+  Divider,
   ClickAwayListener,
 } from '@material-ui/core'
 import MoreVert from '@material-ui/icons/MoreVert'
@@ -40,6 +42,7 @@ import {
   notification,
   Select,
   DatePicker,
+  DateRangePicker,
   CheckboxGroup,
   ProgressButton,
   Checkbox,
@@ -47,24 +50,28 @@ import {
   RadioGroup,
   SizeContainer,
   AntdSelect,
+  TimePicker,
+  NumberInput,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
+console.log(deepDiffMapper)
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 const doctors = [
   { value: 'all', name: 'All' },
   { value: 'bao', name: 'Bao' },
   { value: 'cheah', name: 'Cheah' },
-  { value: 'tan', name: 'Tan' },
-  { value: 'tan1', name: 'Tan1' },
-  { value: 'tan2', name: 'Tan2' },
-  { value: 'tan3', name: 'Tan3' },
-  { value: 'tan4', name: 'Tan4' },
-  { value: 'tan5', name: 'Tan5' },
+  // { value: 'tan', name: 'Tan' },
+  // { value: 'tan1', name: 'Tan1' },
+  // { value: 'tan2', name: 'Tan2' },
+  // { value: 'tan3', name: 'Tan3' },
+  // { value: 'tan4', name: 'Tan4' },
+  // { value: 'tan5', name: 'Tan5' },
 ]
+
 const ResponsiveGridLayout = WidthProvider(Responsive)
 // let layout = {
 //   lg: [
@@ -94,11 +101,19 @@ const styles = (theme) => ({
     right: -13,
     top: 0,
   },
+  labelClass: {
+    label: {
+      minWidth: 100,
+    },
+  },
 })
 
 const initValues = {
   doctorRemarks: 'Testing multiple lines of input',
   timing2: '08:30',
+  doctor: [
+    'bao',
+  ],
 }
 @withFormik({
   mapPropsToValues: () => initValues,
@@ -108,6 +123,11 @@ const initValues = {
     patientAccountNo: Yup.string().required(),
     genderFk: Yup.string().required(),
     doctorRemarks: Yup.string().required(),
+    doctor: Yup.array().of(Yup.string().required()).required(),
+    doctorRadio: Yup.string().required(),
+    isPersist: Yup.boolean().required(),
+    fromto: Yup.array().of(Yup.date().min(2)).required().required(),
+    numberField: Yup.number().required(),
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
         Yup.object().shape({
@@ -130,6 +150,12 @@ class ControlTest extends PureComponent {
   }
 
   state = {}
+
+  // componentDidUpdate (prevProps, prevState, snapshot) {
+  //   console.log(this.props, prevProps)
+
+  //   console.log(deepDiffMapper.map(this.props, prevProps, true))
+  // }
 
   componentDidMount () {
     // create an instance
@@ -159,7 +185,7 @@ class ControlTest extends PureComponent {
   render () {
     const { props, state } = this
     const { classes, ...resetProps } = this.props
-
+    console.log(this.props)
     const testConfig = {
       onFocus: (e) => {
         console.log(1)
@@ -193,43 +219,164 @@ class ControlTest extends PureComponent {
         },
       },
     }
-    console.log(this.props)
     const testComponents = (
-      <GridContainer>
-        <GridItem sm={3}>
-          <FastField
-            name='name'
-            render={(args) => <TextField label='Name' {...args} />}
-          />
-        </GridItem>
-        <GridItem sm={3}>
-          <FastField
-            name='genderFk'
-            render={(args) => (
-              <CodeSelect label='Salutation' code='Salutation' {...args} />
-            )}
-          />
-        </GridItem>
-        <GridItem sm={3}>
-          <FastField
-            name='dob'
-            render={(args) => <DatePicker label='DOB' code='dob' {...args} />}
-          />
-        </GridItem>
-        <GridItem sm={3}>
-          <FastField
-            name='doctor'
-            render={(args) => (
-              <Select
-                label='Filter by Doctor'
-                mode='multiple'
-                options={doctors}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-      </GridContainer>
+      <React.Fragment>
+        <GridContainer>
+          <GridItem sm={3}>
+            <FastField
+              name='name'
+              render={(args) => <TextField label='Name' {...args} />}
+            />
+          </GridItem>
+          <GridItem sm={6}>
+            <FastField
+              name='name'
+              render={(args) => {
+                return (
+                  <TextField
+                    label='Multiline Name'
+                    multiline
+                    rowsMax={6}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='genderFk'
+              render={(args) => (
+                <CodeSelect label='Salutation' code='Salutation' {...args} />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='dob'
+              render={(args) => <DatePicker label='DOB' {...args} />}
+            />
+          </GridItem>
+          <GridItem sm={6}>
+            <FastField
+              name='fromto'
+              render={(args) => (
+                <DateRangePicker label='From' label2='To' {...args} />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='time'
+              render={(args) => <TimePicker label='Time' {...args} />}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='isPersist'
+              render={(args) => {
+                return (
+                  <Checkbox
+                    label='Persist'
+                    inputLabel='Input Persist'
+                    labelPlacement='end'
+                    mode='default'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='doctor'
+              render={(args) => (
+                <CheckboxGroup
+                  label='Filter by Doctor'
+                  // vertical
+                  // simple
+                  // value={}
+                  // value={{ tan1: true }}
+                  textField='name'
+                  options={doctors}
+                  noUnderline
+                  onChange={(e) => {
+                    // console.log(e)
+                    // dispatch({
+                    //   type: 'consultation/updateState',
+                    //   payload: {
+                    //     selectedWidgets: e.target.value,
+                    //   },
+                    // })
+                  }}
+                  // labelClass={}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='doctorRadio'
+              render={(args) => (
+                <RadioGroup
+                  label='Filter by Doctor'
+                  // vertical
+                  // simple
+                  // value={}
+                  // value={{ tan1: true }}
+                  textField='name'
+                  options={doctors}
+                  onChange={(e) => {
+                    // console.log(e)
+                    // dispatch({
+                    //   type: 'consultation/updateState',
+                    //   payload: {
+                    //     selectedWidgets: e.target.value,
+                    //   },
+                    // })
+                  }}
+                  // labelClass={}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='doctor'
+              render={(args) => (
+                <Select
+                  label='Filter by Doctor'
+                  mode='multiple'
+                  options={doctors}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='numberField'
+              render={(args) => (
+                <NumberInput
+                  label='Number Input'
+                  step={0.5}
+                  currency
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='numberField'
+              render={(args) => <TextField label='Text Input' {...args} />}
+            />
+          </GridItem>
+        </GridContainer>
+        <Divider />
+      </React.Fragment>
     )
     return (
       <CardContainer

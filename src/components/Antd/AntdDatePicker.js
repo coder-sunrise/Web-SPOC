@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import moment from 'moment'
 import classnames from 'classnames'
 // material ui
@@ -10,11 +10,18 @@ import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
 import AntdWrapper from './AntdWrapper'
 import { extendFunc } from '@/utils/utils'
-import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
-
-const _dateFormat = 'YYYY-MM-DD'
+import {
+  CustomInputWrapper,
+  BaseInput,
+  CustomInput,
+  dateFormat,
+} from '@/components'
 
 const _toMoment = (value, format) => {
+  if (!value) return ''
+  // console.log(value, format)
+  // console.log(moment.zone())
+  return moment(value)
   if (!value) return value
   try {
     if (moment(value, format).isValid()) return moment(value, format)
@@ -26,9 +33,6 @@ const _toMoment = (value, format) => {
 
 const STYLES = (theme) => ({
   ...inputStyle(theme),
-  dropdownMenu: {
-    zIndex: 1305,
-  },
   datepickerContainer: {
     width: '100%',
     boxSizing: 'content-box',
@@ -43,44 +47,48 @@ const STYLES = (theme) => ({
   },
 })
 
-class AntdDatePicker extends Component {
-  static defaultProps = {
-    // label: 'Select date',
-    format: 'YYYY-MM-DD',
-    disabled: false,
-    size: 'default',
-  }
+class AntdDatePicker extends PureComponent {
+  // static defaultProps = {
+  //   // label: 'Select date',
+  //   format: dateFormat,
+  //   disabled: false,
+  //   size: 'default',
+  // }
 
   state = {
     shrink: false,
   }
 
-  shouldComponentUpdate = (nextProps) => {
-    const { form, field, value } = this.props
-    const { form: nextForm, field: nextField, value: nextValue } = nextProps
+  // shouldComponentUpdate = (nextProps) => {
+  //   const { form, field, value } = this.props
+  //   const { form: nextForm, field: nextField, value: nextValue } = nextProps
 
-    const currentDateValue = form && field ? field.value : value
-    const nextDateValue = nextForm && nextField ? nextField.value : nextValue
+  //   const currentDateValue = form && field ? field.value : value
+  //   const nextDateValue = nextForm && nextField ? nextField.value : nextValue
 
-    if (form && nextForm)
-      return (
-        nextDateValue !== currentDateValue ||
-        form.errors[field.name] !== nextForm.errors[nextField.name] ||
-        form.touched[field.name] !== nextForm.touched[nextField.name]
-      )
+  //   if (form && nextForm)
+  //     return (
+  //       nextDateValue !== currentDateValue ||
+  //       form.errors[field.name] !== nextForm.errors[nextField.name] ||
+  //       form.touched[field.name] !== nextForm.touched[nextField.name]
+  //     )
 
-    return nextDateValue !== currentDateValue
-  }
+  //   return nextDateValue !== currentDateValue
+  // }
 
   handleChange = (date, dateString) => {
+    console.log({ date, dateString })
+    if (date) {
+      date.utcOffset()
+    }
     const { form, field, onChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, dateString)
-    }
+      // console.log(date.format())
+      // console.log(date.utcOffset())
 
-    if (onChange) {
-      const { name } = this.props
-      onChange(dateString, name)
+      // console.log(date.utc().format())
+
+      form.setFieldValue(field.name, date ? date.utc().format() : '')
     }
   }
 
@@ -93,7 +101,9 @@ class AntdDatePicker extends Component {
   }
 
   handleBlur = () => {
-    this.setState({ shrink: false })
+    if (this.state.value === undefined || this.state.value.length === 0) {
+      this.setState({ shrink: false })
+    }
   }
 
   // render () {
@@ -126,7 +136,7 @@ class AntdDatePicker extends Component {
       onOpenChange,
       ...restProps
     } = this.props
-    const { format, form, field, value } = restProps
+    const { format = dateFormat, form, field, value } = restProps
     const selectValue = form && field ? field.value : value
 
     // date picker component dont pass formik props into wrapper
@@ -145,6 +155,7 @@ class AntdDatePicker extends Component {
             onOpenChange,
             this.handleDatePickerOpenChange,
           )}
+          format={format}
           value={_toMoment(selectValue, format)}
         />
       </div>
@@ -155,6 +166,7 @@ class AntdDatePicker extends Component {
     const { classes, ...restProps } = this.props
     const { form, field, value } = restProps
     const selectValue = form && field ? field.value : value
+    // console.log(selectValue)
     const labelProps = {
       shrink: !!selectValue || this.state.shrink,
     }

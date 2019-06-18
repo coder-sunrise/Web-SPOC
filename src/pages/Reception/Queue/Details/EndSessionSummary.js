@@ -10,17 +10,21 @@ import { Button, CommonTableGrid2 } from '@/components'
 const rowData = [
   {
     sessionNo: '190429-01-1.0',
-    visitCount: 10,
-    totalCharges: 400,
-    outstandingBalance: 20,
+    visitCount: 0,
+    totalCharges: 0,
+    outstandingBalance: 0,
   },
 ]
 
-const styles = () => ({
+const styles = (theme) => ({
   divider: {
     margin: '10px 0px',
   },
+  sectionTitle: {
+    padding: theme.spacing.unit,
+  },
   buttonGroup: {
+    textAlign: 'center',
     marginTop: '10px',
   },
 })
@@ -55,7 +59,7 @@ class EndSessionSummary extends PureComponent {
     const { classes } = this.props
     return (
       <div>
-        <h4>
+        <h4 className={classes.sectionTitle}>
           <FormattedMessage id='reception.queue.summaryOfSession' />
         </h4>
         <CommonTableGrid2
@@ -64,7 +68,7 @@ class EndSessionSummary extends PureComponent {
           FuncProps={{ pager: false }}
         />
         <Divider className={classnames(classes.divider)} variant='fullWidth' />
-        <h4>
+        <h4 className={classes.sectionTitle}>
           <FormattedMessage id='reception.queue.paymentCollected' />
         </h4>
         <CommonTableGrid2
@@ -73,13 +77,13 @@ class EndSessionSummary extends PureComponent {
           FuncProps={{ pager: false }}
         />
         <div className={classnames(classes.buttonGroup)}>
-          <Button>
+          <Button color='primary' disabled size='sm'>
             <FormattedMessage id='reception.queue.endSession.printLabel' />
           </Button>
-          <Button>
+          <Button color='primary' disabled size='sm'>
             <FormattedMessage id='reception.queue.endSession.printSummary' />
           </Button>
-          <Button>
+          <Button color='primary' disabled size='sm'>
             <FormattedMessage id='reception.queue.endSession.printDetails' />
           </Button>
         </div>

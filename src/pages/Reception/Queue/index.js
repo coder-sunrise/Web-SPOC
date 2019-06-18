@@ -83,9 +83,7 @@ class Queue extends PureComponent {
     showPatientSearch: false,
     showRegisterNewPatient: false,
     showViewPatientProfile: false,
-    showEndSessionConfirm: false,
     showEndSessionSummary: false,
-    visitPatientID: '',
     currentFilter: StatusIndicator.ALL,
     currentQuery: '',
   }
@@ -169,16 +167,16 @@ class Queue extends PureComponent {
   }
 
   onConfirmEndSession = (doneCb) => {
-    const { dispatch } = this.props
+    const { queueLog, dispatch } = this.props
     dispatch({
       type: 'queueLog/endSession',
+      sessionID: queueLog.sessionInfo.id,
     }).then((r) => {
-      if (doneCb) doneCb(r)
+      // if (doneCb) doneCb(r)
+      this.setState({
+        showEndSessionSummary: true,
+      })
     })
-    // this.setState({
-    //   showEndSessionConfirm: false,
-    //   showEndSessionSummary: true,
-    // })
   }
 
   onEndSessionSummaryClose = () => {
@@ -360,9 +358,7 @@ class Queue extends PureComponent {
             {showEndSessionSummary && (
               <CommonModal
                 open={showEndSessionSummary}
-                title={formatMessage({
-                  id: 'reception.queue.endSession',
-                })}
+                title='Session Summary'
                 onClose={this.onEndSessionSummaryClose}
                 onConfirm={this.onEndSessionSummaryClose}
                 disableBackdropClick

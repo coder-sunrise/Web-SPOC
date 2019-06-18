@@ -11,6 +11,9 @@ const customCheckboxRadioSwitch = (theme) => {
       padding: '7px 6px 6px 6px',
       marginLeft: theme.spacing.unit,
     },
+    vertical: {
+      textAlign: 'left',
+    },
     checkboxAndRadio: {
       position: 'relative',
       display: 'block',

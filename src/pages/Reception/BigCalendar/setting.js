@@ -63,6 +63,12 @@ export const defaultColorOpts = {
   active: primaryColor,
 }
 
+export const doctorEventColorOpts = {
+  name: 'doctorEvent',
+  value: '#bfbfbf',
+  active: '#8c8c8c',
+}
+
 export const reduceToColorClass = (acc, { value, colorValue, colorActive }) => {
   acc[`${value}Background`] = {
     backgroundColor: colorValue,

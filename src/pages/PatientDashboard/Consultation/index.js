@@ -3,8 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import $ from 'jquery'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
-import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
+import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
 import { Affix } from 'antd'
 import {
@@ -52,6 +51,7 @@ import {
   Checkbox,
   NumberFormatter,
   confirm,
+  SizeContainer,
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 
@@ -61,84 +61,6 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
 
-const widgets = [
-  {
-    id: '1',
-    name: 'Clinical Notes',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ClinicalNotes'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '2',
-    name: 'Diagnosis',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/Diagnosis'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      minW: 12,
-      minH: 10,
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '3',
-    name: 'Consultation Document',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ConsultationDocument'),
-      loading: Loading,
-    }),
-    layoutConfig: {},
-  },
-  {
-    id: '4',
-    name: 'Patient History',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/PatientHistory'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '5',
-    name: 'Orders',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/Orders'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {
-        padding: '0 5px',
-      },
-    },
-  },
-  {
-    id: '6',
-    name: 'Test Widget',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/TestWidget'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {},
-    },
-  },
-]
 const ResponsiveGridLayout = WidthProvider(Responsive)
 // let layout = {
 //   lg: [
@@ -147,6 +69,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 //     { i: 'c', x: 6, y: 0, w: 6, h: 2 },
 //   ],
 // }
+// console.log(basicStyle)
 const styles = (theme) => ({
   ...basicStyle(theme),
   root: {
@@ -178,10 +101,11 @@ const styles = (theme) => ({
     backgroundColor: '#ffffff',
   },
   blockName: {
-    position: 'absolute',
-    left: 7,
     lineHeight: '30px',
     fontWeight: 400,
+    float: 'left',
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   paperRoot: {
     // boxSizing: 'content-box',
@@ -291,17 +215,7 @@ class Consultation extends PureComponent {
     let defaultLayout
 
     if (!localStorage.getItem('consultationLayout')) {
-      defaultLayout = {
-        keys: this.pageDefaultWidgets.map((o) => o.id),
-        lg: this.pageDefaultWidgets.map((o) => ({
-          ...o.config.lg,
-          i: o.id,
-        })),
-        md: this.pageDefaultWidgets.map((o) => ({
-          ...o.config.md,
-          i: o.id,
-        })),
-      }
+      defaultLayout = this.getDefaultLayout()
     } else {
       defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
     }
@@ -310,7 +224,7 @@ class Consultation extends PureComponent {
       mode: 'edit',
       rowHeight: getLayoutRowHeight(),
       menuOpen: false,
-      defaultLayout,
+      currentLayout: defaultLayout,
     }
   }
 
@@ -344,8 +258,8 @@ class Consultation extends PureComponent {
   }
 
   removeWidget = (id) => {
-    const { defaultLayout } = this.state
-    const keys = defaultLayout.keys.filter((o) => o.id !== id)
+    const { currentLayout } = this.state
+    const keys = currentLayout.keys.filter((o) => o !== id)
     const sizes = [
       'lg',
       'md',
@@ -355,17 +269,36 @@ class Consultation extends PureComponent {
       keys,
     }
     sizes.forEach((s) => {
-      layout[s] = defaultLayout[s]
+      layout[s] = currentLayout[s]
     })
+    console.log(layout)
+    this.changeLayout(layout)
+  }
 
+  changeLayout = (layout) => {
     this.setState(
       {
-        defaultLayout: layout,
+        currentLayout: layout,
       },
       () => {
         localStorage.setItem('consultationLayout', JSON.stringify(layout))
       },
     )
+  }
+
+  getDefaultLayout = () => {
+    const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
+    return {
+      keys: defaultWidgets.map((o) => o.id),
+      lg: defaultWidgets.map((o) => ({
+        ...o.config.lg,
+        i: o.id,
+      })),
+      md: defaultWidgets.map((o) => ({
+        ...o.config.md,
+        i: o.id,
+      })),
+    }
   }
 
   generateConfig = (id) => {
@@ -377,7 +310,7 @@ class Consultation extends PureComponent {
         root: classes.paperRoot,
       },
       className: 'widget-container',
-      onMouseOver: (e) => {
+      onMouseEnter: (e) => {
         // console.log(cfg, e.target)
         // console.log($(e.target).parent('.widget-container')[0])
         // elevation[cfg.id] = 3
@@ -414,7 +347,7 @@ class Consultation extends PureComponent {
     const layoutCfg = {
       className: classes.layout,
       rowHeight: state.rowHeight,
-      layouts: state.defaultLayout,
+      layouts: state.currentLayout,
       breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       useCSSTransforms: false,
@@ -430,10 +363,11 @@ class Consultation extends PureComponent {
       },
       onLayoutChange: (currentLayout, allLayouts) => {
         console.log(allLayouts)
-        localStorage.setItem('consultationLayout', JSON.stringify(allLayouts))
+        // localStorage.setItem('consultationLayout', JSON.stringify(allLayouts))
+        this.changeLayout(allLayouts)
       },
     }
-    console.log(state.defaultLayout)
+    console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
@@ -445,7 +379,7 @@ class Consultation extends PureComponent {
                 <Button size='sm' color='danger'>
                   Discard
                 </Button>
-                <ProgressButton size='sm' color='primary' icon={null}>
+                <ProgressButton size='sm' color='info' icon={null}>
                   Save Changes
                 </ProgressButton>
                 <ProgressButton size='sm' color='primary' icon={null}>
@@ -467,8 +401,9 @@ class Consultation extends PureComponent {
         >
           
         </CardContainer> */}
+
         <ResponsiveGridLayout {...layoutCfg}>
-          {state.defaultLayout.keys.map((id) => {
+          {state.currentLayout.keys.map((id) => {
             const dw = this.pageDefaultWidgets.find((m) => m.id === id)
             if (!dw) return <div />
             const w = widgets.find((wg) => wg.id === dw.widgetFk)
@@ -481,6 +416,7 @@ class Consultation extends PureComponent {
                     <div className={`${classes.blockHeader} dragable`}>
                       <div>
                         <span className={classes.blockName}>{w.name}</span>
+                        {w.toolbarAddon}
                         <Tooltip title='Replace'>
                           <IconButton
                             aria-label='Replace'
@@ -530,20 +466,19 @@ class Consultation extends PureComponent {
                     </div>
                   )}
                   <div className='non-dragable' style={w.layoutConfig.style}>
-                    <LoadableComponent />
+                    <SizeContainer size='sm'>
+                      <LoadableComponent />
+                    </SizeContainer>
                   </div>
                 </Paper>
               </div>
             )
           })}
         </ResponsiveGridLayout>
+
         <div className={classes.fabContainer}>
           {this.state.mode === 'default' && (
-            <Fab
-              color='primary'
-              className={classes.fab}
-              onClick={this.toggleMode}
-            >
+            <Fab color='info' className={classes.fab} onClick={this.toggleMode}>
               <Edit />
             </Fab>
           )}
@@ -551,7 +486,7 @@ class Consultation extends PureComponent {
             <Slide direction='up' in={this.state.mode === 'edit'} mountOnEnter>
               <div>
                 <Fab
-                  color='primary'
+                  color='secondary'
                   className={classes.fab}
                   style={{ marginRight: 8 }}
                   onClick={this.showWidgetManagePanel}
@@ -565,26 +500,17 @@ class Consultation extends PureComponent {
                   disablePortal
                   onClose={this.closeWidgetManagePanel}
                   className={classes.widgetPopper}
-                  PaperProps={{
-                    style: {
-                      // maxHeight: ITEM_HEIGHT * 4.5,
-                      zIndex: 100,
-                      width: 200,
-                    },
-                  }}
                 >
                   {({ TransitionProps }) => (
                     <Fade {...TransitionProps} timeout={350}>
                       <ClickAwayListener
                         onClickAway={this.closeWidgetManagePanel}
                       >
-                        <Paper
-                          style={{
-                            paddingLeft: theme.spacing.unit * 2,
-                            paddingTop: theme.spacing.unit,
-                          }}
-                        >
+                        <Paper>
                           <CheckboxGroup
+                            style={{
+                              margin: theme.spacing(1),
+                            }}
                             label='Selected Widgets'
                             vertical
                             simple
@@ -603,9 +529,21 @@ class Consultation extends PureComponent {
                             }}
                           />
                           <Divider />
-                          <Button onClick={() => {}} size='sm'>
-                            Reset
-                          </Button>
+                          <div
+                            style={{
+                              padding: theme.spacing(1),
+                            }}
+                          >
+                            <Button
+                              onClick={() => {
+                                this.changeLayout(this.getDefaultLayout())
+                              }}
+                              color='danger'
+                              size='sm'
+                            >
+                              Reset
+                            </Button>
+                          </div>
                         </Paper>
                       </ClickAwayListener>
                     </Fade>

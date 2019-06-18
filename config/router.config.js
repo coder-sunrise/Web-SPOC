@@ -1,15 +1,15 @@
 const routes = [
-  // user
-  {
-    path: '/user',
-    component: '../layouts/UserLayout',
-    routes: [
-      { path: '/user', redirect: '/user/login' },
-      { path: '/user/login', component: './User/Login' },
-      { path: '/user/register', component: './User/Register' },
-      { path: '/user/register-result', component: './User/RegisterResult' },
-    ],
-  },
+  // // user
+  // {
+  //   path: '/user',
+  //   component: '../layouts/UserLayout',
+  //   routes: [
+  //     { path: '/user', redirect: '/user/login' },
+  //     { path: '/user/login', component: './User/Login' },
+  //     { path: '/user/register', component: './User/Register' },
+  //     { path: '/user/register-result', component: './User/RegisterResult' },
+  //   ],
+  // },
   //
   // login
   {
@@ -17,88 +17,6 @@ const routes = [
     component: './Login',
     hideInMenu: true,
   },
-  // login
-  //
-  // EMR
-  {
-    path: '/emr',
-    component: '../layouts/BasicLayout',
-    Routes: [ 'src/pages/Authorized' ],
-    authority: [ 'admin', 'user', 'guest' ],
-    routes: [
-      { path: '/emr', redirect: '/emr/queue' },
-      // queue
-      {
-        path: '/emr/queue',
-        name: 'queue',
-        system: 'emr',
-        component: './Reception/Queue',
-        icon: 'local_hospital',
-        exact: true,
-      },
-      {
-        hideInMenu: true,
-        path: '/emr/queue/patientdashboard',
-        name: 'patientdashboard',
-        component: './PatientDashboard',
-      },
-      {
-        path: '/emr/queue/patientdashboard/consultation/:id',
-        name: 'consultation',
-        hideInMenu: true,
-        component: './PatientDashboard/Consultation',
-      },
-      {
-        path: '/emr/patientdb',
-        icon: 'account_box',
-        name: 'patientdb',
-        // component: '',
-      },
-      {
-        path: '/emr/forms',
-        icon: 'assignment',
-        name: 'forms',
-        // component: '',
-      },
-      {
-        path: '/emr/labsresult',
-        icon: 'poll',
-        name: 'labsresult',
-        // component: '',
-      },
-      {
-        path: '/emr/settings',
-        icon: 'settings',
-        name: 'settings',
-        // component: '',
-      },
-      // queue
-      //
-      // patient dashboard
-      // {
-      //   path: '/emr/patientdashboard',
-      //   system: 'EMR',
-      //   icon: 'group',
-      //   name: 'patientdashboard',
-      //   routes: [
-      //     {
-      //       path: '/emr/patientdashboard',
-      //       name: 'patientdashboard',
-      //       component: './PatientDashboard',
-      //     },
-      //     {
-      //       path: '/emr/patientdashboard/consultation/:id',
-      //       name: 'consultation',
-      //       hideInMenu: true,
-      //       component: './PatientDashboard/Consultation',
-      //     },
-      //   ],
-      // },
-      // patiend dashboard
-      //
-    ],
-  },
-  // EMR
   //
   // CMS
   {
@@ -149,18 +67,6 @@ const routes = [
             exact: true,
           },
           {
-            hideInMenu: true,
-            path: '/reception/queue/patientdashboard',
-            name: 'patientdashboard',
-            component: './PatientDashboard',
-          },
-          {
-            path: '/reception/queue/patientdashboard/consultation/:id',
-            name: 'consultation',
-            hideInMenu: true,
-            component: './PatientDashboard/Consultation',
-          },
-          {
             path: '/reception/queue/dispense/:visitRefNo',
             name: 'dispense',
             hideInMenu: true,
@@ -172,6 +78,18 @@ const routes = [
             name: 'appointment',
             mini: 'AP',
             component: './Reception/BigCalendar',
+          },
+          {
+            hideInMenu: true,
+            path: '/reception/queue/patientdashboard',
+            name: 'patientdashboard',
+            component: './PatientDashboard',
+          },
+          {
+            path: '/reception/queue/patientdashboard/consultation/:id',
+            name: 'consultation',
+            hideInMenu: true,
+            component: './PatientDashboard/Consultation',
           },
         ],
       },
@@ -449,12 +367,6 @@ const routes = [
         path: '/development',
         name: 'Development',
         routes: [
-          {
-            path: '/development/pdf',
-            name: 'pdf',
-            component: './Development/PDF',
-            mini: 'PDF',
-          },
           {
             path: '/development/masonry',
             name: 'Masonry',
