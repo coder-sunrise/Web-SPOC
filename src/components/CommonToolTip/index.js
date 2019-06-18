@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 // material ui
 import { Tooltip, withStyles } from '@material-ui/core'
 // assets
-import { tooltip } from 'assets/jss/index'
+import { tooltip } from '@/assets/jss/index'
 
 const STYLES = () => ({ tooltip })
 

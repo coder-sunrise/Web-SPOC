@@ -80,7 +80,7 @@ class DetailsActionBar extends PureComponent {
         </GridItem>
         <GridItem xs md={6} container justify='flex-end' alignItems='center'>
           <StatisticIndicator
-            filter={currentFilter}
+            // currentFilter={currentFilter}
             handleStatusClick={handleStatusChange}
           />
         </GridItem>

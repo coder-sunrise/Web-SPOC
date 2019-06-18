@@ -1,9 +1,12 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import classnames from 'classnames'
 // umi
 import { FormattedMessage } from 'umi/locale'
 // material ui
 import { Divider, Paper, withStyles } from '@material-ui/core'
+// ant design
+import { Switch } from 'antd'
 // common component
 import { Button } from '@/components'
 import { StatusIndicator } from '../variables'
@@ -35,25 +38,39 @@ const StatisticStyles = () => ({
   status: { padding: '0px 10px', margin: '5px 0px', fontWeight: 400 },
 })
 
+@connect(({ queueLog }) => ({ queueLog }))
 class StatisticIndicator extends PureComponent {
+  state = {
+    currentFilter: StatusIndicator.ALL,
+  }
+
   onButtonClick = (event) => {
-    const { handleStatusClick } = this.props
+    const { handleStatusClick, dispatch } = this.props
     const { id } = event.currentTarget
-    handleStatusClick(id)
+    // this.setState({ currentFilter: id })
+    // handleStatusClick(id)
+    dispatch({
+      type: 'queueLog/updateFilter',
+      status: id,
+    })
   }
 
   render () {
     const {
       classes,
-      filter,
-      handleStatusClick,
-      statistic: { all, waiting, inProgress, completed } = {
+      statistic: { all, appointment, waiting, inProgress, completed } = {
         all: 0,
+        appointment: 0,
         waiting: 0,
         inProgress: 0,
         completed: 0,
       },
+      // currentFilter,
+      queueLog: { currentFilter },
     } = this.props
+
+    // const { currentFilter } = this.state
+
     return (
       <React.Fragment>
         <Paper elevation={6} className={classnames(classes.container)}>
@@ -66,15 +83,38 @@ class StatisticIndicator extends PureComponent {
             {all}
           </h4>
           <Divider variant='fullWidth' />
+
           <Button
             color='primary'
             size='sm'
             block
             id={StatusIndicator.ALL}
             onClick={this.onButtonClick}
-            simple={filter !== StatusIndicator.ALL}
+            simple={currentFilter !== StatusIndicator.ALL}
           >
             {StatusIndicator.ALL}
+          </Button>
+        </Paper>
+        <Paper elevation={6} className={classnames(classes.container)}>
+          <h4
+            className={classnames([
+              classes.number,
+              classes.statusAll,
+            ])}
+          >
+            {appointment}
+          </h4>
+          <Divider variant='fullWidth' />
+
+          <Button
+            color='primary'
+            size='sm'
+            block
+            id={StatusIndicator.APPOINTMENT}
+            onClick={this.onButtonClick}
+            simple={currentFilter !== StatusIndicator.APPOINTMENT}
+          >
+            {StatusIndicator.APPOINTMENT}
           </Button>
         </Paper>
         <Paper elevation={6} className={classnames(classes.container)}>
@@ -87,13 +127,14 @@ class StatisticIndicator extends PureComponent {
             {waiting}
           </h4>
           <Divider variant='fullWidth' />
+
           <Button
             color='primary'
             size='sm'
             block
             id={StatusIndicator.WAITING}
             onClick={this.onButtonClick}
-            simple={filter !== StatusIndicator.WAITING}
+            simple={currentFilter !== StatusIndicator.WAITING}
           >
             {StatusIndicator.WAITING}
           </Button>
@@ -108,13 +149,14 @@ class StatisticIndicator extends PureComponent {
             {inProgress}
           </h4>
           <Divider variant='fullWidth' />
+
           <Button
             color='primary'
             size='sm'
             block
             id={StatusIndicator.IN_PROGRESS}
             onClick={this.onButtonClick}
-            simple={filter !== StatusIndicator.IN_PROGRESS}
+            simple={currentFilter !== StatusIndicator.IN_PROGRESS}
           >
             {StatusIndicator.IN_PROGRESS}
           </Button>
@@ -129,13 +171,14 @@ class StatisticIndicator extends PureComponent {
             {completed}
           </h4>
           <Divider variant='fullWidth' />
+
           <Button
             color='primary'
             size='sm'
             block
             onClick={this.onButtonClick}
             id={StatusIndicator.COMPLETED}
-            simple={filter !== StatusIndicator.COMPLETED}
+            simple={currentFilter !== StatusIndicator.COMPLETED}
           >
             {StatusIndicator.COMPLETED}
           </Button>

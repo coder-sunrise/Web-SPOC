@@ -1,16 +1,15 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles, Typography } from '@material-ui/core'
+import { withStyles, Chip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
+import { Badge } from '@/components'
 
-import {
-  Badge,
-  TextField,
-  TextTypeProvider as TextTypeProviderOrg,
-  Primary,
-} from '@/components'
-
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  badge: {
+    padding: theme.spacing.unit,
+    fontSize: '.875rem',
+  },
+})
 
 const StatusTypeBase = (props) => {
   // console.log('statustypebase', props)
@@ -19,6 +18,7 @@ const StatusTypeBase = (props) => {
     value,
     onValueChange,
     columnExtensions,
+    classes,
   } = props
   // const { name, value: v, ...otherInputProps } = inputProps
   // console.log(props)
@@ -28,30 +28,36 @@ const StatusTypeBase = (props) => {
   let color = 'primary'
 
   // WAITING, TO DISPENSE, IN CONS, PAUSED, OVERPAID, COMPLETED
+  const hasBadge = [
+    'WAITING',
+    'IN CONS',
+  ]
   switch (value.toUpperCase()) {
     case 'WAITING':
       color = 'primary'
       break
     case 'IN CONS':
-      color = 'info'
-      break
-    case 'TO DISPENSE':
-      color = 'rose'
-      break
-    case 'PAUSED':
-      color = 'warning'
-      break
-    case 'OVERPAID':
-      color = 'danger'
-      break
-    case 'COMPLETED':
       color = 'success'
       break
+    // case 'OVERPAID':
+    //   color = 'danger'
+    //   break
+    // case 'APPOINTMENT':
+    //   color = 'rose'
+    //   break
     default:
-      color = 'primary'
+      color = 'gray'
+      break
   }
 
-  return <Badge color={color}>{value}</Badge>
+  return hasBadge.includes(value.toUpperCase()) ? (
+    <Badge className={classes.badge} color={color}>
+      {value}
+    </Badge>
+  ) : (
+    <span className={classes.badge}>{value}</span>
+  )
+  // return <Chip label={value} variant='outlined' color={color} />
 }
 
 export const StatusType = withStyles(styles)(StatusTypeBase)

@@ -93,6 +93,7 @@ class Queue extends PureComponent {
     dispatch({
       type: 'queueLog/getSessionInfo',
     })
+    console.log('willmount index')
   }
 
   showVisitRegistration = (patientID = '') => {
@@ -213,13 +214,14 @@ class Queue extends PureComponent {
       // showEndSessionConfirm,
       showEndSessionSummary,
       showPatientSearch,
-      currentFilter,
       currentQuery,
+      currentFilter,
     } = this.state
 
     const { sessionInfo } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     // console.log('queuelisting state', this.props)
+
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
@@ -271,7 +273,7 @@ class Queue extends PureComponent {
                   isFetching={
                     loading.effects['queueLog/fetchPatientListByName']
                   }
-                  currentFilter={currentFilter}
+                  // currentFilter={currentFilter}
                   currentSearchPatient={currentQuery}
                   handleQueryChange={this.onQueryChanged}
                   handleStatusChange={this.onStatusChange}
@@ -281,15 +283,9 @@ class Queue extends PureComponent {
                 />
                 <DetailsGrid
                   location={this.props.match}
-                  currentFilter={currentFilter}
                   onViewDispenseClick={this.toggleDispense}
-                  queueLog={queueLog}
+                  currentFilter={currentFilter}
                 />
-                {/*
-                  <DetailsFooter
-                    onViewPatientProfile={this.toggleViewPatientProfile}
-                  />
-                */}
               </React.Fragment>
             )}
             <CommonModal

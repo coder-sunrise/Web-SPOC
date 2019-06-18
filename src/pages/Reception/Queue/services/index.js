@@ -1,15 +1,15 @@
 import { stringify } from 'qs'
 import request, { axiosRequest } from '@/utils/request'
 
-export async function queryList (params) {
-  const entities = await request(`/api/fake_list?${stringify(params)}`)
-  return {
-    data: {
-      entities,
-      filter: {},
-    },
-  }
-}
+// export async function queryList (params) {
+//   const entities = await request(`/api/fake_list?${stringify(params)}`)
+//   return {
+//     data: {
+//       entities,
+//       filter: {},
+//     },
+//   }
+// }
 
 export const startSession = async () => {
   const response = await axiosRequest('/api/bizsession/', { method: 'POST' })
@@ -51,8 +51,19 @@ export const getSessionInfo = async (sessionID) => {
   return response
 }
 
-export const getQueueListing = async () => {
-  const response = await request(`/api/queue`)
+export const getQueueListing = async (sessionID) => {
+  const criteria = [
+    {
+      prop: 'VisitFkNavigation.BizSessionFK',
+      val: sessionID,
+      opr: 'eql',
+    },
+  ]
+  console.log('get queue listing', criteria, stringify({ criteria }))
+  const response = await request(`/api/queue/`, {
+    method: 'GET',
+    data: stringify({ criteria }),
+  })
   return response
 }
 

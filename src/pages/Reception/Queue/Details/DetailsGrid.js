@@ -29,6 +29,7 @@ const styles = () => ({
 
 const visitStatusCode = [
   'WAITING',
+  'APPOINTMENT',
   'TO DISPENSE',
   'IN CONS',
   'PAUSED',
@@ -38,11 +39,11 @@ const visitStatusCode = [
 
 const generateRowData = () => {
   const data = []
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 20; i += 1) {
     data.push({
       Id: `row-${i}-data`,
       queueNo: i,
-      visitStatus: visitStatusCode[i % 6],
+      visitStatus: visitStatusCode[i % visitStatusCode.length],
       roomNo: '',
       doctor: 'Cheah',
       refNo: `PT-0000${i}`,
@@ -57,6 +58,9 @@ const generateRowData = () => {
 const filterMap = {
   [StatusIndicator.ALL]: [
     ...visitStatusCode,
+  ].filter((item) => item !== 'APPOINTMENT'),
+  [StatusIndicator.APPOINTMENT]: [
+    'APPOINTMENT',
   ],
   [StatusIndicator.WAITING]: [
     'WAITING',
@@ -99,56 +103,60 @@ const WithFullscreenModal = ({ show, onClose, onConfirm, children }) => {
   )
 }
 
+const FuncConfig = { pager: false }
+const TableConfig = {
+  columns: [
+    { name: 'visitStatus', title: 'Status' },
+    { name: 'queueNo', title: 'Q. No.' },
+    { name: 'patientName', title: 'Patient Name' },
+    { name: 'gender', title: 'Gender' },
+    { name: 'age', title: 'Age' },
+    { name: 'doctor', title: 'Doctor' },
+    { name: 'roomNo', title: 'Room No.' },
+    { name: 'timeIn', title: 'Time In' },
+    { name: 'timeOut', title: 'Time Out' },
+    { name: 'refNo', title: 'Ref. No.' },
+    { name: 'appointmentTime', title: 'Appt. Time' },
+    { name: 'identityNo', title: 'Identity No.' },
+    { name: 'invoiceNo', title: 'Invoice No' },
+    { name: 'invoiceAmount', title: 'Invoice Amount' },
+    { name: 'gst', title: 'GST' },
+    { name: 'payment', title: 'Payment' },
+    { name: 'paymentMode', title: 'Payment Mode' },
+    { name: 'company', title: 'Company' },
+    { name: 'outstandingBalance', title: 'Outstanding' },
+    { name: 'visitRefNo', title: 'Visit Ref No.' },
+    { name: 'referralCompany', title: 'Referral Company' },
+    { name: 'referralPerson', title: 'Referral Person' },
+    { name: 'referralRemarks', title: 'Referral Remarks' },
+    { name: 'Action', title: 'Action' },
+  ],
+  leftColumns: [
+    'visitStatus',
+    'queueNo',
+  ],
+  columnExtensions: [
+    { columnName: 'visitStatus', type: 'status', width: 150 },
+    { columnName: 'paymentMode', width: 150 },
+    { columnName: 'patientName', width: 250 },
+    { columnName: 'referralCompany', width: 150 },
+    { columnName: 'referralPerson', width: 150 },
+    { columnName: 'referralRemarks', width: 150 },
+    { columnName: 'invoiceAmount', type: 'number', currency: true },
+    { columnName: 'payment', type: 'number', currency: true },
+    { columnName: 'gst', type: 'number', currency: true },
+    { columnName: 'outstandingBalance', type: 'number', currency: true },
+    { columnName: 'Action', width: 120, align: 'center' },
+  ],
+}
+
+const dispatchKey = 'queueLog'
+
 @connect(({ queueLog }) => ({ queueLog }))
 class DetailsGrid extends PureComponent {
   state = {
     isFullscreen: false,
     rowData: generateRowData(),
-    tableParams: {
-      columns: [
-        { name: 'visitStatus', title: 'Status' },
-        { name: 'queueNo', title: 'Q. No.' },
-        { name: 'patientName', title: 'Patient Name' },
-        { name: 'doctor', title: 'Doctor' },
-        { name: 'roomNo', title: 'Room No.' },
-        { name: 'refNo', title: 'Ref. No.' },
-        { name: 'timeIn', title: 'Time In' },
-        { name: 'timeOut', title: 'Time Out' },
-        { name: 'appointmentTime', title: 'Appt. Time' },
-        { name: 'identityNo', title: 'Identity No.' },
-        { name: 'gender', title: 'Gender' },
-        { name: 'age', title: 'Age' },
-        { name: 'invoiceNo', title: 'Invoice No' },
-        { name: 'invoiceAmount', title: 'Invoice Amount' },
-        { name: 'gst', title: 'GST' },
-        { name: 'payment', title: 'Payment' },
-        { name: 'paymentMode', title: 'Payment Mode' },
-        { name: 'company', title: 'Company' },
-        { name: 'outstandingBalance', title: 'Outstanding' },
-        { name: 'visitRefNo', title: 'Visit Ref No.' },
-        { name: 'referralCompany', title: 'Referral Company' },
-        { name: 'referralPerson', title: 'Referral Person' },
-        { name: 'referralRemarks', title: 'Referral Remarks' },
-        { name: 'Action', title: 'Action' },
-      ],
-      leftColumns: [
-        'visitStatus',
-        'queueNo',
-      ],
-      columnExtensions: [
-        { columnName: 'visitStatus', type: 'status' },
-        { columnName: 'paymentMode', width: 150 },
-        { columnName: 'patientName', width: 250 },
-        { columnName: 'referralCompany', width: 150 },
-        { columnName: 'referralPerson', width: 150 },
-        { columnName: 'referralRemarks', width: 150 },
-        { columnName: 'invoiceAmount', type: 'number', currency: true },
-        { columnName: 'payment', type: 'number', currency: true },
-        { columnName: 'gst', type: 'number', currency: true },
-        { columnName: 'outstandingBalance', type: 'number', currency: true },
-        { columnName: 'Action', width: 120, align: 'center' },
-      ],
-    },
   }
 
   onViewDispenseClick = (queue) => {
@@ -167,8 +175,22 @@ class DetailsGrid extends PureComponent {
 
   onEditVisitClick = (queue) => {}
 
-  onViewPatientDashboardClick = () => {
-    router.push('/reception/queue/patientdashboard')
+  onViewPatientDashboardClick = (row, id) => {
+    console.log({ row, id })
+    switch (id) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+        break
+      case '4':
+        router.push('/reception/queue/patientdashboard')
+        break
+      case '5':
+        break
+      default:
+        break
+    }
   }
 
   Cell = (props) => {
@@ -176,33 +198,10 @@ class DetailsGrid extends PureComponent {
     const { classes, ...tableProps } = props
     const { location } = this.props
     if (tableProps.column.name === 'Action') {
-      if (location.path === '/emr/queue')
-        return (
-          <Table.Cell {...tableProps}>
-            <Tooltip
-              title={formatMessage({
-                id: 'reception.queue.viewPatientDashboard',
-              })}
-              placement='bottom'
-              classes={{ tooltip: classes.tooltip }}
-            >
-              <div style={{ display: 'inline-block' }}>
-                <GridButton
-                  row={tableProps.row}
-                  Icon={<Pageview />}
-                  onClick={this.onViewPatientDashboardClick}
-                />
-              </div>
-            </Tooltip>
-          </Table.Cell>
-        )
-      // path === '/queue'
       return (
         <Table.Cell {...tableProps}>
           <Tooltip
-            title={formatMessage({
-              id: 'reception.queue.viewPatientDashboard',
-            })}
+            title='More Actions'
             placement='bottom'
             classes={{ tooltip: classes.tooltip }}
           >
@@ -214,36 +213,40 @@ class DetailsGrid extends PureComponent {
               />
             </div>
           </Tooltip>
-          {/*
-            <Tooltip
-              title={formatMessage({ id: 'reception.queue.editVisit' })}
-              placement='bottom'
-              classes={{ tooltip: classes.tooltip }}
-            >
-              <div style={{ display: 'inline-block' }}>
-                <GridButton
-                  row={tableProps.row}
-                  Icon={<Edit />}
-                  onClick={this.onEditVisitClick}
-                />
-              </div>
-            </Tooltip>
-          */}
-          <Tooltip
-            title={formatMessage({ id: 'reception.queue.cancelVisit' })}
-            placement='bottom'
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <div style={{ display: 'inline-block' }}>
-              <GridButton
-                row={tableProps.row}
-                color='danger'
-                Icon={<Remove />}
-              />
-            </div>
-          </Tooltip>
         </Table.Cell>
       )
+      // return (
+      //   <Table.Cell {...tableProps}>
+      //     <Tooltip
+      //       title={formatMessage({
+      //         id: 'reception.queue.viewPatientDashboard',
+      //       })}
+      //       placement='bottom'
+      //       classes={{ tooltip: classes.tooltip }}
+      //     >
+      //       <div style={{ display: 'inline-block' }}>
+      //         <GridButton
+      //           row={tableProps.row}
+      //           Icon={<Pageview />}
+      //           onClick={this.onViewPatientDashboardClick}
+      //         />
+      //       </div>
+      //     </Tooltip>
+      //     <Tooltip
+      //       title={formatMessage({ id: 'reception.queue.cancelVisit' })}
+      //       placement='bottom'
+      //       classes={{ tooltip: classes.tooltip }}
+      //     >
+      //       <div style={{ display: 'inline-block' }}>
+      //         <GridButton
+      //           row={tableProps.row}
+      //           color='danger'
+      //           Icon={<Remove />}
+      //         />
+      //       </div>
+      //     </Tooltip>
+      //   </Table.Cell>
+      // )
     }
     return <Table.Cell {...tableProps} />
   }
@@ -260,14 +263,13 @@ class DetailsGrid extends PureComponent {
   }
 
   render () {
-    const { tableParams } = this.state
     const ActionProps = {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
-    const { classes, queueLog, currentFilter } = this.props
+    const { classes, queueLog, loading } = this.props
     const { isFullscreen, rowData } = this.state
-    // const { queueListing } = queueLog
-
+    const { currentFilter, queueListing } = queueLog
+    const height = isFullscreen ? undefined : 600
     return (
       <div>
         <WithFullscreenModal
@@ -276,11 +278,11 @@ class DetailsGrid extends PureComponent {
           onConfirm={this.toggleFullscreen}
         >
           <CommonTableGrid2
-            height={isFullscreen ? undefined : 600}
+            height={height}
             rows={filterData(currentFilter, rowData)}
-            {...tableParams}
             ActionProps={ActionProps}
-            FuncProps={{ pager: false }}
+            {...TableConfig}
+            FuncProps={FuncConfig}
           />
         </WithFullscreenModal>
 
