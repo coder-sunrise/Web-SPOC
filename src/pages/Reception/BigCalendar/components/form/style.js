@@ -53,6 +53,7 @@ const styles = (theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     paddingLeft: theme.spacing.unit * 2,
+    margin: `${theme.spacing.unit * 4}px 0px ${theme.spacing.unit}px`,
   },
   actionsBtnGroup: {
     textAlign: 'right',
@@ -79,6 +80,12 @@ const styles = (theme) => ({
   enableOccurenceCheckbox: {
     textAlign: 'left',
     paddingLeft: '16px !important',
+  },
+  conflictContainer: {
+    margin: theme.spacing.unit * 2,
+  },
+  conflictContent: {
+    fontWeight: 'bold',
   },
 })
 

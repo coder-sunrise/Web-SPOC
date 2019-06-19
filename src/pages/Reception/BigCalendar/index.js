@@ -57,7 +57,7 @@ const applyFilter = (data, filter) => {
 
   // filter by appointment type
   const { appointmentType } = filter
-  if (appointmentType.length !== 0) {
+  if (appointmentType.length !== 0 && !appointmentType.includes('all')) {
     returnData = returnData.filter((aptData) =>
       appointmentType.includes(aptData.appointmentType),
     )
@@ -94,7 +94,9 @@ class Appointment extends React.PureComponent {
     selectedSlot: {},
     filter: {
       searchQuery: '',
-      appointmentType: [],
+      appointmentType: [
+        'all',
+      ],
       doctors: [
         'all',
       ],
@@ -321,7 +323,7 @@ class Appointment extends React.PureComponent {
         </CommonModal>
         <CommonModal
           open={showDoctorEventModal}
-          title='Doctor Event'
+          title='Doctor Block'
           onClose={this.handleDoctorEventClick}
           onConfirm={this.handleDoctorEventClick}
           maxWidth='sm'

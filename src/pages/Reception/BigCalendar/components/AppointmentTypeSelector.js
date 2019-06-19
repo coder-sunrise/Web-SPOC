@@ -44,12 +44,14 @@ class AppointmentTypeSelector extends PureComponent {
               value={option.value}
               disabled={!!option.disabled}
             >
-              <span
-                className={classnames([
-                  classes.colorDot,
-                  getColorClassByAppointmentType(option.value, classes),
-                ])}
-              />
+              {option.value !== 'all' && (
+                <span
+                  className={classnames([
+                    classes.colorDot,
+                    getColorClassByAppointmentType(option.value, classes),
+                  ])}
+                />
+              )}
               <span>{option.name}</span>
             </OriAntdSelect.Option>
           )

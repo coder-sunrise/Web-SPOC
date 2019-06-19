@@ -10,6 +10,9 @@ import { FastField, Field, withFormik } from 'formik'
 import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 // custom component
 import {
+  Card,
+  CardBody,
+  CardFooter,
   Button,
   CommonModal,
   DatePicker,
@@ -22,6 +25,7 @@ import {
   AntdInput,
   Checkbox,
   TimePicker,
+  Danger,
 } from '@/components'
 // custom components
 import AppointmentTypeSelector from '../../../Appointment/Calendar/Appointments/AppointmentTypeSelector'
@@ -58,19 +62,6 @@ const RECURRENCE_RANGE = {
 
 const _dateFormat = 'DD MMM YYYY'
 const _slotInfoDateFormat = 'MMM DD YYYY'
-
-const getDateValue = (v) => {
-  if (!v) return v
-  if (moment.isMoment(v)) {
-    return v.format(_dateFormat)
-  }
-  return moment(v).isValid() ? moment(v).format(_dateFormat) : v
-}
-
-const DATETIME_KEY = {
-  START: 'start',
-  END: 'end',
-}
 
 const AppointmentSchema = Yup.object().shape({
   patientName: Yup.string().required(),
@@ -603,6 +594,26 @@ class Form extends React.PureComponent {
               )}
             </GridContainer>
           </Paper>
+          <Card
+            size='sm'
+            raised
+            className={classnames(classes.conflictContainer)}
+          >
+            <CardBody>
+              <GridContainer>
+                <GridItem xs md={8}>
+                  <Danger>
+                    <h4 className={classnames(classes.conflictContent)}>
+                      Appointment has conflict in schedule
+                    </h4>
+                  </Danger>
+                </GridItem>
+                <GridItem xs md={4} container justify='flex-end'>
+                  <Button color='info'>Validate</Button>
+                </GridItem>
+              </GridContainer>
+            </CardBody>
+          </Card>
           <div className={classnames(classes.footer)}>
             <GridContainer>
               <GridItem xs md={4} container justify='flex-start'>
@@ -670,8 +681,6 @@ class Form extends React.PureComponent {
   }
 }
 
-const FormComponent = withStyles(styles, { name: 'AppointmentFormComponent' })(
-  Form,
-)
+const FormComponent = withStyles(styles, { name: 'ApptForm' })(Form)
 
 export default FormComponent
