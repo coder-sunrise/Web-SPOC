@@ -61,7 +61,7 @@ class DetailsActionBar extends PureComponent {
     return (
       <GridContainer className={classnames(classes.actionBar)}>
         <GridItem xs md={4}>
-          <AntdInput
+          <TextField
             suffix={isFetching && <CircularProgress size={16} />}
             value={currentSearchPatient}
             onChange={handleQueryChange}
@@ -69,6 +69,7 @@ class DetailsActionBar extends PureComponent {
             label={formatMessage({
               id: 'reception.queue.registerVisitTextBox',
             })}
+            help='Press enter to search patient'
           />
         </GridItem>
 
@@ -86,34 +87,6 @@ class DetailsActionBar extends PureComponent {
         </GridItem>
       </GridContainer>
     )
-    // return (
-    //   <GridContainer className={classNames(classes.spacing)}>
-    //     <GridItem xs md={4}>
-    //       <FastField
-    //         name='SessionNo'
-    //         render={(args) => (
-    //           <TextField
-    //             {...args}
-    //             readOnly
-    //             prefixProps={{
-    //               disableTypography: true,
-    //               style: { width: '25%' },
-    //             }}
-    //             prefix={formatMessage({
-    //               id: 'reception.queue.sessionNo',
-    //             })}
-    //           />
-    //         )}
-    //       />
-    //     </GridItem>
-    //     <GridItem xs md={8} container justify='flex-end' alignItems='center'>
-    //       <Button color='danger' onClick={this.toggleDrawer}>
-    //         <Stop />
-    //         <FormattedMessage id='reception.queue.endSession' />
-    //       </Button>
-    //     </GridItem>
-    //   </GridContainer>
-    // )
   }
 }
 

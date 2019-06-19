@@ -30,6 +30,7 @@ class FormikTextField extends React.PureComponent {
     const { field = {}, form, inputProps = {} } = props
     // console.log(this.state, props)
     this.state = {
+      isDebouncing: false,
       value: field.value !== undefined && field.value !== '' ? field.value : '',
     }
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 300)
@@ -73,11 +74,15 @@ class FormikTextField extends React.PureComponent {
     if (onChange) {
       onChange(v)
     }
+    this.setState({
+      isDebouncing: false,
+    })
   }
 
   onChange = (event) => {
     this.setState({
       value: event.target.value,
+      isDebouncing: true,
     })
     this.debouncedOnChange(event.target.value)
   }
@@ -166,7 +171,9 @@ class FormikTextField extends React.PureComponent {
     // console.log(inputProps)
     // console.log('custominput', inputProps)
     // console.log(props, cfg, state)
-    return <BaseInput {...props} {...cfg} />
+    return (
+      <BaseInput {...props} {...cfg} isDebouncing={this.state.isDebouncing} />
+    )
   }
 }
 

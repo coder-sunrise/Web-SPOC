@@ -278,7 +278,6 @@ class Queue extends PureComponent {
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
-                  location={this.props.match}
                   onViewDispenseClick={this.toggleDispense}
                   currentFilter={currentFilter}
                 />

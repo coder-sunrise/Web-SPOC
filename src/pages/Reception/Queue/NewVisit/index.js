@@ -48,8 +48,9 @@ const styles = (theme) => ({
       [FormFieldName['visit.queueNo']]: nextQueueNo,
     }
   },
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, setSubmitting }) => {
     console.log('handleSubmit', values, props)
+    setSubmitting(false)
   },
 })
 class NewVisit extends PureComponent {
@@ -62,8 +63,8 @@ class NewVisit extends PureComponent {
   }
 
   render () {
-    const { classes, handleSubmit } = this.props
-
+    const { classes, handleSubmit, isValidating, isSubmitting } = this.props
+    console.log({ isValidating, isSubmitting })
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>
@@ -92,8 +93,14 @@ class NewVisit extends PureComponent {
               justify='flex-end'
               className={classes.footerContent}
             >
-              <Button color='primary' onClick={handleSubmit}>
-                Register Visit
+              <Button
+                color='primary'
+                disabled={isSubmitting || isValidating}
+                onClick={handleSubmit}
+              >
+                {!isSubmitting && !isValidating && <span>Register Visit</span>}
+                {isSubmitting && <span>Submitting...</span>}
+                {isValidating && <span>Validating...</span>}
               </Button>
             </GridItem>
           </GridItem>

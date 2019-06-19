@@ -197,7 +197,6 @@ class DetailsGrid extends PureComponent {
   Cell = (props) => {
     // const { column, row, classes, ...restProps } = props
     const { classes, ...tableProps } = props
-    const { location } = this.props
     if (tableProps.column.name === 'Action') {
       return (
         <Table.Cell {...tableProps}>
