@@ -55,6 +55,7 @@ const generateRowData = () => {
   }
   return data
 }
+
 const filterMap = {
   [StatusIndicator.ALL]: [
     ...visitStatusCode,
@@ -266,7 +267,7 @@ class DetailsGrid extends PureComponent {
     const ActionProps = {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
-    const { classes, queueLog, loading } = this.props
+    const { classes, queueLog } = this.props
     const { isFullscreen, rowData } = this.state
     const { currentFilter, queueListing } = queueLog
     const height = isFullscreen ? undefined : 600
@@ -279,7 +280,7 @@ class DetailsGrid extends PureComponent {
         >
           <CommonTableGrid2
             height={height}
-            rows={filterData(currentFilter, rowData)}
+            rows={filterData(currentFilter, queueListing)}
             ActionProps={ActionProps}
             {...TableConfig}
             FuncProps={FuncConfig}

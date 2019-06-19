@@ -63,6 +63,10 @@ const cardHeaderStyle = {
       display: 'inline-block',
     },
   },
+  cardsm: {
+    marginTop: 8,
+    marginBottom: 8,
+  },
   cardHeaderPlain: {
     marginLeft: '0px',
     marginRight: '0px',

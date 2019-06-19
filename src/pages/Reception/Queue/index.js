@@ -9,7 +9,7 @@ import { withFormik } from 'formik'
 import classNames from 'classnames'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
-import { Queue as QueueIcon, Refresh, Stop } from '@material-ui/icons'
+import { Refresh, Stop } from '@material-ui/icons'
 // custom components
 import {
   Card,
@@ -25,7 +25,6 @@ import {
 import EmptySession from './EmptySession'
 import DetailsActionBar from './Details/DetailsActionBar'
 import DetailsGrid from './Details/DetailsGrid'
-import DetailsFooter from './Details/DetailsFooter'
 import NewVisitModal from './NewVisit'
 import PatientSearchModal from './PatientSearch'
 import NewPatient from '../../PatientDatabase/New'
@@ -93,11 +92,9 @@ class Queue extends PureComponent {
     dispatch({
       type: 'queueLog/getSessionInfo',
     })
-    console.log('willmount index')
   }
 
   showVisitRegistration = (patientID = '') => {
-    const { showNewVisit } = this.state
     const { dispatch } = this.props
 
     patientID !== '' &&
@@ -128,11 +125,10 @@ class Queue extends PureComponent {
     this.setState({ showViewPatientProfile: !showViewPatientProfile })
   }
 
-  handleRegisterVisit = (visitInfo = {}) => {
+  handleRegisterVisit = () => {
     this.setState({
       showPatientSearch: false,
       showNewVisit: false,
-      visitPatientID: '',
     })
   }
 
@@ -200,7 +196,7 @@ class Queue extends PureComponent {
       dispatch({
         type: 'queueLog/fetchPatientListByName',
         payload: currentQuery,
-      }).then((response) => {
+      }).then(() => {
         this.setState({ showPatientSearch: true })
       })
   }

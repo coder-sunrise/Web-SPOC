@@ -131,11 +131,7 @@ class AntdNumberInput extends React.PureComponent {
   handleBlur = () => {
     const lengthIsZero =
       this.state.value === null ? true : this.state.value.length === 0
-    console.log('handleBlur', {
-      isUndefined: this.state.value === undefined,
-      value: this.state.value,
-      lengthIsZero,
-    })
+
     if (this.state.value === undefined || lengthIsZero) {
       this.setState({ shrink: false })
     }
@@ -293,7 +289,7 @@ class AntdNumberInput extends React.PureComponent {
           this.state.value === null
         ) || this.state.shrink,
     }
-    console.log('labelProps', { labelProps })
+
     return (
       <CustomInput
         labelProps={labelProps}

@@ -32,7 +32,7 @@ class FormikTextField extends React.PureComponent {
     this.state = {
       value: field.value !== undefined && field.value !== '' ? field.value : '',
     }
-    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
+    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 300)
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -60,7 +60,7 @@ class FormikTextField extends React.PureComponent {
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
-    console.log('base c', value, props)
+    // console.log('base c', value, props)
     const v = {
       target: {
         value,

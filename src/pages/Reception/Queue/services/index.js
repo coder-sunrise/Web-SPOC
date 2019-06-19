@@ -59,7 +59,7 @@ export const getQueueListing = async (sessionID) => {
       opr: 'eql',
     },
   ]
-  console.log('get queue listing', criteria, stringify({ criteria }))
+
   const response = await request(`/api/queue/`, {
     method: 'GET',
     data: stringify({ criteria }),

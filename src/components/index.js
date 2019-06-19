@@ -47,3 +47,5 @@ export SizeContainer from './Size'
 export RichEditor from './RichEditor'
 // export * from './PDF'
 export * from './mui-pro'
+
+export CommonCard from './CommonCard'

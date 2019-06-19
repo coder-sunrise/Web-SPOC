@@ -23,6 +23,35 @@ const InitialSessionInfo = {
   sessionCloseDate: '',
 }
 
+const visitStatusCode = [
+  'WAITING',
+  'APPOINTMENT',
+  'TO DISPENSE',
+  'IN CONS',
+  'PAUSED',
+  'OVERPAID',
+  'COMPLETED',
+]
+
+const generateRowData = () => {
+  const data = []
+  for (let i = 0; i < 12; i += 1) {
+    data.push({
+      Id: `row-${i}-data`,
+      queueNo: i,
+      visitStatus: visitStatusCode[i % visitStatusCode.length],
+      roomNo: '',
+      doctor: 'Cheah',
+      refNo: `PT-0000${i}`,
+      patientName: 'Annie Leonhart @ Annabelle Perfectionism',
+      gender: 'Female',
+      age: i,
+      visitRefNo: `190402-01-${i}`,
+    })
+  }
+  return data
+}
+
 export default createListViewModel({
   namespace: 'queueLog',
   config: {
@@ -33,13 +62,11 @@ export default createListViewModel({
     state: {
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
-      queueListing: [],
+      queueListing: generateRowData(),
       visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
     },
-    subscriptions: (props) => {
-      console.log('subscriptions props', { props })
-    },
+    subscriptions: {},
     effects: {
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)
