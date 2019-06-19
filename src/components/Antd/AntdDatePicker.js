@@ -157,6 +157,7 @@ class AntdDatePicker extends PureComponent {
           )}
           format={format}
           value={_toMoment(selectValue, format)}
+          {...restProps}
         />
       </div>
     )

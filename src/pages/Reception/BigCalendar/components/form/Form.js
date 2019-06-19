@@ -12,7 +12,6 @@ import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 import {
   Card,
   CardBody,
-  CardFooter,
   Button,
   CommonModal,
   DatePicker,
@@ -25,6 +24,7 @@ import {
   AntdInput,
   Checkbox,
   TimePicker,
+  RadioGroup,
   Danger,
 } from '@/components'
 // custom components
@@ -61,6 +61,7 @@ const RECURRENCE_RANGE = {
 }
 
 const _dateFormat = 'DD MMM YYYY'
+const _timeFormat = 'hh:mm a'
 const _slotInfoDateFormat = 'MMM DD YYYY'
 
 const AppointmentSchema = Yup.object().shape({
@@ -69,6 +70,8 @@ const AppointmentSchema = Yup.object().shape({
   doctor: Yup.string().required(),
   startDate: Yup.string().required(),
   endDate: Yup.string().required(),
+  startTime: Yup.string().required(),
+  endTime: Yup.string().required(),
 })
 
 const initialAptInfo = {
@@ -81,7 +84,7 @@ const initialAptInfo = {
   enableRecurrence: false,
   recurrencePattern: 'daily',
   recurrenceRange: RECURRENCE_RANGE.AFTER,
-  occurence: '',
+  occurence: 1,
 }
 
 @withFormik({
@@ -249,6 +252,39 @@ class Form extends React.PureComponent {
     return ''
   }
 
+  startTimeValidation = (value) => {
+    const { values } = this.props
+    if (value === '') return 'Time is required'
+    if (!moment(value, _timeFormat).isValid()) return 'Invalid time'
+
+    const endTime = moment(values.endTime, _timeFormat).isValid()
+      ? moment(values.endTime, _timeFormat)
+      : ''
+    if (endTime === '') return ''
+
+    const startTime = moment(values.startTime, _timeFormat)
+
+    if (startTime.isAfter(endTime)) return 'Start Time must be before End Time'
+
+    return ''
+  }
+
+  endTimeValidation = (value) => {
+    const { values } = this.props
+    if (value === '') return 'Time is required'
+    if (!moment(value, _timeFormat).isValid()) return 'Invalid time'
+
+    const startTime = moment(values.startTime, _timeFormat).isValid()
+      ? moment(values.startTime, _timeFormat)
+      : ''
+    if (startTime === '') return ''
+    const endTime = moment(values.endTime, _timeFormat)
+
+    if (endTime.isBefore(startTime)) return 'End Time must be after Start Time'
+
+    return ''
+  }
+
   handleSelectPatient = (patientID) => {
     fetchPatientInfoByPatientID(patientID).then((response) => {
       if (response) {
@@ -319,8 +355,6 @@ class Form extends React.PureComponent {
     const hideCancelAppointmentClass = {
       [classes.hideCancelAppointmentBtn]: slotInfo.type === 'add',
     }
-
-    console.log({ values })
 
     return (
       <SizeContainer>
@@ -398,8 +432,8 @@ class Form extends React.PureComponent {
                       <OutlinedTextField
                         {...args}
                         multiline
-                        rowsMax={6}
-                        rows={4}
+                        rowsMax={3}
+                        rows={2}
                         label={formatMessage({
                           id: 'reception.appt.form.remarks',
                         })}
@@ -455,11 +489,12 @@ class Form extends React.PureComponent {
               <GridItem xs md={2}>
                 <Field
                   name='startTime'
+                  validate={this.startTimeValidation}
                   render={(args) => (
                     <TimePicker
                       {...args}
                       noLabel
-                      format='hh:mm a'
+                      format={_timeFormat}
                       use12Hours
                       minuteStep={15}
                     />
@@ -474,18 +509,26 @@ class Form extends React.PureComponent {
                   name='endDate'
                   validate={this.endDateValidation}
                   render={(args) => {
-                    return <DatePicker noLabel {...args} format={_dateFormat} />
+                    return (
+                      <DatePicker
+                        disabled
+                        noLabel
+                        {...args}
+                        format={_dateFormat}
+                      />
+                    )
                   }}
                 />
               </GridItem>
               <GridItem xs md={2}>
                 <Field
                   name='endTime'
+                  validate={this.endTimeValidation}
                   render={(args) => (
                     <TimePicker
                       {...args}
                       noLabel
-                      format='hh:mm a'
+                      format={_timeFormat}
                       use12Hours
                       minuteStep={15}
                     />
@@ -537,59 +580,58 @@ class Form extends React.PureComponent {
                       )}
                     />
                   </GridItem>
-                  <GridItem xs md={4}>
-                    <FastField
-                      name='recurrenceRange'
-                      render={(args) => (
-                        <Select
-                          {...args}
-                          label='Range of Recurrence'
-                          options={[
-                            {
-                              value: RECURRENCE_RANGE.AFTER,
-                              name: formatMessage({
-                                id: 'reception.appt.form.endAfter',
-                              }),
-                            },
-                            {
-                              value: RECURRENCE_RANGE.BY,
-                              name: formatMessage({
-                                id: 'reception.appt.form.endBy',
-                              }),
-                            },
-                          ]}
+                  <GridContainer item xs md={12}>
+                    <GridItem>
+                      <FastField
+                        name='recurrenceRange'
+                        render={(args) => (
+                          <RadioGroup
+                            label='Range of Recurrence'
+                            textField='name'
+                            options={[
+                              {
+                                value: RECURRENCE_RANGE.AFTER,
+                                name: 'End After',
+                              },
+                              {
+                                value: RECURRENCE_RANGE.BY,
+                                name: 'End By',
+                              },
+                            ]}
+                            {...args}
+                          />
+                        )}
+                      />
+                    </GridItem>
+                    <GridItem>
+                      {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
+                        <Field
+                          name='occurence'
+                          render={(args) => (
+                            <NumberInput
+                              {...args}
+                              label={formatMessage({
+                                id: 'reception.appt.form.occurence',
+                              })}
+                            />
+                          )}
                         />
                       )}
-                    />
-                  </GridItem>
-                  <GridItem xs md={4}>
-                    {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
-                      <Field
-                        name='occurence'
-                        render={(args) => (
-                          <NumberInput
-                            {...args}
-                            label={formatMessage({
-                              id: 'reception.appt.form.occurence',
-                            })}
-                          />
-                        )}
-                      />
-                    )}
-                    {values.recurrenceRange === RECURRENCE_RANGE.BY && (
-                      <FastField
-                        name='stopDate'
-                        render={(args) => (
-                          <DatePicker
-                            {...args}
-                            label={formatMessage({
-                              id: 'reception.appt.form.stopDate',
-                            })}
-                          />
-                        )}
-                      />
-                    )}
-                  </GridItem>
+                      {values.recurrenceRange === RECURRENCE_RANGE.BY && (
+                        <FastField
+                          name='stopDate'
+                          render={(args) => (
+                            <DatePicker
+                              {...args}
+                              label={formatMessage({
+                                id: 'reception.appt.form.stopDate',
+                              })}
+                            />
+                          )}
+                        />
+                      )}
+                    </GridItem>
+                  </GridContainer>
                 </React.Fragment>
               )}
             </GridContainer>
@@ -609,7 +651,7 @@ class Form extends React.PureComponent {
                   </Danger>
                 </GridItem>
                 <GridItem xs md={4} container justify='flex-end'>
-                  <Button color='info'>Validate</Button>
+                  <Button color='primary'>Validate</Button>
                 </GridItem>
               </GridContainer>
             </CardBody>

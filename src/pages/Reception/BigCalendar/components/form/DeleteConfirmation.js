@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
+import Warning from '@material-ui/icons/Warning'
 // common component
 import {
   GridContainer,
@@ -14,6 +15,14 @@ import {
 const styles = (theme) => ({
   reasonTextBox: {
     paddingTop: `${theme.spacing.unit * 4.75}px !important`,
+  },
+  title: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  warningIcon: {
+    margin: theme.spacing.unit * 2,
   },
 })
 
@@ -67,11 +76,14 @@ function DeleteConfirmation ({ onConfirm, onClose, classes }) {
 
   return step === 0 ? (
     <GridContainer justify='center'>
-      <GridItem xs md={12}>
-        <h4 style={{ textAlign: 'left' }}>
-          Do you want to cancel all occurences of the recurring appointment, or
-          just this one?
-        </h4>
+      <GridItem>
+        <div className={classes.title}>
+          <Warning fontSize='large' className={classes.warningIcon} />
+          <h4 style={{ textAlign: 'left' }}>
+            Do you want to cancel all occurences of the recurring appointment,
+            or just this one?
+          </h4>
+        </div>
       </GridItem>
       <GridItem>
         <RadioGroup
@@ -104,9 +116,12 @@ function DeleteConfirmation ({ onConfirm, onClose, classes }) {
   ) : (
     <GridContainer justify='center'>
       <GridItem xs md={12}>
-        <h4 style={{ textAlign: 'left' }}>
-          Please indicate reason for cancellation
-        </h4>
+        <div className={classes.title}>
+          <Warning fontSize='large' className={classes.warningIcon} />
+          <h4 style={{ textAlign: 'left' }}>
+            Please indicate reason for cancellation
+          </h4>
+        </div>
       </GridItem>
       <GridItem>
         <RadioGroup
