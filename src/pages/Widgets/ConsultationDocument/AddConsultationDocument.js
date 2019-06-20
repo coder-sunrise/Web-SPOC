@@ -30,7 +30,6 @@ import ReferralLetter from './ReferralLetter'
 import Memo from './Memo'
 import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
-import Others from './Others'
 
 const styles = (theme) => ({
   editor: {
@@ -83,7 +82,7 @@ const types = [
     date: Yup.date().required(),
     subject: Yup.string().required(),
 
-    // 3->MC
+    //3->MC
 
     days: Yup.number().when('type', {
       is: (val) => val === '3',
@@ -149,7 +148,6 @@ class AddConsultationDocument extends PureComponent {
           {type === '2' && <Memo {...cfg} />}
           {type === '3' && <MedicalCertificate {...cfg} />}
           {type === '4' && <CertificateAttendance {...cfg} />}
-          {type === '5' && <Others {...cfg} />}
         </div>
         {footer &&
           footer({
