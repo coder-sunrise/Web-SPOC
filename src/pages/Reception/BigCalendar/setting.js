@@ -2,6 +2,13 @@ import { primaryColor } from 'mui-pro-jss'
 
 export const AppointmentTypeOptions = [
   {
+    name: 'All',
+    value: 'all',
+    color: 'primary',
+    colorValue: primaryColor,
+    colorActive: primaryColor,
+  },
+  {
     name: 'Checkup',
     value: 'checkup',
     color: 'red',
@@ -61,6 +68,12 @@ export const defaultColorOpts = {
   name: 'default',
   value: primaryColor,
   active: primaryColor,
+}
+
+export const doctorEventColorOpts = {
+  name: 'doctorEvent',
+  value: '#bfbfbf',
+  active: '#8c8c8c',
 }
 
 export const reduceToColorClass = (acc, { value, colorValue, colorActive }) => {

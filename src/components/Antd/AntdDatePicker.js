@@ -101,7 +101,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   handleChange = (date, dateString) => {
-    // console.log(date, dateString)
+    console.log({ date, dateString })
     if (date) {
       date.utcOffset()
     }

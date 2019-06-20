@@ -33,32 +33,7 @@ const routes = [
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue' },
-      {
-        path: '/dashboard',
-        name: 'dashboard',
-        icon: 'dashboard',
-        hideInMenu: true,
-        routes: [
-          {
-            path: '/dashboard/analysis',
-            name: 'analysis',
-            component: './Dashboard/Analysis',
-            mini: 'AS',
-          },
-          {
-            path: '/dashboard/monitor',
-            name: 'monitor',
-            component: './Dashboard/Monitor',
-            mini: 'MT',
-          },
-          {
-            path: '/dashboard/workplace',
-            name: 'workplace',
-            component: './Dashboard/Workplace',
-            mini: 'WK',
-          },
-        ],
-      },
+
       // Reception
       {
         path: '/reception',

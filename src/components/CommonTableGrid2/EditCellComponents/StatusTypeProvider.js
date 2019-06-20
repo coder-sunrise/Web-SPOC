@@ -1,16 +1,15 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles, Typography } from '@material-ui/core'
+import { withStyles, Chip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
+import { Badge } from '@/components'
 
-import {
-  Badge,
-  TextField,
-  TextTypeProvider as TextTypeProviderOrg,
-  Primary,
-} from '@/components'
-
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  badge: {
+    padding: theme.spacing.unit,
+    fontSize: '.875rem',
+  },
+})
 
 const StatusTypeBase = (props) => {
   // console.log('statustypebase', props)
@@ -19,32 +18,46 @@ const StatusTypeBase = (props) => {
     value,
     onValueChange,
     columnExtensions,
+    classes,
   } = props
   // const { name, value: v, ...otherInputProps } = inputProps
   // console.log(props)
   const cfg = columnExtensions.find(
     ({ columnName: currentColumnName }) => currentColumnName === columnName,
   )
-  let color
+  let color = 'primary'
 
-  switch (value) {
-    case 'REGISTERED':
+  // WAITING, TO DISPENSE, IN CONS, PAUSED, OVERPAID, COMPLETED
+  const hasBadge = [
+    'WAITING',
+    'IN CONS',
+  ]
+  switch (value.toUpperCase()) {
+    case 'WAITING':
       color = 'primary'
       break
-    case 'INVOICED':
-      color = 'rose'
+    case 'IN CONS':
+      color = 'success'
       break
-    case 'CANCELLED':
-      color = 'danger'
-      break
-    case 'PLANNED':
+    // case 'OVERPAID':
+    //   color = 'danger'
+    //   break
+    // case 'APPOINTMENT':
+    //   color = 'rose'
+    //   break
+    default:
       color = 'gray'
       break
-    default:
-      color = 'primary'
   }
 
-  return <Badge color={color}>{value}</Badge>
+  return hasBadge.includes(value.toUpperCase()) ? (
+    <Badge className={classes.badge} color={color}>
+      {value}
+    </Badge>
+  ) : (
+    <span className={classes.badge}>{value}</span>
+  )
+  // return <Chip label={value} variant='outlined' color={color} />
 }
 
 export const StatusType = withStyles(styles)(StatusTypeBase)

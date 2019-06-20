@@ -30,9 +30,10 @@ class FormikTextField extends React.PureComponent {
     const { field = {}, form, inputProps = {} } = props
     // console.log(this.state, props)
     this.state = {
+      isDebouncing: false,
       value: field.value !== undefined && field.value !== '' ? field.value : '',
     }
-    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
+    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 300)
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -60,7 +61,7 @@ class FormikTextField extends React.PureComponent {
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
-    console.log('base c', value, props)
+    // console.log('base c', value, props)
     const v = {
       target: {
         value,
@@ -73,11 +74,15 @@ class FormikTextField extends React.PureComponent {
     if (onChange) {
       onChange(v)
     }
+    this.setState({
+      isDebouncing: false,
+    })
   }
 
   onChange = (event) => {
     this.setState({
       value: event.target.value,
+      isDebouncing: true,
     })
     this.debouncedOnChange(event.target.value)
   }
@@ -165,8 +170,10 @@ class FormikTextField extends React.PureComponent {
 
     // console.log(inputProps)
     // console.log('custominput', inputProps)
-    // console.log(props, cfg, state)
-    return <BaseInput {...props} {...cfg} />
+    // console.log('custominput', props, cfg, state)
+    return (
+      <BaseInput {...props} {...cfg} isDebouncing={this.state.isDebouncing} />
+    )
   }
 }
 

@@ -165,8 +165,9 @@ class CommonModal extends React.PureComponent {
 
     const childrenWithProps = React.Children.map(children, (child) =>
       React.cloneElement(child, {
-        footer: this.footer,
         onConfirm: this.props.onConfirm || this.onConfim,
+        onClose: this.props.onClose,
+        footer: this.footer,
         height: this.state.height,
       }),
     )

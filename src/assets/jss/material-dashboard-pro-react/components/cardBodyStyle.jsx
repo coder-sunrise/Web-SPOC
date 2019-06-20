@@ -6,7 +6,7 @@ const cardBodyStyle = {
     position: 'relative',
   },
   cardBodySm: {
-    padding: 5,
+    padding: '8px 16px',
   },
   cardBodyBackground: {
     position: 'relative',

@@ -123,8 +123,8 @@ const grayColor = '#999999'
 // new color
 const primaryColor = '#3f51b5'
 const secondaryColor = '#1890ff'
-const successColor = '#52c41a'
-const dangerColor = '#f5222d'
+const successColor = '#389e0d'
+const dangerColor = '#cf1322'
 const hoverColor = '#d6e4ff'
 const tableEvenRowColor = '#f0f5ff'
 

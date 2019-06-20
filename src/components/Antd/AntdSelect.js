@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -106,8 +106,14 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  handleFilter = (input, option) =>
-    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  handleFilter = (input, option) => {
+    try {
+      return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    } catch (error) {
+      console.log({ error })
+      return false
+    }
+  }
 
   handleFocus = () => {
     this.setState({ shrink: true })
@@ -213,7 +219,7 @@ class AntdSelect extends React.PureComponent {
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
-        {...restProps}
+        {...this.props}
       />
     )
   }

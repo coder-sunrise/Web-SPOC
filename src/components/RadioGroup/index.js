@@ -65,7 +65,7 @@ class RadioGroup extends React.Component {
           return (
             <div
               className={`${classes.checkboxAndRadio} ${vertical
-                ? ''
+                ? classes.vertical
                 : classes.checkboxAndRadioHorizontal}`}
               key={v}
             >
