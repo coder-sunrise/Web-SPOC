@@ -22,13 +22,11 @@ const styles = () => ({
   },
 })
 
-@connect(({ allergy }) => ({
-  allergy,
-}))
-
 @withFormik({
-  mapPropsToValues: ({ allergy }) => {
-    return allergy.entity
+  mapPropsToValues: ({ patient }) => {
+    console.log('allergy map')
+    console.log(patient)
+    return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
     EditingItems: Yup.array().of(
@@ -62,6 +60,11 @@ class Allergies extends PureComponent {
     height: 0,
   }
 
+  onSaveClick(values){
+    console.log('here update')
+    console.log(values)
+  }
+
   componentDidMount() {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
@@ -86,8 +89,10 @@ class Allergies extends PureComponent {
 
   render() {
     const { height } = this.state
-    const { classes, allergy, dispatch } = this.props
-
+    const { classes, allergy, dispatch,patient,values, ...restProps } = this.props
+   
+    console.log('allergy render')
+    console.log(values)
     return (
       <CardContainer title={this.titleComponent} hideHeader>
         <GridContainer
@@ -128,10 +133,11 @@ class Allergies extends PureComponent {
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
               type='Allergy'
-              entity={allergy.entity}
-              dispatch={dispatch}
               title='Allergy'
               height={height}
+              onSaveClick = {this.onSaveClick}
+              values = {values}
+              {...restProps}
             />
           </GridItem>
 
@@ -142,10 +148,10 @@ class Allergies extends PureComponent {
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
               type='Alert'
-              entity={allergy.entity}
-              dispatch={dispatch}
               title='Medical Alert'
               height={height}
+              values = {values}
+              {...restProps}
             />
           </GridItem>
         </GridContainer>

@@ -75,7 +75,6 @@ const styles = () => ({
     patientAccountNoTypeFk: Yup.string().required(),
     patientAccountNo: Yup.string().required(),
     genderFk: Yup.string().required(),
-    dialect: Yup.string().required(),
     //contact.mobileContactNumber.number:Yup.string().render(),
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
