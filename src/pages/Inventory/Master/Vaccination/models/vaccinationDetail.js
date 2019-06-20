@@ -5,7 +5,7 @@ import { getUniqueGUID } from '@/utils/cdrss'
 const { upsert } = service
 
 export default createFormViewModel({
-  namespace: 'medicationDetail',
+  namespace: 'vaccinationDetail',
   config: {
     queryOnLoad: false,
   },

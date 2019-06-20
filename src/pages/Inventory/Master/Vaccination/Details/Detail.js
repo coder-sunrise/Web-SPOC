@@ -1,32 +1,33 @@
-import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import { Assignment, Save } from '@material-ui/icons'
+import React, { useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Paper, Divider } from '@material-ui/core'
-import { compare } from '@/layouts'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
-import { status, suppliers, dispUOMs, SDDDescription } from '@/utils/codes'
+import { Divider } from '@material-ui/core'
+import { FastField } from 'formik'
+import { connect } from 'dva'
 import { compose } from 'redux'
 
 import {
   CardContainer,
   TextField,
-  Button,
   GridContainer,
   GridItem,
-  notification,
   Select,
   DatePicker,
-  ProgressButton,
   Checkbox,
 } from '@/components'
 
 const styles = () => ({})
 
-const Detail = (props) => {
-  const { classes, theme, type, ...restProps } = props
-  const submitKey = `${type}/submit`
+const Detail = ({ vaccinationDetail, dispatch }) => {
+  useEffect(() => {
+    if (vaccinationDetail.currentId) {
+      dispatch({
+        type: 'vaccinationDetail/query',
+        payload: {
+          id: vaccinationDetail.currentId,
+        },
+      })
+    }
+  }, [])
   return (
     <CardContainer
       hideHeader
@@ -42,9 +43,7 @@ const Detail = (props) => {
               <FastField
                 name='Code'
                 render={(args) => {
-                  const label = 'Medication Code'
-                  const p = { ...args, label }
-                  return <TextField {...p} />
+                  return <TextField label='Vaccination Code' {...args} />
                 }}
               />
             </GridItem>
@@ -52,9 +51,7 @@ const Detail = (props) => {
               <FastField
                 name='Name'
                 render={(args) => {
-                  const label = 'Medication Name'
-                  const p = { ...args, label }
-                  return <TextField {...p} />
+                  return <TextField label='Vaccination Name' {...args} />
                 }}
               />
             </GridItem>
@@ -104,10 +101,18 @@ const Detail = (props) => {
               <FastField
                 name='SDDDescription'
                 render={(args) => {
-                  const label = `${type} SDD Description`
-                  const p = { ...args, label }
-                  return <Select options={SDDDescription} {...p} />
+                  return (
+                    <Select label='SDD Description' options={[]} {...args} />
+                  )
                 }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='Vaccination'
+                render={(args) => (
+                  <Select label='Vaccination' options={[]} {...args} />
+                )}
               />
             </GridItem>
           </GridContainer>
@@ -115,6 +120,30 @@ const Detail = (props) => {
         <GridItem xs={12} md={2} />
         <GridItem xs={12} md={5}>
           <GridContainer>
+            <GridItem xs={12}>
+              <FastField
+                name='Supplier'
+                render={(args) => (
+                  <Select label='Supplier' options={[]} {...args} />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='VaccinationGroup'
+                render={(args) => (
+                  <Select label='Vaccination Group' options={[]} {...args} />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='RevenueCategory'
+                render={(args) => (
+                  <Select label='Revenue Category' options={[]} {...args} />
+                )}
+              />
+            </GridItem>
             <GridItem xs={12}>
               <FastField
                 name='EffectiveStartDate'
@@ -131,87 +160,17 @@ const Detail = (props) => {
                 )}
               />
             </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='Supplier'
-                render={(args) => (
-                  <Select label='Supplier' options={suppliers} {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='BaseUOM'
-                render={(args) => (
-                  <Select label='Base UOM' options={dispUOMs} {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='Category'
-                render={(args) => {
-                  const label = `${type} Category`
-                  const p = { ...args, label }
-                  return <Select options={dispUOMs} {...p} />
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='RevenueCategory'
-                render={(args) => (
-                  <Select
-                    label='Revenue Category'
-                    options={dispUOMs}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
           </GridContainer>
         </GridItem>
       </GridContainer>
       <Divider style={{ margin: '40px 0 20px 0' }} />
-      <div style={{ textAlign: 'center' }}>
-        <Button
-          color='danger'
-          onClick={() => {
-            props.history.push('/inventory/master?t=c')
-          }}
-        >
-          Cancel
-        </Button>
-        <ProgressButton submitKey={submitKey} onClick={props.handleSubmit} />
-      </div>
     </CardContainer>
   )
 }
+
 export default compose(
   withStyles(styles, { withTheme: true }),
-  withFormik({
-    // mapPropsToValues: () => ({}),
-    validationSchema: Yup.object().shape({
-      Code: Yup.string().required(),
-      Name: Yup.string().required(),
-      RevenueCategory: Yup.string().required(),
-    }),
-    handleSubmit: (values, { props }) => {
-      const { modelType, dispatch } = props
-      // dispatch({
-      //   type: `${modelType}/submit`,
-      //   payload: test,
-      // }).then((r) => {
-      //   if (r.message === 'Ok') {
-      //     notification.success({
-      //       message: 'Done',
-      //     })
-      //   }
-      // })
-    },
-    displayName: 'InventoryMasterDetail',
-  }),
-  connect(({ medicationDetail }) => ({
-    medicationDetail,
+  connect(({ vaccinationDetail }) => ({
+    vaccinationDetail,
   })),
 )(Detail)

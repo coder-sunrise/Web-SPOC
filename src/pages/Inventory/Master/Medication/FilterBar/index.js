@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Search, Add } from '@material-ui/icons'
@@ -28,8 +28,7 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = (props) => {
-  const { classes, dispatch, history } = props
+const FilterBar = ({ classes, dispatch, history }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -159,8 +158,8 @@ const FilterBar = (props) => {
 }
 
 export default compose(
+  withStyles(styles, { withTheme: true }),
   withFormik({
     mapPropsToValues: () => {},
   }),
-  withStyles(styles, { withTheme: true }),
 )(FilterBar)

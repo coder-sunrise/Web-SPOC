@@ -1,12 +1,14 @@
-import { stringify } from 'qs'
-import request from '@/utils/request'
+import * as service from '@/services/common'
 
-export async function queryList (params) {
-  const entities = await request(`/api/fake_list?${stringify(params)}`)
-  return {
-    data: {
-      entities,
-      filter: {},
-    },
-  }
+const url = '/api/stockconsumable'
+
+module.exports = {
+  queryList: (params) => service.queryList(url, params),
+  remove: (params) => service.remove(url, params),
+  query: (params) => {
+    return service.query(url, params)
+  },
+  upsert: (params) => {
+    return service.upsert(url, params)
+  },
 }

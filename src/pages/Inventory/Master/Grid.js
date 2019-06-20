@@ -1,23 +1,27 @@
-import React, { PureComponent, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Tooltip } from '@material-ui/core'
-import { Edit, Search } from '@material-ui/icons'
+import { Edit } from '@material-ui/icons'
 import { Button, CommonTableGrid2 } from '@/components'
 
-const Grid = (props) => {
+const Grid = ({
+  dispatch,
+  namespace,
+  history,
+  tableParas,
+  colExtensions,
+  list,
+}) => {
   useEffect(() => {
-    const { type, dispatch } = props
     dispatch({
-      type: `${type}/query`,
+      type: `${namespace}/query`,
     })
   }, [])
-
   const showDetail = (row, vmode) => () => {
-    const { type, history } = props
-    history.push(`/inventory/master/${type}?uid=${row.id}`)
+    history.push(`/inventory/master/${namespace}?uid=${row.id}`)
   }
 
-  const Cell = ({ column, row, dispatch, classes, ...p }) => {
+  const Cell = ({ column, row, classes, ...p }) => {
     if (column.name === 'Action') {
       return (
         <Table.Cell {...p}>
@@ -38,10 +42,8 @@ const Grid = (props) => {
     }
     return <Table.Cell {...p} />
   }
+  const TableCell = (p) => Cell({ ...p, dispatch })
 
-  const { tableParas, colExtensions, type, dispatch } = props
-  const { list } = props[type]
-  const TableCell = (pr) => Cell({ ...pr, dispatch })
   const ActionProps = { TableCellComponent: TableCell }
 
   return (

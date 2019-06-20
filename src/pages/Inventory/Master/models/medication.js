@@ -13,6 +13,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      namespace,
       currentTab: 0,
     },
     subscriptions: ({ dispatch, history }) => {

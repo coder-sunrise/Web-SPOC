@@ -8,8 +8,8 @@ import Grid from '../Grid'
 
 const styles = () => ({})
 
-const Medication = (props) => {
-  const tableParas = {
+const Medication = ({ dispatch, history, medication }) => {
+  const [ tableParas, setTableParas ] = useState({
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
@@ -29,19 +29,23 @@ const Medication = (props) => {
       { name: 'Action', title: 'Action' },
     ],
     leftColumns: [],
-  }
-  const { classes, ...restProps } = props
-  const colExtensions = [
+  })
+  const [ colExtensions, setColExtensions ] = useState([
     { columnName: 'Action', width: 110, align: 'center' },
-    // { columnName: 'dispenseUOMtoPrescribeUOMMeasurement', type: 'number' },
-    // { columnName: 'stock', type: 'number' },
     { columnName: 'averageCostPrice', type: 'number', currency: true },
     { columnName: 'suggestSellingPrice', type: 'number', currency: true },
-  ]
+  ])
 
-  const combineProps = {
-    type: 'medication',
-    ...restProps,
+  const filterProps = {
+    dispatch,
+    history,
+  }
+
+  const gridProps = {
+    ...filterProps,
+    medication,
+    namespace: medication.namespace,
+    list: medication.list || [],
     tableParas,
     colExtensions,
   }
@@ -54,8 +58,8 @@ const Medication = (props) => {
         marginRight: 5,
       }}
     >
-      <FilterBar {...restProps} />
-      <Grid {...combineProps} />
+      <FilterBar {...filterProps} />
+      <Grid {...gridProps} />
     </CardContainer>
   )
 }

@@ -5,7 +5,7 @@ import { getUniqueGUID } from '@/utils/cdrss'
 const { upsert } = service
 
 export default createFormViewModel({
-  namespace: 'medicationDetail',
+  namespace: 'packDetail',
   config: {
     queryOnLoad: false,
   },
@@ -23,14 +23,6 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               currentId: query.uid,
-            },
-          })
-        } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: '',
-              entity: {},
             },
           })
         }

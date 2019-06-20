@@ -1,9 +1,12 @@
-import { queryFakeList, fakeSubmitForm } from '@/services/api'
+import update from 'immutability-helper'
+import { getUniqueId } from '@/utils/utils'
+import { fakeSubmitForm } from '@/services/api'
 import { createListViewModel } from 'medisys-model'
 import * as service from '../Consumable/services'
 
+const namespace = 'consumable'
 export default createListViewModel({
-  namespace: 'consumable',
+  namespace,
   config: {
     queryOnLoad: false,
   },
@@ -11,14 +14,11 @@ export default createListViewModel({
     service,
     state: {
       currentTab: 0,
-      entity: {
-        Code: 'abc',
-      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
-        if (pathname === '/inventory/master/consumable') {
+        if (pathname === '/inventory/master/consumable' && !query.uid) {
           dispatch({
             type: 'updateState',
             payload: {
@@ -29,35 +29,58 @@ export default createListViewModel({
       })
     },
     effects: {
-      *fetchList ({ payload }, { call, put }) {
-        const response = yield call(queryFakeList)
-        yield put({
-          type: 'updateState',
-          payload: {
-            list: Array.isArray(response) ? response : [],
-          },
-        })
-      },
-      *submit ({ payload }, { call }) {
-        return yield call(fakeSubmitForm, payload)
-      },
-      *submitDetail ({ payload }, { call }) {
-        return yield call(fakeSubmitForm, payload)
-      },
-      *submitPrice ({ payload }, { call }) {
-        return yield call(fakeSubmitForm, payload)
-      },
-      *submitStock ({ payload }, { call }) {
-        return yield call(fakeSubmitForm, payload)
-      },
+      // *add ({ payload }, { put, select }) {
+      //   let st = yield select((s) => s[namespace])
+      //   if (payload.length) {
+      //     yield put({
+      //       type: 'updateState',
+      //       payload: update(st, {
+      //         entity: {
+      //           items: {
+      //             $unshift: payload.map((o) => {
+      //               return {
+      //                 Id: getUniqueId(),
+      //                 ...o,
+      //               }
+      //             }),
+      //           },
+      //         },
+      //       }),
+      //     })
+      //   }
+      // },
+      // *change ({ payload }, { put, select }) {
+      //   let st = yield select((s) => s[namespace])
+      //   let { items } = st.entity
+      //   const newItems = items.map((row) => {
+      //     const n = payload[row.Id] ? { ...row, ...payload[row.Id] } : row
+      //     return n
+      //   })
+      //   yield put({
+      //     type: 'updateState',
+      //     payload: update(st, {
+      //       entity: { items: { $set: newItems } },
+      //     }),
+      //   })
+      // },
+      // *delete ({ payload }, { put, select }) {
+      //   let st = yield select((s) => s[namespace])
+      //   let { items } = st.entity
+      //   const newItems = items.filter(
+      //     (row) => !payload.find((o) => o === row.Id),
+      //   )
+      //   yield put({
+      //     type: 'updateState',
+      //     payload: update(st, {
+      //       entity: { items: { $set: newItems } },
+      //     }),
+      //   })
+      // },
+      // *submit ({ payload }, { call }) {
+      //   // console.log(payload)
+      //   return yield call(upsert, payload)
+      // },
     },
-    reducers: {
-      updateCollectPaymentList (state, { payload }) {
-        return {
-          ...state,
-          collectPaymentList: [ ...payload ],
-        }
-      },
-    },
+    reducers: {},
   },
 })

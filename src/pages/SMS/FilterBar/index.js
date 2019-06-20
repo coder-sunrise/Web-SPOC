@@ -225,7 +225,9 @@ const FilterBar = (props) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
-    mapPropsToValues: () => ({}),
+    mapPropsToValues: () => ({
+      SearchBy: 'appointment',
+    }),
   }),
   React.memo,
 )(FilterBar)
