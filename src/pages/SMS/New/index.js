@@ -45,6 +45,8 @@ const New = (props) => {
   const handleClick = () => {
     onSend(messageArr)
     setFieldValue('message', '')
+    setMessageNumber(1)
+    setMessageArr([])
   }
 
   const handleChange = ({ target }) => {
