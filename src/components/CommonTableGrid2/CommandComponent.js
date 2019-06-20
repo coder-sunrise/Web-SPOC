@@ -20,7 +20,7 @@ const CancelButton = ({ onExecute }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      // updateGlobalVariable('gridIgnoreValidation', true)
+      updateGlobalVariable('gridIgnoreValidation', true)
       onExecute(e)
     }}
     justIcon
@@ -36,7 +36,7 @@ const DeleteButton = ({ onExecute }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      // updateGlobalVariable('gridIgnoreValidation', true)
+      updateGlobalVariable('gridIgnoreValidation', true)
       onExecute(e)
     }}
     justIcon
@@ -53,7 +53,7 @@ const AddButton = ({ onExecute }) => (
     <Button
       color='primary'
       onClick={(e) => {
-        // updateGlobalVariable('gridIgnoreValidation', false)
+        updateGlobalVariable('gridIgnoreValidation', false)
         onExecute(e)
       }}
       title='Create new row'
@@ -69,7 +69,7 @@ const CommitButton = ({ onExecute }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      // updateGlobalVariable('gridIgnoreValidation', false)
+      updateGlobalVariable('gridIgnoreValidation', false)
       onExecute(e)
     }}
     justIcon

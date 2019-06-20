@@ -48,7 +48,7 @@ export default ({}) => (
     ]}
     FuncProps={{ pager: false }}
     columnExtensions={[
-      { columnName: 'total', type: 'number', currency: true },
+      { columnName: 'total', type: 'currency' },
     ]}
   />
 )

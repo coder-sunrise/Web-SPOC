@@ -81,9 +81,6 @@ const styles = (theme) => ({
     '& h6': {
       textDecoration: 'underline',
     },
-    '& h6:not(:first-of-type)': {
-      marginTop: theme.spacing(2),
-    },
   },
 })
 const dataSource = [

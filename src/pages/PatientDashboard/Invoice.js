@@ -84,9 +84,7 @@ const Invoice = (props) => {
             { name: 'total', title: 'Total' },
           ]}
           FuncProps={{ pager: false }}
-          columnExtensions={[
-            { columnName: 'total', type: 'number', currency: true },
-          ]}
+          columnExtensions={[ { columnName: 'total', type: 'currency' } ]}
         />
       </GridItem>
       <GridItem xs={12} />
