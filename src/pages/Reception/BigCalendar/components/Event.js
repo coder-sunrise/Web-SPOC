@@ -17,7 +17,7 @@ class Event extends PureComponent {
     console.log({ isDoctorEvent })
     return !isDoctorEvent ? (
       <div
-        style={{ height: '100%' }}
+        style={{ height: '100%', cursor: 'pointer' }}
         onMouseEnter={this._handleMouseEnter}
         onMouseLeave={this._handleMouseLeave}
       >

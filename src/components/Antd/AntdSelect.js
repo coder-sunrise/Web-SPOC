@@ -191,19 +191,19 @@ class AntdSelect extends React.PureComponent {
   }
 
   render () {
-    const { classes, form, field, onChange, ...restProps } = this.props
-    const { value = [] } = restProps
+    const { value = [], form, field } = this.props
     const selectValue = form && field ? field.value : value
     const labelProps = {
       shrink: (!!selectValue && selectValue.length > 0) || this.state.shrink,
     }
+
     return (
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
-        {...restProps}
+        {...this.props}
       />
     )
   }

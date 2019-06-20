@@ -238,6 +238,7 @@ class Queue extends PureComponent {
                 <Button
                   color='info'
                   size='sm'
+                  disabled
                   classes={{ justIcon: classes.icon }}
                 >
                   <Refresh />

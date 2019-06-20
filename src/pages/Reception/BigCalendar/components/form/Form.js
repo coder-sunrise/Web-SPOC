@@ -67,7 +67,7 @@ const _slotInfoDateFormat = 'MMM DD YYYY'
 const AppointmentSchema = Yup.object().shape({
   patientName: Yup.string().required(),
   contactNo: Yup.string().required(),
-  doctor: Yup.string().required(),
+  doctor: Yup.string().required('Doctor name is required'),
   startDate: Yup.string().required(),
   endDate: Yup.string().required(),
   startTime: Yup.string().required(),

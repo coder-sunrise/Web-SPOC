@@ -53,7 +53,7 @@ const ContextMenuOptions = [
     id: 1,
     label: 'Dispense & Bill',
     Icon: Money,
-    disabled: true,
+    disabled: false,
   },
   {
     id: 2,
@@ -79,7 +79,7 @@ const ContextMenuOptions = [
     id: 5,
     label: 'Start Consultation',
     Icon: Play,
-    disabled: true,
+    disabled: false,
   },
 ]
 
@@ -87,7 +87,6 @@ class GridButton extends PureComponent {
   handleClick = (event) => {
     const { onClick, row } = this.props
     const { currentTarget } = event
-    console.log({ currentTarget })
     onClick(row, currentTarget.id)
   }
 

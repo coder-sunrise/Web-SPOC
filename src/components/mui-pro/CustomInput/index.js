@@ -170,7 +170,7 @@ class FormikTextField extends React.PureComponent {
 
     // console.log(inputProps)
     // console.log('custominput', inputProps)
-    // console.log(props, cfg, state)
+    // console.log('custominput', props, cfg, state)
     return (
       <BaseInput {...props} {...cfg} isDebouncing={this.state.isDebouncing} />
     )

@@ -116,20 +116,22 @@ const TableConfig = {
     { name: 'roomNo', title: 'Room No.' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
-    { name: 'refNo', title: 'Ref. No.' },
-    { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'identityNo', title: 'Identity No.' },
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceAmount', title: 'Invoice Amount' },
+    { name: 'appointmentTime', title: 'Appt. Time' },
+    { name: 'identityNo', title: 'Identity No.' },
     { name: 'gst', title: 'GST' },
     { name: 'payment', title: 'Payment' },
     { name: 'paymentMode', title: 'Payment Mode' },
     { name: 'company', title: 'Company' },
     { name: 'outstandingBalance', title: 'Outstanding' },
-    { name: 'visitRefNo', title: 'Visit Ref No.' },
-    { name: 'referralCompany', title: 'Referral Company' },
-    { name: 'referralPerson', title: 'Referral Person' },
-    { name: 'referralRemarks', title: 'Referral Remarks' },
+    { name: 'scheme', title: 'Scheme' },
+    { name: 'contactNo', title: 'Phone' },
+    // { name: 'refNo', title: 'Ref. No.' },
+    // { name: 'visitRefNo', title: 'Visit Ref No.' },
+    // { name: 'referralCompany', title: 'Referral Company' },
+    // { name: 'referralPerson', title: 'Referral Person' },
+    // { name: 'referralRemarks', title: 'Referral Remarks' },
     { name: 'Action', title: 'Action' },
   ],
   leftColumns: [
@@ -179,8 +181,10 @@ class DetailsGrid extends PureComponent {
   onViewPatientDashboardClick = (row, id) => {
     console.log({ row, id })
     switch (id) {
-      case '0':
       case '1':
+        router.push(`/reception/queue/dispense/${row.visitRefNo}`)
+        break
+      case '0':
       case '2':
       case '3':
         break
