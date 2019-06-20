@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { FastField } from 'formik'
@@ -5,11 +6,27 @@ import { withStyles } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import debounce from 'lodash/debounce'
 import { TextField } from '@/components'
+import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
 const styles = (theme) => ({})
 
-const TextEditorBase = React.memo(
-  (props) => {
+class TextEditorBase extends PureComponent {
+  state = {
+    error: false,
+  }
+
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
+  }
+
+  componentDidMount () {
+    this.setState({
+      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+    })
+  }
+
+  render () {
     const {
       column: { name: columnName },
       value,
@@ -18,36 +35,36 @@ const TextEditorBase = React.memo(
       classes,
       config = {},
       row,
-    } = props
+    } = this.props
     // const { name, value: v, ...otherInputProps } = inputProps
     const cfg =
       columnExtensions.find(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
     // console.log(cfg)
-    const { errors = [], ...restConfig } = cfg
-    const error = errors.find((o) => o.index === row.rowIndex) || {}
+    const { validationSchema, isDisabled = () => false, ...restConfig } = cfg
     const submitValue = (e) => {
-      if (value !== e.target.value) onValueChange(e.target.value)
+      this.setState({
+        error: updateCellValue(this.props, this.myRef.current, e.target.value),
+      })
     }
     return (
-      <TextField
-        showErrorIcon
-        noWrapper
-        defaultValue={value}
-        onBlur={submitValue}
-        onCommit={submitValue}
-        // onChange={debounce(submitValue, 2000)}
-        error={error.error}
-        {...restConfig}
-      />
+      <div ref={this.myRef}>
+        <TextField
+          showErrorIcon
+          noWrapper
+          defaultValue={value}
+          onBlur={submitValue}
+          disabled={isDisabled(row)}
+          // onCommit={submitValue}
+          // onChange={submitValue}
+          error={this.state.error}
+          {...restConfig}
+        />
+      </div>
     )
-  },
-  (prevProps, nextProps) => {
-    // prevProps === nextProps || prevProps.value === nextProps.value
-    return true
-  },
-)
+  }
+}
 
 const TextFormatter = (columnExtensions) =>
   React.memo(

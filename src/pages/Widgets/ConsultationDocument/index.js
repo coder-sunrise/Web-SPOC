@@ -90,15 +90,7 @@ class ConsultationDocument extends PureComponent {
                   <Table.Cell {...props}>
                     <Button
                       size='sm'
-                      onClick={() => {
-                        // props.history.push(
-                        //   getAppendUrl({
-                        //     md: 'pt',
-                        //     cmt: 'dmgp',
-                        //     pid: row.id,
-                        //   }),
-                        // )
-                      }}
+                      onClick={this.toggleModal}
                       justIcon
                       round
                       color='primary'

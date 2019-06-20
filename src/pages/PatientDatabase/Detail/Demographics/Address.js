@@ -55,12 +55,14 @@ class Address extends Component {
   deleteAddress = (i) => () => {
     confirm({
       title: 'Do you want to remove this address?',
-      // content:
-      //   'When clicked the OK button, this dialog will be closed after 1 second',
-      onOk () {
-        this.props.arrayHelpers.remove(i)
+      onOk: () => {
+        const { contact = {} } = this.props.values
+        const { contactAddress } = contact
+        const deleted = contactAddress.filter((o, idx) => idx === i)[0]
+        deleted.isDeleted = true
+        this.props.setFieldValue('contact', contact)
+        // this.props.arrayHelpers.remove(i)
       },
-      onCancel () {},
     })
   }
 
@@ -76,12 +78,12 @@ class Address extends Component {
     // console.log(values, addressIndex)
     return (
       <div
-      style={{
-        padding: theme.spacing.unit,
-        marginTop: theme.spacing.unit,
-        marginBottom: theme.spacing.unit,
-      }}
-    >
+        style={{
+          padding: theme.spacing.unit,
+          marginTop: theme.spacing.unit,
+          marginBottom: theme.spacing.unit,
+        }}
+      >
         <GridContainer>
           <GridItem md={1}>
             <Button

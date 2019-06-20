@@ -68,7 +68,14 @@ const styles = (theme) => ({
     right: '21%',
   },
   paragraph: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+  },
+  leftPanel: {
+    position: 'sticky',
+    width: 300,
+    top: 164,
+    float: 'left',
+    marginRight: theme.spacing(1),
   },
   rightPanel: {
     '& h6': {
@@ -264,60 +271,62 @@ class PatientDashboard extends PureComponent {
         <Form.Item label='E-mail'>
           <Input />
         </Form.Item> */}
-        <GridContainer gutter={4} gridLayout>
+        <CardContainer hideHeader size='sm' className={classes.leftPanel}>
+          <Accordion
+            active={0}
+            collapses={[
+              {
+                title: this.getTitle(),
+                content: this.getContent(),
+              },
+              {
+                title: this.getTitle(),
+                content: this.getContent(),
+              },
+              {
+                title: this.getTitle(),
+                content: this.getContent(),
+              },
+            ]}
+          />
+        </CardContainer>
+        <CardContainer
+          hideHeader
+          size='sm'
+          className={classes.rightPanel}
+          // style={{ marginLeft: theme.spacing.unit * 2 }}
+        >
+          <Select
+            noWrapper
+            options={[]}
+            label='Filter By'
+            style={{ maxWidth: 300 }}
+          />
+          <h6>Chief Complaints</h6>
+          <div className={classes.paragraph}>
+            <p>A *paragraph* of text</p>
+            <p>A _second_ row of text</p>
+          </div>
+
+          <h6>Plan</h6>
+          <h6>Diagnosis</h6>
+          <h6>Orders</h6>
+          <Orders />
+          <h6>Consultation Document</h6>
+          <ConsultationDocument />
+          <h6>Result History</h6>
+          <ResultHistory />
+          <h6>Invoice</h6>
+          <Invoice />
+        </CardContainer>
+        {/* <GridContainer gutter={4} gridLayout>
           <GridItem sm={12} md={3}>
-            <CardContainer hideHeader size='sm'>
-              <Accordion
-                active={0}
-                collapses={[
-                  {
-                    title: this.getTitle(),
-                    content: this.getContent(),
-                  },
-                  {
-                    title: this.getTitle(),
-                    content: this.getContent(),
-                  },
-                  {
-                    title: this.getTitle(),
-                    content: this.getContent(),
-                  },
-                ]}
-              />
-            </CardContainer>
+            
           </GridItem>
           <GridItem sm={12} md={9}>
-            <CardContainer
-              hideHeader
-              size='sm'
-              className={classes.rightPanel}
-              // style={{ marginLeft: theme.spacing.unit * 2 }}
-            >
-              <Select
-                noWrapper
-                options={[]}
-                label='Filter By'
-                style={{ maxWidth: 300 }}
-              />
-              <h6>Chief Complaints</h6>
-              <div className={classes.paragraph}>
-                <p>A *paragraph* of text</p>
-                <p>A _second_ row of text</p>
-              </div>
-
-              <h6>Plan</h6>
-              <h6>Diagnosis</h6>
-              <h6>Orders</h6>
-              <Orders />
-              <h6>Consultation Document</h6>
-              <ConsultationDocument />
-              <h6>Result History</h6>
-              <ResultHistory />
-              <h6>Invoice</h6>
-              <Invoice />
-            </CardContainer>
+            
           </GridItem>
-        </GridContainer>
+        </GridContainer> */}
       </div>
       // <GridContainer>
       //   <GridItem xs={12} sm={12} md={2} style={{ paddingTop: 20 }}>

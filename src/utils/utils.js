@@ -2,6 +2,7 @@ import moment from 'moment'
 import React from 'react'
 import nzh from 'nzh/cn'
 import { parse, stringify } from 'qs'
+import $ from 'jquery'
 import numeral from 'numeral'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import lodash from 'lodash'
@@ -455,6 +456,52 @@ const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
   }
 }
 
+const updateCellValue = (
+  {
+    column: { name: columnName },
+    value,
+    onValueChange,
+    columnExtensions,
+    classes,
+    config = {},
+    row,
+  },
+  element,
+  val,
+) => {
+  const cfg =
+    columnExtensions.find(
+      ({ columnName: currentColumnName }) => currentColumnName === columnName,
+    ) || {}
+  // console.log(cfg)
+  const { validationSchema, ...restConfig } = cfg
+  row[columnName] = val
+
+  if (validationSchema) {
+    try {
+      const r = validationSchema.validateSync(row, {
+        abortEarly: false,
+      })
+      // console.log(r)
+      $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
+
+      if (value !== val) {
+        onValueChange(val)
+      }
+      return ''
+      // row._$error = false
+    } catch (er) {
+      // console.log(er)
+      $(element).parents('tr').find('.grid-commit').attr('disabled', true)
+      const actualError = er.inner.find((o) => o.path === columnName)
+      return actualError ? actualError.message : ''
+      // row._$error = true
+    }
+  } else if (value !== val) {
+    onValueChange(val)
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   sleep,
@@ -466,5 +513,6 @@ module.exports = {
   updateLoadingState,
   updateGlobalVariable,
   getGlobalVariable,
+  updateCellValue,
   ...module.exports,
 }

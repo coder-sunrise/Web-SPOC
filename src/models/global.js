@@ -103,6 +103,7 @@ export default createFormViewModel({
     reducers: {
       changeLayoutCollapsed (state, { payload }) {
         localStorage.setItem('menuCollapsed', payload ? 1 : 0)
+
         return {
           ...state,
           collapsed: payload,

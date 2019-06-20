@@ -29,7 +29,7 @@ import DeleteIcon from '@material-ui/icons/Delete'
 export default ({ theme, index, arrayHelpers, ...props }) => (
   <React.Fragment>
     <GridContainer style={{ marginTop: theme.spacing(1) }}>
-      <GridItem xs={6}>
+      <GridItem xs={12}>
         <FastField
           name={`diagnosises[${index}].diagnosis`}
           render={(args) => {
@@ -43,13 +43,14 @@ export default ({ theme, index, arrayHelpers, ...props }) => (
           }}
         />
       </GridItem>
-      <GridItem xs={6}>
+      <GridItem xs={12}>
         <FastField
           name={`diagnosises[${index}].complication`}
           render={(args) => {
             return (
               <CodeSelect
                 label='Complication'
+                mode='multiple'
                 code='PatientAccountNoType'
                 {...args}
               />

@@ -55,8 +55,32 @@ class AntdDatePicker extends PureComponent {
   //   size: 'default',
   // }
 
-  state = {
-    shrink: false,
+  constructor (props) {
+    super(props)
+    const { field = {}, form, inputProps = {}, formatter, parser } = props
+    const v =
+      field.value !== undefined && field.value !== ''
+        ? field.value
+        : props.value || props.defaultValue
+
+    this.state = {
+      shrink: v !== undefined && v !== '',
+      value: v,
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { field, value } = nextProps
+    if (field) {
+      this.setState({
+        value: field.value === undefined ? '' : field.value,
+      })
+    }
+    if (value) {
+      this.setState({
+        value,
+      })
+    }
   }
 
   // shouldComponentUpdate = (nextProps) => {
@@ -82,14 +106,18 @@ class AntdDatePicker extends PureComponent {
       date.utcOffset()
     }
     const { form, field, onChange } = this.props
+    const v = date ? date.utc().format() : ''
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())
 
       // console.log(date.utc().format())
 
-      form.setFieldValue(field.name, date ? date.utc().format() : '')
+      form.setFieldValue(field.name, v)
     }
+    this.setState({
+      value: v,
+    })
   }
 
   handleDatePickerOpenChange = (status) => {
@@ -101,7 +129,7 @@ class AntdDatePicker extends PureComponent {
   }
 
   handleBlur = () => {
-    if (this.state.value === undefined || this.state.value.length === 0) {
+    if (this.state.value === undefined || this.state.value === '') {
       this.setState({ shrink: false })
     }
   }
@@ -136,9 +164,8 @@ class AntdDatePicker extends PureComponent {
       onOpenChange,
       ...restProps
     } = this.props
-    const { format = dateFormat, form, field, value } = restProps
-    const selectValue = form && field ? field.value : value
-
+    const { format = dateFormat } = restProps
+    // console.log(this.state.value)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     return (
@@ -156,7 +183,8 @@ class AntdDatePicker extends PureComponent {
             this.handleDatePickerOpenChange,
           )}
           format={format}
-          value={_toMoment(selectValue, format)}
+          value={_toMoment(this.state.value, format)}
+          {...restProps}
         />
       </div>
     )

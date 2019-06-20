@@ -67,7 +67,7 @@ class BaseInput extends React.PureComponent {
           if (this.props.onCommit) {
             this.props.onCommit({
               target: {
-                value: this.state.value,
+                value: e.target.value,
               },
             })
             setTimeout(() => {

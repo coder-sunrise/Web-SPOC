@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core'
@@ -10,42 +11,82 @@ import {
   TextField,
 } from '@/components'
 import { getCodes } from '@/utils/codes'
+import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
-const SelectEditor = (columnExtensions) =>
-  React.memo((props) => {
-    const { column: { name: columnName }, value, onValueChange, row } = props
+class SelectEditor extends PureComponent {
+  state = {
+    error: false,
+  }
+
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
+  }
+
+  componentDidMount () {
+    this.setState({
+      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+    })
+  }
+
+  render () {
+    const {
+      columnExtensions,
+      column: { name: columnName },
+      value,
+      onValueChange,
+      row,
+    } = this.props
     const cfg =
       columnExtensions.find(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
-    const { type, code, errors = [], ...restProps } = cfg
-    const error = errors.find((o) => o.index === row.rowIndex) || {}
+    const {
+      type,
+      code,
+      validationSchema,
+      isDisabled = () => false,
+      ...restProps
+    } = cfg
     // console.log(cfg, value, props)
     const onChange = (val) => {
-      console.log(val)
-      onValueChange(val)
+      this.setState({
+        error: updateCellValue(this.props, this.myRef.current, val),
+      })
     }
+    // console.log(this.props, cfg)
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
-      error: error.error,
+      error: this.state.error,
       onChange,
       defaultValue: value,
+      label: 'Mr',
+      disabled: isDisabled(row),
       ...restProps,
     }
 
     // console.log(error)
     if (columnName) {
       if (type === 'select') {
-        return <Select {...commonCfg} />
+        return (
+          <div ref={this.myRef}>
+            <Select {...commonCfg} />
+          </div>
+        )
       }
       if (type === 'codeSelect') {
-        return <CodeSelect {...commonCfg} code={code} />
+        return (
+          <div ref={this.myRef}>
+            <CodeSelect {...commonCfg} code={code} />
+          </div>
+        )
       }
       return null
     }
     return <TextField value={value} noWrapper />
-  }, (prevProps, nextProps) => prevProps === nextProps || prevProps.value === nextProps.value || prevProps.error === nextProps.error)
+  }
+}
 
 const SelectDisplay = (columnExtensions, state) => ({
   value,
@@ -59,6 +100,7 @@ const SelectDisplay = (columnExtensions, state) => ({
   // console.log(cfg, restProps, state)
 
   // console.log(value, columnName, restProps)
+  if (!value) return ''
   const v = (cfg.options || state[`${columnName}Option`] || [])
     .find((o) => o.value === value || o.id === value)
   return <span>{v ? v.name : ''}</span>
@@ -94,6 +136,10 @@ class SelectTypeProvider extends PureComponent {
         })
       }
     })
+
+    this.SelectEditor = (ces) => (editorProps) => {
+      return <SelectEditor columnExtensions={ces} {...editorProps} />
+    }
   }
 
   render () {
@@ -102,7 +148,7 @@ class SelectTypeProvider extends PureComponent {
     return (
       <DataTypeProvider
         for={this.state.for.map((o) => o.columnName)}
-        editorComponent={SelectEditor(columnExtensions)}
+        editorComponent={this.SelectEditor(columnExtensions)}
         formatterComponent={SelectDisplay(columnExtensions, this.state)}
       />
     )

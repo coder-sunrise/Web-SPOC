@@ -148,6 +148,12 @@ export const defaultTheme = createMuiTheme({
       root: {
         margin: '5px 0 5px 0',
         paddingTop: 0,
+      },
+    },
+    MuiInputBase: {
+      root: {
+        alignItems: 'start',
+        fontSize: defaultFontSize,
         '& .ant-input': {
           height: 'auto',
         },
@@ -163,6 +169,7 @@ export const defaultTheme = createMuiTheme({
           //   top: -5,
           // },
         },
+
         '& .ant-select-remove-icon': {
           fontSize: 'inherit',
         },
@@ -191,12 +198,10 @@ export const defaultTheme = createMuiTheme({
           overflowX: 'hidden',
           marginRight: 28,
         },
-      },
-    },
-    MuiInputBase: {
-      root: {
-        alignItems: 'start',
-        fontSize: defaultFontSize,
+        '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
+          height: '23px',
+          lineHeight: '22px',
+        },
       },
       input: {
         padding: '4px 0 1px',
@@ -256,6 +261,12 @@ export const smallTheme = createMuiTheme({
       root: {
         margin: '3px 0 3px 0',
         paddingTop: 0,
+      },
+    },
+    MuiInputBase: {
+      root: {
+        alignItems: 'start',
+        fontSize: smallFontSize,
         '& .ant-input': {
           height: 'auto',
         },
@@ -299,16 +310,10 @@ export const smallTheme = createMuiTheme({
           marginRight: 27,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '21px',
-          lineHeight: '21px',
+          height: '20px',
+          lineHeight: '20px',
           marginTop: 0,
         },
-      },
-    },
-    MuiInputBase: {
-      root: {
-        alignItems: 'start',
-        fontSize: smallFontSize,
       },
       input: {
         padding: '2px 0 1px',
@@ -370,6 +375,12 @@ export const largeTheme = createMuiTheme({
       root: {
         margin: '6px 0 5px 0',
         paddingTop: 4,
+      },
+    },
+    MuiInputBase: {
+      root: {
+        alignItems: 'start',
+        fontSize: largeFontSize,
         '& .ant-input': {
           height: 'auto',
         },
@@ -409,12 +420,10 @@ export const largeTheme = createMuiTheme({
           overflowX: 'hidden',
           marginRight: 30,
         },
-      },
-    },
-    MuiInputBase: {
-      root: {
-        alignItems: 'start',
-        fontSize: largeFontSize,
+        '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
+          height: '23px',
+          lineHeight: '22px',
+        },
       },
       input: {
         padding: '6px 0 3px',

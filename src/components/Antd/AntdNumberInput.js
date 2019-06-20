@@ -27,6 +27,9 @@ const STYLES = () => {
         boxShadow: 'none !important',
         borderRightWidth: '0px !important',
       },
+      '& .ant-input-number': {
+        lineHeight: '1rem',
+      },
       '& .ant-input-number-input': {
         height: 'auto',
         padding: 0,

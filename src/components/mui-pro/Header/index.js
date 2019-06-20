@@ -100,7 +100,7 @@ function Header ({ isMobile, collapsed, setting, ...props }) {
             {(value) => (
               <PageHeader
                 wide={contentWidth === 'Fixed'}
-                home={<FormattedMessage id='menu.home' defaultMessage='Home' />}
+                // home={<FormattedMessage id='menu.home' defaultMessage='Home' />}
                 {...value}
                 key='pageheader'
                 {...restProps}
