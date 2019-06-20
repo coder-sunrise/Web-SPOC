@@ -20,7 +20,7 @@ const styles = () => ({})
 }))
 @compare('patientSearch')
 class PatientSearch extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
     // console.log(this)
 
@@ -34,17 +34,19 @@ class PatientSearch extends PureComponent {
       )
     }
     this.defaultAction = (row) => (
-      <Tooltip title='Detail' placement='bottom'>
-        <Button
-          size='sm'
-          onClick={() => showPatient(row)}
-          justIcon
-          round
-          color='primary'
-          style={{ marginRight: 5 }}
-        >
-          <AccountCircle />
-        </Button>
+      <Tooltip title='View Patient Profile' placement='bottom'>
+        <span>
+          <Button
+            size='sm'
+            onClick={() => showPatient(row)}
+            justIcon
+            round
+            color='primary'
+            style={{ marginRight: 5 }}
+          >
+            <AccountCircle />
+          </Button>
+        </span>
       </Tooltip>
     )
     this.defaultOnDblClick = showPatient
@@ -54,7 +56,7 @@ class PatientSearch extends PureComponent {
     // console.log('c PatientSearch')
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (!this.props.disableQueryOnLoad) {
       this.props.dispatch({
         type: 'patientSearch/query',
@@ -62,7 +64,7 @@ class PatientSearch extends PureComponent {
     }
   }
 
-  render () {
+  render() {
     const { props } = this
     const {
       classes,
@@ -71,6 +73,7 @@ class PatientSearch extends PureComponent {
       ...restProps
     } = props
     return (
+
       <CardContainer hideHeader>
         <FilterBar {...restProps} />
         <Grid
