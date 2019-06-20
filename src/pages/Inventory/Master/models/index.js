@@ -1,6 +1,6 @@
 import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services'
+// import * as service from '../services'
 
 export default createFormViewModel({
   namespace: 'inventoryMaster',
@@ -8,7 +8,7 @@ export default createFormViewModel({
     queryOnLoad: false,
   },
   param: {
-    service,
+    // service,
     state: {
       currentTab: 0,
     },
@@ -43,9 +43,7 @@ export default createFormViewModel({
       updateCollectPaymentList (state, { payload }) {
         return {
           ...state,
-          collectPaymentList: [
-            ...payload,
-          ],
+          collectPaymentList: [ ...payload ],
         }
       },
     },

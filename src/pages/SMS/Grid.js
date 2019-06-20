@@ -22,52 +22,10 @@ const generateRowData = () => {
   }
   return data
 }
-const Grid = (props) => {
-  // useEffect(() ={
-  // },[])
-  const { showSMSHistory } = props
+const Grid = ({ showSMSHistory, list, dispatch, ...restProps }) => {
+  console.log('test')
   const [ selectedRows, setSelectedRows ] = useState([])
-
-  const handleSelectionChange = (selection) => {
-    setSelectedRows(selection)
-  }
-
-  const gridGetRowID = (row) => row.id
-  const Cell = ({ column, row, dispatch, classes, ...p }) => {
-    if (column.name === 'Action') {
-      return (
-        <Table.Cell {...p}>
-          <Tooltip title='View SMS History' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={showSMSHistory}
-              justIcon
-              round
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <Textsms />
-            </Button>
-          </Tooltip>
-          {/* <Tooltip title='Edit' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={this.showDetail(row, 1)}
-              justIcon
-              round
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <Edit />
-            </Button>
-          </Tooltip> */}
-        </Table.Cell>
-      )
-    }
-    return <Table.Cell {...p} />
-  }
-
-  const tableParas = {
+  const [ tableParas, setTableParas ] = useState({
     columns: [
       { name: 'patientName', title: 'Patient Name' },
       { name: 'contactNo', title: 'Contact No' },
@@ -83,17 +41,44 @@ const Grid = (props) => {
       { name: 'Action', title: 'Action' },
     ],
     leftColumns: [],
-  }
+  })
 
-  const colExtensions = [
-    { columnName: 'Action', align: 'center' },
+  const [ colExtensions, setColExtensions ] = useState([
+    { columnName: 'Action', width: 120, align: 'center' },
     // { columnName: 'Action', width: 110, align: 'center' },
     // { columnName: 'payments', type: 'number', currency: true },
     // { columnName: 'expenseAmount', type: 'number', currency: true },
-  ]
+  ])
 
-  const { dispatch } = props
-  const { list } = props
+  const handleSelectionChange = (selection) => {
+    setSelectedRows(selection)
+  }
+
+  const gridGetRowID = (row) => row.id
+  const Cell = ({ column, row, classes, ...props }) => {
+    if (column.name === 'Action') {
+      return (
+        <Table.Cell {...props}>
+          <Tooltip title='View SMS History' placement='bottom'>
+            <div>
+              <Button
+                size='sm'
+                onClick={showSMSHistory}
+                justIcon
+                round
+                color='primary'
+                // style={{ marginRight: 5 }}
+              >
+                <Textsms />
+              </Button>
+            </div>
+          </Tooltip>
+        </Table.Cell>
+      )
+    }
+    return <Table.Cell {...props} />
+  }
+
   const TableCell = (p) => Cell({ ...p, dispatch })
   const ActionProps = { TableCellComponent: TableCell }
 

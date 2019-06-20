@@ -22,14 +22,8 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
-    authority: [
-      'admin',
-      'user',
-      'guest',
-    ],
+    Routes: [ 'src/pages/Authorized' ],
+    authority: [ 'admin', 'user', 'guest' ],
     routes: [
       // dashboard
       { path: '/', redirect: '/reception/queue' },
@@ -156,38 +150,38 @@ const routes = [
             path: '/inventory/master/consumable',
             name: 'consumable.detail',
             hideInMenu: true,
-            component: './Inventory/Master/Consumable/Detail',
+            component: './Inventory/Master/Consumable/Details',
           },
           {
             path: '/inventory/master/medication',
             name: 'medication.detail',
             hideInMenu: true,
-            component: './Inventory/Master/Medication/Detail',
+            component: './Inventory/Master/Medication/Details',
           },
           {
             path: '/inventory/master/vaccination',
             name: 'vaccination.detail',
             hideInMenu: true,
-            component: './Inventory/Master/Vaccination/Detail',
+            component: './Inventory/Master/Vaccination/Details',
           },
           {
             path: '/inventory/master/package',
             name: 'package.detail',
             hideInMenu: true,
-            component: './Inventory/Master/Package/Detail',
+            component: './Inventory/Master/Package/Details',
           },
-          {
-            path: '/inventory/pd',
-            name: 'pd',
-            // component: './Inventory/PurchaseReceving',
-            mini: 'PD',
-          },
-          {
-            path: '/inventory/pd/detail',
-            name: 'pd.detail',
-            hideInMenu: true,
-            component: './Inventory/PurchaseDelivery/Detail',
-          },
+          // {
+          //   path: '/inventory/pd',
+          //   name: 'pd',
+          //   // component: './Inventory/PurchaseReceving',
+          //   mini: 'PD',
+          // },
+          // {
+          //   path: '/inventory/pd/detail',
+          //   name: 'pd.detail',
+          //   hideInMenu: true,
+          //   component: './Inventory/PurchaseDelivery/Detail',
+          // },
         ],
       },
       //

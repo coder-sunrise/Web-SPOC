@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import ListItemText from '@material-ui/core/ListItemText'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
 import AddCircle from '@material-ui/icons/AddCircle'
 import RemoveCircle from '@material-ui/icons/RemoveCircle'
 
@@ -17,7 +18,7 @@ import {
   TextField,
 } from '@/components'
 
-const styles = (theme) => ({
+const styles = () => ({
   list: {
     width: '100%',
     overflow: 'auto',
@@ -25,133 +26,64 @@ const styles = (theme) => ({
   },
 })
 
-class Transfer extends React.Component {
-  constructor (props) {
-    super(props)
-    const { items } = props
-    this.state = {
-      addedList: items || [],
-      removedList: [],
-      searchField: '',
-    }
+const Transfer = ({ items, classes, label, limitTitle, limit }) => {
+  const [ addedList, setAddedList ] = useState(items || [])
+  const [ removedList, setRemovedList ] = useState([])
+  const [ searchField, setSearchField ] = useState('')
+  const addClick = (index) => () => {
+    setRemovedList([ ...removedList, ...addedList.slice(index, index + 1) ])
+    setAddedList([
+      ...addedList.slice(0, index),
+      ...addedList.slice(index + 1, addedList.length),
+    ])
   }
 
-  addClick = (index) => () => {
-    const { removedList, addedList } = this.state
-    this.setState({
-      removedList: [
-        ...removedList,
-        ...addedList.slice(index, index + 1),
-      ],
-      addedList: [
-        ...addedList.slice(0, index),
-        ...addedList.slice(index + 1, addedList.length),
-      ],
-    })
+  const removeClick = (index) => () => {
+    setAddedList([ ...addedList, ...removedList.slice(index, index + 1) ])
+    setRemovedList([
+      ...removedList.slice(0, index),
+      ...removedList.slice(index + 1, removedList.length),
+    ])
   }
 
-  removeClick = (index) => () => {
-    const { removedList, addedList } = this.state
-    this.setState({
-      addedList: [
-        ...addedList,
-        ...removedList.slice(index, index + 1),
-      ],
-      removedList: [
-        ...removedList.slice(0, index),
-        ...removedList.slice(index + 1, removedList.length),
-      ],
-    })
+  const removeAll = () => {
+    setRemovedList([])
+    setAddedList([ ...addedList, ...removedList ])
   }
 
-  removeAll = () => {
-    const { removedList, addedList } = this.state
-    this.setState({
-      removedList: [],
-      addedList: [
-        ...addedList,
-        ...removedList,
-      ],
-    })
-  }
-
-  onChange = (event) => {
-    this.setState({
-      searchField: event.target.value,
-    })
-  }
-
-  render () {
-    const { classes, type } = this.props
-    const { addedList, removedList } = this.state
-
-    return (
-      <GridContainer>
-        <GridItem xs={6}>
-          <TextField
-            label='Search'
-            onChange={this.onChange}
-            value={this.state.searchField}
-          />
-          <Card>
-            <CardBody>
-              <List dense className={classes.list}>
-                {addedList.map((value, index) => (
-                  <ListItem key={index} button onClick={this.addClick(index)}>
-                    <ListItemText primary={`${value}`} />
-                    <ListItemSecondaryAction>
-                      <Button
-                        size='sm'
-                        onClick={this.addClick(index)}
-                        justIcon
-                        round
-                        color='primary'
-                      >
-                        <AddCircle />
-                      </Button>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem xs={6}>
-          <Button
-            color='primary'
-            onClick={this.removeAll}
-            size='sm'
-            style={{
-              marginTop: '27px',
-            }}
-          >
-            Remove All
-          </Button>
-          {removedList.length > 0 && (
+  return (
+    <GridContainer>
+      <GridItem xs={6}>
+        <GridContainer>
+          <GridItem xs={12}>
+            <TextField
+              label='Search'
+              onChange={(event) => setSearchField(event.target.value)}
+              value={searchField}
+            />{' '}
+          </GridItem>
+          <GridItem xs={12}>
             <Card>
               <CardBody>
                 <List dense className={classes.list}>
-                  {removedList.map((value, index) => (
+                  {addedList.map((value, index) => (
                     <ListItem
-                      key={value}
+                      key={index}
+                      disabled={limit && limit === removedList.length}
                       button
-                      onClick={this.removeClick(index)}
+                      onClick={addClick(index)}
                     >
-                      {`${type}` === 'Setting' && (
-                        <ListItemText
-                          primary={'Precaution ' + `${index + 1}`}
-                        />
-                      )}
-                      <ListItemText primary={value} />
+                      <ListItemText primary={`${value}`} />
                       <ListItemSecondaryAction>
                         <Button
                           size='sm'
-                          onClick={this.removeClick(index)}
+                          onClick={addClick(index)}
                           justIcon
                           round
+                          disabled={limit && limit === removedList.length}
                           color='primary'
                         >
-                          <RemoveCircle />
+                          <AddCircle />
                         </Button>
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -159,11 +91,68 @@ class Transfer extends React.Component {
                 </List>
               </CardBody>
             </Card>
-          )}
-        </GridItem>
-      </GridContainer>
-    )
-  }
+          </GridItem>
+        </GridContainer>
+      </GridItem>
+      <GridItem xs={6}>
+        <GridContainer>
+          <GridItem xs={9}>
+            <h6
+              style={{
+                marginTop: '27px ',
+              }}
+            >
+              {limitTitle}
+            </h6>
+          </GridItem>
+          <GridItem xs={3}>
+            <Button
+              color='primary'
+              onClick={removeAll}
+              size='sm'
+              style={{
+                marginTop: '27px',
+                float: 'right',
+              }}
+            >
+              Remove All
+            </Button>
+          </GridItem>
+          <GridItem xs={12}>
+            {removedList.length > 0 && (
+              <Card>
+                <CardBody>
+                  <List dense className={classes.list}>
+                    {removedList.map((value, index) => (
+                      <ListItem key={value} button onClick={removeClick(index)}>
+                        {label && (
+                          <ListItemIcon style={{ paddingRight: '20px' }}>
+                            {`${label} ${index + 1}`}
+                          </ListItemIcon>
+                        )}
+                        <ListItemText primary={value} />
+                        <ListItemSecondaryAction>
+                          <Button
+                            size='sm'
+                            onClick={removeClick(index)}
+                            justIcon
+                            round
+                            color='primary'
+                          >
+                            <RemoveCircle />
+                          </Button>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
+                </CardBody>
+              </Card>
+            )}
+          </GridItem>
+        </GridContainer>
+      </GridItem>
+    </GridContainer>
+  )
 }
 
 Transfer.propTypes = {
