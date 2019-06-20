@@ -9,7 +9,7 @@ import { withFormik } from 'formik'
 import classNames from 'classnames'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
-import { Queue as QueueIcon, Refresh, Stop } from '@material-ui/icons'
+import { Refresh, Stop } from '@material-ui/icons'
 // custom components
 import {
   Card,
@@ -25,7 +25,6 @@ import {
 import EmptySession from './EmptySession'
 import DetailsActionBar from './Details/DetailsActionBar'
 import DetailsGrid from './Details/DetailsGrid'
-import DetailsFooter from './Details/DetailsFooter'
 import NewVisitModal from './NewVisit'
 import PatientSearchModal from './PatientSearch'
 import NewPatient from '../../PatientDatabase/New'
@@ -96,7 +95,6 @@ class Queue extends PureComponent {
   }
 
   showVisitRegistration = (patientID = '') => {
-    const { showNewVisit } = this.state
     const { dispatch } = this.props
 
     patientID !== '' &&
@@ -127,11 +125,10 @@ class Queue extends PureComponent {
     this.setState({ showViewPatientProfile: !showViewPatientProfile })
   }
 
-  handleRegisterVisit = (visitInfo = {}) => {
+  handleRegisterVisit = () => {
     this.setState({
       showPatientSearch: false,
       showNewVisit: false,
-      visitPatientID: '',
     })
   }
 
@@ -199,7 +196,7 @@ class Queue extends PureComponent {
       dispatch({
         type: 'queueLog/fetchPatientListByName',
         payload: currentQuery,
-      }).then((response) => {
+      }).then(() => {
         this.setState({ showPatientSearch: true })
       })
   }
@@ -213,13 +210,14 @@ class Queue extends PureComponent {
       // showEndSessionConfirm,
       showEndSessionSummary,
       showPatientSearch,
-      currentFilter,
       currentQuery,
+      currentFilter,
     } = this.state
 
     const { sessionInfo } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     // console.log('queuelisting state', this.props)
+
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
@@ -240,6 +238,7 @@ class Queue extends PureComponent {
                 <Button
                   color='info'
                   size='sm'
+                  disabled
                   classes={{ justIcon: classes.icon }}
                 >
                   <Refresh />
@@ -271,7 +270,7 @@ class Queue extends PureComponent {
                   isFetching={
                     loading.effects['queueLog/fetchPatientListByName']
                   }
-                  currentFilter={currentFilter}
+                  // currentFilter={currentFilter}
                   currentSearchPatient={currentQuery}
                   handleQueryChange={this.onQueryChanged}
                   handleStatusChange={this.onStatusChange}
@@ -280,15 +279,9 @@ class Queue extends PureComponent {
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
-                  location={this.props.match}
                   onViewDispenseClick={this.toggleDispense}
-                  queueLog={queueLog}
+                  currentFilter={currentFilter}
                 />
-                {/*
-                  <DetailsFooter
-                    onViewPatientProfile={this.toggleViewPatientProfile}
-                  />
-                */}
               </React.Fragment>
             )}
             <CommonModal

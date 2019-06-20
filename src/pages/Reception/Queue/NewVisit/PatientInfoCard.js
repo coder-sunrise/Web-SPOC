@@ -88,7 +88,7 @@ class PatientInfoCard extends PureComponent {
       gender,
     } = queueLog.visitPatientInfo
     return (
-      <Card profile>
+      <Card size='sm' profile>
         {loading.effects['queueLog/fetchPatientInfoByPatientID'] ? (
           <Spin className='centerredLoading' />
         ) : (

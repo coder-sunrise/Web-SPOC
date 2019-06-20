@@ -75,7 +75,12 @@ const styles = () => ({
     patientAccountNoTypeFk: Yup.string().required(),
     patientAccountNo: Yup.string().required(),
     genderFk: Yup.string().required(),
+<<<<<<< HEAD
     //contact.mobileContactNumber.number:Yup.string().render(),
+=======
+    dialect: Yup.string().required(),
+    // contact.mobileContactNumber.number:Yup.string().render(),
+>>>>>>> ce99cc550d1bb740cb9ae64ef0395d578c00fcc6
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
         Yup.object().shape({
@@ -406,17 +411,19 @@ class Demographic extends PureComponent {
                   if (!values || !values.contact) return null
                   return (
                     <div>
-                      {values.contact.contactAddress.map((c, i) => {
-                        return (
-                          <Address
-                            addressIndex={i}
-                            // form={form}
-                            theme={theme}
-                            arrayHelpers={arrayHelpers}
-                            {...props}
-                          />
-                        )
-                      })}
+                      {values.contact.contactAddress
+                        .filter((o) => !o.isDeleted)
+                        .map((val, i) => {
+                          return (
+                            <Address
+                              addressIndex={i}
+                              // form={form}
+                              theme={theme}
+                              arrayHelpers={arrayHelpers}
+                              {...props}
+                            />
+                          )
+                        })}
                     </div>
                   )
                 }}

@@ -9,7 +9,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import FormControl from '@material-ui/core/FormControl'
 import InputLabel from '@material-ui/core/InputLabel'
 import FormHelperText from '@material-ui/core/FormHelperText'
-import { InputAdornment, Grid } from '@material-ui/core'
+import { InputAdornment, CircularProgress } from '@material-ui/core'
 import numeral from 'numeral'
 import Error from '@material-ui/icons/Error'
 import Tooltip from '@material-ui/core/Tooltip'
@@ -67,7 +67,7 @@ class BaseInput extends React.PureComponent {
           if (this.props.onCommit) {
             this.props.onCommit({
               target: {
-                value: this.state.value,
+                value: e.target.value,
               },
             })
             setTimeout(() => {
@@ -178,6 +178,7 @@ class BaseInput extends React.PureComponent {
       colon = true,
       realtime = true,
       focus = false,
+      isDebouncing = false,
       preventDefaultKeyDownEvent,
     } = props
     inputIdCounter += 1
@@ -197,8 +198,13 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
-    if (suffix) {
-      cfg.endAdornment = (
+
+    if (suffix || isDebouncing) {
+      cfg.endAdornment = isDebouncing ? (
+        <InputAdornment position='end' {...suffixProps}>
+          <CircularProgress size={16} />
+        </InputAdornment>
+      ) : (
         <InputAdornment position='end' {...suffixProps}>
           {suffix}
         </InputAdornment>

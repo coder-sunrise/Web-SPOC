@@ -5,7 +5,6 @@ import moment from 'moment'
 import { formatMessage } from 'umi/locale'
 // formik
 import { FastField, Field } from 'formik'
-// devexpress-react-scheduler
 // material ui
 import { CircularProgress, Paper, withStyles } from '@material-ui/core'
 // custom component

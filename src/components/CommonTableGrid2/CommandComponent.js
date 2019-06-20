@@ -1,7 +1,7 @@
 import React from 'react'
 import { Pageview, Delete, Save, Edit, Cancel } from '@material-ui/icons'
 import { Button } from '@/components'
-import { updateGlobalVariable } from '@/utils/utils'
+import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
 const EditButton = ({ onExecute }) => (
   <Button
@@ -57,6 +57,8 @@ const AddButton = ({ onExecute }) => (
         onExecute(e)
       }}
       title='Create new row'
+      className='medisys-table-add'
+      style={{ display: 'none' }}
     >
       New
     </Button>
@@ -76,6 +78,7 @@ const CommitButton = ({ onExecute }) => (
     color='primary'
     title='Save'
     style={{ marginRight: 5 }}
+    className='grid-commit'
   >
     <Save />
   </Button>
@@ -89,7 +92,8 @@ const commandComponents = {
   cancel: CancelButton,
 }
 
-const CommandComponent = ({ id, onExecute }) => {
+const CommandComponent = ({ id, onExecute, ...resetProps }) => {
+  // console.log(id, onExecute, resetProps)
   const CommandButton = commandComponents[id]
   return <CommandButton onExecute={onExecute} />
 }

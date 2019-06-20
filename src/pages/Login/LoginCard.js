@@ -129,9 +129,9 @@ class LoginCard extends PureComponent {
                 color='rose'
               >
                 <h3 className={classes.cardTitle}>Login</h3>
-                <p>
+                <h3>
                   <FormattedMessage id='app.login.title' />
-                </p>
+                </h3>
               </CardHeader>
 
               <CardBody className={classnames(classes.body)}>

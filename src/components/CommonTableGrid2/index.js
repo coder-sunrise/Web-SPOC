@@ -8,6 +8,8 @@ import {
   createMuiTheme,
   withStyles,
 } from '@material-ui/core/styles'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
+import { Button } from '@/components'
 // import Paper from '@material-ui/core/Paper'
 import { LinearProgress, Paper } from '@material-ui/core'
 import {
@@ -59,6 +61,7 @@ import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 
 const sizeConfig = {
   sm: {
+    ...smallTheme.overrides,
     MuiTableRow: {
       head: {
         height: 'auto',
@@ -72,6 +75,9 @@ const sizeConfig = {
         padding: '5px 0',
       },
     },
+  },
+  md: {
+    ...defaultTheme.overrides,
   },
 }
 // console.log(colorManipulator)
@@ -140,6 +146,7 @@ class CommonTableGrid2 extends React.Component {
     super(props)
     const {
       classes,
+      theme,
       oddEven = true,
       onRowDoubleClick = (f) => f,
       onRowClick = (f) => f,
@@ -181,11 +188,9 @@ class CommonTableGrid2 extends React.Component {
     )
 
     this.defaultFunctionConfig = {
-      edit: false,
       filter: false,
       selectable: false,
       pager: true,
-      pagerConfig: {},
       pagerStateConfig: {
         onCurrentPageChange: (current) => {
           this.search({
@@ -256,7 +261,7 @@ class CommonTableGrid2 extends React.Component {
             padding: 0,
           },
         },
-        ...sizeConfig[props.size],
+        ...sizeConfig[props.size || 'md'],
       },
     })
     // this.search()
@@ -390,13 +395,15 @@ class CommonTableGrid2 extends React.Component {
       extraRow = [],
       extraColumn = [],
       extraGetter = [],
+      containerComponent,
+      schema,
     } = this.props
 
     const {
       grouping,
       selectable,
       pager,
-      pagerConfig,
+      pagerConfig = {},
       pagerStateConfig,
       groupingConfig,
       summary,
@@ -408,7 +415,9 @@ class CommonTableGrid2 extends React.Component {
       ...this.defaultFunctionConfig,
       ...FuncProps,
     }
-
+    if (containerComponent) {
+      pagerConfig.containerComponent = containerComponent
+    }
     // console.log(
     //   filter,
     //   grouping,
@@ -451,39 +460,40 @@ class CommonTableGrid2 extends React.Component {
         ? { cellComponent: ActionProps.TableCellComponent }
         : {}),
     }
-    const extraPagerConfig = {
-      ...(pagerConfig.containerComponent
-        ? {
-            containerComponent: pagerConfig.containerComponent,
-          }
-        : {}),
-    }
+    // const extraPagerConfig = {
+    //   ...pagerConfig,
+    // }
     // console.log(leftColumns, rightColumns, header)
-    if (errors.length > 0) {
-      newColumExtensions.forEach((c) => {
-        c.errors = []
-        errors.forEach((e, i) => {
-          if (e) {
-            // console.log(i)
-            const m = Object.keys(e).find((es) => es === c.columnName)
-            if (m) {
-              c.errors.push({
-                index: i + 1,
-                columnName: c.columnName,
-                error: e[c.columnName],
-              })
-            }
-          }
-        })
-        // console.log(error, c)
-      })
-    }
+    // console.log(errors)
+    // if (errors.length > 0) {
+
+    // }
+    newColumExtensions.forEach((c) => {
+      c.validationSchema = schema
+      // c.errors = []
+      // errors.forEach((e, i) => {
+      //   if (e) {
+      //     // console.log(i)
+      //     const m = Object.keys(e).find((es) => es === c.columnName)
+      //     if (m) {
+      //       c.errors.push({
+      //         index: i + 1,
+      //         columnName: c.columnName,
+      //         error: e[c.columnName],
+      //       })
+      //     }
+      //   }
+      // })
+      // console.log(error, c)
+    })
+    // console.log(pager, pagerConfig)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
           className={classNames({
             [classes.paperContainer]: true,
             [this.props.className]: true,
+            ['medisys-table']: true,
           })}
           style={this.props.style}
         >
@@ -575,9 +585,7 @@ class CommonTableGrid2 extends React.Component {
 
             {header && <TableHeaderRow showSortingControls />}
             {extraRow.map((o) => o)}
-            {pager && (
-              <PagingPanel pageSizes={pageSizes} {...extraPagerConfig} />
-            )}
+            {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
 
             {grouping && <TableGroupRow {...groupingConfig.row} />}
             {grouping && groupingConfig.showToolbar && <Toolbar />}
@@ -627,7 +635,6 @@ CommonTableGrid2.propTypes = {
   selection: PropTypes.array,
   onSelectionChange: PropTypes.func,
   FuncProps: PropTypes.shape({
-    edit: PropTypes.bool,
     filter: PropTypes.bool,
     grouping: PropTypes.bool,
     pager: PropTypes.bool,

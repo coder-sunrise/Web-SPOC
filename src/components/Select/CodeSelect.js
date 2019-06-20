@@ -5,33 +5,39 @@ import { getCodes } from '@/utils/codes'
 
 const codetables = {}
 
-class CodeSelect extends React.Component {
+class CodeSelect extends React.PureComponent {
   state = {
     options: [],
     width: 'auto',
   }
 
-  componentDidMount () {
-    // console.log(this.props.code)
-    if (this.props.code) {
-      if (!codetables[this.props.code]) {
-        setTimeout(async () => {
-          const codetable = await getCodes(this.props.code)
+  constructor (props) {
+    super(props)
 
+    if (props.code) {
+      if (!codetables[props.code]) {
+        getCodes(props.code).then((options) => {
+          // console.log(options)
           this.setState({
-            options: codetable,
+            options,
           })
-        }, 0)
+        })
       } else {
         this.setState({
-          options: codetables[this.props.code],
+          options: codetables[props.code],
         })
       }
     }
   }
 
+  // componentDidMount () {
+  //   // console.log(this.props.code)
+
+  // }
+
   render () {
     // console.log(this.props)
+    // if (!this.state.options || this.state.options.length === 0) return null
     return (
       <Select
         {...this.props}

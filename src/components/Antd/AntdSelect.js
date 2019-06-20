@@ -1,5 +1,5 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -83,12 +83,37 @@ class AntdSelect extends React.PureComponent {
     size: 'default',
   }
 
-  state = {
-    shrink: false,
+  constructor (props) {
+    super(props)
+    const { form, field } = props
+    this.state = {
+      shrink: false,
+      value: form && field ? field.value : props.value || props.defaultValue,
+    }
+    // console.log('c', props)
   }
 
-  handleFilter = (input, option) =>
-    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+  componentWillReceiveProps (nextProps) {
+    const { field, value } = nextProps
+    if (field) {
+      this.setState({
+        value: field.value,
+      })
+    } else if (value) {
+      this.setState({
+        value,
+      })
+    }
+  }
+
+  handleFilter = (input, option) => {
+    try {
+      return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    } catch (error) {
+      console.log({ error })
+      return false
+    }
+  }
 
   handleFocus = () => {
     this.setState({ shrink: true })
@@ -100,24 +125,17 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  handleValueChange = (event) => {
+  handleValueChange = (val) => {
     const { form, field } = this.props
-    let returnValue = event
 
-    if (event) {
-      returnValue = event.target ? event.target.value : event
-    }
-    console.log(returnValue)
+    // console.log(returnValue)
     if (form && field) {
-      form.setFieldValue(
-        field.name,
-        returnValue === undefined ? '' : returnValue,
-      )
+      form.setFieldValue(field.name, val)
       form.setFieldTouched(field.name, true)
     }
     this.setState({
-      shrink: returnValue !== undefined,
-      value: returnValue,
+      shrink: val !== undefined,
+      value: val,
     })
   }
 
@@ -142,14 +160,10 @@ class AntdSelect extends React.PureComponent {
       value: s[valueField],
       label: s[labelField],
     }))
-
-    const selectValue = form && field ? field.value : value
-
-    const cfg = {}
-    if (selectValue !== undefined) {
-      cfg.value = selectValue
+    const cfg = {
+      value: this.state.value,
     }
-    // console.log(selectValue)
+    // console.log(newOptions, this.state.value, restProps)
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -162,6 +176,7 @@ class AntdSelect extends React.PureComponent {
           onBlur={extendFunc(onBlur, this.handleBlur)}
           defaultValue={defaultValue}
           filterOption={this.handleFilter}
+          allowClear={allowClear}
           {...cfg}
           {...restProps}
         >
@@ -185,19 +200,26 @@ class AntdSelect extends React.PureComponent {
   }
 
   render () {
-    const { classes, form, field, onChange, ...restProps } = this.props
-    const { value = [] } = restProps
+    const { classes, mode, form, field, onChange, ...restProps } = this.props
+    const { value } = this.state
     const selectValue = form && field ? field.value : value
-    const labelProps = {
-      shrink: (!!selectValue && selectValue.length > 0) || this.state.shrink,
+    const labelProps = {}
+    if (!mode || mode === 'default') {
+      labelProps.shrink = selectValue !== undefined || this.state.shrink
+    } else {
+      labelProps.shrink =
+        (selectValue !== undefined && selectValue.length > 0) ||
+        this.state.shrink
     }
+    // console.log(selectValue)
+    // console.log(restProps)
     return (
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
-        {...restProps}
+        {...this.props}
       />
     )
   }

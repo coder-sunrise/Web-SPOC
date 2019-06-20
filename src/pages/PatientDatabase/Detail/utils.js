@@ -29,7 +29,7 @@ module.exports = {
     const { patient } = props
     // console.log(patient.entity, prevProps.values.id)
     if (patient.entity && patient.entity.id !== prevProps.values.id) {
-      console.log(patient.entity)
+      // console.log(patient.entity)
       props.resetForm(patient.entity)
     }
   },
@@ -88,6 +88,7 @@ module.exports = {
     dispatch,
     extraBtn,
     patient,
+    allowSubmit,
   }) => (
     <div
       style={{
@@ -132,7 +133,7 @@ module.exports = {
         <Clear />
         Cancel
       </Button>
-      <ProgressButton onClick={handleSubmit} />
+      <ProgressButton disabled={!allowSubmit} onClick={handleSubmit} />
       {extraBtn}
     </div>
   ),

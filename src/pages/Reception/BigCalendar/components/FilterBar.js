@@ -22,6 +22,9 @@ const styles = () => ({
   selectorContainer: {
     textAlign: 'left',
   },
+  antdSelect: {
+    width: '100%',
+  },
 })
 
 const doctors = [
@@ -33,14 +36,6 @@ const doctors = [
   { value: 'lim', name: 'Dr Lim' },
   { value: 'liu', name: 'Dr Liu' },
 ]
-
-const getTagCount = (values = []) => {
-  const value = `${values.length} Tags Selected`
-  const result = [
-    value,
-  ]
-  return result
-}
 
 class FilterBar extends PureComponent {
   state = {
@@ -65,7 +60,31 @@ class FilterBar extends PureComponent {
 
   onFilterAppointmentTypeChange = (values) => {
     const { handleUpdateFilter, filter } = this.props
-    handleUpdateFilter({ ...filter, appointmentType: values })
+
+    handleUpdateFilter({
+      ...filter,
+      appointmentType: this.processValues(values),
+    })
+  }
+
+  processValues = (values) => {
+    const newItemAll = values.indexOf('all') === values.length - 1
+
+    let processedValues = [
+      ...values,
+    ]
+    if (newItemAll) {
+      // new item === 'all', clear list and left 'all' only
+      processedValues = values.filter((eachValue) => eachValue === 'all')
+    } else {
+      // new item !== 'all'
+      processedValues =
+        values.includes('all') && values.length > 1
+          ? values.filter((eachValue) => eachValue !== 'all')
+          : values
+    }
+
+    return processedValues
   }
 
   onFilterByDoctorChange = (event) => {
@@ -73,25 +92,9 @@ class FilterBar extends PureComponent {
     const { handleUpdateFilter, filter } = this.props
 
     const values = target !== undefined ? target : event
-    const newItemAll = values.indexOf('all') === values.length - 1
-
-    let newDoctorsFilter = values
-    if (newItemAll) {
-      // new item === 'all', clear list and left 'all' only
-      newDoctorsFilter = values.filter((doc) => doc === 'all')
-    } else {
-      // new item !== 'all'
-      newDoctorsFilter =
-        values.includes('all') && values.length > 1
-          ? values.filter((doc) => doc !== 'all')
-          : values
-    }
-
     handleUpdateFilter({
       ...filter,
-      doctors: [
-        ...newDoctorsFilter,
-      ],
+      doctors: this.processValues(values),
     })
   }
 
@@ -99,7 +102,13 @@ class FilterBar extends PureComponent {
     const { searchQuery, isTyping } = this.state
     const { classes, filter, onDoctorEventClick } = this.props
 
-    // const doctorsFilter = getTagCount(filter.doctors)
+    const maxDoctorTagCount = filter.doctors.length === 1 ? 1 : 0
+    const maxDoctorTagPlaceholder = `${filter.doctors
+      .length} doctors selected...`
+
+    const maxAppointmentTagCount = filter.appointmentType.length === 1 ? 1 : 0
+    const maxAppointmentTagPlaceholder = `${filter.appointmentType
+      .length} appointment types selected...`
 
     return (
       <SizeContainer>
@@ -120,7 +129,7 @@ class FilterBar extends PureComponent {
               <GridItem>
                 <Button color='info' onClick={onDoctorEventClick}>
                   <AddIcon />
-                  Doctor Event
+                  Doctor Block
                 </Button>
               </GridItem>
             </GridItem>
@@ -132,6 +141,8 @@ class FilterBar extends PureComponent {
                 mode='multiple'
                 options={doctors}
                 value={filter.doctors}
+                maxTagCount={maxDoctorTagCount}
+                maxTagPlaceholder={maxDoctorTagPlaceholder}
                 onChange={this.onFilterByDoctorChange}
               />
             </GridItem>
@@ -143,6 +154,8 @@ class FilterBar extends PureComponent {
               <AppointmentTypeSelector
                 label='Filter by Appointment Type'
                 value={filter.appointmentType}
+                maxTagCount={maxAppointmentTagCount}
+                maxTagPlaceholder={maxAppointmentTagPlaceholder}
                 onChange={this.onFilterAppointmentTypeChange}
                 // helpText='Leave blank to show all appointment type'
                 mode='multiple'

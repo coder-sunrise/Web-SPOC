@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
 import Loadable from 'react-loadable'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
@@ -21,6 +22,17 @@ import Loading from '@/components/PageLoading/index'
 import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
+// const pecValidationSchema = Yup.array().compact((v) => v.isDeleted).of(
+//   Yup.object().shape({
+//     salutationFk: Yup.string().required(),
+//     name: Yup.string().required(),
+//   }),
+// )
+const pecValidationSchema = Yup.object().shape({
+  salutationFk: Yup.string().required(),
+  name: Yup.string().required(),
+  // primaryContactNo: Yup.date().required(),
+})
 @connect(({ emergencyContact, loading }) => {
   return { emergencyContact, loading }
 })
@@ -29,18 +41,14 @@ import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
     return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
-    patientEmergencyContact: Yup.array().of(
-      Yup.object().shape({
-        salutationFk: Yup.string().required(),
-        name: Yup.string().required(),
-      }),
-    ),
+    patientEmergencyContact: Yup.array()
+      .compact((v) => v.isDeleted)
+      .of(pecValidationSchema),
   }),
-
   handleSubmit,
   displayName: 'EmergencyContact',
 })
-class Grid extends PureComponent {
+class Grid extends React.Component {
   state = {
     editingRowIds: [],
     rowChanges: {},
@@ -58,6 +66,12 @@ class Grid extends PureComponent {
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
+      { columnName: 'name', isDisabled: (row) => !!row.nokPatientProfileFk },
+      // {
+      //   columnName: 'primaryContactNo',
+      //   type: 'date',
+      //   // isDisabled: (row) => true,
+      // },
       {
         columnName: 'salutationFk',
         type: 'codeSelect',
@@ -73,7 +87,9 @@ class Grid extends PureComponent {
           console.log(this)
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
-            const { patientEmergencyContact } = values
+            const patientEmergencyContact = _.cloneDeep(
+              values.patientEmergencyContact,
+            )
             patientEmergencyContact.forEach((pec) => {
               pec.priority = 0
             })
@@ -127,10 +143,16 @@ class Grid extends PureComponent {
       </div>
     )
 
-    this.changeEditingRowIds = (editingRowIds) =>
+    this.changeEditingRowIds = (editingRowIds) => {
       this.setState({ editingRowIds })
+    }
     this.changeRowChanges = (rowChanges) => {
-      console.log(rowChanges)
+      // console.log(rowChanges)
+      // console.log(
+      //   rowChanges,
+      //   this.props.errors,
+      //   this.props.values.patientEmergencyContact,
+      // )
       this.setState({ rowChanges })
     }
 
@@ -143,23 +165,11 @@ class Grid extends PureComponent {
         })
       }
     }
-    this.PagerContent = (me) => (p) => {
-      return (
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              position: 'absolute',
-              padding: me.props.theme.spacing.unit * 2,
-            }}
-          >
-            <Button onClick={this.toggleModal} color='info'>
-              Add From Existing Patient
-            </Button>
-          </div>
-          <PagingPanel.Container {...p} />
-        </div>
-      )
-    }
+    this.PagerContent = (
+      <Button onClick={this.toggleModal} color='info' link>
+        Add From Existing Patient
+      </Button>
+    )
   }
 
   componentDidUpdate = (prevProps) => {
@@ -172,76 +182,15 @@ class Grid extends PureComponent {
     }))
   }
 
-  setArrayValue = (items) => {
-    const { setFieldValue, validateForm } = this.props
-    // runValidationSchema('patientEmergencyContact', items)
-    // resetForm()
-    setFieldValue('patientEmergencyContact', items)
-    validateForm()
-    // console.log(props.errors)
-    // console.log(v)
-    // // setFieldValue('patientEmergencyContact', items)
-  }
-
-  commitChanges = ({ added, changed, deleted }) => {
-    console.log(added, changed, deleted)
-    // console.log(this)
-    const { values } = this.props
-    let { patientEmergencyContact = [] } = values
-    // console.log(patientEmergencyContact)
-    if (added) {
-      patientEmergencyContact = patientEmergencyContact.concat(
-        added.map((o) => {
-          return {
-            id: getUniqueGUID(),
-            ...o,
-          }
-        }),
-      )
-      // console.log(patientEmergencyContact)
-      // props
-      //   .dispatch({
-      //     type: `emergencyContact/localAdd`,
-      //     payload: added.map((o) => {
-      //       return {
-      //         type,
-      //         ...o,
-      //       }
-      //     }),
-      //   })
-      //   .then(setArrayValue)
-    }
-
-    if (changed) {
-      // props
-      //   .dispatch({
-      //     type: `emergencyContact/localChange`,
-      //     payload: changed,
-      //   })
-      //   .then(setArrayValue)
-
-      patientEmergencyContact = patientEmergencyContact.map((row) => {
-        const n = changed[row.id] ? { ...row, ...changed[row.id] } : row
-        return n
-      })
-    }
-
-    if (deleted) {
-      // dispatch({
-      //   type: `emergencyContact/localDelete`,
-      //   payload: deleted,
-      // }).then(setArrayValue)
-
-      patientEmergencyContact = patientEmergencyContact.filter(
-        (row) => !deleted.find((o) => o === row.id) && row.id,
-      )
-    }
-    this.setArrayValue(patientEmergencyContact)
+  commitChanges = ({ rows, added, changed, deleted }) => {
+    console.log(rows, added, changed, deleted)
+    const { setFieldValue } = this.props
+    setFieldValue('patientEmergencyContact', rows)
   }
 
   renderActionFn = (row) => {
     const { props } = this
-    const { dispatch, values } = props
+    const { dispatch, values, setFieldValue } = props
     return (
       <Tooltip title='Add' placement='bottom'>
         <Button
@@ -254,8 +203,9 @@ class Grid extends PureComponent {
               },
             }).then((o) => {
               // console.log(props)
-              const { values: { patientEmergencyContact = [] } } = props
-
+              const patientEmergencyContact = _.cloneDeep(
+                values.patientEmergencyContact,
+              )
               if (
                 patientEmergencyContact.find((m) => m.patientProfileFk === o.id)
               ) {
@@ -265,14 +215,17 @@ class Grid extends PureComponent {
                 return
               }
               patientEmergencyContact.push({
+                id: getUniqueGUID(),
                 patientProfileFk: o.id,
                 salutationFk: o.salutationFk,
                 name: o.name,
                 relationship: '',
+                priority: 0,
                 nokPatientProfileFk: o.id,
                 address: o.contact.contactAddress[0].line1,
               })
-              this.setArrayValue(patientEmergencyContact)
+              setFieldValue('patientEmergencyContact', patientEmergencyContact)
+
               this.toggleModal()
             })
           }}
@@ -290,7 +243,9 @@ class Grid extends PureComponent {
   render () {
     const { values, type, loading, errors, patientSearch } = this.props
     const { SearchPatient = (f) => f } = this
-    // console.log(errors)
+    console.log(this.props)
+    // console.log(this.state)
+    // console.log(pecValidationSchema)
     return (
       <div>
         <CardContainer title={this.titleComponent} hideHeader>
@@ -298,9 +253,8 @@ class Grid extends PureComponent {
             rows={values.patientEmergencyContact.filter((o) => !o.isDeleted)}
             onRowDoubleClick={this.onRowDoubleClick}
             FuncProps={{
-              edit: true,
               pagerConfig: {
-                containerComponent: this.PagerContent(this),
+                containerExtraComponent: this.PagerContent,
               },
             }}
             EditingProps={{
@@ -311,11 +265,13 @@ class Grid extends PureComponent {
               onRowChangesChange: this.changeRowChanges,
               onCommitChanges: this.commitChanges,
             }}
-            errors={errors.patientEmergencyContact}
+            // errors={errors.patientEmergencyContact}
+            schema={pecValidationSchema}
             {...this.tableParas}
           />
           {getFooter({
             resetable: true,
+            allowSubmit: this.state.editingRowIds.length === 0,
             ...this.props,
           })}
         </CardContainer>

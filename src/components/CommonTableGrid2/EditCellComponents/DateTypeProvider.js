@@ -1,52 +1,84 @@
+/* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
+import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
 import {
   DatePicker,
   DateTypeProvider as DateTypeProviderOrg,
 } from '@/components'
 
-const DateEditorBase = (columnExtensions) =>
-  React.memo(
-    (props) => {
-      // console.log(props)
-      const { column = {}, value, onValueChange } = props
-      const { name: columnName } = column
-      const cfg = columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      )
-      const onChange = (option,val) => {
-        console.log(val)
-        onValueChange(val)
-       
-      }
+class DateEditorBase extends PureComponent {
+  state = {
+    error: false,
+  }
 
-      const commonCfg = {
-        onChange,
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
+  }
 
+  componentDidMount () {
+    this.setState({
+      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+    })
+  }
+
+  render () {
+    const { props } = this
+    const { column = {}, value, onValueChange, columnExtensions, row } = props
+    const { name: columnName } = column
+    const cfg = columnExtensions.find(
+      ({ columnName: currentColumnName }) => currentColumnName === columnName,
+    )
+    const onChange = (date, val) => {
+      // console.log(val)
+      if (date) {
+        date.utcOffset()
       }
-      // console.log(cfg, value, props)
-      const { type, ...restProps } = cfg
-      return (
+      this.setState({
+        error: updateCellValue(
+          this.props,
+          this.myRef.current,
+          date ? date.utc().format() : '',
+        ),
+      })
+    }
+    const { type, isDisabled = () => false, ...restProps } = cfg
+
+    const commonCfg = {
+      onChange,
+      disabled: isDisabled(row),
+      defaultValue: value,
+    }
+    // console.log(cfg, value, props)
+    return (
+      <div ref={this.myRef}>
         <DatePicker
           noWrapper
           timeFormat={false}
-          value={value}
+          showErrorIcon
+          error={this.state.error}
           {...commonCfg}
           {...restProps}
         />
-      )
-    },
-    (prevProps, nextProps) => {
-      console.log(prevProps === nextProps, prevProps.value === nextProps.value)
-      return prevProps === nextProps || prevProps.value === nextProps.value
-    },
-  )
+      </div>
+    )
+  }
+}
 
-class DateTypeProvider extends React.Component {
+class DateTypeProvider extends PureComponent {
   static propTypes = {
     columnExtensions: PropTypes.array,
+  }
+
+  constructor (props) {
+    super(props)
+
+    this.DateEditorBase = (ces) => (editorProps) => {
+      return <DateEditorBase columnExtensions={ces} {...editorProps} />
+    }
   }
 
   render () {
@@ -61,7 +93,7 @@ class DateTypeProvider extends React.Component {
               ].indexOf(o.type) >= 0,
           )
           .map((o) => o.columnName)}
-        editorComponent={DateEditorBase(columnExtensions)}
+        editorComponent={this.DateEditorBase(columnExtensions)}
         {...this.props}
       />
     )

@@ -80,7 +80,7 @@ const NumberFormatter = (columnExtensions) =>
       return <b style={{ color }}>${numeral(value).format(qtyFormat)}</b>
     },
     (prevProps, nextProps) => {
-      console.log(prevProps === nextProps, prevProps.value === nextProps.value)
+      // console.log(prevProps === nextProps, prevProps.value === nextProps.value)
       return prevProps === nextProps || prevProps.value === nextProps.value
     },
   )

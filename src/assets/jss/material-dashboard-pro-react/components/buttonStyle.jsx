@@ -13,6 +13,10 @@ import {
   hexToRgb,
 } from 'mui-pro-jss'
 
+const disabled = {
+  opacity: '0.4',
+  pointerEvents: 'none',
+}
 const buttonStyle = {
   button: {
     minHeight: 'auto',
@@ -81,6 +85,7 @@ const buttonStyle = {
         fontSize: '20px',
       },
     },
+    '&:disabled': disabled,
   },
   fullWidth: {
     width: '100%',
@@ -382,10 +387,7 @@ const buttonStyle = {
       boxShadow: 'none',
     },
   },
-  disabled: {
-    opacity: '0.4',
-    pointerEvents: 'none',
-  },
+  disabled,
   lg: {
     padding: '1.125rem 2.25rem',
     fontSize: '0.875rem',
@@ -409,6 +411,9 @@ const buttonStyle = {
       backgroundColor: 'transparent',
       color: '#0645AD',
       boxShadow: 'none',
+    },
+    '&:hover,&:focus': {
+      textDecoration: 'underline',
     },
   },
 

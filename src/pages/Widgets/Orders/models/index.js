@@ -9,7 +9,9 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      default: {},
+      default: {
+        type: '1',
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

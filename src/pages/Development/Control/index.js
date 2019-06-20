@@ -315,7 +315,7 @@ class ControlTest extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem sm={3}>
+          <GridItem sm={6}>
             <FastField
               name='doctorRadio'
               render={(args) => (
@@ -349,6 +349,18 @@ class ControlTest extends PureComponent {
                 <Select
                   label='Filter by Doctor'
                   mode='multiple'
+                  options={doctors}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='doctorsingle'
+              render={(args) => (
+                <Select
+                  label='Filter by Doctor (Single)'
                   options={doctors}
                   {...args}
                 />

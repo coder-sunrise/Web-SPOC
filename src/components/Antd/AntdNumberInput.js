@@ -27,6 +27,9 @@ const STYLES = () => {
         boxShadow: 'none !important',
         borderRightWidth: '0px !important',
       },
+      '& .ant-input-number': {
+        lineHeight: '1rem',
+      },
       '& .ant-input-number-input': {
         height: 'auto',
         padding: 0,
@@ -129,7 +132,10 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleBlur = () => {
-    if (this.state.value === undefined || this.state.value.length === 0) {
+    const lengthIsZero =
+      this.state.value === null ? true : this.state.value.length === 0
+
+    if (this.state.value === undefined || lengthIsZero) {
       this.setState({ shrink: false })
     }
     this.setState({
@@ -280,9 +286,13 @@ class AntdNumberInput extends React.PureComponent {
     const { classes, onChange, ...restProps } = this.props
     const labelProps = {
       shrink:
-        !(this.state.value === undefined || this.state.value === '') ||
-        this.state.shrink,
+        !(
+          this.state.value === undefined ||
+          this.state.value === '' ||
+          this.state.value === null
+        ) || this.state.shrink,
     }
+
     return (
       <CustomInput
         labelProps={labelProps}
