@@ -17,6 +17,7 @@ import {
   Checkbox,
   SizeContainer,
   RichEditor,
+  CustomInputWrapper,
 } from '@/components'
 
 class Medication extends PureComponent {
@@ -26,13 +27,29 @@ class Medication extends PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={6}>
+          <GridItem xs={9}>
             <FastField
+              name='type'
+              render={(args) => {
+                return <CodeSelect label='Name' code='Gender' {...args} />
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={12}>
+            <CustomInputWrapper
+              label='Descriptioni'
+              labelProps={{ shrink: true }}
+            >
+              test
+            </CustomInputWrapper>
+            {/* <FastField
               name='date'
               render={(args) => {
                 return <DatePicker label='Date' {...args} />
               }}
-            />
+            /> */}
           </GridItem>
         </GridContainer>
         <GridContainer>
