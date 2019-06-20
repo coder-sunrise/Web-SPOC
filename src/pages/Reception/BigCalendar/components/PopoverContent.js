@@ -3,16 +3,23 @@ import classnames from 'classnames'
 // material icon
 import { withStyles } from '@material-ui/core'
 import AccessTime from '@material-ui/icons/AccessTime'
+import ErrorOutline from '@material-ui/icons/ErrorOutline'
 // common component
-import { CardBody, GridContainer, GridItem, TextField } from '@/components'
+import {
+  CardBody,
+  GridContainer,
+  GridItem,
+  TextField,
+  Danger,
+} from '@/components'
 
 const styles = () => ({
-  clockIcon: {
+  icon: {
     position: 'relative',
     top: 6,
     marginRight: 15,
   },
-  timeRow: {
+  iconRow: {
     marginBottom: 10,
   },
 })
@@ -20,8 +27,16 @@ const styles = () => ({
 const DoctorEventContent = ({ popoverEvent, classes }) => {
   return (
     <GridContainer direction='column' justify='center' alignItems='center'>
-      <GridItem className={classnames(classes.timeRow)}>
-        <AccessTime className={classnames(classes.clockIcon)} />
+      {popoverEvent.hasConflict && (
+        <GridItem className={classnames(classes.iconRow)}>
+          <ErrorOutline className={classnames(classes.icon)} />
+          <Danger style={{ display: 'inline' }}>
+            <span>This appointment has conflict</span>
+          </Danger>
+        </GridItem>
+      )}
+      <GridItem className={classnames(classes.iconRow)}>
+        <AccessTime className={classnames(classes.icon)} />
         <span>
           {popoverEvent.startTime} - {popoverEvent.endTime}
         </span>
@@ -59,12 +74,21 @@ class PopoverContent extends React.PureComponent {
             justify='center'
             alignItems='center'
           >
-            <GridItem className={classnames(classes.timeRow)}>
-              <AccessTime className={classnames(classes.clockIcon)} />
+            {popoverEvent.hasConflict && (
+              <GridItem className={classnames(classes.iconRow)}>
+                <ErrorOutline className={classnames(classes.icon)} />
+                <Danger style={{ display: 'inline' }}>
+                  <span>This appointment has conflict</span>
+                </Danger>
+              </GridItem>
+            )}
+            <GridItem className={classnames(classes.iconRow)}>
+              <AccessTime className={classnames(classes.icon)} />
               <span>
                 {popoverEvent.startTime} - {popoverEvent.endTime}
               </span>
             </GridItem>
+
             <GridItem>
               <TextField
                 disabled

@@ -345,6 +345,8 @@ class Form extends React.PureComponent {
       values,
     } = this.props
 
+    const { hasConflict } = slotInfo
+
     const {
       showNewPatientModal,
       showSearchPatientModal,
@@ -636,26 +638,28 @@ class Form extends React.PureComponent {
               )}
             </GridContainer>
           </Paper>
-          <Card
-            size='sm'
-            raised
-            className={classnames(classes.conflictContainer)}
-          >
-            <CardBody>
-              <GridContainer>
-                <GridItem xs md={8}>
-                  <Danger>
-                    <h4 className={classnames(classes.conflictContent)}>
-                      Appointment has conflict in schedule
-                    </h4>
-                  </Danger>
-                </GridItem>
-                <GridItem xs md={4} container justify='flex-end'>
-                  <Button color='primary'>Validate</Button>
-                </GridItem>
-              </GridContainer>
-            </CardBody>
-          </Card>
+          {hasConflict && (
+            <Card
+              size='sm'
+              raised
+              className={classnames(classes.conflictContainer)}
+            >
+              <CardBody>
+                <GridContainer>
+                  <GridItem xs md={8}>
+                    <Danger>
+                      <h4 className={classnames(classes.conflictContent)}>
+                        Appointment has conflict in schedule
+                      </h4>
+                    </Danger>
+                  </GridItem>
+                  <GridItem xs md={4} container justify='flex-end'>
+                    <Button color='primary'>Validate</Button>
+                  </GridItem>
+                </GridContainer>
+              </CardBody>
+            </Card>
+          )}
           <div className={classnames(classes.footer)}>
             <GridContainer>
               <GridItem xs md={4} container justify='flex-start'>

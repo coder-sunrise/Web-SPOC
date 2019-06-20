@@ -3,7 +3,7 @@ import React from 'react'
 import { Popover, ClickAwayListener, withStyles } from '@material-ui/core'
 import { Assignment } from '@material-ui/icons'
 // common component
-import { CommonHeader, CommonModal } from '@/components'
+import { CommonHeader, CardContainer, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import CalendarView from './components/CalendarView'
@@ -265,7 +265,7 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     return (
-      <CommonHeader Icon={<Assignment />}>
+      <CardContainer hideHeader size='sm'>
         <Popover
           id='event-popup'
           className={classes.popover}
@@ -291,7 +291,7 @@ class Appointment extends React.PureComponent {
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
         />
-        <div>
+        <div style={{ marginTop: 16 }}>
           <CalendarView
             calendarEvents={applyFilter(calendarEvents, filter)}
             resources={resources}
@@ -332,7 +332,7 @@ class Appointment extends React.PureComponent {
             <DoctorEventForm handleAddDoctorEvent={this.addDoctorEvent} />
           )}
         </CommonModal>
-      </CommonHeader>
+      </CardContainer>
     )
   }
 }
