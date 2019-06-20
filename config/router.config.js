@@ -55,6 +55,13 @@ const routes = [
             component: './Reception/Queue/Dispense',
           },
           {
+            path: '/reception/queue/dispense/:visitRefNo/billing',
+            name: 'dispense',
+            hideInMenu: true,
+            exact: true,
+            component: './Reception/Queue/Dispense/Billing',
+          },
+          {
             path: '/reception/appointment',
             name: 'appointment',
             mini: 'AP',

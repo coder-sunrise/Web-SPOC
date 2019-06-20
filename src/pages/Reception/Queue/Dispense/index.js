@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
+import router from 'umi/router'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, CommonTableGrid2, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 // sub component
 import PatientBanner from './components/PatientBanner'
+import TableData from './components/TableData'
 import style from './style'
 // variables
 import {
@@ -19,10 +21,15 @@ import {
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
   OtherOrdersData,
-  tableConfig,
 } from './variables'
 
 class Dispense extends Component {
+  makePayment = () => {
+    const { location } = this.props
+
+    router.push(`${location.pathname}/billing`)
+  }
+
   render () {
     const { classes } = this.props
     return (
@@ -30,51 +37,56 @@ class Dispense extends Component {
         <PatientBanner />
         <GridContainer direction='column' className={classes.content}>
           <GridItem justify='flex-end' container>
-            <Button color='info'>
+            <Button color='info' size='sm' disabled>
               <Refresh />
               Refresh
             </Button>
-            <Button color='primary'>
+            <Button color='primary' size='sm' disabled>
               <Print />
               Print All Label
             </Button>
-            <Button color='primary'>
+            <Button color='primary' size='sm' disabled>
               <Print />
               Print Label
             </Button>
           </GridItem>
           <GridItem className={classes.gridRow}>
-            <h5>Prescription</h5>
-            <CommonTableGrid2
-              size='sm'
+            <TableData
+              title='Prescription'
               height={200}
               columns={PrescriptionColumns}
-              columnExtensions={PrescriptionColumnExtensions}
-              rows={PrescriptionTableData}
-              {...tableConfig}
+              colExtensions={PrescriptionColumnExtensions}
+              data={PrescriptionTableData}
             />
           </GridItem>
           <GridItem className={classes.gridRow}>
-            <h5>Vaccination</h5>
-            <CommonTableGrid2
-              size='sm'
+            <TableData
+              title='Vaccination'
               height={150}
               columns={VaccinationColumn}
-              columnExtensions={VaccinationColumnExtensions}
-              rows={VaccinationData}
-              {...tableConfig}
+              colExtensions={VaccinationColumnExtensions}
+              data={VaccinationData}
             />
           </GridItem>
           <GridItem className={classes.gridRow}>
-            <h5>Other Orders</h5>
-            <CommonTableGrid2
-              size='sm'
+            <TableData
+              title='Vaccination'
               height={150}
               columns={OtherOrdersColumns}
-              columnExtensions={OtherOrdersColumnExtensions}
-              rows={OtherOrdersData}
-              {...tableConfig}
+              colExtensions={OtherOrdersColumnExtensions}
+              data={OtherOrdersData}
             />
+          </GridItem>
+          <GridItem justify='flex-end' container className={classes.footerRow}>
+            <Button color='success' size='sm' disabled>
+              Save Dispense
+            </Button>
+            <Button color='primary' size='sm' disabled>
+              Edit Order
+            </Button>
+            <Button color='primary' size='sm' onClick={this.makePayment}>
+              Make Payment
+            </Button>
           </GridItem>
         </GridContainer>
       </div>

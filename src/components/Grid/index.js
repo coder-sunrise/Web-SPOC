@@ -153,7 +153,7 @@ const DateFormatter = (columnExtensions) => ({ value }) => {
   // console.log(value)
   if (!value) return null
   return moment.isMoment(value)
-    ? v.format(dateFormatLong)
+    ? value.format(dateFormatLong)
     : moment(value).isValid() ? moment(value).format(dateFormatLong) : value
 }
 
