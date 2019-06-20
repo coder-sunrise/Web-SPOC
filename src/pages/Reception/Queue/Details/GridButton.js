@@ -53,7 +53,7 @@ const ContextMenuOptions = [
     id: 1,
     label: 'Dispense & Bill',
     Icon: Money,
-    disabled: false,
+    disabled: true,
   },
   {
     id: 2,
@@ -79,7 +79,7 @@ const ContextMenuOptions = [
     id: 5,
     label: 'Start Consultation',
     Icon: Play,
-    disabled: false,
+    disabled: true,
   },
 ]
 
