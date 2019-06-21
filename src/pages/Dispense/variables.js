@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export const tableConfig = {
   FuncProps: { pager: false },
 }
@@ -55,7 +57,7 @@ const generatePrescriptionData = () => {
       name: 'Anarex',
       desription: '',
       batchNo: '324792',
-      expiryDate: '2019-06-20',
+      expiryDate: moment(),
       qtyOrdered: 10,
       qtyDispensed: 10,
       unitPrice: 50,

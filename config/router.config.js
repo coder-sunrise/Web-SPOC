@@ -46,7 +46,14 @@ const routes = [
             name: 'dispense',
             hideInMenu: true,
             exact: true,
-            component: './Reception/Queue/Dispense',
+            component: './Dispense',
+          },
+          {
+            path: '/reception/queue/dispense/:visitRefNo/billing',
+            name: 'billing',
+            hideInMenu: true,
+            exact: true,
+            component: './Dispense/Billing',
           },
           {
             path: '/reception/appointment',

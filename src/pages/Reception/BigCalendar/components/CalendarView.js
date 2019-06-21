@@ -40,7 +40,7 @@ const today = new Date()
 class CalendarView extends React.PureComponent {
   state = {
     displayDate: new Date(),
-    calendarView: BigCalendar.Views.DAY,
+    calendarView: BigCalendar.Views.MONTH,
     minTime: new Date(
       today.getFullYear(),
       today.getMonth(),

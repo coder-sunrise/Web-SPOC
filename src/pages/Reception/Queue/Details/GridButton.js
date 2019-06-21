@@ -47,7 +47,7 @@ const ContextMenuOptions = [
     id: 0,
     label: 'Edit Visit',
     Icon: Edit,
-    disabled: false,
+    disabled: true,
   },
   {
     id: 1,
