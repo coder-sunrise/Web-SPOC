@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import withStyles from '@material-ui/core/styles/withStyles'
+import { Yup } from '@/utils/codes'
 
 import {
   Button,
@@ -26,11 +27,11 @@ import {
   RichEditor,
 } from '@/components'
 
-import ReferralLetter from './ReferralLetter'
-import Memo from './Memo'
-import MedicalCertificate from './MedicalCertificate'
-import CertificateAttendance from './CertificateAttendance'
-import Others from './Others'
+import Medication from './Medication'
+// import Memo from './Memo'
+// import MedicalCertificate from './MedicalCertificate'
+// import CertificateAttendance from './CertificateAttendance'
+// import Others from './Others'
 
 const styles = (theme) => ({
   editor: {
@@ -42,36 +43,42 @@ const styles = (theme) => ({
     right: 0,
     top: 4,
   },
+  detail: {
+    margin: `${theme.spacing(1)}px 0px`,
+    border: '1px solid #ccc',
+    borderRadius: 3,
+    padding: `${theme.spacing(1)}px 0px`,
+  },
 })
 const types = [
   {
     value: '1',
-    name: 'Referral Letter',
+    name: 'Medication',
   },
   {
     value: '2',
-    name: 'Memo',
+    name: 'Vaccination',
   },
   {
     value: '3',
-    name: 'Medical Certificate',
+    name: 'Service',
   },
   {
     value: '4',
-    name: 'Certificate of Attendance',
+    name: 'Consumable',
   },
   {
     value: '5',
-    name: 'Others',
+    name: 'Open Prescription',
   },
 ]
-@connect(({ consultationDocument }) => ({
-  consultationDocument,
+@connect(({ orders }) => ({
+  orders,
 }))
 @withFormik({
-  mapPropsToValues: ({ consultationDocument }) => {
+  mapPropsToValues: ({ orders }) => {
     // console.log(diagnosis)
-    return consultationDocument.default
+    return orders.default
   },
   validationSchema: Yup.object().shape({
     type: Yup.string().required(),
@@ -96,15 +103,15 @@ const types = [
   }),
 
   handleSubmit: () => {},
-  displayName: 'AddConsultationDocument',
+  displayName: 'Details',
 })
-class AddConsultationDocument extends PureComponent {
+class Details extends PureComponent {
   toggleModal = () => {
-    const { consultationDocument } = this.props
-    const { showModal } = consultationDocument
+    const { orders } = this.props
+    const { showModal } = orders
 
     this.props.dispatch({
-      type: 'consultationDocument/updateState',
+      type: 'orders/updateState',
       payload: {
         showModal: !showModal,
       },
@@ -113,21 +120,14 @@ class AddConsultationDocument extends PureComponent {
 
   render () {
     const { props } = this
-    const {
-      theme,
-      classes,
-      consultationDocument,
-      values,
-      rowHeight,
-      footer,
-    } = props
+    const { theme, classes, orders, values, rowHeight, footer } = props
     console.log(props)
     const cfg = props
     const { type } = values
     console.log(type)
     return (
       <div>
-        <div style={{ margin: theme.spacing(1) }}>
+        <div className={classes.detail}>
           <GridContainer>
             <GridItem xs={6}>
               <FastField
@@ -145,28 +145,22 @@ class AddConsultationDocument extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          {type === '1' && <ReferralLetter {...cfg} />}
-          {type === '2' && <Memo {...cfg} />}
+          {type === '1' && <Medication {...cfg} />}
+          {/* {type === '2' && <Memo {...cfg} />}
           {type === '3' && <MedicalCertificate {...cfg} />}
           {type === '4' && <CertificateAttendance {...cfg} />}
-          {type === '5' && <Others {...cfg} />}
+          {type === '5' && <Others {...cfg} />} */}
         </div>
-        {footer &&
+        {/* {footer &&
           footer({
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
               disabled: false,
             },
-          })}
+          })} */}
       </div>
     )
   }
 }
-export default withStyles(styles, { withTheme: true })((props) => (
-  <SizeContainer size='md'>
-    {(extraProps) => {
-      return <AddConsultationDocument {...props} {...extraProps} />
-    }}
-  </SizeContainer>
-))
+export default withStyles(styles, { withTheme: true })(Details)
