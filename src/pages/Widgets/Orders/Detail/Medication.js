@@ -36,22 +36,27 @@ class Medication extends PureComponent {
             />
           </GridItem>
         </GridContainer>
-        <GridContainer>
+        {/* <GridContainer>
           <GridItem xs={12}>
             <CustomInputWrapper
               label='Descriptioni'
               labelProps={{ shrink: true }}
             >
-              test
+              <GridContainer>
+                <GridItem xs={3}>
+                  <Select
+                    simple
+                    defaultValue='1'
+                    options={[
+                      { value: '1', name: 'take' },
+                    ]}
+                  />
+                </GridItem>
+              </GridContainer>
             </CustomInputWrapper>
-            {/* <FastField
-              name='date'
-              render={(args) => {
-                return <DatePicker label='Date' {...args} />
-              }}
-            /> */}
+       
           </GridItem>
-        </GridContainer>
+        </GridContainer> */}
         <GridContainer>
           <GridItem xs={6}>
             <FastField
