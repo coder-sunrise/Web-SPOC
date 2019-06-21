@@ -126,6 +126,16 @@ export const defaultTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedOverrides,
+    MuiInputAdornment: {
+      ...sharedOverrides.MuiInputAdornment,
+      root: {
+        ...sharedOverrides.MuiInputAdornment.root,
+        '& > div': {
+          width: '16px !important',
+          height: '16px !important',
+        },
+      },
+    },
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -239,6 +249,20 @@ export const smallTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedOverrides,
+
+    MuiInputAdornment: {
+      ...sharedOverrides.MuiInputAdornment,
+      root: {
+        ...sharedOverrides.MuiInputAdornment.root,
+        '& > div': {
+          width: '12px !important',
+          height: '12px !important',
+        },
+      },
+      positionEnd: {
+        marginTop: 12,
+      },
+    },
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -353,6 +377,16 @@ export const largeTheme = createMuiTheme({
   props: {},
   overrides: {
     ...sharedOverrides,
+    MuiInputAdornment: {
+      ...sharedOverrides.MuiInputAdornment,
+      root: {
+        ...sharedOverrides.MuiInputAdornment.root,
+        '& > div': {
+          width: '20px !important',
+          height: '20px !important',
+        },
+      },
+    },
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
