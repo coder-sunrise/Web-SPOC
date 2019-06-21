@@ -274,6 +274,7 @@ class DetailsGrid extends PureComponent {
     const { isFullscreen, rowData } = this.state
     const { currentFilter, queueListing } = queueLog
     const height = isFullscreen ? undefined : 600
+
     return (
       <div>
         <WithFullscreenModal

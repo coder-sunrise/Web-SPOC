@@ -38,7 +38,8 @@ const generateRowData = () => {
   for (let i = 0; i < 12; i += 1) {
     data.push({
       Id: `row-${i}-data`,
-      queueNo: i,
+      queueNo:
+        visitStatusCode[i % visitStatusCode.length] === 'APPOINTMENT' ? '' : i,
       visitStatus: visitStatusCode[i % visitStatusCode.length],
       roomNo: '',
       doctor: 'Cheah',
