@@ -102,7 +102,7 @@ const styles = (theme) => ({
     },
   },
   paperContainer: {
-    margin: '0 5px',
+    // margin: '0 5px',
     '& > div': {
       width: '100%',
     },
