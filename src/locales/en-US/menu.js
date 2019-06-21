@@ -66,11 +66,11 @@ export default {
   'menu.inventory.package.detail': 'Package Detail',
 
   'menu.queuelisting': 'Queue Listing',
-
   'menu.patientdashboard': 'Patient Dashboard',
   'menu.reception.patientdashboard': 'Patient Dashboard',
   'menu.consultation': 'Consultation',
   'menu.reception.consultation': 'Consultation',
+  'menu.reception.billing': 'Billing',
 
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',

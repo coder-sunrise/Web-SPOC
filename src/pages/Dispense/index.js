@@ -26,8 +26,7 @@ import {
 class Dispense extends Component {
   makePayment = () => {
     const { location } = this.props
-
-    router.push(`${location.pathname}/billing`)
+    this.props.history.push(`${location.pathname}/billing`)
   }
 
   render () {
