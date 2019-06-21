@@ -46,7 +46,7 @@ class Checkbox extends React.Component {
       controlStyle,
       onChange,
       notCentered = false,
-
+      disabled,
       ...resetProps
     } = this.props
     const opts = {
@@ -68,6 +68,7 @@ class Checkbox extends React.Component {
           onChange(field.name, checked)
         }
       },
+      disabled : disabled,
       checked: this.state.checked,
       // ...resetProps,
     }

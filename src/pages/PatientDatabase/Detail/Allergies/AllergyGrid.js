@@ -14,6 +14,7 @@ class AllergyGrid extends PureComponent {
   state = {
     editingRowIds: [],
     rowChanges: {},
+    patientAllergy:[]
   }
 
   tableParas = {
@@ -70,18 +71,14 @@ class AllergyGrid extends PureComponent {
 
     
   this.setArrayValue = (items) => {
-    const { setFieldValue, validateForm } = this.props
-    setFieldValue('patientAllergy', items)
+    const { setArrayValue, validateForm } = this.props
+    setArrayValue(items)
     //validateForm()
   }
 
     this.commitChanges = ({ added, changed, deleted }) => {
-      console.log('oncommite')
-      console.log(this.props.values)
-
-      let { values: { patientAllergy = [] } } =  this.props
       if (added) {
-        patientAllergy = patientAllergy.concat(
+        state.patientAllergy = state.patientAllergy.concat(
           added.map((o) => {
             return {
               id: getUniqueGUID(),
@@ -91,21 +88,21 @@ class AllergyGrid extends PureComponent {
         )
       }
       if (changed) {
-        patientAllergy = patientAllergy.map((row) => {
+        state.patientAllergy = state.patientAllergy.map((row) => {
           const n = changed[row.id] ? { ...row, ...changed[row.id] } : row
           return n
         })
       }
 
       if (deleted) {
-        patientAllergy = patientAllergy.filter(
+        state.patientAllergy = state.patientAllergy.filter(
           (row) => !deleted.find((o) => o === row.id) && row.id,
         )
       }
 
-      this.setArrayValue(patientAllergy)
+      this.setArrayValue(state.patientAllergy)
 
-      this.props.onSaveClick(this.props.values)
+      //this.props.onSaveClick(this.props.values)
     }
 
     
@@ -128,7 +125,7 @@ class AllergyGrid extends PureComponent {
 
   render () {
     const { editingRowIds, rowChanges } = this.state
-    const {  type,values } = this.props
+    const {  type,values,isEditable,rows } = this.props
 
     const EditingProps = {
       showAddCommand: true,
@@ -138,21 +135,22 @@ class AllergyGrid extends PureComponent {
       onRowChangesChange: this.changeRowChanges,
       onCommitChanges: this.commitChanges,
     }
-    console.log('render2')
-    console.log(this.props)
+
     return (
       // <CardContainer title={this.titleComponent} hideHeader>
         <EditableTableGrid2
-          rows={values.patientAllergy.filter((o) => !o.isDeleted)}
+          rows={rows}
           onRowDoubleClick={this.onRowDoubleClick}
           FuncProps={{
-            edit: true,
+            edit: isEditable,
             pagerConfig: {
               containerComponent: this.PagerContent(this),
             },
           }}
           EditingProps={{
-            showAddCommand: true,
+            showAddCommand: isEditable,
+            showEditCommand: isEditable,
+            showDeleteCommand: isEditable,
             editingRowIds: this.state.editingRowIds,
             rowChanges: this.state.rowChanges,
             onEditingRowIdsChange: this.changeEditingRowIds,
