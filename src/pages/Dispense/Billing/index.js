@@ -8,6 +8,7 @@ import PatientBanner from '../components/PatientBanner'
 import DispenseDetails from '../components/DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
+import EditClaimSeq from './components/EditClaimSeq'
 
 const styles = (theme) => ({
   paperContent: {
@@ -71,7 +72,7 @@ class Billing extends Component {
           onConfirm={this.toggleClaimSequenceModal}
           onClose={this.toggleClaimSequenceModal}
         >
-          <div>Claim Sequence</div>
+          {showClaimSeqModal && <EditClaimSeq />}
         </CommonModal>
       </div>
     )

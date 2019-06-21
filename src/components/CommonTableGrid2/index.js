@@ -352,6 +352,14 @@ class CommonTableGrid2 extends React.Component {
         type: `${type}/${queryMethod}`,
         payload: p,
       })
+    } else {
+      const { pagination } = this.state
+      this.setState({
+        pagination: {
+          ...pagination,
+          current: payload.current,
+        },
+      })
     }
   }
 
