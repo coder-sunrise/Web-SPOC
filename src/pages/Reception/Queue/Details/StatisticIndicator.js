@@ -1,15 +1,12 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
-// umi
-import { FormattedMessage } from 'umi/locale'
 // material ui
 import { Divider, Paper, withStyles } from '@material-ui/core'
-// ant design
-import { Switch } from 'antd'
 // common component
 import { Button } from '@/components'
 import { StatusIndicator } from '../variables'
+import { getStatisticCount } from '../utils'
 
 const StatisticStyles = () => ({
   container: {
@@ -40,15 +37,10 @@ const StatisticStyles = () => ({
 
 @connect(({ queueLog }) => ({ queueLog }))
 class StatisticIndicator extends PureComponent {
-  state = {
-    currentFilter: StatusIndicator.ALL,
-  }
-
   onButtonClick = (event) => {
-    const { handleStatusClick, dispatch } = this.props
+    const { dispatch } = this.props
     const { id } = event.currentTarget
-    // this.setState({ currentFilter: id })
-    // handleStatusClick(id)
+
     dispatch({
       type: 'queueLog/updateFilter',
       status: id,
@@ -56,20 +48,15 @@ class StatisticIndicator extends PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      statistic: { all, appointment, waiting, inProgress, completed } = {
-        all: 0,
-        appointment: 0,
-        waiting: 0,
-        inProgress: 0,
-        completed: 0,
-      },
-      // currentFilter,
-      queueLog: { currentFilter },
-    } = this.props
+    const { classes, queueLog: { currentFilter, queueListing } } = this.props
 
-    // const { currentFilter } = this.state
+    const statistic = {
+      all: getStatisticCount(StatusIndicator.ALL, queueListing),
+      appointment: getStatisticCount(StatusIndicator.APPOINTMENT, queueListing),
+      waiting: getStatisticCount(StatusIndicator.WAITING, queueListing),
+      inProgress: getStatisticCount(StatusIndicator.IN_PROGRESS, queueListing),
+      completed: getStatisticCount(StatusIndicator.COMPLETED, queueListing),
+    }
 
     return (
       <React.Fragment>
@@ -80,7 +67,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusAll,
             ])}
           >
-            {all}
+            {statistic.all}
           </h4>
           <Divider variant='fullWidth' />
 
@@ -102,7 +89,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusAll,
             ])}
           >
-            {appointment}
+            {statistic.appointment}
           </h4>
           <Divider variant='fullWidth' />
 
@@ -124,7 +111,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusWaiting,
             ])}
           >
-            {waiting}
+            {statistic.waiting}
           </h4>
           <Divider variant='fullWidth' />
 
@@ -146,7 +133,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusInProgress,
             ])}
           >
-            {inProgress}
+            {statistic.inProgress}
           </h4>
           <Divider variant='fullWidth' />
 
@@ -168,7 +155,7 @@ class StatisticIndicator extends PureComponent {
               classes.statusCompleted,
             ])}
           >
-            {completed}
+            {statistic.completed}
           </h4>
           <Divider variant='fullWidth' />
 

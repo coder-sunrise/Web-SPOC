@@ -9,13 +9,14 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { formatMessage } from 'umi/locale'
 // material ui
 import { Tooltip, withStyles } from '@material-ui/core'
-import { Edit, Pageview, Remove, Fullscreen } from '@material-ui/icons'
+import Pageview from '@material-ui/icons/Pageview'
+import Fullscreen from '@material-ui/icons/Fullscreen'
 // custom components
 import { Button, CommonModal, CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
 // assets
 import { tooltip } from '@/assets/jss/index'
-import { StatusIndicator } from '../variables'
+import { filterData } from '../utils'
 
 const styles = () => ({
   tooltip,
@@ -26,64 +27,6 @@ const styles = () => ({
     zIndex: 999,
   },
 })
-
-const visitStatusCode = [
-  'WAITING',
-  'APPOINTMENT',
-  'TO DISPENSE',
-  'IN CONS',
-  'PAUSED',
-  'OVERPAID',
-  'COMPLETED',
-]
-
-const generateRowData = () => {
-  const data = []
-  for (let i = 0; i < 20; i += 1) {
-    data.push({
-      Id: `row-${i}-data`,
-      queueNo: i,
-      visitStatus: visitStatusCode[i % visitStatusCode.length],
-      roomNo: '',
-      doctor: 'Cheah',
-      refNo: `PT-0000${i}`,
-      patientName: 'Annie Leonhart @ Annabelle Perfectionism',
-      gender: 'Female',
-      age: i,
-      visitRefNo: `190402-01-${i}`,
-    })
-  }
-  return data
-}
-
-const filterMap = {
-  [StatusIndicator.ALL]: [
-    ...visitStatusCode,
-  ].filter((item) => item !== 'APPOINTMENT'),
-  [StatusIndicator.APPOINTMENT]: [
-    'APPOINTMENT',
-  ],
-  [StatusIndicator.WAITING]: [
-    'WAITING',
-  ],
-  [StatusIndicator.IN_PROGRESS]: [
-    'TO DISPENSE',
-    'IN CONS',
-    'PAUSED',
-  ],
-  [StatusIndicator.COMPLETED]: [
-    'OVERPAID',
-    'COMPLETED',
-  ],
-}
-
-const filterData = (filter, data) => {
-  let newData = data.filter((eachRow) => {
-    return filterMap[filter].includes(eachRow.visitStatus)
-  })
-
-  return newData
-}
 
 const WithFullscreenModal = ({ show, onClose, onConfirm, children }) => {
   return show ? (
@@ -153,13 +96,10 @@ const TableConfig = {
   ],
 }
 
-const dispatchKey = 'queueLog'
-
 @connect(({ queueLog }) => ({ queueLog }))
 class DetailsGrid extends PureComponent {
   state = {
     isFullscreen: false,
-    rowData: generateRowData(),
   }
 
   onViewDispenseClick = (queue) => {
@@ -179,7 +119,6 @@ class DetailsGrid extends PureComponent {
   onEditVisitClick = (queue) => {}
 
   onViewPatientDashboardClick = (row, id) => {
-    console.log({ row, id })
     switch (id) {
       case '1':
         router.push(`/reception/queue/dispense/${row.visitRefNo}`)
@@ -199,7 +138,6 @@ class DetailsGrid extends PureComponent {
   }
 
   Cell = (props) => {
-    // const { column, row, classes, ...restProps } = props
     const { classes, ...tableProps } = props
     if (tableProps.column.name === 'Action') {
       return (
@@ -219,38 +157,6 @@ class DetailsGrid extends PureComponent {
           </Tooltip>
         </Table.Cell>
       )
-      // return (
-      //   <Table.Cell {...tableProps}>
-      //     <Tooltip
-      //       title={formatMessage({
-      //         id: 'reception.queue.viewPatientDashboard',
-      //       })}
-      //       placement='bottom'
-      //       classes={{ tooltip: classes.tooltip }}
-      //     >
-      //       <div style={{ display: 'inline-block' }}>
-      //         <GridButton
-      //           row={tableProps.row}
-      //           Icon={<Pageview />}
-      //           onClick={this.onViewPatientDashboardClick}
-      //         />
-      //       </div>
-      //     </Tooltip>
-      //     <Tooltip
-      //       title={formatMessage({ id: 'reception.queue.cancelVisit' })}
-      //       placement='bottom'
-      //       classes={{ tooltip: classes.tooltip }}
-      //     >
-      //       <div style={{ display: 'inline-block' }}>
-      //         <GridButton
-      //           row={tableProps.row}
-      //           color='danger'
-      //           Icon={<Remove />}
-      //         />
-      //       </div>
-      //     </Tooltip>
-      //   </Table.Cell>
-      // )
     }
     return <Table.Cell {...tableProps} />
   }
@@ -271,7 +177,7 @@ class DetailsGrid extends PureComponent {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
     const { classes, queueLog } = this.props
-    const { isFullscreen, rowData } = this.state
+    const { isFullscreen } = this.state
     const { currentFilter, queueListing } = queueLog
     const height = isFullscreen ? undefined : 600
 
