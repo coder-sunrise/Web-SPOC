@@ -219,6 +219,10 @@ class Consultation extends PureComponent {
     } else {
       defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
     }
+    console.log(defaultLayout)
+    if (!defaultLayout.keys) {
+      defaultLayout = this.getDefaultLayout()
+    }
 
     this.state = {
       mode: 'edit',
