@@ -76,7 +76,7 @@ class AntdSelect extends React.PureComponent {
 
   static defaultProps = {
     options: [],
-    label: '',
+    label: undefined,
     labelField: 'name',
     valueField: 'value',
     disabled: false,
@@ -90,13 +90,6 @@ class AntdSelect extends React.PureComponent {
       shrink: false,
       value: form && field ? field.value : props.value || props.defaultValue,
     }
-    if (props)
-      console.log(
-        field ? field.value : undefined,
-        props.value,
-        props.defaultValue,
-      )
-    // console.log('c', props)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -207,7 +200,7 @@ class AntdSelect extends React.PureComponent {
 
   render () {
     const { props } = this
-    const { classes, mode, form, field, onChange, ...restProps } = this.props
+    const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state
     const labelProps = {}
     if (!mode || mode === 'default') {
@@ -217,22 +210,14 @@ class AntdSelect extends React.PureComponent {
         (value !== undefined && value !== '' && value.length > 0) ||
         this.state.shrink
     }
-    console.log(value)
-    if (props)
-      console.log(
-        field ? field.value : undefined,
-        props.value,
-        props.defaultValue,
-      )
 
-    // console.log(restProps)
     return (
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
-        {...this.props}
+        {...restProps}
       />
     )
   }

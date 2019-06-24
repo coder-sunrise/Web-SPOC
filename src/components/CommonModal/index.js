@@ -16,6 +16,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import Loading from '@/components/PageLoading/index'
 
+import { SizeContainer } from '@/components'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
 
 // const styles = theme => ({
@@ -235,7 +236,9 @@ class CommonModal extends React.PureComponent {
           >
             
           </div> */}
-          {open ? childrenWithProps : null}
+          {open ? (
+            <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
+          ) : null}
         </DialogContent>
         {showFooter &&
           this.footer({

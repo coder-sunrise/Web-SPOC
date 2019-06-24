@@ -12,6 +12,15 @@ export default createListViewModel({
       default: {
         type: '1',
         precautions: '1',
+        descriptions: [
+          {
+            action: '1',
+            count: 1,
+            unit: '1',
+            frequency: '1',
+            day: 1,
+          },
+        ],
       },
     },
     subscriptions: ({ dispatch, history }) => {

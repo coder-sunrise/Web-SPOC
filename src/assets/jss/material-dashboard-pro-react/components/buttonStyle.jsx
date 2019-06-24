@@ -1,7 +1,7 @@
 // ##############################
 // // // Button styles
 // #############################
-
+import color from 'color'
 import {
   grayColor,
   roseColor,
@@ -31,14 +31,14 @@ const buttonStyle = {
     padding: '9px 20px',
     margin: 0, // ".3125rem 1px",
     marginRight: 8,
-    fontSize: '14px',
+    fontSize: '1rem',
     fontWeight: '400',
     textTransform: 'uppercase',
     letterSpacing: '0',
     willChange: 'box-shadow, transform',
     transition:
       'box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    lineHeight: '1.42857143',
+    lineHeight: '1.5',
     textAlign: 'center',
     whiteSpace: 'nowrap',
     verticalAlign: 'middle',
@@ -93,11 +93,11 @@ const buttonStyle = {
   primary: {
     backgroundColor: primaryColor,
     boxShadow:
-      '0 2px 2px 0 rgba(156, 39, 176, 0.14), 0 3px 1px -2px rgba(156, 39, 176, 0.2), 0 1px 5px 0 rgba(156, 39, 176, 0.12)',
+      '0 2px 2px 0 rgba(28, 26, 124, 0.14), 0 3px 1px -2px rgba(28, 26, 124, 0.2), 0 1px 5px 0 rgba(28, 26, 124, 0.12)',
     '&:hover,&:focus': {
-      backgroundColor: primaryColor,
+      backgroundColor: color(primaryColor).darken(0.2).hex(),
       boxShadow:
-        '0 14px 26px -12px rgba(156, 39, 176, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(156, 39, 176, 0.2)',
+        '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
     },
   },
   info: {
@@ -105,7 +105,7 @@ const buttonStyle = {
     boxShadow:
       '0 2px 2px 0 rgba(0, 188, 212, 0.14), 0 3px 1px -2px rgba(0, 188, 212, 0.2), 0 1px 5px 0 rgba(0, 188, 212, 0.12)',
     '&:hover,&:focus': {
-      backgroundColor: infoColor,
+      backgroundColor: color(infoColor).darken(0.2).hex(),
       boxShadow:
         '0 14px 26px -12px rgba(0, 188, 212, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 188, 212, 0.2)',
     },
@@ -115,7 +115,7 @@ const buttonStyle = {
     boxShadow:
       '0 2px 2px 0 rgba(76, 175, 80, 0.14), 0 3px 1px -2px rgba(76, 175, 80, 0.2), 0 1px 5px 0 rgba(76, 175, 80, 0.12)',
     '&:hover,&:focus': {
-      backgroundColor: successColor,
+      backgroundColor: color(successColor).darken(0.2).hex(),
       boxShadow:
         '0 14px 26px -12px rgba(76, 175, 80, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(76, 175, 80, 0.2)',
     },
@@ -125,7 +125,7 @@ const buttonStyle = {
     boxShadow:
       '0 2px 2px 0 rgba(255, 152, 0, 0.14), 0 3px 1px -2px rgba(255, 152, 0, 0.2), 0 1px 5px 0 rgba(255, 152, 0, 0.12)',
     '&:hover,&:focus': {
-      backgroundColor: warningColor,
+      backgroundColor: color(warningColor).darken(0.2).hex(),
       boxShadow:
         '0 14px 26px -12px rgba(255, 152, 0, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(255, 152, 0, 0.2)',
     },
@@ -135,7 +135,7 @@ const buttonStyle = {
     boxShadow:
       '0 2px 2px 0 rgba(244, 67, 54, 0.14), 0 3px 1px -2px rgba(244, 67, 54, 0.2), 0 1px 5px 0 rgba(244, 67, 54, 0.12)',
     '&:hover,&:focus': {
-      backgroundColor: dangerColor,
+      backgroundColor: color(dangerColor).darken(0.2).hex(),
       boxShadow:
         '0 14px 26px -12px rgba(244, 67, 54, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(244, 67, 54, 0.2)',
     },
@@ -145,7 +145,7 @@ const buttonStyle = {
     boxShadow:
       '0 2px 2px 0 rgba(233, 30, 99, 0.14), 0 3px 1px -2px rgba(233, 30, 99, 0.2), 0 1px 5px 0 rgba(233, 30, 99, 0.12)',
     '&:hover,&:focus': {
-      backgroundColor: roseColor,
+      backgroundColor: color(roseColor).darken(0.2).hex(),
       boxShadow:
         '0 14px 26px -12px rgba(233, 30, 99, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(233, 30, 99, 0.2)',
     },
@@ -395,18 +395,20 @@ const buttonStyle = {
     borderRadius: '0.2rem',
   },
   sm: {
-    padding: '3px 10px',
+    padding: '3px 10px !important',
     fontSize: '0.7rem',
     lineHeight: '1.5',
     borderRadius: '0.2rem',
   },
   round: {
-    borderRadius: '30px',
+    borderRadius: '30px !important',
   },
   block: {
     width: '100% !important',
   },
   link: {
+    paddingLeft: 0,
+    paddingRight: 0,
     '&,&:hover,&:focus': {
       backgroundColor: 'transparent',
       color: '#0645AD',
@@ -420,11 +422,11 @@ const buttonStyle = {
   justIcon: {
     // paddingLeft: '12px',
     // paddingRight: '12px',
-    padding: 0,
+    padding: '3px !important',
     fontSize: '20px',
-    height: '41px',
+    // height: '41px',
     // minWidth: '41px',
-    width: '41px',
+    // width: '41px',
     '& .fab,& .fas,& .far,& .fal,& svg,& .material-icons': {
       marginRight: '0px',
     },

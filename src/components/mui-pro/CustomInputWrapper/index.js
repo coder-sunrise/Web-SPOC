@@ -21,7 +21,7 @@ const _config = {
   },
 }
 
-function CustomInputWrapper ({ classes, ...props }) {
+function CustomInputWrapper ({ classes, theme, ...props }) {
   // console.log(props)
   // formControlProps.fullWidth =fullWidth || formControlProps.fullWidth
   for (const key in _config) {
@@ -98,6 +98,7 @@ function CustomInputWrapper ({ classes, ...props }) {
       newChildren = children
       break
   }
+  // console.log(label)
   return noWrapper ? (
     <div style={style}>{newChildren}</div>
   ) : (

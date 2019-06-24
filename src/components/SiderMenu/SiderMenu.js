@@ -98,6 +98,7 @@ class SiderMenu extends PureComponent {
       [classes.sidebarWrapperWithPerfectScrollbar]:
         navigator.platform.indexOf('Win') > -1,
     })}`
+    // console.log(shouldCollapse)
     return (
       // <Sider
       //   trigger={null}

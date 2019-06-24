@@ -121,7 +121,7 @@ const grayColor = '#999999'
 // const hoverColor = '#f9efff'
 
 // new color
-const primaryColor = '#3f51b5'
+const primaryColor = '#4255bd'
 const secondaryColor = '#1890ff'
 const successColor = '#389e0d'
 const dangerColor = '#cf1322'
@@ -155,7 +155,7 @@ const borderColor = 'rgba(0, 0, 0, 0.12)'
 const border = `1px solid ${borderColor}`
 const primaryBoxShadow = {
   boxShadow:
-    '0 12px 20px -10px rgba(156, 39, 176, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(156, 39, 176, 0.2)',
+    '0 12px 20px -10px rgba(28, 26, 124, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(28, 26, 124, 0.2)',
 }
 const infoBoxShadow = {
   boxShadow:

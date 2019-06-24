@@ -1,12 +1,12 @@
-import React from "react"
-import ReactDOM from "react-dom"
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-const appRoot = document.getElementById("app-root")
-const modalRoot = document.getElementById("modal-root")
+const appRoot = document.getElementById('app-root')
+const modalRoot = document.getElementById('modal-root')
 export default class ModalWrapper extends React.PureComponent {
   constructor (props) {
     super(props)
-    this.el = document.createElement("div")
+    this.el = document.createElement('div')
   }
 
   componentDidMount () {

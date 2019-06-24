@@ -45,6 +45,7 @@ export OutlinedTextField from './OutlinedTextField'
 export PageHeaderWrapper from './PageHeaderWrapper'
 export SizeContainer from './Size'
 export RichEditor from './RichEditor'
+export SweetAlert from './SweetAlert'
 // export * from './PDF'
 export * from './mui-pro'
 

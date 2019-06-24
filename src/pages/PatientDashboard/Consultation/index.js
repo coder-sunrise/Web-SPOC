@@ -386,17 +386,15 @@ class Consultation extends PureComponent {
             <div style={{ textAlign: 'center', paddingTop: 16 }}>
               <p>Total Invoice</p>
               <h5>{NumberFormatter(210)}</h5>
-              <div>
-                <Button size='sm' color='danger'>
-                  Discard
-                </Button>
-                <ProgressButton size='sm' color='info' icon={null}>
+              <SizeContainer size='sm'>
+                <Button color='danger'>Discard</Button>
+                <ProgressButton color='info' icon={null}>
                   Save Changes
                 </ProgressButton>
-                <ProgressButton size='sm' color='primary' icon={null}>
+                <ProgressButton color='primary' icon={null}>
                   Sign Off
                 </ProgressButton>
-              </div>
+              </SizeContainer>
             </div>
           }
           {...this.props}

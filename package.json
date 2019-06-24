@@ -49,6 +49,7 @@
     "bizcharts-plugin-slider": "^2.1.1-beta.1",
     "classnames": "^2.2.6",
     "cleave.js": "^1.4.7",
+    "color": "^3.1.2",
     "core-js": "^2.6.2",
     "crypto-js": "^3.1.9-1",
     "devextreme-react": "^18.2.3",
