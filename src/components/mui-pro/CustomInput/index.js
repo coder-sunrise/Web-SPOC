@@ -27,11 +27,14 @@ class FormikTextField extends React.PureComponent {
   constructor (props) {
     super(props)
     // this.myRef = React.createRef()
-    const { field = {}, form, inputProps = {} } = props
+    const { field = {}, form, inputProps = {}, defaultValue } = props
     // console.log(this.state, props)
     this.state = {
       isDebouncing: false,
-      value: field.value !== undefined && field.value !== '' ? field.value : '',
+      value:
+        field.value !== undefined && field.value !== ''
+          ? field.value
+          : defaultValue,
     }
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 300)
   }

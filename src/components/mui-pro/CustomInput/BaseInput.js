@@ -114,8 +114,9 @@ class BaseInput extends React.PureComponent {
     const underlineClasses = classNames({
       [classes.underlineError]: error,
       [classes.underlineSuccess]: success && !error,
-      [classes.underline]: !simple,
-      [classes.simple]: simple || noUnderline,
+      [classes.underline]: true,
+      [classes.noUnderline]: noUnderline,
+      [classes.simple]: simple,
       [classes.inputRoot]: true,
       [classes.whiteUnderline]: white,
     })

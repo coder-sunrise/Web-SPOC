@@ -28,7 +28,7 @@ const customInputStyle = {
       borderColor: primaryColor,
     },
   },
-  simple: {
+  noUnderline: {
     '&:hover:not($disabled):before,&:before': {
       borderWidth: '0px !important',
     },

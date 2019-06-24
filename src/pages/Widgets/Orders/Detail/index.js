@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import withStyles from '@material-ui/core/styles/withStyles'
-import { Yup } from '@/utils/codes'
+import { orderTypes } from '@/utils/codes'
 
 import {
   Button,
@@ -50,28 +50,7 @@ const styles = (theme) => ({
     padding: `${theme.spacing(1)}px 0px`,
   },
 })
-const types = [
-  {
-    value: '1',
-    name: 'Medication',
-  },
-  {
-    value: '2',
-    name: 'Vaccination',
-  },
-  {
-    value: '3',
-    name: 'Service',
-  },
-  {
-    value: '4',
-    name: 'Consumable',
-  },
-  {
-    value: '5',
-    name: 'Open Prescription',
-  },
-]
+
 @connect(({ orders }) => ({
   orders,
 }))
@@ -136,7 +115,7 @@ class Details extends PureComponent {
                   return (
                     <Select
                       label='Type'
-                      options={types}
+                      options={orderTypes}
                       allowClear={false}
                       {...args}
                     />

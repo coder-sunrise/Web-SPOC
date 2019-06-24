@@ -220,7 +220,7 @@ class CommonTableGrid2 extends React.Component {
 
     const cellStyle = {
       cell: {
-        borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+        // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
         borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
       },
     }
@@ -242,9 +242,9 @@ class CommonTableGrid2 extends React.Component {
         EditCell: cellStyle,
         TableHeaderCell: cellStyle,
         Table: {
-          table: {
-            borderCollapse: 'collapse',
-          },
+          // table: {
+          //   borderCollapse: 'collapse',
+          // },
           stickyTable: {
             ' & > thead > tr': {
               backgroundColor: '#ffffff',
@@ -498,7 +498,7 @@ class CommonTableGrid2 extends React.Component {
           className={classNames({
             [classes.paperContainer]: true,
             [this.props.className]: true,
-            ['medisys-table']: true,
+            'medisys-table': true,
           })}
           style={this.props.style}
         >

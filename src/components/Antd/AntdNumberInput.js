@@ -100,10 +100,20 @@ class AntdNumberInput extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { field = {}, form, inputProps = {}, formatter, parser } = props
+    const {
+      field = {},
+      form,
+      inputProps = {},
+      formatter,
+      parser,
+      defaultValue,
+    } = props
     this.state = {
       shrink: field.value !== undefined && field.value !== '',
-      value: field.value !== undefined && field.value !== '' ? field.value : '',
+      value:
+        field.value !== undefined && field.value !== ''
+          ? field.value
+          : defaultValue,
       focused: false,
     }
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
@@ -132,10 +142,11 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleBlur = () => {
-    const lengthIsZero =
-      this.state.value === null ? true : this.state.value.length === 0
-
-    if (this.state.value === undefined || lengthIsZero) {
+    if (
+      this.state.value === undefined ||
+      this.state.value === null ||
+      this.state.value === ''
+    ) {
       this.setState({ shrink: false })
     }
     this.setState({

@@ -17,6 +17,7 @@ import {
   Checkbox,
   SizeContainer,
   RichEditor,
+  NumberInput,
   CustomInputWrapper,
 } from '@/components'
 
@@ -27,73 +28,151 @@ class Medication extends PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={9}>
+          <GridItem xs={10}>
             <FastField
               name='type'
               render={(args) => {
-                return <CodeSelect label='Name' code='Gender' {...args} />
+                return (
+                  <Select
+                    label='Name'
+                    options={[
+                      { value: '1', name: 'Biogesic tab 500 mg' },
+                    ]}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
         </GridContainer>
-        {/* <GridContainer>
+        <GridContainer>
           <GridItem xs={12}>
             <CustomInputWrapper
-              label='Descriptioni'
+              label='Description'
               labelProps={{ shrink: true }}
             >
-              <GridContainer>
+              <GridContainer gutter={1}>
+                <GridItem xs={2}>
+                  <Select
+                    simple
+                    defaultValue='1'
+                    options={[
+                      { value: '1', name: 'Take' },
+                    ]}
+                  />
+                </GridItem>
+                <GridItem xs={1}>
+                  <Select
+                    simple
+                    defaultValue='1'
+                    options={[
+                      { value: '1', name: '1' },
+                    ]}
+                  />
+                </GridItem>
+                <GridItem xs={2}>
+                  <Select
+                    simple
+                    defaultValue='1'
+                    options={[
+                      { value: '1', name: 'Tab/s' },
+                    ]}
+                  />
+                </GridItem>
                 <GridItem xs={3}>
                   <Select
                     simple
                     defaultValue='1'
                     options={[
-                      { value: '1', name: 'take' },
+                      { value: '1', name: 'Every Night' },
+                    ]}
+                  />
+                </GridItem>
+                <GridItem xs={2}>
+                  <Select
+                    simple
+                    defaultValue='1'
+                    options={[
+                      { value: '1', name: '2 days' },
                     ]}
                   />
                 </GridItem>
               </GridContainer>
             </CustomInputWrapper>
-       
           </GridItem>
-        </GridContainer> */}
+        </GridContainer>
         <GridContainer>
-          <GridItem xs={6}>
+          <GridItem xs={10}>
             <FastField
-              name='from'
-              render={(args) => {
-                return <TextField disabled label='From' {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12}>
-            <FastField
-              name='address'
+              name='precautions'
               render={(args) => {
                 return (
-                  <TextField label='Address' multiline rowsMax={3} {...args} />
+                  <Select
+                    label='Precaution'
+                    defaultValue='1'
+                    options={[
+                      { value: '1', name: 'Discard 1 month upon opening' },
+                    ]}
+                    {...args}
+                  />
                 )
               }}
             />
           </GridItem>
-          <GridItem xs={9}>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={3}>
             <FastField
-              name='subject'
+              name='quantity'
               render={(args) => {
-                return <TextField label='Subject' {...args} />
+                return (
+                  <TextField
+                    label='Quantity'
+                    defaultValue='1 Bottle'
+                    // suffix='Bottle'
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
-          <GridItem
-            xs={3}
-            style={{ lineHeight: rowHeight, textAlign: 'right' }}
-          >
-            <Button color='info'>Load Template</Button>
+          <GridItem xs={3}>
+            <FastField
+              name='total'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total'
+                    defaultValue='20'
+                    currency
+                    {...args}
+                  />
+                )
+              }}
+            />
           </GridItem>
+          <GridItem xs={3}>
+            <FastField
+              name='totalAfterAdj'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label='Total After Adj'
+                    defaultValue='18'
+                    currency
+                    disabled
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
           <GridItem xs={12} className={classes.editor}>
-            <Button link className={classes.editorBtn}>
+            {/* <Button link className={classes.editorBtn}>
               Add Diagnosis
-            </Button>
+            </Button> */}
             <RichEditor />
           </GridItem>
         </GridContainer>

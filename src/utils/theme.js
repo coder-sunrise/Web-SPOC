@@ -43,6 +43,11 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
+  MuiDrawer: {
+    paper: {
+      overflowX: 'hidden',
+    },
+  },
   MuiInput: {
     underline: {
       '&:hover:not($disabled):not($focused):not($error):before': {

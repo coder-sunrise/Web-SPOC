@@ -85,11 +85,17 @@ class AntdSelect extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { form, field } = props
+    const { form, field, mode } = props
     this.state = {
       shrink: false,
       value: form && field ? field.value : props.value || props.defaultValue,
     }
+    if (props)
+      console.log(
+        field ? field.value : undefined,
+        props.value,
+        props.defaultValue,
+      )
     // console.log('c', props)
   }
 
@@ -200,18 +206,25 @@ class AntdSelect extends React.PureComponent {
   }
 
   render () {
+    const { props } = this
     const { classes, mode, form, field, onChange, ...restProps } = this.props
     const { value } = this.state
-    const selectValue = form && field ? field.value : value
     const labelProps = {}
     if (!mode || mode === 'default') {
-      labelProps.shrink = selectValue !== undefined || this.state.shrink
+      labelProps.shrink = value !== undefined || this.state.shrink
     } else {
       labelProps.shrink =
-        (selectValue !== undefined && selectValue.length > 0) ||
+        (value !== undefined && value !== '' && value.length > 0) ||
         this.state.shrink
     }
-    // console.log(selectValue)
+    console.log(value)
+    if (props)
+      console.log(
+        field ? field.value : undefined,
+        props.value,
+        props.defaultValue,
+      )
+
     // console.log(restProps)
     return (
       <CustomInput

@@ -11,6 +11,7 @@ export default createListViewModel({
     state: {
       default: {
         type: '1',
+        precautions: '1',
       },
     },
     subscriptions: ({ dispatch, history }) => {
