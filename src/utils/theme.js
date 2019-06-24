@@ -234,6 +234,11 @@ export const defaultTheme = createMuiTheme({
         fontWeight: 'inherit',
       },
     },
+    RichEditor: {
+      wrapper: {
+        zoom: '90%',
+      },
+    },
   },
 })
 
@@ -346,6 +351,11 @@ export const smallTheme = createMuiTheme({
       shrink: {
         transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
+      },
+    },
+    RichEditor: {
+      wrapper: {
+        zoom: '70%',
       },
     },
   },
