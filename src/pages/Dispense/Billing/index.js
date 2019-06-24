@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
+import ArrowBack from '@material-ui/icons/ArrowBack'
 // common components
 import { Accordion, Button, CommonModal, GridContainer } from '@/components'
 // sub component
@@ -8,7 +9,10 @@ import PatientBanner from '../components/PatientBanner'
 import DispenseDetails from '../components/DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
-import EditClaimSeq from './components/EditClaimSeq'
+// page modal
+import EditClaimSeq from './modal/EditClaimSeq'
+import CoPayment from './modal/CoPayment'
+import AddPayment from './AddPayment'
 
 const styles = (theme) => ({
   paperContent: {
@@ -23,6 +27,12 @@ const styles = (theme) => ({
 class Billing extends Component {
   state = {
     showClaimSeqModal: false,
+    showCoPaymentModal: false,
+    showAddPaymentModal: false,
+  }
+
+  backToDispense = () => {
+    this.props.history.goBack()
   }
 
   toggleClaimSequenceModal = () => {
@@ -30,8 +40,22 @@ class Billing extends Component {
     this.setState({ showClaimSeqModal: !showClaimSeqModal })
   }
 
+  toggleCoPaymentModal = () => {
+    const { showCoPaymentModal } = this.state
+    this.setState({ showCoPaymentModal: !showCoPaymentModal })
+  }
+
+  toggleAddPaymentModal = () => {
+    const { showAddPaymentModal } = this.state
+    this.setState({ showAddPaymentModal: !showAddPaymentModal })
+  }
+
   render () {
-    const { showClaimSeqModal } = this.state
+    const {
+      showClaimSeqModal,
+      showCoPaymentModal,
+      showAddPaymentModal,
+    } = this.state
     const { classes } = this.props
     return (
       <div>
@@ -56,14 +80,20 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleClaimSeqClick={this.toggleClaimSequenceModal}
+                handleCoPaymentClick={this.toggleCoPaymentModal}
               />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
-              <InvoiceSummary />
+              <InvoiceSummary
+                handleAddPaymentClick={this.toggleAddPaymentModal}
+              />
             </GridContainer>
           </GridContainer>
         </Paper>
         <div className={classes.paymentButton}>
+          <Button color='info' onClick={this.backToDispense}>
+            <ArrowBack />Dispense
+          </Button>
           <Button color='primary'>Complete Payment</Button>
         </div>
         <CommonModal
@@ -73,6 +103,22 @@ class Billing extends Component {
           onClose={this.toggleClaimSequenceModal}
         >
           {showClaimSeqModal && <EditClaimSeq />}
+        </CommonModal>
+        <CommonModal
+          open={showCoPaymentModal}
+          title='Add Copayer'
+          onConfirm={this.toggleCoPaymentModal}
+          onClose={this.toggleCoPaymentModal}
+        >
+          {showCoPaymentModal && <CoPayment />}
+        </CommonModal>
+        <CommonModal
+          open={showAddPaymentModal}
+          title='Add Payment'
+          onConfirm={this.toggleAddPaymentModal}
+          onClose={this.toggleAddPaymentModal}
+        >
+          {showAddPaymentModal && <AddPayment />}
         </CommonModal>
       </div>
     )

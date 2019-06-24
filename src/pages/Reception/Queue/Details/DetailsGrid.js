@@ -1,18 +1,14 @@
 import React, { PureComponent } from 'react'
 import router from 'umi/router'
-import classnames from 'classnames'
 // dva
 import { connect } from 'dva'
 // table grid component
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-// umi locale
-import { formatMessage } from 'umi/locale'
 // material ui
 import { Tooltip, withStyles } from '@material-ui/core'
 import Pageview from '@material-ui/icons/Pageview'
-import Fullscreen from '@material-ui/icons/Fullscreen'
 // custom components
-import { Button, CommonModal, CommonTableGrid2 } from '@/components'
+import { CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
 // assets
 import { tooltip } from '@/assets/jss/index'
@@ -27,25 +23,6 @@ const styles = () => ({
     zIndex: 999,
   },
 })
-
-const WithFullscreenModal = ({ show, onClose, onConfirm, children }) => {
-  return show ? (
-    <CommonModal
-      open={show}
-      title={formatMessage({
-        id: 'reception.queue.queueLog',
-      })}
-      onClose={onClose}
-      onConfirm={onConfirm}
-      fullScreen
-      showFooter={false}
-    >
-      <div>{children}</div>
-    </CommonModal>
-  ) : (
-    children
-  )
-}
 
 const FuncConfig = { pager: false }
 const TableConfig = {
@@ -98,10 +75,6 @@ const TableConfig = {
 
 @connect(({ queueLog }) => ({ queueLog }))
 class DetailsGrid extends PureComponent {
-  state = {
-    isFullscreen: false,
-  }
-
   onViewDispenseClick = (queue) => {
     const { dispatch, location } = this.props
     const href = `${location.pathname}/dispense/${queue.visitRefNo}`
@@ -165,57 +138,23 @@ class DetailsGrid extends PureComponent {
     return this.Cell({ ...props })
   }
 
-  toggleFullscreen = () => {
-    const { isFullscreen } = this.state
-    this.setState({
-      isFullscreen: !isFullscreen,
-    })
-  }
-
   render () {
     const ActionProps = {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
-    const { classes, queueLog } = this.props
-    const { isFullscreen } = this.state
+    const { queueLog } = this.props
     const { currentFilter, queueListing } = queueLog
-    const height = isFullscreen ? undefined : 600
 
     return (
-      <div>
-        <WithFullscreenModal
-          show={isFullscreen}
-          onClose={this.toggleFullscreen}
-          onConfirm={this.toggleFullscreen}
-        >
-          <CommonTableGrid2
-            height={height}
-            rows={filterData(currentFilter, queueListing)}
-            ActionProps={ActionProps}
-            {...TableConfig}
-            FuncProps={FuncConfig}
-          />
-        </WithFullscreenModal>
-
-        <Tooltip
-          title={formatMessage({ id: 'reception.queue.expandQueueLog' })}
-          placement='bottom-start'
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <Button
-            className={classnames(classes.fullscreenBtn)}
-            justIcon
-            round
-            size='sm'
-            color='primary'
-            onClick={this.toggleFullscreen}
-          >
-            <Fullscreen />
-          </Button>
-        </Tooltip>
-      </div>
+      <CommonTableGrid2
+        height={600}
+        rows={filterData(currentFilter, queueListing)}
+        ActionProps={ActionProps}
+        {...TableConfig}
+        FuncProps={FuncConfig}
+      />
     )
   }
 }
 
-export default withStyles(styles)(DetailsGrid)
+export default DetailsGrid

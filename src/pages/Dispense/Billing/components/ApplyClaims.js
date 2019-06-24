@@ -24,7 +24,11 @@ const styles = (theme) => ({
   },
 })
 
-const ApplyClaims = ({ classes, handleClaimSeqClick }) => {
+const ApplyClaims = ({
+  classes,
+  handleClaimSeqClick,
+  handleCoPaymentClick,
+}) => {
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -35,11 +39,11 @@ const ApplyClaims = ({ classes, handleClaimSeqClick }) => {
           <Edit />
           Claim Seq
         </Button>
-        <Button color='primary' size='sm'>
+        <Button color='primary' size='sm' onClick={handleCoPaymentClick}>
           <Add />
           Co-Payment
         </Button>
-        <Button color='primary' size='sm'>
+        <Button color='primary' size='sm' disabled>
           <Reset />
           Reset
         </Button>

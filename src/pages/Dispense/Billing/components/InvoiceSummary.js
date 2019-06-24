@@ -19,7 +19,7 @@ const styles = () => ({
   },
 })
 
-const InvoiceSummary = ({ classes }) => {
+const InvoiceSummary = ({ classes, handleAddPaymentClick }) => {
   return (
     <React.Fragment>
       <GridItem md={12}>
@@ -107,6 +107,7 @@ const InvoiceSummary = ({ classes }) => {
                 simple
                 size='sm'
                 className={classes.invoiceButton}
+                disabled
               >
                 Print Invoice
               </Button>
@@ -117,6 +118,7 @@ const InvoiceSummary = ({ classes }) => {
                 simple
                 size='sm'
                 className={classes.addPaymentButton}
+                onClick={handleAddPaymentClick}
               >
                 Add Payment
               </Button>

@@ -39,7 +39,7 @@ class EditClaimSeq extends Component {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, onConfirm } = this.props
     return (
       <div className={classes.container}>
         <EditableTableGrid2
@@ -60,7 +60,9 @@ class EditClaimSeq extends Component {
           // schema={pecValidationSchema}
         />
         <div className={classes.saveChangesButton}>
-          <Button color='primary'>Save Changes</Button>
+          <Button color='primary' onClick={onConfirm}>
+            Save Changes
+          </Button>
         </div>
       </div>
     )

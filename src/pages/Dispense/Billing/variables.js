@@ -50,3 +50,29 @@ const generateClaimSequenceData = () => {
 }
 
 export const ClaimSequenceData = generateClaimSequenceData()
+
+export const CoPaymentColumns = [
+  { name: 'name', title: 'Name' },
+  { name: 'payableAmount', title: 'Payable Amount' },
+  { name: 'claimAmount', title: 'Claim Amount' },
+]
+
+export const CoPaymentColExtensions = [
+  { columnName: 'payableAmount', type: 'currency' },
+  { columnName: 'claimAmount', type: 'currency' },
+]
+
+const generateCoPaymentData = () => {
+  let data = []
+  for (let i = 0; i < 4; i++) {
+    data.push({
+      id: i,
+      name: `CHAS PA ${i}`,
+      payableAmount: 100,
+      claimAmount: 20,
+    })
+  }
+  return data
+}
+
+export const CoPaymentData = generateCoPaymentData()

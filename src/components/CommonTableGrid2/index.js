@@ -410,6 +410,7 @@ class CommonTableGrid2 extends React.Component {
     const {
       grouping,
       selectable,
+      selectConfig = { showSelectAll: false },
       pager,
       pagerConfig = {},
       pagerStateConfig,
@@ -588,6 +589,7 @@ class CommonTableGrid2 extends React.Component {
                 highlightRow
                 selectByRowClick
                 showSelectionColumn
+                {...selectConfig}
               />
             )}
 
