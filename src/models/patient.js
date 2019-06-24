@@ -14,6 +14,7 @@ export default createFormViewModel({
         patientAccountNo: '',
         patientEmergencyContact: [],
         patientAllergy: [],
+        patientMedicalAlert: [],
         // dob: new Date(),
         contact: {
           contactAddress: [
