@@ -3,8 +3,12 @@ import { connect } from 'dva'
 import classnames from 'classnames'
 // material ui
 import { Divider, Paper, withStyles } from '@material-ui/core'
+import Check from '@material-ui/icons/ArrowForward'
 // common component
 import { Button } from '@/components'
+// styling
+import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
+// variables
 import { StatusIndicator } from '../variables'
 import { getStatisticCount } from '../utils'
 
@@ -13,7 +17,7 @@ const StatisticStyles = () => ({
     textAlign: 'center',
     marginLeft: '5px',
     marginRight: '5px',
-    width: '100px',
+    width: '120px',
   },
   number: {
     padding: '0px 10px',
@@ -24,13 +28,13 @@ const StatisticStyles = () => ({
     color: '#000',
   },
   statusInProgress: {
-    color: '#2196f3',
+    color: dangerColor,
   },
   statusCompleted: {
-    color: '#616161',
+    color: grayColor,
   },
   statusWaiting: {
-    color: '#f50057',
+    color: primaryColor,
   },
   status: { padding: '0px 10px', margin: '5px 0px', fontWeight: 400 },
 })
@@ -77,8 +81,9 @@ class StatisticIndicator extends PureComponent {
             block
             id={StatusIndicator.ALL}
             onClick={this.onButtonClick}
-            simple={currentFilter !== StatusIndicator.ALL}
+            simple
           >
+            {currentFilter === StatusIndicator.ALL && <Check />}
             {StatusIndicator.ALL}
           </Button>
         </Paper>
@@ -99,8 +104,9 @@ class StatisticIndicator extends PureComponent {
             block
             id={StatusIndicator.APPOINTMENT}
             onClick={this.onButtonClick}
-            simple={currentFilter !== StatusIndicator.APPOINTMENT}
+            simple
           >
+            {currentFilter === StatusIndicator.APPOINTMENT && <Check />}
             {StatusIndicator.APPOINTMENT}
           </Button>
         </Paper>
@@ -121,8 +127,8 @@ class StatisticIndicator extends PureComponent {
             block
             id={StatusIndicator.WAITING}
             onClick={this.onButtonClick}
-            simple={currentFilter !== StatusIndicator.WAITING}
           >
+            {currentFilter === StatusIndicator.WAITING && <Check />}
             {StatusIndicator.WAITING}
           </Button>
         </Paper>
@@ -138,13 +144,13 @@ class StatisticIndicator extends PureComponent {
           <Divider variant='fullWidth' />
 
           <Button
-            color='primary'
+            color='danger'
             size='sm'
             block
             id={StatusIndicator.IN_PROGRESS}
             onClick={this.onButtonClick}
-            simple={currentFilter !== StatusIndicator.IN_PROGRESS}
           >
+            {currentFilter === StatusIndicator.IN_PROGRESS && <Check />}
             {StatusIndicator.IN_PROGRESS}
           </Button>
         </Paper>
@@ -160,13 +166,12 @@ class StatisticIndicator extends PureComponent {
           <Divider variant='fullWidth' />
 
           <Button
-            color='primary'
             size='sm'
             block
             onClick={this.onButtonClick}
             id={StatusIndicator.COMPLETED}
-            simple={currentFilter !== StatusIndicator.COMPLETED}
           >
+            {currentFilter === StatusIndicator.COMPLETED && <Check />}
             {StatusIndicator.COMPLETED}
           </Button>
         </Paper>

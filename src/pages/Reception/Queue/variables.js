@@ -12,6 +12,7 @@ export const visitStatusCode = [
   'TO DISPENSE',
   'IN CONS',
   'PAUSED',
+  'PAID',
   'OVERPAID',
   'COMPLETED',
 ]
@@ -32,6 +33,7 @@ export const filterMap = {
     'PAUSED',
   ],
   [StatusIndicator.COMPLETED]: [
+    'PAID',
     'OVERPAID',
     'COMPLETED',
   ],

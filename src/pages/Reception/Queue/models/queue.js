@@ -29,6 +29,7 @@ const visitStatusCode = [
   'TO DISPENSE',
   'IN CONS',
   'PAUSED',
+  'PAID',
   'OVERPAID',
   'COMPLETED',
 ]
