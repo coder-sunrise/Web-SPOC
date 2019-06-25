@@ -143,7 +143,7 @@ class Medication extends PureComponent {
                                     <span
                                       style={{
                                         position: 'absolute',
-                                        bottom: 5,
+                                        bottom: 4,
                                       }}
                                     >
                                       {i + 1}.
@@ -268,7 +268,7 @@ class Medication extends PureComponent {
                                     <span
                                       style={{
                                         position: 'absolute',
-                                        bottom: 5,
+                                        bottom: 4,
                                       }}
                                     >
                                       {i + 1}.
