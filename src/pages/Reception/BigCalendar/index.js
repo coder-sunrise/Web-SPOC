@@ -9,7 +9,7 @@ import FilterBar from './components/FilterBar'
 import CalendarView from './components/CalendarView'
 import PopoverContent from './components/PopoverContent'
 import Form from './components/form/Form'
-import DoctorEventForm from './components/form/DoctorEvent'
+import DoctorBlockForm from './components/form/DoctorBlock'
 // settings
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
 // events data variable
@@ -329,7 +329,7 @@ class Appointment extends React.PureComponent {
           maxWidth='sm'
         >
           {showDoctorEventModal && (
-            <DoctorEventForm handleAddDoctorEvent={this.addDoctorEvent} />
+            <DoctorBlockForm handleAddDoctorEvent={this.addDoctorEvent} />
           )}
         </CommonModal>
       </CardContainer>
