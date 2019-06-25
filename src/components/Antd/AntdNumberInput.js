@@ -161,12 +161,14 @@ class AntdNumberInput extends React.PureComponent {
     //     displayValue: formatter(value),
     //   })
     // }
-    const v = {
-      target: {
-        value,
-        name: props.field.name,
-      },
-    }
+    const v = props.field
+      ? {
+          target: {
+            value,
+            name: props.field.name,
+          },
+        }
+      : { target: { value, name: props.name } }
     if (props.field && props.field.onChange) {
       props.field.onChange(v)
     }

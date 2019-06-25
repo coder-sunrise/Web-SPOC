@@ -10,6 +10,10 @@ export default (theme) => ({
   centerText: {
     textAlign: 'center',
   },
+  paymentTypeContainer: {
+    maxHeight: '50vh',
+    overflowX: 'auto',
+  },
   paymentTypeRow: {
     marginTop: theme.spacing.unit * 2,
     marginBottom: theme.spacing.unit,

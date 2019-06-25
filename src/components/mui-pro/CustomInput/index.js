@@ -62,6 +62,7 @@ class FormikTextField extends React.PureComponent {
     const { loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
     // console.log('base c', value, props)
+
     const v = {
       target: {
         value,

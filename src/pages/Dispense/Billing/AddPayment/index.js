@@ -1,136 +1,113 @@
 import React, { Component } from 'react'
+import * as Yup from 'yup'
+// formik
+import { Formik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import TrashBin from '@material-ui/icons/Delete'
 // common components
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  NumberInput,
-  TextField,
-  Select,
-} from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 // sub component
 import PayerHeader from './PayerHeader'
 import PaymentType from './PaymentType'
+import PaymentCard from './PaymentCard'
+import PaymentSummary from './PaymentSummary'
 // styling
 import styles from './styles'
+import {
+  getLargestID,
+  mapPaymentListToValues,
+  ValidationScheme,
+  InitialValue,
+} from './variables'
+
+const mapPaymentListToValidationScheme = (schemes, payment) => {
+  return {
+    ...schemes,
+    [payment.id]: ValidationScheme[payment.type],
+  }
+}
 
 class AddPayment extends Component {
+  state = {
+    paymentList: [],
+  }
+
+  onPaymentTypeClick = (values) => (event) => {
+    const { currentTarget: { id: type } } = event
+
+    const { paymentList } = this.state
+    const payment = {
+      id: getLargestID(paymentList) + 1,
+      type,
+      ...InitialValue[type],
+    }
+
+    const newPaymentList = paymentList.map((item) => values[item.id])
+    this.setState({
+      paymentList: [
+        ...newPaymentList,
+        payment,
+      ],
+    })
+  }
+
+  onDeleteClick = (event) => {
+    const { currentTarget: { id } } = event
+    const { paymentList } = this.state
+    this.setState({
+      paymentList: paymentList.filter(
+        (payment) => payment.id !== parseInt(id, 10),
+      ),
+    })
+  }
+
+  onConfirmClick = (values, formikBag) => {
+    console.log({ values, formikBag })
+  }
+
   render () {
-    const { classes, onClose, onConfirm } = this.props
+    const { classes, onClose } = this.props
+    const { paymentList } = this.state
+
+    const validationSchema = Yup.object().shape({
+      ...paymentList.reduce(mapPaymentListToValidationScheme, {}),
+    })
+
     return (
       <div>
         <PayerHeader />
-        <PaymentType />
-        <GridContainer justify='space-between' alignItems='flex-end'>
-          <GridItem md={12}>
-            <CardContainer hideHeader>
-              <h5 className={classes.paymentItemHeader}>Cash</h5>
-              <Button
-                justIcon
-                round
-                color='danger'
-                size='sm'
-                className={classes.trashBin}
-              >
-                <TrashBin />
-              </Button>
-              <GridContainer>
-                <GridItem md={6}>
-                  <NumberInput label='Amount' />
-                </GridItem>
-                <GridItem md={6}>
-                  <TextField label='Remarks' />
-                </GridItem>
-              </GridContainer>
-            </CardContainer>
-          </GridItem>
-          <GridItem md={12}>
-            <CardContainer hideHeader>
-              <h5 className={classes.paymentItemHeader}>Nets</h5>
-              <Button
-                justIcon
-                round
-                color='danger'
-                size='sm'
-                className={classes.trashBin}
-              >
-                <TrashBin />
-              </Button>
-              <GridContainer>
-                <GridItem md={6}>
-                  <NumberInput label='Amount' />
-                </GridItem>
-                <GridItem md={6}>
-                  <TextField label='Remarks' />
-                </GridItem>
-              </GridContainer>
-            </CardContainer>
-          </GridItem>
-          <GridItem md={12}>
-            <CardContainer hideHeader>
-              <h5 className={classes.paymentItemHeader}>Credit Card</h5>
-              <Button
-                justIcon
-                round
-                color='danger'
-                size='sm'
-                className={classes.trashBin}
-              >
-                <TrashBin />
-              </Button>
-              <GridContainer>
-                <GridItem md={6}>
-                  <Select
-                    label='Card Type'
-                    options={[
-                      { name: 'Credit Card', value: 'creditCard' },
-                      { name: 'Visa', value: 'visa' },
-                    ]}
-                  />
-                </GridItem>
-                <GridItem md={6}>
-                  <NumberInput label='Card No.' />
-                </GridItem>
-              </GridContainer>
-              <GridContainer>
-                <GridItem md={6}>
-                  <NumberInput label='Amount' />
-                </GridItem>
-                <GridItem md={6}>
-                  <TextField label='Remarks' />
-                </GridItem>
-              </GridContainer>
-            </CardContainer>
-          </GridItem>
-          <GridItem md={6} className={classes.paymentSummary}>
-            <h4>Outstanding balance after payment: $0.00</h4>
-          </GridItem>
-          <GridItem md={6} container className={classes.paymentSummary}>
-            <GridItem md={6}>Total Payment: </GridItem>
-            <GridItem md={6}>$ 0.00</GridItem>
+        <Formik
+          enableReinitialize
+          initialValues={paymentList.reduce(mapPaymentListToValues, {})}
+          validationSchema={validationSchema}
+          onSubmit={this.onConfirmClick}
+          render={({ errors, values, handleSubmit }) => {
+            console.log({ errors })
+            return (
+              <React.Fragment>
+                <PaymentType
+                  handlePaymentTypeClick={this.onPaymentTypeClick(values)}
+                />
+                <PaymentCard
+                  paymentList={paymentList}
+                  handleDeletePayment={this.onDeleteClick}
+                />
 
-            <GridItem md={6}>Cash Rounding: </GridItem>
-            <GridItem md={6}>$ 0.00</GridItem>
-            <GridItem md={6}>Collectable Amount: </GridItem>
-            <GridItem md={6}>$ 0.00</GridItem>
-            <GridItem md={6}>Cash Received: </GridItem>
-            <GridItem md={6}>$ 0.00</GridItem>
-            <GridItem md={6}>Cash Returned: </GridItem>
-            <GridItem md={6}>$ 0.00</GridItem>
-          </GridItem>
-          <GridItem md={12} className={classes.addPaymentActionButtons}>
-            <Button size='sm' color='danger' onClick={onClose}>
-              Cancel
-            </Button>
-            <Button size='sm' color='primary' onClick={onConfirm}>
-              Confirm
-            </Button>
-          </GridItem>
-        </GridContainer>
+                <GridContainer alignItems='flex-end'>
+                  <PaymentSummary />
+                  <GridItem md={12} className={classes.addPaymentActionButtons}>
+                    <Button color='danger' onClick={onClose}>
+                      Cancel
+                    </Button>
+                    <Button color='primary' onClick={handleSubmit}>
+                      Confirm
+                    </Button>
+                  </GridItem>
+                </GridContainer>
+              </React.Fragment>
+            )
+          }}
+        />
       </div>
     )
   }
