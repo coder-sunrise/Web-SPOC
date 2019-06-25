@@ -306,7 +306,7 @@ class Appointment extends React.PureComponent {
 
         <CommonModal
           open={showAppointmentForm}
-          title='Appointment Form'
+          title='Appointment'
           onClose={this.toggleAppointmentForm}
           onConfirm={this.toggleAppointmentForm}
           showFooter={false}

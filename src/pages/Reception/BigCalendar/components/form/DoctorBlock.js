@@ -1,13 +1,15 @@
 import React from 'react'
 import moment from 'moment'
+import classnames from 'classnames'
 import * as Yup from 'yup'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
-import { Paper, withStyles } from '@material-ui/core'
+import { Divider, Paper, withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
+  Checkbox,
   GridContainer,
   GridItem,
   Select,
@@ -17,8 +19,12 @@ import {
   NumberInput,
   RadioGroup,
 } from '@/components'
+// sub components
+import Recurrence from './Recurrence'
+import style from './style'
 
 const STYLES = (theme) => ({
+  ...style,
   paperContainer: {
     padding: theme.spacing.unit,
   },
@@ -144,71 +150,26 @@ function DoctorEventForm ({ classes, handleSubmit, values, ...props }) {
           </GridItem>
           <GridItem xs md={12}>
             <FastField
-              name='subject'
-              render={(args) => <TextField {...args} label='Subject' />}
-            />
-          </GridItem>
-          <GridItem xs md={12}>
-            <FastField
-              name='description'
+              name='remarks'
               render={(args) => (
-                <TextField
-                  {...args}
-                  label='Description'
-                  multiline
-                  rowsMax={4}
-                />
+                <TextField {...args} label='Remarks' multiline rowsMax={4} />
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
+          <GridItem
+            xs
+            md={12}
+            className={classnames(classes.enableOccurenceCheckbox)}
+          >
+            <Divider className={classnames(classes.divider)} />
             <FastField
-              name='recurrencePattern'
-              render={(args) => (
-                <Select
-                  {...args}
-                  options={recurrencePattern}
-                  label='Recurrence Pattern'
-                />
-              )}
+              name='enableRecurrence'
+              render={(args) => {
+                return <Checkbox simple label='Enable Recurrence' {...args} />
+              }}
             />
           </GridItem>
-          <GridItem xs md={12}>
-            <FastField
-              name='recurrenceRange'
-              render={(args) => (
-                <RadioGroup
-                  label='Range of Recurrence'
-                  textField='name'
-                  options={[
-                    {
-                      value: RECURRENCE_RANGE.AFTER,
-                      name: 'End After',
-                    },
-                    {
-                      value: RECURRENCE_RANGE.BY,
-                      name: 'End By',
-                    },
-                  ]}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={12}>
-            {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
-              <FastField
-                name='occurence'
-                render={(args) => <NumberInput {...args} label='Occurence' />}
-              />
-            )}
-            {values.recurrenceRange === RECURRENCE_RANGE.BY && (
-              <FastField
-                name='stopDate'
-                render={(args) => <DatePicker {...args} label='Stop Date' />}
-              />
-            )}
-          </GridItem>
+          <Recurrence values={values} />
         </GridContainer>
       </Paper>
       <GridContainer justify='flex-end' className={classes.buttonContainer}>

@@ -19,7 +19,7 @@ import { recurrencePattern, RECURRENCE_PATTERN } from './variables'
 
 const Recurrence = ({ values }) => {
   return (
-    <GridContainer item md={10}>
+    <GridContainer item md={12}>
       {values.enableRecurrence && (
         <React.Fragment>
           <GridItem xs md={4}>
