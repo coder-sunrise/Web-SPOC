@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import PerfectScrollbar from 'perfect-scrollbar'
 import { formatMessage, FormattedMessage } from 'umi/locale'
@@ -38,6 +39,19 @@ class CommonModal extends React.PureComponent {
     fullWidth: true,
     maxWidth: 'md',
     height: 0,
+  }
+
+  static propTypes = {
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onConfirm: PropTypes.func.isRequired,
+
+    title: PropTypes.string,
+    maxWidth: PropTypes.oneOf([
+      'sm',
+      'lg',
+      'md',
+    ]),
   }
 
   constructor (props) {

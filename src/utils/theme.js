@@ -132,6 +132,7 @@ export const defaultTheme = createMuiTheme({
   },
   overrides: {
     ...sharedOverrides,
+
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -237,6 +238,10 @@ export const defaultTheme = createMuiTheme({
         '& > p': {
           fontSize: defaultFontSize,
         },
+        '& > div': {
+          width: '16px !important',
+          height: '16px !important',
+        },
       },
     },
     MuiButton: {
@@ -266,6 +271,7 @@ export const smallTheme = createMuiTheme({
   },
   overrides: {
     ...sharedOverrides,
+
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -376,6 +382,10 @@ export const smallTheme = createMuiTheme({
         '& > p': {
           fontSize: smallFontSize,
         },
+        '& > div': {
+          width: '12px !important',
+          height: '12px !important',
+        },
       },
     },
     MuiButton: {
@@ -405,6 +415,7 @@ export const largeTheme = createMuiTheme({
   },
   overrides: {
     ...sharedOverrides,
+
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -510,6 +521,10 @@ export const largeTheme = createMuiTheme({
         marginTop: 3,
         '& > p': {
           fontSize: largeFontSize,
+        },
+        '& > div': {
+          width: '20px !important',
+          height: '20px !important',
         },
       },
     },
