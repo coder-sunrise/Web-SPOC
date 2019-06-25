@@ -54,6 +54,11 @@ const generateRowData = () => {
   return data
 }
 
+const mergeGenderAndAge = (data, row) => [
+  ...data,
+  { ...row, 'gender/age': `${row.gender}/${row.age}` },
+]
+
 export default createListViewModel({
   namespace: 'queueLog',
   config: {
@@ -64,7 +69,7 @@ export default createListViewModel({
     state: {
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
-      queueListing: generateRowData(),
+      queueListing: generateRowData().reduce(mergeGenderAndAge, []),
       visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
     },
