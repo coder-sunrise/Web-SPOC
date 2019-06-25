@@ -150,6 +150,7 @@ class AntdSelect extends React.PureComponent {
       onFocus,
       onBlur,
       allowClear = true,
+      style,
       ...restProps
     } = this.props
     const { form, field, value } = restProps

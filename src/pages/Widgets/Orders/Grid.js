@@ -81,7 +81,6 @@ export default ({}) => (
                   // )
                 }}
                 justIcon
-                round
                 color='primary'
                 style={{ marginRight: 5 }}
               >
@@ -99,7 +98,6 @@ export default ({}) => (
                   // )
                 }}
                 justIcon
-                round
                 color='primary'
               >
                 <Delete />

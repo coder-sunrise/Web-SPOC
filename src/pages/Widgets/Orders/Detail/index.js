@@ -29,9 +29,9 @@ import {
 } from '@/components'
 
 import Medication from './Medication'
-// import Memo from './Memo'
-// import MedicalCertificate from './MedicalCertificate'
-// import CertificateAttendance from './CertificateAttendance'
+import Vaccination from './Vaccination'
+import Service from './Service'
+import Consumable from './Consumable'
 // import Others from './Others'
 
 const styles = (theme) => ({
@@ -132,10 +132,10 @@ class Details extends PureComponent {
           </GridContainer>
           <div style={{ marginBottom: theme.spacing(1) }}>
             {type === '1' && <Medication {...cfg} />}
-            {/* {type === '2' && <Memo {...cfg} />}
-          {type === '3' && <MedicalCertificate {...cfg} />}
-          {type === '4' && <CertificateAttendance {...cfg} />}
-          {type === '5' && <Others {...cfg} />} */}
+            {type === '2' && <Vaccination {...cfg} />}
+            {type === '3' && <Service {...cfg} />}
+            {type === '4' && <Consumable {...cfg} />}
+            {type === '5' && <Medication {...cfg} />}
           </div>
 
           <Divider />

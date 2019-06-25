@@ -100,6 +100,7 @@ class AntdNumberInput extends React.PureComponent {
   static defaultProps = {
     disabled: false,
     size: 'default',
+    allowEmpty: true,
   }
 
   constructor (props) {
@@ -191,11 +192,19 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleValueChange = (v) => {
+    // if ((v === undefined || !/\S/.test(v)) && !this.props.allowEmpty) {
+    //   return false
+    // }
+    // console.log(this.props.allowEmpty, v)
+    let newV = v
+    if (v === undefined && !this.props.allowEmpty) {
+      newV = this.props.min
+    }
     this.setState({
-      value: v,
+      value: newV,
     })
 
-    this.debouncedOnChange(v)
+    this.debouncedOnChange(newV)
     return false
   }
 

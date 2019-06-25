@@ -289,14 +289,20 @@ const buttonStyle = {
     },
   },
   simple: {
-    '&,&:focus,&:hover': {
+    '&': {
       color: '#FFFFFF',
       background: 'transparent',
       boxShadow: 'none',
     },
+    '&:focus,&:hover': {
+      backgroundColor: color('#cccccc').darken(0.2).hex(),
+      boxShadow:
+        '0 14px 26px -12px rgba(230, 230, 230, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(230, 230, 230, 0.2)',
+    },
     '&$primary': {
       '&,&:focus,&:hover,&:visited': {
         color: primaryColor,
+        background: 'inherit',
       },
     },
     '&$info': {
@@ -396,7 +402,7 @@ const buttonStyle = {
   },
   sm: {
     padding: '3px 10px !important',
-    fontSize: '0.7rem',
+    fontSize: '0.7rem !important',
     lineHeight: '1.5',
     borderRadius: '0.2rem',
   },
@@ -416,6 +422,11 @@ const buttonStyle = {
     },
     '&:hover,&:focus': {
       textDecoration: 'underline',
+    },
+  },
+  noUnderline: {
+    '&:hover,&:focus': {
+      textDecoration: 'none',
     },
   },
 

@@ -147,7 +147,7 @@ class CommonModal extends React.PureComponent {
       maxWidth = 'md',
       bodyNoPadding = false,
       theme,
-      disableBackdropClick = false,
+      disableBackdropClick = true,
       keepMounted = true,
       footProps = {},
     } = this.props

@@ -51,10 +51,11 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     help,
     fullWidth = true,
     children,
-    style,
     noWrapper = false,
     size = 'medium',
   } = props
+
+  const { style, ...resetProps } = props
 
   const labelClasses = classNames({
     [` ${classes.labelRootError}`]: error,
@@ -90,7 +91,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
         //   underline: underlineClasses,
         //   multiline:classes.multiline,
         // },
-        ...props,
+        ...resetProps,
       })
       break
 

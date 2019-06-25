@@ -25,7 +25,8 @@ const MenuButtonBase = ({ classes, id, onClick, Icon, label, disabled }) => {
     <Button
       className={classes.leftAlign}
       block
-      simple
+      link
+      noUnderline
       disabled={disabled}
       size='sm'
       color='primary'
