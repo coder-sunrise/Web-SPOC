@@ -62,7 +62,7 @@ class SiderMenu extends PureComponent {
       width,
       collapsed,
       miniActive,
-      onCollapse,
+      // onCollapse,
       fixSiderbar,
       theme,
       ...restProps

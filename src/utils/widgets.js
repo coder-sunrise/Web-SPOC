@@ -33,6 +33,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
       loading: Loading,
     }),
+    disabled: true,
     layoutConfig: {
       minW: 12,
       minH: 10,

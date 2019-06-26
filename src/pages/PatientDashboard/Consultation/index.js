@@ -53,6 +53,7 @@ import {
   NumberFormatter,
   confirm,
   SizeContainer,
+  Popconfirm,
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 
@@ -61,6 +62,13 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
+
+const sizes = [
+  'lg',
+  'md',
+  'sm',
+]
+const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 // let layout = {
@@ -82,6 +90,7 @@ const styles = (theme) => ({
   layout: {
     marginLeft: -2,
     marginRight: -3,
+    marginBottom: 30,
   },
   container: {
     width: '100%',
@@ -98,7 +107,7 @@ const styles = (theme) => ({
     textAlign: 'right',
     cursor: 'pointer',
     top: 0,
-    zIndex: 100,
+    zIndex: 1,
     backgroundColor: '#ffffff',
   },
   blockName: {
@@ -166,52 +175,47 @@ class Consultation extends PureComponent {
     this.container = React.createRef()
     // console.log(this.container)
     // console.log(window.innerHeight)
-    // console.log(props)
-
     this.delayedResize = _.debounce(this.resize, 1000)
     window.addEventListener('resize', this.delayedResize)
+    this.delayedChangeLayout = _.debounce(this.changeLayout, 1000)
+
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
     this.pageDefaultWidgets = [
       {
-        id: '00001',
-        widgetFk: '1',
+        id: '1',
         config: {
-          lg: { x: 0, y: 0, w: 6, h: 6, static: true },
-          md: { x: 0, y: 0, w: 5, h: 6, static: true },
+          lg: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 4, static: true },
+          md: { x: 0, y: 0, w: 5, h: 6, minH: 3, minW: 3, static: true },
         },
       },
       {
-        id: '00002',
-        widgetFk: '2',
+        id: '2',
         config: {
-          lg: { x: 6, y: 0, w: 6, h: 4 },
-          md: { x: 5, y: 0, w: 5, h: 4 },
+          lg: { x: 6, y: 0, w: 6, h: 4, minH: 3, minW: 4 },
+          md: { x: 5, y: 0, w: 5, h: 4, minH: 3, minW: 3 },
         },
       },
       {
-        id: '00003',
-        widgetFk: '3',
+        id: '3',
         config: {
-          lg: { x: 6, y: 4, w: 6, h: 2 },
-          md: { x: 5, y: 4, w: 5, h: 2 },
+          lg: { x: 6, y: 4, w: 6, h: 2, minH: 2, minW: 4 },
+          md: { x: 5, y: 4, w: 5, h: 2, minH: 2, minW: 3 },
         },
       },
       {
-        id: '00004',
-        widgetFk: '4',
+        id: '4',
         config: {
-          lg: { x: 0, y: 6, w: 6, h: 6 },
-          md: { x: 0, y: 6, w: 5, h: 6 },
+          lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
+          md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
         },
       },
       {
-        id: '00005',
-        widgetFk: '5',
+        id: '5',
         config: {
-          lg: { x: 6, y: 6, w: 6, h: 6 },
-          md: { x: 5, y: 6, w: 5, h: 6 },
+          lg: { x: 6, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
+          md: { x: 5, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
         },
       },
     ]
@@ -223,20 +227,40 @@ class Consultation extends PureComponent {
       defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
     }
     // console.log(defaultLayout)
-    if (!defaultLayout.keys) {
+    if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
 
     this.state = {
       mode: 'edit',
+      breakpoint: 'lg',
       rowHeight: getLayoutRowHeight(),
       menuOpen: false,
+      collapsed: global.collapsed,
       currentLayout: defaultLayout,
     }
   }
 
+  // static getDerivedStateFromProps (nextProps, preState) {
+  //   const { global } = nextProps
+  //   // console.log(value)
+  //   if (global.collapsed !== preState.collapsed) {
+  //     return {
+  //       collapsed: global.collapsed,
+  //       currentLayout: _.cloneDeep(preState.currentLayout),
+  //     }
+  //   }
+
+  //   return null
+  // }
+
   componentDidMount () {
     // create an instance
+    // console.log(this.props)
+    // const { global } = this.props
+    // $(window).trigger('resize')
+    // console.log($(this.container.current).width())
+    // console.log($(this.container.current).innerWidth())
   }
 
   componentWillUnmount () {
@@ -244,7 +268,7 @@ class Consultation extends PureComponent {
   }
 
   resize = (e) => {
-    console.log(e)
+    // console.log(e)
     this.setState({
       rowHeight: getLayoutRowHeight(),
     })
@@ -264,22 +288,76 @@ class Consultation extends PureComponent {
     })
   }
 
-  removeWidget = (id) => {
+  removeWidget = (widgetId) => {
     const { currentLayout } = this.state
-    const keys = currentLayout.keys.filter((o) => o !== id)
-    const sizes = [
-      'lg',
-      'md',
-      'sm',
-    ]
+
     const layout = {
-      keys,
+      widgets: _.reject(currentLayout.widgets, (w) => w === widgetId),
     }
     sizes.forEach((s) => {
       layout[s] = currentLayout[s]
+      if (layout[s]) {
+        layout[s] = layout[s].filter((o) => o.i !== widgetId)
+      }
     })
-    console.log(layout)
     this.changeLayout(layout)
+  }
+
+  addWidget = (widgetId) => {
+    const { currentLayout } = this.state
+    const layout = _.cloneDeep(currentLayout)
+    layout.widgets.push(widgetId)
+    // console.log(currentLayout)
+    sizes.forEach((s) => {
+      const widget = this.pageDefaultWidgets.find((o) => o.id === widgetId) || {
+        config: {},
+      }
+      if (layout[s]) {
+        const n = {
+          h: 4,
+          w: 6,
+          minH: 3,
+          minW: 4,
+          x: 0,
+          i: widgetId,
+          ...widget.config[s],
+          y: Infinity,
+        }
+        layout[s].push(n)
+        console.log(n)
+      }
+    })
+    this.changeLayout(layout)
+  }
+
+  updateWidget = (ids, changes) => {
+    const keys = Object.keys(changes)
+    for (let index = 0; index < keys.length; index++) {
+      const key = keys[index]
+      console.log(key)
+      if (changes[key]) {
+        this.addWidget(key)
+      } else {
+        this.removeWidget(key)
+      }
+    }
+    // const { currentLayout } = this.state
+    // const widgets = this.getDefaultLayout().widgets.filter(
+    //   (o) => ids.indexOf(o.id) >= 0,
+    // )
+    // console.log(widgets)
+    // const sizes = [
+    //   'lg',
+    //   'md',
+    //   'sm',
+    // ]
+    // const layout = {
+    //   widgets,
+    // }
+    // sizes.forEach((s) => {
+    //   layout[s] = currentLayout[s]
+    // })
+    // this.changeLayout(layout)
   }
 
   changeLayout = (layout) => {
@@ -296,7 +374,7 @@ class Consultation extends PureComponent {
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
     return {
-      keys: defaultWidgets.map((o) => o.id),
+      widgets: defaultWidgets.map((o) => o.id),
       lg: defaultWidgets.map((o) => ({
         ...o.config.lg,
         i: o.id,
@@ -317,21 +395,8 @@ class Consultation extends PureComponent {
         root: classes.paperRoot,
       },
       className: 'widget-container',
-      onMouseEnter: (e) => {
-        // console.log(cfg, e.target)
-        // console.log($(e.target).parent('.widget-container')[0])
-        // elevation[cfg.id] = 3
-        // this.setState({ elevation })
-        if (lasActivedWidgetId === id) return
-        if (lasActivedWidget) {
-          lasActivedWidget.css('overflow', 'hidden')
-        }
-        lasActivedWidget = $($(e.target).parents('.widget-container')[0])
-        if (lasActivedWidget.length > 0) {
-          lasActivedWidgetId = id
-          lasActivedWidget.css('overflow', 'auto')
-        }
-      },
+      onMouseEnter: this.onMouseEnter,
+
       // onMouseOut: (e) => {
       //   console.log(e.target)
 
@@ -348,18 +413,61 @@ class Consultation extends PureComponent {
   }
 
   toggleDrawer = (event) => {
-    this.setState({ openDraw: !this.state.openDraw })
+    this.setState((prevState) => ({ openDraw: !prevState.openDraw }))
   }
+
+  compareNodeLayoutChange = (a, b) => {
+    for (let index = 0; index < a.length; index++) {
+      const a1 = a[index]
+      const b1 = b[index]
+      if (a1.h !== b1.h) return false
+      if (a1.w !== b1.w) return false
+      if (a1.x !== b1.x) return false
+      if (a1.y !== b1.y) return false
+    }
+    return true
+  }
+
+  onMouseEnter = (e) => {
+    // console.log(e.target)
+    // console.log(cfg, e.target)
+    // console.log($(e.target).parent('.widget-container')[0])
+    // elevation[cfg.id] = 3
+    // this.setState({ elevation })
+    // if (lasActivedWidgetId === id) return
+    if (lasActivedWidget) {
+      lasActivedWidget.css('overflow', 'hidden')
+    }
+    lasActivedWidget = $($(e.target).parents('.widget-container')[0])
+    if (lasActivedWidget.length > 0) {
+      lasActivedWidget.css('overflow', 'auto')
+    }
+  }
+
+  // // eslint-disable-next-line camelcase
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   const { global } = nextProps
+  //   // console.log(value)
+  //   if (global.collapsed !== this.state.collapsed) {
+  //     this.setState({
+  //       collapsed: global.collapsed,
+  //       // currentLayout: _.cloneDeep(preState.currentLayout),
+  //     })
+  //     this.forceUpdate()
+  //   }
+  // }
 
   render () {
     const { props, state } = this
     const { classes, theme, dispatch, consultation, ...resetProps } = this.props
+    const { currentLayout } = state
     // console.log(props)
+    // console.log(currentLayout)
     const layoutCfg = {
       className: classes.layout,
       rowHeight: state.rowHeight,
-      layouts: state.currentLayout,
-      breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 },
+      layouts: currentLayout,
+      breakpoints,
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       useCSSTransforms: false,
       margin: [
@@ -370,15 +478,63 @@ class Consultation extends PureComponent {
       draggableHandle: '.dragable',
       isResizable: this.state.mode === 'edit',
       onBreakpointChange: (newBreakpoint, newCols) => {
-        console.log(newBreakpoint, newCols)
+        this.setState({
+          breakpoint: newBreakpoint,
+        })
+        console.log('onBreakpointChange', newBreakpoint, newCols)
       },
-      onLayoutChange: (currentLayout, allLayouts) => {
-        console.log(allLayouts)
+      onLayoutChange: (_currentLayout, allLayouts) => {
+        // console.log(
+        //   'onLayoutChange',
+        //   _currentLayout,
+        //   allLayouts,
+        //   allLayouts[this.state.breakpoint],
+        //   this.state.currentLayout[this.state.breakpoint],
+        //   allLayouts[this.state.breakpoint] ===
+        //     this.state.currentLayout[this.state.breakpoint],
+        //   _.isEqual(
+        //     allLayouts[this.state.breakpoint],
+        //     this.state.currentLayout[this.state.breakpoint],
+        //   ),
+        //   _.isEqualWith(
+        //     allLayouts[this.state.breakpoint],
+        //     this.state.currentLayout[this.state.breakpoint],
+        //     (a, b) => {
+        //       for (let index = 0; index < a.length; index++) {
+        //         const a1 = a[index]
+        //         const b1 = b[index]
+        //         if (a1.h !== b1.h) return false
+        //         if (a1.w !== b1.w) return false
+        //         if (a1.x !== b1.x) return false
+        //         if (a1.y !== b1.y) return false
+        //       }
+        //       return true
+        //     },
+        //   ),
+        // )
         // localStorage.setItem('consultationLayout', JSON.stringify(allLayouts))
-        this.changeLayout(allLayouts)
+        if (
+          !_.isEqualWith(
+            allLayouts[this.state.breakpoint],
+            this.state.currentLayout[this.state.breakpoint],
+            this.compareNodeLayoutChange,
+          )
+        ) {
+          console.log('onLayoutChange')
+          this.delayedChangeLayout(allLayouts)
+        }
+      },
+      onWidthChange: (containerWidth, margin, cols, containerPadding) => {
+        console.log(
+          'onWidthChange',
+          containerWidth,
+          margin,
+          cols,
+          containerPadding,
+        )
       },
     }
-    console.log(state.currentLayout)
+    // console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
@@ -412,10 +568,12 @@ class Consultation extends PureComponent {
         </CardContainer> */}
 
         <ResponsiveGridLayout {...layoutCfg}>
-          {state.currentLayout.keys.map((id) => {
-            const dw = this.pageDefaultWidgets.find((m) => m.id === id)
-            if (!dw) return <div />
-            const w = widgets.find((wg) => wg.id === dw.widgetFk)
+          {state.currentLayout.widgets.map((id) => {
+            const w = widgets.find((o) => o.id === id)
+            if (!w) return <div />
+            const cfgs = state.currentLayout[state.breakpoint]
+            const cfg = cfgs.find((o) => o.i === id)
+            // console.log(cfg)
             const LoadableComponent = w.component
             // console.log(o)
             return (
@@ -431,6 +589,7 @@ class Consultation extends PureComponent {
                             aria-label='Replace'
                             className={classes.margin}
                             size='small'
+                            disabled={cfg.static}
                           >
                             <CompareArrows />
                           </IconButton>
@@ -444,23 +603,22 @@ class Consultation extends PureComponent {
                           <Fullscreen />
                         </IconButton>
                       </Tooltip> */}
-                        <Tooltip title='Delete'>
-                          <IconButton
-                            aria-label='Delete'
-                            className={classes.margin}
-                            size='small'
-                            onClick={() => {
-                              confirm({
-                                title: 'Do you want to remove this widget?',
-                                onOk: () => {
-                                  this.removeWidget(id)
-                                },
-                              })
-                            }}
-                          >
-                            <Clear />
-                          </IconButton>
-                        </Tooltip>
+                        <Popconfirm
+                          title='Do you want to remove this widget?'
+                          onConfirm={() => this.removeWidget(id)}
+                        >
+                          <Tooltip title='Delete'>
+                            <IconButton
+                              aria-label='Delete'
+                              className={classes.margin}
+                              size='small'
+                              disabled={cfg.static}
+                            >
+                              <Clear />
+                            </IconButton>
+                          </Tooltip>
+                        </Popconfirm>
+
                         {/* <Tooltip title='Exit full-screen'>
                           <IconButton
                             aria-label='Exit full-screen'
@@ -510,21 +668,23 @@ class Consultation extends PureComponent {
             style={{
               margin: theme.spacing(2),
             }}
-            label='Selected Widgets'
+            label='Manage Widgets'
             vertical
             simple
-            value={consultation.selectedWidgets}
+            value={currentLayout.widgets}
             valueField='id'
             textField='name'
             options={widgets}
-            onChange={(e) => {
-              console.log(e)
-              dispatch({
-                type: 'consultation/updateState',
-                payload: {
-                  selectedWidgets: e.target.value,
-                },
-              })
+            onChange={(e, s) => {
+              // console.log(e)
+              // dispatch({
+              //   type: 'consultation/updateState',
+              //   payload: {
+              //     selectedWidgets: e.target.value,
+              //   },
+              // })
+              // console.log(e.target.value, s)
+              this.updateWidget(e.target.value, s)
             }}
           />
           <Divider />
