@@ -249,7 +249,7 @@ class CommonModal extends React.PureComponent {
           >
             
           </div> */}
-          {open ? childrenWithProps : null}
+          {open ? childrenWithProps : <div />}
         </DialogContent>
         {showFooter &&
           this.footer({

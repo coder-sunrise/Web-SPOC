@@ -73,7 +73,11 @@ class DetailsActionBar extends PureComponent {
         </GridItem>
 
         <GridItem xs md={3} container alignItems='center'>
-          <Button color='primary' onClick={onRegisterVisitEnterPressed}>
+          <Button
+            color='primary'
+            disabled={currentSearchPatient === ''}
+            onClick={onRegisterVisitEnterPressed}
+          >
             <Search />
             Search
           </Button>

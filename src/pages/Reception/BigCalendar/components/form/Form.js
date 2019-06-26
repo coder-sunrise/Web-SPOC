@@ -28,7 +28,7 @@ import {
   Danger,
 } from '@/components'
 // custom components
-import AppointmentTypeSelector from '../../../Appointment/Calendar/Appointments/AppointmentTypeSelector'
+import AppointmentTypeSelector from '../AppointmentTypeSelector'
 import NewPatient from '../../../../PatientDatabase/New'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
@@ -634,15 +634,13 @@ class Form extends React.PureComponent {
             maxWidth='md'
             showFooter={false}
           >
-            {showSearchPatientModal ? (
-              <PatientSearchModal
-                searchPatientName={values.patientName}
-                patientList={patientList}
-                handleSearchPatient={this.searchPatient}
-                onBackClick={this.closeSearchPatientModal}
-                onSelectClick={this.handleSelectPatient}
-              />
-            ) : null}
+            <PatientSearchModal
+              searchPatientName={values.patientName}
+              patientList={patientList}
+              handleSearchPatient={this.searchPatient}
+              onBackClick={this.closeSearchPatientModal}
+              onSelectClick={this.handleSelectPatient}
+            />
           </CommonModal>
           <CommonModal
             open={showDeleteConfirmationModal}
