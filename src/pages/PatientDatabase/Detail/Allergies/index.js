@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { withFormik, FastField } from 'formik'
+import { withFormik, FastField,Field } from 'formik'
 import * as Yup from 'yup'
 import { withStyles } from '@material-ui/core'
 import { notification, Checkbox, CardContainer, CommonHeader, Select, GridContainer, GridItem } from '@/components'
@@ -22,13 +22,11 @@ const styles = () => ({
   },
 })
 
-@connect(({ allergy }) => ({
-  allergy,
-}))
-
 @withFormik({
-  mapPropsToValues: ({ allergy }) => {
-    return allergy.entity
+  mapPropsToValues: ({ patient }) => {
+    console.log('allergy map')
+    console.log(patient)
+    return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
     EditingItems: Yup.array().of(
@@ -60,6 +58,16 @@ const styles = () => ({
 class Allergies extends PureComponent {
   state = {
     height: 0,
+    isGridEditable: true
+  }
+
+  onChangeOfCheckBox = (event, checked) => {
+    checked == true ? this.setState({ isGridEditable: false }) : this.setState({ isGridEditable: true })
+  }
+  onSaveClick(values) {
+    this.setState(this.state)
+    console.log('here update')
+    console.log(values)
   }
 
   componentDidMount() {
@@ -86,22 +94,27 @@ class Allergies extends PureComponent {
 
   render() {
     const { height } = this.state
-    const { classes, allergy, dispatch } = this.props
+    const { classes, allergy, dispatch, patient, values, ...restProps } = this.props
 
+    console.log('allergy render')
+    console.log(values)
     return (
       <CardContainer title={this.titleComponent} hideHeader>
         <GridContainer
           alignItems='flex-start'>
           <GridItem xs md={12}>
-            <FastField
+            <Field
               name='HasAllergy'
               render={(args) => {
                 return (
                   <Checkbox
+                    disabled = {values.patientAllergy.length > 0}
                     simple
                     label={"This patient doesn't has any allergy"}
+                    onChange={this.onChangeOfCheckBox.bind(this)}
                     {...args}
                   />
+
                 )
               }}
             />
@@ -127,11 +140,15 @@ class Allergies extends PureComponent {
             </h4></GridItem>
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
+              rows={values.patientAllergy.filter((o) => !o.isDeleted)}
               type='Allergy'
-              entity={allergy.entity}
-              dispatch={dispatch}
               title='Allergy'
               height={height}
+              onSaveClick={this.onSaveClick.bind(this)}
+              values={values}
+              isEditable={this.state.isGridEditable}
+              setArrayValue = {(items)=>{this.props.setFieldValue('patientAllergy',items)}}
+              {...restProps}
             />
           </GridItem>
 
@@ -141,18 +158,21 @@ class Allergies extends PureComponent {
 
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
+              rows={values.patientMedicalAlert.filter((o) => !o.isDeleted)}
               type='Alert'
-              entity={allergy.entity}
-              dispatch={dispatch}
               title='Medical Alert'
               height={height}
+              values={values}
+              isEditable={true}
+              setArrayValue = {(items)=>{this.props.setFieldValue('patientMedicalAlert',items)}}
+              {...restProps}
             />
           </GridItem>
         </GridContainer>
         {getFooter({
-            resetable: true,
-            ...this.props,
-          })}
+          resetable: true,
+          ...this.props,
+        })}
       </CardContainer>
     )
   }

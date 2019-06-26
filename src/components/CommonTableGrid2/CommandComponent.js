@@ -4,14 +4,7 @@ import { Button } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
 const EditButton = ({ onExecute }) => (
-  <Button
-    size='sm'
-    onClick={onExecute}
-    justIcon
-    round
-    color='primary'
-    title='Edit'
-  >
+  <Button size='sm' onClick={onExecute} justIcon color='primary' title='Edit'>
     <Edit />
   </Button>
 )
@@ -20,11 +13,10 @@ const CancelButton = ({ onExecute }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      updateGlobalVariable('gridIgnoreValidation', true)
+      // updateGlobalVariable('gridIgnoreValidation', true)
       onExecute(e)
     }}
     justIcon
-    round
     color='danger'
     title='Cancel'
   >
@@ -36,11 +28,10 @@ const DeleteButton = ({ onExecute }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      updateGlobalVariable('gridIgnoreValidation', true)
+      // updateGlobalVariable('gridIgnoreValidation', true)
       onExecute(e)
     }}
     justIcon
-    round
     color='primary'
     title='Delete'
   >
@@ -53,7 +44,7 @@ const AddButton = ({ onExecute }) => (
     <Button
       color='primary'
       onClick={(e) => {
-        updateGlobalVariable('gridIgnoreValidation', false)
+        // updateGlobalVariable('gridIgnoreValidation', false)
         onExecute(e)
       }}
       title='Create new row'
@@ -69,12 +60,11 @@ const CommitButton = ({ onExecute }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      updateGlobalVariable('gridIgnoreValidation', false)
+      // updateGlobalVariable('gridIgnoreValidation', false)
       onExecute(e)
     }}
     justIcon
     data-button-type='progress'
-    round
     color='primary'
     title='Save'
     style={{ marginRight: 5 }}

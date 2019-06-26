@@ -280,6 +280,7 @@ class ControlTest extends PureComponent {
                     label='Persist'
                     inputLabel='Input Persist'
                     labelPlacement='end'
+                    prefix='External Prescription'
                     mode='default'
                     {...args}
                   />

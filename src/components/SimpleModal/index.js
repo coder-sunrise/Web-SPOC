@@ -1,8 +1,9 @@
 import React from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import classNames from 'classnames'
-import SweetAlert from 'react-bootstrap-sweetalert'
 import ModalWrapper from '@/components/ModalWrapper'
+import { SweetAlert } from '@/components'
+
 import CircularProgress from '@material-ui/core/CircularProgress'
 import { withStyles } from '@material-ui/core/styles'
 import sweetAlertStyle from 'mui-pro-jss/material-dashboard-pro-react/views/sweetAlertStyle.jsx'

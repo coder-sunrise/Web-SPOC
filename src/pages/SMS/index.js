@@ -19,10 +19,7 @@ const styles = {
 }
 
 const SMS = (props) => {
-  const [
-    showMessageModal,
-    setShowMessageModal,
-  ] = useState(false)
+  const [ showMessageModal, setShowMessageModal ] = useState(false)
   const { classes } = props
   const newMessageProps = {
     onSend: (value) => {
@@ -45,7 +42,6 @@ const SMS = (props) => {
   }
   const gridProps = {
     showSMSHistory: () => {
-      console.log('test')
       setShowMessageModal(true)
     },
   }

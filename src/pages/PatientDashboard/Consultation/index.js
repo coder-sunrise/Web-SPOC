@@ -22,10 +22,11 @@ import {
   Fab,
   Slide,
   Tooltip,
+  Drawer,
 } from '@material-ui/core'
 import MoreVert from '@material-ui/icons/MoreVert'
 import Clear from '@material-ui/icons/Clear'
-import Add from '@material-ui/icons/Add'
+import Settings from '@material-ui/icons/Settings'
 import Edit from '@material-ui/icons/Edit'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
@@ -131,11 +132,13 @@ const styles = (theme) => ({
   },
   fabContainer: {
     position: 'fixed',
-    bottom: 10,
-    right: 10,
+    right: -3,
+    top: '50%',
     zIndex: 1000,
-    '&> button': {
-      marginLeft: 10,
+    '& button': {
+      borderRadius: '0px !important',
+      borderTopLeftRadius: '3px !important',
+      borderBottomLeftRadius: '3px !important',
     },
   },
   widgetPopper: {
@@ -167,8 +170,8 @@ class Consultation extends PureComponent {
 
     this.delayedResize = _.debounce(this.resize, 1000)
     window.addEventListener('resize', this.delayedResize)
-    console.log(localStorage.getItem('consultationLayout'))
-    console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
+    // console.log(localStorage.getItem('consultationLayout'))
+    // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
     this.pageDefaultWidgets = [
       {
@@ -218,6 +221,10 @@ class Consultation extends PureComponent {
       defaultLayout = this.getDefaultLayout()
     } else {
       defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
+    }
+    // console.log(defaultLayout)
+    if (!defaultLayout.keys) {
+      defaultLayout = this.getDefaultLayout()
     }
 
     this.state = {
@@ -340,6 +347,10 @@ class Consultation extends PureComponent {
     }))
   }
 
+  toggleDrawer = (event) => {
+    this.setState({ openDraw: !this.state.openDraw })
+  }
+
   render () {
     const { props, state } = this
     const { classes, theme, dispatch, consultation, ...resetProps } = this.props
@@ -375,17 +386,15 @@ class Consultation extends PureComponent {
             <div style={{ textAlign: 'center', paddingTop: 16 }}>
               <p>Total Invoice</p>
               <h5>{NumberFormatter(210)}</h5>
-              <div>
-                <Button size='sm' color='danger'>
-                  Discard
-                </Button>
-                <ProgressButton size='sm' color='info' icon={null}>
+              <SizeContainer size='sm'>
+                <Button color='danger'>Discard</Button>
+                <ProgressButton color='info' icon={null}>
                   Save Changes
                 </ProgressButton>
-                <ProgressButton size='sm' color='primary' icon={null}>
+                <ProgressButton color='primary' icon={null}>
                   Sign Off
                 </ProgressButton>
-              </div>
+              </SizeContainer>
             </div>
           }
           {...this.props}
@@ -477,85 +486,64 @@ class Consultation extends PureComponent {
         </ResponsiveGridLayout>
 
         <div className={classes.fabContainer}>
-          {this.state.mode === 'default' && (
-            <Fab color='info' className={classes.fab} onClick={this.toggleMode}>
-              <Edit />
-            </Fab>
-          )}
-          {this.state.mode === 'edit' && (
-            <Slide direction='up' in={this.state.mode === 'edit'} mountOnEnter>
-              <div>
-                <Fab
-                  color='secondary'
-                  className={classes.fab}
-                  style={{ marginRight: 8 }}
-                  onClick={this.showWidgetManagePanel}
-                >
-                  <Add />
-                </Fab>
-                <Popper
-                  anchorEl={state.anchorEl}
-                  open={state.menuOpen}
-                  transition
-                  disablePortal
-                  onClose={this.closeWidgetManagePanel}
-                  className={classes.widgetPopper}
-                >
-                  {({ TransitionProps }) => (
-                    <Fade {...TransitionProps} timeout={350}>
-                      <ClickAwayListener
-                        onClickAway={this.closeWidgetManagePanel}
-                      >
-                        <Paper>
-                          <CheckboxGroup
-                            style={{
-                              margin: theme.spacing(1),
-                            }}
-                            label='Selected Widgets'
-                            vertical
-                            simple
-                            value={consultation.selectedWidgets}
-                            valueField='id'
-                            textField='name'
-                            options={widgets}
-                            onChange={(e) => {
-                              console.log(e)
-                              dispatch({
-                                type: 'consultation/updateState',
-                                payload: {
-                                  selectedWidgets: e.target.value,
-                                },
-                              })
-                            }}
-                          />
-                          <Divider />
-                          <div
-                            style={{
-                              padding: theme.spacing(1),
-                            }}
-                          >
-                            <Button
-                              onClick={() => {
-                                this.changeLayout(this.getDefaultLayout())
-                              }}
-                              color='danger'
-                              size='sm'
-                            >
-                              Reset
-                            </Button>
-                          </div>
-                        </Paper>
-                      </ClickAwayListener>
-                    </Fade>
-                  )}
-                </Popper>
-                {/* <Fab className={classes.fab} onClick={this.toggleMode}>
-                  <Clear />
-                </Fab> */}
-              </div>
-            </Slide>
-          )}
+          <Slide direction='up' in={this.state.mode === 'edit'} mountOnEnter>
+            <div>
+              <Fab
+                color='secondary'
+                className={classes.fab}
+                style={{ marginRight: 8 }}
+                variant='extended'
+                size='small'
+                onClick={this.toggleDrawer}
+              >
+                <Settings />
+              </Fab>
+            </div>
+          </Slide>
         </div>
+        <Drawer
+          anchor='right'
+          open={this.state.openDraw}
+          onClose={this.toggleDrawer}
+        >
+          <CheckboxGroup
+            style={{
+              margin: theme.spacing(2),
+            }}
+            label='Selected Widgets'
+            vertical
+            simple
+            value={consultation.selectedWidgets}
+            valueField='id'
+            textField='name'
+            options={widgets}
+            onChange={(e) => {
+              console.log(e)
+              dispatch({
+                type: 'consultation/updateState',
+                payload: {
+                  selectedWidgets: e.target.value,
+                },
+              })
+            }}
+          />
+          <Divider />
+          <div
+            style={{
+              padding: theme.spacing(2),
+            }}
+          >
+            <Button
+              onClick={() => {
+                this.changeLayout(this.getDefaultLayout())
+              }}
+              color='danger'
+              size='sm'
+            >
+              Reset
+            </Button>
+          </div>
+        </Drawer>
       </div>
     )
   }

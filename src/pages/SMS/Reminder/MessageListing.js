@@ -53,10 +53,7 @@ const styles = (theme) => ({
 })
 
 const MessageListing = (props) => {
-  const [
-    list,
-    setList,
-  ] = useState([
+  const [ list, setList ] = useState([
     {
       date: '2019-05-01 21:37',
       text: 'Hi Tan Ah Kow',
@@ -159,7 +156,7 @@ const MessageListing = (props) => {
       let p = { text, avatar, isOwn, deliveryStatus }
       m = m.concat(
         <React.Fragment key={current.id}>
-          {showTimestamp && <div>{date}</div>}
+          {showTimestamp && <div style={{ textAlign: 'center' }}>{date}</div>}
           <Row reverse={!!isOwn}>
             <Avatar imgUrl={avatar} />
             <Message {...p}>
@@ -179,19 +176,21 @@ const MessageListing = (props) => {
     return m
   }
   const newMessageProps = {
-    onSend: (value) => {
+    onSend: (arr) => {
       setList([
         ...list,
-        {
-          date: moment().format('YYYY-MM-DD HH-mm'),
-          text: value,
-          avatar:
-            'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-          // authorName: 'Jonn Smith',
-          isOwn: true,
-          deliveryStatus: 'Pending',
-          id: list.length + 1,
-        },
+        ...arr.map((m, index) => {
+          return {
+            date: moment().format('YYYY-MM-DD HH-mm'),
+            text: m,
+            avatar:
+              'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
+            // authorName: 'Jonn Smith',
+            isOwn: true,
+            deliveryStatus: 'Pending',
+            id: list.length + 1 + index,
+          }
+        }),
       ])
     },
   }

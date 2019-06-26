@@ -76,12 +76,13 @@ class DetailsActionBar extends PureComponent {
           <Button
             color='primary'
             disabled={currentSearchPatient === ''}
+            size='sm'
             onClick={onRegisterVisitEnterPressed}
           >
             <Search />
             Search
           </Button>
-          <Button color='primary' onClick={toggleNewPatient}>
+          <Button color='primary' size='sm' onClick={toggleNewPatient}>
             <PersonAdd />
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>

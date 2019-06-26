@@ -18,9 +18,7 @@ const RecurrenceWeekly = ({ values }) => {
   const maxTagCount = selectedDays.length === 1 ? 1 : 0
   const everyDay = 'Every day'
   const maxTagPlaceholder =
-    selectedDays.length === 7
-      ? everyDay
-      : `${selectedDays.length} days selected`
+    selectedDays.length === 7 ? everyDay : `${selectedDays.length} selected`
 
   return (
     <GridContainer item xs md={8}>
