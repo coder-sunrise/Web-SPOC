@@ -27,18 +27,20 @@ const routes = [
     ],
     authority: [
       'admin',
-      'user',
       'guest',
+      'user',
     ],
     routes: [
-      // dashboard
+      // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
-
       // Reception
       {
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
+        // authority: [
+        //   'user',
+        // ],
         routes: [
           {
             path: '/reception/queue',
