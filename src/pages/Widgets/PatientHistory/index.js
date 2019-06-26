@@ -186,6 +186,7 @@ class PatientHistory extends Component {
             >
               {data.map((o) => (
                 <ListItem
+                  key={o.id}
                   alignItems='flex-start'
                   classes={{
                     root: classes.listItemRoot,

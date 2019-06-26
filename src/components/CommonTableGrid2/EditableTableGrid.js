@@ -229,18 +229,22 @@ class EditableTableGrid extends PureComponent {
         availableColumns = [],
         showAddCommand = false,
         showEditCommand = true,
-        showDeleteCommand = true
+        showDeleteCommand = true,
         // EditCell = DefaultEditCell,
       } = {},
       ...props
     } = this.props
     // console.log(editingRowIds, this.state.errorRows)
-
+    // console.log('this.containerComponent', this.containerComponent)
+    const cfg = {}
+    if (this.containerComponent) {
+      cfg.containerComponent = this.containerComponent
+    }
     return (
       <CommonTableGrid
         columnExtensions={columnExtensions}
+        {...cfg}
         {...props}
-        containerComponent={this.containerComponent}
         extraState={[
           <EditingState
             editingRowIds={[
@@ -260,8 +264,8 @@ class EditableTableGrid extends PureComponent {
         extraColumn={[
           <TableEditColumn
             showAddCommand={this.addable}
-            showEditCommand = {showEditCommand}
-            showDeleteCommand = {showDeleteCommand}
+            showEditCommand={showEditCommand}
+            showDeleteCommand={showDeleteCommand}
             commandComponent={CommandComponent}
             // cellComponent={(cellProps) => {
             //   console.log(cellProps)
