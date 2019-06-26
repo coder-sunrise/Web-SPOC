@@ -38,7 +38,6 @@ const styles = (theme) => ({
     borderImage: 'initial',
   },
   repliedMessage: {
-    // fontWeight: 'bold',
     marginBottom: '0.1em',
     backgroundColor: 'rgb(251, 251, 251)',
     borderTopLeftRadius: '1.4em',
@@ -127,11 +126,8 @@ const MessageListing = (props) => {
       id: 8,
     },
   ])
-
-  console.log('MessageListingRender')
   const { classes } = props
   const renderMessages = (messages) => {
-    console.log('RenderMessagesRerender')
     let i = 0
     let messageCount = messages.length
     let m = []
@@ -196,7 +192,13 @@ const MessageListing = (props) => {
   }
   return (
     <ThemeProvider>
-      <GridContainer direction='column' spacing={8}>
+      <GridContainer
+        style={{
+          overflowY: 'auto',
+        }}
+        direction='column'
+        spacing={8}
+      >
         <Grid item>
           <Paper className={classes.messageBar}>
             <MessageList active>{renderMessages(list)}</MessageList>

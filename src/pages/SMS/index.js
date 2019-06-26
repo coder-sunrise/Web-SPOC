@@ -62,7 +62,7 @@ const SMS = (props) => {
       <CommonModal
         open={showMessageModal}
         title='Send SMS'
-        maxWidth='sm'
+        // maxWidth='sm'
         onClose={() => setShowMessageModal(false)}
         onConfirm={() => setShowMessageModal(true)}
         showFooter={false}
