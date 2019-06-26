@@ -14,7 +14,7 @@ const MessageWrapper = ({ children }) => (
 )
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: true,
+  isClinicSessionClosed: false,
   id: '',
   // sessionNo: `${moment().format('YYMMDD')}-01`,
   sessionNo: 'N/A',

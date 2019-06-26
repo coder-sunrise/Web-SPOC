@@ -81,7 +81,13 @@ const recurrencePattern = [
   { name: 'Monthly', value: 'wonthly' },
 ]
 
-function DoctorEventForm ({ classes, handleSubmit, values, ...props }) {
+function DoctorEventForm ({
+  classes,
+  handleSubmit,
+  onClose,
+  values,
+  ...props
+}) {
   return (
     <React.Fragment>
       <Paper className={classes.paperContainer}>
@@ -174,7 +180,9 @@ function DoctorEventForm ({ classes, handleSubmit, values, ...props }) {
       </Paper>
       <GridContainer justify='flex-end' className={classes.buttonContainer}>
         <GridItem>
-          <Button color='danger'>Cancel</Button>
+          <Button color='danger' onClick={onClose}>
+            Cancel
+          </Button>
           <Button color='primary' onClick={handleSubmit}>
             Save
           </Button>

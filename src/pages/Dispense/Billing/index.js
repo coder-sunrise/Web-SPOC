@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
+import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
 import { Accordion, Button, CommonModal, GridContainer } from '@/components'
 // sub component
@@ -62,6 +63,8 @@ class Billing extends Component {
         <PatientBanner />
         <div style={{ padding: 8 }}>
           <Accordion
+            leftIcon
+            expandIcon={<SolidExpandMore fontSize='large' />}
             collapses={[
               {
                 title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,

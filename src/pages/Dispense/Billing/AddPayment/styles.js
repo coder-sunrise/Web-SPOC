@@ -10,6 +10,9 @@ export default (theme) => ({
   centerText: {
     textAlign: 'center',
   },
+  boldText: {
+    fontWeight: 'bold',
+  },
   paymentTypeContainer: {
     maxHeight: '50vh',
     overflowX: 'auto',
