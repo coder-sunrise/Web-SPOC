@@ -14,7 +14,7 @@ const MessageWrapper = ({ children }) => (
 )
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: true,
+  isClinicSessionClosed: false,
   id: '',
   // sessionNo: `${moment().format('YYMMDD')}-01`,
   sessionNo: 'N/A',
@@ -29,6 +29,7 @@ const visitStatusCode = [
   'TO DISPENSE',
   'IN CONS',
   'PAUSED',
+  'PAID',
   'OVERPAID',
   'COMPLETED',
 ]
@@ -38,7 +39,8 @@ const generateRowData = () => {
   for (let i = 0; i < 12; i += 1) {
     data.push({
       Id: `row-${i}-data`,
-      queueNo: i,
+      queueNo:
+        visitStatusCode[i % visitStatusCode.length] === 'APPOINTMENT' ? '' : i,
       visitStatus: visitStatusCode[i % visitStatusCode.length],
       roomNo: '',
       doctor: 'Cheah',
@@ -52,6 +54,11 @@ const generateRowData = () => {
   return data
 }
 
+const mergeGenderAndAge = (data, row) => [
+  ...data,
+  { ...row, 'gender/age': `${row.gender}/${row.age}` },
+]
+
 export default createListViewModel({
   namespace: 'queueLog',
   config: {
@@ -62,7 +69,7 @@ export default createListViewModel({
     state: {
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
-      queueListing: generateRowData(),
+      queueListing: generateRowData().reduce(mergeGenderAndAge, []),
       visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
     },

@@ -27,21 +27,30 @@ const StatusTypeBase = (props) => {
   )
   let color = 'primary'
 
-  // WAITING, TO DISPENSE, IN CONS, PAUSED, OVERPAID, COMPLETED
+  // WAITING, TO DISPENSE, IN CONS, PAUSED, PAID, OVERPAID, COMPLETED
   const hasBadge = [
     'WAITING',
     'IN CONS',
+    'PAUSED',
+    'TO DISPENSE',
+    'PAID',
+    'OVERPAID',
   ]
   switch (value.toUpperCase()) {
     case 'WAITING':
       color = 'primary'
       break
-    case 'IN CONS':
+    case 'TO DISPENSE':
       color = 'success'
       break
-    // case 'OVERPAID':
-    //   color = 'danger'
-    //   break
+    case 'IN CONS':
+    case 'PAUSED':
+      color = 'danger'
+      break
+    case 'PAID':
+    case 'OVERPAID':
+      color = 'gray'
+      break
     // case 'APPOINTMENT':
     //   color = 'rose'
     //   break

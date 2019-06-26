@@ -1,17 +1,18 @@
 import React from 'react'
+import { connect } from 'dva'
 // material ui
-import { Popover, ClickAwayListener, withStyles } from '@material-ui/core'
-import { Assignment } from '@material-ui/icons'
+import { Popover, withStyles } from '@material-ui/core'
 // common component
-import { CommonHeader, CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import CalendarView from './components/CalendarView'
 import PopoverContent from './components/PopoverContent'
 import Form from './components/form/Form'
-import DoctorEventForm from './components/form/DoctorEvent'
+import DoctorBlockForm from './components/form/DoctorBlock'
 // settings
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
+import { CalendarActions } from './const'
 // events data variable
 import { dndEvents } from './events'
 
@@ -77,6 +78,7 @@ const applyFilter = (data, filter) => {
   return returnData
 }
 
+@connect(({ calendar }) => ({ calendar }))
 class Appointment extends React.PureComponent {
   state = {
     showPopup: false,
@@ -90,7 +92,7 @@ class Appointment extends React.PureComponent {
       { resourceId: 'cheah', resourceTitle: 'Cheah' },
       { resourceId: 'other', resourceTitle: 'Other' },
     ],
-    calendarEvents: dndEvents,
+    // calendarEvents: dndEvents,
     selectedSlot: {},
     filter: {
       searchQuery: '',
@@ -104,58 +106,55 @@ class Appointment extends React.PureComponent {
     isDragging: false,
   }
 
-  addEvent = (newEvent) => {
-    const { calendarEvents } = this.state
-    const newCalendarEvents = [
-      ...calendarEvents,
-      newEvent,
-    ]
+  _dispatchAction = ({ action, ...args }, callback) => {
+    const { dispatch } = this.props
+    dispatch({ type: action, ...args })
+    callback && callback()
+  }
 
-    this.setState({
-      selectedSlot: {},
-      showAppointmentForm: false,
-      calendarEvents: [
-        ...newCalendarEvents,
-      ],
-    })
+  closeAppointmentForm = () => this.setState({ showAppointmentForm: false })
+
+  addEvent = (newEvent) => {
+    this._dispatchAction(
+      {
+        action: CalendarActions.UpdateEvent,
+        added: newEvent,
+      },
+      this.closeAppointmentForm,
+    )
   }
 
   updateEvent = (changedEvent) => {
-    const { calendarEvents } = this.state
-    const newCalendarEvents = [
-      ...calendarEvents.filter((event) => event.id !== changedEvent.id),
-      changedEvent,
-    ]
-
-    this.setState({
-      calendarEvents: [
-        ...newCalendarEvents,
-      ],
-      showAppointmentForm: false,
-      selectedSlot: {},
-    })
+    this._dispatchAction(
+      {
+        action: CalendarActions.UpdateEvent,
+        edited: changedEvent,
+      },
+      this.closeAppointmentForm,
+    )
   }
 
   deleteEvent = (eventID) => {
-    const { calendarEvents } = this.state
-    const newCalendarEvents = calendarEvents.filter(
-      (event) => event.id !== eventID,
+    this._dispatchAction(
+      {
+        action: CalendarActions.UpdateEvent,
+        deleted: eventID,
+      },
+      this.closeAppointmentForm,
     )
-    this.setState({
-      calendarEvents: [
-        ...newCalendarEvents,
-      ],
-      showAppointmentForm: false,
-      selectedSlot: {},
-    })
   }
 
   moveEvent = (newCalendarEvents) => {
-    this.setState({ calendarEvents: newCalendarEvents, isDragging: false })
+    this._dispatchAction({
+      action: CalendarActions.MoveEvent,
+      calendarEvents: newCalendarEvents,
+    })
   }
 
   onSelectSlot = (event) => {
-    let idList = this.state.calendarEvents.map((a) => a.id)
+    const { calendar: CalendarModel } = this.props
+    const { calendarEvents } = CalendarModel
+    let idList = calendarEvents.map((a) => a.id)
     let newId = Math.max(...idList) + 1
     let hour = {
       id: newId,
@@ -175,19 +174,17 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectEvent = (selectedEvent) => {
+    const { isDoctorEvent } = selectedEvent
+
     this.setState({
       showPopup: false,
       isDragging: false,
       popoverEvent: { ...InitialPopoverEvent },
       popupAnchor: null,
       selectedSlot: { ...selectedEvent, type: 'update' },
-      showAppointmentForm: true,
+      showAppointmentForm: !isDoctorEvent && true,
+      showDoctorEventModal: isDoctorEvent,
     })
-  }
-
-  toggleAppointmentForm = () => {
-    const { showAppointmentForm } = this.state
-    this.setState({ showAppointmentForm: !showAppointmentForm })
   }
 
   onEventMouseOver = (event, syntheticEvent) => {
@@ -212,7 +209,7 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  handleOnDragStart = ({ ...dragProps }) => {
+  handleOnDragStart = () => {
     this.setState({
       showPopup: false,
       popoverEvent: { ...InitialPopoverEvent },
@@ -233,36 +230,39 @@ class Appointment extends React.PureComponent {
   }
 
   addDoctorEvent = (newDoctorEvent) => {
-    const { calendarEvents } = this.state
-    const idList = this.state.calendarEvents.map((a) => a.id)
-    const newId = Math.max(...idList) + 1
-    const newCalendarEvents = [
-      ...calendarEvents,
-      { ...newDoctorEvent, id: newId },
-    ]
-
-    this.setState({
-      selectedSlot: {},
-      showDoctorEventModal: false,
-      calendarEvents: [
-        ...newCalendarEvents,
-      ],
-    })
+    const { calendar: { calendarEvents } } = this.props
+    const idList = calendarEvents.map((a) => a.id)
+    const newID = Math.max(...idList) + 1
+    const doctorBlock = { id: newID, ...newDoctorEvent }
+    this._dispatchAction(
+      {
+        action: CalendarActions.UpdateEvent,
+        added: doctorBlock,
+      },
+      () => {
+        this.setState({
+          selectedSlot: {},
+          showDoctorEventModal: false,
+        })
+      },
+    )
   }
 
   render () {
-    const { classes } = this.props
+    const { calendar: CalendarModel, classes } = this.props
     const {
       showPopup,
       popupAnchor,
       showAppointmentForm,
       showDoctorEventModal,
-      calendarEvents,
+      // calendarEvents,
       selectedSlot,
       resources,
       popoverEvent,
       filter,
     } = this.state
+
+    const { calendarEvents } = CalendarModel
 
     return (
       <CardContainer hideHeader size='sm'>
@@ -306,20 +306,18 @@ class Appointment extends React.PureComponent {
 
         <CommonModal
           open={showAppointmentForm}
-          title='Appointment Form'
-          onClose={this.toggleAppointmentForm}
-          onConfirm={this.toggleAppointmentForm}
+          title='Appointment'
+          onClose={this.closeAppointmentForm}
+          onConfirm={this.closeAppointmentForm}
           showFooter={false}
         >
-          {showAppointmentForm ? (
-            <Form
-              resources={resources}
-              slotInfo={selectedSlot}
-              handleAddEvents={this.addEvent}
-              handleUpdateEvents={this.updateEvent}
-              handleDeleteEvent={this.deleteEvent}
-            />
-          ) : null}
+          <Form
+            resources={resources}
+            slotInfo={selectedSlot}
+            handleAddEvents={this.addEvent}
+            handleUpdateEvents={this.updateEvent}
+            handleDeleteEvent={this.deleteEvent}
+          />
         </CommonModal>
         <CommonModal
           open={showDoctorEventModal}
@@ -328,9 +326,7 @@ class Appointment extends React.PureComponent {
           onConfirm={this.handleDoctorEventClick}
           maxWidth='sm'
         >
-          {showDoctorEventModal && (
-            <DoctorEventForm handleAddDoctorEvent={this.addDoctorEvent} />
-          )}
+          <DoctorBlockForm handleAddDoctorEvent={this.addDoctorEvent} />
         </CommonModal>
       </CardContainer>
     )

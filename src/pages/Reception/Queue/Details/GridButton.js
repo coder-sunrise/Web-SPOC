@@ -54,7 +54,7 @@ const ContextMenuOptions = [
     id: 1,
     label: 'Dispense & Bill',
     Icon: Money,
-    disabled: true,
+    disabled: false,
   },
   {
     id: 2,
