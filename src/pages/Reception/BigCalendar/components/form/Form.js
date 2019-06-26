@@ -32,6 +32,7 @@ import AppointmentTypeSelector from '../../../Appointment/Calendar/Appointments/
 import NewPatient from '../../../../PatientDatabase/New'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
+import Recurrence from './Recurrence'
 // services
 import {
   fetchPatientListByName,
@@ -566,76 +567,7 @@ class Form extends React.PureComponent {
                   }}
                 />
               </GridItem>
-              {values.enableRecurrence && (
-                <React.Fragment>
-                  <GridItem xs md={4}>
-                    <FastField
-                      name='recurrencePattern'
-                      render={(args) => (
-                        <Select
-                          {...args}
-                          options={recurrencePattern}
-                          label={formatMessage({
-                            id: 'reception.appt.form.recurrencePattern',
-                          })}
-                        />
-                      )}
-                    />
-                  </GridItem>
-                  <GridContainer item xs md={12}>
-                    <GridItem>
-                      <FastField
-                        name='recurrenceRange'
-                        render={(args) => (
-                          <RadioGroup
-                            label='Range of Recurrence'
-                            textField='name'
-                            options={[
-                              {
-                                value: RECURRENCE_RANGE.AFTER,
-                                name: 'End After',
-                              },
-                              {
-                                value: RECURRENCE_RANGE.BY,
-                                name: 'End By',
-                              },
-                            ]}
-                            {...args}
-                          />
-                        )}
-                      />
-                    </GridItem>
-                    <GridItem>
-                      {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
-                        <Field
-                          name='occurence'
-                          render={(args) => (
-                            <NumberInput
-                              {...args}
-                              label={formatMessage({
-                                id: 'reception.appt.form.occurence',
-                              })}
-                            />
-                          )}
-                        />
-                      )}
-                      {values.recurrenceRange === RECURRENCE_RANGE.BY && (
-                        <FastField
-                          name='stopDate'
-                          render={(args) => (
-                            <DatePicker
-                              {...args}
-                              label={formatMessage({
-                                id: 'reception.appt.form.stopDate',
-                              })}
-                            />
-                          )}
-                        />
-                      )}
-                    </GridItem>
-                  </GridContainer>
-                </React.Fragment>
-              )}
+              <Recurrence values={values} />
             </GridContainer>
           </Paper>
           {hasConflict && (

@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import router from 'umi/router'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
@@ -8,20 +7,8 @@ import Print from '@material-ui/icons/Print'
 import { Button, GridContainer, GridItem } from '@/components'
 // sub component
 import PatientBanner from './components/PatientBanner'
-import TableData from './components/TableData'
+import DispenseDetails from './components/DispenseDetails'
 import style from './style'
-// variables
-import {
-  PrescriptionColumns,
-  PrescriptionColumnExtensions,
-  PrescriptionTableData,
-  VaccinationColumn,
-  VaccinationColumnExtensions,
-  VaccinationData,
-  OtherOrdersColumns,
-  OtherOrdersColumnExtensions,
-  OtherOrdersData,
-} from './variables'
 
 class Dispense extends Component {
   makePayment = () => {
@@ -49,33 +36,7 @@ class Dispense extends Component {
               Print Label
             </Button>
           </GridItem>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Prescription'
-              height={200}
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions}
-              data={PrescriptionTableData}
-            />
-          </GridItem>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Vaccination'
-              height={150}
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions}
-              data={VaccinationData}
-            />
-          </GridItem>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Vaccination'
-              height={150}
-              columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions}
-              data={OtherOrdersData}
-            />
-          </GridItem>
+          <DispenseDetails />
           <GridItem justify='flex-end' container className={classes.footerRow}>
             <Button color='success' size='sm' disabled>
               Save Dispense

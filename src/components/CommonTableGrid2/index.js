@@ -102,7 +102,7 @@ const styles = (theme) => ({
     },
   },
   paperContainer: {
-    margin: '0 5px',
+    // margin: '0 5px',
     '& > div': {
       width: '100%',
     },
@@ -352,6 +352,14 @@ class CommonTableGrid2 extends React.Component {
         type: `${type}/${queryMethod}`,
         payload: p,
       })
+    } else {
+      const { pagination } = this.state
+      this.setState({
+        pagination: {
+          ...pagination,
+          current: payload.current,
+        },
+      })
     }
   }
 
@@ -402,6 +410,7 @@ class CommonTableGrid2 extends React.Component {
     const {
       grouping,
       selectable,
+      selectConfig = { showSelectAll: false },
       pager,
       pagerConfig = {},
       pagerStateConfig,
@@ -585,6 +594,7 @@ class CommonTableGrid2 extends React.Component {
                 highlightRow
                 selectByRowClick
                 showSelectionColumn
+                {...selectConfig}
               />
             )}
 

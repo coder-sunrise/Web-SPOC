@@ -5,7 +5,8 @@ import classnames from 'classnames'
 import { FormattedMessage, formatMessage } from 'umi/locale'
 // material ui
 import { CircularProgress, withStyles } from '@material-ui/core'
-import { PersonAdd } from '@material-ui/icons'
+import PersonAdd from '@material-ui/icons/PersonAdd'
+import Search from '@material-ui/icons/Search'
 // custom components
 import {
   Button,
@@ -35,8 +36,7 @@ const styles = () => ({
     float: 'left',
   },
   toolBtns: {
-    float: 'right',
-    marginTop: '15px',
+    marginBottom: 20,
   },
 })
 
@@ -60,7 +60,7 @@ class DetailsActionBar extends PureComponent {
     } = this.props
     return (
       <GridContainer className={classnames(classes.actionBar)}>
-        <GridItem xs md={4}>
+        <GridItem xs md={3}>
           <TextField
             suffix={isFetching && <CircularProgress size={16} />}
             value={currentSearchPatient}
@@ -69,12 +69,19 @@ class DetailsActionBar extends PureComponent {
             label={formatMessage({
               id: 'reception.queue.registerVisitTextBox',
             })}
-            help='Press enter to search patient'
           />
         </GridItem>
 
-        <GridItem xs md={2} container alignItems='center'>
-          <Button size='sm' color='primary' onClick={toggleNewPatient}>
+        <GridItem xs md={3} container alignItems='center'>
+          <Button
+            color='primary'
+            size='sm'
+            onClick={onRegisterVisitEnterPressed}
+          >
+            <Search />
+            Search
+          </Button>
+          <Button color='primary' size='sm' onClick={toggleNewPatient}>
             <PersonAdd />
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>

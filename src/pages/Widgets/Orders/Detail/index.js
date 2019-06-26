@@ -1,9 +1,10 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
+import classnames from 'classnames'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
-import withStyles from '@material-ui/core/styles/withStyles'
 import { orderTypes } from '@/utils/codes'
+import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 
 import {
   Button,
@@ -28,9 +29,9 @@ import {
 } from '@/components'
 
 import Medication from './Medication'
-// import Memo from './Memo'
-// import MedicalCertificate from './MedicalCertificate'
-// import CertificateAttendance from './CertificateAttendance'
+import Vaccination from './Vaccination'
+import Service from './Service'
+import Consumable from './Consumable'
 // import Others from './Others'
 
 const styles = (theme) => ({
@@ -48,6 +49,11 @@ const styles = (theme) => ({
     border: '1px solid #ccc',
     borderRadius: 3,
     padding: `${theme.spacing(1)}px 0px`,
+  },
+  footer: {
+    textAlign: 'right',
+    padding: theme.spacing(1),
+    paddingBottom: 0,
   },
 })
 
@@ -124,20 +130,24 @@ class Details extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          {type === '1' && <Medication {...cfg} />}
-          {/* {type === '2' && <Memo {...cfg} />}
-          {type === '3' && <MedicalCertificate {...cfg} />}
-          {type === '4' && <CertificateAttendance {...cfg} />}
-          {type === '5' && <Others {...cfg} />} */}
+          <div style={{ marginBottom: theme.spacing(1) }}>
+            {type === '1' && <Medication {...cfg} />}
+            {type === '2' && <Vaccination {...cfg} />}
+            {type === '3' && <Service {...cfg} />}
+            {type === '4' && <Consumable {...cfg} />}
+            {type === '5' && <Medication {...cfg} />}
+          </div>
+
+          <Divider />
+          <div className={classnames(classes.footer)}>
+            <Button link style={{ float: 'left' }}>
+              $ Adjustment
+            </Button>
+            <Button color='danger'>Cancel</Button>
+
+            <Button color='primary'>Save</Button>
+          </div>
         </div>
-        {/* {footer &&
-          footer({
-            onConfirm: props.handleSubmit,
-            confirmBtnText: 'Save',
-            confirmProps: {
-              disabled: false,
-            },
-          })} */}
       </div>
     )
   }
