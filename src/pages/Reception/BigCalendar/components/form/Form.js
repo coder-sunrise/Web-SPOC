@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import moment from 'moment'
 import * as Yup from 'yup'
 // formik
 import { FastField, withFormik } from 'formik'
@@ -163,20 +164,26 @@ class Form extends React.PureComponent {
 
     const { seriesID, patientName, contactNo, remarks } = values
     const calendarEvents = eventSeries.map((event) => {
-      const { timeFrom, timeTo, room, ...restColumn } = event
-
+      const { timeFrom, timeTo, roomNo, ...restColumn } = event
+      const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
+      const timeIn = moment(timeFrom).format(dateTimeFormat)
+      const timeOut = moment(timeTo).format(dateTimeFormat)
       return {
         seriesID,
         ...restColumn,
         patientName,
         contactNo,
         remarks,
-        room,
+        roomNo,
         timeFrom,
         timeTo,
-        resourceId: room !== undefined ? room : 'other',
+        resourceId: roomNo !== undefined ? roomNo : 'other',
         start: timeFrom,
         end: timeTo,
+        // for Queue Listing
+        visitStatus: 'APPOINTMENT',
+        timeIn,
+        timeOut,
       }
     })
 

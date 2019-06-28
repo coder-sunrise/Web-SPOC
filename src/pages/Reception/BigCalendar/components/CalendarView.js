@@ -176,7 +176,7 @@ class CalendarView extends React.PureComponent {
         // --- functional props ---
         // --- resources ---
         resources={resources}
-        resourceIdAccessor='room'
+        resourceIdAccessor='roomNo'
         resourceTitleAccessor='roomTitle'
         // --- resources ---
         // --- event handlers ---

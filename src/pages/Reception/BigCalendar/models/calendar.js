@@ -1,7 +1,6 @@
-import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 import * as service from '../service/appointment'
-import { dndEvents } from '../events'
+import { calendarEvents } from '../events'
 
 export default createListViewModel({
   namespace: 'calendar',
@@ -11,7 +10,9 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      calendarEvents: [],
+      calendarEvents: [
+        ...calendarEvents,
+      ],
     },
     subscriptions: {},
     effects: {},

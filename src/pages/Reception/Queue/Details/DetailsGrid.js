@@ -10,9 +10,11 @@ import Pageview from '@material-ui/icons/Pageview'
 // custom components
 import { CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
+import AppointmentActionButton from './AppointmentActionButton'
 // assets
 import { tooltip } from '@/assets/jss/index'
 import { filterData } from '../utils'
+import { StatusIndicator } from '../variables'
 
 const styles = () => ({
   tooltip,
@@ -71,11 +73,13 @@ const TableConfig = {
     { columnName: 'payment', type: 'number', currency: true },
     { columnName: 'gst', type: 'number', currency: true },
     { columnName: 'outstandingBalance', type: 'number', currency: true },
-    { columnName: 'Action', width: 120, align: 'center' },
+    { columnName: 'Action', width: 100, align: 'center' },
+    { columnName: 'timeIn', width: 160, type: 'time' },
+    { columnName: 'timeOut', width: 160, type: 'time' },
   ],
 }
 
-@connect(({ queueLog }) => ({ queueLog }))
+@connect(({ queueLog, calendar }) => ({ queueLog, calendar }))
 class DetailsGrid extends PureComponent {
   onViewDispenseClick = (queue) => {
     const { dispatch, location } = this.props
@@ -114,7 +118,30 @@ class DetailsGrid extends PureComponent {
 
   Cell = (props) => {
     const { classes, ...tableProps } = props
+    console.log({ tableProps })
     if (tableProps.column.name === 'Action') {
+      if (
+        tableProps.row.visitStatus === StatusIndicator.APPOINTMENT.toUpperCase()
+      ) {
+        return (
+          <Table.Cell {...tableProps}>
+            <Tooltip
+              title='More Actions'
+              placement='bottom'
+              classes={{ tooltip: classes.tooltip }}
+            >
+              <div style={{ display: 'inline-block' }}>
+                <AppointmentActionButton
+                  row={tableProps.row}
+                  Icon={<Pageview />}
+                  onClick={this.onViewPatientDashboardClick}
+                />
+              </div>
+            </Tooltip>
+          </Table.Cell>
+        )
+      }
+
       return (
         <Table.Cell {...tableProps}>
           <Tooltip
@@ -133,6 +160,7 @@ class DetailsGrid extends PureComponent {
         </Table.Cell>
       )
     }
+
     return <Table.Cell {...tableProps} />
   }
 
@@ -144,13 +172,19 @@ class DetailsGrid extends PureComponent {
     const ActionProps = {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
-    const { queueLog } = this.props
+    const { calendar = { calendarEvents: [] }, queueLog } = this.props
     const { currentFilter, queueListing } = queueLog
+    const { calendarEvents } = calendar
+
+    const data =
+      currentFilter === StatusIndicator.APPOINTMENT
+        ? calendarEvents
+        : filterData(currentFilter, queueListing)
 
     return (
       <CommonTableGrid2
         height={600}
-        rows={filterData(currentFilter, queueListing)}
+        rows={data}
         ActionProps={ActionProps}
         {...TableConfig}
         FuncProps={FuncConfig}

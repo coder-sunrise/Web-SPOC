@@ -32,7 +32,7 @@ export const AppointmentDataColumn = [
   { name: 'appointmentType', title: 'Appointment Type' },
   { name: 'timeFrom', title: 'Time From' },
   { name: 'timeTo', title: 'Time To' },
-  { name: 'room', title: 'Room' },
+  { name: 'roomNo', title: 'Room' },
   { name: 'primaryDoctor', title: 'Primary Doctor' },
 ]
 
@@ -51,7 +51,7 @@ export const AppointmentDataColExtensions = [
     ],
   },
   {
-    columnName: 'room',
+    columnName: 'roomNo',
     type: 'select',
     options: [
       { name: 'Room 1', value: 'room1' },

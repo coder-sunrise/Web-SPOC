@@ -86,10 +86,10 @@ class Appointment extends React.PureComponent {
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: [
-      { room: 'room1', roomTitle: 'Room 1' },
-      { room: 'room2', roomTitle: 'Room 2' },
-      { room: 'room3', roomTitle: 'Room 3' },
-      { room: 'other', roomTitle: 'Other' },
+      { roomNo: 'room1', roomTitle: 'Room 1' },
+      { roomNo: 'room2', roomTitle: 'Room 2' },
+      { roomNo: 'room3', roomTitle: 'Room 3' },
+      { roomNo: 'other', roomTitle: 'Other' },
     ],
     // calendarEvents: dndEvents,
     selectedSlot: {},
@@ -172,10 +172,6 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = (event) => {
-    const { calendar: CalendarModel } = this.props
-    const { calendarEvents } = CalendarModel
-    let idList = calendarEvents.map((a) => a.id)
-    let newId = Math.max(...idList) + 1
     let hour = {
       seriesID: getUniqueGUID(),
       title: 'New Event',
@@ -195,7 +191,7 @@ class Appointment extends React.PureComponent {
 
   onSelectEvent = (selectedEvent) => {
     const { isDoctorEvent } = selectedEvent
-    console.log({ onSelectEvent: selectedEvent })
+
     this.setState({
       showPopup: false,
       isDragging: false,
@@ -283,7 +279,7 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     const { calendarEvents } = CalendarModel
-
+    console.table(calendarEvents)
     return (
       <CardContainer hideHeader size='sm'>
         <Popover
