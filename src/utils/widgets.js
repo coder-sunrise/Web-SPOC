@@ -133,6 +133,17 @@ const widgets = [
   },
   {
     id: '6',
+    name: 'Result History',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/ResultHistory'),
+      loading: Loading,
+    }),
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: '1001',
     name: 'Test Widget',
     component: Loadable({
       loader: () => import('@/pages/Widgets/TestWidget'),

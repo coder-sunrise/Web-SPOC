@@ -83,7 +83,7 @@ const styles = (theme) => ({
     }),
     fromto: Yup.array().when('type', {
       is: (val) => val === '3',
-      then: Yup.array().of(Yup.date().min(2)).required(),
+      then: Yup.array().of(Yup.date()).min(2).required(),
     }),
   }),
 

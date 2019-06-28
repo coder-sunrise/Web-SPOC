@@ -2,10 +2,11 @@ import React, { PureComponent, Suspense } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import $ from 'jquery'
+import classnames from 'classnames'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
-import { Affix } from 'antd'
+import { Menu, Dropdown } from 'antd'
 import {
   FormControl,
   InputLabel,
@@ -13,8 +14,6 @@ import {
   Paper,
   withStyles,
   IconButton,
-  Menu,
-  MenuItem,
   Popper,
   Fade,
   ClickAwayListener,
@@ -63,14 +62,13 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
 
-const sizes = [
-  'lg',
-  'md',
-  'sm',
-]
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
+const sizes = Object.keys(breakpoints)
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
+const topHeight = headerHeight + 107
+const getLayoutRowHeight = () => (window.innerHeight - topHeight) / 6
+
 // let layout = {
 //   lg: [
 //     { i: 'a', x: 0, y: 0, w: 12, h: 6, static: true }, // static: true
@@ -84,13 +82,12 @@ const styles = (theme) => ({
   root: {
     position: 'relative',
   },
-  hide: {
-    display: 'none',
-  },
   layout: {
-    marginLeft: -2,
+    marginLeft: -3,
     marginRight: -3,
-    marginBottom: 30,
+  },
+  layoutOnDrag: {
+    marginBottom: 200,
   },
   container: {
     width: '100%',
@@ -98,6 +95,17 @@ const styles = (theme) => ({
   item: {
     width: 100,
     border: '1px solid #ccc',
+  },
+  hide: {
+    display: 'none',
+  },
+  show: {
+    display: 'inherit',
+  },
+  fullscreen: {
+    position: 'initial !important',
+    width: '100% !important',
+    height: `calc(100vh - ${topHeight}px) !important`,
   },
   block: {
     padding: '4px 2px 0px 2px',
@@ -107,7 +115,7 @@ const styles = (theme) => ({
     textAlign: 'right',
     cursor: 'pointer',
     top: 0,
-    zIndex: 1,
+    zIndex: 2,
     backgroundColor: '#ffffff',
   },
   blockName: {
@@ -156,13 +164,6 @@ const styles = (theme) => ({
   },
 })
 
-const getLayoutRowHeight = () => (window.innerHeight - headerHeight - 107) / 6
-// let myConfig = JSON.parse(localStorage.getItem('myConfig') || '{}')
-// if (Object.values(myConfig).length === 0) {
-//   myConfig = pageDefaultWidgets
-// }
-
-let lasActivedWidgetId = null
 let lasActivedWidget = null
 
 @connect(({ consultation, global }) => ({
@@ -173,12 +174,31 @@ class Consultation extends PureComponent {
   constructor (props) {
     super(props)
     this.container = React.createRef()
+    this.layoutContainer = React.createRef()
     // console.log(this.container)
     // console.log(window.innerHeight)
     this.delayedResize = _.debounce(this.resize, 1000)
     window.addEventListener('resize', this.delayedResize)
     this.delayedChangeLayout = _.debounce(this.changeLayout, 1000)
-
+    this.delayedShowBottomPadding = _.debounce((e) => {
+      if (
+        Math.abs(
+          window.mainPanel.scrollHeight -
+            window.mainPanel.scrollTop -
+            window.mainPanel.clientHeight,
+        ) < 10
+      ) {
+        $(this.layoutContainer.current).addClass(
+          this.props.classes.layoutOnDrag,
+        )
+        $(window.mainPanel).scrollTop($(window.mainPanel).scrollTop() + 5)
+      }
+    }, 1000)
+    this.delayedHideBottomPadding = _.debounce((e) => {
+      $(this.layoutContainer.current).removeClass(
+        this.props.classes.layoutOnDrag,
+      )
+    }, 1000)
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
@@ -218,6 +238,13 @@ class Consultation extends PureComponent {
           md: { x: 5, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
         },
       },
+      // {
+      //   id: '6',
+      //   config: {
+      //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
+      //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
+      //   },
+      // },
     ]
     let defaultLayout
 
@@ -230,6 +257,63 @@ class Consultation extends PureComponent {
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
+
+    this.widgetMenu = (
+      <Menu>
+        {widgets.map((o) => {
+          const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
+
+          return (
+            <Menu.Item
+              key={o.id}
+              disabled={cfg.static}
+              onClick={(e) => {
+                // console.log(this.state.currentLayout)
+                // console.log(e.domEvent.target)
+                // console.log(this.state.replaceWidget)
+                if (e.key === this.state.replaceWidget) return false
+                const layout = _.cloneDeep(this.state.currentLayout)
+                for (let index = 0; index < sizes.length; index++) {
+                  const breakpoint = sizes[index]
+                  if (layout[breakpoint]) {
+                    const target = layout[breakpoint].find((m) => m.i === e.key)
+                    let starter = layout[breakpoint].find(
+                      (m) => m.i === this.state.replaceWidget,
+                    )
+                    if (target) {
+                      target.i = this.state.replaceWidget
+                      starter.i = e.key
+                    } else {
+                      starter.i = e.key
+                      if (
+                        layout.widgets.find(
+                          (m) => m === this.state.replaceWidget,
+                        )
+                      )
+                        layout.widgets = _.reject(
+                          layout.widgets,
+                          (m) => m === this.state.replaceWidget,
+                        )
+
+                      if (!layout.widgets.find((m) => m === e.key)) {
+                        layout.widgets.push(e.key)
+                      }
+                      // layout[breakpoint]=_.reject(layout[breakpoint])
+                    }
+
+                    // console.log(target, starter)
+                  }
+                }
+                // console.log(layout)
+                this.changeLayout(layout)
+              }}
+            >
+              {o.name}
+            </Menu.Item>
+          )
+        })}
+      </Menu>
+    )
 
     this.state = {
       mode: 'edit',
@@ -261,10 +345,23 @@ class Consultation extends PureComponent {
     // $(window).trigger('resize')
     // console.log($(this.container.current).width())
     // console.log($(this.container.current).innerWidth())
+    // $('.react-resizable-handle').on('mouseover',)
+    $(this.layoutContainer.current)
+      .on(
+        'mouseenter',
+        '.react-resizable-handle',
+        this.delayedShowBottomPadding,
+      )
+      .on(
+        'mouseleave',
+        '.react-resizable-handle',
+        this.delayedHideBottomPadding,
+      )
   }
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
+    $(window.mainPanel).css('overflow', 'auto')
   }
 
   resize = (e) => {
@@ -373,17 +470,16 @@ class Consultation extends PureComponent {
 
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
-    return {
+    const r = {
       widgets: defaultWidgets.map((o) => o.id),
-      lg: defaultWidgets.map((o) => ({
-        ...o.config.lg,
-        i: o.id,
-      })),
-      md: defaultWidgets.map((o) => ({
-        ...o.config.md,
-        i: o.id,
-      })),
     }
+    sizes.forEach((s) => {
+      r[s] = defaultWidgets.map((o) => ({
+        ...o.config[s],
+        i: o.id,
+      }))
+    })
+    return r
   }
 
   generateConfig = (id) => {
@@ -444,6 +540,29 @@ class Consultation extends PureComponent {
     }
   }
 
+  onFullScreenClick = (id) => () => {
+    sessionStorage.setItem(
+      'tempLayout',
+      JSON.stringify(this.state.currentLayout),
+    )
+    this.setState(
+      {
+        fullScreenWidget: id,
+      },
+      () => {
+        $(window.mainPanel).css('overflow', 'hidden').scrollTop(0)
+      },
+    )
+  }
+
+  onExitFullScreenClick = () => {
+    $(window.mainPanel).css('overflow', 'auto')
+    this.setState({
+      fullScreenWidget: undefined,
+      currentLayout: JSON.parse(sessionStorage.getItem('tempLayout')),
+    })
+  }
+
   // // eslint-disable-next-line camelcase
   // UNSAFE_componentWillReceiveProps (nextProps) {
   //   const { global } = nextProps
@@ -457,22 +576,22 @@ class Consultation extends PureComponent {
   //   }
   // }
 
-  render () {
-    const { props, state } = this
-    const { classes, theme, dispatch, consultation, ...resetProps } = this.props
-    const { currentLayout } = state
-    // console.log(props)
-    // console.log(currentLayout)
+  getLayoutWidgets = () => {
+    const { state, props } = this
+    const { classes } = props
+    console.log(state.currentLayout)
+
     const layoutCfg = {
       className: classes.layout,
       rowHeight: state.rowHeight,
-      layouts: currentLayout,
+      layouts: state.currentLayout,
       breakpoints,
       cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
       useCSSTransforms: false,
+      preventCollision: !!this.state.fullScreenWidget,
       margin: [
-        1,
-        1,
+        2,
+        2,
       ],
       draggableCancel: '.non-dragable',
       draggableHandle: '.dragable',
@@ -484,36 +603,9 @@ class Consultation extends PureComponent {
         console.log('onBreakpointChange', newBreakpoint, newCols)
       },
       onLayoutChange: (_currentLayout, allLayouts) => {
-        // console.log(
-        //   'onLayoutChange',
-        //   _currentLayout,
-        //   allLayouts,
-        //   allLayouts[this.state.breakpoint],
-        //   this.state.currentLayout[this.state.breakpoint],
-        //   allLayouts[this.state.breakpoint] ===
-        //     this.state.currentLayout[this.state.breakpoint],
-        //   _.isEqual(
-        //     allLayouts[this.state.breakpoint],
-        //     this.state.currentLayout[this.state.breakpoint],
-        //   ),
-        //   _.isEqualWith(
-        //     allLayouts[this.state.breakpoint],
-        //     this.state.currentLayout[this.state.breakpoint],
-        //     (a, b) => {
-        //       for (let index = 0; index < a.length; index++) {
-        //         const a1 = a[index]
-        //         const b1 = b[index]
-        //         if (a1.h !== b1.h) return false
-        //         if (a1.w !== b1.w) return false
-        //         if (a1.x !== b1.x) return false
-        //         if (a1.y !== b1.y) return false
-        //       }
-        //       return true
-        //     },
-        //   ),
-        // )
-        // localStorage.setItem('consultationLayout', JSON.stringify(allLayouts))
+        // console.log(window.mainPanel)
         if (
+          !this.state.fullScreenWidget &&
           !_.isEqualWith(
             allLayouts[this.state.breakpoint],
             this.state.currentLayout[this.state.breakpoint],
@@ -533,7 +625,128 @@ class Consultation extends PureComponent {
           containerPadding,
         )
       },
+      onResizeStart: (e) => {
+        // $(this.layoutContainer.current).addClass(classes.layoutOnDrag)
+        // console.log($(this.layoutContainer.current), classes.layoutOnDrag)
+      },
+      onResizeStop: (e) => {
+        // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
+      },
     }
+
+    return (
+      <div ref={this.layoutContainer}>
+        <ResponsiveGridLayout {...layoutCfg}>
+          {state.currentLayout.widgets.map((id) => {
+            const w = widgets.find((o) => o.id === id)
+            if (!w) return <div />
+            const cfgs = state.currentLayout[state.breakpoint]
+            const cfg = cfgs.find((o) => o.i === id)
+            // console.log(cfg, id)
+
+            if (!cfg) return <div key={id} />
+            const LoadableComponent = w.component
+            return (
+              <div
+                className={classnames({
+                  [classes.block]: true,
+                  [classes.fullscreen]: state.fullScreenWidget === id,
+                  [classes.hide]: state.fullScreenWidget !== id,
+                  [classes.show]:
+                    !state.fullScreenWidget || state.fullScreenWidget === id,
+                })}
+                key={id}
+              >
+                <Paper {...this.generateConfig(id)}>
+                  {this.state.mode === 'edit' && (
+                    <div className={`${classes.blockHeader} dragable`}>
+                      <div>
+                        <span className={classes.blockName}>{w.name}</span>
+                        {w.toolbarAddon}
+                        {!state.fullScreenWidget && (
+                          <React.Fragment>
+                            <Tooltip title='Full-screen'>
+                              <IconButton
+                                aria-label='Full-screen'
+                                size='small'
+                                onClick={this.onFullScreenClick(id)}
+                              >
+                                <Fullscreen />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title='Replace'>
+                              <Dropdown
+                                overlay={this.widgetMenu}
+                                trigger={[
+                                  'click',
+                                ]}
+                                currentWidgetId={id}
+                                disabled={cfg.static}
+                                onVisibleChange={(visible) => {
+                                  if (visible)
+                                    this.setState({
+                                      replaceWidget: id,
+                                    })
+                                }}
+                              >
+                                <IconButton aria-label='Replace' size='small'>
+                                  <CompareArrows />
+                                </IconButton>
+                              </Dropdown>
+                            </Tooltip>
+
+                            <Popconfirm
+                              title='Do you want to remove this widget?'
+                              onConfirm={() => this.removeWidget(id)}
+                            >
+                              <Tooltip title='Delete'>
+                                <IconButton
+                                  aria-label='Delete'
+                                  size='small'
+                                  disabled={cfg.static}
+                                >
+                                  <Clear />
+                                </IconButton>
+                              </Tooltip>
+                            </Popconfirm>
+                          </React.Fragment>
+                        )}
+                        {state.fullScreenWidget === id && (
+                          <Tooltip title='Exit full-screen'>
+                            <IconButton
+                              aria-label='Exit full-screen'
+                              size='small'
+                              onClick={this.onExitFullScreenClick}
+                            >
+                              <FullscreenExit />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </div>
+                      <Divider light />
+                    </div>
+                  )}
+                  <div className='non-dragable' style={w.layoutConfig.style}>
+                    <SizeContainer size='sm'>
+                      <LoadableComponent />
+                    </SizeContainer>
+                  </div>
+                </Paper>
+              </div>
+            )
+          })}
+        </ResponsiveGridLayout>
+      </div>
+    )
+  }
+
+  render () {
+    const { props, state } = this
+    const { classes, theme, dispatch, consultation, ...resetProps } = this.props
+    const { currentLayout } = state
+    // console.log(props)
+    // console.log(currentLayout)
+
     // console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
@@ -555,7 +768,6 @@ class Consultation extends PureComponent {
           }
           {...this.props}
         />
-
         {/* <CardContainer
           hideHeader
           style={{
@@ -566,144 +778,77 @@ class Consultation extends PureComponent {
         >
           
         </CardContainer> */}
+        {this.getLayoutWidgets()}
 
-        <ResponsiveGridLayout {...layoutCfg}>
-          {state.currentLayout.widgets.map((id) => {
-            const w = widgets.find((o) => o.id === id)
-            if (!w) return <div />
-            const cfgs = state.currentLayout[state.breakpoint]
-            const cfg = cfgs.find((o) => o.i === id)
-            // console.log(cfg)
-            const LoadableComponent = w.component
-            // console.log(o)
-            return (
-              <div className={classes.block} key={id}>
-                <Paper {...this.generateConfig(id)}>
-                  {this.state.mode === 'edit' && (
-                    <div className={`${classes.blockHeader} dragable`}>
-                      <div>
-                        <span className={classes.blockName}>{w.name}</span>
-                        {w.toolbarAddon}
-                        <Tooltip title='Replace'>
-                          <IconButton
-                            aria-label='Replace'
-                            className={classes.margin}
-                            size='small'
-                            disabled={cfg.static}
-                          >
-                            <CompareArrows />
-                          </IconButton>
-                        </Tooltip>
-                        {/* <Tooltip title='Full-screen'>
-                        <IconButton
-                          aria-label='Full-screen'
-                          className={classes.margin}
-                          size='small'
-                        >
-                          <Fullscreen />
-                        </IconButton>
-                      </Tooltip> */}
-                        <Popconfirm
-                          title='Do you want to remove this widget?'
-                          onConfirm={() => this.removeWidget(id)}
-                        >
-                          <Tooltip title='Delete'>
-                            <IconButton
-                              aria-label='Delete'
-                              className={classes.margin}
-                              size='small'
-                              disabled={cfg.static}
-                            >
-                              <Clear />
-                            </IconButton>
-                          </Tooltip>
-                        </Popconfirm>
-
-                        {/* <Tooltip title='Exit full-screen'>
-                          <IconButton
-                            aria-label='Exit full-screen'
-                            className={classes.margin}
-                            size='small'
-                          >
-                            <FullscreenExit />
-                          </IconButton>
-                        </Tooltip> */}
-                      </div>
-                      <Divider light />
-                    </div>
-                  )}
-                  <div className='non-dragable' style={w.layoutConfig.style}>
-                    <SizeContainer size='sm'>
-                      <LoadableComponent />
-                    </SizeContainer>
-                  </div>
-                </Paper>
-              </div>
-            )
-          })}
-        </ResponsiveGridLayout>
-
-        <div className={classes.fabContainer}>
-          <Slide direction='up' in={this.state.mode === 'edit'} mountOnEnter>
-            <div>
-              <Fab
-                color='secondary'
-                className={classes.fab}
-                style={{ marginRight: 8 }}
-                variant='extended'
-                size='small'
-                onClick={this.toggleDrawer}
+        {!state.fullScreenWidget && (
+          <React.Fragment>
+            <div className={classes.fabContainer}>
+              <Slide
+                direction='up'
+                in={this.state.mode === 'edit'}
+                mountOnEnter
               >
-                <Settings />
-              </Fab>
+                <div>
+                  <Fab
+                    color='secondary'
+                    className={classes.fab}
+                    style={{ marginRight: 8 }}
+                    variant='extended'
+                    size='small'
+                    onClick={this.toggleDrawer}
+                  >
+                    <Settings />
+                  </Fab>
+                </div>
+              </Slide>
             </div>
-          </Slide>
-        </div>
-        <Drawer
-          anchor='right'
-          open={this.state.openDraw}
-          onClose={this.toggleDrawer}
-        >
-          <CheckboxGroup
-            style={{
-              margin: theme.spacing(2),
-            }}
-            label='Manage Widgets'
-            vertical
-            simple
-            value={currentLayout.widgets}
-            valueField='id'
-            textField='name'
-            options={widgets}
-            onChange={(e, s) => {
-              // console.log(e)
-              // dispatch({
-              //   type: 'consultation/updateState',
-              //   payload: {
-              //     selectedWidgets: e.target.value,
-              //   },
-              // })
-              // console.log(e.target.value, s)
-              this.updateWidget(e.target.value, s)
-            }}
-          />
-          <Divider />
-          <div
-            style={{
-              padding: theme.spacing(2),
-            }}
-          >
-            <Button
-              onClick={() => {
-                this.changeLayout(this.getDefaultLayout())
-              }}
-              color='danger'
-              size='sm'
+            <Drawer
+              anchor='right'
+              open={this.state.openDraw}
+              onClose={this.toggleDrawer}
             >
-              Reset
-            </Button>
-          </div>
-        </Drawer>
+              <CheckboxGroup
+                style={{
+                  margin: theme.spacing(2),
+                }}
+                label='Manage Widgets'
+                vertical
+                simple
+                value={currentLayout.widgets}
+                valueField='id'
+                textField='name'
+                options={widgets}
+                onChange={(e, s) => {
+                  // console.log(e)
+                  // dispatch({
+                  //   type: 'consultation/updateState',
+                  //   payload: {
+                  //     selectedWidgets: e.target.value,
+                  //   },
+                  // })
+                  // console.log(e.target.value, s)
+                  this.updateWidget(e.target.value, s)
+                }}
+              />
+              <Divider />
+              <div
+                style={{
+                  padding: theme.spacing(2),
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    this.changeLayout(this.getDefaultLayout())
+                  }}
+                  color='danger'
+                  size='sm'
+                >
+                  Reset
+                </Button>
+              </div>
+            </Drawer>
+          </React.Fragment>
+        )}
       </div>
     )
   }

@@ -86,7 +86,6 @@ export default ({ theme, index, arrayHelpers, ...props }) => (
         <Button
           style={{ position: 'absolute', bottom: theme.spacing(1) }}
           justIcon
-          round
           color='danger'
           size='sm'
           onClick={() => {
