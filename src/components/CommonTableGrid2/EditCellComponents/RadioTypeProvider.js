@@ -45,7 +45,7 @@ const RadioEditorBase = React.memo(
         value={value}
         checked={row[columnName] === checkedValue}
         onChange={(e, checked) => {
-          console.log(e.target, checked)
+          // console.log(e.target, checked)
           onRadioChange(row, e.target, checked)
           onValueChange(checked ? checkedValue : uncheckedValue)
         }}

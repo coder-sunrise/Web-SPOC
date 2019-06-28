@@ -149,12 +149,33 @@ export function QtyFormatter ({ value }) {
 // }
 let dateFormatLong = 'DD-MMM-YYYY'
 let dateFormat = 'DD-MM-YYYY'
+const timeFormat = 'hh:mm a'
+const fullDateTime = 'DD-MM-YYYY hh:mm a'
+
+const TimeFormatter = ({ value }) => {
+  if (!value) return null
+
+  if (moment.isMoment(value)) {
+    return value.format(fullDateTime)
+  }
+
+  if (moment(value).isValid()) {
+    return moment(value).format(fullDateTime)
+  }
+
+  return value
+}
+
 const DateFormatter = (columnExtensions) => ({ value }) => {
   // console.log(value)
   if (!value) return null
   return moment.isMoment(value)
     ? value.format(dateFormatLong)
     : moment(value).isValid() ? moment(value).format(dateFormatLong) : value
+}
+
+const TimeTypeProvider = (props) => {
+  return <DataTypeProvider formatterComponent={TimeFormatter} {...props} />
 }
 
 const DateTypeProvider = (props) => {
@@ -167,9 +188,6 @@ const DateTypeProvider = (props) => {
 }
 
 const NumberTypeProvider = (props) => {
-  console.warn(
-    'Depecrated warning. This components will be removed in the future. Please avoid using this component',
-  )
   return (
     <DataTypeProvider
       formatterComponent={NumberFormatter}
@@ -201,6 +219,7 @@ const TextTypeProvider = ({ config, ...restProps }) => {
 module.exports = {
   TextTypeProvider,
   DateTypeProvider,
+  TimeTypeProvider,
   NumberTypeProvider,
   QtyTypeProvider,
   NumberFormatter,

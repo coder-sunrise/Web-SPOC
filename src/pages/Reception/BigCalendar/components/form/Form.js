@@ -2,182 +2,53 @@ import React from 'react'
 import classnames from 'classnames'
 import moment from 'moment'
 import * as Yup from 'yup'
-// umi formatMessage
-import { formatMessage } from 'umi/locale'
 // formik
-import { FastField, Field, withFormik } from 'formik'
+import { FastField, withFormik } from 'formik'
 // material ui
-import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
+import { Divider, CircularProgress, withStyles } from '@material-ui/core'
 // custom component
 import {
-  Card,
-  CardBody,
-  Button,
+  CardContainer,
   CommonModal,
-  DatePicker,
   GridContainer,
   GridItem,
   SizeContainer,
-  NumberInput,
   OutlinedTextField,
-  Select,
-  AntdInput,
   Checkbox,
-  TimePicker,
-  RadioGroup,
-  Danger,
 } from '@/components'
 // custom components
-import AppointmentTypeSelector from '../AppointmentTypeSelector'
 import NewPatient from '../../../../PatientDatabase/New'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
+import AppointmentDataGrid from './AppointmentDataGrid'
+import PatientInfoInput from './PatientInfo'
+import AppointmentDateInput from './AppointmentDate'
 import Recurrence from './Recurrence'
+import ConflictBanner from './ConflictBanner'
+import FormFooter from './FormFooter'
 // services
 import {
   fetchPatientListByName,
   fetchPatientInfoByPatientID,
 } from '../../service/appointment'
-import { getColorByAppointmentType } from '../../setting'
+import {
+  handleSubmit as submitForm,
+  mapPropsToValues,
+  getEventSeriesByID,
+} from './formikUtils'
 import styles from './style'
-
-const doctors = [
-  { value: 'medisys', name: 'Medisys' },
-  { value: 'levinne', name: 'Dr Levinne' },
-  { value: 'cheah', name: 'Dr Cheah' },
-  { value: 'tan', name: 'Dr Tan' },
-  { value: 'lim', name: 'Dr Lim' },
-  { value: 'liu', name: 'Dr Liu' },
-]
-
-const recurrencePattern = [
-  { name: 'Daily', value: 'daily' },
-  { name: 'Weekly', value: 'weekly' },
-  { name: 'Monthly', value: 'wonthly' },
-]
-
-const RECURRENCE_RANGE = {
-  AFTER: 'after',
-  BY: 'by',
-}
-
-const _dateFormat = 'DD MMM YYYY'
-const _timeFormat = 'hh:mm a'
-const _slotInfoDateFormat = 'MMM DD YYYY'
 
 const AppointmentSchema = Yup.object().shape({
   patientName: Yup.string().required(),
   contactNo: Yup.string().required(),
-  doctor: Yup.string().required('Doctor name is required'),
   startDate: Yup.string().required(),
-  endDate: Yup.string().required(),
-  startTime: Yup.string().required(),
-  endTime: Yup.string().required(),
 })
-
-const initialAptInfo = {
-  patientName: '',
-  contactNo: '',
-  doctor: '',
-  bookBy: '',
-  bookDate: '',
-  remarks: '',
-  enableRecurrence: false,
-  recurrencePattern: 'daily',
-  recurrenceRange: RECURRENCE_RANGE.AFTER,
-  occurence: 1,
-}
 
 @withFormik({
   enableReinitialize: true,
   validationSchema: AppointmentSchema,
-  handleSubmit: (values, { props, resetForm }) => {
-    const {
-      patientName,
-      contactNo,
-      startDate: _utcStartDate,
-      endDate: _utcEndDate,
-      startTime,
-      endTime,
-      appointmentType = '',
-      doctor,
-    } = values
-    const { handleAddEvents, handleUpdateEvents, slotInfo, resources } = props
-
-    const startDate = moment(_utcStartDate).format(_dateFormat)
-    const endDate = moment(_utcEndDate).format(_dateFormat)
-
-    const _momentStartDate = moment(
-      `${startDate} ${startTime}`,
-      `${_dateFormat} hh:mm a`,
-    )
-    const _nativeStartDate = _momentStartDate.toDate()
-
-    const _momentEndDate = moment(
-      `${endDate} ${endTime}`,
-      `${_dateFormat} hh:mm a`,
-    )
-    const _nativeEndDate = _momentEndDate.toDate()
-
-    const assignedResource = resources.find(
-      (resource) => resource.resourceId === doctor,
-    )
-    let resourceId = assignedResource ? assignedResource.resourceId : 'other'
-
-    if (!_momentStartDate.isValid() && !_momentEndDate.isValid()) return
-
-    const event = {
-      ...slotInfo,
-      ...values,
-      tooltip: `${patientName}(${contactNo})`,
-      start: _nativeStartDate,
-      end: _nativeEndDate,
-      title: `${patientName}(${contactNo})`,
-      color: getColorByAppointmentType(appointmentType),
-      resourceId,
-    }
-
-    switch (slotInfo.type) {
-      case 'update':
-        handleUpdateEvents(event)
-        break
-      default:
-        handleAddEvents(event)
-        break
-    }
-    resetForm()
-  },
-  mapPropsToValues: ({ slotInfo, resources = [] }) => {
-    const startDate = moment(slotInfo.start, _slotInfoDateFormat).format(
-      _dateFormat,
-    )
-    const startTime = moment(slotInfo.start, _slotInfoDateFormat).format(
-      'hh:mm a',
-    )
-    const endDate = moment(slotInfo.end, _slotInfoDateFormat).format(
-      _dateFormat,
-    )
-    const endTime = moment(slotInfo.end, _slotInfoDateFormat).format('hh:mm a')
-
-    const currentResource = resources.find(
-      (resource) => resource.resourceId === slotInfo.resourceId,
-    )
-    let doctor = ''
-    if (currentResource) {
-      doctor =
-        currentResource.resourceId !== 'other' ? currentResource.resourceId : ''
-    }
-
-    return {
-      ...initialAptInfo,
-      ...slotInfo,
-      doctor,
-      startDate,
-      startTime,
-      endDate,
-      endTime,
-    }
-  },
+  handleSubmit: submitForm,
+  mapPropsToValues,
 })
 class Form extends React.PureComponent {
   state = {
@@ -185,6 +56,10 @@ class Form extends React.PureComponent {
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
     patientList: [],
+    eventSeries: getEventSeriesByID(
+      this.props.slotInfo.seriesID,
+      this.props.calendarEvents,
+    ),
   }
 
   toggleNewPatientModal = () => {
@@ -217,73 +92,6 @@ class Form extends React.PureComponent {
         })
       }
     })
-  }
-
-  startDateValidation = (value) => {
-    const { values } = this.props
-
-    if (value === '') return 'Start date is required'
-    if (!moment(value).isValid()) return 'Invalid date'
-
-    // start date should be lower than end date
-    const endDate = moment(values.endDate).isValid()
-      ? moment(values.endDate)
-      : ''
-    if (endDate === '') return ''
-    if (endDate.isBefore(moment(value)))
-      return 'Start Date must be before End Date'
-
-    return ''
-  }
-
-  endDateValidation = (value) => {
-    const { values } = this.props
-    if (value === '') return 'End Date is required'
-    if (!moment(value).isValid()) return 'Invalid date'
-
-    // end date should be greater than start date
-    const startDate = moment(values.startDate).isValid()
-      ? moment(values.startDate)
-      : ''
-    if (startDate === '') return ''
-
-    if (startDate.isAfter(moment(value)))
-      return 'End Date must be after Start Date'
-
-    return ''
-  }
-
-  startTimeValidation = (value) => {
-    const { values } = this.props
-    if (value === '') return 'Time is required'
-    if (!moment(value, _timeFormat).isValid()) return 'Invalid time'
-
-    const endTime = moment(values.endTime, _timeFormat).isValid()
-      ? moment(values.endTime, _timeFormat)
-      : ''
-    if (endTime === '') return ''
-
-    const startTime = moment(values.startTime, _timeFormat)
-
-    if (startTime.isAfter(endTime)) return 'Start Time must be before End Time'
-
-    return ''
-  }
-
-  endTimeValidation = (value) => {
-    const { values } = this.props
-    if (value === '') return 'Time is required'
-    if (!moment(value, _timeFormat).isValid()) return 'Invalid time'
-
-    const startTime = moment(values.startTime, _timeFormat).isValid()
-      ? moment(values.startTime, _timeFormat)
-      : ''
-    if (startTime === '') return ''
-    const endTime = moment(values.endTime, _timeFormat)
-
-    if (endTime.isBefore(startTime)) return 'End Time must be after Start Time'
-
-    return ''
   }
 
   handleSelectPatient = (patientID) => {
@@ -331,15 +139,66 @@ class Form extends React.PureComponent {
         showDeleteConfirmationModal: false,
       },
       () => {
-        handleDeleteEvent(slotInfo.id)
+        handleDeleteEvent(slotInfo.seriesID)
       },
     )
+  }
+
+  onCommitChanges = ({ rows, deleted }) => {
+    if (rows) {
+      this.setState({
+        eventSeries: rows,
+      })
+    }
+    if (deleted) {
+      const { eventSeries } = this.state
+      this.setState({
+        eventSeries: eventSeries.filter((event) => !deleted.includes(event.id)),
+      })
+    }
+  }
+
+  onConfirmClick = () => {
+    const { eventSeries } = this.state
+    const { values, handleUpdateEventSeries, resetForm, slotInfo } = this.props
+
+    const { seriesID, patientName, contactNo, remarks } = values
+    const calendarEvents = eventSeries.map((event) => {
+      const { timeFrom, timeTo, roomNo, ...restColumn } = event
+      const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
+      const timeIn = moment(timeFrom).format(dateTimeFormat)
+      const timeOut = moment(timeTo).format(dateTimeFormat)
+      return {
+        seriesID,
+        ...restColumn,
+        patientName,
+        contactNo,
+        remarks,
+        roomNo,
+        timeFrom,
+        timeTo,
+        resourceId: roomNo !== undefined ? roomNo : 'other',
+        start: timeFrom,
+        end: timeTo,
+        // for Queue Listing
+        visitStatus: 'APPOINTMENT',
+        timeIn,
+        timeOut,
+      }
+    })
+
+    handleUpdateEventSeries({
+      [slotInfo.type]: calendarEvents,
+      seriesID,
+    })
+
+    resetForm()
   }
 
   render () {
     const {
       classes,
-      onConfirm,
+      onClose,
       slotInfo,
       isLoading,
       handleSubmit,
@@ -347,22 +206,20 @@ class Form extends React.PureComponent {
     } = this.props
 
     const { hasConflict } = slotInfo
+    console.log({ slotInfo })
 
     const {
       showNewPatientModal,
       showSearchPatientModal,
       showDeleteConfirmationModal,
       patientList,
+      eventSeries,
     } = this.state
-
-    const hideCancelAppointmentClass = {
-      [classes.hideCancelAppointmentBtn]: slotInfo.type === 'add',
-    }
 
     return (
       <SizeContainer>
         <React.Fragment>
-          <Paper className={classnames(classes.content)}>
+          <CardContainer hideHeader size='sm'>
             {isLoading && (
               <div className={classnames(classes.loading)}>
                 <CircularProgress />
@@ -374,183 +231,34 @@ class Form extends React.PureComponent {
               className={classnames(classes.formContent)}
               alignItems='flex-start'
             >
-              <GridItem container xs md={12}>
-                <GridItem xs md={7}>
-                  <Field
-                    name='patientName'
-                    render={(args) => {
-                      return (
-                        <AntdInput
-                          {...args}
-                          autoFocus
-                          onEnterPressed={this.onSearchPatient}
-                          label={formatMessage({
-                            id: 'reception.appt.form.patientName',
-                          })}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs md={5}>
-                  <div className={classnames(classes.buttonGroup)}>
-                    <Button
-                      size='sm'
-                      color='primary'
-                      onClick={this.onSearchPatient}
-                    >
-                      Search
-                    </Button>
-                    <Button
-                      size='sm'
-                      color='primary'
-                      onClick={this.toggleNewPatientModal}
-                    >
-                      Create Patient
-                    </Button>
-                  </div>
-                </GridItem>
-                <GridItem xs md={7}>
-                  <Field
-                    name='contactNo'
-                    render={(args) => (
-                      <AntdInput
-                        {...args}
-                        label={formatMessage({
-                          id: 'reception.appt.form.contactNo',
-                        })}
-                      />
-                    )}
-                  />
-                </GridItem>
-
-                <GridItem
-                  xs
-                  md={12}
-                  className={classnames(classes.remarksField)}
-                >
-                  <FastField
-                    name='remarks'
-                    render={(args) => (
-                      <OutlinedTextField
-                        {...args}
-                        multiline
-                        rowsMax={3}
-                        rows={2}
-                        label={formatMessage({
-                          id: 'reception.appt.form.remarks',
-                        })}
-                      />
-                    )}
-                  />
-                </GridItem>
-
-                <GridItem xs md={6}>
-                  <FastField
-                    name='doctor'
-                    render={(args) => (
-                      <Select
-                        {...args}
-                        options={doctors}
-                        label={formatMessage({
-                          id: 'reception.appt.form.doctor',
-                        })}
-                      />
-                    )}
-                  />
-                </GridItem>
-
-                <GridItem xs md={6}>
-                  <FastField
-                    name='appointmentType'
-                    render={(args) => (
-                      <AppointmentTypeSelector
-                        {...args}
-                        label='Appointment Type'
-                      />
-                    )}
-                  />
-                </GridItem>
-              </GridItem>
-              <GridItem xs md={12}>
-                <p className={classnames(classes.apptLabel)}>
-                  Appointment Time
-                </p>
-              </GridItem>
-              <GridItem xs md={1}>
-                <p className={classnames(classes.apptSubLabel)}>From</p>
-              </GridItem>
-              <GridItem xs md={3}>
-                <Field
-                  name='startDate'
-                  validate={this.startDateValidation}
-                  render={(args) => (
-                    <DatePicker noLabel {...args} format={_dateFormat} />
-                  )}
+              <GridItem container xs md={6}>
+                <PatientInfoInput
+                  onSearchPatient={this.onSearchPatient}
+                  onCreatePatient={this.toggleNewPatientModal}
                 />
+                <AppointmentDateInput />
               </GridItem>
-              <GridItem xs md={2}>
-                <Field
-                  name='startTime'
-                  validate={this.startTimeValidation}
+              <GridItem xs md={6} className={classnames(classes.remarksField)}>
+                <FastField
+                  name='remarks'
                   render={(args) => (
-                    <TimePicker
+                    <OutlinedTextField
                       {...args}
-                      noLabel
-                      format={_timeFormat}
-                      use12Hours
-                      minuteStep={15}
+                      multiline
+                      rowsMax={3}
+                      rows={3}
+                      label='Appointment Remarks'
                     />
                   )}
                 />
               </GridItem>
-              <GridItem xs md={1}>
-                <p className={classnames(classes.apptSubLabel)}>To</p>
-              </GridItem>
-              <GridItem xs md={3}>
-                <Field
-                  name='endDate'
-                  validate={this.endDateValidation}
-                  render={(args) => {
-                    return (
-                      <DatePicker
-                        disabled
-                        noLabel
-                        {...args}
-                        format={_dateFormat}
-                      />
-                    )
-                  }}
+
+              <GridItem xs md={12} className={classes.verticalSpacing}>
+                <AppointmentDataGrid
+                  appointmentDate={values.startDate}
+                  data={eventSeries}
+                  handleCommitChanges={this.onCommitChanges}
                 />
-              </GridItem>
-              <GridItem xs md={2}>
-                <Field
-                  name='endTime'
-                  validate={this.endTimeValidation}
-                  render={(args) => (
-                    <TimePicker
-                      {...args}
-                      noLabel
-                      format={_timeFormat}
-                      use12Hours
-                      minuteStep={15}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs md={6}>
-                <p className={classnames(classes.dateTimePreview)}>
-                  {` ${moment(values.startDate).format('dddd')}, ${moment(
-                    values.startDate,
-                  ).format(_dateFormat)} ${values.startTime}`}
-                </p>
-              </GridItem>
-              <GridItem xs md={6}>
-                <p className={classnames(classes.dateTimePreview)}>
-                  {`${moment(values.endDate).format('dddd')}, ${moment(
-                    values.endDate,
-                  ).format(_dateFormat)} ${values.endTime}`}
-                </p>
               </GridItem>
               <GridItem
                 xs
@@ -569,52 +277,15 @@ class Form extends React.PureComponent {
               </GridItem>
               <Recurrence values={values} />
             </GridContainer>
-          </Paper>
-          {hasConflict && (
-            <Card
-              size='sm'
-              raised
-              className={classnames(classes.conflictContainer)}
-            >
-              <CardBody>
-                <GridContainer>
-                  <GridItem xs md={8}>
-                    <Danger>
-                      <h4 className={classnames(classes.conflictContent)}>
-                        Appointment has conflict in schedule
-                      </h4>
-                    </Danger>
-                  </GridItem>
-                  <GridItem xs md={4} container justify='flex-end'>
-                    <Button color='primary'>Validate</Button>
-                  </GridItem>
-                </GridContainer>
-              </CardBody>
-            </Card>
-          )}
-          <div className={classnames(classes.footer)}>
-            <GridContainer>
-              <GridItem xs md={4} container justify='flex-start'>
-                <Button
-                  color='danger'
-                  className={classnames(hideCancelAppointmentClass)}
-                  onClick={this.onCancelAppointmentClick}
-                >
-                  Cancel Appointment
-                </Button>
-              </GridItem>
+          </CardContainer>
+          <ConflictBanner hasConflict={hasConflict} />
 
-              <GridItem xs md={8} container justify='flex-end'>
-                <Button onClick={onConfirm} color='danger'>
-                  Cancel
-                </Button>
-                <Button color='success'>Save Draft</Button>
-                <Button onClick={handleSubmit} color='primary'>
-                  Confirm
-                </Button>
-              </GridItem>
-            </GridContainer>
-          </div>
+          <FormFooter
+            isNew={slotInfo.type === 'add'}
+            onCancelAppointmentClick={this.onCancelAppointmentClick}
+            onClose={onClose}
+            onConfirmClick={this.onConfirmClick}
+          />
 
           <CommonModal
             open={showNewPatientModal}

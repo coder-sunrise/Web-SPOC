@@ -15,11 +15,10 @@ const styles = (theme) => ({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   formContent: {
-    padding: `${theme.spacing.unit}px 0`,
+    padding: `${theme.spacing.unit}px 0px`,
   },
-  content: {
-    margin: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
-    padding: `0px ${theme.spacing.unit}px`,
+  verticalSpacing: {
+    margin: `${theme.spacing(1)}px 0px`,
   },
   rowContainer: {
     padding: '0px !important',
@@ -44,6 +43,7 @@ const styles = (theme) => ({
     paddingTop: theme.spacing.unit,
   },
   buttonGroup: {
+    paddingTop: theme.spacing(2),
     height: '100%',
     display: 'flex',
     justifyContent: 'start',
@@ -80,9 +80,6 @@ const styles = (theme) => ({
   enableOccurenceCheckbox: {
     textAlign: 'left',
     paddingLeft: '16px !important',
-  },
-  conflictContainer: {
-    margin: theme.spacing.unit * 2,
   },
   conflictContent: {
     fontWeight: 'bold',

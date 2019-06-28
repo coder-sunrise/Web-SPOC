@@ -58,6 +58,7 @@ import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
+import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 
 const sizeConfig = {
   sm: {
@@ -320,7 +321,7 @@ class CommonTableGrid2 extends React.Component {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query', entity } = this.props
-    console.log(payload)
+
     if (query) {
       query({
         callback: (data) => {
@@ -354,12 +355,13 @@ class CommonTableGrid2 extends React.Component {
       })
     } else {
       const { pagination } = this.state
-      this.setState({
-        pagination: {
-          ...pagination,
-          current: payload.current,
-        },
-      })
+      payload.current &&
+        this.setState({
+          pagination: {
+            ...pagination,
+            current: payload.current,
+          },
+        })
     }
   }
 
@@ -581,6 +583,7 @@ class CommonTableGrid2 extends React.Component {
             <DateTypeProvider columnExtensions={newColumExtensions} />
             <RadioTypeProvider columnExtensions={newColumExtensions} />
             <StatusTypeProvider columnExtensions={newColumExtensions} />
+            <TimeTypeProvider columnExtensions={newColumExtensions} />
 
             {grouping && <DragDropProvider />}
 

@@ -46,7 +46,7 @@ const generateRowData = () => {
       doctor: 'Cheah',
       refNo: `PT-0000${i}`,
       patientName: 'Annie Leonhart @ Annabelle Perfectionism',
-      gender: 'Female',
+      gender: 'F',
       age: i,
       visitRefNo: `190402-01-${i}`,
     })

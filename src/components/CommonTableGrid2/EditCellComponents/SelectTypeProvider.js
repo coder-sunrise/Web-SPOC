@@ -48,13 +48,13 @@ class SelectEditor extends PureComponent {
       isDisabled = () => false,
       ...restProps
     } = cfg
-    // console.log(cfg, value, props)
+
     const onChange = (val) => {
       this.setState({
         error: updateCellValue(this.props, this.myRef.current, val),
       })
     }
-    // console.log(this.props, cfg)
+
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
@@ -66,7 +66,6 @@ class SelectEditor extends PureComponent {
       ...restProps,
     }
 
-    // console.log(error)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -97,12 +96,28 @@ const SelectDisplay = (columnExtensions, state) => ({
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
-  // console.log(cfg, restProps, state)
 
-  // console.log(value, columnName, restProps)
   if (!value) return ''
+
   const v = (cfg.options || state[`${columnName}Option`] || [])
     .find((o) => o.value === value || o.id === value)
+  if (v.color) {
+    return (
+      <div>
+        <span
+          style={{
+            height: '0.8rem',
+            width: '1.5rem',
+            borderRadius: '20%',
+            display: 'inline-block',
+            marginRight: 10,
+            backgroundColor: v.colorValue,
+          }}
+        />
+        <span>{v ? v.name : ''}</span>
+      </div>
+    )
+  }
   return <span>{v ? v.name : ''}</span>
 }
 

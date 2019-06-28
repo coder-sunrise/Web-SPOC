@@ -13,8 +13,7 @@ import DoctorBlockForm from './components/form/DoctorBlock'
 // settings
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
 import { CalendarActions } from './const'
-// events data variable
-import { dndEvents } from './events'
+import { getUniqueGUID } from '@/utils/utils'
 
 const styles = (theme) => ({
   popover: {
@@ -87,10 +86,10 @@ class Appointment extends React.PureComponent {
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: [
-      { resourceId: 'medisys', resourceTitle: 'Medisys' },
-      { resourceId: 'levinne', resourceTitle: 'Levinne' },
-      { resourceId: 'cheah', resourceTitle: 'Cheah' },
-      { resourceId: 'other', resourceTitle: 'Other' },
+      { roomNo: 'room1', roomTitle: 'Room 1' },
+      { roomNo: 'room2', roomTitle: 'Room 2' },
+      { roomNo: 'room3', roomTitle: 'Room 3' },
+      { roomNo: 'other', roomTitle: 'Other' },
     ],
     // calendarEvents: dndEvents,
     selectedSlot: {},
@@ -124,6 +123,27 @@ class Appointment extends React.PureComponent {
     )
   }
 
+  updateEventSeries = ({ seriesID, add, update }) => {
+    add &&
+      this._dispatchAction(
+        {
+          action: CalendarActions.AddEventSeries,
+          series: add,
+        },
+        this.closeAppointmentForm,
+      )
+
+    update &&
+      this._dispatchAction(
+        {
+          action: CalendarActions.UpdateEventSeriesByID,
+          series: update,
+          seriesID,
+        },
+        this.closeAppointmentForm,
+      )
+  }
+
   updateEvent = (changedEvent) => {
     this._dispatchAction(
       {
@@ -134,11 +154,11 @@ class Appointment extends React.PureComponent {
     )
   }
 
-  deleteEvent = (eventID) => {
+  deleteEvent = (seriesID) => {
     this._dispatchAction(
       {
-        action: CalendarActions.UpdateEvent,
-        deleted: eventID,
+        action: CalendarActions.DeleteEventSeriesByID,
+        seriesID,
       },
       this.closeAppointmentForm,
     )
@@ -152,12 +172,8 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = (event) => {
-    const { calendar: CalendarModel } = this.props
-    const { calendarEvents } = CalendarModel
-    let idList = calendarEvents.map((a) => a.id)
-    let newId = Math.max(...idList) + 1
     let hour = {
-      id: newId,
+      seriesID: getUniqueGUID(),
       title: 'New Event',
       allDay: event.slots.length === 1,
       start: event.start,
@@ -263,7 +279,7 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     const { calendarEvents } = CalendarModel
-
+    console.table(calendarEvents)
     return (
       <CardContainer hideHeader size='sm'>
         <Popover
@@ -310,10 +326,13 @@ class Appointment extends React.PureComponent {
           onClose={this.closeAppointmentForm}
           onConfirm={this.closeAppointmentForm}
           showFooter={false}
+          maxWidth='lg'
         >
           <Form
             resources={resources}
             slotInfo={selectedSlot}
+            calendarEvents={calendarEvents}
+            handleUpdateEventSeries={this.updateEventSeries}
             handleAddEvents={this.addEvent}
             handleUpdateEvents={this.updateEvent}
             handleDeleteEvent={this.deleteEvent}
