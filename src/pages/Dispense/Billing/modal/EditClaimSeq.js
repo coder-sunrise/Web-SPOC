@@ -46,7 +46,6 @@ class EditClaimSeq extends Component {
           rows={ClaimSequenceData}
           columns={ClaimSequenceColumns}
           columnExtensions={ClaimSequenceColExtensions}
-          column
           onRowDoubleClick={this.onRowDoubleClick}
           EditingProps={{
             showAddCommand: true,

@@ -229,7 +229,7 @@ class EditableTableGrid extends PureComponent {
         availableColumns = [],
         showAddCommand = false,
         showEditCommand = true,
-        showDeleteCommand = true
+        showDeleteCommand = true,
         // EditCell = DefaultEditCell,
       } = {},
       ...props
@@ -260,8 +260,8 @@ class EditableTableGrid extends PureComponent {
         extraColumn={[
           <TableEditColumn
             showAddCommand={this.addable}
-            showEditCommand = {showEditCommand}
-            showDeleteCommand = {showDeleteCommand}
+            showEditCommand={showEditCommand}
+            showDeleteCommand={showDeleteCommand}
             commandComponent={CommandComponent}
             // cellComponent={(cellProps) => {
             //   console.log(cellProps)
