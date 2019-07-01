@@ -329,27 +329,7 @@ const routes = [
         path: '/setting',
         icon: 'settings',
         name: 'setting',
-        routes: [
-          {
-            path: '/setting/clinic-setting',
-            mini: 'CS',
-            name: 'clinicSetting',
-            // component: '',
-          },
-          {
-            path: '/setting/system-setting',
-            mini: 'SS',
-            name: 'systemSetting',
-            // component: '',
-          },
-          {
-            path: '/setting/print-setting',
-            mini: 'PS',
-            name: 'printSetting',
-            // component: '',
-          },
-        ],
-        // component: '',
+        component: './Setting',
       },
       // Settings
       {

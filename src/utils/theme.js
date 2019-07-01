@@ -2,7 +2,6 @@ import { MuiThemeProvider, createMuiTheme, withStyles } from '@material-ui/core'
 import primaryColor from '@material-ui/core/colors/indigo'
 import secondaryColor from '@material-ui/core/colors/blueGrey'
 import { standardRowHeight, smallRowHeight, largeRowHeight } from 'assets/jss'
-
 import {
   // primaryColor,
   // secondaryColor,
@@ -17,9 +16,9 @@ const defaultFontSize = '1rem'
 const smallFontSize = '0.9rem'
 const largeFontSize = '1.2rem'
 
-const defaultIconWidth = '0.9em'
-const smallIconWidth = '0.82em'
-const largeIconWidth = '0.95em'
+const defaultIconWidth = '0.85em'
+const smallIconWidth = '0.72em'
+const largeIconWidth = '0.89em'
 
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
 
@@ -234,7 +233,7 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 3,
+        marginTop: 5,
         '& > p': {
           fontSize: defaultFontSize,
         },
@@ -245,8 +244,8 @@ export const defaultTheme = createMuiTheme({
       },
     },
     MuiButton: {
-      outlined: {
-        padding: '9px 20px !important',
+      contained: {
+        padding: '8px 18px !important',
         fontSize: `${defaultFontSize} !important`,
         lineHeight: 1.5,
         borderRadius: '3px !important',
@@ -378,7 +377,7 @@ export const smallTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 1,
+        marginTop: 4,
         '& > p': {
           fontSize: smallFontSize,
         },
@@ -389,7 +388,7 @@ export const smallTheme = createMuiTheme({
       },
     },
     MuiButton: {
-      outlined: {
+      contained: {
         padding: '3px 10px !important',
         fontSize: `${smallIconWidth} !important`,
         lineHeight: 1.5,
@@ -518,7 +517,7 @@ export const largeTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 3,
+        marginTop: 5,
         '& > p': {
           fontSize: largeFontSize,
         },
@@ -529,7 +528,7 @@ export const largeTheme = createMuiTheme({
       },
     },
     MuiButton: {
-      outlined: {
+      contained: {
         padding: '12px 25px !important',
         fontSize: `${largeFontSize} !important`,
         lineHeight: 1.5,

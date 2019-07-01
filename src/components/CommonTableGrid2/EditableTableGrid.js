@@ -11,8 +11,9 @@ import {
   PagingPanel,
 } from '@devexpress/dx-react-grid-material-ui'
 import { Getter } from '@devexpress/dx-react-core'
+import Add from '@material-ui/icons/Add'
 import CommandComponent from './CommandComponent'
-import { getGlobalVariable, getUniqueGUID } from '@/utils/utils'
+import { getGlobalVariable, getUniqueNumericId } from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index'
 import EditPlugin from './EditPlugin'
@@ -94,7 +95,7 @@ class EditableTableGrid extends PureComponent {
       newRows = added
         .map((o) => {
           return {
-            id: getUniqueGUID(),
+            id: getUniqueNumericId(),
             isNew: true,
             ...o,
           }
@@ -194,7 +195,7 @@ class EditableTableGrid extends PureComponent {
               link
               disabled={this.state.addedRows.length > 0}
             >
-              New
+              <Add />New
             </Button>
           )}
           {containerExtraComponent}

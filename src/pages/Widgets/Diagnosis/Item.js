@@ -90,7 +90,7 @@ export default ({ theme, index, arrayHelpers, ...props }) => (
           size='sm'
           onClick={() => {
             confirm({
-              title: 'Do you want to remove this diagnosis?',
+              title: 'Confirm to remove a persist diagnosis?',
               onOk () {
                 arrayHelpers.remove(index)
               },

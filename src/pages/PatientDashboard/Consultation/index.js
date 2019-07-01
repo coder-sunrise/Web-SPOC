@@ -238,13 +238,13 @@ class Consultation extends PureComponent {
           md: { x: 5, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
         },
       },
-      // {
-      //   id: '6',
-      //   config: {
-      //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
-      //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
-      //   },
-      // },
+      {
+        id: '1002',
+        config: {
+          lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
+          md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
+        },
+      },
     ]
     let defaultLayout
 
@@ -742,9 +742,16 @@ class Consultation extends PureComponent {
 
   render () {
     const { props, state } = this
-    const { classes, theme, dispatch, consultation, ...resetProps } = this.props
+    const {
+      history,
+      classes,
+      theme,
+      dispatch,
+      consultation,
+      ...resetProps
+    } = this.props
     const { currentLayout } = state
-    // console.log(props)
+    console.log(props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
@@ -756,11 +763,24 @@ class Consultation extends PureComponent {
               <p>Total Invoice</p>
               <h5>{NumberFormatter(210)}</h5>
               <SizeContainer size='sm'>
-                <Button color='danger'>Discard</Button>
+                <Button
+                  color='danger'
+                  onClick={() => {
+                    history.push('/reception/queue/patientdashboard')
+                  }}
+                >
+                  Discard
+                </Button>
                 <ProgressButton color='info' icon={null}>
                   Save Changes
                 </ProgressButton>
-                <ProgressButton color='primary' icon={null}>
+                <ProgressButton
+                  color='primary'
+                  onClick={() => {
+                    history.push('/reception/queue')
+                  }}
+                  icon={null}
+                >
                   Sign Off
                 </ProgressButton>
               </SizeContainer>
