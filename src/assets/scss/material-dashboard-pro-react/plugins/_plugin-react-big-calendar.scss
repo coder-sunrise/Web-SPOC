@@ -293,6 +293,9 @@ button.rbc-input::-moz-focus-inner {
 }
 .rbc-date-cell.rbc-now {
   font-weight: bold;
+  font-size: .9rem;
+  text-decoration: underline;
+  color: $brand-primary;
 }
 .rbc-date-cell > a,
 .rbc-date-cell > a:active,

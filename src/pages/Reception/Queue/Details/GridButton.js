@@ -25,7 +25,8 @@ const MenuButtonBase = ({ classes, id, onClick, Icon, label, disabled }) => {
     <Button
       className={classes.leftAlign}
       block
-      simple
+      link
+      noUnderline
       disabled={disabled}
       size='sm'
       color='primary'
@@ -47,13 +48,13 @@ const ContextMenuOptions = [
     id: 0,
     label: 'Edit Visit',
     Icon: Edit,
-    disabled: false,
+    disabled: true,
   },
   {
     id: 1,
     label: 'Dispense & Bill',
     Icon: Money,
-    disabled: true,
+    disabled: false,
   },
   {
     id: 2,

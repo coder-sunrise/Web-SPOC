@@ -40,7 +40,7 @@ const today = new Date()
 class CalendarView extends React.PureComponent {
   state = {
     displayDate: new Date(),
-    calendarView: BigCalendar.Views.DAY,
+    calendarView: BigCalendar.Views.MONTH,
     minTime: new Date(
       today.getFullYear(),
       today.getMonth(),
@@ -67,10 +67,10 @@ class CalendarView extends React.PureComponent {
     if (event.isDoctorEvent) {
       return { className: classes.doctorEvent }
     }
-    const eventClassName = event.color
+    const eventClassName = event.appointmentType
       ? [
-          classes[`${bg}${event.color}`],
-          classes[`${hover}${event.color}`],
+          classes[`${bg}${event.appointmentType}`],
+          classes[`${hover}${event.appointmentType}`],
         ].join(' ')
       : classes.defaultColor
 
@@ -176,8 +176,8 @@ class CalendarView extends React.PureComponent {
         // --- functional props ---
         // --- resources ---
         resources={resources}
-        resourceIdAccessor='resourceId'
-        resourceTitleAccessor='resourceTitle'
+        resourceIdAccessor='roomNo'
+        resourceTitleAccessor='roomTitle'
         // --- resources ---
         // --- event handlers ---
         onNavigate={this._jumpToDate}

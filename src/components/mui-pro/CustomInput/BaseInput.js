@@ -114,8 +114,9 @@ class BaseInput extends React.PureComponent {
     const underlineClasses = classNames({
       [classes.underlineError]: error,
       [classes.underlineSuccess]: success && !error,
-      [classes.underline]: !simple,
-      [classes.simple]: simple || noUnderline,
+      [classes.underline]: true,
+      [classes.noUnderline]: noUnderline,
+      [classes.simple]: simple,
       [classes.inputRoot]: true,
       [classes.whiteUnderline]: white,
     })
@@ -180,6 +181,7 @@ class BaseInput extends React.PureComponent {
       focus = false,
       isDebouncing = false,
       preventDefaultKeyDownEvent,
+      size,
     } = props
     inputIdCounter += 1
 
@@ -198,11 +200,10 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
-
     if (suffix || isDebouncing) {
       cfg.endAdornment = isDebouncing ? (
         <InputAdornment position='end' {...suffixProps}>
-          <CircularProgress size={16} />
+          <CircularProgress />
         </InputAdornment>
       ) : (
         <InputAdornment position='end' {...suffixProps}>

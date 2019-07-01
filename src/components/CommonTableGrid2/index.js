@@ -58,6 +58,7 @@ import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
+import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 
 const sizeConfig = {
   sm: {
@@ -102,7 +103,7 @@ const styles = (theme) => ({
     },
   },
   paperContainer: {
-    margin: '0 5px',
+    // margin: '0 5px',
     '& > div': {
       width: '100%',
     },
@@ -220,7 +221,7 @@ class CommonTableGrid2 extends React.Component {
 
     const cellStyle = {
       cell: {
-        borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+        // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
         borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
       },
     }
@@ -242,9 +243,9 @@ class CommonTableGrid2 extends React.Component {
         EditCell: cellStyle,
         TableHeaderCell: cellStyle,
         Table: {
-          table: {
-            borderCollapse: 'collapse',
-          },
+          // table: {
+          //   borderCollapse: 'collapse',
+          // },
           stickyTable: {
             ' & > thead > tr': {
               backgroundColor: '#ffffff',
@@ -320,7 +321,7 @@ class CommonTableGrid2 extends React.Component {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query', entity } = this.props
-    console.log(payload)
+
     if (query) {
       query({
         callback: (data) => {
@@ -352,6 +353,15 @@ class CommonTableGrid2 extends React.Component {
         type: `${type}/${queryMethod}`,
         payload: p,
       })
+    } else {
+      const { pagination } = this.state
+      payload.current &&
+        this.setState({
+          pagination: {
+            ...pagination,
+            current: payload.current,
+          },
+        })
     }
   }
 
@@ -402,6 +412,7 @@ class CommonTableGrid2 extends React.Component {
     const {
       grouping,
       selectable,
+      selectConfig = { showSelectAll: false },
       pager,
       pagerConfig = {},
       pagerStateConfig,
@@ -498,7 +509,7 @@ class CommonTableGrid2 extends React.Component {
           className={classNames({
             [classes.paperContainer]: true,
             [this.props.className]: true,
-            ['medisys-table']: true,
+            'medisys-table': true,
           })}
           style={this.props.style}
         >
@@ -572,6 +583,7 @@ class CommonTableGrid2 extends React.Component {
             <DateTypeProvider columnExtensions={newColumExtensions} />
             <RadioTypeProvider columnExtensions={newColumExtensions} />
             <StatusTypeProvider columnExtensions={newColumExtensions} />
+            <TimeTypeProvider columnExtensions={newColumExtensions} />
 
             {grouping && <DragDropProvider />}
 
@@ -585,6 +597,7 @@ class CommonTableGrid2 extends React.Component {
                 highlightRow
                 selectByRowClick
                 showSelectionColumn
+                {...selectConfig}
               />
             )}
 

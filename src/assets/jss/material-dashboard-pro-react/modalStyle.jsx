@@ -54,7 +54,7 @@ const modalStyle = (theme) => {
       lineHeight: '1',
       float: 'right',
       right: '-8px',
-      top: 5,
+      top: 11,
     },
     modalClose: {
       width: '16px',

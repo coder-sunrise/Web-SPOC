@@ -50,7 +50,7 @@ const styles = (theme) => ({})
     diagnosises: Yup.array().of(
       Yup.object().shape({
         diagnosis: Yup.string().required(),
-        complication: Yup.string().required(),
+        complication: Yup.array().of(Yup.string().min(1)).required(),
         orderDate: Yup.string().required(),
       }),
     ),
@@ -84,7 +84,7 @@ class Diagnosis extends PureComponent {
   addDiagnosis = () => {
     this.arrayHelpers.push({
       diagnosis: '',
-      complication: '',
+      complication: [],
       orderDate: '',
       isPersist: false,
       remarks: '',

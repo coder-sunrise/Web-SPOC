@@ -10,44 +10,51 @@ export default ({}) => (
     rows={[
       {
         id: 1,
-        type: 'Referral Letter',
-        subject: 'Referral Letter To Dr Ong',
-        from: 'Dr Johnny',
+        type: 'Medication',
+        subject: 'Biogesic tab 500 mg',
+        description: 'Take Twice A Day',
+        total: 40,
       },
       {
         id: 2,
-        type: 'Others',
-        subject: 'Vaccination Certificate',
-        from: 'Dr Levine',
+        type: 'Medication',
+        subject: 'AMLODIPINE 5MG',
+        description: 'Take Twice A Day',
+        total: 40,
       },
       {
         id: 3,
-        type: 'Memo',
-        subject: 'Patient Visit Reminder',
-        from: 'Dr Levine',
+        type: 'Medication',
+        subject: 'Take Once A Day',
+        description: 'Dr Levine',
+        total: 40,
       },
       {
         id: 4,
-        type: 'Medical Certificate',
-        subject: '09 May 2019 - 09 May 2019 - 1 Day(s)',
-        from: 'Dr Levine',
+        type: 'Vaccination',
+        subject: 'ACTACEL Vaccine Injection (0.5 mL)',
+        description: 'Vaccination Remarks',
+        total: 40,
       },
       {
         id: 5,
-        type: 'Certificate of Attendance',
-        subject: '09 May 2019 - 09 May 2019 - 1 Day',
-        from: 'Dr Levine',
+        type: 'Service',
+        subject: 'Consultation Service',
+        description: '',
+        total: 40,
       },
     ]}
     columns={[
       { name: 'type', title: 'Type' },
-      { name: 'subject', title: 'Subject' },
-      { name: 'from', title: 'From' },
+      { name: 'subject', title: 'Name' },
+      { name: 'description', title: 'Description' },
+      { name: 'total', title: 'Total' },
+
       { name: 'action', title: 'Action' },
     ]}
     FuncProps={{ pager: false }}
     columnExtensions={[
-      { columnName: 'subject', type: 'link', linkField: 'href' },
+      { columnName: 'total', type: 'number', currency: true },
     ]}
     ActionProps={{
       TableCellComponent: ({
@@ -74,7 +81,6 @@ export default ({}) => (
                   // )
                 }}
                 justIcon
-                round
                 color='primary'
                 style={{ marginRight: 5 }}
               >
@@ -92,7 +98,6 @@ export default ({}) => (
                   // )
                 }}
                 justIcon
-                round
                 color='primary'
               >
                 <Delete />

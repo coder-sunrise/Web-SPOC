@@ -2,52 +2,49 @@
 // // // LoginPage view styles
 // #############################
 
-import {
-  container,
-  cardTitle
-} from "mui-pro-jss";
+import { container, cardTitle } from 'mui-pro-jss'
 
-const loginPageStyle = theme => ({
+const loginPageStyle = (theme) => ({
   container: {
     ...container,
-    zIndex: "4",
-    [theme.breakpoints.down("sm")]: {
-      paddingBottom: "100px"
-    }
+    zIndex: '4',
+    [theme.breakpoints.down('sm')]: {
+      paddingBottom: '100px',
+    },
   },
   cardTitle: {
     ...cardTitle,
-    color: "#FFFFFF"
+    color: '#FFFFFF',
   },
   textCenter: {
-    textAlign: "center"
+    textAlign: 'center',
   },
   justifyContentCenter: {
-    justifyContent: "center !important"
+    justifyContent: 'center !important',
   },
   customButtonClass: {
-    "&,&:focus,&:hover": {
-      color: "#FFFFFF"
+    '&,&:focus,&:hover': {
+      color: '#FFFFFF',
     },
-    marginLeft: "5px",
-    marginRight: "5px"
+    marginLeft: '5px',
+    marginRight: '5px',
   },
   inputAdornment: {
-    marginRight: "18px"
+    marginRight: '18px',
   },
   inputAdornmentIcon: {
-    color: "#555"
+    color: '#555',
   },
   cardHidden: {
-    opacity: "0",
-    transform: "translate3d(0, -60px, 0)"
+    opacity: '0',
+    transform: 'translate3d(0, -60px, 0)',
   },
   cardHeader: {
-    marginBottom: "20px"
+    marginBottom: '20px',
   },
   socialLine: {
-    padding: "0.9375rem 0"
-  }
-});
+    padding: '0.9375rem 0',
+  },
+})
 
-export default loginPageStyle;
+export default loginPageStyle
