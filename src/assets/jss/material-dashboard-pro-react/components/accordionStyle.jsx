@@ -69,6 +69,7 @@ const accordionStyle = (theme) => ({
     marginTop: '0',
     marginBottom: '0',
     color: 'inherit',
+    width: '100%',
   },
   expansionPanelDetails: {
     padding: '15px 0px 5px',

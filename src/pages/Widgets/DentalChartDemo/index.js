@@ -69,7 +69,7 @@ class DentalChartDemo extends Component {
     const { theme } = props
     return (
       <Iframe
-        url='http://cdrss.com:8200/Examine/Charts/DentalChart?patientId=664118bc-f92b-4fac-a2cf-3c0d6b1c2243&embedd=1'
+        url='https://cdrss.com:8200/Examine/Charts/DentalChart?patientId=664118bc-f92b-4fac-a2cf-3c0d6b1c2243&embedd=1'
         width='100%'
         height='100%'
         id='identalchartdemo'
