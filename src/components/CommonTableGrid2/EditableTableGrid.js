@@ -13,7 +13,7 @@ import {
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'
 import CommandComponent from './CommandComponent'
-import { getGlobalVariable, getUniqueGUID } from '@/utils/utils'
+import { getGlobalVariable, getUniqueNumericId } from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index'
 import EditPlugin from './EditPlugin'
@@ -95,7 +95,7 @@ class EditableTableGrid extends PureComponent {
       newRows = added
         .map((o) => {
           return {
-            id: getUniqueGUID(),
+            id: getUniqueNumericId(),
             isNew: true,
             ...o,
           }

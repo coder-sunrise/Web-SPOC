@@ -205,6 +205,11 @@
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top;
+  .non-dragable {
+    > div {
+      height: 100%;
+    }
+  }
 }
 .react-grid-item.cssTransforms {
   transition-property: transform;
