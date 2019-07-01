@@ -40,7 +40,7 @@ const RadioEditorBase = React.memo(
     const submitValue = (e) => {
       if (value !== e.target.value) onValueChange(e.target.value)
     }
-    return row.id ? (
+    return (
       <Radio
         value={value}
         checked={row[columnName] === checkedValue}
@@ -50,7 +50,7 @@ const RadioEditorBase = React.memo(
           onValueChange(checked ? checkedValue : uncheckedValue)
         }}
       />
-    ) : null
+    )
   },
   (prevProps, nextProps) => {
     prevProps === nextProps || prevProps.value === nextProps.value

@@ -128,7 +128,7 @@ class SelectTypeProvider extends PureComponent {
 
   constructor (props) {
     super(props)
-    const { salutationFk, config = {}, columnExtensions } = this.props
+    const { columnExtensions } = this.props
     const colFor = columnExtensions.filter(
       (o) =>
         [
