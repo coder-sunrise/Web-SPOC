@@ -23,16 +23,20 @@ const STYLES = () => {
       color: 'currentColor',
       borderWidth: 0,
       background: 'none',
+      lineHeight: '1rem',
+      height: 'auto',
       '&, &:focus, &:hover': {
         boxShadow: 'none !important',
         borderRightWidth: '0px !important',
       },
-      '& .ant-input-number': {
+      '& .ant-input-number-input': {
+        height: '100%',
+        padding: 0,
         lineHeight: '1rem',
       },
-      '& .ant-input-number-input': {
-        height: 'auto',
-        padding: 0,
+      '& .ant-input-number-input-wrap': {
+        lineHeight: '1rem',
+        marginTop: 1,
       },
       '& .ant-input-number-handler-wrap': {
         background: 'none',
@@ -96,14 +100,25 @@ class AntdNumberInput extends React.PureComponent {
   static defaultProps = {
     disabled: false,
     size: 'default',
+    allowEmpty: true,
   }
 
   constructor (props) {
     super(props)
-    const { field = {}, form, inputProps = {}, formatter, parser } = props
+    const {
+      field = {},
+      form,
+      inputProps = {},
+      formatter,
+      parser,
+      defaultValue,
+    } = props
     this.state = {
       shrink: field.value !== undefined && field.value !== '',
-      value: field.value !== undefined && field.value !== '' ? field.value : '',
+      value:
+        field.value !== undefined && field.value !== ''
+          ? field.value
+          : defaultValue,
       focused: false,
     }
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
@@ -132,10 +147,11 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleBlur = () => {
-    const lengthIsZero =
-      this.state.value === null ? true : this.state.value.length === 0
-
-    if (this.state.value === undefined || lengthIsZero) {
+    if (
+      this.state.value === undefined ||
+      this.state.value === null ||
+      this.state.value === ''
+    ) {
       this.setState({ shrink: false })
     }
     this.setState({
@@ -151,7 +167,7 @@ class AntdNumberInput extends React.PureComponent {
 
   debouncedOnChange = (value) => {
     const { props } = this
-    const { loadOnChange, readOnly, onChange } = props
+    const { field, loadOnChange, readOnly, onChange } = props
     // console.log('c', value)
     if (readOnly || loadOnChange) return
     // const { formatter } = this.props
@@ -164,7 +180,7 @@ class AntdNumberInput extends React.PureComponent {
     const v = {
       target: {
         value,
-        name: props.field.name,
+        name: field ? field.name : '',
       },
     }
     if (props.field && props.field.onChange) {
@@ -176,11 +192,19 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleValueChange = (v) => {
+    // if ((v === undefined || !/\S/.test(v)) && !this.props.allowEmpty) {
+    //   return false
+    // }
+    // console.log(this.props.allowEmpty, v)
+    let newV = v
+    if (v === undefined && !this.props.allowEmpty) {
+      newV = this.props.min
+    }
     this.setState({
-      value: v,
+      value: newV,
     })
 
-    this.debouncedOnChange(v)
+    this.debouncedOnChange(newV)
     return false
   }
 
@@ -223,7 +247,7 @@ class AntdNumberInput extends React.PureComponent {
       onFocus,
       onBlur,
       currency,
-      // formatter,
+      formatter,
       // parser,
       ...restProps
     } = this.props
@@ -257,13 +281,21 @@ class AntdNumberInput extends React.PureComponent {
         // console.log(value)
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
-        if (value === '' || value === undefined) return ''
-        console.log('parser', value)
+        // if (value === '' || value === undefined) return ''
+        // console.log('parser', value)
 
-        return numeral(value).value()
+        // return numeral(value).value()
       }
 
       extraCfg.precision = 2
+    } else if (formatter) {
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
+        if (!this.state.focused) {
+          return formatter(v)
+        }
+        return v
+      }
     }
     return (
       <div style={{ width: '100%' }} {...props}>

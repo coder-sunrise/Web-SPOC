@@ -99,16 +99,18 @@ export default createFormViewModel({
           },
         })
       },
-    },
-    reducers: {
-      changeLayoutCollapsed (state, { payload }) {
+      *changeLayoutCollapsed ({ payload }, { put, select }) {
         localStorage.setItem('menuCollapsed', payload ? 1 : 0)
 
-        return {
-          ...state,
-          collapsed: payload,
-        }
+        yield put({
+          type: 'updateState',
+          payload: {
+            collapsed: payload,
+          },
+        })
       },
+    },
+    reducers: {
       saveNotices (state, { payload }) {
         return {
           ...state,

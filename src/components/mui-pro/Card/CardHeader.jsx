@@ -28,7 +28,7 @@ function CardHeader ({ ...props }) {
   const cardHeaderClasses = classNames({
     [classes.cardHeader]: true,
     [classes.cardsm]: props.size === 'sm',
-    [classes[`${color} CardHeader`]]: color,
+    [classes[`${color}CardHeader`]]: color,
     [classes.cardHeaderPlain]: plain,
     [classes.cardHeaderImage]: image,
     [classes.cardHeaderContact]: contact,

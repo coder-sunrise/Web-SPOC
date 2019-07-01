@@ -33,6 +33,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
       loading: Loading,
     }),
+    disabled: true,
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -118,6 +119,11 @@ const widgets = [
     component: Loadable({
       loader: () => import('@/pages/Widgets/Orders'),
       loading: Loading,
+      // render (loaded, props) {
+      //   console.log(loaded, props)
+      //   let Component = loaded.default
+      //   return <Component {...props} />
+      // },
     }),
     layoutConfig: {
       style: {
@@ -127,6 +133,17 @@ const widgets = [
   },
   {
     id: '6',
+    name: 'Result History',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/ResultHistory'),
+      loading: Loading,
+    }),
+    layoutConfig: {
+      style: {},
+    },
+  },
+  {
+    id: '1001',
     name: 'Test Widget',
     component: Loadable({
       loader: () => import('@/pages/Widgets/TestWidget'),

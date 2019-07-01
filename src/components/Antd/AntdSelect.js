@@ -76,7 +76,7 @@ class AntdSelect extends React.PureComponent {
 
   static defaultProps = {
     options: [],
-    label: '',
+    label: undefined,
     labelField: 'name',
     valueField: 'value',
     disabled: false,
@@ -85,12 +85,11 @@ class AntdSelect extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { form, field } = props
+    const { form, field, mode } = props
     this.state = {
       shrink: false,
       value: form && field ? field.value : props.value || props.defaultValue,
     }
-    // console.log('c', props)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -151,6 +150,8 @@ class AntdSelect extends React.PureComponent {
       onFocus,
       onBlur,
       allowClear = true,
+      style,
+      dropdownMatchSelectWidth = false,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -177,6 +178,7 @@ class AntdSelect extends React.PureComponent {
           defaultValue={defaultValue}
           filterOption={this.handleFilter}
           allowClear={allowClear}
+          dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           {...cfg}
           {...restProps}
         >
@@ -200,26 +202,25 @@ class AntdSelect extends React.PureComponent {
   }
 
   render () {
-    const { classes, mode, form, field, onChange, ...restProps } = this.props
+    const { props } = this
+    const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state
-    const selectValue = form && field ? field.value : value
     const labelProps = {}
     if (!mode || mode === 'default') {
-      labelProps.shrink = selectValue !== undefined || this.state.shrink
+      labelProps.shrink = value !== undefined || this.state.shrink
     } else {
       labelProps.shrink =
-        (selectValue !== undefined && selectValue.length > 0) ||
+        (value !== undefined && value !== '' && value.length > 0) ||
         this.state.shrink
     }
-    // console.log(selectValue)
-    // console.log(restProps)
+
     return (
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
-        {...this.props}
+        {...restProps}
       />
     )
   }

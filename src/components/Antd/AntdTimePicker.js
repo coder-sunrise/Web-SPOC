@@ -59,13 +59,14 @@ class AntdTimePicker extends PureComponent {
 
   constructor (props) {
     super(props)
-    const { field = {}, format } = props
+    const { field = {}, format, value } = props
+
     this.state = {
       shrink: field.value !== undefined && field.value !== '',
       value:
         field.value !== undefined && field.value !== ''
           ? _toMoment(field.value, format)
-          : '',
+          : _toMoment(value, format),
     }
   }
 
@@ -99,7 +100,6 @@ class AntdTimePicker extends PureComponent {
   // }
 
   handleChange = (time, timeString) => {
-    console.log(time, timeString)
     this.setState({
       value: time,
     })
@@ -144,6 +144,7 @@ class AntdTimePicker extends PureComponent {
           minuteStep={minuteStep}
           defaultOpenValue={moment('00:00', 'HH:mm')}
           onChange={this.handleChange}
+          onOpenChange={onOpenChange}
           value={this.state.value}
         />
       </div>

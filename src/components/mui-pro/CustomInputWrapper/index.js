@@ -21,7 +21,7 @@ const _config = {
   },
 }
 
-function CustomInputWrapper ({ classes, ...props }) {
+function CustomInputWrapper ({ classes, theme, ...props }) {
   // console.log(props)
   // formControlProps.fullWidth =fullWidth || formControlProps.fullWidth
   for (const key in _config) {
@@ -51,10 +51,11 @@ function CustomInputWrapper ({ classes, ...props }) {
     help,
     fullWidth = true,
     children,
-    style,
     noWrapper = false,
     size = 'medium',
   } = props
+
+  const { style, ...resetProps } = props
 
   const labelClasses = classNames({
     [` ${classes.labelRootError}`]: error,
@@ -90,7 +91,7 @@ function CustomInputWrapper ({ classes, ...props }) {
         //   underline: underlineClasses,
         //   multiline:classes.multiline,
         // },
-        ...props,
+        ...resetProps,
       })
       break
 
@@ -98,6 +99,7 @@ function CustomInputWrapper ({ classes, ...props }) {
       newChildren = children
       break
   }
+  // console.log(label)
   return noWrapper ? (
     <div style={style}>{newChildren}</div>
   ) : (

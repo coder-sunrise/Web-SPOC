@@ -22,17 +22,25 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [ 'src/pages/Authorized' ],
-    authority: [ 'admin', 'user', 'guest' ],
+    Routes: [
+      'src/pages/Authorized',
+    ],
+    authority: [
+      'admin',
+      'user',
+      'guest',
+    ],
     routes: [
-      // dashboard
+      // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
-
       // Reception
       {
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
+        // authority: [
+        //   'user',
+        // ],
         routes: [
           {
             path: '/reception/queue',
@@ -46,7 +54,14 @@ const routes = [
             name: 'dispense',
             hideInMenu: true,
             exact: true,
-            component: './Reception/Queue/Dispense',
+            component: './Dispense',
+          },
+          {
+            path: '/reception/queue/dispense/:visitRefNo/billing',
+            name: 'billing',
+            hideInMenu: true,
+            exact: true,
+            component: './Dispense/Billing',
           },
           {
             path: '/reception/appointment',

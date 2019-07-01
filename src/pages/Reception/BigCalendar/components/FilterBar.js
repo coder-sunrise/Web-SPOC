@@ -121,20 +121,9 @@ class FilterBar extends PureComponent {
                 label={formatMessage({
                   id: 'reception.appt.searchByPatientName',
                 })}
-                suffix={isTyping && <CircularProgress size={16} />}
+                suffix={isTyping && <CircularProgress />}
               />
             </GridItem>
-
-            <GridItem xs md={9} container justify='flex-end'>
-              <GridItem>
-                <Button color='info' onClick={onDoctorEventClick}>
-                  <AddIcon />
-                  Doctor Block
-                </Button>
-              </GridItem>
-            </GridItem>
-          </GridContainer>
-          <GridContainer>
             <GridItem xs md={3}>
               <Select
                 label='Filter by Doctor'
@@ -160,6 +149,21 @@ class FilterBar extends PureComponent {
                 // helpText='Leave blank to show all appointment type'
                 mode='multiple'
               />
+            </GridItem>
+
+            <GridItem
+              xs
+              md={3}
+              container
+              justify='flex-end'
+              alignItems='center'
+            >
+              <GridItem>
+                <Button color='info' onClick={onDoctorEventClick} size='sm'>
+                  <AddIcon />
+                  Doctor Block
+                </Button>
+              </GridItem>
             </GridItem>
           </GridContainer>
         </React.Fragment>

@@ -18,8 +18,6 @@ import {
   Danger,
   Transition,
   ProgressButton,
-  Select,
-  SizeContainer,
 } from '@/components'
 
 import loginPageStyle from '../../assets/jss/material-dashboard-pro-react/views/loginPageStyle'

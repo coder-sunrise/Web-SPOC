@@ -44,6 +44,9 @@ const STYLES = (theme) => ({
       borderRadius: 0,
       paddingLeft: 0,
     },
+    '& .ant-calendar-picker-input.ant-input': {
+      lineHeight: 'inherit !important',
+    },
   },
 })
 
@@ -191,7 +194,7 @@ class AntdDatePicker extends PureComponent {
   }
 
   render () {
-    const { classes, ...restProps } = this.props
+    const { classes, theme, ...restProps } = this.props
     const { form, field, value } = restProps
     const selectValue = form && field ? field.value : value
     // console.log(selectValue)

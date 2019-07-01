@@ -1,4 +1,21 @@
 import React, { PureComponent } from 'react'
+// material ui
+import { withStyles } from '@material-ui/core'
+import ErrorOutline from '@material-ui/icons/ErrorOutline'
+
+const style = () => ({
+  blockDiv: {
+    display: 'block',
+  },
+  container: {
+    height: '100%',
+    cursor: 'pointer',
+  },
+  title: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+})
 
 class Event extends PureComponent {
   _handleMouseEnter = (syntheticEvent) => {
@@ -12,33 +29,27 @@ class Event extends PureComponent {
   }
 
   render () {
-    const { event } = this.props
-    const { isDoctorEvent } = event
-    console.log({ isDoctorEvent })
-    return !isDoctorEvent ? (
+    const { event, classes } = this.props
+    const { isDoctorEvent, hasConflict } = event
+
+    const title = isDoctorEvent ? event.doctor : event.patientName
+
+    return (
       <div
-        style={{ height: '100%', cursor: 'pointer' }}
+        className={classes.container}
         onMouseEnter={this._handleMouseEnter}
         onMouseLeave={this._handleMouseLeave}
       >
-        <span>
-          <strong>{event.patientName}</strong>
-        </span>
-        <span style={{ display: 'block' }}>{event.contactNo}</span>
-      </div>
-    ) : (
-      <div
-        style={{ height: '100%' }}
-        onMouseEnter={this._handleMouseEnter}
-        onMouseLeave={this._handleMouseLeave}
-      >
-        <span>
-          <strong>{event.doctor}</strong>
-        </span>
-        <span style={{ display: 'block' }}>{event.eventType}</span>
+        <div className={classes.title}>
+          <span>
+            <strong>{title}</strong>
+          </span>
+          {hasConflict && <ErrorOutline />}
+        </div>
+        <span className={classes.blockDiv}>{event.contactNo}</span>
       </div>
     )
   }
 }
 
-export default Event
+export default withStyles(style, { name: 'ApptEvent' })(Event)

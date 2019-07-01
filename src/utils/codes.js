@@ -494,6 +494,14 @@ const addressTypes = [
   { label: 'Mailing Address', value: '1' },
   { label: 'Primary Address', value: '2' },
 ]
+
+const orderTypes = [
+  { name: 'Medication', value: '1' },
+  { name: 'Vaccination', value: '2' },
+  { name: 'Service', value: '3' },
+  { name: 'Consumable', value: '4' },
+  { name: 'Open Prescription', value: '5' },
+]
 const localCodes = {}
 export async function getCodes (code) {
   if (!localCodes[code]) {
@@ -537,5 +545,6 @@ module.exports = {
   countries,
   schemes,
   addressTypes,
+  orderTypes,
   ...module.exports,
 }
