@@ -167,7 +167,7 @@ class Grid extends React.Component {
     }
     this.PagerContent = (
       <Button onClick={this.toggleModal} color='info' link>
-        Add From Existing Patient
+        <Add />Add From Existing Patient
       </Button>
     )
   }

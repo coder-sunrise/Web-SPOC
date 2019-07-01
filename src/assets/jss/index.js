@@ -17,6 +17,7 @@
 // ##############################
 // // // Variables - Styles that are used on more than one component
 // #############################
+import color from 'color'
 
 const hexToRgb = (input) => {
   input += ''
@@ -217,7 +218,11 @@ const infoCardHeader = {
   ...infoBoxShadow,
 }
 const primaryCardHeader = {
-  background: 'linear-gradient(60deg, #ab47bc, #8e24aa)',
+  background: `linear-gradient(60deg, ${color(primaryColor).hex()}, ${color(
+    primaryColor,
+  )
+    .darken(0.2)
+    .hex()})`,
   ...primaryBoxShadow,
 }
 const roseCardHeader = {

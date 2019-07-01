@@ -64,7 +64,7 @@ const accordionStyle = (theme) => ({
   },
   expansionPanelSummaryExpandIconExpanded: {},
   title: {
-    fontSize: '15px',
+    // fontSize: '15px',
     fontWeight: 'bolder',
     marginTop: '0',
     marginBottom: '0',

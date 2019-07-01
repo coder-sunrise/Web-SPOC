@@ -26,8 +26,9 @@ function RegularButton ({ ...props }) {
     justIcon,
     pureIcon,
     className,
+    bigview,
     muiClasses,
-    variant = 'outlined',
+    variant = 'contained',
     ...rest
   } = props
   // console.log(simple)
@@ -35,6 +36,9 @@ function RegularButton ({ ...props }) {
     [classes.button]: true,
     [classes[size]]: size,
     [classes[color]]: color,
+    [classes[`${variant}`]]: true,
+    [classes[`${variant}${color}`]]: true,
+    [classes.bigview]: bigview,
     [classes.round]: round,
     [classes.fullWidth]: fullWidth,
     [classes.disabled]: disabled,
