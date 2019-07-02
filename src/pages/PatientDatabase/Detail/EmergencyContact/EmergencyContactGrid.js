@@ -33,11 +33,12 @@ const pecValidationSchema = Yup.object().shape({
   name: Yup.string().required(),
   // primaryContactNo: Yup.date().required(),
 })
-@connect(({ emergencyContact, loading }) => {
-  return { emergencyContact, loading }
+@connect(({ patient, emergencyContact, loading }) => {
+  return { patient, emergencyContact, loading }
 })
 @withFormik({
   mapPropsToValues: ({ patient }) => {
+    // console.log(patient)
     return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
