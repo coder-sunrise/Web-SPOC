@@ -43,22 +43,6 @@ const styles = (theme) => ({})
   //   console.log(dentalChartDemo)
   //   return dentalChartDemo.entity ? dentalChartDemo.entity : dentalChartDemo.default
   // },
-  validationSchema: Yup.object().shape({
-    name: Yup.string().required(),
-    dob: Yup.date().required(),
-    patientAccountNo: Yup.string().required(),
-    genderFk: Yup.string().required(),
-    dialect: Yup.string().required(),
-    contact: Yup.object().shape({
-      contactAddress: Yup.array().of(
-        Yup.object().shape({
-          line1: Yup.string().required(),
-          postcode: Yup.number().required(),
-          countryFk: Yup.string().required(),
-        }),
-      ),
-    }),
-  }),
 
   handleSubmit: () => {},
   displayName: 'DentalChartDemo',

@@ -53,7 +53,6 @@ const styles = (theme) => ({})
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
         Yup.object().shape({
-          line1: Yup.string().required(),
           postcode: Yup.number().required(),
           countryFk: Yup.string().required(),
         }),

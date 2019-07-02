@@ -52,12 +52,16 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
+
   MuiDrawer: {
     paper: {
       overflowX: 'hidden',
     },
   },
   MuiTypography: {
+    body1: {
+      fontSize: '1em',
+    },
     colorTextSecondary: {
       color: 'currentColor',
     },
@@ -161,7 +165,7 @@ export const defaultTheme = createMuiTheme({
         alignItems: 'start',
         fontSize: defaultFontSize,
         '& .ant-input': {
-          height: 'auto',
+          height: '1em',
         },
         '& .anticon': {
           fontSize: defaultFontSize,
@@ -176,7 +180,7 @@ export const defaultTheme = createMuiTheme({
         },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
-          fontSize: '1.1rem',
+          fontSize: '1.1em',
         },
         '& .ant-select-selection__clear': {
           right: 14,
@@ -203,10 +207,15 @@ export const defaultTheme = createMuiTheme({
           height: '23px',
           lineHeight: '22px',
         },
+        '& .Mui-disabled .anticon': {
+          display: 'none',
+        },
       },
+
       input: {
         padding: '4px 0 1px',
         minHeight: 24,
+        height: '1em',
       },
       multiline: {
         padding: 0,
@@ -233,7 +242,11 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 5,
+        marginTop: 4,
+        '& svg': {
+          top: 0,
+          position: 'relative',
+        },
         '& > p': {
           fontSize: defaultFontSize,
         },
@@ -300,7 +313,7 @@ export const smallTheme = createMuiTheme({
         alignItems: 'start',
         fontSize: smallFontSize,
         '& .ant-input': {
-          height: 'auto',
+          height: '1em',
         },
         '& .ant-select': {
           fontSize: smallFontSize,
@@ -319,7 +332,7 @@ export const smallTheme = createMuiTheme({
         },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
-          fontSize: '1rem',
+          fontSize: '1em',
         },
         '& .ant-select-selection__clear': {
           right: 13,
@@ -331,9 +344,9 @@ export const smallTheme = createMuiTheme({
         '& .ant-calendar-picker': {
           fontSize: smallFontSize,
         },
-        '& .ant-calendar-picker-input': {
-          paddingTop: 3,
-        },
+        // '& .ant-calendar-picker-input': {
+        //   paddingTop: 3,
+        // },
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
           height: '21px !important',
           overflowY: 'auto',
@@ -349,7 +362,7 @@ export const smallTheme = createMuiTheme({
       input: {
         padding: '3px 0 0px',
         minHeight: 20,
-        height: '1rem',
+        height: '1em',
       },
       multiline: {
         padding: 0,
@@ -377,7 +390,11 @@ export const smallTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 4,
+        marginTop: 1,
+        '& svg': {
+          top: 2,
+          position: 'relative',
+        },
         '& > p': {
           fontSize: smallFontSize,
         },
@@ -444,7 +461,7 @@ export const largeTheme = createMuiTheme({
         alignItems: 'start',
         fontSize: largeFontSize,
         '& .ant-input': {
-          height: 'auto',
+          height: '1em',
         },
         '& .ant-select': {
           fontSize: largeFontSize,
@@ -489,7 +506,7 @@ export const largeTheme = createMuiTheme({
       input: {
         padding: '6px 0 3px',
         minHeight: 25,
-        height: '1rem',
+        height: '1em',
       },
       multiline: {
         padding: 0,
@@ -503,7 +520,7 @@ export const largeTheme = createMuiTheme({
     MuiInputLabel: {
       root: {
         fontSize: largeFontSize,
-        lineHeight: '1rem',
+        lineHeight: '1em',
         fontWeight: 300,
       },
       formControl: {
@@ -517,7 +534,11 @@ export const largeTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 5,
+        marginTop: 3,
+        '& svg': {
+          top: 4,
+          position: 'relative',
+        },
         '& > p': {
           fontSize: largeFontSize,
         },

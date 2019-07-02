@@ -50,7 +50,10 @@ const cols = {
 }
 
 const ResultHistory = (props) => {
-  const [ showGraphModal, setShowGraphModal ] = useState(false)
+  const [
+    showGraphModal,
+    setShowGraphModal,
+  ] = useState(false)
   return (
     <React.Fragment>
       <CommonModal
@@ -62,7 +65,14 @@ const ResultHistory = (props) => {
         showFooter={false}
       >
         <div>
-          <Chart height={500} width={700} data={data} scale={cols} forceFit padding={{ top: 30, right: 30, bottom: 20, left: 30 }}>
+          <Chart
+            height={500}
+            width={700}
+            data={data}
+            scale={cols}
+            forceFit
+            padding={{ top: 30, right: 30, bottom: 20, left: 30 }}
+          >
             <Axis name='date' />
             <Axis name='value' />
             <Tooltip
@@ -150,7 +160,6 @@ const ResultHistory = (props) => {
                     size='sm'
                     onClick={() => setShowGraphModal(true)}
                     justIcon
-                    round
                     color='primary'
                     style={{ marginRight: 5 }}
                   >
