@@ -94,7 +94,7 @@ class EditableTableGrid extends PureComponent {
       newRows = added
         .map((o) => {
           return {
-            id: getUniqueGUID(),
+            
             isNew: true,
             ...o,
           }

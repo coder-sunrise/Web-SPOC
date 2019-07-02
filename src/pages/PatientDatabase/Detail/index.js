@@ -23,6 +23,8 @@ import Demographic from './Demographics'
 import Allergies from './Allergies'
 import EmergencyContact from './EmergencyContact'
 import Schemes from './Schemes'
+import AppointmentHistory from './AppointmentHistory'
+import PatientHistory from './PatientHistory'
 
 let ps
 const menus = [
@@ -57,6 +59,22 @@ const menus = [
       cmt: 'vst',
     },
     component: Schemes,
+  },
+  {
+    name: 'Appointment History',
+    url: {
+      md: 'pt',
+      cmt: 'ah',
+    },
+    component: AppointmentHistory,
+  },
+  {
+    name: 'Patient History',
+    url: {
+      md: 'pt',
+      cmt: 'ph',
+    },
+    component: PatientHistory,
   },
 ]
 

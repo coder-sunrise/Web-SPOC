@@ -17,27 +17,6 @@ class AllergyGrid extends PureComponent {
     patientAllergy:[]
   }
 
-  tableParas = {
-    columns: [
-      { name: 'allergyName', title: 'Allergy Name' },
-      { name: 'description', title: 'Allergic Reaction' },
-      { name: 'date', title: 'Date' },
-      { name: 'status', title: 'Status' }
-    ],
-    columnExtensions: [
-      {
-        columnName: 'date',
-        type: 'date',
-      },
-      {
-        columnName: 'status',
-        type: 'select',
-        options: status,
-        label: 'Status',
-      },
-    ],
-  }
-
   constructor (props) {
     super(props)
 
@@ -76,32 +55,17 @@ class AllergyGrid extends PureComponent {
     //validateForm()
   }
 
-    this.commitChanges = ({ added, changed, deleted }) => {
-      if (added) {
-        state.patientAllergy = state.patientAllergy.concat(
-          added.map((o) => {
-            return {
-              id: getUniqueGUID(),
-              ...o,
-            }
-          }),
-        )
+    this.commitChanges = ({ rows, added, changed, deleted }) => {
+      
+      rows = rows.map((o) => {
+        return {
+          type: type,
+          ...o,
+        }
       }
-      if (changed) {
-        state.patientAllergy = state.patientAllergy.map((row) => {
-          const n = changed[row.id] ? { ...row, ...changed[row.id] } : row
-          return n
-        })
-      }
+      )
 
-      if (deleted) {
-        state.patientAllergy = state.patientAllergy.filter(
-          (row) => !deleted.find((o) => o === row.id) && row.id,
-        )
-      }
-
-      this.setArrayValue(state.patientAllergy)
-
+      this.setArrayValue(rows)
       //this.props.onSaveClick(this.props.values)
     }
 
@@ -125,7 +89,7 @@ class AllergyGrid extends PureComponent {
 
   render () {
     const { editingRowIds, rowChanges } = this.state
-    const {  type,values,isEditable,rows } = this.props
+    const {  type,values,isEditable,rows,tableParas } = this.props
 
     const EditingProps = {
       showAddCommand: true,
@@ -157,8 +121,7 @@ class AllergyGrid extends PureComponent {
             onRowChangesChange: this.changeRowChanges,
             onCommitChanges: this.commitChanges,
           }}
-          
-          {...this.tableParas}
+          {...tableParas}
         />
       // </CardContainer>
     )

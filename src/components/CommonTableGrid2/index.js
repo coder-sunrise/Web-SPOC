@@ -51,6 +51,7 @@ import {
   Toolbar,
   TableFixedColumns,
   VirtualTable,
+  TableColumnVisibility
 } from '@devexpress/dx-react-grid-material-ui'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -397,6 +398,7 @@ class CommonTableGrid2 extends React.Component {
       extraGetter = [],
       containerComponent,
       schema,
+      hiddenColumnNames,
     } = this.props
 
     const {
@@ -619,6 +621,9 @@ class CommonTableGrid2 extends React.Component {
                   leftColumns
                 )
               }
+            />
+            <TableColumnVisibility
+               hiddenColumnNames={hiddenColumnNames}
             />
             {extraGetter.map((o) => o)}
           </DevGrid>
