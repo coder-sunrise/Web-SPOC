@@ -37,7 +37,7 @@ const Recurrence = ({ values }) => {
             <RecurrenceMonthlyInput values={values} />
           )}
           <GridItem>
-            <h4>Recurrence List</h4>
+            <h5>Recurrence List</h5>
           </GridItem>
           <GridItem>
             <RecurrenceList values={values} />

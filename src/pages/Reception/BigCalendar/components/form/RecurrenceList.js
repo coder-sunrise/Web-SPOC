@@ -1,8 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
 import { RRule } from 'rrule'
+// material ui
+import { Popper, Fade, withStyles } from '@material-ui/core'
+// common component
+import { CardContainer } from '@/components'
 // constant variables
 import { RECURRENCE_RANGE, RECURRENCE_PATTERN, _dateFormat } from './variables'
+
+const styles = (theme) => ({
+  recurrenceList: { textOverflow: 'ellipsis', display: 'inline-block' },
+  popoverContent: { display: 'block' },
+  popoverContainer: { zIndex: 2060 },
+})
 
 const mapRecurrencePatternToRRuleFeq = {
   [RECURRENCE_PATTERN.DAILY]: RRule.DAILY,
@@ -14,7 +24,7 @@ const getRRule = ({
   start,
   stopDate,
   recurrencePattern: freq,
-  every: interval = 1,
+  every,
   recurrenceRange,
   occurence = 1,
   day,
@@ -36,9 +46,12 @@ const getRRule = ({
         }
   let extra = {}
   if (mapRecurrencePatternToRRuleFeq[freq] === RRule.WEEKLY) {
-    extra.byweekday = [
-      ...days,
-    ]
+    if (days.length !== 0) {
+      extra.byweekday = [
+        ...days,
+      ]
+    }
+    extra.wkst = RRule.MO
   }
 
   if (mapRecurrencePatternToRRuleFeq[freq] === RRule.MONTHLY) {
@@ -56,7 +69,7 @@ const getRRule = ({
         start.getUTCMinutes(),
       ),
     ),
-    interval,
+    interval: every === null || every === '' ? 1 : every,
     ...extra,
     ...endType,
   })
@@ -73,16 +86,57 @@ const recurrencesToString = (list, occ, index) =>
         ...list,
       ]
 
-const RecurrenceList = ({ values }) => {
-  console.log({ values })
+const RecurrenceList = ({ classes, values }) => {
+  const [
+    anchorEl,
+    setAnchorEl,
+  ] = useState(null)
+
+  const handleMouseEnter = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMouseLeave = () => {
+    setAnchorEl(null)
+  }
+
+  const open = Boolean(anchorEl)
+  const popoverID = open ? 'recurrencelist-popper' : undefined
+
   const rule = getRRule(values)
-  console.log({ string: rule.toString(), all: rule.all() })
+  console.log({ open, anchorEl })
   return (
-    <h4 style={{ textOverflow: 'ellipsis', display: 'inline-block' }}>
-      {rule.all().reduce(recurrencesToString, []).join(', ')}
-      {rule.all().length > 5 ? '...' : ''}
-    </h4>
+    <div>
+      <Popper
+        id={popoverID}
+        open={open}
+        anchorEl={anchorEl}
+        transition
+        placement='top-end'
+        className={classes.popoverContainer}
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={500}>
+            <CardContainer hideHeader>
+              {rule
+                .all()
+                .map((reccurence) => (
+                  <span className={classes.popoverContent}>
+                    {moment(reccurence).format(_dateFormat)}
+                  </span>
+                ))}
+            </CardContainer>
+          </Fade>
+        )}
+      </Popper>
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <h5 className={classes.recurrenceList}>
+          {rule.all().reduce(recurrencesToString, []).join(', ')}
+          {rule.all().length > 5 ? '...' : ''}
+        </h5>
+      </div>
+    </div>
   )
 }
 
-export default RecurrenceList
+export default withStyles(styles, { name: 'RecurrenceList' })(RecurrenceList)

@@ -19,6 +19,7 @@ export const calendarEvents = [
     start: new Date(now.getFullYear(), now.getMonth(), 15, 7, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 15, 9, 30, 0),
     visitStatus: 'APPOINTMENT',
+    hasConflict: true,
   },
   {
     seriesID: 'series1',
@@ -320,6 +321,7 @@ export const calendarEvents = [
     start: new Date(now.getFullYear(), now.getMonth(), 4, 10, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 4, 15, 30, 0),
     visitStatus: 'APPOINTMENT',
+    hasConflict: true,
   },
   {
     seriesID: 'series10',
@@ -339,6 +341,7 @@ export const calendarEvents = [
     start: new Date(now.getFullYear(), now.getMonth(), 6, 10, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 6, 15, 30, 0),
     visitStatus: 'APPOINTMENT',
+    hasConflict: true,
   },
   {
     seriesID: 'series11',

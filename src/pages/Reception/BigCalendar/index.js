@@ -279,7 +279,7 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     const { calendarEvents } = CalendarModel
-    console.table(calendarEvents)
+
     return (
       <CardContainer hideHeader size='sm'>
         <Popover
