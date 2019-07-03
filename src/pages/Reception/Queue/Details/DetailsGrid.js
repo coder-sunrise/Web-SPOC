@@ -118,7 +118,6 @@ class DetailsGrid extends PureComponent {
 
   Cell = (props) => {
     const { classes, ...tableProps } = props
-    console.log({ tableProps })
     if (tableProps.column.name === 'Action') {
       if (
         tableProps.row.visitStatus === StatusIndicator.APPOINTMENT.toUpperCase()

@@ -199,6 +199,8 @@ class BaseInput extends React.PureComponent {
           {prefix}
         </InputAdornment>
       )
+      if (!labelProps) labelProps = {}
+      labelProps.shrink = true
     }
     if (suffix || isDebouncing) {
       cfg.endAdornment = isDebouncing ? (

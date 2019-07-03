@@ -7,6 +7,7 @@ import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import numeral from 'numeral'
+import Search from '@material-ui/icons/Search'
 
 import {
   FormControl,
@@ -225,7 +226,9 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='name'
-              render={(args) => <TextField label='Name' {...args} />}
+              render={(args) => (
+                <TextField prefix={<Search />} label='Name' {...args} />
+              )}
             />
           </GridItem>
           <GridItem sm={6}>
@@ -234,6 +237,7 @@ class ControlTest extends PureComponent {
               render={(args) => {
                 return (
                   <TextField
+                    prefix={<Search />}
                     label='Multiline Name'
                     multiline
                     rowsMax={6}

@@ -151,6 +151,7 @@ class AntdSelect extends React.PureComponent {
       onBlur,
       allowClear = true,
       style,
+      dropdownMatchSelectWidth = false,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -177,6 +178,7 @@ class AntdSelect extends React.PureComponent {
           defaultValue={defaultValue}
           filterOption={this.handleFilter}
           allowClear={allowClear}
+          dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           {...cfg}
           {...restProps}
         >

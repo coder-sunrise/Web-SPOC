@@ -1,5 +1,9 @@
 import React from 'react'
-import { Pageview, Delete, Save, Edit, Cancel } from '@material-ui/icons'
+import Delete from '@material-ui/icons/Delete'
+import Save from '@material-ui/icons/Save'
+import Edit from '@material-ui/icons/Edit'
+import Cancel from '@material-ui/icons/Cancel'
+
 import { Button } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
