@@ -33,11 +33,8 @@ export { default as Select } from './Antd/AntdSelect'
 export { default as DatePicker } from './Antd/AntdDatePicker'
 export { default as DateRangePicker } from './Antd/AntdDateRangePicker'
 export { default as TimePicker } from './Antd/AntdTimePicker'
-<<<<<<< HEAD
-=======
 export Popconfirm from './Antd/AntdPopconfirm'
 export Popover from './Antd/AntdPopover'
->>>>>>> 03a62439e889b967d0f063474f893c4fd6eee73b
 export NumberInput from './Antd/AntdNumberInput'
 export SimpleAlert from './SimpleAlert'
 export SimpleModal from './SimpleModal'
