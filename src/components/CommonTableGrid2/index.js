@@ -51,7 +51,6 @@ import {
   Toolbar,
   TableFixedColumns,
   VirtualTable,
-  TableColumnVisibility
 } from '@devexpress/dx-react-grid-material-ui'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -59,6 +58,7 @@ import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
+import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 
 const sizeConfig = {
   sm: {
@@ -74,6 +74,7 @@ const sizeConfig = {
     MuiTableCell: {
       root: {
         padding: '5px 0',
+        fontSize: '1em',
       },
     },
   },
@@ -103,7 +104,7 @@ const styles = (theme) => ({
     },
   },
   paperContainer: {
-    margin: '0 5px',
+    // margin: '0 5px',
     '& > div': {
       width: '100%',
     },
@@ -131,7 +132,7 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
     }
   })
 }
-
+let gridId = 0
 @connect(({ loading }) => {
   return { loading }
 })
@@ -153,6 +154,7 @@ class CommonTableGrid2 extends React.Component {
       onRowClick = (f) => f,
     } = props
     // console.log(props)
+    this.gridId = `grid-${gridId++}`
     const cls = classNames({
       [classes.tableStriped]: oddEven,
     })
@@ -237,6 +239,7 @@ class CommonTableGrid2 extends React.Component {
             zIndex: 1,
             overflow: 'visible',
             backgroundColor: 'inherit',
+            borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
           },
         },
         TableCell: cellStyle,
@@ -255,6 +258,7 @@ class CommonTableGrid2 extends React.Component {
         MuiTableCell: {
           root: {
             padding: '10px 8px 10px 8px',
+            fontSize: '1em',
           },
         },
         PrivateSwitchBase: {
@@ -321,7 +325,7 @@ class CommonTableGrid2 extends React.Component {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query', entity } = this.props
-    console.log(payload)
+
     if (query) {
       query({
         callback: (data) => {
@@ -353,6 +357,15 @@ class CommonTableGrid2 extends React.Component {
         type: `${type}/${queryMethod}`,
         payload: p,
       })
+    } else {
+      const { pagination } = this.state
+      payload.current &&
+        this.setState({
+          pagination: {
+            ...pagination,
+            current: payload.current,
+          },
+        })
     }
   }
 
@@ -398,12 +411,12 @@ class CommonTableGrid2 extends React.Component {
       extraGetter = [],
       containerComponent,
       schema,
-      hiddenColumnNames,
     } = this.props
 
     const {
       grouping,
       selectable,
+      selectConfig = { showSelectAll: false },
       pager,
       pagerConfig = {},
       pagerStateConfig,
@@ -472,6 +485,7 @@ class CommonTableGrid2 extends React.Component {
     // }
     newColumExtensions.forEach((c) => {
       c.validationSchema = schema
+      c.gridId = this.gridId
       if (c.type === 'number') {
         if (!c.align) {
           c.align = 'right'
@@ -574,6 +588,7 @@ class CommonTableGrid2 extends React.Component {
             <DateTypeProvider columnExtensions={newColumExtensions} />
             <RadioTypeProvider columnExtensions={newColumExtensions} />
             <StatusTypeProvider columnExtensions={newColumExtensions} />
+            <TimeTypeProvider columnExtensions={newColumExtensions} />
 
             {grouping && <DragDropProvider />}
 
@@ -587,6 +602,7 @@ class CommonTableGrid2 extends React.Component {
                 highlightRow
                 selectByRowClick
                 showSelectionColumn
+                {...selectConfig}
               />
             )}
 
@@ -621,9 +637,6 @@ class CommonTableGrid2 extends React.Component {
                   leftColumns
                 )
               }
-            />
-            <TableColumnVisibility
-               hiddenColumnNames={hiddenColumnNames}
             />
             {extraGetter.map((o) => o)}
           </DevGrid>

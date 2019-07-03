@@ -22,17 +22,25 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [ 'src/pages/Authorized' ],
-    authority: [ 'admin', 'user', 'guest' ],
+    Routes: [
+      'src/pages/Authorized',
+    ],
+    authority: [
+      'admin',
+      'user',
+      'guest',
+    ],
     routes: [
-      // dashboard
+      // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
-
       // Reception
       {
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
+        // authority: [
+        //   'user',
+        // ],
         routes: [
           {
             path: '/reception/queue',
@@ -321,27 +329,7 @@ const routes = [
         path: '/setting',
         icon: 'settings',
         name: 'setting',
-        routes: [
-          {
-            path: '/setting/clinic-setting',
-            mini: 'CS',
-            name: 'clinicSetting',
-            // component: '',
-          },
-          {
-            path: '/setting/system-setting',
-            mini: 'SS',
-            name: 'systemSetting',
-            // component: '',
-          },
-          {
-            path: '/setting/print-setting',
-            mini: 'PS',
-            name: 'printSetting',
-            // component: '',
-          },
-        ],
-        // component: '',
+        component: './Setting',
       },
       // Settings
       {

@@ -1,7 +1,7 @@
 import { MuiThemeProvider, createMuiTheme, withStyles } from '@material-ui/core'
 import primaryColor from '@material-ui/core/colors/indigo'
 import secondaryColor from '@material-ui/core/colors/blueGrey'
-
+import { standardRowHeight, smallRowHeight, largeRowHeight } from 'assets/jss'
 import {
   // primaryColor,
   // secondaryColor,
@@ -16,9 +16,9 @@ const defaultFontSize = '1rem'
 const smallFontSize = '0.9rem'
 const largeFontSize = '1.2rem'
 
-const defaultIconWidth = '0.9em'
-const smallIconWidth = '0.82em'
-const largeIconWidth = '0.95em'
+const defaultIconWidth = '0.85em'
+const smallIconWidth = '0.72em'
+const largeIconWidth = '0.89em'
 
 const defaultButton = {
   padding: '8px 18px !important',
@@ -52,6 +52,15 @@ const sharedFormControlLabel = {
     marginLeft: 0,
   },
 }
+const sharedInputAdornmentRoot = {
+  color: fontColor,
+  // fontSize: '1rem',
+  height: 'auto',
+  whiteSpace: 'nowrap',
+  // '& > p': {
+  //   fontWeight: 300,
+  // },
+}
 const sharedPalette = {
   primary: primaryColor,
   secondary: secondaryColor,
@@ -62,9 +71,18 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
+
   MuiDrawer: {
     paper: {
       overflowX: 'hidden',
+    },
+  },
+  MuiTypography: {
+    body1: {
+      fontSize: '1em',
+    },
+    colorTextSecondary: {
+      color: 'currentColor',
     },
   },
   MuiInput: {
@@ -84,22 +102,6 @@ const sharedOverrides = {
           transform: 'scaleX(1) !important',
         },
       },
-    },
-  },
-  MuiInputAdornment: {
-    root: {
-      color: fontColor,
-      fontSize: '1rem',
-      whiteSpace: 'nowrap',
-      '& > p': {
-        fontWeight: 300,
-      },
-    },
-    positionStart: {
-      marginTop: 15,
-    },
-    positionEnd: {
-      marginTop: 15,
     },
   },
   // RadioGroup: {
@@ -147,9 +149,12 @@ export const defaultTheme = createMuiTheme({
   palette: {
     ...sharedPalette,
   },
-  props: {},
+  props: {
+    rowHeight: standardRowHeight,
+  },
   overrides: {
     ...sharedOverrides,
+
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -179,7 +184,7 @@ export const defaultTheme = createMuiTheme({
         alignItems: 'start',
         fontSize: defaultFontSize,
         '& .ant-input': {
-          height: 'auto',
+          height: '1em',
         },
         '& .anticon': {
           fontSize: defaultFontSize,
@@ -187,11 +192,6 @@ export const defaultTheme = createMuiTheme({
         },
         '& .ant-input-number, .ant-time-picker': {
           fontSize: defaultFontSize,
-          height: 'auto',
-          // '& .ant-input-number-handler-wrap': {
-          //   height: 30,
-          //   top: -5,
-          // },
         },
 
         '& .ant-select-remove-icon': {
@@ -199,7 +199,7 @@ export const defaultTheme = createMuiTheme({
         },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
-          fontSize: '1.1rem',
+          fontSize: '1.1em',
         },
         '& .ant-select-selection__clear': {
           right: 14,
@@ -226,10 +226,15 @@ export const defaultTheme = createMuiTheme({
           height: '23px',
           lineHeight: '22px',
         },
+        '& .Mui-disabled .anticon': {
+          display: 'none',
+        },
       },
+
       input: {
         padding: '4px 0 1px',
         minHeight: 24,
+        height: '1em',
       },
       multiline: {
         padding: 0,
@@ -279,7 +284,9 @@ export const defaultTheme = createMuiTheme({
     },
     RichEditor: {
       wrapper: {
-        zoom: '90%',
+        '& .rdw-editor-toolbar': {
+          zoom: '90%',
+        },
       },
     },
   },
@@ -289,9 +296,12 @@ export const smallTheme = createMuiTheme({
   palette: {
     ...sharedPalette,
   },
-  props: {},
+  props: {
+    rowHeight: smallRowHeight,
+  },
   overrides: {
     ...sharedOverrides,
+
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -321,16 +331,18 @@ export const smallTheme = createMuiTheme({
         alignItems: 'start',
         fontSize: smallFontSize,
         '& .ant-input': {
-          height: 'auto',
+          height: '1em',
+        },
+        '& .ant-switch': {
+          fontSize: smallFontSize,
         },
         '& .ant-select': {
           fontSize: smallFontSize,
           minHeight: 20,
-          padding: '3px 0 0px',
+          padding: '1px 0 0px',
         },
         '& .ant-input-number, .ant-time-picker': {
           fontSize: smallFontSize,
-          height: 'auto',
         },
         '& .anticon': {
           fontSize: smallFontSize,
@@ -341,7 +353,7 @@ export const smallTheme = createMuiTheme({
         },
         '& .anticon-close-circle': {
           color: 'rgba(0, 0, 0, 1)',
-          fontSize: '1rem',
+          fontSize: '1em',
         },
         '& .ant-select-selection__clear': {
           right: 13,
@@ -353,9 +365,9 @@ export const smallTheme = createMuiTheme({
         '& .ant-calendar-picker': {
           fontSize: smallFontSize,
         },
-        '& .ant-calendar-picker-input': {
-          paddingTop: 3,
-        },
+        // '& .ant-calendar-picker-input': {
+        //   paddingTop: 3,
+        // },
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
           height: '21px !important',
           overflowY: 'auto',
@@ -369,9 +381,9 @@ export const smallTheme = createMuiTheme({
         },
       },
       input: {
-        padding: '2px 0 1px',
+        padding: '3px 0 0px',
         minHeight: 20,
-        height: '1rem',
+        height: '1em',
       },
       multiline: {
         padding: 0,
@@ -422,7 +434,9 @@ export const smallTheme = createMuiTheme({
     },
     RichEditor: {
       wrapper: {
-        zoom: '70%',
+        '& .rdw-editor-toolbar': {
+          zoom: '70%',
+        },
       },
     },
   },
@@ -432,9 +446,12 @@ export const largeTheme = createMuiTheme({
   palette: {
     ...sharedPalette,
   },
-  props: {},
+  props: {
+    rowHeight: largeRowHeight,
+  },
   overrides: {
     ...sharedOverrides,
+
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
@@ -464,7 +481,10 @@ export const largeTheme = createMuiTheme({
         alignItems: 'start',
         fontSize: largeFontSize,
         '& .ant-input': {
-          height: 'auto',
+          height: '1em',
+        },
+        '& .ant-switch': {
+          fontSize: largeFontSize,
         },
         '& .ant-select': {
           fontSize: largeFontSize,
@@ -473,7 +493,6 @@ export const largeTheme = createMuiTheme({
         },
         '& .ant-input-number, .ant-time-picker': {
           fontSize: largeFontSize,
-          height: 'auto',
         },
         '& .anticon': {
           fontSize: largeFontSize,
@@ -510,7 +529,7 @@ export const largeTheme = createMuiTheme({
       input: {
         padding: '6px 0 3px',
         minHeight: 25,
-        height: '1rem',
+        height: '1em',
       },
       multiline: {
         padding: 0,
@@ -524,7 +543,7 @@ export const largeTheme = createMuiTheme({
     MuiInputLabel: {
       root: {
         fontSize: largeFontSize,
-        lineHeight: '1rem',
+        lineHeight: '1em',
         fontWeight: 300,
       },
       formControl: {

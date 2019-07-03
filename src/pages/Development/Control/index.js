@@ -7,6 +7,7 @@ import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import numeral from 'numeral'
+import Search from '@material-ui/icons/Search'
 
 import {
   FormControl,
@@ -52,6 +53,7 @@ import {
   AntdSelect,
   TimePicker,
   NumberInput,
+  Switch,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -225,7 +227,9 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='name'
-              render={(args) => <TextField label='Name' {...args} />}
+              render={(args) => (
+                <TextField prefix={<Search />} label='Name' {...args} />
+              )}
             />
           </GridItem>
           <GridItem sm={6}>
@@ -234,6 +238,7 @@ class ControlTest extends PureComponent {
               render={(args) => {
                 return (
                   <TextField
+                    prefix={<Search />}
                     label='Multiline Name'
                     multiline
                     rowsMax={6}
@@ -273,6 +278,14 @@ class ControlTest extends PureComponent {
           </GridItem>
           <GridItem sm={3}>
             <FastField
+              name='name'
+              render={(args) => (
+                <TextField prefix={<Search />} label='Name' {...args} />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
               name='isPersist'
               render={(args) => {
                 return (
@@ -280,6 +293,7 @@ class ControlTest extends PureComponent {
                     label='Persist'
                     inputLabel='Input Persist'
                     labelPlacement='end'
+                    prefix='External Prescription'
                     mode='default'
                     {...args}
                   />
@@ -372,6 +386,7 @@ class ControlTest extends PureComponent {
               name='numberField'
               render={(args) => (
                 <NumberInput
+                  prefix='External Prescription'
                   label='Number Input'
                   step={0.5}
                   currency
@@ -383,7 +398,21 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              render={(args) => <TextField label='Text Input' {...args} />}
+              render={(args) => (
+                <TextField
+                  prefix='External Prescription'
+                  label='Text Input'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='switch'
+              render={(args) => {
+                return <Switch label='Switch' {...args} />
+              }}
             />
           </GridItem>
         </GridContainer>

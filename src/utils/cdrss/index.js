@@ -350,6 +350,10 @@ const getUniqueGUID = () => {
   })
   return uuid
 }
+const getUniqueNumericId = () => {
+  runningId += 1
+  return runningId
+}
 const formatDatetime = (text /* , record --remove */) => {
   if (!text) return ''
   return moment(text).format(format.datetime)
@@ -813,7 +817,8 @@ const immutaeMerge = (fields, st, deep = 0) => {
   }
   if (Object.keys(returnVal).length > 0) {
     return returnVal
-  } else if (Array.isArray(fields)) {
+  }
+  if (Array.isArray(fields)) {
     // console.log(fields, st)
     return { $set: fields }
   }
@@ -1000,6 +1005,7 @@ module.exports = {
   immutaeMerge,
   getUniqueId,
   getUniqueGUID,
+  getUniqueNumericId,
   duplicateCheck,
   encryptString,
   decryptToString,

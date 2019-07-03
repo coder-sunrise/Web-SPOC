@@ -80,7 +80,6 @@ const styles = () => ({
     contact: Yup.object().shape({
       contactAddress: Yup.array().compact((v) => v.isDeleted).of(
         Yup.object().shape({
-          line1: Yup.string().required(),
           postcode: Yup.number().required(),
           countryFK: Yup.string().required(),
         }),
@@ -134,7 +133,7 @@ class Demographic extends PureComponent {
   }
 
   render () {
-    console.log(this.props)
+    console.log('Demographic', this)
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
     return (

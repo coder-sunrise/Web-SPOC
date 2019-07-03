@@ -37,8 +37,7 @@ const STYLES = (theme) => ({
       borderRadius: 0,
       borderBottom: '1px solid rgba(0, 0, 0, 0.42)',
       paddingLeft: 0,
-      fontSize: '1rem',
-      height: 31,
+      lineHIeght: '1.5em',
     },
   },
 })

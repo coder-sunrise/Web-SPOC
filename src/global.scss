@@ -65,6 +65,10 @@
     color: white;
   }
 }
+.ant-input-number-disabled .ant-input-number-input,
+.ant-input-number-disabled {
+  cursor: text;
+}
 .ant-popover-message-title {
   padding-left: 2rem !important;
 }
@@ -211,6 +215,11 @@
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top;
+  .non-dragable {
+    > div {
+      height: 100%;
+    }
+  }
 }
 .react-grid-item.cssTransforms {
   transition-property: transform;
@@ -242,8 +251,8 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  bottom: 0;
-  right: 0;
+  bottom: -4px;
+  right: -2px;
   cursor: se-resize;
 }
 
@@ -304,6 +313,8 @@
 
 .ant-input-disabled {
   background: transparent;
+  // color: rgba(0, 0, 0, 0.75);
+  cursor: inherit;
 }
 .ant-input[disabled] {
   background: transparent;
