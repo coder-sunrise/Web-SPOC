@@ -54,7 +54,7 @@ export const calendarEvents = [
     timeTo: new Date(now.getFullYear(), now.getMonth(), 15, 15, 30, 0),
     timeIn: new Date(now.getFullYear(), now.getMonth(), 15, 14, 30, 0),
     timeOut: new Date(now.getFullYear(), now.getMonth(), 15, 15, 30, 0),
-    start: new Date(now.getFullYear(), now.getMonth(), 15, 114, 30, 0),
+    start: new Date(now.getFullYear(), now.getMonth(), 15, 14, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 15, 15, 30, 0),
     visitStatus: 'APPOINTMENT',
   },

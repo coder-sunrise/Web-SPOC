@@ -2,19 +2,12 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 // common component
-import {
-  CardContainer,
-  DatePicker,
-  GridContainer,
-  GridItem,
-  NumberInput,
-  RadioGroup,
-  Select,
-} from '@/components'
+import { GridContainer, GridItem, Select } from '@/components'
 // sub component
 import RecurrenceDailyInput from './RecurrenceDaily'
 import RecurrenceWeeklyInput from './RecurrenceWeekly'
 import RecurrenceMonthlyInput from './RecurrenceMonthly'
+import RecurrenceList from './RecurrenceList'
 import { recurrencePattern, RECURRENCE_PATTERN } from './variables'
 
 const Recurrence = ({ values }) => {
@@ -43,6 +36,12 @@ const Recurrence = ({ values }) => {
           {values.recurrencePattern === RECURRENCE_PATTERN.MONTHLY && (
             <RecurrenceMonthlyInput values={values} />
           )}
+          <GridItem>
+            <h4>Recurrence List</h4>
+          </GridItem>
+          <GridItem>
+            <RecurrenceList values={values} />
+          </GridItem>
         </React.Fragment>
       )}
     </GridContainer>

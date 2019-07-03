@@ -196,17 +196,9 @@ class Form extends React.PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      onClose,
-      slotInfo,
-      isLoading,
-      handleSubmit,
-      values,
-    } = this.props
+    const { classes, onClose, slotInfo, isLoading, values } = this.props
 
     const { hasConflict } = slotInfo
-    console.log({ slotInfo })
 
     const {
       showNewPatientModal,

@@ -32,7 +32,7 @@ const FormFooter = ({
             className={classnames(hideCancelAppointmentClass)}
             onClick={onCancelAppointmentClick}
           >
-            Cancel Appointment
+            Delete
           </Button>
         </GridItem>
 

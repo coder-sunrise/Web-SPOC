@@ -18,13 +18,13 @@ export const RECURRENCE_RANGE = {
 }
 
 export const days = [
-  { value: 'monday', name: 'Monday' },
-  { value: 'tuesday', name: 'Tuesday' },
-  { value: 'wednesday', name: 'Wednesday' },
-  { value: 'thursday', name: 'Thursday' },
-  { value: 'friday', name: 'Friday' },
-  { value: 'saturday', name: 'Saturday' },
-  { value: 'sunday', name: 'Sunday' },
+  { value: 0, name: 'Monday' },
+  { value: 1, name: 'Tuesday' },
+  { value: 2, name: 'Wednesday' },
+  { value: 3, name: 'Thursday' },
+  { value: 4, name: 'Friday' },
+  { value: 5, name: 'Saturday' },
+  { value: 6, name: 'Sunday' },
 ]
 
 export const AppointmentDataColumn = [
