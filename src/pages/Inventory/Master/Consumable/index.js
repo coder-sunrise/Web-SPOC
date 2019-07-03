@@ -19,7 +19,6 @@ const Consumable = ({ dispatch, history, consumable }) => {
       { name: 'expenseAmount', title: 'Selling Price' },
       { name: 'Action', title: 'Action' },
     ],
-
     leftColumns: [],
   })
 
@@ -33,7 +32,7 @@ const Consumable = ({ dispatch, history, consumable }) => {
     },
     {
       columnName: 'dispUOM',
-      align: 'select',
+      type: 'select',
       options: [],
       label: 'DispUOM',
     },

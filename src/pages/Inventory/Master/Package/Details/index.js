@@ -7,7 +7,7 @@ import { withFormik } from 'formik'
 import DetailPanel from './Detail'
 // import Pricing from '../../DetaPricing'
 // import Stock from '../../Details/Stock'
-import Grid from '../../Grid'
+import InventoryTypeListing from './InventoryTypeListing'
 import { NavPills, ProgressButton, Button } from '@/components'
 import Yup from '@/utils/yup'
 
@@ -36,30 +36,81 @@ const Detail = ({
     showTransfer: false,
   }
 
-  // const pMedi = {
-  //   ...restProps,
-  //   modelType: 'Medication',
-  //   type: 'Medication',
-  // }
+  const medicationProps = {
+    tableParas: {
+      columns: [
+        { name: 'medicationName', title: 'Medication Name' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'amount', title: 'Amount' },
+        { name: 'Action', title: 'Action' },
+      ],
+      leftColumns: [],
+    },
+    colExtensions: [
+      { columnName: 'Action', width: 110, align: 'center' },
+      { columnName: 'unitPrice', type: 'number', currency: true },
+      { columnName: 'amount', type: 'number', currency: true },
+    ],
+    list: [],
+  }
 
-  // const pVacc = {
-  //   ...restProps,
-  //   modelType: 'Vaccination',
-  //   type: 'Vaccination',
-  // }
+  const vaccinationProps = {
+    tableParas: {
+      columns: [
+        { name: 'vaccination', title: 'Vaccination' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'amount', title: 'Amount' },
+        { name: 'Action', title: 'Action' },
+      ],
+      leftColumns: [],
+    },
+    colExtensions: [
+      { columnName: 'Action', width: 110, align: 'center' },
+      { columnName: 'unitPrice', type: 'number', currency: true },
+      { columnName: 'amount', type: 'number', currency: true },
+    ],
+    list: [],
+  }
 
-  // const pCons = {
-  //   ...restProps,
-  //   modelType: 'Consumable',
-  //   type: 'Consumable',
-  // }
+  const consumableProps = {
+    tableParas: {
+      columns: [
+        { name: 'consumableName', title: 'Consumable Name' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'amount', title: 'Amount' },
+        { name: 'Action', title: 'Action' },
+      ],
+      leftColumns: [],
+    },
+    colExtensions: [
+      { columnName: 'Action', width: 110, align: 'center' },
+      { columnName: 'unitPrice', type: 'number', currency: true },
+      { columnName: 'amount', type: 'number', currency: true },
+    ],
+    list: [],
+  }
 
-  // const pServ = {
-  //   ...restProps,
-  //   modelType: 'Service',
-  //   type: 'Service',
-  // }
-
+  const serviceProps = {
+    tableParas: {
+      columns: [
+        { name: 'service', title: 'Service' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'amount', title: 'Amount' },
+        { name: 'Action', title: 'Action' },
+      ],
+      leftColumns: [],
+    },
+    colExtensions: [
+      { columnName: 'Action', width: 110, align: 'center' },
+      { columnName: 'unitPrice', type: 'number', currency: true },
+      { columnName: 'amount', type: 'number', currency: true },
+    ],
+    list: [],
+  }
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -89,22 +140,22 @@ const Detail = ({
             tabButton: 'Detail',
             tabContent: <DetailPanel {...detailProps} />,
           },
-          // {
-          //   tabButton: 'Medication',
-          //   tabContent: <Grid {...pMedi} />,
-          // },
-          // {
-          //   tabButton: 'Vaccination',
-          //   tabContent: <Grid {...pVacc} />,
-          // },
-          // {
-          //   tabButton: 'Consumable',
-          //   tabContent: <Grid {...pCons} />,
-          // },
-          // {
-          //   tabButton: 'Service',
-          //   tabContent: <Grid {...pServ} />,
-          // },
+          {
+            tabButton: 'Medication',
+            tabContent: <InventoryTypeListing {...medicationProps} />,
+          },
+          {
+            tabButton: 'Vaccination',
+            tabContent: <InventoryTypeListing {...vaccinationProps} />,
+          },
+          {
+            tabButton: 'Consumable',
+            tabContent: <InventoryTypeListing {...consumableProps} />,
+          },
+          {
+            tabButton: 'Service',
+            tabContent: <InventoryTypeListing {...serviceProps} />,
+          },
         ]}
       />
     </React.Fragment>

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Remove from '@material-ui/icons/Remove'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
-  CommonTableGrid,
+  CardContainer,
   CommonTableGrid2,
   Tooltip,
   Button,
@@ -13,20 +13,12 @@ import {
 
 const styles = () => ({})
 
-const Grid = ({
+const InventoryTypeListing = ({
   dispatch,
-  namespace,
-  history,
   tableParas,
   colExtensions,
   list,
 }) => {
-  // useEffect(() => {
-  //   dispatch({
-  //     type: `${namespace}/query`,
-  //   })
-  // }, [])
-
   const Cell = ({ column, row, classes, ...p }) => {
     if (column.name === 'Action') {
       return (
@@ -51,13 +43,21 @@ const Grid = ({
   const TableCell = (p) => Cell({ ...p, dispatch })
 
   return (
-    <CommonTableGrid2
-      {...tableParas}
-      columnExtensions={colExtensions}
-      rows={[]}
-      FuncProps={{ pager: false }}
-      ActionProps={{ TableCellComponent: TableCell }}
-    />
+    <CardContainer
+      hideHeader
+      style={{
+        marginLeft: 5,
+        marginRight: 5,
+      }}
+    >
+      <CommonTableGrid2
+        {...tableParas}
+        columnExtensions={colExtensions}
+        rows={list}
+        FuncProps={{ pager: false }}
+        ActionProps={{ TableCellComponent: TableCell }}
+      />
+    </CardContainer>
   )
 }
-export default withStyles(styles, { withTheme: true })(Grid)
+export default withStyles(styles, { withTheme: true })(InventoryTypeListing)

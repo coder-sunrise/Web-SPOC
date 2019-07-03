@@ -51,4 +51,28 @@ export default {
   'inventory.master.package.effectiveStartDate': 'Effective Start Date',
   'inventory.master.package.effectiveEndDate': 'Effective End Date',
   'inventory.master.package.status': 'Status',
+
+  'inventory.master.pricing.lastCostPriceBefBonus':
+    'Last Cost Price (Before Bonus)',
+  'inventory.master.pricing.lastCostPriceAftBonus':
+    'Last Cost Price (After Bonus)',
+  'inventory.master.pricing.averageCostPrice': 'Average Cost Price',
+  'inventory.master.pricing.profitMarginPercentage': 'Markup Margin (%)',
+  'inventory.master.pricing.suggestedSellingPrice': 'Suggested Selling Price',
+  'inventory.master.pricing.sellingPrice': 'Selling Price',
+  'inventory.master.pricing.maxDiscount': 'Max Discount (%)',
+
+  'inventory.master.setting.dosage': 'Dosage',
+  'inventory.master.setting.frequency': 'Frequency',
+  'inventory.master.setting.duration': 'Duration',
+  'inventory.master.setting.uom': 'UOM',
+  'inventory.master.setting.usage': 'Usage',
+  'inventory.master.setting.quantity': 'Quantity',
+
+  'inventory.master.setting.precaution':
+    'Maximum up to 3 precautions to be configured',
+
+  'inventory.master.stock.currentStock': 'Current Stock',
+  'inventory.master.stock.reorderThreshold': 'Re-Order Threshold',
+  'inventory.master.stock.criticalThreshold': 'Critical Threshold',
 }

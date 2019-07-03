@@ -1,16 +1,11 @@
 import React from 'react'
 // nodejs library to set properties for components
-import PropTypes from 'prop-types'
-import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
 import {
-  FormLabel,
   Checkbox as MUICheckbox,
   Switch,
   FormControlLabel,
 } from '@material-ui/core'
-
-import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
 
 class Checkbox extends React.Component {
   state = {
@@ -68,15 +63,15 @@ class Checkbox extends React.Component {
           onChange(field.name, checked)
         }
       },
-      disabled : disabled,
+      disabled,
       checked: this.state.checked,
       // ...resetProps,
     }
-    const style = { margin: '0 auto' }
+    // const style = { margin: '0 auto' }
     return (
       <div style={{ width: '100%' }} {...props}>
         <FormControlLabel
-          style={notCentered ? style : null}
+          // style={notCentered ? style : null}
           control={
             isSwitch ? (
               <Switch

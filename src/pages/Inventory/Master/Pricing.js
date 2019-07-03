@@ -2,6 +2,7 @@ import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
+import { formatMessage } from 'umi/locale'
 
 import {
   CardContainer,
@@ -31,7 +32,9 @@ const Pricing = () => {
                   return (
                     <NumberInput
                       currency
-                      label='Last Cost Price (Before Bonus)'
+                      label={formatMessage({
+                        id: 'inventory.master.pricing.lastCostPriceBefBonus',
+                      })}
                       {...args}
                     />
                   )
@@ -45,7 +48,9 @@ const Pricing = () => {
                   return (
                     <NumberInput
                       currency
-                      label='Last Cost Price (After Bonus)'
+                      label={formatMessage({
+                        id: 'inventory.master.pricing.lastCostPriceAftBonus',
+                      })}
                       {...args}
                     />
                   )
@@ -59,7 +64,9 @@ const Pricing = () => {
                   return (
                     <NumberInput
                       currency
-                      label='Average Cost Price'
+                      label={formatMessage({
+                        id: 'inventory.master.pricing.averageCostPrice',
+                      })}
                       {...args}
                     />
                   )
@@ -75,7 +82,12 @@ const Pricing = () => {
               <FastField
                 name='profitMarginPercentage'
                 render={(args) => (
-                  <NumberInput label='Markup Margin (%)' {...args} />
+                  <NumberInput
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.profitMarginPercentage',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -85,7 +97,9 @@ const Pricing = () => {
                 render={(args) => (
                   <NumberInput
                     currency
-                    label='Suggested Selling Price'
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.suggestedSellingPrice',
+                    })}
                     {...args}
                   />
                 )}
@@ -95,7 +109,13 @@ const Pricing = () => {
               <FastField
                 name='sellingPriceBefDiscount'
                 render={(args) => (
-                  <NumberInput currency label='Selling Price' {...args} />
+                  <NumberInput
+                    currency
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.sellingPrice',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -103,7 +123,12 @@ const Pricing = () => {
               <FastField
                 name='maxDiscount'
                 render={(args) => (
-                  <NumberInput label='Max Discount (%)' {...args} />
+                  <NumberInput
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.maxDiscount',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
