@@ -67,7 +67,7 @@ const Invoice = (props) => {
             type: 'Medication',
             name: 'AMLODIPINE 5MG',
             quantity: 1,
-            total: -40,
+            total: 40,
           },
           {
             id: 3,
@@ -115,7 +115,7 @@ const Invoice = (props) => {
         <GridItem xs={6} md={3}>
           <NumberInput
             prefix='GST (7%):'
-            defaultValue={-13.3}
+            defaultValue={13.3}
             {...amountProps}
           />
         </GridItem>

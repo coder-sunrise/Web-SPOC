@@ -909,6 +909,7 @@ class Consultation extends PureComponent {
           maxWidth='sm'
           bodyNoPadding
           onClose={() => this.toggleInvoiceAdjustment()}
+          onConfirm={() => this.toggleInvoiceAdjustment()}
         >
           <InvoiceAdjustment />
         </CommonModal>

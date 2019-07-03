@@ -38,7 +38,11 @@ const styles = (theme) => ({})
 }))
 @withFormik({
   mapPropsToValues: ({ consultation }) => {
-    return consultation.default
+    return {
+      ...consultation.default,
+      type: true,
+      finalAmount: 190,
+    }
   },
   validationSchema: Yup.object().shape({
     adjustment: Yup.string().required(),
@@ -46,21 +50,35 @@ const styles = (theme) => ({})
     remarks: Yup.string().required(),
   }),
 
-  handleSubmit: () => {},
+  handleSubmit: (values, { props }) => {
+    if (props.onConfirm) props.onConfirm()
+  },
   displayName: 'InvoiceAdjustment',
 })
 class InvoiceAdjustment extends PureComponent {
   render () {
-    const { theme, footer, ...props } = this.props
+    const { theme, footer, values, ...props } = this.props
+    // console.log(values)
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem xs={8}>
-              <FastField
+              <Field
                 name='adjustment'
                 render={(args) => {
-                  return <NumberInput label='Adjustment' {...args} />
+                  if (values.type) {
+                    return <NumberInput currency label='Adjustment' {...args} />
+                  }
+                  return (
+                    <NumberInput
+                      max={100}
+                      min={-100}
+                      percentage
+                      label='Adjustment'
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -68,7 +86,14 @@ class InvoiceAdjustment extends PureComponent {
               <FastField
                 name='type'
                 render={(args) => {
-                  return <Switch label='' {...args} />
+                  return (
+                    <Switch
+                      checkedChildren='$'
+                      unCheckedChildren='%'
+                      label=''
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -80,7 +105,25 @@ class InvoiceAdjustment extends PureComponent {
                     <TextField
                       label='Remarks'
                       multiline
-                      rowsMax='5'
+                      rowsMax='2'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='finalAmount'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      style={{ marginTop: theme.spacing(2) }}
+                      currency
+                      prefix='Total Invoice After Adjustment:'
+                      noUnderline
+                      disabled
+                      normalText
                       {...args}
                     />
                   )

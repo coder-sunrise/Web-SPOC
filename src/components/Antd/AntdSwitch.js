@@ -16,9 +16,10 @@ import { extendFunc } from '@/utils/utils'
 const STYLES = () => {
   return {
     switchContainer: {
-      boxSizing: 'content-box',
-      lineHeight: '1rem',
+      lineHeight: '1em',
+      height: '100%',
       color: 'currentColor',
+      borderRadius: 3,
     },
   }
 }
@@ -37,9 +38,8 @@ class AntdSwitch extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { form, field, mode } = props
+    const { form, field } = props
     this.state = {
-      shrink: false,
       value: form && field ? field.value : props.value || props.defaultValue,
     }
   }
@@ -57,58 +57,33 @@ class AntdSwitch extends React.PureComponent {
     }
   }
 
-  handleFilter = (input, option) => {
-    try {
-      return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
-    } catch (error) {
-      console.log({ error })
-      return false
-    }
-  }
-
-  handleFocus = () => {
-    this.setState({ shrink: true })
-  }
-
-  handleBlur = () => {
-    if (this.state.value === undefined || this.state.value.length === 0) {
-      this.setState({ shrink: false })
-    }
-  }
-
-  handleValueChange = (val) => {
-    const { form, field, all, mode, onChange } = this.props
-    let newVal = val
-    if (mode === 'multiple') {
-      if (val.indexOf(all) > 0) {
-        newVal = [
-          all,
-        ]
-      } else if (val.indexOf(all) === 0) {
-        newVal = _.reject(newVal, (v) => v === all)
-      }
-    }
-    // console.log(val)
-    // console.log(returnValue)
+  handleValueChange = (checked) => {
+    const { form, field, onChange } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, newVal)
+      form.setFieldValue(field.name, checked)
       form.setFieldTouched(field.name, true)
     }
     if (onChange) {
-      onChange(newVal)
+      onChange(checked)
     }
     this.setState({
-      shrink: newVal !== undefined,
-      value: newVal,
+      value: checked,
     })
   }
 
   getComponent = ({ inputRef, ...props }) => {
-    const { classes, defaultValue, onChange, style, ...restProps } = this.props
-    const { form, field, value } = restProps
+    const {
+      classes,
+      defaultValue,
+      onChange,
+      style,
+      form,
+      field,
+      ...restProps
+    } = this.props
 
     const cfg = {
-      value: this.state.value,
+      checked: this.state.value,
     }
     // console.log(newOptions, this.state.value, restProps)
     return (

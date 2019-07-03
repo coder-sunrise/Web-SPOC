@@ -186,6 +186,15 @@ export const defaultTheme = createMuiTheme({
         '& .ant-input': {
           height: '1em',
         },
+        '& .ant-switch': {
+          fontSize: smallFontSize,
+        },
+        '& .ant-switch-loading-icon, .ant-switch:after': {
+          width: 20,
+          height: 20,
+          borderRadius: 3,
+          top: 1,
+        },
         '& .anticon': {
           fontSize: defaultFontSize,
           color: defaultColor,
@@ -238,10 +247,10 @@ export const defaultTheme = createMuiTheme({
       },
       multiline: {
         padding: 0,
-        '& textarea': {
+        '& textarea:first-of-type': {
           position: 'relative',
-          top: 6,
-          paddingBottom: 5,
+          marginBottom: 5,
+          top: 7,
         },
       },
     },
@@ -336,6 +345,12 @@ export const smallTheme = createMuiTheme({
         '& .ant-switch': {
           fontSize: smallFontSize,
         },
+        '& .ant-switch-loading-icon, .ant-switch:after': {
+          width: 16,
+          height: 16,
+          borderRadius: 3,
+          top: 1,
+        },
         '& .ant-select': {
           fontSize: smallFontSize,
           minHeight: 20,
@@ -387,10 +402,10 @@ export const smallTheme = createMuiTheme({
       },
       multiline: {
         padding: 0,
-        '& textarea': {
+        '& textarea:first-of-type': {
           position: 'relative',
-          top: 3,
-          paddingBottom: 3,
+          marginBottom: 3,
+          top: 5,
         },
       },
     },
@@ -486,6 +501,12 @@ export const largeTheme = createMuiTheme({
         '& .ant-switch': {
           fontSize: largeFontSize,
         },
+        '& .ant-switch-loading-icon, .ant-switch:after': {
+          width: 21,
+          height: 21,
+          borderRadius: 3,
+          top: 1,
+        },
         '& .ant-select': {
           fontSize: largeFontSize,
           minHeight: 25,
@@ -533,10 +554,10 @@ export const largeTheme = createMuiTheme({
       },
       multiline: {
         padding: 0,
-        '& textarea': {
+        '& textarea:first-of-type': {
           position: 'relative',
-          top: 6,
-          paddingBottom: 9,
+          marginBottom: 9,
+          top: 8,
         },
       },
     },
