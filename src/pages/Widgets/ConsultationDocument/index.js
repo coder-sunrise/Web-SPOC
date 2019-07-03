@@ -104,7 +104,7 @@ class ConsultationDocument extends PureComponent {
                         // props.history.push(
                         //   getAppendUrl({
                         //     md: 'pt',
-                        //     cmt: 'dmgp',
+                        //     cmt: '1',
                         //     pid: row.id,
                         //   }),
                         // )

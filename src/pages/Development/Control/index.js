@@ -121,7 +121,7 @@ const initValues = {
     name: Yup.string().required(),
     dob: Yup.date().required(),
     patientAccountNo: Yup.string().required(),
-    genderFk: Yup.string().required(),
+    genderFK: Yup.string().required(),
     doctorRemarks: Yup.string().required(),
     doctor: Yup.array().of(Yup.string().required()).required(),
     doctorRadio: Yup.string().required(),
@@ -133,7 +133,7 @@ const initValues = {
         Yup.object().shape({
           line1: Yup.string().required(),
           postcode: Yup.number().required(),
-          countryFk: Yup.string().required(),
+          countryFK: Yup.string().required(),
         }),
       ),
     }),
@@ -245,7 +245,7 @@ class ControlTest extends PureComponent {
           </GridItem>
           <GridItem sm={3}>
             <FastField
-              name='genderFk'
+              name='genderFK'
               render={(args) => (
                 <CodeSelect label='Salutation' code='Salutation' {...args} />
               )}

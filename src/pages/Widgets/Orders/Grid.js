@@ -75,7 +75,7 @@ export default ({}) => (
                   // props.history.push(
                   //   getAppendUrl({
                   //     md: 'pt',
-                  //     cmt: 'dmgp',
+                  //     cmt: '1',
                   //     pid: row.id,
                   //   }),
                   // )
@@ -93,7 +93,7 @@ export default ({}) => (
                   // props.history.push(
                   //   getAppendUrl({
                   //     md: 'pt',
-                  //     cmt: 'dmgp',
+                  //     cmt: '1',
                   //     pid: row.id,
                   //   }),
                   // )

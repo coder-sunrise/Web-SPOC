@@ -24,20 +24,21 @@ import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
 // const pecValidationSchema = Yup.array().compact((v) => v.isDeleted).of(
 //   Yup.object().shape({
-//     salutationFk: Yup.string().required(),
+//     salutationFK: Yup.string().required(),
 //     name: Yup.string().required(),
 //   }),
 // )
 const pecValidationSchema = Yup.object().shape({
-  salutationFk: Yup.string().required(),
+  salutationFK: Yup.string().required(),
   name: Yup.string().required(),
   // primaryContactNo: Yup.date().required(),
 })
-@connect(({ emergencyContact, loading }) => {
-  return { emergencyContact, loading }
+@connect(({ patient, emergencyContact, loading }) => {
+  return { patient, emergencyContact, loading }
 })
 @withFormik({
   mapPropsToValues: ({ patient }) => {
+    // console.log(patient)
     return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
@@ -57,26 +58,45 @@ class Grid extends React.Component {
 
   tableParas = {
     columns: [
-      { name: 'salutationFk', title: 'Salutation' },
+      { name: 'accountNoTypeFK', title: 'Account Type' },
+      { name: 'accountNo', title: 'Account No' },
+      { name: 'salutationFK', title: 'Salutation' },
       { name: 'name', title: 'Name' },
-      { name: 'relationship', title: 'Relationship' },
+      { name: 'relationshipFK', title: 'Relationship' },
       { name: 'address', title: 'Address' },
       { name: 'primaryContactNo', title: 'Primary Contact' },
       { name: 'priority', title: 'Priority' },
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
-      { columnName: 'name', isDisabled: (row) => !!row.nokPatientProfileFk },
+      { columnName: 'name', isDisabled: (row) => !!row.nokPatientProfileFK },
+      {
+        columnName: 'accountNo',
+        isDisabled: (row) => !!row.nokPatientProfileFK,
+      },
+
       // {
       //   columnName: 'primaryContactNo',
       //   type: 'date',
       //   // isDisabled: (row) => true,
       // },
       {
-        columnName: 'salutationFk',
+        columnName: 'relationshipFK',
+        type: 'codeSelect',
+        code: 'relationship',
+        isDisabled: (row) => !!row.nokPatientProfileFK,
+      },
+      {
+        columnName: 'accountNoTypeFK',
+        type: 'codeSelect',
+        code: 'PatientAccountNoType',
+        isDisabled: (row) => !!row.nokPatientProfileFK,
+      },
+      {
+        columnName: 'salutationFK',
         type: 'codeSelect',
         code: 'Salutation',
-        isDisabled: (row) => !!row.nokPatientProfileFk,
+        isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
         columnName: 'priority',
@@ -207,7 +227,7 @@ class Grid extends React.Component {
                 values.patientEmergencyContact,
               )
               if (
-                patientEmergencyContact.find((m) => m.patientProfileFk === o.id)
+                patientEmergencyContact.find((m) => m.patientProfileFK === o.id)
               ) {
                 notification.warn({
                   message: 'This contact person already existed',
@@ -215,14 +235,15 @@ class Grid extends React.Component {
                 return
               }
               patientEmergencyContact.push({
-                id: getUniqueGUID(),
-                patientProfileFk: o.id,
-                salutationFk: o.salutationFk,
+                // id: getUniqueGUID(),
+                patientProfileFK: o.id,
+                salutationFK: o.salutationFK,
+                accountNoTypeFK: o.accountNoTypeFK,
                 name: o.name,
                 relationship: '',
-                priority: 0,
-                nokPatientProfileFk: o.id,
-                address: o.contact.contactAddress[0].line1,
+                isPrimaryContact: false,
+                nokPatientProfileFK: o.id,
+                address: `${primaryAddress.blockNo} ${primaryAddress.buildingName} ${primaryAddress.unitNo}  ${primaryAddress.street}`,
               })
               setFieldValue('patientEmergencyContact', patientEmergencyContact)
 

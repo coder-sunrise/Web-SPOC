@@ -2,7 +2,7 @@ import { createFormViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createFormViewModel({
-  namespace: 'patientDashboard',
+  namespace: 'systemSetting',
   config: {
     queryOnLoad: false,
   },

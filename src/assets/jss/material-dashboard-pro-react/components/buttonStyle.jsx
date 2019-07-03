@@ -90,6 +90,23 @@ const buttonStyle = {
   fullWidth: {
     width: '100%',
   },
+  outlined: {
+    border: '1px solid #d9d9d9',
+    backgroundColor: 'transparent',
+    '&:hover': {
+      backgroundColor: 'transparent',
+      borderColor: primaryColor,
+      color: primaryColor,
+    },
+    // borderWidth: 1,
+  },
+  contained: {
+    color: '#ffffff',
+    backgroundColor: grayColor,
+    '&:hover': {
+      backgroundColor: color(grayColor).darken(0.2).hex(),
+    },
+  },
   primary: {
     backgroundColor: primaryColor,
     boxShadow:

@@ -20,6 +20,25 @@ const defaultIconWidth = '0.9em'
 const smallIconWidth = '0.82em'
 const largeIconWidth = '0.95em'
 
+const defaultButton = {
+  padding: '8px 18px !important',
+  fontSize: `${defaultFontSize} !important`,
+  lineHeight: 1.5,
+  borderRadius: '3px !important',
+}
+const smallButton = {
+  padding: '3px 10px !important',
+  fontSize: `${smallIconWidth} !important`,
+  lineHeight: 1.5,
+  borderRadius: '0.2rem !important',
+}
+const largetButton = {
+  padding: '12px 25px !important',
+  fontSize: `${largeFontSize} !important`,
+  lineHeight: 1.5,
+  borderRadius: '5px !important',
+}
+
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
 
 const sharedFormControlLabel = {
@@ -234,6 +253,30 @@ export const defaultTheme = createMuiTheme({
         fontWeight: 'inherit',
       },
     },
+    MuiInputAdornment: {
+      root: {
+        ...sharedInputAdornmentRoot,
+        marginTop: 2,
+        '& svg': {
+          top: 0,
+          position: 'relative',
+        },
+        '& > p': {
+          fontSize: defaultFontSize,
+        },
+        '& > div': {
+          width: '16px !important',
+          height: '16px !important',
+        },
+      },
+    },
+    MuiButton: {
+      contained: defaultButton,
+      outlined: {
+        ...defaultButton,
+        padding: '7px 17px !important',
+      },
+    },
     RichEditor: {
       wrapper: {
         zoom: '90%',
@@ -353,6 +396,30 @@ export const smallTheme = createMuiTheme({
         fontWeight: 'inherit',
       },
     },
+    MuiInputAdornment: {
+      root: {
+        ...sharedInputAdornmentRoot,
+        marginTop: 1,
+        '& svg': {
+          top: 2,
+          position: 'relative',
+        },
+        '& > p': {
+          fontSize: smallFontSize,
+        },
+        '& > div': {
+          width: '12px !important',
+          height: '12px !important',
+        },
+      },
+    },
+    MuiButton: {
+      contained: smallButton,
+      outlined: {
+        ...smallButton,
+        padding: '2px 9px !important',
+      },
+    },
     RichEditor: {
       wrapper: {
         zoom: '70%',
@@ -466,6 +533,30 @@ export const largeTheme = createMuiTheme({
       shrink: {
         transform: 'translate(0, 6px) scale(0.8)',
         fontWeight: 'inherit',
+      },
+    },
+    MuiInputAdornment: {
+      root: {
+        ...sharedInputAdornmentRoot,
+        marginTop: 3,
+        '& svg': {
+          top: 4,
+          position: 'relative',
+        },
+        '& > p': {
+          fontSize: largeFontSize,
+        },
+        '& > div': {
+          width: '20px !important',
+          height: '20px !important',
+        },
+      },
+    },
+    MuiButton: {
+      contained: largetButton,
+      outlined: {
+        ...largetButton,
+        padding: '11px 24px !important',
       },
     },
   },

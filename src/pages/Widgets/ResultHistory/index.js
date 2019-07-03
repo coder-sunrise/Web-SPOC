@@ -29,21 +29,20 @@ import { withStyles, Divider, Paper } from '@material-ui/core'
 
 import DeleteIcon from '@material-ui/icons/Delete'
 import Grid from './Grid'
-import Detail from './Detail/index'
 import model from './models'
 
 window.g_app.replaceModel(model)
 
 const styles = (theme) => ({})
 
-@connect(({ orders }) => ({
-  orders,
+@connect(({ testWidget }) => ({
+  testWidget,
 }))
 @withFormik({
-  mapPropsToValues: ({ orders }) => {
-    console.log(orders)
-    return orders.entity ? orders.entity : orders.default
-  },
+  // mapPropsToValues: ({ testWidget }) => {
+  //   console.log(testWidget)
+  //   return testWidget.entity ? testWidget.entity : testWidget.default
+  // },
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     dob: Yup.date().required(),
@@ -53,7 +52,6 @@ const styles = (theme) => ({})
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
         Yup.object().shape({
-          line1: Yup.string().required(),
           postcode: Yup.number().required(),
           countryFK: Yup.string().required(),
         }),
@@ -62,22 +60,14 @@ const styles = (theme) => ({})
   }),
 
   handleSubmit: () => {},
-  displayName: 'Orders',
+  displayName: 'ResultHistory',
 })
-class Orders extends Component {
+class ResultHistory extends Component {
   render () {
     const { state, props } = this
     const { theme } = props
-    console.log('order')
-    return (
-      <div>
-        <Detail {...props} />
-        <Divider light />
-
-        <Grid {...props} />
-      </div>
-    )
+    return <div>TBD</div>
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Orders)
+export default withStyles(styles, { withTheme: true })(ResultHistory)

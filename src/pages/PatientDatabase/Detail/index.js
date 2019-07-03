@@ -19,68 +19,7 @@ import { getAppendUrl } from '@/utils/utils'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 
-<<<<<<< HEAD
-import Demographic from './Demographics'
-import Allergies from './Allergies'
-import EmergencyContact from './EmergencyContact'
-import Schemes from './Schemes'
-import AppointmentHistory from './AppointmentHistory'
-import PatientHistory from './PatientHistory'
-
 let ps
-const menus = [
-  {
-    name: 'Demographic',
-    url: {
-      md: 'pt',
-      cmt: 'dmgp',
-    },
-    component: Demographic,
-  },
-  {
-    name: 'Emergency Contact',
-    url: {
-      md: 'pt',
-      cmt: 'ec',
-    },
-    component: EmergencyContact,
-  },
-  {
-    name: 'Allergies',
-    url: {
-      md: 'pt',
-      cmt: 'mi',
-    },
-    component: Allergies,
-  },
-  {
-    name: 'Schemes',
-    url: {
-      md: 'pt',
-      cmt: 'vst',
-    },
-    component: Schemes,
-  },
-  {
-    name: 'Appointment History',
-    url: {
-      md: 'pt',
-      cmt: 'ah',
-    },
-    component: AppointmentHistory,
-  },
-  {
-    name: 'Patient History',
-    url: {
-      md: 'pt',
-      cmt: 'ph',
-    },
-    component: PatientHistory,
-  },
-]
-=======
-let ps
->>>>>>> 5d670aa244ee47238817f4996909ee0b97be62a0
 
 const styles = (theme) => ({
   hide: {
