@@ -61,9 +61,7 @@ class AddPayment extends Component {
     })
   }
 
-  onConfirmClick = (values, formikBag) => {
-    console.log({ values, formikBag })
-  }
+  onConfirmClick = (values, formikBag) => {}
 
   render () {
     const { classes, onClose } = this.props
