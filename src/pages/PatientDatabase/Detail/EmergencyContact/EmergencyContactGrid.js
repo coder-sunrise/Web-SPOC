@@ -233,9 +233,6 @@ class Grid extends React.Component {
                 })
                 return
               }
-              const primaryAddress = o.contact.contactAddress.find(
-                (m) => m.isPrimary,
-              )
               patientEmergencyContact.push({
                 // id: getUniqueGUID(),
                 patientProfileFk: o.id,
@@ -245,7 +242,7 @@ class Grid extends React.Component {
                 relationship: '',
                 isPrimaryContact: false,
                 nokPatientProfileFk: o.id,
-                address: `${primaryAddress.blockNo} ${primaryAddress.buildingName} ${primaryAddress.unitNo}  ${primaryAddress.street}`,
+                address: o.contact.contactAddress[0].line1,
               })
               setFieldValue('patientEmergencyContact', patientEmergencyContact)
 

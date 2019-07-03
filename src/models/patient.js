@@ -20,9 +20,9 @@ export default createFormViewModel({
           contactAddress: [
             {
               // Id: getUniqueGUID(),
-              countryFk: 107,
-              isPrimary: true,
-              isMailing: true,
+              countryFk: '00000000-0000-0000-0000-000000000203',
+              line1: '',
+              line2: '',
             },
           ],
           mobileContactNumber: {

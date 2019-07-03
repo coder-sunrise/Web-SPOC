@@ -68,11 +68,10 @@ class Checkbox extends React.Component {
           onChange(field.name, checked)
         }
       },
-      disabled: disabled,
+      disabled : disabled,
       checked: this.state.checked,
       // ...resetProps,
     }
-    // console.log(disabled)
     const style = { margin: '0 auto' }
     return (
       <div style={{ width: '100%' }} {...props}>

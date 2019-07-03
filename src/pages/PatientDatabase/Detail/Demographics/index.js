@@ -80,6 +80,7 @@ const styles = () => ({
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(
         Yup.object().shape({
+          line1: Yup.string().required(),
           postcode: Yup.number().required(),
           countryFk: Yup.string().required(),
         }),
@@ -122,9 +123,14 @@ class Demographic extends PureComponent {
 
   addAddress = () => {
     this.arrayHelpers.push({
+      id: getUniqueGUID(),
       contactFk: this.props.values.contact.id,
+      line1: '',
+      line2: '',
+      line3: '',
+      line4: '',
       postcode: '',
-      countryFk: 107,
+      countryFk: '',
     })
   }
 
@@ -133,7 +139,7 @@ class Demographic extends PureComponent {
   }
 
   render () {
-    console.log('Demographic', this)
+    console.log(this.props)
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
     return (

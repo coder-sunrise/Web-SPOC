@@ -19,7 +19,46 @@ import { getAppendUrl } from '@/utils/utils'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 
+import Demographic from './Demographics'
+import Allergies from './Allergies'
+import EmergencyContact from './EmergencyContact'
+import Schemes from './Schemes'
+
 let ps
+const menus = [
+  {
+    name: 'Demographic',
+    url: {
+      md: 'pt',
+      cmt: 'dmgp',
+    },
+    component: Demographic,
+  },
+  {
+    name: 'Emergency Contact',
+    url: {
+      md: 'pt',
+      cmt: 'ec',
+    },
+    component: EmergencyContact,
+  },
+  {
+    name: 'Allergies',
+    url: {
+      md: 'pt',
+      cmt: 'mi',
+    },
+    component: Allergies,
+  },
+  {
+    name: 'Schemes',
+    url: {
+      md: 'pt',
+      cmt: 'vst',
+    },
+    component: Schemes,
+  },
+]
 
 const styles = (theme) => ({
   hide: {
@@ -47,60 +86,6 @@ class PatientDetail extends PureComponent {
       { name: 'payAmount', title: 'Pay Amount', nonEditable: false },
       { name: 'balance', title: 'Balance' },
     ],
-  }
-
-  constructor (props) {
-    super(props)
-    this.widgets = [
-      {
-        id: '1',
-        name: 'Demographic',
-        component: Loadable({
-          loader: () => import('./Demographics'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '2',
-        name: 'Emergency Contact',
-        component: Loadable({
-          loader: () => import('./EmergencyContact'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '3',
-        name: 'Allergies',
-        component: Loadable({
-          loader: () => import('./Allergies'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '4',
-        name: 'Schemes',
-        component: Loadable({
-          loader: () => import('./Schemes'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
-          },
-          loading: Loading,
-        }),
-      },
-    ]
   }
 
   componentDidMount () {
@@ -165,8 +150,7 @@ class PatientDetail extends PureComponent {
     const { currentComponent, currentId } = patient
 
     const { selectedIndex } = this.state
-    const currentMenu =
-      this.widgets.find((o) => o.id === currentComponent) || {}
+    const currentMenu = menus.find((o) => o.url.cmt === currentComponent) || {}
     const CurrentComponent = currentMenu.component
 
     return (
@@ -200,15 +184,8 @@ class PatientDetail extends PureComponent {
                 }}
               >
                 <MenuList>
-                  {this.widgets.map((o) => (
-                    <Link
-                      key={o.name}
-                      to={getAppendUrl({
-                        md: 'pt',
-                        cmt: o.id,
-                      })}
-                      {...linkProps}
-                    >
+                  {menus.map((o) => (
+                    <Link key={o.name} to={getAppendUrl(o.url)} {...linkProps}>
                       <MenuItem
                         key={o.name}
                         className={classes.menuItem}
@@ -236,8 +213,8 @@ class PatientDetail extends PureComponent {
               )
             }
           >
-            <CurrentComponent />
-            {/* {menus.map((o) => {
+            {/* <CurrentComponent {...resetProps} /> */}
+            {menus.map((o) => {
               const Compont = o.component
               const show = currentComponent === o.url.cmt
               return (
@@ -251,10 +228,11 @@ class PatientDetail extends PureComponent {
                   }}
                   history={history}
                 >
+                  {/* {show ? <Compont {...resetProps} /> : <div />} */}
                   <Compont {...resetProps} />
                 </Transition>
               )
-            })} */}
+            })}
           </div>
         </GridItem>
       </GridContainer>

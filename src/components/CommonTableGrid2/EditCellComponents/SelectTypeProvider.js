@@ -99,9 +99,8 @@ const SelectDisplay = (columnExtensions, state) => ({
 
   if (!value) return ''
 
-  const v =
-    (cfg.options || state[`${columnName}Option`] || [])
-      .find((o) => o.value === value || o.id === value) || {}
+  const v = (cfg.options || state[`${columnName}Option`] || [])
+    .find((o) => o.value === value || o.id === value)
   if (v.color) {
     return (
       <div>

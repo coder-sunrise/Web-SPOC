@@ -17,6 +17,8 @@ export default createFormViewModel({
           contactAddress: [
             {
               countryFk: '00000000-0000-0000-0000-000000000203',
+              line1: '',
+              line2: '',
             },
           ],
           contactEmailAddress: {

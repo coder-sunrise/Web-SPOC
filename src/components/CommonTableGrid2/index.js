@@ -74,7 +74,6 @@ const sizeConfig = {
     MuiTableCell: {
       root: {
         padding: '5px 0',
-        fontSize: '1em',
       },
     },
   },
@@ -132,7 +131,7 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
     }
   })
 }
-let gridId = 0
+
 @connect(({ loading }) => {
   return { loading }
 })
@@ -154,7 +153,6 @@ class CommonTableGrid2 extends React.Component {
       onRowClick = (f) => f,
     } = props
     // console.log(props)
-    this.gridId = `grid-${gridId++}`
     const cls = classNames({
       [classes.tableStriped]: oddEven,
     })
@@ -239,7 +237,6 @@ class CommonTableGrid2 extends React.Component {
             zIndex: 1,
             overflow: 'visible',
             backgroundColor: 'inherit',
-            borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
           },
         },
         TableCell: cellStyle,
@@ -258,7 +255,6 @@ class CommonTableGrid2 extends React.Component {
         MuiTableCell: {
           root: {
             padding: '10px 8px 10px 8px',
-            fontSize: '1em',
           },
         },
         PrivateSwitchBase: {
@@ -485,7 +481,6 @@ class CommonTableGrid2 extends React.Component {
     // }
     newColumExtensions.forEach((c) => {
       c.validationSchema = schema
-      c.gridId = this.gridId
       if (c.type === 'number') {
         if (!c.align) {
           c.align = 'right'

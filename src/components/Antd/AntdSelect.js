@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
-import _ from 'lodash'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
 import Input from '@material-ui/core/Input'
@@ -41,7 +40,6 @@ const STYLES = () => {
       },
       '& .ant-select-selection--single': {
         height: '100%',
-        lineHeight: '1em',
       },
       '& .ant-select-selection--multiple': {
         height: '100%',
@@ -127,29 +125,16 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleValueChange = (val) => {
-    const { form, field, all, mode, onChange } = this.props
-    let newVal = val
-    if (mode === 'multiple') {
-      if (val.indexOf(all) > 0) {
-        newVal = [
-          all,
-        ]
-      } else if (val.indexOf(all) === 0) {
-        newVal = _.reject(newVal, (v) => v === all)
-      }
-    }
-    // console.log(val)
+    const { form, field } = this.props
+
     // console.log(returnValue)
     if (form && field) {
-      form.setFieldValue(field.name, newVal)
+      form.setFieldValue(field.name, val)
       form.setFieldTouched(field.name, true)
     }
-    if (onChange) {
-      onChange(newVal)
-    }
     this.setState({
-      shrink: newVal !== undefined,
-      value: newVal,
+      shrink: val !== undefined,
+      value: val,
     })
   }
 
@@ -187,7 +172,7 @@ class AntdSelect extends React.PureComponent {
           dropdownClassName={classnames(classes.dropdownMenu)}
           showSearch
           // defaultOpen
-          onChange={this.handleValueChange}
+          onChange={extendFunc(onChange, this.handleValueChange)}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
           defaultValue={defaultValue}

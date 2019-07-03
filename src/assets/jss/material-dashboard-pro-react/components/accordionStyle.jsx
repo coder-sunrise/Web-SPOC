@@ -18,10 +18,10 @@ const accordionStyle = (theme) => ({
     minHeight: 'auto !important',
     backgroundColor: 'transparent',
     borderBottom: '1px solid #ddd',
-    padding: '15px 10px 5px 0px',
-    // borderTopLeftRadius: '3px',
-    // borderTopRightRadius: '3px',
-    // color: '#3C4858',
+    padding: '25px 10px 5px 0px',
+    borderTopLeftRadius: '3px',
+    borderTopRightRadius: '3px',
+    color: '#3C4858',
     '&:hover': {
       color: primaryColor,
     },
@@ -65,16 +65,14 @@ const accordionStyle = (theme) => ({
   expansionPanelSummaryExpandIconExpanded: {},
   title: {
     // fontSize: '15px',
-    fontWeight: 500,
+    fontWeight: 'bolder',
     marginTop: '0',
     marginBottom: '0',
     color: 'inherit',
     width: '100%',
-    fontSize: '1em',
   },
   expansionPanelDetails: {
-    // padding: '15px 0px 5px',
-    padding: '0px',
+    padding: '15px 0px 5px',
   },
   reverseRow: {
     flexDirection: 'row-reverse',

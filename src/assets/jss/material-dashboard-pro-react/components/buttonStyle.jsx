@@ -45,7 +45,6 @@ const buttonStyle = {
     touchAction: 'manipulation',
     cursor: 'pointer',
     overflow: 'hidden',
-    backgroundColor: 'transparent',
     '&:hover': {
       // color: '#FFFFFF',
       // backgroundColor: grayColor,
@@ -99,10 +98,6 @@ const buttonStyle = {
   },
   contained: {
     color: '#ffffff',
-    backgroundColor: grayColor,
-    '&:hover': {
-      backgroundColor: color(grayColor).darken(0.2).hex(),
-    },
   },
   primary: {
     boxShadow:

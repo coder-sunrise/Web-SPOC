@@ -115,11 +115,8 @@
       0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2);
   }
 }
-.ant-select-dropdown-menu {
-  max-height: 256px;
-}
 .ant-select-dropdown {
-  font-size: inherit;
+  font-size: 'inherit';
 }
 .ant-select-dropdown-menu-item {
   font-weight: 300;
@@ -306,7 +303,6 @@
 
 .ant-input-disabled {
   background: transparent;
-  color: rgba(0, 0, 0, 0.75);
 }
 .ant-input[disabled] {
   background: transparent;

@@ -277,14 +277,6 @@ class ControlTest extends PureComponent {
           </GridItem>
           <GridItem sm={3}>
             <FastField
-              name='name'
-              render={(args) => (
-                <TextField prefix={<Search />} label='Name' {...args} />
-              )}
-            />
-          </GridItem>
-          <GridItem sm={3}>
-            <FastField
               name='isPersist'
               render={(args) => {
                 return (
@@ -385,7 +377,6 @@ class ControlTest extends PureComponent {
               name='numberField'
               render={(args) => (
                 <NumberInput
-                  prefix='External Prescription'
                   label='Number Input'
                   step={0.5}
                   currency
@@ -397,7 +388,6 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              prefix='External Prescription'
               render={(args) => <TextField label='Text Input' {...args} />}
             />
           </GridItem>

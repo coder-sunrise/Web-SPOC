@@ -4,7 +4,6 @@ import ErrorOutline from '@material-ui/icons/ErrorOutline'
 export default ({ ...props }) => {
   return (
     <Popconfirm
-      okText='Confirm'
       icon={
         <ErrorOutline
           style={{
