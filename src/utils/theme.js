@@ -20,6 +20,25 @@ const defaultIconWidth = '0.85em'
 const smallIconWidth = '0.72em'
 const largeIconWidth = '0.89em'
 
+const defaultButton = {
+  padding: '8px 18px !important',
+  fontSize: `${defaultFontSize} !important`,
+  lineHeight: 1.5,
+  borderRadius: '3px !important',
+}
+const smallButton = {
+  padding: '3px 10px !important',
+  fontSize: `${smallIconWidth} !important`,
+  lineHeight: 1.5,
+  borderRadius: '0.2rem !important',
+}
+const largetButton = {
+  padding: '12px 25px !important',
+  fontSize: `${largeFontSize} !important`,
+  lineHeight: 1.5,
+  borderRadius: '5px !important',
+}
+
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
 
 const sharedFormControlLabel = {
@@ -242,7 +261,7 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 4,
+        marginTop: 2,
         '& svg': {
           top: 0,
           position: 'relative',
@@ -257,11 +276,10 @@ export const defaultTheme = createMuiTheme({
       },
     },
     MuiButton: {
-      contained: {
-        padding: '8px 18px !important',
-        fontSize: `${defaultFontSize} !important`,
-        lineHeight: 1.5,
-        borderRadius: '3px !important',
+      contained: defaultButton,
+      outlined: {
+        ...defaultButton,
+        padding: '7px 17px !important',
       },
     },
     RichEditor: {
@@ -405,11 +423,10 @@ export const smallTheme = createMuiTheme({
       },
     },
     MuiButton: {
-      contained: {
-        padding: '3px 10px !important',
-        fontSize: `${smallIconWidth} !important`,
-        lineHeight: 1.5,
-        borderRadius: '0.2rem !important',
+      contained: smallButton,
+      outlined: {
+        ...smallButton,
+        padding: '2px 9px !important',
       },
     },
     RichEditor: {
@@ -549,11 +566,10 @@ export const largeTheme = createMuiTheme({
       },
     },
     MuiButton: {
-      contained: {
-        padding: '12px 25px !important',
-        fontSize: `${largeFontSize} !important`,
-        lineHeight: 1.5,
-        borderRadius: '5px !important',
+      contained: largetButton,
+      outlined: {
+        ...largetButton,
+        padding: '11px 24px !important',
       },
     },
   },

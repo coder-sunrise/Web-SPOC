@@ -73,7 +73,7 @@ class Address extends Component {
       setFieldValue,
     } = this.props
     // console.log(values, addressIndex)
-    const addresses = values.contact.contactAddress
+    const addresses = values.contact.contactAddress.filter((o) => !o.isDeleted)
 
     return (
       <div
@@ -186,7 +186,7 @@ class Address extends Component {
           {/* <GridItem xs={12} md={2} /> */}
           <GridItem xs={12} md={4}>
             <FastField
-              name={`contact.contactAddress[${addressIndex}].countryFk`}
+              name={`contact.contactAddress[${addressIndex}].countryFK`}
               render={(args) => (
                 <CodeSelect label='Country' code='Country' max={10} {...args} />
               )}

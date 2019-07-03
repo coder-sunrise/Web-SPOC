@@ -57,13 +57,13 @@ class PatientInfoCard extends PureComponent {
 
   getNationality = () => {
     const { queueLog } = this.props
-    const { nationalityFk } = queueLog.visitPatientInfo
+    const { nationalityFK } = queueLog.visitPatientInfo
 
-    if (!nationalityFk || localStorage.getItem('CT_Nationality') === null)
+    if (!nationalityFK || localStorage.getItem('CT_Nationality') === null)
       return ''
 
     const nationalities = JSON.parse(localStorage.getItem('CT_Nationality'))
-    const nationality = nationalities.find((item) => item.id === nationalityFk)
+    const nationality = nationalities.find((item) => item.id === nationalityFK)
 
     return nationality ? nationality.name : ''
   }
@@ -71,8 +71,8 @@ class PatientInfoCard extends PureComponent {
   getGender = () => {
     const { ctGender } = this.state
     const { queueLog } = this.props
-    const { genderFk } = queueLog.visitPatientInfo
-    const gender = ctGender.find((item) => item.id === genderFk)
+    const { genderFK } = queueLog.visitPatientInfo
+    const gender = ctGender.find((item) => item.id === genderFK)
     if (gender) return gender.name
 
     return ''

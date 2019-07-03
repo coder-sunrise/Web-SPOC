@@ -10,7 +10,7 @@ export default ({ ...props }) => {
           style={{
             position: 'absolute',
             color: 'orange',
-            top: 5,
+            top: 7,
           }}
         />
       }

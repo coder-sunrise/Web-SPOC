@@ -141,7 +141,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                 // this.props.history.push(
                 //   getAppendUrl({
                 //     md: 'pt',
-                //     cmt: 'dmgp',
+                //     cmt: '1',
                 //     new: 1,
                 //   }),
                 // )
