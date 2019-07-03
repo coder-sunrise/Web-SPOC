@@ -12,6 +12,8 @@ import debounce from 'lodash/debounce'
 
 const styles = (theme) => ({})
 
+const radioSelectedMap = {}
+
 const RadioEditorBase = React.memo(
   (props) => {
     const {
@@ -34,20 +36,40 @@ const RadioEditorBase = React.memo(
       onRadioChange,
       checkedValue = true,
       uncheckedValue = false,
+      gridId,
       ...restConfig
     } = cfg
+    // console.log(cfg)
     const error = errors.find((o) => o.index === row.rowIndex) || {}
     const submitValue = (e) => {
       if (value !== e.target.value) onValueChange(e.target.value)
     }
+
+    if (!radioSelectedMap[gridId]) radioSelectedMap[gridId] = {}
+
+    // console.log(
+    //   row[columnName],
+    //   checkedValue,
+    //   radioSelectedMap[gridId][columnName],
+    // )
+    let checked = row[columnName] === checkedValue
+    if (radioSelectedMap[gridId][columnName]) {
+      checked = radioSelectedMap[gridId][columnName] === row.id
+    }
     return (
       <Radio
         value={value}
-        checked={row[columnName] === checkedValue}
-        onChange={(e, checked) => {
-          // console.log(e.target, checked)
-          onRadioChange(row, e.target, checked)
-          onValueChange(checked ? checkedValue : uncheckedValue)
+        // checked={row[columnName] === checkedValue}
+        checked={checked}
+        onChange={(e, c) => {
+          // console.log(e.target, c, row)
+          if (!radioSelectedMap[gridId][columnName])
+            radioSelectedMap[gridId][columnName] = {}
+          if (c) {
+            radioSelectedMap[gridId][columnName] = row.id
+          }
+          onRadioChange(row, e.target, c)
+          onValueChange(c ? checkedValue : uncheckedValue)
         }}
       />
     )

@@ -103,7 +103,7 @@ class CoPayment extends PureComponent {
             </GridItem>
             <GridItem xs={6} md={4}>
               <FastField
-                name='schemeTypeFk'
+                name='schemeTypeFK'
                 render={(args) => (
                   <Select label='Scheme Type' options={suppliers} {...args} />
                 )}
@@ -111,7 +111,7 @@ class CoPayment extends PureComponent {
             </GridItem>
             <GridItem xs={6} md={4}>
               <FastField
-                name='schemeCategoryFk'
+                name='schemeCategoryFK'
                 render={(args) => (
                   <Select
                     label='Scheme Category'
@@ -123,7 +123,7 @@ class CoPayment extends PureComponent {
             </GridItem>
             <GridItem xs={6} md={4}>
               <FastField
-                name='nameFk'
+                name='nameFK'
                 render={(args) => (
                   <Select label='Co-Payer Name' options={suppliers} {...args} />
                 )}
@@ -131,7 +131,7 @@ class CoPayment extends PureComponent {
             </GridItem>
             <GridItem xs={6} md={4}>
               <FastField
-                name='nameTypeFk'
+                name='nameTypeFK'
                 render={(args) => (
                   <Select label='Co-Payer Type' options={suppliers} {...args} />
                 )}
@@ -139,7 +139,7 @@ class CoPayment extends PureComponent {
             </GridItem>
             <GridItem xs={6} md={4}>
               <FastField
-                name='statusFk'
+                name='statusFK'
                 render={(args) => (
                   <Select label='Status' options={suppliers} {...args} />
                 )}

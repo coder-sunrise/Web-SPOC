@@ -72,17 +72,16 @@ const styles = () => ({
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     dob: Yup.date().required(),
-    patientAccountNoTypeFk: Yup.string().required(),
+    patientAccountNoTypeFK: Yup.string().required(),
     patientAccountNo: Yup.string().required(),
-    genderFk: Yup.string().required(),
+    genderFK: Yup.string().required(),
     // dialect: Yup.string().required(),
     // contact.mobileContactNumber.number:Yup.string().render(),
     contact: Yup.object().shape({
-      contactAddress: Yup.array().of(
+      contactAddress: Yup.array().compact((v) => v.isDeleted).of(
         Yup.object().shape({
-          line1: Yup.string().required(),
           postcode: Yup.number().required(),
-          countryFk: Yup.string().required(),
+          countryFK: Yup.string().required(),
         }),
       ),
       mobileContactNumber: Yup.object().shape({
@@ -122,15 +121,10 @@ class Demographic extends PureComponent {
   }
 
   addAddress = () => {
-    this.arrayHelpers.push({
-      id: getUniqueGUID(),
-      contactFk: this.props.values.contact.id,
-      line1: '',
-      line2: '',
-      line3: '',
-      line4: '',
+    this.arrayHelpers.unshift({
+      contactFK: this.props.values.contact.id,
       postcode: '',
-      countryFk: '',
+      countryFK: 107,
     })
   }
 
@@ -139,7 +133,7 @@ class Demographic extends PureComponent {
   }
 
   render () {
-    console.log(this.props)
+    console.log('Demographic', this)
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
     return (
@@ -149,7 +143,7 @@ class Demographic extends PureComponent {
             <GridContainer>
               <GridItem xs={6} md={8}>
                 <FastField
-                  name='patientAccountNoTypeFk'
+                  name='patientAccountNoTypeFK'
                   render={(args) => {
                     return (
                       <CodeSelect
@@ -172,7 +166,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={6} md={4}>
                 <FastField
-                  name='salutationFk'
+                  name='salutationFK'
                   render={(args) => (
                     <CodeSelect label='Title' code='Salutation' {...args} />
                   )}
@@ -201,7 +195,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='genderFk'
+                  name='genderFK'
                   render={(args) => {
                     // console.log('args', args)
                     return (
@@ -218,7 +212,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='maritalStatusFk'
+                  name='maritalStatusFK'
                   render={(args) => (
                     <CodeSelect
                       label='Maritial Status'
@@ -230,7 +224,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='nationalityFk'
+                  name='nationalityFK'
                   render={(args) => (
                     <CodeSelect
                       label='Nationality'
@@ -243,7 +237,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='raceFk'
+                  name='raceFK'
                   render={(args) => (
                     <CodeSelect label='Race' code='Race' {...args} />
                   )}
@@ -251,7 +245,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='religionFk'
+                  name='religionFK'
                   render={(args) => (
                     <CodeSelect label='Religion' code='Religion' {...args} />
                   )}
@@ -259,7 +253,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='languageFk'
+                  name='languageFK'
                   render={(args) => (
                     <CodeSelect label='Language' code='Language' {...args} />
                   )}
@@ -273,7 +267,7 @@ class Demographic extends PureComponent {
               </GridItem>
               <GridItem xs={12}>
                 <FastField
-                  name='occupationFk'
+                  name='occupationFK'
                   render={(args) => (
                     <CodeSelect
                       label='Occupation'

@@ -88,7 +88,7 @@ module.exports = {
     dispatch,
     extraBtn,
     patient,
-    allowSubmit,
+    allowSubmit = true,
   }) => (
     <div
       style={{

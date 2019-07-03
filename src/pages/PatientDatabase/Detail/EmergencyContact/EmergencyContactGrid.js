@@ -24,20 +24,21 @@ import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
 // const pecValidationSchema = Yup.array().compact((v) => v.isDeleted).of(
 //   Yup.object().shape({
-//     salutationFk: Yup.string().required(),
+//     salutationFK: Yup.string().required(),
 //     name: Yup.string().required(),
 //   }),
 // )
 const pecValidationSchema = Yup.object().shape({
-  salutationFk: Yup.string().required(),
+  salutationFK: Yup.string().required(),
   name: Yup.string().required(),
   // primaryContactNo: Yup.date().required(),
 })
-@connect(({ emergencyContact, loading }) => {
-  return { emergencyContact, loading }
+@connect(({ patient, emergencyContact, loading }) => {
+  return { patient, emergencyContact, loading }
 })
 @withFormik({
   mapPropsToValues: ({ patient }) => {
+    // console.log(patient)
     return patient.entity || patient.default
   },
   validationSchema: Yup.object().shape({
@@ -57,21 +58,21 @@ class Grid extends React.Component {
 
   tableParas = {
     columns: [
-      { name: 'accountNoTypeFk', title: 'Account Type' },
+      { name: 'accountNoTypeFK', title: 'Account Type' },
       { name: 'accountNo', title: 'Account No' },
-      { name: 'salutationFk', title: 'Salutation' },
+      { name: 'salutationFK', title: 'Salutation' },
       { name: 'name', title: 'Name' },
-      { name: 'relationshipFk', title: 'Relationship' },
+      { name: 'relationshipFK', title: 'Relationship' },
       { name: 'address', title: 'Address' },
       { name: 'primaryContactNo', title: 'Primary Contact' },
       { name: 'isPrimaryContact', title: 'Priority' },
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
-      { columnName: 'name', isDisabled: (row) => !!row.nokPatientProfileFk },
+      { columnName: 'name', isDisabled: (row) => !!row.nokPatientProfileFK },
       {
         columnName: 'accountNo',
-        isDisabled: (row) => !!row.nokPatientProfileFk,
+        isDisabled: (row) => !!row.nokPatientProfileFK,
       },
 
       // {
@@ -80,22 +81,22 @@ class Grid extends React.Component {
       //   // isDisabled: (row) => true,
       // },
       {
-        columnName: 'relationshipFk',
+        columnName: 'relationshipFK',
         type: 'codeSelect',
         code: 'relationship',
-        isDisabled: (row) => !!row.nokPatientProfileFk,
+        isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
-        columnName: 'accountNoTypeFk',
+        columnName: 'accountNoTypeFK',
         type: 'codeSelect',
         code: 'PatientAccountNoType',
-        isDisabled: (row) => !!row.nokPatientProfileFk,
+        isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
-        columnName: 'salutationFk',
+        columnName: 'salutationFK',
         type: 'codeSelect',
         code: 'Salutation',
-        isDisabled: (row) => !!row.nokPatientProfileFk,
+        isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
         columnName: 'isPrimaryContact',
@@ -226,23 +227,26 @@ class Grid extends React.Component {
                 values.patientEmergencyContact,
               )
               if (
-                patientEmergencyContact.find((m) => m.patientProfileFk === o.id)
+                patientEmergencyContact.find((m) => m.patientProfileFK === o.id)
               ) {
                 notification.warn({
                   message: 'This contact person already existed',
                 })
                 return
               }
+              const primaryAddress = o.contact.contactAddress.find(
+                (m) => m.isPrimary,
+              )
               patientEmergencyContact.push({
                 // id: getUniqueGUID(),
-                patientProfileFk: o.id,
-                salutationFk: o.salutationFk,
-                accountNoTypeFk: o.accountNoTypeFk,
+                patientProfileFK: o.id,
+                salutationFK: o.salutationFK,
+                accountNoTypeFK: o.accountNoTypeFK,
                 name: o.name,
                 relationship: '',
                 isPrimaryContact: false,
-                nokPatientProfileFk: o.id,
-                address: o.contact.contactAddress[0].line1,
+                nokPatientProfileFK: o.id,
+                address: `${primaryAddress.blockNo} ${primaryAddress.buildingName} ${primaryAddress.unitNo}  ${primaryAddress.street}`,
               })
               setFieldValue('patientEmergencyContact', patientEmergencyContact)
 
