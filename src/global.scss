@@ -65,6 +65,10 @@
     color: white;
   }
 }
+.ant-input-number-disabled .ant-input-number-input,
+.ant-input-number-disabled {
+  cursor: text;
+}
 .ant-popover-message-title {
   padding-left: 2rem !important;
 }
@@ -309,7 +313,8 @@
 
 .ant-input-disabled {
   background: transparent;
-  color: rgba(0, 0, 0, 0.75);
+  // color: rgba(0, 0, 0, 0.75);
+  cursor: inherit;
 }
 .ant-input[disabled] {
   background: transparent;

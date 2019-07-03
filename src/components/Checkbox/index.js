@@ -81,6 +81,7 @@ class Checkbox extends React.Component {
           control={
             isSwitch ? (
               <Switch
+                checked={this.state.checked}
                 // classes={{
                 //   checked: classes.checked,
                 //   switchBase: classes.switchBase,

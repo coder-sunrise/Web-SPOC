@@ -333,6 +333,9 @@ export const smallTheme = createMuiTheme({
         '& .ant-input': {
           height: '1em',
         },
+        '& .ant-switch': {
+          fontSize: smallFontSize,
+        },
         '& .ant-select': {
           fontSize: smallFontSize,
           minHeight: 20,
@@ -479,6 +482,9 @@ export const largeTheme = createMuiTheme({
         fontSize: largeFontSize,
         '& .ant-input': {
           height: '1em',
+        },
+        '& .ant-switch': {
+          fontSize: largeFontSize,
         },
         '& .ant-select': {
           fontSize: largeFontSize,

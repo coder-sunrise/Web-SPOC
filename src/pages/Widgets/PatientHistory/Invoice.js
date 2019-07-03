@@ -33,6 +33,14 @@ import {
 } from '@/components'
 
 const Invoice = (props) => {
+  const amountProps = {
+    style: { margin: 0 },
+    noUnderline: true,
+    currency: true,
+    disabled: true,
+    rightAlign: true,
+    normalText: true,
+  }
   return (
     <div>
       <GridContainer>
@@ -59,7 +67,7 @@ const Invoice = (props) => {
             type: 'Medication',
             name: 'AMLODIPINE 5MG',
             quantity: 1,
-            total: 40,
+            total: -40,
           },
           {
             id: 3,
@@ -99,25 +107,21 @@ const Invoice = (props) => {
         <GridItem xs={6} md={3}>
           <NumberInput
             prefix='Sub Total:'
-            currency
-            disabled
             defaultValue={190}
+            {...amountProps}
           />
         </GridItem>
         <GridItem xs={6} md={9} />
-
         <GridItem xs={6} md={3}>
           <NumberInput
             prefix='GST (7%):'
-            currency
-            disabled
-            defaultValue={13.3}
+            defaultValue={-13.3}
+            {...amountProps}
           />
         </GridItem>
         <GridItem xs={6} md={9} />
-
         <GridItem xs={6} md={3}>
-          <NumberInput prefix='Total:' currency disabled defaultValue={203.3} />
+          <NumberInput prefix='Total:' defaultValue={203.3} {...amountProps} />
         </GridItem>
       </GridContainer>
     </div>

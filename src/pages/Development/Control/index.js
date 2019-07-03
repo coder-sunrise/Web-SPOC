@@ -53,6 +53,7 @@ import {
   AntdSelect,
   TimePicker,
   NumberInput,
+  Switch,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -397,8 +398,21 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              prefix='External Prescription'
-              render={(args) => <TextField label='Text Input' {...args} />}
+              render={(args) => (
+                <TextField
+                  prefix='External Prescription'
+                  label='Text Input'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='switch'
+              render={(args) => {
+                return <Switch label='Switch' {...args} />
+              }}
             />
           </GridItem>
         </GridContainer>

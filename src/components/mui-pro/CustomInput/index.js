@@ -145,6 +145,7 @@ class FormikTextField extends React.PureComponent {
       if (!preventDefaultChangeEvent) {
         cfg.onChange = this.onChange
       }
+
       // if(field.value){
       //   cfg.labelProps = {
       //     shrink: !!field.value,
@@ -171,6 +172,7 @@ class FormikTextField extends React.PureComponent {
     } else if (value) {
       cfg.value = value
     }
+    cfg.negative = state.value < 0
 
     // console.log(inputProps)
     // console.log('custominput', inputProps)

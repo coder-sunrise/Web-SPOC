@@ -79,6 +79,9 @@ const modalStyle = (theme) => {
       // textAlign: "right",
       // paddingTop: "0",
       margin: '0',
+      '& > button:last-child': {
+        marginRight: 0,
+      },
     },
     modalFooterCenter: {
       marginLeft: 'auto',
