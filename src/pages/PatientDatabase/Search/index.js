@@ -20,7 +20,7 @@ const styles = () => ({})
 }))
 @compare('patientSearch')
 class PatientSearch extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     // console.log(this)
 
@@ -28,7 +28,7 @@ class PatientSearch extends PureComponent {
       this.props.history.push(
         getAppendUrl({
           md: 'pt',
-          cmt: 'dmgp',
+          cmt: '1',
           pid: row.id,
         }),
       )
@@ -56,7 +56,7 @@ class PatientSearch extends PureComponent {
     // console.log('c PatientSearch')
   }
 
-  componentDidMount() {
+  componentDidMount () {
     if (!this.props.disableQueryOnLoad) {
       this.props.dispatch({
         type: 'patientSearch/query',
@@ -64,7 +64,7 @@ class PatientSearch extends PureComponent {
     }
   }
 
-  render() {
+  render () {
     const { props } = this
     const {
       classes,
@@ -73,7 +73,6 @@ class PatientSearch extends PureComponent {
       ...restProps
     } = props
     return (
-
       <CardContainer hideHeader>
         <FilterBar {...restProps} />
         <Grid

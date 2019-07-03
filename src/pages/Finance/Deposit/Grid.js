@@ -89,7 +89,7 @@ class Grid extends PureComponent {
                     this.props.history.push(
                       getAppendUrl({
                         md: 'pt',
-                        cmt: 'dmgp',
+                        cmt: '1',
                         pid: row.Id,
                       }),
                     )
