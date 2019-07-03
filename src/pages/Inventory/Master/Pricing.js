@@ -26,7 +26,7 @@ const Pricing = () => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='LastCostPriceBefore'
+                name='lastCostPriceBefBonus'
                 render={(args) => {
                   return (
                     <NumberInput
@@ -40,7 +40,7 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='LastCostPriceAfter'
+                name='lastCostPriceAftBonus'
                 render={(args) => {
                   return (
                     <NumberInput
@@ -54,7 +54,7 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='AverageCostPrice'
+                name='averageCostPrice'
                 render={(args) => {
                   return (
                     <NumberInput
@@ -73,7 +73,7 @@ const Pricing = () => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='MarkupMargin'
+                name='profitMarginPercentage'
                 render={(args) => (
                   <NumberInput label='Markup Margin (%)' {...args} />
                 )}
@@ -81,7 +81,7 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='SuggestedSellingPrice'
+                name='suggestSellingPrice'
                 render={(args) => (
                   <NumberInput
                     currency
@@ -93,7 +93,7 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='SellingPrice'
+                name='sellingPriceBefDiscount'
                 render={(args) => (
                   <NumberInput currency label='Selling Price' {...args} />
                 )}
@@ -101,7 +101,7 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='MaxDiscount'
+                name='maxDiscount'
                 render={(args) => (
                   <NumberInput label='Max Discount (%)' {...args} />
                 )}

@@ -31,7 +31,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
-        <GridItem xs={6} md={4}>
+        <GridItem xs={6} md={3}>
           <FastField
             name='Code'
             render={(args) => {
@@ -46,7 +46,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
             }}
           />
         </GridItem>
-        <GridItem xs={6} md={4}>
+        <GridItem xs={6} md={3}>
           <FastField
             name='Name'
             render={(args) => {
@@ -61,23 +61,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
             }}
           />
         </GridItem>
-        <GridItem xs={6} md={4}>
-          <FastField
-            name='Vaccination Group'
-            render={(args) => {
-              return (
-                <Select
-                  label={formatMessage({
-                    id: 'inventory.master.vaccination.group',
-                  })}
-                  options={[]}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={6} md={4}>
+        <GridItem xs={6} md={3}>
           <FastField
             name='Supplier'
             render={(args) => {
@@ -93,7 +77,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
             }}
           />
         </GridItem>
-        <GridItem xs={6} md={4}>
+        <GridItem xs={6} md={3}>
           <FastField
             name='Status'
             render={(args) => {
@@ -163,4 +147,5 @@ export default compose(
   withFormik({
     mapPropsToValues: () => {},
   }),
+  React.memo,
 )(FilterBar)

@@ -50,7 +50,7 @@ const Stock = ({ classes }) => {
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
           <FastField
-            name='CurrentStock'
+            name='currentStock'
             render={(args) => {
               return <NumberInput label='Current Stock' {...args} />
             }}
@@ -58,7 +58,7 @@ const Stock = ({ classes }) => {
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='ReOrderThreshold'
+            name='reOrderThreshold'
             render={(args) => {
               return <NumberInput label='Re-Order Threshold' {...args} />
             }}
@@ -66,7 +66,7 @@ const Stock = ({ classes }) => {
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='CriticalThreshold'
+            name='criticalThreshold'
             render={(args) => {
               return <NumberInput label='Critical Threshold' {...args} />
             }}

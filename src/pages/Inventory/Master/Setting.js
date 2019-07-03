@@ -2,6 +2,7 @@ import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
+
 import {
   Card,
   CardHeader,
@@ -15,23 +16,32 @@ import {
 } from '@/components'
 
 const styles = () => ({})
-const Setting = ({ classes }) => {
+const Setting = ({ classes, setFieldValue, showTransfer }) => {
   const settingProps = {
     items: [
-      'Anti-Inflmation',
-      'Anti-Swelling',
-      'Apply as instructed',
-      'Apply on the ear only',
-      'Apply on the eye only',
-      'Apply on the head and massage',
-      'Avoid alcohol',
-      'Avoid contact with eyes',
-      'Complete whole course of medicine',
+      {
+        value: 'Anti-Inflmation',
+        id: 1,
+      },
+      {
+        value: 'Anti-Swelling',
+        id: 2,
+      },
+      {
+        value: 'Apply as instructed',
+        id: 3,
+      },
+      {
+        value: 'Apply on the ear only',
+        id: 4,
+      },
     ],
     classes,
     label: 'Precaution',
     limitTitle: 'Maximum up to 3 precautions to be configured',
     limit: 3,
+    setFieldValue,
+    fieldName: 'stockDrugDrugPrecaution',
   }
   return (
     <GridContainer>
@@ -46,7 +56,7 @@ const Setting = ({ classes }) => {
             <GridContainer>
               <GridItem xs={6}>
                 <FastField
-                  name='Dosage'
+                  name='prescribeDrugDosageFk'
                   render={(args) => (
                     <Select label='Dosage' options={[]} {...args} />
                   )}
@@ -54,7 +64,7 @@ const Setting = ({ classes }) => {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='PrescribingUOM'
+                  name='prescribeUOMFk'
                   render={(args) => (
                     <Select label='UOM' options={[]} {...args} />
                   )}
@@ -62,7 +72,7 @@ const Setting = ({ classes }) => {
               </GridItem>
               <GridItem xs={12}>
                 <FastField
-                  name='Frequency'
+                  name='prescribeDrugFrequencyFk'
                   render={(args) => (
                     <Select label='Frequency' options={[]} {...args} />
                   )}
@@ -70,7 +80,7 @@ const Setting = ({ classes }) => {
               </GridItem>
               <GridItem xs={12}>
                 <FastField
-                  name='Code'
+                  name='prescribeDuration'
                   render={(args) => {
                     return <TextField label='Duration' {...args} />
                   }}
@@ -91,7 +101,7 @@ const Setting = ({ classes }) => {
             <GridContainer>
               <GridItem xs={12}>
                 <FastField
-                  name='Usage'
+                  name='dispenseDrugConsumptionMethodFk'
                   render={(args) => (
                     <Select label='Usage' options={[]} {...args} />
                   )}
@@ -99,7 +109,7 @@ const Setting = ({ classes }) => {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='Quantity'
+                  name='dispenseQuantity'
                   render={(args) => {
                     return <TextField label='Quantity' {...args} />
                   }}
@@ -107,7 +117,7 @@ const Setting = ({ classes }) => {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='DispensingUOM'
+                  name='dispenseUOMFk'
                   render={(args) => (
                     <Select label='UOM' options={[]} {...args} />
                   )}
@@ -123,19 +133,23 @@ const Setting = ({ classes }) => {
           1 Dispense UOM = <u>1.00</u> Prescribing UOM
         </p>
       </GridItem>
-      <GridItem xs={12}>
-        <Card>
-          <CardHeader color='primary' text>
-            <CardText color='primary'>
-              <h5 className={classes.cardTitle}>Medication Precaution</h5>
-            </CardText>
-          </CardHeader>
-          <CardBody>
-            <Transfer {...settingProps} />
-          </CardBody>
-        </Card>
-      </GridItem>
+      {showTransfer && (
+        <GridItem xs={12}>
+          <Card>
+            <CardHeader color='primary' text>
+              <CardText color='primary'>
+                <h5 className={classes.cardTitle}>Medication Precaution</h5>
+              </CardText>
+            </CardHeader>
+            <CardBody>
+              <Transfer {...settingProps} />
+            </CardBody>
+          </Card>
+        </GridItem>
+      )}
     </GridContainer>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }))(Setting)
+export default compose(withStyles(styles, { withTheme: true }), React.memo)(
+  Setting,
+)

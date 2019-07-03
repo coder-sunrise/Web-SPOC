@@ -1,7 +1,7 @@
 import React from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Search, Add, GridOn } from '@material-ui/icons'
+import { Search, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import { status } from '@/utils/codes'
@@ -27,12 +27,11 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = (props) => {
-  const { classes, dispatch, history } = props
+const FilterBar = ({ classes, dispatch, history }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
-        <GridItem xs={6} md={4}>
+        <GridItem xs={6} md={3}>
           <FastField
             name='Code'
             render={(args) => {
@@ -47,7 +46,7 @@ const FilterBar = (props) => {
             }}
           />
         </GridItem>
-        <GridItem xs={6} md={4}>
+        <GridItem xs={6} md={3}>
           <FastField
             name='Name'
             render={(args) => {
@@ -62,8 +61,23 @@ const FilterBar = (props) => {
             }}
           />
         </GridItem>
-
-        <GridItem xs={6} md={4}>
+        <GridItem xs={6} md={3}>
+          <FastField
+            name='Supplier'
+            render={(args) => {
+              return (
+                <Select
+                  label={formatMessage({
+                    id: 'inventory.master.package.supplier',
+                  })}
+                  options={[]}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={6} md={3}>
           <FastField
             name='Status'
             render={(args) => {
@@ -128,10 +142,10 @@ const FilterBar = (props) => {
     </div>
   )
 }
-
 export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
     mapPropsToValues: () => {},
   }),
+  React.memo,
 )(FilterBar)

@@ -7,7 +7,7 @@ import FilterBar from './FilterBar'
 import Grid from '../Grid'
 
 const styles = () => ({})
-const Package = (props) => {
+const Package = ({ dispatch, history, pack }) => {
   const [ tableParas, setTableParas ] = useState({
     columns: [
       { name: 'refNo', title: 'Code' },
@@ -23,13 +23,21 @@ const Package = (props) => {
     { columnName: 'payments', type: 'number', currency: true },
     { columnName: 'expenseAmount', type: 'number', currency: true },
   ])
-  const { classes, ...restProps } = props
-  const combineProps = {
-    type: 'pack',
-    ...restProps,
+
+  const filterProps = {
+    dispatch,
+    history,
+  }
+
+  const gridProps = {
+    ...filterProps,
+    pack,
+    namespace: pack.namespace,
+    list: pack.list || [],
     tableParas,
     colExtensions,
   }
+
   return (
     <CardContainer
       hideHeader
@@ -38,8 +46,8 @@ const Package = (props) => {
         marginRight: 5,
       }}
     >
-      <FilterBar {...restProps} />
-      <Grid {...combineProps} />
+      <FilterBar {...filterProps} />
+      <Grid {...gridProps} />
     </CardContainer>
   )
 }
