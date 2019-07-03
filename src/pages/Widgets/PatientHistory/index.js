@@ -126,14 +126,14 @@ const data = [
   //   name: Yup.string().required(),
   //   dob: Yup.date().required(),
   //   patientAccountNo: Yup.string().required(),
-  //   genderFk: Yup.string().required(),
+  //   genderFK: Yup.string().required(),
   //   dialect: Yup.string().required(),
   //   contact: Yup.object().shape({
   //     contactAddress: Yup.array().of(
   //       Yup.object().shape({
   //         line1: Yup.string().required(),
   //         postcode: Yup.number().required(),
-  //         countryFk: Yup.string().required(),
+  //         countryFK: Yup.string().required(),
   //       }),
   //     ),
   //   }),
@@ -186,7 +186,6 @@ class PatientHistory extends Component {
             >
               {data.map((o) => (
                 <ListItem
-                  key={o.id}
                   alignItems='flex-start'
                   classes={{
                     root: classes.listItemRoot,

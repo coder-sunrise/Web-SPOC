@@ -11,20 +11,7 @@ export default createListViewModel({
     state: {
       default: {
         type: '1',
-        items: [
-          {
-            action: '1',
-            count: 1,
-            unit: '1',
-            frequency: '1',
-            day: 1,
-            precaution: '1',
-            operator: '1',
-          },
-        ],
-        quantity: 1,
-        total: 20,
-        totalAfterAdj: 18,
+        precautions: '1',
       },
     },
     subscriptions: ({ dispatch, history }) => {

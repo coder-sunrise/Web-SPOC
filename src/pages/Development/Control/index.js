@@ -7,7 +7,6 @@ import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import numeral from 'numeral'
-import Search from '@material-ui/icons/Search'
 
 import {
   FormControl,
@@ -122,7 +121,7 @@ const initValues = {
     name: Yup.string().required(),
     dob: Yup.date().required(),
     patientAccountNo: Yup.string().required(),
-    genderFk: Yup.string().required(),
+    genderFK: Yup.string().required(),
     doctorRemarks: Yup.string().required(),
     doctor: Yup.array().of(Yup.string().required()).required(),
     doctorRadio: Yup.string().required(),
@@ -134,7 +133,7 @@ const initValues = {
         Yup.object().shape({
           line1: Yup.string().required(),
           postcode: Yup.number().required(),
-          countryFk: Yup.string().required(),
+          countryFK: Yup.string().required(),
         }),
       ),
     }),
@@ -226,9 +225,7 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='name'
-              render={(args) => (
-                <TextField prefix={<Search />} label='Name' {...args} />
-              )}
+              render={(args) => <TextField label='Name' {...args} />}
             />
           </GridItem>
           <GridItem sm={6}>
@@ -237,7 +234,6 @@ class ControlTest extends PureComponent {
               render={(args) => {
                 return (
                   <TextField
-                    prefix={<Search />}
                     label='Multiline Name'
                     multiline
                     rowsMax={6}
@@ -249,7 +245,7 @@ class ControlTest extends PureComponent {
           </GridItem>
           <GridItem sm={3}>
             <FastField
-              name='genderFk'
+              name='genderFK'
               render={(args) => (
                 <CodeSelect label='Salutation' code='Salutation' {...args} />
               )}
@@ -284,7 +280,6 @@ class ControlTest extends PureComponent {
                     label='Persist'
                     inputLabel='Input Persist'
                     labelPlacement='end'
-                    prefix='External Prescription'
                     mode='default'
                     {...args}
                   />

@@ -75,12 +75,13 @@ export default ({}) => (
                   // props.history.push(
                   //   getAppendUrl({
                   //     md: 'pt',
-                  //     cmt: 'dmgp',
+                  //     cmt: '1',
                   //     pid: row.id,
                   //   }),
                   // )
                 }}
                 justIcon
+                round
                 color='primary'
                 style={{ marginRight: 5 }}
               >
@@ -92,12 +93,13 @@ export default ({}) => (
                   // props.history.push(
                   //   getAppendUrl({
                   //     md: 'pt',
-                  //     cmt: 'dmgp',
+                  //     cmt: '1',
                   //     pid: row.id,
                   //   }),
                   // )
                 }}
                 justIcon
+                round
                 color='primary'
               >
                 <Delete />

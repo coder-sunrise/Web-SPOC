@@ -205,7 +205,7 @@ class AntdDateRangePicker extends PureComponent {
   }
 
   render () {
-    const { classes, onChange, theme, ...restProps } = this.props
+    const { classes, onChange, ...restProps } = this.props
     // const { value } = restProps
     const labelProps = {
       shrink: this.state.value.length > 0 || this.state.shrink,

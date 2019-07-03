@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -19,29 +18,13 @@ class Accordion extends React.Component {
       active: props.active,
     }
   }
-
   handleChange = (panel) => (event, expanded) => {
     this.setState({
       active: expanded ? panel : -1,
     })
   }
-
   render () {
-    const {
-      classes,
-      collapses,
-      expandIcon = <ExpandMore />,
-      leftIcon = false,
-    } = this.props
-
-    const extraClass = classnames({
-      [classes.reverseRow]: leftIcon,
-    })
-    const expandIconClass = classnames({
-      [classes.expansionPanelSummaryExpandIcon]: true,
-      [classes.expandIconAtLeft]: leftIcon,
-    })
-
+    const { classes, collapses } = this.props
     return (
       <div className={classes.root}>
         {collapses.map((prop, key) => {
@@ -56,14 +39,13 @@ class Accordion extends React.Component {
               }}
             >
               <ExpansionPanelSummary
-                expandIcon={expandIcon}
+                expandIcon={<ExpandMore />}
                 classes={{
                   root: classes.expansionPanelSummary,
                   expanded: classes.expansionPanelSummaryExpaned,
                   content: classes.expansionPanelSummaryContent,
-                  expandIcon: expandIconClass,
+                  expandIcon: classes.expansionPanelSummaryExpandIcon,
                 }}
-                className={extraClass}
               >
                 <h4 className={classes.title}>{prop.title}</h4>
               </ExpansionPanelSummary>

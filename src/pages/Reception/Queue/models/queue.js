@@ -14,7 +14,7 @@ const MessageWrapper = ({ children }) => (
 )
 
 const InitialSessionInfo = {
-  isClinicSessionClosed: false,
+  isClinicSessionClosed: true,
   id: '',
   // sessionNo: `${moment().format('YYMMDD')}-01`,
   sessionNo: 'N/A',
@@ -29,7 +29,6 @@ const visitStatusCode = [
   'TO DISPENSE',
   'IN CONS',
   'PAUSED',
-  'PAID',
   'OVERPAID',
   'COMPLETED',
 ]
@@ -39,25 +38,19 @@ const generateRowData = () => {
   for (let i = 0; i < 12; i += 1) {
     data.push({
       Id: `row-${i}-data`,
-      queueNo:
-        visitStatusCode[i % visitStatusCode.length] === 'APPOINTMENT' ? '' : i,
+      queueNo: i,
       visitStatus: visitStatusCode[i % visitStatusCode.length],
       roomNo: '',
       doctor: 'Cheah',
       refNo: `PT-0000${i}`,
       patientName: 'Annie Leonhart @ Annabelle Perfectionism',
-      gender: 'F',
+      gender: 'Female',
       age: i,
       visitRefNo: `190402-01-${i}`,
     })
   }
   return data
 }
-
-const mergeGenderAndAge = (data, row) => [
-  ...data,
-  { ...row, 'gender/age': `${row.gender}/${row.age}` },
-]
 
 export default createListViewModel({
   namespace: 'queueLog',
@@ -69,7 +62,7 @@ export default createListViewModel({
     state: {
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
-      queueListing: generateRowData().reduce(mergeGenderAndAge, []),
+      queueListing: generateRowData(),
       visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
     },

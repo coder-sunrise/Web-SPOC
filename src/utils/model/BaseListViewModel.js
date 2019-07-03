@@ -97,9 +97,10 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         const { data, filter } = payload
         // const { entities, filter } = data
         // // //console.log('list query')
-        // sortAll(entities)
         // console.log(data)
         const list = data.entities ? data.entities : data.data
+        // sortAll(list)
+
         // console.log(list)
         return {
           ...st,

@@ -1,14 +1,17 @@
 import React from 'react'
-import Delete from '@material-ui/icons/Delete'
-import Save from '@material-ui/icons/Save'
-import Edit from '@material-ui/icons/Edit'
-import Cancel from '@material-ui/icons/Cancel'
-
+import { Pageview, Delete, Save, Edit, Cancel } from '@material-ui/icons'
 import { Button } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
 const EditButton = ({ onExecute }) => (
-  <Button size='sm' onClick={onExecute} justIcon color='primary' title='Edit'>
+  <Button
+    size='sm'
+    onClick={onExecute}
+    justIcon
+    round
+    color='primary'
+    title='Edit'
+  >
     <Edit />
   </Button>
 )
@@ -21,6 +24,7 @@ const CancelButton = ({ onExecute }) => (
       onExecute(e)
     }}
     justIcon
+    round
     color='danger'
     title='Cancel'
   >
@@ -36,6 +40,7 @@ const DeleteButton = ({ onExecute }) => (
       onExecute(e)
     }}
     justIcon
+    round
     color='primary'
     title='Delete'
   >
@@ -69,6 +74,7 @@ const CommitButton = ({ onExecute }) => (
     }}
     justIcon
     data-button-type='progress'
+    round
     color='primary'
     title='Save'
     style={{ marginRight: 5 }}

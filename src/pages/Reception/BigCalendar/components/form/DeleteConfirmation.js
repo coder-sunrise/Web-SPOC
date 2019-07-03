@@ -80,9 +80,29 @@ function DeleteConfirmation ({ onConfirm, onClose, classes }) {
         <div className={classes.title}>
           <Warning fontSize='large' className={classes.warningIcon} />
           <h4 style={{ textAlign: 'left' }}>
-            Do you want to cancel this appointment?
+            Do you want to cancel all occurences of the recurring appointment,
+            or just this one?
           </h4>
         </div>
+      </GridItem>
+      <GridItem>
+        <RadioGroup
+          label=''
+          simple
+          vertical
+          defaultValue={deleteType}
+          onChange={handleDeleteTypeChange}
+          options={[
+            {
+              value: 'occurence',
+              label: 'Delete this occurence',
+            },
+            {
+              value: 'series',
+              label: 'Delete the series',
+            },
+          ]}
+        />
       </GridItem>
       <GridItem container justify='flex-end'>
         <Button onClick={onClose} color='danger'>

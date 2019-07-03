@@ -7,7 +7,7 @@ const STYLES = (theme) => {
   return {
     wrapper: {},
     editor: {
-      minHeight: 120,
+      minHeight: 150,
     },
   }
 }

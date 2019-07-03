@@ -51,34 +51,16 @@ const accordionStyle = (theme) => ({
       top: '10px !important',
     },
   },
-  leftExpansionPanelSummaryExpandIcon: {
-    [theme.breakpoints.up('md')]: {
-      top: 'auto !important',
-    },
-    transform: 'rotate(0deg)',
-    color: 'inherit',
-    [theme.breakpoints.down('sm')]: {
-      top: '10px !important',
-    },
-    marginRight: 0,
-  },
   expansionPanelSummaryExpandIconExpanded: {},
   title: {
-    // fontSize: '15px',
+    fontSize: '15px',
     fontWeight: 'bolder',
     marginTop: '0',
     marginBottom: '0',
     color: 'inherit',
-    width: '100%',
   },
   expansionPanelDetails: {
     padding: '15px 0px 5px',
-  },
-  reverseRow: {
-    flexDirection: 'row-reverse',
-  },
-  expandIconAtLeft: {
-    marginRight: 0,
   },
 })
 

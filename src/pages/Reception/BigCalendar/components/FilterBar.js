@@ -121,7 +121,7 @@ class FilterBar extends PureComponent {
                 label={formatMessage({
                   id: 'reception.appt.searchByPatientName',
                 })}
-                suffix={isTyping && <CircularProgress />}
+                suffix={isTyping && <CircularProgress size={16} />}
               />
             </GridItem>
             <GridItem xs md={3}>

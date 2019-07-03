@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 // formik
 import { FastField } from 'formik'
 // umi
-import { formatMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi/locale'
 // custom components
 import {
   DatePicker,
@@ -15,7 +15,12 @@ import {
 class SchemesCard extends PureComponent {
   render () {
     return (
-      <CommonCard size='sm' title='Schemes'>
+      <CommonCard
+        size='sm'
+        title={
+          <FormattedMessage id='reception.queue.visitRegistration.scheme' />
+        }
+      >
         <GridContainer>
           <GridItem xs md={12}>
             <FastField
@@ -23,7 +28,6 @@ class SchemesCard extends PureComponent {
               render={(args) => (
                 <TextField
                   {...args}
-                  disabled
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.accountNo',
                   })}
@@ -38,7 +42,6 @@ class SchemesCard extends PureComponent {
                 <TextField
                   {...args}
                   currency
-                  disabled
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.balance',
                   })}
@@ -55,7 +58,6 @@ class SchemesCard extends PureComponent {
                     id: 'reception.queue.visitRegistration.validity',
                   })}
                   {...args}
-                  disabled
                 />
               )}
             />

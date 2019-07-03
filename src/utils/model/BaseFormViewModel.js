@@ -164,7 +164,7 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
           // console.log(payload)
           // const { response } = payload
           const { data } = payload
-          // sortAll(data)
+          sortAll(data)
           // //console.log(data)
           return {
             ...st,

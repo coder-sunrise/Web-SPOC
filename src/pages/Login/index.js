@@ -20,7 +20,7 @@ const styles = (theme) => ({
 class LoginPage extends PureComponent {
   componentDidMount = () => {
     const haveToken = localStorage.getItem('token')
-    haveToken && router.push('/')
+    haveToken && router.push('reception/queue')
   }
 
   getBgImage = () => {
@@ -38,7 +38,7 @@ class LoginPage extends PureComponent {
       .then((props) => {
         const { payload } = props
         // const { application } = payload
-        payload.status === 200 && router.push('/')
+        payload.status === 200 && router.push('/reception/queue')
       })
       .catch((error) => {
         console.log('error', error)

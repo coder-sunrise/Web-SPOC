@@ -76,7 +76,7 @@ class AntdSelect extends React.PureComponent {
 
   static defaultProps = {
     options: [],
-    label: undefined,
+    label: '',
     labelField: 'name',
     valueField: 'value',
     disabled: false,
@@ -90,6 +90,13 @@ class AntdSelect extends React.PureComponent {
       shrink: false,
       value: form && field ? field.value : props.value || props.defaultValue,
     }
+    if (props)
+      console.log(
+        field ? field.value : undefined,
+        props.value,
+        props.defaultValue,
+      )
+    // console.log('c', props)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -150,8 +157,6 @@ class AntdSelect extends React.PureComponent {
       onFocus,
       onBlur,
       allowClear = true,
-      style,
-      dropdownMatchSelectWidth = false,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -178,7 +183,6 @@ class AntdSelect extends React.PureComponent {
           defaultValue={defaultValue}
           filterOption={this.handleFilter}
           allowClear={allowClear}
-          dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           {...cfg}
           {...restProps}
         >
@@ -203,7 +207,7 @@ class AntdSelect extends React.PureComponent {
 
   render () {
     const { props } = this
-    const { classes, mode, onChange, ...restProps } = props
+    const { classes, mode, form, field, onChange, ...restProps } = this.props
     const { value } = this.state
     const labelProps = {}
     if (!mode || mode === 'default') {
@@ -213,14 +217,22 @@ class AntdSelect extends React.PureComponent {
         (value !== undefined && value !== '' && value.length > 0) ||
         this.state.shrink
     }
+    console.log(value)
+    if (props)
+      console.log(
+        field ? field.value : undefined,
+        props.value,
+        props.defaultValue,
+      )
 
+    // console.log(restProps)
     return (
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
-        {...restProps}
+        {...this.props}
       />
     )
   }

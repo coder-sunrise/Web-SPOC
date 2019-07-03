@@ -293,11 +293,13 @@ class Queue extends PureComponent {
               fluidHeight
               showFooter={false}
             >
-              <PatientSearchModal
-                searchPatientName={currentQuery}
-                onViewRegisterVisit={this.showVisitRegistration}
-                onViewRegisterPatient={this.toggleRegisterNewPatient}
-              />
+              {showPatientSearch ? (
+                <PatientSearchModal
+                  searchPatientName={currentQuery}
+                  onViewRegisterVisit={this.showVisitRegistration}
+                  onViewRegisterPatient={this.toggleRegisterNewPatient}
+                />
+              ) : null}
             </CommonModal>
             <CommonModal
               open={showNewVisit}
@@ -310,7 +312,9 @@ class Queue extends PureComponent {
               fluidHeight
               showFooter={false}
             >
-              <NewVisitModal visitPatientInfo={queueLog.visitPatientInfo} />
+              {showNewVisit ? (
+                <NewVisitModal visitPatientInfo={queueLog.visitPatientInfo} />
+              ) : null}
             </CommonModal>
             <CommonModal
               open={showRegisterNewPatient}
@@ -322,7 +326,7 @@ class Queue extends PureComponent {
               fullScreen
               showFooter={false}
             >
-              <NewPatient />
+              {showRegisterNewPatient ? <NewPatient /> : null}
             </CommonModal>
             <CommonModal
               open={showViewPatientProfile}
@@ -334,7 +338,7 @@ class Queue extends PureComponent {
               fullScreen
               showFooter={false}
             >
-              <ViewPatient />
+              {showViewPatientProfile ? <ViewPatient /> : null}
             </CommonModal>
             {/* {showEndSessionConfirm ? (
               <SimpleModal
@@ -344,16 +348,17 @@ class Queue extends PureComponent {
                 onConfirm={this.onConfirmEndSession}
               />
             ) : null} */}
-
-            <CommonModal
-              open={showEndSessionSummary}
-              title='Session Summary'
-              onClose={this.onEndSessionSummaryClose}
-              onConfirm={this.onEndSessionSummaryClose}
-              disableBackdropClick
-            >
-              <EndSessionSummary />
-            </CommonModal>
+            {showEndSessionSummary && (
+              <CommonModal
+                open={showEndSessionSummary}
+                title='Session Summary'
+                onClose={this.onEndSessionSummaryClose}
+                onConfirm={this.onEndSessionSummaryClose}
+                disableBackdropClick
+              >
+                {showEndSessionSummary ? <EndSessionSummary /> : null}
+              </CommonModal>
+            )}
           </CardBody>
         </Card>
       </PageHeaderWrapper>

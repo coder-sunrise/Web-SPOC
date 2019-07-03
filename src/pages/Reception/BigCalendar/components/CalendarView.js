@@ -67,10 +67,10 @@ class CalendarView extends React.PureComponent {
     if (event.isDoctorEvent) {
       return { className: classes.doctorEvent }
     }
-    const eventClassName = event.appointmentType
+    const eventClassName = event.color
       ? [
-          classes[`${bg}${event.appointmentType}`],
-          classes[`${hover}${event.appointmentType}`],
+          classes[`${bg}${event.color}`],
+          classes[`${hover}${event.color}`],
         ].join(' ')
       : classes.defaultColor
 
@@ -176,8 +176,8 @@ class CalendarView extends React.PureComponent {
         // --- functional props ---
         // --- resources ---
         resources={resources}
-        resourceIdAccessor='roomNo'
-        resourceTitleAccessor='roomTitle'
+        resourceIdAccessor='resourceId'
+        resourceTitleAccessor='resourceTitle'
         // --- resources ---
         // --- event handlers ---
         onNavigate={this._jumpToDate}

@@ -51,6 +51,7 @@ import {
   Toolbar,
   TableFixedColumns,
   VirtualTable,
+  TableColumnVisibility
 } from '@devexpress/dx-react-grid-material-ui'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -58,7 +59,6 @@ import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
-import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 
 const sizeConfig = {
   sm: {
@@ -103,7 +103,7 @@ const styles = (theme) => ({
     },
   },
   paperContainer: {
-    // margin: '0 5px',
+    margin: '0 5px',
     '& > div': {
       width: '100%',
     },
@@ -321,7 +321,7 @@ class CommonTableGrid2 extends React.Component {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query', entity } = this.props
-
+    console.log(payload)
     if (query) {
       query({
         callback: (data) => {
@@ -353,15 +353,6 @@ class CommonTableGrid2 extends React.Component {
         type: `${type}/${queryMethod}`,
         payload: p,
       })
-    } else {
-      const { pagination } = this.state
-      payload.current &&
-        this.setState({
-          pagination: {
-            ...pagination,
-            current: payload.current,
-          },
-        })
     }
   }
 
@@ -407,12 +398,12 @@ class CommonTableGrid2 extends React.Component {
       extraGetter = [],
       containerComponent,
       schema,
+      hiddenColumnNames,
     } = this.props
 
     const {
       grouping,
       selectable,
-      selectConfig = { showSelectAll: false },
       pager,
       pagerConfig = {},
       pagerStateConfig,
@@ -583,7 +574,6 @@ class CommonTableGrid2 extends React.Component {
             <DateTypeProvider columnExtensions={newColumExtensions} />
             <RadioTypeProvider columnExtensions={newColumExtensions} />
             <StatusTypeProvider columnExtensions={newColumExtensions} />
-            <TimeTypeProvider columnExtensions={newColumExtensions} />
 
             {grouping && <DragDropProvider />}
 
@@ -597,7 +587,6 @@ class CommonTableGrid2 extends React.Component {
                 highlightRow
                 selectByRowClick
                 showSelectionColumn
-                {...selectConfig}
               />
             )}
 
@@ -632,6 +621,9 @@ class CommonTableGrid2 extends React.Component {
                   leftColumns
                 )
               }
+            />
+            <TableColumnVisibility
+               hiddenColumnNames={hiddenColumnNames}
             />
             {extraGetter.map((o) => o)}
           </DevGrid>

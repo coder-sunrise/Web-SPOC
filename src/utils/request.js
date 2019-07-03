@@ -7,7 +7,7 @@ import queryString from 'query-string'
 import $ from 'jquery'
 import { isAntdPro, updateLoadingState } from './utils'
 
-// export const baseUrl = 'http://localhost:9300'
+//  export const baseUrl = 'http://localhost:55314'
 // export const baseUrl = 'http://localhost/SEMR_V2'
 export const baseUrl = 'https://semr2dev2010.emr.com.sg'
 let dynamicURL = baseUrl

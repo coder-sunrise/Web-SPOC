@@ -50,9 +50,6 @@ const styles = (theme) => ({
   hide: {
     display: 'none',
   },
-  title: {
-    fontSize: '1rem',
-  },
   note: {
     fontSize: 10,
     fontWeight: 400,
@@ -75,7 +72,7 @@ const styles = (theme) => ({
   },
   leftPanel: {
     position: 'sticky',
-    width: 400,
+    width: 300,
     top: 164,
     float: 'left',
     marginRight: theme.spacing(1),
@@ -89,6 +86,11 @@ const styles = (theme) => ({
     },
   },
 })
+const dataSource = [
+  '12345',
+  '23456',
+  '34567',
+]
 @connect(({ patientDashboard, global }) => ({
   patientDashboard,
   global,
@@ -147,21 +149,17 @@ class PatientDashboard extends PureComponent {
   }
 
   getTitle = () => (
-    <div className={this.props.classes.title}>
-      <GridContainer>
-        <GridItem sm={7}>
-          <h6>Consultation Visit</h6>
-          <div className={this.props.classes.note}>V4, Dr Levine</div>
-        </GridItem>
-        <GridItem sm={5}>
-          <h6 style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-            {/* <DateRange style={{ position: 'absolute', left: 0 }} /> */}
-            12 Apr 2019
-          </h6>
-          <div className={this.props.classes.note}>&nbsp;</div>
-        </GridItem>
-      </GridContainer>
-    </div>
+    <GridContainer>
+      <GridItem sm={7}>
+        <h6>Consultation Visit</h6>
+        <div className={this.props.classes.note}>V4, Dr Levine</div>
+      </GridItem>
+      <GridItem sm={5}>
+        <h6 style={{ whiteSpace: 'nowrap' }}>
+          <DateRange style={{ fontSize: 10 }} />12 Apr 2019
+        </h6>
+      </GridItem>
+    </GridContainer>
   )
 
   getContent = () => (
@@ -303,17 +301,9 @@ class PatientDashboard extends PureComponent {
         >
           <Select
             noWrapper
-            options={[
-              { name: 'Chief Complaints', value: '1' },
-              { name: 'Plan', value: '2' },
-              { name: 'Diagnosis', value: '3' },
-              { name: 'Consultation Document', value: '4' },
-              { name: 'Orders', value: '5' },
-              { name: 'Result History', value: '6' },
-              { name: 'Invoice', value: '7' },
-            ]}
+            options={[]}
             label='Filter By'
-            style={{ maxWidth: 400 }}
+            style={{ maxWidth: 300 }}
           />
           <h6>Chief Complaints</h6>
           <div className={classes.paragraph}>

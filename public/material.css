@@ -9273,7 +9273,7 @@ button .e-badge.e-badge-circle.e-badge-ghost {
 }
 
 .e-badge.e-badge-primary:not(.e-badge-ghost):not([href]), .e-badge.e-badge-primary[href]:not(.e-badge-ghost) {
-  background-color: #4255bd;
+  background-color: #3f51b5;
   color: #fff;
 }
 
@@ -9386,8 +9386,8 @@ button .e-badge.e-badge-circle.e-badge-ghost {
 
 .e-badge.e-badge-ghost.e-badge-primary {
   background-color: transparent;
-  border: 1px solid #4255bd;
-  color: #4255bd;
+  border: 1px solid #3f51b5;
+  color: #3f51b5;
 }
 
 .e-badge.e-badge-ghost.e-badge-secondary {
@@ -14439,7 +14439,7 @@ body.e-colorpicker-overflow {
 .e-bigger.e-daterangepicker.e-popup .e-range-header .e-start-end .e-end-btn,
 .e-device.e-daterangepicker.e-popup .e-range-header .e-start-end .e-start-btn,
 .e-device.e-daterangepicker.e-popup .e-range-header .e-start-end .e-end-btn {
-  border: 1px solid #4255bd;
+  border: 1px solid #3f51b5;
   box-shadow: none;
   font-size: 14px;
   font-weight: 500;
@@ -14603,7 +14603,7 @@ body.e-colorpicker-overflow {
 .e-bigger .e-daterangepicker.e-rtl.e-popup .e-range-header .e-start-end .e-end-btn,
 .e-bigger.e-daterangepicker.e-rtl.e-popup .e-range-header .e-start-end .e-end-btn,
 .e-device.e-daterangepicker.e-rtl.e-popup .e-range-header .e-start-end .e-end-btn {
-  border: 1px solid #4255bd;
+  border: 1px solid #3f51b5;
   border-radius: 2px 0 0 2px;
   border-right: 0;
 }
@@ -14815,7 +14815,7 @@ body.e-colorpicker-overflow {
 .e-device.e-daterangepicker .e-end-btn.e-active:active:not([disabled]),
 .e-device.e-daterangepicker .e-start-btn.e-active:hover,
 .e-device.e-daterangepicker .e-end-btn.e-active:hover {
-  background: #4255bd;
+  background: #3f51b5;
   color: #fff;
 }
 
@@ -19991,12 +19991,12 @@ body.e-colorpicker-overflow {
 }
 
 .e-tab.e-background .e-tab-header {
-  background: #4255bd;
+  background: #3f51b5;
   border: 0;
 }
 
 .e-tab.e-background .e-tab-header .e-toolbar-items {
-  background: #4255bd;
+  background: #3f51b5;
 }
 
 .e-tab.e-background .e-tab-header .e-indicator {
@@ -20012,7 +20012,7 @@ body.e-colorpicker-overflow {
 }
 
 .e-tab.e-background .e-tab-header .e-toolbar-item .e-tab-wrap {
-  background: #4255bd;
+  background: #3f51b5;
 }
 
 .e-tab.e-background .e-tab-header .e-toolbar-item .e-tab-wrap:hover {
@@ -20047,7 +20047,7 @@ body.e-colorpicker-overflow {
 }
 
 .e-tab.e-background .e-tab-header .e-toolbar-item.e-active .e-tab-wrap {
-  background: #4255bd;
+  background: #3f51b5;
   border-radius: 0;
 }
 
@@ -20090,7 +20090,7 @@ body.e-colorpicker-overflow {
 }
 
 .e-tab.e-background .e-tab-header .e-toolbar-pop .e-toolbar-item {
-  background: #4255bd;
+  background: #3f51b5;
 }
 
 .e-tab.e-background .e-tab-header .e-toolbar-pop .e-toolbar-item .e-tab-wrap .e-tab-text,
@@ -20177,7 +20177,7 @@ body.e-colorpicker-overflow {
 
 .e-tab.e-background.e-disable .e-tab-header .e-toolbar-item.e-active .e-tab-wrap,
 .e-tab.e-background.e-disable .e-tab-header .e-toolbar-item.e-active .e-tab-wrap:focus {
-  background: #4255bd;
+  background: #3f51b5;
   color: rgba(255, 255, 255, 0.38);
 }
 
@@ -21364,7 +21364,7 @@ ejs-sidebar {
 }
 
 .e-diagram-selected-region {
-  stroke: #4255bd;
+  stroke: #3f51b5;
 }
 
 .e-diagram-pivot-line {
@@ -21488,7 +21488,7 @@ ejs-sidebar {
 }
 
 .e-multi-select-wrapper .e-chips.e-mob-chip.e-chip-selected .e-chipcontent {
-  background-color: #4255bd;
+  background-color: #3f51b5;
   color: #fff;
   padding: 12px 4px 11px 0;
 }
@@ -21961,7 +21961,7 @@ ejs-multiselect {
 }
 
 .e-multi-select-wrapper .e-chips.e-mob-chip.e-chip-selected {
-  background-color: #4255bd;
+  background-color: #3f51b5;
   border-radius: 2px;
   color: #fff;
   display: block;
@@ -22585,7 +22585,7 @@ ejs-multiselect {
 }
 
 .e-de-result-list-block .e-de-op-search-txt .e-de-op-search-word-text {
-  color: #4255bd;
+  color: #3f51b5;
 }
 
 .e-de-search-result-item {
@@ -22920,7 +22920,7 @@ ejs-multiselect {
 }
 
 .e-de-op-search-txt .e-de-op-search-word {
-  color: #4255bd;
+  color: #3f51b5;
 }
 
 .e-de-op-more-less {
@@ -24165,7 +24165,7 @@ label[for='container_wholeWord'] {
 }
 
 .e-de-header-footer-list {
-  color: #4255bd;
+  color: #3f51b5;
 }
 
 /*! drop-down button layout */
@@ -28510,14 +28510,14 @@ label[for='container_wholeWord'] {
 }
 
 .e-grid .e-groupheadercell {
-  background-color: #4255bd;
+  background-color: #3f51b5;
   border-color: #e0e0e0;
   border-radius: 12px;
   color: #fff;
 }
 
 .e-grid .e-groupheadercell:hover {
-  background-color: #4255bd;
+  background-color: #3f51b5;
   border-color: #000;
 }
 
@@ -37548,7 +37548,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-more-popup-wrapper .e-appointment {
-  background: #4255bd;
+  background: #3f51b5;
   border-radius: 2px;
   color: #fff;
   display: -ms-flexbox;
@@ -37769,7 +37769,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-vertical-view.e-timescale-disable .e-appointment {
-  background: #4255bd;
+  background: #3f51b5;
   border: 1px solid #e8eaf6;
   border-radius: 2px;
   color: #fff;
@@ -38037,7 +38037,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-vertical-view .e-all-day-appointment-wrapper .e-appointment {
-  background: #4255bd;
+  background: #3f51b5;
   border: 1px solid #e8eaf6;
   border-radius: 2px;
   color: #fff;
@@ -38094,7 +38094,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-vertical-view .e-day-wrapper .e-appointment {
-  background: #4255bd;
+  background: #3f51b5;
   border: 1px solid #e8eaf6;
   border-radius: 2px;
   color: #fff;
@@ -38347,7 +38347,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-month-view .e-appointment {
-  background: #4255bd;
+  background: #3f51b5;
   border: 1px solid #e8eaf6;
   border-radius: 2px;
   color: #fff;
@@ -38561,7 +38561,7 @@ span.e-table-box.e-rbox-select {
 
 .e-schedule .e-timeline-view .e-appointment,
 .e-schedule .e-timeline-month-view .e-appointment {
-  background: #4255bd;
+  background: #3f51b5;
   border: 1px solid #e8eaf6;
   border-radius: 2px;
   color: #fff;
@@ -38845,7 +38845,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-month-agenda-view .e-appointment {
-  border-left: 3px solid #4255bd;
+  border-left: 3px solid #3f51b5;
   border-right: 0;
   cursor: default;
   padding: 0 8px;
@@ -38914,7 +38914,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-month-agenda-view .e-appointment-indicator {
-  background: #4255bd;
+  background: #3f51b5;
   border-radius: 50%;
   height: 6px;
   left: 0;
@@ -38934,7 +38934,7 @@ span.e-table-box.e-rbox-select {
 
 .e-schedule.e-rtl .e-month-agenda-view .e-appointment {
   border-left: 0;
-  border-right: 3px solid #4255bd;
+  border-right: 3px solid #3f51b5;
 }
 
 .e-schedule.e-rtl .e-month-agenda-view .e-resource-column {
@@ -38976,7 +38976,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-agenda-view .e-month-header {
-  background: #4255bd;
+  background: #3f51b5;
   height: 100px;
   padding-top: 12px;
   vertical-align: top;
@@ -39103,7 +39103,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-schedule .e-agenda-view .e-appointment {
-  border-left: 3px solid #4255bd;
+  border-left: 3px solid #3f51b5;
   border-right: 0;
   cursor: default;
   padding: 0 8px;
@@ -39148,7 +39148,7 @@ span.e-table-box.e-rbox-select {
 
 .e-schedule.e-rtl .e-agenda-view .e-appointment {
   border-left: 0;
-  border-right: 3px solid #4255bd;
+  border-right: 3px solid #3f51b5;
 }
 
 .e-schedule.e-rtl .e-agenda-view .e-resource-column {
@@ -39890,7 +39890,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-quick-popup-wrapper .e-event-popup .e-popup-header {
-  background-color: #4255bd;
+  background-color: #3f51b5;
 }
 
 .e-quick-popup-wrapper .e-event-popup .e-popup-header .e-header-icon-wrapper {
@@ -40165,7 +40165,7 @@ span.e-table-box.e-rbox-select {
 }
 
 .e-appointment.e-schedule-event-clone {
-  background: #4255bd;
+  background: #3f51b5;
   border-radius: 2px;
   box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.2);
   color: #fff;

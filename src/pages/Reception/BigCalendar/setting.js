@@ -111,16 +111,14 @@ export const getColorByAppointmentType = (appointmentType) => {
 
 const reduceAppointmentTypeToColor = (
   acc,
-  { value: appointmentType, color: colorName, colorValue, colorActive },
+  { color: colorName, colorValue, colorActive },
 ) => {
-  acc[`background-${appointmentType}`] = {
+  acc[`background-${colorName}`] = {
     backgroundColor: colorValue,
     '& button.edit-button': { backgroundColor: colorValue },
   }
-  acc[`hover-${appointmentType}`] = {
-    '&:hover': { backgroundColor: colorActive },
-  }
-  acc[`span-${appointmentType}`] = { color: colorActive }
+  acc[`hover-${colorName}`] = { '&:hover': { backgroundColor: colorActive } }
+  acc[`span-${colorName}`] = { color: colorActive }
   return acc
 }
 

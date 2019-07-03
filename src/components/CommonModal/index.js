@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import PerfectScrollbar from 'perfect-scrollbar'
 import { formatMessage, FormattedMessage } from 'umi/locale'
@@ -17,7 +16,6 @@ import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import Loading from '@/components/PageLoading/index'
 
-import { SizeContainer } from '@/components'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
 
 // const styles = theme => ({
@@ -39,19 +37,6 @@ class CommonModal extends React.PureComponent {
     fullWidth: true,
     maxWidth: 'md',
     height: 0,
-  }
-
-  static propTypes = {
-    open: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
-    onConfirm: PropTypes.func.isRequired,
-
-    title: PropTypes.string,
-    maxWidth: PropTypes.oneOf([
-      'sm',
-      'lg',
-      'md',
-    ]),
   }
 
   constructor (props) {
@@ -161,7 +146,7 @@ class CommonModal extends React.PureComponent {
       maxWidth = 'md',
       bodyNoPadding = false,
       theme,
-      disableBackdropClick = true,
+      disableBackdropClick = false,
       keepMounted = true,
       footProps = {},
     } = this.props
@@ -250,11 +235,7 @@ class CommonModal extends React.PureComponent {
           >
             
           </div> */}
-          {open ? (
-            <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
-          ) : (
-            <div />
-          )}
+          {open ? childrenWithProps : null}
         </DialogContent>
         {showFooter &&
           this.footer({

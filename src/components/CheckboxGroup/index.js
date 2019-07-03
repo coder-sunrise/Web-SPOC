@@ -10,34 +10,17 @@ class CheckboxGroup extends React.Component {
 
   constructor (props) {
     super(props)
-    const {
-      options = [],
-      valueField = 'value',
-      field,
-      value,
-      defaultValue,
-    } = props
+    const { options = [], valueField = 'value' } = props
     const v = {}
-
     options.forEach((o) => {
       v[`${o[valueField]}`] = false
     })
-    if (field && Array.isArray(field.value)) {
-      field.value.forEach((e) => {
-        v[`${e}`] = true
-      })
-    } else if (value || defaultValue) {
-      ;(value || defaultValue).forEach((e) => {
-        v[`${e}`] = true
-      })
-    }
     this.state = v
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
     const { options, field, value, valueField = 'value' } = nextProps
     const v = preState
-    // console.log(value)
     if (field && Array.isArray(field.value)) {
       options.forEach((o) => {
         v[`${o[valueField]}`] = false
@@ -49,20 +32,10 @@ class CheckboxGroup extends React.Component {
       return v
     }
     if (value) {
-      options.forEach((o) => {
-        v[`${o[valueField]}`] = false
-      })
-      value.forEach((e) => {
-        v[`${e}`] = true
-      })
-      return v
+      return {
+        selectedValue: value || [],
+      }
     }
-    // console.log(value)
-    // if (value) {
-    //   return {
-    //     selectedValue: value || [],
-    //   }
-    // }
     return null
   }
 
@@ -76,7 +49,6 @@ class CheckboxGroup extends React.Component {
       ...this.state,
       ...newVal,
     }
-    // console.log(newSt)
     const { form, field, onChange, onSelectedChange } = this.props
     const v = {
       target: {
@@ -91,9 +63,9 @@ class CheckboxGroup extends React.Component {
     }
     if (form && field) {
       v.target.name = field.name
-      field.onChange(v, newVal)
+      field.onChange(v)
     } else if (onChange) {
-      onChange(v, newVal)
+      onChange(v)
     }
     // let { selectedValue = [] } = this.state
     // let newSv = selectedValue.slice()
@@ -122,7 +94,6 @@ class CheckboxGroup extends React.Component {
       <div style={{ width: '100%', height: 'auto' }} {...props}>
         {options.map((o) => {
           const v = `${o[valueField]}`
-          // console.log(v)
           // const checked = .selectedValue.find((m) => m === v)
           return (
             <div
@@ -138,7 +109,6 @@ class CheckboxGroup extends React.Component {
                     onChange={this.handleChange(v)}
                     value={v}
                     color='primary'
-                    disabled={o.disabled}
                     // icon={
                     //   <FiberManualRecord className={classes.uncheckedIcon} />
                     // }

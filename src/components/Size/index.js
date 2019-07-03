@@ -16,13 +16,13 @@ export default function SizeContainer ({ children, size = 'md', ...props }) {
     theme = largeTheme
     extraProps.rowHeight = largeRowHeight
   }
-  let newChildren = <div>{children}</div>
+
   return (
     <MuiThemeProvider theme={theme}>
       {typeof children === 'function' ? (
         children(extraProps)
       ) : (
-        React.cloneElement(newChildren, {
+        React.cloneElement(children, {
           ...extraProps,
           ...children.props,
         })

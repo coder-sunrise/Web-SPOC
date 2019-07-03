@@ -92,6 +92,7 @@ class ConsultationDocument extends PureComponent {
                       size='sm'
                       onClick={this.toggleModal}
                       justIcon
+                      round
                       color='primary'
                       style={{ marginRight: 5 }}
                     >
@@ -103,12 +104,13 @@ class ConsultationDocument extends PureComponent {
                         // props.history.push(
                         //   getAppendUrl({
                         //     md: 'pt',
-                        //     cmt: 'dmgp',
+                        //     cmt: '1',
                         //     pid: row.id,
                         //   }),
                         // )
                       }}
                       justIcon
+                      round
                       color='primary'
                     >
                       <Delete />

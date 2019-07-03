@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react'
 import NProgress from 'nprogress'
-import $ from 'jquery'
 // import { renderWhenReady} from '@sencha/ext-react'
 // import { Panel } from '@sencha/ext-modern'
 import router from 'umi/router'
@@ -273,25 +272,12 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  // handleMenuCollapse = (collapsed) => {
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'global/changeLayoutCollapsed',
-  //     payload: collapsed,
-  //   })
-  //   console.log('handleMenuCollapse')
-  //   // $(window).trigger('resize')
-  //   setTimeout(() => {
-  //     this.triggerResizeEvent()
-  //   }, 5000)
-  // }
-
-  triggerResizeEvent () {
-    // eslint-disable-line
-    const event = document.createEvent('HTMLEvents')
-    event.initEvent('resize', true, false)
-    window.dispatchEvent(event)
-    // console.log(event)
+  handleMenuCollapse = (collapsed) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/changeLayoutCollapsed',
+      payload: collapsed,
+    })
   }
 
   // renderSettingDrawer = () => {
@@ -312,10 +298,11 @@ class BasicLayout extends React.PureComponent {
     dispatch({
       type: 'global/changeLayoutCollapsed',
       payload: !this.props.collapsed,
-    }).then(() => {
-      // console.log('resize')
-      setTimeout(this.triggerResizeEvent, 500)
     })
+  }
+
+  handleDrawerToggle = () => {
+    this.setState({ mobileOpen: !this.state.mobileOpen })
   }
 
   getRoute = () => {
@@ -352,7 +339,7 @@ class BasicLayout extends React.PureComponent {
             logo={logo}
             logoText='SEMR V2'
             theme={navTheme}
-            // onCollapse={this.handleMenuCollapse}
+            onCollapse={this.handleMenuCollapse}
             menuData={menuData}
             isMobile={isMobile}
             image={image}

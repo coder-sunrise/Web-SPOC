@@ -80,7 +80,7 @@ const pageDefaultWidgets = [
   {
     id: '00001',
     key: 'a',
-    widgetFk: 1,
+    widgetFK: 1,
     config: {
       lg: { i: 'a', x: 0, y: 0, w: 12, h: 6, static: true },
     },
@@ -88,7 +88,7 @@ const pageDefaultWidgets = [
   {
     id: '00002',
     key: 'b',
-    widgetFk: 2,
+    widgetFK: 2,
     config: {
       lg: { i: 'b', x: 0, y: 0, w: 6, h: 2 },
     },
@@ -247,7 +247,7 @@ class Masonry extends PureComponent {
       >
         <ResponsiveGridLayout {...layoutCfg}>
           {pageDefaultWidgets.map((o) => {
-            const w = widgets.find((wg) => wg.id === o.widgetFk)
+            const w = widgets.find((wg) => wg.id === o.widgetFK)
             const LoadableComponent = w.component
             return (
               <Paper {...this.generateConfig(o)} {...o}>
