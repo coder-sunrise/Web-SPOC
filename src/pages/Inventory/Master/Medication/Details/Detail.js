@@ -14,7 +14,7 @@ import {
   GridItem,
   Select,
   DatePicker,
-  Checkbox,
+  Switch,
 } from '@/components'
 
 const styles = () => ({})
@@ -108,18 +108,17 @@ const Detail = ({ medicationDetail, dispatch }) => {
                 name='isEnableRetail'
                 render={(args) => {
                   return (
-                    <Checkbox
-                      prefix={formatMessage({
+                    <Switch
+                      label={formatMessage({
                         id: 'inventory.master.medication.enableRetail',
                       })}
-                      isSwitch
-                      colon={false}
                       {...args}
                     />
                   )
                 }}
               />
             </GridItem>
+            <GridItem xs={12} style={{ marginTop: '10px' }} />
             <GridItem xs={12}>
               <FastField
                 name='sddFk'

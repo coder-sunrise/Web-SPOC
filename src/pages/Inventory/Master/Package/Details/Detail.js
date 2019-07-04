@@ -13,7 +13,7 @@ import {
   GridContainer,
   GridItem,
   DatePicker,
-  Checkbox,
+  Switch,
 } from '@/components'
 
 const styles = () => ({})
@@ -105,15 +105,13 @@ const Detail = ({ packDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='isOrderable '
+                name='isOrderable'
                 render={(args) => {
                   return (
-                    <Checkbox
-                      prefix={formatMessage({
+                    <Switch
+                      label={formatMessage({
                         id: 'inventory.master.package.orderable',
                       })}
-                      isSwitch
-                      colon={false}
                       {...args}
                     />
                   )

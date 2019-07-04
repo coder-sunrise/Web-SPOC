@@ -14,7 +14,7 @@ import {
   GridItem,
   Select,
   DatePicker,
-  Checkbox,
+  Switch,
 } from '@/components'
 
 const styles = () => ({})
@@ -109,12 +109,10 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 name='isEnableRetail'
                 render={(args) => {
                   return (
-                    <Checkbox
-                      prefix={formatMessage({
+                    <Switch
+                      label={formatMessage({
                         id: 'inventory.master.consumable.enableRetail',
                       })}
-                      isSwitch
-                      colon={false}
                       {...args}
                     />
                   )
