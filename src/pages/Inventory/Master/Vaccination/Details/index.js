@@ -39,6 +39,10 @@ const Detail = ({
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
+        <ProgressButton
+          submitKey='vaccinationDetail/submit'
+          onClick={handleSubmit}
+        />
         <Button
           color='danger'
           onClick={() => {
@@ -47,10 +51,6 @@ const Detail = ({
         >
           Cancel
         </Button>
-        <ProgressButton
-          submitKey='vaccinationDetail/submit'
-          onClick={handleSubmit}
-        />
       </div>
       <NavPills
         color='info'

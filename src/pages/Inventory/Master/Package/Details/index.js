@@ -114,6 +114,7 @@ const Detail = ({
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
+        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
         <Button
           color='danger'
           onClick={() => {
@@ -122,7 +123,6 @@ const Detail = ({
         >
           Cancel
         </Button>
-        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
       </div>
       <NavPills
         color='info'
@@ -141,21 +141,21 @@ const Detail = ({
             tabContent: <DetailPanel {...detailProps} />,
           },
           {
-            tabButton: 'Medication',
+            tabButton: 'Order Item',
             tabContent: <InventoryTypeListing {...medicationProps} />,
           },
-          {
-            tabButton: 'Vaccination',
-            tabContent: <InventoryTypeListing {...vaccinationProps} />,
-          },
-          {
-            tabButton: 'Consumable',
-            tabContent: <InventoryTypeListing {...consumableProps} />,
-          },
-          {
-            tabButton: 'Service',
-            tabContent: <InventoryTypeListing {...serviceProps} />,
-          },
+          // {
+          //   tabButton: 'Vaccination',
+          //   tabContent: <InventoryTypeListing {...vaccinationProps} />,
+          // },
+          // {
+          //   tabButton: 'Consumable',
+          //   tabContent: <InventoryTypeListing {...consumableProps} />,
+          // },
+          // {
+          //   tabButton: 'Service',
+          //   tabContent: <InventoryTypeListing {...serviceProps} />,
+          // },
         ]}
       />
     </React.Fragment>

@@ -11,15 +11,21 @@ import {
   GridItem,
 } from '@/components'
 
-const styles = () => ({})
+const styles = () => ({
+  displayDiv: {
+    float: 'right',
+    padding: '20px',
+  },
+})
 
 const InventoryTypeListing = ({
   dispatch,
   tableParas,
   colExtensions,
   list,
+  classes,
 }) => {
-  const Cell = ({ column, row, classes, ...p }) => {
+  const Cell = ({ column, row, ...p }) => {
     if (column.name === 'Action') {
       return (
         <Table.Cell {...p}>
@@ -50,13 +56,27 @@ const InventoryTypeListing = ({
         marginRight: 5,
       }}
     >
-      <CommonTableGrid2
-        {...tableParas}
-        columnExtensions={colExtensions}
-        rows={list}
-        FuncProps={{ pager: false }}
-        ActionProps={{ TableCellComponent: TableCell }}
-      />
+      <GridContainer>
+        <GridItem xs={12} md={12}>
+          <div className={classes.displayDiv}>
+            <p>rerewrwe</p>
+          </div>
+        </GridItem>
+        <GridItem xs={10} md={10}>
+          <CommonTableGrid2
+            {...tableParas}
+            columnExtensions={colExtensions}
+            rows={list}
+            FuncProps={{ pager: false }}
+            ActionProps={{ TableCellComponent: TableCell }}
+          />
+        </GridItem>
+        <GridItem xs={10} md={10}>
+          <div className={classes.displayDiv}>
+            <p>rerewrwe</p>
+          </div>
+        </GridItem>
+      </GridContainer>
     </CardContainer>
   )
 }

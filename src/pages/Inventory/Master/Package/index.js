@@ -12,15 +12,14 @@ const Package = ({ dispatch, history, pack }) => {
     columns: [
       { name: 'refNo', title: 'Code' },
       { name: 'patientName', title: 'Name' },
-      { name: 'payments', title: 'Avg Cost Price' },
       { name: 'expenseAmount', title: 'Selling Price' },
+      { name: 'status', title: 'Status' },
       { name: 'Action', title: 'Action' },
     ],
     leftColumns: [],
   })
   const [ colExtensions, setColExtensions ] = useState([
     { columnName: 'Action', width: 110, align: 'center' },
-    { columnName: 'payments', type: 'number', currency: true },
     { columnName: 'expenseAmount', type: 'number', currency: true },
   ])
 

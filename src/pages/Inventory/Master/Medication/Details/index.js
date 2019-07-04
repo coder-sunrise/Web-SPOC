@@ -39,18 +39,18 @@ const Detail = ({
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          onClick={() => {
-            history.push('/inventory/master?t=1')
-          }}
-        >
-          Cancel
-        </Button>
         <ProgressButton
           submitKey='medicationDetail/submit'
           onClick={handleSubmit}
         />
+        <Button
+          color='danger'
+          onClick={() => {
+            history.push('/inventory/master?t=0')
+          }}
+        >
+          Cancel
+        </Button>
       </div>
       <NavPills
         color='info'

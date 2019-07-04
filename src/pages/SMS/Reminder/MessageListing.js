@@ -1,23 +1,21 @@
 import React, { useState } from 'react'
-import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compose } from 'redux'
 import { Paper, Grid } from '@material-ui/core'
-import { GridContainer, GridItem } from '@/components'
+import { GridContainer } from '@/components'
 import {
   ThemeProvider,
   MessageList,
   Message,
   MessageText,
-  MessageGroup,
   Avatar,
   Row,
 } from '@livechat/ui-kit'
 
 import New from '../New'
 
-const styles = (theme) => ({
+const styles = () => ({
   messageBar: {
     height: '55vh',
   },
@@ -51,7 +49,7 @@ const styles = (theme) => ({
   },
 })
 
-const MessageListing = (props) => {
+const MessageListing = ({ classes }) => {
   const [ list, setList ] = useState([
     {
       date: '2019-05-01 21:37',
@@ -126,7 +124,6 @@ const MessageListing = (props) => {
       id: 8,
     },
   ])
-  const { classes } = props
   const renderMessages = (messages) => {
     let i = 0
     let messageCount = messages.length
@@ -135,7 +132,6 @@ const MessageListing = (props) => {
     while (i < messageCount) {
       let previous = messages[i - 1]
       let current = messages[i]
-      let next = messages[i + 1]
       let currentMoment = moment(current.date)
       let showTimestamp = true
 

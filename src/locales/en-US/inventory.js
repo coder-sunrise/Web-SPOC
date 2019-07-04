@@ -46,7 +46,7 @@ export default {
   'inventory.master.package.name': 'Package Name',
   'inventory.master.package.description': 'Description',
   'inventory.master.package.remarks': 'Remarks',
-  'inventory.master.package.orderable': 'Enable Retail',
+  'inventory.master.package.orderable': 'Orderable',
   'inventory.master.package.supplier': 'Supplier',
   'inventory.master.package.effectiveStartDate': 'Effective Start Date',
   'inventory.master.package.effectiveEndDate': 'Effective End Date',
