@@ -2,7 +2,7 @@ import { primaryColor } from 'mui-pro-jss'
 
 export const AppointmentTypeOptions = [
   {
-    name: 'All',
+    name: 'All Appointment Type',
     value: 'all',
     color: 'primary',
     colorValue: primaryColor,

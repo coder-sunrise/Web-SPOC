@@ -7,6 +7,11 @@ export const ItemTableColumn = [
   { name: 'claimAmount', title: 'Claim Amount ($)' },
 ]
 
+export const ItemTableColumnExtensions = [
+  { columnName: 'payableAmount', type: 'currency', currency: true },
+  { columnName: 'claimAmount', type: 'currency', currency: true },
+]
+
 const generateItemData = () => {
   let data = []
   for (let i = 0; i < 4; i++) {
@@ -58,8 +63,8 @@ export const CoPaymentColumns = [
 ]
 
 export const CoPaymentColExtensions = [
-  { columnName: 'payableAmount', type: 'currency' },
-  { columnName: 'claimAmount', type: 'currency' },
+  { columnName: 'payableAmount', type: 'currency', currency: true },
+  { columnName: 'claimAmount', type: 'currency', currency: true },
 ]
 
 const generateCoPaymentData = () => {

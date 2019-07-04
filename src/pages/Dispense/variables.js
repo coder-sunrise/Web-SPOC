@@ -45,8 +45,13 @@ export const PrescriptionColumns = [
 
 export const PrescriptionColumnExtensions = [
   { columnName: 'expiryDate', type: 'date' },
-  { columnName: 'unitPrice', type: 'currency', align: 'right' },
-  { columnName: 'totalPrice', type: 'currency', align: 'right' },
+  { columnName: 'unitPrice', type: 'currency', align: 'right', currency: true },
+  {
+    columnName: 'totalPrice',
+    type: 'currency',
+    align: 'right',
+    currency: true,
+  },
 ]
 
 const generatePrescriptionData = () => {
@@ -102,8 +107,13 @@ export const VaccinationColumn = [
 
 export const VaccinationColumnExtensions = [
   { columnName: 'qtyDispensed', align: 'right' },
-  { columnName: 'unitPrice', type: 'currency', align: 'right' },
-  { columnName: 'totalPrice', type: 'currency', align: 'right' },
+  { columnName: 'unitPrice', type: 'currency', align: 'right', currency: true },
+  {
+    columnName: 'totalPrice',
+    type: 'currency',
+    align: 'right',
+    currency: true,
+  },
 ]
 
 const generateVaccinationData = () => {
@@ -148,8 +158,13 @@ export const OtherOrdersColumns = [
 ]
 
 export const OtherOrdersColumnExtensions = [
-  { columnName: 'unitPrice', type: 'currency', align: 'right' },
-  { columnName: 'totalPrice', type: 'currency', align: 'right' },
+  { columnName: 'unitPrice', type: 'currency', align: 'right', currency: true },
+  {
+    columnName: 'totalPrice',
+    type: 'currency',
+    align: 'right',
+    currency: true,
+  },
 ]
 
 const generateOtherOrdersData = () => {

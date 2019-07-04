@@ -61,9 +61,7 @@ class AddPayment extends Component {
     })
   }
 
-  onConfirmClick = (values, formikBag) => {
-    console.log({ values, formikBag })
-  }
+  onConfirmClick = (values, formikBag) => {}
 
   render () {
     const { classes, onClose } = this.props
@@ -81,8 +79,7 @@ class AddPayment extends Component {
           initialValues={paymentList.reduce(mapPaymentListToValues, {})}
           validationSchema={validationSchema}
           onSubmit={this.onConfirmClick}
-          render={({ errors, values, handleSubmit }) => {
-            console.log({ errors })
+          render={({ values, handleSubmit }) => {
             return (
               <React.Fragment>
                 <PaymentType

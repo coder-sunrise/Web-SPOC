@@ -33,23 +33,63 @@ export const InitialValue = {
 
 export const ValidationScheme = {
   [paymentTypes.cash]: Yup.object().shape({
-    amount: Yup.number().required(),
+    amount: Yup.number()
+      .positive()
+      .transform((value) => {
+        if (Number.isNaN(value)) {
+          return undefined
+        }
+        return value
+      })
+      .required('Amount is required'),
   }),
   [paymentTypes.nets]: Yup.object().shape({
-    amount: Yup.number().required(),
+    amount: Yup.number()
+      .positive()
+      .transform((value) => {
+        if (Number.isNaN(value)) {
+          return undefined
+        }
+        return value
+      })
+      .required('Amount is required'),
   }),
   [paymentTypes.creditCard]: Yup.object().shape({
-    cardType: Yup.string().required(),
-    cardNo: Yup.string().required(),
-    amount: Yup.number().required(),
+    cardType: Yup.string().required('Card Type is required'),
+    cardNo: Yup.string().required('Card No. is required'),
+    amount: Yup.number()
+      .positive()
+      .transform((value) => {
+        if (Number.isNaN(value)) {
+          return undefined
+        }
+        return value
+      })
+      .required('Amount is required'),
   }),
   [paymentTypes.cheque]: Yup.object().shape({
-    chequeNo: Yup.number().required(),
-    amount: Yup.number().required(),
+    chequeNo: Yup.number().required('Cheque No. is required'),
+    amount: Yup.number()
+      .positive()
+      .transform((value) => {
+        if (Number.isNaN(value)) {
+          return undefined
+        }
+        return value
+      })
+      .required('Amount is required'),
   }),
   [paymentTypes.giro]: Yup.object().shape({
-    referrenceNo: Yup.number().required(),
-    amount: Yup.number().required(),
+    referrenceNo: Yup.number().required('Referrence No. is required'),
+    amount: Yup.number()
+      .positive()
+      .transform((value) => {
+        if (Number.isNaN(value)) {
+          return undefined
+        }
+        return value
+      })
+      .required('Amount is required'),
   }),
 }
 

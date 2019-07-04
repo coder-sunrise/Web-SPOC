@@ -31,7 +31,6 @@ const visitStatusCode = [
   'PAUSED',
   'PAID',
   'OVERPAID',
-  'COMPLETED',
 ]
 
 const generateRowData = () => {

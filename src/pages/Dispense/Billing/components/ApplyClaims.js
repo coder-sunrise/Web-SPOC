@@ -8,7 +8,11 @@ import Reset from '@material-ui/icons/Cached'
 import { Button, GridItem } from '@/components'
 // sub components
 import TableData from '../../components/TableData'
-import { ItemData, ItemTableColumn } from '../variables'
+import {
+  ItemData,
+  ItemTableColumn,
+  ItemTableColumnExtensions,
+} from '../variables'
 
 const styles = (theme) => ({
   gridRow: {
@@ -53,6 +57,7 @@ const ApplyClaims = ({
           <TableData
             height={200}
             columns={ItemTableColumn}
+            colExtensions={ItemTableColumnExtensions}
             data={ItemData}
             title='Corporate A'
           />
@@ -63,6 +68,7 @@ const ApplyClaims = ({
           <TableData
             height={200}
             columns={ItemTableColumn}
+            colExtensions={ItemTableColumnExtensions}
             data={ItemData}
             title='Corporate B'
           />

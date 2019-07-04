@@ -72,6 +72,7 @@ const NumberFormatter = (columnExtensions) =>
 
       if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
         color = 'red'
+
       if (cfg && cfg.currency) {
         if (text) return numeral(value).format(currencyFormat)
         return <b style={{ color }}>{numeral(value).format(currencyFormat)}</b>

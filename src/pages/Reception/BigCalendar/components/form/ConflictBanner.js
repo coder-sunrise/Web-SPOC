@@ -25,7 +25,7 @@ const ConflictBanner = ({ classes, hasConflict }) =>
         </GridItem>
         <GridItem xs md={4} container justify='flex-end'>
           <Button color='primary' disabled>
-            Validate
+            Check Availability
           </Button>
         </GridItem>
       </GridContainer>

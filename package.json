@@ -99,6 +99,7 @@
     "react-select": "^2.3.0",
     "react-swipeable-views": "^0.13.0",
     "react-table": "^6.8.6",
+    "rrule": "^2.6.2",
     "sass-loader": "^7.1.0",
     "yup": "^0.26.6"
   },
