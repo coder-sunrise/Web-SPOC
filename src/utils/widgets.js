@@ -1,5 +1,7 @@
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
+import { Menu, Dropdown } from 'antd'
+
 import {
   FormControl,
   InputLabel,
@@ -7,7 +9,6 @@ import {
   Paper,
   withStyles,
   IconButton,
-  Menu,
   MenuItem,
   Popper,
   Fade,
@@ -17,6 +18,7 @@ import {
   Slide,
   Tooltip,
 } from '@material-ui/core'
+import MoreHoriz from '@material-ui/icons/MoreHoriz'
 import MoreVert from '@material-ui/icons/MoreVert'
 import Clear from '@material-ui/icons/Clear'
 import Add from '@material-ui/icons/Add'
@@ -41,6 +43,24 @@ const widgets = [
         padding: '0 5px',
       },
     },
+    toolbarAddon: (
+      <Dropdown
+        overlay={
+          <Menu>
+            <Menu.Item>Upload Attachment</Menu.Item>
+            <Menu.Divider />
+            <Menu.Item>Add Scribble Notes</Menu.Item>
+          </Menu>
+        }
+        trigger={[
+          'click',
+        ]}
+      >
+        <IconButton style={{ float: 'left' }}>
+          <MoreHoriz />
+        </IconButton>
+      </Dropdown>
+    ),
   },
   {
     id: '2',

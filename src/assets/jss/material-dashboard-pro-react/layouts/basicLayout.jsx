@@ -8,13 +8,14 @@ const basicStyle = (theme) => ({
     lineHeight: standardRowHeight,
     textAlign: 'left',
     '& > button': {
-      marginRight: theme.spacing.unit,
+      marginRight: theme.spacing(1),
     },
   },
   actionBtn: {
     position: 'relative',
-    textAlign: 'center',
-    marginTop: theme.spacing.unit,
+    textAlign: 'right',
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
   },
 })
 

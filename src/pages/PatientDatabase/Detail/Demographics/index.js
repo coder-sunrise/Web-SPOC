@@ -410,6 +410,12 @@ class Demographic extends PureComponent {
                               // form={form}
                               theme={theme}
                               arrayHelpers={arrayHelpers}
+                              propName='contact.contactAddress'
+                              style={{
+                                padding: theme.spacing.unit,
+                                marginTop: theme.spacing.unit,
+                                marginBottom: theme.spacing.unit,
+                              }}
                               {...props}
                             />
                           )

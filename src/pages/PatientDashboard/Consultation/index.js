@@ -121,7 +121,7 @@ const styles = (theme) => ({
     backgroundColor: '#ffffff',
   },
   blockName: {
-    lineHeight: '30px',
+    lineHeight: '26px',
     fontWeight: 400,
     float: 'left',
     marginLeft: theme.spacing(1),

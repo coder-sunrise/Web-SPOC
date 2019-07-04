@@ -56,6 +56,7 @@ const menuData = [
     items: [
       {
         text: 'Clinic Information',
+        url: '/setting/clinicinfo',
       },
       {
         text: 'GST Setup',
@@ -70,6 +71,7 @@ const menuData = [
     items: [
       {
         text: 'Service',
+        url: '/setting/service',
       },
       {
         text: 'Service Center',
@@ -121,14 +123,15 @@ const styles = (theme) => ({
   bigviewBtn: {
     // width: 180,
     marginRight: 0,
+    minHeight: 106,
   },
   longTextBtn: {
     '& span': {
       whiteSpace: 'initial',
     },
     '& svg': {
-      width: 60,
-      height: 60,
+      width: 50,
+      height: 50,
     },
   },
 })
@@ -146,14 +149,13 @@ class SystemSetting extends PureComponent {
       return {
         ...o,
         content: (
-          <GridContainer>
+          <GridContainer style={{ marginTop: theme.spacing(1) }}>
             {(o.items || []).map((item) => {
               return (
                 <GridItem
                   key={item.name}
-                  xs={6}
-                  md={3}
-                  lg={2}
+                  xs={4}
+                  md={2}
                   style={{ marginBottom: theme.spacing(2) }}
                 >
                   <Button
@@ -165,6 +167,9 @@ class SystemSetting extends PureComponent {
                       // [classes.longTextBtn]: item.longText,
                     })}
                     variant='outlined'
+                    onClick={() => {
+                      this.props.history.push(item.url)
+                    }}
                   >
                     {item.icon || <ListAlt />}
                     {item.text}
@@ -178,22 +183,7 @@ class SystemSetting extends PureComponent {
     })
   }
 
-  state = {
-    selectedIndex: null,
-    showCollectPayment: false,
-    columns: [
-      { name: 'Id', title: 'id' },
-      { name: 'PatientRefNo', title: 'Patient Ref No.' },
-      { name: 'PatientName', title: 'Patient Name' },
-      { name: 'CardType', title: '' },
-      { name: 'FinNumber', title: 'Account' },
-      { name: 'copay', title: 'Co-Pay' },
-      { name: 'amount', title: 'Amount' },
-      { name: 'outstandingBalance', title: 'O/S Balance' },
-      { name: 'payAmount', title: 'Pay Amount', nonEditable: false },
-      { name: 'balance', title: 'Balance' },
-    ],
-  }
+  state = {}
 
   componentDidMount () {}
 

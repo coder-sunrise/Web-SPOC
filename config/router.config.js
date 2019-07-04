@@ -329,7 +329,25 @@ const routes = [
         path: '/setting',
         icon: 'settings',
         name: 'setting',
-        component: './Setting',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/setting',
+            name: 'setting',
+            component: './Setting',
+            // hideInMenu: true,
+          },
+          {
+            path: '/setting/clinicinfo',
+            name: 'clinicinfo',
+            component: './Setting/ClinicInfo',
+          },
+          {
+            path: '/setting/service',
+            name: 'service',
+            component: './Setting/Service',
+          },
+        ],
       },
       // Settings
       {

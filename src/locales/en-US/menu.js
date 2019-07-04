@@ -81,6 +81,8 @@ export default {
   'menu.report': 'Report',
   'menu.humanResource': 'Human Resource',
   'menu.setting': 'Setting',
+  'menu.setting.clinicinfo': 'Clinic Information',
+  'menu.setting.service': 'Service',
   'menu.setting.clinicSetting': 'Clinic Setting',
   'menu.setting.systemSetting': 'System Setting',
   'menu.setting.printSetting': 'Print Setting',

@@ -1,4 +1,6 @@
 import { MuiThemeProvider, createMuiTheme, withStyles } from '@material-ui/core'
+import color from 'color'
+
 import primaryColor from '@material-ui/core/colors/indigo'
 import secondaryColor from '@material-ui/core/colors/blueGrey'
 import { standardRowHeight, smallRowHeight, largeRowHeight } from 'assets/jss'
@@ -16,9 +18,9 @@ const defaultFontSize = '1rem'
 const smallFontSize = '0.9rem'
 const largeFontSize = '1.2rem'
 
-const defaultIconWidth = '0.85em'
-const smallIconWidth = '0.72em'
-const largeIconWidth = '0.89em'
+const defaultIconWidth = '1.2rem'
+const smallIconWidth = '1rem'
+const largeIconWidth = '1.5rem'
 
 const defaultButton = {
   padding: '8px 18px !important',
@@ -28,7 +30,7 @@ const defaultButton = {
 }
 const smallButton = {
   padding: '3px 10px !important',
-  fontSize: `${smallIconWidth} !important`,
+  fontSize: `${smallFontSize} !important`,
   lineHeight: 1.5,
   borderRadius: '0.2rem !important',
 }
@@ -139,6 +141,14 @@ const sharedOverrides = {
   MuiListItem: {
     button: {
       '&:hover,&:focus': {
+        backgroundColor: hoverColor,
+      },
+    },
+    root: {
+      '&$selected': {
+        backgroundColor: color(hoverColor).lighten(0.05).hex(),
+      },
+      '&$selected:hover': {
         backgroundColor: hoverColor,
       },
     },
@@ -272,7 +282,7 @@ export const defaultTheme = createMuiTheme({
         ...sharedInputAdornmentRoot,
         marginTop: 2,
         '& svg': {
-          top: 0,
+          top: 5,
           position: 'relative',
         },
         '& > p': {
@@ -428,7 +438,7 @@ export const smallTheme = createMuiTheme({
         ...sharedInputAdornmentRoot,
         marginTop: 1,
         '& svg': {
-          top: 2,
+          top: 4,
           position: 'relative',
         },
         '& > p': {
