@@ -9,16 +9,14 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      currentComponent: 'dmgp',
+      currentComponent: '1',
       default: {
         patientAccountNo: '',
         // dob: new Date(),
         contact: {
           contactAddress: [
             {
-              countryFk: '00000000-0000-0000-0000-000000000203',
-              line1: '',
-              line2: '',
+              countryFK: '00000000-0000-0000-0000-000000000203',
             },
           ],
           contactEmailAddress: {

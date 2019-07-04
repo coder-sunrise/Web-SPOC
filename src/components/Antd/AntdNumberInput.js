@@ -247,6 +247,8 @@ class AntdNumberInput extends React.PureComponent {
       onFocus,
       onBlur,
       currency,
+      percentage,
+      style,
       formatter,
       // parser,
       ...restProps
@@ -288,6 +290,18 @@ class AntdNumberInput extends React.PureComponent {
       }
 
       extraCfg.precision = 2
+    } else if (percentage) {
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
+        if (!this.state.focused) {
+          return numeral(v / 100).format('0.00%')
+        }
+        return v
+      }
+      extraCfg.parser = (v) => {
+        if (typeof v === 'number') return v
+        return v.replace(/\$\s?|(,*)/g, '')
+      }
     } else if (formatter) {
       extraCfg.formatter = (v) => {
         if (v === '') return ''

@@ -67,7 +67,8 @@ class Checkbox extends React.Component {
       checked: this.state.checked,
       // ...resetProps,
     }
-    // const style = { margin: '0 auto' }
+    // console.log(disabled)
+    const style = { margin: '0 auto' }
     return (
       <div style={{ width: '100%' }} {...props}>
         <FormControlLabel
@@ -75,6 +76,7 @@ class Checkbox extends React.Component {
           control={
             isSwitch ? (
               <Switch
+                checked={this.state.checked}
                 // classes={{
                 //   checked: classes.checked,
                 //   switchBase: classes.switchBase,

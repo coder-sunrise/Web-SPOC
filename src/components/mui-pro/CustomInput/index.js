@@ -27,7 +27,7 @@ class FormikTextField extends React.PureComponent {
   constructor (props) {
     super(props)
     // this.myRef = React.createRef()
-    const { field = {}, form, inputProps = {}, defaultValue } = props
+    const { field = {}, form, inputProps = {}, defaultValue = '' } = props
     // console.log(this.state, props)
     this.state = {
       isDebouncing: false,
@@ -128,11 +128,11 @@ class FormikTextField extends React.PureComponent {
       realtime = true,
       focus = false,
       shrink = false,
-      field,
-      form,
+
       preventDefaultChangeEvent,
       value,
     } = props
+    const { field, form, ...resetProps } = props
     // console.log(this.state, this.state.value)
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
@@ -145,6 +145,7 @@ class FormikTextField extends React.PureComponent {
       if (!preventDefaultChangeEvent) {
         cfg.onChange = this.onChange
       }
+
       // if(field.value){
       //   cfg.labelProps = {
       //     shrink: !!field.value,
@@ -171,12 +172,17 @@ class FormikTextField extends React.PureComponent {
     } else if (value) {
       cfg.value = value
     }
+    cfg.negative = state.value < 0
 
     // console.log(inputProps)
     // console.log('custominput', inputProps)
     // console.log('custominput', props, cfg, state)
     return (
-      <BaseInput {...props} {...cfg} isDebouncing={this.state.isDebouncing} />
+      <BaseInput
+        {...resetProps}
+        {...cfg}
+        isDebouncing={this.state.isDebouncing}
+      />
     )
   }
 }

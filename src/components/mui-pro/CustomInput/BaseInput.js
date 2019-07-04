@@ -93,8 +93,12 @@ class BaseInput extends React.PureComponent {
       success,
       simple,
       noUnderline,
+      normalText,
       white,
+      rightAlign,
+      currency,
       inputRootCustomClasses,
+      negative,
     } = this.props
     let { error, help } = this.props
     // if (field && form) {
@@ -111,14 +115,19 @@ class BaseInput extends React.PureComponent {
     //         : help
     //   }
     // }
+    // console.log(this)
     const underlineClasses = classNames({
       [classes.underlineError]: error,
       [classes.underlineSuccess]: success && !error,
       [classes.underline]: true,
       [classes.noUnderline]: noUnderline,
+      [classes.normalText]: normalText,
+      [classes.rightAlign]: rightAlign,
       [classes.simple]: simple,
       [classes.inputRoot]: true,
       [classes.whiteUnderline]: white,
+      [classes.currency]: normalText && currency,
+      [classes.negativeCurrency]: normalText && negative,
     })
     // console.log(underlineClasses)
     const marginTop = classNames({
@@ -182,6 +191,7 @@ class BaseInput extends React.PureComponent {
       isDebouncing = false,
       preventDefaultKeyDownEvent,
       size,
+      style,
     } = props
     inputIdCounter += 1
 
@@ -239,6 +249,7 @@ class BaseInput extends React.PureComponent {
         id={inputIdPrefix + inputIdCounter}
         labelProps={labelProps}
         {...props}
+        style={style}
         error={error}
         help={help}
       >

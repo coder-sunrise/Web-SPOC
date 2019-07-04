@@ -36,12 +36,35 @@ const customInputStyle = {
       borderWidth: '0px !important',
     },
   },
+
   // inputRoot: {
   //   marginTop: '0 !important',
   // },
   disabled: {
+    color: 'rgba(0, 0, 0, 1)',
+    // cursor: 'not-allowed',
     '&:before': {
       borderBottomStyle: 'dotted',
+    },
+  },
+  normalText: {
+    color: 'currentColor',
+    cursor: 'initial !important',
+  },
+  rightAlign: {
+    '& input': {
+      textAlign: 'right',
+    },
+  },
+  currency: {
+    '& input': {
+      color: 'darkblue',
+      fontWeight: 500,
+    },
+  },
+  negativeCurrency: {
+    '& input': {
+      color: 'red',
     },
   },
   underlineError: {

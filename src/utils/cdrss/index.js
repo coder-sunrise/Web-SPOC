@@ -705,7 +705,8 @@ const defaultFormBehavior = (
   return returnVal
 }
 
-const sortAll = (data, fieldName = 'sortOrder') => {
+const sortAll = (data, fieldName = 'id') => {
+  // console.log(data, fieldName)
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
       data = data.sort((a, b) => a[fieldName] - b[fieldName])

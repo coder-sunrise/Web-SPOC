@@ -53,6 +53,7 @@ import {
   AntdSelect,
   TimePicker,
   NumberInput,
+  Switch,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -122,7 +123,7 @@ const initValues = {
     name: Yup.string().required(),
     dob: Yup.date().required(),
     patientAccountNo: Yup.string().required(),
-    genderFk: Yup.string().required(),
+    genderFK: Yup.string().required(),
     doctorRemarks: Yup.string().required(),
     doctor: Yup.array().of(Yup.string().required()).required(),
     doctorRadio: Yup.string().required(),
@@ -134,7 +135,7 @@ const initValues = {
         Yup.object().shape({
           line1: Yup.string().required(),
           postcode: Yup.number().required(),
-          countryFk: Yup.string().required(),
+          countryFK: Yup.string().required(),
         }),
       ),
     }),
@@ -249,7 +250,7 @@ class ControlTest extends PureComponent {
           </GridItem>
           <GridItem sm={3}>
             <FastField
-              name='genderFk'
+              name='genderFK'
               render={(args) => (
                 <CodeSelect label='Salutation' code='Salutation' {...args} />
               )}
@@ -273,6 +274,14 @@ class ControlTest extends PureComponent {
             <FastField
               name='time'
               render={(args) => <TimePicker label='Time' {...args} />}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='name'
+              render={(args) => (
+                <TextField prefix={<Search />} label='Name' {...args} />
+              )}
             />
           </GridItem>
           <GridItem sm={3}>
@@ -377,6 +386,7 @@ class ControlTest extends PureComponent {
               name='numberField'
               render={(args) => (
                 <NumberInput
+                  prefix='External Prescription'
                   label='Number Input'
                   step={0.5}
                   currency
@@ -388,7 +398,21 @@ class ControlTest extends PureComponent {
           <GridItem sm={3}>
             <FastField
               name='numberField'
-              render={(args) => <TextField label='Text Input' {...args} />}
+              render={(args) => (
+                <TextField
+                  prefix='External Prescription'
+                  label='Text Input'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='switch'
+              render={(args) => {
+                return <Switch label='Switch' {...args} />
+              }}
             />
           </GridItem>
         </GridContainer>

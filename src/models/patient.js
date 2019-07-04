@@ -9,20 +9,21 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      currentComponent: 'dmgp',
+      currentComponent: '1',
       default: {
         patientAccountNo: '',
         patientEmergencyContact: [],
         patientAllergy: [],
+        patientScheme: [],
         patientMedicalAlert: [],
         // dob: new Date(),
         contact: {
           contactAddress: [
             {
               // Id: getUniqueGUID(),
-              countryFk: '00000000-0000-0000-0000-000000000203',
-              line1: '',
-              line2: '',
+              countryFK: 107,
+              isPrimary: true,
+              isMailing: true,
             },
           ],
           mobileContactNumber: {

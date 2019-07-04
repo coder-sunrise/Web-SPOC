@@ -24,6 +24,7 @@ import {
   Drawer,
 } from '@material-ui/core'
 import MoreVert from '@material-ui/icons/MoreVert'
+import MoreHoriz from '@material-ui/icons/MoreHoriz'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
 import Edit from '@material-ui/icons/Edit'
@@ -61,6 +62,7 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
+import InvoiceAdjustment from './InvoiceAdjustment'
 
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
@@ -161,6 +163,11 @@ const styles = (theme) => ({
   widgetPopper: {
     zIndex: 101,
     width: 300,
+  },
+  iconButton: {
+    position: 'absolute',
+    top: -3,
+    marginLeft: 10,
   },
 })
 
@@ -319,7 +326,7 @@ class Consultation extends PureComponent {
       mode: 'edit',
       breakpoint: 'lg',
       rowHeight: getLayoutRowHeight(),
-      menuOpen: false,
+      showInvoiceAdjustment: false,
       collapsed: global.collapsed,
       currentLayout: defaultLayout,
     }
@@ -740,6 +747,12 @@ class Consultation extends PureComponent {
     )
   }
 
+  toggleInvoiceAdjustment = () => {
+    this.setState((prevState) => ({
+      showInvoiceAdjustment: !prevState.showInvoiceAdjustment,
+    }))
+  }
+
   render () {
     const { props, state } = this
     const {
@@ -760,7 +773,28 @@ class Consultation extends PureComponent {
         <Banner
           extraCmt={
             <div style={{ textAlign: 'center', paddingTop: 16 }}>
-              <p>Total Invoice</p>
+              <p style={{ position: 'relative' }}>
+                Total Invoice
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item onClick={this.toggleInvoiceAdjustment}>
+                        Add Invoice Adjustment
+                      </Menu.Item>
+                      <Menu.Divider />
+
+                      <Menu.Item>Absorb GST</Menu.Item>
+                    </Menu>
+                  }
+                  trigger={[
+                    'click',
+                  ]}
+                >
+                  <IconButton className={classes.iconButton}>
+                    <MoreHoriz />
+                  </IconButton>
+                </Dropdown>
+              </p>
               <h5>{NumberFormatter(210)}</h5>
               <SizeContainer size='sm'>
                 <Button
@@ -869,6 +903,16 @@ class Consultation extends PureComponent {
             </Drawer>
           </React.Fragment>
         )}
+        <CommonModal
+          open={this.state.showInvoiceAdjustment}
+          title='Add Invoice Adjustment'
+          maxWidth='sm'
+          bodyNoPadding
+          onClose={() => this.toggleInvoiceAdjustment()}
+          onConfirm={() => this.toggleInvoiceAdjustment()}
+        >
+          <InvoiceAdjustment />
+        </CommonModal>
       </div>
     )
   }

@@ -54,7 +54,7 @@ export const getSessionInfo = async (sessionID) => {
 export const getQueueListing = async (sessionID) => {
   const criteria = [
     {
-      prop: 'VisitFkNavigation.BizSessionFK',
+      prop: 'VisitFKNavigation.BizSessionFK',
       val: sessionID,
       opr: 'eql',
     },
