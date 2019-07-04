@@ -79,8 +79,7 @@ class AddPayment extends Component {
           initialValues={paymentList.reduce(mapPaymentListToValues, {})}
           validationSchema={validationSchema}
           onSubmit={this.onConfirmClick}
-          render={({ errors, values, handleSubmit }) => {
-            console.log({ errors })
+          render={({ values, handleSubmit }) => {
             return (
               <React.Fragment>
                 <PaymentType

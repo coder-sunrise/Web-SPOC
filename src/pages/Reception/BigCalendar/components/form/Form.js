@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'dva'
 import classnames from 'classnames'
 import moment from 'moment'
 import * as Yup from 'yup'
@@ -44,6 +45,7 @@ const AppointmentSchema = Yup.object().shape({
   startDate: Yup.string().required(),
 })
 
+@connect(({ loginSEMR }) => ({ loginSEMR }))
 @withFormik({
   enableReinitialize: true,
   validationSchema: AppointmentSchema,

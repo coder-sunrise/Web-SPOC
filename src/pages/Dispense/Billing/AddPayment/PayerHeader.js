@@ -14,11 +14,11 @@ const PayerHeader = ({ classes }) => (
     </GridItem>
     <GridItem md={3} className={classes.centerText}>
       <h4>Total Payable: </h4>
-      <h4>$20</h4>
+      <h4>$20.00</h4>
     </GridItem>
     <GridItem md={3} className={classes.centerText}>
       <h4>Outstanding: </h4>
-      <h4>$20</h4>
+      <h4>$20.00</h4>
     </GridItem>
   </GridContainer>
 )
