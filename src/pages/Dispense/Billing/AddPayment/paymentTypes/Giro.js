@@ -32,7 +32,7 @@ const Giro = ({ classes, payment, handleDeletePayment }) => {
         <GridItem md={6}>
           <FastField
             name={`${payment.id}.amount`}
-            render={(args) => <NumberInput label='Amount' {...args} />}
+            render={(args) => <NumberInput label='Amount' {...args} currency />}
           />
         </GridItem>
         <GridItem md={6}>

@@ -9,7 +9,7 @@ import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
 import Stock from '../../Stock'
-import Setting from './Setting'
+import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
@@ -26,28 +26,31 @@ const Detail = ({
   medicationDetail,
   history,
   handleSubmit,
+  setFieldValue,
 }) => {
   const { currentTab } = medication
 
   const detailProps = {
     medicationDetail,
     dispatch,
+    setFieldValue,
+    showTransfer: true,
   }
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          onClick={() => {
-            history.push('/inventory/master?t=1')
-          }}
-        >
-          Cancel
-        </Button>
         <ProgressButton
           submitKey='medicationDetail/submit'
           onClick={handleSubmit}
         />
+        <Button
+          color='danger'
+          onClick={() => {
+            history.push('/inventory/master?t=0')
+          }}
+        >
+          Cancel
+        </Button>
       </div>
       <NavPills
         color='info'
@@ -94,7 +97,6 @@ export default compose(
       return medicationDetail.entity ? medicationDetail.entity : {}
     },
     handleSubmit: (values, { props }) => {
-      console.log(props)
       console.log(values)
       const { dispatch } = props
       // dispatch({
@@ -108,14 +110,16 @@ export default compose(
       //   }
       // })
     },
-    validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
-      displayValue: Yup.string().required(),
-      // revenueCategory: Yup.string().required(),
-      effectiveStartDate: Yup.string().required(),
-      effectiveEndDate: Yup.string().required(),
-      // SellingPrice: Yup.number().required(),
-    }),
+    validationSchema: Yup.object().shape(
+      {
+        // code: Yup.string().required(),
+        // displayValue: Yup.string().required(),
+        // // revenueCategory: Yup.string().required(),
+        // effectiveStartDate: Yup.string().required(),
+        // effectiveEndDate: Yup.string().required(),
+        // SellingPrice: Yup.number().required(),
+      },
+    ),
     displayName: 'InventoryMedicationDetail',
   }),
 )(Detail)

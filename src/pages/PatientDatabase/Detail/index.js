@@ -201,25 +201,23 @@ class PatientDetail extends PureComponent {
               >
                 <MenuList>
                   {this.widgets.map((o) => (
-                    <Link
+                    <MenuItem
                       key={o.name}
-                      to={getAppendUrl({
-                        md: 'pt',
-                        cmt: o.id,
-                      })}
-                      {...linkProps}
+                      className={classes.menuItem}
+                      selected={currentMenu.name === o.name}
+                      disabled={!patient.entity && o.id !== '1'}
+                      onClick={(e) => {
+                        onMenuClick(e, o)
+                        this.props.history.push(
+                          getAppendUrl({
+                            md: 'pt',
+                            cmt: o.id,
+                          }),
+                        )
+                      }}
                     >
-                      <MenuItem
-                        key={o.name}
-                        className={classes.menuItem}
-                        selected={currentMenu.name === o.name}
-                        onClick={(e) => {
-                          onMenuClick(e, o)
-                        }}
-                      >
-                        {o.name}
-                      </MenuItem>
-                    </Link>
+                      {o.name}
+                    </MenuItem>
                   ))}
                 </MenuList>
               </div>

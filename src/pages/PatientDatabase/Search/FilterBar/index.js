@@ -88,13 +88,16 @@ class FilterBar extends PureComponent {
                   //   type: 'patientSearch/updateFilter',
                   //   payload: this.props.values,
                   // })
+                  const { search } = this.props.values
                   const prefix = this.props.values.isExactSearch
                     ? 'eql_'
                     : 'like_'
                   this.props.dispatch({
                     type: 'patientSearch/query',
                     payload: {
-                      [`${prefix}name`]: this.props.values.search,
+                      [`${prefix}name`]: search,
+                      [`${prefix}patientAccountNo`]: search,
+                      [`${prefix}contactFkNavigation.contactNumber.number`]: search,
                     },
                   })
                 }}

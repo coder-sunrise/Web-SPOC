@@ -65,7 +65,13 @@ export const handleSubmit = (values, { props, resetForm }) => {
   console.groupEnd('handleSubmit')
 }
 
-export const mapPropsToValues = ({ slotInfo, resources = [] }) => {
+const initDailyRecurrence = {
+  every: 1,
+  recurrenceRange: 'after',
+  occurence: 1,
+}
+
+export const mapPropsToValues = ({ slotInfo, resources = [], loginSEMR }) => {
   const startDate = moment(slotInfo.start).format(_dateFormat)
   const startTime = moment(slotInfo.start).format('hh:mm a')
   const endDate = moment(slotInfo.end).format(_dateFormat)
@@ -80,9 +86,12 @@ export const mapPropsToValues = ({ slotInfo, resources = [] }) => {
       currentResource.resourceId !== 'other' ? currentResource.resourceId : ''
   }
 
+  const bookedBy = 'medisys'
+
   return {
     ...initialAptInfo,
     ...slotInfo,
+
     doctor,
     startDate,
     startTime,

@@ -174,13 +174,15 @@ class EditableTableGrid extends PureComponent {
       } = {},
       ...props
     } = this.props
-
+    console.log(props, p)
     return (
       <div style={{ position: 'relative' }}>
         <div
           style={{
             position: 'absolute',
-            padding: theme.spacing.unit * 2,
+            height: '100%',
+            display: 'flex',
+            // padding: theme.spacing.unit * 2,
           }}
         >
           {showAddCommand && (

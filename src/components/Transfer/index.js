@@ -26,12 +26,25 @@ const styles = () => ({
   },
 })
 
-const Transfer = ({ items, classes, label, limitTitle, limit }) => {
+const Transfer = ({
+  items,
+  classes,
+  label,
+  limitTitle,
+  limit,
+  setFieldValue,
+  fieldName,
+}) => {
   const [ addedList, setAddedList ] = useState(items || [])
   const [ removedList, setRemovedList ] = useState([])
   const [ searchField, setSearchField ] = useState('')
   const addClick = (index) => () => {
-    setRemovedList([ ...removedList, ...addedList.slice(index, index + 1) ])
+    const tempList = [ ...removedList, ...addedList.slice(index, index + 1) ]
+    setRemovedList(tempList)
+    if (setFieldValue && fieldName) {
+      setFieldValue(fieldName, tempList)
+    }
+
     setAddedList([
       ...addedList.slice(0, index),
       ...addedList.slice(index + 1, addedList.length),
@@ -40,14 +53,21 @@ const Transfer = ({ items, classes, label, limitTitle, limit }) => {
 
   const removeClick = (index) => () => {
     setAddedList([ ...addedList, ...removedList.slice(index, index + 1) ])
-    setRemovedList([
+    const tempList = [
       ...removedList.slice(0, index),
       ...removedList.slice(index + 1, removedList.length),
-    ])
+    ]
+    setRemovedList(tempList)
+    if (setFieldValue && fieldName) {
+      setFieldValue(fieldName, tempList)
+    }
   }
 
   const removeAll = () => {
     setRemovedList([])
+    if (setFieldValue && fieldName) {
+      setFieldValue(fieldName, [])
+    }
     setAddedList([ ...addedList, ...removedList ])
   }
 
@@ -66,14 +86,14 @@ const Transfer = ({ items, classes, label, limitTitle, limit }) => {
             <Card>
               <CardBody>
                 <List dense className={classes.list}>
-                  {addedList.map((value, index) => (
+                  {addedList.map((item, index) => (
                     <ListItem
-                      key={index}
+                      key={item.id}
                       disabled={limit && limit === removedList.length}
                       button
                       onClick={addClick(index)}
                     >
-                      <ListItemText primary={`${value}`} />
+                      <ListItemText primary={`${item.value}`} />
                       <ListItemSecondaryAction>
                         <Button
                           size='sm'
@@ -123,14 +143,18 @@ const Transfer = ({ items, classes, label, limitTitle, limit }) => {
               <Card>
                 <CardBody>
                   <List dense className={classes.list}>
-                    {removedList.map((value, index) => (
-                      <ListItem key={value} button onClick={removeClick(index)}>
+                    {removedList.map((item, index) => (
+                      <ListItem
+                        key={item.id}
+                        button
+                        onClick={removeClick(index)}
+                      >
                         {label && (
                           <ListItemIcon style={{ paddingRight: '20px' }}>
                             {`${label} ${index + 1}`}
                           </ListItemIcon>
                         )}
-                        <ListItemText primary={value} />
+                        <ListItemText primary={item.value} />
                         <ListItemSecondaryAction>
                           <Button
                             size='sm'

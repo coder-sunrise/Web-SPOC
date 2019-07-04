@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Tooltip, withStyles } from '@material-ui/core'
+import { Tooltip } from '@material-ui/core'
 import Textsms from '@material-ui/icons/Textsms'
 import { Button, CommonTableGrid2 } from '@/components'
 import { compose } from 'redux'
@@ -22,32 +22,28 @@ const generateRowData = () => {
   }
   return data
 }
-const Grid = ({ showSMSHistory, list, dispatch, ...restProps }) => {
+const Grid = ({ showSMSHistory, list, dispatch }) => {
   console.log('test')
   const [ selectedRows, setSelectedRows ] = useState([])
   const [ tableParas, setTableParas ] = useState({
     columns: [
       { name: 'patientName', title: 'Patient Name' },
       { name: 'contactNo', title: 'Contact No' },
-      { name: 'upComingAppt', title: 'UpComing Appt.' },
+      { name: 'upcomingAppt', title: 'Upcoming Appt.' },
       { name: 'remarks', title: 'Appt. Remarks' },
       { name: 'doctor', title: 'Doctor' },
-      { name: 'status', title: 'Status' },
+      { name: 'status', title: 'Appt. Status' },
       { name: 'apptType', title: 'Appt. Type' },
       { name: 'lastVisitDate', title: 'Last Visit Date' },
-      { name: 'tag', title: 'Tag' },
+      { name: 'lastSMSStatus', title: 'Last SMS Status' },
       { name: 'lastSMSSent', title: 'Last SMS Sent' },
       { name: 'lastSMSReceived', title: 'Last SMS Received' },
       { name: 'Action', title: 'Action' },
     ],
     leftColumns: [],
   })
-
   const [ colExtensions, setColExtensions ] = useState([
     { columnName: 'Action', width: 120, align: 'center' },
-    // { columnName: 'Action', width: 110, align: 'center' },
-    // { columnName: 'payments', type: 'number', currency: true },
-    // { columnName: 'expenseAmount', type: 'number', currency: true },
   ])
 
   const handleSelectionChange = (selection) => {
@@ -67,7 +63,6 @@ const Grid = ({ showSMSHistory, list, dispatch, ...restProps }) => {
                 justIcon
                 round
                 color='primary'
-                // style={{ marginRight: 5 }}
               >
                 <Textsms />
               </Button>

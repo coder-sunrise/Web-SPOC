@@ -1,21 +1,19 @@
 import React, { useEffect } from 'react'
 import { connect } from 'dva'
+import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
-import { withFormik, FastField } from 'formik'
-import Yup from '@/utils/yup'
+import { FastField } from 'formik'
 import { compose } from 'redux'
 
 import {
   CodeSelect,
   CardContainer,
   TextField,
-  Button,
   GridContainer,
   GridItem,
   Select,
   DatePicker,
-  ProgressButton,
   Checkbox,
 } from '@/components'
 
@@ -48,7 +46,14 @@ const Detail = ({ consumableDetail, dispatch }) => {
               <FastField
                 name='code'
                 render={(args) => {
-                  return <TextField label='Consumable Code' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.consumable.code',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -56,7 +61,14 @@ const Detail = ({ consumableDetail, dispatch }) => {
               <FastField
                 name='displayValue'
                 render={(args) => {
-                  return <TextField label='Consumable Name' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.consumable.name',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -64,16 +76,30 @@ const Detail = ({ consumableDetail, dispatch }) => {
               <FastField
                 name='description'
                 render={(args) => {
-                  return <TextField label='Description' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.consumable.description',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='remark'
+                name='remarks'
                 render={(args) => {
                   return (
-                    <TextField label='Remark' multiline rowsMax='5' {...args} />
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.consumable.remarks',
+                      })}
+                      multiline
+                      rowsMax='5'
+                      {...args}
+                    />
                   )
                 }}
               />
@@ -84,7 +110,9 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 render={(args) => {
                   return (
                     <Checkbox
-                      prefix='Enable Retail'
+                      prefix={formatMessage({
+                        id: 'inventory.master.consumable.enableRetail',
+                      })}
                       isSwitch
                       colon={false}
                       {...args}
@@ -103,7 +131,9 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 name='supplier'
                 render={(args) => (
                   <CodeSelect
-                    label='Supplier'
+                    label={formatMessage({
+                      id: 'inventory.master.consumable.supplier',
+                    })}
                     code='Supplier'
                     max={10}
                     {...args}
@@ -116,7 +146,9 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 name='baseUOM'
                 render={(args) => (
                   <CodeSelect
-                    label='Base UOM'
+                    label={formatMessage({
+                      id: 'inventory.master.consumable.baseUOM',
+                    })}
                     code='BaseUOM'
                     max={10}
                     {...args}
@@ -128,7 +160,13 @@ const Detail = ({ consumableDetail, dispatch }) => {
               <FastField
                 name='consumableCategory'
                 render={(args) => (
-                  <Select label='Consumable Category' options={[]} {...args} />
+                  <Select
+                    label={formatMessage({
+                      id: 'inventory.master.consumable.category',
+                    })}
+                    options={[]}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -136,7 +174,13 @@ const Detail = ({ consumableDetail, dispatch }) => {
               <FastField
                 name='revenueCategory'
                 render={(args) => (
-                  <Select label='Revenue Category' options={[]} {...args} />
+                  <Select
+                    label={formatMessage({
+                      id: 'inventory.master.consumable.revenueCategory',
+                    })}
+                    options={[]}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -144,7 +188,12 @@ const Detail = ({ consumableDetail, dispatch }) => {
               <FastField
                 name='effectiveStartDate'
                 render={(args) => (
-                  <DatePicker label='Effective Start Date' {...args} />
+                  <DatePicker
+                    label={formatMessage({
+                      id: 'inventory.master.consumable.effectiveStartDate',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -152,7 +201,12 @@ const Detail = ({ consumableDetail, dispatch }) => {
               <FastField
                 name='effectiveEndDate'
                 render={(args) => (
-                  <DatePicker label='Effective End Date' {...args} />
+                  <DatePicker
+                    label={formatMessage({
+                      id: 'inventory.master.consumable.effectiveEndDate',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -165,6 +219,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
+  React.memo,
   connect(({ consumableDetail }) => ({
     consumableDetail,
   })),

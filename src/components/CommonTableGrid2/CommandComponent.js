@@ -71,7 +71,6 @@ const CommitButton = ({ onExecute }) => (
     data-button-type='progress'
     color='primary'
     title='Save'
-    style={{ marginRight: 5 }}
     className='grid-commit'
   >
     <Save />

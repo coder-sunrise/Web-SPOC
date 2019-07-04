@@ -128,7 +128,7 @@ class SiderMenu extends PureComponent {
           >
             <Logo {...this.props} collapsed={shouldCollapse} />
             <SidebarWrapper className={sidebarWrapper}>
-              <User {...this.props} collapsed={shouldCollapse} />
+              {/* <User {...this.props} collapsed={shouldCollapse} /> */}
               <Suspense fallback={null}>
                 {/* <BaseMenu
             {...this.props}
@@ -166,7 +166,7 @@ class SiderMenu extends PureComponent {
           >
             <Logo {...this.props} collapsed={shouldCollapse} />
             <SidebarWrapper className={sidebarWrapper}>
-              <User {...this.props} collapsed={shouldCollapse} />
+              {/* <User {...this.props} collapsed={shouldCollapse} /> */}
               <Suspense fallback={null}>
                 {/* <BaseMenu
             {...this.props}

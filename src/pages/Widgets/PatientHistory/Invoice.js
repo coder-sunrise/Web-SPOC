@@ -103,24 +103,24 @@ const Invoice = (props) => {
         ]}
       />
       <GridContainer>
-        <GridItem xs={6} md={9} />
-        <GridItem xs={6} md={3}>
+        <GridItem xs={2} md={9} />
+        <GridItem xs={10} md={3}>
           <NumberInput
             prefix='Sub Total:'
             defaultValue={190}
             {...amountProps}
           />
         </GridItem>
-        <GridItem xs={6} md={9} />
-        <GridItem xs={6} md={3}>
+        <GridItem xs={2} md={9} />
+        <GridItem xs={10} md={3}>
           <NumberInput
             prefix='GST (7%):'
             defaultValue={13.3}
             {...amountProps}
           />
         </GridItem>
-        <GridItem xs={6} md={9} />
-        <GridItem xs={6} md={3}>
+        <GridItem xs={2} md={9} />
+        <GridItem xs={10} md={3}>
           <NumberInput prefix='Total:' defaultValue={203.3} {...amountProps} />
         </GridItem>
       </GridContainer>

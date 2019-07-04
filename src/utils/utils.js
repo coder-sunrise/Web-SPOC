@@ -339,6 +339,7 @@ const convertToQuery = (
   const {
     current,
     pagesize,
+    combineCondition,
     includeDeleted,
     includeParentDeleted,
     queryExcludeFields,
@@ -352,6 +353,7 @@ const convertToQuery = (
   delete customQuerys.includeParentDeleted
   delete customQuerys.queryExcludeFields
   delete customQuerys.totalRecords
+  delete customQuerys.combineCondition
 
   // console.log(query)
   let newQuery = {}
@@ -410,6 +412,7 @@ const convertToQuery = (
     })),
     current,
     pagesize,
+    combineCondition,
     includeDeleted,
     includeParentDeleted,
     queryExcludeFields,

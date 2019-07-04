@@ -11,29 +11,35 @@ const styles = () => ({})
 const Medication = ({ dispatch, history, medication }) => {
   const [ tableParas, setTableParas ] = useState({
     columns: [
-      { name: 'code', title: 'Code' },
-      { name: 'displayValue', title: 'Name' },
+      { name: 'refNo', title: 'Code' },
+      { name: 'patientName', title: 'Name' },
       { name: 'supplier', title: 'Supplier' },
-      { name: 'revenueCategory', title: 'Category' },
-      { name: 'group', title: 'Group' },
-      { name: 'status', title: 'Status' },
-      { name: 'dispenseUOM', title: 'Disp. UOM' },
-      { name: 'prescribeUOM', title: 'Prescr. UOM' },
-      {
-        name: 'dispenseUOMtoPrescribeUOMMeasurement',
-        title: '1 Dis = Prescr. UOM',
-      },
+      { name: 'dispUOM', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
-      { name: 'averageCostPrice', title: 'Avg Cost Price' },
-      { name: 'suggestSellingPrice', title: 'Selling Price' },
+      { name: 'payments', title: 'Avg Cost Price' },
+      { name: 'expenseAmount', title: 'Selling Price' },
+      { name: 'status', title: 'Status' },
       { name: 'Action', title: 'Action' },
     ],
     leftColumns: [],
   })
+
   const [ colExtensions, setColExtensions ] = useState([
     { columnName: 'Action', width: 110, align: 'center' },
-    { columnName: 'averageCostPrice', type: 'number', currency: true },
-    { columnName: 'suggestSellingPrice', type: 'number', currency: true },
+    {
+      columnName: 'supplier',
+      type: 'select',
+      options: [],
+      label: 'Supplier',
+    },
+    {
+      columnName: 'dispUOM',
+      align: 'select',
+      options: [],
+      label: 'DispUOM',
+    },
+    { columnName: 'payments', type: 'number', currency: true },
+    { columnName: 'expenseAmount', type: 'number', currency: true },
   ])
 
   const filterProps = {

@@ -2,6 +2,7 @@ import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
+import { formatMessage } from 'umi/locale'
 
 import {
   CardContainer,
@@ -26,12 +27,14 @@ const Pricing = () => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='LastCostPriceBefore'
+                name='lastCostPriceBefBonus'
                 render={(args) => {
                   return (
                     <NumberInput
                       currency
-                      label='Last Cost Price (Before Bonus)'
+                      label={formatMessage({
+                        id: 'inventory.master.pricing.lastCostPriceBefBonus',
+                      })}
                       {...args}
                     />
                   )
@@ -40,12 +43,14 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='LastCostPriceAfter'
+                name='lastCostPriceAftBonus'
                 render={(args) => {
                   return (
                     <NumberInput
                       currency
-                      label='Last Cost Price (After Bonus)'
+                      label={formatMessage({
+                        id: 'inventory.master.pricing.lastCostPriceAftBonus',
+                      })}
                       {...args}
                     />
                   )
@@ -54,12 +59,14 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='AverageCostPrice'
+                name='averageCostPrice'
                 render={(args) => {
                   return (
                     <NumberInput
                       currency
-                      label='Average Cost Price'
+                      label={formatMessage({
+                        id: 'inventory.master.pricing.averageCostPrice',
+                      })}
                       {...args}
                     />
                   )
@@ -73,19 +80,12 @@ const Pricing = () => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='MarkupMargin'
-                render={(args) => (
-                  <NumberInput label='Markup Margin (%)' {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='SuggestedSellingPrice'
+                name='profitMarginPercentage'
                 render={(args) => (
                   <NumberInput
-                    currency
-                    label='Suggested Selling Price'
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.profitMarginPercentage',
+                    })}
                     {...args}
                   />
                 )}
@@ -93,17 +93,42 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='SellingPrice'
+                name='suggestSellingPrice'
                 render={(args) => (
-                  <NumberInput currency label='Selling Price' {...args} />
+                  <NumberInput
+                    currency
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.suggestedSellingPrice',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='MaxDiscount'
+                name='sellingPriceBefDiscount'
                 render={(args) => (
-                  <NumberInput label='Max Discount (%)' {...args} />
+                  <NumberInput
+                    currency
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.sellingPrice',
+                    })}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='maxDiscount'
+                render={(args) => (
+                  <NumberInput
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.maxDiscount',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>

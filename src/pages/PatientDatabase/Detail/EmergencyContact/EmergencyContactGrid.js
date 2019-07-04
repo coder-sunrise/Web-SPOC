@@ -104,7 +104,7 @@ class Grid extends React.Component {
         checkedValue: true,
         uncheckedValue: false,
         onRadioChange: (row, e, checked) => {
-          console.log(this)
+          // console.log(this)
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
             const patientEmergencyContact = _.cloneDeep(

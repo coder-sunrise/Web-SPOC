@@ -175,7 +175,7 @@ function DoctorEventForm ({
               }}
             />
           </GridItem>
-          <Recurrence values={values} />
+          <Recurrence values={values} isDoctorBlock />
         </GridContainer>
       </Paper>
       <GridContainer justify='flex-end' className={classes.buttonContainer}>
