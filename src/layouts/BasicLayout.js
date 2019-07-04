@@ -50,6 +50,9 @@ const _theme = createMuiTheme({
   typography: {
     useNextVariants: true,
   },
+  props: {
+    ...defaultTheme.props,
+  },
   palette: {
     ...defaultTheme.palette,
     // primary: {

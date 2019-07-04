@@ -305,8 +305,11 @@ export default class BaseCRUDViewModel {
         }
       },
 
-      reset () {
-        return state
+      reset (st, { payload }) {
+        return {
+          ...st,
+          entity: undefined,
+        }
       },
 
       showModal (st, { payload }) {

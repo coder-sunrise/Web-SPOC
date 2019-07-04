@@ -60,6 +60,13 @@ import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 
+const cellStyle = {
+  cell: {
+    // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+    borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
+  },
+}
+
 const sizeConfig = {
   sm: {
     ...smallTheme.overrides,
@@ -75,6 +82,17 @@ const sizeConfig = {
       root: {
         padding: '5px 0',
         fontSize: '1em',
+      },
+    },
+    EditCell: {
+      cell: {
+        padding: '4px 2px 3px 2px',
+        ...cellStyle.cell,
+      },
+    },
+    Pager: {
+      pager: {
+        padding: `0 8px`,
       },
     },
   },
@@ -221,12 +239,6 @@ class CommonTableGrid2 extends React.Component {
       summaryConfig: {},
     }
 
-    const cellStyle = {
-      cell: {
-        // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-        borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
-      },
-    }
     this.theme = createMuiTheme({
       overrides: {
         RootBase: {
@@ -243,7 +255,12 @@ class CommonTableGrid2 extends React.Component {
           },
         },
         TableCell: cellStyle,
-        EditCell: cellStyle,
+        EditCell: {
+          cell: {
+            padding: '7px 4px 7px 4px',
+            ...cellStyle.cell,
+          },
+        },
         TableHeaderCell: cellStyle,
         Table: {
           // table: {
@@ -266,9 +283,15 @@ class CommonTableGrid2 extends React.Component {
             padding: 0,
           },
         },
+        Pagination: {
+          button: {
+            fontWeight: 300,
+          },
+        },
         ...sizeConfig[props.size || 'md'],
       },
     })
+    console.log(this.theme)
     // this.search()
     // console.log(props.query, ' c grid')
   }
@@ -363,7 +386,7 @@ class CommonTableGrid2 extends React.Component {
         this.setState({
           pagination: {
             ...pagination,
-            current: payload.current,
+            ...payload,
           },
         })
     }
@@ -373,6 +396,7 @@ class CommonTableGrid2 extends React.Component {
     const {
       classes,
       pageSizes = [
+        5,
         10,
         50,
         100,

@@ -302,6 +302,8 @@ class AntdNumberInput extends React.PureComponent {
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
       }
+      extraCfg.max = 100
+      extraCfg.min = -100
     } else if (formatter) {
       extraCfg.formatter = (v) => {
         if (v === '') return ''

@@ -14,6 +14,7 @@ export default createFormViewModel({
         patientAccountNo: '',
         patientEmergencyContact: [],
         patientAllergy: [],
+        patientAllergyMetaData: [],
         patientScheme: [],
         patientMedicalAlert: [],
         // dob: new Date(),
@@ -26,6 +27,9 @@ export default createFormViewModel({
               isMailing: true,
             },
           ],
+          contactEmailAddress: {
+            emailAddress: '',
+          },
           mobileContactNumber: {
             number: '',
           },

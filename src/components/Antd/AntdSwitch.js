@@ -92,6 +92,8 @@ class AntdSwitch extends React.PureComponent {
           className={classnames(classes.switchContainer)}
           onChange={this.handleValueChange}
           defaultValue={defaultValue}
+          checkedChildren='Yes'
+          unCheckedChildren='No'
           {...cfg}
           {...restProps}
         />

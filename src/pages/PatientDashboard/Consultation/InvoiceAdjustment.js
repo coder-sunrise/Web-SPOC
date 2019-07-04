@@ -68,13 +68,19 @@ class InvoiceAdjustment extends PureComponent {
                 name='adjustment'
                 render={(args) => {
                   if (values.type) {
-                    return <NumberInput currency label='Adjustment' {...args} />
+                    return (
+                      <NumberInput
+                        autoFocus
+                        currency
+                        label='Adjustment'
+                        {...args}
+                      />
+                    )
                   }
                   return (
                     <NumberInput
-                      max={100}
-                      min={-100}
                       percentage
+                      autoFocus
                       label='Adjustment'
                       {...args}
                     />
