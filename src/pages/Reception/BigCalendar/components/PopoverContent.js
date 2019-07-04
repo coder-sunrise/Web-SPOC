@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import moment from 'moment'
 // material icon
 import { withStyles } from '@material-ui/core'
 import AccessTime from '@material-ui/icons/AccessTime'
@@ -23,6 +24,11 @@ const styles = () => ({
     marginBottom: 10,
   },
 })
+
+const getTimeString = (value) => {
+  const timeFormat = 'hh:mm a'
+  return moment(value).isValid() ? moment(value).format(timeFormat) : 'N/A'
+}
 
 const DoctorEventContent = ({ popoverEvent, classes }) => {
   return (
@@ -48,14 +54,7 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
         <TextField disabled label='Event Type' value={popoverEvent.eventType} />
       </GridItem>
       <GridItem>
-        <TextField disabled label='Subject' value={popoverEvent.subject} />
-      </GridItem>
-      <GridItem>
-        <TextField
-          disabled
-          label='Description'
-          value={popoverEvent.description}
-        />
+        <TextField disabled label='Remarks' value={popoverEvent.remarks} />
       </GridItem>
     </GridContainer>
   )
@@ -85,7 +84,8 @@ class PopoverContent extends React.PureComponent {
             <GridItem className={classnames(classes.iconRow)}>
               <AccessTime className={classnames(classes.icon)} />
               <span>
-                {popoverEvent.startTime} - {popoverEvent.endTime}
+                {getTimeString(popoverEvent.timeFrom)} -{' '}
+                {getTimeString(popoverEvent.timeTo)}
               </span>
             </GridItem>
 

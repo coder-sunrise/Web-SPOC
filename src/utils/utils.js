@@ -482,7 +482,7 @@ const updateCellValue = (
       const r = validationSchema.validateSync(row, {
         abortEarly: false,
       })
-      // console.log(r)
+      // console.log({ r })
       $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
       if (value !== val) {

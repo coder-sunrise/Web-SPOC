@@ -92,7 +92,6 @@ class ConsultationDocument extends PureComponent {
                       size='sm'
                       onClick={this.toggleModal}
                       justIcon
-                      round
                       color='primary'
                       style={{ marginRight: 5 }}
                     >
@@ -110,7 +109,6 @@ class ConsultationDocument extends PureComponent {
                         // )
                       }}
                       justIcon
-                      round
                       color='primary'
                     >
                       <Delete />

@@ -4,7 +4,7 @@ import { withFormik, FastField,Field } from 'formik'
 import * as Yup from 'yup'
 import { withStyles } from '@material-ui/core'
 import { notification, Checkbox, CardContainer, CommonHeader, Select, GridContainer, GridItem } from '@/components'
-import { status } from '@/utils/codes'
+
 import allergyModal from '../models/allergy'
 import AllergyGrid from './AllergyGrid'
 import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
@@ -23,7 +23,6 @@ const styles = () => ({
 })
 
 @withFormik({
-  enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
     console.log('allergy map')
     console.log(patient)
@@ -38,7 +37,21 @@ const styles = () => ({
     ),
   }),
 
-  handleSubmit,
+  handleSubmit: (values, { props }) => {
+    props
+      .dispatch({
+        type: 'addPayment/submit',
+        payload: values,
+      })
+      .then((r) => {
+        if (r.message === 'Ok') {
+          notification.success({
+            message: 'Done',
+          })
+          if (props.onConfirm) props.onConfirm()
+        }
+      })
+  },
   displayName: 'Allergy',
 })
 
@@ -46,49 +59,6 @@ class Allergies extends PureComponent {
   state = {
     height: 0,
     isGridEditable: true
-  }
-
-  tableParas_Allergy = {
-    columns: [
-      { name: 'allergyName', title: 'Allergy Name' },
-      { name: 'allergyReaction', title: 'Allergic Reaction' },
-      { name: 'onsetDate', title: 'Date' },
-      { name: 'patientAllergyStatusFk', title: 'Status' },
-    ],
-    columnExtensions: [
-      {
-        columnName: 'onsetDate',
-        type: 'date',
-      },
-      {
-        columnName: 'patientAllergyStatusFk',
-        type: 'codeSelect',
-        code: 'PatientAllergyStatus',
-        label: 'Status',
-      },
-    ]
-  }
-
-  tableParas_Alert = {
-    columns: [
-      { name: 'allergyName', title: 'Allergy Name' },
-      { name: 'allergyReaction', title: 'Allergic Reaction' },
-      { name: 'onsetDate', title: 'Date' },
-      { name: 'patientAllergyStatusFk', title: 'Status' },
-    ],
-    columnExtensions: [
-      {
-        columnName: 'onsetDate',
-        type: 'date',
-      },
-      {
-        columnName: 'patientAllergyStatusFk',
-        type: 'codeSelect',
-        code: 'PatientAllergyStatus',
-        label: 'Status',
-      },
-
-    ]
   }
 
   onChangeOfCheckBox = (event, checked) => {
@@ -124,10 +94,10 @@ class Allergies extends PureComponent {
 
   render() {
     const { height } = this.state
-    const { classes, allergy, dispatch, patient,values, ...restProps } = this.props
+    const { classes, allergy, dispatch, patient, values, ...restProps } = this.props
 
-     console.log('allergy render')
-     console.log(values)
+    console.log('allergy render')
+    console.log(values)
     return (
       <CardContainer title={this.titleComponent} hideHeader>
         <GridContainer
@@ -138,7 +108,7 @@ class Allergies extends PureComponent {
               render={(args) => {
                 return (
                   <Checkbox
-                    disabled = {values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'Allergy').length > 0}
+                    disabled = {values.patientAllergy.length > 0}
                     simple
                     label={"This patient doesn't has any allergy"}
                     onChange={this.onChangeOfCheckBox.bind(this)}
@@ -170,21 +140,14 @@ class Allergies extends PureComponent {
             </h4></GridItem>
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
-              rows={values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'Allergy')}
+              rows={values.patientAllergy.filter((o) => !o.isDeleted)}
               type='Allergy'
               title='Allergy'
               height={height}
-              values={values}
-              patient = {patient}
               onSaveClick={this.onSaveClick.bind(this)}
+              values={values}
               isEditable={this.state.isGridEditable}
-              setArrayValue = {(items)=>{
-                let vals = Array.from(values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'NonAllergy'))
-                vals = vals.concat(items)
-                this.props.setFieldValue('patientAllergy',vals)}
-              
-              }
-              tableParas = {this.tableParas_Allergy}
+              setArrayValue = {(items)=>{this.props.setFieldValue('patientAllergy',items)}}
               {...restProps}
             />
           </GridItem>
@@ -195,27 +158,19 @@ class Allergies extends PureComponent {
 
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
-              rows={values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'NonAllergy')}
-              type='NonAllergy'
+              rows={values.patientMedicalAlert.filter((o) => !o.isDeleted)}
+              type='Alert'
               title='Medical Alert'
               height={height}
               values={values}
-              patient = {patient}
               isEditable={true}
-              setArrayValue = {(items)=>{
-                let vals = Array.from(values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'Allergy'))
-                vals = vals.concat(items)
-                this.props.setFieldValue('patientAllergy',vals)}
-              
-              }
-              tableParas = {this.tableParas_Alert}
+              setArrayValue = {(items)=>{this.props.setFieldValue('patientMedicalAlert',items)}}
               {...restProps}
             />
           </GridItem>
         </GridContainer>
         {getFooter({
           resetable: true,
-          allowSubmit: true,
           ...this.props,
         })}
       </CardContainer>

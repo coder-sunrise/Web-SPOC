@@ -23,16 +23,20 @@ const STYLES = () => {
       color: 'currentColor',
       borderWidth: 0,
       background: 'none',
+      lineHeight: '1rem',
+      height: 'auto',
       '&, &:focus, &:hover': {
         boxShadow: 'none !important',
         borderRightWidth: '0px !important',
       },
-      '& .ant-input-number': {
+      '& .ant-input-number-input': {
+        height: '100%',
+        padding: 0,
         lineHeight: '1rem',
       },
-      '& .ant-input-number-input': {
-        height: 'auto',
-        padding: 0,
+      '& .ant-input-number-input-wrap': {
+        lineHeight: '1rem',
+        marginTop: 1,
       },
       '& .ant-input-number-handler-wrap': {
         background: 'none',
@@ -96,6 +100,7 @@ class AntdNumberInput extends React.PureComponent {
   static defaultProps = {
     disabled: false,
     size: 'default',
+    allowEmpty: true,
   }
 
   constructor (props) {
@@ -162,7 +167,7 @@ class AntdNumberInput extends React.PureComponent {
 
   debouncedOnChange = (value) => {
     const { props } = this
-    const { loadOnChange, readOnly, onChange } = props
+    const { field, loadOnChange, readOnly, onChange } = props
     // console.log('c', value)
     if (readOnly || loadOnChange) return
     // const { formatter } = this.props
@@ -175,7 +180,7 @@ class AntdNumberInput extends React.PureComponent {
     const v = {
       target: {
         value,
-        name: props.field.name,
+        name: field ? field.name : '',
       },
     }
     if (props.field && props.field.onChange) {
@@ -187,11 +192,19 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleValueChange = (v) => {
+    // if ((v === undefined || !/\S/.test(v)) && !this.props.allowEmpty) {
+    //   return false
+    // }
+    // console.log(this.props.allowEmpty, v)
+    let newV = v
+    if (v === undefined && !this.props.allowEmpty) {
+      newV = this.props.min
+    }
     this.setState({
-      value: v,
+      value: newV,
     })
 
-    this.debouncedOnChange(v)
+    this.debouncedOnChange(newV)
     return false
   }
 
@@ -234,7 +247,9 @@ class AntdNumberInput extends React.PureComponent {
       onFocus,
       onBlur,
       currency,
-      // formatter,
+      percentage,
+      style,
+      formatter,
       // parser,
       ...restProps
     } = this.props
@@ -268,13 +283,33 @@ class AntdNumberInput extends React.PureComponent {
         // console.log(value)
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
-        if (value === '' || value === undefined) return ''
-        console.log('parser', value)
+        // if (value === '' || value === undefined) return ''
+        // console.log('parser', value)
 
-        return numeral(value).value()
+        // return numeral(value).value()
       }
 
       extraCfg.precision = 2
+    } else if (percentage) {
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
+        if (!this.state.focused) {
+          return numeral(v / 100).format('0.00%')
+        }
+        return v
+      }
+      extraCfg.parser = (v) => {
+        if (typeof v === 'number') return v
+        return v.replace(/\$\s?|(,*)/g, '')
+      }
+    } else if (formatter) {
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
+        if (!this.state.focused) {
+          return formatter(v)
+        }
+        return v
+      }
     }
     return (
       <div style={{ width: '100%' }} {...props}>

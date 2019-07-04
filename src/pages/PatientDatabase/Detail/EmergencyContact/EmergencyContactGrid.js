@@ -65,7 +65,7 @@ class Grid extends React.Component {
       { name: 'relationshipFK', title: 'Relationship' },
       { name: 'address', title: 'Address' },
       { name: 'primaryContactNo', title: 'Primary Contact' },
-      { name: 'priority', title: 'Priority' },
+      { name: 'isPrimaryContact', title: 'Priority' },
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
@@ -99,10 +99,10 @@ class Grid extends React.Component {
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
-        columnName: 'priority',
+        columnName: 'isPrimaryContact',
         type: 'radio',
-        checkedValue: 1,
-        uncheckedValue: 0,
+        checkedValue: true,
+        uncheckedValue: false,
         onRadioChange: (row, e, checked) => {
           console.log(this)
           if (checked) {
@@ -111,11 +111,11 @@ class Grid extends React.Component {
               values.patientEmergencyContact,
             )
             patientEmergencyContact.forEach((pec) => {
-              pec.priority = 0
+              pec.isPrimaryContact = false
             })
             const r = patientEmergencyContact.find((o) => o.id === row.id)
             if (r) {
-              r.priority = 1
+              r.isPrimaryContact = true
             }
             setFieldValue('patientEmergencyContact', patientEmergencyContact)
             setFieldTouched('patientEmergencyContact', true)
@@ -187,7 +187,7 @@ class Grid extends React.Component {
     }
     this.PagerContent = (
       <Button onClick={this.toggleModal} color='info' link>
-        Add From Existing Patient
+        <Add />Add From Existing Patient
       </Button>
     )
   }
@@ -234,6 +234,9 @@ class Grid extends React.Component {
                 })
                 return
               }
+              const primaryAddress = o.contact.contactAddress.find(
+                (m) => m.isPrimary,
+              )
               patientEmergencyContact.push({
                 // id: getUniqueGUID(),
                 patientProfileFK: o.id,
