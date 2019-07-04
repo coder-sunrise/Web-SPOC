@@ -1,32 +1,36 @@
-import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { compare } from '@/layouts'
-import moment from 'moment'
-import { withStyles } from '@material-ui/core/styles'
+import React from 'react'
+// formik
+import { withFormik } from 'formik'
+// material ui
+import { withStyles } from '@material-ui/core'
+// common components
 import { CardContainer } from '@/components'
+// sub components
+import FilterBar from './components/FilterBar'
+import InvoiceDataGrid from './components/InvoiceDataGrid'
+// styles
+import styles from './styles'
 
-import Grid from './Grid'
-import FilterBar from './FilterBar'
-
-const styles = (theme) => ({})
-@connect(({ invoice }) => ({
-  invoice,
-}))
-@compare('invoice')
-class Invoice extends PureComponent {
-  state = {}
+@withFormik({
+  mapPropsToValues: () => {},
+})
+class Invoice extends React.Component {
+  onRowDoubleClick = (row) => {
+    this.props.history.push(`/finance/invoice/${row.invoiceNo}`)
+  }
 
   render () {
-    const { classes, ...resetProps } = this.props
-
+    const { classes } = this.props
     return (
-      <CardContainer title='Invoice / Payment'>
-        <FilterBar {...resetProps} />
-        <Grid {...resetProps} />
+      <CardContainer hideHeader>
+        <FilterBar />
+        <InvoiceDataGrid handleRowDoubleClick={this.onRowDoubleClick} />
+        <p className={classes.footerNote}>
+          Note: Total Payment is the sum total of the payment amount of payers
+        </p>
       </CardContainer>
     )
   }
 }
 
-export default withStyles(styles)(Invoice)
+export default withStyles(styles, { name: 'InvoicePage' })(Invoice)

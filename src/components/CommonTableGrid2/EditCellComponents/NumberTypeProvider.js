@@ -78,7 +78,7 @@ const NumberFormatter = (columnExtensions) =>
         return <b style={{ color }}>{numeral(value).format(currencyFormat)}</b>
       }
       if (text) return numeral(value).format(qtyFormat)
-      return <b style={{ color }}>${numeral(value).format(qtyFormat)}</b>
+      return <b style={{ color }}>{numeral(value).format(qtyFormat)}</b>
     },
     (prevProps, nextProps) => {
       // console.log(prevProps === nextProps, prevProps.value === nextProps.value)
