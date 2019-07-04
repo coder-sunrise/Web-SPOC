@@ -13,6 +13,11 @@ import {
 
 import style from './style'
 
+const ConfirmText = {
+  ADD: 'Save Appointment',
+  EDIT: 'Reschedule Appointment',
+}
+
 const FormFooter = ({
   classes,
   isNew,
@@ -23,6 +28,9 @@ const FormFooter = ({
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,
   }
+
+  const confirmBtnText = isNew ? ConfirmText.ADD : ConfirmText.EDIT
+
   return (
     <div className={classnames(classes.footer)}>
       <GridContainer>
@@ -32,7 +40,7 @@ const FormFooter = ({
             className={classnames(hideCancelAppointmentClass)}
             onClick={onCancelAppointmentClick}
           >
-            Delete
+            Cancel Appointment
           </Button>
         </GridItem>
 
@@ -44,7 +52,7 @@ const FormFooter = ({
             Save Draft
           </Button>
           <Button onClick={onConfirmClick} color='primary'>
-            Confirm
+            {confirmBtnText}
           </Button>
         </GridItem>
       </GridContainer>
