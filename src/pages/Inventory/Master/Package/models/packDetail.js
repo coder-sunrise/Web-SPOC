@@ -25,6 +25,14 @@ export default createFormViewModel({
               currentId: query.uid,
             },
           })
+        } else {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              currentId: '',
+              entity: {},
+            },
+          })
         }
       })
     },

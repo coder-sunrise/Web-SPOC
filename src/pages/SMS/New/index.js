@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import Send from '@material-ui/icons/Send'
-import Email from '@material-ui/icons/Email'
+import MailIcon from '@material-ui/icons/Mail'
 import { FastField, withFormik } from 'formik'
 import { compose } from 'redux'
 import lodash from 'lodash'
+import Badge from '@material-ui/core/Badge'
 
 import {
   GridContainer,
@@ -14,10 +15,9 @@ import {
 } from '@/components'
 import { formatMessage } from 'umi/locale'
 
-const New = (props) => {
+const New = ({ values, onSend, setFieldValue, errors }) => {
   const [ messageNumber, setMessageNumber ] = useState(1)
   const [ messageArr, setMessageArr ] = useState([])
-  const { values, onSend, setFieldValue, errors } = props
   const SMSTemplate = [
     {
       name: 'Appointment Reminder',
@@ -45,6 +45,8 @@ const New = (props) => {
   const handleClick = () => {
     onSend(messageArr)
     setFieldValue('message', '')
+    setMessageNumber(1)
+    setMessageArr([])
   }
 
   const handleChange = ({ target }) => {
@@ -106,22 +108,21 @@ const New = (props) => {
           }}
         />
       </GridItem>
-      <GridItem md={2}>
+      <GridItem md={1}>
         {values.message ? values.message.length : 0}/160
       </GridItem>
-      <GridItem md={2}>
-        (<Email />
-        {messageNumber})
+      <GridItem md={11}>
+        <Badge badgeContent={messageNumber} color='primary'>
+          <MailIcon />
+        </Badge>
       </GridItem>
     </GridContainer>
   )
 }
 
 export default compose(
+  // withStyles(styles, { withTheme: true }),
   withFormik({
-    // validationSchema: Yup.object().shape({
-    //   message: Yup.string().max(160, 'Exceed Message Length'),
-    // }),
     mapPropsToValues: () => {},
   }),
   // React.memo,

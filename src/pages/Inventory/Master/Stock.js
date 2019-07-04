@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
+import { formatMessage } from 'umi/locale'
+
 import {
   CardContainer,
   GridContainer,
@@ -50,25 +52,46 @@ const Stock = ({ classes }) => {
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
           <FastField
-            name='CurrentStock'
+            name='currentStock'
             render={(args) => {
-              return <NumberInput label='Current Stock' {...args} />
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.currentStock',
+                  })}
+                  {...args}
+                />
+              )
             }}
           />
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='ReOrderThreshold'
+            name='reOrderThreshold'
             render={(args) => {
-              return <NumberInput label='Re-Order Threshold' {...args} />
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.reorderThreshold',
+                  })}
+                  {...args}
+                />
+              )
             }}
           />
         </GridItem>
         <GridItem xs={12} md={4}>
           <FastField
-            name='CriticalThreshold'
+            name='criticalThreshold'
             render={(args) => {
-              return <NumberInput label='Critical Threshold' {...args} />
+              return (
+                <NumberInput
+                  label={formatMessage({
+                    id: 'inventory.master.stock.criticalThreshold',
+                  })}
+                  {...args}
+                />
+              )
             }}
           />
         </GridItem>

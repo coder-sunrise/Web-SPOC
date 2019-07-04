@@ -9,7 +9,7 @@ import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
 import Stock from '../../Stock'
-import Setting from './Setting'
+import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
@@ -26,16 +26,23 @@ const Detail = ({
   vaccinationDetail,
   history,
   handleSubmit,
+  setFieldValue,
 }) => {
   const { currentTab } = vaccination
 
   const detailProps = {
     vaccinationDetail,
     dispatch,
+    setFieldValue,
+    showTransfer: false,
   }
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
+        <ProgressButton
+          submitKey='vaccinationDetail/submit'
+          onClick={handleSubmit}
+        />
         <Button
           color='danger'
           onClick={() => {
@@ -44,10 +51,6 @@ const Detail = ({
         >
           Cancel
         </Button>
-        <ProgressButton
-          submitKey='vaccinationDetail/submit'
-          onClick={handleSubmit}
-        />
       </div>
       <NavPills
         color='info'

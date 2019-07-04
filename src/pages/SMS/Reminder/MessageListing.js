@@ -1,23 +1,21 @@
 import React, { useState } from 'react'
-import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compose } from 'redux'
 import { Paper, Grid } from '@material-ui/core'
-import { GridContainer, GridItem } from '@/components'
+import { GridContainer } from '@/components'
 import {
   ThemeProvider,
   MessageList,
   Message,
   MessageText,
-  MessageGroup,
   Avatar,
   Row,
 } from '@livechat/ui-kit'
 
 import New from '../New'
 
-const styles = (theme) => ({
+const styles = () => ({
   messageBar: {
     height: '55vh',
   },
@@ -38,7 +36,6 @@ const styles = (theme) => ({
     borderImage: 'initial',
   },
   repliedMessage: {
-    // fontWeight: 'bold',
     marginBottom: '0.1em',
     backgroundColor: 'rgb(251, 251, 251)',
     borderTopLeftRadius: '1.4em',
@@ -52,7 +49,7 @@ const styles = (theme) => ({
   },
 })
 
-const MessageListing = (props) => {
+const MessageListing = ({ classes }) => {
   const [ list, setList ] = useState([
     {
       date: '2019-05-01 21:37',
@@ -127,11 +124,7 @@ const MessageListing = (props) => {
       id: 8,
     },
   ])
-
-  console.log('MessageListingRender')
-  const { classes } = props
   const renderMessages = (messages) => {
-    console.log('RenderMessagesRerender')
     let i = 0
     let messageCount = messages.length
     let m = []
@@ -139,7 +132,6 @@ const MessageListing = (props) => {
     while (i < messageCount) {
       let previous = messages[i - 1]
       let current = messages[i]
-      let next = messages[i + 1]
       let currentMoment = moment(current.date)
       let showTimestamp = true
 
@@ -196,7 +188,13 @@ const MessageListing = (props) => {
   }
   return (
     <ThemeProvider>
-      <GridContainer direction='column' spacing={8}>
+      <GridContainer
+        style={{
+          overflowY: 'auto',
+        }}
+        direction='column'
+        spacing={8}
+      >
         <Grid item>
           <Paper className={classes.messageBar}>
             <MessageList active>{renderMessages(list)}</MessageList>

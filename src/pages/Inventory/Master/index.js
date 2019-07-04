@@ -30,12 +30,12 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
       contentStyle={{ margin: '0 -5px' }}
       tabs={[
         {
-          tabButton: 'Consumable',
-          tabContent: <Consumable {...componentProps} />,
-        },
-        {
           tabButton: 'Medication',
           tabContent: <Medication {...componentProps} />,
+        },
+        {
+          tabButton: 'Consumable',
+          tabContent: <Consumable {...componentProps} />,
         },
         {
           tabButton: 'Vaccination',

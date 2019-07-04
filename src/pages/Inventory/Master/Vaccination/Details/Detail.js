@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
+import { formatMessage } from 'umi/locale'
 import { FastField } from 'formik'
 import { connect } from 'dva'
 import { compose } from 'redux'
@@ -43,7 +44,14 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='Code'
                 render={(args) => {
-                  return <TextField label='Vaccination Code' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.vaccination.code',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -51,7 +59,14 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='Name'
                 render={(args) => {
-                  return <TextField label='Vaccination Name' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.vaccination.name',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -59,16 +74,30 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='Description'
                 render={(args) => {
-                  return <TextField label='Description' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.vaccination.description',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='Remark'
+                name='Remarks'
                 render={(args) => {
                   return (
-                    <TextField label='Remark' multiline rowsMax='5' {...args} />
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.vaccination.remarks',
+                      })}
+                      multiline
+                      rowsMax='5'
+                      {...args}
+                    />
                   )
                 }}
               />
@@ -79,7 +108,9 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
                 render={(args) => {
                   return (
                     <Checkbox
-                      prefix='Enable Retail'
+                      prefix={formatMessage({
+                        id: 'inventory.master.vaccination.enableRetail',
+                      })}
                       isSwitch
                       colon={false}
                       // controlStyle={{ marginLeft: 200 }}
@@ -93,7 +124,14 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='SDDID'
                 render={(args) => {
-                  return <TextField label='SDD ID' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.vaccination.sddID',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -102,17 +140,15 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
                 name='SDDDescription'
                 render={(args) => {
                   return (
-                    <Select label='SDD Description' options={[]} {...args} />
+                    <Select
+                      label={formatMessage({
+                        id: 'inventory.master.vaccination.sddDescription',
+                      })}
+                      options={[]}
+                      {...args}
+                    />
                   )
                 }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='Vaccination'
-                render={(args) => (
-                  <Select label='Vaccination' options={[]} {...args} />
-                )}
               />
             </GridItem>
           </GridContainer>
@@ -124,7 +160,13 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='Supplier'
                 render={(args) => (
-                  <Select label='Supplier' options={[]} {...args} />
+                  <Select
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.supplier',
+                    })}
+                    options={[]}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -132,7 +174,13 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='VaccinationGroup'
                 render={(args) => (
-                  <Select label='Vaccination Group' options={[]} {...args} />
+                  <Select
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.vaccinationGroup',
+                    })}
+                    options={[]}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -140,7 +188,13 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='RevenueCategory'
                 render={(args) => (
-                  <Select label='Revenue Category' options={[]} {...args} />
+                  <Select
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.revenueCategory',
+                    })}
+                    options={[]}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -148,7 +202,12 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='EffectiveStartDate'
                 render={(args) => (
-                  <DatePicker label='Effective Start Date' {...args} />
+                  <DatePicker
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.effectiveStartDate',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -156,7 +215,25 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
               <FastField
                 name='EffectiveEndDate'
                 render={(args) => (
-                  <DatePicker label='Effective End Date' {...args} />
+                  <DatePicker
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.effectiveEndDate',
+                    })}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='EffectiveEndDate'
+                render={(args) => (
+                  <DatePicker
+                    label={formatMessage({
+                      id: 'inventory.master.vaccination.effectiveEndDate',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -170,6 +247,7 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
 
 export default compose(
   withStyles(styles, { withTheme: true }),
+  React.memo,
   connect(({ vaccinationDetail }) => ({
     vaccinationDetail,
   })),

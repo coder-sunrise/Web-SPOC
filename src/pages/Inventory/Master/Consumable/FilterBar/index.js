@@ -161,4 +161,5 @@ export default compose(
   withFormik({
     mapPropsToValues: () => {},
   }),
+  React.memo,
 )(FilterBar)

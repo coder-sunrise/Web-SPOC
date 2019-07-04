@@ -1,13 +1,8 @@
-import React, { PureComponent, useState } from 'react'
-import { connect } from 'dva'
-import { FormattedMessage, formatMessage } from 'umi/locale'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Paper } from '@material-ui/core'
-import { compare } from '@/layouts'
-import { getAppendUrl } from '@/utils/utils'
 import { compose } from 'redux'
 import MessageListing from './Reminder/MessageListing'
-import { CommonModal, Button, CommonHeader, CardContainer } from '@/components'
+import { CommonModal, CardContainer } from '@/components'
 import Grid from './Grid'
 import New from './New'
 import FilterBar from './FilterBar'
@@ -18,9 +13,8 @@ const styles = {
   },
 }
 
-const SMS = (props) => {
+const SMS = ({ classes }) => {
   const [ showMessageModal, setShowMessageModal ] = useState(false)
-  const { classes } = props
   const newMessageProps = {
     onSend: (value) => {
       console.log(value)
@@ -62,7 +56,6 @@ const SMS = (props) => {
       <CommonModal
         open={showMessageModal}
         title='Send SMS'
-        maxWidth='sm'
         onClose={() => setShowMessageModal(false)}
         onConfirm={() => setShowMessageModal(true)}
         showFooter={false}

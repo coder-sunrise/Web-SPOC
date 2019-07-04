@@ -1,10 +1,9 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Search, Add } from '@material-ui/icons'
+import { Search } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
 import { compose } from 'redux'
 
 import {
@@ -31,9 +30,7 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = (props) => {
-  const { classes, theme, dispatch, values } = props
-
+const FilterBar = ({ classes }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>

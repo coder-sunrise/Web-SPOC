@@ -2,28 +2,23 @@ import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
-import { withFormik, FastField } from 'formik'
-import Yup from '@/utils/yup'
+import { formatMessage } from 'umi/locale'
+import { FastField } from 'formik'
 import { compose } from 'redux'
 
 import {
   CodeSelect,
   CardContainer,
   TextField,
-  Button,
   GridContainer,
   GridItem,
-  Select,
   DatePicker,
-  ProgressButton,
   Checkbox,
 } from '@/components'
 
 const styles = () => ({})
 
-const Detail = (props) => {
-  const { packDetail, dispatch } = props
-  const submitKey = `packDetail/submit`
+const Detail = ({ packDetail, dispatch }) => {
   useEffect(() => {
     if (packDetail.currentId) {
       dispatch({
@@ -50,7 +45,14 @@ const Detail = (props) => {
               <FastField
                 name='code'
                 render={(args) => {
-                  return <TextField label='Package Code' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.package.code',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -58,7 +60,14 @@ const Detail = (props) => {
               <FastField
                 name='displayValue'
                 render={(args) => {
-                  return <TextField label='Package Name' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.package.name',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
@@ -66,16 +75,30 @@ const Detail = (props) => {
               <FastField
                 name='description'
                 render={(args) => {
-                  return <TextField label='Description' {...args} />
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.package.description',
+                      })}
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='remark'
+                name='remarks'
                 render={(args) => {
                   return (
-                    <TextField label='Remark' multiline rowsMax='5' {...args} />
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.master.package.remarks',
+                      })}
+                      multiline
+                      rowsMax='5'
+                      {...args}
+                    />
                   )
                 }}
               />
@@ -86,7 +109,9 @@ const Detail = (props) => {
                 render={(args) => {
                   return (
                     <Checkbox
-                      prefix='Orderable'
+                      prefix={formatMessage({
+                        id: 'inventory.master.package.orderable',
+                      })}
                       isSwitch
                       colon={false}
                       {...args}
@@ -104,7 +129,12 @@ const Detail = (props) => {
               <FastField
                 name='effectiveStartDate'
                 render={(args) => (
-                  <DatePicker label='Effective Start Date' {...args} />
+                  <DatePicker
+                    label={formatMessage({
+                      id: 'inventory.master.package.effectiveStartDate',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -112,7 +142,12 @@ const Detail = (props) => {
               <FastField
                 name='effectiveEndDate'
                 render={(args) => (
-                  <DatePicker label='Effective End Date' {...args} />
+                  <DatePicker
+                    label={formatMessage({
+                      id: 'inventory.master.package.effectiveEndDate',
+                    })}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
@@ -120,49 +155,13 @@ const Detail = (props) => {
         </GridItem>
       </GridContainer>
       <Divider style={{ margin: '40px 0 20px 0' }} />
-      <div style={{ textAlign: 'center' }}>
-        <Button
-          color='danger'
-          onClick={() => {
-            props.history.push('/inventory/master?t=1')
-          }}
-        >
-          Cancel
-        </Button>
-        <ProgressButton submitKey={submitKey} onClick={props.handleSubmit} />
-      </div>
     </CardContainer>
   )
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ packDetail }) => ({
-    packDetail,
+  React.memo,
+  connect(({ vaccinationDetail }) => ({
+    vaccinationDetail,
   })),
-  withFormik({
-    enableReinitialize: true,
-    mapPropsToValues: ({ packDetail }) => {
-      return packDetail.entity ? packDetail.entity : {}
-    },
-    validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
-      displayValue: Yup.string().required(),
-      effectiveStartDate: Yup.string().required(),
-      effectiveEndDate: Yup.string().required(),
-    }),
-    handleSubmit: (values, { props }) => {
-      const { dispatch } = props
-      // dispatch({
-      //   type: `${modelType}/submit`,
-      //   payload: test,
-      // }).then((r) => {
-      //   if (r.message === 'Ok') {
-      //     notification.success({
-      //       message: 'Done',
-      //     })
-      //   }
-      // })
-    },
-    displayName: 'InventoryPackageDetail',
-  }),
 )(Detail)
