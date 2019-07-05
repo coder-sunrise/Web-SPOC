@@ -78,7 +78,7 @@ class NavPills extends React.Component {
               {...icon}
               classes={{
                 root: pillsClasses,
-                labelContainer: classes.labelContainer,
+                // labelContainer: classes.labelContainer,
                 label: classes.label,
                 selected: classes[color],
               }}

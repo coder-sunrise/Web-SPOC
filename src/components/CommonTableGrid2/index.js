@@ -510,7 +510,7 @@ class CommonTableGrid2 extends React.Component {
     newColumExtensions.forEach((c) => {
       c.validationSchema = schema
       c.gridId = this.gridId
-      if (c.type === 'number') {
+      if (c.type === 'number' || c.type === 'currency') {
         if (!c.align) {
           c.align = 'right'
         }

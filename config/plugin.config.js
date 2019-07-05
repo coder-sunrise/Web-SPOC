@@ -148,6 +148,7 @@ export default (config) => {
         'medisys-model': path.resolve(srcDir, 'utils/model/'),
         'medisys-util': path.resolve(srcDir, 'utils/cdrss/'),
         utils: path.resolve(srcDir, 'utils/utils/'),
+        'medisys-components': path.resolve(srcDir, 'components/_medisys/'),
       },
     },
     // entry: {

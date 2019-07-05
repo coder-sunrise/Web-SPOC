@@ -217,16 +217,16 @@ const routes = [
             exact: true,
           },
           {
-            path: '/finance/invoice/:id',
+            path: '/finance/invoice/:invoiceNo',
             name: 'invoice/detail',
             hideInMenu: true,
-            component: './Finance/Invoice/Detail',
+            component: './Finance/Invoice/Details',
           },
           {
             path: '/finance/note',
             name: 'credit/debitnote',
             hideInMenu: true,
-            component: './Finance/CreditDebitNote',
+            // component: './Finance/CreditDebitNote',
             mini: 'CD',
           },
           {
@@ -234,26 +234,26 @@ const routes = [
             name: 'corporate-billing',
             mini: 'CB',
             exact: true,
-            component: './Finance/CorporateBilling',
+            // component: './Finance/CorporateBilling',
           },
           {
             path: '/finance/billing/:companyName',
             name: 'corporate-billing/detail',
             hideInMenu: true,
-            component:
-              './Finance/CorporateBilling/Detail/CorporateBillingDetail',
+            // component:
+            //   './Finance/CorporateBilling/Detail/CorporateBillingDetail',
           },
           {
             path: '/finance/deposit',
             name: 'deposit',
             mini: 'DP',
-            component: './Finance/Deposit',
+            // component: './Finance/Deposit',
           },
           {
             path: '/finance/deposit/:depositNo',
             name: 'invoice/detail',
             hideInMenu: true,
-            component: './Finance/Deposit/Detail/index.js',
+            // component: './Finance/Deposit/Detail/index.js',
           },
           {
             path: '/finance/statement',

@@ -37,7 +37,7 @@ export default {
   'menu.account.logout': 'Logout',
 
   'menu.finance': 'Finance',
-  'menu.finance.invoice/list': 'Invoice / Payment',
+  'menu.finance.invoice/list': 'Invoice/Payment',
   'menu.finance.invoice/detail': 'Invoice',
   'menu.finance.deposit': 'Deposit',
   'menu.finance.doctor-expense': 'Doctor Expense',
