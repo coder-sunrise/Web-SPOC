@@ -102,8 +102,8 @@ export default {
   'finance.scheme.search.name': 'Scheme Name',
   'finance.scheme.search.type': 'Scheme Type',
   'finance.scheme.search.category': 'Scheme Category',
-  'finance.scheme.search.cpname': 'Co-Pyaer Name',
-  'finance.scheme.search.cptype': 'Co-Pyaer Type',
+  'finance.scheme.search.cpname': 'Co-Payer Name',
+  'finance.scheme.search.cptype': 'Co-Payer Type',
   'finance.scheme.search.status': 'Status',
   // Finance -> Credit/Debit Note (cdnote)
   'finance.cdNote.title': 'Credit / Debit Note',
