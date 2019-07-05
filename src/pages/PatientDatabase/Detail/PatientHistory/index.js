@@ -5,14 +5,10 @@ import * as Yup from 'yup'
 
 import { withStyles } from '@material-ui/core'
 
-import schemesModal from '../models/schemes'
-import payersModal from '../models/payers'
-
-import {  CardContainer, CommonHeader, GridContainer, GridItem } from '@/components'
+import { CardContainer, CommonHeader, GridContainer, GridItem } from '@/components'
+import PatientHistory from '@/pages/Widgets/PatientHistory'
 
 
-window.g_app.replaceModel(schemesModal)
-window.g_app.replaceModel(payersModal)
 
 const styles = () => ({
   container: {
@@ -23,32 +19,20 @@ const styles = () => ({
   },
 })
 
-@connect(({ schemes, payers }) => {
-  return ({
-    schemes,
-    payers,
-  })
-})
 
-class PatientHistory extends PureComponent {
-  state = {
-    height: 100,
-  }
 
-  componentDidMount () {
+class History extends PureComponent {
+
+  componentDidMount() {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  onReset () {
-    console.log('Schemes-onReset', this)
-  }
-
-  resize () {
+  resize() {
     if (this.divElement) {
       const height = this.divElement.clientHeight
       if (height > 0) {
@@ -57,19 +41,13 @@ class PatientHistory extends PureComponent {
     }
   }
 
-  render () {
-    const { classes, schemes, payers, dispatch } = this.props
-    const { height } = this.state
-
+  render() {
     return (
-      <CardContainer title={this.titleComponent} hideHeader>
-      <GridContainer
-alignItems='flex-start'>
-</GridContainer>
-</CardContainer>
+      <PatientHistory {...this.props}></PatientHistory>
+
     )
   }
 }
 
-export default withStyles(styles, { withTheme: true })(PatientHistory)
+export default withStyles(styles, { withTheme: true })(History)
 

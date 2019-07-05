@@ -100,6 +100,30 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
+      {
+        id: '5',
+        name: 'AppointmentHistory',
+        component: Loadable({
+          loader: () => import('./AppointmentHistory'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...props} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '6',
+        name: 'PatientHistory',
+        component: Loadable({
+          loader: () => import('./PatientHistory'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...props} />
+          },
+          loading: Loading,
+        }),
+      },
     ]
   }
 
