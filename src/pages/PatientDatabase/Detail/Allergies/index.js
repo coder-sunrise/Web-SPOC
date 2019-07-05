@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { withFormik, FastField,Field } from 'formik'
+import { withFormik, FastField, Field } from 'formik'
 import * as Yup from 'yup'
 import { withStyles } from '@material-ui/core'
 import { notification, Checkbox, CardContainer, CommonHeader, Select, GridContainer, GridItem } from '@/components'
@@ -126,24 +126,26 @@ class Allergies extends PureComponent {
 
   render() {
     const { height } = this.state
-    const { classes, allergy, dispatch, patient,values, ...restProps } = this.props
+    const { classes, allergy, dispatch, patient, values, ...restProps } = this.props
 
-     console.log('allergy render')
-     console.log(values)
+    if (values.patientAllergyMetaData.length > 0) {
+      values.patientAllergyMetaData[0].noAllergies == true ? this.setState({ isGridEditable: false }) : this.setState({ isGridEditable: true })
+    }
+    console.log('allergy render')
+    console.log(values)
     return (
       <CardContainer title={this.titleComponent} hideHeader>
         <GridContainer
           alignItems='flex-start'>
           <GridItem xs md={12}>
             <Field
-              name='HasAllergy'
+              name='patientAllergyMetaData[0].noAllergies'
               render={(args) => {
                 return (
                   <Checkbox
-                    disabled = {values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'Allergy').length > 0}
+                    disabled={values.patientAllergy.filter((o) => !o.isDeleted && o.type == 'Allergy').length > 0}
                     simple
                     label={"This patient doesn't has any allergy"}
-                    onChange={this.onChangeOfCheckBox.bind(this)}
                     {...args}
                   />
 
@@ -153,13 +155,13 @@ class Allergies extends PureComponent {
           </GridItem>
           <GridItem xs md={3} style={{ marginTop: -10 }}>
             <FastField
-              name='G6PD'
+              name='patientAllergyMetaData[0].isG6PDConfirmed'
               render={(args) => (
                 <Select
                   {...args}
                   options={[
-                    { name: 'Yes', value: 1 },
-                    { name: 'No', value: 0 },
+                    { name: 'Yes', value: true },
+                    { name: 'No', value: false },
                   ]}
                   label={"G6PD Deficiency"}
                 />
@@ -168,49 +170,51 @@ class Allergies extends PureComponent {
           </GridItem>
 
           <GridItem xs md={12}>  <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
-            Allergy
+            Drug Allergy
             </h4></GridItem>
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
-              rows={values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'Allergy')}
+              rows={values.patientAllergy.filter((o) => !o.isDeleted && o.type == 'Allergy')}
               type='Allergy'
               title='Allergy'
               height={height}
               values={values}
-              patient = {patient}
+              patient={patient}
               onSaveClick={this.onSaveClick.bind(this)}
               isEditable={this.state.isGridEditable}
-              setArrayValue = {(items)=>{
-                let vals = Array.from(values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'NonAllergy'))
+              setArrayValue={(items) => {
+                let vals = Array.from(values.patientAllergy.filter((o) => !o.isDeleted && o.type == 'NonAllergy'))
                 vals = vals.concat(items)
-                this.props.setFieldValue('patientAllergy',vals)}
-              
+                this.props.setFieldValue('patientAllergy', vals)
               }
-              tableParas = {this.tableParas_Allergy}
+
+              }
+              tableParas={this.tableParas_Allergy}
               {...restProps}
             />
           </GridItem>
 
           <GridItem xs md={12}>  <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
-            Medical Alert
+            Non-Drug Allergy
             </h4></GridItem>
 
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
-              rows={values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'NonAllergy')}
+              rows={values.patientAllergy.filter((o) => !o.isDeleted && o.type == 'NonAllergy')}
               type='NonAllergy'
               title='Medical Alert'
               height={height}
               values={values}
-              patient = {patient}
+              patient={patient}
               isEditable={true}
-              setArrayValue = {(items)=>{
-                let vals = Array.from(values.patientAllergy.filter((o) => !o.isDeleted&&o.type == 'Allergy'))
+              setArrayValue={(items) => {
+                let vals = Array.from(values.patientAllergy.filter((o) => !o.isDeleted && o.type == 'Allergy'))
                 vals = vals.concat(items)
-                this.props.setFieldValue('patientAllergy',vals)}
-              
+                this.props.setFieldValue('patientAllergy', vals)
               }
-              tableParas = {this.tableParas_Alert}
+
+              }
+              tableParas={this.tableParas_Alert}
               {...restProps}
             />
           </GridItem>
