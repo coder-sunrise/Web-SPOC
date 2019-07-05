@@ -94,6 +94,13 @@ const customInputStyle = {
   labelRootSuccess: {
     color: `${successColor} !important`,
   },
+  required: {
+    top: -2,
+    position: 'relative',
+    left: 5,
+    fontSize: '0.8em',
+    color: 'red',
+  },
   formControl: {
     position: 'relative',
     verticalAlign: 'unset',

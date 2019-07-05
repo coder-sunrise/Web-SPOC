@@ -291,7 +291,7 @@ class CommonTableGrid2 extends React.Component {
         ...sizeConfig[props.size || 'md'],
       },
     })
-    console.log(this.theme)
+    // console.log(this.theme)
     // this.search()
     // console.log(props.query, ' c grid')
   }
@@ -403,6 +403,7 @@ class CommonTableGrid2 extends React.Component {
       ],
       columns = [],
       entity,
+      type,
       rows,
       TableCell = DefaultTableCell,
       columnExtensions = [],
@@ -598,7 +599,7 @@ class CommonTableGrid2 extends React.Component {
 
             {grouping && <IntegratedGrouping />}
             {/* <IntegratedFiltering /> */}
-            {sort && <IntegratedSorting />}
+            {sort && !type && <IntegratedSorting />}
             {summary && <IntegratedSummary {...summaryConfig.integrated} />}
             {pager && !entity && <IntegratedPaging />}
             {pager &&

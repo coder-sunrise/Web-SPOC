@@ -5,7 +5,6 @@ import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import { orderTypes } from '@/utils/codes'
 import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
-
 import {
   Button,
   CommonHeader,
@@ -27,11 +26,13 @@ import {
   SizeContainer,
   RichEditor,
 } from '@/components'
+import { currencySymbol } from '@/utils/config'
 
 import Medication from './Medication'
 import Vaccination from './Vaccination'
 import Service from './Service'
 import Consumable from './Consumable'
+import Adjustment from './Adjustment'
 // import Others from './Others'
 
 const styles = (theme) => ({
@@ -91,20 +92,18 @@ const styles = (theme) => ({
   displayName: 'Details',
 })
 class Details extends PureComponent {
-  toggleModal = () => {
-    const { orders } = this.props
-    const { showModal } = orders
+  state = {
+    showModal: false,
+  }
 
-    this.props.dispatch({
-      type: 'orders/updateState',
-      payload: {
-        showModal: !showModal,
-      },
-    })
+  toggleModal = () => {
+    this.setState((prevState) => ({
+      showModal: !prevState.showModal,
+    }))
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     const { theme, classes, orders, values, rowHeight, footer } = props
     console.log(props)
     const cfg = props
@@ -140,13 +139,27 @@ class Details extends PureComponent {
 
           <Divider />
           <div className={classnames(classes.footer)}>
-            <Button link style={{ float: 'left' }}>
-              $ Adjustment
+            <Button link style={{ float: 'left' }} onClick={this.toggleModal}>
+              {currencySymbol} Adjustment
             </Button>
             <Button color='danger'>Cancel</Button>
 
             <Button color='primary'>Save</Button>
           </div>
+          <CommonModal
+            open={state.showModal}
+            title='Adjustment'
+            onClose={this.toggleModal}
+            onConfirm={this.toggleModal}
+            maxWidth='sm'
+            bodyNoPadding
+            // showFooter=
+            // footProps={{
+            //   confirmBtnText: 'Save',
+            // }}
+          >
+            <Adjustment {...this.props} />
+          </CommonModal>
         </div>
       </div>
     )

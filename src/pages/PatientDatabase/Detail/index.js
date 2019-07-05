@@ -156,6 +156,12 @@ class PatientDetail extends PureComponent {
     if (navigator.platform.indexOf('Win') > -1 && ps) {
       ps.destroy()
     }
+    this.props.dispatch({
+      type: 'patient/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
   }
 
   filterList = (item) => {

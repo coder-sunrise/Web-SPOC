@@ -117,6 +117,10 @@ class BasicLayout extends React.PureComponent {
       this.menus = menus
       this.forceUpdate()
     })
+
+    dispatch({
+      type: 'global/getUserSettings',
+    }).then((response) => {})
   }
 
   // componentDidMount () {
@@ -328,6 +332,7 @@ class BasicLayout extends React.PureComponent {
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
+    // console.log(loading)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
