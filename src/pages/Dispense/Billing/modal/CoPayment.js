@@ -88,7 +88,6 @@ class CoPayment extends Component {
               columnExtensions={CoPaymentColExtensions}
               onRowDoubleClick={this.onRowDoubleClick}
               EditingProps={{
-                showAddCommand: true,
                 editingRowIds: this.state.editingRowIds,
                 rowChanges: this.state.rowChanges,
                 onEditingRowIdsChange: this.changeEditingRowIds,
