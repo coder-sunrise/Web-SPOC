@@ -217,7 +217,7 @@ const routes = [
             exact: true,
           },
           {
-            path: '/finance/invoice/:id',
+            path: '/finance/invoice/:invoiceNo',
             name: 'invoice/detail',
             hideInMenu: true,
             component: './Finance/Invoice/Details',

@@ -7,6 +7,7 @@ import Printer from '@material-ui/icons/Print'
 import { Button, NavPills } from '@/components'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
+import PaymentDetails from './PaymentDetails'
 // styling
 import styles from './styles'
 
@@ -14,7 +15,7 @@ const Content = ({ classes }) => {
   const [
     active,
     setActive,
-  ] = useState(0)
+  ] = useState(1)
 
   const onTabChange = (event, activeTab) => {
     setActive(activeTab)
@@ -36,7 +37,7 @@ const Content = ({ classes }) => {
         onChange={onTabChange}
         tabs={[
           { tabButton: 'Invoice', tabContent: <InvoiceDetails /> },
-          { tabButton: 'Payment', tabContent: <div>Payment</div> },
+          { tabButton: 'Payment', tabContent: <PaymentDetails /> },
         ]}
       />
     </React.Fragment>
