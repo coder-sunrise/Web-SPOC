@@ -34,6 +34,7 @@ const PaymentCard = ({
     { ...DefaultPaymentInfo },
     { ...DefaultPaymentInfo },
   ],
+  actions,
 }) => {
   return (
     <CardContainer hideHeader>
@@ -48,7 +49,7 @@ const PaymentCard = ({
       </CardContainer>
       <GridContainer alignItems='center'>
         <GridItem md={7}>
-          <PaymentActions type={payerType} />
+          <PaymentActions type={payerType} {...actions} />
         </GridItem>
         <GridItem
           md={5}

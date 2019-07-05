@@ -15,7 +15,7 @@ const Content = ({ classes }) => {
   const [
     active,
     setActive,
-  ] = useState(1)
+  ] = useState(0)
 
   const onTabChange = (event, activeTab) => {
     setActive(activeTab)
