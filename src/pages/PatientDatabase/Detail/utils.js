@@ -34,50 +34,39 @@ module.exports = {
     }
   },
   handleSubmit: (values, component) => {
-    const { props, setValues } = component
-    console.log(values)
+    const { props, setValues, onConfirm } = component
+    const { dispatch, history, patient } = props
     // return
-    props
-      .dispatch({
-        type: 'patient/upsert',
-        payload: values,
-      })
-      .then((r) => {
-        // console.log(r)
-        // console.debug(123)
-        if (r) {
-          notification.success({
-            // duration:0,`
-            message: r.id ? 'Created' : 'Saved',
-          })
-
-          if (r.id) {
-            props.history.push(
-              getRemovedUrl(
-                [
-                  'new',
-                ],
-                getAppendUrl({
-                  pid: r.id,
-                }),
-              ),
-            )
-          } else {
-            props
-              .dispatch({
-                type: 'patient/query',
-                payload: {
-                  id: props.patient.currentId,
-                },
-              })
-              .then((value) => {
-                // console.log(value)
-                setValues(value)
-              })
-          }
-          if (props.onConfirm) props.onConfirm()
+    dispatch({
+      type: 'patient/upsert',
+      payload: values,
+    }).then((r) => {
+      // console.log(r)
+      // console.debug(123)
+      if (r) {
+        if (r.id) {
+          history.push(
+            getRemovedUrl(
+              [
+                'new',
+              ],
+              getAppendUrl({
+                pid: r.id,
+              }),
+            ),
+          )
         }
-      })
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: r.id || patient.entity.id,
+          },
+        }).then((value) => {
+          setValues(value)
+        })
+        if (onConfirm) onConfirm()
+      }
+    })
   },
 
   getFooter: ({

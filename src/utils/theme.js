@@ -15,7 +15,7 @@ import {
 } from 'mui-pro-jss'
 
 const defaultFontSize = '1rem'
-const smallFontSize = '0.9rem'
+const smallFontSize = '0.85rem'
 const largeFontSize = '1.2rem'
 
 const defaultIconWidth = '1.2rem'
@@ -242,8 +242,8 @@ export const defaultTheme = createMuiTheme({
           marginRight: 28,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '23px',
-          lineHeight: '22px',
+          height: '25px',
+          lineHeight: '24px',
         },
         '& .Mui-disabled .anticon': {
           display: 'none',
@@ -364,7 +364,7 @@ export const smallTheme = createMuiTheme({
         '& .ant-select': {
           fontSize: smallFontSize,
           minHeight: 20,
-          padding: '1px 0 0px',
+          // padding: '1px 0 0px',
         },
         '& .ant-input-number, .ant-time-picker': {
           fontSize: smallFontSize,
@@ -394,14 +394,14 @@ export const smallTheme = createMuiTheme({
         //   paddingTop: 3,
         // },
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
-          height: '21px !important',
+          height: '22px !important',
           overflowY: 'auto',
           overflowX: 'hidden',
           marginRight: 27,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '20px',
-          lineHeight: '20px',
+          height: '22px',
+          lineHeight: '22px',
           marginTop: 0,
         },
       },
@@ -520,7 +520,7 @@ export const largeTheme = createMuiTheme({
         '& .ant-select': {
           fontSize: largeFontSize,
           minHeight: 25,
-          padding: '3px 0 0px',
+          // padding: '3px 0 0px',
         },
         '& .ant-input-number, .ant-time-picker': {
           fontSize: largeFontSize,
@@ -547,14 +547,14 @@ export const largeTheme = createMuiTheme({
           fontSize: largeFontSize,
         },
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
-          height: '28px !important',
+          height: '30px !important',
           overflowY: 'auto',
           overflowX: 'hidden',
           marginRight: 30,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '23px',
-          lineHeight: '22px',
+          height: '27px',
+          lineHeight: '26px',
         },
       },
       input: {

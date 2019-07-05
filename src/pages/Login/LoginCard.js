@@ -184,7 +184,6 @@ class LoginCard extends PureComponent {
                   icon={<LockOpen />}
                   block
                   color='rose'
-                  size='lg'
                   onClick={this.onEnterPressed}
                 />
               </CardFooter>

@@ -186,7 +186,7 @@ class ControlTest extends PureComponent {
 
   render () {
     const { props, state } = this
-    const { classes, ...resetProps } = this.props
+    const { classes, theme, ...resetProps } = this.props
     console.log(this.props)
     const testConfig = {
       onFocus: (e) => {
@@ -222,7 +222,7 @@ class ControlTest extends PureComponent {
       },
     }
     const testComponents = (
-      <React.Fragment>
+      <div style={{ marginBottom: theme.spacing(5) }}>
         <GridContainer>
           <GridItem sm={3}>
             <FastField
@@ -329,7 +329,7 @@ class ControlTest extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem sm={6}>
+          <GridItem sm={3}>
             <FastField
               name='doctorRadio'
               render={(args) => (
@@ -351,6 +351,18 @@ class ControlTest extends PureComponent {
                     // })
                   }}
                   // labelClass={}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='numberField'
+              render={(args) => (
+                <TextField
+                  prefix='External Prescription'
+                  label='Text Input'
                   {...args}
                 />
               )}
@@ -417,7 +429,7 @@ class ControlTest extends PureComponent {
           </GridItem>
         </GridContainer>
         <Divider />
-      </React.Fragment>
+      </div>
     )
     return (
       <CardContainer
@@ -428,59 +440,10 @@ class ControlTest extends PureComponent {
         }}
         title={this.title}
       >
-        <BaseInput label='BaseInput' {...testConfig} />
-        <FastField
-          name='doctorRemarks'
-          render={(args) => (
-            <TextField
-              label='Remark'
-              multiline
-              rowsMax={4}
-              {...testConfig}
-              {...args}
-            />
-          )}
-        />
         <SizeContainer size='lg'>{testComponents}</SizeContainer>
-
         {testComponents}
         <SizeContainer size='sm'>{testComponents}</SizeContainer>
 
-        <RadioGroup
-          label='Ttest'
-          defaultValue='1'
-          options={[
-            {
-              value: '1',
-              label: 'Mailing Address',
-            },
-            {
-              value: '2',
-              label: 'Primary Address',
-            },
-          ]}
-        />
-        <FastField
-          name='rd0'
-          render={(args) => (
-            <RadioGroup
-              label=' '
-              simple
-              defaultValue='1'
-              options={[
-                {
-                  value: '1',
-                  label: 'Mailing Address',
-                },
-                {
-                  value: '2',
-                  label: 'Primary Address',
-                },
-              ]}
-              {...args}
-            />
-          )}
-        />
         <div>
           <Button
             onClick={() => {

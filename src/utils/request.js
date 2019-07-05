@@ -38,42 +38,6 @@ export function updateAPIType (type) {
   }
 }
 
-const checkStatus = async (response) => {
-  // console.log(response)
-
-  if (response.status >= 200 && response.status < 300) {
-    return response
-  }
-  let returnObj = {
-    title: codeMessage[response.status],
-  }
-
-  let isJson = false
-  try {
-    returnObj = await response.json()
-    isJson = true
-  } catch (error) {}
-  const errortext = returnObj.title || returnObj.message
-  notification.destroy()
-  notification.error({
-    message: (
-      <div>
-        <h4>
-          {errortext}: {response.url}
-        </h4>
-        {JSON.stringify(returnObj.errors)}
-      </div>
-    ),
-    duration: 5000,
-  })
-
-  const error = new Error(errortext)
-  error.isJson = isJson
-  error.name = response.status
-  error.response = response
-  throw error
-}
-
 const showErrorNotification = (header, message) => {
   notification.destroy()
   notification.error({
@@ -284,10 +248,18 @@ export default function request (url, option) {
         let payload = {}
         if (response) {
           try {
+            updateLoadingState()
+
             let returnObj = {
               title: codeMessage[response.status],
             }
-
+            if (response.status === 401) {
+              /* eslint-disable no-underscore-dangle */
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+              })
+              return false
+            }
             let isJson = false
             try {
               returnObj = response
@@ -296,7 +268,6 @@ export default function request (url, option) {
             const errortext =
               returnObj.title || returnObj.message || returnObj.statusText
             notification.destroy()
-            updateLoadingState()
             notification.error({
               message: (
                 <div>

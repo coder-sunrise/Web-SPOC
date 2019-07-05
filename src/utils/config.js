@@ -29,6 +29,7 @@
   }
 }
 const proxyPrefix = '/api/v2'
+const userSetting = JSON.parse(localStorage.getItem('userSettings')) || {}
 module.exports = {
   name: 'CDRSS (BETA) [UAT]',
   prefix: 'cdr',
@@ -212,4 +213,8 @@ module.exports = {
     },
     remote: remoteValidator,
   },
+  currencyFormat: '0,0.00',
+  currencySymbol: '$',
+  qtyFormat: '0.0',
+  ...userSetting,
 }

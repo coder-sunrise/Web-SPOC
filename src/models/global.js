@@ -1,6 +1,6 @@
 import { queryNotices } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
-
+import config from '@/utils/config'
 // console.log(
 //   localStorage.getItem('menuCollapsed') !== undefined,
 //   Boolean(localStorage.getItem('menuCollapsed')),
@@ -19,6 +19,7 @@ export default createFormViewModel({
           ? localStorage.getItem('menuCollapsed') === '1'
           : true,
       notices: [],
+      currencySymbol: '$',
     },
     setting: {
       skipDefaultListen: true,
@@ -106,6 +107,21 @@ export default createFormViewModel({
           type: 'updateState',
           payload: {
             collapsed: payload,
+          },
+        })
+      },
+      *getUserSettings ({ payload }, { put, select }) {
+        localStorage.setItem('menuCollapsed', payload ? 1 : 0)
+        const mockUserConfig = {
+          currencySymbol: 'USD',
+        }
+        if (config.currencySymbol !== mockUserConfig.currencySymbol) {
+          localStorage.setItem('userSettings', JSON.stringify(mockUserConfig))
+        }
+        yield put({
+          type: 'updateState',
+          payload: {
+            ...mockUserConfig,
           },
         })
       },

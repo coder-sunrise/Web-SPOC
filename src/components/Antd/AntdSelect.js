@@ -7,7 +7,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import Input from '@material-ui/core/Input'
 
 // ant
-import { Select } from 'antd'
+import { Select, Spin } from 'antd'
 import AntdWrapper from './AntdWrapper'
 import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
 
@@ -34,6 +34,9 @@ const STYLES = () => {
       },
       '& .ant-select-selection': {
         background: 'none',
+      },
+      '& .ant-select-selection-selected-value': {
+        height: 40,
       },
       '& .ant-select-selection__rendered': {
         lineHeight: 'inherit',
@@ -91,18 +94,32 @@ class AntdSelect extends React.PureComponent {
     this.state = {
       shrink: false,
       value: form && field ? field.value : props.value || props.defaultValue,
+      data: props.options || [],
+      fetching: false,
     }
+
+    this.lastFetchId = 0
+    this.fetchData = _.debounce(props.onFetchData || this.fetchData, 800)
   }
 
   componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
+    const { field, value, options, valueField, autoComplete } = nextProps
+    let v = this.state.value
     if (field) {
+      v = field.value
       this.setState({
         value: field.value,
       })
     } else if (value) {
+      v = value
+
       this.setState({
         value,
+      })
+    }
+    if (autoComplete && options && this.state.data.length === 0) {
+      this.setState({
+        data: _.filter(options, (o) => o[valueField] === v),
       })
     }
   }
@@ -121,7 +138,10 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleBlur = () => {
-    if (this.state.value === undefined || this.state.value.length === 0) {
+    if (
+      this.state.value === undefined ||
+      (this.state.value && this.state.value.length === 0)
+    ) {
       this.setState({ shrink: false })
     }
   }
@@ -153,6 +173,24 @@ class AntdSelect extends React.PureComponent {
     })
   }
 
+  fetchData = (value) => {
+    console.log('fetching data', value)
+    const search = value.toLowerCase()
+    this.lastFetchId += 1
+    const fetchId = this.lastFetchId
+    this.setState({ data: [], fetching: true })
+    const { props } = this
+    const { options, valueField, labelField, max = 50 } = props
+
+    this.setState({
+      data: _.filter(
+        options,
+        (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
+      ).splice(0, max),
+      fetching: false,
+    })
+  }
+
   getComponent = ({ inputRef, ...props }) => {
     const {
       valueField,
@@ -167,11 +205,12 @@ class AntdSelect extends React.PureComponent {
       allowClear = true,
       style,
       dropdownMatchSelectWidth = false,
+      autoComplete,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
 
-    const newOptions = options.map((s) => ({
+    const newOptions = (autoComplete ? this.state.data : options).map((s) => ({
       ...s,
       value: s[valueField],
       label: s[labelField],
@@ -179,7 +218,8 @@ class AntdSelect extends React.PureComponent {
     const cfg = {
       value: this.state.value,
     }
-    // console.log(newOptions, this.state.value, restProps)
+    // console.log(cfg)
+    // console.log(newOptions, this.state.value, cfg)
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -190,10 +230,14 @@ class AntdSelect extends React.PureComponent {
           onChange={this.handleValueChange}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
+          onSearch={this.fetchData}
           defaultValue={defaultValue}
           filterOption={this.handleFilter}
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
+          notFoundContent={
+            this.state.fetching ? <Spin size='small' /> : <p>Not Found</p>
+          }
           {...cfg}
           {...restProps}
         >
@@ -222,10 +266,14 @@ class AntdSelect extends React.PureComponent {
     const { value } = this.state
     const labelProps = {}
     if (!mode || mode === 'default') {
-      labelProps.shrink = value !== undefined || this.state.shrink
+      labelProps.shrink =
+        (value !== undefined && value !== null) || this.state.shrink
     } else {
       labelProps.shrink =
-        (value !== undefined && value !== '' && value.length > 0) ||
+        (value !== undefined &&
+          value !== null &&
+          value !== '' &&
+          value.length > 0) ||
         this.state.shrink
     }
 

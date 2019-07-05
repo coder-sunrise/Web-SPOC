@@ -90,35 +90,35 @@ const routes = [
         icon: 'group',
         name: 'patient',
         routes: [
-          {
-            path: '/patientdb/new',
-            name: 'new',
-            mini: 'NP',
-            component: './PatientDatabase/New',
-            hideChildrenInMenu: true,
-            routes: [
-              {
-                path: '/patientdb/new/personal',
-                name: 'Personal Info',
-                // component: './PatientDatabase/Personal',
-              },
-              {
-                path: '/patientdb/new/emergency',
-                name: 'Emergency Contact',
-                // component: './PatientDatabase/EmergencyContact',
-              },
-              {
-                path: '/patientdb/new/allergies',
-                name: 'Allergies',
-                // component: './PatientDatabase/Allergies',
-              },
-              {
-                path: '/patientdb/new/schemes',
-                name: 'Schemes',
-                // component: './PatientDatabase/Schemes',
-              },
-            ],
-          },
+          // {
+          //   path: '/patientdb/new',
+          //   name: 'new',
+          //   mini: 'NP',
+          //   component: './PatientDatabase/New',
+          //   hideChildrenInMenu: true,
+          //   routes: [
+          //     {
+          //       path: '/patientdb/new/personal',
+          //       name: 'Personal Info',
+          //       // component: './PatientDatabase/Personal',
+          //     },
+          //     {
+          //       path: '/patientdb/new/emergency',
+          //       name: 'Emergency Contact',
+          //       // component: './PatientDatabase/EmergencyContact',
+          //     },
+          //     {
+          //       path: '/patientdb/new/allergies',
+          //       name: 'Allergies',
+          //       // component: './PatientDatabase/Allergies',
+          //     },
+          //     {
+          //       path: '/patientdb/new/schemes',
+          //       name: 'Schemes',
+          //       // component: './PatientDatabase/Schemes',
+          //     },
+          //   ],
+          // },
           {
             path: '/patientdb/search',
             name: 'search',

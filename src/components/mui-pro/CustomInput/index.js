@@ -152,10 +152,11 @@ class FormikTextField extends React.PureComponent {
       //   }
       // }
 
+      const rawError = Object.byString(form.errors, field.name)
       const shouldShow =
         Object.byString(form.touched, field.name) || form.submitCount > 0
       if (!error) {
-        cfg.error = shouldShow && !!Object.byString(form.errors, field.name)
+        cfg.error = shouldShow && !!rawError
       }
       if (cfg.error) {
         focus = focus || this.shouldFocus(error)
@@ -164,11 +165,9 @@ class FormikTextField extends React.PureComponent {
           this.refEl.focus()
           window.alreadyFocused = true
         }
-        cfg.help =
-          !showErrorIcon && shouldShow
-            ? Object.byString(form.errors, field.name)
-            : help
+        cfg.help = !showErrorIcon && shouldShow ? rawError : help
       }
+      cfg.rawError = error || rawError
     } else if (value) {
       cfg.value = value
     }

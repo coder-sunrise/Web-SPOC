@@ -1,5 +1,6 @@
 ﻿import { formatUrlPath, sortAll, decrypt } from 'medisys-util'
 import BaseCRUDViewModel from './BaseCRUDViewModel'
+import { notification } from '@/components'
 
 export default class BaseFormViewModel extends BaseCRUDViewModel {
   constructor (options) {
@@ -81,8 +82,18 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
         ...super.effects({ queryFnName: 'query' }),
         *upsert ({ payload, history }, { select, call, put }) {
           console.log('upsert', payload)
+          const { cfg = {} } = payload
+          const r = yield call(service.upsert, payload)
+          let message = r.id ? 'Created' : 'Saved'
+          if (cfg.message) {
+            message = cfg.message
+          }
+          notification.success({
+            // duration:0,`
+            message,
+          })
 
-          return yield call(service.upsert, payload)
+          return r
         },
 
         *create ({ payload, history }, { select, call, put }) {
