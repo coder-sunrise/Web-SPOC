@@ -1,63 +1,103 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'dva'
-import { FormattedMessage, formatMessage } from 'umi/locale'
-import { Assignment } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
-import { Paper } from '@material-ui/core'
-import { compare } from '@/layouts'
 import { getAppendUrl } from '@/utils/utils'
+import { NavPills, ProgressButton, Button } from '@/components'
+import { withFormik } from 'formik'
+import Yup from '@/utils/yup'
+import { compose } from 'redux'
+import DetailPanel from './Detail'
 
-import {
-  PageHeaderWrapper,
-  NavPills,
-  CardContainer,
-  notification,
-} from '@/components'
+const styles = () => ({
+  actionDiv: {
+    float: 'right',
+    textAlign: 'center',
+    marginTop: '22px',
+    marginRight: '10px',
+  },
+})
 
-import Company from './Company/index'
-import ReferralPerson from './ReferralPerson/index'
-import CoPayment from './CoPayment/index'
-
-const styles = () => ({})
-@connect(({ scheme }) => ({
+const Detail = ({
+  classes,
+  dispatch,
   scheme,
-}))
-@compare('scheme')
-class Detail extends PureComponent {
-  render () {
-    // console.log(this)
-    const { props } = this
-    const { classes, theme, ...restProps } = props
-    const { scheme } = restProps
-    return (
+  schemeDetail,
+  history,
+  handleSubmit,
+}) => {
+  const detailProps = {
+    schemeDetail,
+    dispatch,
+  }
+  const { currentTab } = scheme
+  return (
+    <React.Fragment>
+      <div className={classes.actionDiv}>
+        <ProgressButton
+          submitKey='schemeDetail/submit'
+          onClick={handleSubmit}
+        />
+        <Button
+          color='danger'
+          onClick={() => {
+            history.push('/finance/scheme')
+          }}
+        >
+          Cancel
+        </Button>
+      </div>
       <NavPills
         color='info'
         onChange={(event, active) => {
-          this.props.history.push(
+          history.push(
             getAppendUrl({
               t: active,
             }),
           )
         }}
-        index={scheme.currentTab}
+        index={currentTab}
         contentStyle={{ margin: '0 -5px' }}
         tabs={[
           {
-            tabButton: 'Company',
-            tabContent: <Company {...restProps} />,
-          },
-          {
-            tabButton: 'Referral Person',
-            tabContent: <ReferralPerson {...restProps} />,
-          },
-          {
-            tabButton: 'Co-Payment',
-            tabContent: <CoPayment {...restProps} />,
+            tabButton: 'Detail',
+            tabContent: <DetailPanel {...detailProps} />,
           },
         ]}
       />
-    )
-  }
+    </React.Fragment>
+  )
 }
-
-export default withStyles(styles, { withTheme: true })(Detail)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  connect(({ scheme, schemeDetail }) => ({
+    scheme,
+    schemeDetail,
+  })),
+  withFormik({
+    enableReinitialize: true,
+    mapPropsToValues: ({ schemeDetail }) => {
+      return schemeDetail.entity ? schemeDetail.entity : {}
+    },
+    validationSchema: Yup.object().shape({
+      code: Yup.string().required(),
+      displayValue: Yup.string().required(),
+      revenueCategory: Yup.string().required(),
+      effectiveStartDate: Yup.string().required(),
+      effectiveEndDate: Yup.string().required(),
+    }),
+    handleSubmit: (values, { props }) => {
+      const { dispatch } = props
+      // dispatch({
+      //   type: `${modelType}/submit`,
+      //   payload: test,
+      // }).then((r) => {
+      //   if (r.message === 'Ok') {
+      //     notification.success({
+      //       message: 'Done',
+      //     })
+      //   }
+      // })
+    },
+    displayName: 'FinanceSchemeDetail',
+  }),
+)(Detail)
