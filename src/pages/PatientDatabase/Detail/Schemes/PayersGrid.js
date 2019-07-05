@@ -16,7 +16,8 @@ class PayersGrid extends PureComponent {
       { name: 'payerName', title: 'Payer Name' },
       { name: 'payerId', title: 'Payer ID' },
       { name: 'dateOfBirth', title: 'Date of Birth' },
-      { name: 'relationship', title: 'Relationship' },
+      { name: 'patientIs', title: 'Patient Is' },
+      { name: 'scheme', title: 'Scheme' },
     ],
     columnExtensions: [
       {
@@ -83,7 +84,7 @@ class PayersGrid extends PureComponent {
 
   render () {
     const { editingRowIds, rowChanges } = this.state
-    const { entity: { items }, type } = this.props
+    const { type,rows } = this.props
 
     const EditingProps = {
       showAddCommand: true,
@@ -96,7 +97,7 @@ class PayersGrid extends PureComponent {
 
     return (
         <EditableTableGrid2
-          rows={items.filter(o => o.type === type)}
+          rows={rows}
           onRowDoubleClick={this.onRowDoubleClick}
           FuncProps={{ edit: true }}
           EditingProps={EditingProps}

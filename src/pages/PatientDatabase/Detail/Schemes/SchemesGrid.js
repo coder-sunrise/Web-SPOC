@@ -15,26 +15,32 @@ class SchemesGrid extends PureComponent {
 
   tableParas = {
     columns: [
-      { name: 'scheme', title: 'Scheme' },
-      { name: 'payer', title: 'Payer' },
-      { name: 'accountNo', title: 'Account Number' },
-      { name: 'validUntil', title: 'Valid Until' },
-      { name: 'userAsMain', title: 'User as Main' },
+      { name: 'schemeTypeFK', title: 'Scheme Type' },
+      { name: 'coPaymentSchemeFK', title: 'Scheme Name' },
+      { name: 'accountNumber', title: 'Account Number' },
+      { name: 'validFrom', title: 'Valid From' },
+      { name: 'validTo', title: 'Valid To' },
     ],
     columnExtensions: [
       {
-        columnName: 'validUntil',
+        columnName: 'validFrom',
         type: 'date',
       },
       {
-        columnName: 'scheme',
-        type: 'select',
-        options: schemes,
+        columnName: 'validTo',
+        type: 'date',
       },
       {
-        columnName: 'userAsMain',
-        type: 'select',
-        options: yesNo,
+        columnName: 'schemeTypeFK',
+        type: 'codeSelect',
+        code: 'SchemeType',
+        label: 'scheme',
+      },
+      {
+        columnName: 'coPaymentSchemeFK',
+        type: 'codeSelect',
+        code: 'SchemeCategory',
+        label: 'coscheme',
       },
     ],
   }
@@ -65,39 +71,16 @@ class SchemesGrid extends PureComponent {
       }
     }
 
-    this.commitChanges = ({ added, changed, deleted }) => {
 
-      if (added) {
-        this.props.dispatch({
-          type: `schemes/add`,
-          payload: added.map(o => {
-            return {
-              type,
-              ...o,
-            }
-          }),
-        })
-      }
-
-      if (changed) {
-        this.props.dispatch({
-          type: `schemes/change`,
-          payload: changed,
-        })
-      }
-
-      if (deleted) {
-        dispatch({
-          type: `schemes/delete`,
-          payload: deleted,
-        })
-      }
+    this.commitChanges = ({rows, added, changed, deleted }) => {
+      const {setFieldValue } = this.props
+      setFieldValue('patientScheme',rows)
     }
   }
 
   render () {
     const { editingRowIds, rowChanges } = this.state
-    const { entity: { items }, type } = this.props
+    const { type,rows } = this.props
 
     const EditingProps = {
       showAddCommand: true,
@@ -110,7 +93,7 @@ class SchemesGrid extends PureComponent {
 
     return (
         <EditableTableGrid2
-          rows={items.filter(o => o.type === type)}
+          rows={rows}
           onRowDoubleClick={this.onRowDoubleClick}
           FuncProps={{ edit: true }}
           EditingProps={EditingProps}

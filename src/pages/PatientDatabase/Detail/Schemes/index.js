@@ -11,6 +11,7 @@ import payersModal from '../models/payers'
 import SchemesGrid from './SchemesGrid'
 import PayersGrid from './PayersGrid'
 import {  CardContainer, CommonHeader, GridContainer, GridItem } from '@/components'
+import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
 
 window.g_app.replaceModel(schemesModal)
@@ -25,11 +26,30 @@ const styles = () => ({
   },
 })
 
-@connect(({ schemes, payers }) => {
+@connect(({patient }) => {
   return ({
-    schemes,
-    payers,
+    patient
   })
+})
+
+@withFormik({
+  enableReinitialize: true,
+  mapPropsToValues: ({ patient }) => {
+    console.log('schema map')
+    console.log(patient)
+    return patient.entity || patient.default
+  },
+  validationSchema: Yup.object().shape({
+    EditingItems: Yup.array().of(
+      Yup.object().shape({
+        Description: Yup.string().required('Description is required'),
+        UnitPrice: Yup.number().required('Unit Price is required'),
+      }),
+    ),
+  }),
+
+  handleSubmit,
+  displayName: 'Allergy',
 })
 
 class Schemes extends PureComponent {
@@ -50,6 +70,10 @@ class Schemes extends PureComponent {
     console.log('Schemes-onReset', this)
   }
 
+  onSaveClick(values) {
+    this.setState(this.state)
+  }
+
   resize () {
     if (this.divElement) {
       const height = this.divElement.clientHeight
@@ -60,9 +84,13 @@ class Schemes extends PureComponent {
   }
 
   render () {
-    const { classes, schemes, payers, dispatch } = this.props
+    const { classes, schemes, payers, dispatch,values, ...restProps  } = this.props
     const { height } = this.state
 
+    let patientPayer = []
+
+    console.log('schema render')
+    console.log(values)
     return (
       <CardContainer title={this.titleComponent} hideHeader>
                 <GridContainer
@@ -72,26 +100,31 @@ class Schemes extends PureComponent {
             </h4></GridItem>
          <GridItem xs md={12} style={{ marginTop: 8 }}>
           <SchemesGrid
+           rows={values.patientScheme.filter((o) => !o.isDeleted)}
             type='Schemes'
-            entity={schemes.entity}
-            dispatch={dispatch}
             title='Schemes'
             height={height}
+            values={values}
+            {...restProps}
           />
         </GridItem>
         <GridItem xs md={12}>  <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
-            Payers
+            Medisave Payer
             </h4></GridItem>
         <GridItem xs md={12} style={{ marginTop: 8 }}>
           <PayersGrid
+          rows={patientPayer}
             type='Payers'
-            entity={payers.entity}
-            dispatch={dispatch}
             title='Payers'
             height={height}
           />
         </GridItem>
         </GridContainer>
+        {getFooter({
+          resetable: true,
+          allowSubmit: true,
+          ...this.props,
+        })}
         </CardContainer>
     )
   }
