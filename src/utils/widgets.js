@@ -129,7 +129,7 @@ const widgets = [
     }),
     layoutConfig: {
       style: {
-        padding: '0 5px',
+        padding: 5,
       },
     },
   },

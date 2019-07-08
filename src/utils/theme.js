@@ -280,9 +280,9 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 2,
+        marginTop: 4,
         '& svg': {
-          top: 5,
+          top: 3,
           position: 'relative',
         },
         '& > p': {
@@ -436,9 +436,9 @@ export const smallTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 1,
+        marginTop: 2,
         '& svg': {
-          top: 4,
+          top: 3,
           position: 'relative',
         },
         '& > p': {
@@ -588,9 +588,9 @@ export const largeTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 3,
+        marginTop: 5,
         '& svg': {
-          top: 4,
+          top: 2,
           position: 'relative',
         },
         '& > p': {

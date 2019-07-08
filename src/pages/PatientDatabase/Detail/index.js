@@ -258,9 +258,9 @@ class PatientDetail extends PureComponent {
           <div
             style={
               height > 0 ? (
-                { height: height - 20, overflow: 'auto', padding: '0 2px' }
+                { height: height - 20, overflow: 'auto', padding: 4 }
               ) : (
-                { padding: '0 2px' }
+                { padding: 4 }
               )
             }
           >
