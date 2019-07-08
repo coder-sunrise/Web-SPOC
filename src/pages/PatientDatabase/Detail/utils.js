@@ -109,12 +109,7 @@ module.exports = {
         color='danger'
         onClick={() => {
           dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              showPatientInfoPanel: false,
-              fullscreen: false,
-              currentPatientId: null,
-            },
+            type: 'patient/closePatientModal',
           })
         }}
         style={{ marginRight: theme.spacing.unit }}

@@ -10,6 +10,8 @@ import classNames from 'classnames'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 import { Refresh, Stop } from '@material-ui/icons'
+import { getAppendUrl } from '@/utils/utils'
+
 // custom components
 import {
   Card,
@@ -116,8 +118,11 @@ class Queue extends PureComponent {
   }
 
   toggleRegisterNewPatient = () => {
-    const { showRegisterNewPatient } = this.state
-    this.setState({ showRegisterNewPatient: !showRegisterNewPatient })
+    // const { showRegisterNewPatient } = this.state
+    // this.setState({ showRegisterNewPatient: !showRegisterNewPatient })
+    this.props.dispatch({
+      type: 'patient/openPatientModal',
+    })
   }
 
   toggleViewPatientProfile = () => {
@@ -312,7 +317,7 @@ class Queue extends PureComponent {
             >
               <NewVisitModal visitPatientInfo={queueLog.visitPatientInfo} />
             </CommonModal>
-            <CommonModal
+            {/* <CommonModal
               open={showRegisterNewPatient}
               title={formatMessage({
                 id: 'reception.queue.patientSearch.registerNewPatient',
@@ -323,7 +328,7 @@ class Queue extends PureComponent {
               showFooter={false}
             >
               <NewPatient />
-            </CommonModal>
+            </CommonModal> */}
             <CommonModal
               open={showViewPatientProfile}
               title={formatMessage({

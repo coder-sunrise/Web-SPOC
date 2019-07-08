@@ -28,7 +28,7 @@ export default createFormViewModel({
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        // console.log(loct, method)
+        console.log(loct, method)
         if (query.md === 'pt') {
           dispatch({
             type: 'updateState',
@@ -38,9 +38,9 @@ export default createFormViewModel({
             },
           })
         }
-        if (typeof window.ga !== 'undefined') {
-          window.ga('send', 'pageview', pathname + search)
-        }
+        // if (typeof window.ga !== 'undefined') {
+        //   window.ga('send', 'pageview', pathname + search)
+        // }
       })
     },
     effects: {
