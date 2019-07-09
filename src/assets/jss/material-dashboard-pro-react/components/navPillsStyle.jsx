@@ -13,7 +13,7 @@ import {
 
 const navPillsStyle = (theme) => ({
   root: {
-    marginTop: '20px',
+    marginTop: '10px',
     paddingLeft: '0',
     marginBottom: '0',
     overflow: 'visible !important',
@@ -28,6 +28,7 @@ const navPillsStyle = (theme) => ({
   tabContent: {
     willChange: 'auto',
     transform: 'none',
+    margin: 1,
   },
   displayNone: {
     display: 'none !important',
@@ -42,7 +43,7 @@ const navPillsStyle = (theme) => ({
     float: 'left',
     position: 'relative',
     display: 'block',
-    borderRadius: '30px',
+    borderRadius: '24px',
     minWidth: '100px',
     textAlign: 'center',
     transition: 'all .3s',
@@ -83,7 +84,7 @@ const navPillsStyle = (theme) => ({
     color: 'inherit',
   },
   contentWrapper: {
-    marginTop: '20px',
+    marginTop: '10px',
   },
   primary: {
     '&,&:hover': {

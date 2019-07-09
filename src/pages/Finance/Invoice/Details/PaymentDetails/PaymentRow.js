@@ -3,10 +3,19 @@ import React from 'react'
 import { IconButton, withStyles } from '@material-ui/core'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
-import { GridContainer, GridItem } from '@/components'
+import { GridContainer, GridItem, Tooltip } from '@/components'
 import styles from './styles'
 
-const PaymentRow = ({ type, itemID, date, amount, classes }) => {
+const PaymentRow = ({
+  type,
+  itemID,
+  date,
+  amount,
+  classes,
+  handleVoidClick,
+}) => {
+  const onVoidClick = () => handleVoidClick({ type, itemID })
+
   return (
     <GridContainer
       justify='center'
@@ -27,9 +36,11 @@ const PaymentRow = ({ type, itemID, date, amount, classes }) => {
           <span className={classes.currency}>${amount}</span>
         </GridItem>
         <GridItem>
-          <IconButton id={itemID}>
-            <Cross />
-          </IconButton>
+          <Tooltip title='Void'>
+            <IconButton id={itemID} onClick={onVoidClick}>
+              <Cross />
+            </IconButton>
+          </Tooltip>
         </GridItem>
       </GridItem>
     </GridContainer>

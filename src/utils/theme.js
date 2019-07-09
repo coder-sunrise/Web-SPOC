@@ -73,7 +73,17 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
-
+  NavPills: {
+    contentWrapper: {
+      marginLeft: 1,
+      marginRight: 1,
+    },
+  },
+  MuiBadge: {
+    badge: {
+      right: 8,
+    },
+  },
   MuiDrawer: {
     paper: {
       overflowX: 'hidden',
