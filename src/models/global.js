@@ -37,6 +37,13 @@ export default createFormViewModel({
               showPatientInfoPanel: true,
             },
           })
+        } else {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              showPatientInfoPanel: false,
+            },
+          })
         }
         // if (typeof window.ga !== 'undefined') {
         //   window.ga('send', 'pageview', pathname + search)

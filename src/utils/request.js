@@ -201,6 +201,7 @@ export default function request (url, option) {
 
     let r = $.when(
       $.ajax({
+        timeout: 20000,
         ...newOptions,
         url: newUrl,
         type: newOptions.method,
@@ -271,12 +272,17 @@ export default function request (url, option) {
             let returnObj = {
               title: codeMessage[response.status],
             }
+            let errorMsg = 'Unknown System Error'
+
             if (response.status === 401) {
               /* eslint-disable no-underscore-dangle */
               window.g_app._store.dispatch({
                 type: 'login/logout',
               })
               return false
+            }
+            if (s === 'timeout') {
+              errorMsg = 'The request timeout'
             }
             let isJson = false
             // try {
@@ -285,7 +291,10 @@ export default function request (url, option) {
             // } catch (error) {}
 
             const errortext =
-              returnObj.title || returnObj.message || returnObj.statusText
+              returnObj.title ||
+              returnObj.message ||
+              returnObj.statusText ||
+              errorMsg
 
             notification.destroy()
             notification.error({
@@ -316,7 +325,6 @@ export default function request (url, option) {
             // msg = payload.message || statusText
           } catch (error) {
             console.error(error)
-            let errorMsg = 'Unknown System Error'
             const exception = { success: false, status, errorMsg, payload }
             throw exception
           }

@@ -70,17 +70,23 @@ class PatientSearch extends PureComponent {
       classes,
       renderActionFn = this.defaultAction,
       onRowDblClick = this.defaultOnDblClick,
+      simple,
       ...restProps
     } = props
-    return (
-      <CardContainer hideHeader>
+    const newChildren = (
+      <React.Fragment>
         <FilterBar {...restProps} />
         <Grid
           renderActionFn={renderActionFn}
           onRowDblClick={onRowDblClick}
           {...restProps}
         />
-      </CardContainer>
+      </React.Fragment>
+    )
+    return simple ? (
+      <div>{newChildren}</div>
+    ) : (
+      <CardContainer hideHeader>{newChildren}</CardContainer>
     )
   }
 }

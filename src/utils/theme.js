@@ -153,6 +153,14 @@ const sharedOverrides = {
       },
     },
   },
+  MuiTooltip: {
+    tooltip: {
+      backgroundColor: '#ffffff',
+      color: 'rgba(0, 0, 0, 0.87)',
+      boxShadow:
+        '0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12)',
+    },
+  },
 }
 
 export const defaultTheme = createMuiTheme({
@@ -161,6 +169,7 @@ export const defaultTheme = createMuiTheme({
   },
   props: {
     rowHeight: standardRowHeight,
+    size: 'md',
   },
   overrides: {
     ...sharedOverrides,
@@ -317,6 +326,7 @@ export const smallTheme = createMuiTheme({
   },
   props: {
     rowHeight: smallRowHeight,
+    size: 'sm',
   },
   overrides: {
     ...sharedOverrides,
@@ -473,6 +483,7 @@ export const largeTheme = createMuiTheme({
   },
   props: {
     rowHeight: largeRowHeight,
+    size: 'lg',
   },
   overrides: {
     ...sharedOverrides,

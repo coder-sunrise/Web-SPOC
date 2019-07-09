@@ -84,12 +84,15 @@ class Grid extends React.Component {
         columnName: 'relationshipFK',
         type: 'codeSelect',
         code: 'relationship',
-        isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
         columnName: 'accountNoTypeFK',
         type: 'codeSelect',
         code: 'PatientAccountNoType',
+        isDisabled: (row) => !!row.nokPatientProfileFK,
+      },
+      {
+        columnName: 'address',
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
@@ -239,14 +242,18 @@ class Grid extends React.Component {
               )
               patientEmergencyContact.push({
                 // id: getUniqueGUID(),
+                accountNo: o.patientAccountNo,
                 patientProfileFK: o.id,
                 salutationFK: o.salutationFK,
-                accountNoTypeFK: o.accountNoTypeFK,
+                accountNoTypeFK: o.patientAccountNoTypeFK,
                 name: o.name,
                 relationship: '',
                 isPrimaryContact: false,
                 nokPatientProfileFK: o.id,
-                address: `${primaryAddress.blockNo} ${primaryAddress.buildingName} ${primaryAddress.unitNo}  ${primaryAddress.street}`,
+                address: `${primaryAddress.blockNo ||
+                  ''} ${primaryAddress.buildingName ||
+                  ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street ||
+                  ''}`,
               })
               setFieldValue('patientEmergencyContact', patientEmergencyContact)
 
@@ -304,9 +311,10 @@ class Grid extends React.Component {
           title='Search Patient'
           onClose={this.toggleModal}
           showFooter={false}
+          maxWidth='lg'
           onConfirm={this.toggleModal}
         >
-          {this.state.showModal && <SearchPatient />}
+          <SearchPatient />
         </CommonModal>
       </div>
     )

@@ -105,7 +105,7 @@ const buttonStyle = {
   contained: {
     color: '#ffffff',
     backgroundColor: grayColor,
-    '&:hover:not($simple):not($link)': {
+    '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(grayColor).darken(0.2).hex(),
     },
   },
@@ -119,7 +119,7 @@ const buttonStyle = {
   },
   containedprimary: {
     backgroundColor: primaryColor,
-    '&:hover:not($simple):not($link)': {
+    '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(primaryColor).darken(0.2).hex(),
     },
   },
@@ -139,7 +139,7 @@ const buttonStyle = {
   },
   containedinfo: {
     backgroundColor: infoColor,
-    '&:hover:not($simple):not($link)': {
+    '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(infoColor).darken(0.2).hex(),
     },
   },
@@ -159,7 +159,7 @@ const buttonStyle = {
   },
   containedsuccess: {
     backgroundColor: successColor,
-    '&:hover:not($simple):not($link)': {
+    '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(successColor).darken(0.2).hex(),
     },
   },
@@ -179,7 +179,7 @@ const buttonStyle = {
   },
   containedwarning: {
     backgroundColor: warningColor,
-    '&:hover:not($simple):not($link)': {
+    '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(warningColor).darken(0.2).hex(),
     },
   },
@@ -199,7 +199,7 @@ const buttonStyle = {
   },
   containeddanger: {
     backgroundColor: dangerColor,
-    '&:hover:not($simple):not($link)': {
+    '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(dangerColor).darken(0.2).hex(),
     },
   },
@@ -219,7 +219,7 @@ const buttonStyle = {
   },
   containedrose: {
     backgroundColor: roseColor,
-    '&:hover:not($simple):not($link)': {
+    '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(roseColor).darken(0.2).hex(),
     },
   },
@@ -233,6 +233,9 @@ const buttonStyle = {
     '&,&:focus,&:hover': {
       backgroundColor: '#FFFFFF',
       color: grayColor,
+    },
+    '&:hover:not($simple):not($link):not($transparent)': {
+      backgroundColor: color('#ffffff').darken(0.05).hex(),
     },
   },
   twitter: {
@@ -469,6 +472,9 @@ const buttonStyle = {
       color: 'inherit',
       background: 'transparent',
       boxShadow: 'none',
+    },
+    '&:hover': {
+      background: 'rgba(0, 0, 0, 0.08)',
     },
   },
   disabled,
