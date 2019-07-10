@@ -291,7 +291,7 @@ class CommonTableGrid2 extends React.Component {
         ...sizeConfig[props.size || 'md'],
       },
     })
-    console.log(this.theme)
+    // console.log(this.theme)
     // this.search()
     // console.log(props.query, ' c grid')
   }

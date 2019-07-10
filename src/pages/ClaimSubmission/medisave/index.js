@@ -2,15 +2,30 @@ import React from 'react'
 // common components
 import { CommonModal, CardContainer, NavPills } from '@/components'
 import ClaimDetails from '../common/ClaimDetails'
+import ClaimDetailsSection from './ClaimDetailsSection'
 
 import New from './New'
 import Draft from './Draft'
 
 class Medisave extends React.Component {
+  state = {
+    showClaimDetails: false,
+    claimDetails: {},
+    claimDetailsReadOnly: false,
+  }
+
+  openClaimDetails = ({ claimDetails }) =>
+    this.setState({ showClaimDetails: true, claimDetails })
+
+  closeClaimDetails = () =>
+    this.setState({ showClaimDetails: false, claimDetails: {} })
+
   navigateToInvoiceDetails = (row) => {
     const { invoiceNo } = row
     const processedInvoiceNo = invoiceNo.replace('/', '-')
-    // router.push(`/claim-submission/Medisave/invoice/${processedInvoiceNo}`)
+    this.props.history.push(
+      `/claim-submission/medisave/invoice/${processedInvoiceNo}`,
+    )
   }
 
   handleContextMenuItemClick = (currentTarget, row) => {
@@ -27,13 +42,17 @@ class Medisave extends React.Component {
     }
   }
 
-  openClaimDetails = () => {}
+  onTabChange = (_, active) => {
+    this.setState({ claimDetailsReadOnly: active === 0 })
+  }
 
   render () {
+    const { showClaimDetails, claimDetails, claimDetailsReadOnly } = this.state
     return (
       <CardContainer hideHeader size='sm'>
         <NavPills
           active={0}
+          onChange={this.onTabChange}
           tabs={[
             {
               tabButton: 'Draft',
@@ -53,14 +72,18 @@ class Medisave extends React.Component {
             },
           ]}
         />
-        {/* <CommonModal
+        <CommonModal
           title='Claim Details'
           open={showClaimDetails}
           onClose={this.closeClaimDetails}
           onConfirm={this.closeClaimDetails}
         >
-          <ClaimDetails claimDetails={claimDetails} />
-        </CommonModal> */}
+          <ClaimDetails
+            claimDetails={claimDetails}
+            readOnly={claimDetailsReadOnly}
+            ClaimDetailsSection={ClaimDetailsSection}
+          />
+        </CommonModal>
       </CardContainer>
     )
   }

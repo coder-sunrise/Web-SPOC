@@ -352,6 +352,12 @@ const routes = [
             name: 'medisave',
             component: './ClaimSubmission/medisave',
           },
+          {
+            path: '/claim-submission/medisave/invoice/:invoiceNo',
+            name: 'patientInvoice',
+            hideInMenu: true,
+            component: './Finance/Invoice/Details',
+          },
         ],
       },
       // Claim Submission

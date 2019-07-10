@@ -84,6 +84,7 @@ export const DraftMedisaveTableData = generateDraftMedisaveData()
 export const TableConfig = {
   FuncProps: {
     selectable: true,
+    selectConfig: { showSelectAll: true },
   },
 }
 

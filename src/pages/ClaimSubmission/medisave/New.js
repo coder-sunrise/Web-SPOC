@@ -1,10 +1,16 @@
 import React from 'react'
 // formik
-import { withFormik } from 'formik'
+import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  CardContainer,
+  GridContainer,
+  GridItem,
+  TextField,
+} from '@/components'
 // sub components
 import BaseSearchBar from '../common/BaseSearchBar'
 import TableGrid from '../common/TableGrid'
@@ -35,7 +41,14 @@ class NewMedisave extends React.Component {
 
     return (
       <CardContainer hideHeader size='sm'>
-        <BaseSearchBar hideInvoiceDate />
+        <BaseSearchBar>
+          <GridItem md={12}>
+            <FastField
+              name='hrnNo'
+              render={(args) => <TextField {...args} label='HRN No.' />}
+            />
+          </GridItem>
+        </BaseSearchBar>
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
