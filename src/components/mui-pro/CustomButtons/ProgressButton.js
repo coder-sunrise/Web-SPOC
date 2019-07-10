@@ -38,6 +38,7 @@ class ProgressButton extends React.Component {
       text = 'Save',
       submitKey,
       classes,
+      onClick,
       ...rest
     } = props
     return (
@@ -46,7 +47,7 @@ class ProgressButton extends React.Component {
         disabled={disabled || loading.global || global.disableSave}
         data-button-type='progress'
         {...rest}
-        onClick={this.onClick}
+        onClick={onClick}
       >
         {loading.effects[submitKey] ? (
           <Refresh className='spin-custom' />
