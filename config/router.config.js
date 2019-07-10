@@ -398,7 +398,7 @@ const routes = [
             path: '/development/scribble',
             name: 'Scribble',
             mini: 'CA',
-            // component: './Development/Scribble',
+            component: './Development/Scribble',
           },
         ],
       },
