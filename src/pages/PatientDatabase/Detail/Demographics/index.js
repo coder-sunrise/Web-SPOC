@@ -48,7 +48,12 @@ import avatar from '@/assets/img/faces/marc.jpg'
 import { titles, finTypes, gender } from '@/utils/codes'
 import { standardRowHeight } from 'mui-pro-jss'
 // import model from '../models/demographic'
-import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import {
+  getUniqueGUID,
+  getRemovedUrl,
+  getAppendUrl,
+  difference,
+} from '@/utils/utils'
 import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 import Address from './Address'
 
@@ -65,10 +70,7 @@ const styles = () => ({
   patient,
 }))
 @withFormik({
-  mapPropsToValues: ({ patient }) => {
-    // console.log(patient)
-    return patient.entity ? patient.entity : patient.default
-  },
+  mapPropsToValues: ({ patient }) => patient.entity || patient.default,
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     dob: Yup.date().required(),
@@ -78,18 +80,17 @@ const styles = () => ({
     // dialect: Yup.string().required(),
     // contact.mobileContactNumber.number:Yup.string().render(),
     contact: Yup.object().shape({
-      contactAddress: Yup.array().compact((v) => v.isDeleted).of(
-        Yup.object().shape({
-          postcode: Yup.number().required(),
-          countryFK: Yup.string().required(),
-        }),
-      ),
+      // contactAddress: Yup.array().compact((v) => v.isDeleted).of(
+      //   Yup.object().shape({
+      //     postcode: Yup.number().required(),
+      //     countryFK: Yup.string().required(),
+      //   }),
+      // ),
       mobileContactNumber: Yup.object().shape({
         number: Yup.string().required(),
       }),
     }),
   }),
-
   handleSubmit,
   displayName: 'Demographic',
 })
@@ -97,22 +98,20 @@ class Demographic extends PureComponent {
   state = {}
 
   componentDidMount () {
-    const { props, value } = this
-
-    // if (props.patient.currentId) {
-    //   setCurrentPatient(props, props.setValues, () => {
-    //     if (value && value.contact.contactAddress.length === 0) {
-    //       this.addAddress()
-    //     }
-    //   })
-    // } else {
-    //   props.setValues(props.demographic.default)
-    // }
-    // props.setValues(props.patient.entity)
+    if (!this.props.values.id) {
+      this.props.validateForm()
+    }
   }
 
   componentDidUpdate = (prevProps) => {
+    // console.log(difference(prevProps, this.props))
+    // console.log('componentDidUpdate', prevProps, this.props)
+
     componentDidUpdate(this.props, prevProps)
+  }
+
+  componentWillUnmount () {
+    this.props.resetForm()
   }
 
   isValidDate = (current) => {
@@ -133,7 +132,7 @@ class Demographic extends PureComponent {
   }
 
   render () {
-    console.log('Demographic', this)
+    console.log('Demographic', this.props)
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
     return (
@@ -272,8 +271,8 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Occupation'
                       code='Occupation'
-                      width={600}
-                      max={10}
+                      autoComplete
+                      // max={10}
                       // defaultMenuIsOpen
                       {...args}
                     />

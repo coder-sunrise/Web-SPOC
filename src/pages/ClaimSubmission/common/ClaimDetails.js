@@ -37,7 +37,8 @@ const ClaimDetails = ({
   claimDetails,
   onConfirm,
   onClose,
-  ClaimDetailsSection,
+  readOnly = true,
+  renderClaimDetails,
 }) => {
   return (
     <Formik initialValues={{ ...claimDetails }}>
@@ -142,8 +143,9 @@ const ClaimDetails = ({
               <h4>Claim Details</h4>
               <Divider />
             </GridItem>
-            {ClaimDetailsSection !== undefined ? (
-              <ClaimDetailsSection />
+            {}
+            {renderClaimDetails !== undefined ? (
+              renderClaimDetails(readOnly)
             ) : (
               <GridItem md={12} container>
                 <GridItem md={5}>

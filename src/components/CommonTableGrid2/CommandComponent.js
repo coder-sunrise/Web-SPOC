@@ -2,7 +2,7 @@ import React from 'react'
 import Delete from '@material-ui/icons/Delete'
 import Save from '@material-ui/icons/Save'
 import Edit from '@material-ui/icons/Edit'
-import Cancel from '@material-ui/icons/Cancel'
+import Cancel from '@material-ui/icons/Clear'
 
 import { Button } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
@@ -69,6 +69,7 @@ const CommitButton = ({ onExecute }) => (
     }}
     justIcon
     data-button-type='progress'
+    data-grid-button='true'
     color='primary'
     title='Save'
     className='grid-commit'

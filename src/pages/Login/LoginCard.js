@@ -103,11 +103,8 @@ class LoginCard extends PureComponent {
     }
   }
 
-  handleApplicationChange = (name, value) => {
-    console.log('handleApplicationChange', name, value)
-  }
-
   onEnterPressed = () => {
+    console.log('on login click')
     const { handleSubmit } = this.props
     handleSubmit()
   }
@@ -184,7 +181,6 @@ class LoginCard extends PureComponent {
                   icon={<LockOpen />}
                   block
                   color='rose'
-                  size='lg'
                   onClick={this.onEnterPressed}
                 />
               </CardFooter>

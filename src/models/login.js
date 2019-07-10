@@ -53,6 +53,7 @@ export default {
           currentAuthority: 'guest',
         },
       })
+      localStorage.removeItem('token')
       reloadAuthorized()
       yield put(
         routerRedux.push({
@@ -62,6 +63,7 @@ export default {
           }),
         }),
       )
+      return true
     },
   },
 

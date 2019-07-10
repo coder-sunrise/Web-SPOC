@@ -11,7 +11,7 @@ class Medisave extends React.Component {
   state = {
     showClaimDetails: false,
     claimDetails: {},
-    claimDetailsReadOnly: false,
+    claimDetailsReadOnly: true,
   }
 
   openClaimDetails = ({ claimDetails }) =>
@@ -81,7 +81,9 @@ class Medisave extends React.Component {
           <ClaimDetails
             claimDetails={claimDetails}
             readOnly={claimDetailsReadOnly}
-            ClaimDetailsSection={ClaimDetailsSection}
+            renderClaimDetails={(readOnly) => (
+              <ClaimDetailsSection readOnly={readOnly} />
+            )}
           />
         </CommonModal>
       </CardContainer>

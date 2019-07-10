@@ -1,5 +1,7 @@
+import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '@/services/patient'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 
 export default createFormViewModel({
   namespace: 'patient',
@@ -51,7 +53,7 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
-        // console.log(pathname)
+        // console.log({ pathname })
         // console.log(loct, method)
         // console.log(query)
         if (query.md === 'pt' && query.cmt) {
@@ -71,7 +73,11 @@ export default createFormViewModel({
           //   })
           // }
         }
-        if (query.new || pathname === '/patientdb/new') {
+        if (
+          query.new ||
+          pathname === '/patientdb/new' ||
+          pathname === '/reception/queue'
+        ) {
           dispatch({
             type: 'updateState',
             payload: {
@@ -92,6 +98,35 @@ export default createFormViewModel({
             list: Array.isArray(response) ? response : [],
           },
         })
+      },
+      *closePatientModal ({ payload }, { call, put }) {
+        router.push(
+          getRemovedUrl([
+            'md',
+            'cmt',
+            'pid',
+            'new',
+          ]),
+        )
+
+        yield put({
+          type: 'global/updateAppState',
+          payload: {
+            showPatientInfoPanel: false,
+            fullscreen: false,
+            currentPatientId: null,
+          },
+        })
+      },
+
+      openPatientModal ({ payload }, { call, put }) {
+        router.push(
+          getAppendUrl({
+            md: 'pt',
+            cmt: '1',
+            new: 1,
+          }),
+        )
       },
       // *querySingle ({ payload }, { call, put }) {
       //   const response = yield call(service.query, payload)

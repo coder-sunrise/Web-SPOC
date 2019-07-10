@@ -15,14 +15,22 @@ import PropTypes from 'prop-types'
 // material-ui components
 import RegularButton from './index'
 
-@connect(({ loading }) => ({ loading }))
+@connect(({ loading, global }) => ({ loading, global }))
 class ProgressButton extends React.Component {
+  componentDidMount () {}
+
+  onClick = () => {
+    const { props } = this
+    const { onClick } = props
+    console.log(onClick)
+  }
+
   render () {
     const { props } = this
-    // console.log(props)
     const {
       disabled,
       loading,
+      global,
       children,
       dispatch,
       color = 'primary',
@@ -30,14 +38,16 @@ class ProgressButton extends React.Component {
       text = 'Save',
       submitKey,
       classes,
+      onClick,
       ...rest
     } = props
     return (
       <RegularButton
         color={color}
-        disabled={disabled || loading.global}
-        data-button-type={'progress'}
+        disabled={disabled || loading.global || global.disableSave}
+        data-button-type='progress'
         {...rest}
+        onClick={onClick}
       >
         {loading.effects[submitKey] ? (
           <Refresh className='spin-custom' />

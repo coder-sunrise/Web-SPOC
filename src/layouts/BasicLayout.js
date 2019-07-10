@@ -117,6 +117,10 @@ class BasicLayout extends React.PureComponent {
       this.menus = menus
       this.forceUpdate()
     })
+
+    dispatch({
+      type: 'global/getUserSettings',
+    }).then((response) => {})
   }
 
   // componentDidMount () {
@@ -157,8 +161,8 @@ class BasicLayout extends React.PureComponent {
     // }
 
     // check token, logout if token not exist
-    const hasToken = localStorage.getItem('token')
-    !hasToken && router.push('/login')
+    const accessToken = localStorage.getItem('token')
+    !accessToken && router.push('/login')
 
     window.addEventListener('resize', this.resizeFunction)
 
@@ -170,13 +174,45 @@ class BasicLayout extends React.PureComponent {
     // dispatch({
     //   type: 'setting/getSetting',
     // })
-  }
 
-  componentWillUnmount () {
-    // if (navigator.platform.indexOf("Win") > -1) {
-    //   ps.destroy()
-    // }
-    window.removeEventListener('resize', this.resizeFunction)
+    const tokenEndpoint = 'https://semr2dev2010.emr.com.sg/connect/token'
+    const signalREndPoint =
+      'https://ec2-175-41-131-73.ap-southeast-1.compute.amazonaws.com/notificationHub'
+
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(signalREndPoint, {
+        accessTokenFactory: () => {
+          return accessToken
+        },
+      })
+      .build()
+
+    connection.on('NewNotification', (eventName, data) => {
+      console.log(eventName, data)
+      // var message = data.sender + ' says ' + data.message
+      // var li = document.createElement('li')
+      // li.textContent = message
+      // document.getElementById('messagesList').appendChild(li)
+      // console.log('***************')
+      // console.log('NotificationReceived: ' + eventName + ' from ' + data.sender)
+      // console.log('Message:' + data.message)
+      // console.log('***************')
+      // var notification = new Notification('New Messsage Received', {
+      //   body: data.sender + ': ' + data.message,
+      //   icon:
+      //     'https://5.imimg.com/data5/XQ/KP/MY-40305254/kids-toy-500x500.jpg',
+      // })
+    })
+
+    connection
+      .start()
+      .then(() => {
+        console.log('Connected started')
+      })
+      .catch((err) => {
+        return console.error(err.toString())
+      }) // JSON-string from `response.json()` call
+      .catch((error) => console.error(error))
   }
 
   componentDidUpdate (e) {
@@ -194,6 +230,13 @@ class BasicLayout extends React.PureComponent {
     // if (isMobile && !preProps.isMobile && !collapsed) {
     //   this.handleMenuCollapse(false)
     // }
+  }
+
+  componentWillUnmount () {
+    // if (navigator.platform.indexOf("Win") > -1) {
+    //   ps.destroy()
+    // }
+    window.removeEventListener('resize', this.resizeFunction)
   }
 
   handleDrawerToggle = () => {
@@ -328,6 +371,7 @@ class BasicLayout extends React.PureComponent {
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
+    // console.log(loading)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()

@@ -3,29 +3,17 @@ import React from 'react'
 import nzh from 'nzh/cn'
 import { parse, stringify } from 'qs'
 import numeral from 'numeral'
-import {
-  Column,
-  FilteringState,
-  GroupingState,
-  IntegratedFiltering,
-  IntegratedGrouping,
-  IntegratedPaging,
-  IntegratedSelection,
-  IntegratedSorting,
-  PagingState,
-  SelectionState,
-  SortingState,
-  DataTypeProvider,
-  DataTypeProviderProps,
-} from '@devexpress/dx-react-grid'
+import { DataTypeProvider } from '@devexpress/dx-react-grid'
 
-const currencyFormat = '$0,0.00'
-const qtyFormat = '0.0'
+import config from '@/utils/config'
+
+const { currencyFormat, qtyFormat, currencySymbol } = config
+
 function NumberFormatter (p) {
   const { column } = p
-  let config
+  let cfg
   if (this) {
-    config = this.config[column.name] || {}
+    cfg = this.config[column.name] || {}
   }
   let propConvert = p
   if (typeof p === 'number') {
@@ -35,54 +23,17 @@ function NumberFormatter (p) {
 
   if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
     color = 'red'
-  if (config && config.currency) {
+  if (cfg && cfg.currency) {
     if (text) return numeral(value).format(currencyFormat)
-    return <b style={{ color }}>${numeral(value).format(currencyFormat)}</b>
-  }
-  if (text) return numeral(value).format(qtyFormat)
-  return <b style={{ color }}>${numeral(value).format(qtyFormat)}</b>
-}
-export function TextfieldEditor (props) {
-  // console.log('textfieldeditor', props)
-  const { paras, value, classes, column, ...resetProps } = props
-  const { inputProps } = column
-  const { name, value: v, ...otherInputProps } = inputProps
-  if (name) {
     return (
-      <FastField
-        name={name}
-        render={(args) => {
-          // console.log(args)
-          return (
-            <CustomInput
-              showErrorIcon
-              noWrapper
-              {...resetProps}
-              {...otherInputProps}
-              {...args}
-              onChange={(e) => {
-                args.field.onChange({
-                  target: {
-                    value: e.target.value,
-                    name: args.field.name,
-                  },
-                })
-                if (otherInputProps.onChange) otherInputProps.onChange(e)
-              }}
-            />
-          )
-        }}
-      />
+      <b style={{ color }}>
+        {currencySymbol}
+        {numeral(value).format(currencyFormat)}
+      </b>
     )
   }
-  return (
-    <CustomInput
-      value={v || value}
-      noWrapper
-      {...resetProps}
-      {...otherInputProps}
-    />
-  )
+  if (text) return numeral(value).format(qtyFormat)
+  return <b style={{ color }}>{numeral(value).format(qtyFormat)}</b>
 }
 export function NumberInputEditor (props) {
   const { paras, value, classes, column, ...resetProps } = props
@@ -207,17 +158,7 @@ const QtyTypeProvider = (props) => {
   )
 }
 
-const TextTypeProvider = ({ config, ...restProps }) => {
-  return (
-    <DataTypeProvider
-      editorComponent={TextfieldEditor.bind({ config })}
-      {...restProps}
-    />
-  )
-}
-
 module.exports = {
-  TextTypeProvider,
   DateTypeProvider,
   TimeTypeProvider,
   NumberTypeProvider,

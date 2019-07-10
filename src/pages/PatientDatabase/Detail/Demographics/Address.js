@@ -65,7 +65,7 @@ class Address extends Component {
 
   render () {
     const { addressIndex, classes, theme, values, style, propName } = this.props
-    console.log(values, propName)
+    // console.log(values, propName)
     const v = Object.byString(values, propName)
     // console.log(v)
     let addresses = v

@@ -12,6 +12,9 @@ import { InputNumber } from 'antd'
 import { CustomInput } from '@/components'
 
 import { extendFunc } from '@/utils/utils'
+import config from '@/utils/config'
+
+const { currencyFormat, qtyFormat, currencySymbol } = config
 
 const STYLES = () => {
   return {
@@ -272,7 +275,7 @@ class AntdNumberInput extends React.PureComponent {
         // console.log('formatter', v, nVal)
         if (v === '') return ''
         if (!this.state.focused) {
-          return numeral(v).format('$0,0.00')
+          return currencySymbol + numeral(v).format(`${currencyFormat}`)
         } /* else if (nVal.indexOf('.') > 0) {
           return this.state.value
         }

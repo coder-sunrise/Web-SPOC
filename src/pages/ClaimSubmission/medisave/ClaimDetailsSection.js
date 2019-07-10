@@ -19,7 +19,7 @@ const ClaimDetailsSection = ({ classes, readOnly = true }) => (
         <FastField
           name='hrnNo'
           render={(args) => (
-            <TextField {...args} label='HRN No.' disabled={!readOnly} />
+            <TextField {...args} label='HRN No.' disabled={readOnly} />
           )}
         />
       </GridItem>
@@ -28,7 +28,7 @@ const ClaimDetailsSection = ({ classes, readOnly = true }) => (
         <FastField
           name='claimStatus'
           render={(args) => (
-            <TextField {...args} label='Claim Status' disabled={!readOnly} />
+            <TextField {...args} label='Claim Status' disabled={readOnly} />
           )}
         />
       </GridItem>
@@ -59,7 +59,7 @@ const ClaimDetailsSection = ({ classes, readOnly = true }) => (
         <FastField
           name='chargeCode'
           render={(args) => (
-            <TextField {...args} label='Charge Code' disabled={!readOnly} />
+            <TextField {...args} label='Charge Code' disabled={readOnly} />
           )}
         />
       </GridItem>

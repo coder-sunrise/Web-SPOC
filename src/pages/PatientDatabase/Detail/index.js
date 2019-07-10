@@ -156,6 +156,12 @@ class PatientDetail extends PureComponent {
     if (navigator.platform.indexOf('Win') > -1 && ps) {
       ps.destroy()
     }
+    this.props.dispatch({
+      type: 'patient/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
   }
 
   filterList = (item) => {
@@ -252,9 +258,9 @@ class PatientDetail extends PureComponent {
           <div
             style={
               height > 0 ? (
-                { height: height - 20, overflow: 'auto', padding: '0 2px' }
+                { height: height - 20, overflow: 'auto', padding: 4 }
               ) : (
-                { padding: '0 2px' }
+                { padding: 4 }
               )
             }
           >

@@ -1,6 +1,6 @@
 import { queryNotices } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
-
+import config from '@/utils/config'
 // console.log(
 //   localStorage.getItem('menuCollapsed') !== undefined,
 //   Boolean(localStorage.getItem('menuCollapsed')),
@@ -19,6 +19,7 @@ export default createFormViewModel({
           ? localStorage.getItem('menuCollapsed') === '1'
           : true,
       notices: [],
+      currencySymbol: '$',
     },
     setting: {
       skipDefaultListen: true,
@@ -27,7 +28,7 @@ export default createFormViewModel({
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        // console.log(loct, method)
+        console.log(loct, method)
         if (query.md === 'pt') {
           dispatch({
             type: 'updateState',
@@ -36,10 +37,17 @@ export default createFormViewModel({
               showPatientInfoPanel: true,
             },
           })
+        } else {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              showPatientInfoPanel: false,
+            },
+          })
         }
-        if (typeof window.ga !== 'undefined') {
-          window.ga('send', 'pageview', pathname + search)
-        }
+        // if (typeof window.ga !== 'undefined') {
+        //   window.ga('send', 'pageview', pathname + search)
+        // }
       })
     },
     effects: {
@@ -106,6 +114,21 @@ export default createFormViewModel({
           type: 'updateState',
           payload: {
             collapsed: payload,
+          },
+        })
+      },
+      *getUserSettings ({ payload }, { put, select }) {
+        localStorage.setItem('menuCollapsed', payload ? 1 : 0)
+        const mockUserConfig = {
+          currencySymbol: '$',
+        }
+        if (config.currencySymbol !== mockUserConfig.currencySymbol) {
+          localStorage.setItem('userSettings', JSON.stringify(mockUserConfig))
+        }
+        yield put({
+          type: 'updateState',
+          payload: {
+            ...mockUserConfig,
           },
         })
       },

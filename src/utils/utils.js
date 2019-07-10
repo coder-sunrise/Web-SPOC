@@ -505,6 +505,34 @@ const updateCellValue = (
   }
 }
 
+const observers = {}
+const watchForElementChange = (e) => {
+  let t = e.selector
+
+  let n = e.ongoing
+
+  let a = e.callback
+
+  let i = e.config
+
+  let r =
+    undefined === i
+      ? {
+          childList: true,
+          characterData: true,
+          subtree: true,
+          attributes: true,
+        }
+      : i
+  ;(observers[t] = new MutationObserver((e1) => {
+    e1.forEach((e2) => {
+      a(e2)
+    }),
+      n || observers[t].disconnect()
+  })),
+    observers[t].observe(e.container || document, r)
+}
+
 module.exports = {
   ...cdrssUtil,
   sleep,
@@ -517,5 +545,6 @@ module.exports = {
   updateGlobalVariable,
   getGlobalVariable,
   updateCellValue,
+  watchForElementChange,
   ...module.exports,
 }

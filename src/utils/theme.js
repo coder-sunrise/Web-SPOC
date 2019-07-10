@@ -15,7 +15,7 @@ import {
 } from 'mui-pro-jss'
 
 const defaultFontSize = '1rem'
-const smallFontSize = '0.9rem'
+const smallFontSize = '0.85rem'
 const largeFontSize = '1.2rem'
 
 const defaultIconWidth = '1.2rem'
@@ -163,6 +163,14 @@ const sharedOverrides = {
       },
     },
   },
+  MuiTooltip: {
+    tooltip: {
+      backgroundColor: '#ffffff',
+      color: 'rgba(0, 0, 0, 0.87)',
+      boxShadow:
+        '0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12)',
+    },
+  },
 }
 
 export const defaultTheme = createMuiTheme({
@@ -171,6 +179,7 @@ export const defaultTheme = createMuiTheme({
   },
   props: {
     rowHeight: standardRowHeight,
+    size: 'md',
   },
   overrides: {
     ...sharedOverrides,
@@ -252,8 +261,8 @@ export const defaultTheme = createMuiTheme({
           marginRight: 28,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '23px',
-          lineHeight: '22px',
+          height: '25px',
+          lineHeight: '24px',
         },
         '& .Mui-disabled .anticon': {
           display: 'none',
@@ -290,9 +299,9 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 2,
+        marginTop: 4,
         '& svg': {
-          top: 5,
+          top: 3,
           position: 'relative',
         },
         '& > p': {
@@ -327,6 +336,7 @@ export const smallTheme = createMuiTheme({
   },
   props: {
     rowHeight: smallRowHeight,
+    size: 'sm',
   },
   overrides: {
     ...sharedOverrides,
@@ -374,7 +384,7 @@ export const smallTheme = createMuiTheme({
         '& .ant-select': {
           fontSize: smallFontSize,
           minHeight: 20,
-          padding: '1px 0 0px',
+          // padding: '1px 0 0px',
         },
         '& .ant-input-number, .ant-time-picker': {
           fontSize: smallFontSize,
@@ -404,14 +414,14 @@ export const smallTheme = createMuiTheme({
         //   paddingTop: 3,
         // },
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
-          height: '21px !important',
+          height: '22px !important',
           overflowY: 'auto',
           overflowX: 'hidden',
           marginRight: 27,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '20px',
-          lineHeight: '20px',
+          height: '22px',
+          lineHeight: '22px',
           marginTop: 0,
         },
       },
@@ -446,9 +456,9 @@ export const smallTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 1,
+        marginTop: 2,
         '& svg': {
-          top: 4,
+          top: 3,
           position: 'relative',
         },
         '& > p': {
@@ -483,6 +493,7 @@ export const largeTheme = createMuiTheme({
   },
   props: {
     rowHeight: largeRowHeight,
+    size: 'lg',
   },
   overrides: {
     ...sharedOverrides,
@@ -530,7 +541,7 @@ export const largeTheme = createMuiTheme({
         '& .ant-select': {
           fontSize: largeFontSize,
           minHeight: 25,
-          padding: '3px 0 0px',
+          // padding: '3px 0 0px',
         },
         '& .ant-input-number, .ant-time-picker': {
           fontSize: largeFontSize,
@@ -557,14 +568,14 @@ export const largeTheme = createMuiTheme({
           fontSize: largeFontSize,
         },
         '& .ant-select-selection--multiple .ant-select-selection__rendered': {
-          height: '28px !important',
+          height: '30px !important',
           overflowY: 'auto',
           overflowX: 'hidden',
           marginRight: 30,
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '23px',
-          lineHeight: '22px',
+          height: '27px',
+          lineHeight: '26px',
         },
       },
       input: {
@@ -598,9 +609,9 @@ export const largeTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 3,
+        marginTop: 5,
         '& svg': {
-          top: 4,
+          top: 2,
           position: 'relative',
         },
         '& > p': {

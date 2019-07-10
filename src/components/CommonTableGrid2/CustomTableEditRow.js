@@ -79,13 +79,21 @@ class CustomTableEditRow extends PureComponent {
     super(props)
     const { availableColumns } = this.props
 
-    this.EditCell = (editorProps) => (
-      <EditCell availableColumns={availableColumns} {...editorProps} />
-    )
+    this.EditCell = (editorProps) => {
+      // console.log(availableColumns, editorProps)
+      return <EditCell availableColumns={availableColumns} {...editorProps} />
+    }
+
+    this.EditRow = (editorProps) => {
+      // console.log(editorProps)
+      return <TableEditRow.Row {...editorProps} className='grid-new-row' />
+    }
   }
 
   render () {
-    return <TableEditRow cellComponent={this.EditCell} />
+    return (
+      <TableEditRow cellComponent={this.EditCell} rowComponent={this.EditRow} />
+    )
   }
 }
 

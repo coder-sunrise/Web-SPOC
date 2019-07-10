@@ -29,36 +29,34 @@ class GlobalModalContainer extends PureComponent {
             this.props.handleSubmit()
           }}
         /> */}
-        {global.showPatientInfoPanel && (
-          <CommonModal
-            open={global.showPatientInfoPanel}
-            title='Patient Profile'
-            onClose={(e) => {
-              history.push(
-                getRemovedUrl([
-                  'md',
-                  'cmt',
-                  'pid',
-                  'new',
-                ]),
-              )
-              dispatch({
-                type: 'global/updateAppState',
-                payload: {
-                  showPatientInfoPanel: false,
-                  fullscreen: false,
-                  currentPatientId: null,
-                },
-              })
-            }}
-            // onConfirm={this.toggleModal}
-            fullScreen
-            showFooter={false}
-          >
-            <PatientDetail {...this.props} />
-            {/* {global.currentPatientId} */}
-          </CommonModal>
-        )}
+        <CommonModal
+          open={global.showPatientInfoPanel}
+          title='Patient Profile'
+          onClose={(e) => {
+            history.push(
+              getRemovedUrl([
+                'md',
+                'cmt',
+                'pid',
+                'new',
+              ]),
+            )
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showPatientInfoPanel: false,
+                fullscreen: false,
+                currentPatientId: null,
+              },
+            })
+          }}
+          // onConfirm={this.toggleModal}
+          fullScreen
+          showFooter={false}
+        >
+          <PatientDetail {...this.props} />
+          {/* {global.currentPatientId} */}
+        </CommonModal>
       </div>
     )
   }

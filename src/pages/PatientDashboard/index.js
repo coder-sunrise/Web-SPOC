@@ -75,13 +75,7 @@ const styles = (theme) => ({
   },
 
   rightPanel: {
-    '& h5': {
-      textDecoration: 'underline',
-      marginTop: theme.spacing(2),
-    },
-    // '& h5:not(:first-of-type)': {
-    //   marginTop: theme.spacing(2),
-    // },
+    marginTop: theme.spacing(1),
   },
 })
 @connect(({ patientDashboard, global }) => ({
@@ -142,6 +136,7 @@ class PatientDashboard extends PureComponent {
         <PatientHistory
           override={{
             leftPanel: classes.leftPanel,
+            rightPanel: classes.rightPanel,
           }}
         />
       </div>

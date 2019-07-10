@@ -45,6 +45,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     labelProps,
     inputProps = {},
     error,
+    rawError,
     white,
     inputRootCustomClasses,
     success,
@@ -54,7 +55,6 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     noWrapper = false,
     size = 'medium',
   } = props
-
   const { style, ...resetProps } = props
 
   const labelClasses = classNames({
@@ -112,7 +112,10 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
       <React.Fragment>
         {label !== undefined ? (
           <InputLabel className={labelClasses} htmlFor={id} {...labelProps}>
-            {label}
+            <React.Fragment>
+              {label}
+              {label && rawError && <span className={classes.required}>*</span>}
+            </React.Fragment>
           </InputLabel>
         ) : null}
         {label2 !== undefined ? (

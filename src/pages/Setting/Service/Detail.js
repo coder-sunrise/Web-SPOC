@@ -20,6 +20,7 @@ import {
   Switch,
   EditableTableGrid2,
   notification,
+  SizeContainer,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -115,96 +116,99 @@ class Detail extends PureComponent {
     console.log('detail', props)
     return (
       <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer>
-            <GridItem md={6}>
-              <FastField
-                name='code'
-                render={(args) => <TextField label='Code' {...args} />}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
-              />
-            </GridItem>
-            <GridItem md={10}>
-              <FastField
-                name='effectiveDates'
-                render={(args) => {
-                  return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={2}>
-              <FastField
-                name='autoOrder'
-                render={(args) => {
-                  return <Switch label='Auto Order' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='serviceCategory'
-                render={(args) => {
-                  return <Select label='Service Category' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='revenueCategory'
-                render={(args) => {
-                  return <Select label='Revenue Category' {...args} />
-                }}
-              />
-            </GridItem>
-            <GridItem md={12}>
-              <FastField
-                name='description'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Description'
-                      multiline
-                      rowsMax={4}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          <EditableTableGrid2
-            style={{ marginTop: theme.spacing(1) }}
-            size='sm'
-            rows={values.items.filter((o) => !o.isDeleted)}
-            onRowDoubleClick={this.onRowDoubleClick}
-            FuncProps={{
-              pagerConfig: {
-                containerExtraComponent: this.PagerContent,
-              },
-            }}
-            EditingProps={{
-              showAddCommand: true,
-              editingRowIds: this.state.editingRowIds,
-              rowChanges: this.state.rowChanges,
-              onEditingRowIdsChange: this.changeEditingRowIds,
-              onRowChangesChange: this.changeRowChanges,
-              onCommitChanges: this.commitChanges,
-            }}
-            schema={itemSchema}
-            {...this.tableParas}
-          />
-        </div>
+        <SizeContainer size='sm'>
+          <div style={{ margin: theme.spacing(1) }}>
+            <GridContainer>
+              <GridItem md={6}>
+                <FastField
+                  name='code'
+                  render={(args) => <TextField label='Code' {...args} />}
+                />
+              </GridItem>
+              <GridItem md={6}>
+                <FastField
+                  name='displayValue'
+                  render={(args) => (
+                    <TextField label='Display Value' {...args} />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={10}>
+                <FastField
+                  name='effectiveDates'
+                  render={(args) => {
+                    return (
+                      <DateRangePicker
+                        label='Effective Start Date'
+                        label2='End Date'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={2}>
+                <FastField
+                  name='autoOrder'
+                  render={(args) => {
+                    return <Switch label='Auto Order' {...args} />
+                  }}
+                />
+              </GridItem>
+              <GridItem md={6}>
+                <FastField
+                  name='serviceCategory'
+                  render={(args) => {
+                    return <Select label='Service Category' {...args} />
+                  }}
+                />
+              </GridItem>
+              <GridItem md={6}>
+                <FastField
+                  name='revenueCategory'
+                  render={(args) => {
+                    return <Select label='Revenue Category' {...args} />
+                  }}
+                />
+              </GridItem>
+              <GridItem md={12}>
+                <FastField
+                  name='description'
+                  render={(args) => {
+                    return (
+                      <TextField
+                        label='Description'
+                        multiline
+                        rowsMax={4}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+            <EditableTableGrid2
+              style={{ marginTop: theme.spacing(1) }}
+              rows={values.items.filter((o) => !o.isDeleted)}
+              onRowDoubleClick={this.onRowDoubleClick}
+              FuncProps={{
+                pagerConfig: {
+                  containerExtraComponent: this.PagerContent,
+                },
+              }}
+              EditingProps={{
+                showAddCommand: true,
+                editingRowIds: this.state.editingRowIds,
+                rowChanges: this.state.rowChanges,
+                onEditingRowIdsChange: this.changeEditingRowIds,
+                onRowChangesChange: this.changeRowChanges,
+                onCommitChanges: this.commitChanges,
+              }}
+              schema={itemSchema}
+              {...this.tableParas}
+            />
+          </div>
+        </SizeContainer>
         {footer &&
           footer({
             onConfirm: props.handleSubmit,

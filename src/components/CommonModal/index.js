@@ -36,8 +36,6 @@ function getContainerHeight (props) {
 class CommonModal extends React.PureComponent {
   state = {
     // open: false,
-    fullWidth: true,
-    maxWidth: 'md',
     height: 0,
   }
 
@@ -63,6 +61,7 @@ class CommonModal extends React.PureComponent {
       confirmProps = {},
       cancelProps,
       confirmBtnText = 'Confirm',
+      extraButtons,
     }) => {
       const { disabled = false } = confirmProps
       return (
@@ -75,11 +74,11 @@ class CommonModal extends React.PureComponent {
           >
             Cancel
           </Button>
+          {extraButtons}
           <Button
             color='primary'
             onClick={onConfirm}
             {...confirmProps}
-            style={{ marginLeft: theme.spacing.unit }}
             disabled={disabled || loading.global}
           >
             {loading.global ? 'Processing...' : `${confirmBtnText}`}

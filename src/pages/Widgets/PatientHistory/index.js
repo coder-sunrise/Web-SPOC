@@ -92,6 +92,8 @@ const styles = (theme) => ({
     marginTop: 0,
   },
   rightPanel: {
+    marginTop: 0,
+
     '& h5': {
       textDecoration: 'underline',
       marginTop: theme.spacing(2),
@@ -335,9 +337,9 @@ class PatientHistory extends Component {
   }
 
   render () {
-    const { theme, classes, override = {} } = this.props
+    const { theme, style, classes, override = {} } = this.props
     return (
-      <div>
+      <div style={style}>
         <CardContainer
           hideHeader
           size='sm'
@@ -367,7 +369,10 @@ class PatientHistory extends Component {
         <CardContainer
           hideHeader
           size='sm'
-          className={classes.rightPanel}
+          className={classnames({
+            [classes.rightPanel]: true,
+            [override.rightPanel]: true,
+          })}
           // style={{ marginLeft: theme.spacing.unit * 2 }}
         >
           <Select

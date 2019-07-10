@@ -6,9 +6,11 @@ import { withStyles } from '@material-ui/core'
 import {
   NumberInput,
   NumberTypeProvider as NumberTypeProviderOrg,
-  currencyFormat,
-  qtyFormat,
 } from '@/components'
+
+import config from '@/utils/config'
+
+const { currencyFormat, qtyFormat, currencySymbol } = config
 
 const styles = (theme) => ({
   root: {
@@ -75,7 +77,12 @@ const NumberFormatter = (columnExtensions) =>
 
       if (cfg && cfg.currency) {
         if (text) return numeral(value).format(currencyFormat)
-        return <b style={{ color }}>{numeral(value).format(currencyFormat)}</b>
+        return (
+          <b style={{ color }}>
+            {currencySymbol}
+            {numeral(value).format(currencyFormat)}
+          </b>
+        )
       }
       if (text) return numeral(value).format(qtyFormat)
       return <b style={{ color }}>{numeral(value).format(qtyFormat)}</b>

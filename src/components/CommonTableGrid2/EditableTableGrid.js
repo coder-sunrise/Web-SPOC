@@ -115,7 +115,10 @@ class EditableTableGrid extends PureComponent {
       //   type: `emergencyContact/localDelete`,
       //   payload: deleted,
       // }).then(setArrayValue)
-
+      console.log(deleted)
+      if (deleted[0] === undefined) {
+        newRows = newRows.filter((o) => o.id !== undefined)
+      }
       const deletedEcs = newRows.filter((row) =>
         deleted.find((o) => o === row.id),
       )
@@ -164,6 +167,7 @@ class EditableTableGrid extends PureComponent {
   containerComponent = (p) => {
     // console.log(this.props)
     const { theme, FuncProps = {} } = this.props
+    // console.log(theme)
     const { pagerConfig = {} } = FuncProps
     const { containerExtraComponent } = pagerConfig
     // console.log(containerExtraComponent)
@@ -174,7 +178,7 @@ class EditableTableGrid extends PureComponent {
       } = {},
       ...props
     } = this.props
-    console.log(props, p)
+    // console.log(props, p)
     return (
       <div style={{ position: 'relative' }}>
         <div
@@ -182,12 +186,18 @@ class EditableTableGrid extends PureComponent {
             position: 'absolute',
             height: '100%',
             display: 'flex',
-            // padding: theme.spacing.unit * 2,
+            padding: theme.spacing(theme.props.size === 'sm' ? 0.5 : 1),
           }}
         >
           {showAddCommand && (
             <Button
               onClick={(e) => {
+                window.g_app._store.dispatch({
+                  type: 'global/updateState',
+                  payload: {
+                    disableSave: true,
+                  },
+                })
                 $(e.target)
                   .parents('.medisys-table')
                   .find('.medisys-table-add')
@@ -216,6 +226,19 @@ class EditableTableGrid extends PureComponent {
     } = this.props
 
     return showAddCommand && this.state.addedRows.length === 0
+  }
+
+  componentDidUpdate () {
+    const { EditingProps: { editingRowIds = [] } = {} } = this.props
+    // console.log(editingRowIds, this.addable())
+    if (editingRowIds.length === 0 && this.addable()) {
+      window.g_app._store.dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
+    }
   }
 
   render () {
@@ -250,9 +273,7 @@ class EditableTableGrid extends PureComponent {
         {...props}
         extraState={[
           <EditingState
-            editingRowIds={[
-              ...new Set(editingRowIds.concat(this.state.errorRows)),
-            ]}
+            editingRowIds={editingRowIds}
             rowChanges={rowChanges}
             onAddedRowsChange={this.onAddedRowsChange}
             onEditingRowIdsChange={this._onEditingRowIdsChange}
@@ -270,23 +291,23 @@ class EditableTableGrid extends PureComponent {
             showEditCommand={showEditCommand}
             showDeleteCommand={showDeleteCommand}
             commandComponent={CommandComponent}
-            // cellComponent={(cellProps) => {
-            //   console.log(cellProps)
-            //   const { children, ...p } = cellProps
-            //   return (
-            //     <Table.Cell {...p}>
-            //       {children.map((o) => {
-            //         if (o) {
-            //           return React.cloneElement(o, {
-            //             row: p.row,
-            //             ...o.props,
-            //           })
-            //         }
-            //         return null
-            //       })}
-            //     </Table.Cell>
-            //   )
-            // }}
+            cellComponent={(cellProps) => {
+              const { children, ...p } = cellProps
+              return (
+                <Table.Cell {...p}>
+                  {children.map((o) => {
+                    if (o) {
+                      return React.cloneElement(o, {
+                        row: p.row,
+                        editingRowIds,
+                        ...o.props,
+                      })
+                    }
+                    return null
+                  })}
+                </Table.Cell>
+              )
+            }}
           />,
         ]}
         extraGetter={[

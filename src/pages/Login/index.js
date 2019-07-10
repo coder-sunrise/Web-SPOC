@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import NProgress from 'nprogress'
 import router from 'umi/router'
 // material ui
 import { MuiThemeProvider, withStyles } from '@material-ui/core'
@@ -16,7 +17,7 @@ import loginBackground from '../../assets/img/login.jpeg'
 const styles = (theme) => ({
   ...authStyle(theme),
 })
-@connect(({ loginSEMR }) => ({ loginSEMR }))
+@connect(({ loginSEMR, loading }) => ({ loginSEMR, loading }))
 class LoginPage extends PureComponent {
   componentDidMount = () => {
     const haveToken = localStorage.getItem('token')
@@ -46,7 +47,11 @@ class LoginPage extends PureComponent {
   }
 
   render () {
-    const { classes, ...rest } = this.props
+    const { classes, loading, ...rest } = this.props
+    NProgress.start()
+    if (!loading.global) {
+      NProgress.done()
+    }
     return (
       <div className={classes.wrapper}>
         <SizeContainer size='lg'>
