@@ -347,6 +347,16 @@ const routes = [
             name: 'service',
             component: './Setting/Service',
           },
+          {
+            path: '/setting/publicholiday',
+            name: 'publicholiday',
+            component: './Setting/PublicHoliday',
+          },
+          {
+            path: '/setting/doctorblock',
+            name: 'doctorblock',
+            component: './Setting/DoctorBlock',
+          },
         ],
       },
       // Settings

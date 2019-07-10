@@ -83,6 +83,8 @@ export default {
   'menu.setting': 'Setting',
   'menu.setting.clinicinfo': 'Clinic Information',
   'menu.setting.service': 'Service',
+  'menu.setting.publicholiday': 'Public Holiday',
+  'menu.setting.doctorblock': 'Doctor Block',
   'menu.setting.clinicSetting': 'Clinic Setting',
   'menu.setting.systemSetting': 'System Setting',
   'menu.setting.printSetting': 'Print Setting',

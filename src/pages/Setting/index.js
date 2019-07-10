@@ -100,6 +100,11 @@ const menuData = [
       },
       {
         text: 'Public Holiday',
+        url: '/setting/publicholiday',
+      },
+      {
+        text: 'Doctor Block',
+        url: '/setting/doctorblock',
       },
     ],
   },
