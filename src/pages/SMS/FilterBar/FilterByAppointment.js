@@ -2,10 +2,17 @@ import React from 'react'
 import { formatMessage } from 'umi/locale'
 // formik
 import { FastField } from 'formik'
+// material ui
+import { withStyles } from '@material-ui/core'
 // common components
 import { Checkbox, GridItem, DatePicker, Select } from '@/components'
 
-const FilterByAppointment = () => {
+const styles = (theme) => ({
+  checkbox: {
+    paddingTop: `${theme.spacing(2)}px !important`,
+  },
+})
+const FilterByAppointment = ({ classes }) => {
   return (
     <React.Fragment>
       <GridItem xs={2}>
@@ -84,7 +91,7 @@ const FilterByAppointment = () => {
           }}
         />
       </GridItem>
-      <GridItem xs={4}>
+      <GridItem xs={4} className={classes.checkbox}>
         <FastField
           name='ExcludeSent'
           render={(args) => (
@@ -152,4 +159,6 @@ const FilterByAppointment = () => {
   )
 }
 
-export default FilterByAppointment
+export default withStyles(styles, { name: 'FilterByAppointment' })(
+  FilterByAppointment,
+)

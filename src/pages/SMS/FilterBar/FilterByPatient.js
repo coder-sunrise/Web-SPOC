@@ -1,6 +1,8 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+// material ui
+import { withStyles } from '@material-ui/core'
 // common components
 import {
   DateRangePicker,
@@ -10,7 +12,13 @@ import {
   Select,
 } from '@/components'
 
-const FilterByPatient = () => {
+const styles = (theme) => ({
+  checkbox: {
+    paddingTop: `${theme.spacing(2)}px !important`,
+  },
+})
+
+const FilterByPatient = ({ classes }) => {
   return (
     <React.Fragment>
       <GridItem md={4}>
@@ -41,7 +49,7 @@ const FilterByPatient = () => {
           )}
         />
       </GridItem>
-      <GridItem xs={4}>
+      <GridItem xs={4} className={classes.checkbox}>
         <FastField
           name='consent'
           render={(args) => <Checkbox simple label='PDPA Consent' {...args} />}
@@ -68,4 +76,4 @@ const FilterByPatient = () => {
   )
 }
 
-export default FilterByPatient
+export default withStyles(styles, { name: 'FilterByPatient' })(FilterByPatient)
