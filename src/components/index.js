@@ -8,6 +8,7 @@ export FormField from './Form/FormField'
 
 export Checkbox from './Checkbox'
 export Transfer from './Transfer'
+export ButtonGroup from './ButtonGroup'
 export RadioGroup from './RadioGroup'
 export CheckboxGroup from './CheckboxGroup'
 

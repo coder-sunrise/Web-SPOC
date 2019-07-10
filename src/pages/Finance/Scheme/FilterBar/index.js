@@ -143,7 +143,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
               variant='contained'
               color='primary'
               onClick={() => {
-                history.push('/finance/scheme')
+                history.push('/finance/scheme/details')
               }}
             >
               <Add />

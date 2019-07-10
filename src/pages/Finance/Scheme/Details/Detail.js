@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
@@ -19,13 +18,13 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ consumableDetail, dispatch }) => {
+const Detail = ({ schemeDetail, dispatch }) => {
   useEffect(() => {
-    if (consumableDetail.currentId) {
+    if (schemeDetail.currentId) {
       dispatch({
-        type: 'consumableDetail/query',
+        type: 'schemeDetail/query',
         payload: {
-          id: consumableDetail.currentId,
+          id: schemeDetail.currentId,
         },
       })
     }
@@ -49,7 +48,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.consumable.code',
+                        id: 'finance.scheme.detail.code',
                       })}
                       {...args}
                     />
@@ -64,7 +63,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.consumable.name',
+                        id: 'finance.scheme.detail.name',
                       })}
                       {...args}
                     />
@@ -79,7 +78,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.consumable.description',
+                        id: 'finance.scheme.detail.description',
                       })}
                       {...args}
                     />
@@ -94,25 +93,10 @@ const Detail = ({ consumableDetail, dispatch }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.consumable.remarks',
+                        id: 'finance.scheme.detail.remarks',
                       })}
                       multiline
                       rowsMax='5'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='isEnableRetail'
-                render={(args) => {
-                  return (
-                    <Switch
-                      label={formatMessage({
-                        id: 'inventory.master.consumable.enableRetail',
-                      })}
                       {...args}
                     />
                   )
@@ -126,57 +110,44 @@ const Detail = ({ consumableDetail, dispatch }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='supplier'
+                name='schemeType'
+                render={(args) => {
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'finance.scheme.detail.type',
+                      })}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='schemeCategory'
+                render={(args) => {
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'finance.scheme.detail.category',
+                      })}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='coPayer'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({
-                      id: 'inventory.master.consumable.supplier',
+                      id: 'finance.scheme.detail.coPayer',
                     })}
-                    code='Supplier'
+                    code='coPayer'
                     max={10}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='baseUOM'
-                render={(args) => (
-                  <CodeSelect
-                    label={formatMessage({
-                      id: 'inventory.master.consumable.baseUOM',
-                    })}
-                    code='BaseUOM'
-                    max={10}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='consumableCategory'
-                render={(args) => (
-                  <Select
-                    label={formatMessage({
-                      id: 'inventory.master.consumable.category',
-                    })}
-                    options={[]}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='revenueCategory'
-                render={(args) => (
-                  <Select
-                    label={formatMessage({
-                      id: 'inventory.master.consumable.revenueCategory',
-                    })}
-                    options={[]}
                     {...args}
                   />
                 )}
@@ -188,7 +159,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 render={(args) => (
                   <DatePicker
                     label={formatMessage({
-                      id: 'inventory.master.consumable.effectiveStartDate',
+                      id: 'finance.scheme.detail.effectiveStartDate',
                     })}
                     {...args}
                   />
@@ -201,7 +172,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 render={(args) => (
                   <DatePicker
                     label={formatMessage({
-                      id: 'inventory.master.consumable.effectiveEndDate',
+                      id: 'finance.scheme.detail.effectiveEndDate',
                     })}
                     {...args}
                   />
@@ -218,7 +189,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ consumableDetail }) => ({
-    consumableDetail,
-  })),
+  // connect(({ schemeDetail }) => ({
+  //   schemeDetail,
+  // })),
 )(Detail)
