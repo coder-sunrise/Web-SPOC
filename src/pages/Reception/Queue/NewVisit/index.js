@@ -64,7 +64,7 @@ class NewVisit extends PureComponent {
 
   render () {
     const { classes, handleSubmit, isValidating, isSubmitting } = this.props
-    console.log({ isValidating, isSubmitting })
+
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>

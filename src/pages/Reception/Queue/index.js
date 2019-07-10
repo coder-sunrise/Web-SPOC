@@ -196,9 +196,18 @@ class Queue extends PureComponent {
       dispatch({
         type: 'queueLog/fetchPatientListByName',
         payload: currentQuery,
-      }).then(() => {
-        this.setState({ showPatientSearch: true })
-      })
+      }).then(this.showSearchResult)
+  }
+
+  showSearchResult = () => {
+    const { queueLog } = this.props
+    const { patientList } = queueLog
+
+    if (patientList.length === 1) {
+      this.showVisitRegistration(patientList[0].id)
+    } else if (patientList.length > 1)
+      this.setState({ showPatientSearch: true })
+    else this.setState({ showRegisterNewPatient: true })
   }
 
   render () {
