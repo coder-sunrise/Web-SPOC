@@ -6,13 +6,13 @@ import { withStyles } from '@material-ui/core'
 // common components
 import { Button, CardContainer, GridContainer, GridItem } from '@/components'
 // sub components
-import BaseSearchBar from '../../common/BaseSearchBar'
-import TableGrid from '../../common/TableGrid'
+import BaseSearchBar from '../common/BaseSearchBar'
+import TableGrid from '../common/TableGrid'
 // variables
 import {
-  NewCHASColumnExtensions,
-  NewCHASColumns,
-  NewCHASTableData,
+  NewMedisaveColumnExtensions,
+  NewMedisaveColumns,
+  NewMedisaveTableData,
   TableConfig,
 } from './variables'
 
@@ -29,25 +29,25 @@ const styles = (theme) => ({
 @withFormik({
   mapPropsToValues: () => ({}),
 })
-class RejectedCHAS extends React.Component {
+class NewMedisave extends React.Component {
   render () {
     const { classes, handleContextMenuItemClick } = this.props
+
     return (
       <CardContainer hideHeader size='sm'>
-        <BaseSearchBar />
+        <BaseSearchBar hideInvoiceDate />
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
-              data={NewCHASTableData}
-              columnExtensions={NewCHASColumnExtensions}
-              columns={NewCHASColumns}
+              data={NewMedisaveTableData}
+              columnExtensions={NewMedisaveColumnExtensions}
+              columns={NewMedisaveColumns}
               tableConfig={TableConfig}
               onContextMenuItemClick={handleContextMenuItemClick}
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
             <Button color='info'>Refresh</Button>
-            <Button color='primary'>Re-Submit Claim</Button>
           </GridItem>
         </GridContainer>
       </CardContainer>
@@ -55,4 +55,4 @@ class RejectedCHAS extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'RejectedCHAS' })(RejectedCHAS)
+export default withStyles(styles, { name: 'DraftMedisave' })(NewMedisave)

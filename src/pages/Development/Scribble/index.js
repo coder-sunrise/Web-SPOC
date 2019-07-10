@@ -11,17 +11,12 @@ class Scribble extends React.Component {
       <div>
         <ImageEditor
           includeUI={{
-            loadImage: {
-              path: 'img/sampleImage.jpg',
-              name: 'SampleImage',
-            },
             theme: uiTheme,
             menu: [
               'shape',
-              'filter',
               'draw',
             ],
-            initMenu: 'filter',
+            initMenu: 'draw',
             uiSize: {
               width: '1000px',
               height: '700px',
@@ -34,7 +29,6 @@ class Scribble extends React.Component {
             cornerSize: 20,
             rotatingPointOffset: 70,
           }}
-          usageStatistics
         />
       </div>
     )

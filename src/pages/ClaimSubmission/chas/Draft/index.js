@@ -1,5 +1,4 @@
 import React from 'react'
-import router from 'umi/router'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -7,8 +6,8 @@ import { withStyles } from '@material-ui/core'
 // common components
 import { Button, CardContainer, GridContainer, GridItem } from '@/components'
 // sub components
-import BaseSearchBar from '../components/BaseSearchBar'
-import TableGrid from '../components/TableGrid'
+import BaseSearchBar from '../../common/BaseSearchBar'
+import TableGrid from '../../common/TableGrid'
 // variables
 import {
   NewCHASColumnExtensions,
@@ -31,26 +30,6 @@ const styles = (theme) => ({
   mapPropsToValues: () => ({}),
 })
 class DraftCHAS extends React.Component {
-  navigateToInvoiceDetails = (row) => {
-    const { invoiceNo } = row
-    const processedInvoiceNo = invoiceNo.replace('/', '-')
-    router.push(`/claim-submission/chas/invoice/${processedInvoiceNo}`)
-  }
-
-  handleContextMenuItemClick = (currentTarget, row) => {
-    const { id } = currentTarget
-    switch (id) {
-      case '0':
-        this.openClaimDetails({ claimDetails: row })
-        break
-      case '1':
-        this.navigateToInvoiceDetails(row)
-        break
-      default:
-        break
-    }
-  }
-
   render () {
     const { classes, handleContextMenuItemClick } = this.props
 

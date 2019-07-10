@@ -1,32 +1,16 @@
 import React from 'react'
 // common components
 import { CommonModal, CardContainer, NavPills } from '@/components'
-// sub components
-import Draft from './Draft'
-import New from './New'
-import Submitted from './Submitted'
-import Approved from './Approved'
-import Rejected from './Rejected'
 import ClaimDetails from '../common/ClaimDetails'
 
-class CHAS extends React.Component {
-  state = {
-    showClaimDetails: false,
-    claimDetails: {},
-  }
+import New from './New'
+import Draft from './Draft'
 
-  openClaimDetails = ({ claimDetails }) =>
-    this.setState({ showClaimDetails: true, claimDetails })
-
-  closeClaimDetails = () =>
-    this.setState({ showClaimDetails: false, claimDetails: {} })
-
+class Medisave extends React.Component {
   navigateToInvoiceDetails = (row) => {
-    const { history } = this.props
     const { invoiceNo } = row
     const processedInvoiceNo = invoiceNo.replace('/', '-')
-
-    history.push(`/claim-submission/chas/invoice/${processedInvoiceNo}`)
+    // router.push(`/claim-submission/Medisave/invoice/${processedInvoiceNo}`)
   }
 
   handleContextMenuItemClick = (currentTarget, row) => {
@@ -43,12 +27,13 @@ class CHAS extends React.Component {
     }
   }
 
+  openClaimDetails = () => {}
+
   render () {
-    const { showClaimDetails, claimDetails } = this.state
     return (
       <CardContainer hideHeader size='sm'>
         <NavPills
-          active={1}
+          active={0}
           tabs={[
             {
               tabButton: 'Draft',
@@ -66,43 +51,19 @@ class CHAS extends React.Component {
                 />
               ),
             },
-            {
-              tabButton: 'Submitted',
-              tabContent: (
-                <Submitted
-                  handleContextMenuItemClick={this.handleContextMenuItemClick}
-                />
-              ),
-            },
-            {
-              tabButton: 'Approved',
-              tabContent: (
-                <Approved
-                  handleContextMenuItemClick={this.handleContextMenuItemClick}
-                />
-              ),
-            },
-            {
-              tabButton: 'Rejected',
-              tabContent: (
-                <Rejected
-                  handleContextMenuItemClick={this.handleContextMenuItemClick}
-                />
-              ),
-            },
           ]}
         />
-        <CommonModal
+        {/* <CommonModal
           title='Claim Details'
           open={showClaimDetails}
           onClose={this.closeClaimDetails}
           onConfirm={this.closeClaimDetails}
         >
           <ClaimDetails claimDetails={claimDetails} />
-        </CommonModal>
+        </CommonModal> */}
       </CardContainer>
     )
   }
 }
 
-export default CHAS
+export default Medisave

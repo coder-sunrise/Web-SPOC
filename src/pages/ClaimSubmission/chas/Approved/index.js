@@ -12,8 +12,8 @@ import {
   Select,
 } from '@/components'
 // sub components
-import BaseSearchBar from '../components/BaseSearchBar'
-import TableGrid from '../components/TableGrid'
+import BaseSearchBar from '../../common/BaseSearchBar'
+import TableGrid from '../../common/TableGrid'
 // variables
 import {
   NewCHASColumnExtensions,

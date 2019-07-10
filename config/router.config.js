@@ -337,15 +337,20 @@ const routes = [
             component: './ClaimSubmission',
           },
           {
+            path: '/claim-submission/chas',
+            name: 'chas',
+            component: './ClaimSubmission/chas',
+          },
+          {
             path: '/claim-submission/chas/invoice/:invoiceNo',
             name: 'patientInvoice',
             hideInMenu: true,
             component: './Finance/Invoice/Details',
           },
           {
-            path: '/claim-submission/chas',
-            name: 'chas',
-            component: './ClaimSubmission/chas',
+            path: '/claim-submission/medisave',
+            name: 'medisave',
+            component: './ClaimSubmission/medisave',
           },
         ],
       },

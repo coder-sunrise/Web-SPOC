@@ -14,35 +14,42 @@ const TableGrid = ({
   columnExtensions,
   tableConfig,
   onContextMenuItemClick,
+  contextMenuOptions = undefined,
 }) => {
   const Cell = React.memo(({ ...tableProps }) => {
     const handleMenuItemClick = (event) => {
       onContextMenuItemClick(event.currentTarget, tableProps.row)
     }
 
+    const defaultContextMenuOptions = [
+      {
+        id: 0,
+        label: 'Claim Details',
+        Icon: NearMe,
+        onClick: handleMenuItemClick,
+      },
+      {
+        id: 1,
+        label: 'Invoice Detail',
+        Icon: Money,
+
+        onClick: handleMenuItemClick,
+      },
+    ]
+    const options =
+      contextMenuOptions !== undefined
+        ? contextMenuOptions.map((item) => ({
+            ...item,
+            onClick: handleMenuItemClick,
+          }))
+        : defaultContextMenuOptions
+
     if (tableProps.column.name === 'action') {
       return (
         <Table.Cell {...tableProps}>
           <Tooltip title='More Actions' placement='bottom'>
             <div style={{ display: 'inline-block' }}>
-              <GridButton
-                row={tableProps.row}
-                ContextMenuOptions={[
-                  {
-                    id: 0,
-                    label: 'Claim Details',
-                    Icon: NearMe,
-                    onClick: handleMenuItemClick,
-                  },
-                  {
-                    id: 1,
-                    label: 'Invoice Detail',
-                    Icon: Money,
-
-                    onClick: handleMenuItemClick,
-                  },
-                ]}
-              />
+              <GridButton row={tableProps.row} ContextMenuOptions={options} />
             </div>
           </Tooltip>
         </Table.Cell>

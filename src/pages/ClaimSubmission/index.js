@@ -45,7 +45,14 @@ class ClaimSubmission extends React.Component {
 
         <GridItem md={2}>
           <Badge badgeContent={5} color='error' className={classes.badge}>
-            <Button fullWidth bigview color='primary' variant='outlined'>
+            <Button
+              fullWidth
+              bigview
+              color='primary'
+              variant='outlined'
+              id='medisave'
+              onClick={this.navigate}
+            >
               <Note />
               MEDISAVE
             </Button>
