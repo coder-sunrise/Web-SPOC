@@ -4,7 +4,7 @@ import MailIcon from '@material-ui/icons/Mail'
 import { FastField, withFormik } from 'formik'
 import { compose } from 'redux'
 import lodash from 'lodash'
-import Badge from '@material-ui/core/Badge'
+import { Badge } from '@material-ui/core'
 
 import {
   GridContainer,
@@ -16,8 +16,14 @@ import {
 import { formatMessage } from 'umi/locale'
 
 const New = ({ values, onSend, setFieldValue, errors }) => {
-  const [ messageNumber, setMessageNumber ] = useState(1)
-  const [ messageArr, setMessageArr ] = useState([])
+  const [
+    messageNumber,
+    setMessageNumber,
+  ] = useState(1)
+  const [
+    messageArr,
+    setMessageArr,
+  ] = useState([])
   const SMSTemplate = [
     {
       name: 'Appointment Reminder',
@@ -112,8 +118,10 @@ const New = ({ values, onSend, setFieldValue, errors }) => {
         {values.message ? values.message.length : 0}/160
       </GridItem>
       <GridItem md={11}>
-        <Badge badgeContent={messageNumber} color='primary'>
-          <MailIcon />
+        <Badge badgeContent={messageNumber} color='error'>
+          <Button justIcon color='primary'>
+            <MailIcon />
+          </Button>
         </Badge>
       </GridItem>
     </GridContainer>
