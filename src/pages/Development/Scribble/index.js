@@ -1,20 +1,25 @@
 import React from 'react'
 import 'tui-image-editor/dist/tui-image-editor.css'
 import ImageEditor from '@toast-ui/react-image-editor'
+// material ui
+import { withStyles } from '@material-ui/core'
+// toast ui theme
 import uiTheme from './uiTheme'
 // common component
 import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+
+const styles = (theme) => ({
+  buttonsBar: {
+    margin: theme.spacing(2),
+    // marginBottom: theme.spacing(2),
+  },
+})
 
 class Scribble extends React.Component {
   editorRef = React.createRef()
 
   state = {
     action: 'shape',
-  }
-
-  onActionClick = (event) => {
-    const { currentTarget } = event
-    this.setState({ action: currentTarget.id })
   }
 
   uploadImage = () => {
@@ -41,14 +46,6 @@ class Scribble extends React.Component {
       .catch((error) => {
         console.log({ error })
       })
-    // editorInstance
-    //   .loadImageFromFile(
-    //     'C:\\Users\\zhebin\\Pictures\\england-northumberland-craster-on-the-north-sea-coast-dunstanburgh-K1AAD6.jpg',
-    //   )
-    //   .then((result) => {
-    //     console.log('old : ' + result.oldWidth + ', ' + result.oldHeight)
-    //     console.log('new : ' + result.newWidth + ', ' + result.newHeight)
-    //   })
   }
 
   onFileChange = (event) => {
@@ -74,12 +71,95 @@ class Scribble extends React.Component {
     // })
   }
 
+  onActionClick = (event) => {
+    const { currentTarget } = event
+
+    const imageEditor = this.editorRef.current.getInstance()
+
+    switch (currentTarget.id) {
+      case 'draw':
+        this.setState({ action: currentTarget.id })
+        imageEditor.changeCursor('crosshair')
+        break
+      case 'circle_shape':
+        this.setState({ action: currentTarget.id })
+        imageEditor.changeCursor('crosshair')
+        imageEditor.setBrush({
+          width: 12,
+          color: '#000',
+        })
+        break
+      case 'undo':
+        imageEditor.undo()
+        break
+      case 'redo':
+        imageEditor.redo()
+        break
+      case 'reset':
+        imageEditor.clearObjects()
+        break
+      default:
+        break
+    }
+  }
+
+  handleMousedown = (event, originPointer) => {
+    const { action } = this.state
+    const imageEditor = this.editorRef.current.getInstance()
+
+    switch (action) {
+      case 'draw': {
+        console.log('start draw')
+        const success = imageEditor.startDrawingMode('FREE_DRAWING')
+        console.log({ imageEditor, mode: imageEditor.getDrawingMode() })
+        break
+      }
+      case 'circle_shape':
+        {
+          console.log('start circle_shape')
+
+          const mode = imageEditor.getDrawingMode()
+          imageEditor.setDrawingShape('circle', {
+            fill: 'transparent',
+            stroke: 'blue',
+            strokeWidth: 3,
+            rx: 10,
+            ry: 100,
+          })
+          imageEditor.startDrawingMode('SHAPE')
+          console.log({ imageEditor })
+          // if (mode === 'NORMAL') {
+
+          // } else {
+          //   imageEditor.stopDrawingMode()
+          // }
+          // imageEditor.setObjectPosition()
+          // if (mode !== 'NORMAL') imageEditor.stopDrawingMode()
+        }
+        break
+      default:
+        break
+    }
+  }
+
+  downloadImage = () => {
+    const imageEditor = this.editorRef.current.getInstance()
+    const dataurl = imageEditor.toDataURL()
+    console.log({ imageEditor, dataurl })
+  }
+
   render () {
     const { action } = this.state
+    const { classes } = this.props
+
     return (
       <CardContainer hideHeader>
-        <GridContainer justify='center' alignItems='center'>
-          <GridItem md={12}>
+        <GridContainer
+          direction='column'
+          justify='space-between'
+          alignItems='center'
+        >
+          <GridItem className={classes.buttonsBar}>
             <input
               type='file'
               id='file'
@@ -96,13 +176,50 @@ class Scribble extends React.Component {
             </Button>
             <Button
               color='primary'
+              variant='outlined'
+              onClick={this.downloadImage}
+            >
+              Download
+            </Button>
+          </GridItem>
+          <GridItem md={6} className={classes.buttonsBar}>
+            <Button
+              color='primary'
               size='sm'
-              simple={action !== 'shape'}
-              id='shape'
+              variant='outlined'
+              id='undo'
               onClick={this.onActionClick}
             >
-              Shape
+              Undo
             </Button>
+            <Button
+              color='primary'
+              size='sm'
+              variant='outlined'
+              id='redo'
+              onClick={this.onActionClick}
+            >
+              Redo
+            </Button>
+            <Button
+              color='primary'
+              size='sm'
+              variant='outlined'
+              id='reset'
+              onClick={this.onActionClick}
+            >
+              Reset
+            </Button>
+            <Button
+              color='primary'
+              size='sm'
+              simple={action !== 'circle_shape'}
+              id='circle_shape'
+              onClick={this.onActionClick}
+            >
+              Circle Shape
+            </Button>
+
             <Button
               color='primary'
               size='sm'
@@ -119,14 +236,20 @@ class Scribble extends React.Component {
               ref={this.editorRef}
               includeUI={{
                 theme: uiTheme,
-                // menu: [],
+                // menu: [
+                //   'draw',
+                // ],
                 uiSize: {
                   width: '1000px',
                   height: '700px',
                 },
               }}
-              cssMaxHeight={700}
-              cssMaxWidth={700}
+              onMousedown={this.handleMousedown}
+              onObjectactivated={(props) => {
+                console.log('onObjectActivated', { props })
+              }}
+              // cssMaxHeight={700}
+              // cssMaxWidth={700}
               selectionStyle={{
                 cornerSize: 20,
                 rotatingPointOffset: 70,
@@ -139,4 +262,4 @@ class Scribble extends React.Component {
   }
 }
 
-export default Scribble
+export default withStyles(styles, { name: 'Scribble' })(Scribble)
