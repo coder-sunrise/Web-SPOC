@@ -395,7 +395,6 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-
               {
                 values.patientReferral === "2" && 
                   <GridItem xs={12}>
@@ -420,8 +419,6 @@ class Demographic extends PureComponent {
                     />
                   </GridItem>
               }
-              
-
             </GridContainer>
           </GridItem>
         </GridContainer>

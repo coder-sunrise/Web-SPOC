@@ -1,24 +1,13 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import Yup from '@/utils/yup'
-import _ from 'lodash'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { withStyles, Tooltip } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
-import Delete from '@material-ui/icons/Delete'
+// import Edit from '@material-ui/icons/Edit'
+// import Delete from '@material-ui/icons/Delete'
 import {
   GridContainer,
   GridItem,
-  Button,
   TextField,
-  Checkbox,
-  Select,
-  ProgressButton,
   DateRangePicker,
-  Switch,
-  EditableTableGrid2,
   notification,
 } from '@/components'
 
