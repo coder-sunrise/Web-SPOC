@@ -19,7 +19,8 @@ export default createFormViewModel({
     effects: {
       *getToken ({ credentialPayload }, { call, put }) {
         const response = yield call(login, credentialPayload)
-
+        // const { status } = response
+        // console.log({ status })
         return yield put({
           type: 'updateLoginStatus',
           payload: { ...response },

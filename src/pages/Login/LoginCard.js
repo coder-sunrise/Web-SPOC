@@ -6,7 +6,7 @@ import * as Yup from 'yup'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { LockOpen } from '@material-ui/icons'
+import LockOpen from '@material-ui/icons/LockOpen'
 import {
   GridContainer,
   GridItem,
