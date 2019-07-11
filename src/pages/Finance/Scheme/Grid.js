@@ -45,7 +45,7 @@ const Grid = ({ history, dispatch, scheme: { list } }) => {
   }, [])
 
   const showDetail = (row, vmode) => () => {
-    history.push(`/finance/scheme/${row.Id}?vmode=${vmode}`)
+    history.push(`/finance/scheme/details?uid=${row.id}`)
   }
 
   const Cell = ({ column, row, classes, ...props }) => {

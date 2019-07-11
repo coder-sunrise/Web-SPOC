@@ -7,6 +7,7 @@ import { withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import { compose } from 'redux'
 import DetailPanel from './Detail'
+import Setting from './Setting'
 
 const styles = () => ({
   actionDiv: {
@@ -62,6 +63,10 @@ const Detail = ({
             tabButton: 'Detail',
             tabContent: <DetailPanel {...detailProps} />,
           },
+          {
+            tabButton: 'Setting',
+            tabContent: <Setting {...detailProps} />,
+          },
         ]}
       />
     </React.Fragment>
@@ -76,17 +81,17 @@ export default compose(
   withFormik({
     enableReinitialize: true,
     mapPropsToValues: ({ schemeDetail }) => {
-      return schemeDetail.entity ? schemeDetail.entity : {}
+      return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      revenueCategory: Yup.string().required(),
-      effectiveStartDate: Yup.string().required(),
-      effectiveEndDate: Yup.string().required(),
+      // effectiveStartDate: Yup.string().required(),
+      // effectiveEndDate: Yup.string().required(),
     }),
     handleSubmit: (values, { props }) => {
       const { dispatch } = props
+      console.log(values)
       // dispatch({
       //   type: `${modelType}/submit`,
       //   payload: test,

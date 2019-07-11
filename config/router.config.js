@@ -22,14 +22,8 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
-    authority: [
-      'admin',
-      'user',
-      'guest',
-    ],
+    Routes: [ 'src/pages/Authorized' ],
+    authority: [ 'admin', 'user', 'guest' ],
     routes: [
       // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
@@ -281,10 +275,10 @@ const routes = [
             component: './Finance/Scheme',
           },
           {
-            path: '/finance/scheme/:id',
+            path: '/finance/scheme/details',
             name: 'scheme/detail',
             hideInMenu: true,
-            component: './Finance/Scheme/Detail',
+            component: './Finance/Scheme/Details',
           },
         ],
       },
