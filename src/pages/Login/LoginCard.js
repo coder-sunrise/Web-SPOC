@@ -49,6 +49,7 @@ const submitKey = 'loginSEMR/getToken'
 const LoginSchema = Yup.object().shape({
   username: Yup.string().trim().required('Please enter Username'),
   password: Yup.string().trim().required('Please enter Password'),
+  clinic_code: Yup.string().trim().required('Please enter Clinic Code'),
 })
 @connect(({ loginSEMR }) => ({ loginSEMR }))
 @withFormik({
