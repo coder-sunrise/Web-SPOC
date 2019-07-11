@@ -1,8 +1,8 @@
 export default {
-  'common.bi.image': '',
+  // 'common.bi.image': '',
   'common.bisize.width': '251px',
   'common.bisize.height': '21px',
-  'common.backgroundImage': './img/bg.png',
+  // 'common.backgroundImage': './img/bg.png',
   'common.backgroundColor': '#fff',
   'common.border': '1px solid #c1c1c1',
 
@@ -26,13 +26,13 @@ export default {
   'downloadButton.fontSize': '12px',
 
   // main icons
-  'menu.normalIcon.path': '../dist/svg/icon-d.svg',
+  'menu.normalIcon.path': 'assets/svg/icon-d',
   'menu.normalIcon.name': 'icon-d',
-  'menu.activeIcon.path': '../dist/svg/icon-b.svg',
+  'menu.activeIcon.path': 'assets/svg/icon-b',
   'menu.activeIcon.name': 'icon-b',
-  'menu.disabledIcon.path': '../dist/svg/icon-a.svg',
+  'menu.disabledIcon.path': 'assets/svg/icon-a',
   'menu.disabledIcon.name': 'icon-a',
-  'menu.hoverIcon.path': '../dist/svg/icon-c.svg',
+  'menu.hoverIcon.path': 'assets/svg/icon-c.svg',
   'menu.hoverIcon.name': 'icon-c',
   'menu.iconSize.width': '24px',
   'menu.iconSize.height': '24px',
@@ -42,9 +42,9 @@ export default {
   'submenu.partition.color': '#e5e5e5',
 
   // submenu icons
-  'submenu.normalIcon.path': '../dist/svg/icon-d.svg',
+  'submenu.normalIcon.path': 'assets/svg/icon-d',
   'submenu.normalIcon.name': 'icon-d',
-  'submenu.activeIcon.path': '../dist/svg/icon-b.svg',
+  'submenu.activeIcon.path': 'assets/svg/icon-b',
   'submenu.activeIcon.name': 'icon-b',
   'submenu.iconSize.width': '32px',
   'submenu.iconSize.height': '32px',
