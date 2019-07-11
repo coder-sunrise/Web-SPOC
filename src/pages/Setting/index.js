@@ -103,6 +103,10 @@ const menuData = [
         url: '/setting/publicholiday',
       },
       {
+        text: 'Participant Role',
+        url: '/setting/participantrole',
+      },
+      {
         text: 'Doctor Block',
         url: '/setting/doctorblock',
       },

@@ -347,6 +347,11 @@ const routes = [
             component: './Setting/PublicHoliday',
           },
           {
+            path: '/setting/participantrole',
+            name: 'participantrole',
+            component: './Setting/ParticipantRole',
+          },
+          {
             path: '/setting/doctorblock',
             name: 'doctorblock',
             component: './Setting/DoctorBlock',
