@@ -8,6 +8,7 @@ import { AddPayment } from 'medisys-components'
 import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
 import PaymentCard from './PaymentCard'
+import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 // styles
 import styles from './styles'
 import { PayerType } from './variables'
@@ -17,6 +18,8 @@ class PaymentDetails extends Component {
     showAddPayment: false,
     showAddCrNote: false,
     showWriteOff: false,
+    showDeleteConfirmation: false,
+    onVoid: {},
   }
 
   onAddPaymentClick = () => this.setState({ showAddPayment: true })
@@ -31,14 +34,36 @@ class PaymentDetails extends Component {
 
   closeWriteOffModal = () => this.setState({ showWriteOff: false })
 
+  closeDeleteConfirmationModal = () =>
+    this.setState({ showDeleteConfirmation: false })
+
+  onVoidClick = ({ type, itemID }) => {
+    this.setState({
+      showDeleteConfirmation: true,
+      onVoid: { type, itemID },
+    })
+  }
+
+  onPrinterClick = ({ currentTarget }) => {
+    console.log({ printer: currentTarget })
+  }
+
   render () {
     const { classes } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
       handleWriteOff: this.onWriteOffClick,
+      handleVoidClick: this.onVoidClick,
+      handlePrinterClick: this.onPrinterClick,
     }
-    const { showAddPayment, showAddCrNote, showWriteOff } = this.state
+    const {
+      showAddPayment,
+      showAddCrNote,
+      showWriteOff,
+      showDeleteConfirmation,
+      onVoid,
+    } = this.state
 
     return (
       <div className={classes.container}>
@@ -103,6 +128,7 @@ class PaymentDetails extends Component {
         >
           <AddCrNote />
         </CommonModal>
+
         <CommonModal
           open={showWriteOff}
           title='Write Off'
@@ -111,6 +137,16 @@ class PaymentDetails extends Component {
           maxWidth='sm'
         >
           <WriteOff />
+        </CommonModal>
+
+        <CommonModal
+          open={showDeleteConfirmation}
+          title='Void Payment'
+          onConfirm={this.closeDeleteConfirmationModal}
+          onClose={this.closeDeleteConfirmationModal}
+          maxWidth='sm'
+        >
+          <DeleteConfirmation {...onVoid} />
         </CommonModal>
       </div>
     )

@@ -318,6 +318,44 @@ const routes = [
       },
       // Human Resource
       //
+      // Claim Submission
+      {
+        path: '/claim-submission',
+        icon: 'receipt',
+        name: 'claimSubmission',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/claim-submission',
+            name: 'chas',
+            component: './ClaimSubmission',
+          },
+          {
+            path: '/claim-submission/chas',
+            name: 'chas',
+            component: './ClaimSubmission/chas',
+          },
+          {
+            path: '/claim-submission/chas/invoice/:invoiceNo',
+            name: 'patientInvoice',
+            hideInMenu: true,
+            component: './Finance/Invoice/Details',
+          },
+          {
+            path: '/claim-submission/medisave',
+            name: 'medisave',
+            component: './ClaimSubmission/medisave',
+          },
+          {
+            path: '/claim-submission/medisave/invoice/:invoiceNo',
+            name: 'patientInvoice',
+            hideInMenu: true,
+            component: './Finance/Invoice/Details',
+          },
+        ],
+      },
+      // Claim Submission
+      //
       // Settings
       {
         path: '/setting',
@@ -362,10 +400,10 @@ const routes = [
             component: './Development/Control',
           },
           {
-            path: '/development/new-calendar',
-            name: 'Calendar',
+            path: '/development/scribble',
+            name: 'Scribble',
             mini: 'CA',
-            // component: './Development/BigCalendar',
+            component: './Development/Scribble',
           },
         ],
       },

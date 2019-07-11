@@ -53,7 +53,7 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
-        // console.log(pathname)
+        // console.log({ pathname })
         // console.log(loct, method)
         // console.log(query)
         if (query.md === 'pt' && query.cmt) {
@@ -73,7 +73,11 @@ export default createFormViewModel({
           //   })
           // }
         }
-        if (query.new || pathname === '/patientdb/new') {
+        if (
+          query.new ||
+          pathname === '/patientdb/new' ||
+          pathname === '/reception/queue'
+        ) {
           dispatch({
             type: 'updateState',
             payload: {

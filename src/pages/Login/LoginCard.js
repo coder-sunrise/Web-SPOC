@@ -6,7 +6,7 @@ import * as Yup from 'yup'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { LockOpen } from '@material-ui/icons'
+import LockOpen from '@material-ui/icons/LockOpen'
 import {
   GridContainer,
   GridItem,
@@ -57,15 +57,15 @@ const LoginSchema = Yup.object().shape({
       return {
         username: 'medisys',
         password: 'Medi$y$Innovati0n',
-        application: 'CMS',
+        clinic_code: '123456789',
       }
-    return { username: '', password: '', application: '' }
+    return { username: '', password: '', clinic_code: '' }
   },
   handleSubmit: (values, { props }) => {
-    const { username, password, application } = values
+    const { username, password, clinic_code } = values
     const { handleLogin } = props
 
-    handleLogin(username, password, application)
+    handleLogin(username, password, clinic_code)
   },
   validationSchema: LoginSchema,
 })
@@ -164,7 +164,7 @@ class LoginCard extends PureComponent {
                   )}
                 />
                 <FastField
-                  name='clinicCode'
+                  name='clinic_code'
                   render={(args) => (
                     <TextField
                       {...args}

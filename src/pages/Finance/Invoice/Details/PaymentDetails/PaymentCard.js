@@ -34,7 +34,7 @@ const PaymentCard = ({
     { ...DefaultPaymentInfo },
     { ...DefaultPaymentInfo },
   ],
-  actions,
+  actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
   return (
     <CardContainer hideHeader>
@@ -42,14 +42,20 @@ const PaymentCard = ({
         {`${payerTypeToString[payerType]} (${payerName})`}
       </p>
       <CardContainer hideHeader size='sm'>
-        <IconButton id={payerID} className={classes.printButton}>
+        <IconButton
+          id={payerID}
+          className={classes.printButton}
+          onClick={handlePrinterClick}
+        >
           <Printer />
         </IconButton>
-        {payments.map((payment) => <PaymentRow {...payment} />)}
+        {payments.map((payment) => (
+          <PaymentRow {...payment} handleVoidClick={handleVoidClick} />
+        ))}
       </CardContainer>
       <GridContainer alignItems='center'>
         <GridItem md={7}>
-          <PaymentActions type={payerType} {...actions} />
+          <PaymentActions type={payerType} {...buttonActions} />
         </GridItem>
         <GridItem
           md={5}

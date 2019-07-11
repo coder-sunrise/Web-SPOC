@@ -28,13 +28,12 @@ class LoginPage extends PureComponent {
     return loginBackground
   }
 
-  onLogin = (username, password, application) => {
+  onLogin = (username, password, clinicCode) => {
     const { dispatch } = this.props
-    const credential = { username, password }
+    const credential = { username, password, clinic_code: clinicCode }
     dispatch({
       type: 'loginSEMR/getToken',
       credentialPayload: credential,
-      application,
     })
       .then((props) => {
         const { payload } = props

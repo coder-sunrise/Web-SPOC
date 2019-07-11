@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import _ from 'lodash'
 import classNames from 'classnames'
 import { extendFunc } from '@/utils/utils'
 import Error from '@material-ui/icons/Error'
@@ -8,16 +8,10 @@ import {
   TextField,
   Tooltip,
   withStyles,
-  OutlinedInput,
 } from '@material-ui/core'
 import { CustomInputWrapper } from 'mui-pro-components'
 
-const styles = (theme) => ({
-  // textField: {
-  //   marginLeft: theme.spacing.unit,
-  //   marginRight: theme.spacing.unit,
-  // },
-})
+const styles = () => ({})
 
 const _config = {
   inputPropsArray: {
@@ -34,42 +28,45 @@ const _config = {
       'disabled',
     ],
   },
-  // formControlPropsArray:{
-  //   key:'formControlProps',
-  //   value:['fullWidth'],
-  // },
 }
 
 class OutlinedTextField extends PureComponent {
-  state = {
-    value: undefined,
+  constructor (props) {
+    super(props)
+    const { field = {}, defaultValue = '' } = props
+    this.state = {
+      value:
+        field.value !== undefined && field.value !== ''
+          ? field.value
+          : defaultValue,
+    }
+
+    this.debounceOnChange = _.debounce(this.debounceOnChange.bind(this), 300)
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
-    const { value, field, control = 1 } = nextProps
-    if (value !== undefined) {
-      return {
-        value,
-        control,
-      }
-    }
+  componentWillReceiveProps (nextProps) {
+    const { field } = nextProps
     if (field) {
-      return {
-        value: field.value,
-        control,
-      }
+      this.setState({
+        value:
+          field.value !== undefined && field.value !== '' ? field.value : '',
+      })
     }
-    return null
   }
 
   onChange = (event) => {
-    const { props } = this
     const { value } = event.target
-    if (props.readOnly) return
-
     this.setState({
       value,
     })
+
+    this.debounceOnChange(value)
+  }
+
+  debounceOnChange = (value) => {
+    const { props } = this
+    if (props.readOnly) return
+
     if (props.onChange) {
       props.onChange({
         target: {
@@ -87,13 +84,6 @@ class OutlinedTextField extends PureComponent {
         },
         props,
       )
-    }
-    if (props.inputProps && props.inputProps.onChange) {
-      props.inputProps.onChange({
-        target: {
-          value,
-        },
-      })
     }
   }
 
@@ -181,31 +171,18 @@ class OutlinedTextField extends PureComponent {
     }
     let {
       classes,
-      formControlProps = {},
       prefixProps,
       suffixProps,
       // label,
       id,
-      labelProps,
       inputProps = {},
       children,
       error,
-      validBeforeChange = false,
       showErrorIcon,
-      white,
-      inputRootCustomClasses,
-      success,
       help,
       fullWidth = true,
-      number,
-      currency,
-      creditCard,
-      qty,
-      control = 1,
       prefix,
       suffix,
-      colon = true,
-      realtime = true,
     } = props
     // console.log(this.state, this.state.value)
     if (this.state && this.state.value !== undefined) {

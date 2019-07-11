@@ -17,12 +17,13 @@ export default createFormViewModel({
     },
     subscriptions: {},
     effects: {
-      *getToken ({ credentialPayload, application }, { call, put }) {
+      *getToken ({ credentialPayload }, { call, put }) {
         const response = yield call(login, credentialPayload)
-
+        // const { status } = response
+        // console.log({ status })
         return yield put({
           type: 'updateLoginStatus',
-          payload: { ...response, application },
+          payload: { ...response },
         })
 
         // if (response.status === 200) {
