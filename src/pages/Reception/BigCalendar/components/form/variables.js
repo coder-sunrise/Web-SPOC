@@ -48,6 +48,9 @@ export const AppointmentDataColExtensions = [
     type: 'select',
     options: [
       { name: 'Medisys', value: 'medisys' },
+      { name: 'Levinne', value: 'levinne' },
+      { name: 'Cheah', value: 'cheah' },
+      { name: 'Tab', value: 'tan' },
     ],
   },
   {

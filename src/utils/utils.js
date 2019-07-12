@@ -427,21 +427,21 @@ const convertToQuery = (
   return returnVal
 }
 
-const updateGlobalVariable = (key, value) => {
+export const updateGlobalVariable = (key, value) => {
   if (!window.medisys) {
     window.medisys = {}
   }
   window.medisys[key] = value
 }
 
-const getGlobalVariable = (key) => {
+export const getGlobalVariable = (key) => {
   if (!window.medisys) {
     window.medisys = {}
   }
   return window.medisys[key]
 }
 
-const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
+export const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
   const { dispatch, getState } = window.g_app._store
   const { loading } = getState()
   if (loading) {
@@ -459,7 +459,7 @@ const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
   }
 }
 
-const updateCellValue = (
+export const updateCellValue = (
   {
     column: { name: columnName },
     value,
@@ -506,7 +506,7 @@ const updateCellValue = (
 }
 
 const observers = {}
-const watchForElementChange = (e) => {
+export const watchForElementChange = (e) => {
   let t = e.selector
 
   let n = e.ongoing
@@ -535,6 +535,7 @@ const watchForElementChange = (e) => {
 
 module.exports = {
   ...cdrssUtil,
+  ...module.exports,
   sleep,
   sumReducer,
   maxReducer,
@@ -546,5 +547,4 @@ module.exports = {
   getGlobalVariable,
   updateCellValue,
   watchForElementChange,
-  ...module.exports,
 }

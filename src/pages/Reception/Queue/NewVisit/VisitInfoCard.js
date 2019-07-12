@@ -57,7 +57,7 @@ class VisitInfoCard extends PureComponent {
 
           <GridItem xs md={12}>
             <FastField
-              name={FormField['visit.doctor']}
+              name={FormField['visit.doctorProfileFk']}
               render={(args) => (
                 <Select
                   label={formatMessage({
@@ -71,7 +71,7 @@ class VisitInfoCard extends PureComponent {
           </GridItem>
           <GridItem xs md={12}>
             <FastField
-              name={FormField['visit.remarks']}
+              name={FormField['visit.visitRemarks']}
               render={(args) => (
                 <TextField
                   {...args}

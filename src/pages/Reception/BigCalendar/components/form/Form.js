@@ -162,24 +162,40 @@ class Form extends React.PureComponent {
 
   onConfirmClick = () => {
     const { eventSeries } = this.state
-    const { values, handleUpdateEventSeries, resetForm, slotInfo } = this.props
+    const {
+      values,
+      handleUpdateEventSeries,
+      resetForm,
+      slotInfo,
+      resources,
+    } = this.props
 
     const { seriesID, patientName, contactNo, remarks } = values
     const calendarEvents = eventSeries.map((event) => {
-      const { timeFrom, timeTo, roomNo, ...restColumn } = event
+      const { timeFrom, timeTo, doctor, ...restColumn } = event
       const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
       const timeIn = moment(timeFrom).format(dateTimeFormat)
       const timeOut = moment(timeTo).format(dateTimeFormat)
+
+      const matchedResource = resources.find(
+        (resource) =>
+          resource.doctorName.toUpperCase() === doctor.toUpperCase(),
+      )
+
+      const doctorResource =
+        matchedResource !== undefined ? matchedResource.doctorProfileFK : '4'
+
       return {
         seriesID,
         ...restColumn,
         patientName,
         contactNo,
         remarks,
-        roomNo,
         timeFrom,
         timeTo,
-        resourceId: roomNo !== undefined ? roomNo : 'other',
+        doctor,
+        doctorProfileFK: doctorResource,
+        resourceId: doctorResource,
         start: timeFrom,
         end: timeTo,
         // for Queue Listing

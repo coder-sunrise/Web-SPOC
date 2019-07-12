@@ -41,7 +41,7 @@ const TableConfig = {
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceAmount', title: 'Invoice Amount' },
     { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'identityNo', title: 'Identity No.' },
+    { name: 'accNo', title: 'Acc No.' },
     { name: 'gst', title: 'GST' },
     { name: 'payment', title: 'Payment' },
     { name: 'paymentMode', title: 'Payment Mode' },

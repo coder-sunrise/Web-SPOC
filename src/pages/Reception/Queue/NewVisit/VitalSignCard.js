@@ -25,7 +25,7 @@ class VitalSignCard extends PureComponent {
         <GridContainer>
           <GridItem xs md={12}>
             <FastField
-              name={FormField['vitalsign.temperature']}
+              name={FormField['vitalsign.temperatureC']}
               render={(args) => (
                 <NumberInput
                   {...args}
@@ -41,7 +41,7 @@ class VitalSignCard extends PureComponent {
           </GridItem>
           <GridItem xs md={6}>
             <FastField
-              name={FormField['vitalsign.bloodPressure']}
+              name={FormField['vitalsign.bpSysMMHG']}
               render={(args) => (
                 <TextField
                   {...args}
@@ -54,7 +54,7 @@ class VitalSignCard extends PureComponent {
           </GridItem>
           <GridItem xs md={6}>
             <FastField
-              name={FormField['vitalsign.mmhg']}
+              name={FormField['vitalsign.bpDiaMMHG']}
               render={(args) => (
                 <TextField
                   {...args}
@@ -67,7 +67,7 @@ class VitalSignCard extends PureComponent {
           </GridItem>
           <GridItem xs md={12}>
             <FastField
-              name={FormField['vitalsign.heartRate']}
+              name={FormField['vitalsign.pulseRateBPM']}
               render={(args) => (
                 <NumberInput
                   {...args}
@@ -83,7 +83,7 @@ class VitalSignCard extends PureComponent {
           </GridItem>
           <GridItem xs md={12}>
             <FastField
-              name={FormField['vitalsign.weight']}
+              name={FormField['vitalsign.weightKG']}
               render={(args) => (
                 <NumberInput
                   {...args}
@@ -99,7 +99,7 @@ class VitalSignCard extends PureComponent {
           </GridItem>
           <GridItem xs md={12}>
             <FastField
-              name={FormField['vitalsign.height']}
+              name={FormField['vitalsign.heightCM']}
               render={(args) => (
                 <NumberInput
                   {...args}

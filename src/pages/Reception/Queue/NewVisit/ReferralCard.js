@@ -23,7 +23,7 @@ class ReferralCard extends PureComponent {
         <GridContainer>
           <GridItem xs md={12}>
             <FastField
-              name={FormField['referral.referredBy']}
+              name={FormField['referral.referralPersonFK']}
               render={(args) => <TextField {...args} label='Referred By' />}
             />
           </GridItem>
@@ -35,7 +35,7 @@ class ReferralCard extends PureComponent {
           </GridItem>
           <GridItem xs md={12}>
             <FastField
-              name={FormField['referral.institution']}
+              name={FormField['referral.referralCompanyFK']}
               render={(args) => <TextField label='Institution' {...args} />}
             />
           </GridItem>

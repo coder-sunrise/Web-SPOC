@@ -116,8 +116,6 @@ class Scribble extends React.Component {
       }
       case 'circle_shape':
         {
-          console.log('start circle_shape')
-
           const mode = imageEditor.getDrawingMode()
           imageEditor.setDrawingShape('circle', {
             fill: 'transparent',
@@ -127,14 +125,6 @@ class Scribble extends React.Component {
             ry: 100,
           })
           imageEditor.startDrawingMode('SHAPE')
-          console.log({ imageEditor })
-          // if (mode === 'NORMAL') {
-
-          // } else {
-          //   imageEditor.stopDrawingMode()
-          // }
-          // imageEditor.setObjectPosition()
-          // if (mode !== 'NORMAL') imageEditor.stopDrawingMode()
         }
         break
       default:
