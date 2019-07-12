@@ -6,6 +6,8 @@ import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common components
 import { Checkbox, GridItem, DatePicker, Select } from '@/components'
+// medisys component
+import { AppointmentTypeSelect } from 'medisys-components'
 
 const styles = (theme) => ({
   checkbox: {
@@ -39,7 +41,14 @@ const FilterByAppointment = ({ classes }) => {
           )}
         />
       </GridItem>
-      <GridItem xs={4} />
+      <GridItem xs={4}>
+        <FastField
+          name='appointmentType'
+          render={(args) => {
+            return <AppointmentTypeSelect label='Appointment Type' {...args} />
+          }}
+        />
+      </GridItem>
       <GridItem xs={4} />
       <GridItem xs={4}>
         <FastField

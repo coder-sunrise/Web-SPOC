@@ -676,7 +676,9 @@ class CommonTableGrid2 extends React.Component {
               {selectable && (
                 <TableSelection
                   highlightRow
-                  selectByRowClick
+                  selectByRowClick={
+                    !columns.find((col) => col.name.toUpperCase() !== 'ACTION')
+                  }
                   showSelectionColumn
                   {...selectConfig}
                 />
