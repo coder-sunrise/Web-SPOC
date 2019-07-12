@@ -582,6 +582,10 @@ class CommonTableGrid2 extends React.Component {
       // console.log(error, c)
     })
     // console.log(pager, pagerConfig)
+
+    const allowSelectRowByClick =
+      columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined
+
     const HeaderRow = this.TableHeaderRow
     return (
       <MuiThemeProvider theme={this.theme}>
@@ -676,7 +680,7 @@ class CommonTableGrid2 extends React.Component {
               {selectable && (
                 <TableSelection
                   highlightRow
-                  selectByRowClick
+                  selectByRowClick={allowSelectRowByClick}
                   showSelectionColumn
                   {...selectConfig}
                 />

@@ -80,7 +80,7 @@ const ContextMenuOptions = [
     id: 5,
     label: 'Start Consultation',
     Icon: Play,
-    disabled: true,
+    disabled: false,
   },
 ]
 

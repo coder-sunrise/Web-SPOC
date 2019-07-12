@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Tooltip } from '@material-ui/core'
-import Textsms from '@material-ui/icons/Textsms'
-import { Button, CommonTableGrid2 } from '@/components'
 import { compose } from 'redux'
 import moment from 'moment'
+// devexpress react grid
+import { Table } from '@devexpress/dx-react-grid-material-ui'
+// common components
+import { CommonTableGrid2, Tooltip } from '@/components'
+// medisys components
+import { GridContextMenuButton } from 'medisys-components'
 
 const generateRowData = () => {
   let data = []
@@ -18,14 +20,20 @@ const generateRowData = () => {
       doctor: 'Dr Levine',
       status: 'Confirmed',
       apptType: 'Screening',
+      reminderSent: 'Yes',
     })
   }
   return data
 }
 const Grid = ({ showSMSHistory, list, dispatch }) => {
-  console.log('test')
-  const [ selectedRows, setSelectedRows ] = useState([])
-  const [ tableParas, setTableParas ] = useState({
+  const [
+    selectedRows,
+    setSelectedRows,
+  ] = useState([])
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
       { name: 'patientName', title: 'Patient Name' },
       { name: 'contactNo', title: 'Contact No' },
@@ -38,11 +46,15 @@ const Grid = ({ showSMSHistory, list, dispatch }) => {
       { name: 'lastSMSStatus', title: 'Last SMS Status' },
       { name: 'lastSMSSent', title: 'Last SMS Sent' },
       { name: 'lastSMSReceived', title: 'Last SMS Received' },
+      { name: 'reminderSent', title: 'Reminder Sent' },
       { name: 'Action', title: 'Action' },
     ],
     leftColumns: [],
   })
-  const [ colExtensions, setColExtensions ] = useState([
+  const [
+    colExtensions,
+    setColExtensions,
+  ] = useState([
     { columnName: 'Action', width: 120, align: 'center' },
   ])
 
@@ -50,22 +62,60 @@ const Grid = ({ showSMSHistory, list, dispatch }) => {
     setSelectedRows(selection)
   }
 
+  const handleContextMenuClick = (recordRow, id) => {
+    switch (id) {
+      case '0':
+        showSMSHistory()
+        break
+      default:
+        break
+    }
+  }
+
   const gridGetRowID = (row) => row.id
   const Cell = ({ column, row, classes, ...props }) => {
     if (column.name === 'Action') {
+      // return (
+      //   <Table.Cell {...props}>
+      //     <Tooltip title='View SMS History' placement='bottom'>
+      //       <div>
+      //         <Button
+      //           size='sm'
+      //           onClick={showSMSHistory}
+      //           justIcon
+      //           round
+      //           color='primary'
+      //         >
+      //           <Textsms />
+      //         </Button>
+      //       </div>
+      //     </Tooltip>
+      //   </Table.Cell>
+      // )
       return (
         <Table.Cell {...props}>
           <Tooltip title='View SMS History' placement='bottom'>
-            <div>
-              <Button
-                size='sm'
-                onClick={showSMSHistory}
-                justIcon
-                round
-                color='primary'
-              >
-                <Textsms />
-              </Button>
+            <div style={{ display: 'inline-block' }}>
+              <GridContextMenuButton
+                row={row}
+                onClick={handleContextMenuClick}
+                contextMenuOptions={[
+                  {
+                    id: '0',
+                    label: 'View SMS History',
+                  },
+                  {
+                    id: '1',
+                    label: 'Mark as Read',
+                    disabled: true,
+                  },
+                  {
+                    id: '2',
+                    label: 'Mark as Unread',
+                    disabled: true,
+                  },
+                ]}
+              />
             </div>
           </Tooltip>
         </Table.Cell>
