@@ -8,32 +8,54 @@ import { withStyles } from '@material-ui/core'
 import { Button, GridItem, AntdInput, TextField } from '@/components'
 import style from './style'
 
-const PatientInfoInput = ({ classes, onSearchPatient, onCreatePatient }) => {
+const PatientInfoInput = ({
+  classes,
+  onSearchPatient,
+  onCreatePatient,
+  isRegisteredPatient,
+  patientName,
+}) => {
   return (
     <React.Fragment>
       <GridItem xs md={6}>
-        <FastField
-          name='patientName'
-          render={(args) => {
-            return (
-              <AntdInput
-                {...args}
-                autoFocus
-                onEnterPressed={onSearchPatient}
-                label='Patient Name'
-              />
-            )
-          }}
-        />
+        {!isRegisteredPatient ? (
+          <FastField
+            name='patientName'
+            render={(args) => {
+              return (
+                <AntdInput
+                  {...args}
+                  autoFocus
+                  onEnterPressed={onSearchPatient}
+                  label='Patient Name'
+                />
+              )
+            }}
+          />
+        ) : (
+          <div className={classnames(classes.buttonGroup)}>
+            <Button color='primary' link className={classes.patientNameButton}>
+              {patientName}
+            </Button>
+          </div>
+        )}
       </GridItem>
       <GridItem xs md={6}>
         <div className={classnames(classes.buttonGroup)}>
-          <Button size='sm' color='primary' onClick={onSearchPatient}>
-            Search
-          </Button>
-          <Button size='sm' color='primary' onClick={onCreatePatient}>
-            Create Patient
-          </Button>
+          {!isRegisteredPatient ? (
+            <React.Fragment>
+              <Button size='sm' color='primary' onClick={onSearchPatient}>
+                Search
+              </Button>
+              <Button size='sm' color='primary' onClick={onCreatePatient}>
+                Create Patient
+              </Button>
+            </React.Fragment>
+          ) : (
+            <Button size='sm' color='primary' disabled>
+              Register To Visit
+            </Button>
+          )}
         </div>
       </GridItem>
       <GridItem xs md={6}>

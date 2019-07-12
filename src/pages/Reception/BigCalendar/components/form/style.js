@@ -84,6 +84,10 @@ const styles = (theme) => ({
   conflictContent: {
     fontWeight: 'bold',
   },
+  patientNameButton: {
+    paddingLeft: '0px !important',
+    textDecoration: 'underline',
+  },
 })
 
 export default styles

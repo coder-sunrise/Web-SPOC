@@ -62,6 +62,7 @@ class Form extends React.PureComponent {
       this.props.slotInfo.seriesID,
       this.props.calendarEvents,
     ),
+    isRegisteredPatient: false,
   }
 
   toggleNewPatientModal = () => {
@@ -117,6 +118,7 @@ class Form extends React.PureComponent {
 
         this.setState({
           showSearchPatientModal: false,
+          isRegisteredPatient: true,
         })
       }
     })
@@ -161,7 +163,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
-    const { eventSeries } = this.state
+    const { eventSeries, isRegisteredPatient } = this.state
     const {
       values,
       handleUpdateEventSeries,
@@ -189,6 +191,7 @@ class Form extends React.PureComponent {
         seriesID,
         ...restColumn,
         patientName,
+        isRegisteredPatient,
         contactNo,
         remarks,
         timeFrom,
@@ -239,12 +242,15 @@ class Form extends React.PureComponent {
 
             <GridContainer
               className={classnames(classes.formContent)}
-              alignItems='flex-start'
+              alignItems='center'
+              justify='center'
             >
               <GridItem container xs md={6}>
                 <PatientInfoInput
                   onSearchPatient={this.onSearchPatient}
                   onCreatePatient={this.toggleNewPatientModal}
+                  isRegisteredPatient={values.isRegisteredPatient}
+                  patientName={values.patientName}
                 />
                 <AppointmentDateInput />
               </GridItem>
@@ -288,7 +294,6 @@ class Form extends React.PureComponent {
               <Recurrence values={values} />
             </GridContainer>
           </CardContainer>
-          <ConflictBanner hasConflict={hasConflict} />
 
           <FormFooter
             isNew={slotInfo.type === 'add'}

@@ -28,6 +28,7 @@ export const days = [
 ]
 
 export const AppointmentDataColumn = [
+  { name: 'conflict', title: ' ' },
   { name: 'doctor', title: 'Doctor' },
   { name: 'appointmentType', title: 'Appointment Type' },
   { name: 'timeFrom', title: 'Time From' },
@@ -37,6 +38,13 @@ export const AppointmentDataColumn = [
 ]
 
 export const AppointmentDataColExtensions = [
+  {
+    columnName: 'conflict',
+    type: 'none',
+    editingEnabled: false,
+    disabled: true,
+    width: 80,
+  },
   { columnName: 'timeFrom', type: 'time', format: 'hh:mm a' },
   { columnName: 'timeTo', type: 'time', format: 'hh:mm a' },
   {
@@ -86,6 +94,7 @@ export const _dateFormat = 'DD MMM YYYY'
 
 export const initialAptInfo = {
   patientName: '',
+  isRegisteredPatient: false,
   contactNo: '',
   doctor: '',
   bookBy: '',
