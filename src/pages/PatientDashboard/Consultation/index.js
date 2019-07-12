@@ -811,6 +811,16 @@ class Consultation extends PureComponent {
                 <ProgressButton
                   color='primary'
                   onClick={() => {
+                    dispatch({
+                      type: 'global/sendNotification',
+                      payload: {
+                        type: 'Consultation',
+                        data: {
+                          message: 'reception update',
+                          sender: 'Mr Test',
+                        },
+                      },
+                    })
                     history.push('/reception/queue')
                   }}
                   icon={null}

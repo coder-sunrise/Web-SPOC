@@ -154,7 +154,7 @@ class BreadcrumbView extends PureComponent {
     return (
       // <div >
       <Breadcrumbs
-        className={styles.breadcrumb}
+        className={classes.breadcrumb}
         separator={<NavigateNextIcon fontSize='small' />}
       >
         {extraBreadcrumbItems}
@@ -168,7 +168,7 @@ class BreadcrumbView extends PureComponent {
    * Convert parameters into breadcrumbs
    */
   conversionBreadcrumbList = () => {
-    const { breadcrumbList, breadcrumbSeparator } = this.props
+    const { breadcrumbList, breadcrumbSeparator, classes } = this.props
     const {
       routes,
       params,
@@ -183,7 +183,7 @@ class BreadcrumbView extends PureComponent {
     if (routes && params) {
       return (
         <Breadcrumb
-          className={styles.breadcrumb}
+          className={classes.breadcrumb}
           routes={routes.filter((route) => route.breadcrumbName)}
           params={params}
           itemRender={this.itemRender}

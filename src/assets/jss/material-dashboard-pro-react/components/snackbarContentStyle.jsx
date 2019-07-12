@@ -25,7 +25,7 @@ const snackbarContentStyle = {
     ...defaultFont,
     flexWrap: 'unset',
     position: 'relative',
-    padding: '20px 15px',
+    padding: 15,
     lineHeight: '20px',
     marginBottom: '20px',
     fontSize: '14px',
@@ -79,52 +79,57 @@ const snackbarContentStyle = {
   message: {
     padding: '0',
     display: 'block',
-    maxWidth: '89%',
+    maxWidth: '95%',
   },
   close: {
-    width: '11px',
-    height: '11px',
+    // width: '11px',
+    // height: '11px',
+    // position: 'absolute',
+    // right: 25,
+    // top: 17,
   },
   iconButton: {
-    width: '24px',
-    height: '24px',
+    // width: '24px',
+    // height: '24px',
     padding: '0',
   },
   icon: {
-    width: '38px',
-    height: '38px',
-    display: 'block',
-    left: '15px',
+    // width: '38px',
+    // height: '38px',
+    // display: 'block',
+    // left: '15px',
     position: 'absolute',
-    marginTop: '-39px',
-    fontSize: '20px',
-    backgroundColor: '#FFFFFF',
-    padding: '9px',
-    borderRadius: '50%',
-    maxWidth: '38px',
-    boxShadow:
-      '0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2)',
+    background: 'transparent',
+    color: '#ffffff',
+    // marginTop: '-39px',
+    // fontSize: '20px',
+    // backgroundColor: '#FFFFFF',
+    // padding: '9px',
+    // borderRadius: '50%',
+    // maxWidth: '38px',
+    // boxShadow:
+    //   '0 10px 30px -12px rgba(0, 0, 0, 0.42), 0 4px 25px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2)',
   },
-  infoIcon: {
-    color: '#00d3ee',
-  },
-  successIcon: {
-    color: '#5cb860',
-  },
-  warningIcon: {
-    color: '#ffa21a',
-  },
-  dangerIcon: {
-    color: '#f55a4e',
-  },
-  primaryIcon: {
-    color: '#af2cc5',
-  },
-  roseIcon: {
-    color: '#eb3573',
-  },
+  // infoIcon: {
+  //   color: '#00d3ee',
+  // },
+  // successIcon: {
+  //   color: '#5cb860',
+  // },
+  // warningIcon: {
+  //   color: '#ffa21a',
+  // },
+  // dangerIcon: {
+  //   color: '#f55a4e',
+  // },
+  // primaryIcon: {
+  //   color: '#af2cc5',
+  // },
+  // roseIcon: {
+  //   color: '#eb3573',
+  // },
   iconMessage: {
-    paddingLeft: '50px',
+    paddingLeft: 40,
     display: 'block',
     wordBreak: 'break-word',
   },

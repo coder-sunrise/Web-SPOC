@@ -228,18 +228,18 @@ class EditableTableGrid extends PureComponent {
     return showAddCommand && this.state.addedRows.length === 0
   }
 
-  componentDidUpdate () {
-    const { EditingProps: { editingRowIds = [] } = {} } = this.props
-    // console.log(editingRowIds, this.addable())
-    if (editingRowIds.length === 0 && this.addable()) {
-      window.g_app._store.dispatch({
-        type: 'global/updateState',
-        payload: {
-          disableSave: false,
-        },
-      })
-    }
-  }
+  // componentDidUpdate () {
+  //   const { EditingProps: { editingRowIds = [] } = {} } = this.props
+  //   // console.log(editingRowIds, this.addable())
+  //   if (editingRowIds.length === 0 && this.addable()) {
+  //     window.g_app._store.dispatch({
+  //       type: 'global/updateState',
+  //       payload: {
+  //         disableSave: false,
+  //       },
+  //     })
+  //   }
+  // }
 
   render () {
     const {

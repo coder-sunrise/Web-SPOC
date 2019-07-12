@@ -299,7 +299,7 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 4,
+        marginTop: 3,
         '& svg': {
           top: 3,
           position: 'relative',

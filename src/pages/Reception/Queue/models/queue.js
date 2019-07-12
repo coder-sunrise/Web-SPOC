@@ -72,7 +72,20 @@ export default createListViewModel({
       visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
     },
-    subscriptions: {},
+    subscriptions: ({ dispatch, history }) => {
+      console.log('queueLog subscriptions')
+      dispatch({
+        type: 'global/subscribeNotification',
+        payload: {
+          type: 'Consultation',
+          callback: () => {
+            dispatch({
+              type: 'fetchQueueListing',
+            })
+          },
+        },
+      })
+    },
     effects: {
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)

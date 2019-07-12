@@ -88,7 +88,6 @@ class SimpleModal extends React.Component {
     const { onCancel, onOk, ...resetProps } = this.props
 
     if (this.state.hide) return null
-
     if (this.state.done) {
       return (
         <ModalWrapper>
@@ -98,7 +97,8 @@ class SimpleModal extends React.Component {
             title='Done!'
             onConfirm={this.hideAlert}
             onCancel={this.hideAlert}
-            confirmBtnCssClass={`${classes.button} ${classes.success}`}
+            cancelBtnCssClass={`${classes.button} ${classes.contained} ${classes.danger} ${classes.containeddanger}`}
+            confirmBtnCssClass={`${classes.button} ${classes.contained} ${classes.primary} ${classes.containedprimary}`}
           />
         </ModalWrapper>
       )
@@ -112,7 +112,8 @@ class SimpleModal extends React.Component {
             title='Error!'
             onConfirm={this.hideAlert}
             onCancel={this.hideAlert}
-            confirmBtnCssClass={`${classes.button} ${classes.error}`}
+            cancelBtnCssClass={`${classes.button} ${classes.contained} ${classes.danger} ${classes.containeddanger}`}
+            confirmBtnCssClass={`${classes.button} ${classes.contained} ${classes.primary} ${classes.containedprimary}`}
           />
         </ModalWrapper>
       )
@@ -130,10 +131,10 @@ class SimpleModal extends React.Component {
           //   title={`Are you sure to void the Payment ${ row.itemCode  } ?`}
           onConfirm={this.onConfirm}
           onCancel={this.hideAlert}
-          confirmBtnCssClass={`${classes.button} ${submitting
+          cancelBtnCssClass={`${classes.button} ${classes.contained} ${classes.danger} ${classes.containeddanger}`}
+          confirmBtnCssClass={`${classes.button} ${classes.contained} ${submitting
             ? classes.default
-            : classes.info}`}
-          cancelBtnCssClass={`${classes.button} ${classes.danger}`}
+            : classes.primary} ${classes.containedprimary}`}
           {...resetProps}
         >
           {this.props.children}
