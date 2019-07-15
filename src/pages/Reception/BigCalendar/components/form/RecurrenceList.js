@@ -1,18 +1,13 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 import { RRule } from 'rrule'
-// material ui
-import { Popper, Fade, withStyles } from '@material-ui/core'
-// common component
-import { CardContainer } from '@/components'
 // constant variables
-import { RECURRENCE_RANGE, RECURRENCE_PATTERN, _dateFormat } from './variables'
-
-const styles = (theme) => ({
-  recurrenceList: { textOverflow: 'ellipsis', display: 'inline-block' },
-  popoverContent: { display: 'block' },
-  popoverContainer: { zIndex: 2060 },
-})
+import {
+  RECURRENCE_RANGE,
+  RECURRENCE_PATTERN,
+  DAYS_OF_WEEK,
+  _dateFormat,
+} from './variables'
 
 const mapRecurrencePatternToRRuleFeq = {
   [RECURRENCE_PATTERN.DAILY]: RRule.DAILY,
@@ -95,71 +90,65 @@ const getRRule = (
   return rule
 }
 
-const recurrencesToString = (list, occ, index) =>
-  index < 5
-    ? [
-        ...list,
-        moment(occ).format(_dateFormat),
-      ]
-    : [
-        ...list,
-      ]
+const joinWeekDays = (selectedDays) => {
+  const days = [
+    ...selectedDays,
+  ]
+    .sort()
+    .map((d) => DAYS_OF_WEEK[d])
+    .join(', ')
+  const pos = days.lastIndexOf(',')
 
-const RecurrenceList = ({ classes, values, isDoctorBlock }) => {
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
+  const result = `${days.substring(0, pos)} and${days.substring(pos + 1)}`
+  return result
+}
 
-  const handleMouseEnter = (event) => {
-    setAnchorEl(event.currentTarget)
+const formatRecurrenceLabel = (
+  { recurrencePattern, every, day: dayOfMonth, days: weekdays = [], startDate },
+  rule,
+) => {
+  let result = ''
+
+  let until = ''
+  if (rule.options.until == null) {
+    const lastDate = rule.all()[rule.all().length - 1]
+    const parsedLastDate = moment(lastDate).format(_dateFormat)
+    until = parsedLastDate
+  } else {
+    const parsedDate = moment(rule.options.until)
+    until = parsedDate.format(_dateFormat)
   }
 
-  const handleMouseLeave = () => {
-    setAnchorEl(null)
+  const plural = every > 1 ? 's' : ''
+  switch (recurrencePattern) {
+    case RECURRENCE_PATTERN.DAILY: {
+      result = `Occur every ${every} day${plural} effective ${startDate}`
+      break
+    }
+    case RECURRENCE_PATTERN.WEEKLY: {
+      const days = joinWeekDays(weekdays)
+      result = `Occur every ${every} week${plural} on ${days} effective ${startDate} until ${until} `
+      break
+    }
+    case RECURRENCE_PATTERN.MONTHLY: {
+      result = `Occurs day ${dayOfMonth} of every ${every} month${plural} effective ${startDate} until ${until}`
+      break
+    }
+    default:
+      break
   }
+  return result
+}
 
-  const open = Boolean(anchorEl)
-  const popoverID = open ? 'recurrencelist-popper' : undefined
-
+const RecurrenceList = ({ values, isDoctorBlock }) => {
   const rule = getRRule(values, isDoctorBlock)
+  const label = formatRecurrenceLabel(values, rule)
 
   return (
     <div>
-      {rule && (
-        <React.Fragment>
-          <Popper
-            id={popoverID}
-            open={open}
-            anchorEl={anchorEl}
-            transition
-            placement='top-end'
-            className={classes.popoverContainer}
-          >
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={500}>
-                <CardContainer hideHeader>
-                  {rule
-                    .all()
-                    .map((reccurence) => (
-                      <span className={classes.popoverContent}>
-                        {moment(reccurence).format(_dateFormat)}
-                      </span>
-                    ))}
-                </CardContainer>
-              </Fade>
-            )}
-          </Popper>
-          <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-            <h5 className={classes.recurrenceList}>
-              {rule.all().reduce(recurrencesToString, []).join(', ')}
-              {rule.all().length > 5 ? '...' : ''}
-            </h5>
-          </div>
-        </React.Fragment>
-      )}
+      <h5>{label}</h5>
     </div>
   )
 }
 
-export default withStyles(styles, { name: 'RecurrenceList' })(RecurrenceList)
+export default RecurrenceList

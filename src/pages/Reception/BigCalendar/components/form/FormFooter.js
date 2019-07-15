@@ -45,12 +45,13 @@ const FormFooter = ({
         </GridItem>
 
         <GridItem xs md={8} container justify='flex-end'>
+          <Button color='success' disabled>
+            Check Availability
+          </Button>
           <Button onClick={onClose} color='danger'>
             Cancel
           </Button>
-          <Button color='success' disabled>
-            Save Draft
-          </Button>
+
           <Button onClick={onConfirmClick} color='primary'>
             {confirmBtnText}
           </Button>

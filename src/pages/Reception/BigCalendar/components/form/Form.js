@@ -291,7 +291,7 @@ class Form extends React.PureComponent {
                   }}
                 />
               </GridItem>
-              <Recurrence values={values} />
+              {values.enableRecurrence && <Recurrence values={values} />}
             </GridContainer>
           </CardContainer>
 

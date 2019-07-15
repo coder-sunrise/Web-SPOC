@@ -82,6 +82,7 @@ export const mapPropsToValues = ({ slotInfo }) => {
   return {
     ...initialAptInfo,
     ...slotInfo,
+    ...initDailyRecurrence,
     startDate,
     startTime,
     endDate,
