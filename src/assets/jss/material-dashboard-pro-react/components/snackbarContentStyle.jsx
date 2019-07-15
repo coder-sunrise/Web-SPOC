@@ -19,7 +19,7 @@ const snackbarContentStyle = {
     transform: 'none',
     display: 'inherit',
     position: 'inherit',
-    paddingTop: 22,
+    // paddingTop: 22,
   },
   root: {
     ...defaultFont,

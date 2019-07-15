@@ -87,11 +87,18 @@ const AddButton = ({ onExecute }) => (
   </div>
 )
 
-const CommitButton = ({ onExecute, editingRowIds }) => (
+const CommitButton = ({ onExecute, editingRowIds, row }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      if (editingRowIds.length > 0) {
+      console.log(
+        (!row.id && editingRowIds.length === 0) ||
+          (row.id && editingRowIds.length === 1),
+      )
+      if (
+        (!row.id && editingRowIds.length === 0) ||
+        (row.id && editingRowIds.length === 1)
+      ) {
         window.g_app._store.dispatch({
           type: 'global/updateState',
           payload: {

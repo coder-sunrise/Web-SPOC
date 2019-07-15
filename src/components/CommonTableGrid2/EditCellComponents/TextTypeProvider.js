@@ -69,14 +69,17 @@ class TextEditorBase extends PureComponent {
 const TextFormatter = (columnExtensions) =>
   React.memo(
     (props) => {
-      const { column: { name: columnName }, value } = props
+      const { column: { name: columnName }, value, row } = props
       const cfg =
         columnExtensions.find(
           ({ columnName: currentColumnName }) =>
             currentColumnName === columnName,
         ) || {}
-      const { type, ...restProps } = cfg
+      const { type, render, ...restProps } = cfg
 
+      if (render) {
+        return render(row)
+      }
       // console.log(props, cfg)
       if (type === 'link') {
         return <a href={cfg.link || '#'}>{value}</a>

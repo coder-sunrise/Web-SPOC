@@ -764,7 +764,7 @@ class Consultation extends PureComponent {
       ...resetProps
     } = this.props
     const { currentLayout } = state
-    console.log(props)
+    // console.log(props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)

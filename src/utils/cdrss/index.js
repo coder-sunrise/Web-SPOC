@@ -736,6 +736,40 @@ const sortAll = (data, fieldName = 'id') => {
   return data
 }
 
+const cleanFieldValue = (data) => {
+  // console.log(data, fieldName)
+  if (data === undefined || data === null) return data
+  if (typeof data === 'object') {
+    if (Array.isArray(data)) {
+      data.forEach((element) => {
+        cleanFieldValue(element)
+      })
+    } else {
+      if (data.isNew) {
+        delete data.id
+      }
+      for (let field in data) {
+        if (Object.prototype.hasOwnProperty.call(data, field)) {
+          if (Array.isArray(data[field])) {
+            // data[field] = lodash.sortBy(data[field], [
+            //   (o) => o[fieldName],
+            // ])
+            for (let subfield in data[field]) {
+              if (Object.prototype.hasOwnProperty.call(data[field], subfield)) {
+                cleanFieldValue(data[field][subfield])
+              }
+            }
+          }
+          if (typeof data[field] === 'object') {
+            cleanFieldValue(data[field])
+          }
+        }
+      }
+    }
+  }
+  return data
+}
+
 // TODO: There is issue with Momoent type set, need to be come out a better version
 update.extend('$auto', (value, object) => {
   return object ? update(object, value) : update({}, value)
@@ -1002,6 +1036,7 @@ module.exports = {
   defaultFormBehavior,
   defaultContainerBehavior,
   sortAll,
+  cleanFieldValue,
   immutaeMerge,
   getUniqueId,
   getUniqueGUID,
