@@ -1,18 +1,21 @@
 export default {
   'visit.queueNo': 'queueNo',
   'visit.visitType': 'visitType',
-  'visit.doctor': 'doctor',
-  'visit.remarks': 'remarks',
+  'visit.doctorProfileFk': 'doctorProfileFK',
+  'visit.visitRemarks': 'visitRemarks',
 
-  'vitalsign.temperature': 'temperature',
-  'vitalsign.bloodPressure': 'bloodPressure',
-  'vitalsign.mmhg': 'mmhg',
-  'vitalsign.heartRate': 'heartRate',
-  'vitalsign.weight': 'weight',
-  'vitalsign.height': 'height',
+  'vitalsign.temperatureC': 'temperatureC',
+  'vitalsign.bpSysMMHG': 'bpSysMMHG',
+  'vitalsign.bpDiaMMHG': 'bpDiaMMHG',
+  'vitalsign.pulseRateBPM': 'pulseRateBPM',
+  'vitalsign.weightKG': 'weightKG',
+  'vitalsign.heightCM': 'heightCM',
   'vitalsign.bmi': 'bmi',
 
-  'referral.referredBy': 'referredBy',
+  'referral.referralPersonFK': 'referralPersonFK',
   'referral.referralDate': 'referralDate',
-  'referral.institution': 'institution',
+  'referral.referralCompanyFK': 'referralCompanyFK',
+
+  'participant.participant': 'participant',
+  'participant.participants': 'participants',
 }

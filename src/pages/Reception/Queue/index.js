@@ -207,7 +207,7 @@ class Queue extends PureComponent {
   showSearchResult = () => {
     const { queueLog } = this.props
     const { patientList } = queueLog
-    console.log({ patientList })
+
     if (patientList.length === 1) {
       this.showVisitRegistration(patientList[0].id)
     } else if (patientList.length > 1) {

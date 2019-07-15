@@ -41,7 +41,7 @@ const TableConfig = {
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceAmount', title: 'Invoice Amount' },
     { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'identityNo', title: 'Identity No.' },
+    { name: 'accNo', title: 'Acc No.' },
     { name: 'gst', title: 'GST' },
     { name: 'payment', title: 'Payment' },
     { name: 'paymentMode', title: 'Payment Mode' },
@@ -110,6 +110,7 @@ class DetailsGrid extends PureComponent {
         router.push('/reception/queue/patientdashboard')
         break
       case '5':
+        router.push('/reception/queue/patientdashboard/consultation/new')
         break
       default:
         break

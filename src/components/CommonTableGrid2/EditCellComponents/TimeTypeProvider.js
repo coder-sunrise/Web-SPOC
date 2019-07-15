@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
-import { updateCellValue } from '@/utils/utils'
+import { updateCellValue } from 'utils'
 import {
   TimePicker,
   TimeTypeProvider as TimeTypeProviderOrg,

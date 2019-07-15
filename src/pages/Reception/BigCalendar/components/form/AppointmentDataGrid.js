@@ -130,6 +130,9 @@ class AppointmentDataGrid extends React.PureComponent {
         columns={AppointmentDataColumn}
         columnExtensions={columnExtensions}
         schema={validationSchema}
+        leftColumns={[
+          'conflict',
+        ]}
         EditingProps={{
           showAddCommand: true,
           editingRowIds: this.state.editingRowIds,

@@ -24,7 +24,7 @@ const FilterByPatient = ({ classes }) => {
       <GridItem md={4}>
         <FastField
           name='patientName'
-          render={(args) => <TextField {...args} label='Patient Name' />}
+          render={(args) => <TextField {...args} label='Patient Details' />}
         />
       </GridItem>
       <GridItem md={4}>

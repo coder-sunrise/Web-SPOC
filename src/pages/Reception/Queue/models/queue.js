@@ -189,12 +189,14 @@ export default createListViewModel({
         })
       },
       *registerVisitInfo ({ payload }, { call, put }) {
-        const response = yield call(service.registerVisit, payload.visitInfo)
+        const response = yield call(service.registerVisit, payload)
+
         return yield put({
           type: 'registerVisit',
-          payload: {
-            ...response.data.entities,
-          },
+          payload: {},
+          // payload: {
+          //   ...response.data.entities,
+          // },
         })
       },
     },

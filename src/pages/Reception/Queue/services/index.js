@@ -92,7 +92,13 @@ export async function fetchPatientListByName (patientName) {
 }
 
 export async function registerVisit (visitInfo) {
-  return { data: { visitInfo } }
+  const formData = new FormData()
+  formData.append('queueDetailsModel', JSON.stringify(visitInfo))
+  const options = { method: 'POST', data: formData }
+  console.log({ formData, stringify: JSON.stringify(visitInfo) })
+  const response = await axiosRequest(`/api/queue`, options)
+  console.log({ registerVisit: response })
+  return {}
 }
 
 export async function getCodeTable (codetableName) {

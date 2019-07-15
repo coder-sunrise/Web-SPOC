@@ -86,10 +86,11 @@ class Appointment extends React.PureComponent {
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: [
-      { roomNo: 'room1', roomTitle: 'Room 1' },
-      { roomNo: 'room2', roomTitle: 'Room 2' },
-      { roomNo: 'room3', roomTitle: 'Room 3' },
-      { roomNo: 'other', roomTitle: 'Other' },
+      { doctorProfileFK: '0', doctorName: 'Medisys' },
+      { doctorProfileFK: '1', doctorName: 'Levinne' },
+      { doctorProfileFK: '2', doctorName: 'Cheah' },
+      { doctorProfileFK: '3', doctorName: 'Tan' },
+      { doctorProfileFK: '4', doctorName: 'Other' },
     ],
     // calendarEvents: dndEvents,
     selectedSlot: {},
@@ -172,13 +173,13 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = (event) => {
+    console.log('onselectslot', { event })
     let hour = {
       seriesID: getUniqueGUID(),
       title: 'New Event',
       allDay: event.slots.length === 1,
       start: event.start,
       end: event.end,
-      resourceId: event.resourceId,
       type: 'add',
     }
 

@@ -62,6 +62,7 @@ class Form extends React.PureComponent {
       this.props.slotInfo.seriesID,
       this.props.calendarEvents,
     ),
+    isRegisteredPatient: false,
   }
 
   toggleNewPatientModal = () => {
@@ -117,6 +118,7 @@ class Form extends React.PureComponent {
 
         this.setState({
           showSearchPatientModal: false,
+          isRegisteredPatient: true,
         })
       }
     })
@@ -161,25 +163,42 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
-    const { eventSeries } = this.state
-    const { values, handleUpdateEventSeries, resetForm, slotInfo } = this.props
+    const { eventSeries, isRegisteredPatient } = this.state
+    const {
+      values,
+      handleUpdateEventSeries,
+      resetForm,
+      slotInfo,
+      resources,
+    } = this.props
 
     const { seriesID, patientName, contactNo, remarks } = values
     const calendarEvents = eventSeries.map((event) => {
-      const { timeFrom, timeTo, roomNo, ...restColumn } = event
+      const { timeFrom, timeTo, doctor, ...restColumn } = event
       const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
       const timeIn = moment(timeFrom).format(dateTimeFormat)
       const timeOut = moment(timeTo).format(dateTimeFormat)
+
+      const matchedResource = resources.find(
+        (resource) =>
+          resource.doctorName.toUpperCase() === doctor.toUpperCase(),
+      )
+
+      const doctorResource =
+        matchedResource !== undefined ? matchedResource.doctorProfileFK : '4'
+
       return {
         seriesID,
         ...restColumn,
         patientName,
+        isRegisteredPatient,
         contactNo,
         remarks,
-        roomNo,
         timeFrom,
         timeTo,
-        resourceId: roomNo !== undefined ? roomNo : 'other',
+        doctor,
+        doctorProfileFK: doctorResource,
+        resourceId: doctorResource,
         start: timeFrom,
         end: timeTo,
         // for Queue Listing
@@ -223,12 +242,15 @@ class Form extends React.PureComponent {
 
             <GridContainer
               className={classnames(classes.formContent)}
-              alignItems='flex-start'
+              alignItems='center'
+              justify='center'
             >
               <GridItem container xs md={6}>
                 <PatientInfoInput
                   onSearchPatient={this.onSearchPatient}
                   onCreatePatient={this.toggleNewPatientModal}
+                  isRegisteredPatient={values.isRegisteredPatient}
+                  patientName={values.patientName}
                 />
                 <AppointmentDateInput />
               </GridItem>
@@ -272,7 +294,6 @@ class Form extends React.PureComponent {
               <Recurrence values={values} />
             </GridContainer>
           </CardContainer>
-          <ConflictBanner hasConflict={hasConflict} />
 
           <FormFooter
             isNew={slotInfo.type === 'add'}

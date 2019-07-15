@@ -87,29 +87,7 @@ class StatisticIndicator extends PureComponent {
             {StatusIndicator.ALL}
           </Button>
         </Paper>
-        <Paper elevation={6} className={classnames(classes.container)}>
-          <h4
-            className={classnames([
-              classes.number,
-              classes.statusAll,
-            ])}
-          >
-            {statistic.appointment}
-          </h4>
-          <Divider variant='fullWidth' />
 
-          <Button
-            color='primary'
-            size='sm'
-            block
-            id={StatusIndicator.APPOINTMENT}
-            onClick={this.onButtonClick}
-            simple
-          >
-            {currentFilter === StatusIndicator.APPOINTMENT && <Check />}
-            {StatusIndicator.APPOINTMENT}
-          </Button>
-        </Paper>
         <Paper elevation={6} className={classnames(classes.container)}>
           <h4
             className={classnames([
@@ -173,6 +151,29 @@ class StatisticIndicator extends PureComponent {
           >
             {currentFilter === StatusIndicator.COMPLETED && <Check />}
             {StatusIndicator.COMPLETED}
+          </Button>
+        </Paper>
+        <Paper elevation={6} className={classnames(classes.container)}>
+          <h4
+            className={classnames([
+              classes.number,
+              classes.statusAll,
+            ])}
+          >
+            {statistic.appointment}
+          </h4>
+          <Divider variant='fullWidth' />
+
+          <Button
+            color='primary'
+            size='sm'
+            block
+            id={StatusIndicator.APPOINTMENT}
+            onClick={this.onButtonClick}
+            simple
+          >
+            {currentFilter === StatusIndicator.APPOINTMENT && <Check />}
+            {StatusIndicator.APPOINTMENT}
           </Button>
         </Paper>
       </React.Fragment>

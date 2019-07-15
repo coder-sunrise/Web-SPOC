@@ -16,7 +16,7 @@ import {
   SizeContainer,
 } from '@/components'
 // sub components
-import AppointmentTypeSelector from './AppointmentTypeSelector'
+import { AppointmentTypeSelect } from 'medisys-components'
 
 const styles = () => ({
   selectorContainer: {
@@ -140,7 +140,7 @@ class FilterBar extends PureComponent {
               md={3}
               className={classnames(classes.selectorContainer)}
             >
-              <AppointmentTypeSelector
+              <AppointmentTypeSelect
                 label='Filter by Appointment Type'
                 value={filter.appointmentType}
                 maxTagCount={maxAppointmentTagCount}
