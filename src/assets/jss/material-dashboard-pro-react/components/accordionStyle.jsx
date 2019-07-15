@@ -12,7 +12,7 @@ const accordionStyle = (theme) => ({
     },
   },
   expansionPanelExpanded: {
-    margin: '0',
+    margin: '0 !important',
   },
   expansionPanelSummary: {
     minHeight: 'auto !important',
