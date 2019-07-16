@@ -117,6 +117,16 @@ const menuData = [
     url: '/setting/publicholiday',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Doctor Block',
+    url: '/setting/doctorblock',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Participant Role',
+    url: '/setting/participantrole',
+  },
+  {
     title: 'System User',
     text: 'TBD',
   },
@@ -168,6 +178,7 @@ class SystemSetting extends PureComponent {
   }
 
   state = {
+    searchText: '',
     selectedOptions: [],
     active: 0,
   }
@@ -182,14 +193,22 @@ class SystemSetting extends PureComponent {
     return Object.keys(this.group).map((o) => {
       return {
         title: o,
+        items: this.group[o],
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }}>
             {this.group[o]
-              .filter(
-                (m) =>
-                  this.state.selectedOptions.indexOf(m.text) >= 0 ||
-                  this.state.selectedOptions.length === 0,
-              )
+              .filter((m) => {
+                console.log(
+                  m.text,
+                  this.state.searchText,
+                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                    0 || !this.state.searchText,
+                )
+                return (
+                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                    0 || !this.state.searchText
+                )
+              })
               .map((item) => {
                 return (
                   <GridItem
@@ -236,7 +255,7 @@ class SystemSetting extends PureComponent {
 
     return (
       <CardContainer hideHeader>
-        <Select
+        {/* <Select
           options={menuData}
           mode='multiple'
           prefix={<Search />}
@@ -249,8 +268,33 @@ class SystemSetting extends PureComponent {
               selectedOptions: v,
             })
           }}
+        /> */}
+        <TextField
+          prefix={<Search />}
+          onChange={(e) => {
+            console.log(e.target)
+            this.setState({
+              searchText: e.target.value.toLowerCase(),
+            })
+          }}
         />
         <Accordion
+          defaultActive={0}
+          mode={this.state.searchText.length > 0 ? 'multiple' : 'default'}
+          collapses={this.menus().filter((item) => {
+            return (
+              !this.state.searchText ||
+              // item.title.toLocaleLowerCase().indexOf(this.state.searchText) >=
+              //   0 ||
+              item.items.find(
+                (m) =>
+                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                  0,
+              )
+            )
+          })}
+        />
+        {/* <Accordion
           defaultActive={0}
           mode={this.state.selectedOptions.length > 0 ? 'multiple' : 'default'}
           collapses={this.menus().filter((item) => {
@@ -262,7 +306,7 @@ class SystemSetting extends PureComponent {
               seletedOptions.find((m) => m.title === item.title)
             )
           })}
-        />
+        /> */}
         {/* <Button color='primary'>Test Test TestTest Test Test</Button>
         <MuiButton color='primary' variant='contained'>
           Test Test TestTest Test Test
