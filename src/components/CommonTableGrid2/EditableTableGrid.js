@@ -95,7 +95,7 @@ class EditableTableGrid extends PureComponent {
       newRows = added
         .map((o) => {
           return {
-            // id: getUniqueNumericId(),
+            id: getUniqueNumericId(),
             isNew: true,
             ...o,
           }
@@ -300,6 +300,7 @@ class EditableTableGrid extends PureComponent {
                       return React.cloneElement(o, {
                         row: p.row,
                         editingRowIds,
+                        key: o.props.id,
                         ...o.props,
                       })
                     }

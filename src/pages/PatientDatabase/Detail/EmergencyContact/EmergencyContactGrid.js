@@ -19,7 +19,7 @@ import Add from '@material-ui/icons/Add'
 import { titles } from '@/utils/codes'
 import { PagingPanel } from '@devexpress/dx-react-grid-material-ui'
 import Loading from '@/components/PageLoading/index'
-import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { getUniqueNumericId, getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
 // const pecValidationSchema = Yup.array().compact((v) => v.isDeleted).of(
@@ -29,9 +29,10 @@ import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 //   }),
 // )
 const pecValidationSchema = Yup.object().shape({
-  salutationFK: Yup.string().required(),
+  accountNoTypeFK: Yup.string().required(),
+  accountNo: Yup.string().required(),
   name: Yup.string().required(),
-  // primaryContactNo: Yup.date().required(),
+  relationshipFK: Yup.number().required(),
 })
 @connect(({ patient, emergencyContact, loading }) => {
   return { patient, emergencyContact, loading }
@@ -242,6 +243,8 @@ class Grid extends React.Component {
               )
               patientEmergencyContact.push({
                 // id: getUniqueGUID(),
+                id: getUniqueNumericId(),
+                isNew: true,
                 accountNo: o.patientAccountNo,
                 patientProfileFK: o.id,
                 salutationFK: o.salutationFK,

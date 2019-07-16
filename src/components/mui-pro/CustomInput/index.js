@@ -36,7 +36,7 @@ class FormikTextField extends React.PureComponent {
           ? field.value
           : defaultValue,
     }
-    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 300)
+    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -60,7 +60,7 @@ class FormikTextField extends React.PureComponent {
     }
   }
 
-  debouncedOnChange = (value) => {
+  _onChange = (value) => {
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
@@ -69,10 +69,11 @@ class FormikTextField extends React.PureComponent {
     const v = {
       target: {
         value,
-        name: props.field.name,
+        // name: props.field.name,
       },
     }
     if (props.field && props.field.onChange) {
+      v.target.name = props.field.name
       props.field.onChange(v)
     }
     if (onChange) {
@@ -93,6 +94,13 @@ class FormikTextField extends React.PureComponent {
 
   shouldFocus = (error) => {
     return error && this.props.form.submitCount !== this.validationCount
+  }
+
+  onKeyUp = (e) => {
+    // console.log('onKeyUp', e.target.value)
+    if (e.which === 13) {
+      this._onChange(e.target.value)
+    }
   }
 
   render () {
@@ -128,7 +136,7 @@ class FormikTextField extends React.PureComponent {
       realtime = true,
       focus = false,
       shrink = false,
-
+      onKeyUp,
       preventDefaultChangeEvent,
       value,
     } = props
@@ -172,6 +180,7 @@ class FormikTextField extends React.PureComponent {
       cfg.value = value
     }
     cfg.negative = state.value < 0
+    cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
 
     // console.log(inputProps)
     // console.log('custominput', inputProps)

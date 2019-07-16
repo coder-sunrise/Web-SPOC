@@ -225,13 +225,7 @@ class CommonTableGrid2 extends React.Component {
       grouping: false,
       groupingConfig: {},
       sort: true,
-      sortConfig: {
-        onSortingChange: (sorting) => {
-          this.search({
-            sorting,
-          })
-        },
-      },
+      sortConfig: {},
       summary: false,
       summaryConfig: {},
     }
@@ -334,12 +328,21 @@ class CommonTableGrid2 extends React.Component {
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
-    const { entity } = nextProps
+    const { entity, columnExtensions } = nextProps
     if (
       entity &&
       (entity.pagination !== preState.pagination ||
         entity.filter !== preState.filter)
     ) {
+      // console.log(entity.filter)
+      if (entity.filter && entity.filter.sorting) {
+        entity.filter.sorting.forEach((o) => {
+          const c = columnExtensions.find((m) => m.sortBy === o.columnName)
+          if (c) {
+            o.columnName = c.columnName
+          }
+        })
+      }
       return {
         pagination: entity.pagination,
         rows: entity.list,
@@ -507,6 +510,7 @@ class CommonTableGrid2 extends React.Component {
     if (containerComponent) {
       pagerConfig.containerComponent = containerComponent
     }
+    // console.log(sortConfig)
     // console.log(
     //   filter,
     //   grouping,
@@ -631,6 +635,18 @@ class CommonTableGrid2 extends React.Component {
                 <SortingState
                   sorting={this.state.pagination.sorting}
                   defaultSorting={defaultSorting}
+                  onSortingChange={(sorting) => {
+                    sorting.forEach((o) => {
+                      const c = newColumExtensions.find(
+                        (m) => m.columnName === o.columnName,
+                      )
+                      o.columnName = c.sortBy || c.columnName
+                    })
+                    this.search({
+                      sorting,
+                    })
+                  }}
+                  columnExtensions={newColumExtensions}
                   {...sortConfig}
                 />
               )}
