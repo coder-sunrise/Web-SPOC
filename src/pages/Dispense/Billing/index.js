@@ -105,7 +105,7 @@ class Billing extends Component {
           onConfirm={this.toggleClaimSequenceModal}
           onClose={this.toggleClaimSequenceModal}
         >
-          {showClaimSeqModal && <EditClaimSeq />}
+          <EditClaimSeq />
         </CommonModal>
         <CommonModal
           open={showCoPaymentModal}
@@ -113,7 +113,7 @@ class Billing extends Component {
           onConfirm={this.toggleCoPaymentModal}
           onClose={this.toggleCoPaymentModal}
         >
-          {showCoPaymentModal && <CoPayment />}
+          <CoPayment />
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
@@ -121,7 +121,7 @@ class Billing extends Component {
           onConfirm={this.toggleAddPaymentModal}
           onClose={this.toggleAddPaymentModal}
         >
-          {showAddPaymentModal && <AddPayment />}
+          <AddPayment />
         </CommonModal>
       </div>
     )

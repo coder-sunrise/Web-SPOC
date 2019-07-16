@@ -45,6 +45,14 @@ class Detail extends PureComponent {
     return (
       <React.Fragment>
         <DoctorBlock />
+        {footer &&
+          footer({
+            onConfirm: props.handleSubmit,
+            confirmBtnText: 'Save',
+            confirmProps: {
+              disabled: false,
+            },
+          })}
       </React.Fragment>
     )
   }

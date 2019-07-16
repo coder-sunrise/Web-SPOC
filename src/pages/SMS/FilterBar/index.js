@@ -1,20 +1,18 @@
 import React from 'react'
-import { FastField, withFormik } from 'formik'
+import { compose } from 'redux'
+// umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
+// formik
+import { FastField, withFormik } from 'formik'
+// material ui
 import { Search } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { compose } from 'redux'
-
-import {
-  GridContainer,
-  GridItem,
-  Select,
-  Button,
-  RadioGroup,
-  DatePicker,
-  Checkbox,
-} from '@/components'
+// common components
+import { GridContainer, GridItem, Button, RadioGroup } from '@/components'
+// sub components
+import FilterByAppointment from './FilterByAppointment'
+import FilterByPatient from './FilterByPatient'
 
 const styles = (theme) => ({
   filterBar: {
@@ -30,18 +28,18 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = ({ classes }) => {
+const FilterBar = ({ classes, values }) => {
   return (
     <div className={classes.filterBar}>
-      <GridContainer>
+      <GridContainer alignItems='center'>
         <GridItem xs={6}>
           <FastField
             name='SearchBy'
             render={(args) => (
               <RadioGroup
-                label=''
+                label='Filter By'
                 simple
-                defaultValue='appointment'
+                defaultValue='patient'
                 options={[
                   {
                     value: 'appointment',
@@ -58,146 +56,11 @@ const FilterBar = ({ classes }) => {
           />
         </GridItem>
         <GridItem xs={6} />
-        <GridItem xs={2}>
-          <FastField
-            name='Start'
-            render={(args) => (
-              <DatePicker
-                label={formatMessage({ id: 'sms.from' })}
-                timeFormat={false}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={2}>
-          <FastField
-            name='End'
-            render={(args) => (
-              <DatePicker
-                label={formatMessage({ id: 'sms.to' })}
-                timeFormat={false}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={4} />
-        <GridItem xs={4} />
-        <GridItem xs={4}>
-          <FastField
-            name='Doctor'
-            render={(args) => {
-              return (
-                <Select
-                  label={formatMessage({
-                    id: 'sms.doctor',
-                  })}
-                  options={[
-                    {
-                      name: 'Dr Levine',
-                      value: 'Dr Levine',
-                    },
-                    {
-                      name: 'Dr Heloo',
-                      value: 'Dr Heloo',
-                    },
-                  ]}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={4}>
-          <FastField
-            name='AppointmentStatus'
-            render={(args) => {
-              return (
-                <Select
-                  label={formatMessage({
-                    id: 'sms.appointment.status',
-                  })}
-                  options={[
-                    {
-                      name: 'Confirmed',
-                      value: 'Confirmed',
-                    },
-                    {
-                      name: 'Unknown',
-                      value: 'Unknown',
-                    },
-                  ]}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={4}>
-          <FastField
-            name='ExcludeSent'
-            render={(args) => (
-              <Checkbox
-                simple
-                label={formatMessage({
-                  id: 'sms.appointment.exclude',
-                })}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={4}>
-          <FastField
-            name='SMSStatus'
-            render={(args) => {
-              return (
-                <Select
-                  label={formatMessage({
-                    id: 'sms.status',
-                  })}
-                  options={[
-                    {
-                      name: 'Sent',
-                      value: 'Sent',
-                    },
-                    {
-                      name: 'Pending',
-                      value: 'Pending',
-                    },
-                  ]}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={4}>
-          <FastField
-            name='MessageStatus'
-            render={(args) => {
-              return (
-                <Select
-                  label={formatMessage({
-                    id: 'sms.message.status',
-                  })}
-                  options={[
-                    {
-                      name: 'Read',
-                      value: 'Read',
-                    },
-                    {
-                      name: 'Unread',
-                      value: 'Unread',
-                    },
-                  ]}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
+        {values.SearchBy === 'appointment' ? (
+          <FilterByAppointment />
+        ) : (
+          <FilterByPatient />
+        )}
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
             <Button

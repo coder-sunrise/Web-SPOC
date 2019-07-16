@@ -31,8 +31,9 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingClinicService }) => ({
+@connect(({ settingClinicService, global }) => ({
   settingClinicService,
+  global,
 }))
 class Service extends PureComponent {
   state = {}
@@ -54,7 +55,6 @@ class Service extends PureComponent {
       theme,
       ...restProps
     } = this.props
-
     const cfg = {
       toggleModal: this.toggleModal,
     }

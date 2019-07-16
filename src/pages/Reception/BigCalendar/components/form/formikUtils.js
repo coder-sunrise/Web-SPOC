@@ -71,32 +71,22 @@ const initDailyRecurrence = {
   occurence: 1,
 }
 
-export const mapPropsToValues = ({ slotInfo, resources = [], loginSEMR }) => {
+export const mapPropsToValues = ({ slotInfo }) => {
   const startDate = moment(slotInfo.start).format(_dateFormat)
   const startTime = moment(slotInfo.start).format('hh:mm a')
   const endDate = moment(slotInfo.end).format(_dateFormat)
   const endTime = moment(slotInfo.end).format('hh:mm a')
-
-  const currentResource = resources.find(
-    (resource) => resource.resourceId === slotInfo.resourceId,
-  )
-  let doctor = ''
-  if (currentResource) {
-    doctor =
-      currentResource.resourceId !== 'other' ? currentResource.resourceId : ''
-  }
 
   const bookedBy = 'medisys'
 
   return {
     ...initialAptInfo,
     ...slotInfo,
-
-    doctor,
     startDate,
     startTime,
     endDate,
     endTime,
+    bookedBy,
   }
 }
 

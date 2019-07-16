@@ -113,7 +113,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { classes, theme, footer, values } = props
-    console.log('detail', props)
+    // console.log('detail', props)
     return (
       <React.Fragment>
         <SizeContainer size='sm'>

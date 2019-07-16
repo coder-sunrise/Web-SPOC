@@ -72,7 +72,9 @@ class PatientInfoCard extends PureComponent {
     const { ctGender } = this.state
     const { queueLog } = this.props
     const { genderFK } = queueLog.visitPatientInfo
+    console.log({ info: queueLog.visitPatientInfo })
     const gender = ctGender.find((item) => item.id === genderFK)
+    console.log({ gender, ctGender })
     if (gender) return gender.name
 
     return ''

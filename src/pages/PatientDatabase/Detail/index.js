@@ -102,7 +102,7 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '5',
-        name: 'AppointmentHistory',
+        name: 'Appointment History',
         component: Loadable({
           loader: () => import('./AppointmentHistory'),
           render: (loaded, p) => {
@@ -114,7 +114,7 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '6',
-        name: 'PatientHistory',
+        name: 'Patient History',
         component: Loadable({
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
@@ -230,25 +230,27 @@ class PatientDetail extends PureComponent {
                 }}
               >
                 <MenuList>
-                  {this.widgets.map((o) => (
-                    <MenuItem
-                      key={o.name}
-                      className={classes.menuItem}
-                      selected={currentMenu.name === o.name}
-                      disabled={!patient.entity && o.id !== '1'}
-                      onClick={(e) => {
-                        onMenuClick(e, o)
-                        this.props.history.push(
-                          getAppendUrl({
-                            md: 'pt',
-                            cmt: o.id,
-                          }),
-                        )
-                      }}
-                    >
-                      {o.name}
-                    </MenuItem>
-                  ))}
+                  {this.widgets
+                    .filter((o) => !!patient.entity || o.id === '1')
+                    .map((o) => (
+                      <MenuItem
+                        key={o.name}
+                        className={classes.menuItem}
+                        selected={currentMenu.name === o.name}
+                        disabled={!patient.entity && o.id !== '1'}
+                        onClick={(e) => {
+                          onMenuClick(e, o)
+                          this.props.history.push(
+                            getAppendUrl({
+                              md: 'pt',
+                              cmt: o.id,
+                            }),
+                          )
+                        }}
+                      >
+                        {o.name}
+                      </MenuItem>
+                    ))}
                 </MenuList>
               </div>
             </CardBody>

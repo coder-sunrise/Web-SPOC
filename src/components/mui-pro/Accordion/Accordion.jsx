@@ -16,14 +16,43 @@ class Accordion extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      active: props.active,
+      active: props.defaultActive,
+      activedKeys: Array.isArray(props.defaultActive)
+        ? props.defaultActive
+        : [
+            props.defaultActive,
+          ],
     }
   }
 
-  handleChange = (panel) => (event, expanded) => {
-    this.setState({
-      active: expanded ? panel : -1,
+  static getDerivedStateFromProps (nextProps, preState) {
+    const { active } = nextProps
+    if (active >= 0 && active !== preState.active) {
+      return {
+        active,
+      }
+    }
+    return null
+  }
+
+  handleChange = (p) => (event, expanded) => {
+    const { props } = this
+    const { onChange } = props
+
+    this.setState((prevState) => {
+      let keys = prevState.activedKeys
+      if (expanded) {
+        keys.push(p.key)
+      } else {
+        keys = keys.filter((o) => o !== p.key)
+      }
+      return {
+        active: expanded ? p.key : -1,
+        activedKeys: keys,
+      }
     })
+
+    if (onChange) onChange(event, p, expanded)
   }
 
   render () {
@@ -32,8 +61,8 @@ class Accordion extends React.Component {
       collapses,
       expandIcon = <ExpandMore />,
       leftIcon = false,
+      mode = 'default',
     } = this.props
-
     const extraClass = classnames({
       [classes.reverseRow]: leftIcon,
     })
@@ -47,8 +76,17 @@ class Accordion extends React.Component {
         {collapses.map((prop, key) => {
           return (
             <ExpansionPanel
-              expanded={this.state.active === key}
-              onChange={this.handleChange(key)}
+              expanded={
+                mode === 'multiple' ? (
+                  this.state.activedKeys.indexOf(key) >= 0
+                ) : (
+                  this.state.active === key
+                )
+              }
+              onChange={this.handleChange({
+                key,
+                prop,
+              })}
               key={key}
               classes={{
                 root: classes.expansionPanel,
@@ -80,6 +118,7 @@ class Accordion extends React.Component {
 
 Accordion.defaultProps = {
   active: -1,
+  activedKeys: [],
 }
 
 Accordion.propTypes = {

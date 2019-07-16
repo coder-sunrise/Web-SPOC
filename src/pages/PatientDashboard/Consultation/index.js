@@ -764,7 +764,7 @@ class Consultation extends PureComponent {
       ...resetProps
     } = this.props
     const { currentLayout } = state
-    console.log(props)
+    // console.log(props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
@@ -811,6 +811,16 @@ class Consultation extends PureComponent {
                 <ProgressButton
                   color='primary'
                   onClick={() => {
+                    dispatch({
+                      type: 'global/sendNotification',
+                      payload: {
+                        type: 'Consultation',
+                        data: {
+                          message: 'reception update',
+                          sender: 'Mr Test',
+                        },
+                      },
+                    })
                     history.push('/reception/queue')
                   }}
                   icon={null}

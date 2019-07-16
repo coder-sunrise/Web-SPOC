@@ -73,7 +73,17 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
-
+  NavPills: {
+    contentWrapper: {
+      marginLeft: 1,
+      marginRight: 1,
+    },
+  },
+  MuiBadge: {
+    badge: {
+      right: 8,
+    },
+  },
   MuiDrawer: {
     paper: {
       overflowX: 'hidden',
@@ -289,7 +299,7 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 4,
+        marginTop: 2,
         '& svg': {
           top: 3,
           position: 'relative',
@@ -599,7 +609,7 @@ export const largeTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 5,
+        marginTop: 4,
         '& svg': {
           top: 2,
           position: 'relative',
