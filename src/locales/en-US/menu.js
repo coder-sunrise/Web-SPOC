@@ -83,6 +83,7 @@ export default {
   'menu.setting': 'Setting',
   'menu.setting.clinicinfo': 'Clinic Information',
   'menu.setting.service': 'Service',
+  'menu.setting.clinicbreakhour': 'Clinic Break Hour',
   'menu.setting.publicholiday': 'Public Holiday',
   'menu.setting.participantrole': 'Participant Role',
   'menu.setting.doctorblock': 'Doctor Block',

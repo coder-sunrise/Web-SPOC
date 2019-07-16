@@ -380,6 +380,11 @@ const routes = [
             component: './Setting/Service',
           },
           {
+            path: '/setting/clinicbreakhour',
+            name: 'clinicbreakhour',
+            component: './Setting/ClinicBreakHour',
+          },
+          {
             path: '/setting/publicholiday',
             name: 'publicholiday',
             component: './Setting/PublicHoliday',
