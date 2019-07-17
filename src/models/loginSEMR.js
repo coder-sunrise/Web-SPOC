@@ -1,5 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import router from 'umi/router'
+import moment from 'moment'
+import Cookies from 'universal-cookie'
 import * as service from '../services/loginSEMR'
 
 const { login } = service
@@ -38,6 +40,9 @@ export default createFormViewModel({
           const { data, application } = payload
           localStorage.setItem('token', data.access_token)
           localStorage.setItem('application', application)
+
+          const cookies = new Cookies()
+          cookies.set('_lastLogin', new Date())
         }
         return { ...state, isInvalidLogin }
       },

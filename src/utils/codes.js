@@ -1,4 +1,7 @@
-import request from './request'
+import Cookies from 'universal-cookie'
+import moment from 'moment'
+import request, { axiosRequest } from './request'
+import db from './indexedDB'
 
 const paymentMethods = [
   { name: 'Cash', value: 'cash' },
@@ -502,19 +505,74 @@ const orderTypes = [
   { name: 'Consumable', value: '4' },
   { name: 'Open Prescription', value: '5' },
 ]
-const localCodes = {}
-export async function getCodes (code) {
-  if (!localCodes[code]) {
-    const r = await request(`/api/CodeTable?ctnames=${code}`)
-    if (r.status === '200') {
-      // console.log(r)
-      localCodes[code] = r.data[code] || []
-    } else {
-      localCodes[code] = []
-    }
+// const localCodes = {}
+// export async function getCodes (code) {
+//   if (!localCodes[code]) {
+//     const r = await request(`/api/CodeTable?ctnames=${code}`)
+
+//     if (r.status === '200') {
+//       // console.log(r)
+//       localCodes[code] = r.data[code] || []
+//     } else {
+//       localCodes[code] = []
+//     }
+//   }
+//   // console.log(localCodes[code])
+//   return localCodes[code]
+// }
+
+const _fetchAndSaveCodeTable = async (code) => {
+  const response = await axiosRequest(`/api/CodeTable?ctnames=${code}`, {
+    method: 'GET',
+  })
+  const { status: statusCode, data } = response
+
+  if (statusCode === 200) {
+    await db.codetable.put({
+      code,
+      data: response.data[code],
+      createDate: new Date(),
+      updateDate: new Date(),
+    })
+    return data[code]
   }
-  // console.log(localCodes[code])
-  return localCodes[code]
+
+  return []
+}
+
+export const getCodes = async (_code) => {
+  const code = _code.toLowerCase()
+
+  let result = []
+  try {
+    await db.open()
+    const ct = await db.codetable.get(code)
+
+    const cookies = new Cookies()
+    const lastLoginDate = cookies.get('_lastLogin')
+    const parsedLastLoginDate = moment(lastLoginDate)
+
+    // not exist in current table, make network call to retrieve data
+    if (ct === undefined) {
+      result = _fetchAndSaveCodeTable(code)
+    } else {
+      // compare updateDate with lastLoginDate
+      // if updateDate > lastLoginDate, do nothing
+      // else perform network call and update indexedDB
+      const { updateDate, data: existedData } = ct
+      const parsedUpdateDate = moment(updateDate)
+
+      result = parsedUpdateDate.isBefore(parsedLastLoginDate)
+        ? _fetchAndSaveCodeTable(code)
+        : existedData
+    }
+  } catch (error) {
+    console.group('getcodes2 error')
+    console.log({ error })
+    console.groupEnd('getcodes2 error')
+  }
+
+  return result
 }
 
 module.exports = {

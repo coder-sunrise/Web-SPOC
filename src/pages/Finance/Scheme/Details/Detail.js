@@ -146,7 +146,7 @@ const Detail = ({ schemeDetail, dispatch }) => {
                     label={formatMessage({
                       id: 'finance.scheme.detail.coPayer',
                     })}
-                    code='coPayer'
+                    code='ctcoPayer'
                     max={10}
                     {...args}
                   />

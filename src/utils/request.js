@@ -104,7 +104,7 @@ export const axiosRequest = (url, option) => {
         ? showErrorNotification('', statusText)
         : showErrorNotification('', data.message)
 
-      return false
+      return error.response
     })
 }
 

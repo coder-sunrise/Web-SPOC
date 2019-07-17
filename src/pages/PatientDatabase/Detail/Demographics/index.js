@@ -147,7 +147,7 @@ class Demographic extends PureComponent {
                     return (
                       <CodeSelect
                         label='Account Type'
-                        code='PatientAccountNoType'
+                        code='ctPatientAccountNoType'
                         width={350}
                         {...args}
                       />
@@ -167,7 +167,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='salutationFK'
                   render={(args) => (
-                    <CodeSelect label='Title' code='Salutation' {...args} />
+                    <CodeSelect label='Title' code='ctSalutation' {...args} />
                   )}
                 />
               </GridItem>
@@ -200,7 +200,7 @@ class Demographic extends PureComponent {
                     return (
                       <CodeSelect
                         label='Gender'
-                        code='Gender'
+                        code='ctGender'
                         // defaultMenuIsOpen
                         // closeMenuOnSelect={false}
                         {...args}
@@ -215,7 +215,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Maritial Status'
-                      code='MaritalStatus'
+                      code='ctMaritalStatus'
                       {...args}
                     />
                   )}
@@ -227,7 +227,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Nationality'
-                      code='Nationality'
+                      code='ctNationality'
                       max={5}
                       {...args}
                     />
@@ -238,7 +238,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='raceFK'
                   render={(args) => (
-                    <CodeSelect label='Race' code='Race' {...args} />
+                    <CodeSelect label='Race' code='ctRace' {...args} />
                   )}
                 />
               </GridItem>
@@ -246,7 +246,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='religionFK'
                   render={(args) => (
-                    <CodeSelect label='Religion' code='Religion' {...args} />
+                    <CodeSelect label='Religion' code='ctReligion' {...args} />
                   )}
                 />
               </GridItem>
@@ -254,7 +254,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='languageFK'
                   render={(args) => (
-                    <CodeSelect label='Language' code='Language' {...args} />
+                    <CodeSelect label='Language' code='ctLanguage' {...args} />
                   )}
                 />
               </GridItem>
@@ -270,7 +270,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Occupation'
-                      code='Occupation'
+                      code='ctOccupation'
                       autoComplete
                       // max={10}
                       // defaultMenuIsOpen
@@ -320,7 +320,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Preferred Contact Mode'
-                      code='ContactMode'
+                      code='ctContactMode'
                       {...args}
                     />
                   )}
@@ -378,7 +378,7 @@ class Demographic extends PureComponent {
                   name='patientReferral'
                   render={(args) => (
                     <RadioGroup
-                      label="Referral Person"
+                      label='Referral Person'
                       defaultValue='1'
                       options={[
                         {
@@ -395,30 +395,38 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-              {
-                values.patientReferral === "2" && 
-                  <GridItem xs={12}>
-                    <Field
-                      name='patientReferralProfile'
-                      render={(args) => {
-                        return (
-                        <TextField label='Patient Name/Account No./Mobile No.' {...args} />
-                      )}}
-                    />
-                  </GridItem>
-              }
-              {
-                values.patientReferral && 
-                  <GridItem xs={12}>
-                    <Field
-                      name='patientReferralRemarks'
-                      render={(args) => {
-                        return (
-                        <TextField label='Remarks' multiline rowsMax={4} {...args} />
-                      )}}
-                    />
-                  </GridItem>
-              }
+              {values.patientReferral === '2' && (
+                <GridItem xs={12}>
+                  <Field
+                    name='patientReferralProfile'
+                    render={(args) => {
+                      return (
+                        <TextField
+                          label='Patient Name/Account No./Mobile No.'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
+              {values.patientReferral && (
+                <GridItem xs={12}>
+                  <Field
+                    name='patientReferralRemarks'
+                    render={(args) => {
+                      return (
+                        <TextField
+                          label='Remarks'
+                          multiline
+                          rowsMax={4}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
             </GridContainer>
           </GridItem>
         </GridContainer>

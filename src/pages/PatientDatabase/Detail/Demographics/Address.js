@@ -217,7 +217,12 @@ class Address extends Component {
             <FastField
               name={`${prefix}countryFK`}
               render={(args) => (
-                <CodeSelect label='Country' code='Country' max={10} {...args} />
+                <CodeSelect
+                  label='Country'
+                  code='ctCountry'
+                  max={10}
+                  {...args}
+                />
               )}
             />
           </GridItem>

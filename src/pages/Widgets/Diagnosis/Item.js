@@ -41,7 +41,7 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
               return (
                 <CodeSelect
                   label='Diagnosis'
-                  code='PatientAccountNoType'
+                  code='ctPatientAccountNoType'
                   {...args}
                 />
               )
@@ -56,7 +56,7 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
                 <CodeSelect
                   label='Complication'
                   mode='multiple'
-                  code='PatientAccountNoType'
+                  code='ctPatientAccountNoType'
                   {...args}
                 />
               )
