@@ -42,6 +42,20 @@ const styles = (theme) => ({
   ...AppointmentTypeAsColor,
 })
 
+const flattenAppointmentDateToCalendarEvents = (marshal, event) =>
+  event.isDoctorEvent
+    ? [
+        ...marshal,
+        event,
+      ]
+    : [
+        ...marshal,
+        ...event.appointmentResources.map((appointment) => {
+          const { appointmentResources, ...restEvent } = event
+          return { ...restEvent, ...appointment }
+        }),
+      ]
+
 @connect(({ calendar }) => ({ calendar }))
 class Appointment extends React.PureComponent {
   state = {
@@ -141,7 +155,7 @@ class Appointment extends React.PureComponent {
     // the important values are the ...restEvent
     const { start, end, ...restEvent } = selectedEvent
     const { isDoctorEvent, series } = restEvent
-
+    console.log({ selectedEvent })
     if (series) {
       this.setState({
         showSeriesConfirmation: true,
@@ -205,13 +219,10 @@ class Appointment extends React.PureComponent {
   }
 
   addDoctorEvent = (newDoctorEvent) => {
-    const { calendar: { calendarEvents } } = this.props
-
-    const doctorBlock = { id: getUniqueGUID(), ...newDoctorEvent }
     this._dispatchAction(
       {
         action: CalendarActions.UpdateDoctorEvent,
-        added: doctorBlock,
+        added: newDoctorEvent,
       },
       () => {
         this.setState({
@@ -258,14 +269,7 @@ class Appointment extends React.PureComponent {
 
     const { calendarEvents } = CalendarModel
     const marshalData = calendarEvents.reduce(
-      (marshal, event) => [
-        ...marshal,
-        ...event.appointmentResources.map((appointment) => {
-          if (event.isDoctorEvent) return { event }
-          const { appointmentResources, ...restEvent } = event
-          return { ...restEvent, ...appointment }
-        }),
-      ],
+      flattenAppointmentDateToCalendarEvents,
       [],
     )
 
@@ -333,6 +337,7 @@ class Appointment extends React.PureComponent {
           maxWidth='sm'
         >
           <DoctorBlockForm
+            initialProps={selectedSlot}
             handleAddDoctorEvent={this.addDoctorEvent}
             validationSchema={DoctorFormValidation}
           />

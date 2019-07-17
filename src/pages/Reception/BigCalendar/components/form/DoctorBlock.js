@@ -21,6 +21,7 @@ import {
 } from '@/components'
 // sub components
 import Recurrence from './Recurrence'
+import { getUniqueGUID } from '@/utils/utils'
 import style from './style'
 
 const STYLES = (theme) => ({
@@ -208,9 +209,10 @@ export default withFormik({
       `${date} ${eventTime}`,
       `${_dateFormat} ${_timeFormat}`,
     )
-
+    console.log({ values })
     const event = {
       ...values,
+      _appointmentID: getUniqueGUID(),
       startTime: startDate.format(_timeFormat),
       endTime: endDate.format(_timeFormat),
       start: startDate.toDate(),
@@ -219,8 +221,9 @@ export default withFormik({
       resourceId: doctor,
     }
 
-    resetForm()
     handleAddDoctorEvent(event)
+    // todo: update doctor event
+    resetForm()
   },
   mapPropsToValues: ({ initialProps }) => ({
     doctor: undefined,

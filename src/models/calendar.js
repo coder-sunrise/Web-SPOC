@@ -107,7 +107,51 @@ export default createListViewModel({
       },
       updateDoctorEvent (state, { added, updated, deleted }) {
         console.log({ added, updated, deleted })
-        return { ...state }
+        let newCalendarEvents = [
+          ...state.calendarEvents,
+        ]
+
+        if (added) {
+          newCalendarEvents = [
+            ...state.calendarEvents,
+            added,
+          ]
+        }
+
+        if (updated) {
+          newCalendarEvents = newCalendarEvents.reduce(
+            (events, e) =>
+              e._appointmentID === updated._appointmentID
+                ? [
+                    ...events,
+                    updated,
+                  ]
+                : [
+                    ...events,
+                    e,
+                  ],
+            [],
+          )
+        }
+
+        if (deleted) {
+          newCalendarEvents = newCalendarEvents.reduce(
+            (events, e) =>
+              e._appointmentID === deleted
+                ? [
+                    ...events,
+                  ]
+                : [
+                    ...events,
+                    e,
+                  ],
+            [],
+          )
+        }
+
+        console.log({ newCalendarEvents })
+
+        return { ...state, calendarEvents: newCalendarEvents }
       },
       // updateEventListing (state, { added, edited, deleted }) {
       //   const { calendarEvents } = state
