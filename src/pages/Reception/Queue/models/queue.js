@@ -71,6 +71,10 @@ export default createListViewModel({
       queueListing: generateRowData().reduce(mergeGenderAndAge, []),
       visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
+      error: {
+        hasError: false,
+        message: '',
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       console.log('queueLog subscriptions')
@@ -98,8 +102,11 @@ export default createListViewModel({
           })
         }
         return yield put({
-          type: 'updateSessionInfo',
-          payload: { ...InitialSessionInfo },
+          type: 'toggleError',
+          error: {
+            hasError: true,
+            message: 'Failed to start session.',
+          },
         })
       },
       *endSession ({ sessionID }, { call, put }) {
@@ -131,6 +138,11 @@ export default createListViewModel({
             payload: { ...queueListingResponse },
           })
 
+          yield put({
+            type: 'toggleError',
+            error: { hasError: false, message: '' },
+          })
+
           return yield put({
             type: 'updateSessionInfo',
             payload: { ...sessionData[0] },
@@ -138,8 +150,12 @@ export default createListViewModel({
         }
 
         return yield put({
-          type: 'updateSessionInfo',
-          payload: { ...InitialSessionInfo },
+          type: 'toggleError',
+          error: {
+            hasError: true,
+            message:
+              'Failed to get session info. Please contact system Administrator',
+          },
         })
       },
       *fetchQueueListing ({ sessionID }, { call, put }) {
@@ -201,9 +217,13 @@ export default createListViewModel({
       },
     },
     reducers: {
+      toggleError (state, { error = {} }) {
+        return { ...state, error: { ...error } }
+      },
       updateSessionInfo (state, { payload }) {
         return { ...state, sessionInfo: { ...payload } }
       },
+
       updateVisitPatientInfo (state, { payload }) {
         return {
           ...state,

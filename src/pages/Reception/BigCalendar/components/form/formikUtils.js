@@ -1,6 +1,5 @@
 import moment from 'moment'
 import { initialAptInfo, _dateFormat } from './variables'
-import { getColorByAppointmentType } from '../../setting'
 
 // export const handleSubmit = (values, { props, resetForm }) => {
 //   const {
@@ -59,7 +58,7 @@ import { getColorByAppointmentType } from '../../setting'
 //   resetForm()
 // }
 
-export const handleSubmit = (values, { props, resetForm }) => {
+export const handleSubmit = (values, { props }) => {
   console.group('handleSubmit')
   console.log({ values, props })
   console.groupEnd('handleSubmit')
@@ -67,31 +66,46 @@ export const handleSubmit = (values, { props, resetForm }) => {
 
 const initDailyRecurrence = {
   every: 1,
+  recurrencePattern: 'daily',
   recurrenceRange: 'after',
   occurence: 1,
 }
 
 export const mapPropsToValues = ({ slotInfo }) => {
   const startDate = moment(slotInfo.start).format(_dateFormat)
-  const startTime = moment(slotInfo.start).format('hh:mm a')
-  const endDate = moment(slotInfo.end).format(_dateFormat)
-  const endTime = moment(slotInfo.end).format('hh:mm a')
 
   const bookedBy = 'medisys'
-
+  console.log({ slotInfo })
   return {
     ...initialAptInfo,
     ...slotInfo,
-    startDate,
-    startTime,
-    endDate,
-    endTime,
+    ...initDailyRecurrence,
+    appointmentDate: startDate,
+    // startDate,
+    // startTime,
+    // endDate,
+    // endTime,
     bookedBy,
   }
 }
 
-export const getEventSeriesByID = (seriesID, data) => {
-  if (!data && !seriesID) return []
+export const getEventSeriesByID = (appointmentID, data) => {
+  if (!data && !appointmentID) return []
 
-  return data.filter((eachData) => eachData.seriesID === seriesID)
+  const appointment = data.find(
+    (eachData) => eachData._appointmentID === appointmentID,
+  )
+
+  if (!appointment) return []
+
+  const appointmentDataGrid = appointment.appointmentResources.map(
+    (resource, index) => ({
+      ...resource,
+      id: `${appointmentID}-resource-${index}`,
+      timeFrom: resource.start,
+      timeTo: resource.end,
+    }),
+  )
+  console.log({ appointmentDataGrid })
+  return appointmentDataGrid
 }

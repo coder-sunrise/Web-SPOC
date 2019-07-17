@@ -3,13 +3,7 @@ import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  Danger,
-} from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 
 import style from './style'
 
@@ -45,12 +39,13 @@ const FormFooter = ({
         </GridItem>
 
         <GridItem xs md={8} container justify='flex-end'>
+          <Button color='success' disabled>
+            Check Availability
+          </Button>
           <Button onClick={onClose} color='danger'>
             Cancel
           </Button>
-          <Button color='success' disabled>
-            Save Draft
-          </Button>
+
           <Button onClick={onConfirmClick} color='primary'>
             {confirmBtnText}
           </Button>
