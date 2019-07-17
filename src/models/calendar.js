@@ -105,36 +105,39 @@ export default createListViewModel({
           calendarEvents: newCalendarEvents,
         }
       },
-
-      updateEventListing (state, { added, edited, deleted }) {
-        const { calendarEvents } = state
-
-        let newCalendarEvents = [
-          ...calendarEvents,
-        ]
-
-        if (added) {
-          newCalendarEvents = [
-            ...calendarEvents,
-            added,
-          ]
-        }
-
-        if (edited) {
-          const removeEdited = (event) => event.id !== edited.id
-          newCalendarEvents = [
-            ...newCalendarEvents.filter(removeEdited),
-            edited,
-          ]
-        }
-
-        if (deleted) {
-          const removeDeleted = (event) => event.id !== deleted
-          newCalendarEvents = newCalendarEvents.filter(removeDeleted)
-        }
-
-        return { ...state, calendarEvents: newCalendarEvents }
+      updateDoctorEvent (state, { added, updated, deleted }) {
+        console.log({ added, updated, deleted })
+        return { ...state }
       },
+      // updateEventListing (state, { added, edited, deleted }) {
+      //   const { calendarEvents } = state
+
+      //   let newCalendarEvents = [
+      //     ...calendarEvents,
+      //   ]
+
+      //   if (added) {
+      //     newCalendarEvents = [
+      //       ...calendarEvents,
+      //       added,
+      //     ]
+      //   }
+
+      //   if (edited) {
+      //     const removeEdited = (event) => event.id !== edited.id
+      //     newCalendarEvents = [
+      //       ...newCalendarEvents.filter(removeEdited),
+      //       edited,
+      //     ]
+      //   }
+
+      //   if (deleted) {
+      //     const removeDeleted = (event) => event.id !== deleted
+      //     newCalendarEvents = newCalendarEvents.filter(removeDeleted)
+      //   }
+
+      //   return { ...state, calendarEvents: newCalendarEvents }
+      // },
     },
   },
 })

@@ -18,7 +18,7 @@ const mapRecurrencePatternToRRuleFeq = {
 const getRRule = (
   {
     eventDate: doctorBlockStartDate,
-    start: eventStartDate,
+    appointmentDate: eventStartDate,
     stopDate,
     recurrencePattern: freq,
     every,
@@ -33,7 +33,7 @@ const getRRule = (
   try {
     const start = isDoctorBlock
       ? moment(doctorBlockStartDate).toDate()
-      : eventStartDate
+      : moment(eventStartDate).toDate()
     const until = moment(stopDate).toDate()
 
     const endType =
@@ -142,7 +142,7 @@ const formatRecurrenceLabel = (
 
 const RecurrenceList = ({ values, isDoctorBlock }) => {
   const rule = getRRule(values, isDoctorBlock)
-  const label = formatRecurrenceLabel(values, rule)
+  const label = rule !== undefined ? formatRecurrenceLabel(values, rule) : ''
 
   return (
     <div>

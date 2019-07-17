@@ -13,7 +13,12 @@ import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
 // settings
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
-import { CalendarActions } from './const'
+import {
+  CalendarActions,
+  DoctorFormValidation,
+  InitialPopoverEvent,
+  applyFilter,
+} from './const'
 import { getUniqueGUID } from '@/utils/utils'
 
 const styles = (theme) => ({
@@ -36,47 +41,6 @@ const styles = (theme) => ({
   },
   ...AppointmentTypeAsColor,
 })
-
-const InitialPopoverEvent = {
-  startTime: '',
-  endTime: '',
-  patientName: '',
-  contactNo: '',
-}
-
-const applyFilter = (data, filter) => {
-  let returnData = [
-    ...data,
-  ]
-
-  // filter by doctor
-  const { doctors } = filter
-  if (doctors.length !== 0 && !doctors.includes('all'))
-    returnData = returnData.filter((aptData) =>
-      doctors.includes(aptData.doctor),
-    )
-
-  // filter by appointment type
-  const { appointmentType } = filter
-  if (appointmentType.length !== 0 && !appointmentType.includes('all')) {
-    returnData = returnData.filter((aptData) =>
-      appointmentType.includes(aptData.appointmentType),
-    )
-  }
-  // filter by query
-  const { searchQuery } = filter
-  if (searchQuery !== '') {
-    returnData = returnData.filter((aptData) => {
-      const { patientName } = aptData
-      if (patientName.toLowerCase().includes(searchQuery.toLowerCase()))
-        return true
-
-      return false
-    })
-  }
-
-  return returnData
-}
 
 @connect(({ calendar }) => ({ calendar }))
 class Appointment extends React.PureComponent {
@@ -115,16 +79,6 @@ class Appointment extends React.PureComponent {
 
   closeAppointmentForm = () => this.setState({ showAppointmentForm: false })
 
-  addEvent = (newEvent) => {
-    this._dispatchAction(
-      {
-        action: CalendarActions.UpdateEvent,
-        added: newEvent,
-      },
-      this.closeAppointmentForm,
-    )
-  }
-
   updateEventSeries = ({ _appointmentID, add, update }) => {
     add &&
       this._dispatchAction(
@@ -144,16 +98,6 @@ class Appointment extends React.PureComponent {
         },
         this.closeAppointmentForm,
       )
-  }
-
-  updateEvent = (changedEvent) => {
-    this._dispatchAction(
-      {
-        action: CalendarActions.UpdateEvent,
-        edited: changedEvent,
-      },
-      this.closeAppointmentForm,
-    )
   }
 
   deleteEvent = (eventID, appointmentID) => {
@@ -176,9 +120,8 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onSelectSlot = (event) => {
+  onSelectSlot = () => {
     let hour = {
-      // seriesID: getUniqueGUID(),
       _appointmentID: getUniqueGUID(),
       allDay: false,
       // start: event.start,
@@ -263,12 +206,11 @@ class Appointment extends React.PureComponent {
 
   addDoctorEvent = (newDoctorEvent) => {
     const { calendar: { calendarEvents } } = this.props
-    const idList = calendarEvents.map((a) => a.id)
-    const newID = Math.max(...idList) + 1
-    const doctorBlock = { id: newID, ...newDoctorEvent }
+
+    const doctorBlock = { id: getUniqueGUID(), ...newDoctorEvent }
     this._dispatchAction(
       {
-        action: CalendarActions.UpdateEvent,
+        action: CalendarActions.UpdateDoctorEvent,
         added: doctorBlock,
       },
       () => {
@@ -319,6 +261,7 @@ class Appointment extends React.PureComponent {
       (marshal, event) => [
         ...marshal,
         ...event.appointmentResources.map((appointment) => {
+          if (event.isDoctorEvent) return { event }
           const { appointmentResources, ...restEvent } = event
           return { ...restEvent, ...appointment }
         }),
@@ -379,8 +322,6 @@ class Appointment extends React.PureComponent {
             slotInfo={selectedSlot}
             calendarEvents={calendarEvents}
             handleUpdateEventSeries={this.updateEventSeries}
-            handleAddEvents={this.addEvent}
-            handleUpdateEvents={this.updateEvent}
             handleDeleteEvent={this.deleteEvent}
           />
         </CommonModal>
@@ -391,7 +332,10 @@ class Appointment extends React.PureComponent {
           onConfirm={this.handleDoctorEventClick}
           maxWidth='sm'
         >
-          <DoctorBlockForm handleAddDoctorEvent={this.addDoctorEvent} />
+          <DoctorBlockForm
+            handleAddDoctorEvent={this.addDoctorEvent}
+            validationSchema={DoctorFormValidation}
+          />
         </CommonModal>
         <CommonModal
           open={showSeriesConfirmation}
