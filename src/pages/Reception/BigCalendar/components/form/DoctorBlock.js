@@ -184,7 +184,8 @@ function DoctorEventForm ({
 }
 
 export default withFormik({
-  validationSchema: (props) => props.validationSchema,
+  validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
+    validationSchema,
   handleSubmit: (values, { props, resetForm }) => {
     const { handleAddDoctorEvent } = props
     const {
