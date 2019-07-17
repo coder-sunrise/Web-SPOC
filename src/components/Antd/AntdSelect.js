@@ -170,7 +170,7 @@ class AntdSelect extends React.PureComponent {
         newVal = _.reject(newVal, (v) => v === all)
       }
     }
-    // console.log(val)
+    console.log(val)
     // console.log(returnValue)
     if (form && field) {
       form.setFieldValue(field.name, newVal)
@@ -185,22 +185,33 @@ class AntdSelect extends React.PureComponent {
     })
   }
 
-  fetchData = (value) => {
+  fetchData = async (value) => {
     console.log('fetching data', value)
-    const search = value.toLowerCase()
-    this.lastFetchId += 1
-    const fetchId = this.lastFetchId
-    this.setState({ data: [], fetching: true })
-    const { props } = this
-    const { options, valueField, labelField, max = 50 } = props
+    if (this.props.query) {
+      this.setState({
+        fetching: true,
+      })
+      const q = await this.props.query(value)
+      console.log(q)
+      this.setState({
+        fetching: false,
+      })
+    } else {
+      const search = value.toLowerCase()
+      this.lastFetchId += 1
+      const fetchId = this.lastFetchId
+      this.setState({ data: [], fetching: true })
+      const { props } = this
+      const { options, valueField, labelField, max = 50 } = props
 
-    this.setState({
-      data: _.filter(
-        options,
-        (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
-      ).splice(0, max),
-      fetching: false,
-    })
+      this.setState({
+        data: _.filter(
+          options,
+          (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
+        ).splice(0, max),
+        fetching: false,
+      })
+    }
   }
 
   getSelectOptions = (opts, renderDropdown) => {

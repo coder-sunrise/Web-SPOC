@@ -15,6 +15,25 @@ class GlobalModalContainer extends PureComponent {
   //   console.log(para)
   // }
 
+  constructor (props) {
+    super(props)
+    this._timer = null
+  }
+
+  componentDidUpdate (preProps) {
+    if (
+      !preProps.global.showSessionTimeout &&
+      this.props.global.showSessionTimeout === true
+    ) {
+      clearTimeout(this._timer)
+      this._timer = setTimeout(() => {
+        this.props.dispatch({
+          type: 'login/logout',
+        })
+      }, 10000)
+    }
+  }
+
   render () {
     const { global, dispatch, history } = this.props
     return (
@@ -56,6 +75,39 @@ class GlobalModalContainer extends PureComponent {
         >
           <PatientDetail {...this.props} />
           {/* {global.currentPatientId} */}
+        </CommonModal>
+
+        <CommonModal
+          open={global.showSessionTimeout}
+          title='Session Timeout'
+          maxWidth='sm'
+          onClose={(e) => {
+            clearTimeout(this._timer)
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showSessionTimeout: false,
+              },
+            })
+          }}
+          onConfimr={() => {
+            this.props.dispatch({
+              type: 'login/logout',
+            })
+          }}
+          showFooter
+        >
+          <div
+            style={{
+              textAlign: 'center',
+              minHeight: 100,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            Your session will be disconnected in 1 minutes
+          </div>
         </CommonModal>
       </div>
     )

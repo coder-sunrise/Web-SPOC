@@ -102,7 +102,8 @@ class RadioGroup extends React.Component {
 
   render () {
     const { classes, ...restProps } = this.props
-    console.log(this.props)
+    // console.log(this.props)
+    console.log(this.state.selectedValue)
     return (
       <CustomInput
         inputComponent={this.getComponent}

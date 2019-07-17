@@ -22,8 +22,14 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [ 'src/pages/Authorized' ],
-    authority: [ 'admin', 'user', 'guest' ],
+    Routes: [
+      'src/pages/Authorized',
+    ],
+    authority: [
+      'admin',
+      'user',
+      'guest',
+    ],
     routes: [
       // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
@@ -380,6 +386,11 @@ const routes = [
             component: './Setting/Service',
           },
           {
+            path: '/setting/room',
+            name: 'room',
+            component: './Setting/Room',
+          },
+          {
             path: '/setting/publicholiday',
             name: 'publicholiday',
             component: './Setting/PublicHoliday',
@@ -402,12 +413,6 @@ const routes = [
         path: '/development',
         name: 'Development',
         routes: [
-          {
-            path: '/development/masonry',
-            name: 'Masonry',
-            mini: 'MS',
-            component: './Development/Masonry',
-          },
           {
             path: '/development/control',
             name: 'Control',

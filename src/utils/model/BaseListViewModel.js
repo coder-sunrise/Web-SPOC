@@ -15,6 +15,31 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
     return {
       ...super.effects({ queryFnName: 'queryList' }),
 
+      *querySingle (
+        { payload = { keepFilter: true, defaultQuery: false }, history },
+        { call, put, select },
+      ) {
+        const response = yield call(service.query, payload)
+        // console.log(response)
+        const { data, status, message } = response
+        if (status === '200' || data) {
+          yield put({
+            type: 'querySingleSuccess',
+            payload: {
+              data,
+            },
+          })
+          yield put({
+            type: 'querySingleDone',
+            payload: {
+              data,
+            },
+          })
+        }
+        return data
+        // }
+      },
+
       *create ({ payload }, { select, call, put }) {
         const state = yield select((st) => st[namespace])
         const newObj = state.currentItem
@@ -115,6 +140,17 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
             },
           },
           // currentItem: entities[0],
+        }
+      },
+
+      querySingleSuccess (st, { payload }) {
+        console.log(payload)
+        const { data } = payload
+        sortAll(data)
+        return {
+          ...st,
+          entity: data,
+          queryCount: (st.queryCount || 0) + 1,
         }
       },
 

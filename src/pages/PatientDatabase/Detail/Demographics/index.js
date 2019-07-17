@@ -45,6 +45,8 @@ import InboxIcon from '@material-ui/icons/MoveToInbox'
 import DraftsIcon from '@material-ui/icons/Drafts'
 import SendIcon from '@material-ui/icons/Send'
 import avatar from '@/assets/img/faces/marc.jpg'
+import { queryList } from '@/services/patient'
+
 import { titles, finTypes, gender } from '@/utils/codes'
 import { standardRowHeight } from 'mui-pro-jss'
 // import model from '../models/demographic'
@@ -378,15 +380,14 @@ class Demographic extends PureComponent {
                   name='patientReferral'
                   render={(args) => (
                     <RadioGroup
-                      label="Referral Person"
-                      defaultValue='1'
+                      label='Referral Person'
                       options={[
                         {
-                          value: '1',
+                          value: 'Company',
                           label: 'Company',
                         },
                         {
-                          value: '2',
+                          value: 'Patient',
                           label: 'Patient',
                         },
                       ]}
@@ -395,30 +396,48 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-              {
-                values.patientReferral === "2" && 
-                  <GridItem xs={12}>
-                    <Field
-                      name='patientReferralProfile'
-                      render={(args) => {
-                        return (
-                        <TextField label='Patient Name/Account No./Mobile No.' {...args} />
-                      )}}
-                    />
-                  </GridItem>
-              }
-              {
-                values.patientReferral && 
-                  <GridItem xs={12}>
-                    <Field
-                      name='patientReferralRemarks'
-                      render={(args) => {
-                        return (
-                        <TextField label='Remarks' multiline rowsMax={4} {...args} />
-                      )}}
-                    />
-                  </GridItem>
-              }
+              {values.patientReferral === 'Patient' && (
+                <GridItem xs={12}>
+                  <Field
+                    name='patientReferralProfile'
+                    render={(args) => {
+                      return (
+                        <Select
+                          remote
+                          query={(v) => {
+                            return queryList({
+                              name: v,
+                              patientAccountNo: v,
+                              'contactFkNavigation.contactNumber.number': v,
+                              combineCondition: 'or',
+                            })
+                          }}
+                          // options={this.state.searchedPatientList}
+                          label='Patient Name/Account No./Mobile No.'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
+              {values.patientReferral && (
+                <GridItem xs={12}>
+                  <Field
+                    name='patientReferralRemarks'
+                    render={(args) => {
+                      return (
+                        <TextField
+                          label='Remarks'
+                          multiline
+                          rowsMax={4}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              )}
             </GridContainer>
           </GridItem>
         </GridContainer>

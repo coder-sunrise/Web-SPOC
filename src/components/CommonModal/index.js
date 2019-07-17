@@ -17,7 +17,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import Loading from '@/components/PageLoading/index'
 
-import { SizeContainer } from '@/components'
+import { SizeContainer, ProgressButton } from '@/components'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
 
 // const styles = theme => ({
@@ -101,7 +101,7 @@ class CommonModal extends React.PureComponent {
     confirmBtnText = 'Confirm',
     extraButtons,
   }) => {
-    const { loading, global, classes } = this.props
+    const { loading, global, classes, confirmText, cancelText } = this.props
     // console.log('footer', this.props)
     const { disabled = false } = confirmProps
     return (
@@ -112,17 +112,18 @@ class CommonModal extends React.PureComponent {
           disabled={loading.global}
           {...cancelProps}
         >
-          Cancel
+          {cancelText || 'Cancel'}
         </Button>
         {extraButtons}
-        <Button
+        <ProgressButton
           color='primary'
           onClick={onConfirm}
+          icon={null}
           {...confirmProps}
-          disabled={disabled || loading.global || global.disableSave}
+          // disabled={disabled || loading.global || global.disableSave}
         >
-          {loading.global ? 'Processing...' : `${confirmBtnText}`}
-        </Button>
+          {confirmText || confirmBtnText}
+        </ProgressButton>
       </DialogActions>
     )
   }

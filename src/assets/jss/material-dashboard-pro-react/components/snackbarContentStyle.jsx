@@ -98,6 +98,8 @@ const snackbarContentStyle = {
     // height: '38px',
     // display: 'block',
     // left: '15px',
+    width: '1.4rem',
+    height: '1.4rem',
     position: 'absolute',
     background: 'transparent',
     color: '#ffffff',

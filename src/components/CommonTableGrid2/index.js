@@ -328,15 +328,19 @@ class CommonTableGrid2 extends React.Component {
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
-    const { entity, columnExtensions } = nextProps
+    const { entity, type, columnExtensions } = nextProps
+    let _entity = entity
+    if (!_entity && type) {
+      _entity = window.g_app._store.getState()[type]
+    }
     if (
-      entity &&
-      (entity.pagination !== preState.pagination ||
-        entity.filter !== preState.filter)
+      _entity &&
+      (_entity.pagination !== preState.pagination ||
+        _entity.filter !== preState.filter)
     ) {
-      // console.log(entity.filter)
-      if (entity.filter && entity.filter.sorting) {
-        entity.filter.sorting.forEach((o) => {
+      // console.log(_entity.filter)
+      if (_entity.filter && _entity.filter.sorting) {
+        _entity.filter.sorting.forEach((o) => {
           const c = columnExtensions.find((m) => m.sortBy === o.columnName)
           if (c) {
             o.columnName = c.columnName
@@ -344,9 +348,10 @@ class CommonTableGrid2 extends React.Component {
         })
       }
       return {
-        pagination: entity.pagination,
-        rows: entity.list,
-        filter: entity.filter,
+        pagination: _entity.pagination,
+        rows: _entity.list,
+        filter: _entity.filter,
+        entity: _entity,
       }
     }
     if (nextProps.rows && nextProps.rows !== preState.rows) {
@@ -399,7 +404,7 @@ class CommonTableGrid2 extends React.Component {
   // }
 
   search = (payload) => {
-    const { query, dispatch, type, queryMethod = 'query', entity } = this.props
+    const { query, dispatch, type, queryMethod = 'query' } = this.props
 
     if (query) {
       query({
@@ -421,10 +426,10 @@ class CommonTableGrid2 extends React.Component {
         },
         ...payload,
       })
-    } else if (entity) {
+    } else if (this.state.entity) {
       const p = {
-        ...entity.pagination,
-        ...entity.filter,
+        ...this.state.entity.pagination,
+        ...this.state.entity.filter,
         ...payload,
       }
       // console.log(p)
@@ -454,7 +459,6 @@ class CommonTableGrid2 extends React.Component {
         100,
       ],
       columns = [],
-      entity,
       type,
       rows,
       TableCell = DefaultTableCell,
@@ -610,7 +614,7 @@ class CommonTableGrid2 extends React.Component {
           <div ref={this.myRef}>
             <DevGrid
               rows={getIndexedRows(
-                entity ? entity.list : rows,
+                this.state.entity ? this.state.entity.list : rows,
                 this.state.pagination,
               )} // this.state.data ||
               columns={
@@ -672,9 +676,9 @@ class CommonTableGrid2 extends React.Component {
               {/* <IntegratedFiltering /> */}
               {sort && !type && <IntegratedSorting />}
               {summary && <IntegratedSummary {...summaryConfig.integrated} />}
-              {pager && !entity && <IntegratedPaging />}
+              {pager && !this.state.entity && <IntegratedPaging />}
               {pager &&
-              entity && (
+              this.state.entity && (
                 <CustomPaging totalCount={this.state.pagination.totalRecords} />
               )}
               {selectable && <IntegratedSelection />}

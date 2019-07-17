@@ -279,7 +279,7 @@ export const defaultTheme = createMuiTheme({
         '& textarea:first-of-type': {
           position: 'relative',
           marginBottom: 5,
-          top: 7,
+          top: 3,
         },
       },
     },
@@ -435,7 +435,7 @@ export const smallTheme = createMuiTheme({
         '& textarea:first-of-type': {
           position: 'relative',
           marginBottom: 3,
-          top: 5,
+          top: 0,
         },
       },
     },

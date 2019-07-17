@@ -97,12 +97,12 @@ const SelectDisplay = (columnExtensions, state) => ({
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
 
-  if (!value) return ''
-
+  if (value === undefined) return ''
   const v =
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
-  if (v.color) {
+
+  if (v.colorValue) {
     return (
       <div>
         <span
@@ -116,6 +116,19 @@ const SelectDisplay = (columnExtensions, state) => ({
           }}
         />
         <span>{v ? v.name : ''}</span>
+      </div>
+    )
+  }
+  if (v.color) {
+    return (
+      <div>
+        <span
+          style={{
+            color: v.color,
+          }}
+        >
+          {v ? v.name : ''}
+        </span>
       </div>
     )
   }

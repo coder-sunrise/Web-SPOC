@@ -166,6 +166,7 @@ class FormikTextField extends React.PureComponent {
       if (!error) {
         cfg.error = shouldShow && !!rawError
       }
+      // console.log(rawError)
       if (cfg.error) {
         focus = focus || this.shouldFocus(error)
         if (focus && this.refEl && !window.alreadyFocused) {

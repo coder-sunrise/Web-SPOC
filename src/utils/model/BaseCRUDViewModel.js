@@ -1,11 +1,16 @@
 ﻿/* eslint-disable consistent-return */
+import _ from 'lodash'
+
 import {
   config as cfg,
   formatUrlPath,
   immutaeMerge,
   decrypt,
+  cleanFieldValue,
 } from 'medisys-util'
 import update from 'immutability-helper'
+import { notification } from '@/components'
+
 import { getUniqueGUID } from '@/utils/utils'
 
 const { prefix, openPages } = cfg
@@ -53,11 +58,10 @@ export default class BaseCRUDViewModel {
 
   state () {
     return {
-      isMotion: localStorage.getItem(`${prefix}userIsMotion`) === 'true',
-      modalType: 'create',
       isTouched: false,
       entity: null,
-      items: [],
+      // items: [],
+      default: {},
     }
   }
 
@@ -71,7 +75,7 @@ export default class BaseCRUDViewModel {
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {
-        console.log(namespace, queryFnName, payload)
+        console.log(namespace, queryFnName, payload, service)
         if (!service || !service[queryFnName]) return
         let filter = yield select((st) => st[namespace].filter)
         let exclude = yield select((st) => st[namespace].exclude)
@@ -91,9 +95,8 @@ export default class BaseCRUDViewModel {
         const { list = {} } = config
         filter = {
           ...filter,
-          queryExcludeFields: list.exclude || exclude,
+          // queryExcludeFields: list.exclude || exclude,
         }
-
         const response = yield call(service[queryFnName], filter)
         // console.log(response)
         const { data, status, message } = response
@@ -116,7 +119,24 @@ export default class BaseCRUDViewModel {
         return data
         // }
       },
+      *upsert ({ payload, history }, { select, call, put }) {
+        console.log('upsert', payload)
+        const { cfg = {} } = payload
+        const newPayload = cleanFieldValue(_.cloneDeep(payload))
+        const r = yield call(service.upsert, newPayload)
+        if (r) {
+          let message = r.id ? 'Created' : 'Saved'
+          if (cfg.message) {
+            message = cfg.message
+          }
+          notification.success({
+            // duration:0,`
+            message,
+          })
+        }
 
+        return r
+      },
       *lock ({ payload, history }, { call, put, select, take }) {
         const s = yield select((st) => st[namespace])
         const { currentItem, newDetailPath } = s

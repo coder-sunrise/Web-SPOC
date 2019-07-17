@@ -342,7 +342,7 @@ const convertToQuery = (
     combineCondition,
     includeDeleted,
     includeParentDeleted,
-    queryExcludeFields,
+    // queryExcludeFields,
     sorting = [],
   } = query
   let customQuerys = { ...query }
@@ -351,7 +351,7 @@ const convertToQuery = (
   delete customQuerys.sorting
   delete customQuerys.includeDeleted
   delete customQuerys.includeParentDeleted
-  delete customQuerys.queryExcludeFields
+  // delete customQuerys.queryExcludeFields
   delete customQuerys.totalRecords
   delete customQuerys.combineCondition
 
@@ -415,7 +415,7 @@ const convertToQuery = (
     combineCondition,
     includeDeleted,
     includeParentDeleted,
-    queryExcludeFields,
+    // queryExcludeFields,
   }
   convertExcludeFields.forEach((p) => {
     if (customQuerys[p] !== undefined) returnVal[p] = customQuerys[p]

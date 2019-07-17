@@ -1,7 +1,6 @@
 ﻿import _ from 'lodash'
 import { formatUrlPath, sortAll, decrypt, cleanFieldValue } from 'medisys-util'
 import BaseCRUDViewModel from './BaseCRUDViewModel'
-import { notification } from '@/components'
 
 export default class BaseFormViewModel extends BaseCRUDViewModel {
   constructor (options) {
@@ -81,24 +80,6 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
 
       effects: {
         ...super.effects({ queryFnName: 'query' }),
-        *upsert ({ payload, history }, { select, call, put }) {
-          console.log('upsert', payload)
-          const { cfg = {} } = payload
-          const newPayload = cleanFieldValue(_.cloneDeep(payload))
-          const r = yield call(service.upsert, newPayload)
-          if (r) {
-            let message = r.id ? 'Created' : 'Saved'
-            if (cfg.message) {
-              message = cfg.message
-            }
-            notification.success({
-              // duration:0,`
-              message,
-            })
-          }
-
-          return r
-        },
 
         *create ({ payload, history }, { select, call, put }) {
           console.log('create', payload)
@@ -180,7 +161,7 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
           // const { response } = payload
           const { data } = payload
           sortAll(data)
-          //console.log(data)
+          // console.log(data)
           return {
             ...st,
             entity: data,

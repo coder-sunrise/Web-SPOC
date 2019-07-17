@@ -1,5 +1,6 @@
 import Moment from 'moment'
 import * as Yup from 'yup'
+import { camelizeKeys, pascalizeKeys } from 'humps'
 
 // console.log(Yup)
 function _printValue (value, quoteStrings) {
@@ -83,6 +84,10 @@ Yup.setLocale({
   number: {
     //   min: 'Deve ser maior que ${min}',
     required: '',
+  },
+  array: {
+    min: 'This field must have at least ${min} items',
+    max: 'This field must have less than or equal to ${max} items',
   },
 })
 

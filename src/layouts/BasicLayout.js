@@ -1,6 +1,8 @@
 import React, { Suspense } from 'react'
 import NProgress from 'nprogress'
 import $ from 'jquery'
+import _ from 'lodash'
+
 // import { renderWhenReady} from '@sencha/ext-react'
 // import { Panel } from '@sencha/ext-modern'
 import router from 'umi/router'
@@ -121,6 +123,25 @@ class BasicLayout extends React.PureComponent {
     dispatch({
       type: 'global/getUserSettings',
     }).then((response) => {})
+
+    let sessionTimeOutTimer = null
+    const resetSessionTimeOut = (e) => {
+      console.log(e)
+      clearTimeout(sessionTimeOutTimer)
+      sessionTimeOutTimer = setTimeout(() => {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            showSessionTimeout: true,
+          },
+        })
+      }, 30 * 60 * 1000)
+    }
+    const debouncedRST = _.debounce(resetSessionTimeOut, 10000)
+    $(document).on('click', debouncedRST)
+    $(document).on('keydown', debouncedRST)
+
+    resetSessionTimeOut()
   }
 
   // componentDidMount () {

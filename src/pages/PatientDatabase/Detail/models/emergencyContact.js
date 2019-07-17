@@ -18,11 +18,7 @@ export default createFormViewModel({
       },
     },
     subscriptions: {},
-    effects: {
-      *submit ({ payload }, { call }) {
-        return yield call(fakeSubmitForm, payload)
-      },
-    },
+    effects: {},
     reducers: {},
   },
 })

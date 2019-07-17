@@ -19,16 +19,9 @@ import {
 
 const _toMoment = (value, format) => {
   if (!value) return ''
-  // console.log(value, format)
-  // console.log(moment.zone())
-  return moment(value)
-  if (!value) return value
-  try {
-    if (moment(value, format).isValid()) return moment(value, format)
-    return null
-  } catch (error) {
-    return null
-  }
+  const m = moment.utc(value)
+
+  return m.local()
 }
 
 const STYLES = (theme) => ({
@@ -40,6 +33,10 @@ const STYLES = (theme) => ({
     boxSizing: 'content-box',
     lineHeight: '1rem',
     color: 'currentColor',
+    '& .ant-calendar-picker-icon': {
+      marginTop: -7,
+      right: 10,
+    },
     '& > div > input': {
       border: 'none',
       boxShadow: 'none !important',
@@ -55,6 +52,7 @@ const STYLES = (theme) => ({
     },
     '& .ant-calendar-range-picker-separator': {
       marginRight: 10,
+      marginTop: 3,
     },
   },
 })
@@ -91,6 +89,8 @@ class AntdDateRangePicker extends PureComponent {
 
   componentWillReceiveProps (nextProps) {
     const { field } = nextProps
+    // console.log(field.value)
+
     if (field) {
       this.setState({
         value:
@@ -104,9 +104,7 @@ class AntdDateRangePicker extends PureComponent {
     this.setState({
       value: dateArray,
     })
-    if (Array.isArray(dateArray)) {
-      dateArray.forEach((o) => o.utcOffset())
-    }
+
     const { form, field, onChange } = this.props
     if (form && field) {
       // console.log(date.format())
@@ -116,7 +114,7 @@ class AntdDateRangePicker extends PureComponent {
 
       form.setFieldValue(
         field.name,
-        Array.isArray(dateArray) ? dateArray.map((o) => o.format()) : [],
+        Array.isArray(dateArray) ? dateArray.map((o) => o.utc().format()) : [],
       )
     }
 
@@ -134,7 +132,8 @@ class AntdDateRangePicker extends PureComponent {
     this.setState({ shrink: true })
   }
 
-  handleBlur = () => {
+  handleBlur = (e) => {
+    // console.log('blur', e, e.target, e.target.value)
     if (this.state.value === undefined || this.state.value.length === 0) {
       this.setState({ shrink: false })
     }
@@ -215,6 +214,8 @@ class AntdDateRangePicker extends PureComponent {
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
+        preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
         {...restProps}
       />
     )

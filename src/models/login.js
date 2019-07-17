@@ -53,6 +53,12 @@ export default {
           currentAuthority: 'guest',
         },
       })
+      yield put({
+        type: 'global/updateState',
+        payload: {
+          showSessionTimeout: false,
+        },
+      })
       localStorage.removeItem('token')
       reloadAuthorized()
       yield put(

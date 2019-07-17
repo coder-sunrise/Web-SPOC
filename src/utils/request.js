@@ -234,6 +234,7 @@ export default function request (url, option) {
       //   return response.json()
       // })
       .then((response, s, xhr) => {
+        console.log(response, s, xhr, xhr.getAllResponseHeaders())
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)
@@ -261,7 +262,14 @@ export default function request (url, option) {
         return data
       })
       .catch((response, s, xhr) => {
-        console.log(response, s, xhr)
+        console.log(
+          response.getResponseHeader('Date'),
+          response.getResponseHeader('date'),
+          s,
+          xhr,
+          xhr,
+        )
+
         let msg
         let status
         let payload = {}
@@ -297,16 +305,24 @@ export default function request (url, option) {
               errorMsg
 
             notification.destroy()
-            notification.error({
-              message: (
-                <div>
-                  <h4>{errortext}</h4>
+            if (response.responseJSON) {
+              notification.error({
+                // message: response.responseJSON.status,
+                description: response.responseJSON.message,
+                duration: 5000,
+              })
+            } else {
+              notification.error({
+                message: (
+                  <div>
+                    <h4>{errortext}</h4>
 
-                  {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
-                </div>
-              ),
-              duration: 5000,
-            })
+                    {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
+                  </div>
+                ),
+                duration: 5000,
+              })
+            }
 
             // const error = new Error(errortext)
             // error.isJson = isJson

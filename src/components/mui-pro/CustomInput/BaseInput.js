@@ -75,7 +75,9 @@ class BaseInput extends React.PureComponent {
               btn.trigger('click')
             }, 200)
           } else {
-            btn.trigger('click')
+            setTimeout(() => {
+              btn.trigger('click')
+            }, 200)
           }
           break
         }

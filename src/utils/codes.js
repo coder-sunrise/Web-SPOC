@@ -1,5 +1,10 @@
 import request from './request'
 
+const status = [
+  { value: false, name: 'Inactive', color: 'red' },
+  { value: true, name: 'Active', color: 'green' },
+]
+
 const paymentMethods = [
   { name: 'Cash', value: 'cash' },
   { name: 'Nets', value: 'nets' },
@@ -24,12 +29,6 @@ const finTypes = [
   { name: 'Fin', value: 'Fin' },
   { name: 'NRIC', value: 'NRIC' },
   { name: 'Passport', value: 'Passport' },
-]
-
-const status = [
-  { name: 'Active', value: '1' },
-  { name: 'Inactive', value: '0' },
-  { name: 'Unknown', value: '2' },
 ]
 
 const drugs = [

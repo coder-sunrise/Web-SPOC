@@ -21,7 +21,10 @@ const _toMoment = (value, format) => {
   if (!value) return ''
   // console.log(value, format)
   // console.log(moment.zone())
-  return moment(value)
+  console.log(value)
+  const m = moment.utc(value)
+
+  return m.local()
   if (!value) return value
   try {
     if (moment(value, format).isValid()) return moment(value, format)
@@ -106,11 +109,12 @@ class AntdDatePicker extends PureComponent {
 
   handleChange = (date, dateString) => {
     console.log({ date, dateString })
-    if (date) {
-      date.utcOffset()
-    }
-    const { form, field, onChange } = this.props
+    // if (date) {
+    //   date.utcOffset()
+    // }
+    const { form, field, onChange, dateFormat } = this.props
     const v = date ? date.utc().format() : ''
+
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())

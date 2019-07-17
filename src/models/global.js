@@ -146,7 +146,7 @@ export default createFormViewModel({
             accessTokenFactory: () => localStorage.getItem('token'),
           })
           .build()
-
+        // console.log(connection)
         connection.on('NewNotification', (type, response) => {
           const { sender, message } = response
           console.log(type, response)

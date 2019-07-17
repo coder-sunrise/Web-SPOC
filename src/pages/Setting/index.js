@@ -195,15 +195,9 @@ class SystemSetting extends PureComponent {
         title: o,
         items: this.group[o],
         content: (
-          <GridContainer style={{ marginTop: theme.spacing(1) }}>
+          <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
             {this.group[o]
               .filter((m) => {
-                console.log(
-                  m.text,
-                  this.state.searchText,
-                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                    0 || !this.state.searchText,
-                )
                 return (
                   m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
                     0 || !this.state.searchText

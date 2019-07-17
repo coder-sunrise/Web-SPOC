@@ -20,7 +20,8 @@ const disabled = {
 const buttonStyle = {
   button: {
     minHeight: 'auto',
-    minWidth: 'auto',
+    // minWidth: 'auto',
+    minWidth: 100,
     // backgroundColor: grayColor,
     // color: '#FFFFFF',
     boxShadow:
@@ -535,6 +536,7 @@ const buttonStyle = {
     // paddingRight: '12px',
     padding: '3px !important',
     fontSize: '20px',
+    minWidth: 'auto',
     // height: '41px',
     // minWidth: '41px',
     // width: '41px',
