@@ -107,11 +107,6 @@ export const initialAptInfo = {
   isRegisteredPatient: false,
   contactNo: '',
   doctor: '',
-  bookBy: '',
-  bookDate: '',
   remarks: '',
   enableRecurrence: false,
-  recurrencePattern: 'daily',
-  recurrenceRange: RECURRENCE_RANGE.AFTER,
-  occurence: 1,
 }

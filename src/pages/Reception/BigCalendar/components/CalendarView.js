@@ -87,39 +87,27 @@ class CalendarView extends React.PureComponent {
     this.setState({ calendarView: view })
   }
 
-  _moveEvent = ({
-    event,
-    start,
-    end,
-    resourceId,
-    isAllDay: droppedOnAllDaySlot,
-  }) => {
+  _moveEvent = ({ event, start, end, resourceId }) => {
     const { calendarEvents: events, handleMoveEvent } = this.props
 
     const idx = events.indexOf(event)
-    let { allDay } = event
-
-    if (!event.allDay && droppedOnAllDaySlot) {
-      allDay = true
-    } else if (event.allDay && !droppedOnAllDaySlot) {
-      allDay = false
-    }
+    const { id, _appointmentID } = event
 
     const resourceID = resourceId !== undefined ? resourceId : event.resourceId
+
     const updatedEvent = {
-      ...event,
       start,
       end,
       resourceId: resourceID,
-      allDay,
     }
+    console.log({ updatedEvent, id, _appointmentID })
 
-    const nextEvents = [
-      ...events,
-    ]
-    nextEvents.splice(idx, 1, updatedEvent)
+    // const nextEvents = [
+    //   ...events,
+    // ]
+    // nextEvents.splice(idx, 1, updatedEvent)
 
-    handleMoveEvent(nextEvents)
+    handleMoveEvent({ updatedEvent, id, _appointmentID })
   }
 
   Toolbar = (toolbarProps) => {

@@ -3,13 +3,7 @@ import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  Danger,
-} from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 
 import style from './style'
 

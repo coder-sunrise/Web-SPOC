@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
+import Cached from '@material-ui/icons/Cached'
 
 const style = () => ({
   blockDiv: {
@@ -30,7 +31,7 @@ class Event extends PureComponent {
 
   render () {
     const { event, classes } = this.props
-    const { isDoctorEvent, hasConflict } = event
+    const { isDoctorEvent, hasConflict, series } = event
 
     const title = isDoctorEvent ? event.doctor : event.patientName
 
@@ -45,6 +46,7 @@ class Event extends PureComponent {
             <strong>{title}</strong>
           </span>
           {hasConflict && <ErrorOutline />}
+          {series && <Cached />}
         </div>
         <span className={classes.blockDiv}>{event.contactNo}</span>
       </div>

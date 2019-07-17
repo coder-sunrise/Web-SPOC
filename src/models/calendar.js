@@ -1,6 +1,23 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services/calendar'
 import { calendarEvents as defaultEvents } from '../pages/Reception/BigCalendar/events'
+import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
+
+const deleteApptResources = (eventID, appointmentID) => (events, e) =>
+  e.appointmentID === appointmentID
+    ? [
+        ...events,
+        e,
+      ]
+    : [
+        ...events,
+        {
+          ...e,
+          appointmentResources: e.appointmentResources.filter(
+            (res) => res.id !== eventID,
+          ),
+        },
+      ]
 
 export default createListViewModel({
   namespace: 'calendar',
@@ -11,43 +28,81 @@ export default createListViewModel({
     service,
     state: {
       calendarEvents: [
-        ...defaultEvents,
+        ...newEvents,
       ],
     },
     subscriptions: {},
     effects: {},
     reducers: {
-      moveEvent (state, { calendarEvents }) {
-        return { ...state, calendarEvents }
+      moveEvent (state, { updatedEvent, id, _appointmentID }) {
+        const { calendarEvents } = state
+        const appointment = calendarEvents.find(
+          (e) => e._appointmentID === _appointmentID,
+        )
+        if (!appointment) return { ...state }
+
+        const updateAppointmentResource = (Rs, resource) =>
+          resource.id !== id
+            ? [
+                ...Rs,
+                { ...resource },
+              ]
+            : [
+                ...Rs,
+                { ...resource, ...updatedEvent },
+              ]
+        const updatedResources = appointment.appointmentResources.reduce(
+          updateAppointmentResource,
+          [],
+        )
+
+        const removed = calendarEvents.filter(
+          (event) => event._appointmentID !== _appointmentID,
+        )
+
+        const newCalendarEvents = [
+          ...removed,
+          {
+            ...appointment,
+            appointmentResources: updatedResources,
+          },
+        ]
+
+        return { ...state, calendarEvents: newCalendarEvents }
       },
       addEventSeries (state, { series }) {
         return {
           ...state,
           calendarEvents: [
             ...state.calendarEvents,
-            ...series,
+            series,
           ],
         }
       },
-      updateEventSeriesBySeriesID (state, { series, seriesID }) {
+      updateEventSeriesByEventID (state, { series, _appointmentID }) {
         const { calendarEvents: originalEvents } = state
         const removed = originalEvents.filter(
-          (event) => event.seriesID !== seriesID,
+          (event) => event._appointmentID !== _appointmentID,
         )
+
         const newCalendarEvents = [
           ...removed,
-          ...series,
+          series,
         ]
 
         return { ...state, calendarEvents: newCalendarEvents }
       },
-      deleteEventSeriesBySeriesID (state, { seriesID }) {
+      deleteEventSeriesByEventID (state, { eventID, appointmentID }) {
         const { calendarEvents } = state
+
+        const newCalendarEvents = calendarEvents.reduce(
+          deleteApptResources(eventID, appointmentID),
+          [],
+        )
+
         return {
           ...state,
-          calendarEvents: calendarEvents.filter(
-            (event) => event.seriesID !== seriesID,
-          ),
+          calendarEvents: newCalendarEvents,
         }
       },
 

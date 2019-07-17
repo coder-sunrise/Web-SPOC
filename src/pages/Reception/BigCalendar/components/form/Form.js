@@ -25,7 +25,6 @@ import AppointmentDataGrid from './AppointmentDataGrid'
 import PatientInfoInput from './PatientInfo'
 import AppointmentDateInput from './AppointmentDate'
 import Recurrence from './Recurrence'
-import ConflictBanner from './ConflictBanner'
 import FormFooter from './FormFooter'
 // services
 import {
@@ -37,6 +36,7 @@ import {
   mapPropsToValues,
   getEventSeriesByID,
 } from './formikUtils'
+import { getUniqueGUID } from '@/utils/utils'
 import styles from './style'
 
 const AppointmentSchema = Yup.object().shape({
@@ -59,7 +59,7 @@ class Form extends React.PureComponent {
     showDeleteConfirmationModal: false,
     patientList: [],
     eventSeries: getEventSeriesByID(
-      this.props.slotInfo.seriesID,
+      this.props.slotInfo._appointmentID,
       this.props.calendarEvents,
     ),
     isRegisteredPatient: false,
@@ -138,12 +138,13 @@ class Form extends React.PureComponent {
 
   onConfirmCancelAppointment = ({ deleteType, reasonType, reason }) => {
     const { handleDeleteEvent, slotInfo } = this.props
+    console.log({ slotInfo })
     this.setState(
       {
         showDeleteConfirmationModal: false,
       },
       () => {
-        handleDeleteEvent(slotInfo.seriesID)
+        handleDeleteEvent(slotInfo.id, slotInfo._appointmentID)
       },
     )
   }
@@ -172,9 +173,10 @@ class Form extends React.PureComponent {
       resources,
     } = this.props
 
-    const { seriesID, patientName, contactNo, remarks } = values
+    const { _appointmentID, patientName, contactNo, remarks } = values
+
     const calendarEvents = eventSeries.map((event) => {
-      const { timeFrom, timeTo, doctor, ...restColumn } = event
+      const { timeFrom, timeTo, doctor, id, ...restColumn } = event
       const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
       const timeIn = moment(timeFrom).format(dateTimeFormat)
       const timeOut = moment(timeTo).format(dateTimeFormat)
@@ -188,29 +190,44 @@ class Form extends React.PureComponent {
         matchedResource !== undefined ? matchedResource.doctorProfileFK : '4'
 
       return {
-        seriesID,
-        ...restColumn,
-        patientName,
-        isRegisteredPatient,
-        contactNo,
-        remarks,
-        timeFrom,
-        timeTo,
-        doctor,
-        doctorProfileFK: doctorResource,
+        ...event,
+        id: id !== undefined ? id : getUniqueGUID(),
         resourceId: doctorResource,
         start: timeFrom,
         end: timeTo,
-        // for Queue Listing
-        visitStatus: 'APPOINTMENT',
-        timeIn,
-        timeOut,
       }
+      // return {
+      //   _appointmentID,
+      //   id:
+      //   ...restColumn,
+      //   patientName,
+      //   isRegisteredPatient,
+      //   contactNo,
+      //   remarks,
+      //   timeFrom,
+      //   timeTo,
+      //   doctor,
+      //   // doctorProfileFK: doctorResource,
+      //   resourceId: doctorResource,
+      //   start: timeFrom,
+      //   end: timeTo,
+      //   // for Queue Listing
+      //   visitStatus: 'APPOINTMENT',
+      //   timeIn,
+      //   timeOut,
+      // }
     })
 
+    console.log({ values, slotInfo })
+    const updated = {
+      ...values,
+      appointmentResources: calendarEvents,
+    }
+    console.log({ updated })
+
     handleUpdateEventSeries({
-      [slotInfo.type]: calendarEvents,
-      seriesID,
+      [slotInfo.type]: updated,
+      _appointmentID,
     })
 
     resetForm()
@@ -218,8 +235,6 @@ class Form extends React.PureComponent {
 
   render () {
     const { classes, onClose, slotInfo, isLoading, values } = this.props
-
-    const { hasConflict } = slotInfo
 
     const {
       showNewPatientModal,
@@ -271,7 +286,7 @@ class Form extends React.PureComponent {
 
               <GridItem xs md={12} className={classes.verticalSpacing}>
                 <AppointmentDataGrid
-                  appointmentDate={values.startDate}
+                  appointmentDate={values.appointmentDate}
                   data={eventSeries}
                   handleCommitChanges={this.onCommitChanges}
                 />
