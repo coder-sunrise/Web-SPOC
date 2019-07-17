@@ -258,7 +258,7 @@ class ControlTest extends PureComponent {
             <FastField
               name='genderFK'
               render={(args) => (
-                <CodeSelect label='Salutation' code='Salutation' {...args} />
+                <CodeSelect label='Salutation' code='ctSalutation' {...args} />
               )}
             />
           </GridItem>

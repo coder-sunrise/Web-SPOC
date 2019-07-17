@@ -76,7 +76,7 @@ class TestWidget extends Component {
                 return (
                   <CodeSelect
                     label='Type'
-                    code='PatientAccountNoType'
+                    code='ctPatientAccountNoType'
                     {...args}
                   />
                 )
@@ -90,7 +90,7 @@ class TestWidget extends Component {
                 return (
                   <CodeSelect
                     label='Name'
-                    code='PatientAccountNoType'
+                    code='ctPatientAccountNoType'
                     {...args}
                   />
                 )
@@ -112,7 +112,7 @@ class TestWidget extends Component {
                 return (
                   <CodeSelect
                     label='Precaution'
-                    code='PatientAccountNoType'
+                    code='ctPatientAccountNoType'
                     {...args}
                   />
                 )

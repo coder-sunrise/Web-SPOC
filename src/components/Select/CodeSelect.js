@@ -15,18 +15,21 @@ class CodeSelect extends React.PureComponent {
     super(props)
 
     if (props.code) {
-      if (!codetables[props.code]) {
-        getCodes(props.code).then((options) => {
-          // console.log(options)
-          this.setState({
-            options,
-          })
-        })
-      } else {
-        this.setState({
-          options: codetables[props.code],
-        })
-      }
+      getCodes(props.code).then((codetableData) => {
+        this.setState({ options: codetableData })
+      })
+
+      // if (!codetables[props.code]) {
+      //   getCodes(props.code).then((options) => {
+      //     this.setState({
+      //       options,
+      //     })
+      //   })
+      // } else {
+      //   this.setState({
+      //     options: codetables[props.code],
+      //   })
+      // }
     }
   }
 
