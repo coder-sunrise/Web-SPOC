@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
 import moment from 'moment'
+import _ from 'lodash'
 import PerfectScrollbar from 'perfect-scrollbar'
 import Link from 'umi/link'
 import ListAlt from '@material-ui/icons/ListAlt'
@@ -53,70 +54,97 @@ import Loading from '@/components/PageLoading/index'
 const menuData = [
   {
     title: 'Master Setting',
-    items: [
-      {
-        text: 'Clinic Information',
-        url: '/setting/clinicinfo',
-      },
-      {
-        text: 'GST Setup',
-      },
-      {
-        text: 'General Setting',
-      },
-    ],
+    text: 'Clinic Information',
+    url: '/setting/clinicinfo',
+  },
+  {
+    title: 'Master Setting',
+    text: 'GST Setup',
+    url: '/setting/gstsetup',
+  },
+  {
+    title: 'Master Setting',
+    text: 'General Setting',
+    url: '/setting/generalsetting',
   },
   {
     title: 'Clinic Setting',
-    items: [
-      {
-        text: 'Service',
-        url: '/setting/service',
-      },
-      {
-        text: 'Service Center',
-        icon: <Business />,
-      },
-      {
-        text: 'Service Center Category',
-        icon: <FolderOpen />,
-      },
-      {
-        text: 'Service Category',
-        icon: <FolderOpen />,
-      },
-      {
-        text: 'Revenue Category',
-        icon: <FolderOpen />,
-      },
-      {
-        text: 'Room',
-      },
-      {
-        text: 'Clinic Operation Hour',
-      },
-      {
-        text: 'Clinic Break Hour',
-      },
-      {
-        text: 'Public Holiday',
-      },
-    ],
+    text: 'Service',
+    url: '/setting/service',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Service Center',
+    icon: <Business />,
+    url: '/setting/servicecenter',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Service Center Category',
+    icon: <FolderOpen />,
+    url: '/setting/servicecentercategory',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Service Category',
+    icon: <FolderOpen />,
+    url: '/setting/servicecategory',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Revenue Category',
+    icon: <FolderOpen />,
+    url: '/setting/revenuecategory',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Room',
+    url: '/setting/room',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Clinic Operation Hour',
+    url: '/setting/clinicoperationhour',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Clinic Break Hour',
+    url: '/setting/clinicbreakhour',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Public Holiday',
+    url: '/setting/publicholiday',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Doctor Block',
+    url: '/setting/doctorblock',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Participant Role',
+    url: '/setting/participantrole',
   },
   {
     title: 'System User',
+    text: 'TBD',
   },
   {
     title: 'Print Setup',
+    text: 'TBD',
   },
   {
     title: 'User Preference',
+    text: 'TBD',
   },
   {
     title: 'Templates',
+    text: 'TBD',
   },
   {
     title: 'Contact',
+    text: 'TBD',
   },
 ]
 const styles = (theme) => ({
@@ -143,51 +171,76 @@ const styles = (theme) => ({
 class SystemSetting extends PureComponent {
   constructor (props) {
     super(props)
+    this.group = _.groupBy(menuData, 'title')
 
+    // console.log(menuData, group, Object.keys(group))
     const { classes, theme } = props
-    this.menus = menuData.map((o) => {
+  }
+
+  state = {
+    searchText: '',
+    selectedOptions: [],
+    active: 0,
+  }
+
+  componentDidMount () {}
+
+  componentWillUnmount () {}
+
+  menus = () => {
+    const { classes, theme } = this.props
+
+    return Object.keys(this.group).map((o) => {
       return {
-        ...o,
+        title: o,
+        items: this.group[o],
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }}>
-            {(o.items || []).map((item) => {
-              return (
-                <GridItem
-                  key={item.name}
-                  xs={4}
-                  md={2}
-                  style={{ marginBottom: theme.spacing(2) }}
-                >
-                  <Button
-                    fullWidth
-                    bigview
-                    color='primary'
-                    className={classnames({
-                      [classes.bigviewBtn]: true,
-                      // [classes.longTextBtn]: item.longText,
-                    })}
-                    variant='outlined'
-                    onClick={() => {
-                      this.props.history.push(item.url)
-                    }}
+            {this.group[o]
+              .filter((m) => {
+                console.log(
+                  m.text,
+                  this.state.searchText,
+                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                    0 || !this.state.searchText,
+                )
+                return (
+                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                    0 || !this.state.searchText
+                )
+              })
+              .map((item) => {
+                return (
+                  <GridItem
+                    key={item.name}
+                    xs={4}
+                    md={2}
+                    style={{ marginBottom: theme.spacing(2) }}
                   >
-                    {item.icon || <ListAlt />}
-                    {item.text}
-                  </Button>
-                </GridItem>
-              )
-            })}
+                    <Button
+                      fullWidth
+                      bigview
+                      color='primary'
+                      className={classnames({
+                        [classes.bigviewBtn]: true,
+                        // [classes.longTextBtn]: item.longText,
+                      })}
+                      variant='outlined'
+                      onClick={() => {
+                        this.props.history.push(item.url)
+                      }}
+                    >
+                      {item.icon || <ListAlt />}
+                      {item.text}
+                    </Button>
+                  </GridItem>
+                )
+              })}
           </GridContainer>
         ),
       }
     })
   }
-
-  state = {}
-
-  componentDidMount () {}
-
-  componentWillUnmount () {}
 
   render () {
     const {
@@ -202,8 +255,58 @@ class SystemSetting extends PureComponent {
 
     return (
       <CardContainer hideHeader>
-        <TextField prefix={<Search />} simple />
-        <Accordion active={0} collapses={this.menus} />
+        {/* <Select
+          options={menuData}
+          mode='multiple'
+          prefix={<Search />}
+          labelField='text'
+          valueField='text'
+          groupField='title'
+          simple
+          onChange={(v) => {
+            this.setState({
+              selectedOptions: v,
+            })
+          }}
+        /> */}
+        <TextField
+          prefix={<Search />}
+          onChange={(e) => {
+            console.log(e.target)
+            this.setState({
+              searchText: e.target.value.toLowerCase(),
+            })
+          }}
+        />
+        <Accordion
+          defaultActive={0}
+          mode={this.state.searchText.length > 0 ? 'multiple' : 'default'}
+          collapses={this.menus().filter((item) => {
+            return (
+              !this.state.searchText ||
+              // item.title.toLocaleLowerCase().indexOf(this.state.searchText) >=
+              //   0 ||
+              item.items.find(
+                (m) =>
+                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                  0,
+              )
+            )
+          })}
+        />
+        {/* <Accordion
+          defaultActive={0}
+          mode={this.state.selectedOptions.length > 0 ? 'multiple' : 'default'}
+          collapses={this.menus().filter((item) => {
+            const seletedOptions = menuData.filter(
+              (o) => this.state.selectedOptions.indexOf(o.text) >= 0,
+            )
+            return (
+              this.state.selectedOptions.length === 0 ||
+              seletedOptions.find((m) => m.title === item.title)
+            )
+          })}
+        /> */}
         {/* <Button color='primary'>Test Test TestTest Test Test</Button>
         <MuiButton color='primary' variant='contained'>
           Test Test TestTest Test Test

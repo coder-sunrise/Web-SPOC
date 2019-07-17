@@ -121,10 +121,10 @@ class AddConsultationDocument extends PureComponent {
       rowHeight,
       footer,
     } = props
-    console.log(props)
+    // console.log(props)
     const cfg = props
     const { type } = values
-    console.log(type)
+    // console.log(type)
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>

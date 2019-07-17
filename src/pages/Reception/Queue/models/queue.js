@@ -76,7 +76,20 @@ export default createListViewModel({
         message: '',
       },
     },
-    subscriptions: {},
+    subscriptions: ({ dispatch, history }) => {
+      console.log('queueLog subscriptions')
+      dispatch({
+        type: 'global/subscribeNotification',
+        payload: {
+          type: 'Consultation',
+          callback: () => {
+            dispatch({
+              type: 'fetchQueueListing',
+            })
+          },
+        },
+      })
+    },
     effects: {
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)

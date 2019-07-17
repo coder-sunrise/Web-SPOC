@@ -12,17 +12,17 @@ class Grid extends PureComponent {
   state = {
     tableParas: {
       columns: [
-        { name: 'patientReferenceNo', title: 'Reference No.' },
-        { name: 'patientAccountNo', title: 'Account No.' },
+        { name: 'patientReferenceNo', title: 'Ref. No.' },
+        { name: 'patientAccountNo', title: 'Acc. No.' },
         { name: 'name', title: 'Patient Name' },
         { name: 'lastPayment', title: 'Last Visit Date' },
         { name: 'status', title: 'Status' },
-        { name: 'gender', title: 'Gender' },
+        { name: 'gender/age', title: 'Gender / Age' },
         { name: 'dob', title: 'DOB' },
         { name: 'race', title: 'Race' },
-        { name: 'language', title: 'Prefered Language' },
         { name: 'nationality', title: 'Nationality' },
         { name: 'mobileNo', title: 'Mobile No.' },
+        { name: 'homeNo', title: 'Home No.' },
         { name: 'officeNo', title: 'Office No.' },
         { name: 'action', title: 'Action' },
       ],
@@ -33,9 +33,23 @@ class Grid extends PureComponent {
         //   options: status,
         //   label: 'Status',
         // },
+        {
+          columnName: 'gender/age',
+          render: (row) => {
+            // console.log(row)
+            return `${row.gender.substring(0, 1)}/${row.age}`
+          },
+          sortBy: 'genderFK',
+        },
         { columnName: 'dob', type: 'date' },
+        { columnName: 'race', sortBy: 'raceFK' },
         { columnName: 'lastPayment', type: 'date' },
       ],
+      FuncProps: {
+        pager: true,
+        filter: true,
+      },
+
       // leftColumns: [
       //   'PatientReferenceNo',
       //   'PatientAccountNo',
@@ -93,7 +107,6 @@ class Grid extends PureComponent {
           type='patientSearch'
           entity={patientSearch}
           ActionProps={ActionProps}
-          FuncProps={{ pager: true, filter: true }}
           onRowDoubleClick={onRowDblClick}
           {...tableParas}
         />

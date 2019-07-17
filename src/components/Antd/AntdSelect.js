@@ -125,8 +125,20 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleFilter = (input, option) => {
+    // console.log(input, option, option.props.children, this.props.labelField)
     try {
-      return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      if (Array.isArray(option.props.children)) {
+        // return (
+        //   option.props.children.filter(
+        //     (o) =>
+        //       o.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0,
+        //   ).length > 0
+        // )
+        return false
+      }
+      return (
+        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+      )
     } catch (error) {
       console.log({ error })
       return false
@@ -191,10 +203,26 @@ class AntdSelect extends React.PureComponent {
     })
   }
 
+  getSelectOptions = (opts, renderDropdown) => {
+    return renderDropdown !== undefined
+      ? opts.map((option) => renderDropdown(option))
+      : opts.map((option) => (
+          <Select.Option
+            key={option.value}
+            title={option.label}
+            value={option.value}
+            disabled={!!option.disabled}
+          >
+            {option.label}
+          </Select.Option>
+        ))
+  }
+
   getComponent = ({ inputRef, ...props }) => {
     const {
       valueField,
       labelField,
+      groupField,
       options,
       classes,
       defaultValue,
@@ -218,8 +246,22 @@ class AntdSelect extends React.PureComponent {
     const cfg = {
       value: this.state.value,
     }
-    // console.log(cfg)
+    // console.log(newOptions)
     // console.log(newOptions, this.state.value, cfg)
+    let opts = []
+    if (newOptions[0] && newOptions[0][groupField]) {
+      const groups = _.groupBy(newOptions, groupField)
+      const group = Object.values(groups)
+      opts = group.map((g) => {
+        return (
+          <Select.OptGroup label={g[0].title}>
+            {this.getSelectOptions(g, renderDropdown)}
+          </Select.OptGroup>
+        )
+      })
+    } else {
+      opts = this.getSelectOptions(newOptions, renderDropdown)
+    }
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -241,20 +283,7 @@ class AntdSelect extends React.PureComponent {
           {...cfg}
           {...restProps}
         >
-          {renderDropdown !== undefined ? (
-            newOptions.map((option) => renderDropdown(option))
-          ) : (
-            newOptions.map((option) => (
-              <Select.Option
-                key={option.value}
-                title={option.name}
-                value={option.value}
-                disabled={!!option.disabled}
-              >
-                {option.name}
-              </Select.Option>
-            ))
-          )}
+          {opts}
         </Select>
       </div>
     )

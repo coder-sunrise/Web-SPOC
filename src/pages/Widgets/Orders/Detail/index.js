@@ -105,10 +105,10 @@ class Details extends PureComponent {
   render () {
     const { props, state } = this
     const { theme, classes, orders, values, rowHeight, footer } = props
-    console.log(props)
+    // console.log(props)
     const cfg = props
     const { type } = values
-    console.log(type)
+    // console.log(type)
     return (
       <div>
         <div className={classes.detail}>

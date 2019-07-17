@@ -32,7 +32,7 @@ function getContainerHeight (props) {
   return window.innerHeight - 44 - (props.showFooter ? 63 : 0)
 }
 
-@connect(({ loading }) => ({ loading }))
+@connect(({ loading, global }) => ({ loading, global }))
 class CommonModal extends React.PureComponent {
   state = {
     // open: false,
@@ -52,41 +52,11 @@ class CommonModal extends React.PureComponent {
     ]),
   }
 
-  constructor (props) {
-    super(props)
-    // console.log(this.state, props)
-    const { loading, classes, theme } = props
-    this.footer = ({
-      onConfirm,
-      confirmProps = {},
-      cancelProps,
-      confirmBtnText = 'Confirm',
-      extraButtons,
-    }) => {
-      const { disabled = false } = confirmProps
-      return (
-        <DialogActions className={classes.modalFooter}>
-          <Button
-            onClick={this.onClose}
-            color='danger'
-            disabled={loading.global}
-            {...cancelProps}
-          >
-            Cancel
-          </Button>
-          {extraButtons}
-          <Button
-            color='primary'
-            onClick={onConfirm}
-            {...confirmProps}
-            disabled={disabled || loading.global}
-          >
-            {loading.global ? 'Processing...' : `${confirmBtnText}`}
-          </Button>
-        </DialogActions>
-      )
-    }
-  }
+  // constructor (props) {
+  //   super(props)
+  //   // console.log(this.state, props)
+  //   const { loading, classes, theme } = props
+  // }
 
   static getDerivedStateFromProps (nextProps, preState) {
     const { open } = nextProps
@@ -123,6 +93,39 @@ class CommonModal extends React.PureComponent {
   //     }
   //     return null
   // }
+
+  footer = ({
+    onConfirm,
+    confirmProps = {},
+    cancelProps,
+    confirmBtnText = 'Confirm',
+    extraButtons,
+  }) => {
+    const { loading, global, classes } = this.props
+    // console.log('footer', this.props)
+    const { disabled = false } = confirmProps
+    return (
+      <DialogActions className={classes.modalFooter}>
+        <Button
+          onClick={this.onClose}
+          color='danger'
+          disabled={loading.global}
+          {...cancelProps}
+        >
+          Cancel
+        </Button>
+        {extraButtons}
+        <Button
+          color='primary'
+          onClick={onConfirm}
+          {...confirmProps}
+          disabled={disabled || loading.global || global.disableSave}
+        >
+          {loading.global ? 'Processing...' : `${confirmBtnText}`}
+        </Button>
+      </DialogActions>
+    )
+  }
 
   onClose = (e) => {
     if (this.props.onClose) {
@@ -164,7 +167,7 @@ class CommonModal extends React.PureComponent {
       keepMounted = true,
       footProps = {},
     } = this.props
-    if (!children) return null
+    if (!children || !open) return null
     // console.log(bodyNoPadding)
     if (
       navigator.platform.indexOf('Win') > -1 &&
@@ -185,7 +188,7 @@ class CommonModal extends React.PureComponent {
         height: this.state.height,
       }),
     )
-
+    // console.log(this.props)
     return (
       <Dialog
         classes={{

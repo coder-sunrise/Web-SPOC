@@ -39,6 +39,9 @@ const headerStyle = (theme) => ({
   flex: {
     flex: 1,
   },
+  breadcrumb: {
+    fontSize: 18,
+  },
   title: {
     ...defaultFont,
     lineHeight: '30px',

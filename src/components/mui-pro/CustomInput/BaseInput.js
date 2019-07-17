@@ -47,7 +47,8 @@ class BaseInput extends React.PureComponent {
   //   super(props)
   // }
 
-  _onKeyDown = (e) => {
+  _onKeyUp = (e) => {
+    // console.log('_onKeyUp')
     // console.log(e.target.tagName==='TEXTAREA')
     if (this.props.preventDefaultKeyDownEvent) return
     if (e.target.tagName === 'TEXTAREA') return
@@ -192,6 +193,7 @@ class BaseInput extends React.PureComponent {
       preventDefaultKeyDownEvent,
       size,
       style,
+      onKeyUp,
     } = props
     inputIdCounter += 1
 
@@ -224,7 +226,7 @@ class BaseInput extends React.PureComponent {
       )
     }
     if (!preventDefaultKeyDownEvent) {
-      cfg.onKeyDown = this._onKeyDown
+      cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
     }
     // console.log(error, showErrorIcon)
     if (error && showErrorIcon) {

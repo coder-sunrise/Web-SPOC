@@ -7,17 +7,44 @@ import Cancel from '@material-ui/icons/Clear'
 import { Button } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
-const EditButton = ({ onExecute }) => (
-  <Button size='sm' onClick={onExecute} justIcon color='primary' title='Edit'>
+const EditButton = ({ onExecute, editingRowIds }) => (
+  <Button
+    size='sm'
+    onClick={(e) => {
+      if (editingRowIds.length === 0) {
+        window.g_app._store.dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: true,
+          },
+        })
+      }
+      onExecute(e)
+    }}
+    justIcon
+    color='primary'
+    title='Edit'
+  >
     <Edit />
   </Button>
 )
 
-const CancelButton = ({ onExecute }) => (
+const CancelButton = ({ onExecute, row, editingRowIds }) => (
   <Button
     size='sm'
     onClick={(e) => {
       // updateGlobalVariable('gridIgnoreValidation', true)
+      if (
+        (!row.id && editingRowIds.length === 0) ||
+        (row.id && editingRowIds.length === 1)
+      ) {
+        window.g_app._store.dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: false,
+          },
+        })
+      }
       onExecute(e)
     }}
     justIcon
@@ -60,10 +87,25 @@ const AddButton = ({ onExecute }) => (
   </div>
 )
 
-const CommitButton = ({ onExecute }) => (
+const CommitButton = ({ onExecute, editingRowIds, row }) => (
   <Button
     size='sm'
     onClick={(e) => {
+      console.log(
+        (!row.id && editingRowIds.length === 0) ||
+          (row.id && editingRowIds.length === 1),
+      )
+      if (
+        (!row.id && editingRowIds.length === 0) ||
+        (row.id && editingRowIds.length === 1)
+      ) {
+        window.g_app._store.dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: false,
+          },
+        })
+      }
       // updateGlobalVariable('gridIgnoreValidation', false)
       onExecute(e)
     }}
@@ -87,9 +129,8 @@ const commandComponents = {
 }
 
 const CommandComponent = ({ id, onExecute, ...resetProps }) => {
-  // console.log(id, onExecute, resetProps)
   const CommandButton = commandComponents[id]
-  return <CommandButton onExecute={onExecute} />
+  return <CommandButton onExecute={onExecute} {...resetProps} />
 }
 
 export default CommandComponent

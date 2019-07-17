@@ -26,7 +26,13 @@ import {
   ClickAwayListener,
 } from '@material-ui/core'
 import MoreVert from '@material-ui/icons/MoreVert'
-
+import Snackbar from '@material-ui/core/Snackbar'
+import SnackbarContent from '@material-ui/core/SnackbarContent'
+import CheckCircleIcon from '@material-ui/icons/CheckCircle'
+import WarningIcon from '@material-ui/icons/Warning'
+import ErrorIcon from '@material-ui/icons/Error'
+import InfoIcon from '@material-ui/icons/Info'
+import CloseIcon from '@material-ui/icons/Close'
 import {
   CardContainer,
   TextField,
@@ -449,6 +455,15 @@ class ControlTest extends PureComponent {
             onClick={() => {
               console.log(initValues)
               props.resetForm(initValues)
+              // notification.error({
+              //   // icon: WarningIcon,
+              //   icon: null,
+              //   duration: 0,
+              //   placement: 'bottomRight',
+              //   message: 'Notification Title',
+              //   // description:
+              //   //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
+              // })
             }}
           >
             Reset

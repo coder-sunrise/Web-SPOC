@@ -375,12 +375,50 @@ class Demographic extends PureComponent {
               </GridItem> */}
               <GridItem xs={12}>
                 <FastField
-                  name='doctorRemarks'
+                  name='patientReferral'
                   render={(args) => (
-                    <TextField label='Remark' multiline rowsMax={4} {...args} />
+                    <RadioGroup
+                      label="Referral Person"
+                      defaultValue='1'
+                      options={[
+                        {
+                          value: '1',
+                          label: 'Company',
+                        },
+                        {
+                          value: '2',
+                          label: 'Patient',
+                        },
+                      ]}
+                      {...args}
+                    />
                   )}
                 />
               </GridItem>
+              {
+                values.patientReferral === "2" && 
+                  <GridItem xs={12}>
+                    <Field
+                      name='patientReferralProfile'
+                      render={(args) => {
+                        return (
+                        <TextField label='Patient Name/Account No./Mobile No.' {...args} />
+                      )}}
+                    />
+                  </GridItem>
+              }
+              {
+                values.patientReferral && 
+                  <GridItem xs={12}>
+                    <Field
+                      name='patientReferralRemarks'
+                      render={(args) => {
+                        return (
+                        <TextField label='Remarks' multiline rowsMax={4} {...args} />
+                      )}}
+                    />
+                  </GridItem>
+              }
             </GridContainer>
           </GridItem>
         </GridContainer>

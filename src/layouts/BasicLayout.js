@@ -42,7 +42,7 @@ import Footer from 'mui-pro-components/Footer'
 import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
 import Exception403 from '../pages/Exception/403'
-// import PageLoading from '@/components/PageLoading'
+import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
@@ -174,45 +174,9 @@ class BasicLayout extends React.PureComponent {
     // dispatch({
     //   type: 'setting/getSetting',
     // })
-
-    const tokenEndpoint = 'https://semr2dev2010.emr.com.sg/connect/token'
-    const signalREndPoint =
-      'https://ec2-175-41-131-73.ap-southeast-1.compute.amazonaws.com/notificationHub'
-
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl(signalREndPoint, {
-        accessTokenFactory: () => {
-          return accessToken
-        },
-      })
-      .build()
-
-    connection.on('NewNotification', (eventName, data) => {
-      console.log(eventName, data)
-      // var message = data.sender + ' says ' + data.message
-      // var li = document.createElement('li')
-      // li.textContent = message
-      // document.getElementById('messagesList').appendChild(li)
-      // console.log('***************')
-      // console.log('NotificationReceived: ' + eventName + ' from ' + data.sender)
-      // console.log('Message:' + data.message)
-      // console.log('***************')
-      // var notification = new Notification('New Messsage Received', {
-      //   body: data.sender + ': ' + data.message,
-      //   icon:
-      //     'https://5.imimg.com/data5/XQ/KP/MY-40305254/kids-toy-500x500.jpg',
-      // })
+    dispatch({
+      type: 'global/initStream',
     })
-
-    connection
-      .start()
-      .then(() => {
-        console.log('Connected started')
-      })
-      .catch((err) => {
-        return console.error(err.toString())
-      }) // JSON-string from `response.json()` call
-      .catch((error) => console.error(error))
   }
 
   componentDidUpdate (e) {
@@ -493,12 +457,12 @@ class BasicLayout extends React.PureComponent {
             <ContainerQuery query={query}>
               {(params) => (
                 <Context.Provider value={this.getContext()}>
-                  <ErrorBoundary>
-                    {!global.fullscreen && (
-                      <div className={cx(params)}>{layout}</div>
-                    )}
-                    <GlobalModalContainer {...props} />
-                  </ErrorBoundary>
+                  <div id='main-page' className={cx(params)}>
+                    <ErrorBoundary>
+                      {!global.fullscreen && layout}
+                      <GlobalModalContainer {...props} />
+                    </ErrorBoundary>
+                  </div>
                 </Context.Provider>
               )}
             </ContainerQuery>
