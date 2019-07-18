@@ -100,12 +100,6 @@ class CalendarView extends React.PureComponent {
       end,
       resourceId: resourceID,
     }
-    console.log({ updatedEvent, id, _appointmentID })
-
-    // const nextEvents = [
-    //   ...events,
-    // ]
-    // nextEvents.splice(idx, 1, updatedEvent)
 
     handleMoveEvent({ updatedEvent, id, _appointmentID })
   }
@@ -157,6 +151,7 @@ class CalendarView extends React.PureComponent {
         // --- functional props ---
         selectable='ignoreEvents'
         resizable={false}
+        showMultiDayTimes={false}
         step={15}
         timeslots={2}
         longPressThreshold={500}
