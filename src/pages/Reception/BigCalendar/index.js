@@ -126,6 +126,9 @@ class Appointment extends React.PureComponent {
   }
 
   moveEvent = ({ updatedEvent, id, _appointmentID }) => {
+    this.setState({
+      isDragging: false,
+    })
     this._dispatchAction({
       action: CalendarActions.MoveEvent,
       updatedEvent,
@@ -155,7 +158,7 @@ class Appointment extends React.PureComponent {
     // the important values are the ...restEvent
     const { start, end, ...restEvent } = selectedEvent
     const { isDoctorEvent, series } = restEvent
-    console.log({ selectedEvent })
+
     if (series) {
       this.setState({
         showSeriesConfirmation: true,
