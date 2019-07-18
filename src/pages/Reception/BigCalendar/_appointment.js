@@ -146,6 +146,7 @@ const generateAppointmentData = () => {
     const appointment = {
       _appointmentID: i,
       patientName: patientName[i % 5],
+      isRegisteredPatient: i === 1,
       contactNo: contactNo[i % 5],
       remarks: '',
       appointmentDate: appointmentDate[i % 5],

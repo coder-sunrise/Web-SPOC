@@ -53,20 +53,6 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
           </GridItem>
         </React.Fragment>
       </GridContainer>
-      <GridItem xs md={12} className={classes.enableOccurenceCheckbox}>
-        <FastField
-          name='updateAllMatches'
-          render={(args) => {
-            return (
-              <Checkbox
-                simple
-                label='Update all appointments match the series'
-                {...args}
-              />
-            )
-          }}
-        />
-      </GridItem>
     </CommonCard>
   )
 }

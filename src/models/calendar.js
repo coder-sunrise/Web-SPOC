@@ -1,6 +1,5 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services/calendar'
-import { calendarEvents as defaultEvents } from '../pages/Reception/BigCalendar/events'
 import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
 
 const deleteApptResources = (eventID, appointmentID) => (events, e) =>
@@ -106,7 +105,6 @@ export default createListViewModel({
         }
       },
       updateDoctorEvent (state, { add, update, deleted }) {
-        console.log({ add, update, deleted })
         let newCalendarEvents = [
           ...state.calendarEvents,
         ]
@@ -119,7 +117,6 @@ export default createListViewModel({
         }
 
         if (update) {
-          console.log('update', { update })
           newCalendarEvents = newCalendarEvents.reduce(
             (events, e) =>
               e._appointmentID === update._appointmentID
@@ -149,9 +146,6 @@ export default createListViewModel({
             [],
           )
         }
-
-        console.log({ newCalendarEvents })
-
         return { ...state, calendarEvents: newCalendarEvents }
       },
       // updateEventListing (state, { added, edited, deleted }) {
