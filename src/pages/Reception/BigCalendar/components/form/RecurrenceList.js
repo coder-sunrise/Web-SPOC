@@ -104,7 +104,13 @@ const joinWeekDays = (selectedDays) => {
 }
 
 const formatRecurrenceLabel = (
-  { recurrencePattern, every, day: dayOfMonth, days: weekdays = [], startDate },
+  {
+    recurrencePattern,
+    every,
+    day: dayOfMonth,
+    days: weekdays = [],
+    appointmentDate: startDate,
+  },
   rule,
 ) => {
   let result = ''

@@ -272,68 +272,63 @@ class Form extends React.PureComponent {
     return (
       <SizeContainer>
         <React.Fragment>
-          <CardContainer hideHeader size='sm'>
-            {isLoading && (
-              <div className={classnames(classes.loading)}>
-                <CircularProgress />
-                <h3 style={{ fontWeight: 400 }}>Populating patient info...</h3>
-              </div>
-            )}
+          {isLoading && (
+            <div className={classnames(classes.loading)}>
+              <CircularProgress />
+              <h3 style={{ fontWeight: 400 }}>Populating patient info...</h3>
+            </div>
+          )}
 
-            <GridContainer
-              className={classnames(classes.formContent)}
-              alignItems='center'
-              justify='center'
+          <GridContainer
+            className={classnames(classes.formContent)}
+            alignItems='center'
+            justify='center'
+          >
+            <GridItem container xs md={6}>
+              <PatientInfoInput
+                onSearchPatient={this.onSearchPatient}
+                onCreatePatient={this.toggleNewPatientModal}
+                isRegisteredPatient={values.isRegisteredPatient}
+                patientName={values.patientName}
+              />
+              <AppointmentDateInput />
+            </GridItem>
+            <GridItem xs md={6} className={classnames(classes.remarksField)}>
+              <FastField
+                name='remarks'
+                render={(args) => (
+                  <OutlinedTextField
+                    {...args}
+                    multiline
+                    rowsMax={3}
+                    rows={3}
+                    label='Appointment Remarks'
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem xs md={12} className={classes.verticalSpacing}>
+              <AppointmentDataGrid
+                appointmentDate={values.appointmentDate}
+                data={eventSeries}
+                handleCommitChanges={this.onCommitChanges}
+              />
+            </GridItem>
+            <GridItem
+              xs
+              md={12}
+              className={classnames(classes.enableOccurenceCheckbox)}
             >
-              <GridItem container xs md={6}>
-                <PatientInfoInput
-                  onSearchPatient={this.onSearchPatient}
-                  onCreatePatient={this.toggleNewPatientModal}
-                  isRegisteredPatient={values.isRegisteredPatient}
-                  patientName={values.patientName}
-                />
-                <AppointmentDateInput />
-              </GridItem>
-              <GridItem xs md={6} className={classnames(classes.remarksField)}>
-                <FastField
-                  name='remarks'
-                  render={(args) => (
-                    <OutlinedTextField
-                      {...args}
-                      multiline
-                      rowsMax={3}
-                      rows={3}
-                      label='Appointment Remarks'
-                    />
-                  )}
-                />
-              </GridItem>
-
-              <GridItem xs md={12} className={classes.verticalSpacing}>
-                <AppointmentDataGrid
-                  appointmentDate={values.appointmentDate}
-                  data={eventSeries}
-                  handleCommitChanges={this.onCommitChanges}
-                />
-              </GridItem>
-              <GridItem
-                xs
-                md={12}
-                className={classnames(classes.enableOccurenceCheckbox)}
-              >
-                <Divider className={classnames(classes.divider)} />
-                <FastField
-                  name='enableRecurrence'
-                  render={(args) => {
-                    return (
-                      <Checkbox simple label='Enable Recurrence' {...args} />
-                    )
-                  }}
-                />
-              </GridItem>
-              {values.enableRecurrence && <Recurrence values={values} />}
-            </GridContainer>
-          </CardContainer>
+              <FastField
+                name='enableRecurrence'
+                render={(args) => {
+                  return <Checkbox simple label='Enable Recurrence' {...args} />
+                }}
+              />
+            </GridItem>
+            {values.enableRecurrence && <Recurrence values={values} />}
+          </GridContainer>
 
           <FormFooter
             isNew={slotInfo.type === 'add'}
