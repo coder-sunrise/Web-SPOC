@@ -93,7 +93,7 @@ const TextFormatter = (columnExtensions) =>
 
 export const TextEditor = withStyles(styles)(TextEditorBase)
 
-class TextTypeProvider extends PureComponent {
+class TextTypeProvider extends React.Component {
   static propTypes = {
     for: PropTypes.array.isRequired,
     columnExtensions: PropTypes.array,
@@ -106,9 +106,8 @@ class TextTypeProvider extends PureComponent {
     }
   }
 
-  // shouldComponentUpdate () {
-  //   return false
-  // }
+  shouldComponentUpdate = (nextProps, nextState) =>
+    this.props.editingRowIds !== nextProps.editingRowIds
 
   render () {
     const { columnExtensions } = this.props

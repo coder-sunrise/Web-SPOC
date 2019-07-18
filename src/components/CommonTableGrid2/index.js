@@ -492,6 +492,7 @@ class CommonTableGrid2 extends React.Component {
       extraGetter = [],
       containerComponent,
       schema,
+      editingRowIds,
     } = this.props
 
     const {
@@ -514,7 +515,7 @@ class CommonTableGrid2 extends React.Component {
     if (containerComponent) {
       pagerConfig.containerComponent = containerComponent
     }
-    // console.log(sortConfig)
+    console.log(this.props)
     // console.log(
     //   filter,
     //   grouping,
@@ -590,7 +591,10 @@ class CommonTableGrid2 extends React.Component {
       // console.log(error, c)
     })
     // console.log(pager, pagerConfig)
-
+    const cellComponentConfig = {
+      columnExtensions: newColumExtensions,
+      editingRowIds,
+    }
     const allowSelectRowByClick =
       columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined
 
@@ -682,13 +686,13 @@ class CommonTableGrid2 extends React.Component {
                 <CustomPaging totalCount={this.state.pagination.totalRecords} />
               )}
               {selectable && <IntegratedSelection />}
-              <TextTypeProvider columnExtensions={newColumExtensions} />
-              <SelectTypeProvider columnExtensions={newColumExtensions} />
-              <NumberTypeProvider columnExtensions={newColumExtensions} />
-              <DateTypeProvider columnExtensions={newColumExtensions} />
-              <RadioTypeProvider columnExtensions={newColumExtensions} />
-              <StatusTypeProvider columnExtensions={newColumExtensions} />
-              <TimeTypeProvider columnExtensions={newColumExtensions} />
+              <TextTypeProvider {...cellComponentConfig} />
+              <SelectTypeProvider {...cellComponentConfig} />
+              <NumberTypeProvider {...cellComponentConfig} />
+              <DateTypeProvider {...cellComponentConfig} />
+              <RadioTypeProvider {...cellComponentConfig} />
+              <StatusTypeProvider {...cellComponentConfig} />
+              <TimeTypeProvider {...cellComponentConfig} />
 
               {grouping && <DragDropProvider />}
 

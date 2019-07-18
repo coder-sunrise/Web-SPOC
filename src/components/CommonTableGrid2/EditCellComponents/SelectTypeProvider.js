@@ -11,7 +11,11 @@ import {
   TextField,
 } from '@/components'
 import { getCodes } from '@/utils/codes'
-import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
+import {
+  updateGlobalVariable,
+  updateCellValue,
+  difference,
+} from '@/utils/utils'
 
 class SelectEditor extends PureComponent {
   state = {
@@ -19,6 +23,7 @@ class SelectEditor extends PureComponent {
   }
 
   constructor (props) {
+    console.log('constructor', props)
     super(props)
     this.myRef = React.createRef()
   }
@@ -101,7 +106,7 @@ const SelectDisplay = (columnExtensions, state) => ({
   const v =
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
-
+  // console.log(cfg)
   if (v.colorValue) {
     return (
       <div>
@@ -135,12 +140,13 @@ const SelectDisplay = (columnExtensions, state) => ({
   return <span>{v ? v.name : ''}</span>
 }
 
-class SelectTypeProvider extends PureComponent {
+class SelectTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
   }
 
   constructor (props) {
+    // console.log('SelectTypeProvider constructor')
     super(props)
     const { columnExtensions } = this.props
     const colFor = columnExtensions.filter(
@@ -153,15 +159,17 @@ class SelectTypeProvider extends PureComponent {
 
     this.state = {
       for: colFor || [],
+      codeLoaded: 0,
     }
     // console.log(props)
     colFor.forEach((f) => {
       if (f.code) {
         getCodes(f.code).then((o) => {
           // console.log(o)
-          this.setState({
+          this.setState((prevState) => ({
             [`${f.columnName}Option`]: o,
-          })
+            codeLoaded: ++prevState.codeLoaded,
+          }))
         })
       }
     })
@@ -170,6 +178,10 @@ class SelectTypeProvider extends PureComponent {
       return <SelectEditor columnExtensions={ces} {...editorProps} />
     }
   }
+
+  shouldComponentUpdate = (nextProps, nextState) =>
+    this.props.editingRowIds !== nextProps.editingRowIds ||
+    Object.keys(this.state).length !== Object.keys(nextState).length
 
   render () {
     // console.log('texttypeprovider', this.props)

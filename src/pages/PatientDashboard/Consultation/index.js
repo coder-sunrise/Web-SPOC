@@ -806,7 +806,7 @@ class Consultation extends PureComponent {
                   Discard
                 </Button>
                 <ProgressButton color='info' icon={null}>
-                  Save Changes
+                  Pause
                 </ProgressButton>
                 <ProgressButton
                   color='primary'

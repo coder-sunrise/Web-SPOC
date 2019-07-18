@@ -13,7 +13,7 @@ class CodeSelect extends React.PureComponent {
 
   constructor (props) {
     super(props)
-
+    // console.log(props.code)
     if (props.code) {
       getCodes(props.code).then((codetableData) => {
         this.setState({ options: codetableData })
@@ -41,6 +41,7 @@ class CodeSelect extends React.PureComponent {
   render () {
     // console.log(this.props)
     // if (!this.state.options || this.state.options.length === 0) return null
+    // console.log(this.state.options)
     return (
       <Select
         {...this.props}

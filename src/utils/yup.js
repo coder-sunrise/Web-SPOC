@@ -81,6 +81,9 @@ Yup.setLocale({
       return "Please check the value, it's not valid"
     },
   },
+  string: {
+    email: 'This field must be a valid email',
+  },
   number: {
     //   min: 'Deve ser maior que ${min}',
     required: '',

@@ -33,6 +33,11 @@ export async function query (url, params) {
       method: 'GET',
     })
   }
+  if (typeof params === 'number') {
+    return request(`${url}/${params}`, {
+      method: 'GET',
+    })
+  }
   return request(url, {
     method: 'GET',
     data: {

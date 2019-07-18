@@ -142,6 +142,12 @@ class AntdDatePicker extends PureComponent {
     }
   }
 
+  // disabledDate = (current) => {
+  //   console.log(current)
+  //   // Can not select days before today and today
+  //   return current && current < moment().endOf('day')
+  // }
+
   // render () {
   //   const { classes, onChange, ...restProps } = this.props
   //   const { format, form, field, value } = restProps
@@ -186,6 +192,7 @@ class AntdDatePicker extends PureComponent {
           onChange={extendFunc(onChange, this.handleChange)}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
+          // disabledDate={this.disabledDate}
           onOpenChange={extendFunc(
             onOpenChange,
             this.handleDatePickerOpenChange,

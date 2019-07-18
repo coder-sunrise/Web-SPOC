@@ -285,7 +285,7 @@ class AntdSelect extends React.PureComponent {
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-
+    // console.log(options)
     const source = autoComplete || query ? this.state.data : options
 
     const cfg = {

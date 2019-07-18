@@ -4,6 +4,7 @@ import _ from 'lodash'
 import Loadable from 'react-loadable'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
+import { query } from '@/services/patient'
 
 import {
   EditableTableGrid2,
@@ -84,12 +85,12 @@ class Grid extends React.Component {
       {
         columnName: 'relationshipFK',
         type: 'codeSelect',
-        code: 'relationship',
+        code: 'ctrelationship',
       },
       {
         columnName: 'accountNoTypeFK',
         type: 'codeSelect',
-        code: 'PatientAccountNoType',
+        code: 'ctPatientAccountNoType',
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
@@ -99,7 +100,7 @@ class Grid extends React.Component {
       {
         columnName: 'salutationFK',
         type: 'codeSelect',
-        code: 'Salutation',
+        code: 'ctSalutation',
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
@@ -196,6 +197,33 @@ class Grid extends React.Component {
     )
   }
 
+  // static getDerivedStateFromProps (nextProps, preState) {
+  //   const { values, errors } = nextProps
+  //   console.log(values, errors)
+  //   console.log(errors)
+  //   if (errors && Array.isArray(errors.patientEmergencyContact)) {
+  //     const ids = preState.editingRowIds.splice()
+  //     for (
+  //       let index = 0;
+  //       index < errors.patientEmergencyContact.length;
+  //       index++
+  //     ) {
+  //       const er = errors.patientEmergencyContact[index]
+  //       const row = values.patientEmergencyContact[index]
+  //       if (er && row && preState.editingRowIds.indexOf(row.id) < 0) {
+  //         ids.push(row.id)
+  //       }
+  //     }
+  //     if (ids.length > 0 && ids.length !== preState.editingRowIds.length) {
+  //       console.log(preState.editingRowIds, ids)
+  //       return {
+  //         editingRowIds: ids,
+  //       }
+  //     }
+  //   }
+  //   return null
+  // }
+
   componentDidUpdate = (prevProps) => {
     componentDidUpdate(this.props, prevProps)
   }
@@ -219,49 +247,57 @@ class Grid extends React.Component {
       <Tooltip title='Add' placement='bottom'>
         <Button
           size='sm'
-          onClick={() => {
-            dispatch({
-              type: 'emergencyContact/query',
-              payload: {
-                id: row.id,
-              },
-            }).then((o) => {
-              // console.log(props)
-              const patientEmergencyContact = _.cloneDeep(
-                values.patientEmergencyContact,
+          onClick={async () => {
+            const r = await query(row.id)
+            const o = r.data
+            const patientEmergencyContact = _.cloneDeep(
+              values.patientEmergencyContact,
+            )
+            if (
+              patientEmergencyContact.find(
+                (m) => m.patientProfileFK === o.id && !m.isDeleted,
               )
-              if (
-                patientEmergencyContact.find((m) => m.patientProfileFK === o.id)
-              ) {
-                notification.warn({
-                  message: 'This contact person already existed',
-                })
-                return
-              }
-              const primaryAddress = o.contact.contactAddress.find(
-                (m) => m.isPrimary,
-              )
-              patientEmergencyContact.push({
-                // id: getUniqueGUID(),
-                id: getUniqueNumericId(),
-                isNew: true,
-                accountNo: o.patientAccountNo,
-                patientProfileFK: o.id,
-                salutationFK: o.salutationFK,
-                accountNoTypeFK: o.patientAccountNoTypeFK,
-                name: o.name,
-                relationship: '',
-                isPrimaryContact: false,
-                nokPatientProfileFK: o.id,
-                address: `${primaryAddress.blockNo ||
-                  ''} ${primaryAddress.buildingName ||
-                  ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street ||
-                  ''}`,
+            ) {
+              notification.warn({
+                message: 'This contact person already existed',
               })
-              setFieldValue('patientEmergencyContact', patientEmergencyContact)
-
-              this.toggleModal()
+              return
+            }
+            if (o.id === values.id) {
+              notification.warn({
+                message: 'Can not add this patient himself as contact person',
+              })
+              return
+            }
+            const primaryAddress =
+              o.contact.contactAddress.find((m) => m.isPrimary) || {}
+            const newId = getUniqueNumericId()
+            patientEmergencyContact.push({
+              // id: getUniqueGUID(),
+              id: newId,
+              isNew: true,
+              accountNo: o.patientAccountNo,
+              patientProfileFK: o.id,
+              salutationFK: o.salutationFK,
+              accountNoTypeFK: o.patientAccountNoTypeFK,
+              name: o.name,
+              relationship: '',
+              isPrimaryContact: false,
+              nokPatientProfileFK: o.id,
+              address: `${primaryAddress.blockNo ||
+                ''} ${primaryAddress.buildingName ||
+                ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street ||
+                ''}`,
             })
+            setFieldValue('patientEmergencyContact', patientEmergencyContact)
+            this.setState((prevState) => {
+              return {
+                editingRowIds: prevState.editingRowIds.concat([
+                  newId,
+                ]),
+              }
+            })
+            this.toggleModal()
           }}
           justIcon
           round

@@ -337,7 +337,7 @@ const mapFormFieldsToPostValues = (values) => {
 
 let runningId = 0
 const getUniqueId = (prefix = 'sys-gen-') => {
-  runningId += 1
+  runningId -= 1
   return `${prefix}${runningId}`
 }
 
@@ -351,7 +351,7 @@ const getUniqueGUID = () => {
   return uuid
 }
 const getUniqueNumericId = () => {
-  runningId += 1
+  runningId -= 1
   return runningId
 }
 const formatDatetime = (text /* , record --remove */) => {

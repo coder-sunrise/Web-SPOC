@@ -80,6 +80,7 @@ const styles = () => ({
     patientAccountNoTypeFK: Yup.number().required(),
     patientAccountNo: Yup.string().required(),
     genderFK: Yup.number().required(),
+
     referredBy: Yup.string(),
     referralRemarks: Yup.string().when('referredBy', {
       is: 'Company',
@@ -98,6 +99,9 @@ const styles = () => ({
       //     countryFK: Yup.string().required(),
       //   }),
       // ),
+      contactEmailAddress: Yup.object().shape({
+        emailAddress: Yup.string().email(),
+      }),
       mobileContactNumber: Yup.object().shape({
         number: Yup.string().required(),
       }),
@@ -129,6 +133,16 @@ class Demographic extends PureComponent {
   isValidDate = (current) => {
     let yesterday = moment().subtract(1, 'day')
     return current.isBefore(yesterday)
+  }
+
+  disabledDate = (current) => {
+    console.log(current)
+    // Can select day from 1800-01-01 till now
+    return (
+      current &&
+      (current > moment().endOf('day') ||
+        current < moment('1800-01-01').startOf('day'))
+    )
   }
 
   addAddress = () => {
@@ -254,6 +268,14 @@ class Demographic extends PureComponent {
                   }}
                 />
               </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name='callingName'
+                  render={(args) => {
+                    return <TextField label='Calling Name' {...args} />
+                  }}
+                />
+              </GridItem>
               <GridItem xs={6}>
                 <FastField
                   name='dob'
@@ -261,7 +283,7 @@ class Demographic extends PureComponent {
                     <DatePicker
                       label='Date of Birth'
                       timeFormat={false}
-                      isValidDate={this.isValidDate}
+                      disabledDate={this.disabledDate}
                       {...args}
                     />
                   )}
