@@ -133,7 +133,9 @@ const appointmentResources = {
       doctor: 'medisys',
       resourceId: '0',
       appointmentType: AppointmentTypeOptions[4].value,
-      // color: AppointmentTypeOptions[4].color,
+
+      series: true,
+      draft: true,
     },
   ],
 }

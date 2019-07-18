@@ -26,6 +26,7 @@ import PatientInfoInput from './PatientInfo'
 import AppointmentDateInput from './AppointmentDate'
 import Recurrence from './Recurrence'
 import FormFooter from './FormFooter'
+import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 // services
 import {
   fetchPatientListByName,
@@ -63,6 +64,7 @@ class Form extends React.PureComponent {
       this.props.calendarEvents,
     ),
     isRegisteredPatient: false,
+    showSeriesUpdateConfirmation: false,
   }
 
   toggleNewPatientModal = () => {
@@ -164,6 +166,15 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
+    const { slotInfo } = this.props
+    if (slotInfo.series) {
+      this.openSeriesUpdateConfirmation()
+    } else {
+      this._confirm()
+    }
+  }
+
+  _confirm = () => {
     const { eventSeries, isRegisteredPatient } = this.state
     const {
       values,
@@ -217,13 +228,10 @@ class Form extends React.PureComponent {
       //   timeOut,
       // }
     })
-
-    console.log({ values, slotInfo })
     const updated = {
       ...values,
       appointmentResources: calendarEvents,
     }
-    console.log({ updated })
 
     handleUpdateEventSeries({
       [slotInfo.type]: updated,
@@ -233,6 +241,22 @@ class Form extends React.PureComponent {
     resetForm()
   }
 
+  openSeriesUpdateConfirmation = () => {
+    this.setState({
+      showSeriesUpdateConfirmation: true,
+    })
+  }
+
+  closeSeriesUpdateConfirmation = () => {
+    this.setState({ showSeriesUpdateConfirmation: false })
+  }
+
+  onConfirmSeriesUpdate = (type) => {
+    console.log({ type })
+    this.closeSeriesUpdateConfirmation()
+    this._confirm()
+  }
+
   render () {
     const { classes, onClose, slotInfo, isLoading, values } = this.props
 
@@ -240,6 +264,7 @@ class Form extends React.PureComponent {
       showNewPatientModal,
       showSearchPatientModal,
       showDeleteConfirmationModal,
+      showSeriesUpdateConfirmation,
       patientList,
       eventSeries,
     } = this.state
@@ -312,6 +337,7 @@ class Form extends React.PureComponent {
 
           <FormFooter
             isNew={slotInfo.type === 'add'}
+            isDraft={slotInfo.draft}
             onCancelAppointmentClick={this.onCancelAppointmentClick}
             onClose={onClose}
             onConfirmClick={this.onConfirmClick}
@@ -351,6 +377,15 @@ class Form extends React.PureComponent {
             maxWidth='sm'
           >
             <DeleteConfirmation />
+          </CommonModal>
+          <CommonModal
+            open={showSeriesUpdateConfirmation}
+            title='Alert'
+            onClose={this.closeSeriesUpdateConfirmation}
+            onConfirm={this.onConfirmSeriesUpdate}
+            maxWidth='sm'
+          >
+            <SeriesUpdateConfirmation />
           </CommonModal>
         </React.Fragment>
       </SizeContainer>

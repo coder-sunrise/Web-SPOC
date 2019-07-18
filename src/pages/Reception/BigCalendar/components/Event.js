@@ -34,7 +34,7 @@ class Event extends PureComponent {
     const { isDoctorEvent, hasConflict, series } = event
 
     const title = isDoctorEvent ? event.doctor : event.patientName
-
+    const subtitle = isDoctorEvent ? event.eventType : event.contactNo
     return (
       <div
         className={classes.container}
@@ -48,7 +48,7 @@ class Event extends PureComponent {
           {hasConflict && <ErrorOutline />}
           {series && <Cached />}
         </div>
-        <span className={classes.blockDiv}>{event.contactNo}</span>
+        <span className={classes.blockDiv}>{subtitle}</span>
       </div>
     )
   }
