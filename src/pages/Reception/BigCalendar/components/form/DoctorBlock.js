@@ -188,7 +188,9 @@ export default withFormik({
   validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
     validationSchema,
   handleSubmit: (values, { props, resetForm }) => {
-    const { handleAddDoctorEvent } = props
+    const { handleUpdateDoctorEvent, initialProps } = props
+
+    const { type = 'add' } = initialProps
     const {
       doctor,
       durationHour,
@@ -209,10 +211,14 @@ export default withFormik({
       `${date} ${eventTime}`,
       `${_dateFormat} ${_timeFormat}`,
     )
-    console.log({ values })
+    const _appointmentID =
+      values._appointmentID !== undefined
+        ? values._appointmentID
+        : getUniqueGUID()
+
     const event = {
       ...values,
-      _appointmentID: getUniqueGUID(),
+      _appointmentID,
       startTime: startDate.format(_timeFormat),
       endTime: endDate.format(_timeFormat),
       start: startDate.toDate(),
@@ -221,7 +227,9 @@ export default withFormik({
       resourceId: doctor,
     }
 
-    handleAddDoctorEvent(event)
+    handleUpdateDoctorEvent({
+      [type]: event,
+    })
     // todo: update doctor event
     resetForm()
   },

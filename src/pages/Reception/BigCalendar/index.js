@@ -218,11 +218,11 @@ class Appointment extends React.PureComponent {
     this.setState({ showDoctorEventModal: !showDoctorEventModal })
   }
 
-  addDoctorEvent = (newDoctorEvent) => {
+  updateDoctorEvent = (doctorEvent) => {
     this._dispatchAction(
       {
         action: CalendarActions.UpdateDoctorEvent,
-        added: newDoctorEvent,
+        ...doctorEvent,
       },
       () => {
         this.setState({
@@ -338,7 +338,7 @@ class Appointment extends React.PureComponent {
         >
           <DoctorBlockForm
             initialProps={selectedSlot}
-            handleAddDoctorEvent={this.addDoctorEvent}
+            handleUpdateDoctorEvent={this.updateDoctorEvent}
             validationSchema={DoctorFormValidation}
           />
         </CommonModal>

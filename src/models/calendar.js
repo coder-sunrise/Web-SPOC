@@ -105,26 +105,27 @@ export default createListViewModel({
           calendarEvents: newCalendarEvents,
         }
       },
-      updateDoctorEvent (state, { added, updated, deleted }) {
-        console.log({ added, updated, deleted })
+      updateDoctorEvent (state, { add, update, deleted }) {
+        console.log({ add, update, deleted })
         let newCalendarEvents = [
           ...state.calendarEvents,
         ]
 
-        if (added) {
+        if (add) {
           newCalendarEvents = [
             ...state.calendarEvents,
-            added,
+            add,
           ]
         }
 
-        if (updated) {
+        if (update) {
+          console.log('update', { update })
           newCalendarEvents = newCalendarEvents.reduce(
             (events, e) =>
-              e._appointmentID === updated._appointmentID
+              e._appointmentID === update._appointmentID
                 ? [
                     ...events,
-                    updated,
+                    update,
                   ]
                 : [
                     ...events,
