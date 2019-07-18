@@ -4,9 +4,9 @@ import classnames from 'classnames'
 import { FormattedMessage } from 'umi/locale'
 // material ui
 import { LinearProgress, withStyles } from '@material-ui/core'
-import { PlayCircleOutline } from '@material-ui/icons'
+import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline'
 // custom components
-import { Button } from '@/components'
+import { Button, Danger } from '@/components'
 
 const STYLES = () => ({
   emptyStateContainer: {
@@ -33,37 +33,46 @@ class EmptySession extends PureComponent {
   }
 
   render () {
-    const { classes, loadingProps } = this.props
-
+    const { classes, loadingProps, errorState } = this.props
+    const notLoadingSessionInfo =
+      !loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] &&
+      !loadingProps.effects[LOADING_KEY.START_SESSION]
     return (
       <div className={classnames(classes.emptyStateContainer)}>
         <div className={classnames(classes.content)}>
-          {loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] && (
+          {errorState.hasError ? (
+            <Danger>
+              <h4 style={{ fontWeight: 'bold' }}>{errorState.message}</h4>
+            </Danger>
+          ) : (
             <React.Fragment>
-              <h3>
-                <FormattedMessage id='reception.queue.gettingSessionInfo' />
-              </h3>
-              <LinearProgress />
-            </React.Fragment>
-          )}
-          {loadingProps.effects[LOADING_KEY.START_SESSION] && (
-            <React.Fragment>
-              <h3>
-                <FormattedMessage id='reception.queue.startingASession' />
-              </h3>
-              <LinearProgress />
-            </React.Fragment>
-          )}
-          {!loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] &&
-          !loadingProps.effects[LOADING_KEY.START_SESSION] && (
-            <React.Fragment>
-              <h3>
-                <FormattedMessage id='reception.queue.emptyState' />
-              </h3>
-              <Button color='primary' onClick={this.onStartClick}>
-                <PlayCircleOutline />
-                <FormattedMessage id='reception.queue.startSession' />
-              </Button>
+              {loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] && (
+                <React.Fragment>
+                  <h3>
+                    <FormattedMessage id='reception.queue.gettingSessionInfo' />
+                  </h3>
+                  <LinearProgress />
+                </React.Fragment>
+              )}
+              {loadingProps.effects[LOADING_KEY.START_SESSION] && (
+                <React.Fragment>
+                  <h3>
+                    <FormattedMessage id='reception.queue.startingASession' />
+                  </h3>
+                  <LinearProgress />
+                </React.Fragment>
+              )}
+              {notLoadingSessionInfo && (
+                <React.Fragment>
+                  <h3>
+                    <FormattedMessage id='reception.queue.emptyState' />
+                  </h3>
+                  <Button color='primary' onClick={this.onStartClick}>
+                    <PlayCircleOutline />
+                    <FormattedMessage id='reception.queue.startSession' />
+                  </Button>
+                </React.Fragment>
+              )}
             </React.Fragment>
           )}
         </div>

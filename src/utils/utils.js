@@ -15,7 +15,7 @@ document.addEventListener('click', () => {
 })
 
 Object.byString = function (o, s) {
-  if (o === undefined) return ''
+  if (o === undefined || o === null) return ''
   s = s.replace(/\[(\w+)\]/g, '.$1') // convert indexes to properties
   s = s.replace(/^\./, '') // strip a leading dot
   let a = s.split('.')

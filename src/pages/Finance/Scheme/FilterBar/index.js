@@ -53,7 +53,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.type',
                   })}
-                  code='Gender'
+                  code='ctGender'
                   {...args}
                 />
               )
@@ -69,7 +69,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.category',
                   })}
-                  code='Gender'
+                  code='ctGender'
                   {...args}
                 />
               )
@@ -85,7 +85,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.cpname',
                   })}
-                  code='Gender'
+                  code='ctGender'
                   {...args}
                 />
               )
@@ -101,7 +101,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.cptype',
                   })}
-                  code='Gender'
+                  code='ctGender'
                   {...args}
                 />
               )
@@ -117,7 +117,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.status',
                   })}
-                  code='Gender'
+                  code='ctGender'
                   {...args}
                 />
               )

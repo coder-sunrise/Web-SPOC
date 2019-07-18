@@ -41,7 +41,7 @@ import {
   CardContainer,
   confirm,
 } from '@/components'
-import InboxIcon from '@material-ui/icons/MoveToInbox'
+import Call from '@material-ui/icons/Call'
 import DraftsIcon from '@material-ui/icons/Drafts'
 import SendIcon from '@material-ui/icons/Send'
 import avatar from '@/assets/img/faces/marc.jpg'
@@ -61,11 +61,12 @@ import Address from './Address'
 
 // window.g_app.replaceModel(model)
 const styles = () => ({
-  btnContainer: {
-    lineHeight: standardRowHeight,
-    textAlign: 'right',
+  contactIcon: {
+    width: 15,
+    height: 15,
+    position: 'relative',
+    top: 3,
   },
-  collectPaymentBtn: { float: 'right', marginTop: '22px', marginRight: '10px' },
 })
 
 @connect(({ patient }) => ({
@@ -76,9 +77,18 @@ const styles = () => ({
   validationSchema: Yup.object().shape({
     name: Yup.string().required(),
     dob: Yup.date().required(),
-    patientAccountNoTypeFK: Yup.string().required(),
+    patientAccountNoTypeFK: Yup.number().required(),
     patientAccountNo: Yup.string().required(),
-    genderFK: Yup.string().required(),
+    genderFK: Yup.number().required(),
+    referredBy: Yup.string(),
+    referralRemarks: Yup.string().when('referredBy', {
+      is: 'Company',
+      then: Yup.string().required(),
+    }),
+    referredByPatientFK: Yup.number().when('referredBy', {
+      is: 'Patient',
+      then: Yup.number().required(),
+    }),
     // dialect: Yup.string().required(),
     // contact.mobileContactNumber.number:Yup.string().render(),
     contact: Yup.object().shape({
@@ -129,6 +139,69 @@ class Demographic extends PureComponent {
     })
   }
 
+  selectReferralPerson = (args) => {
+    const { values, classes } = this.props
+    return (
+      <Select
+        remote
+        query={(v) => {
+          const search = {}
+          if (typeof v === 'number') {
+            search.eql_id = v //for default getter based on id
+          } else {
+            search.name = v
+            search.patientAccountNo = v
+            search['contactFkNavigation.contactNumber.number'] = v
+          }
+          return queryList({
+            ...search,
+            combineCondition: 'or',
+          })
+        }}
+        label='Patient Name/Account No./Mobile No.'
+        renderDropdown={(p) => {
+          // console.log(p)
+          return (
+            <div>
+              <p>
+                {p.patientAccountNo} / {p.name}
+              </p>
+              <p>
+                Ref No. {p.patientReferenceNo}
+                <span style={{ float: 'right' }}>
+                  <Call className={classes.contactIcon} />
+                  {p.mobileNo || p.officeNo || p.homeNo}
+                </span>
+              </p>
+            </div>
+          )
+        }}
+        filterOption={(input, option) => {
+          // console.log(input, option.props)
+          const { data } = option.props
+          const search = input.toLowerCase()
+          return (
+            (data.name || '').toLowerCase().indexOf(search) >= 0 ||
+            (data.patientAccountNo || '').toLowerCase().indexOf(search) >= 0 ||
+            (data.mobileNo || '').toLowerCase().indexOf(search) >= 0 ||
+            (data.officeNo || '').toLowerCase().indexOf(search) >= 0 ||
+            (data.homeNo || '').toLowerCase().indexOf(search) >= 0
+          )
+        }}
+        onChange={(v) => {
+          if (v === values.id) {
+            notification.error({
+              message: 'Can not use this patient as referral person',
+            })
+            return false
+          }
+          return true
+        }}
+        {...args}
+      />
+    )
+  }
+
   onReset = () => {
     this.props.resetForm()
   }
@@ -149,7 +222,7 @@ class Demographic extends PureComponent {
                     return (
                       <CodeSelect
                         label='Account Type'
-                        code='PatientAccountNoType'
+                        code='ctPatientAccountNoType'
                         width={350}
                         {...args}
                       />
@@ -169,7 +242,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='salutationFK'
                   render={(args) => (
-                    <CodeSelect label='Title' code='Salutation' {...args} />
+                    <CodeSelect label='Title' code='ctSalutation' {...args} />
                   )}
                 />
               </GridItem>
@@ -202,7 +275,7 @@ class Demographic extends PureComponent {
                     return (
                       <CodeSelect
                         label='Gender'
-                        code='Gender'
+                        code='ctGender'
                         // defaultMenuIsOpen
                         // closeMenuOnSelect={false}
                         {...args}
@@ -217,7 +290,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Maritial Status'
-                      code='MaritalStatus'
+                      code='ctMaritalStatus'
                       {...args}
                     />
                   )}
@@ -229,7 +302,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Nationality'
-                      code='Nationality'
+                      code='ctNationality'
                       max={5}
                       {...args}
                     />
@@ -240,7 +313,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='raceFK'
                   render={(args) => (
-                    <CodeSelect label='Race' code='Race' {...args} />
+                    <CodeSelect label='Race' code='ctRace' {...args} />
                   )}
                 />
               </GridItem>
@@ -248,7 +321,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='religionFK'
                   render={(args) => (
-                    <CodeSelect label='Religion' code='Religion' {...args} />
+                    <CodeSelect label='Religion' code='ctReligion' {...args} />
                   )}
                 />
               </GridItem>
@@ -256,7 +329,7 @@ class Demographic extends PureComponent {
                 <FastField
                   name='languageFK'
                   render={(args) => (
-                    <CodeSelect label='Language' code='Language' {...args} />
+                    <CodeSelect label='Language' code='ctLanguage' {...args} />
                   )}
                 />
               </GridItem>
@@ -272,7 +345,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Occupation'
-                      code='Occupation'
+                      code='ctOccupation'
                       autoComplete
                       // max={10}
                       // defaultMenuIsOpen
@@ -322,7 +395,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <CodeSelect
                       label='Preferred Contact Mode'
-                      code='ContactMode'
+                      code='ctContactMode'
                       {...args}
                     />
                   )}
@@ -377,7 +450,7 @@ class Demographic extends PureComponent {
               </GridItem> */}
               <GridItem xs={12}>
                 <FastField
-                  name='patientReferral'
+                  name='referredBy'
                   render={(args) => (
                     <RadioGroup
                       label='Referral Person'
@@ -396,35 +469,18 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-              {values.patientReferral === 'Patient' && (
+              {values.referredBy === 'Patient' && (
                 <GridItem xs={12}>
                   <Field
-                    name='patientReferralProfile'
-                    render={(args) => {
-                      return (
-                        <Select
-                          remote
-                          query={(v) => {
-                            return queryList({
-                              name: v,
-                              patientAccountNo: v,
-                              'contactFkNavigation.contactNumber.number': v,
-                              combineCondition: 'or',
-                            })
-                          }}
-                          // options={this.state.searchedPatientList}
-                          label='Patient Name/Account No./Mobile No.'
-                          {...args}
-                        />
-                      )
-                    }}
+                    name='referredByPatientFK'
+                    render={this.selectReferralPerson}
                   />
                 </GridItem>
               )}
-              {values.patientReferral && (
+              {values.referredBy && (
                 <GridItem xs={12}>
                   <Field
-                    name='patientReferralRemarks'
+                    name='referralRemarks'
                     render={(args) => {
                       return (
                         <TextField
@@ -462,6 +518,7 @@ class Demographic extends PureComponent {
                         .map((val, i) => {
                           return (
                             <Address
+                              key={i}
                               addressIndex={i}
                               // form={form}
                               theme={theme}

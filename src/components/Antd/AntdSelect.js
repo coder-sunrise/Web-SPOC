@@ -15,9 +15,9 @@ import { extendFunc } from '@/utils/utils'
 
 const STYLES = () => {
   return {
-    dropdownMenu: {
-      zIndex: 1310,
-    },
+    // dropdownMenu: {
+    //   zIndex: 1310,
+    // },
     selectContainer: {
       width: '100%',
       boxSizing: 'content-box',
@@ -35,9 +35,9 @@ const STYLES = () => {
       '& .ant-select-selection': {
         background: 'none',
       },
-      '& .ant-select-selection-selected-value': {
-        height: 40,
-      },
+      // '& .ant-select-selection-selected-value': {
+      //   height: 40,
+      // },
       '& .ant-select-selection__rendered': {
         lineHeight: 'inherit',
         marginRight: 0,
@@ -96,10 +96,19 @@ class AntdSelect extends React.PureComponent {
       value: form && field ? field.value : props.value || props.defaultValue,
       data: props.options || [],
       fetching: false,
+      fetchId: 0,
     }
 
     this.lastFetchId = 0
     this.fetchData = _.debounce(props.onFetchData || this.fetchData, 800)
+  }
+
+  componentDidMount () {
+    if (this.state.value && this.props.query && this.state.data.length === 0) {
+      //for remote datasouce, get the selected value by default
+      // console.log(this.state.value)
+      this.fetchData(this.state.value)
+    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -150,8 +159,11 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleBlur = () => {
+    // console.log(this.state.value)
     if (
       this.state.value === undefined ||
+      this.state.value === null ||
+      this.state.value === '' ||
       (this.state.value && this.state.value.length === 0)
     ) {
       this.setState({ shrink: false })
@@ -170,37 +182,50 @@ class AntdSelect extends React.PureComponent {
         newVal = _.reject(newVal, (v) => v === all)
       }
     }
-    console.log(val)
+    // console.log(val)
     // console.log(returnValue)
-    if (form && field) {
-      form.setFieldValue(field.name, newVal)
-      form.setFieldTouched(field.name, true)
-    }
+
+    let proceed = true
     if (onChange) {
-      onChange(newVal)
+      proceed = onChange(newVal) !== false
     }
-    this.setState({
-      shrink: newVal !== undefined,
-      value: newVal,
-    })
+    if (proceed) {
+      if (form && field) {
+        form.setFieldValue(field.name, newVal)
+        form.setFieldTouched(field.name, true)
+      }
+      this.setState({
+        shrink: newVal !== undefined,
+        value: newVal,
+      })
+    }
   }
 
   fetchData = async (value) => {
     console.log('fetching data', value)
+    this.setState((prevState) => {
+      return { data: [], fetching: true, fetchId: ++prevState.fetchId }
+    })
     if (this.props.query) {
-      this.setState({
-        fetching: true,
-      })
       const q = await this.props.query(value)
-      console.log(q)
+      // console.log(q)
+      let data = []
+      try {
+        data = q.data.data
+      } catch (error) {}
       this.setState({
         fetching: false,
+        data: data.map((o) => {
+          return {
+            ...o,
+            name: o.name,
+            value: o.id,
+          }
+        }),
       })
     } else {
       const search = value.toLowerCase()
-      this.lastFetchId += 1
-      const fetchId = this.lastFetchId
-      this.setState({ data: [], fetching: true })
+
       const { props } = this
       const { options, valueField, labelField, max = 50 } = props
 
@@ -214,19 +239,30 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  getSelectOptions = (opts, renderDropdown) => {
-    return renderDropdown !== undefined
-      ? opts.map((option) => renderDropdown(option))
-      : opts.map((option) => (
-          <Select.Option
-            key={option.value}
-            title={option.label}
-            value={option.value}
-            disabled={!!option.disabled}
-          >
-            {option.label}
-          </Select.Option>
-        ))
+  getSelectOptions = (source, renderDropdown) => {
+    const { valueField, labelField } = this.props
+    return source
+      .map((s) => ({
+        ...s,
+        value: s[valueField],
+        label: s[labelField],
+      }))
+      .map((option) => (
+        <Select.Option
+          data={option}
+          key={option.value}
+          title={option.label}
+          label={option.label}
+          value={option.value}
+          disabled={!!option.disabled}
+        >
+          {typeof renderDropdown === 'function' ? (
+            renderDropdown(option)
+          ) : (
+            option.label
+          )}
+        </Select.Option>
+      ))
   }
 
   getComponent = ({ inputRef, ...props }) => {
@@ -245,23 +281,21 @@ class AntdSelect extends React.PureComponent {
       style,
       dropdownMatchSelectWidth = false,
       autoComplete,
+      query,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
 
-    const newOptions = (autoComplete ? this.state.data : options).map((s) => ({
-      ...s,
-      value: s[valueField],
-      label: s[labelField],
-    }))
+    const source = autoComplete || query ? this.state.data : options
+
     const cfg = {
       value: this.state.value,
     }
     // console.log(newOptions)
     // console.log(newOptions, this.state.value, cfg)
     let opts = []
-    if (newOptions[0] && newOptions[0][groupField]) {
-      const groups = _.groupBy(newOptions, groupField)
+    if (source[0] && source[0][groupField]) {
+      const groups = _.groupBy(source, groupField)
       const group = Object.values(groups)
       opts = group.map((g) => {
         return (
@@ -271,7 +305,7 @@ class AntdSelect extends React.PureComponent {
         )
       })
     } else {
-      opts = this.getSelectOptions(newOptions, renderDropdown)
+      opts = this.getSelectOptions(source, renderDropdown)
     }
     return (
       <div style={{ width: '100%' }} {...props}>
@@ -288,8 +322,15 @@ class AntdSelect extends React.PureComponent {
           filterOption={this.handleFilter}
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
+          optionLabelProp='label'
           notFoundContent={
-            this.state.fetching ? <Spin size='small' /> : <p>Not Found</p>
+            this.state.fetching ? (
+              <Spin size='small' />
+            ) : (
+              <p>
+                {this.state.fetchId > 0 ? 'Not Found' : 'Input Search Text'}
+              </p>
+            )
           }
           {...cfg}
           {...restProps}

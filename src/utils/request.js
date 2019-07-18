@@ -104,7 +104,7 @@ export const axiosRequest = (url, option) => {
         ? showErrorNotification('', statusText)
         : showErrorNotification('', data.message)
 
-      return false
+      return error.response
     })
 }
 
@@ -308,7 +308,8 @@ export default function request (url, option) {
             if (response.responseJSON) {
               notification.error({
                 // message: response.responseJSON.status,
-                description: response.responseJSON.message,
+                description:
+                  response.responseJSON.message || response.responseJSON.title,
                 duration: 5000,
               })
             } else {

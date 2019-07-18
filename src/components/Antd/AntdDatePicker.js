@@ -21,7 +21,7 @@ const _toMoment = (value, format) => {
   if (!value) return ''
   // console.log(value, format)
   // console.log(moment.zone())
-  console.log(value)
+  // console.log(value)
   const m = moment.utc(value)
 
   return m.local()
@@ -108,7 +108,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   handleChange = (date, dateString) => {
-    console.log({ date, dateString })
+    // console.log({ date, dateString })
     // if (date) {
     //   date.utcOffset()
     // }

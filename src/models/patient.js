@@ -19,7 +19,7 @@ export default createFormViewModel({
         patientAllergyMetaData: [],
         patientScheme: [],
         patientMedicalAlert: [],
-        // patientReferral: 'Company',
+        referredBy: '',
         // dob: new Date(),
         contact: {
           contactAddress: [

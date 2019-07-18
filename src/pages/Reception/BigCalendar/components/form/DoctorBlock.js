@@ -86,122 +86,106 @@ function DoctorEventForm ({
   handleSubmit,
   onClose,
   values,
+  footer,
   ...props
 }) {
   return (
     <React.Fragment>
-      <Paper className={classes.paperContainer}>
-        <GridContainer justify='center'>
-          <GridItem xs md={12}>
-            <FastField
-              name='doctor'
-              render={(args) => (
-                <Select {...args} allowClear label='Doctor' options={doctors} />
-              )}
-            />
-          </GridItem>
-          <GridContainer item xs md={12} justify='center'>
-            <GridItem xs md={8}>
-              <FastField
-                name='eventDate'
-                render={(args) => (
-                  <DatePicker {...args} label='Date' format={_dateFormat} />
-                )}
-              />
-            </GridItem>
-            <GridItem xs md={4}>
-              <FastField
-                name='eventTime'
-                render={(args) => (
-                  <TimePicker
-                    {...args}
-                    label='Time'
-                    format={_timeFormat}
-                    use12Hours
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer item xs md={12} justify='center'>
-            <GridItem xs md={6}>
-              <FastField
-                name='durationHour'
-                render={(args) => (
-                  <Select {...args} label='Hour' options={durationHours} />
-                )}
-              />
-            </GridItem>
-            <GridItem xs md={6}>
-              <FastField
-                name='durationMinute'
-                render={(args) => (
-                  <Select
-                    {...args}
-                    label='Minute: '
-                    options={durationMinutes}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridItem xs md={12}>
-            <FastField
-              name='eventType'
-              render={(args) => (
-                <Select {...args} label='Event Type' options={eventType} />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={12}>
-            <FastField
-              name='remarks'
-              render={(args) => (
-                <TextField {...args} label='Remarks' multiline rowsMax={4} />
-              )}
-            />
-          </GridItem>
-          <GridItem
-            xs
-            md={12}
-            className={classnames(classes.enableOccurenceCheckbox)}
-          >
-            <Divider className={classnames(classes.divider)} />
-            <FastField
-              name='enableRecurrence'
-              render={(args) => {
-                return <Checkbox simple label='Enable Recurrence' {...args} />
-              }}
-            />
-          </GridItem>
-          <Recurrence values={values} isDoctorBlock />
-        </GridContainer>
-      </Paper>
-      <GridContainer justify='flex-end' className={classes.buttonContainer}>
-        <GridItem>
-          <Button color='danger' onClick={onClose}>
-            Cancel
-          </Button>
-          <Button color='primary' onClick={handleSubmit}>
-            Save
-          </Button>
+      <GridContainer justify='center'>
+        <GridItem xs md={12}>
+          <FastField
+            name='doctor'
+            render={(args) => (
+              <Select {...args} allowClear label='Doctor' options={doctors} />
+            )}
+          />
         </GridItem>
+        <GridContainer item xs md={12} justify='center'>
+          <GridItem xs md={8}>
+            <FastField
+              name='eventDate'
+              render={(args) => (
+                <DatePicker {...args} label='Date' format={_dateFormat} />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={4}>
+            <FastField
+              name='eventTime'
+              render={(args) => (
+                <TimePicker
+                  {...args}
+                  label='Time'
+                  format={_timeFormat}
+                  use12Hours
+                />
+              )}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer item xs md={12} justify='center'>
+          <GridItem xs md={6}>
+            <FastField
+              name='durationHour'
+              render={(args) => (
+                <Select {...args} label='Hour' options={durationHours} />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={6}>
+            <FastField
+              name='durationMinute'
+              render={(args) => (
+                <Select {...args} label='Minute: ' options={durationMinutes} />
+              )}
+            />
+          </GridItem>
+        </GridContainer>
+
+        <GridItem xs md={12}>
+          <FastField
+            name='eventType'
+            render={(args) => (
+              <Select {...args} label='Event Type' options={eventType} />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={12}>
+          <FastField
+            name='remarks'
+            render={(args) => (
+              <TextField {...args} label='Remarks' multiline rowsMax={4} />
+            )}
+          />
+        </GridItem>
+        <GridItem
+          xs
+          md={12}
+          className={classnames(classes.enableOccurenceCheckbox)}
+        >
+          <FastField
+            name='enableRecurrence'
+            render={(args) => {
+              return <Checkbox simple label='Enable Recurrence' {...args} />
+            }}
+          />
+        </GridItem>
+        {values.enableRecurrence && (
+          <Recurrence values={values} isDoctorBlock />
+        )}
       </GridContainer>
+      {footer &&
+        footer({
+          confirmText: 'Confirm',
+          onConfirm: handleSubmit,
+        })}
     </React.Fragment>
   )
 }
 
-const DoctorFormValidation = Yup.object().shape({
-  doctor: Yup.string().required(),
-  durationHour: Yup.string().required(),
-  durationMinute: Yup.string().required(),
-  eventDate: Yup.string().required(),
-  eventTime: Yup.string().required(),
-})
-
 export default withFormik({
-  validationSchema: DoctorFormValidation,
+  validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
+    validationSchema,
   handleSubmit: (values, { props, resetForm }) => {
     const { handleAddDoctorEvent } = props
     const {
@@ -238,8 +222,8 @@ export default withFormik({
     resetForm()
     handleAddDoctorEvent(event)
   },
-  mapPropsToValues: () => ({
-    doctor: '',
+  mapPropsToValues: ({ initialProps }) => ({
+    doctor: undefined,
     durationHour: '0',
     durationMinute: '15',
     eventDate: '',
@@ -247,7 +231,9 @@ export default withFormik({
     subject: '',
     description: '',
     occurence: 0,
+    enableRecurrence: false,
     recurrencePattern: 'daily',
     recurrenceRange: RECURRENCE_RANGE.AFTER,
+    ...initialProps,
   }),
 })(withStyles(STYLES, { name: 'DoctorForm' })(DoctorEventForm))

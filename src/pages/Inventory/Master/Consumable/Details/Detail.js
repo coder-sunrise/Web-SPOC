@@ -132,7 +132,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                     label={formatMessage({
                       id: 'inventory.master.consumable.supplier',
                     })}
-                    code='Supplier'
+                    code='ctSupplier'
                     max={10}
                     {...args}
                   />
@@ -147,7 +147,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                     label={formatMessage({
                       id: 'inventory.master.consumable.baseUOM',
                     })}
-                    code='BaseUOM'
+                    code='ctBaseUOM'
                     max={10}
                     {...args}
                   />

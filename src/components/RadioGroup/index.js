@@ -13,7 +13,7 @@ class RadioGroup extends React.Component {
 
   static getDerivedStateFromProps (nextProps, preState) {
     const { field, value } = nextProps
-    console.log(nextProps)
+    // console.log(nextProps)
     if (field) {
       return {
         selectedValue: field.value || '',
@@ -103,7 +103,7 @@ class RadioGroup extends React.Component {
   render () {
     const { classes, ...restProps } = this.props
     // console.log(this.props)
-    console.log(this.state.selectedValue)
+    // console.log(this.state.selectedValue)
     return (
       <CustomInput
         inputComponent={this.getComponent}

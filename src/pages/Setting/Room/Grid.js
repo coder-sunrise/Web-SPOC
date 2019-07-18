@@ -32,7 +32,7 @@ export default ({ dispatch, classes, settingRoom, toggleModal }) => {
         { name: 'code', title: 'Code' },
         { name: 'displayValue', title: 'Display Value' },
         { name: 'description', title: 'Description' },
-        { name: 'isDeleted', title: 'Status' },
+        { name: 'isDeleted', title: 'Status' }, //wait api return isActive to replace
         { name: 'action', title: 'Action' },
       ]}
       // FuncProps={{ pager: false }}

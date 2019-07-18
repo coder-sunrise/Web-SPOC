@@ -230,7 +230,7 @@ class Queue extends PureComponent {
       currentFilter,
     } = this.state
 
-    const { sessionInfo } = queueLog
+    const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     // console.log('queuelisting state', this.props)
 
@@ -279,6 +279,7 @@ class Queue extends PureComponent {
               <EmptySession
                 handleStartSession={this.onStartSession}
                 loadingProps={loading}
+                errorState={error}
               />
             ) : (
               <React.Fragment>

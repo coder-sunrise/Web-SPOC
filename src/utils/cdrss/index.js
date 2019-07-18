@@ -716,6 +716,10 @@ const sortAll = (data, fieldName = 'id') => {
     } else {
       for (let field in data) {
         if (Object.prototype.hasOwnProperty.call(data, field)) {
+          if (data[field] === null || data[field] === undefined) {
+            delete data[field]
+            continue
+          }
           if (Array.isArray(data[field])) {
             data[field] = lodash.sortBy(data[field], [
               (o) => o[fieldName],

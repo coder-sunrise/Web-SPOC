@@ -38,12 +38,7 @@ class AppointmentType extends PureComponent {
         options={AppointmentTypeOptions}
         renderDropdown={(option) => {
           return (
-            <OriAntdSelect.Option
-              key={option.value}
-              title={option.name}
-              value={option.value}
-              disabled={!!option.disabled}
-            >
+            <React.Fragment>
               {option.value !== 'all' && (
                 <span
                   className={classnames([
@@ -53,7 +48,7 @@ class AppointmentType extends PureComponent {
                 />
               )}
               <span>{option.name}</span>
-            </OriAntdSelect.Option>
+            </React.Fragment>
           )
         }}
         {...restProps}

@@ -150,6 +150,7 @@ export const calendarEvents = [
     start: new Date(now.getFullYear(), now.getMonth(), 11, 9, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 11, 8, 30, 0),
     visitStatus: 'APPOINTMENT',
+    series: true,
   },
   {
     seriesID: 'series3',

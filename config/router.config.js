@@ -391,6 +391,11 @@ const routes = [
             component: './Setting/Room',
           },
           {
+            path: '/setting/clinicbreakhour',
+            name: 'clinicbreakhour',
+            component: './Setting/ClinicBreakHour',
+          },
+          {
             path: '/setting/publicholiday',
             name: 'publicholiday',
             component: './Setting/PublicHoliday',
