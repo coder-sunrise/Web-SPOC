@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { AppointmentTypeOptions } from './setting'
 import { getUniqueGUID } from '@/utils/utils'
 
@@ -7,6 +8,14 @@ const patientName = [
   'Jason Goh',
   'Tan Min Min',
   'John Legend',
+]
+
+const doctorName = [
+  'medisys',
+  'levinne',
+  'cheah',
+  'tan',
+  'lim',
 ]
 
 const contactNo = [
@@ -24,6 +33,13 @@ const appointmentDate = [
   new Date(now.getFullYear(), now.getMonth(), 15),
   new Date(now.getFullYear(), now.getMonth(), 20),
   new Date(now.getFullYear(), now.getMonth(), 25),
+]
+const doctorBlockDate = [
+  new Date(now.getFullYear(), now.getMonth(), 4),
+  new Date(now.getFullYear(), now.getMonth(), 11),
+  new Date(now.getFullYear(), now.getMonth(), 14),
+  new Date(now.getFullYear(), now.getMonth(), 21),
+  new Date(now.getFullYear(), now.getMonth(), 26),
 ]
 
 const appointmentResources = {
@@ -140,16 +156,17 @@ const appointmentResources = {
   ],
 }
 
+const max = 5
 const generateAppointmentData = () => {
   let data = []
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < max; i++) {
     const appointment = {
       _appointmentID: i,
-      patientName: patientName[i % 5],
+      patientName: patientName[i % max],
       isRegisteredPatient: i === 1,
-      contactNo: contactNo[i % 5],
+      contactNo: contactNo[i % max],
       remarks: '',
-      appointmentDate: appointmentDate[i % 5],
+      appointmentDate: appointmentDate[i % max],
       bookedBy: 'medisys',
       appointmentResources: appointmentResources[i],
     }
@@ -158,4 +175,44 @@ const generateAppointmentData = () => {
   return data
 }
 
-export const events = generateAppointmentData()
+const generateDoctorBlock = () => {
+  const _dateFormat = 'DD MMM YYYY'
+  const _timeFormat = 'hh:mm a'
+  const _fullFormat = `${_dateFormat} ${_timeFormat}`
+  let data = []
+  for (let i = 0; i < max; i++) {
+    const eventTime = '12:15 pm'
+    const eventDate = moment(doctorBlockDate[i % max])
+    const date = moment(eventDate).format(_dateFormat)
+
+    const endDate = moment(`${date} ${eventTime}`, _fullFormat)
+    endDate.add(parseInt('1', 10), 'hours')
+    endDate.add(parseInt('15', 10), 'minutes')
+
+    const startDate = moment(
+      `${date} ${eventTime}`,
+      `${_dateFormat} ${_timeFormat}`,
+    )
+
+    const doctorBlock = {
+      _appointmentID: `doctorBlock-${i}`,
+      doctor: doctorName[i % max],
+      durationHour: '1',
+      durationMinute: '15',
+      eventDate,
+      eventTime,
+      start: startDate.toDate(),
+      end: endDate.toDate(),
+      isDoctorEvent: true,
+      resourceId: '0',
+      eventType: 'vacation',
+    }
+    data.push(doctorBlock)
+  }
+  return data
+}
+
+export const events = [
+  ...generateAppointmentData(),
+  ...generateDoctorBlock(),
+]

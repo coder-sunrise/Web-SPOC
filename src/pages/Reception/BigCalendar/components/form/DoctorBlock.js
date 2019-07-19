@@ -219,8 +219,8 @@ export default withFormik({
     const event = {
       ...values,
       _appointmentID,
-      startTime: startDate.format(_timeFormat),
-      endTime: endDate.format(_timeFormat),
+      // startTime: startDate.format(_timeFormat),
+      // endTime: endDate.format(_timeFormat),
       start: startDate.toDate(),
       end: endDate.toDate(),
       isDoctorEvent: true,

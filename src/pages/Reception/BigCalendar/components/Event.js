@@ -43,12 +43,14 @@ class Event extends PureComponent {
       >
         <div className={classes.title}>
           <span>
-            <strong>{title}</strong>
+            <strong>{title ? title.toUpperCase() : ''}</strong>
           </span>
           {hasConflict && <ErrorOutline />}
           {series && <Cached />}
         </div>
-        <span className={classes.blockDiv}>{subtitle}</span>
+        <span className={classes.blockDiv}>
+          {subtitle ? subtitle.toUpperCase() : ''}
+        </span>
       </div>
     )
   }
