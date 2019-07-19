@@ -1,72 +1,33 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+// material ui
+import { withStyles } from '@material-ui/core'
 // common component
-import {
-  DatePicker,
-  GridContainer,
-  GridItem,
-  NumberInput,
-  RadioGroup,
-  Select,
-} from '@/components'
-import { RECURRENCE_RANGE, days } from './variables'
+import { GridContainer, GridItem, NumberInput } from '@/components'
+import styles from './style'
 
-const RecurrenceMonthly = ({ values }) => {
+const RecurrenceMonthly = ({ classes, labelSize, inputSize }) => {
   return (
-    <GridContainer item xs md={8}>
-      <GridItem md={6}>
-        <FastField
-          name='day'
-          render={(args) => <NumberInput label='Day' {...args} />}
-        />
+    <GridContainer item xs md={12}>
+      <GridItem md={labelSize} className={classes.inlineLabel}>
+        <span>Day</span>
       </GridItem>
-      <GridItem md={6}>
+      <GridItem md={inputSize}>
+        <FastField name='day' render={(args) => <NumberInput {...args} />} />
+      </GridItem>
+      <GridItem md={inputSize}>
         <FastField
           name='every'
           render={(args) => (
-            <NumberInput {...args} label='Of Every' suffix='month(s)' />
+            <NumberInput {...args} prefix='of every: ' suffix='month(s)' />
           )}
         />
-      </GridItem>
-      <GridItem md={6}>
-        <FastField
-          name='recurrenceRange'
-          render={(args) => (
-            <RadioGroup
-              label='Range of Recurrence'
-              textField='name'
-              options={[
-                {
-                  value: RECURRENCE_RANGE.AFTER,
-                  name: 'End After',
-                },
-                {
-                  value: RECURRENCE_RANGE.BY,
-                  name: 'End By',
-                },
-              ]}
-              {...args}
-            />
-          )}
-        />
-      </GridItem>
-      <GridItem md={6}>
-        {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
-          <FastField
-            name='occurence'
-            render={(args) => <NumberInput {...args} label='Occurence' />}
-          />
-        )}
-        {values.recurrenceRange === RECURRENCE_RANGE.BY && (
-          <FastField
-            name='stopDate'
-            render={(args) => <DatePicker {...args} label='Stop Date' />}
-          />
-        )}
       </GridItem>
     </GridContainer>
   )
 }
 
-export default RecurrenceMonthly
+export default withStyles(styles, { name: 'RecurrenceMonthly' })(
+  RecurrenceMonthly,
+)

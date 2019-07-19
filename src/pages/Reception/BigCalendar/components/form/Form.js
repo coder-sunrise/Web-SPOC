@@ -16,6 +16,7 @@ import {
   SizeContainer,
   OutlinedTextField,
   Checkbox,
+  Select,
 } from '@/components'
 // custom components
 import NewPatient from '../../../../PatientDatabase/New'
@@ -37,6 +38,7 @@ import {
   mapPropsToValues,
   getEventSeriesByID,
 } from './formikUtils'
+
 import { getUniqueGUID } from '@/utils/utils'
 import styles from './style'
 
@@ -281,8 +283,8 @@ class Form extends React.PureComponent {
 
           <GridContainer
             className={classnames(classes.formContent)}
-            alignItems='center'
-            justify='center'
+            // alignItems='center'
+            // justify='center'
           >
             <GridItem container xs md={6}>
               <PatientInfoInput
@@ -315,19 +317,10 @@ class Form extends React.PureComponent {
                 handleCommitChanges={this.onCommitChanges}
               />
             </GridItem>
-            <GridItem
-              xs
-              md={12}
-              className={classnames(classes.enableOccurenceCheckbox)}
-            >
-              <FastField
-                name='enableRecurrence'
-                render={(args) => {
-                  return <Checkbox simple label='Enable Recurrence' {...args} />
-                }}
-              />
+
+            <GridItem xs md={12}>
+              <Recurrence values={values} />
             </GridItem>
-            {values.enableRecurrence && <Recurrence values={values} />}
           </GridContainer>
 
           <FormFooter
