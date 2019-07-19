@@ -60,7 +60,7 @@ const flattenAppointmentDateToCalendarEvents = (marshal, event) =>
 class Appointment extends React.PureComponent {
   state = {
     showPopup: false,
-    showAppointmentForm: true,
+    showAppointmentForm: false,
     showDoctorEventModal: false,
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
