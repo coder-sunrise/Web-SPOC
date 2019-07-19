@@ -106,7 +106,12 @@ function DoctorEventForm ({
             <FastField
               name='eventDate'
               render={(args) => (
-                <DatePicker {...args} label='Date' format={_dateFormat} />
+                <DatePicker
+                  {...args}
+                  label='Date'
+                  allowClear={false}
+                  format={_dateFormat}
+                />
               )}
             />
           </GridItem>
@@ -159,21 +164,10 @@ function DoctorEventForm ({
             )}
           />
         </GridItem>
-        <GridItem
-          xs
-          md={12}
-          className={classnames(classes.enableOccurenceCheckbox)}
-        >
-          <FastField
-            name='enableRecurrence'
-            render={(args) => {
-              return <Checkbox simple label='Enable Recurrence' {...args} />
-            }}
-          />
-        </GridItem>
-        {values.enableRecurrence && (
+
+        <GridItem md={12}>
           <Recurrence values={values} isDoctorBlock />
-        )}
+        </GridItem>
       </GridContainer>
       {footer &&
         footer({
