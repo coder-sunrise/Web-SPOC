@@ -21,7 +21,7 @@ export const DoctorFormValidation = Yup.object().shape({
   doctor: Yup.string().required(),
   durationHour: Yup.string().required(),
   durationMinute: Yup.string().required(),
-  appointmentDate: Yup.string().required(),
+  eventDate: Yup.string().required(),
   eventTime: Yup.string().required(),
 })
 
