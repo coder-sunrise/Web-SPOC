@@ -1,5 +1,7 @@
 import * as Yup from 'yup'
 
+export const timeFormat = 'hh:mm a'
+
 const _modelKey = 'calendar/'
 
 export const CalendarActions = {
