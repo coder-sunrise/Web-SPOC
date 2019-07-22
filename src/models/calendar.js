@@ -146,10 +146,8 @@ export default createListViewModel({
                   ],
             [],
           )
-          console.log({ newCalendarEvents })
         }
-        return { ...state }
-        // return { ...state, calendarEvents: newCalendarEvents }
+        return { ...state, calendarEvents: newCalendarEvents }
       },
       // updateEventListing (state, { added, edited, deleted }) {
       //   const { calendarEvents } = state

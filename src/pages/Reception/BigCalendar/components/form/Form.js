@@ -375,6 +375,15 @@ class Form extends React.PureComponent {
           >
             <SeriesUpdateConfirmation />
           </CommonModal>
+          <CommonModal
+            open={showSeriesUpdateConfirmation}
+            title='Alert'
+            onClose={this.closeSeriesUpdateConfirmation}
+            onConfirm={this.onConfirmSeriesUpdate}
+            maxWidth='sm'
+          >
+            <SeriesUpdateConfirmation />
+          </CommonModal>
         </React.Fragment>
       </SizeContainer>
     )
