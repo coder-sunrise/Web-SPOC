@@ -42,7 +42,7 @@ const styles = (theme) => ({
   ...AppointmentTypeAsColor,
 })
 
-const flattenAppointmentDateToCalendarEvents = (marshal, event) =>
+export const flattenAppointmentDateToCalendarEvents = (marshal, event) =>
   event.isDoctorEvent
     ? [
         ...marshal,
@@ -271,7 +271,7 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     const { calendarEvents } = CalendarModel
-    const marshalData = calendarEvents.reduce(
+    const flattenedCalendarData = calendarEvents.reduce(
       flattenAppointmentDateToCalendarEvents,
       [],
     )
@@ -305,7 +305,7 @@ class Appointment extends React.PureComponent {
         />
         <div style={{ marginTop: 16 }}>
           <CalendarView
-            calendarEvents={applyFilter(marshalData, filter)}
+            calendarEvents={applyFilter(flattenedCalendarData, filter)}
             resources={resources}
             handleSelectSlot={this.onSelectSlot}
             handleSelectEvent={this.onSelectEvent}
