@@ -2,22 +2,6 @@ import { createListViewModel } from 'medisys-model'
 import * as service from '../services/calendar'
 import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
 
-const deleteApptResources = (eventID, appointmentID) => (events, e) =>
-  e.appointmentID === appointmentID
-    ? [
-        ...events,
-        e,
-      ]
-    : [
-        ...events,
-        {
-          ...e,
-          appointmentResources: e.appointmentResources.filter(
-            (res) => res.id !== eventID,
-          ),
-        },
-      ]
-
 export default createListViewModel({
   namespace: 'calendar',
   config: {
@@ -94,9 +78,8 @@ export default createListViewModel({
       deleteEventSeriesByEventID (state, { eventID, appointmentID }) {
         const { calendarEvents } = state
 
-        const newCalendarEvents = calendarEvents.reduce(
-          deleteApptResources(eventID, appointmentID),
-          [],
+        const newCalendarEvents = calendarEvents.filter(
+          (event) => event._appointmentID !== appointmentID,
         )
 
         return {
@@ -133,7 +116,6 @@ export default createListViewModel({
         }
 
         if (deleted) {
-          console.log({ deleted })
           newCalendarEvents = newCalendarEvents.reduce(
             (events, e) =>
               e._appointmentID === deleted
@@ -149,35 +131,6 @@ export default createListViewModel({
         }
         return { ...state, calendarEvents: newCalendarEvents }
       },
-      // updateEventListing (state, { added, edited, deleted }) {
-      //   const { calendarEvents } = state
-
-      //   let newCalendarEvents = [
-      //     ...calendarEvents,
-      //   ]
-
-      //   if (added) {
-      //     newCalendarEvents = [
-      //       ...calendarEvents,
-      //       added,
-      //     ]
-      //   }
-
-      //   if (edited) {
-      //     const removeEdited = (event) => event.id !== edited.id
-      //     newCalendarEvents = [
-      //       ...newCalendarEvents.filter(removeEdited),
-      //       edited,
-      //     ]
-      //   }
-
-      //   if (deleted) {
-      //     const removeDeleted = (event) => event.id !== deleted
-      //     newCalendarEvents = newCalendarEvents.filter(removeDeleted)
-      //   }
-
-      //   return { ...state, calendarEvents: newCalendarEvents }
-      // },
     },
   },
 })

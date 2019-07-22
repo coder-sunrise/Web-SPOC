@@ -34,7 +34,7 @@ class PatientInfoCard extends PureComponent {
     //   .catch((error) => {
     //     console.log('error occured', error)
     //   })
-    getCodes('Gender')
+    getCodes('ctgender')
       .then((response) => {
         if (!response && !response.data) return
         const data = [
