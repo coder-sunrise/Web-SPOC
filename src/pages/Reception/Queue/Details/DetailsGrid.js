@@ -11,10 +11,11 @@ import Pageview from '@material-ui/icons/Pageview'
 import { CommonTableGrid2 } from '@/components'
 import GridButton from './GridButton'
 import AppointmentActionButton from './AppointmentActionButton'
+import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
+import { filterData, filterDoctorBlock } from '../utils'
+import { StatusIndicator } from '../variables'
 // assets
 import { tooltip } from '@/assets/jss/index'
-import { filterData } from '../utils'
-import { StatusIndicator } from '../variables'
 
 const styles = () => ({
   tooltip,
@@ -176,10 +177,17 @@ class DetailsGrid extends PureComponent {
     const { currentFilter, queueListing } = queueLog
     const { calendarEvents } = calendar
 
+    const flattenedCalendarData = calendarEvents.reduce(
+      flattenAppointmentDateToCalendarEvents,
+      [],
+    )
+
     const data =
       currentFilter === StatusIndicator.APPOINTMENT
-        ? calendarEvents
+        ? filterDoctorBlock(flattenedCalendarData)
         : filterData(currentFilter, queueListing)
+
+    console.log({ data })
 
     return (
       <CommonTableGrid2

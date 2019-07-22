@@ -13,6 +13,7 @@ import {
   TextField,
   Danger,
 } from '@/components'
+import { timeFormat } from '../const'
 
 const styles = () => ({
   icon: {
@@ -26,11 +27,12 @@ const styles = () => ({
 })
 
 const getTimeString = (value) => {
-  const timeFormat = 'hh:mm a'
   return moment(value).isValid() ? moment(value).format(timeFormat) : 'N/A'
 }
 
 const DoctorEventContent = ({ popoverEvent, classes }) => {
+  const startTime = getTimeString(popoverEvent.start)
+  const endTime = getTimeString(popoverEvent.end)
   return (
     <GridContainer direction='column' justify='center' alignItems='center'>
       {popoverEvent.hasConflict && (
@@ -44,7 +46,7 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
       <GridItem className={classnames(classes.iconRow)}>
         <AccessTime className={classnames(classes.icon)} />
         <span>
-          {popoverEvent.startTime} - {popoverEvent.endTime}
+          {startTime} - {endTime}
         </span>
       </GridItem>
       <GridItem>

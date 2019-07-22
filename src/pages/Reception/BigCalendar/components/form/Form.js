@@ -16,6 +16,7 @@ import {
   SizeContainer,
   OutlinedTextField,
   Checkbox,
+  Select,
 } from '@/components'
 // custom components
 import NewPatient from '../../../../PatientDatabase/New'
@@ -26,6 +27,7 @@ import PatientInfoInput from './PatientInfo'
 import AppointmentDateInput from './AppointmentDate'
 import Recurrence from './Recurrence'
 import FormFooter from './FormFooter'
+import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 // services
 import {
   fetchPatientListByName,
@@ -36,6 +38,7 @@ import {
   mapPropsToValues,
   getEventSeriesByID,
 } from './formikUtils'
+
 import { getUniqueGUID } from '@/utils/utils'
 import styles from './style'
 
@@ -63,6 +66,7 @@ class Form extends React.PureComponent {
       this.props.calendarEvents,
     ),
     isRegisteredPatient: false,
+    showSeriesUpdateConfirmation: false,
   }
 
   toggleNewPatientModal = () => {
@@ -164,6 +168,15 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
+    const { slotInfo } = this.props
+    if (slotInfo.series) {
+      this.openSeriesUpdateConfirmation()
+    } else {
+      this._confirm()
+    }
+  }
+
+  _confirm = () => {
     const { eventSeries, isRegisteredPatient } = this.state
     const {
       values,
@@ -217,13 +230,10 @@ class Form extends React.PureComponent {
       //   timeOut,
       // }
     })
-
-    console.log({ values, slotInfo })
     const updated = {
       ...values,
       appointmentResources: calendarEvents,
     }
-    console.log({ updated })
 
     handleUpdateEventSeries({
       [slotInfo.type]: updated,
@@ -233,6 +243,22 @@ class Form extends React.PureComponent {
     resetForm()
   }
 
+  openSeriesUpdateConfirmation = () => {
+    this.setState({
+      showSeriesUpdateConfirmation: true,
+    })
+  }
+
+  closeSeriesUpdateConfirmation = () => {
+    this.setState({ showSeriesUpdateConfirmation: false })
+  }
+
+  onConfirmSeriesUpdate = (type) => {
+    console.log({ type })
+    this.closeSeriesUpdateConfirmation()
+    this._confirm()
+  }
+
   render () {
     const { classes, onClose, slotInfo, isLoading, values } = this.props
 
@@ -240,6 +266,7 @@ class Form extends React.PureComponent {
       showNewPatientModal,
       showSearchPatientModal,
       showDeleteConfirmationModal,
+      showSeriesUpdateConfirmation,
       patientList,
       eventSeries,
     } = this.state
@@ -247,71 +274,58 @@ class Form extends React.PureComponent {
     return (
       <SizeContainer>
         <React.Fragment>
-          <CardContainer hideHeader size='sm'>
-            {isLoading && (
-              <div className={classnames(classes.loading)}>
-                <CircularProgress />
-                <h3 style={{ fontWeight: 400 }}>Populating patient info...</h3>
-              </div>
-            )}
+          {isLoading && (
+            <div className={classnames(classes.loading)}>
+              <CircularProgress />
+              <h3 style={{ fontWeight: 400 }}>Populating patient info...</h3>
+            </div>
+          )}
 
-            <GridContainer
-              className={classnames(classes.formContent)}
-              alignItems='center'
-              justify='center'
-            >
-              <GridItem container xs md={6}>
-                <PatientInfoInput
-                  onSearchPatient={this.onSearchPatient}
-                  onCreatePatient={this.toggleNewPatientModal}
-                  isRegisteredPatient={values.isRegisteredPatient}
-                  patientName={values.patientName}
-                />
-                <AppointmentDateInput />
-              </GridItem>
-              <GridItem xs md={6} className={classnames(classes.remarksField)}>
-                <FastField
-                  name='remarks'
-                  render={(args) => (
-                    <OutlinedTextField
-                      {...args}
-                      multiline
-                      rowsMax={3}
-                      rows={3}
-                      label='Appointment Remarks'
-                    />
-                  )}
-                />
-              </GridItem>
+          <GridContainer
+            className={classnames(classes.formContent)}
+            // alignItems='center'
+            // justify='center'
+          >
+            <GridItem container xs md={6}>
+              <PatientInfoInput
+                onSearchPatient={this.onSearchPatient}
+                onCreatePatient={this.toggleNewPatientModal}
+                isRegisteredPatient={values.isRegisteredPatient}
+                patientName={values.patientName}
+              />
+              <AppointmentDateInput />
+            </GridItem>
+            <GridItem xs md={6} className={classnames(classes.remarksField)}>
+              <FastField
+                name='remarks'
+                render={(args) => (
+                  <OutlinedTextField
+                    {...args}
+                    multiline
+                    rowsMax={3}
+                    rows={3}
+                    label='Appointment Remarks'
+                  />
+                )}
+              />
+            </GridItem>
 
-              <GridItem xs md={12} className={classes.verticalSpacing}>
-                <AppointmentDataGrid
-                  appointmentDate={values.appointmentDate}
-                  data={eventSeries}
-                  handleCommitChanges={this.onCommitChanges}
-                />
-              </GridItem>
-              <GridItem
-                xs
-                md={12}
-                className={classnames(classes.enableOccurenceCheckbox)}
-              >
-                <Divider className={classnames(classes.divider)} />
-                <FastField
-                  name='enableRecurrence'
-                  render={(args) => {
-                    return (
-                      <Checkbox simple label='Enable Recurrence' {...args} />
-                    )
-                  }}
-                />
-              </GridItem>
-              {values.enableRecurrence && <Recurrence values={values} />}
-            </GridContainer>
-          </CardContainer>
+            <GridItem xs md={12} className={classes.verticalSpacing}>
+              <AppointmentDataGrid
+                appointmentDate={values.appointmentDate}
+                data={eventSeries}
+                handleCommitChanges={this.onCommitChanges}
+              />
+            </GridItem>
+
+            <GridItem xs md={12}>
+              <Recurrence values={values} />
+            </GridItem>
+          </GridContainer>
 
           <FormFooter
             isNew={slotInfo.type === 'add'}
+            isDraft={slotInfo.draft}
             onCancelAppointmentClick={this.onCancelAppointmentClick}
             onClose={onClose}
             onConfirmClick={this.onConfirmClick}
@@ -350,7 +364,25 @@ class Form extends React.PureComponent {
             onConfirm={this.onConfirmCancelAppointment}
             maxWidth='sm'
           >
-            <DeleteConfirmation />
+            <DeleteConfirmation isSeries={values.series} />
+          </CommonModal>
+          <CommonModal
+            open={showSeriesUpdateConfirmation}
+            title='Alert'
+            onClose={this.closeSeriesUpdateConfirmation}
+            onConfirm={this.onConfirmSeriesUpdate}
+            maxWidth='sm'
+          >
+            <SeriesUpdateConfirmation />
+          </CommonModal>
+          <CommonModal
+            open={showSeriesUpdateConfirmation}
+            title='Alert'
+            onClose={this.closeSeriesUpdateConfirmation}
+            onConfirm={this.onConfirmSeriesUpdate}
+            maxWidth='sm'
+          >
+            <SeriesUpdateConfirmation />
           </CommonModal>
         </React.Fragment>
       </SizeContainer>

@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Warning'
 // common component
 import {
+  Danger,
   GridContainer,
   GridItem,
   RadioGroup,
@@ -26,7 +27,12 @@ const styles = (theme) => ({
   },
 })
 
-function DeleteConfirmation ({ onConfirm, onClose, classes }) {
+function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
+  const [
+    error,
+    setError,
+  ] = useState()
+
   const [
     step,
     setStep,
@@ -41,6 +47,10 @@ function DeleteConfirmation ({ onConfirm, onClose, classes }) {
     reason,
     setReason,
   ] = useState('')
+  const [
+    seriesType,
+    setSeriesType,
+  ] = useState('')
 
   const [
     reasonType,
@@ -48,7 +58,17 @@ function DeleteConfirmation ({ onConfirm, onClose, classes }) {
   ] = useState('noshow')
 
   const onContinueClick = () => {
-    setStep(1)
+    if (seriesType === '') {
+      setError('Please choose an option')
+    } else {
+      setStep(1)
+    }
+  }
+
+  const onChange = (event, value) => {
+    const { target } = event
+    setSeriesType(target.value)
+    setError('')
   }
 
   const handleDeleteTypeChange = (event) => {
@@ -73,7 +93,6 @@ function DeleteConfirmation ({ onConfirm, onClose, classes }) {
       reason,
     })
   }
-
   return step === 0 ? (
     <GridContainer justify='center'>
       <GridItem>
@@ -83,6 +102,32 @@ function DeleteConfirmation ({ onConfirm, onClose, classes }) {
             Do you want to cancel this appointment?
           </h4>
         </div>
+      </GridItem>
+      {isSeries && (
+        <GridItem>
+          <RadioGroup
+            label=''
+            simple
+            vertical
+            defaultValue={seriesType}
+            onChange={onChange}
+            options={[
+              {
+                value: 'single',
+                label: 'Only appointment that has not been modified',
+              },
+              {
+                value: 'all',
+                label: 'All appointment',
+              },
+            ]}
+          />
+        </GridItem>
+      )}
+      <GridItem md={6} className={classes.centerText}>
+        <Danger>
+          <p>{error}</p>
+        </Danger>
       </GridItem>
       <GridItem container justify='flex-end'>
         <Button onClick={onClose} color='danger'>

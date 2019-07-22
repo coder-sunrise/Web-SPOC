@@ -21,6 +21,7 @@ import {
 } from '@/components'
 // sub components
 import Recurrence from './Recurrence'
+import { getUniqueGUID } from '@/utils/utils'
 import style from './style'
 
 const STYLES = (theme) => ({
@@ -105,7 +106,12 @@ function DoctorEventForm ({
             <FastField
               name='eventDate'
               render={(args) => (
-                <DatePicker {...args} label='Date' format={_dateFormat} />
+                <DatePicker
+                  {...args}
+                  label='Date'
+                  allowClear={false}
+                  format={_dateFormat}
+                />
               )}
             />
           </GridItem>
@@ -158,21 +164,10 @@ function DoctorEventForm ({
             )}
           />
         </GridItem>
-        <GridItem
-          xs
-          md={12}
-          className={classnames(classes.enableOccurenceCheckbox)}
-        >
-          <FastField
-            name='enableRecurrence'
-            render={(args) => {
-              return <Checkbox simple label='Enable Recurrence' {...args} />
-            }}
-          />
-        </GridItem>
-        {values.enableRecurrence && (
+
+        <GridItem md={12}>
           <Recurrence values={values} isDoctorBlock />
-        )}
+        </GridItem>
       </GridContainer>
       {footer &&
         footer({
@@ -187,7 +182,9 @@ export default withFormik({
   validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
     validationSchema,
   handleSubmit: (values, { props, resetForm }) => {
-    const { handleAddDoctorEvent } = props
+    const { handleUpdateDoctorEvent, initialProps } = props
+
+    const { type = 'add' } = initialProps
     const {
       doctor,
       durationHour,
@@ -208,19 +205,27 @@ export default withFormik({
       `${date} ${eventTime}`,
       `${_dateFormat} ${_timeFormat}`,
     )
+    const _appointmentID =
+      values._appointmentID !== undefined
+        ? values._appointmentID
+        : getUniqueGUID()
 
     const event = {
       ...values,
-      startTime: startDate.format(_timeFormat),
-      endTime: endDate.format(_timeFormat),
+      _appointmentID,
+      // startTime: startDate.format(_timeFormat),
+      // endTime: endDate.format(_timeFormat),
       start: startDate.toDate(),
       end: endDate.toDate(),
       isDoctorEvent: true,
       resourceId: doctor,
     }
 
+    handleUpdateDoctorEvent({
+      [type]: event,
+    })
+    // todo: update doctor event
     resetForm()
-    handleAddDoctorEvent(event)
   },
   mapPropsToValues: ({ initialProps }) => ({
     doctor: undefined,

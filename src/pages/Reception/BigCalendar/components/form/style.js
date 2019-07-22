@@ -53,7 +53,8 @@ const styles = (theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     paddingLeft: theme.spacing.unit * 2,
-    margin: `${theme.spacing.unit * 4}px 0px ${theme.spacing.unit}px`,
+    // margin: `${theme.spacing(2)}px 0px ${theme.spacing.unit}px`,
+    marginBottom: theme.spacing(1),
   },
   actionsBtnGroup: {
     textAlign: 'right',
@@ -87,6 +88,14 @@ const styles = (theme) => ({
   patientNameButton: {
     paddingLeft: '0px !important',
     textDecoration: 'underline',
+  },
+  recurrenceListLabel: {
+    marginTop: theme.spacing(1),
+    fontSize: '1rem',
+  },
+  inlineLabel: {
+    marginTop: theme.spacing(1),
+    fontSize: '1rem',
   },
 })
 

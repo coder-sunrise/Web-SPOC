@@ -42,7 +42,9 @@ export default createFormViewModel({
           localStorage.setItem('application', application)
 
           const cookies = new Cookies()
-          cookies.set('_lastLogin', new Date())
+          cookies.set('_lastLogin', new Date(), {
+            expires: new Date(9999, 11, 31),
+          })
         }
         return { ...state, isInvalidLogin }
       },
