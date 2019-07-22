@@ -3,8 +3,7 @@ import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
-// umi
-import { FormattedMessage } from 'umi/locale'
+import { withStyles } from '@material-ui/core'
 // custom components
 import {
   Button,
@@ -16,8 +15,17 @@ import {
 } from '@/components'
 import FormField from './formField'
 
+const styles = (theme) => ({
+  verticalSpacing: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+})
+
 class ReferralCard extends PureComponent {
   render () {
+    const { classes } = this.props
+
     return (
       <CommonCard size='sm' title='Referral'>
         <GridContainer>
@@ -39,11 +47,21 @@ class ReferralCard extends PureComponent {
               render={(args) => <TextField label='Institution' {...args} />}
             />
           </GridItem>
-          <GridItem xs md={12}>
-            <Button color='rose'>
+          <GridItem className={classes.verticalSpacing}>
+            <Button color='rose' size='sm'>
               <AttachFile />
-              <FormattedMessage id='reception.queue.visitRegistration.attachment' />
+              Upload
             </Button>
+          </GridItem>
+          <GridItem className={classes.verticalSpacing}>
+            <div>
+              <p>
+                <a>Attachment001.pdf</a>
+              </p>
+              <p>
+                <a>Attachment002.pdf</a>
+              </p>
+            </div>
           </GridItem>
         </GridContainer>
       </CommonCard>
@@ -51,4 +69,4 @@ class ReferralCard extends PureComponent {
   }
 }
 
-export default ReferralCard
+export default withStyles(styles, { name: 'ReferralCard' })(ReferralCard)

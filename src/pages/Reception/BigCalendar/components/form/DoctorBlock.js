@@ -1,37 +1,52 @@
-import React from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
-import classnames from 'classnames'
 import * as Yup from 'yup'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
-import { Divider, Paper, withStyles } from '@material-ui/core'
+import { Popover, withStyles } from '@material-ui/core'
+import Info from '@material-ui/icons/Info'
 // common components
 import {
   Button,
-  Checkbox,
   GridContainer,
   GridItem,
   Select,
   DatePicker,
   TimePicker,
+  SizeContainer,
   TextField,
-  NumberInput,
-  RadioGroup,
 } from '@/components'
 // sub components
 import Recurrence from './Recurrence'
 import { getUniqueGUID } from '@/utils/utils'
 import style from './style'
+import { tooltip } from '@/assets/jss/index'
 
 const STYLES = (theme) => ({
   ...style,
+  tooltip: {
+    ...tooltip,
+    padding: '10px 5px',
+    background: '#4f4f4f',
+    maxWidth: 400,
+    textAlign: 'left',
+    fontSize: '0.85rem',
+  },
+  popover: {
+    pointerEvents: 'none',
+  },
+
   paperContainer: {
     padding: theme.spacing.unit,
   },
-  buttonContainer: {
-    margin: `${theme.spacing.unit * 2}px ${theme.spacing.unit}px ${theme.spacing
-      .unit}px`,
+  conflictIcon: {
+    marginTop: 'auto',
+    marginBottom: theme.spacing(0.5),
+  },
+  checkAvailabilityBtn: {
+    position: 'absolute',
+    left: theme.spacing(2),
   },
 })
 
@@ -82,17 +97,59 @@ const recurrencePattern = [
   { name: 'Monthly', value: 'wonthly' },
 ]
 
-function DoctorEventForm ({
+const DoctorEventForm = ({
   classes,
   handleSubmit,
   onClose,
   values,
   footer,
   ...props
-}) {
+}) => {
+  const { hasConflict } = values
+  const [
+    anchorEl,
+    setAnchorEl,
+  ] = useState(null)
+
+  const handlePopoverOpen = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null)
+  }
+
+  const showPopup = Boolean(anchorEl)
+
   return (
     <React.Fragment>
-      <GridContainer justify='center'>
+      <Popover
+        id='event-popup'
+        className={classes.popover}
+        open={showPopup}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        placement='top-start'
+        anchorOrigin={{
+          vertical: 'center',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
+        disableRestoreFocus
+      >
+        <div className={classes.tooltip}>
+          <ul>
+            <li>
+              The selected slot: 26 July 2019 11:45AM - 12:00PM already had an
+              appointment with: Tan Mei Ling
+            </li>
+          </ul>
+        </div>
+      </Popover>
+      <GridContainer>
         <GridItem xs md={12}>
           <FastField
             name='doctor'
@@ -101,8 +158,8 @@ function DoctorEventForm ({
             )}
           />
         </GridItem>
-        <GridContainer item xs md={12} justify='center'>
-          <GridItem xs md={8}>
+        <GridContainer item xs md={12}>
+          <GridItem xs md={4}>
             <FastField
               name='eventDate'
               render={(args) => (
@@ -128,9 +185,20 @@ function DoctorEventForm ({
               )}
             />
           </GridItem>
+          {hasConflict && (
+            <GridItem md={1} className={classes.conflictIcon}>
+              <SizeContainer size='lg'>
+                <Info
+                  color='error'
+                  onMouseEnter={handlePopoverOpen}
+                  onMouseLeave={handlePopoverClose}
+                />
+              </SizeContainer>
+            </GridItem>
+          )}
         </GridContainer>
-        <GridContainer item xs md={12} justify='center'>
-          <GridItem xs md={6}>
+        <GridContainer item xs md={12}>
+          <GridItem xs md={4}>
             <FastField
               name='durationHour'
               render={(args) => (
@@ -138,7 +206,7 @@ function DoctorEventForm ({
               )}
             />
           </GridItem>
-          <GridItem xs md={6}>
+          <GridItem xs md={4}>
             <FastField
               name='durationMinute'
               render={(args) => (
@@ -173,6 +241,11 @@ function DoctorEventForm ({
         footer({
           confirmText: 'Confirm',
           onConfirm: handleSubmit,
+          extraButtons: (
+            <Button className={classes.checkAvailabilityBtn} color='success'>
+              Check Availability
+            </Button>
+          ),
         })}
     </React.Fragment>
   )

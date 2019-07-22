@@ -27,6 +27,9 @@ const styles = (theme) => ({
   cardContent: {
     padding: `0px ${16}px !important`,
   },
+  row: {
+    marginBottom: theme.spacing(3),
+  },
   footerContent: {
     paddingRight: `${theme.spacing.unit * 2}px !important`,
     paddingTop: `${theme.spacing.unit * 2}px !important`,
@@ -120,7 +123,7 @@ class NewVisit extends PureComponent {
             <PatientInfoCard />
           </GridItem>
           <GridItem container xs md={9} className={classes.formContent}>
-            <GridItem xs md={12} container>
+            <GridItem xs md={12} container className={classes.row}>
               <GridItem xs d={6} className={classes.cardContent}>
                 <VisitInfoCard />
               </GridItem>
@@ -128,7 +131,7 @@ class NewVisit extends PureComponent {
                 <VitalSignCard />
               </GridItem>
             </GridItem>
-            <GridItem xs md={12} container>
+            <GridItem xs md={12} container className={classes.row}>
               <GridItem xs md={6} className={classes.cardContent}>
                 <SchemesCard />
               </GridItem>
@@ -137,10 +140,11 @@ class NewVisit extends PureComponent {
               </GridItem>
             </GridItem>
             <GridItem xs md={12} container>
-              <GridItem xs md={6} className={classes.cardContent}>
+              <GridItem xs md={12} className={classes.cardContent}>
                 <ParticipantCard />
               </GridItem>
             </GridItem>
+
             <GridItem
               container
               justify='flex-end'

@@ -208,6 +208,7 @@ const generateDoctorBlock = () => {
       resourceId: '0',
       eventType: 'vacation',
       visitStatus: 'APPOINTMENT',
+      hasConflict: i === max - 1,
     }
     data.push(doctorBlock)
   }
