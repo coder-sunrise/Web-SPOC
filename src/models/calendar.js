@@ -133,6 +133,7 @@ export default createListViewModel({
         }
 
         if (deleted) {
+          console.log({ deleted })
           newCalendarEvents = newCalendarEvents.reduce(
             (events, e) =>
               e._appointmentID === deleted
@@ -145,8 +146,10 @@ export default createListViewModel({
                   ],
             [],
           )
+          console.log({ newCalendarEvents })
         }
-        return { ...state, calendarEvents: newCalendarEvents }
+        return { ...state }
+        // return { ...state, calendarEvents: newCalendarEvents }
       },
       // updateEventListing (state, { added, edited, deleted }) {
       //   const { calendarEvents } = state

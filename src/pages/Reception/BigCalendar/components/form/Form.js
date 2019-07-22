@@ -364,7 +364,7 @@ class Form extends React.PureComponent {
             onConfirm={this.onConfirmCancelAppointment}
             maxWidth='sm'
           >
-            <DeleteConfirmation />
+            <DeleteConfirmation isSeries={values.series} />
           </CommonModal>
           <CommonModal
             open={showSeriesUpdateConfirmation}
