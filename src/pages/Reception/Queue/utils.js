@@ -8,6 +8,12 @@ export const filterData = (filter, data) => {
   return newData
 }
 
+export const filterDoctorBlock = (data) => {
+  return data.filter(
+    (eachRow) => eachRow.isDoctorEvent === undefined || !eachRow.isDoctorEvent,
+  )
+}
+
 export const getStatisticCount = (type, data) => {
   const filteredData = filterData(type, data)
 

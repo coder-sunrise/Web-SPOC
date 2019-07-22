@@ -169,6 +169,7 @@ const generateAppointmentData = () => {
       appointmentDate: appointmentDate[i % max],
       bookedBy: 'medisys',
       appointmentResources: appointmentResources[i],
+      visitStatus: 'APPOINTMENT',
     }
     data.push(appointment)
   }
@@ -206,6 +207,7 @@ const generateDoctorBlock = () => {
       isDoctorEvent: true,
       resourceId: '0',
       eventType: 'vacation',
+      visitStatus: 'APPOINTMENT',
     }
     data.push(doctorBlock)
   }
