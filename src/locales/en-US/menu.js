@@ -91,6 +91,8 @@ export default {
   'menu.setting.clinicSetting': 'Clinic Setting',
   'menu.setting.systemSetting': 'System Setting',
   'menu.setting.printSetting': 'Print Setting',
+  'menu.setting.userprofile': 'User Profile',
+  'menu.setting.userrole': 'User Role',
   'menu.claimSubmission': 'Claim Submission',
   'menu.claimSubmission.chas': 'CHAS',
   'menu.claimSubmission.medisave': 'Medisave',

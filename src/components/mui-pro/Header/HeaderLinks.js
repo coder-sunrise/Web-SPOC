@@ -286,6 +286,12 @@ class HeaderLinks extends React.Component {
                         My Account
                       </MenuItem>
                       <MenuItem
+                        onClick={this.handleClose('ChangePassword')}
+                        className={dropdownItem}
+                      >
+                        Change Password
+                      </MenuItem>
+                      <MenuItem
                         onClick={this.handleClose('Account', this.logout)}
                         className={dropdownItem}
                       >

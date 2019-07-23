@@ -410,6 +410,16 @@ const routes = [
             name: 'doctorblock',
             component: './Setting/DoctorBlock',
           },
+          {
+            path: '/setting/userprofile',
+            name: 'userprofile',
+            component: './Setting/UserProfile',
+          },
+          {
+            path: '/setting/userrole',
+            name: 'userrole',
+            component: './Setting/UserRole',
+          },
         ],
       },
       // Settings

@@ -126,7 +126,7 @@ class BasicLayout extends React.PureComponent {
 
     let sessionTimeOutTimer = null
     const resetSessionTimeOut = (e) => {
-      console.log(e)
+      // console.log(e)
       clearTimeout(sessionTimeOutTimer)
       sessionTimeOutTimer = setTimeout(() => {
         dispatch({
