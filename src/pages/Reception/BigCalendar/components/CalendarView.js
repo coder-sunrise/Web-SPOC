@@ -32,6 +32,15 @@ const styles = () => ({
       backgroundColor: doctorEventColorOpts.activeColor,
     },
   },
+  calendarHolidayLabel: {
+    paddingLeft: 4,
+    float: 'left',
+    textAlign: 'left',
+    maxWidth: '75%',
+    fontSize: '0.9rem',
+    fontWeight: '450',
+    color: '#6f6f6f',
+  },
   ...AppointmentTypeAsColor,
 })
 
@@ -79,6 +88,26 @@ class CalendarView extends React.PureComponent {
     }
   }
 
+  _customSlotPropGetter = (date) => {
+    const { calendarView } = this.state
+    if (
+      calendarView === BigCalendar.Views.MONTH &&
+      (date.getDate() === 7 ||
+        date.getDate() === 17 ||
+        date.getDate() === 19 ||
+        date.getDate() === 28)
+    )
+      return {
+        className: 'calendar-holiday',
+        style: {
+          '&::before': {
+            content: 'test 123',
+          },
+        },
+      }
+    return {}
+  }
+
   _jumpToDate = (date) => {
     this.setState({ displayDate: date })
   }
@@ -88,9 +117,7 @@ class CalendarView extends React.PureComponent {
   }
 
   _moveEvent = ({ event, start, end, resourceId }) => {
-    const { calendarEvents: events, handleMoveEvent } = this.props
-
-    const idx = events.indexOf(event)
+    const { handleMoveEvent } = this.props
     const { id, _appointmentID } = event
 
     const resourceID = resourceId !== undefined ? resourceId : event.resourceId
@@ -120,6 +147,32 @@ class CalendarView extends React.PureComponent {
     return <Event {...eventProps} handleMouseOver={handleEventMouseOver} />
   }
 
+  MonthDateHeader = ({
+    date,
+    onDrillDown,
+    label,
+    // ***unused props provided by dependencies***
+    // drillDownView,
+    // isOffRange,
+  }) => {
+    const { classes } = this.props
+    let holidayLabel = ''
+    if (
+      date.getDate() === 7 ||
+      date.getDate() === 17 ||
+      date.getDate() === 19 ||
+      date.getDate() === 28
+    ) {
+      holidayLabel = 'Public Holiday'
+    }
+    return (
+      <div>
+        <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>
+        <a onClick={onDrillDown}>{label}</a>
+      </div>
+    )
+  }
+
   render () {
     const {
       // --- event handlers ---
@@ -137,8 +190,12 @@ class CalendarView extends React.PureComponent {
     return (
       <DragAndDropCalendar
         components={{
+          // https://github.com/intljusticemission/react-big-calendar/blob/master/src/Calendar.js
           toolbar: this.Toolbar,
           event: this.Event,
+          month: {
+            dateHeader: this.MonthDateHeader,
+          },
         }}
         localizer={localizer}
         date={displayDate}
@@ -167,11 +224,11 @@ class CalendarView extends React.PureComponent {
         onEventDrop={this._moveEvent}
         onView={this._onViewChange}
         eventPropGetter={this._eventColors}
+        dayPropGetter={this._customSlotPropGetter}
         onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}
         onDoubleClickEvent={handleDoubleClick}
         onDragStart={handleOnDragStart}
-
         // --- event handlers ---
       />
     )

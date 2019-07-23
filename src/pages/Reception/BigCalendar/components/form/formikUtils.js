@@ -72,20 +72,16 @@ const initDailyRecurrence = {
 }
 
 export const mapPropsToValues = ({ slotInfo }) => {
-  const startDate = moment(slotInfo.start).format(_dateFormat)
-
-  const bookedBy = 'medisys'
-  console.log({ slotInfo })
   return {
     ...initialAptInfo,
     ...slotInfo,
     ...initDailyRecurrence,
-    appointmentDate: startDate,
+    appointmentDate: moment(slotInfo.start).format(_dateFormat),
     // startDate,
     // startTime,
     // endDate,
     // endTime,
-    bookedBy,
+    bookedBy: 'medisys', // TODO: connect to user model in the future
   }
 }
 
