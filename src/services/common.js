@@ -2,8 +2,6 @@ import request from '@/utils/request'
 import { getUniqueGUID, convertToQuery } from '@/utils/utils'
 
 export async function queryList (url, params, convertExcludeFields) {
-  // //console.log('queryList', url)
-
   // //console.log('querylist')
   // console.log(params)
   return request(url, {
@@ -27,7 +25,6 @@ export async function remove (url, params) {
 }
 
 export async function query (url, params) {
-  // //console.log('query', url)
   if (params.id) {
     return request(`${url}/${params.id}`, {
       method: 'GET',

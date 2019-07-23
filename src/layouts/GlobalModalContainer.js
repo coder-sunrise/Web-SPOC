@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import qs from 'query-string'
 import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
+import { ChangePassword } from 'medisys-components'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
 
@@ -75,6 +76,30 @@ class GlobalModalContainer extends PureComponent {
         >
           <PatientDetail {...this.props} />
           {/* {global.currentPatientId} */}
+        </CommonModal>
+
+        <CommonModal
+          title='Change Password'
+          open={global.showChangePasswordModal}
+          onClose={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showChangePasswordModal: false,
+              },
+            })
+          }}
+          onConfirm={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showChangePasswordModal: false,
+              },
+            })
+          }}
+          maxWidth='sm'
+        >
+          <ChangePassword />
         </CommonModal>
 
         <CommonModal

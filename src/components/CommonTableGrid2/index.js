@@ -515,7 +515,7 @@ class CommonTableGrid2 extends React.Component {
     if (containerComponent) {
       pagerConfig.containerComponent = containerComponent
     }
-    console.log(this.props)
+    // console.log(this.props)
     // console.log(
     //   filter,
     //   grouping,

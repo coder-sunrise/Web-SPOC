@@ -187,8 +187,6 @@ class DetailsGrid extends PureComponent {
         ? filterDoctorBlock(flattenedCalendarData)
         : filterData(currentFilter, queueListing)
 
-    console.log({ data })
-
     return (
       <CommonTableGrid2
         height={600}

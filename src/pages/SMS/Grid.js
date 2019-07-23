@@ -125,6 +125,7 @@ const Grid = ({ showSMSHistory, list, dispatch }) => {
   }
 
   const TableCell = (p) => Cell({ ...p, dispatch })
+
   const ActionProps = { TableCellComponent: TableCell }
 
   return (
