@@ -137,10 +137,11 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onSelectSlot = () => {
+  onSelectSlot = ({ start }) => {
     let hour = {
       _appointmentID: getUniqueGUID(),
       allDay: false,
+      start,
       // start: event.start,
       // end: event.end,
       type: 'add',
