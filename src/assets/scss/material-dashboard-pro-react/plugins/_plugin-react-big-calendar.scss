@@ -70,18 +70,19 @@ button.rbc-input::-moz-focus-inner {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 3px;
-  text-align: right;
+  text-align: center;
   vertical-align: middle;
   font-weight: bold;
   font-size: 1rem;
   min-height: 0;
   border-bottom: 1px solid #ddd;
-  color: #999999;
-  &:last-child {
-    span {
-      padding-right: 15px;
-    }
-  }
+  color: #9e9e9e;
+  // color: #2b2b2b;
+  // &:last-child {
+  //   span {
+  //     // padding-right: 15px;
+  //   }
+  // }
 }
 .rbc-header > a,
 .rbc-header > a:active,
@@ -540,6 +541,7 @@ button.rbc-input::-moz-focus-inner {
   box-sizing: content-box;
   width: 100%;
   position: relative;
+  display: none;
 }
 .rbc-time-view .rbc-allday-events {
   position: relative;
@@ -577,7 +579,7 @@ button.rbc-input::-moz-focus-inner {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  min-width: 0;
+  // min-width: 0;
   -webkit-flex-direction: column;
   -ms-flex-direction: column;
   flex-direction: column;
@@ -614,8 +616,10 @@ button.rbc-input::-moz-focus-inner {
   border-left-width: 0;
   border-right: 1px solid #ddd;
 }
+
 .rbc-time-content > .rbc-day-slot {
   width: 100%;
+
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
@@ -695,3 +699,39 @@ button.rbc-input::-moz-focus-inner {
 .rbc-addons-dnd-resize-ew-anchor {
   display: none;
 }
+
+.rbc-time-view-resources .rbc-header,
+.rbc-time-view-resources .rbc-day-bg {
+  width: 140px;
+  -ms-flex: 1 1;
+  flex: 1 1;
+  -ms-flex-preferred-size: 0 px;
+  flex-basis: 0 px;
+}
+
+.rbc-time-view-resources .rbc-time-gutter,
+.rbc-time-view-resources .rbc-time-header-gutter {
+  position: -webkit-sticky;
+  position: sticky;
+  left: 0;
+  background-color: white;
+  border-right: 1px solid #ddd;
+  z-index: 10;
+  margin-right: -1px;
+}
+
+.rbc-time-view-resources .rbc-time-header {
+  overflow: hidden;
+}
+
+.rbc-time-view-resources .rbc-day-slot {
+  min-width: 140px;
+}
+
+.rbc-time-header-content + .rbc-time-header-content {
+  margin-left: -1px;
+}
+
+// .rbc-time-header-cell {
+//   color: #979797;
+// }

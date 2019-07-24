@@ -7,7 +7,11 @@ import { Button, GridContainer, GridItem } from '@/components'
 
 import style from './style'
 
-const ConfirmText = {
+const ButtonText = {
+  DELETE: 'Delete',
+  CANCEL: 'Cancel',
+  CHECK: 'Check Availability',
+  DRAFT: 'Save Draft',
   ADD: 'Save Appointment',
   EDIT: 'Reschedule Appointment',
 }
@@ -15,7 +19,9 @@ const ConfirmText = {
 const FormFooter = ({
   classes,
   isNew,
+  isDraft,
   onCancelAppointmentClick,
+  onSaveDraftClick,
   onClose,
   onConfirmClick,
 }) => {
@@ -23,7 +29,7 @@ const FormFooter = ({
     [classes.hideCancelAppointmentBtn]: isNew,
   }
 
-  const confirmBtnText = isNew ? ConfirmText.ADD : ConfirmText.EDIT
+  const confirmBtnText = isNew || isDraft ? ButtonText.ADD : ButtonText.EDIT
 
   return (
     <div className={classnames(classes.footer)}>
@@ -34,18 +40,22 @@ const FormFooter = ({
             className={classnames(hideCancelAppointmentClass)}
             onClick={onCancelAppointmentClick}
           >
-            Cancel Appointment
+            {ButtonText.DELETE}
           </Button>
         </GridItem>
 
         <GridItem xs md={8} container justify='flex-end'>
           <Button color='success' disabled>
-            Check Availability
+            {ButtonText.CHECK}
           </Button>
           <Button onClick={onClose} color='danger'>
-            Cancel
+            {ButtonText.CANCEL}
           </Button>
-
+          {isDraft && (
+            <Button onClick={onSaveDraftClick} color='info'>
+              {ButtonText.DRAFT}
+            </Button>
+          )}
           <Button onClick={onConfirmClick} color='primary'>
             {confirmBtnText}
           </Button>

@@ -42,6 +42,20 @@ const styles = (theme) => ({
   ...AppointmentTypeAsColor,
 })
 
+export const flattenAppointmentDateToCalendarEvents = (marshal, event) =>
+  event.isDoctorEvent
+    ? [
+        ...marshal,
+        event,
+      ]
+    : [
+        ...marshal,
+        ...event.appointmentResources.map((appointment) => {
+          const { appointmentResources, ...restEvent } = event
+          return { ...restEvent, ...appointment }
+        }),
+      ]
+
 @connect(({ calendar }) => ({ calendar }))
 class Appointment extends React.PureComponent {
   state = {
@@ -112,6 +126,9 @@ class Appointment extends React.PureComponent {
   }
 
   moveEvent = ({ updatedEvent, id, _appointmentID }) => {
+    this.setState({
+      isDragging: false,
+    })
     this._dispatchAction({
       action: CalendarActions.MoveEvent,
       updatedEvent,
@@ -204,14 +221,11 @@ class Appointment extends React.PureComponent {
     this.setState({ showDoctorEventModal: !showDoctorEventModal })
   }
 
-  addDoctorEvent = (newDoctorEvent) => {
-    const { calendar: { calendarEvents } } = this.props
-
-    const doctorBlock = { id: getUniqueGUID(), ...newDoctorEvent }
+  updateDoctorEvent = (doctorEvent) => {
     this._dispatchAction(
       {
         action: CalendarActions.UpdateDoctorEvent,
-        added: doctorBlock,
+        ...doctorEvent,
       },
       () => {
         this.setState({
@@ -257,15 +271,8 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     const { calendarEvents } = CalendarModel
-    const marshalData = calendarEvents.reduce(
-      (marshal, event) => [
-        ...marshal,
-        ...event.appointmentResources.map((appointment) => {
-          if (event.isDoctorEvent) return { event }
-          const { appointmentResources, ...restEvent } = event
-          return { ...restEvent, ...appointment }
-        }),
-      ],
+    const flattenedCalendarData = calendarEvents.reduce(
+      flattenAppointmentDateToCalendarEvents,
       [],
     )
 
@@ -298,7 +305,7 @@ class Appointment extends React.PureComponent {
         />
         <div style={{ marginTop: 16 }}>
           <CalendarView
-            calendarEvents={applyFilter(marshalData, filter)}
+            calendarEvents={applyFilter(flattenedCalendarData, filter)}
             resources={resources}
             handleSelectSlot={this.onSelectSlot}
             handleSelectEvent={this.onSelectEvent}
@@ -333,7 +340,8 @@ class Appointment extends React.PureComponent {
           maxWidth='sm'
         >
           <DoctorBlockForm
-            handleAddDoctorEvent={this.addDoctorEvent}
+            initialProps={selectedSlot}
+            handleUpdateDoctorEvent={this.updateDoctorEvent}
             validationSchema={DoctorFormValidation}
           />
         </CommonModal>

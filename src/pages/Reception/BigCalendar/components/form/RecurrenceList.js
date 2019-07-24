@@ -104,10 +104,22 @@ const joinWeekDays = (selectedDays) => {
 }
 
 const formatRecurrenceLabel = (
-  { recurrencePattern, every, day: dayOfMonth, days: weekdays = [], startDate },
+  {
+    recurrencePattern,
+    every,
+    day: dayOfMonth,
+    days: weekdays = [],
+    appointmentDate,
+    eventDate: doctorBlockStartDate,
+  },
   rule,
 ) => {
   let result = ''
+
+  const startDate =
+    appointmentDate === undefined
+      ? moment(doctorBlockStartDate).format(_dateFormat)
+      : appointmentDate
 
   let until = ''
   if (rule.options.until == null) {
@@ -118,6 +130,19 @@ const formatRecurrenceLabel = (
     const parsedDate = moment(rule.options.until)
     until = parsedDate.format(_dateFormat)
   }
+
+  if (recurrencePattern === RECURRENCE_PATTERN.DAILY && !every) return ''
+
+  if (
+    recurrencePattern === RECURRENCE_PATTERN.WEEKLY &&
+    (!every || weekdays.length === 0)
+  )
+    return ''
+  if (
+    recurrencePattern === RECURRENCE_PATTERN.MONTHLY &&
+    (!every || !dayOfMonth)
+  )
+    return ''
 
   const plural = every > 1 ? 's' : ''
   switch (recurrencePattern) {
@@ -140,13 +165,13 @@ const formatRecurrenceLabel = (
   return result
 }
 
-const RecurrenceList = ({ values, isDoctorBlock }) => {
+const RecurrenceList = ({ values, isDoctorBlock, ...restProps }) => {
   const rule = getRRule(values, isDoctorBlock)
   const label = rule !== undefined ? formatRecurrenceLabel(values, rule) : ''
 
   return (
-    <div>
-      <h5>{label}</h5>
+    <div {...restProps}>
+      <span>{label}</span>
     </div>
   )
 }
