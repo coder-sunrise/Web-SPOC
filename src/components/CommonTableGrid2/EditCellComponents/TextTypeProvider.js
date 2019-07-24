@@ -105,11 +105,7 @@ const TextFormatter = (columnExtensions) =>
       )
     },
     (prevProps, nextProps) => {
-      return (
-        prevProps === nextProps ||
-        prevProps.value === nextProps.value ||
-        this.props.commitCount !== nextProps.commitCount
-      )
+      return prevProps === nextProps || prevProps.value === nextProps.value
     },
   )
 
@@ -129,7 +125,8 @@ class TextTypeProvider extends React.Component {
   }
 
   shouldComponentUpdate = (nextProps, nextState) =>
-    this.props.editingRowIds !== nextProps.editingRowIds
+    this.props.editingRowIds !== nextProps.editingRowIds ||
+    this.props.commitCount !== nextProps.commitCount
 
   render () {
     const { columnExtensions } = this.props

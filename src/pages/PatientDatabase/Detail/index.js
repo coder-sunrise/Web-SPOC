@@ -41,7 +41,7 @@ const _multiples = [2,7,6,5,4,3,2]
 Yup.addMethod(Yup.string, 'NRIC', function (message) {
   return this.test('isValidNRIC', message, function (value = '') {
     const { parent, createError } = this
-    const { patientAccountNoTypeFK } = parent
+    const { patientAccountNoTypeFK, dob } = parent
 
     const firstChar = value[0] || ''
     const lastChar = value[value.length - 1] || ''
@@ -75,7 +75,7 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
     }
     if (value.length !== 9)
       return createError({
-        message: 'Account No. must be 9 digits',
+        message: 'Account number must be 9 digits',
       })
     value = value.toUpperCase()
 
@@ -83,7 +83,7 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
 
     if (!new RegExp(/^\d+$/).test(numericNRICString))
       return createError({
-        message: 'The format is wrong',
+        message: ' Invalid account number structure',
       })
     let numberNRIC = Number(numericNRICString)
     let total = 0
@@ -95,10 +95,46 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
     }
     if (total % 11 > outputChars.length - 1)
       return createError({
-        message: 'The format is wrong',
+        message: ' Invalid account number structure',
       })
 
-    return lastChar === outputChars[total % 11]
+    if (dob) {
+      switch (patientAccountNoTypeFK) {
+        case 5:
+        case 6:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+          // nric
+          const mDob = moment(dob)
+          if (mDob.year() >= 2000) {
+            if (firstChar !== 'T') {
+              return createError({
+                message: 'Invalid date of birth',
+              })
+            }
+          } else if (firstChar !== 'S') {
+            return createError({
+              message: 'Invalid date of birth',
+            })
+          }
+          if (
+            patientAccountNoTypeFK === 13 &&
+            Math.abs(mDob.diff(moment(), 'year')) >= 15
+          ) {
+            return createError({
+              message:
+                'For Singaporean age 15 and above, please choose others than SG Birth Cert',
+            })
+          }
+          break
+
+        default:
+          return true
+      }
+    }
+    return true
   })
 })
 
