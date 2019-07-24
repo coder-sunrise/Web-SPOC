@@ -16,11 +16,10 @@ export default createListViewModel({
     effects: {
       *fetchUserProfileByID ({ id }, { call, put }) {
         const response = yield call(service.fetchUserProfileByID, id)
-        const { data, status } = response
+        const { data = {}, status } = response
 
         return yield put({
           type: 'updateCurrentSelected',
-          showUserProfileModal: status === 200,
           userProfile: { ...data },
         })
       },
@@ -36,11 +35,11 @@ export default createListViewModel({
           currentSelectedUser: {},
         }
       },
-      updateCurrentSelected (state, { showUserProfileModal, userProfile }) {
+      updateCurrentSelected (state, { userProfile }) {
         return {
           ...state,
+          showUserProfileModal: !!userProfile,
           currentSelectedUser: { ...userProfile },
-          showUserProfileModal,
         }
       },
     },

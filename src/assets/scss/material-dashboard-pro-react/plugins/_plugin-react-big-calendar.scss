@@ -28,6 +28,8 @@ button.rbc-input::-moz-focus-inner {
   -webkit-align-items: stretch;
   -ms-flex-align: stretch;
   align-items: stretch;
+  min-height: 80vh;
+  // max-height: 80vh;
 }
 .rbc-calendar *,
 .rbc-calendar *:before,
@@ -251,6 +253,8 @@ button.rbc-input::-moz-focus-inner {
   height: 100%;
   border-left: none;
   border-right: none;
+  // max-height: 75vh;
+  // overflow: auto;
 }
 .rbc-month-view {
   border-top: none;
@@ -604,6 +608,17 @@ button.rbc-input::-moz-focus-inner {
   overflow-y: auto;
   position: relative;
 }
+
+// .rbc-day-slot.rbc-time-column:nth-child(14n + 2),
+// .rbc-day-slot.rbc-time-column:nth-child(14n + 3),
+// .rbc-day-slot.rbc-time-column:nth-child(14n + 4),
+// .rbc-day-slot.rbc-time-column:nth-child(14n + 5),
+// .rbc-day-slot.rbc-time-column:nth-child(14n + 6),
+// .rbc-day-slot.rbc-time-column:nth-child(14n + 7),
+// .rbc-day-slot.rbc-time-column:nth-child(14n + 8) {
+//   background: $brand-primary-hover;
+// }
+
 .rbc-time-content > .rbc-time-gutter {
   -webkit-flex: none;
   -ms-flex: none;

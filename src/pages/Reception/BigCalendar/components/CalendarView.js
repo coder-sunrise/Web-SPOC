@@ -88,7 +88,7 @@ class CalendarView extends React.PureComponent {
     }
   }
 
-  _customSlotPropGetter = (date) => {
+  _customDayPropGetter = (date) => {
     const { calendarView } = this.state
     if (
       calendarView === BigCalendar.Views.MONTH &&
@@ -106,6 +106,11 @@ class CalendarView extends React.PureComponent {
         },
       }
     return {}
+  }
+
+  _customSlotPropGetter = (props) => {
+    console.log({ props })
+    return props.child
   }
 
   _jumpToDate = (date) => {
@@ -224,7 +229,7 @@ class CalendarView extends React.PureComponent {
         onEventDrop={this._moveEvent}
         onView={this._onViewChange}
         eventPropGetter={this._eventColors}
-        dayPropGetter={this._customSlotPropGetter}
+        dayPropGetter={this._customDayPropGetter}
         onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}
         onDoubleClickEvent={handleDoubleClick}
