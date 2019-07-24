@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import router from 'umi/router'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -11,8 +12,8 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   CardContainer,
-  CommonModal,
   CommonTableGrid2,
+  CommonModal,
   GridContainer,
   GridItem,
   Select,
@@ -21,7 +22,7 @@ import {
 } from '@/components'
 // sub component
 import UserProfileForm from './UserProfileForm'
-import { dummyData, UserProfileTableConfig } from './const'
+import { UserProfileTableConfig } from './const'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -49,8 +50,8 @@ class UserProfile extends React.Component {
   }
 
   handleActionButtonClick = (event) => {
-    const { dispatch } = this.props
     const { currentTarget } = event
+    const { dispatch } = this.props
     dispatch({
       type: 'settingUserProfile/fetchUserProfileByID',
       id: currentTarget.id,
@@ -79,13 +80,6 @@ class UserProfile extends React.Component {
 
   TableCell = (p) => this.Cell({ ...p })
 
-  closeModal = () => {
-    this.props.dispatch({ type: 'settingUserProfile/closeModal' })
-  }
-
-  openModal = () =>
-    this.props.dispatch({ type: 'settingUserProfile/openModal' })
-
   handleSearchClick = () => {
     const { dispatch, values } = this.props
     const prefix = 'like_'
@@ -105,6 +99,22 @@ class UserProfile extends React.Component {
       payload: {
         showChangePasswordModal: true,
       },
+    })
+  }
+
+  onAddNewClick = () => {
+    router.push('/setting/userprofile/new')
+  }
+
+  openModal = () => {
+    this.props.dispatch({
+      type: 'settingUserProfile/openModal',
+    })
+  }
+
+  closeModal = () => {
+    this.props.dispatch({
+      type: 'settingUserProfile/closeModal',
     })
   }
 
@@ -162,15 +172,15 @@ class UserProfile extends React.Component {
         </GridContainer>
         <CommonModal
           title={
-            currentSelectedUser.userName ? (
-              'Edit User Profile'
-            ) : (
+            Object.entries(currentSelectedUser).length === 0 ? (
               'Add User Profile'
+            ) : (
+              'Edit User Profile'
             )
           }
           open={showUserProfileModal}
-          onClose={this.closeModal}
           onConfirm={this.closeModal}
+          onClose={this.closeModal}
         >
           <UserProfileForm
             selectedUser={currentSelectedUser}

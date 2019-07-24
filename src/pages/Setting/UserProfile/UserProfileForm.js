@@ -1,7 +1,7 @@
 import React from 'react'
 import * as Yup from 'yup'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField, Field, withFormik } from 'formik'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 import Key from '@material-ui/icons/VpnKey'
@@ -18,11 +18,21 @@ import {
 } from '@/components'
 
 const styles = (theme) => ({
+  container: {
+    marginBottom: theme.spacing(2),
+  },
   verticalSpacing: {
     marginTop: theme.spacing(2),
     '& > h4': {
       fontWeight: 500,
     },
+    marginBottom: theme.spacing(1.5),
+  },
+  isDoctorCheck: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    zIndex: 99,
   },
 })
 
@@ -37,12 +47,16 @@ const UserProfileForm = ({
   const isEdit = selectedUser.userName !== undefined
   return (
     <React.Fragment>
-      <GridContainer alignItems='center'>
+      <GridContainer alignItems='center' className={classes.container}>
+        <GridItem md={12} className={classes.verticalSpacing}>
+          <h4>Login Info</h4>
+          <Divider />
+        </GridItem>
         <GridItem md={6}>
           <FastField
             name='userName'
             render={(args) => (
-              <TextField {...args} label='User Login ID' disabled={isEdit} />
+              <TextField {...args} label='Username' disabled={isEdit} />
             )}
           />
         </GridItem>
@@ -69,6 +83,11 @@ const UserProfileForm = ({
           </GridItem>
         )}
 
+        <GridItem md={12} className={classes.verticalSpacing}>
+          <h4>Profile</h4>
+          <Divider />
+        </GridItem>
+
         <GridItem md={6}>
           <FastField
             name='name'
@@ -85,18 +104,6 @@ const UserProfileForm = ({
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name='phoneNumber'
-            render={(args) => <TextField {...args} label='Contact No.' />}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='email'
-            render={(args) => <TextField {...args} label='Email' />}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
             name='userAccountNo'
             render={(args) => (
               <TextField {...args} label='User Account No.' disabled={isEdit} />
@@ -106,9 +113,41 @@ const UserProfileForm = ({
         <GridItem md={6}>
           <FastField
             name='isDoctor'
-            render={(args) => <Checkbox {...args} label='Is Doctor' />}
+            render={(args) => <Checkbox {...args} label='Is Doctor' simple />}
           />
         </GridItem>
+        <GridItem md={6}>
+          <FastField
+            name='phoneNumber'
+            render={(args) => <TextField {...args} label='Contact No.' />}
+          />
+        </GridItem>
+        <GridItem md={6} style={{ position: 'relative' }}>
+          {/* <div className={classes.isDoctorCheck}>
+            <FastField
+              name='isDoctor'
+              render={(args) => <Checkbox {...args} label='Is Doctor' simple />}
+            />
+            </div> */}
+          <Field
+            name='mcrNo'
+            render={(args) => (
+              <TextField
+                {...args}
+                label='Doctor MCR No.'
+                disabled={!values.isDoctor}
+              />
+            )}
+          />
+        </GridItem>
+
+        <GridItem md={6}>
+          <FastField
+            name='email'
+            render={(args) => <TextField {...args} label='Email' />}
+          />
+        </GridItem>
+
         <GridItem md={6}>
           <FastField
             name='genderFk'
@@ -117,30 +156,27 @@ const UserProfileForm = ({
             )}
           />
         </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='mcrNo'
-            render={(args) => <TextField {...args} label='Doctor MCR No.' />}
-          />
-        </GridItem>
+
         <GridItem md={6}>
           <FastField
             name='dob'
             render={(args) => <DatePicker {...args} label='Date Of Birth' />}
           />
         </GridItem>
+
+        <GridItem md={6}>
+          <FastField
+            name='designation'
+            render={(args) => <TextField {...args} label='Designation' />}
+          />
+        </GridItem>
+
         <GridItem md={6}>
           <FastField
             name='effectiveStartDate'
             render={(args) => (
               <DatePicker {...args} label='Effective Start Date' />
             )}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='designation'
-            render={(args) => <TextField {...args} label='Designation' />}
           />
         </GridItem>
         <GridItem md={6}>
@@ -162,17 +198,17 @@ const UserProfileForm = ({
           />
         </GridItem>
       </GridContainer>
-
       {footer &&
         footer({
-          confirmBtnText: 'Save',
           onConfirm: handleSubmit,
+          confirmBtnText: isEdit ? 'Save' : 'Add',
         })}
     </React.Fragment>
   )
 }
 
 export default withFormik({
+  enableReinitialize: true,
   validationSchema: Yup.object().shape({
     userLoginID: Yup.string().required('Login ID is a required field'),
     password: Yup.string().required('Password is a required field'),

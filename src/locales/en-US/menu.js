@@ -92,6 +92,8 @@ export default {
   'menu.setting.systemSetting': 'System Setting',
   'menu.setting.printSetting': 'Print Setting',
   'menu.setting.userprofile': 'User Profile',
+  'menu.setting.newuserprofile': 'Add User Profile',
+  'menu.setting.edituserprofile': 'Edit User Profile',
   'menu.setting.userrole': 'User Role',
   'menu.claimSubmission': 'Claim Submission',
   'menu.claimSubmission.chas': 'CHAS',

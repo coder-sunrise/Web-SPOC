@@ -416,6 +416,16 @@ const routes = [
             component: './Setting/UserProfile',
           },
           {
+            path: '/setting/userprofile/new',
+            name: 'newuserprofile',
+            component: './Setting/UserProfile/Details',
+          },
+          {
+            path: '/setting/userprofile/:id',
+            name: 'edituserprofile',
+            component: './Setting/UserProfile/Details',
+          },
+          {
             path: '/setting/userrole',
             name: 'userrole',
             component: './Setting/UserRole',

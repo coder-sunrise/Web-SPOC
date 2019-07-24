@@ -64,6 +64,7 @@ const TableConfig = {
     'queueNo',
   ],
   columnExtensions: [
+    { columnName: 'queueNo', width: 60 },
     { columnName: 'visitStatus', type: 'status', width: 150 },
     { columnName: 'paymentMode', width: 150 },
     { columnName: 'patientName', width: 250 },
@@ -193,6 +194,7 @@ class DetailsGrid extends PureComponent {
         rows={data}
         ActionProps={ActionProps}
         {...TableConfig}
+        size='sm'
         FuncProps={FuncConfig}
       />
     )
