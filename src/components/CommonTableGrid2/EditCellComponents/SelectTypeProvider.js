@@ -98,7 +98,7 @@ class SelectEditor extends PureComponent {
 
 const SelectDisplay = (columnExtensions, state) => ({
   value,
-  column: { name: columnName },
+  column: { name: columnName, ...restColumn },
   ...restProps
 }) => {
   const cfg =
@@ -107,7 +107,7 @@ const SelectDisplay = (columnExtensions, state) => ({
     ) || {}
 
   if (value === undefined) return ''
-  const v =
+  let v =
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
   // console.log(cfg)

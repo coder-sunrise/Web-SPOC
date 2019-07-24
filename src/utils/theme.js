@@ -272,6 +272,7 @@ export const defaultTheme = createMuiTheme({
           overflowY: 'auto',
           overflowX: 'hidden',
           marginRight: 28,
+          marginBottom: '-9px',
         },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
           height: '25px',

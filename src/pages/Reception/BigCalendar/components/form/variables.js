@@ -50,10 +50,10 @@ export const AppointmentDataColumn = [
 export const AppointmentDataColExtensions = [
   {
     columnName: 'conflict',
-    type: 'none',
+    type: 'error',
     editingEnabled: false,
     disabled: true,
-    width: 80,
+    width: 60,
   },
   { columnName: 'timeFrom', type: 'time', format: 'hh:mm a' },
   { columnName: 'timeTo', type: 'time', format: 'hh:mm a' },
@@ -82,23 +82,6 @@ export const AppointmentDataColExtensions = [
   },
   { columnName: 'appointmentType', type: 'select' },
 ]
-
-const generateDummyAppointmentData = () => {
-  let data = []
-  for (let i = 0; i < 5; i++) {
-    data.push({
-      id: i,
-      doctor: 'cheah',
-      appointmentType: 'Check up',
-      timeFrom: moment().format('hh:mm a'),
-      timeTo: moment().format('hh:mm a'),
-      room: `Room ${i}`,
-    })
-  }
-  return data
-}
-
-export const DummyAppointmentData = generateDummyAppointmentData()
 
 export const _dateFormat = 'DD MMM YYYY'
 
