@@ -94,7 +94,7 @@ class SelectEditor extends PureComponent {
 
 const SelectDisplay = (columnExtensions, state) => ({
   value,
-  column: { name: columnName },
+  column: { name: columnName, ...restColumn },
   ...restProps
 }) => {
   const cfg =
@@ -103,10 +103,27 @@ const SelectDisplay = (columnExtensions, state) => ({
     ) || {}
 
   if (value === undefined) return ''
-  const v =
+  let v =
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
   // console.log(cfg)
+
+  if (cfg.mode === 'multiple') {
+    const selectedName = cfg.options.reduce(
+      (selected, option) =>
+        value.includes(option.value)
+          ? [
+              ...selected,
+              option.name,
+            ]
+          : [
+              ...selected,
+            ],
+      [],
+    )
+    v = { name: selectedName.join(', ') }
+  }
+
   if (v.colorValue) {
     return (
       <div>
@@ -137,6 +154,7 @@ const SelectDisplay = (columnExtensions, state) => ({
       </div>
     )
   }
+
   return <span>{v ? v.name : ''}</span>
 }
 

@@ -109,6 +109,12 @@ const appointmentResources = {
       doctor: 'medisys',
       resourceId: '0',
       appointmentType: AppointmentTypeOptions[2].value,
+      hasConflict: true,
+      conflicts: [
+        'The selected slot: 15 July 2019 7.30AM - 11.30AM is not within operating hour.',
+        'The selected slot: 15 July 2019 7.30AM - 11.30AM is not within operating hour.',
+        'The selected slot: 15 July 2019 7.30AM - 11.30AM is not within operating hour.',
+      ],
       // color: AppointmentTypeOptions[2].color,
     },
   ],
