@@ -395,6 +395,8 @@ class PatientDetail extends PureComponent {
           console.log(o)
           this.props.resetForm(o)
         })
+    } else {
+      this.props.validateForm()
     }
 
     // dispatch({

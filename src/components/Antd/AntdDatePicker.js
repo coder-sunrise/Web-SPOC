@@ -235,6 +235,8 @@ class AntdDatePicker extends PureComponent {
         inputComponent={this.getComponent}
         {...restProps}
         value={this.state.selectValue}
+        preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
       />
     )
   }

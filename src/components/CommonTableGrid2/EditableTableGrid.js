@@ -107,7 +107,7 @@ class EditableTableGrid extends PureComponent {
   _onCommitChanges = ({ added, changed, deleted }) => {
     const { EditingProps, rows, schema } = this.props
     const { onCommitChanges = (f) => f } = EditingProps
-    console.log(added, changed, deleted)
+    // console.log(added, changed, deleted)
     // this.setState({
 
     // })

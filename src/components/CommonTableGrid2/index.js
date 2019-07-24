@@ -654,7 +654,7 @@ class CommonTableGrid2 extends React.Component {
           }
         }),
     ])
-    console.log(errors, newColumExtensions)
+    // console.log(errors, newColumExtensions)
 
     const tableProps = {
       columnExtensions: newColumExtensions,
