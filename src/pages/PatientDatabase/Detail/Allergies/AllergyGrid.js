@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
+import moment from 'moment'
 import { PagingPanel } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import {
@@ -10,11 +12,13 @@ import {
 } from '@/components'
 import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
 
+@connect(({ user }) => ({
+  user,
+}))
 class AllergyGrid extends PureComponent {
   state = {
     editingRowIds: [],
     rowChanges: {},
-    patientAllergy:[]
   }
 
   constructor (props) {
@@ -23,107 +27,95 @@ class AllergyGrid extends PureComponent {
     const { state } = this
     const { title, titleChildren, dispatch, type } = props
 
-    this.titleComponent = (
-      <div style={{ position: 'relative' }}>
-        {title}
-        {titleChildren}
-      </div>
-    )
-
-    this.changeEditingRowIds = (editingRowIds) =>
-      this.setState({ editingRowIds })
-    this.changeRowChanges = (rowChanges) => {
-      console.log(rowChanges)
-      this.setState({ rowChanges })
+    this.tableParas = {
+      columns: [
+        {
+          name: type === 'Allergy' ? 'allergyFK' : 'allergyName',
+          title: 'Allergy Name',
+        },
+        { name: 'allergyReaction', title: 'Allergic Reaction' },
+        { name: 'onsetDate', title: 'Date' },
+        { name: 'patientAllergyStatusFK', title: 'Status' },
+      ],
+      columnExtensions: [
+        {
+          columnName: 'onsetDate',
+          type: 'date',
+        },
+        {
+          columnName: 'allergyFK',
+          type: 'codeSelect',
+          code: 'ctDrugAllergy',
+          label: 'Allergy Name',
+          autoComplete: true,
+          onChange: (val, option, row) => {
+            row.allergyCode = option.code || option.name
+            row.allergyName = option.name
+          },
+        },
+        {
+          columnName: 'allergyName',
+          onChange: (val, row) => {
+            row.allergyCode = val
+            row.allergyFK = 1 //
+          },
+        },
+        {
+          columnName: 'allergyReaction',
+          type: 'select',
+          label: 'Allergic Reaction',
+          options: [
+            { value: 'Allergy' },
+            { value: 'Adverse Drug Reaction' },
+            { value: 'Uncertain' },
+          ],
+          labelField: 'value',
+        },
+        {
+          columnName: 'patientAllergyStatusFK',
+          type: 'codeSelect',
+          code: 'ctPatientAllergyStatus',
+          label: 'Status',
+        },
+      ],
     }
-
-    this.onRowDoubleClick = (row) => {
-      if (!state.editingRowIds.find((o) => o === row.Id)) {
-        this.setState({
-          editingRowIds: state.editingRowIds.concat([
-            row.Id,
-          ]),
-        })
-      }
-
-    }
-
-    
-  this.setArrayValue = (items) => {
-    const { setArrayValue, validateForm } = this.props
-    setArrayValue(items)
-    //validateForm()
-  }
 
     this.commitChanges = ({ rows, added, changed, deleted }) => {
-      
-      rows = rows.map((o) => {
-        return {
-          type: type,
-          ...o,
-        }
-      }
-      )
-
-      this.setArrayValue(rows)
-      //this.props.onSaveClick(this.props.values)
+      console.log(rows)
+      this.props.setArrayValue(rows)
     }
-
-    
-
-    this.PagerContent = (me) => (p) => {
-      return (
-        <div style={{ position: 'relative' }}>
-          <div
-            style={{
-              position: 'absolute'
-            
-            }}
-          >
-          </div>
-          <PagingPanel.Container {...p} />
-        </div>
-      )
+    this.onAddedRowsChange = (addedRows) => {
+      return addedRows.map((row) => ({
+        onsetDate: moment(),
+        ...row,
+        confirmedByUserFK: props.user.data.id,
+        isConfirmed: true,
+        type,
+      }))
     }
   }
 
   render () {
     const { editingRowIds, rowChanges } = this.state
-    const {  type,values,isEditable,rows,tableParas } = this.props
-
-    const EditingProps = {
-      showAddCommand: true,
-      editingRowIds,
-      rowChanges,
-      onEditingRowIdsChange: this.changeEditingRowIds,
-      onRowChangesChange: this.changeRowChanges,
-      onCommitChanges: this.commitChanges,
-    }
+    const { type, values, isEditable, rows, schema } = this.props
 
     return (
-      // <CardContainer title={this.titleComponent} hideHeader>
-        <EditableTableGrid2
-          rows={rows}
-          onRowDoubleClick={this.onRowDoubleClick}
-          FuncProps={{
-            edit: isEditable,
-            pagerConfig: {
-              containerComponent: this.PagerContent(this),
-            },
-          }}
-          EditingProps={{
-            showAddCommand: isEditable,
-            showEditCommand: isEditable,
-            showDeleteCommand: isEditable,
-            editingRowIds: this.state.editingRowIds,
-            rowChanges: this.state.rowChanges,
-            onEditingRowIdsChange: this.changeEditingRowIds,
-            onRowChangesChange: this.changeRowChanges,
-            onCommitChanges: this.commitChanges,
-          }}
-          {...tableParas}
-        />
-      // </CardContainer>
+      <EditableTableGrid2
+        rows={rows}
+        schema={schema}
+        FuncProps={{
+          edit: isEditable,
+          pager: false,
+        }}
+        EditingProps={{
+          showAddCommand: isEditable,
+          showEditCommand: isEditable,
+          showDeleteCommand: isEditable,
+          onCommitChanges: this.commitChanges,
+          onAddedRowsChange: this.onAddedRowsChange,
+        }}
+        {...this.tableParas}
+      />
     )
   }
 }

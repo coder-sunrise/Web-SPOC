@@ -2,7 +2,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { FastField } from 'formik'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import debounce from 'lodash/debounce'
 import { TextField } from '@/components'
@@ -42,11 +42,24 @@ class TextEditorBase extends PureComponent {
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
     // console.log(cfg)
-    const { validationSchema, isDisabled = () => false, ...restConfig } = cfg
+    const {
+      validationSchema,
+      isDisabled = () => false,
+      onChange,
+      ...restConfig
+    } = cfg
     const submitValue = (e) => {
+      const error = updateCellValue(
+        this.props,
+        this.myRef.current,
+        e.target.value,
+      )
       this.setState({
-        error: updateCellValue(this.props, this.myRef.current, e.target.value),
+        error,
       })
+      if (!error) {
+        if (onChange) onChange(e.target.value, row)
+      }
     }
     return (
       <div ref={this.myRef}>
@@ -54,7 +67,7 @@ class TextEditorBase extends PureComponent {
           showErrorIcon
           noWrapper
           defaultValue={value}
-          onBlur={submitValue}
+          onChange={submitValue}
           disabled={isDisabled(row)}
           // onCommit={submitValue}
           // onChange={submitValue}
@@ -76,7 +89,6 @@ const TextFormatter = (columnExtensions) =>
             currentColumnName === columnName,
         ) || {}
       const { type, render, ...restProps } = cfg
-
       if (render) {
         return render(row)
       }
@@ -84,10 +96,20 @@ const TextFormatter = (columnExtensions) =>
       if (type === 'link') {
         return <a href={cfg.link || '#'}>{value}</a>
       }
-      return value || ''
+      return (
+        (
+          <Tooltip title={value} enterDelay={1500}>
+            <span>{value}</span>
+          </Tooltip>
+        ) || ''
+      )
     },
     (prevProps, nextProps) => {
-      return prevProps === nextProps || prevProps.value === nextProps.value
+      return (
+        prevProps === nextProps ||
+        prevProps.value === nextProps.value ||
+        this.props.commitCount !== nextProps.commitCount
+      )
     },
   )
 
@@ -121,8 +143,13 @@ class TextTypeProvider extends React.Component {
             'date',
           ].indexOf(o.type) < 0,
       )
+      // .filter(
+      //   (o) =>
+      //     [
+      //       'rowSort',
+      //     ].indexOf(o.columnName) < 0,
+      // )
       .map((o) => o.columnName)
-    // console.log(columns)
     return (
       <DataTypeProvider
         for={columns}

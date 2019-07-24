@@ -117,7 +117,7 @@ const TimeFormatter = ({ value }) => {
   return value
 }
 
-const DateFormatter = (columnExtensions) => ({ value }) => {
+const DateFormatter = ({ value }) => {
   // console.log(value)
   if (!value) return null
   return moment.isMoment(value)
@@ -130,12 +130,7 @@ const TimeTypeProvider = (props) => {
 }
 
 const DateTypeProvider = (props) => {
-  return (
-    <DataTypeProvider
-      formatterComponent={DateFormatter(props.columnExtensions)}
-      {...props}
-    />
-  )
+  return <DataTypeProvider formatterComponent={DateFormatter} {...props} />
 }
 
 const NumberTypeProvider = (props) => {
@@ -164,6 +159,7 @@ module.exports = {
   NumberTypeProvider,
   QtyTypeProvider,
   NumberFormatter,
+  DateFormatter,
   currencyFormat,
   qtyFormat,
   dateFormat,

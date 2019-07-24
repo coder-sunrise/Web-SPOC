@@ -1,4 +1,5 @@
 import React from 'react'
+import $ from 'jquery'
 import Delete from '@material-ui/icons/Delete'
 import Save from '@material-ui/icons/Save'
 import Edit from '@material-ui/icons/Edit'
@@ -7,6 +8,7 @@ import Cancel from '@material-ui/icons/Clear'
 import { Button } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
+let commitCount = 0
 const EditButton = ({ onExecute, editingRowIds }) => (
   <Button
     size='sm'
@@ -86,39 +88,77 @@ const AddButton = ({ onExecute }) => (
     </Button>
   </div>
 )
+class CommitButton extends React.PureComponent {
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
+  }
 
-const CommitButton = ({ onExecute, editingRowIds, row }) => (
-  <Button
-    size='sm'
-    onClick={(e) => {
-      console.log(
-        (!row.id && editingRowIds.length === 0) ||
-          (row.id && editingRowIds.length === 1),
-      )
-      if (
-        (!row.id && editingRowIds.length === 0) ||
-        (row.id && editingRowIds.length === 1)
-      ) {
-        window.g_app._store.dispatch({
-          type: 'global/updateState',
-          payload: {
-            disableSave: false,
-          },
-        })
-      }
-      // updateGlobalVariable('gridIgnoreValidation', false)
-      onExecute(e)
-    }}
-    justIcon
-    data-button-type='progress'
-    data-grid-button='true'
-    color='primary'
-    title='Save'
-    className='grid-commit'
-  >
-    <Save />
-  </Button>
-)
+  render () {
+    const { onExecute, editingRowIds, row, schema } = this.props
+
+    return (
+      <div ref={this.myRef} style={{ display: 'inline-block' }}>
+        <Button
+          size='sm'
+          onClick={(e) => {
+            // console.log(
+            //   (!row.id && editingRowIds.length === 0) ||
+            //     (row.id && editingRowIds.length === 1),
+            // )
+            if (schema) {
+              try {
+                schema.validateSync(row, {
+                  abortEarly: false,
+                })
+                // console.log({ r })
+
+                // row._$error = false
+              } catch (er) {
+                // console.log(er)
+                // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
+                console.log(er, this.myRef.current)
+                $(this.myRef.current).find('button').attr('disabled', true)
+                // const actualError = er.inner.find((o) => o.path === columnName)
+                // return actualError ? actualError.message : ''
+                // row._$error = true
+                window.g_app._store.dispatch({
+                  type: 'global/updateState',
+                  payload: {
+                    commitCount: commitCount++,
+                  },
+                })
+                return
+              }
+            }
+
+            if (
+              (!row.id && editingRowIds.length === 0) ||
+              (row.id && editingRowIds.length === 1)
+            ) {
+              window.g_app._store.dispatch({
+                type: 'global/updateState',
+                payload: {
+                  disableSave: false,
+                },
+              })
+            }
+            // updateGlobalVariable('gridIgnoreValidation', false)
+            onExecute(e)
+          }}
+          justIcon
+          data-button-type='progress'
+          data-grid-button='true'
+          color='primary'
+          title='Save'
+          className='grid-commit'
+        >
+          <Save />
+        </Button>
+      </div>
+    )
+  }
+}
 
 const commandComponents = {
   add: AddButton,

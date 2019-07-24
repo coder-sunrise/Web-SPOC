@@ -2,12 +2,10 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
+import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
-import {
-  DatePicker,
-  DateTypeProvider as DateTypeProviderOrg,
-} from '@/components'
+import { DateRangePicker, DateFormatter } from '@/components'
 
 class DateEditorBase extends PureComponent {
   state = {
@@ -32,23 +30,33 @@ class DateEditorBase extends PureComponent {
     const cfg = columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     )
-    const onChange = (date, val) => {
-      // console.log(date, val)
-      this.setState({
-        error: updateCellValue(this.props, this.myRef.current, date || ''),
-      })
-    }
-    const { type, isDisabled = () => false, ...restProps } = cfg
 
-    const commonCfg = {
+    const {
+      type,
+      isDisabled = () => false,
+      getInitialValue,
       onChange,
+      ...restProps
+    } = cfg
+    const _onChange = (date, moments, org) => {
+      // console.log(date, moments, org)
+      const error = updateCellValue(this.props, this.myRef.current, date)
+      this.setState({
+        error,
+      })
+      if (!error) {
+        if (onChange) onChange(date, moments, org, row)
+      }
+    }
+    const commonCfg = {
+      onChange: _onChange,
       disabled: isDisabled(row),
-      defaultValue: value,
+      defaultValue: getInitialValue ? getInitialValue(row) : value,
     }
     // console.log(cfg, value, props)
     return (
       <div ref={this.myRef}>
-        <DatePicker
+        <DateRangePicker
           noWrapper
           timeFormat={false}
           showErrorIcon
@@ -61,7 +69,36 @@ class DateEditorBase extends PureComponent {
   }
 }
 
-class DateTypeProvider extends React.Component {
+const DateRangeFormatter = (columnExtensions) =>
+  React.memo(
+    (props) => {
+      const { column: { name: columnName }, value, row } = props
+      const cfg =
+        columnExtensions.find(
+          ({ columnName: currentColumnName }) =>
+            currentColumnName === columnName,
+        ) || {}
+      const { type, render, getInitialValue, ...restProps } = cfg
+      if (render) {
+        return render(row)
+      }
+      const v = getInitialValue ? getInitialValue(row) : value
+      // console.log(cfg, value)
+      if (!v || v.length === 0 || !v[0] || !v[1]) return ''
+      return `${DateFormatter({ value: v[0] })} to ${DateFormatter({
+        value: v[1],
+      })}`
+    },
+    (prevProps, nextProps) => {
+      return (
+        prevProps === nextProps ||
+        prevProps.value === nextProps.value ||
+        this.props.commitCount !== nextProps.commitCount
+      )
+    },
+  )
+
+class RangeDateTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
   }
@@ -75,21 +112,21 @@ class DateTypeProvider extends React.Component {
   }
 
   shouldComponentUpdate = (nextProps, nextState) =>
-    this.props.editingRowIds !== nextProps.editingRowIds ||
-    this.props.commitCount !== nextProps.commitCount
+    this.props.editingRowIds !== nextProps.editingRowIds
 
   render () {
     const { columnExtensions } = this.props
     return (
-      <DateTypeProviderOrg
+      <DataTypeProvider
         for={columnExtensions
           .filter(
             (o) =>
               [
-                'date',
+                'daterange',
               ].indexOf(o.type) >= 0,
           )
           .map((o) => o.columnName)}
+        formatterComponent={DateRangeFormatter(columnExtensions)}
         editorComponent={this.DateEditorBase(columnExtensions)}
         {...this.props}
       />
@@ -97,4 +134,4 @@ class DateTypeProvider extends React.Component {
   }
 }
 
-export default DateTypeProvider
+export default RangeDateTypeProvider

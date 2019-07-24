@@ -11,7 +11,7 @@ import {
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { Button } from '@/components'
 // import Paper from '@material-ui/core/Paper'
-import { LinearProgress, Paper, Tooltip } from '@material-ui/core'
+import { LinearProgress, Paper, Tooltip, IconButton } from '@material-ui/core'
 import {
   primaryColor,
   dangerColor,
@@ -21,6 +21,9 @@ import {
   hoverColor,
   tableEvenRowColor,
 } from 'mui-pro-jss'
+import ArrowDropDown from '@material-ui/icons/ArrowDropDown'
+import ArrowDropUp from '@material-ui/icons/ArrowDropUp'
+
 import classNames from 'classnames'
 import { connect } from 'dva'
 import {
@@ -56,6 +59,7 @@ import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
+import RangeDateTypeProvider from './EditCellComponents/RangeDateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
@@ -88,6 +92,14 @@ const styles = (theme) => ({
       // ),
       backgroundColor: hoverColor,
     },
+
+    '& > tbody > tr.grid-edit-row': {
+      backgroundColor: '#ffffff',
+    },
+
+    '& > tbody > tr.grid-edit-row:hover': {
+      backgroundColor: '#ffffff',
+    },
   },
   paperContainer: {
     // margin: '0 5px',
@@ -119,8 +131,8 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
   })
 }
 let gridId = 0
-@connect(({ loading }) => {
-  return { loading }
+@connect(({ loading, global }) => {
+  return { loading, global }
 })
 class CommonTableGrid2 extends React.Component {
   state = {
@@ -138,6 +150,7 @@ class CommonTableGrid2 extends React.Component {
       oddEven = true,
       onRowDoubleClick = (f) => f,
       onRowClick = (f) => f,
+      rowMoveable = (f) => false,
     } = props
     // console.log(props)
     this.gridId = `grid-${gridId++}`
@@ -170,10 +183,13 @@ class CommonTableGrid2 extends React.Component {
         onClick={(event) => {
           onRowClick(row, event)
         }}
-        style={{
-          // cursor: 'pointer',
-          // ...styles[row.sector.toLowerCase()],
-        }}
+        className={
+          typeof rowMoveable === 'function' && rowMoveable(row) ? (
+            'moveable'
+          ) : (
+            ''
+          )
+        }
       />
     )
 
@@ -230,6 +246,17 @@ class CommonTableGrid2 extends React.Component {
       summaryConfig: {},
     }
 
+    const tableRowSharedRootConfig = {
+      '&.moveable ~ tr td.td-move-cell button:nth-child(1)': {
+        display: 'block !important',
+      },
+      '&.moveable:last-of-type td.td-move-cell button:nth-child(2)': {
+        display: 'none !important',
+      },
+      '& td:not(.td-move-cell) .move-button': {
+        visibility: 'hidden',
+      },
+    }
     const sizeConfig = {
       sm: {
         ...smallTheme.overrides,
@@ -239,6 +266,7 @@ class CommonTableGrid2 extends React.Component {
           },
           root: {
             height: 'auto',
+            ...tableRowSharedRootConfig,
           },
         },
         MuiTableCell: {
@@ -267,6 +295,11 @@ class CommonTableGrid2 extends React.Component {
       },
       md: {
         ...defaultTheme.overrides,
+        MuiTableRow: {
+          root: {
+            ...tableRowSharedRootConfig,
+          },
+        },
       },
     }
     const size = props.size || theme.props.size
@@ -284,6 +317,9 @@ class CommonTableGrid2 extends React.Component {
             backgroundColor: 'inherit',
             borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
           },
+          dividerRight: {
+            borderRightWidth: 0,
+          },
         },
         TableCell: cellStyle,
         EditCell: {
@@ -294,9 +330,9 @@ class CommonTableGrid2 extends React.Component {
         },
         TableHeaderCell: cellStyle,
         Table: {
-          // table: {
-          //   borderCollapse: 'collapse',
-          // },
+          table: {
+            borderCollapse: 'collapse',
+          },
           stickyTable: {
             ' & > thead > tr': {
               backgroundColor: '#ffffff',
@@ -449,6 +485,55 @@ class CommonTableGrid2 extends React.Component {
     }
   }
 
+  moveRow = (row, direction) => () => {
+    const { onRowMove } = this.props
+    if (onRowMove) onRowMove(row, direction)
+  }
+
+  Cell = (p) => {
+    const { classes, ...restProps } = p
+    const { column, row } = restProps
+    // console.log(p2)
+    // return null
+    if (column && column.name === 'rowMove') {
+      const cls = {
+        width: 20,
+        height: 20,
+        padding: 1,
+        margin: '0 auto',
+      }
+
+      if (!this.props.rowMoveable || !this.props.rowMoveable(row))
+        return <Table.Cell {...restProps} />
+
+      return (
+        <Table.Cell
+          {...restProps}
+          className='td-move-cell'
+          style={{ padding: 0 }}
+        >
+          <div style={{ display: 'flex', flexFlow: 'column' }}>
+            <IconButton
+              className='move-button'
+              style={{ ...cls, display: 'none' }}
+              onClick={this.moveRow(row, 'UP')}
+            >
+              <ArrowDropUp />
+            </IconButton>
+            <IconButton
+              className='move-button'
+              style={cls}
+              onClick={this.moveRow(row, 'DOWN')}
+            >
+              <ArrowDropDown />
+            </IconButton>
+          </div>
+        </Table.Cell>
+      )
+    }
+    return <Table.Cell {...restProps} />
+  }
+
   render () {
     const {
       classes,
@@ -469,6 +554,7 @@ class CommonTableGrid2 extends React.Component {
       rightColumns = [],
       leftColumns = [],
       showRowNumber = false,
+      rowMoveable = null,
       header = true,
       selection = [],
       errors = [],
@@ -493,6 +579,7 @@ class CommonTableGrid2 extends React.Component {
       containerComponent,
       schema,
       editingRowIds,
+      global,
     } = this.props
 
     const {
@@ -515,7 +602,7 @@ class CommonTableGrid2 extends React.Component {
     if (containerComponent) {
       pagerConfig.containerComponent = containerComponent
     }
-    console.log(this.props)
+    // console.log(this.props)
     // console.log(
     //   filter,
     //   grouping,
@@ -530,33 +617,49 @@ class CommonTableGrid2 extends React.Component {
     // )
     // console.log(this.state)
     const { TableBase } = this
-
+    const actionColCfg = { columnName: 'action', width: 95, align: 'center' }
     const newColumExtensions = columnExtensions.concat([
       ...[
-        { columnName: 'action', width: 95, align: 'center' },
+        actionColCfg,
         {
           columnName: 'rowIndex',
           width: 80,
           align: 'left',
           disabled: true,
         },
+        {
+          columnName: 'rowMove',
+          width: 40,
+          align: 'center',
+          disabled: true,
+        },
       ],
       ...columns
-        .filter((o) => !columnExtensions.find((m) => m.columnName === o.name))
+        .filter(
+          (o) =>
+            !columnExtensions.find((m) => m.columnName === o.name) ||
+            o.name === 'action',
+        )
         .map((o) => {
+          let extraCfg = {}
+          if (o.name === 'action') {
+            extraCfg = {
+              ...actionColCfg,
+            }
+          }
           return {
+            ...extraCfg,
             columnName: o.name,
             type: 'text',
           }
         }),
     ])
-    // console.log(errors, newColumExtensions)
+    console.log(errors, newColumExtensions)
 
     const tableProps = {
       columnExtensions: newColumExtensions,
-      ...(ActionProps.TableCellComponent
-        ? { cellComponent: ActionProps.TableCellComponent }
-        : {}),
+      cellComponent:
+        (this.props.ActionProps || {}).TableCellComponent || this.Cell,
     }
     // const extraPagerConfig = {
     //   ...pagerConfig,
@@ -594,11 +697,27 @@ class CommonTableGrid2 extends React.Component {
     const cellComponentConfig = {
       columnExtensions: newColumExtensions,
       editingRowIds,
+      commitCount: global.commitCount,
     }
     const allowSelectRowByClick =
       columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined
 
     const HeaderRow = this.TableHeaderRow
+
+    let newColumns = columns
+    let newLeftCols = leftColumns
+    if (rowMoveable && !newColumns.find((o) => o.name === 'rowMove')) {
+      newLeftCols = [
+        'rowMove',
+      ].concat(newLeftCols)
+      newColumns.unshift({ name: 'rowMove', title: ' ' })
+    }
+    if (showRowNumber && !newColumns.find((o) => o.name === 'rowIndex')) {
+      newLeftCols = [
+        'rowIndex',
+      ].concat(newLeftCols)
+      newColumns.unshift({ name: 'rowIndex', title: 'No.' })
+    }
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -618,18 +737,12 @@ class CommonTableGrid2 extends React.Component {
           <div ref={this.myRef}>
             <DevGrid
               rows={getIndexedRows(
-                this.state.entity ? this.state.entity.list : rows,
+                this.state.entity
+                  ? this.state.entity.list
+                  : rows.filter((o) => !o.isDeleted),
                 this.state.pagination,
               )} // this.state.data ||
-              columns={
-                showRowNumber ? (
-                  [
-                    { name: 'rowIndex', title: 'No.' },
-                  ].concat(columns)
-                ) : (
-                  columns
-                )
-              }
+              columns={newColumns}
               getRowId={getRowId}
             >
               {filter && (
@@ -690,6 +803,7 @@ class CommonTableGrid2 extends React.Component {
               <SelectTypeProvider {...cellComponentConfig} />
               <NumberTypeProvider {...cellComponentConfig} />
               <DateTypeProvider {...cellComponentConfig} />
+              <RangeDateTypeProvider {...cellComponentConfig} />
               <RadioTypeProvider {...cellComponentConfig} />
               <StatusTypeProvider {...cellComponentConfig} />
               <TimeTypeProvider {...cellComponentConfig} />
@@ -734,15 +848,7 @@ class CommonTableGrid2 extends React.Component {
                     ]
                   )
                 }
-                leftColumns={
-                  showRowNumber ? (
-                    [
-                      'rowIndex',
-                    ].concat(leftColumns)
-                  ) : (
-                    leftColumns
-                  )
-                }
+                leftColumns={newLeftCols}
               />
               {extraGetter.map((o) => o)}
             </DevGrid>

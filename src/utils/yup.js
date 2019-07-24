@@ -1,5 +1,6 @@
 import Moment from 'moment'
 import * as Yup from 'yup'
+import _ from 'lodash'
 import { camelizeKeys, pascalizeKeys } from 'humps'
 
 // console.log(Yup)
@@ -119,7 +120,28 @@ Yup.date = () => {
   })
   return r
 }
+Yup.addMethod(Yup.array, 'unique', function (
+  mapper,
+  message = 'This collection not allow dupication',
+  callback,
+) {
+  return this.test('isUnique', message, function (value = []) {
+    const { parent, createError, options } = this
+    // const { originalValue } = options
 
+    const compareValues = value.map(mapper)
+    // console.log(value, _.uniq(compareValues).length, value.length)
+    if (
+      _.uniq(compareValues).length !== value.filter((o) => !o.isDeleted).length
+    ) {
+      createError({
+        message,
+      })
+      if (callback) callback(message)
+    }
+    return true
+  })
+})
 export default Yup
 
 // module.exports = Yup.date().transform(function (value, originalValue) {

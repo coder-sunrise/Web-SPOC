@@ -189,7 +189,7 @@ class Detail extends PureComponent {
             </GridContainer>
             <EditableTableGrid2
               style={{ marginTop: theme.spacing(1) }}
-              rows={values.items.filter((o) => !o.isDeleted)}
+              rows={values.items}
               onRowDoubleClick={this.onRowDoubleClick}
               FuncProps={{
                 pagerConfig: {

@@ -105,7 +105,7 @@ class AntdSelect extends React.PureComponent {
 
   componentDidMount () {
     if (this.state.value && this.props.query && this.state.data.length === 0) {
-      //for remote datasouce, get the selected value by default
+      // for remote datasouce, get the selected value by default
       // console.log(this.state.value)
       this.fetchData(this.state.value)
     }
@@ -171,7 +171,17 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleValueChange = (val) => {
-    const { form, field, all, mode, onChange } = this.props
+    const {
+      form,
+      field,
+      all,
+      mode,
+      onChange,
+      options,
+      autoComplete,
+      query,
+      valueField,
+    } = this.props
     let newVal = val
     if (mode === 'multiple') {
       if (val.indexOf(all) > 0) {
@@ -187,7 +197,10 @@ class AntdSelect extends React.PureComponent {
 
     let proceed = true
     if (onChange) {
-      proceed = onChange(newVal) !== false
+      const option = (autoComplete || query ? this.state.data : options).find(
+        (o) => o[valueField] === newVal,
+      )
+      proceed = onChange(newVal, option) !== false
     }
     if (proceed) {
       if (form && field) {
@@ -328,7 +341,11 @@ class AntdSelect extends React.PureComponent {
               <Spin size='small' />
             ) : (
               <p>
-                {this.state.fetchId > 0 ? 'Not Found' : 'Input Search Text'}
+                {this.state.fetchId > 0 && (autoComplete || query) ? (
+                  'Not Found'
+                ) : (
+                  'Input Search Text'
+                )}
               </p>
             )
           }

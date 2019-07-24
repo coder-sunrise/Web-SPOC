@@ -1,7 +1,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import {
   MUISelect,
@@ -51,26 +51,30 @@ class SelectEditor extends PureComponent {
       code,
       validationSchema,
       isDisabled = () => false,
+      onChange,
       ...restProps
     } = cfg
 
-    const onChange = (val) => {
+    const _onChange = (val, option) => {
+      const error = updateCellValue(this.props, this.myRef.current, val)
       this.setState({
-        error: updateCellValue(this.props, this.myRef.current, val),
+        error,
       })
+      if (!error) {
+        if (onChange) onChange(val, option, row, onValueChange)
+      }
     }
 
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
       error: this.state.error,
-      onChange,
       defaultValue: value,
-      label: 'Mr',
       disabled: isDisabled(row),
       ...restProps,
+      onChange: _onChange,
     }
-
+    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -107,6 +111,15 @@ const SelectDisplay = (columnExtensions, state) => ({
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
   // console.log(cfg)
+  const { labelField = 'name' } = cfg
+  // console.log(v, labelField)
+  const vEl = v ? (
+    <Tooltip title={v[labelField]} enterDelay={1500}>
+      <span>{v[labelField]}</span>
+    </Tooltip>
+  ) : (
+    ''
+  )
   if (v.colorValue) {
     return (
       <div>
@@ -120,24 +133,22 @@ const SelectDisplay = (columnExtensions, state) => ({
             backgroundColor: v.colorValue,
           }}
         />
-        <span>{v ? v.name : ''}</span>
+        {vEl}
       </div>
     )
   }
   if (v.color) {
     return (
-      <div>
-        <span
-          style={{
-            color: v.color,
-          }}
-        >
-          {v ? v.name : ''}
-        </span>
+      <div
+        style={{
+          color: v.color,
+        }}
+      >
+        {vEl}
       </div>
     )
   }
-  return <span>{v ? v.name : ''}</span>
+  return vEl
 }
 
 class SelectTypeProvider extends React.Component {
@@ -179,9 +190,16 @@ class SelectTypeProvider extends React.Component {
     }
   }
 
-  shouldComponentUpdate = (nextProps, nextState) =>
-    this.props.editingRowIds !== nextProps.editingRowIds ||
-    Object.keys(this.state).length !== Object.keys(nextState).length
+  shouldComponentUpdate = (nextProps, nextState) => {
+    // console.log(nextProps, this.props)
+    // console.log(nextState, this.state)
+
+    return (
+      this.props.editingRowIds !== nextProps.editingRowIds ||
+      Object.keys(this.state).length !== Object.keys(nextState).length ||
+      this.props.commitCount !== nextProps.commitCount
+    )
+  }
 
   render () {
     // console.log('texttypeprovider', this.props)

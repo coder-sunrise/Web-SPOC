@@ -248,6 +248,7 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
+    // console.log(inputProps)
     const element = (
       <CustomInputWrapper
         id={inputIdPrefix + inputIdCounter}
@@ -275,6 +276,7 @@ class BaseInput extends React.PureComponent {
             fullWidth
             inputRef={this.getRef}
             {...cfg}
+            inputProps={inputProps}
             {...inputProps}
           />
         )}

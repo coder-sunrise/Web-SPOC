@@ -2,10 +2,7 @@ import React, { PureComponent } from 'react'
 
 import { withStyles } from '@material-ui/core'
 
-import emergencyModal from '../models/emergencyContact'
 import EmergencyContactGrid from './EmergencyContactGrid'
-
-window.g_app.replaceModel(emergencyModal)
 
 const styles = () => ({
   container: {
@@ -44,7 +41,7 @@ class EmergencyContact extends PureComponent {
   // }
 
   render () {
-    const { classes, emergencyContact, dispatch, ...restProps } = this.props
+    const { classes, dispatch, ...restProps } = this.props
 
     return <EmergencyContactGrid {...restProps} />
   }

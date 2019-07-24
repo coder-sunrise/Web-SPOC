@@ -61,6 +61,8 @@ class FormikTextField extends React.PureComponent {
   }
 
   _onChange = (value) => {
+    console.log(value)
+
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
@@ -85,6 +87,7 @@ class FormikTextField extends React.PureComponent {
   }
 
   onChange = (event) => {
+    console.log(event)
     this.setState({
       value: event.target.value,
       isDebouncing: true,
@@ -139,6 +142,8 @@ class FormikTextField extends React.PureComponent {
       onKeyUp,
       preventDefaultChangeEvent,
       value,
+      uppercase,
+      lowercase,
     } = props
     const { field, form, ...resetProps } = props
     // console.log(this.state, this.state.value)
@@ -150,9 +155,6 @@ class FormikTextField extends React.PureComponent {
     if (field && form) {
       cfg.value = state.value
       cfg.name = field.name
-      if (!preventDefaultChangeEvent) {
-        cfg.onChange = this.onChange
-      }
 
       // if(field.value){
       //   cfg.labelProps = {
@@ -180,9 +182,16 @@ class FormikTextField extends React.PureComponent {
     } else if (value) {
       cfg.value = value
     }
+    if (!preventDefaultChangeEvent) {
+      cfg.onChange = this.onChange
+    }
     cfg.negative = state.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
-
+    if (uppercase) {
+      cfg.value = cfg.value.toUpperCase()
+    } else if (lowercase) {
+      cfg.value = cfg.value.toLowerCase()
+    }
     // console.log(inputProps)
     // console.log('custominput', inputProps)
     // console.log('custominput', props, cfg, state)

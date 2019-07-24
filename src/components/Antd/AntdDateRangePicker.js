@@ -106,21 +106,20 @@ class AntdDateRangePicker extends PureComponent {
     })
 
     const { form, field, onChange } = this.props
+    const v = Array.isArray(dateArray)
+      ? dateArray.map((o) => o.utc().format())
+      : []
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())
 
       // console.log(date.utc().format())
 
-      form.setFieldValue(
-        field.name,
-        Array.isArray(dateArray) ? dateArray.map((o) => o.utc().format()) : [],
-      )
+      form.setFieldValue(field.name, v)
     }
 
     if (onChange) {
-      const { name } = this.props
-      onChange(dateArray, dateString)
+      onChange(v, dateArray, dateString)
     }
   }
 
@@ -188,7 +187,7 @@ class AntdDateRangePicker extends PureComponent {
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
           placeholder=''
-          onChange={extendFunc(onChange, this.handleChange)}
+          onChange={this.handleChange}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
           onOpenChange={extendFunc(

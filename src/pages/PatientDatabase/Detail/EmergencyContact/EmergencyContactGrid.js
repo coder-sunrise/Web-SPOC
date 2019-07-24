@@ -29,28 +29,7 @@ import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 //     name: Yup.string().required(),
 //   }),
 // )
-const pecValidationSchema = Yup.object().shape({
-  accountNoTypeFK: Yup.string().required(),
-  accountNo: Yup.string().required(),
-  name: Yup.string().required(),
-  relationshipFK: Yup.number().required(),
-})
-@connect(({ patient, emergencyContact, loading }) => {
-  return { patient, emergencyContact, loading }
-})
-@withFormik({
-  mapPropsToValues: ({ patient }) => {
-    // console.log(patient)
-    return patient.entity || patient.default
-  },
-  validationSchema: Yup.object().shape({
-    patientEmergencyContact: Yup.array()
-      .compact((v) => v.isDeleted)
-      .of(pecValidationSchema),
-  }),
-  handleSubmit,
-  displayName: 'EmergencyContact',
-})
+
 class Grid extends React.Component {
   state = {
     editingRowIds: [],
@@ -168,19 +147,6 @@ class Grid extends React.Component {
       </div>
     )
 
-    this.changeEditingRowIds = (editingRowIds) => {
-      this.setState({ editingRowIds })
-    }
-    this.changeRowChanges = (rowChanges) => {
-      // console.log(rowChanges)
-      // console.log(
-      //   rowChanges,
-      //   this.props.errors,
-      //   this.props.values.patientEmergencyContact,
-      // )
-      this.setState({ rowChanges })
-    }
-
     this.onRowDoubleClick = (row) => {
       if (!state.editingRowIds.find((o) => o === row.id)) {
         this.setState({
@@ -190,42 +156,16 @@ class Grid extends React.Component {
         })
       }
     }
+    this.onEditingRowIdsChange = (ids) => {
+      this.setState({
+        editingRowIds: ids,
+      })
+    }
     this.PagerContent = (
       <Button onClick={this.toggleModal} color='info' link>
         <Add />Add From Existing Patient
       </Button>
     )
-  }
-
-  // static getDerivedStateFromProps (nextProps, preState) {
-  //   const { values, errors } = nextProps
-  //   console.log(values, errors)
-  //   console.log(errors)
-  //   if (errors && Array.isArray(errors.patientEmergencyContact)) {
-  //     const ids = preState.editingRowIds.splice()
-  //     for (
-  //       let index = 0;
-  //       index < errors.patientEmergencyContact.length;
-  //       index++
-  //     ) {
-  //       const er = errors.patientEmergencyContact[index]
-  //       const row = values.patientEmergencyContact[index]
-  //       if (er && row && preState.editingRowIds.indexOf(row.id) < 0) {
-  //         ids.push(row.id)
-  //       }
-  //     }
-  //     if (ids.length > 0 && ids.length !== preState.editingRowIds.length) {
-  //       console.log(preState.editingRowIds, ids)
-  //       return {
-  //         editingRowIds: ids,
-  //       }
-  //     }
-  //   }
-  //   return null
-  // }
-
-  componentDidUpdate = (prevProps) => {
-    componentDidUpdate(this.props, prevProps)
   }
 
   toggleModal = () => {
@@ -281,7 +221,7 @@ class Grid extends React.Component {
               salutationFK: o.salutationFK,
               accountNoTypeFK: o.patientAccountNoTypeFK,
               name: o.name,
-              relationship: '',
+              relationshipFK: undefined,
               isPrimaryContact: false,
               nokPatientProfileFK: o.id,
               address: `${primaryAddress.blockNo ||
@@ -311,40 +251,39 @@ class Grid extends React.Component {
   }
 
   render () {
-    const { values, type, loading, errors, patientSearch } = this.props
+    const { values, type, loading, errors, schema } = this.props
     const { SearchPatient = (f) => f } = this
     console.log(this.props)
-    // console.log(this.state)
+    console.log(this.state)
     // console.log(pecValidationSchema)
     return (
       <div>
-        <CardContainer title={this.titleComponent} hideHeader>
-          <EditableTableGrid2
-            rows={values.patientEmergencyContact.filter((o) => !o.isDeleted)}
-            onRowDoubleClick={this.onRowDoubleClick}
-            FuncProps={{
-              pagerConfig: {
-                containerExtraComponent: this.PagerContent,
-              },
-            }}
-            EditingProps={{
-              showAddCommand: true,
-              editingRowIds: this.state.editingRowIds,
-              rowChanges: this.state.rowChanges,
-              onEditingRowIdsChange: this.changeEditingRowIds,
-              onRowChangesChange: this.changeRowChanges,
-              onCommitChanges: this.commitChanges,
-            }}
-            // errors={errors.patientEmergencyContact}
-            schema={pecValidationSchema}
-            {...this.tableParas}
-          />
-          {getFooter({
+        {/* <CardContainer title={this.titleComponent} hideHeader> */}
+        <EditableTableGrid2
+          rows={values.patientEmergencyContact}
+          onRowDoubleClick={this.onRowDoubleClick}
+          FuncProps={{
+            pagerConfig: {
+              containerExtraComponent: this.PagerContent,
+            },
+            pager: false,
+          }}
+          EditingProps={{
+            showAddCommand: true,
+            editingRowIds: this.state.editingRowIds,
+            onEditingRowIdsChange: this.onEditingRowIdsChange,
+            onCommitChanges: this.commitChanges,
+          }}
+          // errors={errors.patientEmergencyContact}
+          schema={schema}
+          {...this.tableParas}
+        />
+        {/* {getFooter({
             resetable: true,
             allowSubmit: this.state.editingRowIds.length === 0,
             ...this.props,
-          })}
-        </CardContainer>
+          })} */}
+        {/* </CardContainer> */}
         <CommonModal
           open={this.state.showModal}
           title='Search Patient'

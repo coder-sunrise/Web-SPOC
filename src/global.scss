@@ -46,9 +46,9 @@
   -webkit-animation: spin 1000ms infinite linear;
   animation: spin 1000ms infinite linear;
 }
-.ant-calendar-date {
-  line-height: 24px;
-}
+// .ant-calendar-date {
+//   line-height: 24px;
+// }
 .ant-notification-notice {
   padding: 0;
   border-radius: 0;
@@ -311,7 +311,7 @@
 }
 
 .ant-select-disabled .ant-select-selection {
-  cursor: text;
+  cursor: inherit;
   background: transparent;
 }
 

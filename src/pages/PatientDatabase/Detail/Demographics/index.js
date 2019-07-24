@@ -51,12 +51,11 @@ import { titles, finTypes, gender } from '@/utils/codes'
 import { standardRowHeight } from 'mui-pro-jss'
 // import model from '../models/demographic'
 import {
-  getUniqueGUID,
+  getUniqueNumericId,
   getRemovedUrl,
   getAppendUrl,
   difference,
 } from '@/utils/utils'
-import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 import Address from './Address'
 
 // window.g_app.replaceModel(model)
@@ -69,84 +68,46 @@ const styles = () => ({
   },
 })
 
-@connect(({ patient }) => ({
-  patient,
-}))
-@withFormik({
-  mapPropsToValues: ({ patient }) => patient.entity || patient.default,
-  validationSchema: Yup.object().shape({
-    name: Yup.string().required(),
-    dob: Yup.date().required(),
-    patientAccountNoTypeFK: Yup.number().required(),
-    patientAccountNo: Yup.string().required(),
-    genderFK: Yup.number().required(),
-
-    referredBy: Yup.string(),
-    referralRemarks: Yup.string().when('referredBy', {
-      is: 'Company',
-      then: Yup.string().required(),
-    }),
-    referredByPatientFK: Yup.number().when('referredBy', {
-      is: 'Patient',
-      then: Yup.number().required(),
-    }),
-    // dialect: Yup.string().required(),
-    // contact.mobileContactNumber.number:Yup.string().render(),
-    contact: Yup.object().shape({
-      // contactAddress: Yup.array().compact((v) => v.isDeleted).of(
-      //   Yup.object().shape({
-      //     postcode: Yup.number().required(),
-      //     countryFK: Yup.string().required(),
-      //   }),
-      // ),
-      contactEmailAddress: Yup.object().shape({
-        emailAddress: Yup.string().email(),
-      }),
-      mobileContactNumber: Yup.object().shape({
-        number: Yup.string().required(),
-      }),
-    }),
-  }),
-  handleSubmit,
-  displayName: 'Demographic',
-})
+// @connect(({ patient }) => ({
+//   patient,
+// }))
 class Demographic extends PureComponent {
   state = {}
 
-  componentDidMount () {
-    if (!this.props.values.id) {
-      this.props.validateForm()
-    }
-  }
+  // componentDidMount () {
+  //   if (!this.props.values.id) {
+  //     this.props.validateForm()
+  //   }
+  // }
 
-  componentDidUpdate = (prevProps) => {
-    // console.log(difference(prevProps, this.props))
-    // console.log('componentDidUpdate', prevProps, this.props)
+  // componentDidUpdate = (prevProps) => {
+  //   // console.log(difference(prevProps, this.props))
+  //   // console.log('componentDidUpdate', prevProps, this.props)
+  //   // componentDidUpdate(this.props, prevProps)
+  // }
 
-    componentDidUpdate(this.props, prevProps)
-  }
+  // componentWillUnmount () {
+  //   this.props.resetForm()
+  // }
 
-  componentWillUnmount () {
-    this.props.resetForm()
-  }
+  // isValidDate = (current) => {
+  //   let yesterday = moment().subtract(1, 'day')
+  //   return current.isBefore(yesterday)
+  // }
 
-  isValidDate = (current) => {
-    let yesterday = moment().subtract(1, 'day')
-    return current.isBefore(yesterday)
-  }
-
-  disabledDate = (current) => {
-    console.log(current)
-    // Can select day from 1800-01-01 till now
-    return (
-      current &&
-      (current > moment().endOf('day') ||
-        current < moment('1800-01-01').startOf('day'))
-    )
-  }
+  // disabledDate = (current) => {
+  //   console.log(current)
+  //   // Can select day from 1800-01-01 till now
+  //   return (
+  //     current &&
+  //     (current > moment().endOf('day') ||
+  //       current < moment('1800-01-01').startOf('day'))
+  //   )
+  // }
 
   addAddress = () => {
     this.arrayHelpers.unshift({
+      id: getUniqueNumericId(),
       contactFK: this.props.values.contact.id,
       postcode: '',
       countryFK: 107,
@@ -161,7 +122,7 @@ class Demographic extends PureComponent {
         query={(v) => {
           const search = {}
           if (typeof v === 'number') {
-            search.eql_id = v //for default getter based on id
+            search.eql_id = v // for default getter based on id
           } else {
             search.name = v
             search.patientAccountNo = v
@@ -225,7 +186,7 @@ class Demographic extends PureComponent {
     const { props, state } = this
     const { values, patient, theme, classes, setValues } = props
     return (
-      <CardContainer title='Demographic' hideHeader>
+      <React.Fragment>
         <GridContainer gutter={0}>
           <GridItem xs={12} md={5}>
             <GridContainer>
@@ -248,7 +209,14 @@ class Demographic extends PureComponent {
                 <FastField
                   name='patientAccountNo'
                   render={(args) => {
-                    return <TextField label='Account No.' {...args} />
+                    return (
+                      <TextField
+                        label='Account No.'
+                        uppercase
+                        inputProps={{ maxLength: 9 }}
+                        {...args}
+                      />
+                    )
                   }}
                 />
               </GridItem>
@@ -283,7 +251,7 @@ class Demographic extends PureComponent {
                     <DatePicker
                       label='Date of Birth'
                       timeFormat={false}
-                      disabledDate={this.disabledDate}
+                      dobRestrict
                       {...args}
                     />
                   )}
@@ -361,16 +329,15 @@ class Demographic extends PureComponent {
                   render={(args) => <TextField label='Dialect' {...args} />}
                 />
               </GridItem>
+
               <GridItem xs={12}>
                 <FastField
-                  name='occupationFK'
+                  name='patientRemarks'
                   render={(args) => (
-                    <CodeSelect
-                      label='Occupation'
-                      code='ctOccupation'
-                      autoComplete
-                      // max={10}
-                      // defaultMenuIsOpen
+                    <TextField
+                      label='Remarks'
+                      multiline
+                      rowsMax={4}
                       {...args}
                     />
                   )}
@@ -535,26 +502,24 @@ class Demographic extends PureComponent {
                   if (!values || !values.contact) return null
                   return (
                     <div>
-                      {values.contact.contactAddress
-                        .filter((o) => !o.isDeleted)
-                        .map((val, i) => {
-                          return (
-                            <Address
-                              key={i}
-                              addressIndex={i}
-                              // form={form}
-                              theme={theme}
-                              arrayHelpers={arrayHelpers}
-                              propName='contact.contactAddress'
-                              style={{
-                                padding: theme.spacing.unit,
-                                marginTop: theme.spacing.unit,
-                                marginBottom: theme.spacing.unit,
-                              }}
-                              {...props}
-                            />
-                          )
-                        })}
+                      {values.contact.contactAddress.map((val, i) => {
+                        return (
+                          <Address
+                            key={val.id}
+                            addressIndex={i}
+                            // form={form}
+                            theme={theme}
+                            arrayHelpers={arrayHelpers}
+                            propName='contact.contactAddress'
+                            style={{
+                              padding: theme.spacing.unit,
+                              marginTop: theme.spacing.unit,
+                              marginBottom: theme.spacing.unit,
+                            }}
+                            {...props}
+                          />
+                        )
+                      })}
                     </div>
                   )
                 }}
@@ -576,23 +541,7 @@ class Demographic extends PureComponent {
             </GridItem>
           </GridContainer>
         </Paper>
-        {getFooter({
-          ...props,
-          // extraBtn: (
-          //   <Button
-          //     // className={classes.modalCloseButton}
-          //     key='addAddress'
-          //     aria-label='Reset'
-          //     color='primary'
-          //     onClick={this.addAddress}
-          //     style={{ right: 0, position: 'absolute' }}
-          //   >
-          //     <Add />
-          //     Add Address
-          //   </Button>
-          // ),
-        })}
-      </CardContainer>
+      </React.Fragment>
     )
   }
 }

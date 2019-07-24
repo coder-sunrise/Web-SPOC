@@ -16,11 +16,13 @@ document.addEventListener('click', () => {
 
 Object.byString = function (o, s) {
   if (o === undefined || o === null) return ''
+  // console.log(o, s)
   s = s.replace(/\[(\w+)\]/g, '.$1') // convert indexes to properties
   s = s.replace(/^\./, '') // strip a leading dot
   let a = s.split('.')
   for (let i = 0, n = a.length; i < n; ++i) {
     let k = a[i]
+    if (o === undefined || o === null) continue
     try {
       if (k in o) {
         o = o[k]
@@ -479,7 +481,7 @@ export const updateCellValue = (
   // console.log(cfg)
   const { validationSchema, ...restConfig } = cfg
   row[columnName] = val
-
+  // console.log(validationSchema)
   if (validationSchema) {
     try {
       const r = validationSchema.validateSync(row, {
@@ -496,6 +498,7 @@ export const updateCellValue = (
     } catch (er) {
       // console.log(er)
       $(element).parents('tr').find('.grid-commit').attr('disabled', true)
+      // console.log(er)
       const actualError = er.inner.find((o) => o.path === columnName)
       return actualError ? actualError.message : ''
       // row._$error = true

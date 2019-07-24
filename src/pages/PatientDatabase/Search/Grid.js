@@ -9,8 +9,12 @@ import { status } from '@/utils/codes'
 import { Button, CommonModal, CommonTableGrid2 } from '@/components'
 
 class Grid extends PureComponent {
-  state = {
-    tableParas: {
+  state = {}
+
+  constructor (props) {
+    super(props)
+
+    this.tableParas = {
       columns: [
         { name: 'patientReferenceNo', title: 'Ref. No.' },
         { name: 'patientAccountNo', title: 'Acc. No.' },
@@ -44,71 +48,32 @@ class Grid extends PureComponent {
         { columnName: 'dob', type: 'date' },
         { columnName: 'race', sortBy: 'raceFK' },
         { columnName: 'lastPayment', type: 'date' },
+        {
+          columnName: 'action',
+          align: 'center',
+          render: (row) => {
+            const { renderActionFn = (f) => f } = props
+            return renderActionFn(row)
+          },
+        },
       ],
       FuncProps: {
         pager: true,
         filter: true,
       },
-
-      // leftColumns: [
-      //   'PatientReferenceNo',
-      //   'PatientAccountNo',
-      //   'Name',
-      //   'lastPayment',
-      // ],
-    },
-  }
-
-  componentDidMount () {
-    // this.props.dispatch({
-    //   type: queryType,
-    //   // filter:
-    // })
-  }
-
-  Cell = ({ column, row, dispatch, classes, renderActionFn, ...props }) => {
-    // console.log(this)
-    if (column.name === 'action') {
-      return <Table.Cell {...props}>{renderActionFn(row)}</Table.Cell>
     }
-    return <Table.Cell {...props} />
   }
-
-  // search = (filter) => (gridParas) => {
-  //   console.log(gridParas)
-  //   const { callback, ...resetProps } = gridParas
-  //   this.props
-  //     .dispatch({
-  //       type: 'patientSearch/query',
-  //       payload: {
-  //         ...filter,
-  //         ...resetProps,
-  //       },
-  //     })
-  //     .then(callback)
-  //   // console.log(this)
-  // }
 
   render () {
-    const {
-      patientSearch,
-      dispatch,
-      renderActionFn,
-      onRowDblClick,
-    } = this.props
-    const { tableParas } = this.state
+    const { patientSearch, onRowDblClick } = this.props
 
-    const TableCell = (p) => this.Cell({ ...p, dispatch, renderActionFn })
-    const ActionProps = { TableCellComponent: TableCell }
     return (
       <React.Fragment>
         <CommonTableGrid2
-          // query={this.search(filter)}
           type='patientSearch'
           entity={patientSearch}
-          ActionProps={ActionProps}
           onRowDoubleClick={onRowDblClick}
-          {...tableParas}
+          {...this.tableParas}
         />
       </React.Fragment>
     )

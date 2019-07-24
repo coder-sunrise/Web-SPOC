@@ -55,10 +55,11 @@ class Address extends Component {
       })
   }
 
-  deleteAddress = (i) => () => {
+  deleteAddress = (id) => () => {
     const contact = _.cloneDeep(this.props.values.contact)
     const { contactAddress } = contact
-    const deleted = contactAddress.filter((o, idx) => idx === i)[0]
+    // console.log(contactAddress, id)
+    const deleted = contactAddress.find((o, idx) => o.id === id)
     deleted.isDeleted = true
     this.props.setFieldValue('contact', contact)
   }
@@ -71,7 +72,6 @@ class Address extends Component {
     let addresses = v
     let isArray = false
     if (Array.isArray(v)) {
-      addresses = v.filter((o) => !o.isDeleted)
       isArray = true
     }
     let prefix = propName
@@ -79,7 +79,7 @@ class Address extends Component {
       prefix += `[${addressIndex}]`
     }
     prefix += '.'
-    // console.log(this)
+    if (Object.byString(values, `${prefix}isDeleted`)) return null
     const btnSearch = (
       <Button
         // className={classes.modalCloseButton}
@@ -146,10 +146,12 @@ class Address extends Component {
               style={{ lineHeight: theme.props.rowHeight }}
             >
               {btnSearch}
-              {addresses.length > 1 && (
+              {addresses.filter((o) => !o.isDeleted).length > 1 && (
                 <Popconfirm
                   title='Do you want to remove this address?'
-                  onConfirm={this.deleteAddress(addressIndex)}
+                  onConfirm={this.deleteAddress(
+                    Object.byString(values, `${prefix}id`),
+                  )}
                 >
                   <Button
                     color='danger'

@@ -11,14 +11,16 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      menuErrors: {},
       currentComponent: '1',
       default: {
         patientAccountNo: '',
         patientEmergencyContact: [],
         patientAllergy: [],
         patientAllergyMetaData: [],
-        patientScheme: [],
         patientMedicalAlert: [],
+        patientScheme: [],
+        schemePayer: [],
         referredBy: '',
         // dob: new Date(),
         contact: {
@@ -74,19 +76,19 @@ export default createFormViewModel({
           //   })
           // }
         }
-        if (
-          query.new ||
-          pathname === '/patientdb/new' ||
-          pathname === '/reception/queue'
-        ) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: undefined,
-              entity: null,
-            },
-          })
-        }
+        // if (
+        //   query.new ||
+        //   pathname === '/patientdb/new' ||
+        //   pathname === '/reception/queue'
+        // ) {
+        //   dispatch({
+        //     type: 'updateState',
+        //     payload: {
+        //       currentId: undefined,
+        //       entity: null,
+        //     },
+        //   })
+        // }
       })
     },
     effects: {
@@ -113,6 +115,7 @@ export default createFormViewModel({
         yield put({
           type: 'global/updateAppState',
           payload: {
+            disableSave: false,
             showPatientInfoPanel: false,
             fullscreen: false,
             currentPatientId: null,

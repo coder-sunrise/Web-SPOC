@@ -171,6 +171,16 @@ const sharedOverrides = {
         '0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12)',
     },
   },
+  // MuiTableBody: {
+  //   root: {
+  //     // '& tr.moveable:last-of-type td.td-move-cell button:last-of-type': {
+  //     //   display: 'none',
+  //     // },
+  //     '& tr.moveable:nth-child(4) td.td-move-cell button:nth-child(1)': {
+  //       display: 'none',
+  //     },
+  //   },
+  // },
 }
 
 export const defaultTheme = createMuiTheme({
@@ -247,10 +257,13 @@ export const defaultTheme = createMuiTheme({
           right: 11,
           top: '52%',
         },
-
-        '& .ant-select-selection--single': {
-          marginTop: 4,
+        '& .ant-select-selection--single .ant-select-selection-selected-value': {
+          position: 'relative',
+          top: 1,
         },
+        // '& .ant-select-selection--single': {
+        //   marginTop: 4,
+        // },
         '& .ant-select-selection--single .ant-select-selection__clear': {
           top: 5,
         },
@@ -263,6 +276,9 @@ export const defaultTheme = createMuiTheme({
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
           height: '25px',
           lineHeight: '24px',
+        },
+        '& .Mui-disabled': {
+          cursor: 'not-allowed',
         },
         '& .Mui-disabled .anticon': {
           display: 'none',
@@ -560,6 +576,10 @@ export const largeTheme = createMuiTheme({
         '& .ant-select-selection__clear': {
           right: 17,
           top: 10,
+        },
+        '& .ant-select-selection--single .ant-select-selection-selected-value': {
+          position: 'relative',
+          top: 1,
         },
         '& .ant-select-selection--single .ant-select-selection__clear': {
           top: 5,

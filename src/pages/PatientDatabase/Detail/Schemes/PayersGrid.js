@@ -1,33 +1,31 @@
 import React, { PureComponent } from 'react'
 
-import {
-  EditableTableGrid2,
-  CardContainer,
-} from '@/components'
+import { EditableTableGrid2, CardContainer } from '@/components'
 
 class PayersGrid extends PureComponent {
-  state = {
-    editingRowIds: [],
-    rowChanges: {},
-  }
-
   tableParas = {
     columns: [
       { name: 'payerName', title: 'Payer Name' },
-      { name: 'payerId', title: 'Payer ID' },
-      { name: 'dateOfBirth', title: 'Date of Birth' },
-      { name: 'patientIs', title: 'Patient Is' },
+      { name: 'payerID', title: 'Payer ID' },
+      { name: 'dob', title: 'Date of Birth' },
+      { name: 'relationshipFK', title: 'Patient Is' },
       { name: 'scheme', title: 'Scheme' },
     ],
     columnExtensions: [
       {
-        columnName: 'dateOfBirth',
+        columnName: 'dob',
         type: 'date',
+        dobRestrict: true,
+      },
+      {
+        columnName: 'relationshipFK',
+        type: 'codeSelect',
+        code: 'ctMedisaveRelationShip',
       },
     ],
   }
 
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     const { title, titleChildren, dispatch, type } = props
@@ -40,69 +38,28 @@ class PayersGrid extends PureComponent {
       </div>
     )
 
-    this.changeEditingRowIds = editingRowIds => this.setState({ editingRowIds })
-    this.changeRowChanges = rowChanges => this.setState({ rowChanges })
-
-    this.onRowDoubleClick = row => {
-      if (!state.editingRowIds.find(o => o === row.Id)) {
-        this.setState({
-          editingRowIds: state.editingRowIds.concat([
-            row.Id,
-          ]),
-        })
-      }
-    }
-
-    this.commitChanges = ({ added, changed, deleted }) => {
-      if (added) {
-        this.props.dispatch({
-          type: `payers/add`,
-          payload: added.map(o => {
-            return {
-              type,
-              ...o,
-            }
-          }),
-        })
-      }
-
-      if (changed) {
-        this.props.dispatch({
-          type: `payers/change`,
-          payload: changed,
-        })
-      }
-
-      if (deleted) {
-        dispatch({
-          type: `payers/delete`,
-          payload: deleted,
-        })
-      }
+    this.commitChanges = ({ rows, added, changed, deleted }) => {
+      const { setFieldValue } = this.props
+      setFieldValue('schemePayer', rows)
     }
   }
 
   render () {
-    const { editingRowIds, rowChanges } = this.state
-    const { type,rows } = this.props
+    const { type, rows, schema } = this.props
 
     const EditingProps = {
       showAddCommand: true,
-      editingRowIds,
-      rowChanges,
-      onEditingRowIdsChange: this.changeEditingRowIds,
-      onRowChangesChange: this.changeRowChanges,
       onCommitChanges: this.commitChanges,
     }
 
     return (
-        <EditableTableGrid2
-          rows={rows}
-          onRowDoubleClick={this.onRowDoubleClick}
-          FuncProps={{ edit: true }}
-          EditingProps={EditingProps}
-          {...this.tableParas}
-        />
+      <EditableTableGrid2
+        rows={rows}
+        FuncProps={{ pager: false }}
+        EditingProps={EditingProps}
+        schema={schema}
+        {...this.tableParas}
+      />
     )
   }
 }

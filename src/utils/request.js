@@ -234,7 +234,7 @@ export default function request (url, option) {
       //   return response.json()
       // })
       .then((response, s, xhr) => {
-        console.log(response, s, xhr, xhr.getAllResponseHeaders())
+        // console.log(response, s, xhr, xhr.getAllResponseHeaders())
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)

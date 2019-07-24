@@ -86,7 +86,7 @@ class CustomTableEditRow extends PureComponent {
 
     this.EditRow = (editorProps) => {
       // console.log(editorProps)
-      return <TableEditRow.Row {...editorProps} className='grid-new-row' />
+      return <TableEditRow.Row {...editorProps} className='grid-edit-row' />
     }
   }
 

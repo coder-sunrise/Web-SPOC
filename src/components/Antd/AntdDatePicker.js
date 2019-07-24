@@ -123,6 +123,9 @@ class AntdDatePicker extends PureComponent {
 
       form.setFieldValue(field.name, v)
     }
+    if (onChange) {
+      onChange(v, date, dateString)
+    }
     this.setState({
       value: v,
     })
@@ -169,6 +172,18 @@ class AntdDatePicker extends PureComponent {
   //   )
   // }
 
+  buildInRestrict = (current) => {
+    const { dobRestrict } = this.props
+    if (dobRestrict) {
+      return (
+        current &&
+        (current > moment().endOf('day') ||
+          current < moment('1800-01-01').startOf('day'))
+      )
+    }
+    return false
+  }
+
   getComponent = ({ inputRef, ...props }) => {
     const {
       classes,
@@ -189,10 +204,11 @@ class AntdDatePicker extends PureComponent {
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
           placeholder=''
-          onChange={extendFunc(onChange, this.handleChange)}
+          onChange={this.handleChange}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
           // disabledDate={this.disabledDate}
+          disabledDate={this.buildInRestrict}
           onOpenChange={extendFunc(
             onOpenChange,
             this.handleDatePickerOpenChange,
