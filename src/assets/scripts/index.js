@@ -11,7 +11,13 @@ import { baseUrl } from '@/utils/request'
 // toast ui theme
 import uiTheme from './uiTheme'
 // common component
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  CodeSelect,
+  CardContainer,
+  GridContainer,
+  GridItem,
+} from '@/components'
 
 const styles = (theme) => ({
   buttonsBar: {
@@ -44,17 +50,48 @@ class Scribble extends React.Component {
         // reportServiceUrl: '/api/ReportViewer',
         processingMode: ej.ReportViewer.ProcessingMode.Remote,
         reportPath: 'GroupingAgg.rdl',
-        // exportSettings: {
-        //   exportOptions:
-        //     ej.ReportViewer.ExportOptions.Html |
-        //     ej.ReportViewer.ExportOptions.Pdf,
-        // },
+        exportSettings: {
+          exportOptions:
+            ej.ReportViewer.ExportOptions.Html |
+            ej.ReportViewer.ExportOptions.Pdf,
+        },
       })
 
       // $('#reportViewerContainer').ejReportViewer({
+      //   dataSources: [
+      //     {
+      //       name: 'PatientDeposit',
+      //       values: [
+      //         {
+      //           DepositDate: '2017-01-04',
+      //           PatientName: 'Med 400 Package',
+      //           Remarks: null,
+      //           DepositAmount: 2,
+      //           DepositModeDisplayValue: 'Cash',
+      //           SessionNo: '030117-06',
+      //         },
+      //         {
+      //           DepositDate: '2017-01-04',
+      //           PatientName: 'Med 400 Package',
+      //           Remarks: 'Remarks',
+      //           DepositAmount: 1,
+      //           DepositModeDisplayValue: 'Cash',
+      //           SessionNo: '030117-06',
+      //         },
+      //         {
+      //           DepositDate: '2017-01-11',
+      //           PatientName: 'Medisave 400 Package',
+      //           Remarks: null,
+      //           DepositAmount: 1,
+      //           DepositModeDisplayValue: 'Cash',
+      //           SessionNo: '110117-02',
+      //         },
+      //       ],
+      //     },
+      //   ],
       //   reportServiceUrl: `${baseUrl}/ReportViewerAPI`,
-      //   processingMode: ej.ReportViewer.ProcessingMode.Local,
-      //   reportPath: 'QueueListing',
+      //   processingMode: ej.ReportViewer.ProcessingMode.remote,
+      //   reportPath: '~/resources/Report/BusinessTransactionMainReport_A4.rdlc',
       //   ajaxBeforeLoad: onAjaxRequest,
       // })
     })
@@ -209,109 +246,16 @@ class Scribble extends React.Component {
 
     return (
       <CardContainer hideHeader>
-        <GridContainer
-          direction='column'
-          justify='space-between'
-          alignItems='center'
-        >
-          <GridItem className={classes.buttonsBar}>
-            <input
-              type='file'
-              id='file'
-              ref='fileUploader'
-              style={{ display: 'none' }}
-              onChange={this.onFileChange}
-            />
-            <Button
-              color='primary'
-              variant='outlined'
-              onClick={this.uploadImage}
-            >
-              Upload
-            </Button>
-            <Button
-              color='primary'
-              variant='outlined'
-              onClick={this.downloadImage}
-            >
-              Download
-            </Button>
-          </GridItem>
-          <GridItem md={6} className={classes.buttonsBar}>
-            <Button
-              color='primary'
-              size='sm'
-              variant='outlined'
-              id='undo'
-              onClick={this.onActionClick}
-            >
-              Undo
-            </Button>
-            <Button
-              color='primary'
-              size='sm'
-              variant='outlined'
-              id='redo'
-              onClick={this.onActionClick}
-            >
-              Redo
-            </Button>
-            <Button
-              color='primary'
-              size='sm'
-              variant='outlined'
-              id='reset'
-              onClick={this.onActionClick}
-            >
-              Reset
-            </Button>
-            <Button
-              color='primary'
-              size='sm'
-              simple={action !== 'circle_shape'}
-              id='circle_shape'
-              onClick={this.onActionClick}
-            >
-              Circle Shape
-            </Button>
-
-            <Button
-              color='primary'
-              size='sm'
-              id='draw'
-              simple={action !== 'draw'}
-              onClick={this.onActionClick}
-            >
-              Draw
-            </Button>
-          </GridItem>
-
-          <GridItem md={12}>
-            <ImageEditor
-              ref={this.editorRef}
-              includeUI={{
-                theme: uiTheme,
-                // menu: [
-                //   'draw',
-                // ],
-                uiSize: {
-                  width: '1000px',
-                  height: '700px',
-                },
-              }}
-              onMousedown={this.handleMousedown}
-              onObjectactivated={(props) => {
-                console.log('onObjectActivated', { props })
-              }}
-              // cssMaxHeight={700}
-              // cssMaxWidth={700}
-              selectionStyle={{
-                cornerSize: 20,
-                rotatingPointOffset: 70,
-              }}
-            />
-          </GridItem>
-        </GridContainer>
+        {/* <EJ.ReportViewer
+          id='groupingReportViewer'
+          reportServiceUrl='http://js.syncfusion.com/ejservices/api/ReportViewer'
+          processingMode='remote'
+          reportPath='GroupingAgg.rdl'
+        /> */}
+        <div
+          id='reportViewerContainer'
+          style={{ height: '70vh', width: '100%' }}
+        />
       </CardContainer>
     )
   }
