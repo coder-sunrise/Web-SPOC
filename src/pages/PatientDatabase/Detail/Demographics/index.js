@@ -184,7 +184,7 @@ class Demographic extends PureComponent {
   render () {
     console.log('Demographic', this.props)
     const { props, state } = this
-    const { values, patient, theme, classes, setValues } = props
+    const { values, patient, theme, classes, setValues, setFieldValue } = props
     return (
       <React.Fragment>
         <GridContainer gutter={0}>
@@ -232,7 +232,19 @@ class Demographic extends PureComponent {
                 <FastField
                   name='name'
                   render={(args) => {
-                    return <TextField label='Full Name' {...args} />
+                    return (
+                      <TextField
+                        label='Full Name'
+                        onChange={(e) => {
+                          if (
+                            !values.callingName ||
+                            e.target.value.indexOf(values.callingName) === 0
+                          )
+                            setFieldValue('callingName', e.target.value)
+                        }}
+                        {...args}
+                      />
+                    )
                   }}
                 />
               </GridItem>
@@ -329,7 +341,19 @@ class Demographic extends PureComponent {
                   render={(args) => <TextField label='Dialect' {...args} />}
                 />
               </GridItem>
-
+              <GridItem xs={12}>
+                <FastField
+                  name='occupationFK'
+                  render={(args) => (
+                    <CodeSelect
+                      label='Occupation'
+                      code='ctOccupation'
+                      autoComplete
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
               <GridItem xs={12}>
                 <FastField
                   name='patientRemarks'

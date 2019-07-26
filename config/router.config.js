@@ -425,6 +425,12 @@ const routes = [
             component: './Development/Control',
           },
           {
+            path: '/development/imageeditor',
+            name: 'TUIImageEditor',
+            mini: 'IE',
+            component: './Development/TUIImageEditor',
+          },
+          {
             path: '/development/scribble',
             name: 'Scribble',
             mini: 'CA',

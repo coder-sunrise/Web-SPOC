@@ -102,6 +102,8 @@
     "react-table": "^6.8.6",
     "rrule": "^2.6.2",
     "sass-loader": "^7.1.0",
+    "tui-color-picker": "^2.2.3",
+    "tui-image-editor": "^3.6.1",
     "universal-cookie": "^4.0.2",
     "yup": "^0.26.6"
   },

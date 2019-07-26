@@ -282,7 +282,7 @@ export default function request (url, option) {
             }
             let errorMsg = 'Unknown System Error'
 
-            if (response.status === 401) {
+            if (response.status === 401 && !localStorage.getItem('debug')) {
               /* eslint-disable no-underscore-dangle */
               window.g_app._store.dispatch({
                 type: 'login/logout',
