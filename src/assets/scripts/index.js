@@ -50,17 +50,48 @@ class Scribble extends React.Component {
         // reportServiceUrl: '/api/ReportViewer',
         processingMode: ej.ReportViewer.ProcessingMode.Remote,
         reportPath: 'GroupingAgg.rdl',
-        // exportSettings: {
-        //   exportOptions:
-        //     ej.ReportViewer.ExportOptions.Html |
-        //     ej.ReportViewer.ExportOptions.Pdf,
-        // },
+        exportSettings: {
+          exportOptions:
+            ej.ReportViewer.ExportOptions.Html |
+            ej.ReportViewer.ExportOptions.Pdf,
+        },
       })
 
       // $('#reportViewerContainer').ejReportViewer({
+      //   dataSources: [
+      //     {
+      //       name: 'PatientDeposit',
+      //       values: [
+      //         {
+      //           DepositDate: '2017-01-04',
+      //           PatientName: 'Med 400 Package',
+      //           Remarks: null,
+      //           DepositAmount: 2,
+      //           DepositModeDisplayValue: 'Cash',
+      //           SessionNo: '030117-06',
+      //         },
+      //         {
+      //           DepositDate: '2017-01-04',
+      //           PatientName: 'Med 400 Package',
+      //           Remarks: 'Remarks',
+      //           DepositAmount: 1,
+      //           DepositModeDisplayValue: 'Cash',
+      //           SessionNo: '030117-06',
+      //         },
+      //         {
+      //           DepositDate: '2017-01-11',
+      //           PatientName: 'Medisave 400 Package',
+      //           Remarks: null,
+      //           DepositAmount: 1,
+      //           DepositModeDisplayValue: 'Cash',
+      //           SessionNo: '110117-02',
+      //         },
+      //       ],
+      //     },
+      //   ],
       //   reportServiceUrl: `${baseUrl}/ReportViewerAPI`,
-      //   processingMode: ej.ReportViewer.ProcessingMode.Local,
-      //   reportPath: 'QueueListing',
+      //   processingMode: ej.ReportViewer.ProcessingMode.remote,
+      //   reportPath: '~/resources/Report/BusinessTransactionMainReport_A4.rdlc',
       //   ajaxBeforeLoad: onAjaxRequest,
       // })
     })
