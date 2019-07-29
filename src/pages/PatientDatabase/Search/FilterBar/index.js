@@ -58,7 +58,7 @@ class FilterBar extends PureComponent {
                 )
               }}
             />
-            <div className={classes.tansactionCheck}>
+            {/* <div className={classes.tansactionCheck}>
               <FastField
                 name='isExactSearch'
                 render={(args) => {
@@ -74,7 +74,7 @@ class FilterBar extends PureComponent {
                   )
                 }}
               />
-            </div>
+            </div> */}
           </GridItem>
           <GridItem lg={12} xl={4}>
             <div className={classes.filterBtn}>

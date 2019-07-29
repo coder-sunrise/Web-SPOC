@@ -1,6 +1,8 @@
 import moment from 'moment'
 import React from 'react'
 import nzh from 'nzh/cn'
+import router from 'umi/router'
+import { formatMessage, setLocale, getLocale } from 'umi/locale'
 import { parse, stringify } from 'qs'
 import $ from 'jquery'
 import numeral from 'numeral'
@@ -536,6 +538,38 @@ export const watchForElementChange = (e) => {
     observers[t].observe(e.container || document, r)
 }
 
+const confirmBeforeReload = (e) => {
+  e.preventDefault()
+  // Chrome requires returnValue to be set
+  e.returnValue = ''
+}
+
+const navigateDirtyCheck = (itemPath) => (e) => {
+  if (window.beforeReloadHandlerAdded) {
+    window.g_app._store.dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: formatMessage({
+          id: 'app.general.leave-without-save',
+        }),
+        onOpenConfirm: () => {
+          window.g_app._store.dispatch({
+            type: 'formik/updateState',
+            payload: {},
+          })
+          window.beforeReloadHandlerAdded = false
+          window.removeEventListener('beforeunload', confirmBeforeReload)
+          router.push({
+            pathname: itemPath,
+          })
+        },
+      },
+    })
+    e.preventDefault()
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -550,4 +584,6 @@ module.exports = {
   getGlobalVariable,
   updateCellValue,
   watchForElementChange,
+  confirmBeforeReload,
+  navigateDirtyCheck,
 }

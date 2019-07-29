@@ -75,7 +75,7 @@ const modalStyle = (theme) => {
     modalFooter: {
       borderTop: `1px solid ${theme.palette.divider}`,
 
-      padding: '12px',
+      padding: theme.spacing(1),
       // textAlign: "right",
       // paddingTop: "0",
       margin: '0',

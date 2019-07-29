@@ -2,12 +2,12 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
 import Link from 'umi/link'
 import { withStyles, MenuItem, MenuList, Divider } from '@material-ui/core'
 import {
+  withFormikExtend,
   PictureUpload,
   GridContainer,
   GridItem,
@@ -229,7 +229,7 @@ const schemaSchemes = {
   patient,
   global,
 }))
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ patient }) => {
     console.log('mapPropsToValues', patient)
     return patient.entity || patient.default
@@ -280,7 +280,7 @@ const schemaSchemes = {
     })
   },
 
-  displayName: 'Demographic',
+  displayName: 'PatientDetail',
 })
 class PatientDetail extends PureComponent {
   state = {
@@ -395,8 +395,6 @@ class PatientDetail extends PureComponent {
           console.log(o)
           this.props.resetForm(o)
         })
-    } else {
-      this.props.validateForm()
     }
 
     // dispatch({
@@ -458,6 +456,7 @@ class PatientDetail extends PureComponent {
       height,
       linkProps = {},
       onMenuClick = (p) => p,
+      footer,
       ...resetProps
     } = this.props
     console.log(this.props)
@@ -558,7 +557,7 @@ class PatientDetail extends PureComponent {
             <div
               style={
                 height > 0 ? (
-                  { height: height - 70 - 20, overflow: 'auto', padding: 4 }
+                  { height: height - 88 - 20, overflow: 'auto', padding: 4 }
                 ) : (
                   { padding: 4 }
                 )
@@ -567,45 +566,28 @@ class PatientDetail extends PureComponent {
               <CurrentComponent {...resetProps} />
             </div>
           </CardContainer>
+
           <div
             style={{
               position: 'relative',
-              textAlign: 'center',
             }}
           >
-            {values &&
-            values.id && (
-              <Button
-                // className={classes.modalCloseButton}
-                key='reset'
-                aria-label='Reset'
-                color='danger'
-                onClick={() => {
-                  resetForm(patient.entity)
-                }}
-                style={{ left: 0, position: 'absolute' }}
-              >
-                <Replay />
-                Reset
-              </Button>
-            )}
-            <Button
-              // className={classes.modalCloseButton}
-              key='cancel'
-              aria-label='Cancel'
-              color='danger'
-              onClick={() => {
+            {footer({
+              align: 'center',
+              onReset:
+                values && values.id
+                  ? () => {
+                      resetForm(patient.entity)
+                    }
+                  : undefined,
+              onCancel: () => {
                 dispatch({
                   type: 'patient/closePatientModal',
                 })
-              }}
-              style={{ marginRight: theme.spacing.unit }}
-            >
-              <Clear />
-              Cancel
-            </Button>
-            <ProgressButton onClick={handleSubmit} />
-            {/* {extraBtn} disabled={!allowSubmit} */}
+              },
+              onConfirm: handleSubmit,
+              confirmBtnText: 'Save',
+            })}
           </div>
         </GridItem>
       </GridContainer>

@@ -3,7 +3,9 @@ import { Menu } from 'antd'
 import Link from 'umi/link'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
-import { isUrl } from '@/utils/utils'
+import { isUrl, confirmBeforeReload, navigateDirtyCheck } from '@/utils/utils'
+import router from 'umi/router'
+import { formatMessage, setLocale, getLocale } from 'umi/locale'
 
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -230,7 +232,7 @@ class BaseMenu extends PureComponent {
                 onCollapse(true)
               }
             ) : (
-              undefined
+              navigateDirtyCheck(itemPath)
             )
           }
           className={navLinkClasses}
@@ -244,7 +246,7 @@ class BaseMenu extends PureComponent {
           )}
 
           <ListItemText
-            primary={item.name}
+            primary={item.name + '1'}
             disableTypography
             className={level === 0 ? itemText : collapseItemText}
           />

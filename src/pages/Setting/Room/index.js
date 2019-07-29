@@ -64,6 +64,7 @@ class Room extends PureComponent {
         <Grid {...cfg} {...this.props} />
         <CommonModal
           open={settingRoom.showModal}
+          observe='RoomDetail'
           title='Add Room'
           maxWidth='md'
           bodyNoPadding

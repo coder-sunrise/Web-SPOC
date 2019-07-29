@@ -51,6 +51,7 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showPatientInfoPanel}
           title='Patient Profile'
+          observe='PatientDetail'
           onClose={(e) => {
             dispatch({
               type: 'patient/closePatientModal',
@@ -77,7 +78,7 @@ class GlobalModalContainer extends PureComponent {
               },
             })
           }}
-          onConfimr={() => {
+          onConfirm={() => {
             this.props.dispatch({
               type: 'login/logout',
             })
@@ -95,6 +96,68 @@ class GlobalModalContainer extends PureComponent {
           >
             Your session will be disconnected in 1 minutes
           </div>
+        </CommonModal>
+
+        <CommonModal
+          open={global.showSessionTimeout}
+          title='Session Timeout'
+          maxWidth='sm'
+          onClose={(e) => {
+            clearTimeout(this._timer)
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showSessionTimeout: false,
+              },
+            })
+          }}
+          onConfirm={() => {
+            this.props.dispatch({
+              type: 'login/logout',
+            })
+          }}
+          showFooter
+        >
+          <div
+            style={{
+              textAlign: 'center',
+              minHeight: 100,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            Your session will be disconnected in 1 minutes
+          </div>
+        </CommonModal>
+
+        <CommonModal
+          open={global.openConfirm}
+          title={global.openConfirmTitle}
+          maxWidth='sm'
+          onClose={(e) => {
+            clearTimeout(this._timer)
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: false,
+              },
+            })
+          }}
+          onConfirm={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openConfirm: false,
+              },
+            })
+            if (global.onOpenConfirm) {
+              global.onOpenConfirm()
+            }
+          }}
+          showFooter
+        >
+          <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
         </CommonModal>
       </div>
     )

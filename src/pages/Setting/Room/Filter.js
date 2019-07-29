@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { status } from '@/utils/codes'
 import {
+  withFormikExtend,
+  FastField,
   GridContainer,
   GridItem,
   Button,
@@ -12,7 +13,7 @@ import {
   ProgressButton,
 } from '@/components'
 
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ settingRoom }) => settingRoom.filter || {},
   handleSubmit: () => {},
   displayName: 'RoomFilter',

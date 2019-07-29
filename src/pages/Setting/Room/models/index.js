@@ -7,7 +7,9 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      default: {},
+      default: {
+        isUserMaintainable: true,
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -16,15 +18,20 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      querySingleDone (st, { payload }) {
+      queryDone (st, { payload }) {
         const { data } = payload
-        data.effectiveDates = [
-          data.effectiveStartDate,
-          data.effectiveEndDate,
-        ]
+
         return {
           ...st,
-          entity: data,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+              effectiveDates: [
+                o.effectiveStartDate,
+                o.effectiveEndDate,
+              ],
+            }
+          }),
         }
       },
     },

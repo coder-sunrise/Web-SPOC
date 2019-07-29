@@ -61,7 +61,7 @@ class FormikTextField extends React.PureComponent {
   }
 
   _onChange = (value) => {
-    console.log(value)
+    // console.log(value)
 
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
@@ -87,7 +87,7 @@ class FormikTextField extends React.PureComponent {
   }
 
   onChange = (event) => {
-    console.log(event)
+    // console.log(event)
     this.setState({
       value: event.target.value,
       isDebouncing: true,

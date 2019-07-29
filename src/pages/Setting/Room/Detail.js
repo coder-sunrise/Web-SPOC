@@ -1,14 +1,13 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles, Tooltip } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import {
+  withFormikExtend,
+  FastField,
   GridContainer,
   GridItem,
   Button,
@@ -30,7 +29,8 @@ const itemSchema = Yup.object().shape({
   sellingPrice: Yup.number().required(),
 })
 
-@withFormik({
+@withFormikExtend({
+  a: 134,
   mapPropsToValues: ({ settingRoom }) =>
     settingRoom.entity || settingRoom.default,
   validationSchema: Yup.object().shape({
@@ -65,16 +65,10 @@ const itemSchema = Yup.object().shape({
 class Detail extends PureComponent {
   state = {}
 
-  componentDidMount () {
-    if (!this.props.values.id) {
-      this.props.validateForm()
-    }
-  }
-
   render () {
     const { props } = this
     const { classes, theme, footer, values } = props
-    console.log('detail', props)
+    // console.log('detail', props)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

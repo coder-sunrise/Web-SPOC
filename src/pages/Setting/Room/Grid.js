@@ -7,6 +7,7 @@ import * as service from './services'
 
 export default ({ dispatch, classes, settingRoom, toggleModal }) => {
   const editRow = async (row) => {
+    const { list } = settingRoom
     // For complex object retrieve from server
     // dispatch({
     //   type: 'settingRoom/querySingle',
@@ -19,7 +20,7 @@ export default ({ dispatch, classes, settingRoom, toggleModal }) => {
       type: 'settingRoom/updateState',
       payload: {
         showModal: true,
-        entity: row,
+        entity: list.find((o) => o.id === row.id),
       },
     })
   }
@@ -32,13 +33,13 @@ export default ({ dispatch, classes, settingRoom, toggleModal }) => {
         { name: 'code', title: 'Code' },
         { name: 'displayValue', title: 'Display Value' },
         { name: 'description', title: 'Description' },
-        { name: 'isDeleted', title: 'Status' }, //wait api return isActive to replace
+        { name: 'isActive', title: 'Status' },
         { name: 'action', title: 'Action' },
       ]}
       // FuncProps={{ pager: false }}
       columnExtensions={[
         {
-          columnName: 'isDeleted',
+          columnName: 'isActive',
           sortingEnabled: false,
           type: 'select',
           options: status,

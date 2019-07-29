@@ -11,6 +11,8 @@ import Link from 'umi/link'
 import styles from './index.less'
 import { urlToList } from '../_utils/pathTools'
 
+import { navigateDirtyCheck } from '@/utils/utils'
+
 export const getBreadcrumb = (breadcrumbNameMap = [], url) => {
   let breadcrumb = breadcrumbNameMap[url]
   if (!breadcrumb) {
@@ -132,7 +134,9 @@ class BreadcrumbView extends PureComponent {
       !currentBreadcrumb.hideInBreadcrumb ? location.pathname === targetUrl ? (
         <Typography color='textPrimary'>{name}</Typography>
       ) : (
-        <Link to={targetUrl}>{name}</Link>
+        <Link to={targetUrl} onClick={navigateDirtyCheck(targetUrl)}>
+          {name}
+        </Link>
       ) : null
     })
     // Add home breadcrumbs to your head

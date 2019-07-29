@@ -21,6 +21,23 @@ export default class BaseCRUDViewModel {
     this.options = options
   }
 
+  create () {
+    const { namespace, param, setting = {} } = this.options
+    const { service, state, subscriptions, effects, reducers } = param
+    return {
+      state,
+      subscriptions: {},
+      effects: {
+        ...this.effects({}),
+        ...effects,
+      },
+      reducers: {
+        ...this.reducers(),
+        ...reducers,
+      },
+    }
+  }
+
   subscriptions ({ dispatch, history }) {
     history.listen((location) => {
       // if (lastLocation && lastLocation.key === location.key) return
@@ -58,8 +75,8 @@ export default class BaseCRUDViewModel {
 
   state () {
     return {
-      isTouched: false,
-      entity: null,
+      // isTouched: false,
+      // entity: null,
       // items: [],
       default: {},
     }

@@ -14,6 +14,7 @@ import inventory from './en-US/inventory'
 import sms from './en-US/sms'
 import finance from './en-US/finance'
 import reception from './en-US/reception'
+import general from './en-US/general'
 
 export default {
   'navBar.lang': 'Languages',
@@ -24,6 +25,7 @@ export default {
   'app.forms.basic.title': 'Basic form',
   'app.forms.basic.description':
     'Form pages are used to collect or verify information to users, and basic forms are common in scenarios where there are fewer data items.',
+  ...general,
   ...analysis,
   ...exception,
   ...form,

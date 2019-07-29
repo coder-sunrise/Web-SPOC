@@ -23,6 +23,8 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
     return {
       namespace,
       state: {
+        entity: null,
+        default: {},
         ...super.state(),
         // data: {},
         ...state,

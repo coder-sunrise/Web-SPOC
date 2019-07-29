@@ -1,4 +1,5 @@
 import React from 'react'
+
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import PerfectScrollbar from 'perfect-scrollbar'
@@ -16,6 +17,7 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import Loading from '@/components/PageLoading/index'
+import { confirmBeforeReload } from '@/utils/utils'
 
 import { SizeContainer, ProgressButton } from '@/components'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
@@ -36,6 +38,7 @@ function getContainerHeight (props) {
 class CommonModal extends React.PureComponent {
   state = {
     // open: false,
+    openConfirm: false,
     height: 0,
   }
 
@@ -95,7 +98,9 @@ class CommonModal extends React.PureComponent {
   // }
 
   footer = ({
+    align = 'flex-end',
     onConfirm,
+    onReset,
     confirmProps = {},
     cancelProps,
     confirmBtnText = 'Confirm',
@@ -105,11 +110,25 @@ class CommonModal extends React.PureComponent {
     // console.log('footer', this.props)
     const { disabled = false } = confirmProps
     return (
-      <DialogActions className={classes.modalFooter}>
+      <DialogActions
+        className={classes.modalFooter}
+        style={{ justifyContent: align }}
+      >
+        {onReset && (
+          <Button
+            key='reset'
+            aria-label='Reset'
+            color='danger'
+            onClick={onReset}
+            style={{ left: 0, position: 'absolute' }}
+          >
+            Reset
+          </Button>
+        )}
         <Button
           onClick={this.onClose}
           color='danger'
-          disabled={loading.global}
+          // disabled={loading.global}
           {...cancelProps}
         >
           {cancelText || 'Cancel'}
@@ -122,23 +141,44 @@ class CommonModal extends React.PureComponent {
           {...confirmProps}
           // disabled={disabled || loading.global || global.disableSave}
         >
-          {confirmText || confirmBtnText}
+          {confirmBtnText || confirmText}
         </ProgressButton>
       </DialogActions>
     )
   }
 
-  onClose = (e) => {
-    if (this.props.onClose) {
-      this.props.onClose(e)
+  onClose = (force) => {
+    const ob = window.g_app._store.getState().formik[this.props.observe]
+    console.log(ob)
+    if (ob) {
+      if (ob.dirty && force !== true) {
+        this.setState({
+          openConfirm: true,
+        })
+        return false
+      }
+      this.props.dispatch({
+        type: 'formik/updateState',
+        payload: {
+          [this.props.observe]: undefined,
+        },
+      })
+      window.removeEventListener('beforeunload', confirmBeforeReload)
     }
+    if (this.props.onClose) {
+      this.props.onClose()
+    }
+    return true
   }
 
-  onConfim = (cb) => {
-    if (this.props.onConfim) {
-      this.props.onConfim()
+  onConfirm = (cb) => {
+    console.log('onConfirm')
+    window.removeEventListener('beforeunload', confirmBeforeReload)
+
+    if (this.props.onConfirm) {
+      this.props.onConfirm()
     }
-    if (cb) cb()
+    if (typeof cb === 'function') cb()
   }
 
   handleMaxWidthChange = (event) => {
@@ -183,68 +223,72 @@ class CommonModal extends React.PureComponent {
 
     const childrenWithProps = React.Children.map(children, (child) =>
       React.cloneElement(child, {
-        onConfirm: this.props.onConfirm || this.onConfim,
-        onClose: this.props.onClose,
+        onConfirm: this.onConfirm,
+        onClose: this.onClose,
         footer: this.footer,
         height: this.state.height,
       }),
     )
     // console.log(this.props)
     return (
-      <Dialog
-        classes={{
-          root: `${classes.modalRoot}`,
-          paper: classes.modal,
-        }}
-        disableBackdropClick={disableBackdropClick}
-        open={open}
-        fullScreen={this.props.fullScreen}
-        fullWidth={adaptFullWidth}
-        maxWidth={maxWidth}
-        TransitionComponent={Transition}
-        keepMounted={keepMounted}
-        onClose={this.onClose}
-        aria-labelledby='classic-modal-slide-title'
-        aria-describedby='classic-modal-slide-description'
-        style={{ overflow: 'hidden' }}
-      >
-        <DialogTitle
-          // id="classic-modal-slide-title"
-          disableTypography
-          className={classes.modalHeader}
+      <React.Fragment>
+        <Dialog
+          classes={{
+            root: `${classes.modalRoot}`,
+            paper: classes.modal,
+          }}
+          disableBackdropClick={disableBackdropClick}
+          open={open}
+          fullScreen={this.props.fullScreen}
+          fullWidth={adaptFullWidth}
+          maxWidth={maxWidth}
+          TransitionComponent={Transition}
+          keepMounted={keepMounted}
+          onClose={this.onClose}
+          aria-labelledby='classic-modal-slide-title'
+          aria-describedby='classic-modal-slide-description'
+          style={{ overflow: 'hidden' }}
+          onEscapeKeyDown={this.onClose}
         >
-          <Button
-            justIcon
-            className={classes.modalCloseButton}
-            key='close'
-            aria-label='Close'
-            color='transparent'
-            onClick={this.onClose}
+          {title && (
+            <DialogTitle
+              // id="classic-modal-slide-title"
+              disableTypography
+              className={classes.modalHeader}
+            >
+              <Button
+                justIcon
+                className={classes.modalCloseButton}
+                key='close'
+                aria-label='Close'
+                color='transparent'
+                onClick={this.onClose}
+              >
+                <Close className={classes.modalClose} />
+              </Button>
+              <h4 className={classes.modalTitle}>{title}</h4>
+            </DialogTitle>
+          )}
+          <DialogContent
+            // id="classic-modal-slide-description"
+            className={`${classes.modalBody} ${bodyNoPadding
+              ? classes.modalBodyNoPadding
+              : classes.modalBodyPadding}`}
+            style={{ maxHeight: this.state.height }}
           >
-            <Close className={classes.modalClose} />
-          </Button>
-          {title && <h4 className={classes.modalTitle}>{title}</h4>}
-        </DialogTitle>
-        <DialogContent
-          // id="classic-modal-slide-description"
-          className={`${classes.modalBody} ${bodyNoPadding
-            ? classes.modalBodyNoPadding
-            : classes.modalBodyPadding}`}
-          style={{ maxHeight: this.state.height }}
-        >
-          {loading.global ? (
-            <Loading
-              style={{
-                position: 'absolute',
-                width: '100%',
-                zIndex: 99999,
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                margin: bodyNoPadding ? 0 : -12,
-              }}
-            />
-          ) : null}
-          {/* <div
+            {loading.global ? (
+              <Loading
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  zIndex: 99999,
+                  height: '100%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                  margin: bodyNoPadding ? 0 : -12,
+                }}
+              />
+            ) : null}
+            {/* <div
             ref='modalContent'
             style={{
               height: this.getHeight(),
@@ -253,18 +297,51 @@ class CommonModal extends React.PureComponent {
           >
             
           </div> */}
-          {open ? (
-            <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
-          ) : (
-            <div />
-          )}
-        </DialogContent>
-        {showFooter &&
-          this.footer({
-            onConfirm: this.props.onConfirm,
-            ...footProps,
-          })}
-      </Dialog>
+            {open ? (
+              <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
+            ) : (
+              <div />
+            )}
+          </DialogContent>
+          {showFooter &&
+            this.footer({
+              onConfirm: this.onConfirm,
+              ...footProps,
+            })}
+        </Dialog>
+
+        <Dialog open={this.state.openConfirm} maxWidth='sm' fullWidth>
+          <DialogContent>
+            <h3>
+              <FormattedMessage id='app.general.leave-without-save' />
+            </h3>
+          </DialogContent>
+          <DialogActions className={classes.modalFooter}>
+            <Button
+              onClick={() => {
+                this.setState({
+                  openConfirm: false,
+                })
+              }}
+              color='danger'
+            >
+              Cancel
+            </Button>
+            <Button
+              color='primary'
+              onClick={() => {
+                this.setState({
+                  openConfirm: false,
+                })
+                window.removeEventListener('beforeunload', confirmBeforeReload)
+                this.onClose(true)
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
     )
   }
 }

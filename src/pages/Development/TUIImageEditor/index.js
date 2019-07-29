@@ -120,7 +120,6 @@ class ControlTest extends PureComponent {
   // }
 
   componentDidMount () {
-    return
     const myTheme = {
       'common.bi.image':
         'https://uicdn.toast.com/toastui/img/tui-image-editor-bi.png',
@@ -217,15 +216,15 @@ class ControlTest extends PureComponent {
         //   'shape',
         //   'filter',
         // ],
-        initMenu: 'filter',
+        initMenu: 'draw',
         uiSize: {
           // width: '1000px',
           height: '85vh',
         },
-        menuBarPosition: 'right',
+        menuBarPosition: 'bottom',
       },
-      // cssMaxHeight={document.documentElement.clientHeight}
-      // cssMaxWidth={document.documentElement.clientWidth}
+      cssMaxHeight: document.documentElement.clientHeight * 0.7,
+      // cssMaxWidth=document.documentElement.clientWidth
       // selectionStyle={{
       //   cornerSize: 20,
       //   rotatingPointOffset: 70,
@@ -311,44 +310,6 @@ class ControlTest extends PureComponent {
 
     return (
       <CardContainer hideHeader>
-        <div className='sub-menu-container menu' id='draw-line-sub-menu'>
-          <ul className='menu'>
-            <li className='menu-item'>
-              <label>
-                <input
-                  type='radio'
-                  name='select-line-type'
-                  value='freeDrawing'
-                  checked='checked'
-                />{' '}
-                Free drawing
-              </label>
-              <label>
-                <input
-                  type='radio'
-                  name='select-line-type'
-                  value='lineDrawing'
-                />{' '}
-                Straight line
-              </label>
-            </li>
-            <li className='menu-item'>
-              <div id='tui-brush-color-picker'>Brush color</div>
-            </li>
-            <li className='menu-item'>
-              <label className='menu-item no-pointer'>
-                Brush width<input
-                  id='input-brush-width-range'
-                  type='range'
-                  min='5'
-                  max='30'
-                  value='12'
-                />
-              </label>
-            </li>
-            <li className='menu-item close'>Close</li>
-          </ul>
-        </div>
         <div id='tui-image-editor-container' />
       </CardContainer>
     )
