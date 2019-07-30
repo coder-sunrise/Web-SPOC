@@ -182,7 +182,7 @@ class DetailsGrid extends PureComponent {
       flattenAppointmentDateToCalendarEvents,
       [],
     )
-
+    console.log({ queueListing })
     const data =
       currentFilter === StatusIndicator.APPOINTMENT
         ? filterDoctorBlock(flattenedCalendarData)

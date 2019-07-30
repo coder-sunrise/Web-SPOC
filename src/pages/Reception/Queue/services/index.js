@@ -51,18 +51,19 @@ export const getSessionInfo = async (sessionID) => {
   return response
 }
 
-export const getQueueListing = async (sessionID) => {
+export const getQueueListing = async (sessionID, filter) => {
   const criteria = [
     {
       prop: 'VisitFKNavigation.BizSessionFK',
       val: sessionID,
       opr: 'eql',
     },
+    filter,
   ]
 
   const response = await request(`/api/queue/`, {
     method: 'GET',
-    data: stringify({ criteria }),
+    data: stringify({ criteria, combineCondition: 'and' }),
   })
   return response
 }
@@ -103,5 +104,18 @@ export async function registerVisit (visitInfo) {
 
 export async function getCodeTable (codetableName) {
   const response = await request(`/api/CodeTable?ctnames=${codetableName}`)
+  return response
+}
+
+export const fetchDoctorProfile = async () => {
+  const criteria = {
+    current: 1,
+    pageSize: 10,
+  }
+  const response = await request('/api/doctorprofile', {
+    method: 'GET',
+    // body: JSON.stringify(criteria),
+  })
+  console.log({ response })
   return response
 }

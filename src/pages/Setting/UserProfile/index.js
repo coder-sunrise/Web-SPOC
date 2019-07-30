@@ -118,6 +118,15 @@ class UserProfile extends React.Component {
     })
   }
 
+  onConfirmClick = (values) => {
+    const { dispatch } = this.props
+    console.log({ values, props: this.props })
+    dispatch({
+      type: 'settingUserProfile/upsert',
+      payload: { ...values },
+    })
+  }
+
   render () {
     const { classes, settingUserProfile } = this.props
     const {
@@ -179,8 +188,8 @@ class UserProfile extends React.Component {
             )
           }
           open={showUserProfileModal}
-          onConfirm={this.closeModal}
           onClose={this.closeModal}
+          onConfirm={this.onConfirmClick}
         >
           <UserProfileForm
             selectedUser={currentSelectedUser}

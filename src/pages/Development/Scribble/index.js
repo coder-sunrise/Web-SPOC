@@ -1,6 +1,6 @@
 import React from 'react'
-import 'tui-image-editor/dist/tui-image-editor.css'
-import ImageEditor from '@toast-ui/react-image-editor'
+// import 'tui-image-editor/dist/tui-image-editor.css'
+// import ImageEditor from '@toast-ui/react-image-editor'
 
 // import '@syncfusion/reporting-react/Scripts/reports/ej.reporting.react.min'
 // import './create-react-class.min'
@@ -25,64 +25,6 @@ class Scribble extends React.Component {
 
   state = {
     action: 'shape',
-  }
-
-  componentDidMount () {
-    // const script = document.createElement('script')
-
-    // script.src = 'https://use.typekit.net/foobar.js'
-    // script.async = true
-
-    // document.body.appendChild(script)
-
-    // eslint-disable-line
-    $(function () {
-      $('#reportViewerContainer').ejReportViewer({
-        reportServiceUrl:
-          'http://js.syncfusion.com/ejservices/api/ReportViewer',
-        // reportServerUrl: 'http://js.syncfusion.com/ejservices',
-        // reportServiceUrl: '/api/ReportViewer',
-        processingMode: ej.ReportViewer.ProcessingMode.Remote,
-        reportPath: 'GroupingAgg.rdl',
-        // exportSettings: {
-        //   exportOptions:
-        //     ej.ReportViewer.ExportOptions.Html |
-        //     ej.ReportViewer.ExportOptions.Pdf,
-        // },
-      })
-
-      // $('#reportViewerContainer').ejReportViewer({
-      //   reportServiceUrl: `${baseUrl}/ReportViewerAPI`,
-      //   processingMode: ej.ReportViewer.ProcessingMode.Local,
-      //   reportPath: 'QueueListing',
-      //   ajaxBeforeLoad: onAjaxRequest,
-      // })
-    })
-    function getQueryString (name) {
-      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
-      var r = location.search.substr(1).match(reg)
-      if (r !== null) return decodeURI(r[2])
-      return null
-    }
-    function onAjaxRequest (args) {
-      //Passing custom parameter data to server
-      var param = ''
-      var from = getQueryString('ListingFrom')
-      if (from != null) {
-        param = '"ListingFrom":"' + from + '"'
-      }
-      var to = getQueryString('ListingTo')
-      if (to != null) {
-        if (param != '') {
-          param += ','
-        }
-        param += '"ListingTo":"' + to + '"'
-      }
-      if (param != '') args.data = '{' + param + '}'
-      console.log({ args })
-    }
-
-    console.log($('#reportViewerContainer'))
   }
 
   uploadImage = () => {
@@ -204,8 +146,6 @@ class Scribble extends React.Component {
   render () {
     const { action } = this.state
     const { classes } = this.props
-
-    const myExtScript = require('./reportViewer')
 
     return (
       <CardContainer hideHeader>
