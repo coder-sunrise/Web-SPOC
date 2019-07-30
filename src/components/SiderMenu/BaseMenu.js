@@ -246,7 +246,7 @@ class BaseMenu extends PureComponent {
           )}
 
           <ListItemText
-            primary={item.name + '1'}
+            primary={item.name}
             disableTypography
             className={level === 0 ? itemText : collapseItemText}
           />
