@@ -182,13 +182,13 @@ class Queue extends PureComponent {
     this.setState({ currentQuery: value })
   }
 
-  onEnterPressed = () => {
+  onEnterPressed = (searchQuery) => {
     const { dispatch } = this.props
-    const { currentQuery } = this.state
-    currentQuery !== '' &&
+    // const { currentQuery } = this.state
+    searchQuery !== '' &&
       dispatch({
         type: `${modelKey}fetchPatientListByName`,
-        payload: currentQuery,
+        payload: searchQuery,
       }).then(this.showSearchResult)
   }
 
@@ -274,8 +274,8 @@ class Queue extends PureComponent {
                     loading.effects[`${modelKey}fetchPatientListByName`]
                   }
                   // currentFilter={currentFilter}
-                  currentSearchPatient={currentQuery}
-                  handleQueryChange={this.onQueryChanged}
+                  // currentSearchPatient={currentQuery}
+                  // handleQueryChange={this.onQueryChanged}
                   handleStatusChange={this.onStatusChange}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   togglePatientSearch={this.togglePatientSearch}

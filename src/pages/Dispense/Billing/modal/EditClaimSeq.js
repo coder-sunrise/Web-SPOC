@@ -55,6 +55,9 @@ class EditClaimSeq extends Component {
             onRowChangesChange: this.changeRowChanges,
             onCommitChanges: this.commitChanges,
           }}
+          FuncProps={{
+            pager: false,
+          }}
           // errors={errors.patientEmergencyContact}
           // schema={pecValidationSchema}
         />

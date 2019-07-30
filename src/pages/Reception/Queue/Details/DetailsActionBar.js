@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 // umi locale
 import { FormattedMessage, formatMessage } from 'umi/locale'
+// formik
+import { FastField, withFormik } from 'formik'
 // material ui
 import { CircularProgress, withStyles } from '@material-ui/core'
 import PersonAdd from '@material-ui/icons/PersonAdd'
@@ -40,6 +42,15 @@ const styles = () => ({
   },
 })
 
+@withFormik({
+  mapPropsToValues: () => ({
+    search: '',
+  }),
+  handleSubmit: ({ search }, { props }) => {
+    const { onRegisterVisitEnterPressed } = props
+    onRegisterVisitEnterPressed(search)
+  },
+})
 class DetailsActionBar extends PureComponent {
   static propTypes = {
     onRegisterVisitEnterPressed: PropTypes.func,
@@ -51,33 +62,34 @@ class DetailsActionBar extends PureComponent {
     const {
       classes,
       toggleNewPatient,
-      currentFilter,
-      currentSearchPatient,
       handleStatusChange,
-      handleQueryChange,
-      onRegisterVisitEnterPressed,
       isFetching,
+      handleSubmit,
+      values,
     } = this.props
     return (
       <GridContainer className={classnames(classes.actionBar)}>
         <GridItem xs md={3}>
-          <TextField
-            suffix={isFetching && <CircularProgress size={16} />}
-            value={currentSearchPatient}
-            onChange={handleQueryChange}
-            onEnterPressed={onRegisterVisitEnterPressed}
-            label={formatMessage({
-              id: 'reception.queue.registerVisitTextBox',
-            })}
+          <FastField
+            name='search'
+            render={(args) => (
+              <TextField
+                {...args}
+                suffix={isFetching && <CircularProgress size={16} />}
+                label={formatMessage({
+                  id: 'reception.queue.registerVisitTextBox',
+                })}
+              />
+            )}
           />
         </GridItem>
 
         <GridItem xs md={3} container alignItems='center'>
           <Button
             color='primary'
-            disabled={currentSearchPatient.trim() === ''}
+            disabled={values.search.trim() === ''}
             size='sm'
-            onClick={onRegisterVisitEnterPressed}
+            onClick={handleSubmit}
           >
             <Search />
             Search

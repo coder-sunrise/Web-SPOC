@@ -128,6 +128,9 @@ class AppointmentDataGrid extends React.PureComponent {
         leftColumns={[
           'conflict',
         ]}
+        FuncProps={{
+          pager: false,
+        }}
         EditingProps={{
           showAddCommand: true,
           editingRowIds: this.state.editingRowIds,
