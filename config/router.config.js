@@ -293,6 +293,7 @@ const routes = [
         path: '/forms',
         icon: 'assignment',
         name: 'forms',
+        hideInMenu: true,
         // component: './Forms',
       },
       // Forms
@@ -311,7 +312,7 @@ const routes = [
         path: '/report',
         icon: 'library_books',
         name: 'report',
-        // component: './Report',
+        component: './Report',
       },
       // Report
       //
@@ -320,6 +321,7 @@ const routes = [
         path: '/human-resource',
         icon: 'perm_identity',
         name: 'humanResource',
+        hideInMenu: true,
         // component: '',
       },
       // Human Resource
@@ -409,6 +411,26 @@ const routes = [
             path: '/setting/doctorblock',
             name: 'doctorblock',
             component: './Setting/DoctorBlock',
+          },
+          {
+            path: '/setting/userprofile',
+            name: 'userprofile',
+            component: './Setting/UserProfile',
+          },
+          {
+            path: '/setting/userprofile/new',
+            name: 'newuserprofile',
+            component: './Setting/UserProfile/Details',
+          },
+          {
+            path: '/setting/userprofile/:id',
+            name: 'edituserprofile',
+            component: './Setting/UserProfile/Details',
+          },
+          {
+            path: '/setting/userrole',
+            name: 'userrole',
+            component: './Setting/UserRole',
           },
         ],
       },

@@ -1,8 +1,13 @@
 import React from 'react'
-import 'tui-image-editor/dist/tui-image-editor.css'
-import ImageEditor from '@toast-ui/react-image-editor'
+// import 'tui-image-editor/dist/tui-image-editor.css'
+// import ImageEditor from '@toast-ui/react-image-editor'
+
+// import '@syncfusion/reporting-react/Scripts/reports/ej.reporting.react.min'
+// import './create-react-class.min'
+
 // material ui
 import { withStyles } from '@material-ui/core'
+import { baseUrl } from '@/utils/request'
 // toast ui theme
 import uiTheme from './uiTheme'
 // common component

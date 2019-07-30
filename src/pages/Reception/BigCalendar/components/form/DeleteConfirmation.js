@@ -58,22 +58,17 @@ function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
   ] = useState('noshow')
 
   const onContinueClick = () => {
-    if (seriesType === '') {
+    if (isSeries && seriesType === '') {
       setError('Please choose an option')
     } else {
       setStep(1)
     }
   }
 
-  const onChange = (event, value) => {
+  const onChange = (event) => {
     const { target } = event
     setSeriesType(target.value)
     setError('')
-  }
-
-  const handleDeleteTypeChange = (event) => {
-    const { target } = event
-    setDeleteType(target.value)
   }
 
   const onReasonTextChange = (event) => {

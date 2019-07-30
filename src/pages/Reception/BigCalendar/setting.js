@@ -72,7 +72,7 @@ export const defaultColorOpts = {
 
 export const doctorEventColorOpts = {
   name: 'doctorEvent',
-  value: '#bfbfbf',
+  value: '#999',
   active: '#8c8c8c',
 }
 

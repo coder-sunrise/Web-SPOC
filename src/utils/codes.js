@@ -566,12 +566,20 @@ export const getCodes = async (_code) => {
         : existedData
     }
   } catch (error) {
-    console.group('getcodes2 error')
     console.log({ error })
-    console.groupEnd('getcodes2 error')
   }
 
   return result
+}
+
+export const getTenantCodes = async (tenantCode) => {
+  // todo: paging
+  const response = await request(`/api/${tenantCode}`, { method: 'GET' })
+  const { status: statusCode, data } = response
+  if (statusCode === '200' || statusCode === 200) {
+    return data
+  }
+  return {}
 }
 
 module.exports = {

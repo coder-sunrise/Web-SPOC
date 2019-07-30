@@ -32,7 +32,7 @@ import PatientSearchModal from './PatientSearch'
 import NewPatient from '../../PatientDatabase/New'
 import ViewPatient from '../../PatientDatabase/Detail'
 import EndSessionSummary from './Details/EndSessionSummary'
-import { StatusIndicator } from './variables'
+import { StatusIndicator, modelKey } from './variables'
 
 const drawerWidth = 400
 
@@ -80,9 +80,7 @@ const styles = (theme) => ({
 @withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends PureComponent {
   state = {
-    showNewVisit: false,
     showPatientSearch: false,
-    showRegisterNewPatient: false,
     showViewPatientProfile: false,
     showEndSessionSummary: false,
     currentFilter: StatusIndicator.ALL,
@@ -92,7 +90,7 @@ class Queue extends PureComponent {
   componentWillMount = () => {
     const { dispatch } = this.props
     dispatch({
-      type: 'queueLog/getSessionInfo',
+      type: `${modelKey}getSessionInfo`,
     })
   }
 
@@ -101,25 +99,22 @@ class Queue extends PureComponent {
 
     patientID !== '' &&
       dispatch({
-        type: 'queueLog/fetchPatientInfoByPatientID',
+        type: `${modelKey}fetchPatientInfoByPatientID`,
         payload: { patientID },
-      }).then((response) => {
-        console.log('response', response)
-      })
-    this.setState({
-      showNewVisit: true,
-    })
+      }).then(() =>
+        this.setState({
+          showPatientSearch: false,
+        }),
+      )
   }
 
   closeVisitRegistration = () => {
-    this.setState({
-      showNewVisit: false,
+    this.props.dispatch({
+      type: `${modelKey}closeVisitModal`,
     })
   }
 
   toggleRegisterNewPatient = () => {
-    // const { showRegisterNewPatient } = this.state
-    // this.setState({ showRegisterNewPatient: !showRegisterNewPatient })
     this.props.dispatch({
       type: 'patient/openPatientModal',
     })
@@ -130,17 +125,10 @@ class Queue extends PureComponent {
     this.setState({ showViewPatientProfile: !showViewPatientProfile })
   }
 
-  handleRegisterVisit = () => {
-    this.setState({
-      showPatientSearch: false,
-      showNewVisit: false,
-    })
-  }
-
   togglePatientSearch = () => {
     // const { dispatch } = this.props
     // dispatch({
-    //   type: 'queueLog/togglePatientSearch',
+    //   type: `${modelKey}togglePatientSearch`,
     // })
     const { showPatientSearch } = this.state
     this.setState({ showPatientSearch: !showPatientSearch })
@@ -149,7 +137,7 @@ class Queue extends PureComponent {
   onStartSession = () => {
     const { dispatch } = this.props
     dispatch({
-      type: 'queueLog/startSession',
+      type: `${modelKey}startSession`,
     })
   }
 
@@ -171,7 +159,7 @@ class Queue extends PureComponent {
   onConfirmEndSession = (doneCb) => {
     const { queueLog, dispatch } = this.props
     dispatch({
-      type: 'queueLog/endSession',
+      type: `${modelKey}endSession`,
       sessionID: queueLog.sessionInfo.id,
     }).then((r) => {
       // if (doneCb) doneCb(r)
@@ -194,13 +182,13 @@ class Queue extends PureComponent {
     this.setState({ currentQuery: value })
   }
 
-  onEnterPressed = () => {
+  onEnterPressed = (searchQuery) => {
     const { dispatch } = this.props
-    const { currentQuery } = this.state
-    currentQuery !== '' &&
+    // const { currentQuery } = this.state
+    searchQuery !== '' &&
       dispatch({
-        type: 'queueLog/fetchPatientListByName',
-        payload: currentQuery,
+        type: `${modelKey}fetchPatientListByName`,
+        payload: searchQuery,
       }).then(this.showSearchResult)
   }
 
@@ -220,8 +208,6 @@ class Queue extends PureComponent {
   render () {
     const { classes, queueLog, loading } = this.props
     const {
-      showNewVisit,
-      showRegisterNewPatient,
       showViewPatientProfile,
       // showEndSessionConfirm,
       showEndSessionSummary,
@@ -230,7 +216,7 @@ class Queue extends PureComponent {
       currentFilter,
     } = this.state
 
-    const { sessionInfo, error } = queueLog
+    const { showNewVisit, sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     // console.log('queuelisting state', this.props)
 
@@ -285,11 +271,11 @@ class Queue extends PureComponent {
               <React.Fragment>
                 <DetailsActionBar
                   isFetching={
-                    loading.effects['queueLog/fetchPatientListByName']
+                    loading.effects[`${modelKey}fetchPatientListByName`]
                   }
                   // currentFilter={currentFilter}
-                  currentSearchPatient={currentQuery}
-                  handleQueryChange={this.onQueryChanged}
+                  // currentSearchPatient={currentQuery}
+                  // handleQueryChange={this.onQueryChanged}
                   handleStatusChange={this.onStatusChange}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   togglePatientSearch={this.togglePatientSearch}
@@ -322,25 +308,13 @@ class Queue extends PureComponent {
                 id: 'reception.queue.visitRegistration',
               })}
               onClose={this.closeVisitRegistration}
-              onConfirm={this.handleRegisterVisit}
+              onConfirm={this.closeVisitRegistration}
               maxWidth='lg'
               fluidHeight
               showFooter={false}
             >
               <NewVisitModal visitPatientInfo={queueLog.visitPatientInfo} />
             </CommonModal>
-            {/* <CommonModal
-              open={showRegisterNewPatient}
-              title={formatMessage({
-                id: 'reception.queue.patientSearch.registerNewPatient',
-              })}
-              onClose={this.toggleRegisterNewPatient}
-              onConfirm={this.toggleRegisterNewPatient}
-              fullScreen
-              showFooter={false}
-            >
-              <NewPatient />
-            </CommonModal> */}
             <CommonModal
               open={showViewPatientProfile}
               title={formatMessage({

@@ -16,6 +16,8 @@ import ReferralCard from './ReferralCard'
 import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
+// services
+import { fetchDoctorProfile } from '../services'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -26,6 +28,9 @@ const styles = (theme) => ({
   },
   cardContent: {
     padding: `0px ${16}px !important`,
+  },
+  row: {
+    marginBottom: theme.spacing(3),
   },
   footerContent: {
     paddingRight: `${theme.spacing.unit * 2}px !important`,
@@ -50,9 +55,8 @@ const styles = (theme) => ({
     }
   },
   handleSubmit: (values, { props, setSubmitting }) => {
-    console.log('handleSubmit', values, props)
-
-    const { dispatch, queueLog } = props
+    const { queueNo, ...restValues } = values
+    const { dispatch, queueLog, onConfirm } = props
     const { sessionInfo, visitPatientInfo } = queueLog
     const visitID = sessionInfo.id
 
@@ -62,43 +66,47 @@ const styles = (theme) => ({
 
     const patientProfileFK = visitPatientInfo.id
 
+    const payload = {
+      queueNo,
+      queueNoPrefix: sessionInfo.sessionNoPrefix,
+      visit: {
+        patientProfileFK,
+        bizSessionFK: visitID,
+        visitPurposeFK: 1,
+        visitReferenceNo,
+        // doctorProfileFK: null,
+        // plannedVisitFK: null,
+        // counterFK: null,
+        // roomFK: null,
+        // timeIn: new Date(),
+        // timeOut: new Date(),
+        // visitDate: new Date(),
+        // queueSetupFK: null,
+        visitStatus: 'WAITING',
+        visitRemarks: null,
+        temperatureC: null,
+        bpSysMMHG: 1,
+        bpDiaMMHG: 2,
+        heightCM: null,
+        weightKG: null,
+        bmi: null,
+        pulseRateBPM: null,
+        priorityTime: null,
+        priorityType: null,
+        referralPersonFK: null,
+        referralCompanyFK: null,
+        referralPerson: null,
+        referralDate: null,
+        ...restValues,
+      },
+    }
+    console.log({ visitDate: new Date() })
     dispatch({
       type: 'queueLog/registerVisitInfo',
-      payload: {
-        queueNo: '1',
-        queueNoPrefix: null,
-        visit: {
-          patientProfileFK,
-          doctorProfileFK: null,
-          bizSessionFK: visitID,
-          plannedVisitFK: null,
-          visitPurposeFK: 1,
-          visitReferenceNo,
-          counterFK: null,
-          roomFK: null,
-          timeIn: '2019-07-05T13:50:00',
-          timeOut: null,
-          visitStatus: 'WAITING',
-          visitDate: '2019-07-05T13:50:00',
-          visitRemarks: null,
-          temperatureC: null,
-          bpSysMMHG: 1,
-          bpDiaMMHG: 2,
-          heightCM: null,
-          weightKG: null,
-          bmi: null,
-          pulseRateBPM: null,
-          priorityTime: null,
-          priorityType: null,
-          referralPersonFK: null,
-          referralCompanyFK: null,
-          referralPerson: null,
-          referralDate: null,
-          queueSetupFK: null,
-        },
-      },
+      payload,
     })
     setSubmitting(false)
+    onConfirm()
   },
 })
 class NewVisit extends PureComponent {
@@ -110,8 +118,26 @@ class NewVisit extends PureComponent {
     return age
   }
 
+  calculateBMI = () => {
+    const { heightCM, weightKG } = this.props.values
+    const { setFieldValue, setFieldTouched } = this.props
+    if (heightCM && weightKG) {
+      const heightM = heightCM / 100
+      const bmi = weightKG / heightM ** 2
+      const bmiInTwoDecimal = Math.round(bmi * 100) / 100
+      setFieldValue(FormFieldName['vitalsign.bmi'], bmiInTwoDecimal)
+      setFieldTouched(FormFieldName['vitalsign.bmi'], true)
+    }
+  }
+
   render () {
-    const { classes, handleSubmit, isValidating, isSubmitting } = this.props
+    const {
+      classes,
+      handleSubmit,
+      isValidating,
+      isSubmitting,
+      values,
+    } = this.props
 
     return (
       <React.Fragment>
@@ -120,15 +146,15 @@ class NewVisit extends PureComponent {
             <PatientInfoCard />
           </GridItem>
           <GridItem container xs md={9} className={classes.formContent}>
-            <GridItem xs md={12} container>
+            <GridItem xs md={12} container className={classes.row}>
               <GridItem xs d={6} className={classes.cardContent}>
                 <VisitInfoCard />
               </GridItem>
               <GridItem xs md={6} className={classes.cardContent}>
-                <VitalSignCard />
+                <VitalSignCard handleCalculateBMI={this.calculateBMI} />
               </GridItem>
             </GridItem>
-            <GridItem xs md={12} container>
+            <GridItem xs md={12} container className={classes.row}>
               <GridItem xs md={6} className={classes.cardContent}>
                 <SchemesCard />
               </GridItem>
@@ -136,11 +162,14 @@ class NewVisit extends PureComponent {
                 <ReferralCard />
               </GridItem>
             </GridItem>
-            <GridItem xs md={12} container>
-              <GridItem xs md={6} className={classes.cardContent}>
-                <ParticipantCard />
+            {/*
+              <GridItem xs md={12} container>
+                <GridItem xs md={12} className={classes.cardContent}>
+                  <ParticipantCard />
+                </GridItem>
               </GridItem>
-            </GridItem>
+            */}
+
             <GridItem
               container
               justify='flex-end'

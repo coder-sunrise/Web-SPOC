@@ -128,7 +128,13 @@ const menuData = [
   },
   {
     title: 'System User',
-    text: 'TBD',
+    text: 'System User',
+    url: '/setting/userprofile',
+  },
+  {
+    title: 'System User',
+    text: 'Role',
+    url: '/setting/userrole',
   },
   {
     title: 'Print Setup',

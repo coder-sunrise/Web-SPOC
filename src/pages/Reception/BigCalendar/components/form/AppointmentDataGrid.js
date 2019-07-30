@@ -4,8 +4,6 @@ import moment from 'moment'
 import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
-// antd
-import { Select as OriAntdSelect } from 'antd'
 // common component
 import { EditableTableGrid2 } from '@/components'
 import {
@@ -99,6 +97,8 @@ class AppointmentDataGrid extends React.PureComponent {
         return {
           ...column,
           options: AppointmentTypeOptions,
+          mode: 'multiple',
+
           renderDropdown: (option) => {
             return (
               <React.Fragment>
@@ -128,6 +128,9 @@ class AppointmentDataGrid extends React.PureComponent {
         leftColumns={[
           'conflict',
         ]}
+        FuncProps={{
+          pager: false,
+        }}
         EditingProps={{
           showAddCommand: true,
           editingRowIds: this.state.editingRowIds,

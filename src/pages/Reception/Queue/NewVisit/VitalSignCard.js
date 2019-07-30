@@ -15,6 +15,7 @@ import FormField from './formField'
 
 class VitalSignCard extends PureComponent {
   render () {
+    const { handleCalculateBMI } = this.props
     return (
       <CommonCard
         size='sm'
@@ -43,7 +44,7 @@ class VitalSignCard extends PureComponent {
             <FastField
               name={FormField['vitalsign.bpSysMMHG']}
               render={(args) => (
-                <TextField
+                <NumberInput
                   {...args}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.bloodPressure',
@@ -56,7 +57,7 @@ class VitalSignCard extends PureComponent {
             <FastField
               name={FormField['vitalsign.bpDiaMMHG']}
               render={(args) => (
-                <TextField
+                <NumberInput
                   {...args}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
@@ -93,6 +94,7 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.weight.suffix',
                   })}
+                  onChange={handleCalculateBMI}
                 />
               )}
             />
@@ -109,6 +111,7 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.height.suffix',
                   })}
+                  onChange={handleCalculateBMI}
                 />
               )}
             />
@@ -117,7 +120,7 @@ class VitalSignCard extends PureComponent {
             <FastField
               name={FormField['vitalsign.bmi']}
               render={(args) => (
-                <TextField
+                <NumberInput
                   {...args}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.bmi',
@@ -125,6 +128,7 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.bmi.suffix',
                   })}
+                  disabled
                 />
               )}
             />

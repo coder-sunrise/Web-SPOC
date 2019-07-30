@@ -68,7 +68,8 @@ export default createListViewModel({
     state: {
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
-      queueListing: generateRowData().reduce(mergeGenderAndAge, []),
+      // queueListing: generateRowData().reduce(mergeGenderAndAge, [])
+      queueListing: [],
       visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
       error: {
@@ -77,7 +78,7 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      console.log('queueLog subscriptions')
+      // console.log('queueLog subscriptions')
       dispatch({
         type: 'global/subscribeNotification',
         payload: {
@@ -128,14 +129,9 @@ export default createListViewModel({
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
 
-          const queueListingResponse = yield call(
-            service.getQueueListing,
-            sessionData[0].id,
-          )
-
           yield put({
-            type: 'updateQueueListing',
-            payload: { ...queueListingResponse },
+            type: 'fetchQueueListing',
+            sessionID: sessionData[0].id,
           })
 
           yield put({
@@ -158,13 +154,24 @@ export default createListViewModel({
           },
         })
       },
-      *fetchQueueListing ({ sessionID }, { call, put }) {
-        const response = yield call(service.getQueueListing, sessionID)
-        const { status, data } = response
-        console.log({ response })
+      *fetchQueueListing ({ sessionID, visitStatus }, { call, put }) {
+        const filterByStatus = visitStatus
+          ? {
+              prop: 'visitFkNavigation.visitStatus',
+              val: visitStatus,
+              opr: 'eql',
+            }
+          : {}
+        const response = yield call(
+          service.getQueueListing,
+          sessionID,
+          filterByStatus,
+        )
+        const { data: { data = [] } } = response
+
         return yield put({
           type: 'updateQueueListing',
-          queueListing: [],
+          queueListing: data,
         })
       },
       *fetchPatientListByName ({ payload }, { call, put }) {
@@ -215,19 +222,29 @@ export default createListViewModel({
           // },
         })
       },
+      // *fetchDoctorProfile({ _}, { call, put}){
+      //   const reposne = yield call(service.fetchDoctorProfile)
+
+      //   return yield put({
+      //     type: ''
+      //   })
+      // }
     },
     reducers: {
       toggleError (state, { error = {} }) {
         return { ...state, error: { ...error } }
       },
+      closeVisitModal (state) {
+        return { ...state, showNewVisit: false, visitPatientInfo: {} }
+      },
       updateSessionInfo (state, { payload }) {
         return { ...state, sessionInfo: { ...payload } }
       },
-
       updateVisitPatientInfo (state, { payload }) {
         return {
           ...state,
           visitPatientInfo: { ...payload },
+          showNewVisit: !!payload,
         }
       },
       updatePatientList (state, { payload }) {
@@ -239,7 +256,10 @@ export default createListViewModel({
         }
       },
       updateQueueListing (state, { queueListing }) {
-        return { ...state }
+        return {
+          ...state,
+          queueListing: queueListing.reduce(mergeGenderAndAge, []),
+        }
       },
       registerVisit (state, { payload }) {
         return { ...state }

@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
+import { withStyles } from '@material-ui/core'
 // formik
 import { FastField } from 'formik'
 // umi
@@ -14,11 +15,20 @@ import {
   GridContainer,
   GridItem,
   Select,
+  CodeSelect,
 } from '@/components'
 import FormField from './formField'
 
+const styles = (theme) => ({
+  verticalSpacing: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+})
+
 class VisitInfoCard extends PureComponent {
   render () {
+    const { classes } = this.props
     return (
       <CommonCard
         size='sm'
@@ -44,11 +54,11 @@ class VisitInfoCard extends PureComponent {
             <FastField
               name={FormField['visit.visitType']}
               render={(args) => (
-                <Select
+                <CodeSelect
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.visitType',
                   })}
-                  options={[]}
+                  code='ctvisitpurpose'
                   {...args}
                 />
               )}
@@ -59,11 +69,12 @@ class VisitInfoCard extends PureComponent {
             <FastField
               name={FormField['visit.doctorProfileFk']}
               render={(args) => (
-                <Select
+                <CodeSelect
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.doctor',
                   })}
-                  options={[]}
+                  tenantCode='doctorprofile'
+                  // code='ctgender'
                   {...args}
                 />
               )}
@@ -84,11 +95,21 @@ class VisitInfoCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
-            <Button color='rose'>
+          <GridItem className={classes.verticalSpacing}>
+            <Button color='rose' size='sm'>
               <AttachFile />
               <FormattedMessage id='reception.queue.visitRegistration.attachment' />
             </Button>
+          </GridItem>
+          <GridItem className={classes.verticalSpacing}>
+            <div>
+              <p>
+                <a>Attachment001.pdf</a>
+              </p>
+              <p>
+                <a>Attachment002.pdf</a>
+              </p>
+            </div>
           </GridItem>
         </GridContainer>
       </CommonCard>
@@ -96,4 +117,4 @@ class VisitInfoCard extends PureComponent {
   }
 }
 
-export default VisitInfoCard
+export default withStyles(styles, { name: 'VisitInfoCard' })(VisitInfoCard)

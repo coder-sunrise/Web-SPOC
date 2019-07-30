@@ -69,21 +69,23 @@ const showErrorNotification = (header, message) => {
   })
 }
 
-export const axiosRequest = (url, option) => {
-  const token = localStorage.getItem('token')
-  const headerConfig = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  }
-  const apiUrl = baseUrl + url
-  return axios({
-    url: apiUrl,
-    ...option,
-    ...headerConfig,
-  })
-    .then((response) => {
+export const axiosRequest = async (url, option) => {
+  let result = {}
+  try {
+    const token = localStorage.getItem('token')
+    const headerConfig = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+    const apiUrl = baseUrl + url
+
+    result = await axios({
+      url: apiUrl,
+      ...option,
+      ...headerConfig,
+    }).then((response) => {
       const { data, status } = response
       console.log('axios response', response)
       if (status >= 200 && status < 300) {
@@ -92,20 +94,28 @@ export const axiosRequest = (url, option) => {
       }
       return status
     })
-    .catch((error) => {
-      console.log('axios error', error.response)
-      const {
-        data = { message: 'An error occured' },
-        status,
-        statusText,
-      } = error.response
+  } catch (error) {
+    const {
+      response = {
+        data: {},
+        status: -1,
+        statusText: '',
+      },
+    } = error
+    console.log('axios error', response)
+    const {
+      data = { message: 'An error occured' },
+      status,
+      statusText,
+    } = response
 
-      status === 401
-        ? showErrorNotification('', statusText)
-        : showErrorNotification('', data.message)
+    status === 401
+      ? showErrorNotification('', statusText)
+      : showErrorNotification('', data.message)
 
-      return error.response
-    })
+    return response
+  }
+  return result
 }
 
 /**
@@ -235,6 +245,7 @@ export default function request (url, option) {
       // })
       .then((response, s, xhr) => {
         // console.log(response, s, xhr, xhr.getAllResponseHeaders())
+
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)

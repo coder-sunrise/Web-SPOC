@@ -142,7 +142,7 @@ class Form extends React.PureComponent {
 
   onConfirmCancelAppointment = ({ deleteType, reasonType, reason }) => {
     const { handleDeleteEvent, slotInfo } = this.props
-    console.log({ slotInfo })
+
     this.setState(
       {
         showDeleteConfirmationModal: false,
@@ -365,15 +365,6 @@ class Form extends React.PureComponent {
             maxWidth='sm'
           >
             <DeleteConfirmation isSeries={values.series} />
-          </CommonModal>
-          <CommonModal
-            open={showSeriesUpdateConfirmation}
-            title='Alert'
-            onClose={this.closeSeriesUpdateConfirmation}
-            onConfirm={this.onConfirmSeriesUpdate}
-            maxWidth='sm'
-          >
-            <SeriesUpdateConfirmation />
           </CommonModal>
           <CommonModal
             open={showSeriesUpdateConfirmation}

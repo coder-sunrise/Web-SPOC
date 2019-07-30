@@ -109,6 +109,12 @@ const appointmentResources = {
       doctor: 'medisys',
       resourceId: '0',
       appointmentType: AppointmentTypeOptions[2].value,
+      hasConflict: true,
+      conflicts: [
+        'The selected slot: 15 July 2019 7.30AM - 11.30AM is not within operating hour.',
+        'The selected slot: 15 July 2019 7.30AM - 11.30AM is not within operating hour.',
+        'The selected slot: 15 July 2019 7.30AM - 11.30AM is not within operating hour.',
+      ],
       // color: AppointmentTypeOptions[2].color,
     },
   ],
@@ -146,6 +152,94 @@ const appointmentResources = {
       id: getUniqueGUID(),
       start: new Date(now.getFullYear(), now.getMonth(), 25, 11, 30, 0),
       end: new Date(now.getFullYear(), now.getMonth(), 25, 15, 0, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[4].value,
+
+      series: true,
+      draft: true,
+    },
+    // test
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 26, 7, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[5].value,
+      // color: AppointmentTypeOptions[5].color,
+    },
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 26, 15, 0, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[4].value,
+
+      series: true,
+      draft: true,
+    },
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 26, 15, 0, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[4].value,
+
+      series: true,
+      draft: true,
+    },
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 26, 15, 0, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[4].value,
+
+      series: true,
+      draft: true,
+    },
+
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[4].value,
+
+      series: true,
+      draft: true,
+    },
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[4].value,
+
+      series: true,
+      draft: true,
+    },
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
+      doctor: 'medisys',
+      resourceId: '0',
+      appointmentType: AppointmentTypeOptions[4].value,
+
+      series: true,
+      draft: true,
+    },
+    {
+      id: getUniqueGUID(),
+      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
+      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
       doctor: 'medisys',
       resourceId: '0',
       appointmentType: AppointmentTypeOptions[4].value,
@@ -208,6 +302,7 @@ const generateDoctorBlock = () => {
       resourceId: '0',
       eventType: 'vacation',
       visitStatus: 'APPOINTMENT',
+      hasConflict: i === max - 1,
     }
     data.push(doctorBlock)
   }

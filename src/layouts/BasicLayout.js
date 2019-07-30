@@ -126,7 +126,7 @@ class BasicLayout extends React.PureComponent {
 
     let sessionTimeOutTimer = null
     const resetSessionTimeOut = (e) => {
-      console.log(e)
+      // console.log(e)
       clearTimeout(sessionTimeOutTimer)
       sessionTimeOutTimer = setTimeout(() => {
         dispatch({
@@ -182,8 +182,8 @@ class BasicLayout extends React.PureComponent {
     // }
 
     // check token, logout if token not exist
-    const accessToken = localStorage.getItem('token')
-    !accessToken && router.push('/login')
+    // const accessToken = localStorage.getItem('token')
+    // !accessToken && router.push('/login')
 
     window.addEventListener('resize', this.resizeFunction)
 

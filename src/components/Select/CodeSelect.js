@@ -1,7 +1,7 @@
 import React from 'react'
 // import Select from './index'
 import Select from '../Antd/AntdSelect'
-import { getCodes } from '@/utils/codes'
+import { getCodes, getTenantCodes } from '@/utils/codes'
 
 const codetables = {}
 
@@ -30,6 +30,23 @@ class CodeSelect extends React.PureComponent {
       //     options: codetables[props.code],
       //   })
       // }
+    } else if (props.tenantCode) {
+      getTenantCodes(props.tenantCode).then((response) => {
+        const { data = [] } = response
+        const tenantCodeOptions = data.reduce(
+          (options, opt) => [
+            ...options,
+            {
+              name: opt.userProfile ? opt.userProfile.name : '',
+              id: opt.id,
+            },
+          ],
+          [],
+        )
+        this.setState({
+          options: tenantCodeOptions,
+        })
+      })
     }
   }
 
@@ -41,7 +58,6 @@ class CodeSelect extends React.PureComponent {
   render () {
     // console.log(this.props)
     // if (!this.state.options || this.state.options.length === 0) return null
-    // console.log(this.state.options)
     return (
       <Select
         {...this.props}

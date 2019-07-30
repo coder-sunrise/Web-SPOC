@@ -63,6 +63,7 @@ import RangeDateTypeProvider from './EditCellComponents/RangeDateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
+import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import { watchForElementChange } from '@/utils/utils'
 
 const cellStyle = {
@@ -807,6 +808,7 @@ class CommonTableGrid2 extends React.Component {
               <RadioTypeProvider {...cellComponentConfig} />
               <StatusTypeProvider {...cellComponentConfig} />
               <TimeTypeProvider {...cellComponentConfig} />
+              <RowErrorTypeProvider {...cellComponentConfig} />
 
               {grouping && <DragDropProvider />}
 

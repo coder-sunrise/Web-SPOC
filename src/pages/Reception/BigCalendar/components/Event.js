@@ -4,13 +4,14 @@ import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
 import Cached from '@material-ui/icons/Cached'
 
-const style = () => ({
+const style = (theme) => ({
   blockDiv: {
     display: 'block',
   },
   container: {
     height: '100%',
     cursor: 'pointer',
+    paddingLeft: theme.spacing(0.5),
   },
   title: {
     display: 'flex',
