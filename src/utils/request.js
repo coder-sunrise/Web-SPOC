@@ -244,7 +244,12 @@ export default function request (url, option) {
       //   return response.json()
       // })
       .then((response, s, xhr) => {
-        console.log(response, s, xhr, xhr.getAllResponseHeaders())
+        // console.log('request.js', {
+        //   response,
+        //   s,
+        //   xhr,
+        //   headers: xhr.getAllResponseHeaders(),
+        // })
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)

@@ -17,6 +17,8 @@ export const visitStatusCode = [
   'COMPLETED',
 ]
 
+export const modelKey = 'queueLog/'
+
 export const filterMap = {
   [StatusIndicator.ALL]: [
     ...visitStatusCode,

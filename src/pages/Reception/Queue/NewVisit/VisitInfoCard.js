@@ -15,6 +15,7 @@ import {
   GridContainer,
   GridItem,
   Select,
+  CodeSelect,
 } from '@/components'
 import FormField from './formField'
 
@@ -53,11 +54,11 @@ class VisitInfoCard extends PureComponent {
             <FastField
               name={FormField['visit.visitType']}
               render={(args) => (
-                <Select
+                <CodeSelect
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.visitType',
                   })}
-                  options={[]}
+                  code='ctvisitpurpose'
                   {...args}
                 />
               )}
@@ -68,11 +69,12 @@ class VisitInfoCard extends PureComponent {
             <FastField
               name={FormField['visit.doctorProfileFk']}
               render={(args) => (
-                <Select
+                <CodeSelect
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.doctor',
                   })}
-                  options={[]}
+                  tenantCode='doctorprofile'
+                  // code='ctgender'
                   {...args}
                 />
               )}

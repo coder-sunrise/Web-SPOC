@@ -29,10 +29,7 @@ const styles = (theme) => ({
     marginBottom: theme.spacing(1.5),
   },
   isDoctorCheck: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    zIndex: 99,
+    paddingTop: `${theme.spacing(2)}px !important`,
   },
 })
 
@@ -110,7 +107,7 @@ const UserProfileForm = ({
             )}
           />
         </GridItem>
-        <GridItem md={6}>
+        <GridItem md={6} className={classes.isDoctorCheck}>
           <FastField
             name='isDoctor'
             render={(args) => <Checkbox {...args} label='Is Doctor' simple />}
@@ -122,7 +119,7 @@ const UserProfileForm = ({
             render={(args) => <TextField {...args} label='Contact No.' />}
           />
         </GridItem>
-        <GridItem md={6} style={{ position: 'relative' }}>
+        <GridItem md={6}>
           {/* <div className={classes.isDoctorCheck}>
             <FastField
               name='isDoctor'
@@ -135,7 +132,7 @@ const UserProfileForm = ({
               <TextField
                 {...args}
                 label='Doctor MCR No.'
-                disabled={!values.isDoctor}
+                // disabled={!values.isDoctor}
               />
             )}
           />
@@ -210,10 +207,10 @@ const UserProfileForm = ({
 export default withFormik({
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
-    userLoginID: Yup.string().required('Login ID is a required field'),
+    userName: Yup.string().required('Login ID is a required field'),
     password: Yup.string().required('Password is a required field'),
     name: Yup.string().required('Name is a required field'),
-    contactNo: Yup.string().required('Contact No. is a required field'),
+    phoneNumber: Yup.string().required('Contact No. is a required field'),
     userAccountNo: Yup.string().required(
       'User Account No. is a required field',
     ),
@@ -227,8 +224,59 @@ export default withFormik({
   }),
   mapPropsToValues: ({ selectedUser }) => ({
     ...selectedUser,
+    role: '1',
   }),
-  handleSubmit: (values, props) => {
+  handleSubmit: (values, { props, ...formikBag }) => {
     console.log('submit', values, props)
+    const { onConfirm } = props
+    const { role, ...restValues } = values
+    const hardcodedProfileValue = {
+      // role: '1',
+
+      // effectiveEndDate: '2019-07-31T08:36:14Z',
+      // effectiveStartDate: '2019-07-25T08:36:12Z',
+      // name: 'test medisys',
+      // password: '123456',
+      // phoneNumber: '12345678',
+      // userAccountNo: '00001',
+      // userName: 'test',
+
+      email: '',
+      title: '',
+      userCode: '',
+      dob: '2019-07-26T08:26:07.254Z',
+      isUserMaintainable: true,
+      genderFk: 1,
+      qualificationCodeFk: 0,
+      registrationStatusFk: 0,
+      registrationTypeFk: 0,
+      boardNameFk: 0,
+      roleSpecialityFk: 0,
+      languageSpokenFk: 0,
+      designation: '',
+      principalUserProfileFk: 0,
+      lastLoginDate: '2019-07-26T08:26:07.254Z',
+      createDate: '2019-07-26T08:26:07.254Z',
+      createByUserFk: 1,
+      createByClinicFk: 0,
+      updateDate: '2019-07-26T08:26:07.254Z',
+      updateByUserFk: 1,
+      updateByClinicFk: 0,
+      // userRoles: [
+      //   {
+      //     id: 0,
+      //     name: 'doctor',
+      //     normalizedName: 'doctor',
+      //   },
+      // ],
+      userRole: 'doctor',
+      doctorMCRNo: '12345A',
+      isDoctor: true,
+      // id: 0,
+      isDeleted: false,
+      concurrencyToken: 0,
+      ...restValues,
+    }
+    onConfirm(hardcodedProfileValue)
   },
 })(withStyles(styles, { name: 'UserProfileForm' })(UserProfileForm))
