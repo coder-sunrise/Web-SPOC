@@ -5,13 +5,22 @@ import React from 'react'
 // import '@syncfusion/reporting-react/Scripts/reports/ej.reporting.react.min'
 // import './create-react-class.min'
 
+import { Document, Page, pdfjs } from 'react-pdf'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { baseUrl } from '@/utils/request'
+import { axiosRequest, baseUrl } from '@/utils/request'
 // toast ui theme
 import uiTheme from './uiTheme'
 // common component
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  CardContainer,
+  GridContainer,
+  GridItem,
+  CommonModal,
+} from '@/components'
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 const styles = (theme) => ({
   buttonsBar: {
@@ -20,11 +29,68 @@ const styles = (theme) => ({
   },
 })
 
+const BASE64_MARKER = ';base64,'
+function _arrayBufferToBase64 (buffer) {
+  let binary = ''
+  const bytes = new Uint8Array(buffer)
+  const len = bytes.byteLength
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return window.btoa(binary)
+}
+
+function dataURLtoFile (dataurl, filename) {
+  var arr = dataurl.split(','),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File(
+    [
+      u8arr,
+    ],
+    filename,
+    { type: mime },
+  )
+}
+
 class Scribble extends React.Component {
   editorRef = React.createRef()
 
   state = {
     action: 'shape',
+    pdfData: '',
+    numPages: 1,
+    pageNumber: 1,
+    loadedPdf: false,
+  }
+
+  componentDidMount = () => {
+    this.fetchReport()
+  }
+
+  fetchReport = async () => {
+    const response = await axiosRequest('/api/Report/QueueListing', {
+      method: 'POST',
+      responseType: 'arraybuffer',
+      body: { ListingFrom: '2017-7-1', ListingTo: '2017-7-31' },
+    })
+    const { data } = response
+
+    const base64 = _arrayBufferToBase64(data)
+    const FILE_NAME = 'myCoolFileName.pdf'
+    this.setState({
+      // pdfData: dataURLtoFile(
+      //   `data:application/pdf;headers=filename%3D${FILE_NAME};base64,${base64}`,
+      //   'queuelisting.pdf',
+      // ),
+      pdfData: `data:application/pdf;headers=filename%3D${FILE_NAME};base64,${base64}`,
+      loadedPdf: true,
+    })
   }
 
   uploadImage = () => {
@@ -143,115 +209,101 @@ class Scribble extends React.Component {
     console.log({ imageEditor, dataurl })
   }
 
+  onDocumentLoadSuccess = ({ numPages }) => {
+    console.log('on document load success', { numPages })
+    this.setState({ numPages, pageNumber: 1 })
+  }
+
+  changePage = (offset) =>
+    this.setState((prevState) => ({
+      pageNumber: prevState.pageNumber + offset,
+    }))
+
+  previousPage = () => this.changePage(-1)
+
+  nextPage = () => this.changePage(1)
+
+  closeModal = () => this.setState({ loadedPdf: false })
+
   render () {
-    const { action } = this.state
+    const { action, pdfData, numPages, pageNumber, loadedPdf } = this.state
     const { classes } = this.props
+
+    //Usage example:
+    // var file =
+    //   pdfData !== '' ? dataURLtoFile(pdfData, 'Queue Listing Report.pdf') : ''
+    // console.log(file)
 
     return (
       <CardContainer hideHeader>
-        <GridContainer
-          direction='column'
-          justify='space-between'
-          alignItems='center'
+        <input type='file' onChange={this.onFileChange} />
+        <div>
+          <p>
+            Page {pageNumber || (numPages ? 1 : '--')} of {numPages || '--'}
+          </p>
+          <button
+            type='button'
+            disabled={pageNumber <= 1}
+            onClick={this.previousPage}
+          >
+            Previous
+          </button>
+          <button
+            type='button'
+            disabled={pageNumber >= numPages}
+            onClick={this.nextPage}
+          >
+            Next
+          </button>
+        </div>
+        <a href={`/${pdfData}`} download>
+          Download
+        </a>
+        <CommonModal
+          open={loadedPdf}
+          onClose={this.closeModal}
+          title='Report'
+          maxWidth='lg'
         >
-          <GridItem className={classes.buttonsBar}>
-            <input
-              type='file'
-              id='file'
-              ref='fileUploader'
-              style={{ display: 'none' }}
-              onChange={this.onFileChange}
-            />
-            <Button
-              color='primary'
-              variant='outlined'
-              onClick={this.uploadImage}
-            >
-              Upload
+          <CardContainer hideHeader size='sm'>
+            <Button onClick={this.previousPage} size='sm' color='primary'>
+              Previous
             </Button>
-            <Button
-              color='primary'
-              variant='outlined'
-              onClick={this.downloadImage}
-            >
-              Download
+            <Button onClick={this.nextPage} size='sm' color='primary'>
+              Next
             </Button>
-          </GridItem>
-          <GridItem md={6} className={classes.buttonsBar}>
-            <Button
-              color='primary'
-              size='sm'
-              variant='outlined'
-              id='undo'
-              onClick={this.onActionClick}
+            <div
+              style={{
+                width: '100%',
+                minHeight: '60vh',
+                maxHeight: '75vh',
+                overflow: 'auto',
+              }}
             >
-              Undo
-            </Button>
-            <Button
-              color='primary'
-              size='sm'
-              variant='outlined'
-              id='redo'
-              onClick={this.onActionClick}
-            >
-              Redo
-            </Button>
-            <Button
-              color='primary'
-              size='sm'
-              variant='outlined'
-              id='reset'
-              onClick={this.onActionClick}
-            >
-              Reset
-            </Button>
-            <Button
-              color='primary'
-              size='sm'
-              simple={action !== 'circle_shape'}
-              id='circle_shape'
-              onClick={this.onActionClick}
-            >
-              Circle Shape
-            </Button>
+              <Document
+                file={pdfData}
+                // renderMode='svg'
+                onLoadSuccess={this.onDocumentLoadSuccess}
+              >
+                <Page pageNumber={pageNumber} width={700} scale={1.5} />
+              </Document>
+            </div>
+          </CardContainer>
+        </CommonModal>
 
-            <Button
-              color='primary'
-              size='sm'
-              id='draw'
-              simple={action !== 'draw'}
-              onClick={this.onActionClick}
-            >
-              Draw
-            </Button>
-          </GridItem>
+        {/*
 
-          <GridItem md={12}>
-            <ImageEditor
-              ref={this.editorRef}
-              includeUI={{
-                theme: uiTheme,
-                // menu: [
-                //   'draw',
-                // ],
-                uiSize: {
-                  width: '1000px',
-                  height: '700px',
-                },
-              }}
-              onMousedown={this.handleMousedown}
-              onObjectactivated={(props) => {
-                console.log('onObjectActivated', { props })
-              }}
-              // cssMaxHeight={700}
-              // cssMaxWidth={700}
-              selectionStyle={{
-                cornerSize: 20,
-                rotatingPointOffset: 70,
-              }}
+          <div style={{ minHeight: '70vh' }}>
+            <object
+              name='QueueListingReport.pdf'
+              data={pdfData}
+              type='application/pdf'
+              aria-label='Document PDF'
+              style={{ width: '100%', height: '70vh' }}
             />
-          </GridItem>
-        </GridContainer>
+          </div>
+          
+          */}
       </CardContainer>
     )
   }

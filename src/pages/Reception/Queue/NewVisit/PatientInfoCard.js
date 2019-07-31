@@ -15,25 +15,13 @@ import { getCodes } from '@/utils/codes'
 
 const styles = () => ({})
 
-@connect(({ queueLog, loading }) => ({ queueLog, loading }))
+@connect(({ visitRegistration, loading }) => ({ visitRegistration, loading }))
 class PatientInfoCard extends PureComponent {
   state = {
     ctGender: [],
   }
 
   componentDidMount () {
-    // TODO: enhance this part to store codetable and keep track of updating date
-    // getCodes('Nationality')
-    //   .then((response) => {
-    //     if (!response && !response.data) return
-    //     const data = [
-    //       ...response.data.Nationality,
-    //     ]
-    //     localStorage.setItem('CT_Nationality', JSON.stringify(data))
-    //   })
-    //   .catch((error) => {
-    //     console.log('error occured', error)
-    //   })
     getCodes('ctgender')
       .then((response) => {
         if (!response && !response.data) return
@@ -48,16 +36,16 @@ class PatientInfoCard extends PureComponent {
   }
 
   getAge = () => {
-    const { queueLog } = this.props
-    const { dob } = queueLog.visitPatientInfo
+    const { visitRegistration } = this.props
+    const { dob } = visitRegistration.patientInfo
 
     const age = moment().diff(dob, 'years')
     return age
   }
 
   getNationality = () => {
-    const { queueLog } = this.props
-    const { nationalityFK } = queueLog.visitPatientInfo
+    const { visitRegistration } = this.props
+    const { nationalityFK } = visitRegistration.patientInfo
 
     if (!nationalityFK || localStorage.getItem('CT_Nationality') === null)
       return ''
@@ -70,9 +58,9 @@ class PatientInfoCard extends PureComponent {
 
   getGender = () => {
     const { ctGender } = this.state
-    const { queueLog } = this.props
-    const { genderFK } = queueLog.visitPatientInfo
-    console.log({ info: queueLog.visitPatientInfo })
+    const { visitRegistration } = this.props
+    const { genderFK } = visitRegistration.patientInfo
+    console.log({ info: visitRegistration.patientInfo })
     const gender = ctGender.find((item) => item.id === genderFK)
     console.log({ gender, ctGender })
     if (gender) return gender.name
@@ -81,17 +69,18 @@ class PatientInfoCard extends PureComponent {
   }
 
   render () {
-    const { classes, queueLog, loading } = this.props
+    const { classes, visitRegistration, loading } = this.props
     const {
       name,
       patientAccountNo,
       patientReferenceNo,
       dob,
       gender,
-    } = queueLog.visitPatientInfo
+    } = visitRegistration.patientInfo
+    console.log({ visitRegistration })
     return (
       <Card size='sm' profile>
-        {loading.effects['queueLog/fetchPatientInfoByPatientID'] ? (
+        {loading.effects['visitRegistration/fetchPatientInfoByPatientID'] ? (
           <Spin className='centerredLoading' />
         ) : (
           <React.Fragment>

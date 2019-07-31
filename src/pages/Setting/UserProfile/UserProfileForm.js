@@ -22,14 +22,17 @@ const styles = (theme) => ({
     marginBottom: theme.spacing(2),
   },
   verticalSpacing: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(3),
     '& > h4': {
       fontWeight: 500,
     },
-    marginBottom: theme.spacing(1.5),
+    // marginBottom: theme.spacing(1),
   },
   isDoctorCheck: {
     paddingTop: `${theme.spacing(2)}px !important`,
+  },
+  indent: {
+    paddingLeft: theme.spacing(2),
   },
 })
 
@@ -47,153 +50,159 @@ const UserProfileForm = ({
       <GridContainer alignItems='center' className={classes.container}>
         <GridItem md={12} className={classes.verticalSpacing}>
           <h4>Login Info</h4>
-          <Divider />
         </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='userName'
-            render={(args) => (
-              <TextField {...args} label='Username' disabled={isEdit} />
-            )}
-          />
-        </GridItem>
-        {!isEdit ? (
-          <React.Fragment>
-            <GridItem md={6}>
-              <FastField
-                name='password'
-                render={(args) => (
-                  <TextField {...args} label='Password' type='password' />
-                )}
-              />
-            </GridItem>
-            <GridItem md={6} />
-            <GridItem md={6}>
-              <i>User must create a new password at next sign in.</i>
-            </GridItem>
-          </React.Fragment>
-        ) : (
+        <GridContainer className={classes.indent} alignItems='center'>
           <GridItem md={6}>
-            <Button color='primary' onClick={onChangePasswordClick}>
-              <Key />Change Password
-            </Button>
+            <FastField
+              name='userName'
+              render={(args) => (
+                <TextField {...args} label='Username' disabled={isEdit} />
+              )}
+            />
           </GridItem>
-        )}
+          {!isEdit ? (
+            <React.Fragment>
+              <GridItem md={6}>
+                <FastField
+                  name='password'
+                  render={(args) => (
+                    <TextField {...args} label='Password' type='password' />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={6} />
+              <GridItem md={6}>
+                <i>User must create a new password at next sign in.</i>
+              </GridItem>
+            </React.Fragment>
+          ) : (
+            <GridItem md={6}>
+              <Button color='primary' onClick={onChangePasswordClick}>
+                <Key />Change Password
+              </Button>
+            </GridItem>
+          )}
+        </GridContainer>
 
         <GridItem md={12} className={classes.verticalSpacing}>
           <h4>Profile</h4>
-          <Divider />
         </GridItem>
-
-        <GridItem md={6}>
-          <FastField
-            name='name'
-            render={(args) => (
-              <TextField {...args} label='Name' disabled={isEdit} />
-            )}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='title'
-            render={(args) => <Select {...args} label='Title' options={[]} />}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='userAccountNo'
-            render={(args) => (
-              <TextField {...args} label='User Account No.' disabled={isEdit} />
-            )}
-          />
-        </GridItem>
-        <GridItem md={6} className={classes.isDoctorCheck}>
-          <FastField
-            name='isDoctor'
-            render={(args) => <Checkbox {...args} label='Is Doctor' simple />}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='phoneNumber'
-            render={(args) => <TextField {...args} label='Contact No.' />}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          {/* <div className={classes.isDoctorCheck}>
+        <GridContainer className={classes.indent}>
+          <GridItem md={6}>
+            <FastField
+              name='name'
+              render={(args) => (
+                <TextField {...args} label='Name' disabled={isEdit} />
+              )}
+            />
+          </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='title'
+              render={(args) => <Select {...args} label='Title' options={[]} />}
+            />
+          </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='userAccountNo'
+              render={(args) => (
+                <TextField
+                  {...args}
+                  label='User Account No.'
+                  disabled={isEdit}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={6} className={classes.isDoctorCheck}>
+            <FastField
+              name='isDoctor'
+              render={(args) => <Checkbox {...args} label='Is Doctor' simple />}
+            />
+          </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='phoneNumber'
+              render={(args) => <TextField {...args} label='Contact No.' />}
+            />
+          </GridItem>
+          <GridItem md={6}>
+            {/* <div className={classes.isDoctorCheck}>
             <FastField
               name='isDoctor'
               render={(args) => <Checkbox {...args} label='Is Doctor' simple />}
             />
             </div> */}
-          <Field
-            name='mcrNo'
-            render={(args) => (
-              <TextField
-                {...args}
-                label='Doctor MCR No.'
-                // disabled={!values.isDoctor}
-              />
-            )}
-          />
-        </GridItem>
+            <Field
+              name='mcrNo'
+              render={(args) => (
+                <TextField
+                  {...args}
+                  label='Doctor MCR No.'
+                  // disabled={!values.isDoctor}
+                />
+              )}
+            />
+          </GridItem>
 
-        <GridItem md={6}>
-          <FastField
-            name='email'
-            render={(args) => <TextField {...args} label='Email' />}
-          />
-        </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='email'
+              render={(args) => <TextField {...args} label='Email' />}
+            />
+          </GridItem>
 
-        <GridItem md={6}>
-          <FastField
-            name='genderFk'
-            render={(args) => (
-              <CodeSelect {...args} label='Gender' code='ctgender' />
-            )}
-          />
-        </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='genderFk'
+              render={(args) => (
+                <CodeSelect {...args} label='Gender' code='ctgender' />
+              )}
+            />
+          </GridItem>
 
-        <GridItem md={6}>
-          <FastField
-            name='dob'
-            render={(args) => <DatePicker {...args} label='Date Of Birth' />}
-          />
-        </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='dob'
+              render={(args) => <DatePicker {...args} label='Date Of Birth' />}
+            />
+          </GridItem>
 
-        <GridItem md={6}>
-          <FastField
-            name='designation'
-            render={(args) => <TextField {...args} label='Designation' />}
-          />
-        </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='designation'
+              render={(args) => <TextField {...args} label='Designation' />}
+            />
+          </GridItem>
 
-        <GridItem md={6}>
-          <FastField
-            name='effectiveStartDate'
-            render={(args) => (
-              <DatePicker {...args} label='Effective Start Date' />
-            )}
-          />
-        </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='effectiveEndDate'
-            render={(args) => (
-              <DatePicker {...args} label='Effective End Date' />
-            )}
-          />
-        </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='effectiveStartDate'
+              render={(args) => (
+                <DatePicker {...args} label='Effective Start Date' />
+              )}
+            />
+          </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='effectiveEndDate'
+              render={(args) => (
+                <DatePicker {...args} label='Effective End Date' />
+              )}
+            />
+          </GridItem>
+        </GridContainer>
         <GridItem md={12} className={classes.verticalSpacing}>
           <h4>User Role</h4>
-          <Divider />
         </GridItem>
-        <GridItem md={6}>
-          <FastField
-            name='role'
-            render={(args) => <Select {...args} label='Role' options={[]} />}
-          />
-        </GridItem>
+        <GridContainer className={classes.indent}>
+          <GridItem md={6}>
+            <FastField
+              name='role'
+              render={(args) => <Select {...args} label='Role' options={[]} />}
+            />
+          </GridItem>
+        </GridContainer>
       </GridContainer>
       {footer &&
         footer({

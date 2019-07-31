@@ -459,6 +459,12 @@ const routes = [
             mini: 'CA',
             component: './Development/Scribble',
           },
+          {
+            path: '/development/reportviewer',
+            name: 'Report Sample',
+            mini: 'RS',
+            component: './Development/Report',
+          },
         ],
       },
       {
