@@ -6,25 +6,30 @@ import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
-import { Button, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  SizeContainer,
+  withFormikExtend,
+} from '@/components'
 // Sub-components
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
 import SchemesCard from './SchemesCard'
 import ReferralCard from './ReferralCard'
-import ParticipantCard from './ParticipantCard'
+// import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
-// services
-import { fetchDoctorProfile } from '../services'
 
 const styles = (theme) => ({
   gridContainer: {
     marginBottom: theme.spacing.unit * 2,
   },
   formContent: {
-    padding: `0px ${32}px !important`,
+    maxHeight: '80vh',
+    overflow: 'auto',
   },
   cardContent: {
     padding: `0px ${16}px !important`,
@@ -44,27 +49,32 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog }) => ({ queueLog }))
-@withFormik({
+@connect(({ queueLog, visitRegistration }) => ({ queueLog, visitRegistration }))
+@withFormikExtend({
+  displayName: 'VisitRegistration',
   enableReinitialize: true,
   validationSchema: VisitValidationSchema,
   mapPropsToValues: ({ queueLog }) => {
-    const nextQueueNo = queueLog.queueListing.length + 1
-    return {
-      [FormFieldName['visit.queueNo']]: nextQueueNo,
+    if (queueLog) {
+      const nextQueueNo = queueLog.queueListing.length + 1
+      return {
+        [FormFieldName['visit.queueNo']]: nextQueueNo,
+      }
     }
+    return {}
   },
   handleSubmit: (values, { props, setSubmitting }) => {
     const { queueNo, ...restValues } = values
     const { dispatch, queueLog, onConfirm } = props
-    const { sessionInfo, visitPatientInfo } = queueLog
+
+    const { sessionInfo, patientInfo } = queueLog
     const visitID = sessionInfo.id
 
     const visitReferenceNo = `${sessionInfo.sessionNo}-${parseFloat(
       visitID,
     ).toFixed(1)}`
 
-    const patientProfileFK = visitPatientInfo.id
+    const patientProfileFK = patientInfo.id
 
     const payload = {
       queueNo,
@@ -101,23 +111,15 @@ const styles = (theme) => ({
       },
     }
     console.log({ visitDate: new Date() })
-    dispatch({
-      type: 'queueLog/registerVisitInfo',
-      payload,
-    })
+    // dispatch({
+    //   type: 'queueLog/registerVisitInfo',
+    //   payload,
+    // })
     setSubmitting(false)
     onConfirm()
   },
 })
 class NewVisit extends PureComponent {
-  getAge = () => {
-    const { visitPatientInfo } = this.props
-    const { dateOfBirth } = visitPatientInfo
-
-    const age = moment().diff(dateOfBirth, 'years')
-    return age
-  }
-
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
     const { setFieldValue, setFieldTouched } = this.props
@@ -131,37 +133,29 @@ class NewVisit extends PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      handleSubmit,
-      isValidating,
-      isSubmitting,
-      values,
-    } = this.props
+    const { classes, handleSubmit, footer } = this.props
 
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>
           <GridItem xs sm={12} md={3} className={classes.patientInfo}>
             <PatientInfoCard />
+            {/* <SchemesCard /> */}
           </GridItem>
           <GridItem container xs md={9} className={classes.formContent}>
-            <GridItem xs md={12} container className={classes.row}>
-              <GridItem xs d={6} className={classes.cardContent}>
-                <VisitInfoCard />
-              </GridItem>
-              <GridItem xs md={6} className={classes.cardContent}>
-                <VitalSignCard handleCalculateBMI={this.calculateBMI} />
-              </GridItem>
-            </GridItem>
-            <GridItem xs md={12} container className={classes.row}>
-              <GridItem xs md={6} className={classes.cardContent}>
-                <SchemesCard />
-              </GridItem>
-              <GridItem xs md={6} className={classes.cardContent}>
-                <ReferralCard />
-              </GridItem>
-            </GridItem>
+            <SizeContainer size='sm'>
+              <React.Fragment>
+                <GridItem xs md={12} className={classes.row}>
+                  <VisitInfoCard />
+                </GridItem>
+                <GridItem xs md={12} className={classes.row}>
+                  <VitalSignCard handleCalculateBMI={this.calculateBMI} />
+                </GridItem>
+                <GridItem xs md={12} className={classes.row}>
+                  <ReferralCard />
+                </GridItem>
+              </React.Fragment>
+            </SizeContainer>
             {/*
               <GridItem xs md={12} container>
                 <GridItem xs md={12} className={classes.cardContent}>
@@ -169,24 +163,13 @@ class NewVisit extends PureComponent {
                 </GridItem>
               </GridItem>
             */}
-
-            <GridItem
-              container
-              justify='flex-end'
-              className={classes.footerContent}
-            >
-              <Button
-                color='primary'
-                disabled={isSubmitting || isValidating}
-                onClick={handleSubmit}
-              >
-                {!isSubmitting && !isValidating && <span>Register Visit</span>}
-                {isSubmitting && <span>Submitting...</span>}
-                {isValidating && <span>Validating...</span>}
-              </Button>
-            </GridItem>
           </GridItem>
         </GridContainer>
+        {footer &&
+          footer({
+            confirmBtnText: 'Register visit',
+            onConfirm: handleSubmit,
+          })}
       </React.Fragment>
     )
   }

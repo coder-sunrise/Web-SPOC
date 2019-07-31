@@ -88,6 +88,7 @@ export const axiosRequest = async (url, option) => {
     }).then((response) => {
       const { data, status } = response
       console.log('axios response', response)
+
       if (status >= 200 && status < 300) {
         const { data: nestedData } = data
         return { status, data: nestedData !== undefined ? nestedData : data }
@@ -110,8 +111,16 @@ export const axiosRequest = async (url, option) => {
     } = response
 
     status === 401
-      ? showErrorNotification('', statusText)
+      ? showErrorNotification('', 'Session Expired')
       : showErrorNotification('', data.message)
+
+    if (status === 401 && !localStorage.getItem('debug')) {
+      /* eslint-disable no-underscore-dangle */
+      window.g_app._store.dispatch({
+        type: 'login/logout',
+      })
+      return false
+    }
 
     return response
   }

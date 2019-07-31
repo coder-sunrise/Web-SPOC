@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
 import { withStyles } from '@material-ui/core'
@@ -24,6 +25,14 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  attachmentLabel: {
+    fontSize: '0.9rem',
+    fontWeight: 300,
+  },
+  attachmentItem: {
+    marginLeft: theme.spacing(0.5),
+    marginRight: theme.spacing(0.5),
+  },
 })
 
 class VisitInfoCard extends PureComponent {
@@ -37,20 +46,7 @@ class VisitInfoCard extends PureComponent {
         }
       >
         <GridContainer>
-          <GridItem xs md={12}>
-            <FastField
-              name={FormField['visit.queueNo']}
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.queueNo',
-                  })}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={12}>
+          <GridItem xs md={4}>
             <FastField
               name={FormField['visit.visitType']}
               render={(args) => (
@@ -64,8 +60,7 @@ class VisitInfoCard extends PureComponent {
               )}
             />
           </GridItem>
-
-          <GridItem xs md={12}>
+          <GridItem xs md={4}>
             <FastField
               name={FormField['visit.doctorProfileFk']}
               render={(args) => (
@@ -76,6 +71,19 @@ class VisitInfoCard extends PureComponent {
                   tenantCode='doctorprofile'
                   // code='ctgender'
                   {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={4}>
+            <FastField
+              name={FormField['visit.queueNo']}
+              render={(args) => (
+                <NumberInput
+                  {...args}
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.queueNo',
+                  })}
                 />
               )}
             />
@@ -96,20 +104,33 @@ class VisitInfoCard extends PureComponent {
             />
           </GridItem>
           <GridItem className={classes.verticalSpacing}>
+            <span className={classes.attachmentLabel}>Attachment:</span>
+          </GridItem>
+          <GridItem md={10} className={classes.verticalSpacing}>
+            <div>
+              <span
+                className={classnames([
+                  classes.attachmentItem,
+                  classes.attachmentLabel,
+                ])}
+              >
+                <a>Attachment001.pdf</a>
+              </span>
+              <span
+                className={classnames([
+                  classes.attachmentItem,
+                  classes.attachmentLabel,
+                ])}
+              >
+                <a>Attachment002.pdf</a>
+              </span>
+            </div>
+          </GridItem>
+          <GridItem>
             <Button color='rose' size='sm'>
               <AttachFile />
-              <FormattedMessage id='reception.queue.visitRegistration.attachment' />
+              Upload
             </Button>
-          </GridItem>
-          <GridItem className={classes.verticalSpacing}>
-            <div>
-              <p>
-                <a>Attachment001.pdf</a>
-              </p>
-              <p>
-                <a>Attachment002.pdf</a>
-              </p>
-            </div>
           </GridItem>
         </GridContainer>
       </CommonCard>

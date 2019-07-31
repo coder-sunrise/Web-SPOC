@@ -14,8 +14,8 @@ import {
   Button,
   GridContainer,
   GridItem,
-  AntdInput,
   TextField,
+  ProgressButton,
 } from '@/components'
 // sub component
 import StatisticIndicator from './StatisticIndicator'
@@ -55,14 +55,12 @@ class DetailsActionBar extends PureComponent {
   static propTypes = {
     onRegisterVisitEnterPressed: PropTypes.func,
     toggleNewPatient: PropTypes.func,
-    handleStatusChange: PropTypes.func,
   }
 
   render () {
     const {
       classes,
       toggleNewPatient,
-      handleStatusChange,
       isFetching,
       handleSubmit,
       values,
@@ -72,38 +70,38 @@ class DetailsActionBar extends PureComponent {
         <GridItem xs md={3}>
           <FastField
             name='search'
-            render={(args) => (
-              <TextField
-                {...args}
-                suffix={isFetching && <CircularProgress size={16} />}
-                label={formatMessage({
-                  id: 'reception.queue.registerVisitTextBox',
-                })}
-              />
-            )}
+            render={(args) => {
+              return (
+                <TextField
+                  suffix={isFetching && <CircularProgress size={16} />}
+                  label={formatMessage({
+                    id: 'reception.queue.registerVisitTextBox',
+                  })}
+                  {...args}
+                />
+              )
+            }}
           />
         </GridItem>
 
         <GridItem xs md={3} container alignItems='center'>
-          <Button
+          <ProgressButton
+            variant='contained'
             color='primary'
-            disabled={values.search.trim() === ''}
-            size='sm'
+            icon={<Search />}
             onClick={handleSubmit}
+            size='sm'
           >
-            <Search />
             Search
-          </Button>
+          </ProgressButton>
+
           <Button color='primary' size='sm' onClick={toggleNewPatient}>
             <PersonAdd />
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </GridItem>
         <GridItem xs md={6} container justify='flex-end' alignItems='center'>
-          <StatisticIndicator
-            // currentFilter={currentFilter}
-            handleStatusClick={handleStatusChange}
-          />
+          <StatisticIndicator />
         </GridItem>
       </GridContainer>
     )

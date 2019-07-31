@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react'
+import router from 'umi/router'
 import { connect } from 'dva'
 import qs from 'query-string'
 import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { ChangePassword } from 'medisys-components'
+import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
 
@@ -122,40 +124,6 @@ class GlobalModalContainer extends PureComponent {
             Your session will be disconnected in 1 minutes
           </div>
         </CommonModal>
-
-        <CommonModal
-          open={global.showSessionTimeout}
-          title='Session Timeout'
-          maxWidth='sm'
-          onClose={(e) => {
-            clearTimeout(this._timer)
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                showSessionTimeout: false,
-              },
-            })
-          }}
-          onConfirm={() => {
-            this.props.dispatch({
-              type: 'login/logout',
-            })
-          }}
-          showFooter
-        >
-          <div
-            style={{
-              textAlign: 'center',
-              minHeight: 100,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            Your session will be disconnected in 1 minutes
-          </div>
-        </CommonModal>
-
         <CommonModal
           open={global.openConfirm}
           title={global.openConfirmTitle}
@@ -183,6 +151,25 @@ class GlobalModalContainer extends PureComponent {
           showFooter
         >
           <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+        </CommonModal>
+
+        <CommonModal
+          open={global.showVisitRegistration}
+          title='Visit Registration'
+          onClose={() => {
+            dispatch({
+              type: 'visitRegistration/closeModal',
+            })
+          }}
+          onConfirm={() => {
+            dispatch({
+              type: 'visitRegistration/closeModal',
+            })
+          }}
+          maxWidth='lg'
+          observe='VisitRegistration'
+        >
+          <VisitRegistration />
         </CommonModal>
       </div>
     )

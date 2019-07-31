@@ -4,33 +4,40 @@ import FormField from './formField'
 
 const VitalSignMessage = {
   [FormField['visit.visit.queueNo']]: 'Queue No cannot be blank',
-  [FormField['vitalsign.temperature']]:
+  [FormField['vitalsign.temperatureC']]:
     'Temperature must be between 0 and 200 °C',
-  [FormField['vitalsign.bloodPressure']]:
+  [FormField['vitalsign.bpSysMMHG']]:
     'Blood pressure must be between 0 and 999',
-  [FormField['vitalsign.heartRate']]: 'Heart rate must be between 0 and 999',
-  [FormField['vitalsign.weight']]: 'Weight must be between 0 and 999',
-  [FormField['vitalsign.height']]: 'Height must be between 0 and 999',
+  [FormField['vitalsign.bpDiaMMHG']]:
+    'Blood pressure must be between 0 and 999',
+  [FormField['vitalsign.pulseRateBPM']]: 'Heart rate must be between 0 and 999',
+  [FormField['vitalsign.weightKG']]: 'Weight must be between 0 and 999',
+  [FormField['vitalsign.heightCM']]: 'Height must be between 0 and 999',
 }
 
 export default Yup.object().shape({
   [FormField['visit.queueNo']]: Yup.string().required(
     VitalSignMessage[FormField['visit.queueNo']],
   ),
-
-  [FormField['vitalsign.temperature']]: Yup.number()
-    .min(0, VitalSignMessage[FormField['vitalsign.temperature']])
-    .max(200, VitalSignMessage[FormField['vitalsign.temperature']]),
-  [FormField['vitalsign.bloodPressure']]: Yup.number()
-    .min(0, VitalSignMessage[FormField['vitalsign.bloodPressure']])
-    .max(999, VitalSignMessage[FormField['vitalsign.bloodPressure']]),
-  [FormField['vitalsign.heartRate']]: Yup.number()
-    .min(0, VitalSignMessage[FormField['vitalsign.heartRate']])
-    .max(999, VitalSignMessage[FormField['vitalsign.heartRate']]),
-  [FormField['vitalsign.weight']]: Yup.number()
-    .min(0, VitalSignMessage[FormField['vitalsign.weight']])
-    .max(999, VitalSignMessage[FormField['vitalsign.weight']]),
-  [FormField['vitalsign.height']]: Yup.number()
-    .min(0, VitalSignMessage[FormField['vitalsign.height']])
-    .max(999, VitalSignMessage[FormField['vitalsign.height']]),
+  [FormField['visit.doctorProfileFk']]: Yup.string().required(
+    'Must select an assigned doctor',
+  ),
+  [FormField['vitalsign.temperatureC']]: Yup.number()
+    .min(0, VitalSignMessage[FormField['vitalsign.temperatureC']])
+    .max(200, VitalSignMessage[FormField['vitalsign.temperatureC']]),
+  [FormField['vitalsign.bpSysMMHG']]: Yup.number()
+    .min(0, VitalSignMessage[FormField['vitalsign.bpSysMMHG']])
+    .max(999, VitalSignMessage[FormField['vitalsign.bpSysMMHG']]),
+  [FormField['vitalsign.bpDiaMMHG']]: Yup.number()
+    .min(0, VitalSignMessage[FormField['vitalsign.bpDiaMMHG']])
+    .max(999, VitalSignMessage[FormField['vitalsign.bpDiaMMHG']]),
+  [FormField['vitalsign.pulseRateBPM']]: Yup.number()
+    .min(0, VitalSignMessage[FormField['vitalsign.pulseRateBPM']])
+    .max(999, VitalSignMessage[FormField['vitalsign.pulseRateBPM']]),
+  [FormField['vitalsign.weightKG']]: Yup.number()
+    .min(0, VitalSignMessage[FormField['vitalsign.weightKG']])
+    .max(999, VitalSignMessage[FormField['vitalsign.weightKG']]),
+  [FormField['vitalsign.heightCM']]: Yup.number()
+    .min(0, VitalSignMessage[FormField['vitalsign.heightCM']])
+    .max(999, VitalSignMessage[FormField['vitalsign.heightCM']]),
 })

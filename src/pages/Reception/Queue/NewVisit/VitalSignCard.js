@@ -24,7 +24,7 @@ class VitalSignCard extends PureComponent {
         }
       >
         <GridContainer>
-          <GridItem xs md={12}>
+          <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.temperatureC']}
               render={(args) => (
@@ -40,33 +40,38 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={6}>
+          <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.bpSysMMHG']}
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  label={formatMessage({
-                    id: 'reception.queue.visitRegistration.bloodPressure',
-                  })}
-                />
-              )}
+              render={({ args }) => {
+                console.log({ args })
+                return (
+                  <NumberInput
+                    {...args}
+                    label='Blood Pressure SYS'
+                    suffix={formatMessage({
+                      id: 'reception.queue.visitRegistration.mmhg',
+                    })}
+                  />
+                )
+              }}
             />
           </GridItem>
-          <GridItem xs md={6}>
+          <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.bpDiaMMHG']}
               render={(args) => (
                 <NumberInput
                   {...args}
-                  label={formatMessage({
+                  label='Blood Pressure DIA'
+                  suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
                   })}
                 />
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
+          <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.pulseRateBPM']}
               render={(args) => (
@@ -82,7 +87,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
+          <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.weightKG']}
               render={(args) => (
@@ -99,7 +104,7 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
+          <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.heightCM']}
               render={(args) => (
@@ -116,7 +121,8 @@ class VitalSignCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
+          <GridItem xs md={4} />
+          <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.bmi']}
               render={(args) => (

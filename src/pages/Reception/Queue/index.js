@@ -95,22 +95,26 @@ class Queue extends PureComponent {
   }
 
   showVisitRegistration = (patientID = '') => {
-    const { dispatch } = this.props
-
-    patientID !== '' &&
-      dispatch({
-        type: `${modelKey}fetchPatientInfoByPatientID`,
-        payload: { patientID },
-      }).then(() =>
-        this.setState({
-          showPatientSearch: false,
-        }),
-      )
+    this.setState(
+      {
+        showPatientSearch: false,
+      },
+      () =>
+        this.props.history.push(
+          getAppendUrl({
+            md: 'visreg',
+            cmt: patientID,
+          }),
+        ),
+    )
   }
 
   closeVisitRegistration = () => {
     this.props.dispatch({
-      type: `${modelKey}closeVisitModal`,
+      type: 'global/updateAppState',
+      payload: {
+        showVisitRegistration: false,
+      },
     })
   }
 
@@ -171,15 +175,6 @@ class Queue extends PureComponent {
 
   onEndSessionSummaryClose = () => {
     this.setState({ showEndSessionSummary: false })
-  }
-
-  onStatusChange = (newStatus) => {
-    this.setState({ currentFilter: newStatus })
-  }
-
-  onQueryChanged = (event) => {
-    const { value } = event.target
-    this.setState({ currentQuery: value })
   }
 
   onEnterPressed = (searchQuery) => {
@@ -273,10 +268,6 @@ class Queue extends PureComponent {
                   isFetching={
                     loading.effects[`${modelKey}fetchPatientListByName`]
                   }
-                  // currentFilter={currentFilter}
-                  // currentSearchPatient={currentQuery}
-                  // handleQueryChange={this.onQueryChanged}
-                  handleStatusChange={this.onStatusChange}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   togglePatientSearch={this.togglePatientSearch}
                   toggleNewPatient={this.toggleRegisterNewPatient}
@@ -302,7 +293,7 @@ class Queue extends PureComponent {
                 onViewRegisterPatient={this.toggleRegisterNewPatient}
               />
             </CommonModal>
-            <CommonModal
+            {/* <CommonModal
               open={showNewVisit}
               title={formatMessage({
                 id: 'reception.queue.visitRegistration',
@@ -311,10 +302,11 @@ class Queue extends PureComponent {
               onConfirm={this.closeVisitRegistration}
               maxWidth='lg'
               fluidHeight
+              observe='VisitRegistration'
               showFooter={false}
             >
-              <NewVisitModal visitPatientInfo={queueLog.visitPatientInfo} />
-            </CommonModal>
+              <NewVisitModal />
+            </CommonModal> */}
             <CommonModal
               open={showViewPatientProfile}
               title={formatMessage({

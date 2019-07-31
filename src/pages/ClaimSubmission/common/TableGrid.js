@@ -6,7 +6,7 @@ import Money from '@material-ui/icons/AttachMoney'
 // common components
 import { CommonTableGrid2, Tooltip } from '@/components'
 // sub component
-import GridButton from './GridButton'
+import { GridContextMenuButton as GridButton } from 'medisys-components'
 
 const TableGrid = ({
   data,
@@ -17,8 +17,8 @@ const TableGrid = ({
   contextMenuOptions = undefined,
 }) => {
   const Cell = React.memo(({ ...tableProps }) => {
-    const handleMenuItemClick = (event) => {
-      onContextMenuItemClick(event.currentTarget, tableProps.row)
+    const handleMenuItemClick = (row, id) => {
+      // onContextMenuItemClick(event.currentTarget, tableProps.row)
     }
 
     const defaultContextMenuOptions = [
@@ -26,14 +26,11 @@ const TableGrid = ({
         id: 0,
         label: 'Claim Details',
         Icon: NearMe,
-        onClick: handleMenuItemClick,
       },
       {
         id: 1,
         label: 'Invoice Detail',
         Icon: Money,
-
-        onClick: handleMenuItemClick,
       },
     ]
     const options =
@@ -49,7 +46,11 @@ const TableGrid = ({
         <Table.Cell {...tableProps}>
           <Tooltip title='More Actions' placement='bottom'>
             <div style={{ display: 'inline-block' }}>
-              <GridButton row={tableProps.row} ContextMenuOptions={options} />
+              <GridButton
+                row={tableProps.row}
+                contextMenuOptions={options}
+                onClick={handleMenuItemClick}
+              />
             </div>
           </Tooltip>
         </Table.Cell>

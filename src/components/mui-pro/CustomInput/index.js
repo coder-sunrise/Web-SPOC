@@ -101,6 +101,7 @@ class FormikTextField extends React.PureComponent {
 
   onKeyUp = (e) => {
     // console.log('onKeyUp', e.target.value)
+    // console.log('onKeyUp', e.which)
     if (e.which === 13) {
       this._onChange(e.target.value)
     }
