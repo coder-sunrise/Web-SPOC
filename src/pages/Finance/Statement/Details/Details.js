@@ -10,7 +10,7 @@ import {
   GridContainer,
   GridItem,
   EditableTableGrid,
-  CommonTableGrid2,
+  CommonTableGrid,
   CommonModal,
 } from '@/components'
 import CollectPayment from './CollectPayment'
@@ -261,7 +261,7 @@ class Details extends PureComponent {
             FuncProps={FuncProps}
           />
         */}
-        <CommonTableGrid2
+        <CommonTableGrid
           // height={300}
           rows={rows}
           columns={columns}

@@ -17,7 +17,7 @@ import {
   Select,
   Accordion,
   Button,
-  CommonTableGrid2,
+  CommonTableGrid,
   DatePicker,
   NumberInput,
   CommonModal,

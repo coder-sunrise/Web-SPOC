@@ -11,7 +11,7 @@ import { PanTool, Edit, Search } from '@material-ui/icons'
 import { sleep, getAppendUrl } from '@/utils/utils'
 import { status, suppliers, dispUOMs, yesNo } from '@/utils/codes'
 
-import { Button, CommonModal, EditableTableGrid2 } from '@/components'
+import { Button, CommonModal, EditableTableGrid } from '@/components'
 
 @connect(({ consumable }) => ({
   consumable,
@@ -117,7 +117,7 @@ class BatchEditList extends PureComponent {
     // console.log(height)
     // if (this.state.height <= 0) return null
     return (
-      <EditableTableGrid2
+      <EditableTableGrid
         height={height - 73}
         rows={list}
         showRowNumber

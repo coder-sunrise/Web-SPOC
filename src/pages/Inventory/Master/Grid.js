@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Tooltip } from '@material-ui/core'
 import { Edit } from '@material-ui/icons'
-import { Button, CommonTableGrid2 } from '@/components'
+import { Button, CommonTableGrid } from '@/components'
 
 const Grid = ({
   dispatch,
@@ -48,7 +48,7 @@ const Grid = ({
 
   return (
     <React.Fragment>
-      <CommonTableGrid2
+      <CommonTableGrid
         rows={list}
         columnExtensions={colExtensions}
         ActionProps={ActionProps}

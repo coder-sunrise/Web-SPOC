@@ -59,7 +59,7 @@ import {
   CommonModal,
   DownloadPDF,
   MyDocument,
-  CommonTableGrid2,
+  CommonTableGrid,
 } from '@/components'
 import AddPayment from './AddPayment'
 import AddCreditNote from './AddCreditNote'
@@ -601,7 +601,7 @@ class Payment extends React.Component {
         </SimpleModal>
 
         <Paper>
-          <CommonTableGrid2
+          <CommonTableGrid
             rows={rows}
             header={false}
             oddEven={false}

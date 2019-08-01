@@ -5,7 +5,9 @@ import { FormLabel, Radio, FormControlLabel } from '@material-ui/core'
 import { Formik, Field } from 'formik'
 import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
+import { control } from '@/components/Decorator'
 
+@control()
 class RadioGroup extends React.Component {
   state = {
     selectedValue: this.props.defaultValue || '',
@@ -54,6 +56,7 @@ class RadioGroup extends React.Component {
       vertical,
       valueField = 'value',
       textField = 'label',
+      disabled,
       ...resetProps
     } = this.props
     // console.log(this.state.selectedValue)
@@ -76,6 +79,7 @@ class RadioGroup extends React.Component {
                     onChange={this.handleChange}
                     color='primary'
                     value={v}
+                    disabled={disabled}
                     // icon={
                     //   <FiberManualRecord className={classes.radioUnchecked} />
                     // }

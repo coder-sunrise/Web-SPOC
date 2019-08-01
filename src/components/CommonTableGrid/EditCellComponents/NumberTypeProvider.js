@@ -8,6 +8,10 @@ import {
   NumberTypeProvider as NumberTypeProviderOrg,
 } from '@/components'
 
+import config from '@/utils/config'
+
+const { currencyFormat, qtyFormat, currencySymbol } = config
+
 const styles = (theme) => ({
   root: {
     paddingRight: theme.spacing.unit,
@@ -26,60 +30,89 @@ const styles = (theme) => ({
 const numberOnChangeFormatter = (onChangeEvent) => (value) =>
   onChangeEvent(numeral(value)._value)
 
-const CurrencyEditorBase = (props) => {
-  const {
-    column: { name: columnName },
-    value,
-    onValueChange,
-    columnExtensions,
-    classes,
-  } = props
-  const disabled = columnExtensions.some(
-    ({ editingEnabled, columnName: currentColumnName }) =>
-      currentColumnName === columnName && editingEnabled === false,
-  )
-
+const NumberEditorBase = (columnExtensions) => (props) => {
+  const { column: { name: columnName }, value, onValueChange, classes } = props
+  const cfg =
+    columnExtensions.find(
+      ({ columnName: currentColumnName }) => currentColumnName === columnName,
+    ) || {}
+  const { type, ...restProps } = cfg
   return (
     <NumberInput
       inputProps={{
         fullWidth: true,
       }}
       classes={{ input: classes.alignRight }}
-      disabled={disabled}
-      value={value}
+      defaultValue={value}
       onChange={(event) => {
+        // console.log(event)
         numberOnChangeFormatter(onValueChange)(event.target.value)
       }}
       currency
       noWrapper
+      {...restProps}
     />
   )
 }
+const NumberFormatter = (columnExtensions) =>
+  React.memo(
+    (props) => {
+      const {
+        column: { name: columnName },
+        value,
+        onValueChange,
+        classes,
+        text = false,
+      } = props
+      let { color = 'darkblue' } = props
+      const cfg =
+        columnExtensions.find(
+          ({ columnName: currentColumnName }) =>
+            currentColumnName === columnName,
+        ) || {}
+      const { type, ...restProps } = cfg
 
-export const NumberEditor = withStyles(styles)(CurrencyEditorBase)
+      if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
+        color = 'red'
+
+      if (cfg && cfg.currency) {
+        if (text) return numeral(value).format(currencyFormat)
+        return (
+          <b style={{ color }}>
+            {currencySymbol}
+            {numeral(value).format(currencyFormat)}
+          </b>
+        )
+      }
+      if (text) return numeral(value).format(qtyFormat)
+      return <b style={{ color }}>{numeral(value).format(qtyFormat)}</b>
+    },
+    (prevProps, nextProps) => {
+      // console.log(prevProps === nextProps, prevProps.value === nextProps.value)
+      return prevProps === nextProps || prevProps.value === nextProps.value
+    },
+  )
 
 class NumberTypeProvider extends PureComponent {
   static propTypes = {
-    for: PropTypes.array.isRequired,
     columnExtensions: PropTypes.array,
   }
 
-  constructor (props) {
-    super(props)
-    const { columnExtensions } = this.props
-    this.NumberEditor = (editorProps) => (
-      <NumberEditor columnExtensions={columnExtensions} {...editorProps} />
-    )
-  }
-
   render () {
-    const { for: dtpFor, config } = this.props
-    // console.log(this.props)
+    const { columnExtensions } = this.props
     return (
       <NumberTypeProviderOrg
-        for={dtpFor}
-        config={config}
-        editorComponent={this.NumberEditor}
+        for={columnExtensions
+          .filter(
+            (o) =>
+              [
+                'number',
+                'currency',
+              ].indexOf(o.type) >= 0,
+          )
+          .map((o) => o.columnName)}
+        formatterComponent={NumberFormatter(columnExtensions)}
+        editorComponent={withStyles(styles)(NumberEditorBase(columnExtensions))}
       />
     )
   }

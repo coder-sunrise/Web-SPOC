@@ -4,7 +4,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import NearMe from '@material-ui/icons/NearMe'
 import Money from '@material-ui/icons/AttachMoney'
 // common components
-import { CommonTableGrid2, Tooltip } from '@/components'
+import { CommonTableGrid, Tooltip } from '@/components'
 // sub component
 import GridButton from './GridButton'
 
@@ -60,7 +60,7 @@ const TableGrid = ({
   })
 
   return (
-    <CommonTableGrid2
+    <CommonTableGrid
       rows={data}
       columns={columns}
       columnExtensions={columnExtensions}

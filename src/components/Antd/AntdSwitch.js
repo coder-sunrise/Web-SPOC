@@ -10,6 +10,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 
 // ant
 import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
+import { control } from '@/components/Decorator'
 
 import { extendFunc } from '@/utils/utils'
 
@@ -23,7 +24,7 @@ const STYLES = () => {
     },
   }
 }
-
+@control()
 class AntdSwitch extends React.PureComponent {
   static propTypes = {
     label: PropTypes.string,

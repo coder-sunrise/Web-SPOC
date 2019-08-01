@@ -20,8 +20,10 @@ import { extendFunc, currencyFormat } from '@/utils/utils'
 import CustomInputWrapper from '../CustomInputWrapper'
 import FormatInput from './FormatInput'
 import BaseInput from './BaseInput'
+import { control } from '@/components/Decorator'
 
-class FormikTextField extends React.PureComponent {
+@control()
+class TextField extends React.PureComponent {
   validationCount = 0
 
   constructor (props) {
@@ -205,7 +207,7 @@ class FormikTextField extends React.PureComponent {
   }
 }
 
-FormikTextField.propTypes = {
+TextField.propTypes = {
   label: PropTypes.node,
   labelProps: PropTypes.object,
   inputProps: PropTypes.object,
@@ -223,4 +225,4 @@ FormikTextField.propTypes = {
   onBlur: PropTypes.func,
 }
 
-export default FormikTextField
+export default TextField

@@ -7,7 +7,7 @@ import { withStyles } from '@material-ui/core'
 // antd
 import { Select as OriAntdSelect } from 'antd'
 // common component
-import { EditableTableGrid2 } from '@/components'
+import { EditableTableGrid } from '@/components'
 import {
   AppointmentTypeOptions,
   getColorClassByAppointmentType,
@@ -120,7 +120,7 @@ class AppointmentDataGrid extends React.PureComponent {
     })
 
     return (
-      <EditableTableGrid2
+      <EditableTableGrid
         rows={data}
         columns={AppointmentDataColumn}
         columnExtensions={columnExtensions}

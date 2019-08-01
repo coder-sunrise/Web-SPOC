@@ -8,7 +8,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Tooltip, withStyles } from '@material-ui/core'
 import Pageview from '@material-ui/icons/Pageview'
 // custom components
-import { CommonTableGrid2 } from '@/components'
+import { CommonTableGrid } from '@/components'
 import GridButton from './GridButton'
 import AppointmentActionButton from './AppointmentActionButton'
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
@@ -190,7 +190,7 @@ class DetailsGrid extends PureComponent {
     console.log({ data })
 
     return (
-      <CommonTableGrid2
+      <CommonTableGrid
         height={600}
         rows={data}
         ActionProps={ActionProps}

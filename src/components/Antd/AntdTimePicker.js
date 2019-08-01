@@ -8,9 +8,9 @@ import { DatePicker, TimePicker } from 'antd'
 // assets
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
-import AntdWrapper from './AntdWrapper'
 import { extendFunc } from '@/utils/utils'
 import { CustomInput } from '@/components'
+import { control } from '@/components/Decorator'
 
 const _dateFormat = 'YYYY-MM-DD'
 
@@ -49,7 +49,7 @@ const STYLES = (theme) => ({
     },
   },
 })
-
+@control()
 class AntdTimePicker extends PureComponent {
   static defaultProps = {
     format: 'HH:mm',

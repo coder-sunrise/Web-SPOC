@@ -1,8 +1,10 @@
-import CheckPermissions from './CheckPermissions';
+import CheckPermissions from './CheckPermissions'
+// import Exception403 from '@/pages/Exception/403'
 
 const Authorized = ({ children, authority, noMatch = null }) => {
-  const childrenRender = typeof children === 'undefined' ? null : children;
-  return CheckPermissions(authority, childrenRender, noMatch);
-};
+  // console.log('Authorized', children, authority, noMatch)
+  const childrenRender = typeof children === 'undefined' ? null : children
+  return CheckPermissions(authority, childrenRender, noMatch)
+}
 
-export default Authorized;
+export default Authorized

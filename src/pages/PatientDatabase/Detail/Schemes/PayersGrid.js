@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 
-import { EditableTableGrid2, CardContainer } from '@/components'
+import { EditableTableGrid, CardContainer } from '@/components'
 
 class PayersGrid extends PureComponent {
   tableParas = {
@@ -53,7 +53,7 @@ class PayersGrid extends PureComponent {
     }
 
     return (
-      <EditableTableGrid2
+      <EditableTableGrid
         rows={rows}
         FuncProps={{ pager: false }}
         EditingProps={EditingProps}

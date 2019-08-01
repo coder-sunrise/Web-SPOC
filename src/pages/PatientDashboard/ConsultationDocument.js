@@ -1,7 +1,7 @@
-import { CommonTableGrid2 } from '@/components'
+import { CommonTableGrid } from '@/components'
 
 export default ({}) => (
-  <CommonTableGrid2
+  <CommonTableGrid
     size='sm'
     rows={[
       {

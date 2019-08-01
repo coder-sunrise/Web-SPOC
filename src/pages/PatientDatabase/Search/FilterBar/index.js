@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
+import Authorized from '@/utils/Authorized'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Search, PermIdentity } from '@material-ui/icons'
 import { withStyles, Tooltip } from '@material-ui/core'
@@ -105,21 +106,22 @@ class FilterBar extends PureComponent {
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
-
-              {!disableAdd && (
-                <Button
-                  variant='contained'
-                  color='primary'
-                  onClick={() => {
-                    dispatch({
-                      type: 'patient/openPatientModal',
-                    })
-                  }}
-                >
-                  <PermIdentity />
-                  New Patient
-                </Button>
-              )}
+              <Authorized authority='patient.edit'>
+                {!disableAdd && (
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={() => {
+                      dispatch({
+                        type: 'patient/openPatientModal',
+                      })
+                    }}
+                  >
+                    <PermIdentity />
+                    New Patient
+                  </Button>
+                )}
+              </Authorized>
             </div>
           </GridItem>
         </GridContainer>

@@ -1,14 +1,8 @@
 import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import { withFormik } from 'formik'
-import * as Yup from 'yup'
 
 import { withStyles } from '@material-ui/core'
 
-import { CardContainer, CommonHeader, GridContainer, GridItem } from '@/components'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
-
-
 
 const styles = () => ({
   container: {
@@ -19,20 +13,17 @@ const styles = () => ({
   },
 })
 
-
-
 class History extends PureComponent {
-
-  componentDidMount() {
+  componentDidMount () {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount() {
+  componentWillUnmount () {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  resize() {
+  resize () {
     if (this.divElement) {
       const height = this.divElement.clientHeight
       if (height > 0) {
@@ -41,13 +32,9 @@ class History extends PureComponent {
     }
   }
 
-  render() {
-    return (
-      <PatientHistory {...this.props}></PatientHistory>
-
-    )
+  render () {
+    return <PatientHistory {...this.props} />
   }
 }
 
 export default withStyles(styles, { withTheme: true })(History)
-

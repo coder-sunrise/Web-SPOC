@@ -5,12 +5,15 @@ import Redirect from 'umi/redirect'
 
 const Authority = getAuthority()
 const Authorized = RenderAuthorized(Authority)
-
-export default ({ children }) => (
-  <Authorized
-    authority={children.props.route.authority}
-    noMatch={<Redirect to='/login' />}
-  >
-    {children}
-  </Authorized>
-)
+// console.log('Authorized', Authority)
+export default ({ children, ...restProps }) => {
+  // console.log(children, restProps)
+  return (
+    <Authorized
+      authority={children.props.route.authority}
+      noMatch={<Redirect to='/login' />}
+    >
+      {children}
+    </Authorized>
+  )
+}

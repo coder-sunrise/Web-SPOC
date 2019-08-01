@@ -23,7 +23,7 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 
 import { Getter } from '@devexpress/dx-react-core'
-import { NumberInput, CommonTableGrid2 } from '@/components'
+import { NumberInput, CommonTableGrid } from '@/components'
 
 import { NumberFormatter } from '@/utils/utils'
 import CommandComponent from './CommandComponent'
@@ -155,7 +155,7 @@ class CollectPaymentGrid extends PureComponent {
     // const TableCell = (p) => Cell({ ...p })
     const editingStateColumnExtensions = this.getEditingStateColExt()
     return (
-      <CommonTableGrid2
+      <CommonTableGrid
         height={400}
         rows={collectPaymentList}
         columns={columns}

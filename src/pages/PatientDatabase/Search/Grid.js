@@ -6,7 +6,7 @@ import { AccountCircle } from '@material-ui/icons'
 import { getAppendUrl } from '@/utils/utils'
 import { status } from '@/utils/codes'
 
-import { Button, CommonModal, CommonTableGrid2 } from '@/components'
+import { Button, CommonModal, CommonTableGrid } from '@/components'
 
 class Grid extends PureComponent {
   state = {}
@@ -69,7 +69,7 @@ class Grid extends PureComponent {
 
     return (
       <React.Fragment>
-        <CommonTableGrid2
+        <CommonTableGrid
           type='patientSearch'
           entity={patientSearch}
           onRowDoubleClick={onRowDblClick}

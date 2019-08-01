@@ -17,7 +17,7 @@ import {
   ProgressButton,
   DateRangePicker,
   Switch,
-  EditableTableGrid2,
+  EditableTableGrid,
   notification,
   SizeContainer,
 } from '@/components'

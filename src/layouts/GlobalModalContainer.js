@@ -52,6 +52,7 @@ class GlobalModalContainer extends PureComponent {
           open={global.showPatientInfoPanel}
           title='Patient Profile'
           observe='PatientDetail'
+          authority='patient'
           onClose={(e) => {
             dispatch({
               type: 'patient/closePatientModal',

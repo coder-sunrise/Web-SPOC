@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { CommonTableGrid2, Button, CommonModal } from '@/components'
+import { CommonTableGrid, Button, CommonModal } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Assignment from '@material-ui/icons/Assignment'
 import {
@@ -86,7 +86,7 @@ const ResultHistory = (props) => {
         </div>
       </CommonModal>
 
-      <CommonTableGrid2
+      <CommonTableGrid
         size='sm'
         rows={[
           {

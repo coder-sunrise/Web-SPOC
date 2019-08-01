@@ -8,8 +8,8 @@ import { DatePicker } from 'antd'
 // assets
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
-import AntdWrapper from './AntdWrapper'
 import { extendFunc } from '@/utils/utils'
+import { control } from '@/components/Decorator'
 import {
   CustomInputWrapper,
   BaseInput,
@@ -54,6 +54,7 @@ const STYLES = (theme) => ({
   },
 })
 
+@control()
 class AntdDatePicker extends PureComponent {
   // static defaultProps = {
   //   // label: 'Select date',

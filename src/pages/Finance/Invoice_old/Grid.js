@@ -9,7 +9,7 @@ import { PanTool, Edit, Search, Person } from '@material-ui/icons'
 import { sleep, getAppendUrl } from '@/utils/utils'
 import { status, suppliers, dispUOMs } from '@/utils/codes'
 
-import { Button, CommonModal, CommonTableGrid2 } from '@/components'
+import { Button, CommonModal, CommonTableGrid } from '@/components'
 
 class Grid extends PureComponent {
   state = {
@@ -109,7 +109,7 @@ class Grid extends PureComponent {
 
     return (
       <React.Fragment>
-        <CommonTableGrid2
+        <CommonTableGrid
           // height={500}
           rows={list}
           ActionProps={ActionProps}

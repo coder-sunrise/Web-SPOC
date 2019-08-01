@@ -19,11 +19,6 @@ const styles = (theme) => ({
 })
 @connect(({ loginSEMR, loading }) => ({ loginSEMR, loading }))
 class LoginPage extends PureComponent {
-  componentDidMount = () => {
-    const haveToken = localStorage.getItem('token')
-    haveToken && router.push('/')
-  }
-
   getBgImage = () => {
     return loginBackground
   }

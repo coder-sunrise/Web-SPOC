@@ -5,7 +5,7 @@ import { FormattedMessage } from 'umi/locale'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // custom components
-import { Button, CommonTableGrid2 } from '@/components'
+import { Button, CommonTableGrid } from '@/components'
 
 const rowData = [
   {
@@ -62,7 +62,7 @@ class EndSessionSummary extends PureComponent {
         <h4 className={classes.sectionTitle}>
           <FormattedMessage id='reception.queue.summaryOfSession' />
         </h4>
-        <CommonTableGrid2
+        <CommonTableGrid
           {...summaryTableProps}
           rows={rowData}
           FuncProps={{ pager: false }}
@@ -71,7 +71,7 @@ class EndSessionSummary extends PureComponent {
         <h4 className={classes.sectionTitle}>
           <FormattedMessage id='reception.queue.paymentCollected' />
         </h4>
-        <CommonTableGrid2
+        <CommonTableGrid
           {...paymentCollectedTableProps}
           rows={[]}
           FuncProps={{ pager: false }}

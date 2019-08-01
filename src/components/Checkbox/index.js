@@ -3,6 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
+import { control } from '@/components/Decorator'
 import {
   FormLabel,
   Checkbox as MUICheckbox,
@@ -10,8 +11,7 @@ import {
   FormControlLabel,
 } from '@material-ui/core'
 
-import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
-
+@control()
 class Checkbox extends React.Component {
   state = {
     // value:this.props.field?getValue(this.props.field.value):'',

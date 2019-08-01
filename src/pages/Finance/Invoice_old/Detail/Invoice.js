@@ -7,7 +7,7 @@ import Paper from '@material-ui/core/Paper'
 import { withStyles } from '@material-ui/core/styles'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Print } from '@material-ui/icons'
-import { Button, CommonModal, CommonTableGrid2 } from '@/components'
+import { Button, CommonModal, CommonTableGrid } from '@/components'
 
 const sumReducer = (p, n) => {
   return p + n
@@ -162,7 +162,7 @@ class Invoice extends PureComponent {
     const { rows } = this.state
     return (
       <Paper>
-        <CommonTableGrid2
+        <CommonTableGrid
           rows={rows}
           oddEven={false}
           ActionProps={{}}

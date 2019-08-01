@@ -1,3 +1,25 @@
+const roleAccessRightsMapping = {
+  tester: [
+    { name: 'tester', rights: 'enable' },
+    { name: 'patient.test', rights: 'enable' },
+    // { name: 'patient.edit', rights: 'disable' },
+    { name: 'patient.edit', rights: 'enable' },
+    { name: 'patient.view', rights: 'enable' },
+    { name: 'patient.history', rights: 'disable' },
+  ],
+  editor: [
+    { name: 'editor', rights: 'enable' },
+    { name: 'patient.edit', rights: 'enable' },
+    { name: 'patient.new', rights: 'enable' },
+    { name: 'patient.view', rights: 'enable' },
+  ],
+}
+const accessRightsMapping = {
+  'patient.edit': 'SEMRWebApp:PatientDatabase:EditPatientProfile',
+  'patient.new': 'SEMRWebApp:PatientDatabase:NewPatient',
+  'patient.view': 'SEMRWebApp:PatientDatabase',
+}
+
 // use localStorage to store the authority info, which might be sent from server in actual project.
 export function getAuthority (str) {
   // return localStorage.getItem('antd-pro-authority') || ['admin', 'user'];
@@ -13,16 +35,20 @@ export function getAuthority (str) {
   } catch (e) {
     authority = authorityString
   }
+  let result = authority
+  // console.log(result, authority)
   if (typeof authority === 'string') {
-    return [
+    result = [
       authority,
     ]
   }
-  return (
-    authority || [
-      'admin',
-    ]
-  )
+  const r = result
+    .map((o) => roleAccessRightsMapping[o] || [])
+    .reduce((a, b) => {
+      return a.concat(b)
+    })
+  // console.log(r)
+  return r
 }
 
 export function setAuthority (authority) {

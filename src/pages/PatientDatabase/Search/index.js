@@ -40,6 +40,7 @@ class PatientSearch extends PureComponent {
             size='sm'
             onClick={() => showPatient(row)}
             justIcon
+            authority='none'
             round
             color='primary'
             style={{ marginRight: 5 }}

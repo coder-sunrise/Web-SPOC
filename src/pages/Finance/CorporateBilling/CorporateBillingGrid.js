@@ -6,7 +6,7 @@ import Pageview from '@material-ui/icons/Pageview'
 // dev grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom component
-import { Button, CommonTableGrid2, Tooltip } from '@/components'
+import { Button, CommonTableGrid, Tooltip } from '@/components'
 
 const CellBase = (props) => {
   const { column, row, dispatch } = props
@@ -91,7 +91,7 @@ class CorporateBillingGrid extends PureComponent {
     const ActionProps = { TableCellComponent: TableCell }
 
     return (
-      <CommonTableGrid2
+      <CommonTableGrid
         rows={list}
         columns={columns}
         columnExtensions={columnExtensions}

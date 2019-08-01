@@ -8,7 +8,7 @@ import { PanTool, Payment, AccountCircle } from '@material-ui/icons'
 import Modal from './Modal'
 import { sleep, getAppendUrl } from '@/utils/utils'
 
-import { Button, CommonModal, CommonTableGrid2 } from '@/components'
+import { Button, CommonModal, CommonTableGrid } from '@/components'
 
 class Grid extends PureComponent {
   state = {
@@ -130,7 +130,7 @@ class Grid extends PureComponent {
 
     return (
       <React.Fragment>
-        <CommonTableGrid2 rows={list} {...this.tableParas} />
+        <CommonTableGrid rows={list} {...this.tableParas} />
         <CommonModal
           open={showDepositRefundModal}
           title={isDeposit ? 'Deposit' : 'Refund'}

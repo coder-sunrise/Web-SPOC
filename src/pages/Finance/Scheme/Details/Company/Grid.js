@@ -13,7 +13,7 @@ import {
   ProgressButton,
   Button,
   CommonModal,
-  CommonTableGrid2,
+  CommonTableGrid,
 } from '@/components'
 
 class Grid extends PureComponent {
@@ -104,7 +104,7 @@ class Grid extends PureComponent {
 
     return (
       <div>
-        <CommonTableGrid2
+        <CommonTableGrid
           // height={500}
           rows={list}
           columnExtensions={colExtenstions}
