@@ -163,6 +163,7 @@ class CommonModal extends React.PureComponent {
           [this.props.observe]: undefined,
         },
       })
+      window.beforeReloadHandlerAdded = false
       window.removeEventListener('beforeunload', confirmBeforeReload)
     }
     if (this.props.onClose) {
@@ -173,6 +174,7 @@ class CommonModal extends React.PureComponent {
 
   onConfirm = (cb) => {
     console.log('onConfirm')
+    window.beforeReloadHandlerAdded = false
     window.removeEventListener('beforeunload', confirmBeforeReload)
 
     if (this.props.onConfirm) {
@@ -333,6 +335,7 @@ class CommonModal extends React.PureComponent {
                 this.setState({
                   openConfirm: false,
                 })
+                window.beforeReloadHandlerAdded = false
                 window.removeEventListener('beforeunload', confirmBeforeReload)
                 this.onClose(true)
               }}

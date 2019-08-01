@@ -60,11 +60,8 @@ class PatientInfoCard extends PureComponent {
     const { ctGender } = this.state
     const { visitRegistration } = this.props
     const { genderFK } = visitRegistration.patientInfo
-    console.log({ info: visitRegistration.patientInfo })
     const gender = ctGender.find((item) => item.id === genderFK)
-    console.log({ gender, ctGender })
     if (gender) return gender.name
-
     return ''
   }
 

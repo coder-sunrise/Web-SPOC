@@ -23,7 +23,7 @@ const _arrayBufferToBase64 = (buffer) => {
 
 const BASE64_MARKER = 'data:application/pdf;base64,'
 
-const styles = (theme) => ({
+const styles = () => ({
   reportContainer: {
     display: 'flex',
     flexDirection: 'column',

@@ -73,9 +73,13 @@ export const axiosRequest = async (url, option) => {
   let result = {}
   try {
     const token = localStorage.getItem('token')
+    const defaultContentType = 'application/json'
     const headerConfig = {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type':
+          option && option.contentType
+            ? option.contentType
+            : defaultContentType,
         Authorization: `Bearer ${token}`,
       },
     }
