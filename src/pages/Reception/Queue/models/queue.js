@@ -112,12 +112,14 @@ export default createListViewModel({
       *endSession ({ sessionID }, { call, put }) {
         const response = yield call(service.endSession, sessionID)
         const { status } = response
-        if (status >= 204)
+        console.log({ response })
+        if (status >= 204 && status < 400)
           // end session successfully, reset session info
           yield put({
             type: 'updateSessionInfo',
             payload: { ...InitialSessionInfo },
           })
+
         return status >= 204
       },
       *getSessionInfo (_, { call, put }) {

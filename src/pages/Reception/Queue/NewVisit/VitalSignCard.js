@@ -43,18 +43,15 @@ class VitalSignCard extends PureComponent {
           <GridItem xs md={3}>
             <FastField
               name={FormField['vitalsign.bpSysMMHG']}
-              render={({ args }) => {
-                console.log({ args })
-                return (
-                  <NumberInput
-                    {...args}
-                    label='Blood Pressure SYS'
-                    suffix={formatMessage({
-                      id: 'reception.queue.visitRegistration.mmhg',
-                    })}
-                  />
-                )
-              }}
+              render={(args) => (
+                <NumberInput
+                  {...args}
+                  label='Blood Pressure SYS'
+                  suffix={formatMessage({
+                    id: 'reception.queue.visitRegistration.mmhg',
+                  })}
+                />
+              )}
             />
           </GridItem>
           <GridItem xs md={3}>

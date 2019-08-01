@@ -44,7 +44,7 @@ class PatientSearch extends PureComponent {
 
   viewPatientInfo = (patientID) => {
     const { onViewRegisterVisit } = this.props
-    onViewRegisterVisit(patientID)
+    onViewRegisterVisit({ patientID })
   }
 
   Cell = (props) => {

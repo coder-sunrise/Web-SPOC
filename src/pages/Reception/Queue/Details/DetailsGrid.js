@@ -93,7 +93,7 @@ const ContextMenuOptions = [
     id: 0,
     label: 'Edit Visit',
     Icon: Edit,
-    disabled: true,
+    disabled: false,
   },
   {
     id: 1,
@@ -145,14 +145,16 @@ class DetailsGrid extends PureComponent {
     router.push(href)
   }
 
-  onEditVisitClick = (queue) => {}
-
-  onViewPatientDashboardClick = (row, id) => {
+  onContextButtonClick = (row, id) => {
     switch (id) {
+      case '0':
+        this.props.handleEditVisitClick({
+          visitID: row.id,
+        })
+        break
       case '1':
         router.push(`/reception/queue/dispense/${row.visitRefNo}`)
         break
-      case '0':
       case '2':
       case '3':
         break
@@ -184,7 +186,7 @@ class DetailsGrid extends PureComponent {
                 <AppointmentActionButton
                   row={tableProps.row}
                   Icon={<Pageview />}
-                  onClick={this.onViewPatientDashboardClick}
+                  onClick={this.onContextButtonClick}
                 />
               </div>
             </Tooltip>
@@ -202,7 +204,7 @@ class DetailsGrid extends PureComponent {
             <div style={{ display: 'inline-block' }}>
               <GridButton
                 row={tableProps.row}
-                onClick={this.onViewPatientDashboardClick}
+                onClick={this.onContextButtonClick}
                 contextMenuOptions={ContextMenuOptions}
               />
             </div>

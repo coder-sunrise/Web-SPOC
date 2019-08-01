@@ -125,6 +125,25 @@ class GlobalModalContainer extends PureComponent {
             Your session will be disconnected in 1 minutes
           </div>
         </CommonModal>
+
+        <CommonModal
+          open={global.showVisitRegistration}
+          title='Visit Registration'
+          onClose={() => {
+            dispatch({
+              type: 'visitRegistration/closeModal',
+            })
+          }}
+          onConfirm={() => {
+            dispatch({
+              type: 'visitRegistration/closeModal',
+            })
+          }}
+          maxWidth='lg'
+          observe='VisitRegistration'
+        >
+          <VisitRegistration />
+        </CommonModal>
         <CommonModal
           open={global.openConfirm}
           title={global.openConfirmTitle}
@@ -152,25 +171,6 @@ class GlobalModalContainer extends PureComponent {
           showFooter
         >
           <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
-        </CommonModal>
-
-        <CommonModal
-          open={global.showVisitRegistration}
-          title='Visit Registration'
-          onClose={() => {
-            dispatch({
-              type: 'visitRegistration/closeModal',
-            })
-          }}
-          onConfirm={() => {
-            dispatch({
-              type: 'visitRegistration/closeModal',
-            })
-          }}
-          maxWidth='lg'
-          observe='VisitRegistration'
-        >
-          <VisitRegistration />
         </CommonModal>
       </div>
     )

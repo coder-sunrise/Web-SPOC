@@ -11,7 +11,6 @@ import classNames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
 import { Refresh, Stop } from '@material-ui/icons'
 import { getAppendUrl } from '@/utils/utils'
-
 // custom components
 import {
   Card,
@@ -20,16 +19,12 @@ import {
   CommonModal,
   PageHeaderWrapper,
   Button,
-  confirm,
 } from '@/components'
-
 // current page sub components
 import EmptySession from './EmptySession'
 import DetailsActionBar from './Details/DetailsActionBar'
 import DetailsGrid from './Details/DetailsGrid'
-import NewVisitModal from './NewVisit'
 import PatientSearchModal from './PatientSearch'
-import NewPatient from '../../PatientDatabase/New'
 import ViewPatient from '../../PatientDatabase/Detail'
 import EndSessionSummary from './Details/EndSessionSummary'
 import { StatusIndicator, modelKey } from './variables'
@@ -94,18 +89,18 @@ class Queue extends PureComponent {
     })
   }
 
-  showVisitRegistration = (patientID = '') => {
+  showVisitRegistration = ({ visitID = undefined, patientID = undefined }) => {
+    const parameter = {
+      md: 'visreg',
+    }
+    if (patientID) parameter.pid = patientID
+    if (visitID) parameter.vis = visitID
+
     this.setState(
       {
         showPatientSearch: false,
       },
-      () =>
-        this.props.history.push(
-          getAppendUrl({
-            md: 'visreg',
-            cmt: patientID,
-          }),
-        ),
+      () => this.props.history.push(getAppendUrl(parameter)),
     )
   }
 
@@ -147,29 +142,24 @@ class Queue extends PureComponent {
 
   onEndSessionClick = () => {
     // const { showEndSessionConfirm } = this.state
-    const { queueLog } = this.props
+    const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
     const { sessionNo } = sessionInfo
-    // this.setState({
-    //   showEndSessionConfirm: !showEndSessionConfirm,
-    // })
-    confirm({
-      title: `Are you sure to end current session (${sessionNo})`,
-      onOk: this.onConfirmEndSession,
-      // onDone:
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Are you sure to end current session (${sessionNo})`,
+        onOpenConfirm: this.onConfirmEndSession,
+      },
     })
   }
 
-  onConfirmEndSession = (doneCb) => {
+  onConfirmEndSession = () => {
     const { queueLog, dispatch } = this.props
     dispatch({
       type: `${modelKey}endSession`,
       sessionID: queueLog.sessionInfo.id,
-    }).then((r) => {
-      // if (doneCb) doneCb(r)
-      this.setState({
-        showEndSessionSummary: true,
-      })
     })
   }
 
@@ -192,7 +182,7 @@ class Queue extends PureComponent {
     const { patientList } = queueLog
 
     if (patientList.length === 1) {
-      this.showVisitRegistration(patientList[0].id)
+      this.showVisitRegistration({ patientID: patientList[0].id })
     } else if (patientList.length > 1) {
       this.setState({ showPatientSearch: true })
     } else {
@@ -200,18 +190,25 @@ class Queue extends PureComponent {
     }
   }
 
+  onRefreshClick = () => {
+    const { queueLog, dispatch } = this.props
+    dispatch({
+      type: `${modelKey}fetchQueueListing`,
+      sessionID: queueLog.sessionInfo.id,
+    })
+  }
+
   render () {
     const { classes, queueLog, loading } = this.props
     const {
       showViewPatientProfile,
-      // showEndSessionConfirm,
       showEndSessionSummary,
       showPatientSearch,
       currentQuery,
       currentFilter,
     } = this.state
 
-    const { showNewVisit, sessionInfo, error } = queueLog
+    const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     // console.log('queuelisting state', this.props)
 
@@ -222,11 +219,6 @@ class Queue extends PureComponent {
       >
         <Card>
           <CardHeader icon>
-            {/*
-              <h4 className={classNames(classes.cardIconTitle)}>
-                <FormattedMessage id='reception.queue.queueLog' />
-              </h4>
-            */}
             <h3 className={classNames(classes.sessionNo)}>
               {`Queue (Session No.: ${sessionNo})`}
             </h3>
@@ -235,7 +227,7 @@ class Queue extends PureComponent {
                 <Button
                   color='info'
                   size='sm'
-                  disabled
+                  onClick={this.onRefreshClick}
                   classes={{ justIcon: classes.icon }}
                 >
                   <Refresh />
@@ -274,6 +266,7 @@ class Queue extends PureComponent {
                 />
                 <DetailsGrid
                   onViewDispenseClick={this.toggleDispense}
+                  handleEditVisitClick={this.showVisitRegistration}
                   currentFilter={currentFilter}
                 />
               </React.Fragment>
@@ -293,20 +286,6 @@ class Queue extends PureComponent {
                 onViewRegisterPatient={this.toggleRegisterNewPatient}
               />
             </CommonModal>
-            {/* <CommonModal
-              open={showNewVisit}
-              title={formatMessage({
-                id: 'reception.queue.visitRegistration',
-              })}
-              onClose={this.closeVisitRegistration}
-              onConfirm={this.closeVisitRegistration}
-              maxWidth='lg'
-              fluidHeight
-              observe='VisitRegistration'
-              showFooter={false}
-            >
-              <NewVisitModal />
-            </CommonModal> */}
             <CommonModal
               open={showViewPatientProfile}
               title={formatMessage({
@@ -319,15 +298,6 @@ class Queue extends PureComponent {
             >
               <ViewPatient />
             </CommonModal>
-            {/* {showEndSessionConfirm ? (
-              <SimpleModal
-                title={`Are you sure to end current session (${sessionNo})`}
-                open={showEndSessionConfirm}
-                onCancel={this.onEndSessionClick}
-                onConfirm={this.onConfirmEndSession}
-              />
-            ) : null} */}
-
             <CommonModal
               open={showEndSessionSummary}
               title='Session Summary'

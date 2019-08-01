@@ -54,36 +54,43 @@ const styles = (theme) => ({
   displayName: 'VisitRegistration',
   enableReinitialize: true,
   validationSchema: VisitValidationSchema,
-  mapPropsToValues: ({ queueLog }) => {
-    if (queueLog) {
-      const nextQueueNo = queueLog.queueListing.length + 1
-      return {
-        [FormFieldName['visit.queueNo']]: nextQueueNo,
-      }
+  mapPropsToValues: ({ queueLog, visitRegistration }) => {
+    let qNo =
+      queueLog && queueLog.queueListing ? queueLog.queueListing.length + 1 : 1
+    const { visitInfo } = visitRegistration
+    if (Object.keys(visitInfo).length > 0) {
+      qNo = visitInfo.queueNo
     }
-    return {}
+    const { visit = {} } = visitInfo
+
+    return {
+      queueNo: qNo,
+      ...visit,
+    }
   },
   handleSubmit: (values, { props, setSubmitting }) => {
     const { queueNo, ...restValues } = values
-    const { dispatch, queueLog, onConfirm } = props
+    const { dispatch, queueLog, visitRegistration, onConfirm } = props
 
-    const { sessionInfo, patientInfo } = queueLog
-    const visitID = sessionInfo.id
+    const { sessionInfo } = queueLog
+    const { visitInfo: { id = undefined }, patientInfo } = visitRegistration
+    const bizSessionFK = sessionInfo.id
 
-    const visitReferenceNo = `${sessionInfo.sessionNo}-${parseFloat(
-      visitID,
-    ).toFixed(1)}`
+    const visitReferenceNo = `${sessionInfo.sessionNo}-${parseFloat(id).toFixed(
+      1,
+    )}`
 
     const patientProfileFK = patientInfo.id
 
     const payload = {
+      visitID: id,
       queueNo,
       queueNoPrefix: sessionInfo.sessionNoPrefix,
       visit: {
         patientProfileFK,
-        bizSessionFK: visitID,
-        visitPurposeFK: 1,
+        bizSessionFK,
         visitReferenceNo,
+        // visitPurposeFK: 1,
         // doctorProfileFK: null,
         // plannedVisitFK: null,
         // counterFK: null,
@@ -110,13 +117,20 @@ const styles = (theme) => ({
         ...restValues,
       },
     }
-    console.log({ visitDate: new Date() })
-    // dispatch({
-    //   type: 'queueLog/registerVisitInfo',
-    //   payload,
-    // })
-    setSubmitting(false)
-    onConfirm()
+
+    const type =
+      id === undefined
+        ? 'visitRegistration/registerVisitInfo'
+        : 'visitRegistration/saveVisitInfo'
+
+    dispatch({
+      type,
+      payload,
+    }).then((response) => {
+      setSubmitting(false)
+      console.log({ response })
+      response && onConfirm()
+    })
   },
 })
 class NewVisit extends PureComponent {
@@ -133,8 +147,13 @@ class NewVisit extends PureComponent {
   }
 
   render () {
-    const { classes, handleSubmit, footer } = this.props
-
+    const {
+      classes,
+      handleSubmit,
+      footer,
+      visitRegistration: { visitInfo },
+    } = this.props
+    const isEdit = Object.keys(visitInfo).length > 0
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>
@@ -167,7 +186,7 @@ class NewVisit extends PureComponent {
         </GridContainer>
         {footer &&
           footer({
-            confirmBtnText: 'Register visit',
+            confirmBtnText: isEdit ? 'Save' : 'Register visit',
             onConfirm: handleSubmit,
           })}
       </React.Fragment>

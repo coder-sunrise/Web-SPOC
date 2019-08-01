@@ -1,7 +1,21 @@
 import router from 'umi/router'
-import { createFormViewModel } from 'medisys-model'
+import { createFormViewModel, createListViewModel } from 'medisys-model'
 import * as service from '../services/visit'
-import { getRemovedUrl } from '@/utils/utils'
+import { getRemovedUrl, convertToQuery } from '@/utils/utils'
+
+const openModal = {
+  type: 'global/updateAppState',
+  payload: {
+    showVisitRegistration: true,
+  },
+}
+
+const closeModal = {
+  type: 'global/updateAppState',
+  payload: {
+    showVisitRegistration: false,
+  },
+}
 
 export default createFormViewModel({
   namespace: 'visitRegistration',
@@ -12,21 +26,23 @@ export default createFormViewModel({
     service,
     state: {
       patientInfo: {},
+      visitInfo: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
         const { query } = location
-        if (query.md === 'visreg' && query.cmt) {
-          dispatch({
-            type: 'fetchPatientInfoByPatientID',
-            payload: { patientID: query.cmt },
-          })
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              showVisitRegistration: true,
-            },
-          })
+        if (query.md === 'visreg') {
+          query.vis
+            ? dispatch({
+                type: 'fetchVisitInfo',
+                visitID: query.vis,
+              })
+            : dispatch({
+                type: 'fetchPatientInfoByPatientID',
+                payload: { patientID: query.pid },
+              })
+
+          dispatch(openModal)
         }
       })
     },
@@ -37,13 +53,38 @@ export default createFormViewModel({
             'md',
             'cmt',
             'pid',
+            'vis',
+            'acc',
+            'refno',
             'new',
           ]),
         )
-        return yield put({
-          type: 'global/updateAppState',
+        yield put({
+          type: 'updateState',
           payload: {
-            showVisitRegistration: false,
+            visitInfo: {},
+            patientInfo: {},
+          },
+        })
+        return yield put(closeModal)
+      },
+      *fetchVisitInfo ({ visitID }, { call, put }) {
+        const response = yield call(service.fetchVisitInfo, visitID)
+        const { data = {} } = response
+        console.log({ data })
+        const { visit: { patientProfileFK = undefined } } = data
+
+        const patientInfoResponse = patientProfileFK
+          ? yield call(service.fetchPatientInfoByPatientID, patientProfileFK)
+          : {}
+
+        const { data: patientInfo = {} } = patientInfoResponse
+
+        return yield put({
+          type: 'updateState',
+          payload: {
+            visitInfo: data,
+            patientInfo,
           },
         })
       },
@@ -62,11 +103,20 @@ export default createFormViewModel({
       },
       *registerVisitInfo ({ payload }, { call, put }) {
         const response = yield call(service.registerVisit, payload)
-
-        return yield put({
-          type: 'registerVisit',
-          payload: {},
-        })
+        const { status, data: { visit = {} } } = response
+        if (status >= 200 && status < 300) {
+          const { bizSessionFK } = visit
+          return yield put({
+            type: 'queueLog/fetchQueueListing',
+            sessionID: bizSessionFK,
+          })
+        }
+        return false
+      },
+      *saveVisitInfo ({ payload }, { call }) {
+        const response = yield call(service.saveVisit, payload)
+        console.log({ response })
+        return false
       },
       reducers: {},
     },
