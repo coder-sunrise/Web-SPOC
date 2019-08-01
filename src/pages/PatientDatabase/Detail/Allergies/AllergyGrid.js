@@ -1,16 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import { PagingPanel } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import {
-  Button,
-  CommonModal,
-  CommonTableGrid2,
-  EditableTableGrid2,
-  CardContainer,
-} from '@/components'
-import { getUniqueGUID, getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { EditableTableGrid } from '@/components'
 
 @connect(({ user }) => ({
   user,
@@ -24,8 +15,7 @@ class AllergyGrid extends PureComponent {
   constructor (props) {
     super(props)
 
-    const { state } = this
-    const { title, titleChildren, dispatch, type } = props
+    const { type } = props
 
     this.tableParas = {
       columns: [
@@ -80,9 +70,8 @@ class AllergyGrid extends PureComponent {
       ],
     }
 
-    this.commitChanges = ({ rows, added, changed, deleted }) => {
+    this.commitChanges = ({ rows }) => {
       console.log(rows)
-      this.props.setArrayValue(rows)
     }
     this.onAddedRowsChange = (addedRows) => {
       return addedRows.map((row) => ({
@@ -96,11 +85,10 @@ class AllergyGrid extends PureComponent {
   }
 
   render () {
-    const { editingRowIds, rowChanges } = this.state
-    const { type, values, isEditable, rows, schema } = this.props
+    const { isEditable, rows, schema } = this.props
 
     return (
-      <EditableTableGrid2
+      <EditableTableGrid
         rows={rows}
         schema={schema}
         FuncProps={{

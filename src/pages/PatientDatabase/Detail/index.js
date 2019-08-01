@@ -1,11 +1,10 @@
 import React, { PureComponent } from 'react'
+import Loadable from 'react-loadable'
 import { connect } from 'dva'
 import moment from 'moment'
-import PerfectScrollbar from 'perfect-scrollbar'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
-import Link from 'umi/link'
-import { withStyles, MenuItem, MenuList, Divider } from '@material-ui/core'
+
+import avatar from '@/assets/img/faces/marc.jpg'
 import {
   withFormikExtend,
   PictureUpload,
@@ -14,246 +13,38 @@ import {
   Card,
   CardAvatar,
   CardBody,
-  Transition,
-  ProgressButton,
   CardContainer,
-  Button,
   notification,
 } from '@/components'
-import avatar from '@/assets/img/faces/marc.jpg'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
-import Replay from '@material-ui/icons/Replay'
-import Clear from '@material-ui/icons/Clear'
-
-import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
+import { withStyles, MenuItem, MenuList, Divider } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import schema from './schema'
 
-let ps
+const styles = () => ({})
 
-const styles = (theme) => ({
-  hide: {
-    display: 'none',
-  },
-})
-
-// prettier-ignore
-const _multiples = [2,7,6,5,4,3,2]
-Yup.addMethod(Yup.string, 'NRIC', function (message) {
-  return this.test('isValidNRIC', message, function (value = '') {
-    const { parent, createError } = this
-    const { patientAccountNoTypeFK, dob } = parent
-
-    const firstChar = value[0] || ''
-    const lastChar = value[value.length - 1] || ''
-    let outputChars = []
-    switch (patientAccountNoTypeFK) {
-      case 1: // fin
-        if (firstChar === 'F')
-          // prettier-ignore
-          outputChars = ['X','W','U','T','R','Q','P','N','M','L','K']
-        else if (firstChar === 'G')
-          // prettier-ignore
-          outputChars = ['R','Q','P','N','M','L','K','X','W','U','T']
-        break
-      case 5:
-      case 6:
-      case 10:
-      case 11:
-      case 12:
-      case 13:
-        // nric
-        if (firstChar === 'S')
-          // prettier-ignore
-          outputChars = ['J','Z','I','H','G','F','E','D','C','B','A']
-        else if (firstChar === 'T')
-          // prettier-ignore
-          outputChars = ['G','F','E','D','C','B','A','J','Z','I','H']
-        break
-
-      default:
-        return true
-    }
-    if (value.length !== 9)
-      return createError({
-        message: 'Account number must be 9 digits',
-      })
-    value = value.toUpperCase()
-
-    const numericNRICString = value.substring(1, value.length - 2)
-
-    if (!new RegExp(/^\d+$/).test(numericNRICString))
-      return createError({
-        message: ' Invalid account number structure',
-      })
-    let numberNRIC = Number(numericNRICString)
-    let total = 0
-    let count = 0
-    while (numberNRIC !== 0) {
-      total += (numberNRIC % 10) * _multiples[_multiples.length - (1 + count++)]
-      numberNRIC /= 10
-      numberNRIC = Math.floor(numberNRIC)
-    }
-    if (total % 11 > outputChars.length - 1)
-      return createError({
-        message: ' Invalid account number structure',
-      })
-
-    if (dob) {
-      switch (patientAccountNoTypeFK) {
-        case 5:
-        case 6:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-          // nric
-          const mDob = moment(dob)
-          if (mDob.year() >= 2000) {
-            if (firstChar !== 'T') {
-              return createError({
-                message: 'Invalid date of birth',
-              })
-            }
-          } else if (firstChar !== 'S') {
-            return createError({
-              message: 'Invalid date of birth',
-            })
-          }
-          if (
-            patientAccountNoTypeFK === 13 &&
-            Math.abs(mDob.diff(moment(), 'year')) >= 15
-          ) {
-            return createError({
-              message:
-                'For Singaporean age 15 and above, please choose others than SG Birth Cert',
-            })
-          }
-          break
-
-        default:
-          return true
-      }
-    }
-    return true
-  })
-})
-
-const schemaDemographic = {
-  name: Yup.string().required(),
-  dob: Yup.date().required(),
-  patientAccountNoTypeFK: Yup.number().required(),
-  patientAccountNo: Yup.string().NRIC().required(),
-  genderFK: Yup.number().required(),
-
-  referredBy: Yup.string(),
-  referralRemarks: Yup.string().when('referredBy', {
-    is: 'Company',
-    then: Yup.string().required(),
-  }),
-  referredByPatientFK: Yup.number().when('referredBy', {
-    is: 'Patient',
-    then: Yup.number().required(),
-  }),
-  // dialect: Yup.string().required(),
-  // contact.mobileContactNumber.number:Yup.string().render(),
-  contact: Yup.object().shape({
-    // contactAddress: Yup.array().compact((v) => v.isDeleted).of(
-    //   Yup.object().shape({
-    //     postcode: Yup.number().required(),
-    //     countryFK: Yup.string().required(),
-    //   }),
-    // ),
-    contactEmailAddress: Yup.object().shape({
-      emailAddress: Yup.string().email(),
-    }),
-    mobileContactNumber: Yup.object().shape({
-      number: Yup.string().required(),
-    }),
-  }),
-}
-
-const pecValidationSchema = Yup.object().shape({
-  accountNoTypeFK: Yup.string().required(),
-  accountNo: Yup.string().NRIC().required(),
-  name: Yup.string().required(),
-  relationshipFK: Yup.number().required(),
-})
-const schemaEmergencyContact = {
-  patientEmergencyContact: Yup.array()
-    .compact((v) => v.isDeleted)
-    .of(pecValidationSchema),
-}
-
-const schemaAllergies = {
-  patientAllergyMetaData: Yup.array().compact((v) => v.isDeleted).of(
-    Yup.object().shape({
-      noAllergies: Yup.boolean(),
-      g6PDFK: Yup.number(),
-    }),
-  ),
-  patientAllergy: Yup.array().compact((v) => v.isDeleted).of(
-    Yup.object().shape({
-      type: Yup.string().required(),
-      allergyFK: Yup.number().required(),
-      allergyName: Yup.string().required(),
-      allergyReaction: Yup.string().required(),
-      patientAllergyStatusFK: Yup.number().required(),
-      adverseReaction: Yup.string(),
-      onsetDate: Yup.date(),
-    }),
-  ),
-}
-
-const schemaSchemes = {
-  patientScheme: Yup.array()
-    .unique((v) => v.schemeTypeFK, 'error', () => {
-      notification.error({
-        message: 'The Schemes record already exists in the system',
-      })
-    })
-    .compact((v) => v.isDeleted)
-    .of(
-      Yup.object().shape({
-        schemeTypeFK: Yup.number().required(),
-      }),
-    ),
-  schemePayer: Yup.array().compact((v) => v.isDeleted).of(
-    Yup.object().shape({
-      payerName: Yup.string().required(),
-      dob: Yup.date(),
-    }),
-  ),
-}
-// console.log(pecValidationSchema, schemaAllergies)
 @connect(({ patient, global }) => ({
   patient,
   global,
 }))
 @withFormikExtend({
+  authority: {
+    view: 'patient.view',
+    edit: 'patient.edit',
+  },
   mapPropsToValues: ({ patient }) => {
-    console.log('mapPropsToValues', patient)
     return patient.entity || patient.default
   },
-  validationSchema: ({ patient, dispatch }) => {
-    const { currentComponent } = patient
-    return Yup.object().shape({
-      ...schemaDemographic,
-      ...schemaEmergencyContact,
-      ...schemaAllergies,
-      ...schemaSchemes,
-    })
-  },
+  validationSchema: schema,
 
   handleSubmit: (values, component) => {
-    const { props, setValues, onConfirm } = component
+    const { props, resetForm, onConfirm } = component
     const { dispatch, history, patient } = props
-    // return
     dispatch({
       type: 'patient/upsert',
       payload: values,
     }).then((r) => {
-      // console.log(r)
-      // console.debug(123)
       if (r) {
         if (r.id) {
           history.push(
@@ -273,7 +64,7 @@ const schemaSchemes = {
             id: r.id || patient.entity.id,
           },
         }).then((value) => {
-          setValues(value)
+          resetForm(value)
         })
         if (onConfirm) onConfirm()
       }
@@ -283,10 +74,7 @@ const schemaSchemes = {
   displayName: 'PatientDetail',
 })
 class PatientDetail extends PureComponent {
-  state = {
-    // selectedIndex: null,
-    // menuErrors: [],
-  }
+  state = {}
 
   constructor (props) {
     console.log('PatientDetail constructor')
@@ -295,12 +83,12 @@ class PatientDetail extends PureComponent {
       {
         id: '1',
         name: 'Demographic',
-        schema: schemaDemographic,
+        access: 'patient.view',
+        schema: schema.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            // console.log(props, p)
             return <Cmpnet {...p} />
           },
           loading: Loading,
@@ -309,12 +97,20 @@ class PatientDetail extends PureComponent {
       {
         id: '2',
         name: 'Emergency Contact',
-        schema: schemaEmergencyContact,
+        access: 'patient.view',
+        schema: schema.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={pecValidationSchema} {...p} />
+            return (
+              <Cmpnet
+                schema={
+                  schema.emergencyContact.patientEmergencyContact._subType
+                }
+                {...p}
+              />
+            )
           },
           loading: Loading,
         }),
@@ -322,12 +118,13 @@ class PatientDetail extends PureComponent {
       {
         id: '3',
         name: 'Allergies',
-        schema: schemaAllergies,
+        access: 'patient.view',
+        schema: schema.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schemaAllergies} {...p} />
+            return <Cmpnet schema={schema.allergies} {...p} />
           },
           loading: Loading,
         }),
@@ -335,12 +132,13 @@ class PatientDetail extends PureComponent {
       {
         id: '4',
         name: 'Schemes',
-        schema: schemaSchemes,
+        access: 'patient.view',
+        schema: schema.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet schema={schemaSchemes} {...p} />
+            return <Cmpnet schema={schema.schemes} {...p} />
           },
           loading: Loading,
         }),
@@ -348,6 +146,7 @@ class PatientDetail extends PureComponent {
       {
         id: '5',
         name: 'Appointment History',
+        access: 'patient.view',
         component: Loadable({
           loader: () => import('./AppointmentHistory'),
           render: (loaded, p) => {
@@ -360,6 +159,7 @@ class PatientDetail extends PureComponent {
       {
         id: '6',
         name: 'Patient History',
+        access: 'patient.view',
         component: Loadable({
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
@@ -372,17 +172,7 @@ class PatientDetail extends PureComponent {
     ]
   }
 
-  // handleListItemClick = (e, i) => {
-  //   this.setState({ selectedIndex: i })
-  // }
-
   componentDidMount () {
-    // if (navigator.platform.indexOf('Win') > -1 && this.refs.sidebarWrapper) {
-    //   ps = new PerfectScrollbar(this.refs.sidebarWrapper, {
-    //     suppressScrollX: true,
-    //     suppressScrollY: false,
-    //   })
-    // }
     if (this.props.patient.currentId) {
       this.props
         .dispatch({
@@ -392,23 +182,13 @@ class PatientDetail extends PureComponent {
           },
         })
         .then((o) => {
-          console.log(o)
           this.props.resetForm(o)
         })
     }
-
-    // dispatch({
-    //   type: 'updateState',
-    //   payload: {
-    //     currentComponent: query.cmt,
-    //     currentId: query.pid,
-    //   },
-    // })
   }
 
   componentWillReceiveProps (nextProps) {
-    const { values, errors, dispatch, patient } = nextProps
-    // console.log(schemaDemographic, schemaEmergencyContact, errors)
+    const { errors, dispatch, patient } = nextProps
 
     const menuErrors = {}
     Object.keys(errors).forEach((k) => {
@@ -426,45 +206,19 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  componentWillUnmount () {
-    if (navigator.platform.indexOf('Win') > -1 && ps) {
-      ps.destroy()
-    }
-    // this.props.dispatch({
-    //   type: 'patient/updateState',
-    //   payload: {
-    //     entity: undefined,
-    //   },
-    // })
-  }
-
-  filterList = (item) => {
-    const { columns } = this.state
-    const cols = columns.map((col) => col.name)
-    const list = Object.keys(item).reduce((filtered, key) => {
-      return cols.includes(key)
-        ? { ...filtered, [key]: item[key] }
-        : { ...filtered }
-    }, {})
-    return list
-  }
-
   render () {
     const {
       theme,
       classes,
       height,
-      linkProps = {},
       onMenuClick = (p) => p,
       footer,
       ...resetProps
     } = this.props
-    console.log(this.props)
 
     const {
       patient,
       global,
-      history,
       handleSubmit,
       resetForm,
       values,
@@ -472,7 +226,6 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors } = patient
-    // console.log(values, this.state)
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}
     const CurrentComponent = currentMenu.component
@@ -515,37 +268,39 @@ class PatientDetail extends PureComponent {
                         Number(o.id) <= 4,
                     )
                     .map((o) => (
-                      <MenuItem
-                        key={o.name}
-                        className={classes.menuItem}
-                        selected={currentMenu.name === o.name}
-                        disabled={
-                          global.disableSave && currentMenu.name !== o.name
-                        }
-                        onClick={(e) => {
-                          onMenuClick(e, o)
-                          dispatch({
-                            type: 'patient/updateState',
-                            payload: {
-                              entity: values,
-                            },
-                          })
-                          this.props.history.push(
-                            getAppendUrl({
-                              md: 'pt',
-                              cmt: o.id,
-                            }),
-                          )
-                        }}
-                      >
-                        <span
-                          style={{
-                            color: menuErrors[o.id] ? 'red' : 'inherit',
+                      <Authorized authority={o.access}>
+                        <MenuItem
+                          key={o.name}
+                          className={classes.menuItem}
+                          selected={currentMenu.name === o.name}
+                          disabled={
+                            global.disableSave && currentMenu.name !== o.name
+                          }
+                          onClick={(e) => {
+                            onMenuClick(e, o)
+                            dispatch({
+                              type: 'patient/updateState',
+                              payload: {
+                                entity: values,
+                              },
+                            })
+                            this.props.history.push(
+                              getAppendUrl({
+                                md: 'pt',
+                                cmt: o.id,
+                              }),
+                            )
                           }}
                         >
-                          {o.name}
-                        </span>
-                      </MenuItem>
+                          <span
+                            style={{
+                              color: menuErrors[o.id] ? 'red' : 'inherit',
+                            }}
+                          >
+                            {o.name}
+                          </span>
+                        </MenuItem>
+                      </Authorized>
                     ))}
                 </MenuList>
               </div>

@@ -1,4 +1,4 @@
-import { CommonTableGrid2, Button } from '@/components'
+import { CommonTableGrid, Button } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
@@ -25,7 +25,7 @@ export default ({ dispatch, classes, settingRoom, toggleModal }) => {
     })
   }
   return (
-    <CommonTableGrid2
+    <CommonTableGrid
       style={{ margin: 0 }}
       type='settingRoom'
       onRowDoubleClick={editRow}

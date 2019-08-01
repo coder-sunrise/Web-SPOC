@@ -13,7 +13,7 @@ import {
   GridItem,
   Button,
   TextField,
-  CommonTableGrid2,
+  CommonTableGrid,
   Danger,
 } from '@/components'
 import ActionButton from './GridActionButton'
@@ -112,7 +112,7 @@ class PatientSearch extends PureComponent {
             )}
           </GridItem>
           <GridItem xs md={12} style={{ marginBottom: '5px' }}>
-            <CommonTableGrid2
+            <CommonTableGrid
               rows={patientList}
               columnExtensions={columnExtensions}
               columns={columns}

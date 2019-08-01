@@ -1,4 +1,4 @@
-import { CommonTableGrid2 } from '@/components'
+import { CommonTableGrid } from '@/components'
 
 export default ({ classes, theme }) => (
   <div>

@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
-  EditableTableGrid2,
+  EditableTableGrid,
   GridContainer,
   GridItem,
   Select,
@@ -82,7 +82,7 @@ class CoPayment extends Component {
             />
           </GridItem>
           <GridItem md={12}>
-            <EditableTableGrid2
+            <EditableTableGrid
               rows={CoPaymentData}
               columns={CoPaymentColumns}
               columnExtensions={CoPaymentColExtensions}

@@ -14,7 +14,7 @@ import {
   GridItem,
   Button,
   TextField,
-  CommonTableGrid2,
+  CommonTableGrid,
 } from '@/components'
 import ViewDetailsButton from './ViewDetailsBtn'
 
@@ -111,7 +111,7 @@ class PatientSearch extends PureComponent {
         </GridContainer>
 
         <div style={{ marginBottom: '5px' }}>
-          <CommonTableGrid2
+          <CommonTableGrid
             height={400}
             rows={queueLog.patientList}
             columnExtensions={columnExtensions}

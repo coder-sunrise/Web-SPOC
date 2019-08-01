@@ -118,7 +118,7 @@ class BreadcrumbView extends PureComponent {
         return null
       }
       let targetUrl = url
-      if (currentBreadcrumb.children) {
+      if (currentBreadcrumb.children && currentBreadcrumb.children.length) {
         targetUrl = currentBreadcrumb.children[0].path
       }
       const isLinkable =

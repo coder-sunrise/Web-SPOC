@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, EditableTableGrid2 } from '@/components'
+import { Button, EditableTableGrid } from '@/components'
 import {
   ClaimSequenceColumns,
   ClaimSequenceColExtensions,
@@ -42,7 +42,7 @@ class EditClaimSeq extends Component {
     const { classes, onConfirm } = this.props
     return (
       <div className={classes.container}>
-        <EditableTableGrid2
+        <EditableTableGrid
           rows={ClaimSequenceData}
           columns={ClaimSequenceColumns}
           columnExtensions={ClaimSequenceColExtensions}

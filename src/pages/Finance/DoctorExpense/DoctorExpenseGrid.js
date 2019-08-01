@@ -6,7 +6,7 @@ import { Remove, Apps } from '@material-ui/icons'
 // dev grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom components
-import { Button, CommonTableGrid2, Tooltip } from '@/components'
+import { Button, CommonTableGrid, Tooltip } from '@/components'
 
 const styles = () => ({
   root: {},
@@ -79,7 +79,7 @@ class DoctorExpenseGrid extends PureComponent {
 
     return (
       <Paper>
-        <CommonTableGrid2
+        <CommonTableGrid
           rows={list}
           columns={columns}
           columnExtensions={columnExtensions}

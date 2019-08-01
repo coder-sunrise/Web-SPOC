@@ -1,6 +1,6 @@
 import React from 'react'
 // common component
-import { CommonTableGrid2 } from '@/components'
+import { CommonTableGrid } from '@/components'
 // variables
 import {
   InvoiceGridData,
@@ -11,7 +11,7 @@ import {
 
 const InvoiceDataGrid = ({ handleRowDoubleClick }) => {
   return (
-    <CommonTableGrid2
+    <CommonTableGrid
       height={600}
       rows={InvoiceGridData}
       columns={InvoiceGridColumns}

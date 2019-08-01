@@ -4,7 +4,7 @@ import moment from 'moment'
 // devexpress react grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common components
-import { CommonTableGrid2, Tooltip } from '@/components'
+import { CommonTableGrid, Tooltip } from '@/components'
 // medisys components
 import { GridContextMenuButton } from 'medisys-components'
 
@@ -130,7 +130,7 @@ const Grid = ({ showSMSHistory, list, dispatch }) => {
 
   return (
     <React.Fragment>
-      <CommonTableGrid2
+      <CommonTableGrid
         getRowId={gridGetRowID}
         rows={generateRowData()}
         onSelectionChange={handleSelectionChange}

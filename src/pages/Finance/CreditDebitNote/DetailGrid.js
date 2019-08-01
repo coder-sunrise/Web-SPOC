@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 // custom component
-import { CommonTableGrid2 } from '@/components'
+import { CommonTableGrid } from '@/components'
 
 const data = []
 
@@ -19,7 +19,7 @@ class DetailGrid extends PureComponent {
 
   render () {
     const { tableProps } = this.state
-    return <CommonTableGrid2 rows={data} {...tableProps} />
+    return <CommonTableGrid rows={data} {...tableProps} />
   }
 }
 

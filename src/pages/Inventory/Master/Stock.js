@@ -9,7 +9,7 @@ import {
   GridContainer,
   GridItem,
   NumberInput,
-  CommonTableGrid2,
+  CommonTableGrid,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -96,7 +96,7 @@ const Stock = ({ classes }) => {
           />
         </GridItem>
       </GridContainer>
-      <CommonTableGrid2 rows={[]} {...tableParas} />
+      <CommonTableGrid rows={[]} {...tableParas} />
       <Divider style={{ margin: '40px 0 20px 0' }} />
     </CardContainer>
   )

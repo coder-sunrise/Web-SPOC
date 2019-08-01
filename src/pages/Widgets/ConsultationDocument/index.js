@@ -1,6 +1,6 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
-import { CommonTableGrid2, Button, CommonModal } from '@/components'
+import { CommonTableGrid, Button, CommonModal } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
@@ -30,7 +30,7 @@ class ConsultationDocument extends PureComponent {
 
     return (
       <div>
-        <CommonTableGrid2
+        <CommonTableGrid
           size='sm'
           style={{ margin: 0 }}
           rows={[

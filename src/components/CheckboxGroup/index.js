@@ -4,7 +4,9 @@ import CustomInput from 'mui-pro-components/CustomInput'
 import { FormLabel, Checkbox, FormControlLabel } from '@material-ui/core'
 import FiberManualRecord from '@material-ui/icons/FiberManualRecord'
 import regularFormsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/regularFormsStyle'
+import { control } from '@/components/Decorator'
 
+@control()
 class CheckboxGroup extends React.Component {
   state = {}
 

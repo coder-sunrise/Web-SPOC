@@ -18,6 +18,7 @@ import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import Loading from '@/components/PageLoading/index'
 import { confirmBeforeReload } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 
 import { SizeContainer, ProgressButton } from '@/components'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
@@ -106,9 +107,17 @@ class CommonModal extends React.PureComponent {
     confirmBtnText = 'Confirm',
     extraButtons,
   }) => {
-    const { loading, global, classes, confirmText, cancelText } = this.props
+    const {
+      loading,
+      global,
+      classes,
+      authority,
+      confirmText,
+      cancelText,
+    } = this.props
     // console.log('footer', this.props)
     const { disabled = false } = confirmProps
+
     return (
       <DialogActions
         className={classes.modalFooter}
@@ -117,6 +126,7 @@ class CommonModal extends React.PureComponent {
         {onReset && (
           <Button
             key='reset'
+            hideIfNoEditRights
             aria-label='Reset'
             color='danger'
             onClick={onReset}
@@ -125,17 +135,20 @@ class CommonModal extends React.PureComponent {
             Reset
           </Button>
         )}
+
         <Button
           onClick={this.onClose}
           color='danger'
+          authority='none'
           // disabled={loading.global}
           {...cancelProps}
         >
-          {cancelText || 'Cancel'}
+          {cancelText || 'Close'}
         </Button>
         {extraButtons}
         <ProgressButton
           color='primary'
+          hideIfNoEditRights
           onClick={onConfirm}
           icon={null}
           {...confirmProps}
@@ -163,6 +176,7 @@ class CommonModal extends React.PureComponent {
           [this.props.observe]: undefined,
         },
       })
+      window.beforeReloadHandlerAdded = false
       window.removeEventListener('beforeunload', confirmBeforeReload)
     }
     if (this.props.onClose) {
@@ -173,6 +187,7 @@ class CommonModal extends React.PureComponent {
 
   onConfirm = (cb) => {
     console.log('onConfirm')
+    window.beforeReloadHandlerAdded = false
     window.removeEventListener('beforeunload', confirmBeforeReload)
 
     if (this.props.onConfirm) {
@@ -260,6 +275,7 @@ class CommonModal extends React.PureComponent {
                 justIcon
                 className={classes.modalCloseButton}
                 key='close'
+                authority='none'
                 aria-label='Close'
                 color='transparent'
                 onClick={this.onClose}
@@ -333,6 +349,7 @@ class CommonModal extends React.PureComponent {
                 this.setState({
                   openConfirm: false,
                 })
+                window.beforeReloadHandlerAdded = false
                 window.removeEventListener('beforeunload', confirmBeforeReload)
                 this.onClose(true)
               }}

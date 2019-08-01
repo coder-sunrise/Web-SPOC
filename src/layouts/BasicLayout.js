@@ -108,12 +108,15 @@ class BasicLayout extends React.PureComponent {
     this.resizeFunction = this.resizeFunction.bind(this)
 
     const { dispatch, route: { routes, authority } } = this.props
+    // console.log(routes)
     dispatch({
       type: 'menu/getMenuData',
       payload: { routes, authority },
     }).then((menus) => {
       this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
       this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
+      // console.log(this.breadcrumbNameMap)
+
       this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
       this.getPageTitle = memoizeOne(this.getPageTitle)
       this.menus = menus
@@ -228,10 +231,6 @@ class BasicLayout extends React.PureComponent {
     this.setState({ mobileOpen: !this.state.mobileOpen })
   }
 
-  getRoute () {
-    return this.props.location.pathname !== '/maps/full-screen-maps'
-  }
-
   resizeFunction () {
     if (window.innerWidth >= 960) {
       this.setState({ mobileOpen: false })
@@ -251,6 +250,7 @@ class BasicLayout extends React.PureComponent {
    * @param {Object} menuData 菜单配置
    */
   getBreadcrumbNameMap (menus) {
+    // console.log('getBreadcrumbNameMap')
     const routerMap = {}
     const flattenMenuData = (data) => {
       data.forEach((menuItem) => {
@@ -267,6 +267,7 @@ class BasicLayout extends React.PureComponent {
 
   matchParamsPath = (pathname) => {
     if (!this.breadcrumbNameMap) return null
+    console.log('matchParamsPath', pathname, this.breadcrumbNameMap)
     const pathKey = Object.keys(this.breadcrumbNameMap).find((key) =>
       pathToRegexp(key).test(pathname),
     )
@@ -349,10 +350,6 @@ class BasicLayout extends React.PureComponent {
     })
   }
 
-  getRoute = () => {
-    return this.props.location.pathname !== '/maps/full-screen-maps'
-  }
-
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
@@ -373,6 +370,7 @@ class BasicLayout extends React.PureComponent {
     // console.log(this.props)
     const isTop = PropsLayout === 'topmenu'
     const routerConfig = this.matchParamsPath(pathname)
+    // console.log('routerConfig', routerConfig)
     const mainPanel = `${classes.mainPanel} ${cx({
       [classes.mainPanelSidebarMini]: collapsed,
     })}`
@@ -435,37 +433,16 @@ class BasicLayout extends React.PureComponent {
           />
           {/* </Affix> */}
 
-          {this.getRoute() ? (
-            <div className={classes.content}>
-              <div className={classes.container}>
-                <Authorized
-                  authority={routerConfig && routerConfig.authority}
-                  noMatch={<Exception403 />}
-                >
-                  {children}
-                </Authorized>
-              </div>
-            </div>
-          ) : (
-            <div className={classes.map}>
-              <Authorized
+          <div className={classes.content}>
+            <div className={classes.container}>{children}</div>
+            {/* <Authorized
                 authority={routerConfig && routerConfig.authority}
                 noMatch={<Exception403 />}
               >
                 {children}
-              </Authorized>
-            </div>
-          )}
-          {/* <Content style={this.getContentStyle()}>
-            <Authorized
-              authority={routerConfig && routerConfig.authority}
-              noMatch={<Exception403 />}
-            >
-              {children}
-            </Authorized>
-          </Content> */}
-          {/* <Footer /> */}
-          {this.getRoute() ? <Footer fluid /> : null}
+              </Authorized> */}
+          </div>
+          {/* <Footer fluid /> */}
         </div>
       </div>
     )

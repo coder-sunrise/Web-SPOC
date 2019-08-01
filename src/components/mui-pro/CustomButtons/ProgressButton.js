@@ -16,14 +16,16 @@ import PropTypes from 'prop-types'
 import RegularButton from './index'
 
 @connect(({ loading, global }) => ({ loading, global }))
-class ProgressButton extends React.Component {
+class ProgressButton extends React.PureComponent {
+  static displayName = 'ProgressButton'
+
   componentDidMount () {}
 
-  onClick = () => {
-    const { props } = this
-    const { onClick } = props
-    console.log(onClick)
-  }
+  // onClick = () => {
+  //   const { props } = this
+  //   const { onClick } = props
+  //   // console.log(onClick)
+  // }
 
   render () {
     const { props } = this
@@ -59,7 +61,7 @@ class ProgressButton extends React.Component {
     )
   }
 }
-ProgressButton.propTypes = {}
+// ProgressButton.propTypes = {}
 
 // export default withStyles(styles, { withTheme: true })(ProgressButton)
 export default ProgressButton

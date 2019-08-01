@@ -8,9 +8,8 @@ import Input from '@material-ui/core/Input'
 
 // ant
 import { Select, Spin } from 'antd'
-import AntdWrapper from './AntdWrapper'
-import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
-
+import { CustomInput } from '@/components'
+import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 
 const STYLES = () => {
@@ -65,6 +64,7 @@ const STYLES = () => {
   }
 }
 
+@control()
 class AntdSelect extends React.PureComponent {
   static propTypes = {
     // required props

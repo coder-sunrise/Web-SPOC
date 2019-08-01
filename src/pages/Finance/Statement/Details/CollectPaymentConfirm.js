@@ -8,7 +8,7 @@ import {
   GridItem,
   NumberInput,
   EditableTableGrid,
-  CommonTableGrid2,
+  CommonTableGrid,
 } from '@/components'
 
 const styles = () => ({
@@ -82,7 +82,7 @@ class CollectPaymentConfirm extends PureComponent {
             />
           </GridItem>
           <GridItem xs>
-            <CommonTableGrid2
+            <CommonTableGrid
               rows={rows}
               columns={columns}
               columnExtensions={columnExtensions}

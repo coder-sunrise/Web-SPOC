@@ -4,7 +4,7 @@ import { Tooltip } from '@material-ui/core'
 import { Edit, Search } from '@material-ui/icons'
 import { suppliers, dispUOMs } from '@/utils/codes'
 
-import { Button, CommonTableGrid2 } from '@/components'
+import { Button, CommonTableGrid } from '@/components'
 
 const Grid = ({ history, dispatch, scheme: { list } }) => {
   const [ tableParas, setTableParas ] = useState({
@@ -86,7 +86,7 @@ const Grid = ({ history, dispatch, scheme: { list } }) => {
   const ActionProps = { TableCellComponent: TableCell }
   return (
     <React.Fragment>
-      <CommonTableGrid2
+      <CommonTableGrid
         rows={list}
         columnExtensions={colExtenstions}
         ActionProps={ActionProps}

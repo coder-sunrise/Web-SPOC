@@ -18,7 +18,7 @@ import {
   ProgressButton,
   DateRangePicker,
   Switch,
-  EditableTableGrid2,
+  EditableTableGrid,
   notification,
   SizeContainer,
 } from '@/components'
@@ -187,7 +187,7 @@ class Detail extends PureComponent {
                 />
               </GridItem>
             </GridContainer>
-            <EditableTableGrid2
+            <EditableTableGrid
               style={{ marginTop: theme.spacing(1) }}
               rows={values.items}
               onRowDoubleClick={this.onRowDoubleClick}

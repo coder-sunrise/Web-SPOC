@@ -1,68 +1,98 @@
+/* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
-import { FastField } from 'formik'
+import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
 import {
   DatePicker,
   DateTypeProvider as DateTypeProviderOrg,
 } from '@/components'
-import { DatePicker as ANTDatePicker } from 'antd'
-// import DateTimePicker from './DateTimePicker'
-// console.log(DateTypeProviderOrg)
-const DateEditorBase = ({
-  column: { name: columnName },
-  value,
-  onValueChange,
-  columnExtensions,
-}) => {
-  const disabled = columnExtensions.some(
-    ({ editingEnabled, columnName: currentColumnName }) =>
-      currentColumnName === columnName && editingEnabled === false,
-  )
-  // DatePicker doesnt receive value props,
-  // and only works with formik Field/FastField
-  // TODO: enhance DatePicker
-  // return <DatePicker disabled={disabled} timeFormat={false} />
 
-  // temporary for testing only
-  // if (columnName === 'invoiceDate')
-  //   return (
-  //     <FastField
-  //       name={columnName}
-  //       render={(args) => <DatePicker {...args} label='DateTimePicker' />}
-  //     />
-  //   )
-  // // console.log(value)
-  return (
-    <DatePicker
-      noWrapper
-      timeFormat={false}
-      defaultValue={value}
-      onChange={onValueChange}
-    />
-  )
+class DateEditorBase extends PureComponent {
+  state = {
+    error: false,
+  }
+
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
+  }
+
+  componentDidMount () {
+    this.setState({
+      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+    })
+  }
+
+  render () {
+    const { props } = this
+    const { column = {}, value, onValueChange, columnExtensions, row } = props
+    const { name: columnName } = column
+    const cfg = columnExtensions.find(
+      ({ columnName: currentColumnName }) => currentColumnName === columnName,
+    )
+    const onChange = (date, val) => {
+      // console.log(date, val)
+      this.setState({
+        error: updateCellValue(this.props, this.myRef.current, date || ''),
+      })
+    }
+    const { type, isDisabled = () => false, ...restProps } = cfg
+
+    const commonCfg = {
+      onChange,
+      disabled: isDisabled(row),
+      defaultValue: value,
+    }
+    // console.log(cfg, value, props)
+    return (
+      <div ref={this.myRef}>
+        <DatePicker
+          noWrapper
+          timeFormat={false}
+          showErrorIcon
+          error={this.state.error}
+          {...commonCfg}
+          {...restProps}
+        />
+      </div>
+    )
+  }
 }
 
-class DateTypeProvider extends PureComponent {
+class DateTypeProvider extends React.Component {
   static propTypes = {
-    for: PropTypes.array.isRequired,
     columnExtensions: PropTypes.array,
   }
 
   constructor (props) {
     super(props)
-    const { columnExtensions = [] } = this.props
-    this.DateEditor = (editorProps) => (
-      <DateEditorBase columnExtensions={columnExtensions} {...editorProps} />
-    )
+
+    this.DateEditorBase = (ces) => (editorProps) => {
+      return <DateEditorBase columnExtensions={ces} {...editorProps} />
+    }
   }
 
+  shouldComponentUpdate = (nextProps, nextState) =>
+    this.props.editingRowIds !== nextProps.editingRowIds ||
+    this.props.commitCount !== nextProps.commitCount
+
   render () {
-    // console.log(this)
-    const { for: dtpFor } = this.props
+    const { columnExtensions } = this.props
     return (
-      <DateTypeProviderOrg for={dtpFor} editorComponent={this.DateEditor} />
+      <DateTypeProviderOrg
+        for={columnExtensions
+          .filter(
+            (o) =>
+              [
+                'date',
+              ].indexOf(o.type) >= 0,
+          )
+          .map((o) => o.columnName)}
+        editorComponent={this.DateEditorBase(columnExtensions)}
+        {...this.props}
+      />
     )
   }
 }

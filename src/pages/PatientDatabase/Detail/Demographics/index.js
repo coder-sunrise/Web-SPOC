@@ -1,64 +1,28 @@
 import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import moment from 'moment'
-import PerfectScrollbar from 'perfect-scrollbar'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
 
-import { Save, Close, Clear, FilterList, Search, Add } from '@material-ui/icons'
 import {
-  withStyles,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  MenuList,
-  Divider,
-  Paper,
-} from '@material-ui/core'
-import { Affix } from 'antd'
-import { formatMessage } from 'umi/locale'
-import {
+  Field,
+  FastField,
+  FieldArray,
   Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
   GridContainer,
   GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
   TextField,
-  BaseInput,
   notification,
   Select,
   CodeSelect,
   DatePicker,
   RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
 } from '@/components'
 import Call from '@material-ui/icons/Call'
-import DraftsIcon from '@material-ui/icons/Drafts'
-import SendIcon from '@material-ui/icons/Send'
-import avatar from '@/assets/img/faces/marc.jpg'
+import { Add } from '@material-ui/icons'
+import { withStyles, Paper } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
+import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
 
-import { titles, finTypes, gender } from '@/utils/codes'
-import { standardRowHeight } from 'mui-pro-jss'
-// import model from '../models/demographic'
-import {
-  getUniqueNumericId,
-  getRemovedUrl,
-  getAppendUrl,
-  difference,
-} from '@/utils/utils'
 import Address from './Address'
 
-// window.g_app.replaceModel(model)
 const styles = () => ({
   contactIcon: {
     width: 15,
@@ -68,42 +32,9 @@ const styles = () => ({
   },
 })
 
-// @connect(({ patient }) => ({
-//   patient,
-// }))
+@Authorized.Secured('patient.view')
 class Demographic extends PureComponent {
   state = {}
-
-  // componentDidMount () {
-  //   if (!this.props.values.id) {
-  //     this.props.validateForm()
-  //   }
-  // }
-
-  // componentDidUpdate = (prevProps) => {
-  //   // console.log(difference(prevProps, this.props))
-  //   // console.log('componentDidUpdate', prevProps, this.props)
-  //   // componentDidUpdate(this.props, prevProps)
-  // }
-
-  // componentWillUnmount () {
-  //   this.props.resetForm()
-  // }
-
-  // isValidDate = (current) => {
-  //   let yesterday = moment().subtract(1, 'day')
-  //   return current.isBefore(yesterday)
-  // }
-
-  // disabledDate = (current) => {
-  //   console.log(current)
-  //   // Can select day from 1800-01-01 till now
-  //   return (
-  //     current &&
-  //     (current > moment().endOf('day') ||
-  //       current < moment('1800-01-01').startOf('day'))
-  //   )
-  // }
 
   addAddress = () => {
     this.arrayHelpers.unshift({
@@ -177,14 +108,9 @@ class Demographic extends PureComponent {
     )
   }
 
-  onReset = () => {
-    this.props.resetForm()
-  }
-
   render () {
-    console.log('Demographic', this.props)
-    const { props, state } = this
-    const { values, patient, theme, classes, setValues, setFieldValue } = props
+    const { props } = this
+    const { values, theme, setFieldValue } = props
     return (
       <React.Fragment>
         <GridContainer gutter={0}>
@@ -196,6 +122,7 @@ class Demographic extends PureComponent {
                   render={(args) => {
                     return (
                       <CodeSelect
+                        // hideIfNoEditRights
                         label='Account Type'
                         code='ctPatientAccountNoType'
                         width={350}
@@ -224,7 +151,12 @@ class Demographic extends PureComponent {
                 <FastField
                   name='salutationFK'
                   render={(args) => (
-                    <CodeSelect label='Title' code='ctSalutation' {...args} />
+                    <CodeSelect
+                      // authority='none'
+                      label='Title'
+                      code='ctSalutation'
+                      {...args}
+                    />
                   )}
                 />
               </GridItem>
@@ -414,53 +346,6 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-              {/* <GridItem xs={12}>
-                <FastField
-                  name='Address'
-                  render={(args) => (
-                    <TextField
-                      label='Address'
-                      multiline
-                      rowsMax={2}
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={8}>
-                <FastField
-                  name='Country'
-                  render={(args) => <TextField label='Country' {...args} />}
-                />
-              </GridItem>
-              <GridItem xs={4}>
-                <FastField
-                  name='Postcode'
-                  render={(args) => <TextField label='Postcode' {...args} />}
-                />
-              </GridItem> */}
-              {/* <GridItem xs={12}>
-                <FastField
-                  name='referral'
-                  render={(args) => (
-                    <RadioGroup
-                      prefix='Referral'
-                      label=' '
-                      options={[
-                        {
-                          value: '1',
-                          label: 'Company',
-                        },
-                        {
-                          value: '2',
-                          label: 'Patient',
-                        },
-                      ]}
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem> */}
               <GridItem xs={12}>
                 <FastField
                   name='referredBy'
@@ -531,7 +416,6 @@ class Demographic extends PureComponent {
                           <Address
                             key={val.id}
                             addressIndex={i}
-                            // form={form}
                             theme={theme}
                             arrayHelpers={arrayHelpers}
                             propName='contact.contactAddress'
@@ -553,7 +437,6 @@ class Demographic extends PureComponent {
               <Button
                 link
                 href=''
-                // className={classes.modalCloseButton}
                 key='addAddress'
                 aria-label='Reset'
                 color='danger'

@@ -3,6 +3,7 @@ import React from 'react'
 import classNames from 'classnames'
 // nodejs library to set properties for components
 import PropTypes from 'prop-types'
+import { control } from '@/components/Decorator'
 
 // material-ui components
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -10,56 +11,69 @@ import Button from '@material-ui/core/Button'
 
 import buttonStyle from 'mui-pro-jss/material-dashboard-pro-react/components/buttonStyle.jsx'
 
-function RegularButton ({ ...props }) {
-  const {
-    classes,
-    color,
-    round,
-    children,
-    fullWidth,
-    disabled,
-    simple,
-    size,
-    block,
-    link,
-    noUnderline,
-    justIcon,
-    pureIcon,
-    className,
-    bigview,
-    muiClasses,
-    variant = 'contained',
-    ...rest
-  } = props
-  // console.log(simple)
-  const btnClasses = classNames({
-    [classes.button]: true,
-    [classes[size]]: size,
-    [classes[color]]: color,
-    [classes[`${variant}`]]: true,
-    [classes[`${variant}${color}`]]: true,
-    [classes.bigview]: bigview,
-    [classes.round]: round,
-    [classes.fullWidth]: fullWidth,
-    [classes.disabled]: disabled,
-    [classes.simple]: simple,
-    [classes.block]: block,
-    [classes.noUnderline]: noUnderline,
-    [classes.link]: link,
-    [classes.justIcon]: pureIcon || justIcon,
-    [classes.pureIcon]: pureIcon,
-    [className]: className,
-  })
-  return (
-    <Button
-      variant={variant}
-      {...rest}
-      classes={muiClasses}
-      className={btnClasses}
-    >
-      {children}
-    </Button>
-  )
+@control(
+  {
+    // disabledProps: 'hidden',
+  },
+)
+class RegularButton extends React.PureComponent {
+  static displayName = 'RegularButton'
+
+  render () {
+    const { ...props } = this.props
+    // console.log(props)
+    const {
+      classes,
+      color,
+      round,
+      children,
+      fullWidth,
+      disabled,
+      simple,
+      size,
+      block,
+      link,
+      noUnderline,
+      justIcon,
+      pureIcon,
+      className,
+      bigview,
+      muiClasses,
+      variant = 'contained',
+      hidden,
+      ...rest
+    } = props
+    // console.log(simple)
+    const btnClasses = classNames({
+      [classes.button]: true,
+      [classes[size]]: size,
+      [classes[color]]: color,
+      [classes[`${variant}`]]: true,
+      [classes[`${variant}${color}`]]: true,
+      [classes.bigview]: bigview,
+      [classes.round]: round,
+      [classes.fullWidth]: fullWidth,
+      [classes.disabled]: disabled,
+      [classes.simple]: simple,
+      [classes.block]: block,
+      [classes.noUnderline]: noUnderline,
+      [classes.link]: link,
+      [classes.justIcon]: pureIcon || justIcon,
+      [classes.pureIcon]: pureIcon,
+      [className]: className,
+    })
+    if (hidden) return null
+    return (
+      <Button
+        variant={variant}
+        {...rest}
+        classes={muiClasses}
+        className={btnClasses}
+      >
+        {children}
+      </Button>
+    )
+  }
 }
 
 RegularButton.propTypes = {

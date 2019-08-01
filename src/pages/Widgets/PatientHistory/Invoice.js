@@ -27,7 +27,7 @@ import {
   Select,
   Accordion,
   Button,
-  CommonTableGrid2,
+  CommonTableGrid,
   DatePicker,
   NumberInput,
 } from '@/components'
@@ -52,7 +52,7 @@ const Invoice = (props) => {
         </GridItem>
       </GridContainer>
 
-      <CommonTableGrid2
+      <CommonTableGrid
         size='sm'
         rows={[
           {

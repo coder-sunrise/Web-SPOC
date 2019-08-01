@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { EditableTableGrid2, notification } from '@/components'
+import { EditableTableGrid, notification } from '@/components'
 
 import { schemes, yesNo } from '@/utils/codes'
 
@@ -159,7 +159,7 @@ class SchemesGrid extends PureComponent {
     }
 
     return (
-      <EditableTableGrid2
+      <EditableTableGrid
         rows={this.getSortedRows(rows)}
         rowMoveable={this.isCorporate}
         onRowMove={this.onRowMove}

@@ -1,10 +1,10 @@
-import { CommonTableGrid2, Button } from '@/components'
+import { CommonTableGrid, Button } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 
 export default ({}) => (
-  <CommonTableGrid2
+  <CommonTableGrid
     size='sm'
     style={{ margin: 0 }}
     rows={[

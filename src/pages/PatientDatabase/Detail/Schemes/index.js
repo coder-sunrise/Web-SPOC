@@ -1,47 +1,12 @@
 import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import { withFormik } from 'formik'
-import * as Yup from 'yup'
 
-import { withStyles } from '@material-ui/core'
-
-import schemesModal from '../models/schemes'
-import payersModal from '../models/payers'
+import { GridContainer, GridItem } from '@/components'
 
 import SchemesGrid from './SchemesGrid'
 import PayersGrid from './PayersGrid'
-import {
-  CardContainer,
-  CommonHeader,
-  GridContainer,
-  GridItem,
-} from '@/components'
-import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
-
-window.g_app.replaceModel(schemesModal)
-window.g_app.replaceModel(payersModal)
-
-const styles = () => ({
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    height: 'calc(100vh - 80px)',
-  },
-})
 
 class Schemes extends PureComponent {
-  state = {
-    height: 100,
-  }
-
-  onReset () {
-    console.log('Schemes-onReset', this)
-  }
-
-  onSaveClick (values) {
-    this.setState(this.state)
-  }
+  state = {}
 
   render () {
     const {
@@ -56,7 +21,7 @@ class Schemes extends PureComponent {
     return (
       <GridContainer>
         <GridItem xs md={12}>
-          <h4 className={classes.cardIconTitle}>Schemes</h4>
+          <h4>Schemes</h4>
         </GridItem>
         <GridItem xs md={12} style={{ marginTop: 8 }}>
           <SchemesGrid
@@ -67,7 +32,7 @@ class Schemes extends PureComponent {
           />
         </GridItem>
         <GridItem xs md={12}>
-          <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
+          <h4 style={{ marginTop: 20 }}>
             Medisave Payer
           </h4>
         </GridItem>
@@ -84,4 +49,4 @@ class Schemes extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Schemes)
+export default Schemes

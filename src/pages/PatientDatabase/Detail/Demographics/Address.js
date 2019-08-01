@@ -1,27 +1,22 @@
 import React, { Component } from 'react'
-import { FastField, Field } from 'formik'
-import { Paper } from '@material-ui/core'
 import _ from 'lodash'
 import axios from 'axios'
-import { Save, Close, Clear, FilterList, Search, Add } from '@material-ui/icons'
 
 import {
   Button,
   GridContainer,
   GridItem,
   TextField,
-  Select,
-  RadioGroup,
+  FastField,
+  Field,
   CodeSelect,
-  confirm,
   Popconfirm,
   notification,
   Checkbox,
 } from '@/components'
+import { Close, Search } from '@material-ui/icons'
 
-import { countries, addressTypes } from '@/utils/codes'
-import { getUniqueGUID } from '@/utils/cdrss'
-
+//TODO: To update api to our server api
 const API =
   'https://developers.onemap.sg/commonapi/search?returnGeom=Y&getAddrDetails=Y&searchVal='
 
@@ -82,7 +77,6 @@ class Address extends Component {
     if (Object.byString(values, `${prefix}isDeleted`)) return null
     const btnSearch = (
       <Button
-        // className={classes.modalCloseButton}
         key='search'
         color='info'
         aria-label='Get Address'
@@ -92,7 +86,6 @@ class Address extends Component {
           prefix,
           Object.byString(values, `${prefix}postcode`),
         )}
-        // style={{ marginTop: 20 }}
       >
         <Search />
         Get Address

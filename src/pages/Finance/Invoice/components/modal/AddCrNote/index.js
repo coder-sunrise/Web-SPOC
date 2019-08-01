@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 // common components
-import { CommonTableGrid2 } from '@/components'
+import { CommonTableGrid } from '@/components'
 // sub components
 import CrNoteForm from './CrNoteForm'
 import Summary from './Summary'
@@ -18,7 +18,7 @@ class AddCrNote extends Component {
     return (
       <div>
         <CrNoteForm />
-        <CommonTableGrid2
+        <CommonTableGrid
           {...TableConfig}
           height={300}
           rows={CrNoteData}

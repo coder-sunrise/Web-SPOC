@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core'
 // common component
 import {
-  CommonTableGrid2,
+  CommonTableGrid,
   GridContainer,
   GridItem,
   OutlinedTextField,
@@ -24,7 +24,7 @@ class InvoiceDetails extends Component {
     const { classes } = this.props
     return (
       <div className={classes.cardContainer}>
-        <CommonTableGrid2
+        <CommonTableGrid
           size='sm'
           height={300}
           rows={[

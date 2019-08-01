@@ -10,7 +10,7 @@ import { primaryColor } from 'mui-pro-jss'
 // ant
 import { InputNumber } from 'antd'
 import { CustomInput } from '@/components'
-
+import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 import config from '@/utils/config'
 
@@ -89,6 +89,7 @@ const STYLES = () => {
   }
 }
 
+@control()
 class AntdNumberInput extends React.PureComponent {
   static propTypes = {
     label: PropTypes.string,

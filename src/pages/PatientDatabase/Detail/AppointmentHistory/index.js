@@ -1,23 +1,15 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { withFormik } from 'formik'
-import * as Yup from 'yup'
 
 import { withStyles } from '@material-ui/core'
-
-import schemesModal from '../models/schemes'
-import payersModal from '../models/payers'
 
 import {
   CardContainer,
   CommonHeader,
   GridContainer,
   GridItem,
-  CommonTableGrid2,
+  CommonTableGrid,
 } from '@/components'
-
-window.g_app.replaceModel(schemesModal)
-window.g_app.replaceModel(payersModal)
 
 const styles = () => ({
   container: {
@@ -78,24 +70,7 @@ class AppointmentHistory extends PureComponent {
     let list = []
     return (
       <CardContainer title={this.titleComponent} hideHeader>
-        <GridContainer alignItems='flex-start'>
-          <GridItem xs md={12}>
-            {' '}
-            <h4 className={classes.cardIconTitle}>Previous Appointment</h4>
-          </GridItem>
-          <GridItem xs md={12} style={{ marginTop: 8 }}>
-            <CommonTableGrid2 rows={list} {...this.tableParas} />
-          </GridItem>
-          <GridItem xs md={12}>
-            {' '}
-            <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
-              Current & Future Appointment
-            </h4>
-          </GridItem>
-          <GridItem xs md={12} style={{ marginTop: 8 }}>
-            <CommonTableGrid2 rows={list} {...this.tableParas} />
-          </GridItem>
-        </GridContainer>
+        TBD
       </CardContainer>
     )
   }

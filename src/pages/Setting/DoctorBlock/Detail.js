@@ -11,12 +11,11 @@ import DoctorBlock from '../../Reception/BigCalendar/components/form/DoctorBlock
 //   Select,
 //   ProgressButton,
 //   Switch,
-//   EditableTableGrid2,
+//   EditableTableGrid,
 //   notification,
 // } from '@/components'
 
 const styles = (theme) => ({})
-
 
 class Detail extends PureComponent {
   state = {

@@ -26,7 +26,7 @@ class SelectCell extends PureComponent {
       onValueChange,
       ...restProps
     } = this.props
-
+    console.log('selectcell')
     return (
       <CustomInputWrapper {...restProps}>
         <Select

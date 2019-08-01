@@ -26,21 +26,19 @@ const routes = [
       'src/pages/Authorized',
     ],
     authority: [
-      'admin',
-      'user',
-      'guest',
+      { name: 'admin', rights: 'enable' },
+      { name: 'user', rights: 'enable' },
+      { name: 'guest', rights: 'enable' },
+      { name: 'tester', rights: 'enable' },
     ],
     routes: [
       // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
       // Reception
       {
-        path: '/reception',
+        path: '/reception/queue',
         icon: 'local_hospital',
         name: 'reception',
-        // authority: [
-        //   'user',
-        // ],
         routes: [
           {
             path: '/reception/queue',
@@ -68,6 +66,9 @@ const routes = [
             name: 'appointment',
             mini: 'AP',
             component: './Reception/BigCalendar',
+            authority: [
+              'tester',
+            ],
           },
           {
             hideInMenu: true,
@@ -86,7 +87,7 @@ const routes = [
       //
       // Patient Database
       {
-        path: '/patientdb',
+        path: '/patientdb/search',
         icon: 'group',
         name: 'patient',
         routes: [

@@ -14,7 +14,7 @@ import {
   Button,
   CommonHeader,
   CommonModal,
-  CommonTableGrid2,
+  CommonTableGrid,
   Tooltip,
 } from '@/components'
 // sub components
@@ -232,7 +232,7 @@ class Statement extends PureComponent {
           handleSearch={this.handleSearch}
           handleAddNew={this.toggleAddNewStatementModal}
         />
-        <CommonTableGrid2
+        <CommonTableGrid
           rows={rows}
           columns={columns}
           getRowId={getRowId}

@@ -4,7 +4,7 @@ import Remove from '@material-ui/icons/Remove'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   CardContainer,
-  CommonTableGrid2,
+  CommonTableGrid,
   Tooltip,
   Button,
   GridContainer,
@@ -63,7 +63,7 @@ const InventoryTypeListing = ({
           </div>
         </GridItem>
         <GridItem xs={10} md={10}>
-          <CommonTableGrid2
+          <CommonTableGrid
             {...tableParas}
             columnExtensions={colExtensions}
             rows={list}

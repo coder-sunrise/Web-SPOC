@@ -3,6 +3,8 @@ import router from 'umi/router'
 import moment from 'moment'
 import Cookies from 'universal-cookie'
 import * as service from '../services/loginSEMR'
+import { reloadAuthorized } from '@/utils/Authorized'
+import { setAuthority } from '@/utils/authority'
 
 const { login } = service
 
@@ -23,6 +25,8 @@ export default createFormViewModel({
         const response = yield call(login, credentialPayload)
         // const { status } = response
         // console.log({ status })
+        reloadAuthorized()
+
         return yield put({
           type: 'updateLoginStatus',
           payload: { ...response },
@@ -37,7 +41,16 @@ export default createFormViewModel({
       updateLoginStatus (state, { payload }) {
         const isInvalidLogin = payload.status !== 200
         if (!isInvalidLogin) {
-          const { data, application } = payload
+          const {
+            data,
+            application,
+            currentAuthority = [
+              'tester',
+              // 'editor',
+            ],
+          } = payload
+          setAuthority(currentAuthority)
+
           localStorage.setItem('token', data.access_token)
           localStorage.setItem('application', application)
 

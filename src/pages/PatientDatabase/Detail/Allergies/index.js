@@ -1,37 +1,17 @@
 import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import { withFormik, FastField, Field } from 'formik'
-import * as Yup from 'yup'
-import { withStyles } from '@material-ui/core'
 import {
-  notification,
   Checkbox,
-  CardContainer,
-  CommonHeader,
   Select,
   GridContainer,
   GridItem,
+  FastField,
+  Field,
 } from '@/components'
-import { status } from '@/utils/codes'
-import allergyModal from '../models/allergy'
+
 import AllergyGrid from './AllergyGrid'
-import { handleSubmit, getFooter, componentDidUpdate } from '../utils'
 
-window.g_app.replaceModel(allergyModal)
-
-const styles = () => ({
-  collectPaymentBtn: { float: 'right', marginTop: '22px', marginRight: '10px' },
-  item: {},
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    height: 'calc(100vh - 80px)',
-  },
-})
 class Allergies extends PureComponent {
   state = {
-    height: 0,
     isGridEditable: true,
   }
 
@@ -49,18 +29,8 @@ class Allergies extends PureComponent {
     this.props.values.patientAllergy.filter((o) => o.type === type)
 
   render () {
-    const { height } = this.state
-    const {
-      classes,
-      allergy,
-      dispatch,
-      values,
-      schema,
-      ...restProps
-    } = this.props
+    const { classes, dispatch, values, schema, ...restProps } = this.props
 
-    // console.log('allergy render')
-    // console.log(values)
     return (
       <div>
         <GridContainer alignItems='flex-start'>
@@ -103,10 +73,7 @@ class Allergies extends PureComponent {
           </GridItem>
 
           <GridItem xs md={12}>
-            {' '}
-            <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
-              Drug Allergy
-            </h4>
+            <h4 style={{ marginTop: 20 }}>Drug Allergy</h4>
           </GridItem>
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
@@ -121,10 +88,7 @@ class Allergies extends PureComponent {
           </GridItem>
 
           <GridItem xs md={12}>
-            {' '}
-            <h4 className={classes.cardIconTitle} style={{ marginTop: 20 }}>
-              Non-Drug Allergy
-            </h4>
+            <h4 style={{ marginTop: 20 }}>Non-Drug Allergy</h4>
           </GridItem>
 
           <GridItem xs md={12} style={{ marginTop: 8 }}>
@@ -144,4 +108,4 @@ class Allergies extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Allergies)
+export default Allergies
