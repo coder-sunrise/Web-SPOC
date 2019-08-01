@@ -221,6 +221,7 @@ class CommonModal extends React.PureComponent {
       theme,
       disableBackdropClick = true,
       keepMounted = true,
+      overrideLoading = false,
       footProps = {},
     } = this.props
     if (!children || !open) return null
@@ -292,7 +293,7 @@ class CommonModal extends React.PureComponent {
               : classes.modalBodyPadding}`}
             style={{ maxHeight: this.state.height }}
           >
-            {loading.global ? (
+            {!overrideLoading && loading.global ? (
               <Loading
                 style={{
                   position: 'absolute',

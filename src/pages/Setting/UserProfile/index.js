@@ -38,6 +38,19 @@ const styles = (theme) => ({
   }),
 })
 class UserProfile extends React.Component {
+  state = {
+    gridConfig: {
+      ...UserProfileTableConfig,
+      columnExtensions: [
+        ...UserProfileTableConfig.columnExtensions,
+        {
+          columnName: 'action',
+          render: this.Cell,
+        },
+      ],
+    },
+  }
+
   componentDidMount = () => {
     this.props.dispatch({
       type: 'settingUserProfile/query',
@@ -58,7 +71,8 @@ class UserProfile extends React.Component {
     })
   }
 
-  Cell = ({ column, row, classes, ...props }) => {
+  Cell = ({ column, row, ...props }) => {
+    console.log({ column, row, props })
     if (column.name.toUpperCase() === 'ACTION') {
       return (
         <Table.Cell {...props}>
@@ -135,8 +149,6 @@ class UserProfile extends React.Component {
       currentSelectedUser,
     } = settingUserProfile
 
-    const ActionProps = { TableCellComponent: this.TableCell }
-
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -172,11 +184,7 @@ class UserProfile extends React.Component {
             </Button>
           </GridItem>
           <GridItem md={12}>
-            <CommonTableGrid2
-              {...UserProfileTableConfig}
-              ActionProps={ActionProps}
-              rows={list}
-            />
+            <CommonTableGrid2 rows={list} {...this.state.gridConfig} />
           </GridItem>
         </GridContainer>
         <CommonModal

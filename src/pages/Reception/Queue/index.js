@@ -19,6 +19,7 @@ import {
   CommonModal,
   PageHeaderWrapper,
   Button,
+  ProgressButton,
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
@@ -59,10 +60,10 @@ const styles = (theme) => ({
     float: 'right',
     paddingTop: 5,
   },
-  icon: {
-    paddingTop: '0.5px',
-    paddingBottom: '0.5px',
-  },
+  // icon: {
+  //   paddingTop: '0.5px',
+  //   paddingBottom: '0.5px',
+  // },
   cardIconTitle: {
     color: 'black',
   },
@@ -224,19 +225,18 @@ class Queue extends PureComponent {
             </h3>
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
-                <Button
+                <ProgressButton
                   color='info'
                   size='sm'
                   onClick={this.onRefreshClick}
-                  classes={{ justIcon: classes.icon }}
+                  submitKey={`${modelKey}fetchQueueListing`}
+                  icon={<Refresh />}
                 >
-                  <Refresh />
                   Refresh
-                </Button>
+                </ProgressButton>
                 <Button
                   color='danger'
                   size='sm'
-                  classes={{ justIcon: classes.icon }}
                   onClick={this.onEndSessionClick}
                 >
                   <Stop />

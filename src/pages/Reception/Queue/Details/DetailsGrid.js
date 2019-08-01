@@ -85,6 +85,11 @@ const TableConfig = {
     { columnName: 'Action', width: 100, align: 'center' },
     { columnName: 'timeIn', width: 160, type: 'time' },
     { columnName: 'timeOut', width: 160, type: 'time' },
+    {
+      columnName: 'gender/age',
+      render: (row) => `${row.gender}/${row.age}`,
+      sortBy: 'genderFK',
+    },
   ],
 }
 
@@ -232,7 +237,7 @@ class DetailsGrid extends PureComponent {
       flattenAppointmentDateToCalendarEvents,
       [],
     )
-    console.log({ queueListing })
+
     const data =
       currentFilter === StatusIndicator.APPOINTMENT
         ? filterDoctorBlock(flattenedCalendarData)
