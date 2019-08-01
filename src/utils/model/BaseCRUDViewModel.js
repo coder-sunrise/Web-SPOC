@@ -92,7 +92,7 @@ export default class BaseCRUDViewModel {
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {
-        console.log(namespace, queryFnName, payload, service)
+        // console.log(namespace, queryFnName, payload, service)
         if (!service || !service[queryFnName]) return
         let filter = yield select((st) => st[namespace].filter)
         let exclude = yield select((st) => st[namespace].exclude)
@@ -114,7 +114,7 @@ export default class BaseCRUDViewModel {
           ...filter,
           // queryExcludeFields: list.exclude || exclude,
         }
-        console.log({ filter })
+        // console.log({ filter })
         const response = yield call(service[queryFnName], filter)
         // console.log(response)
         const { data, status, message } = response

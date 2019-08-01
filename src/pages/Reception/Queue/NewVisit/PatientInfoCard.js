@@ -2,37 +2,57 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import classNames from 'classnames'
 import moment from 'moment'
-// antd
-import { Spin } from 'antd'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { Divider, CircularProgress, withStyles } from '@material-ui/core'
 // custom components
-import { Card, CardAvatar, CardBody } from '@/components'
+import { CardContainer } from '@/components'
+// sub components
+import SchemesCard from './SchemesCard'
 // assets
 import avatar from '@/assets/img/faces/marc.jpg'
 // service
 import { getCodes } from '@/utils/codes'
 
-const styles = () => ({})
+const styles = (theme) => ({
+  container: {
+    minHeight: '30vh',
+  },
+  patientInfoContainer: {
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    '& > h5': {
+      marginBottom: theme.spacing(1),
+    },
+  },
+  patientName: {
+    fontWeight: 500,
+  },
+})
 
 @connect(({ visitRegistration, loading }) => ({ visitRegistration, loading }))
 class PatientInfoCard extends PureComponent {
   state = {
     ctGender: [],
+    ctNationality: [],
   }
 
   componentDidMount () {
-    getCodes('ctgender')
-      .then((response) => {
-        if (!response && !response.data) return
-        const data = [
-          ...response,
-        ]
-        this.setState({ ctGender: data })
+    this.fetchCodes()
+  }
+
+  fetchCodes = async () => {
+    try {
+      const nationality = await getCodes('ctnationality')
+
+      const gender = await getCodes('ctgender')
+
+      this.setState({
+        ctGender: gender,
+        ctNationality: nationality,
       })
-      .catch((error) => {
-        console.log('error occured', error)
-      })
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   getAge = () => {
@@ -44,15 +64,10 @@ class PatientInfoCard extends PureComponent {
   }
 
   getNationality = () => {
+    const { ctNationality } = this.state
     const { visitRegistration } = this.props
     const { nationalityFK } = visitRegistration.patientInfo
-
-    if (!nationalityFK || localStorage.getItem('CT_Nationality') === null)
-      return ''
-
-    const nationalities = JSON.parse(localStorage.getItem('CT_Nationality'))
-    const nationality = nationalities.find((item) => item.id === nationalityFK)
-
+    const nationality = ctNationality.find((item) => item.id === nationalityFK)
     return nationality ? nationality.name : ''
   }
 
@@ -61,8 +76,7 @@ class PatientInfoCard extends PureComponent {
     const { visitRegistration } = this.props
     const { genderFK } = visitRegistration.patientInfo
     const gender = ctGender.find((item) => item.id === genderFK)
-    if (gender) return gender.name
-    return ''
+    return gender ? gender.name : ''
   }
 
   render () {
@@ -72,37 +86,29 @@ class PatientInfoCard extends PureComponent {
       patientAccountNo,
       patientReferenceNo,
       dob,
-      gender,
     } = visitRegistration.patientInfo
-    console.log({ visitRegistration })
+
     return (
-      <Card size='sm' profile>
+      <CardContainer hideHeader size='sm' className={classes.container}>
         {loading.effects['visitRegistration/fetchPatientInfoByPatientID'] ? (
-          <Spin className='centerredLoading' />
+          <CircularProgress className='centerredLoading' />
         ) : (
           <React.Fragment>
-            <CardAvatar profile>
-              <img src={avatar} alt='...' />
-            </CardAvatar>
-            <CardBody profile>
-              <React.Fragment>
-                <h4 className={classNames(classes.cardTitle)}>{name}</h4>
-                <h5 className={classNames(classes.cardCategory)}>
-                  {`${patientReferenceNo}`}
-                </h5>
-                <h5 className={classNames(classes.cardCategory)}>
-                  {`${patientAccountNo}, ${this.getNationality()}`}
-                </h5>
-                <h5>
-                  {`${moment(dob).format(
-                    'DD-MMM-YYYY',
-                  )}, (${this.getAge()}, ${this.getGender()})`}
-                </h5>
-              </React.Fragment>
-            </CardBody>
+            <div className={classes.patientInfoContainer}>
+              <h4 className={classNames(classes.patientName)}>{name}</h4>
+              <h5>{`${patientReferenceNo}`}</h5>
+              <h5>{`${patientAccountNo}, ${this.getNationality()}`}</h5>
+              <h5>
+                {`${moment(dob).format(
+                  'DD-MMM-YYYY',
+                )}, (${this.getAge()}, ${this.getGender()})`}
+              </h5>
+            </div>
+            <Divider light />
+            <SchemesCard />
           </React.Fragment>
         )}
-      </Card>
+      </CardContainer>
     )
   }
 }

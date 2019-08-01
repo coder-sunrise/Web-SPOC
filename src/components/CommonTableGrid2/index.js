@@ -197,13 +197,15 @@ class CommonTableGrid2 extends React.Component {
     this.TableHeaderRow = ({ row, ...restProps }) => (
       <TableHeaderRow
         {...restProps}
-        titleComponent={({ children }) => (
-          <Tooltip title={children} placement='top'>
-            <div>{children}</div>
-          </Tooltip>
-        )}
+        titleComponent={({ children }) => {
+          return (
+            <Tooltip title={children} placement='top'>
+              <div>{children}</div>
+            </Tooltip>
+          )
+        }}
         sortLabelComponent={({ children, ...p }) => {
-          // console.log(children, p)
+          // console.log({ children, p })
 
           return (
             <TableHeaderRow.SortLabel

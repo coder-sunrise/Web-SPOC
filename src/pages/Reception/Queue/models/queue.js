@@ -226,7 +226,7 @@ export default createListViewModel({
       updateQueueListing (state, { queueListing }) {
         return {
           ...state,
-          queueListing: queueListing.reduce(mergeGenderAndAge, []),
+          queueListing,
         }
       },
       registerVisit (state, { payload }) {

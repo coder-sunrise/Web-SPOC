@@ -1,23 +1,19 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import moment from 'moment'
-// formik
-import { withFormik } from 'formik'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { CircularProgress, withStyles } from '@material-ui/core'
 // custom component
 import {
-  Button,
   GridContainer,
   GridItem,
   SizeContainer,
   withFormikExtend,
 } from '@/components'
+import Loading from '@/components/PageLoading/index'
 // Sub-components
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
-import SchemesCard from './SchemesCard'
 import ReferralCard from './ReferralCard'
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
@@ -28,6 +24,7 @@ const styles = (theme) => ({
     marginBottom: theme.spacing.unit * 2,
   },
   formContent: {
+    minHeight: '50vh',
     maxHeight: '80vh',
     overflow: 'auto',
   },
@@ -44,12 +41,24 @@ const styles = (theme) => ({
   hide: {
     display: 'none',
   },
-  patientInfo: {
-    marginTop: '20px',
+  loadingIndicator: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    width: '100%',
+    minHeight: '50vh',
+    '& > p': {
+      fontSize: '1.1rem',
+    },
   },
 })
 
-@connect(({ queueLog, visitRegistration }) => ({ queueLog, visitRegistration }))
+@connect(({ queueLog, loading, visitRegistration }) => ({
+  queueLog,
+  loading,
+  visitRegistration,
+}))
 @withFormikExtend({
   displayName: 'VisitRegistration',
   enableReinitialize: true,
@@ -149,32 +158,42 @@ class NewVisit extends PureComponent {
   render () {
     const {
       classes,
-      handleSubmit,
       footer,
+      handleSubmit,
+      loading,
       visitRegistration: { visitInfo },
     } = this.props
     const isEdit = Object.keys(visitInfo).length > 0
+    const fetchingVisitInfo =
+      loading.effects['visitRegistration/fetchVisitInfo']
+
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>
-          <GridItem xs sm={12} md={3} className={classes.patientInfo}>
+          <GridItem xs sm={12} md={3}>
             <PatientInfoCard />
-            {/* <SchemesCard /> */}
           </GridItem>
           <GridItem container xs md={9} className={classes.formContent}>
-            <SizeContainer size='sm'>
-              <React.Fragment>
-                <GridItem xs md={12} className={classes.row}>
-                  <VisitInfoCard />
-                </GridItem>
-                <GridItem xs md={12} className={classes.row}>
-                  <VitalSignCard handleCalculateBMI={this.calculateBMI} />
-                </GridItem>
-                <GridItem xs md={12} className={classes.row}>
-                  <ReferralCard />
-                </GridItem>
-              </React.Fragment>
-            </SizeContainer>
+            {fetchingVisitInfo ? (
+              <div className={classes.loadingIndicator}>
+                <CircularProgress />
+                <p>Loading visit info...</p>
+              </div>
+            ) : (
+              <SizeContainer size='sm'>
+                <React.Fragment>
+                  <GridItem xs md={12} className={classes.row}>
+                    <VisitInfoCard />
+                  </GridItem>
+                  <GridItem xs md={12} className={classes.row}>
+                    <VitalSignCard handleCalculateBMI={this.calculateBMI} />
+                  </GridItem>
+                  <GridItem xs md={12} className={classes.row}>
+                    <ReferralCard />
+                  </GridItem>
+                </React.Fragment>
+              </SizeContainer>
+            )}
             {/*
               <GridItem xs md={12} container>
                 <GridItem xs md={12} className={classes.cardContent}>

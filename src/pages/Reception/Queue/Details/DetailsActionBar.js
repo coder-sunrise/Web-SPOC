@@ -91,6 +91,7 @@ class DetailsActionBar extends PureComponent {
             icon={<Search />}
             onClick={handleSubmit}
             size='sm'
+            submitKey='queueLog/fetchPatientListByName'
           >
             Search
           </ProgressButton>

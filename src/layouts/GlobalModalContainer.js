@@ -128,6 +128,7 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showVisitRegistration}
           title='Visit Registration'
+          overrideLoading
           onClose={() => {
             dispatch({
               type: 'visitRegistration/closeModal',

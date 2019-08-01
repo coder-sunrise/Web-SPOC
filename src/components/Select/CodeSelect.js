@@ -33,16 +33,21 @@ class CodeSelect extends React.PureComponent {
     } else if (props.tenantCode) {
       getTenantCodes(props.tenantCode).then((response) => {
         const { data = [] } = response
-        const tenantCodeOptions = data.reduce(
-          (options, opt) => [
+
+        const tenantCodeOptions = data.reduce((options, opt) => {
+          return [
             ...options,
             {
-              name: opt.userProfile ? opt.userProfile.name : '',
+              name:
+                opt &&
+                opt.clinicianInfomation &&
+                opt.clinicianInfomation.userProfile
+                  ? opt.clinicianInfomation.userProfile.name
+                  : '',
               id: opt.id,
             },
-          ],
-          [],
-        )
+          ]
+        }, [])
         this.setState({
           options: tenantCodeOptions,
         })
