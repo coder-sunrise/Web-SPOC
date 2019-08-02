@@ -23,7 +23,7 @@ class SelectEditor extends PureComponent {
   }
 
   constructor (props) {
-    console.log('constructor', props)
+    // console.log('constructor', props)
     super(props)
     this.myRef = React.createRef()
   }

@@ -29,7 +29,6 @@ const cardStyle = {
     boxShadow: 'none',
   },
   cardProfile: {
-    marginTop: '30px',
     textAlign: 'center',
   },
   cardBlog: {

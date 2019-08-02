@@ -363,6 +363,17 @@ class AntdSelect extends React.PureComponent {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state
+
+    if (this.props.text) {
+      if (value === undefined) return null
+      const match = this.props.options.find(
+        (o) => o[this.props.valueField] === value,
+      )
+      if (match) return match[this.props.labelField]
+
+      return null
+    }
+
     const labelProps = {}
     if (!mode || mode === 'default') {
       labelProps.shrink =

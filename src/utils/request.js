@@ -293,7 +293,7 @@ export default function request (url, option) {
             }
             let errorMsg = 'Unknown System Error'
 
-            if (response.status === 401 && !localStorage.getItem('debug')) {
+            if (response.status === 401) {
               /* eslint-disable no-underscore-dangle */
               window.g_app._store.dispatch({
                 type: 'login/logout',
@@ -302,6 +302,10 @@ export default function request (url, option) {
             }
             if (s === 'timeout') {
               errorMsg = 'The request timeout'
+            }
+            if (response.status === 503) {
+              errorMsg =
+                'Service temporarily unavailable, please contact customer service'
             }
             let isJson = false
             // try {

@@ -58,11 +58,12 @@ class CodeSelect extends React.PureComponent {
   render () {
     // console.log(this.props)
     // if (!this.state.options || this.state.options.length === 0) return null
+
     return (
       <Select
-        {...this.props}
         options={this.state.options || []}
         valueField='id'
+        {...this.props}
       />
     )
   }

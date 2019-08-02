@@ -36,7 +36,7 @@ const routes = [
       { path: '/', redirect: '/reception/queue' },
       // Reception
       {
-        path: '/reception/queue',
+        path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
         routes: [
@@ -87,7 +87,7 @@ const routes = [
       //
       // Patient Database
       {
-        path: '/patientdb/search',
+        path: '/patientdb',
         icon: 'group',
         name: 'patient',
         routes: [

@@ -84,11 +84,11 @@ class Banner extends PureComponent {
         }}
       >
         <GridContainer>
-          <GridItem xs={6} md={1} gutter={0}>
+          {/* <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
               <img src={avatar} alt='...' />
             </CardAvatar>
-          </GridItem>
+          </GridItem> */}
           <GridItem xs={6} md={2}>
             <Block h3='Mr John Smith' body='G512345R, Malaysian' />
           </GridItem>
@@ -101,7 +101,7 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block header='Medical Problem' body='Asthma' />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={12} md={4}>
             {extraCmt}
           </GridItem>
         </GridContainer>

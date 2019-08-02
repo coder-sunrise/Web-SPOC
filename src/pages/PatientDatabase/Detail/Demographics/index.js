@@ -375,6 +375,16 @@ class Demographic extends PureComponent {
                   />
                 </GridItem>
               )}
+              {values.referredBy === 'Company' && (
+                <GridItem xs={12}>
+                  <Field
+                    name='referralCompanyReferenceNo'
+                    render={(args) => (
+                      <TextField label='Company Ref. No.' {...args} />
+                    )}
+                  />
+                </GridItem>
+              )}
               {values.referredBy && (
                 <GridItem xs={12}>
                   <Field
@@ -433,7 +443,7 @@ class Demographic extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={3} md={5}>
+            <GridItem xs={12}>
               <Button
                 link
                 href=''

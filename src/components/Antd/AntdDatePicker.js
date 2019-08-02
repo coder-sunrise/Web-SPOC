@@ -194,6 +194,7 @@ class AntdDatePicker extends PureComponent {
       onFocus,
       onBlur,
       onOpenChange,
+      value,
       ...restProps
     } = this.props
     const { format = dateFormat } = restProps
@@ -202,36 +203,38 @@ class AntdDatePicker extends PureComponent {
     // date picker component should handle the value change event itself
     return (
       <div style={{ width: '100%' }} {...props}>
-        <LocaleProvider locale={en_US}>
-          <DatePicker
-            className={classnames(classes.datepickerContainer)}
-            dropdownClassName={classnames(classes.dropdownMenu)}
-            allowClear
-            placeholder=''
-            onChange={this.handleChange}
-            onFocus={extendFunc(onFocus, this.handleFocus)}
-            onBlur={extendFunc(onBlur, this.handleBlur)}
-            // disabledDate={this.disabledDate}
+        <DatePicker
+          className={classnames(classes.datepickerContainer)}
+          dropdownClassName={classnames(classes.dropdownMenu)}
+          allowClear
+          placeholder=''
+          onChange={this.handleChange}
+          onFocus={extendFunc(onFocus, this.handleFocus)}
+          onBlur={extendFunc(onBlur, this.handleBlur)}
+          // disabledDate={this.disabledDate}
 
-            disabledDate={this.buildInRestrict}
-            onOpenChange={extendFunc(
-              onOpenChange,
-              this.handleDatePickerOpenChange,
-            )}
-            format={format}
-            value={_toMoment(this.state.value, format)}
-            {...restProps}
-          />
-        </LocaleProvider>
+          disabledDate={this.buildInRestrict}
+          onOpenChange={extendFunc(
+            onOpenChange,
+            this.handleDatePickerOpenChange,
+          )}
+          format={format}
+          value={_toMoment(this.state.value, format)}
+          {...restProps}
+        />
       </div>
     )
   }
 
   render () {
     const { classes, theme, ...restProps } = this.props
-    const { form, field, value } = restProps
+    const { form, field, value, text, format = dateFormat } = restProps
     const selectValue = form && field ? field.value : value
-    // console.log(selectValue)
+
+    if (text) {
+      if (selectValue) return _toMoment(selectValue, format).format(format)
+      return null
+    }
     const labelProps = {
       shrink: !!selectValue || this.state.shrink,
     }

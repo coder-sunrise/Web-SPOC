@@ -45,9 +45,7 @@ const cardBodyStyle = {
       },
     },
   },
-  cardBodyProfile: {
-    marginTop: '15px',
-  },
+  cardBodyProfile: {},
   cardBodyCalendar: {
     padding: '0px !important',
   },

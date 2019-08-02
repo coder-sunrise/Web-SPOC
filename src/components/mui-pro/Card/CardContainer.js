@@ -24,6 +24,7 @@ function CardContainer ({
   icon = <Assignment />,
   ...props
 }) {
+  const simpleHeader = hideHeader && title
   return simple ? (
     children
   ) : (
@@ -33,6 +34,21 @@ function CardContainer ({
           {icon && <CardIcon color='primary'>{icon}</CardIcon>}
           <h4>{typeof title === 'function' ? title() : title}</h4>
         </CardHeader>
+      )}
+      {simpleHeader &&
+      title && (
+        <h4
+          style={{
+            position: 'absolute',
+            top: -13,
+            display: 'block',
+            backgroundColor: 'inherit',
+            left: 20,
+            fontWeight: 500,
+          }}
+        >
+          {title}
+        </h4>
       )}
       <CardBody {...props}>{children}</CardBody>
     </Card>

@@ -15,13 +15,22 @@ import {
   CardBody,
   CardContainer,
   notification,
+  CodeSelect,
   dateFormatLong,
+  DatePicker,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { withStyles, MenuItem, MenuList, Divider } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import schema from './schema'
+
+moment.updateLocale('en', {
+  relativeTime: {
+    past: '%s',
+    yy: '%d yr',
+  },
+})
 
 const styles = () => ({})
 
@@ -226,96 +235,161 @@ class PatientDetail extends PureComponent {
       dispatch,
     } = resetProps
     if (!patient) return null
-    const { currentComponent, currentId, menuErrors } = patient
+    const { currentComponent, currentId, menuErrors, entity } = patient
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}
     const CurrentComponent = currentMenu.component
+    // console.log(patient)
 
     return (
       <GridContainer>
-        <GridItem xs={12} sm={12} md={2} style={{ paddingTop: 20 }}>
+        <GridItem xs={12} sm={12} md={2}>
           <Card profile>
-            {currentId ? (
-              <CardAvatar profile>
-                <a href='#pablo' onClick={(e) => e.preventDefault()}>
-                  <img src={avatar} alt='...' />
-                </a>
-              </CardAvatar>
-            ) : (
-              <PictureUpload style={{ marginTop: '-50px' }} />
-            )}
             <CardBody profile>
-              {currentId && (
+              {entity && (
                 <React.Fragment>
-                  <h6 className={classes.cardCategory}>G1234567X</h6>
-                  <h4 className={classes.cardTitle}>Alec Thompson</h4>
-                  <h6>{moment().format(dateFormatLong)}</h6>
+                  <h4
+                    className={classes.cardCategory}
+                    style={{ marginBottom: theme.spacing(1), fontWeight: 500 }}
+                  >
+                    <CodeSelect
+                      // authority='none'
+                      text
+                      code='ctSalutation'
+                      value={entity.salutationFK}
+                    />{' '}
+                    {entity.name}
+                  </h4>
+                  <p>{entity.patientReferenceNo}</p>
+                  <p>
+                    {entity.patientAccountNo},{' '}
+                    <CodeSelect
+                      text
+                      code='ctNationality'
+                      value={entity.nationalityFK}
+                    />
+                  </p>
+
+                  <p>
+                    <DatePicker
+                      text
+                      format={dateFormatLong}
+                      value={entity.dob}
+                    />{' '}
+                    ({moment(entity.dob).fromNow()})
+                  </p>
+                  <Divider light />
+                  <div
+                    style={{
+                      textAlign: 'left',
+                      fontSize: '0.8rem',
+                      paddingTop: theme.spacing(1),
+                      maxHeight: height - 455 - 20,
+                      overflow: 'auto',
+                    }}
+                  >
+                    {entity.patientScheme.map((o) => {
+                      return (
+                        <div style={{ marginBottom: theme.spacing(1) }}>
+                          <p style={{ fontWeight: 500 }}>
+                            <CodeSelect
+                              text
+                              code='ctSchemeType'
+                              value={o.schemeTypeFK}
+                            />
+                            <CodeSelect
+                              text
+                              // code='ctSchemeType'
+                              options={[
+                                { value: 1, name: 'Test 01' },
+                                { value: 2, name: 'Test 02' },
+                                { value: 3, name: 'Test 03' },
+                              ]}
+                              value={o.coPaymentSchemeFK}
+                            />
+                          </p>
+                          {o.validFrom && (
+                            <p>
+                              Validity:{' '}
+                              <DatePicker
+                                text
+                                format={dateFormatLong}
+                                value={o.validFrom}
+                              />{' '}
+                              -{' '}
+                              <DatePicker
+                                text
+                                format={dateFormatLong}
+                                value={o.validTo}
+                              />
+                            </p>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <Divider light />
                 </React.Fragment>
               )}
-
-              <Divider light />
-              <div
-                ref='sidebarWrapper'
-                style={{
-                  maxHeight: 'calc(100vh - 329px)',
-                  position: 'relative',
-                }}
-              >
-                <MenuList>
-                  {this.widgets
-                    .filter(
-                      (o) =>
-                        (!!patient.entity && !!patient.entity.id) ||
-                        Number(o.id) <= 4,
-                    )
-                    .map((o) => (
-                      <Authorized authority={o.access}>
-                        <MenuItem
-                          key={o.name}
-                          className={classes.menuItem}
-                          selected={currentMenu.name === o.name}
-                          disabled={
-                            global.disableSave && currentMenu.name !== o.name
-                          }
-                          onClick={(e) => {
-                            onMenuClick(e, o)
-                            dispatch({
-                              type: 'patient/updateState',
-                              payload: {
-                                entity: values,
-                              },
-                            })
-                            this.props.history.push(
-                              getAppendUrl({
-                                md: 'pt',
-                                cmt: o.id,
-                              }),
-                            )
+              <MenuList>
+                {this.widgets
+                  .filter(
+                    (o) =>
+                      (!!patient.entity && !!patient.entity.id) ||
+                      Number(o.id) <= 4,
+                  )
+                  .map((o) => (
+                    <Authorized authority={o.access}>
+                      <MenuItem
+                        key={o.name}
+                        className={classes.menuItem}
+                        selected={currentMenu.name === o.name}
+                        disabled={
+                          global.disableSave && currentMenu.name !== o.name
+                        }
+                        onClick={(e) => {
+                          onMenuClick(e, o)
+                          dispatch({
+                            type: 'patient/updateState',
+                            payload: {
+                              entity: values,
+                            },
+                          })
+                          this.props.history.push(
+                            getAppendUrl({
+                              md: 'pt',
+                              cmt: o.id,
+                            }),
+                          )
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: menuErrors[o.id] ? 'red' : 'inherit',
                           }}
                         >
-                          <span
-                            style={{
-                              color: menuErrors[o.id] ? 'red' : 'inherit',
-                            }}
-                          >
-                            {o.name}
-                          </span>
-                        </MenuItem>
-                      </Authorized>
-                    ))}
-                </MenuList>
-              </div>
+                          {o.name}
+                        </span>
+                      </MenuItem>
+                    </Authorized>
+                  ))}
+              </MenuList>
             </CardBody>
           </Card>
         </GridItem>
         <GridItem xs={12} sm={12} md={10}>
-          <CardContainer style={{ marginTop: 0 }} hideHeader>
+          <CardContainer hideHeader title={currentMenu.name}>
             <div
               style={
                 height > 0 ? (
-                  { height: height - 88 - 20, overflow: 'auto', padding: 4 }
+                  {
+                    height: height - 95 - 20,
+                    overflow: 'auto',
+                    padding: 4,
+                    paddingTop: 20,
+                  }
                 ) : (
-                  { padding: 4 }
+                  { padding: 4, paddingTop: 20 }
                 )
               }
             >
