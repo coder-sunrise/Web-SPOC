@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import router from 'umi/router'
+import moment from 'moment'
 // dva
 import { connect } from 'dva'
 // table grid component
@@ -14,12 +15,12 @@ import Person from '@material-ui/icons/Person'
 import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 // custom components
-import { CommonTableGrid2 } from '@/components'
+import { CommonTableGrid2, DateFormatter } from '@/components'
 // import GridButton from './GridButton'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import AppointmentActionButton from './AppointmentActionButton'
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
-import { filterData, filterDoctorBlock } from '../utils'
+import { filterData, filterDoctorBlock, todayOnly } from '../utils'
 import { StatusIndicator } from '../variables'
 // assets
 import { tooltip } from '@/assets/jss/index'
@@ -87,8 +88,20 @@ const TableConfig = {
     { columnName: 'timeOut', width: 160, type: 'time' },
     {
       columnName: 'gender/age',
-      render: (row) => `${row.gender}/${row.age}`,
+      render: (row) =>
+        row.gender && row.age ? `${row.gender}/${row.age}` : '',
       sortBy: 'genderFK',
+    },
+    {
+      columnName: 'appointmentTime',
+      width: 160,
+      render: (row) => {
+        if (row.appointmentTime) {
+          return DateFormatter({ value: row.appointmentTime, full: true })
+        }
+        if (row.start) return DateFormatter({ value: row.start, full: true })
+        return ''
+      },
     },
   ],
 }
@@ -233,10 +246,9 @@ class DetailsGrid extends PureComponent {
     const { currentFilter, queueListing } = queueLog
     const { calendarEvents } = calendar
 
-    const flattenedCalendarData = calendarEvents.reduce(
-      flattenAppointmentDateToCalendarEvents,
-      [],
-    )
+    const flattenedCalendarData = calendarEvents
+      .reduce(flattenAppointmentDateToCalendarEvents, [])
+      .filter(todayOnly)
 
     const data =
       currentFilter === StatusIndicator.APPOINTMENT
