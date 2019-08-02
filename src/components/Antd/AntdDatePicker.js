@@ -4,7 +4,9 @@ import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
 // ant
-import { DatePicker } from 'antd'
+import { DatePicker, LocaleProvider } from 'antd'
+import en_US from 'antd/es/locale-provider/en_US'
+
 // assets
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
@@ -200,24 +202,27 @@ class AntdDatePicker extends PureComponent {
     // date picker component should handle the value change event itself
     return (
       <div style={{ width: '100%' }} {...props}>
-        <DatePicker
-          className={classnames(classes.datepickerContainer)}
-          dropdownClassName={classnames(classes.dropdownMenu)}
-          allowClear
-          placeholder=''
-          onChange={this.handleChange}
-          onFocus={extendFunc(onFocus, this.handleFocus)}
-          onBlur={extendFunc(onBlur, this.handleBlur)}
-          // disabledDate={this.disabledDate}
-          disabledDate={this.buildInRestrict}
-          onOpenChange={extendFunc(
-            onOpenChange,
-            this.handleDatePickerOpenChange,
-          )}
-          format={format}
-          value={_toMoment(this.state.value, format)}
-          {...restProps}
-        />
+        <LocaleProvider locale={en_US}>
+          <DatePicker
+            className={classnames(classes.datepickerContainer)}
+            dropdownClassName={classnames(classes.dropdownMenu)}
+            allowClear
+            placeholder=''
+            onChange={this.handleChange}
+            onFocus={extendFunc(onFocus, this.handleFocus)}
+            onBlur={extendFunc(onBlur, this.handleBlur)}
+            // disabledDate={this.disabledDate}
+
+            disabledDate={this.buildInRestrict}
+            onOpenChange={extendFunc(
+              onOpenChange,
+              this.handleDatePickerOpenChange,
+            )}
+            format={format}
+            value={_toMoment(this.state.value, format)}
+            {...restProps}
+          />
+        </LocaleProvider>
       </div>
     )
   }
@@ -234,6 +239,9 @@ class AntdDatePicker extends PureComponent {
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
+        // onKeyUp={(e) => {
+        //   console.log(e)
+        // }}
         {...restProps}
         value={this.state.selectValue}
         preventDefaultChangeEvent

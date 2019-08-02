@@ -32,12 +32,11 @@ class Schemes extends PureComponent {
           />
         </GridItem>
         <GridItem xs md={12}>
-          <h4 style={{ marginTop: 20 }}>
-            Medisave Payer
-          </h4>
+          <h4 style={{ marginTop: 20 }}>Medisave Payer</h4>
         </GridItem>
         <GridItem xs md={12} style={{ marginTop: 8 }}>
           <PayersGrid
+            enableAdd={values.patientScheme.find((o) => o.schemeTypeFK === 11)} //TODO: check is medisave added
             rows={values.schemePayer}
             schema={schema.schemePayer._subType}
             values={values}

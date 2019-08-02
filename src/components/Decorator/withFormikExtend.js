@@ -50,14 +50,16 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     render () {
-      // console.log(props, this.props, Component)
       const rights = {}
-      if (authority.view) {
-        rights.view = { name: authority.view, rights: 'enable' }
+      if (authority) {
+        if (authority.view) {
+          rights.view = { name: authority.view, rights: 'enable' }
+        }
+        if (authority.edit) {
+          rights.edit = { name: authority.edit, rights: 'enable' }
+        }
       }
-      if (authority.edit) {
-        rights.edit = { name: authority.edit, rights: 'enable' }
-      }
+
       return authority ? (
         <AuthorizedContext.Provider value={rights}>
           <Component {...this.props} />

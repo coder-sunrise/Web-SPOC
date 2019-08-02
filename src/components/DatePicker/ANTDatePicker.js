@@ -127,6 +127,7 @@ class ANTDatePicker extends PureComponent {
 
     if (onChange) {
       const { name } = this.props
+      // console.log(date, dateString,)
       onChange(name, dateString)
     }
   }

@@ -15,6 +15,7 @@ import {
   CardBody,
   CardContainer,
   notification,
+  dateFormatLong,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { withStyles, MenuItem, MenuList, Divider } from '@material-ui/core'
@@ -248,7 +249,7 @@ class PatientDetail extends PureComponent {
                 <React.Fragment>
                   <h6 className={classes.cardCategory}>G1234567X</h6>
                   <h4 className={classes.cardTitle}>Alec Thompson</h4>
-                  <h6>{moment().format('DD-MMM-YYYY')}</h6>
+                  <h6>{moment().format(dateFormatLong)}</h6>
                 </React.Fragment>
               )}
 

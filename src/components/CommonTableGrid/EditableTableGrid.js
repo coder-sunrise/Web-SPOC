@@ -194,6 +194,7 @@ class EditableTableGrid extends PureComponent {
     const {
       EditingProps: {
         showAddCommand = false,
+        addCommandProps = {},
         // EditCell = DefaultEditCell,
       } = {},
       ...props
@@ -220,6 +221,7 @@ class EditableTableGrid extends PureComponent {
             color='primary'
             link
             disabled={this.state.addedRows.length > 0}
+            {...addCommandProps}
           >
             <Add />New
           </Button>

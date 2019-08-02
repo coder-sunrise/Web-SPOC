@@ -176,7 +176,7 @@ const schemaAllergies = {
 
 const schemaSchemes = {
   patientScheme: Yup.array()
-    .unique((v) => v.schemeTypeFK, 'error', () => {
+    .unique((v) => `${v.schemeTypeFK}-${v.coPaymentSchemeFK}`, 'error', () => {
       notification.error({
         message: 'The Schemes record already exists in the system',
       })
@@ -190,7 +190,10 @@ const schemaSchemes = {
   schemePayer: Yup.array().compact((v) => v.isDeleted).of(
     Yup.object().shape({
       payerName: Yup.string().required(),
-      dob: Yup.date(),
+      payerID: Yup.string().required(),
+      relationshipFK: Yup.number().required(),
+      // scheme: Yup.string().required(),
+      dob: Yup.date().required(),
     }),
   ),
 }

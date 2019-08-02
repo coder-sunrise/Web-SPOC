@@ -70,9 +70,7 @@ class AllergyGrid extends PureComponent {
       ],
     }
 
-    this.commitChanges = ({ rows }) => {
-      console.log(rows)
-    }
+    this.commitChanges = props.setArrayValue
     this.onAddedRowsChange = (addedRows) => {
       return addedRows.map((row) => ({
         onsetDate: moment(),

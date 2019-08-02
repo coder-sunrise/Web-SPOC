@@ -11,17 +11,13 @@ import {
 import AllergyGrid from './AllergyGrid'
 
 class Allergies extends PureComponent {
-  state = {
-    isGridEditable: true,
-  }
+  state = {}
 
-  updateValue = (type) => (items) => {
-    let vals = Array.from(
-      this.props.values.patientAllergy.filter(
-        (o) => !o.isDeleted && o.type === type,
-      ),
+  updateValue = (type) => ({ rows }) => {
+    let vals = this.props.values.patientAllergy.filter(
+      (o) => !o.isDeleted && o.type === type,
     )
-    vals = vals.concat(items)
+    vals = vals.concat(rows)
     this.props.setFieldValue('patientAllergy', vals)
   }
 
@@ -30,7 +26,6 @@ class Allergies extends PureComponent {
 
   render () {
     const { classes, dispatch, values, schema, ...restProps } = this.props
-
     return (
       <div>
         <GridContainer alignItems='flex-start'>
@@ -47,9 +42,6 @@ class Allergies extends PureComponent {
                     }
                     simple
                     label={"This patient doesn't has any allergy"}
-                    onChange={(name, checked) => {
-                      this.setState({ isGridEditable: !checked })
-                    }}
                     {...args}
                   />
                 )
@@ -80,7 +72,10 @@ class Allergies extends PureComponent {
               rows={this.getRows('Allergy')}
               type='Allergy'
               title='Allergy'
-              isEditable={this.state.isGridEditable}
+              isEditable={
+                !values.patientAllergyMetaData[0] ||
+                values.patientAllergyMetaData[0].noAllergies === false
+              }
               setArrayValue={this.updateValue('NonAllergy')}
               schema={schema.patientAllergy._subType}
               {...restProps}

@@ -84,7 +84,7 @@ function getNotificationInstance (prefixCls, placement, callback) {
     callback(notificationInstance[cacheKey])
     return
   }
-  console.log(defaultTheme.overrides.MuiIconButton)
+  // console.log(defaultTheme.overrides.MuiIconButton)
   Notification.newInstance(
     {
       prefixCls,

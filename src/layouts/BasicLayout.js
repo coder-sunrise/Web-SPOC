@@ -2,7 +2,7 @@ import React, { Suspense } from 'react'
 import NProgress from 'nprogress'
 import $ from 'jquery'
 import _ from 'lodash'
-
+import moment from 'moment'
 // import { renderWhenReady} from '@sencha/ext-react'
 // import { Panel } from '@sencha/ext-modern'
 import router from 'umi/router'
@@ -47,6 +47,8 @@ import Exception403 from '../pages/Exception/403'
 import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
+
+moment.locale('en')
 
 const _theme = createMuiTheme({
   typography: {

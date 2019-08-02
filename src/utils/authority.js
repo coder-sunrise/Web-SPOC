@@ -36,6 +36,7 @@ export function getAuthority (str) {
     authority = authorityString
   }
   let result = authority
+  if (!result) return []
   // console.log(result, authority)
   if (typeof authority === 'string') {
     result = [

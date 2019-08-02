@@ -41,6 +41,7 @@ export default createFormViewModel({
       updateLoginStatus (state, { payload }) {
         const isInvalidLogin = payload.status !== 200
         if (!isInvalidLogin) {
+          console.log(payload)
           const {
             data,
             application,

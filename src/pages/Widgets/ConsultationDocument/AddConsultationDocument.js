@@ -1,10 +1,11 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 import {
+  withFormikExtend,
+  FastField,
   Button,
   CommonHeader,
   CommonModal,
@@ -45,20 +46,20 @@ const styles = (theme) => ({
 })
 const types = [
   {
-    value: '1',
-    name: 'Referral Letter',
-  },
-  {
-    value: '2',
-    name: 'Memo',
-  },
-  {
     value: '3',
     name: 'Medical Certificate',
   },
   {
     value: '4',
     name: 'Certificate of Attendance',
+  },
+  {
+    value: '1',
+    name: 'Referral Letter',
+  },
+  {
+    value: '2',
+    name: 'Memo',
   },
   {
     value: '5',
@@ -68,7 +69,7 @@ const types = [
 @connect(({ consultationDocument }) => ({
   consultationDocument,
 }))
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ consultationDocument }) => {
     // console.log(diagnosis)
     return consultationDocument.default

@@ -45,7 +45,7 @@ class FilterBar extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem lg={12} xl={8} style={{ position: 'relative' }}>
+          <GridItem md={12} lg={8} style={{ position: 'relative' }}>
             <FastField
               name='search'
               render={(args) => {
@@ -77,7 +77,7 @@ class FilterBar extends PureComponent {
               />
             </div> */}
           </GridItem>
-          <GridItem lg={12} xl={4}>
+          <GridItem md={12} lg={4}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 variant='contained'

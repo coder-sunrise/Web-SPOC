@@ -69,34 +69,23 @@ class DateEditorBase extends PureComponent {
   }
 }
 
-const DateRangeFormatter = (columnExtensions) =>
-  React.memo(
-    (props) => {
-      const { column: { name: columnName }, value, row } = props
-      const cfg =
-        columnExtensions.find(
-          ({ columnName: currentColumnName }) =>
-            currentColumnName === columnName,
-        ) || {}
-      const { type, render, getInitialValue, ...restProps } = cfg
-      if (render) {
-        return render(row)
-      }
-      const v = getInitialValue ? getInitialValue(row) : value
-      // console.log(cfg, value)
-      if (!v || v.length === 0 || !v[0] || !v[1]) return ''
-      return `${DateFormatter({ value: v[0] })} to ${DateFormatter({
-        value: v[1],
-      })}`
-    },
-    (prevProps, nextProps) => {
-      return (
-        prevProps === nextProps ||
-        prevProps.value === nextProps.value ||
-        this.props.commitCount !== nextProps.commitCount
-      )
-    },
-  )
+const DateRangeFormatter = (columnExtensions) => (props) => {
+  const { column: { name: columnName }, value, row } = props
+  const cfg =
+    columnExtensions.find(
+      ({ columnName: currentColumnName }) => currentColumnName === columnName,
+    ) || {}
+  const { type, render, getInitialValue, ...restProps } = cfg
+  if (render) {
+    return render(row)
+  }
+  const v = getInitialValue ? getInitialValue(row) : value
+  // console.log(cfg, value)
+  if (!v || v.length === 0 || !v[0] || !v[1]) return ''
+  return `${DateFormatter({ value: v[0] })} to ${DateFormatter({
+    value: v[1],
+  })}`
+}
 
 class RangeDateTypeProvider extends React.Component {
   static propTypes = {
@@ -112,7 +101,8 @@ class RangeDateTypeProvider extends React.Component {
   }
 
   shouldComponentUpdate = (nextProps, nextState) =>
-    this.props.editingRowIds !== nextProps.editingRowIds
+    this.props.editingRowIds !== nextProps.editingRowIds ||
+    this.props.commitCount !== nextProps.commitCount
 
   render () {
     const { columnExtensions } = this.props

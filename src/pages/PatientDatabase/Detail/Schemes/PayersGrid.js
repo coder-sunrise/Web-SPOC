@@ -45,10 +45,13 @@ class PayersGrid extends PureComponent {
   }
 
   render () {
-    const { type, rows, schema } = this.props
+    const { enableAdd, rows, schema } = this.props
 
     const EditingProps = {
       showAddCommand: true,
+      addCommandProps: {
+        disabled: !enableAdd,
+      },
       onCommitChanges: this.commitChanges,
     }
 

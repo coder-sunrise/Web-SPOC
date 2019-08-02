@@ -11,7 +11,7 @@ export default createFormViewModel({
     service: {},
     state: {
       default: {
-        type: '1',
+        type: '3',
         from: 'Dr Johhy',
         referenceNo: 'MC203918-29',
         days: 1,

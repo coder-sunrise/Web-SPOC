@@ -21,7 +21,7 @@ export default {
   'reception.queue.status.completed': 'Completed',
 
   'reception.queue.registerVisit': 'Register Visit',
-  'reception.queue.createPatient': 'Create New Patient',
+  'reception.queue.createPatient': 'Register New Patient',
   'reception.queue.deleteVisit': 'Delete Visit',
   'reception.queue.printTotal': 'Print Total',
   'reception.queue.endSession': 'End Session',

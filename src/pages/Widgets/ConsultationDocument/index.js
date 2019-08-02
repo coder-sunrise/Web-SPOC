@@ -124,6 +124,7 @@ class ConsultationDocument extends PureComponent {
           open={showModal}
           title='Add Consultation Document'
           onClose={this.toggleModal}
+          observe='AddConsultationDocument'
           // onConfirm={this.toggleCollectPayment}
           maxWidth='md'
           bodyNoPadding
