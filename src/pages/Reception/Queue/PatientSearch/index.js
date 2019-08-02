@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import classNames from 'classnames'
 import { connect } from 'dva'
+// formik
+import { FastField, withFormik } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // table grid component
@@ -13,6 +15,7 @@ import {
   GridContainer,
   GridItem,
   Button,
+  ProgressButton,
   TextField,
   CommonTableGrid,
 } from '@/components'
@@ -25,9 +28,13 @@ const styles = () => ({
 })
 
 @connect(({ queueLog, loading }) => ({ queueLog, loading }))
+@withFormik({
+  mapPropsToValues: () => ({
+    search: '',
+  }),
+})
 class PatientSearch extends PureComponent {
   state = {
-    searchQuery: this.props.searchPatientName,
     columns: [
       { name: 'name', title: 'Name' },
       { name: 'patientAccountNo', title: 'ID' },
@@ -66,20 +73,16 @@ class PatientSearch extends PureComponent {
   gridGetRowID = (row) => row.id
 
   searchPatient = () => {
-    const { dispatch } = this.props
-    const { searchQuery } = this.state
+    const { dispatch, values } = this.props
+
     dispatch({
       type: 'queueLog/fetchPatientListByName',
-      payload: searchQuery,
+      payload: values.search,
     })
   }
 
-  onSearchQueryChange = (event) => {
-    this.setState({ searchQuery: event.target.value })
-  }
-
   render () {
-    const { columns, columnExtensions, searchQuery } = this.state
+    const { columns, columnExtensions } = this.state
     const { classes, queueLog, onViewRegisterPatient, loading } = this.props
     const ActionProps = { TableCellComponent: this.TableCell }
 
@@ -87,22 +90,28 @@ class PatientSearch extends PureComponent {
       <React.Fragment>
         <GridContainer className={classNames(classes.spacing)}>
           <GridItem xs md={6}>
-            <TextField
-              value={searchQuery}
-              onChange={this.onSearchQueryChange}
-              help='Leave blank to list all patient'
-              label={formatMessage({
-                id: 'reception.queue.patientName',
-              })}
+            <FastField
+              name='search'
+              render={(args) => (
+                <TextField
+                  {...args}
+                  label={formatMessage({
+                    id: 'reception.queue.patientName',
+                  })}
+                />
+              )}
             />
           </GridItem>
-          <GridItem xs md={2} container alignItems='center'>
-            <Button color='primary' size='sm' onClick={this.searchPatient}>
-              <Search />
+          <GridItem xs md={4} container alignItems='center'>
+            <ProgressButton
+              color='primary'
+              size='sm'
+              icon={<Search />}
+              onClick={this.searchPatient}
+              submitKey='queueLog/fetchPatientListByName'
+            >
               <FormattedMessage id='reception.queue.search' />
-            </Button>
-          </GridItem>
-          <GridItem xs md={4} container justify='flex-end' alignItems='center'>
+            </ProgressButton>
             <Button color='primary' size='sm' onClick={onViewRegisterPatient}>
               <PersonAdd />
               <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />

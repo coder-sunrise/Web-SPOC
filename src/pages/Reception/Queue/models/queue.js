@@ -124,7 +124,7 @@ export default createListViewModel({
       },
       *getSessionInfo (_, { call, put }) {
         const response = yield call(service.getActiveSession)
-        const { data } = response
+        const { status, data } = response
         // data = null when get session failed
 
         if (data && data.totalRecords === 1) {
@@ -145,15 +145,15 @@ export default createListViewModel({
             payload: { ...sessionData[0] },
           })
         }
-
-        return yield put({
-          type: 'toggleError',
-          error: {
-            hasError: true,
-            message:
-              'Failed to get session info. Please contact system Administrator',
-          },
-        })
+        if (status >= 400)
+          return yield put({
+            type: 'toggleError',
+            error: {
+              hasError: true,
+              message:
+                'Failed to get session info. Please contact system Administrator',
+            },
+          })
       },
       *fetchQueueListing ({ sessionID, visitStatus }, { call, put }) {
         const filterByStatus = visitStatus

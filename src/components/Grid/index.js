@@ -117,12 +117,18 @@ const TimeFormatter = ({ value }) => {
   return value
 }
 
-const DateFormatter = ({ value }) => {
+const DateFormatter = ({ value, full = false }) => {
   // console.log(value)
+  const format = full ? fullDateTime : dateFormatLong
   if (!value) return null
-  return moment.isMoment(value)
-    ? value.format(dateFormatLong)
-    : moment(value).isValid() ? moment(value).format(dateFormatLong) : value
+
+  if (moment.isMoment(value)) return value.format(format)
+
+  return moment(value).isValid() ? moment(value).format(format) : value
+
+  // return moment.isMoment(value)
+  //   ? value.format(format)
+  //   : moment(value).isValid() ? moment(value).format(format) : value
 }
 
 const TimeTypeProvider = (props) => {

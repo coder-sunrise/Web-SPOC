@@ -42,14 +42,14 @@ const styles = (theme) => ({
   ...AppointmentTypeAsColor,
 })
 
-export const flattenAppointmentDateToCalendarEvents = (marshal, event) =>
+export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
   event.isDoctorEvent
     ? [
-        ...marshal,
+        ...massaged,
         event,
       ]
     : [
-        ...marshal,
+        ...massaged,
         ...event.appointmentResources.map((appointment) => {
           const { appointmentResources, ...restEvent } = event
           return { ...restEvent, ...appointment }
