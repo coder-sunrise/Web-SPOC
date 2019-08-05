@@ -39,9 +39,10 @@ export default createFormViewModel({
     },
     reducers: {
       updateLoginStatus (state, { payload }) {
-        const isInvalidLogin = payload.status !== 200
+        console.log({ payload })
+        const isInvalidLogin =
+          payload.status !== 200 || payload.access_token !== undefined
         if (!isInvalidLogin) {
-          console.log(payload)
           const {
             data,
             application,

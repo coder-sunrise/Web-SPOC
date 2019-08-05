@@ -1,12 +1,5 @@
-import request, { baseUrl } from '@/utils/request'
+import request, { axiosRequest } from '@/utils/request'
 import { stringify } from 'qs'
-import axios from 'axios'
-
-const CONFIG = {
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded',
-  },
-}
 
 const FORM_DATA = {
   grant_type: 'password',
@@ -17,17 +10,24 @@ const FORM_DATA = {
 }
 
 export async function login (credential) {
-  const getTokenURL = baseUrl + '/connect/token'
-  // const getTokenURL = 'http://semr2dev2010.emr.com.sg/connect/token'
-  //
+  const getTokenURL = '/connect/token'
   const requestBody = {
     ...FORM_DATA,
     ...credential,
   }
-  const response = await axios
-    .post(getTokenURL, stringify(requestBody), CONFIG)
-    .catch((error) => {
-      return error.response
-    })
+  // const response = await axiosRequest(getTokenURL, {
+  //   method: 'POST',
+  //   data: stringify(requestBody),
+  //   contentType: 'application/x-www-form-urlencoded',
+  // })
+
+  const response = await request(
+    getTokenURL,
+    {
+      method: 'POST',
+      data: stringify(requestBody),
+    },
+    { contentType: 'application/x-www-form-urlencoded' },
+  )
   return response
 }

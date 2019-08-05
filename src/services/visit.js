@@ -14,31 +14,23 @@ export async function fetchPatientInfoByPatientID (patientID) {
 export const query = (params) => service.query(patientApiUrl, params)
 
 export async function registerVisit (visitInfo) {
-  const formData = new FormData()
-  formData.append('queueDetailsModel', JSON.stringify(visitInfo))
   const options = {
     method: 'POST',
-    data: formData,
-    contentType: 'application/x-www-form-urlencoded',
+    data: JSON.stringify(visitInfo),
   }
-
   const response = await axiosRequest(`/api/queue`, options)
-  console.log({ registerVisit: response })
+
   return response
 }
 
 export const saveVisit = async (visitInfo) => {
-  const { visitID, ...restVisit } = visitInfo
-  const formData = new FormData()
-  formData.append('queueDetails', JSON.stringify({ queueDetails: restVisit }))
-  console.log({ body: JSON.stringify({ queueDetails: restVisit }) })
+  const { id } = visitInfo
   const options = {
     method: 'PUT',
-    data: JSON.stringify({ queueDetails: restVisit }),
-    // contentType: 'application/x-www-form-urlencoded',
+    data: JSON.stringify(visitInfo),
   }
 
-  const response = await axiosRequest(`/api/queue/${visitID}`, options)
+  const response = await axiosRequest(`/api/queue/${id}`, options)
   return response
 }
 

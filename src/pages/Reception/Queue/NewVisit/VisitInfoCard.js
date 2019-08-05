@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+
 import classnames from 'classnames'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
@@ -15,9 +16,9 @@ import {
   CommonCard,
   GridContainer,
   GridItem,
-  Select,
   CodeSelect,
 } from '@/components'
+import AttachmentWrapper from './withAttachment'
 import FormField from './formField'
 
 const styles = (theme) => ({
@@ -33,19 +34,37 @@ const styles = (theme) => ({
     marginLeft: theme.spacing(0.5),
     marginRight: theme.spacing(0.5),
   },
+  notUploaded: {
+    '& > a': {
+      color: '#999',
+    },
+  },
 })
+
+const convertToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result.split(',')[1])
+    reader.onerror = (error) => reject(error)
+  })
+
+const getFileExtension = (filename) => {
+  return filename.split('.').pop()
+}
 
 class VisitInfoCard extends PureComponent {
   render () {
-    const { classes } = this.props
+    const { attachments, handleUpdateAttachments } = this.props
+
     return (
-      <CommonCard
-        size='sm'
-        title={
-          <FormattedMessage id='reception.queue.visitRegistration.visitInformation' />
-        }
+      <AttachmentWrapper
+        title='Visit Information'
+        attachmentType='Visit'
+        handleUpdateAttachments={handleUpdateAttachments}
+        attachments={attachments}
       >
-        <GridContainer>
+        <React.Fragment>
           <GridItem xs md={4}>
             <FastField
               name={FormField['visit.visitType']}
@@ -103,37 +122,8 @@ class VisitInfoCard extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem className={classes.verticalSpacing}>
-            <span className={classes.attachmentLabel}>Attachment:</span>
-          </GridItem>
-          <GridItem md={10} className={classes.verticalSpacing}>
-            <div>
-              <span
-                className={classnames([
-                  classes.attachmentItem,
-                  classes.attachmentLabel,
-                ])}
-              >
-                <a>Attachment001.pdf</a>
-              </span>
-              <span
-                className={classnames([
-                  classes.attachmentItem,
-                  classes.attachmentLabel,
-                ])}
-              >
-                <a>Attachment002.pdf</a>
-              </span>
-            </div>
-          </GridItem>
-          <GridItem>
-            <Button color='rose' size='sm'>
-              <AttachFile />
-              Upload
-            </Button>
-          </GridItem>
-        </GridContainer>
-      </CommonCard>
+        </React.Fragment>
+      </AttachmentWrapper>
     )
   }
 }

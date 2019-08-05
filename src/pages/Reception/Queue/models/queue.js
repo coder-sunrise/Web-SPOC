@@ -89,6 +89,9 @@ export default createListViewModel({
           },
         },
       })
+      history.listen((location) => {
+        console.log({ location })
+      })
     },
     effects: {
       *startSession (_, { call, put }) {
@@ -154,6 +157,7 @@ export default createListViewModel({
                 'Failed to get session info. Please contact system Administrator',
             },
           })
+        return true
       },
       *fetchQueueListing ({ sessionID, visitStatus }, { call, put }) {
         const filterByStatus = visitStatus

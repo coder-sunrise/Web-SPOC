@@ -20,7 +20,9 @@ export default {
         payload: response,
       })
       // Login successfully
-      if (response.status === 'ok') {
+
+      if (response && response.access_token) {
+        localStorage.setItem('token', response.access_token)
         reloadAuthorized()
         const urlParams = new URL(window.location.href)
         const params = getPageQuery()
