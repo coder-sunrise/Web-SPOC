@@ -2,11 +2,21 @@ export const UserProfileTableConfig = {
   columns: [
     { name: 'userName', title: 'Login Account' },
     { name: 'name', title: 'Name' },
-    { name: 'role', title: 'Role' },
+    {
+      name: 'role',
+      title: 'Role',
+    },
     { name: 'status', title: 'Status' },
     { name: 'action', title: 'Action' },
   ],
-  columnExtensions: [],
+  columnExtensions: [
+    {
+      columnName: 'role',
+      render: (row) => {
+        return row.role ? row.role.name : ''
+      },
+    },
+  ],
   FuncProps: {
     pager: false,
   },

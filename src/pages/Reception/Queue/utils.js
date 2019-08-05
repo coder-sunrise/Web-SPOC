@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { filterMap } from './variables'
 
 export const filterData = (filter, data) => {
@@ -18,4 +19,12 @@ export const getStatisticCount = (type, data) => {
   const filteredData = filterData(type, data)
 
   return filteredData.length
+}
+
+export const todayOnly = (event) => {
+  const eventDate = !event.isDoctorEvent
+    ? moment(event.appointmentDate)
+    : moment(event.eventDate)
+  const today = moment()
+  return today.diff(eventDate, 'days') === 0
 }

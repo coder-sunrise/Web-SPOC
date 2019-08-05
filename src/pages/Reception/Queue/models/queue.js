@@ -70,7 +70,6 @@ export default createListViewModel({
       patientList: [],
       // queueListing: generateRowData().reduce(mergeGenderAndAge, [])
       queueListing: [],
-      visitPatientInfo: {},
       currentFilter: StatusIndicator.ALL,
       error: {
         hasError: false,
@@ -89,6 +88,9 @@ export default createListViewModel({
             })
           },
         },
+      })
+      history.listen((location) => {
+        console.log({ location })
       })
     },
     effects: {
@@ -113,17 +115,19 @@ export default createListViewModel({
       *endSession ({ sessionID }, { call, put }) {
         const response = yield call(service.endSession, sessionID)
         const { status } = response
-        if (status >= 204)
+        console.log({ response })
+        if (status >= 204 && status < 400)
           // end session successfully, reset session info
           yield put({
             type: 'updateSessionInfo',
             payload: { ...InitialSessionInfo },
           })
+
         return status >= 204
       },
       *getSessionInfo (_, { call, put }) {
         const response = yield call(service.getActiveSession)
-        const { data } = response
+        const { status, data } = response
         // data = null when get session failed
 
         if (data && data.totalRecords === 1) {
@@ -144,15 +148,16 @@ export default createListViewModel({
             payload: { ...sessionData[0] },
           })
         }
-
-        return yield put({
-          type: 'toggleError',
-          error: {
-            hasError: true,
-            message:
-              'Failed to get session info. Please contact system Administrator',
-          },
-        })
+        if (status >= 400)
+          return yield put({
+            type: 'toggleError',
+            error: {
+              hasError: true,
+              message:
+                'Failed to get session info. Please contact system Administrator',
+            },
+          })
+        return true
       },
       *fetchQueueListing ({ sessionID, visitStatus }, { call, put }) {
         const filterByStatus = visitStatus
@@ -199,29 +204,6 @@ export default createListViewModel({
           })
         }
       },
-      *fetchPatientInfoByPatientID ({ payload }, { call, put }) {
-        const response = yield call(
-          service.fetchPatientInfoByPatientID,
-          payload.patientID,
-        )
-        return yield put({
-          type: 'updateVisitPatientInfo',
-          payload: {
-            ...response.data,
-          },
-        })
-      },
-      *registerVisitInfo ({ payload }, { call, put }) {
-        const response = yield call(service.registerVisit, payload)
-
-        return yield put({
-          type: 'registerVisit',
-          payload: {},
-          // payload: {
-          //   ...response.data.entities,
-          // },
-        })
-      },
       // *fetchDoctorProfile({ _}, { call, put}){
       //   const reposne = yield call(service.fetchDoctorProfile)
 
@@ -234,18 +216,8 @@ export default createListViewModel({
       toggleError (state, { error = {} }) {
         return { ...state, error: { ...error } }
       },
-      closeVisitModal (state) {
-        return { ...state, showNewVisit: false, visitPatientInfo: {} }
-      },
       updateSessionInfo (state, { payload }) {
         return { ...state, sessionInfo: { ...payload } }
-      },
-      updateVisitPatientInfo (state, { payload }) {
-        return {
-          ...state,
-          visitPatientInfo: { ...payload },
-          showNewVisit: !!payload,
-        }
       },
       updatePatientList (state, { payload }) {
         return {
@@ -258,7 +230,7 @@ export default createListViewModel({
       updateQueueListing (state, { queueListing }) {
         return {
           ...state,
-          queueListing: queueListing.reduce(mergeGenderAndAge, []),
+          queueListing,
         }
       },
       registerVisit (state, { payload }) {

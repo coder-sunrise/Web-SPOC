@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import router from 'umi/router'
+import moment from 'moment'
 // dva
 import { connect } from 'dva'
 // table grid component
@@ -7,12 +8,19 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 // material ui
 import { Tooltip, withStyles } from '@material-ui/core'
 import Pageview from '@material-ui/icons/Pageview'
+import Edit from '@material-ui/icons/Edit'
+import Money from '@material-ui/icons/AttachMoney'
+import Clear from '@material-ui/icons/Clear'
+import Person from '@material-ui/icons/Person'
+import Book from '@material-ui/icons/LibraryBooks'
+import Play from '@material-ui/icons/PlayArrow'
 // custom components
-import { CommonTableGrid } from '@/components'
-import GridButton from './GridButton'
+import { CommonTableGrid, DateFormatter } from '@/components'
+// import GridButton from './GridButton'
+import { GridContextMenuButton as GridButton } from 'medisys-components'
 import AppointmentActionButton from './AppointmentActionButton'
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
-import { filterData, filterDoctorBlock } from '../utils'
+import { filterData, filterDoctorBlock, todayOnly } from '../utils'
 import { StatusIndicator } from '../variables'
 // assets
 import { tooltip } from '@/assets/jss/index'
@@ -78,8 +86,66 @@ const TableConfig = {
     { columnName: 'Action', width: 100, align: 'center' },
     { columnName: 'timeIn', width: 160, type: 'time' },
     { columnName: 'timeOut', width: 160, type: 'time' },
+    {
+      columnName: 'gender/age',
+      render: (row) =>
+        row.gender && row.age ? `${row.gender}/${row.age}` : '',
+      sortBy: 'genderFK',
+    },
+    {
+      columnName: 'appointmentTime',
+      width: 160,
+      render: (row) => {
+        if (row.appointmentTime) {
+          return DateFormatter({ value: row.appointmentTime, full: true })
+        }
+        if (row.start) return DateFormatter({ value: row.start, full: true })
+        return ''
+      },
+    },
   ],
 }
+
+const ContextMenuOptions = [
+  {
+    id: 0,
+    label: 'Edit Visit',
+    Icon: Edit,
+    disabled: false,
+  },
+  {
+    id: 1,
+    label: 'Dispense & Bill',
+    Icon: Money,
+    disabled: false,
+  },
+  {
+    id: 2,
+    label: 'Delete Visit',
+    Icon: Clear,
+    disabled: true,
+  },
+  { isDivider: true },
+  {
+    id: 3,
+    label: 'Patient Profile',
+    Icon: Person,
+    disabled: true,
+  },
+  {
+    id: 4,
+    label: 'Patient Dashboard',
+    Icon: Book,
+    disabled: false,
+  },
+  { isDivider: true },
+  {
+    id: 5,
+    label: 'Start Consultation',
+    Icon: Play,
+    disabled: false,
+  },
+]
 
 @connect(({ queueLog, calendar }) => ({ queueLog, calendar }))
 class DetailsGrid extends PureComponent {
@@ -97,14 +163,16 @@ class DetailsGrid extends PureComponent {
     router.push(href)
   }
 
-  onEditVisitClick = (queue) => {}
-
-  onViewPatientDashboardClick = (row, id) => {
+  onContextButtonClick = (row, id) => {
     switch (id) {
+      case '0':
+        this.props.handleEditVisitClick({
+          visitID: row.id,
+        })
+        break
       case '1':
         router.push(`/reception/queue/dispense/${row.visitRefNo}`)
         break
-      case '0':
       case '2':
       case '3':
         break
@@ -136,7 +204,7 @@ class DetailsGrid extends PureComponent {
                 <AppointmentActionButton
                   row={tableProps.row}
                   Icon={<Pageview />}
-                  onClick={this.onViewPatientDashboardClick}
+                  onClick={this.onContextButtonClick}
                 />
               </div>
             </Tooltip>
@@ -154,8 +222,8 @@ class DetailsGrid extends PureComponent {
             <div style={{ display: 'inline-block' }}>
               <GridButton
                 row={tableProps.row}
-                Icon={<Pageview />}
-                onClick={this.onViewPatientDashboardClick}
+                onClick={this.onContextButtonClick}
+                contextMenuOptions={ContextMenuOptions}
               />
             </div>
           </Tooltip>
@@ -178,11 +246,10 @@ class DetailsGrid extends PureComponent {
     const { currentFilter, queueListing } = queueLog
     const { calendarEvents } = calendar
 
-    const flattenedCalendarData = calendarEvents.reduce(
-      flattenAppointmentDateToCalendarEvents,
-      [],
-    )
-    console.log({ queueListing })
+    const flattenedCalendarData = calendarEvents
+      .reduce(flattenAppointmentDateToCalendarEvents, [])
+      .filter(todayOnly)
+
     const data =
       currentFilter === StatusIndicator.APPOINTMENT
         ? filterDoctorBlock(flattenedCalendarData)

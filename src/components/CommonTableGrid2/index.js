@@ -135,7 +135,7 @@ let gridId = 0
 @connect(({ loading, global }) => {
   return { loading, global }
 })
-class CommonTableGrid extends React.Component {
+class CommonTableGrid2 extends React.Component {
   state = {
     pagination: {
       current: 1,
@@ -862,7 +862,7 @@ class CommonTableGrid extends React.Component {
     )
   }
 }
-CommonTableGrid.propTypes = {
+CommonTableGrid2.propTypes = {
   // required
   rows: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
@@ -902,6 +902,6 @@ CommonTableGrid.propTypes = {
 }
 
 export default withStyles(styles, {
-  name: 'CommonTableGrid',
+  name: 'CommonTableGrid2',
   withTheme: true,
-})(CommonTableGrid)
+})(CommonTableGrid2)

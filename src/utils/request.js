@@ -69,13 +69,19 @@ const showErrorNotification = (header, message) => {
   })
 }
 
-export const axiosRequest = async (url, option) => {
+export const axiosRequest = async (
+  url,
+  options = { contentType: undefined },
+) => {
   let result = {}
   try {
     const token = localStorage.getItem('token')
+    const defaultContentType = 'application/json'
+    const { contentType, ...option } = options
     const headerConfig = {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type':
+          contentType !== undefined ? contentType : defaultContentType,
         Authorization: `Bearer ${token}`,
       },
     }
@@ -88,6 +94,7 @@ export const axiosRequest = async (url, option) => {
     }).then((response) => {
       const { data, status } = response
       console.log('axios response', response)
+
       if (status >= 200 && status < 300) {
         const { data: nestedData } = data
         return { status, data: nestedData !== undefined ? nestedData : data }
@@ -110,8 +117,16 @@ export const axiosRequest = async (url, option) => {
     } = response
 
     status === 401
-      ? showErrorNotification('', statusText)
+      ? showErrorNotification('', 'Session Expired')
       : showErrorNotification('', data.message)
+
+    if (status === 401 && !localStorage.getItem('debug')) {
+      /* eslint-disable no-underscore-dangle */
+      window.g_app._store.dispatch({
+        type: 'login/logout',
+      })
+      return false
+    }
 
     return response
   }
@@ -125,7 +140,11 @@ export const axiosRequest = async (url, option) => {
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request (url, option) {
+export default function request (
+  url,
+  option,
+  { contentType } = { contentType: undefined },
+) {
   const options = {
     expirys: true,
     ...option,
@@ -207,8 +226,6 @@ export default function request (url, option) {
   }
   // console.log(newOptions)
   try {
-    caches.open('test').then((cache) => {})
-
     let r = $.when(
       $.ajax({
         timeout: 20000,
@@ -219,14 +236,12 @@ export default function request (url, option) {
         cache: true,
         data: newOptions.data || newOptions.body,
         beforeSend: (xhr /* , settings */) => {
-          // if (localStorage.getItem('accessToken')) {
-
-          // }
+          const defaultContentType = 'application/json; charset=utf-8'
           xhr.setRequestHeader('Authorization', `Bearer ${token}`)
           xhr.setRequestHeader('Accept', 'application/json')
           xhr.setRequestHeader(
             'Content-Type',
-            'application/json; charset=utf-8',
+            contentType !== undefined ? contentType : defaultContentType,
           )
         },
       }),

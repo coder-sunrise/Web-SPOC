@@ -9,8 +9,9 @@ import { Button } from '@/components'
 // styling
 import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
 // variables
+import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
 import { StatusIndicator } from '../variables'
-import { getStatisticCount } from '../utils'
+import { getStatisticCount, todayOnly } from '../utils'
 
 const StatisticStyles = () => ({
   container: {
@@ -39,7 +40,7 @@ const StatisticStyles = () => ({
   status: { padding: '0px 10px', margin: '5px 0px', fontWeight: 400 },
 })
 
-@connect(({ queueLog }) => ({ queueLog }))
+@connect(({ queueLog, calendar }) => ({ queueLog, calendar }))
 class StatisticIndicator extends PureComponent {
   onButtonClick = (event) => {
     const { dispatch } = this.props
@@ -52,14 +53,23 @@ class StatisticIndicator extends PureComponent {
   }
 
   render () {
-    const { classes, queueLog: { currentFilter, queueListing } } = this.props
+    const {
+      classes,
+      calendar,
+      queueLog: { currentFilter, queueListing },
+    } = this.props
+    const { calendarEvents } = calendar
+
+    const flattenedCalendarData = calendarEvents
+      .reduce(flattenAppointmentDateToCalendarEvents, [])
+      .filter(todayOnly)
 
     const statistic = {
       all: getStatisticCount(StatusIndicator.ALL, queueListing),
-      appointment: getStatisticCount(StatusIndicator.APPOINTMENT, queueListing),
       waiting: getStatisticCount(StatusIndicator.WAITING, queueListing),
       inProgress: getStatisticCount(StatusIndicator.IN_PROGRESS, queueListing),
       completed: getStatisticCount(StatusIndicator.COMPLETED, queueListing),
+      appointment: flattenedCalendarData.length,
     }
 
     return (

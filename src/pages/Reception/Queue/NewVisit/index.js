@@ -1,30 +1,34 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import moment from 'moment'
-// formik
-import { withFormik } from 'formik'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { CircularProgress, withStyles } from '@material-ui/core'
 // custom component
-import { Button, GridContainer, GridItem } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  SizeContainer,
+  withFormikExtend,
+} from '@/components'
+import Loading from '@/components/PageLoading/index'
 // Sub-components
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
-import SchemesCard from './SchemesCard'
 import ReferralCard from './ReferralCard'
-import ParticipantCard from './ParticipantCard'
+// import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
 // services
-import { fetchDoctorProfile } from '../services'
+import { uploadFile } from '@/services/file'
 
 const styles = (theme) => ({
   gridContainer: {
     marginBottom: theme.spacing.unit * 2,
   },
   formContent: {
-    padding: `0px ${32}px !important`,
+    minHeight: '50vh',
+    maxHeight: '80vh',
+    overflow: 'auto',
   },
   cardContent: {
     padding: `0px ${16}px !important`,
@@ -39,41 +43,107 @@ const styles = (theme) => ({
   hide: {
     display: 'none',
   },
-  patientInfo: {
-    marginTop: '20px',
+  loadingIndicator: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    width: '100%',
+    minHeight: '50vh',
+    '& > p': {
+      fontSize: '1.1rem',
+    },
   },
 })
 
-@connect(({ queueLog }) => ({ queueLog }))
-@withFormik({
+const uploadFiles = async (file, index) => {
+  const response = await uploadFile(file)
+  const { id, fileName } = response
+  if (id && fileName)
+    return {
+      fileIndexFK: id,
+      fileName,
+      sortOrder: index,
+      attachmentType: file.attachmentType,
+    }
+  return {}
+}
+
+@connect(({ queueLog, loading, visitRegistration }) => ({
+  queueLog,
+  loading,
+  visitRegistration,
+}))
+@withFormikExtend({
+  displayName: 'VisitRegistration',
   enableReinitialize: true,
   validationSchema: VisitValidationSchema,
-  mapPropsToValues: ({ queueLog }) => {
-    const nextQueueNo = queueLog.queueListing.length + 1
+  mapPropsToValues: ({ queueLog, visitRegistration }) => {
+    let qNo =
+      queueLog && queueLog.queueListing ? queueLog.queueListing.length + 1 : 1
+    const { visitInfo } = visitRegistration
+    if (Object.keys(visitInfo).length > 0) {
+      qNo = visitInfo.queueNo
+    }
+    const { visit = {} } = visitInfo
+
+    const visitEntries = Object.keys(visit).reduce(
+      (entries, key) => ({
+        ...entries,
+        [key]: visit[key] === null ? undefined : visit[key],
+      }),
+      {},
+    )
+
     return {
-      [FormFieldName['visit.queueNo']]: nextQueueNo,
+      queueNo: qNo,
+      ...visitEntries,
     }
   },
-  handleSubmit: (values, { props, setSubmitting }) => {
-    const { queueNo, ...restValues } = values
-    const { dispatch, queueLog, onConfirm } = props
-    const { sessionInfo, visitPatientInfo } = queueLog
-    const visitID = sessionInfo.id
+  handleSubmit: async (values, { props, setSubmitting }) => {
+    const { queueNo, visitAttachment, ...restValues } = values
+    const { dispatch, queueLog, visitRegistration, onConfirm } = props
 
-    const visitReferenceNo = `${sessionInfo.sessionNo}-${parseFloat(
-      visitID,
-    ).toFixed(1)}`
+    const { sessionInfo } = queueLog
+    const {
+      visitInfo: { id = undefined, visit, ...restVisitInfo },
+      patientInfo,
+    } = visitRegistration
+    const bizSessionFK = sessionInfo.id
 
-    const patientProfileFK = visitPatientInfo.id
+    const visitReferenceNo = `${sessionInfo.sessionNo}-${parseFloat(id).toFixed(
+      1,
+    )}`
 
+    const patientProfileFK = patientInfo.id
+
+    let uploaded = []
+    if (visitAttachment) {
+      uploaded = await Promise.all(
+        visitAttachment
+          .filter((attachment) => {
+            if (attachment.id !== undefined) return true
+            if (attachment._tempID !== undefined && attachment.isDeleted)
+              return false
+            return true
+          })
+          .map(
+            (fileObject, index) =>
+              fileObject.id ? fileObject : uploadFiles(fileObject, index),
+          ),
+      )
+    }
     const payload = {
+      id,
+      ...restVisitInfo,
       queueNo,
       queueNoPrefix: sessionInfo.sessionNoPrefix,
       visit: {
+        visitAttachment: uploaded,
         patientProfileFK,
-        bizSessionFK: visitID,
-        visitPurposeFK: 1,
+        bizSessionFK,
         visitReferenceNo,
+        // visitPurposeFK: 1,
         // doctorProfileFK: null,
         // plannedVisitFK: null,
         // counterFK: null,
@@ -98,26 +168,24 @@ const styles = (theme) => ({
         referralPerson: null,
         referralDate: null,
         ...restValues,
+        // ...restValues,
       },
     }
-    console.log({ visitDate: new Date() })
+
+    const type =
+      id === undefined
+        ? 'visitRegistration/registerVisitInfo'
+        : 'visitRegistration/saveVisitInfo'
     dispatch({
-      type: 'queueLog/registerVisitInfo',
+      type,
       payload,
+    }).then((response) => {
+      setSubmitting(false)
+      return response && onConfirm()
     })
-    setSubmitting(false)
-    onConfirm()
   },
 })
 class NewVisit extends PureComponent {
-  getAge = () => {
-    const { visitPatientInfo } = this.props
-    const { dateOfBirth } = visitPatientInfo
-
-    const age = moment().diff(dateOfBirth, 'years')
-    return age
-  }
-
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
     const { setFieldValue, setFieldTouched } = this.props
@@ -130,38 +198,79 @@ class NewVisit extends PureComponent {
     }
   }
 
+  updateAttachmens = ({ added, deleted }) => {
+    const { values: { visitAttachment = [] }, setFieldValue } = this.props
+    let updated = [
+      ...visitAttachment,
+    ]
+    if (added)
+      updated = [
+        ...updated,
+        ...added,
+      ]
+
+    if (deleted)
+      updated = updated.map((attachment) => {
+        const uploaded = attachment.id !== undefined
+
+        if (uploaded && attachment.id === deleted)
+          return { ...attachment, isDeleted: true }
+
+        if (attachment._tempID === deleted) {
+          return { ...attachment, isDeleted: true }
+        }
+
+        return { ...attachment }
+      })
+    setFieldValue('visitAttachment', updated)
+  }
+
   render () {
     const {
       classes,
+      footer,
       handleSubmit,
-      isValidating,
-      isSubmitting,
+      loading,
+      visitRegistration: { visitInfo },
+      setFieldValue,
       values,
     } = this.props
-
+    const isEdit = Object.keys(visitInfo).length > 0
+    const fetchingVisitInfo =
+      loading.effects['visitRegistration/fetchVisitInfo']
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>
-          <GridItem xs sm={12} md={3} className={classes.patientInfo}>
+          <GridItem xs sm={12} md={3}>
             <PatientInfoCard />
           </GridItem>
           <GridItem container xs md={9} className={classes.formContent}>
-            <GridItem xs md={12} container className={classes.row}>
-              <GridItem xs d={6} className={classes.cardContent}>
-                <VisitInfoCard />
-              </GridItem>
-              <GridItem xs md={6} className={classes.cardContent}>
-                <VitalSignCard handleCalculateBMI={this.calculateBMI} />
-              </GridItem>
-            </GridItem>
-            <GridItem xs md={12} container className={classes.row}>
-              <GridItem xs md={6} className={classes.cardContent}>
-                <SchemesCard />
-              </GridItem>
-              <GridItem xs md={6} className={classes.cardContent}>
-                <ReferralCard />
-              </GridItem>
-            </GridItem>
+            {fetchingVisitInfo ? (
+              <div className={classes.loadingIndicator}>
+                <CircularProgress />
+                <p>Loading visit info...</p>
+              </div>
+            ) : (
+              <SizeContainer size='sm'>
+                <React.Fragment>
+                  <GridItem xs md={12} className={classes.row}>
+                    <VisitInfoCard
+                      handleUpdateAttachments={this.updateAttachmens}
+                      attachments={values.visitAttachment}
+                    />
+                  </GridItem>
+                  <GridItem xs md={12} className={classes.row}>
+                    <VitalSignCard handleCalculateBMI={this.calculateBMI} />
+                  </GridItem>
+                  <GridItem xs md={12} className={classes.row}>
+                    <ReferralCard
+                      handleUpdateAttachments={this.updateAttachmens}
+                      attachments={values.visitAttachment}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              </SizeContainer>
+            )}
             {/*
               <GridItem xs md={12} container>
                 <GridItem xs md={12} className={classes.cardContent}>
@@ -169,24 +278,13 @@ class NewVisit extends PureComponent {
                 </GridItem>
               </GridItem>
             */}
-
-            <GridItem
-              container
-              justify='flex-end'
-              className={classes.footerContent}
-            >
-              <Button
-                color='primary'
-                disabled={isSubmitting || isValidating}
-                onClick={handleSubmit}
-              >
-                {!isSubmitting && !isValidating && <span>Register Visit</span>}
-                {isSubmitting && <span>Submitting...</span>}
-                {isValidating && <span>Validating...</span>}
-              </Button>
-            </GridItem>
           </GridItem>
         </GridContainer>
+        {footer &&
+          footer({
+            confirmBtnText: isEdit ? 'Save' : 'Register visit',
+            onConfirm: handleSubmit,
+          })}
       </React.Fragment>
     )
   }

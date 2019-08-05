@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react'
+import router from 'umi/router'
 import { connect } from 'dva'
 import qs from 'query-string'
 import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { ChangePassword } from 'medisys-components'
+import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
 
@@ -125,38 +127,24 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
-          open={global.showSessionTimeout}
-          title='Session Timeout'
-          maxWidth='sm'
-          onClose={(e) => {
-            clearTimeout(this._timer)
+          open={global.showVisitRegistration}
+          title='Visit Registration'
+          overrideLoading
+          onClose={() => {
             dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                showSessionTimeout: false,
-              },
+              type: 'visitRegistration/closeModal',
             })
           }}
           onConfirm={() => {
-            this.props.dispatch({
-              type: 'login/logout',
+            dispatch({
+              type: 'visitRegistration/closeModal',
             })
           }}
-          showFooter
+          maxWidth='lg'
+          observe='VisitRegistration'
         >
-          <div
-            style={{
-              textAlign: 'center',
-              minHeight: 100,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            Your session will be disconnected in 1 minutes
-          </div>
+          <VisitRegistration />
         </CommonModal>
-
         <CommonModal
           open={global.openConfirm}
           title={global.openConfirmTitle}

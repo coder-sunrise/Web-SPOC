@@ -114,6 +114,7 @@ export default class BaseCRUDViewModel {
           ...filter,
           // queryExcludeFields: list.exclude || exclude,
         }
+        // console.log({ filter })
         const response = yield call(service[queryFnName], filter)
         // console.log(response)
         const { data, status, message } = response

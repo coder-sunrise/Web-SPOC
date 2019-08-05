@@ -66,9 +66,6 @@ const routes = [
             name: 'appointment',
             mini: 'AP',
             component: './Reception/BigCalendar',
-            authority: [
-              'tester',
-            ],
           },
           {
             hideInMenu: true,
@@ -458,6 +455,12 @@ const routes = [
             name: 'Scribble',
             mini: 'CA',
             component: './Development/Scribble',
+          },
+          {
+            path: '/development/reportviewer',
+            name: 'Report Sample',
+            mini: 'RS',
+            component: './Development/Report',
           },
         ],
       },

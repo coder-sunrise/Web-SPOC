@@ -9,7 +9,7 @@ import {
   Button,
   CardContainer,
   CommonModal,
-  CommonTableGrid2,
+  CommonTableGrid,
   GridContainer,
   GridItem,
   TextField,
@@ -92,7 +92,7 @@ class UserRole extends React.Component {
             </Button>
           </GridItem>
           <GridItem md={12}>
-            <CommonTableGrid2
+            <CommonTableGrid
               rows={dummyData}
               {...UserRoleTableConfig}
               ActionProps={ActionProps}

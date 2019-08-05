@@ -12,7 +12,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   CardContainer,
-  CommonTableGrid2,
+  CommonTableGrid,
   CommonModal,
   GridContainer,
   GridItem,
@@ -38,6 +38,19 @@ const styles = (theme) => ({
   }),
 })
 class UserProfile extends React.Component {
+  state = {
+    gridConfig: {
+      ...UserProfileTableConfig,
+      columnExtensions: [
+        ...UserProfileTableConfig.columnExtensions,
+        {
+          columnName: 'action',
+          render: this.Cell,
+        },
+      ],
+    },
+  }
+
   componentDidMount = () => {
     this.props.dispatch({
       type: 'settingUserProfile/query',
@@ -58,7 +71,8 @@ class UserProfile extends React.Component {
     })
   }
 
-  Cell = ({ column, row, classes, ...props }) => {
+  Cell = ({ column, row, ...props }) => {
+    console.log({ column, row, props })
     if (column.name.toUpperCase() === 'ACTION') {
       return (
         <Table.Cell {...props}>
@@ -120,7 +134,6 @@ class UserProfile extends React.Component {
 
   onConfirmClick = (values) => {
     const { dispatch } = this.props
-    console.log({ values, props: this.props })
     dispatch({
       type: 'settingUserProfile/upsert',
       payload: { ...values },
@@ -134,8 +147,6 @@ class UserProfile extends React.Component {
       showUserProfileModal,
       currentSelectedUser,
     } = settingUserProfile
-
-    const ActionProps = { TableCellComponent: this.TableCell }
 
     return (
       <CardContainer hideHeader>
@@ -172,11 +183,7 @@ class UserProfile extends React.Component {
             </Button>
           </GridItem>
           <GridItem md={12}>
-            <CommonTableGrid2
-              {...UserProfileTableConfig}
-              ActionProps={ActionProps}
-              rows={list}
-            />
+            <CommonTableGrid rows={list} {...this.state.gridConfig} />
           </GridItem>
         </GridContainer>
         <CommonModal

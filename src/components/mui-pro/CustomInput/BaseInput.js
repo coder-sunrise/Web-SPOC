@@ -48,7 +48,6 @@ class BaseInput extends React.PureComponent {
   // }
 
   _onKeyUp = (e) => {
-    // console.log('_onKeyUp')
     // console.log(e.target.tagName==='TEXTAREA')
     if (this.props.preventDefaultKeyDownEvent) return
     if (e.target.tagName === 'TEXTAREA') return

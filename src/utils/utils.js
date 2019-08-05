@@ -545,6 +545,7 @@ const confirmBeforeReload = (e) => {
 }
 
 const navigateDirtyCheck = (itemPath) => (e) => {
+  console.log({ itemPath, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',

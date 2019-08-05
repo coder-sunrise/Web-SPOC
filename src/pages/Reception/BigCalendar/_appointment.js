@@ -32,7 +32,8 @@ const appointmentDate = [
   new Date(now.getFullYear(), now.getMonth(), 10),
   new Date(now.getFullYear(), now.getMonth(), 15),
   new Date(now.getFullYear(), now.getMonth(), 20),
-  new Date(now.getFullYear(), now.getMonth(), 25),
+  // new Date(now.getFullYear(), now.getMonth(), 25),
+  new Date(now.getFullYear(), now.getMonth(), now.getDate()),
 ]
 const doctorBlockDate = [
   new Date(now.getFullYear(), now.getMonth(), 4),
@@ -141,8 +142,22 @@ const appointmentResources = {
   4: [
     {
       id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 25, 7, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 25, 11, 30, 0),
+      start: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        7,
+        30,
+        0,
+      ),
+      end: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        11,
+        30,
+        0,
+      ),
       doctor: 'medisys',
       resourceId: '0',
       appointmentType: AppointmentTypeOptions[5].value,
@@ -150,29 +165,15 @@ const appointmentResources = {
     },
     {
       id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 25, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 25, 15, 0, 0),
-      doctor: 'medisys',
-      resourceId: '0',
-      appointmentType: AppointmentTypeOptions[4].value,
-
-      series: true,
-      draft: true,
-    },
-    // test
-    {
-      id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 26, 7, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
-      doctor: 'medisys',
-      resourceId: '0',
-      appointmentType: AppointmentTypeOptions[5].value,
-      // color: AppointmentTypeOptions[5].color,
-    },
-    {
-      id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 26, 15, 0, 0),
+      start: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        11,
+        30,
+        0,
+      ),
+      end: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0),
       doctor: 'medisys',
       resourceId: '0',
       appointmentType: AppointmentTypeOptions[4].value,
@@ -182,68 +183,18 @@ const appointmentResources = {
     },
     {
       id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 26, 15, 0, 0),
+      start: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        11,
+        30,
+        0,
+      ),
+      end: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 0, 0),
       doctor: 'medisys',
       resourceId: '0',
       appointmentType: AppointmentTypeOptions[4].value,
-
-      series: true,
-      draft: true,
-    },
-    {
-      id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 26, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 26, 15, 0, 0),
-      doctor: 'medisys',
-      resourceId: '0',
-      appointmentType: AppointmentTypeOptions[4].value,
-
-      series: true,
-      draft: true,
-    },
-
-    {
-      id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
-      doctor: 'medisys',
-      resourceId: '0',
-      appointmentType: AppointmentTypeOptions[4].value,
-
-      series: true,
-      draft: true,
-    },
-    {
-      id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
-      doctor: 'medisys',
-      resourceId: '0',
-      appointmentType: AppointmentTypeOptions[4].value,
-
-      series: true,
-      draft: true,
-    },
-    {
-      id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
-      doctor: 'medisys',
-      resourceId: '0',
-      appointmentType: AppointmentTypeOptions[4].value,
-
-      series: true,
-      draft: true,
-    },
-    {
-      id: getUniqueGUID(),
-      start: new Date(now.getFullYear(), now.getMonth(), 12, 11, 30, 0),
-      end: new Date(now.getFullYear(), now.getMonth(), 12, 15, 0, 0),
-      doctor: 'medisys',
-      resourceId: '0',
-      appointmentType: AppointmentTypeOptions[4].value,
-
       series: true,
       draft: true,
     },

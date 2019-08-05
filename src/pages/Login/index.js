@@ -32,8 +32,9 @@ class LoginPage extends PureComponent {
     })
       .then((props) => {
         const { payload } = props
-        // const { application } = payload
-        payload.status === 200 && router.push('/')
+        const validLogin = payload.access_token !== undefined
+
+        validLogin && router.push('/')
       })
       .catch((error) => {
         console.log('error', error)

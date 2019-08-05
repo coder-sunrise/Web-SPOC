@@ -60,9 +60,9 @@ const GridContextMenuButton = ({
   const MenuItemsOverlay = (
     <Menu>
       {contextMenuOptions.map(
-        ({ disabled, label, Icon, id, isDivider }) =>
+        ({ disabled, label, Icon, id, isDivider }, index) =>
           isDivider ? (
-            <Menu.Divider />
+            <Menu.Divider key={`divider-${index}`} />
           ) : (
             <Menu.Item key={id} disabled={disabled}>
               <MenuButton

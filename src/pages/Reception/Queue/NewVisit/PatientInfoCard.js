@@ -2,121 +2,113 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import classNames from 'classnames'
 import moment from 'moment'
-// antd
-import { Spin } from 'antd'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { Divider, CircularProgress, withStyles } from '@material-ui/core'
 // custom components
-import { Card, CardAvatar, CardBody } from '@/components'
+import { CardContainer } from '@/components'
+// sub components
+import SchemesCard from './SchemesCard'
 // assets
 import avatar from '@/assets/img/faces/marc.jpg'
 // service
 import { getCodes } from '@/utils/codes'
 
-const styles = () => ({})
+const styles = (theme) => ({
+  container: {
+    minHeight: '30vh',
+  },
+  patientInfoContainer: {
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    '& > h5': {
+      marginBottom: theme.spacing(1),
+    },
+  },
+  patientName: {
+    fontWeight: 500,
+  },
+})
 
-@connect(({ queueLog, loading }) => ({ queueLog, loading }))
+@connect(({ visitRegistration, loading }) => ({ visitRegistration, loading }))
 class PatientInfoCard extends PureComponent {
   state = {
     ctGender: [],
+    ctNationality: [],
   }
 
   componentDidMount () {
-    // TODO: enhance this part to store codetable and keep track of updating date
-    // getCodes('Nationality')
-    //   .then((response) => {
-    //     if (!response && !response.data) return
-    //     const data = [
-    //       ...response.data.Nationality,
-    //     ]
-    //     localStorage.setItem('CT_Nationality', JSON.stringify(data))
-    //   })
-    //   .catch((error) => {
-    //     console.log('error occured', error)
-    //   })
-    getCodes('ctgender')
-      .then((response) => {
-        if (!response && !response.data) return
-        const data = [
-          ...response,
-        ]
-        this.setState({ ctGender: data })
+    this.fetchCodes()
+  }
+
+  fetchCodes = async () => {
+    try {
+      const nationality = await getCodes('ctnationality')
+
+      const gender = await getCodes('ctgender')
+
+      this.setState({
+        ctGender: gender,
+        ctNationality: nationality,
       })
-      .catch((error) => {
-        console.log('error occured', error)
-      })
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   getAge = () => {
-    const { queueLog } = this.props
-    const { dob } = queueLog.visitPatientInfo
+    const { visitRegistration } = this.props
+    const { dob } = visitRegistration.patientInfo
 
     const age = moment().diff(dob, 'years')
     return age
   }
 
   getNationality = () => {
-    const { queueLog } = this.props
-    const { nationalityFK } = queueLog.visitPatientInfo
-
-    if (!nationalityFK || localStorage.getItem('CT_Nationality') === null)
-      return ''
-
-    const nationalities = JSON.parse(localStorage.getItem('CT_Nationality'))
-    const nationality = nationalities.find((item) => item.id === nationalityFK)
-
+    const { ctNationality } = this.state
+    const { visitRegistration } = this.props
+    const { nationalityFK } = visitRegistration.patientInfo
+    const nationality = ctNationality.find((item) => item.id === nationalityFK)
     return nationality ? nationality.name : ''
   }
 
   getGender = () => {
     const { ctGender } = this.state
-    const { queueLog } = this.props
-    const { genderFK } = queueLog.visitPatientInfo
-    console.log({ info: queueLog.visitPatientInfo })
+    const { visitRegistration } = this.props
+    const { genderFK } = visitRegistration.patientInfo
     const gender = ctGender.find((item) => item.id === genderFK)
-    console.log({ gender, ctGender })
-    if (gender) return gender.name
-
-    return ''
+    return gender ? gender.name : ''
   }
 
   render () {
-    const { classes, queueLog, loading } = this.props
+    const { classes, visitRegistration, loading } = this.props
     const {
       name,
       patientAccountNo,
       patientReferenceNo,
       dob,
-      gender,
-    } = queueLog.visitPatientInfo
+    } = visitRegistration.patientInfo
+
     return (
-      <Card size='sm' profile>
-        {loading.effects['queueLog/fetchPatientInfoByPatientID'] ? (
-          <Spin className='centerredLoading' />
+      <CardContainer hideHeader size='sm' className={classes.container}>
+        {loading.effects['visitRegistration/fetchPatientInfoByPatientID'] ? (
+          <CircularProgress className='centerredLoading' />
         ) : (
           <React.Fragment>
-            <CardAvatar profile>
-              <img src={avatar} alt='...' />
-            </CardAvatar>
-            <CardBody profile>
-              <React.Fragment>
-                <h4 className={classNames(classes.cardTitle)}>{name}</h4>
-                <h5 className={classNames(classes.cardCategory)}>
-                  {`${patientReferenceNo}`}
-                </h5>
-                <h5 className={classNames(classes.cardCategory)}>
-                  {`${patientAccountNo}, ${this.getNationality()}`}
-                </h5>
-                <h5>
-                  {`${moment(dob).format(
-                    'DD-MMM-YYYY',
-                  )}, (${this.getAge()}, ${this.getGender()})`}
-                </h5>
-              </React.Fragment>
-            </CardBody>
+            <div className={classes.patientInfoContainer}>
+              <h4 className={classNames(classes.patientName)}>{name}</h4>
+              <h5>{`${patientReferenceNo}`}</h5>
+              <h5>{`${patientAccountNo}, ${this.getNationality()}`}</h5>
+              <h5>
+                {`${moment(dob).format(
+                  'DD-MMM-YYYY',
+                )}, (${this.getAge()}, ${this.getGender()})`}
+              </h5>
+            </div>
+            <Divider light />
+            <SchemesCard />
           </React.Fragment>
         )}
-      </Card>
+      </CardContainer>
     )
   }
 }

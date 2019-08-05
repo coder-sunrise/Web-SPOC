@@ -1,6 +1,6 @@
 export default {
   'visit.queueNo': 'queueNo',
-  'visit.visitType': 'visitType',
+  'visit.visitType': 'visitPurposeFK',
   'visit.doctorProfileFk': 'doctorProfileFK',
   'visit.visitRemarks': 'visitRemarks',
 
