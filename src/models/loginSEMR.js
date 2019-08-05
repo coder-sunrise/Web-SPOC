@@ -35,18 +35,19 @@ export default createFormViewModel({
     },
     reducers: {
       updateLoginStatus (state, { payload }) {
-        const isInvalidLogin = payload.status !== 200
-        if (!isInvalidLogin) {
-          const { data, application } = payload
-          localStorage.setItem('token', data.access_token)
-          localStorage.setItem('application', application)
+        const isValidLogin =
+          payload.status === 200 || payload.access_token !== undefined
+        if (isValidLogin) {
+          // eslint-disable-next-line camelcase
+          const { access_token } = payload
+          localStorage.setItem('token', access_token)
 
           const cookies = new Cookies()
           cookies.set('_lastLogin', new Date(), {
             expires: new Date(9999, 11, 31),
           })
         }
-        return { ...state, isInvalidLogin }
+        return { ...state, isInvalidLogin: !isValidLogin }
       },
     },
   },

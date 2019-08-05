@@ -115,8 +115,8 @@ export default createFormViewModel({
       },
       *saveVisitInfo ({ payload }, { call }) {
         const response = yield call(service.saveVisit, payload)
-        console.log({ response })
-        return false
+        const { status = -1 } = response
+        return status >= 200 || status < 300
       },
       reducers: {},
     },

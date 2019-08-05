@@ -18,6 +18,8 @@ import ReferralCard from './ReferralCard'
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
+// services
+import { uploadFile } from '@/services/file'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -54,6 +56,19 @@ const styles = (theme) => ({
   },
 })
 
+const uploadFiles = async (file, index) => {
+  const response = await uploadFile(file)
+  const { id, fileName } = response
+  if (id && fileName)
+    return {
+      fileIndexFK: id,
+      fileName,
+      sortOrder: index,
+      attachmentType: file.attachmentType,
+    }
+  return {}
+}
+
 @connect(({ queueLog, loading, visitRegistration }) => ({
   queueLog,
   loading,
@@ -72,17 +87,28 @@ const styles = (theme) => ({
     }
     const { visit = {} } = visitInfo
 
+    const visitEntries = Object.keys(visit).reduce(
+      (entries, key) => ({
+        ...entries,
+        [key]: visit[key] === null ? undefined : visit[key],
+      }),
+      {},
+    )
+
     return {
       queueNo: qNo,
-      ...visit,
+      ...visitEntries,
     }
   },
-  handleSubmit: (values, { props, setSubmitting }) => {
-    const { queueNo, ...restValues } = values
+  handleSubmit: async (values, { props, setSubmitting }) => {
+    const { queueNo, visitAttachment, ...restValues } = values
     const { dispatch, queueLog, visitRegistration, onConfirm } = props
 
     const { sessionInfo } = queueLog
-    const { visitInfo: { id = undefined }, patientInfo } = visitRegistration
+    const {
+      visitInfo: { id = undefined, visit, ...restVisitInfo },
+      patientInfo,
+    } = visitRegistration
     const bizSessionFK = sessionInfo.id
 
     const visitReferenceNo = `${sessionInfo.sessionNo}-${parseFloat(id).toFixed(
@@ -91,11 +117,29 @@ const styles = (theme) => ({
 
     const patientProfileFK = patientInfo.id
 
+    let uploaded = []
+    if (visitAttachment) {
+      uploaded = await Promise.all(
+        visitAttachment
+          .filter((attachment) => {
+            if (attachment.id !== undefined) return true
+            if (attachment._tempID !== undefined && attachment.isDeleted)
+              return false
+            return true
+          })
+          .map(
+            (fileObject, index) =>
+              fileObject.id ? fileObject : uploadFiles(fileObject, index),
+          ),
+      )
+    }
     const payload = {
-      visitID: id,
+      id,
+      ...restVisitInfo,
       queueNo,
       queueNoPrefix: sessionInfo.sessionNoPrefix,
       visit: {
+        visitAttachment: uploaded,
         patientProfileFK,
         bizSessionFK,
         visitReferenceNo,
@@ -124,6 +168,7 @@ const styles = (theme) => ({
         referralPerson: null,
         referralDate: null,
         ...restValues,
+        // ...restValues,
       },
     }
 
@@ -131,14 +176,13 @@ const styles = (theme) => ({
       id === undefined
         ? 'visitRegistration/registerVisitInfo'
         : 'visitRegistration/saveVisitInfo'
-
     dispatch({
       type,
       payload,
     }).then((response) => {
       setSubmitting(false)
       console.log({ response })
-      response && onConfirm()
+      return response && onConfirm()
     })
   },
 })
@@ -155,6 +199,33 @@ class NewVisit extends PureComponent {
     }
   }
 
+  updateAttachmens = ({ added, deleted }) => {
+    const { values: { visitAttachment = [] }, setFieldValue } = this.props
+    let updated = [
+      ...visitAttachment,
+    ]
+    if (added)
+      updated = [
+        ...updated,
+        ...added,
+      ]
+
+    if (deleted)
+      updated = updated.map((attachment) => {
+        const uploaded = attachment.id !== undefined
+
+        if (uploaded && attachment.id === deleted)
+          return { ...attachment, isDeleted: true }
+
+        if (attachment._tempID === deleted) {
+          return { ...attachment, isDeleted: true }
+        }
+
+        return { ...attachment }
+      })
+    setFieldValue('visitAttachment', updated)
+  }
+
   render () {
     const {
       classes,
@@ -162,11 +233,13 @@ class NewVisit extends PureComponent {
       handleSubmit,
       loading,
       visitRegistration: { visitInfo },
+      setFieldValue,
+      values,
     } = this.props
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
-
+    console.log({ values })
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>
@@ -183,13 +256,19 @@ class NewVisit extends PureComponent {
               <SizeContainer size='sm'>
                 <React.Fragment>
                   <GridItem xs md={12} className={classes.row}>
-                    <VisitInfoCard />
+                    <VisitInfoCard
+                      handleUpdateAttachments={this.updateAttachmens}
+                      attachments={values.visitAttachment}
+                    />
                   </GridItem>
                   <GridItem xs md={12} className={classes.row}>
                     <VitalSignCard handleCalculateBMI={this.calculateBMI} />
                   </GridItem>
                   <GridItem xs md={12} className={classes.row}>
-                    <ReferralCard />
+                    <ReferralCard
+                      handleUpdateAttachments={this.updateAttachmens}
+                      attachments={values.visitAttachment}
+                    />
                   </GridItem>
                 </React.Fragment>
               </SizeContainer>
