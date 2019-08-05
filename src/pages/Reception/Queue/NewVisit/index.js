@@ -181,7 +181,6 @@ const uploadFiles = async (file, index) => {
       payload,
     }).then((response) => {
       setSubmitting(false)
-
       return response && onConfirm()
     })
   },
