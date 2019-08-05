@@ -39,23 +39,17 @@ export default createFormViewModel({
     },
     reducers: {
       updateLoginStatus (state, { payload }) {
-        console.log({ payload })
-        const isInvalidLogin =
-          payload.status !== 200 || payload.access_token !== undefined
+        const isInvalidLogin = payload.access_token === undefined
         if (!isInvalidLogin) {
           const {
-            data,
-            application,
+            access_token: accessToken,
             currentAuthority = [
               'tester',
               // 'editor',
             ],
           } = payload
           setAuthority(currentAuthority)
-
-          localStorage.setItem('token', data.access_token)
-          localStorage.setItem('application', application)
-
+          localStorage.setItem('token', accessToken)
           const cookies = new Cookies()
           cookies.set('_lastLogin', new Date(), {
             expires: new Date(9999, 11, 31),

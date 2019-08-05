@@ -66,9 +66,6 @@ const routes = [
             name: 'appointment',
             mini: 'AP',
             component: './Reception/BigCalendar',
-            authority: [
-              'tester',
-            ],
           },
           {
             hideInMenu: true,

@@ -12,7 +12,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   Button,
   CardContainer,
-  CommonTableGrid2,
+  CommonTableGrid,
   CommonModal,
   GridContainer,
   GridItem,
@@ -134,7 +134,6 @@ class UserProfile extends React.Component {
 
   onConfirmClick = (values) => {
     const { dispatch } = this.props
-    console.log({ values, props: this.props })
     dispatch({
       type: 'settingUserProfile/upsert',
       payload: { ...values },
@@ -184,7 +183,7 @@ class UserProfile extends React.Component {
             </Button>
           </GridItem>
           <GridItem md={12}>
-            <CommonTableGrid2 rows={list} {...this.state.gridConfig} />
+            <CommonTableGrid rows={list} {...this.state.gridConfig} />
           </GridItem>
         </GridContainer>
         <CommonModal

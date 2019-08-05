@@ -15,7 +15,7 @@ import Person from '@material-ui/icons/Person'
 import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 // custom components
-import { CommonTableGrid2, DateFormatter } from '@/components'
+import { CommonTableGrid, DateFormatter } from '@/components'
 // import GridButton from './GridButton'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import AppointmentActionButton from './AppointmentActionButton'
@@ -256,7 +256,7 @@ class DetailsGrid extends PureComponent {
         : filterData(currentFilter, queueListing)
 
     return (
-      <CommonTableGrid2
+      <CommonTableGrid
         height={600}
         rows={data}
         ActionProps={ActionProps}

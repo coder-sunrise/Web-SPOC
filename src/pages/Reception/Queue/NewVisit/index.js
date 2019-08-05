@@ -181,7 +181,7 @@ const uploadFiles = async (file, index) => {
       payload,
     }).then((response) => {
       setSubmitting(false)
-      console.log({ response })
+
       return response && onConfirm()
     })
   },
@@ -239,7 +239,6 @@ class NewVisit extends PureComponent {
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
-    console.log({ values })
     return (
       <React.Fragment>
         <GridContainer className={classes.gridContainer}>
