@@ -6,7 +6,7 @@ import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
 import { Accordion, Button, CommonModal, GridContainer } from '@/components'
 // sub component
-import PatientBanner from '../components/PatientBanner'
+import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '../components/DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'

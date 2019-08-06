@@ -100,6 +100,7 @@ class CommonModal extends React.PureComponent {
 
   footer = ({
     align = 'flex-end',
+    // onClose,
     onConfirm,
     onReset,
     confirmProps = {},
@@ -162,7 +163,7 @@ class CommonModal extends React.PureComponent {
 
   onClose = (force) => {
     const ob = window.g_app._store.getState().formik[this.props.observe]
-    console.log(ob)
+    // console.log(ob)
     if (ob) {
       if (ob.dirty && force !== true) {
         this.setState({

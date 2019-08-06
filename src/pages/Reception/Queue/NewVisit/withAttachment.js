@@ -1,11 +1,13 @@
-import React, { useRef } from 'react'
-import classnames from 'classnames'
+import React, { useState, useEffect, useRef } from 'react'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
 import { Chip, withStyles } from '@material-ui/core'
 // custom components
 import { Button, CommonCard, GridContainer, GridItem } from '@/components'
 import { getUniqueGUID } from '@/utils/cdrss'
+// services
+import { uploadFile, deleteFileByFileID } from '@/services/file'
+import { getCodes } from '@/utils/codes'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -55,6 +57,19 @@ const withAttachment = ({
   attachments = [],
   title = '',
 }) => {
+  const [
+    fileStatusList,
+    setFileStatusList,
+  ] = useState([])
+
+  useEffect(() => {
+    getCodes('ltfilestatus').then((response) => {
+      setFileStatusList([
+        ...response,
+      ])
+    })
+  }, [])
+
   const fileAttachments = attachments.filter(
     (attachment) =>
       attachment.attachmentType === attachmentType && !attachment.isDeleted,
@@ -64,16 +79,23 @@ const withAttachment = ({
 
   const mapFileToUploadObject = async (file) => {
     const base64 = await convertToBase64(file)
-    return {
-      _tempID: getUniqueGUID(),
+    const fileStatusFK = fileStatusList.find(
+      (item) => item.code.toUpperCase() === 'UPLOADED',
+    )
+
+    const uploadObject = {
       fileName: file.name,
       fileSize: file.size,
       fileExtension: getFileExtension(file.name),
       fileCategoryFK: 1,
       content: base64,
-      isConfirmed: false,
+      // isConfirmed: false,
+      fileStatusFK: fileStatusFK.id,
       attachmentType,
     }
+    const uploaded = await uploadFile(uploadObject)
+
+    return { ...uploaded, attachmentType }
   }
 
   const onUploadClick = () => {
@@ -96,12 +118,16 @@ const withAttachment = ({
     }
   }
 
-  const onDelete = (id) => {
+  const onDelete = (fileIndexFK, id) => {
+    if (!fileIndexFK && id) {
+      deleteFileByFileID(id)
+    }
+
     handleUpdateAttachments({
-      deleted: id,
+      deleted: !fileIndexFK ? id : fileIndexFK,
     })
   }
-
+  // console.log({ fileAttachments })
   return (
     <CommonCard size='sm' title={title}>
       <GridContainer>
@@ -111,9 +137,9 @@ const withAttachment = ({
         </GridItem>
         <GridItem md={10} className={classes.verticalSpacing}>
           <div>
-            {fileAttachments.map((attachment, index) => (
+            {fileAttachments.map((attachment) => (
               <Chip
-                key={`${attachment.fileName}-${index}`}
+                key={attachment.id}
                 size='small'
                 variant='outlined'
                 label={attachment.fileName}
@@ -121,8 +147,7 @@ const withAttachment = ({
                 onClick={(event) => {
                   console.log({ target: event.currentTarget })
                 }}
-                onDelete={() =>
-                  onDelete(attachment.id ? attachment.id : attachment._tempID)}
+                onDelete={() => onDelete(attachment.fileIndexFK, attachment.id)}
                 className={classes.chip}
               />
               // <span

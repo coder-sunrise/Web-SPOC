@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
-import { CircularProgress, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 // custom component
 import {
   GridContainer,
@@ -9,17 +9,18 @@ import {
   SizeContainer,
   withFormikExtend,
 } from '@/components'
-import Loading from '@/components/PageLoading/index'
 // Sub-components
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 // import ParticipantCard from './ParticipantCard'
+// medisys-components
+import { ErrorWrapper, LoadingWrapper } from 'medisys-components'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
 // services
-import { uploadFile } from '@/services/file'
+import { deleteFileByFileID } from '@/services/file'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -40,9 +41,6 @@ const styles = (theme) => ({
     paddingRight: `${theme.spacing.unit * 2}px !important`,
     paddingTop: `${theme.spacing.unit * 2}px !important`,
   },
-  hide: {
-    display: 'none',
-  },
   loadingIndicator: {
     display: 'flex',
     justifyContent: 'center',
@@ -55,19 +53,6 @@ const styles = (theme) => ({
     },
   },
 })
-
-const uploadFiles = async (file, index) => {
-  const response = await uploadFile(file)
-  const { id, fileName } = response
-  if (id && fileName)
-    return {
-      fileIndexFK: id,
-      fileName,
-      sortOrder: index,
-      attachmentType: file.attachmentType,
-    }
-  return {}
-}
 
 @connect(({ queueLog, loading, visitRegistration }) => ({
   queueLog,
@@ -119,19 +104,36 @@ const uploadFiles = async (file, index) => {
 
     let uploaded = []
     if (visitAttachment) {
-      uploaded = await Promise.all(
-        visitAttachment
-          .filter((attachment) => {
-            if (attachment.id !== undefined) return true
-            if (attachment._tempID !== undefined && attachment.isDeleted)
-              return false
-            return true
-          })
-          .map(
-            (fileObject, index) =>
-              fileObject.id ? fileObject : uploadFiles(fileObject, index),
-          ),
-      )
+      uploaded = visitAttachment
+        .filter((item) => {
+          // filter out not yet confirmed files
+          if (item.fileIndexFK === undefined && item.isDeleted) return false
+          return true
+        })
+        .map(
+          (
+            { fileIndexFK, fileName, attachmentType, isDeleted, ...rest },
+            index,
+          ) =>
+            !fileIndexFK
+              ? {
+                  // file status === uploaded, only 4 info needed for API
+                  fileIndexFK: rest.id,
+                  sortOrder: index,
+                  fileName,
+                  attachmentType,
+                  isDeleted,
+                }
+              : {
+                  // file status === confirmed, need to provide full object for API
+                  ...rest,
+                  fileIndexFK,
+                  fileName,
+                  attachmentType,
+                  isDeleted,
+                  sortOrder: index,
+                },
+        )
     }
     const payload = {
       id,
@@ -143,20 +145,11 @@ const uploadFiles = async (file, index) => {
         patientProfileFK,
         bizSessionFK,
         visitReferenceNo,
-        // visitPurposeFK: 1,
-        // doctorProfileFK: null,
-        // plannedVisitFK: null,
-        // counterFK: null,
-        // roomFK: null,
-        // timeIn: new Date(),
-        // timeOut: new Date(),
-        // visitDate: new Date(),
-        // queueSetupFK: null,
         visitStatus: 'WAITING',
         visitRemarks: null,
         temperatureC: null,
-        bpSysMMHG: 1,
-        bpDiaMMHG: 2,
+        bpSysMMHG: null,
+        bpDiaMMHG: null,
         heightCM: null,
         weightKG: null,
         bmi: null,
@@ -167,8 +160,7 @@ const uploadFiles = async (file, index) => {
         referralCompanyFK: null,
         referralPerson: null,
         referralDate: null,
-        ...restValues,
-        // ...restValues,
+        ...restValues, // override values from formik values
       },
     }
 
@@ -176,6 +168,7 @@ const uploadFiles = async (file, index) => {
       id === undefined
         ? 'visitRegistration/registerVisitInfo'
         : 'visitRegistration/saveVisitInfo'
+
     dispatch({
       type,
       payload,
@@ -186,6 +179,25 @@ const uploadFiles = async (file, index) => {
   },
 })
 class NewVisit extends PureComponent {
+  componentWillUnmount () {
+    // delete Attachments where fileStatus === 'Uploaded'
+    // unmount will be invoked too when submit succeeded,
+    // but this.props.values will be empty after submit succeeed
+
+    const { values } = this.props
+    if (values && values.visitAttachment) {
+      const { visitAttachment } = values
+
+      const notConfirmedFiles = visitAttachment.filter(
+        (attachment) => attachment.fileIndexFK === undefined,
+      )
+
+      notConfirmedFiles.forEach((item) => {
+        !item.isDeleted && deleteFileByFileID(item.id)
+      })
+    }
+  }
+
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
     const { setFieldValue, setFieldTouched } = this.props
@@ -198,11 +210,12 @@ class NewVisit extends PureComponent {
     }
   }
 
-  updateAttachmens = ({ added, deleted }) => {
+  updateAttachments = ({ added, deleted }) => {
     const { values: { visitAttachment = [] }, setFieldValue } = this.props
     let updated = [
       ...visitAttachment,
     ]
+
     if (added)
       updated = [
         ...updated,
@@ -210,18 +223,21 @@ class NewVisit extends PureComponent {
       ]
 
     if (deleted)
-      updated = updated.map((attachment) => {
-        const uploaded = attachment.id !== undefined
+      updated = updated.reduce((attachments, item) => {
+        if (
+          (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
+          (item.fileIndexFK === undefined && item.id === deleted)
+        )
+          return [
+            ...attachments,
+            { ...item, isDeleted: true },
+          ]
 
-        if (uploaded && attachment.id === deleted)
-          return { ...attachment, isDeleted: true }
-
-        if (attachment._tempID === deleted) {
-          return { ...attachment, isDeleted: true }
-        }
-
-        return { ...attachment }
-      })
+        return [
+          ...attachments,
+          { ...item },
+        ]
+      }, [])
     setFieldValue('visitAttachment', updated)
   }
 
@@ -231,55 +247,61 @@ class NewVisit extends PureComponent {
       footer,
       handleSubmit,
       loading,
-      visitRegistration: { visitInfo },
-      setFieldValue,
+      visitRegistration: { visitInfo, errorState },
       values,
+      isSubmitting,
     } = this.props
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
+    const fetchingInfoText = fetchingVisitInfo
+      ? 'Loading visit info...'
+      : undefined
+
+    const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
+    // console.log({ attachments: values.visitAttachment })
     return (
       <React.Fragment>
-        <GridContainer className={classes.gridContainer}>
-          <GridItem xs sm={12} md={3}>
-            <PatientInfoCard />
-          </GridItem>
-          <GridItem container xs md={9} className={classes.formContent}>
-            {fetchingVisitInfo ? (
-              <div className={classes.loadingIndicator}>
-                <CircularProgress />
-                <p>Loading visit info...</p>
-              </div>
-            ) : (
-              <SizeContainer size='sm'>
-                <React.Fragment>
-                  <GridItem xs md={12} className={classes.row}>
-                    <VisitInfoCard
-                      handleUpdateAttachments={this.updateAttachmens}
-                      attachments={values.visitAttachment}
-                    />
+        <LoadingWrapper
+          loading={isSubmitting || fetchingVisitInfo}
+          text={!fetchingInfoText ? loadingText : fetchingInfoText}
+        >
+          <GridContainer className={classes.gridContainer}>
+            <GridItem xs sm={12} md={3}>
+              <PatientInfoCard />
+            </GridItem>
+            <GridItem container xs md={9} className={classes.formContent}>
+              <ErrorWrapper errorState={errorState} errorKey='visitInfo'>
+                <SizeContainer size='sm'>
+                  <React.Fragment>
+                    <GridItem xs md={12} className={classes.row}>
+                      <VisitInfoCard
+                        handleUpdateAttachments={this.updateAttachments}
+                        attachments={values.visitAttachment}
+                      />
+                    </GridItem>
+                    <GridItem xs md={12} className={classes.row}>
+                      <VitalSignCard handleCalculateBMI={this.calculateBMI} />
+                    </GridItem>
+                    <GridItem xs md={12} className={classes.row}>
+                      <ReferralCard
+                        handleUpdateAttachments={this.updateAttachments}
+                        attachments={values.visitAttachment}
+                      />
+                    </GridItem>
+                  </React.Fragment>
+                </SizeContainer>
+              </ErrorWrapper>
+              {/*
+                <GridItem xs md={12} container>
+                  <GridItem xs md={12} className={classes.cardContent}>
+                    <ParticipantCard />
                   </GridItem>
-                  <GridItem xs md={12} className={classes.row}>
-                    <VitalSignCard handleCalculateBMI={this.calculateBMI} />
-                  </GridItem>
-                  <GridItem xs md={12} className={classes.row}>
-                    <ReferralCard
-                      handleUpdateAttachments={this.updateAttachmens}
-                      attachments={values.visitAttachment}
-                    />
-                  </GridItem>
-                </React.Fragment>
-              </SizeContainer>
-            )}
-            {/*
-              <GridItem xs md={12} container>
-                <GridItem xs md={12} className={classes.cardContent}>
-                  <ParticipantCard />
                 </GridItem>
-              </GridItem>
-            */}
-          </GridItem>
-        </GridContainer>
+              */}
+            </GridItem>
+          </GridContainer>
+        </LoadingWrapper>
         {footer &&
           footer({
             confirmBtnText: isEdit ? 'Save' : 'Register visit',

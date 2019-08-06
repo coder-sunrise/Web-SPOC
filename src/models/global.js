@@ -32,7 +32,7 @@ export default createFormViewModel({
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        console.log(loct, method)
+        // console.log(loct, method)
         if (query.md === 'pt') {
           dispatch({
             type: 'updateState',

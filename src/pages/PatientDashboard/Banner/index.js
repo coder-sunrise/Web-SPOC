@@ -81,6 +81,8 @@ class Banner extends PureComponent {
           position: 'sticky',
           top: headerHeight,
           zIndex: 1000,
+          paddingLeft: 16,
+          paddingRight: 16,
         }}
       >
         <GridContainer>

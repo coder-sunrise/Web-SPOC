@@ -269,7 +269,7 @@ class BasicLayout extends React.PureComponent {
 
   matchParamsPath = (pathname) => {
     if (!this.breadcrumbNameMap) return null
-    console.log('matchParamsPath', pathname, this.breadcrumbNameMap)
+    // console.log('matchParamsPath', pathname, this.breadcrumbNameMap)
     const pathKey = Object.keys(this.breadcrumbNameMap).find((key) =>
       pathToRegexp(key).test(pathname),
     )
