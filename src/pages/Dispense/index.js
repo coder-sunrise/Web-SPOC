@@ -6,7 +6,8 @@ import Print from '@material-ui/icons/Print'
 // common component
 import { Button, GridContainer, GridItem } from '@/components'
 // sub component
-import PatientBanner from './components/PatientBanner'
+// import PatientBanner from './components/PatientBanner'
+import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './components/DispenseDetails'
 import style from './style'
 

@@ -93,7 +93,7 @@ export const axiosRequest = async (
       ...headerConfig,
     }).then((response) => {
       const { data, status } = response
-      console.log('axios response', response)
+      // console.log('axios response', response)
 
       if (status >= 200 && status < 300) {
         const { data: nestedData } = data
