@@ -199,7 +199,7 @@ class EmergencyContact extends PureComponent {
   render () {
     const { values, schema } = this.props
     const { SearchPatient = (f) => f } = this
-    console.log({ values: values.patientEmergencyContact })
+    console.log({ params: this.tableParas })
     return (
       <div>
         <EditableTableGrid

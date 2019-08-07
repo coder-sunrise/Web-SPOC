@@ -11,7 +11,7 @@ Authorized.AuthorizedRoute = AuthorizedRoute
 Authorized.check = check
 Authorized.Context = AuthorizedContext
 Authorized.generalCheck = (matches, props, component, disabledComponent) => {
-  console.log(matches, props, component, disabledComponent)
+  // console.log(matches, props, component, disabledComponent)
   const rights = Array.isArray(matches)
     ? matches
     : [
@@ -34,6 +34,7 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
     if (component.type.displayName === 'RegularButton') {
       return null
     }
+
     return (
       disabledComponent ||
       React.cloneElement(component, {
