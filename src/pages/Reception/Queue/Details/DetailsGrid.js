@@ -16,8 +16,12 @@ import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 // custom components
 import { CommonTableGrid, DateFormatter } from '@/components'
-// import GridButton from './GridButton'
-import { GridContextMenuButton as GridButton } from 'medisys-components'
+// medisys component
+import {
+  GridContextMenuButton as GridButton,
+  LoadingWrapper,
+} from 'medisys-components'
+// sub component
 import AppointmentActionButton from './AppointmentActionButton'
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
 import { filterData, filterDoctorBlock, todayOnly } from '../utils'
@@ -123,14 +127,14 @@ const ContextMenuOptions = [
     id: 2,
     label: 'Delete Visit',
     Icon: Clear,
-    disabled: true,
+    disabled: false,
   },
   { isDivider: true },
   {
     id: 3,
     label: 'Patient Profile',
     Icon: Person,
-    disabled: true,
+    disabled: false,
   },
   {
     id: 4,
@@ -147,7 +151,12 @@ const ContextMenuOptions = [
   },
 ]
 
-@connect(({ queueLog, calendar }) => ({ queueLog, calendar }))
+@connect(({ queueLog, calendar, global, loading }) => ({
+  queueLog,
+  calendar,
+  global,
+  loading,
+}))
 class DetailsGrid extends PureComponent {
   onViewDispenseClick = (queue) => {
     const { dispatch, location } = this.props
@@ -163,6 +172,46 @@ class DetailsGrid extends PureComponent {
     router.push(href)
   }
 
+  onViewPatientProfileClick = (row) => {
+    const { patientAccountNo, patientReferenceNo, patientName } = row
+    const { dispatch } = this.props
+    // dispatch({
+    //   type: 'queueLog/getPatientID',
+    //   payload: {
+    //     patientAccountNo,
+    //     patientReferenceNo,
+    //     patientName,
+    //   },
+    // })
+  }
+
+  deleteQueueConfirmation = (row) => {
+    const { queueNo, id } = row
+    const { dispatch } = this.props
+
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Are you sure want to delete this visit - (Q No. - ${queueNo})?`,
+        onOpenConfirm: () => this.deleteQueue(id),
+      },
+    })
+  }
+
+  deleteQueue = (queueID) => {
+    const { dispatch, queueLog } = this.props
+    const { sessionInfo } = queueLog
+    dispatch({
+      type: 'queueLog/deleteQueueByQueueID',
+      queueID,
+    })
+    dispatch({
+      type: 'queueLog/fetchQueueListing',
+      sessionID: sessionInfo.id,
+    })
+  }
+
   onContextButtonClick = (row, id) => {
     switch (id) {
       case '0':
@@ -174,7 +223,10 @@ class DetailsGrid extends PureComponent {
         router.push(`/reception/queue/dispense/${row.visitRefNo}`)
         break
       case '2':
+        this.deleteQueueConfirmation(row)
+        break
       case '3':
+        this.onViewPatientProfileClick(row)
         break
       case '4':
         router.push('/reception/queue/patientdashboard')
@@ -212,6 +264,13 @@ class DetailsGrid extends PureComponent {
         )
       }
 
+      const { row } = tableProps
+      const shouldDisableDelete = row.visitStatus !== 'WAITING'
+      const newContextMenuOptions = ContextMenuOptions.map(
+        (opt) =>
+          opt.id === 2 ? { ...opt, disabled: shouldDisableDelete } : { ...opt },
+      )
+
       return (
         <Table.Cell {...tableProps}>
           <Tooltip
@@ -223,7 +282,7 @@ class DetailsGrid extends PureComponent {
               <GridButton
                 row={tableProps.row}
                 onClick={this.onContextButtonClick}
-                contextMenuOptions={ContextMenuOptions}
+                contextMenuOptions={newContextMenuOptions}
               />
             </div>
           </Tooltip>
@@ -242,7 +301,12 @@ class DetailsGrid extends PureComponent {
     const ActionProps = {
       TableCellComponent: withStyles(styles)(this.TableCell),
     }
-    const { calendar = { calendarEvents: [] }, queueLog } = this.props
+    const {
+      calendar = { calendarEvents: [] },
+      queueLog,
+      loading,
+      global,
+    } = this.props
     const { currentFilter, queueListing } = queueLog
     const { calendarEvents } = calendar
 
@@ -255,15 +319,25 @@ class DetailsGrid extends PureComponent {
         ? filterDoctorBlock(flattenedCalendarData)
         : filterData(currentFilter, queueListing)
 
+    const isLoading = global.showVisitRegistration
+      ? false
+      : loading.effects['queueLog/fetchQueueListing']
+
     return (
-      <CommonTableGrid
-        height={600}
-        rows={data}
-        ActionProps={ActionProps}
-        {...TableConfig}
-        size='sm'
-        FuncProps={FuncConfig}
-      />
+      <LoadingWrapper
+        linear
+        loading={isLoading}
+        text='Getting queue listing...'
+      >
+        <CommonTableGrid
+          height={600}
+          rows={data}
+          ActionProps={ActionProps}
+          {...TableConfig}
+          size='sm'
+          FuncProps={FuncConfig}
+        />
+      </LoadingWrapper>
     )
   }
 }

@@ -64,9 +64,16 @@ const styles = (theme) => ({
   enableReinitialize: true,
   validationSchema: VisitValidationSchema,
   mapPropsToValues: ({ queueLog, visitRegistration }) => {
-    let qNo =
-      queueLog && queueLog.queueListing ? queueLog.queueListing.length + 1 : 1
+    const { queueListing } = queueLog
+    const largestQNo = queueListing.reduce(
+      (largest, { queueNo }) =>
+        parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
+      0,
+    )
+    let qNo = parseFloat(largestQNo + 1).toFixed(1)
+
     const { visitInfo } = visitRegistration
+
     if (Object.keys(visitInfo).length > 0) {
       qNo = visitInfo.queueNo
     }

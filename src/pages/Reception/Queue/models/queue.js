@@ -204,6 +204,10 @@ export default createListViewModel({
           })
         }
       },
+      *deleteQueueByQueueID ({ queueID }, { call }) {
+        yield call(service.deleteQueue, queueID)
+        return true
+      },
       // *fetchDoctorProfile({ _}, { call, put}){
       //   const reposne = yield call(service.fetchDoctorProfile)
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 // material ui
-import { CircularProgress, withStyles } from '@material-ui/core'
+import { LinearProgress, CircularProgress, withStyles } from '@material-ui/core'
 // common components
 import { Primary } from '@/components'
 
@@ -30,9 +30,19 @@ const styles = () => ({
   blur: {
     opacity: 0.4,
   },
+  linearProgress: {
+    minWidth: '150px',
+    width: '15%',
+  },
 })
 
-const LoadingWrapper = ({ classes, children, loading = false, text = '' }) => {
+const LoadingWrapper = ({
+  classes,
+  children,
+  linear = false,
+  loading = false,
+  text = '',
+}) => {
   const mainContentClass = classnames({
     [classes.blur]: loading,
   })
@@ -45,7 +55,11 @@ const LoadingWrapper = ({ classes, children, loading = false, text = '' }) => {
   return (
     <div className={classes.container}>
       <div className={loadingClass}>
-        <CircularProgress />
+        {linear ? (
+          <LinearProgress className={classes.linearProgress} />
+        ) : (
+          <CircularProgress />
+        )}
         <Primary>
           <h4>{text}</h4>
         </Primary>
