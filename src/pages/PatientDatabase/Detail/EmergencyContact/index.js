@@ -92,6 +92,7 @@ class EmergencyContact extends PureComponent {
       return (
         <Component
           renderActionFn={this.renderActionFn}
+          onRowDblClick={this.onAddExistPatient}
           simple
           disableAdd
           disableQueryOnLoad
@@ -127,63 +128,64 @@ class EmergencyContact extends PureComponent {
     setFieldValue('patientEmergencyContact', rows)
   }
 
-  renderActionFn = (row) => {
+  onAddExistPatient = async (row) => {
     const { props } = this
     const { values, setFieldValue } = props
+    if (!row || !row.id) return
+    const r = await query(row.id)
+    const o = r.data
+    const patientEmergencyContact = _.cloneDeep(values.patientEmergencyContact)
+    if (
+      patientEmergencyContact.find(
+        (m) => m.patientProfileFK === o.id && !m.isDeleted,
+      )
+    ) {
+      notification.warn({
+        message: 'This contact person already existed',
+      })
+      return
+    }
+    if (o.id === values.id) {
+      notification.warn({
+        message: 'Can not add this patient himself as contact person',
+      })
+      return
+    }
+    const primaryAddress =
+      o.contact.contactAddress.find((m) => m.isPrimary) || {}
+    const newId = getUniqueNumericId()
+    patientEmergencyContact.push({
+      id: newId,
+      isNew: true,
+      accountNo: o.patientAccountNo,
+      patientProfileFK: o.id,
+      salutationFK: o.salutationFK,
+      accountNoTypeFK: o.patientAccountNoTypeFK,
+      name: o.name,
+      relationshipFK: undefined,
+      isPrimaryContact: false,
+      nokPatientProfileFK: o.id,
+      address: `${primaryAddress.blockNo || ''} ${primaryAddress.buildingName ||
+        ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street || ''}`,
+    })
+    setFieldValue('patientEmergencyContact', patientEmergencyContact)
+    this.setState((prevState) => {
+      return {
+        editingRowIds: prevState.editingRowIds.concat([
+          newId,
+        ]),
+      }
+    })
+    this.toggleModal()
+  }
+
+  renderActionFn = (row) => {
     return (
       <Tooltip title='Add' placement='bottom'>
         <Button
           size='sm'
-          onClick={async () => {
-            const r = await query(row.id)
-            const o = r.data
-            const patientEmergencyContact = _.cloneDeep(
-              values.patientEmergencyContact,
-            )
-            if (
-              patientEmergencyContact.find(
-                (m) => m.patientProfileFK === o.id && !m.isDeleted,
-              )
-            ) {
-              notification.warn({
-                message: 'This contact person already existed',
-              })
-              return
-            }
-            if (o.id === values.id) {
-              notification.warn({
-                message: 'Can not add this patient himself as contact person',
-              })
-              return
-            }
-            const primaryAddress =
-              o.contact.contactAddress.find((m) => m.isPrimary) || {}
-            const newId = getUniqueNumericId()
-            patientEmergencyContact.push({
-              id: newId,
-              isNew: true,
-              accountNo: o.patientAccountNo,
-              patientProfileFK: o.id,
-              salutationFK: o.salutationFK,
-              accountNoTypeFK: o.patientAccountNoTypeFK,
-              name: o.name,
-              relationshipFK: undefined,
-              isPrimaryContact: false,
-              nokPatientProfileFK: o.id,
-              address: `${primaryAddress.blockNo ||
-                ''} ${primaryAddress.buildingName ||
-                ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street ||
-                ''}`,
-            })
-            setFieldValue('patientEmergencyContact', patientEmergencyContact)
-            this.setState((prevState) => {
-              return {
-                editingRowIds: prevState.editingRowIds.concat([
-                  newId,
-                ]),
-              }
-            })
-            this.toggleModal()
+          onClick={() => {
+            this.onAddExistPatient(row)
           }}
           justIcon
           round
@@ -199,7 +201,6 @@ class EmergencyContact extends PureComponent {
   render () {
     const { values, schema } = this.props
     const { SearchPatient = (f) => f } = this
-    console.log({ values: values.patientEmergencyContact })
     return (
       <div>
         <EditableTableGrid

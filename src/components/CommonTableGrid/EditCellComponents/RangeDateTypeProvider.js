@@ -46,13 +46,23 @@ class DateEditorBase extends PureComponent {
         error,
       })
       if (!error) {
-        if (onChange) onChange(date, moments, org, row)
+        if (onChange)
+          onChange(
+            date,
+            moments,
+            org,
+            window.$tempGridRow[gridId]
+              ? window.$tempGridRow[gridId][row.id] || {}
+              : row,
+          )
       }
     }
     const commonCfg = {
       onChange: _onChange,
       disabled: isDisabled(
-        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+        window.$tempGridRow[gridId]
+          ? window.$tempGridRow[gridId][row.id] || {}
+          : row,
       ),
       defaultValue: getInitialValue ? getInitialValue(row) : value,
       value,

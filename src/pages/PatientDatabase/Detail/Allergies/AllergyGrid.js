@@ -38,16 +38,18 @@ class AllergyGrid extends PureComponent {
           code: 'ctDrugAllergy',
           label: 'Allergy Name',
           autoComplete: true,
-          onChange: (val, option, row) => {
-            row.allergyCode = option.code || option.name
-            row.allergyName = option.name
+          onChange: ({ val, option, row }) => {
+            if (option) {
+              row.allergyCode = option.code || option.name
+              row.allergyName = option.name
+            }
           },
         },
         {
           columnName: 'allergyName',
           onChange: (val, row) => {
             row.allergyCode = val
-            row.allergyFK = 1 //
+            row.allergyFK = 1
           },
         },
         {
@@ -84,7 +86,6 @@ class AllergyGrid extends PureComponent {
 
   render () {
     const { isEditable, rows, schema } = this.props
-
     return (
       <EditableTableGrid
         rows={rows}

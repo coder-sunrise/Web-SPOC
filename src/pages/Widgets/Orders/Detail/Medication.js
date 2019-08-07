@@ -24,7 +24,7 @@ import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 
 class Medication extends PureComponent {
-  getActionItem = (i, arrayHelpers) => {
+  getActionItem = (i, arrayHelpers, prop) => {
     const { theme, values } = this.props
     return (
       <GridItem
@@ -35,7 +35,7 @@ class Medication extends PureComponent {
           textAlign: 'center',
         }}
       >
-        {values.items.length > 1 && (
+        {values[prop].length > 1 && (
           <Popconfirm
             title='Are you sure delete this item?'
             onConfirm={() => arrayHelpers.remove(i)}
@@ -102,18 +102,18 @@ class Medication extends PureComponent {
               }}
             >
               <FieldArray
-                name='items'
+                name='descriptions'
                 render={(arrayHelpers) => {
                   this.descriptionArrayHelpers = arrayHelpers
-                  if (!values || !values.items) return null
-                  return values.items.map((val, i) => {
+                  if (!values || !values.descriptions) return null
+                  return values.descriptions.map((val, i) => {
                     return (
                       <div key={i}>
                         <GridContainer>
                           {i > 0 && (
                             <GridItem xs={2}>
                               <FastField
-                                name={`items[${i}].operator`}
+                                name={`descriptions[${i}].operator`}
                                 render={(args) => {
                                   return (
                                     <Select
@@ -136,7 +136,7 @@ class Medication extends PureComponent {
                           {i > 0 && <GridItem xs={10} />}
                           <GridItem xs={2}>
                             <FastField
-                              name={`items[${i}].action`}
+                              name={`descriptions[${i}].action`}
                               render={(args) => {
                                 return (
                                   <div style={{ position: 'relative' }}>
@@ -164,7 +164,7 @@ class Medication extends PureComponent {
                           </GridItem>
                           <GridItem xs={1}>
                             <FastField
-                              name={`items[${i}].count`}
+                              name={`descriptions[${i}].count`}
                               render={(args) => {
                                 return (
                                   <NumberInput
@@ -180,7 +180,7 @@ class Medication extends PureComponent {
                           </GridItem>
                           <GridItem xs={2}>
                             <FastField
-                              name={`items[${i}].unit`}
+                              name={`descriptions[${i}].unit`}
                               render={(args) => {
                                 return (
                                   <Select
@@ -197,7 +197,7 @@ class Medication extends PureComponent {
                           </GridItem>
                           <GridItem xs={3}>
                             <FastField
-                              name={`items[${i}].frequency`}
+                              name={`descriptions[${i}].frequency`}
                               render={(args) => {
                                 return (
                                   <Select
@@ -214,7 +214,7 @@ class Medication extends PureComponent {
                           </GridItem>
                           <GridItem xs={2}>
                             <FastField
-                              name={`items[${i}].day`}
+                              name={`descriptions[${i}].day`}
                               render={(args) => {
                                 return (
                                   <NumberInput
@@ -230,7 +230,7 @@ class Medication extends PureComponent {
                               }}
                             />
                           </GridItem>
-                          {this.getActionItem(i, arrayHelpers)}
+                          {this.getActionItem(i, arrayHelpers, 'descriptions')}
                         </GridContainer>
                       </div>
                     )
@@ -252,16 +252,16 @@ class Medication extends PureComponent {
               }}
             >
               <FieldArray
-                name='items'
+                name='precautions'
                 render={(arrayHelpers) => {
-                  if (!values || !values.items) return null
-                  return values.items.map((val, i) => {
+                  if (!values || !values.precautions) return null
+                  return values.precautions.map((val, i) => {
                     return (
                       <div key={i}>
                         <GridContainer>
                           <GridItem xs={10}>
                             <FastField
-                              name={`items[${i}].precaution`}
+                              name={`precautions[${i}].precaution`}
                               render={(args) => {
                                 return (
                                   <div style={{ position: 'relative' }}>
@@ -296,7 +296,7 @@ class Medication extends PureComponent {
                               }}
                             />
                           </GridItem>
-                          {this.getActionItem(i, arrayHelpers)}
+                          {this.getActionItem(i, arrayHelpers, 'precautions')}
                         </GridContainer>
                       </div>
                     )

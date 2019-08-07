@@ -102,15 +102,11 @@ class CommitButton extends React.PureComponent {
         <Button
           size='sm'
           onClick={(e) => {
-            // console.log(
-            //   (!row.id && editingRowIds.length === 0) ||
-            //     (row.id && editingRowIds.length === 1),
-            // )
             if (schema) {
               try {
                 schema.validateSync(
                   window.$tempGridRow[gridId]
-                    ? window.$tempGridRow[gridId][row.id]
+                    ? window.$tempGridRow[gridId][row.id] || {}
                     : row,
                   {
                     abortEarly: false,

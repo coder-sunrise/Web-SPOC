@@ -59,12 +59,20 @@ class TextEditorBase extends PureComponent {
         error,
       })
       if (!error) {
-        if (onChange) onChange(e.target.value, row)
+        if (onChange)
+          onChange(
+            e.target.value,
+            window.$tempGridRow[gridId]
+              ? window.$tempGridRow[gridId][row.id] || {}
+              : row,
+          )
       }
     }
     const commonCfg = {
       disabled: isDisabled(
-        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+        window.$tempGridRow[gridId]
+          ? window.$tempGridRow[gridId][row.id] || {}
+          : row,
       ),
     }
     return (

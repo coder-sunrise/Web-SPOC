@@ -585,6 +585,7 @@ class CommonTableGrid extends React.Component {
       schema,
       editingRowIds,
       global,
+      gridId,
     } = this.props
 
     const {
@@ -600,7 +601,6 @@ class CommonTableGrid extends React.Component {
       sort,
       sortConfig,
       filter,
-      gridId,
     } = {
       ...this.defaultFunctionConfig,
       ...FuncProps,

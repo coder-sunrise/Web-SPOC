@@ -78,6 +78,20 @@ class SchemesGrid extends PureComponent {
             onValueChange(undefined)
             return
           }
+          console.log(row, rows)
+          if (
+            this.medisaveCheck(row) &&
+            rows.filter(
+              (o) => !o.isDeleted && this.medisaveCheck(o) && o.id !== row.id,
+            ).length > 0
+          ) {
+            notification.error({
+              message:
+                'Patient can only either Medisave 500 Visit or Outpantient Scan at any point of time',
+            })
+            onValueChange(undefined)
+            return
+          }
           if (this.isMedisave(row)) {
             row.validRange = []
             row.validFrom = ''
@@ -150,6 +164,18 @@ class SchemesGrid extends PureComponent {
       [
         'MEDI500VISUT',
         'FLEXIMEDI',
+        'OPSCAN',
+      ].indexOf(r.code) >= 0
+    )
+  }
+
+  medisaveCheck = (row) => {
+    console.log(row)
+    const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
+    if (!r) return false
+    return (
+      [
+        'MEDI500VISUT',
         'OPSCAN',
       ].indexOf(r.code) >= 0
     )

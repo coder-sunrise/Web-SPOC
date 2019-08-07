@@ -26,6 +26,9 @@ class Allergies extends PureComponent {
 
   render () {
     const { classes, dispatch, values, schema, ...restProps } = this.props
+    const allergyDisabled =
+      values.patientAllergy.filter((o) => !o.isDeleted && o.type === 'Allergy')
+        .length > 0
     return (
       <div>
         <GridContainer alignItems='flex-start'>
@@ -35,11 +38,7 @@ class Allergies extends PureComponent {
               render={(args) => {
                 return (
                   <Checkbox
-                    disabled={
-                      values.patientAllergy.filter(
-                        (o) => !o.isDeleted && o.type === 'Allergy',
-                      ).length > 0
-                    }
+                    disabled={allergyDisabled}
                     simple
                     label={"This patient doesn't has any allergy"}
                     {...args}
@@ -69,7 +68,7 @@ class Allergies extends PureComponent {
           </GridItem>
           <GridItem xs md={12} style={{ marginTop: 8 }}>
             <AllergyGrid
-              rows={this.getRows('Allergy')}
+              rows={allergyDisabled ? [] : this.getRows('Allergy')}
               type='Allergy'
               title='Allergy'
               isEditable={

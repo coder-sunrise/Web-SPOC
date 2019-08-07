@@ -43,7 +43,9 @@ class DateEditorBase extends PureComponent {
     const commonCfg = {
       onChange,
       disabled: isDisabled(
-        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+        window.$tempGridRow[gridId]
+          ? window.$tempGridRow[gridId][row.id] || {}
+          : row,
       ),
       defaultValue: value,
     }

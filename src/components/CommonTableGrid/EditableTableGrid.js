@@ -130,15 +130,18 @@ class EditableTableGrid extends PureComponent {
 
     // })
     // console.log('commitChanges')
-    const { values, setFieldValue } = this.props
+    // const { values, setFieldValue } = this.props
     let newRows = _.cloneDeep(rows)
     // console.log(patientEmergencyContact)
     if (added) {
+      // console.log(added, window.$tempGridRow, window.$tempGridRow[this.gridId])
+      const tempNewData = window.$tempGridRow[this.gridId][undefined] || {}
       newRows = added
         .map((o) => {
           return {
             id: getUniqueNumericId(),
             isNew: true,
+            ...tempNewData,
             ...o,
           }
         })
@@ -147,7 +150,13 @@ class EditableTableGrid extends PureComponent {
 
     if (changed) {
       newRows = newRows.map((row) => {
-        const n = changed[row.id] ? { ...row, ...changed[row.id] } : row
+        const n = changed[row.id]
+          ? {
+              ...row,
+              ...window.$tempGridRow[this.gridId][row.id],
+              ...changed[row.id],
+            }
+          : row
         return n
       })
     }
@@ -305,7 +314,7 @@ class EditableTableGrid extends PureComponent {
       ...props
     } = this.props
 
-    console.log('editabletablegrid', { props: this.props })
+    // console.log('editabletablegrid', { props: this.props })
 
     const { FuncProps: { pager = true } } = props
     const { editingRowIds, deletedRowIds, rowChanges, addedRows } = this.state
@@ -360,6 +369,7 @@ class EditableTableGrid extends PureComponent {
                       editingRowIds,
                       key: o.props.id,
                       schema: this.props.schema,
+                      gridId: this.gridId,
                       ...o.props,
                     })
                   }

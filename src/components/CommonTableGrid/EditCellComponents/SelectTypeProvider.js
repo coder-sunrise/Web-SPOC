@@ -57,19 +57,23 @@ class SelectEditor extends PureComponent {
     } = cfg
 
     const _onChange = (val, option) => {
+      // console.log(val, option)
       const error = updateCellValue(this.props, this.myRef.current, val)
       this.setState({
         error,
       })
-
-      if (onChange)
-        onChange({
-          val,
-          option,
-          row,
-          onValueChange,
-          error,
-        })
+      if (!error) {
+        if (onChange)
+          onChange({
+            val,
+            option,
+            row: window.$tempGridRow[gridId]
+              ? window.$tempGridRow[gridId][row.id] || {}
+              : row,
+            onValueChange,
+            error,
+          })
+      }
     }
     // console.log(window.$tempGridRow)
     const commonCfg = {
@@ -78,7 +82,9 @@ class SelectEditor extends PureComponent {
       error: this.state.error,
       defaultValue: value,
       disabled: isDisabled(
-        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+        window.$tempGridRow[gridId]
+          ? window.$tempGridRow[gridId][row.id] || {}
+          : row,
       ),
       ...restProps,
       onChange: _onChange,

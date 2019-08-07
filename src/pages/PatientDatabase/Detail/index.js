@@ -32,9 +32,15 @@ moment.updateLocale('en', {
     past: '%s',
     yy: '%d yr',
   },
+
 })
 
-const styles = () => ({})
+const styles = () => ({
+  menuItem:{
+    paddingLeft:0,
+    paddingRight:0
+  }
+})
 
 @connect(({ patient, global }) => ({
   patient,
@@ -281,7 +287,11 @@ class PatientDetail extends PureComponent {
                       format={dateFormatLong}
                       value={entity.dob}
                     />{' '}
-                    ({moment(entity.dob).fromNow()})
+                    ({moment(entity.dob).fromNow()}, {<CodeSelect
+                        code='ctGender'
+                        text
+                        value={entity.genderFK}
+                      />})
                   </p>
                   <Divider light />
                   <div
@@ -373,7 +383,7 @@ class PatientDetail extends PureComponent {
                           )
                         }}
                       >
-                        <ListItemIcon>
+                        <ListItemIcon style={{minWidth:25}}>
                           <KeyboardArrowRight />
                         </ListItemIcon>
                         <ListItemText primary={<span

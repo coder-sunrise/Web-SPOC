@@ -11,7 +11,18 @@ export default createListViewModel({
     state: {
       default: {
         type: '1',
-        items: [
+        precautions: [
+          {
+            action: '1',
+            count: 1,
+            unit: '1',
+            frequency: '1',
+            day: 1,
+            precaution: '1',
+            operator: '1',
+          },
+        ],
+        descriptions: [
           {
             action: '1',
             count: 1,

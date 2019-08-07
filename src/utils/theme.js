@@ -148,11 +148,11 @@ const sharedOverrides = {
       color: primaryColor,
     },
   },
-  MuiListItemIcon: {
-    root: {
-      minWidth: 25,
-    },
-  },
+  // MuiListItemIcon: {
+  //   root: {
+  //     minWidth: 25,
+  //   },
+  // },
   MuiListItem: {
     button: {
       '&:hover,&:focus': {

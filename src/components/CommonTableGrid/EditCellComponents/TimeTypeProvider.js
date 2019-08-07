@@ -87,7 +87,9 @@ class TimeEditorBase extends PureComponent {
       onChange: this.onChange,
       onOpenChange: this.onOpenChange,
       disabled: isDisabled(
-        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+        window.$tempGridRow[gridId]
+          ? window.$tempGridRow[gridId][row.id] || {}
+          : row,
       ),
       value,
     }
