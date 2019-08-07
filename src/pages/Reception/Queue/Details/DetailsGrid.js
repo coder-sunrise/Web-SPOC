@@ -94,7 +94,7 @@ const TableConfig = {
     'queueNo',
   ],
   columnExtensions: [
-    { columnName: 'queueNo', width: 60, compare: compareQueueNo },
+    { columnName: 'queueNo', width: 80, compare: compareQueueNo },
     { columnName: 'visitStatus', type: 'status', width: 150 },
     { columnName: 'paymentMode', width: 150 },
     { columnName: 'patientName', width: 250 },
