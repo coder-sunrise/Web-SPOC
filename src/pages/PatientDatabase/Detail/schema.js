@@ -180,15 +180,19 @@ const schemaAllergies = {
 
 const schemaSchemes = {
   patientScheme: Yup.array()
+    .compact((v) => v.isDeleted)
     .unique((v) => `${v.schemeTypeFK}-${v.coPaymentSchemeFK}`, 'error', () => {
       notification.error({
         message: 'The Schemes record already exists in the system',
       })
     })
-    .compact((v) => v.isDeleted)
     .of(
       Yup.object().shape({
         schemeTypeFK: Yup.number().required(),
+        validRange: Yup.array().when('schemeTypeFK', {
+          is: (val) => val <= 10,
+          then: Yup.array().of(Yup.date().min(2)).required(),
+        }),
       }),
     ),
   schemePayer: Yup.array().compact((v) => v.isDeleted).of(

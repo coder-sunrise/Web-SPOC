@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 // nodejs library to set properties for components
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -33,7 +34,12 @@ class Checkbox extends React.Component {
     return null
   }
 
-  getCheckboxComponent = ({ inputRef, onChange: inputOnChange, ...props }) => {
+  getCheckboxComponent = ({
+    inputRef,
+    onChange: inputOnChange,
+    className,
+    ...props
+  }) => {
     const {
       classes,
       isSwitch,
@@ -74,7 +80,14 @@ class Checkbox extends React.Component {
     }
     const style = { margin: '0 auto' }
     return (
-      <div style={{ width: '100%' }} {...props}>
+      <div
+        className={classnames({
+          [className]: true,
+          'checkbox-container': true,
+        })}
+        style={{ width: '100%' }}
+        {...props}
+      >
         <FormControlLabel
           style={notCentered ? style : null}
           control={

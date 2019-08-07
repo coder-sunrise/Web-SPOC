@@ -116,13 +116,14 @@ class AntdNumberInput extends React.PureComponent {
       formatter,
       parser,
       defaultValue,
+      value,
     } = props
     this.state = {
       shrink: field.value !== undefined && field.value !== '',
       value:
         field.value !== undefined && field.value !== ''
           ? field.value
-          : defaultValue,
+          : defaultValue || value,
       focused: false,
     }
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
@@ -242,55 +243,21 @@ class AntdNumberInput extends React.PureComponent {
   //   return this.debouncedFormatter(v)
   // }
 
-  getComponent = ({ inputRef, ...props }) => {
-    const {
-      classes,
-      defaultValue,
-      renderDropdown,
-      onChange,
-      onFocus,
-      onBlur,
-      currency,
-      percentage,
-      style,
-      formatter,
-      // parser,
-      ...restProps
-    } = this.props
-    const { form, field, value } = restProps
-
-    const cfg = {}
-    // if (selectValue !== undefined) {
-    //   cfg.value = selectValue
-    // }
-    // console.log(props)
+  getConfig = () => {
+    const { currency, percentage, formatter } = this.props
     const extraCfg = {}
+
     if (currency) {
       extraCfg.formatter = (v) => {
-        // console.log(this.state.focused)
-        // console.log(this.state.value)
-        // const nVal = `${v}`
-        // return nVal === ''
-        //   ? ''
-        //   : `$ ${nVal}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-        // console.log('formatter', v, nVal)
         if (v === '') return ''
         if (!this.state.focused) {
           return currencySymbol + numeral(v).format(`${currencyFormat}`)
-        } /* else if (nVal.indexOf('.') > 0) {
-          return this.state.value
         }
-        return numeral(v).format('$0,0') */
         return v
       }
       extraCfg.parser = (v) => {
-        // console.log(value)
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
-        // if (value === '' || value === undefined) return ''
-        // console.log('parser', value)
-
-        // return numeral(value).value()
       }
 
       extraCfg.precision = 2
@@ -317,6 +284,35 @@ class AntdNumberInput extends React.PureComponent {
         return v
       }
     }
+    return extraCfg
+  }
+
+  getComponent = ({ inputRef, ...props }) => {
+    const {
+      classes,
+      defaultValue,
+      renderDropdown,
+      onChange,
+      onFocus,
+      onBlur,
+      currency,
+      percentage,
+      style,
+      formatter,
+      // parser,
+      ...restProps
+    } = this.props
+
+    // if (selectValue !== undefined) {
+    //   cfg.value = selectValue
+    // }
+    // console.log(props)
+    if (this.props.text) {
+      const cfg = this.getConfig()
+      if (cfg.formatter) return <span>{cfg.formatter(this.state.value)}</span>
+      return <span>{this.state.value}</span>
+    }
+
     return (
       <div style={{ width: '100%' }} {...props}>
         <InputNumber
@@ -325,7 +321,7 @@ class AntdNumberInput extends React.PureComponent {
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
           value={this.state.value}
-          {...extraCfg}
+          {...this.getConfig()}
           {...restProps}
           // formatter={this.handleFormatter}
           // parser={this.handleParser}
@@ -336,6 +332,7 @@ class AntdNumberInput extends React.PureComponent {
 
   render () {
     const { classes, onChange, ...restProps } = this.props
+
     const labelProps = {
       shrink:
         !(

@@ -3,6 +3,7 @@ import {
   dangerColor,
   successColor,
   defaultFont,
+  fontColor,
 } from 'mui-pro-jss'
 
 const customInputStyle = {
@@ -46,6 +47,18 @@ const customInputStyle = {
     '&:before': {
       borderBottomStyle: 'dotted',
     },
+  },
+  text: {
+    color: 'transparent',
+    textShadow: `0 0 0 ${fontColor}`,
+  },
+  textControl: {
+    display: 'inline-block',
+    width: 'auto',
+    margin: 0,
+  },
+  textInput: {
+    fontSize: 'inherit',
   },
   normalText: {
     color: 'currentColor',
@@ -98,8 +111,8 @@ const customInputStyle = {
     top: -2,
     position: 'relative',
     left: 5,
-    fontSize: '0.8em',
     color: 'red',
+    fontWeight: 500,
   },
   formControl: {
     position: 'relative',

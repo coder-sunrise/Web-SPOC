@@ -194,7 +194,7 @@ class AntdSelect extends React.PureComponent {
     }
     // console.log(val)
     // console.log(returnValue)
-    console.log({ val, newVal })
+    // console.log({ val, newVal })
 
     let proceed = true
     if (onChange) {

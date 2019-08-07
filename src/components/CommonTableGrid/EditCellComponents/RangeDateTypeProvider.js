@@ -36,11 +36,12 @@ class DateEditorBase extends PureComponent {
       isDisabled = () => false,
       getInitialValue,
       onChange,
+      gridId,
       ...restProps
     } = cfg
     const _onChange = (date, moments, org) => {
-      // console.log(date, moments, org)
       const error = updateCellValue(this.props, this.myRef.current, date)
+
       this.setState({
         error,
       })
@@ -50,10 +51,13 @@ class DateEditorBase extends PureComponent {
     }
     const commonCfg = {
       onChange: _onChange,
-      disabled: isDisabled(row),
+      disabled: isDisabled(
+        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+      ),
       defaultValue: getInitialValue ? getInitialValue(row) : value,
+      value,
     }
-    // console.log(cfg, value, props)
+    // console.log(cfg, value, commonCfg)
     return (
       <div ref={this.myRef}>
         <DateRangePicker
@@ -102,7 +106,8 @@ class RangeDateTypeProvider extends React.Component {
 
   shouldComponentUpdate = (nextProps, nextState) =>
     this.props.editingRowIds !== nextProps.editingRowIds ||
-    this.props.commitCount !== nextProps.commitCount
+    this.props.commitCount !== nextProps.commitCount ||
+    true
 
   render () {
     const { columnExtensions } = this.props

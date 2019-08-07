@@ -148,6 +148,11 @@ const sharedOverrides = {
       color: primaryColor,
     },
   },
+  MuiListItemIcon: {
+    root: {
+      minWidth: 25,
+    },
+  },
   MuiListItem: {
     button: {
       '&:hover,&:focus': {
@@ -155,6 +160,7 @@ const sharedOverrides = {
       },
     },
     root: {
+      // textDecoration: 'underline',
       '&$selected': {
         backgroundColor: color(hoverColor).lighten(0.05).hex(),
       },
@@ -169,6 +175,13 @@ const sharedOverrides = {
       color: 'rgba(0, 0, 0, 0.87)',
       boxShadow:
         '0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12)',
+    },
+  },
+  MuiCircularProgress: {
+    indeterminate: {
+      animation:
+        'MuiCircularProgress-keyframes-mui-progress-circular-rotate 1.4s linear infinite',
+      animationName: 'none',
     },
   },
   // MuiTableBody: {
@@ -284,6 +297,10 @@ export const defaultTheme = createMuiTheme({
         '& .Mui-disabled .anticon': {
           display: 'none',
         },
+        '& .checkbox-container': {
+          position: 'relative',
+          top: 1,
+        },
       },
 
       input: {
@@ -296,7 +313,7 @@ export const defaultTheme = createMuiTheme({
         '& textarea:first-of-type': {
           position: 'relative',
           marginBottom: 5,
-          top: 3,
+          top: 6,
         },
       },
     },
@@ -316,7 +333,8 @@ export const defaultTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 2,
+        position: 'relative',
+        top: 3,
         '& svg': {
           top: 3,
           position: 'relative',

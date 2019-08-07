@@ -20,6 +20,8 @@ import EditPlugin from './EditPlugin'
 import { Button } from '@/components'
 import Authorized from '@/utils/Authorized'
 
+let uniqueGid = 0
+
 const styles = (theme) => ({})
 
 class EditableTableGrid extends PureComponent {
@@ -27,10 +29,12 @@ class EditableTableGrid extends PureComponent {
     super(props)
     this.state = {
       editingRowIds: [],
-      hasError: false,
+      deletedRowIds: [],
+      // hasError: false,
       addedRows: [],
-      errorRows: [],
+      // errorRows: [],
     }
+    this.gridId = `edit-${uniqueGid++}`
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
@@ -45,7 +49,7 @@ class EditableTableGrid extends PureComponent {
     return null
   }
 
-  onAddedRowsChange = (addedRows) => {
+  _onAddedRowsChange = (addedRows) => {
     let row = addedRows
     if (this.props.EditingProps.onAddedRowsChange) {
       row = this.props.EditingProps.onAddedRowsChange(addedRows)
@@ -55,7 +59,7 @@ class EditableTableGrid extends PureComponent {
     })
   }
 
-  onEditingRowIdsChange = (ids) => {
+  _onEditingRowIdsChange = (ids) => {
     const { EditingProps, rows } = this.props
     const { onEditingRowIdsChange } = EditingProps
 
@@ -69,7 +73,20 @@ class EditableTableGrid extends PureComponent {
     })
   }
 
-  onRowChangesChange = (changes) => {
+  _onDeletedRowIdsChange = (ids) => {
+    const { EditingProps, rows } = this.props
+    const { onDeletedRowIdsChange } = EditingProps
+
+    let newIds = ids
+    if (onDeletedRowIdsChange) {
+      newIds = onDeletedRowIdsChange(ids)
+    }
+    this.setState({
+      deletedRowIds: newIds,
+    })
+  }
+
+  _onRowChangesChange = (changes) => {
     const { EditingProps, rows } = this.props
     const { onRowChangesChange } = EditingProps
 
@@ -155,17 +172,15 @@ class EditableTableGrid extends PureComponent {
     // if (schema) {
     //   for (let index = 0; index < newRows.length; index++) {
     //     const row = newRows[index]
-    //     let vaild = false
+    //     console.log(row)
     //     try {
-    //       const r = schema.validateSync(row, { abortEarly: false })
-    //       console.log(r)
-    //       vaild = true
+    //       schema.validateSync(row, { abortEarly: true })
     //     } catch (error) {
     //       console.log(error)
-    //       this.setState({ hasError: true })
+    //       return
     //     }
-    //     return vaild
     //   }
+    // }
 
     //   // schema.validate(newRows, { abortEarly: false }).then(
     //   //   (v) => {
@@ -293,7 +308,7 @@ class EditableTableGrid extends PureComponent {
     console.log('editabletablegrid', { props: this.props })
 
     const { FuncProps: { pager = true } } = props
-    const { editingRowIds, rowChanges, addedRows } = this.state
+    const { editingRowIds, deletedRowIds, rowChanges, addedRows } = this.state
     // console.log(this.state, this.props)
     // console.log(editingRowIds, this.state.errorRows)
     // console.log('this.containerComponent', this.containerComponent)
@@ -302,21 +317,25 @@ class EditableTableGrid extends PureComponent {
       cfg.containerComponent = this.containerComponent
     }
     const sharedCfg = {
+      gridId: this.gridId,
       columnExtensions,
       editingRowIds,
       onRowDoubleClick: this.onRowDoubleClick,
       ...cfg,
       ...props,
     }
+    // console.log(rowChanges, addedRows)
     const editableCfg = {
       extraState: [
         <EditingState
           editingRowIds={editingRowIds}
+          deletedRowIds={deletedRowIds}
           rowChanges={rowChanges}
           addedRows={addedRows}
-          onAddedRowsChange={this.onAddedRowsChange}
-          onEditingRowIdsChange={this.onEditingRowIdsChange}
-          onRowChangesChange={this.onRowChangesChange}
+          onAddedRowsChange={this._onAddedRowsChange}
+          onEditingRowIdsChange={this._onEditingRowIdsChange}
+          onDeletedRowIdsChange={this._onDeletedRowIdsChange}
+          onRowChangesChange={this._onRowChangesChange}
           onCommitChanges={this._onCommitChanges}
           columnExtensions={columnExtensions}
         />,

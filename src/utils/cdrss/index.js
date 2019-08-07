@@ -23,11 +23,11 @@ const { regex, format } = config
 // const CollapsePanel = Collapse.Panel
 const textarea = Input.TextArea
 const RadioGroup = Radio.Group
-Array.prototype.selectMany = function (fn) {
-  return this.map(fn).reduce((x, y) => {
-    return x.concat(y)
-  }, [])
-}
+// Array.prototype.selectMany = function (fn) {
+//   return this.map(fn).reduce((x, y) => {
+//     return x.concat(y)
+//   }, [])
+// }
 String.prototype.hyphenToHump = function () {
   return this.replace(/-(\w)/g, (...args) => {
     return args[1].toUpperCase()

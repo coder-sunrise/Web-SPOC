@@ -66,6 +66,8 @@ import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import { watchForElementChange } from '@/utils/utils'
 
+window.$tempGridRow = {}
+
 const cellStyle = {
   cell: {
     // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
@@ -113,8 +115,8 @@ const styles = (theme) => ({
 const DefaultTableCell = React.memo(
   ({ dispatch, ...props }) => <Table.Cell {...props} />,
   (prevProps, nextProps) => {
-    console.log(prevProps, nextProps)
-    console.log(prevProps === nextProps, prevProps.row === nextProps.row)
+    // console.log(prevProps, nextProps)
+    // console.log(prevProps === nextProps, prevProps.row === nextProps.row)
     return prevProps === nextProps || prevProps.row === nextProps.row
   },
 )
@@ -131,7 +133,7 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
     }
   })
 }
-let gridId = 0
+let uniqueGid = 0
 @connect(({ loading, global }) => {
   return { loading, global }
 })
@@ -154,7 +156,7 @@ class CommonTableGrid extends React.Component {
       rowMoveable = (f) => false,
     } = props
     // console.log(props)
-    this.gridId = `grid-${gridId++}`
+    this.gridId = 'view-' + uniqueGid++
     this.myRef = React.createRef()
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -598,6 +600,7 @@ class CommonTableGrid extends React.Component {
       sort,
       sortConfig,
       filter,
+      gridId,
     } = {
       ...this.defaultFunctionConfig,
       ...FuncProps,
@@ -674,7 +677,7 @@ class CommonTableGrid extends React.Component {
     // }
     newColumExtensions.forEach((c) => {
       c.validationSchema = schema
-      c.gridId = this.gridId
+      c.gridId = gridId || this.gridId
       if (c.type === 'number' || c.type === 'currency') {
         if (!c.align) {
           c.align = 'right'
@@ -701,6 +704,7 @@ class CommonTableGrid extends React.Component {
       columnExtensions: newColumExtensions,
       editingRowIds,
       commitCount: global.commitCount,
+      errorCount: global.errorCount,
     }
     const allowSelectRowByClick =
       columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined

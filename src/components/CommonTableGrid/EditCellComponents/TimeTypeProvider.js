@@ -69,7 +69,14 @@ class TimeEditorBase extends PureComponent {
 
   render () {
     const { props } = this
-    const { column = {}, value, onValueChange, columnExtensions, row } = props
+    const {
+      column = {},
+      value,
+      onValueChange,
+      columnExtensions,
+      row,
+      gridId,
+    } = props
     const { name: columnName } = column
     const cfg = columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
@@ -79,7 +86,9 @@ class TimeEditorBase extends PureComponent {
     const commonCfg = {
       onChange: this.onChange,
       onOpenChange: this.onOpenChange,
-      disabled: isDisabled(row),
+      disabled: isDisabled(
+        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+      ),
       value,
     }
     return (

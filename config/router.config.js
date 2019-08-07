@@ -451,6 +451,12 @@ const routes = [
           //   component: './Development/TUIImageEditor',
           // },
           {
+            path: '/development/imageeditor2',
+            name: 'LCImageEditor',
+            mini: 'CA',
+            component: './Development/LCImageEditor',
+          },
+          {
             path: '/development/scribble',
             name: 'Scribble',
             mini: 'CA',

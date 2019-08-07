@@ -46,6 +46,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     inputProps = {},
     error,
     rawError,
+    text,
     white,
     inputRootCustomClasses,
     success,
@@ -71,6 +72,8 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     [classes.formControl]: true,
     [classes.noLabel]: !label,
     [props.className]: true,
+    [classes.textControl]: !!text,
+
     // [classes.medium]: size === 'default' || size === 'medium' || size === 'md',
     // [classes.small]: size === 'small' || size === 'sm',
     // [classes.large]: size === 'large' || size === 'lg',

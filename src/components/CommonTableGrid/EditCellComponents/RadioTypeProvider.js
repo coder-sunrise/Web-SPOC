@@ -37,6 +37,7 @@ const RadioEditorBase = React.memo(
       checkedValue = true,
       uncheckedValue = false,
       gridId,
+      isDisabled = () => false,
       ...restConfig
     } = cfg
     // console.log(cfg)
@@ -56,6 +57,12 @@ const RadioEditorBase = React.memo(
     if (radioSelectedMap[gridId][columnName]) {
       checked = radioSelectedMap[gridId][columnName] === row.id
     }
+
+    const commonCfg = {
+      disabled: isDisabled(
+        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+      ),
+    }
     return (
       <Radio
         value={value}
@@ -71,6 +78,7 @@ const RadioEditorBase = React.memo(
           onRadioChange(row, e.target, c)
           onValueChange(c ? checkedValue : uncheckedValue)
         }}
+        {...commonCfg}
       />
     )
   },

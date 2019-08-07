@@ -31,12 +31,24 @@ const numberOnChangeFormatter = (onChangeEvent) => (value) =>
   onChangeEvent(numeral(value)._value)
 
 const NumberEditorBase = (columnExtensions) => (props) => {
-  const { column: { name: columnName }, value, onValueChange, classes } = props
+  const {
+    column: { name: columnName },
+    value,
+    onValueChange,
+    classes,
+    row,
+  } = props
   const cfg =
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
-  const { type, ...restProps } = cfg
+  const { type, isDisabled = () => false, gridId, ...restProps } = cfg
+
+  const commonCfg = {
+    disabled: isDisabled(
+      window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+    ),
+  }
   return (
     <NumberInput
       inputProps={{
@@ -50,6 +62,7 @@ const NumberEditorBase = (columnExtensions) => (props) => {
       }}
       currency
       noWrapper
+      {...commonCfg}
       {...restProps}
     />
   )

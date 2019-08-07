@@ -51,10 +51,6 @@ class AppointmentHistory extends PureComponent {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  onReset () {
-    console.log('Schemes-onReset', this)
-  }
-
   resize () {
     if (this.divElement) {
       const height = this.divElement.clientHeight

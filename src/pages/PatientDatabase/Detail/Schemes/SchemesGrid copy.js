@@ -2,17 +2,30 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import { EditableTableGrid, notification } from '@/components'
 
+import Yup from '@/utils/yup'
 import { getCodes } from '@/utils/codes'
+import { getUniqueNumericId } from '@/utils/utils'
 
 let schemeTypes = []
 getCodes('ctSchemeType').then((codetableData) => {
   schemeTypes = codetableData
 })
 
+const schema = Yup.array().unique(
+  (v) => `${v.schemeTypeFK}-${v.coPaymentSchemeFK}`,
+  'error',
+  () => {
+    notification.error({
+      message: 'The Schemes record already exists in the system',
+    })
+  },
+)
+
 class SchemesGrid extends PureComponent {
   state = {
     editingRowIds: [],
     rowChanges: {},
+    rows: null, // Save current row data for logic checking
   }
 
   tableParas = {
@@ -46,46 +59,9 @@ class SchemesGrid extends PureComponent {
         columnName: 'schemeTypeFK',
         type: 'codeSelect',
         code: 'ctSchemeType',
-        onChange: ({ val, option, row, onValueChange }) => {
-          // console.log(row)
-          let rows = this.props.rows
-          if (!row.id) {
-            rows = rows.concat([
-              row,
-            ])
-          }
-          if (
-            rows.filter(
-              (o) => !o.isDeleted && o.schemeTypeFK === val && o.id !== row.id,
-            ).length >= 1
-          ) {
-            notification.error({
-              message: 'The Schemes record already exists in the system',
-            })
-            onValueChange(undefined)
-            return
-          }
-          if (
-            this.isCHAS(val) &&
-            rows.filter(
-              (o) =>
-                !o.isDeleted && this.isCHAS(o.schemeTypeFK) && o.id !== row.id,
-            ).length > 0
-          ) {
-            notification.error({
-              message: 'Patient already has a CHAS Scheme Added',
-            })
-            onValueChange(undefined)
-            return
-          }
-          if (this.isMedisave(row)) {
-            row.validRange = []
-            row.validFrom = ''
-            row.validTo = ''
-          }
-          // console.log(val)
-          onValueChange(val)
-        },
+        // onChange: (val, option, row, onValueChange) => {
+        //   console.log(val, option, row, onValueChange, this.props.rows)
+        // },
       },
       {
         columnName: 'coPaymentSchemeFK',
@@ -115,36 +91,31 @@ class SchemesGrid extends PureComponent {
 
     const { title, titleChildren, dispatch, type } = props
     const { state } = this
+  }
 
-    this.commitChanges = ({ rows, added, changed, deleted }) => {
-      const { setFieldValue } = this.props
-      const newRows = this.getSortedRows(rows)
-      newRows.forEach((r, i) => {
-        if (r.validRange && !this.isMedisave(r)) {
-          r.validFrom = r.validRange[0]
-          r.validTo = r.validRange[1]
-        } else {
-          r.validRange = []
-          r.validFrom = ''
-          r.validTo = ''
-        }
-        r.sequence = this.isCorporate(r) ? i : 0
-      })
+  static getDerivedStateFromProps (nextProps, preState) {
+    const { rows } = nextProps
 
-      setFieldValue('patientScheme', newRows)
-    }
+    if (rows && rows.length > 0 && !preState.rows)
+      return {
+        rows,
+      }
+
+    return null
   }
 
   isCorporate = (row) => {
     return row.schemeTypeFK === 11
   }
 
-  isCHAS = (schemeTypeFK) => {
-    return schemeTypeFK <= 5
+  isCHAS = (row) => {
+    return row.schemeTypeFK <= 5
   }
 
   isMedisave = (row) => {
+    console.log(schemeTypes)
     const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
+    console.log(r)
     if (!r) return false
     return (
       [
@@ -160,6 +131,47 @@ class SchemesGrid extends PureComponent {
       'sequence',
       'schemeTypeFK',
     ])
+  }
+
+  onRowChangesChange = (changes) => {
+    console.log(changes)
+
+    this.setState((preSate) => {
+      return {
+        rows: preSate.rows.map(
+          (row) => (changes[row.id] ? { ...row, ...changes[row.id] } : row),
+        ),
+      }
+    })
+    return changes
+  }
+
+  onDeletedRowIdsChange = (ids) => {
+    this.setState((preSate) => {
+      return {
+        rows: preSate.rows.filter((o) => ids.indexOf(o.id) < 0),
+      }
+    })
+    return ids
+  }
+
+  onAddedRowsChange = (addedRows) => {
+    const newRows = addedRows
+      .map((o) => {
+        return {
+          id: getUniqueNumericId(),
+          isNew: true,
+          ...o,
+        }
+      })
+      .concat(this.state.rows.filter((o) => !o.isNew))
+    this.setState((preSate) => {
+      return {
+        rows: newRows,
+      }
+    })
+    this.checkDataValidity(newRows)
+    return addedRows
   }
 
   onRowMove = (row, dirt) => {
@@ -188,19 +200,45 @@ class SchemesGrid extends PureComponent {
     // console.log(row, dirt, newRows)
   }
 
-  render () {
-    const { editingRowIds, rowChanges } = this.state
-    const { type, rows, schema } = this.props
+  commitChanges = ({ rows, added, changed, deleted }) => {
+    const { setFieldValue } = this.props
+    const newRows = this.getSortedRows(rows)
+    newRows.forEach((r, i) => {
+      if (r.validRange) {
+        r.validFrom = r.validRange[0]
+        r.validTo = r.validRange[1]
+      }
+      r.sequence = this.isCorporate(r) ? i : 0
+    })
 
+    setFieldValue('patientScheme', newRows)
+  }
+
+  checkDataValidity = (rows) => {
+    schema.validateSync(rows)
+
+    if (rows.filter((o) => !o.isDeleted && this.isCHAS(o)).length > 1) {
+      notification.error({
+        message: 'Patient already has a CHAS Scheme Added',
+      })
+    }
+  }
+
+  render () {
+    const { editingRowIds, rowChanges, rows } = this.state
+    const { type, schema } = this.props
+    console.log(rows)
     const EditingProps = {
       showAddCommand: true,
-
+      onRowChangesChange: this.onRowChangesChange,
+      onAddedRowsChange: this.onAddedRowsChange,
+      onDeletedRowIdsChange: this.onDeletedRowIdsChange,
       onCommitChanges: this.commitChanges,
     }
 
     return (
       <EditableTableGrid
-        rows={this.getSortedRows(rows)}
+        rows={this.getSortedRows(this.props.rows)}
         rowMoveable={this.isCorporate}
         onRowMove={this.onRowMove}
         FuncProps={{ pager: false }}

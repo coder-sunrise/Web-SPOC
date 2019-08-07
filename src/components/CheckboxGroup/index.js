@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
 import { FormLabel, Checkbox, FormControlLabel } from '@material-ui/core'
@@ -107,7 +108,7 @@ class CheckboxGroup extends React.Component {
     // this.setState({ selectedValue: newSv })
   }
 
-  getComponent = ({ inputRef, onChange, ...props }) => {
+  getComponent = ({ inputRef, onChange, className, ...props }) => {
     const { state } = this
     const {
       classes,
@@ -121,7 +122,14 @@ class CheckboxGroup extends React.Component {
       ...resetProps
     } = this.props
     return (
-      <div style={{ width: '100%', height: 'auto' }} {...props}>
+      <div
+        className={classnames({
+          [className]: true,
+          'checkbox-container': true,
+        })}
+        style={{ width: '100%', height: 'auto' }}
+        {...props}
+      >
         {options.map((o) => {
           const v = `${o[valueField]}`
           // console.log(v)
