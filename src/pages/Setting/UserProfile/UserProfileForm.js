@@ -236,8 +236,8 @@ export default withFormik({
     role: '1',
   }),
   handleSubmit: (values, { props, ...formikBag }) => {
-    console.log('submit', values, props)
-    const { onConfirm } = props
+    // console.log('submit', values, props)
+    const { onSubmit } = props
     const { role, ...restValues } = values
     const hardcodedProfileValue = {
       // role: '1',
@@ -286,6 +286,6 @@ export default withFormik({
       concurrencyToken: 0,
       ...restValues,
     }
-    onConfirm(hardcodedProfileValue)
+    onSubmit(hardcodedProfileValue)
   },
 })(withStyles(styles, { name: 'UserProfileForm' })(UserProfileForm))

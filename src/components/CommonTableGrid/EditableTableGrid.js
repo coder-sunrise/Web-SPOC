@@ -290,6 +290,8 @@ class EditableTableGrid extends PureComponent {
       ...props
     } = this.props
 
+    console.log('editabletablegrid', { props: this.props })
+
     const { FuncProps: { pager = true } } = props
     const { editingRowIds, rowChanges, addedRows } = this.state
     // console.log(this.state, this.props)
@@ -371,6 +373,8 @@ class EditableTableGrid extends PureComponent {
         />,
       ],
     }
+    // console.log('EditableTableGrid')
+
     const element = (
       <Authorized.Context.Consumer>
         {({ view, edit, behavior }) => (

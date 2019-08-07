@@ -10,7 +10,7 @@ import { Tooltip, withStyles } from '@material-ui/core'
 import Pageview from '@material-ui/icons/Pageview'
 import Edit from '@material-ui/icons/Edit'
 import Money from '@material-ui/icons/AttachMoney'
-import Clear from '@material-ui/icons/Clear'
+import Delete from '@material-ui/icons/Delete'
 import Person from '@material-ui/icons/Person'
 import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
@@ -126,7 +126,7 @@ const ContextMenuOptions = [
   {
     id: 2,
     label: 'Delete Visit',
-    Icon: Clear,
+    Icon: Delete,
     disabled: false,
   },
   { isDivider: true },
@@ -134,7 +134,7 @@ const ContextMenuOptions = [
     id: 3,
     label: 'Patient Profile',
     Icon: Person,
-    disabled: false,
+    disabled: true,
   },
   {
     id: 4,
@@ -158,6 +158,12 @@ const ContextMenuOptions = [
   loading,
 }))
 class DetailsGrid extends PureComponent {
+  onRowDoubleClick = (row) => {
+    this.props.handleEditVisitClick({
+      visitID: row.id,
+    })
+  }
+
   onViewDispenseClick = (queue) => {
     const { dispatch, location } = this.props
     const href = `${location.pathname}/dispense/${queue.visitRefNo}`
@@ -336,6 +342,7 @@ class DetailsGrid extends PureComponent {
           {...TableConfig}
           size='sm'
           FuncProps={FuncConfig}
+          onRowDoubleClick={this.onRowDoubleClick}
         />
       </LoadingWrapper>
     )
