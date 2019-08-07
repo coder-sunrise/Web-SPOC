@@ -95,7 +95,7 @@ class CommitButton extends React.PureComponent {
   }
 
   render () {
-    const { onExecute, editingRowIds, row, schema } = this.props
+    const { onExecute, editingRowIds, row, schema, gridId } = this.props
 
     return (
       <div ref={this.myRef} style={{ display: 'inline-block' }}>
@@ -108,16 +108,21 @@ class CommitButton extends React.PureComponent {
             // )
             if (schema) {
               try {
-                schema.validateSync(row, {
-                  abortEarly: false,
-                })
+                schema.validateSync(
+                  window.$tempGridRow[gridId]
+                    ? window.$tempGridRow[gridId][row.id]
+                    : row,
+                  {
+                    abortEarly: false,
+                  },
+                )
                 // console.log({ r })
 
                 // row._$error = false
               } catch (er) {
                 // console.log(er)
                 // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
-                console.log(er, this.myRef.current)
+                // console.log(er, this.myRef.current)
                 $(this.myRef.current).find('button').attr('disabled', true)
                 // const actualError = er.inner.find((o) => o.path === columnName)
                 // return actualError ? actualError.message : ''
@@ -128,7 +133,7 @@ class CommitButton extends React.PureComponent {
                     commitCount: commitCount++,
                   },
                 })
-                return
+                return false
               }
             }
 

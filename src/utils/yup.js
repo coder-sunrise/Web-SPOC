@@ -130,7 +130,7 @@ Yup.addMethod(Yup.array, 'unique', function (
     // const { originalValue } = options
 
     const compareValues = value.map(mapper)
-    console.log(value, compareValues, value.filter((o) => !o.isDeleted))
+    // console.log(value, compareValues, value.filter((o) => !o.isDeleted))
     if (
       _.uniq(compareValues).length !== value.filter((o) => !o.isDeleted).length
     ) {
@@ -138,6 +138,7 @@ Yup.addMethod(Yup.array, 'unique', function (
         message,
       })
       if (callback) callback(message)
+      return false
     }
     return true
   })

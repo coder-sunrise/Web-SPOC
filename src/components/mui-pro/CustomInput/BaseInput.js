@@ -102,6 +102,7 @@ class BaseInput extends React.PureComponent {
       currency,
       inputRootCustomClasses,
       negative,
+      text,
     } = this.props
     let { error, help } = this.props
     // if (field && form) {
@@ -123,11 +124,12 @@ class BaseInput extends React.PureComponent {
       [classes.underlineError]: error,
       [classes.underlineSuccess]: success && !error,
       [classes.underline]: true,
-      [classes.noUnderline]: noUnderline,
+      [classes.noUnderline]: noUnderline || text,
       [classes.normalText]: normalText,
       [classes.rightAlign]: rightAlign,
       [classes.simple]: simple,
       [classes.inputRoot]: true,
+      [classes.textInput]: !!text,
       [classes.whiteUnderline]: white,
       [classes.currency]: normalText && currency,
       [classes.negativeCurrency]: normalText && negative,
@@ -139,6 +141,7 @@ class BaseInput extends React.PureComponent {
     const inputClasses = classNames({
       [classes.input]: true,
       [classes.whiteInput]: white,
+      [classes.text]: !!text,
     })
     return {
       input: inputClasses,

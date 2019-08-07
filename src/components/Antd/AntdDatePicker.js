@@ -72,7 +72,6 @@ class AntdDatePicker extends PureComponent {
       field.value !== undefined && field.value !== ''
         ? field.value
         : props.value || props.defaultValue
-
     this.state = {
       shrink: v !== undefined && v !== '',
       value: v,
@@ -157,7 +156,7 @@ class AntdDatePicker extends PureComponent {
   // render () {
   //   const { classes, onChange, ...restProps } = this.props
   //   const { format, form, field, value } = restProps
-  //   const selectValue = form && field ? field.value : value
+  //   const value = form && field ? field.value : value
 
   //   // date picker component dont pass formik props into wrapper
   //   // date picker component should handle the value change event itself
@@ -169,7 +168,7 @@ class AntdDatePicker extends PureComponent {
   //         allowClear
   //         placeholder=''
   //         onChange={extendFunc(onChange, this.handleChange)}
-  //         value={_toMoment(selectValue, format)}
+  //         value={_toMoment(value, format)}
   //       />
   //     </AntdWrapper>
   //   )
@@ -195,12 +194,15 @@ class AntdDatePicker extends PureComponent {
       onBlur,
       onOpenChange,
       value,
+      text,
       ...restProps
     } = this.props
     const { format = dateFormat } = restProps
     // console.log(this.state.value)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
+    if (text)
+      return <span>{_toMoment(this.state.value, format).format(format)}</span>
     return (
       <div style={{ width: '100%' }} {...props}>
         <DatePicker
@@ -228,15 +230,9 @@ class AntdDatePicker extends PureComponent {
 
   render () {
     const { classes, theme, ...restProps } = this.props
-    const { form, field, value, text, format = dateFormat } = restProps
-    const selectValue = form && field ? field.value : value
 
-    if (text) {
-      if (selectValue) return _toMoment(selectValue, format).format(format)
-      return null
-    }
     const labelProps = {
-      shrink: !!selectValue || this.state.shrink,
+      shrink: !!this.state.value || this.state.shrink,
     }
     return (
       <CustomInput
@@ -246,7 +242,7 @@ class AntdDatePicker extends PureComponent {
         //   console.log(e)
         // }}
         {...restProps}
-        value={this.state.selectValue}
+        value={this.state.value}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
       />

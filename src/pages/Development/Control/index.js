@@ -286,7 +286,12 @@ class ControlTest extends PureComponent {
             <FastField
               name='name'
               render={(args) => (
-                <TextField prefix={<Search />} label='Name' {...args} />
+                <TextField
+                  prefix={<Search />}
+                  label='sdf'
+                  prefix='Name'
+                  {...args}
+                />
               )}
             />
           </GridItem>

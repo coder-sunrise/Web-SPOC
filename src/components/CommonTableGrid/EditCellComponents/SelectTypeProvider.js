@@ -52,6 +52,7 @@ class SelectEditor extends PureComponent {
       validationSchema,
       isDisabled = () => false,
       onChange,
+      gridId,
       ...restProps
     } = cfg
 
@@ -60,17 +61,25 @@ class SelectEditor extends PureComponent {
       this.setState({
         error,
       })
-      if (!error) {
-        if (onChange) onChange(val, option, row, onValueChange)
-      }
-    }
 
+      if (onChange)
+        onChange({
+          val,
+          option,
+          row,
+          onValueChange,
+          error,
+        })
+    }
+    // console.log(window.$tempGridRow)
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
       error: this.state.error,
       defaultValue: value,
-      disabled: isDisabled(row),
+      disabled: isDisabled(
+        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+      ),
       ...restProps,
       onChange: _onChange,
     }

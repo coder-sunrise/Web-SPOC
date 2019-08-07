@@ -463,6 +463,8 @@ export const updateLoadingState = (type = '@@DVA_LOADING/HIDE') => {
   }
 }
 
+let errorCount = 0
+
 export const updateCellValue = (
   {
     column: { name: columnName },
@@ -475,30 +477,53 @@ export const updateCellValue = (
   },
   element,
   val,
+  col,
 ) => {
   const cfg =
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
-  // console.log(cfg)
-  const { validationSchema, ...restConfig } = cfg
-  row[columnName] = val
-  // console.log(validationSchema)
+  const { validationSchema, gridId, ...restConfig } = cfg
+  if (!window.$tempGridRow[gridId]) {
+    window.$tempGridRow[gridId] = {}
+  }
+  if (!window.$tempGridRow[gridId][row.id]) {
+    window.$tempGridRow[gridId][row.id] = row
+  }
+
+  window.$tempGridRow[gridId][row.id][columnName] = val
+  // console.log(val)
+
   if (validationSchema) {
     try {
-      const r = validationSchema.validateSync(row, {
-        abortEarly: false,
-      })
-      // console.log({ r })
-      $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
-
       if (value !== val) {
         onValueChange(val)
       }
+      const r = validationSchema.validateSync(
+        window.$tempGridRow[gridId][row.id],
+        {
+          abortEarly: false,
+        },
+      )
+      // console.log({ r })
+      $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
+
       return ''
       // row._$error = false
     } catch (er) {
       // console.log(er)
+      // window.g_app._store.dispatch({
+      //   type: 'global/updateState',
+      //   payload: {
+      //     errorCount: errorCount++,
+      //   },
+      // })
+      // const { inner } = er
+      // if (inner) {
+      //   if (!inner.find((o) => o.path === columnName)) {
+      //     return
+      //   }
+      // }
       $(element).parents('tr').find('.grid-commit').attr('disabled', true)
       // console.log(er)
       const actualError = er.inner.find((o) => o.path === columnName)

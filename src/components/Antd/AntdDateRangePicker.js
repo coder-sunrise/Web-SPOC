@@ -68,7 +68,7 @@ class AntdDateRangePicker extends PureComponent {
       value:
         field.value !== undefined && field.value.length > 0
           ? field.value.map((o) => _toMoment(o))
-          : [],
+          : (props.value || props.defaultValue || []).map((o) => _toMoment(o)),
     }
   }
 
@@ -169,9 +169,10 @@ class AntdDateRangePicker extends PureComponent {
       onBlur,
       onOpenChange,
       nowOnwards,
+      value,
       ...restProps
     } = this.props
-    const { format = dateFormat, form, field, value } = restProps
+    const { format = dateFormat, form, field } = restProps
     const selectValue = form && field ? field.value : value
 
     const cfg = {}

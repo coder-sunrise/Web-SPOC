@@ -44,11 +44,21 @@ const Invoice = (props) => {
   return (
     <div>
       <GridContainer>
-        <GridItem xs={6}>
-          <TextField label='Invoice No' disabled defaultValue='INV/123456' />
+        <GridItem xs={12}>
+          <TextField
+            prefix='Invoice No: '
+            text
+            defaultValue='INV/123456'
+            noUnderline
+          />
         </GridItem>
-        <GridItem xs={6}>
-          <DatePicker label='Invoice Date' disabled defaultValue={moment()} />
+        <GridItem xs={12}>
+          <DatePicker
+            prefix='Invoice Date: '
+            text
+            defaultValue={moment()}
+            noUnderline
+          />
         </GridItem>
       </GridContainer>
 

@@ -56,12 +56,13 @@
     "draft-js": "^0.10.5",
     "dva": "^2.4.0",
     "enquire-js": "^0.2.1",
+    "fabric": "^3.3.2",
     "formik": "^1.5.7",
     "hash.js": "^1.1.5",
     "humps": "^2.0.1",
     "jquery": "^3.4.1",
     "jsonp": "^0.2.1",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.15",
     "lodash-decorators": "^6.0.0",
     "memoize-one": "^4.1.0",
     "moment": "^2.23.0",
@@ -95,7 +96,7 @@
     "react-loadable": "^5.5.0",
     "react-media": "^1.9.2",
     "react-router-dom": "^4.3.1",
-    "react-select": "^2.3.0",
+    "react-sketch": "^0.5.1",
     "react-swipeable-views": "^0.13.0",
     "react-table": "^6.8.6",
     "rrule": "^2.6.2",
@@ -144,9 +145,9 @@
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.6.0",
     "typescript": "^3.3.3333",
-    "umi": "2.7.7",
+    "umi": "^2.8.16",
     "umi-plugin-ga": "^1.1.3",
-    "umi-plugin-react": "1.8.4"
+    "umi-plugin-react": "^1.9.14"
   },
   "optionalDependencies": {
     "puppeteer": "^1.10.0"

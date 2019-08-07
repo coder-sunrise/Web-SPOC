@@ -408,8 +408,6 @@ class Demographic extends PureComponent {
         <Paper
           style={{
             padding: theme.spacing.unit,
-            marginTop: theme.spacing.unit,
-            marginBottom: theme.spacing.unit,
           }}
         >
           <GridContainer>

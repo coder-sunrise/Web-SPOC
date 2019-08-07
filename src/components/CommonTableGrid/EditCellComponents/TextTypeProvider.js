@@ -46,6 +46,7 @@ class TextEditorBase extends PureComponent {
       validationSchema,
       isDisabled = () => false,
       onChange,
+      gridId,
       ...restConfig
     } = cfg
     const submitValue = (e) => {
@@ -61,6 +62,11 @@ class TextEditorBase extends PureComponent {
         if (onChange) onChange(e.target.value, row)
       }
     }
+    const commonCfg = {
+      disabled: isDisabled(
+        window.$tempGridRow[gridId] ? window.$tempGridRow[gridId][row.id] : row,
+      ),
+    }
     return (
       <div ref={this.myRef}>
         <TextField
@@ -68,10 +74,10 @@ class TextEditorBase extends PureComponent {
           noWrapper
           defaultValue={value}
           onChange={submitValue}
-          disabled={isDisabled(row)}
           // onCommit={submitValue}
           // onChange={submitValue}
           error={this.state.error}
+          {...commonCfg}
           {...restConfig}
         />
       </div>

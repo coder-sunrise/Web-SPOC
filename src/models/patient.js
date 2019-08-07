@@ -152,6 +152,22 @@ export default createFormViewModel({
       //   return yield call(service.upsert, payload)
       // },
     },
-    reducers: {},
+    reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+        // console.log(payload)
+        data.patientScheme.forEach((ps) => {
+          if (ps.validFrom && ps.validTo)
+            ps.validRange = [
+              ps.validFrom,
+              ps.validTo,
+            ]
+        })
+        return {
+          ...st,
+          entity: data,
+        }
+      },
+    },
   },
 })

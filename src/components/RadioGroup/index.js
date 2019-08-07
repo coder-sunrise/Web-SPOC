@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
 import { FormLabel, Radio, FormControlLabel } from '@material-ui/core'
@@ -46,7 +47,7 @@ class RadioGroup extends React.Component {
     }
   }
 
-  getComponent = ({ inputRef, onChange, ...props }) => {
+  getComponent = ({ inputRef, onChange, className, ...props }) => {
     const { state } = this
     const {
       classes,
@@ -61,7 +62,14 @@ class RadioGroup extends React.Component {
     } = this.props
     // console.log(this.state.selectedValue)
     return (
-      <div style={{ width: '100%', height: 'auto' }} {...props}>
+      <div
+        className={classnames({
+          [className]: true,
+          'checkbox-container': true,
+        })}
+        style={{ width: '100%', height: 'auto' }}
+        {...props}
+      >
         {options.map((o, i) => {
           const v = `${o[valueField]}`
 
