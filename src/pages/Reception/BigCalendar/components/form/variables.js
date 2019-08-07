@@ -38,7 +38,7 @@ export const days = [
 ]
 
 export const AppointmentDataColumn = [
-  { name: 'conflict', title: ' ' },
+  // { name: 'conflict', title: ' ' },
   { name: 'doctor', title: 'Doctor' },
   { name: 'appointmentType', title: 'Appointment Type' },
   { name: 'timeFrom', title: 'Time From' },

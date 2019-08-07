@@ -26,10 +26,21 @@ const checkPermissions = (
   Exception,
   type,
 ) => {
+  // console.log(
+  //   'checkPermissions',
+  //   authority,
+  //   currentAuthority,
+  //   target,
+  //   Exception,
+  // )
   // 没有判定权限.默认查看所有
   // Retirement authority, return target;
-  if (!authority) {
-    return target
+  if (!authority || (Array.isArray(authority) && !authority.join(' ').trim())) {
+    return typeof target === 'function' && type !== 'decorator'
+      ? target({
+          name: 'full.edit',
+        })
+      : target
   }
   // 数组处理
   let match = null
@@ -67,7 +78,7 @@ const checkPermissions = (
           ].indexOf(o.rights) >= 0,
       )
       if (match)
-        return typeof type === 'function' && type !== 'decorator'
+        return typeof target === 'function' && type !== 'decorator'
           ? target(match)
           : target
 
@@ -132,13 +143,7 @@ const checkPermissions = (
       throw error
     }
   }
-  console.log(
-    'checkPermissions',
-    authority,
-    currentAuthority,
-    target,
-    Exception,
-  )
+
   throw new Error('unsupported parameters')
 }
 

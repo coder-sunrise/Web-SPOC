@@ -8,10 +8,26 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import MoreVert from '@material-ui/icons/MoreVert'
 // common components
 import { Button } from '@/components'
+import { primaryColor } from 'mui-pro-jss'
 
-const style = () => ({
+const style = (theme) => ({
   leftAlign: {
     justifyContent: 'start',
+  },
+  menu: {
+    '& > .ant-dropdown-menu-item': {
+      display: 'flex',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+    },
+    '& span': {
+      fontSize: '0.8rem',
+      color: primaryColor,
+    },
+  },
+  icon: {
+    color: primaryColor,
+    marginRight: theme.spacing(1),
   },
 })
 
@@ -39,6 +55,7 @@ const MenuButton = withStyles(style, {
 })(MenuButtonBase)
 
 const GridContextMenuButton = ({
+  classes,
   color = 'primary',
   contextMenuOptions = [
     {
@@ -53,25 +70,33 @@ const GridContextMenuButton = ({
   row = {},
 }) => {
   const handleClick = (event) => {
-    const { currentTarget } = event
-    onClick(row, currentTarget.id)
+    const { key } = event
+
+    onClick(row, key)
   }
 
+  //   <MenuButton
+  //   id={id}
+  //   Icon={Icon}
+  //   label={label}
+  //   disabled={disabled}
+  //   onClick={handleClick}
+  // />
   const MenuItemsOverlay = (
-    <Menu>
+    <Menu onClick={handleClick} className={classes.menu}>
       {contextMenuOptions.map(
         ({ disabled, label, Icon, id, isDivider }, index) =>
           isDivider ? (
             <Menu.Divider key={`divider-${index}`} />
           ) : (
-            <Menu.Item key={id} disabled={disabled}>
-              <MenuButton
-                id={id}
-                Icon={Icon}
-                label={label}
-                disabled={disabled}
-                onClick={handleClick}
-              />
+            <Menu.Item
+              key={id}
+              id={id}
+              disabled={disabled}
+              // onClick={handleClick}
+            >
+              <Icon className={classes.icon} />
+              <span>{label}</span>
             </Menu.Item>
           ),
       )}
@@ -112,4 +137,6 @@ const GridContextMenuButton = ({
 //   ]),
 // }
 
-export default GridContextMenuButton
+export default withStyles(style, { name: 'GridContextMenuButton' })(
+  GridContextMenuButton,
+)
