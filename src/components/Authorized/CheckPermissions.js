@@ -35,6 +35,7 @@ const checkPermissions = (
   // )
   // 没有判定权限.默认查看所有
   // Retirement authority, return target;
+
   if (!authority || (Array.isArray(authority) && !authority.join(' ').trim())) {
     return typeof target === 'function' && type !== 'decorator'
       ? target({
@@ -66,7 +67,6 @@ const checkPermissions = (
       ? Exception()
       : Exception
   }
-
   // string 处理
   if (typeof authority === 'string') {
     const r = currentAuthority.filter((o) => o.name === authority)
@@ -149,9 +149,9 @@ const checkPermissions = (
 
 export { checkPermissions }
 
-const check = (authority, target, Exception) => {
+const check = (authority, target, Exception, type) => {
   // console.log(authority, CURRENT, target, Exception)
-  return checkPermissions(authority, CURRENT, target, Exception)
+  return checkPermissions(authority, CURRENT, target, Exception, type)
 }
 
 export default check
