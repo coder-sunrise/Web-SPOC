@@ -7,15 +7,17 @@ import withStyles from '@material-ui/core/styles/withStyles'
 // wrapper
 import { extendFunc } from '@/utils/utils'
 import { control } from '@/components/Decorator'
-
+import { DatePicker as DP } from 'antd'
 import {
   CustomInputWrapper,
   BaseInput,
   CustomInput,
   dateFormat,
-  DatePicker,
 } from '@/components'
 
+import DatePicker from './AntdDatePicker'
+
+const { RangePicker } = DP
 const _toMoment = (value, format) => {
   if (!value) return ''
   const m = moment.utc(value)
@@ -173,7 +175,6 @@ class AntdDateRangePicker extends PureComponent {
     } = this.props
     const { format = dateFormat, form, field } = restProps
     const selectValue = form && field ? field.value : value
-
     const cfg = {}
     //     if(nowOnwards){
     // cfg.disabledDate=()=>{
@@ -193,7 +194,7 @@ class AntdDateRangePicker extends PureComponent {
     }
     return (
       <div style={{ width: '100%' }} {...props}>
-        <DatePicker.RangePicker
+        <RangePicker
           className={classnames(classes.datepickerContainer)}
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
