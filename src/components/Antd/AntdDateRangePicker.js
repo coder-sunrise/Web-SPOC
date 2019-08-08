@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
+import AutosizeInput from 'react-input-autosize'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
-// ant
-import { DatePicker } from 'antd'
-// assets
-import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
 import { extendFunc } from '@/utils/utils'
 import { control } from '@/components/Decorator'
@@ -16,6 +13,7 @@ import {
   BaseInput,
   CustomInput,
   dateFormat,
+  DatePicker,
 } from '@/components'
 
 const _toMoment = (value, format) => {
@@ -170,6 +168,7 @@ class AntdDateRangePicker extends PureComponent {
       onOpenChange,
       nowOnwards,
       value,
+      text,
       ...restProps
     } = this.props
     const { format = dateFormat, form, field } = restProps
@@ -183,6 +182,15 @@ class AntdDateRangePicker extends PureComponent {
     //     }
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
+    if (text) {
+      // console.log(this.state.value)
+      return (
+        <span>
+          <DatePicker text format={dateFormat} value={this.state.value[0]} /> ~
+          <DatePicker text format={dateFormat} value={this.state.value[1]} />
+        </span>
+      )
+    }
     return (
       <div style={{ width: '100%' }} {...props}>
         <DatePicker.RangePicker
