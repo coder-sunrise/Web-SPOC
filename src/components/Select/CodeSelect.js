@@ -1,10 +1,10 @@
 import React from 'react'
-// import Select from './index'
+import PropTypes from 'prop-types'
+import { connect } from 'dva'
 import Select from '../Antd/AntdSelect'
-import { getCodes, getTenantCodes } from '@/utils/codes'
+import { getTenantCodes } from '@/utils/codes'
 
-const codetables = {}
-
+@connect(({ codetable }) => ({ codetable }))
 class CodeSelect extends React.PureComponent {
   state = {
     options: [],
@@ -13,23 +13,12 @@ class CodeSelect extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    // console.log(props.code)
+    const { dispatch } = props
     if (props.code) {
-      getCodes(props.code).then((codetableData) => {
-        this.setState({ options: codetableData })
+      dispatch({
+        type: 'codetable/fetchCodes',
+        code: props.code,
       })
-
-      // if (!codetables[props.code]) {
-      //   getCodes(props.code).then((options) => {
-      //     this.setState({
-      //       options,
-      //     })
-      //   })
-      // } else {
-      //   this.setState({
-      //     options: codetables[props.code],
-      //   })
-      // }
     } else if (props.tenantCode) {
       getTenantCodes(props.tenantCode).then((response) => {
         const { data = [] } = response
@@ -55,26 +44,20 @@ class CodeSelect extends React.PureComponent {
     }
   }
 
-  // componentDidMount () {
-  //   // console.log(this.props.code)
-
-  // }
-
   render () {
-    // console.log(this.props)
-    // if (!this.state.options || this.state.options.length === 0) return null
+    const { codetable, code } = this.props
 
-    return (
-      <Select
-        options={this.state.options || []}
-        valueField='id'
-        {...this.props}
-      />
-    )
+    const options =
+      code !== undefined ? codetable[code.toLowerCase()] : this.state.options
+
+    return <Select options={options || []} valueField='id' {...this.props} />
   }
 }
 
-CodeSelect.propTypes = {}
+CodeSelect.propTypes = {
+  code: PropTypes.string,
+  tenantCode: PropTypes.string,
+}
 
 // export default withStyles(extendedFormsStyle)(CodeSelect)
 export default CodeSelect
