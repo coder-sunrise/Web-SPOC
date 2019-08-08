@@ -34,6 +34,7 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
     if (component.type.displayName === 'RegularButton') {
       return null
     }
+
     return (
       disabledComponent ||
       React.cloneElement(component, {

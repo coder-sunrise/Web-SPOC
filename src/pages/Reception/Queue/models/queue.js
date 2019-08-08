@@ -1,9 +1,6 @@
-// import { queryFakeList, fakeSubmitForm } from '@/services/api'
-import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 import { notification } from '@/components'
-import Error, { showErrorNotification } from '@/utils/error'
 import { StatusIndicator } from '../variables'
 
 const MessageWrapper = ({ children }) => (
@@ -22,41 +19,6 @@ const InitialSessionInfo = {
   sessionStartDate: '',
   sessionCloseDate: '',
 }
-
-const visitStatusCode = [
-  'WAITING',
-  'APPOINTMENT',
-  'TO DISPENSE',
-  'IN CONS',
-  'PAUSED',
-  'PAID',
-  'OVERPAID',
-]
-
-const generateRowData = () => {
-  const data = []
-  for (let i = 0; i < 12; i += 1) {
-    data.push({
-      Id: `row-${i}-data`,
-      queueNo:
-        visitStatusCode[i % visitStatusCode.length] === 'APPOINTMENT' ? '' : i,
-      visitStatus: visitStatusCode[i % visitStatusCode.length],
-      roomNo: '',
-      doctor: 'Cheah',
-      refNo: `PT-0000${i}`,
-      patientName: 'Annie Leonhart @ Annabelle Perfectionism',
-      gender: 'F',
-      age: i,
-      visitRefNo: `190402-01-${i}`,
-    })
-  }
-  return data
-}
-
-const mergeGenderAndAge = (data, row) => [
-  ...data,
-  { ...row, 'gender/age': `${row.gender}/${row.age}` },
-]
 
 export default createListViewModel({
   namespace: 'queueLog',
@@ -208,13 +170,6 @@ export default createListViewModel({
         yield call(service.deleteQueue, queueID)
         return true
       },
-      // *fetchDoctorProfile({ _}, { call, put}){
-      //   const reposne = yield call(service.fetchDoctorProfile)
-
-      //   return yield put({
-      //     type: ''
-      //   })
-      // }
     },
     reducers: {
       toggleError (state, { error = {} }) {
@@ -236,9 +191,6 @@ export default createListViewModel({
           ...state,
           queueListing,
         }
-      },
-      registerVisit (state, { payload }) {
-        return { ...state }
       },
       showError (state, { payload }) {
         return { ...state, errorMessage: payload }

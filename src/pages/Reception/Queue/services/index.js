@@ -63,7 +63,13 @@ export const getQueueListing = async (sessionID, filter) => {
 
   const response = await request(`/api/queue/`, {
     method: 'GET',
-    data: stringify({ criteria, combineCondition: 'and' }),
+    data: stringify({
+      criteria,
+      combineCondition: 'and',
+      // sort: [
+      //   { sortby: 'queueNo', order: 'asc' },
+      // ],
+    }),
   })
   return response
 }

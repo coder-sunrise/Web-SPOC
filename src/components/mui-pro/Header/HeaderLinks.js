@@ -2,6 +2,8 @@ import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 // import { Manager, Target, Popper } from "react-popper";
+// dva
+import { connect } from 'dva'
 
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -27,6 +29,7 @@ import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/component
 
 import { updateAPIType } from '@/utils/request'
 
+@connect(({ user }) => ({ user }))
 class HeaderLinks extends React.Component {
   state = {
     openNotification: false,
@@ -59,7 +62,7 @@ class HeaderLinks extends React.Component {
   }
 
   render () {
-    const { classes, rtlActive } = this.props
+    const { classes, rtlActive, user } = this.props
     const { openNotification, openAccount, openDomain, title } = this.state
 
     // console.log(openNotification, openAccount)
@@ -77,6 +80,7 @@ class HeaderLinks extends React.Component {
     const managerClasses = classNames({
       [classes.managerClasses]: true,
     })
+    const name = user.data ? user.data.name : ''
     return (
       <div className={wrapper}>
         {/*
@@ -252,6 +256,7 @@ class HeaderLinks extends React.Component {
                 ? `${classes.links} ${classes.linksRTL}`
                 : classes.links}`}
             />
+            <span className={classes.username}>{name}</span>
             <Hidden mdUp implementation='css'>
               <span className={classes.linkText}>
                 {rtlActive ? 'الملف الشخصي' : 'Profile'}
@@ -263,7 +268,7 @@ class HeaderLinks extends React.Component {
             anchorEl={this.anchorElAccount}
             transition
             disablePortal
-            placement='bottom'
+            placement='bottom-end'
             className={classNames({
               [classes.popperClose]: !openAccount,
               [classes.pooperResponsive]: true,
@@ -296,66 +301,6 @@ class HeaderLinks extends React.Component {
                         className={dropdownItem}
                       >
                         Logout
-                      </MenuItem>
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Grow>
-            )}
-          </Popper>
-        </div>
-        <div className={managerClasses}>
-          <Button
-            color='transparent'
-            aria-label='Domain'
-            aria-owns={openDomain ? 'menu-list' : null}
-            aria-haspopup='true'
-            onClick={this.handleClick('Domain')}
-            className={rtlActive ? classes.buttonLinkRTL : classes.buttonLink}
-            muiClasses={{
-              label: rtlActive ? classes.labelRTL : '',
-            }}
-            buttonRef={(node) => {
-              this.anchorElAccount = node
-            }}
-          >
-            <span className={classes.linkText}>{this.state.title}</span>
-          </Button>
-          <Popper
-            open={openDomain}
-            anchorEl={this.anchorElAccount}
-            transition
-            disablePortal
-            placement='bottom'
-            className={classNames({
-              [classes.popperClose]: !openDomain,
-              [classes.pooperResponsive]: true,
-              [classes.pooperNav]: true,
-            })}
-          >
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                id='menu-list'
-                style={{ transformOrigin: '0 0 0' }}
-              >
-                <Paper className={classes.dropdown}>
-                  <ClickAwayListener onClickAway={this.handleClose('Domain')}>
-                    <MenuList role='menu'>
-                      <MenuItem
-                        onClick={this.handleAPIDomainSelection('Domain', 'UAT')}
-                        className={dropdownItem}
-                      >
-                        UAT
-                      </MenuItem>
-                      <MenuItem
-                        onClick={this.handleAPIDomainSelection(
-                          'Domain',
-                          'PROD',
-                        )}
-                        className={dropdownItem}
-                      >
-                        Production
                       </MenuItem>
                     </MenuList>
                   </ClickAwayListener>

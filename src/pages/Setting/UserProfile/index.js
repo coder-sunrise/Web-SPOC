@@ -45,7 +45,9 @@ class UserProfile extends React.Component {
         ...UserProfileTableConfig.columnExtensions,
         {
           columnName: 'action',
-          render: this.Cell,
+          width: 90,
+          align: 'center',
+          render: (row) => this.Cell(row),
         },
       ],
     },
@@ -71,28 +73,20 @@ class UserProfile extends React.Component {
     })
   }
 
-  Cell = ({ column, row, ...props }) => {
-    console.log({ column, row, props })
-    if (column.name.toUpperCase() === 'ACTION') {
-      return (
-        <Table.Cell {...props}>
-          <Tooltip title='Edit user profile'>
-            <Button
-              justIcon
-              color='primary'
-              onClick={this.handleActionButtonClick}
-              id={row.id}
-            >
-              <Edit />
-            </Button>
-          </Tooltip>
-        </Table.Cell>
-      )
-    }
-    return <Table.Cell {...props} />
+  Cell = (row) => {
+    return (
+      <Tooltip title='Edit User Profile' placement='bottom'>
+        <Button
+          justIcon
+          color='primary'
+          onClick={this.handleActionButtonClick}
+          id={row.id}
+        >
+          <Edit />
+        </Button>
+      </Tooltip>
+    )
   }
-
-  TableCell = (p) => this.Cell({ ...p })
 
   handleSearchClick = () => {
     const { dispatch, values } = this.props
@@ -197,12 +191,11 @@ class UserProfile extends React.Component {
           }
           open={showUserProfileModal}
           onClose={this.closeModal}
-          // onConfirm={this.onConfirmClick}
+          onConfirm={this.onConfirmClick}
         >
           <UserProfileForm
-            selectedUser={currentSelectedUser}
+            // selectedUser={currentSelectedUser}
             onChangePasswordClick={this.handleChangePassword}
-            onSubmit={this.onConfirmClick}
           />
         </CommonModal>
       </CardContainer>
