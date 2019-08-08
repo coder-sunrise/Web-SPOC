@@ -62,9 +62,8 @@ class TextField extends React.PureComponent {
     }
   }
 
-  _onChange = (value) => {
+  _onChange = (value = '') => {
     // console.log(value)
-
     const { props } = this
     const { loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return

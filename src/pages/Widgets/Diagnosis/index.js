@@ -50,7 +50,7 @@ const styles = (theme) => ({})
     diagnosises: Yup.array().of(
       Yup.object().shape({
         diagnosis: Yup.string().required(),
-        complication: Yup.array().of(Yup.string().min(1)).required(),
+        complication: Yup.array().of(Yup.string()).required().min(1),
         orderDate: Yup.string().required(),
       }),
     ),
