@@ -72,6 +72,7 @@ const showErrorNotification = (header, message) => {
 export const axiosRequest = async (
   url,
   options = { contentType: undefined },
+  headers = {},
 ) => {
   let result = {}
   try {
@@ -83,6 +84,7 @@ export const axiosRequest = async (
         'Content-Type':
           contentType !== undefined ? contentType : defaultContentType,
         Authorization: `Bearer ${token}`,
+        ...headers,
       },
     }
     const apiUrl = baseUrl + url

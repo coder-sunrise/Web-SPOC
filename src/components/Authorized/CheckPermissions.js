@@ -40,6 +40,7 @@ const checkPermissions = (
     return typeof target === 'function' && type !== 'decorator'
       ? target({
           name: 'full.edit',
+          rights: 'enable',
         })
       : target
   }

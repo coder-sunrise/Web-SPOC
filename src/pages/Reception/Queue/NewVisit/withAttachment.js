@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
+// import fetch from 'dva/fetch'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
 import { Chip, withStyles } from '@material-ui/core'
 // custom components
 import { Button, CommonCard, GridContainer, GridItem } from '@/components'
-import { getUniqueGUID } from '@/utils/cdrss'
 // services
-import { uploadFile, deleteFileByFileID } from '@/services/file'
+import { uploadFile, downloadFile, deleteFileByFileID } from '@/services/file'
+// utils
 import { getCodes } from '@/utils/codes'
 
 const styles = (theme) => ({
@@ -127,7 +128,11 @@ const withAttachment = ({
       deleted: !fileIndexFK ? id : fileIndexFK,
     })
   }
-  // console.log({ fileAttachments })
+
+  const onClick = (attachment) => {
+    downloadFile(attachment)
+  }
+
   return (
     <CommonCard size='sm' title={title}>
       <GridContainer>
@@ -144,22 +149,10 @@ const withAttachment = ({
                 variant='outlined'
                 label={attachment.fileName}
                 color={attachment.id ? 'primary' : ''}
-                onClick={(event) => {
-                  console.log({ target: event.currentTarget })
-                }}
+                onClick={() => onClick(attachment)}
                 onDelete={() => onDelete(attachment.fileIndexFK, attachment.id)}
                 className={classes.chip}
               />
-              // <span
-              //   key={`${attachment.fileName}-${index}`}
-              //   className={classnames({
-              //     [classes.attachmentItem]: true,
-              //     [classes.attachmentLabel]: true,
-              //     [classes.notUploaded]: attachment.id === undefined,
-              //   })}
-              // >
-              //   <a></a>
-              // </span>
             ))}
           </div>
         </GridItem>

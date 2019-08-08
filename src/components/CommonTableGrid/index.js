@@ -798,7 +798,10 @@ class CommonTableGrid extends React.Component {
 
               {grouping && <IntegratedGrouping />}
               {/* <IntegratedFiltering /> */}
-              {sort && !type && <IntegratedSorting />}
+              {sort &&
+              !type && (
+                <IntegratedSorting columnExtensions={newColumExtensions} />
+              )}
               {summary && <IntegratedSummary {...summaryConfig.integrated} />}
               {pager && !this.state.entity && <IntegratedPaging />}
               {pager &&
