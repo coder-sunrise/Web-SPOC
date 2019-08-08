@@ -38,8 +38,8 @@ moment.updateLocale('en', {
 const styles = () => ({
   menuItem:{
     paddingLeft:0,
-    paddingRight:0
-  }
+    paddingRight:0,
+  },
 })
 
 @connect(({ patient, global }) => ({
@@ -288,10 +288,10 @@ class PatientDetail extends PureComponent {
                       value={entity.dob}
                     />{' '}
                     ({moment(entity.dob).fromNow()}, {<CodeSelect
-                        code='ctGender'
-                        text
-                        value={entity.genderFK}
-                      />})
+                      code='ctGender'
+                      text
+                      value={entity.genderFK}
+                    />})
                   </p>
                   <Divider light />
                   <div
@@ -398,7 +398,7 @@ class PatientDetail extends PureComponent {
                                 left: 6,
                           }}
                           />:null}
-                        </span>}
+                                               </span>}
                         />
                         
                         
