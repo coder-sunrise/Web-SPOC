@@ -45,7 +45,7 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
       })
     value = value.toUpperCase()
 
-    const numericNRICString = value.substring(1, value.length - 2)
+    const numericNRICString = value.substring(1, value.length - 1)
 
     if (!new RegExp(/^\d+$/).test(numericNRICString))
       return createError({
@@ -191,7 +191,7 @@ const schemaSchemes = {
         schemeTypeFK: Yup.number().required(),
         validRange: Yup.array().when('schemeTypeFK', {
           is: (val) => val <= 10,
-          then: Yup.array().of(Yup.date().min(2)).required(),
+          then: Yup.array().of(Yup.date()).required().min(2),
         }),
       }),
     ),
