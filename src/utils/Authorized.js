@@ -6,7 +6,8 @@ let Authorized = RenderAuthorized(rights) // eslint-disable-line
 // console.log(getAuthority(), Authorized)
 // Reload the rights component
 const reloadAuthorized = () => {
-  Authorized = RenderAuthorized(rights)
+  const newRights = getAuthority()
+  Authorized = RenderAuthorized(newRights)
 }
 // console.log('RenderAuthorized', RenderAuthorized)
 
