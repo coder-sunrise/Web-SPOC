@@ -1,14 +1,18 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import _ from 'lodash'
 import { EditableTableGrid, notification } from '@/components'
 
 import { getCodes } from '@/utils/codes'
 
-let schemeTypes = []
-getCodes('ctSchemeType').then((codetableData) => {
-  schemeTypes = codetableData
-})
+// let schemeTypes = []
+// getCodes('ctSchemeType').then((codetableData) => {
+//   schemeTypes = codetableData
+// })
 
+const ctSchemeType = 'ctSchemeType'
+
+@connect(({ codetable }) => ({ codetable }))
 class SchemesGrid extends PureComponent {
   state = {
     editingRowIds: [],
@@ -158,7 +162,14 @@ class SchemesGrid extends PureComponent {
   }
 
   isMedisave = (row) => {
-    const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
+    const { codetable } = this.props
+    // const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
+
+    const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()]
+    const r = ctSchemeTypes
+      ? ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
+      : undefined
+
     if (!r) return false
     return (
       [
@@ -170,8 +181,13 @@ class SchemesGrid extends PureComponent {
   }
 
   medisaveCheck = (row) => {
-    console.log(row)
-    const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
+    const { codetable } = this.props
+    const schemeTypes = codetable[ctSchemeType.toLowerCase()]
+
+    const r = schemeTypes
+      ? schemeTypes.find((o) => o.id === row.schemeTypeFK)
+      : undefined
+
     if (!r) return false
     return (
       [

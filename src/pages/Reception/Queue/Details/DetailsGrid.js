@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import router from 'umi/router'
-import moment from 'moment'
 // dva
 import { connect } from 'dva'
 // table grid component
@@ -14,6 +13,7 @@ import Delete from '@material-ui/icons/Delete'
 import Person from '@material-ui/icons/Person'
 import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
+import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
 // custom components
 import { CommonTableGrid, DateFormatter } from '@/components'
 // medisys component
@@ -166,6 +166,18 @@ const ContextMenuOptions = [
     label: 'Start Consultation',
     Icon: Play,
     disabled: false,
+  },
+  {
+    id: 6,
+    label: 'Resume Consultation',
+    Icon: PlayCircle,
+    disabled: true,
+  },
+  {
+    id: 7,
+    label: 'Edit Consultation',
+    Icon: Edit,
+    disabled: true,
   },
 ]
 

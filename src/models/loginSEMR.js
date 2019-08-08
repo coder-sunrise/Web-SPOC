@@ -55,7 +55,7 @@ export default createFormViewModel({
             expires: new Date(9999, 11, 31),
           })
         }
-        // reloadAuthorized()
+        reloadAuthorized()
         return { ...state, isInvalidLogin }
       },
     },
