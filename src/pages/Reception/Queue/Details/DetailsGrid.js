@@ -39,7 +39,25 @@ const styles = () => ({
   },
 })
 
-const FuncConfig = { pager: false }
+const compareQueueNo = (a, b) => {
+  const floatA = parseFloat(a)
+  const floatB = parseFloat(b)
+  if (Number.isNaN(floatA) || Number.isNaN(floatB)) {
+    return -1
+  }
+
+  return floatA < floatB ? -1 : 1
+}
+
+const FuncConfig = {
+  pager: false,
+  sort: true,
+  sortConfig: {
+    defaultSorting: [
+      { columnName: 'queueNo', direction: 'asc' },
+    ],
+  },
+}
 const TableConfig = {
   columns: [
     { name: 'visitStatus', title: 'Status' },
@@ -76,7 +94,7 @@ const TableConfig = {
     'queueNo',
   ],
   columnExtensions: [
-    { columnName: 'queueNo', width: 60 },
+    { columnName: 'queueNo', width: 80, compare: compareQueueNo },
     { columnName: 'visitStatus', type: 'status', width: 150 },
     { columnName: 'paymentMode', width: 150 },
     { columnName: 'patientName', width: 250 },

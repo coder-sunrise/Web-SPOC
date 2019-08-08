@@ -78,7 +78,7 @@ class SchemesGrid extends PureComponent {
             onValueChange(undefined)
             return
           }
-          console.log(row, rows)
+          // console.log(row, rows)
           if (
             this.medisaveCheck(row) &&
             rows.filter(

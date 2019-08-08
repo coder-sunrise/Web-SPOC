@@ -119,19 +119,21 @@ class AppointmentDataGrid extends React.PureComponent {
       return { ...column }
     })
 
+    console.log({ state: this.state })
+
     return (
       <div>
         <EditableTableGrid
           rows={data}
-          // schema={validationSchema}
-          // leftColumns={[
-          //   'conflict',
-          // ]}
-          onRowDoubleClick={() => {
-            console.log('double click row')
-          }}
+          schema={validationSchema}
+          leftColumns={[
+            'conflict',
+          ]}
+          // onRowDoubleClick={() => {
+          //   console.log('double click row')
+          // }}
           FuncProps={{
-            pagerConfig: {},
+            // pagerConfig: {},
             pager: false,
           }}
           EditingProps={{

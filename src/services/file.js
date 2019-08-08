@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request, { axiosRequest } from '@/utils/request'
 
 const url = '/api/files'
 
@@ -20,8 +20,35 @@ export const uploadFile = async (payload) => {
 }
 
 export const getFileByFileID = async (fileID) => {
-  const response = await request(`${url}/${fileID}`, { method: 'GET' })
+  const response = await axiosRequest(`${url}/${fileID}`, {
+    method: 'GET',
+    responseType: 'arraybuffer',
+  })
   return response
+}
+
+export const downloadFile = async (attachment) => {
+  try {
+    const { fileIndexFK, id } = attachment
+    const response = await getFileByFileID(!fileIndexFK ? id : fileIndexFK)
+
+    const { data, status } = response
+    if (status >= 200 && status < 300) {
+      const dataUrl = window.URL.createObjectURL(
+        new Blob([
+          data,
+        ]),
+      )
+      const link = document.createElement('a')
+      link.href = dataUrl
+      link.setAttribute('download', attachment.fileName)
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode.removeChild(link)
+    }
+  } catch (error) {
+    console.log({ error })
+  }
 }
 
 export const deleteFileByFileID = async (fileID) => {

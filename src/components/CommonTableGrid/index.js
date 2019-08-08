@@ -156,7 +156,7 @@ class CommonTableGrid extends React.Component {
       rowMoveable = (f) => false,
     } = props
     // console.log(props)
-    this.gridId = 'view-' + uniqueGid++
+    this.gridId = `view-${uniqueGid++}`
     this.myRef = React.createRef()
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -384,7 +384,7 @@ class CommonTableGrid extends React.Component {
         _entity.filter.sorting.forEach((o) => {
           const c = columnExtensions.find((m) => m.sortBy === o.columnName)
           if (c) {
-            o.columnName = c.columnName
+            o.columnName = c.sortBy || c.columnName
           }
         })
       }
@@ -798,7 +798,10 @@ class CommonTableGrid extends React.Component {
 
               {grouping && <IntegratedGrouping />}
               {/* <IntegratedFiltering /> */}
-              {sort && !type && <IntegratedSorting />}
+              {sort &&
+              !type && (
+                <IntegratedSorting columnExtensions={newColumExtensions} />
+              )}
               {summary && <IntegratedSummary {...summaryConfig.integrated} />}
               {pager && !this.state.entity && <IntegratedPaging />}
               {pager &&

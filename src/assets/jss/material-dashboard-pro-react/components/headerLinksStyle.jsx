@@ -150,6 +150,10 @@ const headerLinksStyle = (theme) => ({
     // width: "20px !important",
     // height: "20px !important"
   },
+  username: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(2.5),
+  },
 })
 
 export default headerLinksStyle

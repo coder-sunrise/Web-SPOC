@@ -1,5 +1,4 @@
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 // ant design
 import { Dropdown, Menu } from 'antd'
 // material ui core
@@ -31,29 +30,6 @@ const style = (theme) => ({
   },
 })
 
-const MenuButtonBase = ({ classes, id, onClick, Icon, label, disabled }) => {
-  return (
-    <Button
-      className={classes.leftAlign}
-      block
-      link
-      noUnderline
-      disabled={disabled}
-      size='sm'
-      color='primary'
-      id={id}
-      onClick={onClick}
-    >
-      {Icon && <Icon />}
-      {label}
-    </Button>
-  )
-}
-
-const MenuButton = withStyles(style, {
-  name: 'MenuButton',
-})(MenuButtonBase)
-
 const GridContextMenuButton = ({
   classes,
   color = 'primary',
@@ -75,13 +51,6 @@ const GridContextMenuButton = ({
     onClick(row, key)
   }
 
-  //   <MenuButton
-  //   id={id}
-  //   Icon={Icon}
-  //   label={label}
-  //   disabled={disabled}
-  //   onClick={handleClick}
-  // />
   const MenuItemsOverlay = (
     <Menu onClick={handleClick} className={classes.menu}>
       {contextMenuOptions.map(
@@ -89,12 +58,7 @@ const GridContextMenuButton = ({
           isDivider ? (
             <Menu.Divider key={`divider-${index}`} />
           ) : (
-            <Menu.Item
-              key={id}
-              id={id}
-              disabled={disabled}
-              // onClick={handleClick}
-            >
+            <Menu.Item key={id} id={id} disabled={disabled}>
               <Icon className={classes.icon} />
               <span>{label}</span>
             </Menu.Item>
