@@ -51,6 +51,7 @@ const customInputStyle = {
   text: {
     color: 'transparent',
     textShadow: `0 0 0 ${fontColor}`,
+    padding: 0,
   },
   textControl: {
     display: 'inline-block',
@@ -58,7 +59,17 @@ const customInputStyle = {
     margin: 0,
   },
   textInput: {
+    color: 'currentColor',
+    cursor: 'initial !important',
     fontSize: 'inherit',
+    '& > div': {
+      top: 0,
+      '& > p': {
+        minHeight: 24,
+        display: 'inline-block',
+        lineHeight: '24px',
+      },
+    },
   },
   normalText: {
     color: 'currentColor',
@@ -67,6 +78,7 @@ const customInputStyle = {
   rightAlign: {
     '& input': {
       textAlign: 'right',
+      width: '100% !important',
     },
   },
   currency: {

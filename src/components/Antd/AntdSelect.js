@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
+import AutosizeInput from 'react-input-autosize'
 import _ from 'lodash'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -321,6 +322,14 @@ class AntdSelect extends React.PureComponent {
     } else {
       opts = this.getSelectOptions(source, renderDropdown)
     }
+
+    if (this.props.text) {
+      const match = source.find((o) => o[this.props.valueField] === value)
+      let text = ''
+      if (match) text = match[this.props.labelField]
+      return <AutosizeInput inputClassName={props.className} value={text} />
+    }
+
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -363,16 +372,6 @@ class AntdSelect extends React.PureComponent {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state
-
-    if (this.props.text) {
-      if (value === undefined) return null
-      const match = this.props.options.find(
-        (o) => o[this.props.valueField] === value,
-      )
-      if (match) return match[this.props.labelField]
-
-      return null
-    }
 
     const labelProps = {}
     if (!mode || mode === 'default') {

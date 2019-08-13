@@ -17,6 +17,7 @@ import {
   notification,
   CodeSelect,
   dateFormatLong,
+  DateRangePicker,
   DatePicker,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
@@ -327,19 +328,14 @@ class PatientDetail extends PureComponent {
                             </p>
                             {o.validFrom && (
                               <>
-                                <p>Balance: <NumberInput value={80} currency text />
+                                <p><NumberInput prefix='Balance: ' value={80} currency text />
                                 </p>
                                 <p>
-                                Validity:{' '}
-                                  <DatePicker
+                                  <DateRangePicker
+                                    prefix='Validity: '
                                     text
                                     format={dateFormatLong}
-                                    value={o.validFrom}
-                                  />{' '}-{' '}
-                                  <DatePicker
-                                    text
-                                    format={dateFormatLong}
-                                    value={o.validTo}
+                                    value={[o.validFrom,o.validTo]}
                                   />
                                 </p>
                               </>

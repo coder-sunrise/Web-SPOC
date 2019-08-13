@@ -30,7 +30,6 @@ const itemSchema = Yup.object().shape({
 })
 
 @withFormikExtend({
-  a: 134,
   mapPropsToValues: ({ settingRoom }) =>
     settingRoom.entity || settingRoom.default,
   validationSchema: Yup.object().shape({
@@ -41,24 +40,23 @@ const itemSchema = Yup.object().shape({
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
-    props
-      .dispatch({
-        type: 'settingRoom/upsert',
-        payload: {
-          ...restValues,
-          effectiveStartDate: effectiveDates[0],
-          effectiveEndDate: effectiveDates[1],
-          roomStatusFK: 1,
-        },
-      })
-      .then((r) => {
-        if (r) {
-          if (props.onConfirm) props.onConfirm()
-          props.dispatch({
-            type: 'settingRoom/query',
-          })
-        }
-      })
+    const { dispatch, onConfirm } = props
+    dispatch({
+      type: 'settingRoom/upsert',
+      payload: {
+        ...restValues,
+        effectiveStartDate: effectiveDates[0],
+        effectiveEndDate: effectiveDates[1],
+        roomStatusFK: 1,
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'settingRoom/query',
+        })
+      }
+    })
   },
   displayName: 'RoomDetail',
 })

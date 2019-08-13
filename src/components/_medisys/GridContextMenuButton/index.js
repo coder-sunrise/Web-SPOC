@@ -18,10 +18,15 @@ const style = (theme) => ({
       display: 'flex',
       justifyContent: 'flex-start',
       alignItems: 'center',
+      '& span': {
+        fontSize: '0.8rem',
+        color: primaryColor,
+      },
     },
-    '& span': {
-      fontSize: '0.8rem',
-      color: primaryColor,
+    '& > .ant-dropdown-menu-item-disabled': {
+      '& span': {
+        color: 'rgba(0, 0, 0, 0.25)',
+      },
     },
   },
   icon: {

@@ -3,6 +3,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 // nodejs library that concatenates classes
 import classNames from 'classnames'
+import AutosizeInput from 'react-input-autosize'
 import $ from 'jquery'
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -124,14 +125,13 @@ class BaseInput extends React.PureComponent {
       [classes.underlineSuccess]: success && !error,
       [classes.underline]: true,
       [classes.noUnderline]: noUnderline || text,
-      [classes.normalText]: normalText,
       [classes.rightAlign]: rightAlign,
       [classes.simple]: simple,
       [classes.inputRoot]: true,
       [classes.textInput]: !!text,
       [classes.whiteUnderline]: white,
-      [classes.currency]: normalText && currency,
-      [classes.negativeCurrency]: normalText && negative,
+      [classes.currency]: text && currency,
+      [classes.negativeCurrency]: text && negative,
     })
     // console.log(underlineClasses)
     const marginTop = classNames({
@@ -198,6 +198,7 @@ class BaseInput extends React.PureComponent {
       size,
       style,
       onKeyUp,
+      text,
     } = props
     inputIdCounter += 1
 
@@ -249,6 +250,11 @@ class BaseInput extends React.PureComponent {
           </Tooltip>
         </InputAdornment>
       )
+    }
+    if (text) {
+      cfg.inputComponent = ({ className }) => {
+        return <AutosizeInput inputClassName={className} {...inputProps} />
+      }
     }
     // console.log(inputProps)
     const element = (

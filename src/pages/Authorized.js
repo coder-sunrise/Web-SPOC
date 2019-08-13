@@ -4,9 +4,9 @@ import { getAuthority } from '@/utils/authority'
 import Redirect from 'umi/redirect'
 
 // console.log('Authorized', Authority)
+const Authority = getAuthority()
+const Authorized = RenderAuthorized(Authority)
 export default ({ children, ...restProps }) => {
-  const Authority = getAuthority()
-  const Authorized = RenderAuthorized(Authority)
   return (
     <Authorized
       authority={children.props.route.authority}
