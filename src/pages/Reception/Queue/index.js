@@ -68,7 +68,8 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, loading }) => ({
+@connect(({ queueLog, patientSearch, loading }) => ({
+  patientSearch,
   queueLog,
   loading,
 }))
@@ -78,7 +79,6 @@ class Queue extends PureComponent {
     showPatientSearch: false,
     showEndSessionSummary: false,
     currentFilter: StatusIndicator.ALL,
-    currentQuery: '',
   }
 
   componentWillMount = () => {
@@ -156,24 +156,28 @@ class Queue extends PureComponent {
     this.setState({ showEndSessionSummary: false })
   }
 
-  onEnterPressed = (searchQuery) => {
+  onEnterPressed = async (searchQuery) => {
     const { dispatch } = this.props
-    searchQuery !== '' &&
-      dispatch({
-        type: `${modelKey}fetchPatientListByName`,
-        payload: searchQuery,
-      }).then(this.showSearchResult)
+    const prefix = 'like_'
+    await dispatch({
+      type: 'patientSearch/query',
+      payload: {
+        [`${prefix}name`]: searchQuery,
+        [`${prefix}patientAccountNo`]: searchQuery,
+        [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+        combineCondition: 'or',
+      },
+    })
+    this.showSearchResult()
   }
 
   showSearchResult = () => {
-    const { queueLog } = this.props
-    const { patientList } = queueLog
+    const { patientSearch } = this.props
+    const { list } = patientSearch
 
-    if (patientList.length === 1)
-      return this.showVisitRegistration({ patientID: patientList[0].id })
-
-    if (patientList.length > 1)
-      return this.setState({ showPatientSearch: true })
+    if (list.length === 1)
+      return this.showVisitRegistration({ patientID: list[0].id })
+    if (list.length > 1) return this.setState({ showPatientSearch: true })
 
     return this.toggleRegisterNewPatient()
   }
@@ -185,12 +189,22 @@ class Queue extends PureComponent {
     })
   }
 
+  onViewPatientProfileClick = (patientProfileFK) => {
+    this.props.history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: '1',
+        pid: patientProfileFK,
+      }),
+    )
+  }
+
   render () {
     const { classes, queueLog, loading } = this.props
+    console.log(this.props)
     const {
       showEndSessionSummary,
       showPatientSearch,
-      currentQuery,
       currentFilter,
     } = this.state
 
@@ -249,7 +263,7 @@ class Queue extends PureComponent {
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
-                  history={this.props.history}
+                  onViewPatientProfileClick={this.onViewPatientProfileClick}
                   onViewDispenseClick={this.toggleDispense}
                   handleEditVisitClick={this.showVisitRegistration}
                   currentFilter={currentFilter}
@@ -262,13 +276,11 @@ class Queue extends PureComponent {
               onClose={this.togglePatientSearch}
               onConfirm={this.togglePatientSearch}
               maxWidth='md'
-              fluidHeight
-              showFooter={false}
+              overrideLoading
             >
               <PatientSearchModal
-                searchPatientName={currentQuery}
-                onViewRegisterVisit={this.showVisitRegistration}
-                onViewRegisterPatient={this.toggleRegisterNewPatient}
+                handleRegisterVisitClick={this.showVisitRegistration}
+                onViewPatientProfileClick={this.onViewPatientProfileClick}
               />
             </CommonModal>
             <CommonModal

@@ -150,9 +150,7 @@ export default createListViewModel({
       },
       *fetchPatientListByName ({ payload }, { call, put }) {
         try {
-          const response = !payload
-            ? yield call(service.fetchPatientList)
-            : yield call(service.fetchPatientListByName, payload)
+          const response = yield call(service.fetchPatientList, payload)
           const { data } = response
           return yield put({
             type: 'updatePatientList',

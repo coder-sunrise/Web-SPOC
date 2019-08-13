@@ -90,18 +90,24 @@ export async function fetchPatientInfoByPatientID (patientID) {
   return response
 }
 
-export async function fetchPatientList () {
-  const response = await request('/api/patient')
-  return response
-}
+// export async function fetchPatientList () {
+//   const response = await request('/api/patient')
+//   return response
+// }
 
-export async function fetchPatientListByName (patientName) {
+export async function fetchPatientList (search) {
   const criteria = [
-    { prop: 'name', val: patientName, opr: 'like' },
+    { prop: 'name', val: search, opr: 'like' },
+    { prop: 'patientAccountNo', val: search, opr: 'like' },
+    {
+      prop: 'contactFkNavigation.contactNumber.number',
+      val: search,
+      opr: 'like',
+    },
   ]
   const response = await request('/api/patient', {
     method: 'GET',
-    data: stringify({ criteria }),
+    data: stringify({ criteria, combineCondition: 'or' }),
   })
   return response
 }

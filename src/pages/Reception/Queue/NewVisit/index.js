@@ -92,6 +92,7 @@ const styles = (theme) => ({
 
     return {
       queueNo: qNo,
+      visitPurposeFK: 1,
       ...visitEntries,
     }
   },
@@ -148,7 +149,7 @@ const styles = (theme) => ({
     const payload = {
       id,
       ...restVisitInfo,
-      queueNo,
+      queueNo: parseFloat(queueNo).toFixed(1),
       queueNoPrefix: sessionInfo.sessionNoPrefix,
       visit: {
         visitAttachment: uploaded,
@@ -179,6 +180,7 @@ const styles = (theme) => ({
         ? 'visitRegistration/registerVisitInfo'
         : 'visitRegistration/saveVisitInfo'
 
+    // console.log({ payload })
     dispatch({
       type,
       payload,
@@ -269,7 +271,7 @@ class NewVisit extends PureComponent {
       : undefined
 
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-    // console.log({ attachments: values.visitAttachment })
+
     return (
       <React.Fragment>
         <LoadingWrapper

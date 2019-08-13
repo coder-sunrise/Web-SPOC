@@ -1,23 +1,11 @@
 import React, { PureComponent } from 'react'
-
-import classnames from 'classnames'
-// material ui
-import AttachFile from '@material-ui/icons/AttachFile'
 import { withStyles } from '@material-ui/core'
 // formik
 import { FastField } from 'formik'
 // umi
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { formatMessage } from 'umi/locale'
 // custom components
-import {
-  Button,
-  TextField,
-  NumberInput,
-  CommonCard,
-  GridContainer,
-  GridItem,
-  CodeSelect,
-} from '@/components'
+import { TextField, NumberInput, GridItem, CodeSelect } from '@/components'
 import AttachmentWrapper from './withAttachment'
 import FormField from './formField'
 
@@ -40,18 +28,6 @@ const styles = (theme) => ({
     },
   },
 })
-
-const convertToBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result.split(',')[1])
-    reader.onerror = (error) => reject(error)
-  })
-
-const getFileExtension = (filename) => {
-  return filename.split('.').pop()
-}
 
 class VisitInfoCard extends PureComponent {
   render () {
@@ -103,6 +79,10 @@ class VisitInfoCard extends PureComponent {
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.queueNo',
                   })}
+                  formatter={(value) => {
+                    const isNaN = Number.isNaN(parseFloat(value))
+                    return isNaN ? value : parseFloat(value).toFixed(1)
+                  }}
                 />
               )}
             />

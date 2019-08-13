@@ -5,7 +5,7 @@ import { connect } from 'dva'
 // table grid component
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // material ui
-import { Tooltip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import Pageview from '@material-ui/icons/Pageview'
 import Edit from '@material-ui/icons/Edit'
 import Money from '@material-ui/icons/AttachMoney'
@@ -15,7 +15,7 @@ import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
 // custom components
-import { CommonTableGrid, DateFormatter } from '@/components'
+import { CommonTableGrid, DateFormatter, Tooltip } from '@/components'
 // medisys component
 import {
   GridContextMenuButton as GridButton,
@@ -26,12 +26,8 @@ import AppointmentActionButton from './AppointmentActionButton'
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
 import { filterData, filterDoctorBlock, todayOnly } from '../utils'
 import { StatusIndicator } from '../variables'
-import { getAppendUrl } from '@/utils/utils'
-// assets
-import { tooltip } from '@/assets/jss/index'
 
 const styles = () => ({
-  tooltip,
   fullscreenBtn: {
     float: 'right',
     top: '-15px',
@@ -211,25 +207,7 @@ class DetailsGrid extends PureComponent {
 
   onViewPatientProfileClick = (row) => {
     const { patientProfileFK } = row
-    const { dispatch } = this.props
-    // dispatch({
-    //   type: 'patient'
-    // })
-    this.props.history.push(
-      getAppendUrl({
-        md: 'pt',
-        cmt: '1',
-        pid: patientProfileFK,
-      }),
-    )
-    // dispatch({
-    //   type: 'queueLog/getPatientID',
-    //   payload: {
-    //     patientAccountNo,
-    //     patientReferenceNo,
-    //     patientName,
-    //   },
-    // })
+    this.props.onViewPatientProfileClick(patientProfileFK)
   }
 
   deleteQueueConfirmation = (row) => {
@@ -292,11 +270,7 @@ class DetailsGrid extends PureComponent {
       ) {
         return (
           <Table.Cell {...tableProps}>
-            <Tooltip
-              title='More Actions'
-              placement='bottom'
-              classes={{ tooltip: classes.tooltip }}
-            >
+            <Tooltip title='More Actions'>
               <div style={{ display: 'inline-block' }}>
                 <AppointmentActionButton
                   row={tableProps.row}
@@ -310,11 +284,18 @@ class DetailsGrid extends PureComponent {
       }
 
       const { row } = tableProps
+      const enabledDispense = [
+        'DISPENSE',
+        'PAID',
+        'OVERPAID',
+      ]
       const shouldDisableDelete = row.visitStatus !== 'WAITING'
-      const newContextMenuOptions = ContextMenuOptions.map(
-        (opt) =>
-          opt.id === 2 ? { ...opt, disabled: shouldDisableDelete } : { ...opt },
-      )
+      const shouldDisableDispense = !enabledDispense.includes(row.visitStatus)
+      const newContextMenuOptions = ContextMenuOptions.map((opt) => {
+        if (opt.id === 1) return { ...opt, disabled: shouldDisableDispense }
+        if (opt.id === 2) return { ...opt, disabled: shouldDisableDelete }
+        return { ...opt }
+      })
 
       return (
         <Table.Cell {...tableProps}>

@@ -65,7 +65,12 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { patientSearch, onRowDblClick } = this.props
+    const {
+      patientSearch,
+      onRowDblClick,
+      overrideTableParas = {},
+      size = 'md',
+    } = this.props
 
     return (
       <React.Fragment>
@@ -74,6 +79,8 @@ class Grid extends PureComponent {
           entity={patientSearch}
           onRowDoubleClick={onRowDblClick}
           {...this.tableParas}
+          {...overrideTableParas}
+          size={size}
         />
       </React.Fragment>
     )
