@@ -201,7 +201,6 @@ class Queue extends PureComponent {
 
   render () {
     const { classes, queueLog, loading } = this.props
-    console.log(this.props)
     const {
       showEndSessionSummary,
       showPatientSearch,

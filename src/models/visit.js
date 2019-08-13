@@ -25,6 +25,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      entity: {},
       patientInfo: {},
       visitInfo: {},
       errorState: {},
