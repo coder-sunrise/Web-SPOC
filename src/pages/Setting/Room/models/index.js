@@ -8,6 +8,9 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      filter: {
+        code: 123,
+      },
       default: {
         isUserMaintainable: true,
         effectiveDates: [

@@ -2,32 +2,16 @@ import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { withStyles, Tooltip } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
-import Delete from '@material-ui/icons/Delete'
 import {
   withFormikExtend,
   FastField,
   GridContainer,
   GridItem,
-  Button,
   TextField,
-  Checkbox,
-  Select,
-  ProgressButton,
   DateRangePicker,
-  Switch,
-  EditableTableGrid,
-  notification,
-  SizeContainer,
 } from '@/components'
 
 const styles = (theme) => ({})
-
-const itemSchema = Yup.object().shape({
-  serviceCenter: Yup.string().required(),
-  sellingPrice: Yup.number().required(),
-})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingRoom }) =>
@@ -36,7 +20,6 @@ const itemSchema = Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    items: Yup.array().compact((v) => v.isDeleted).of(itemSchema),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
