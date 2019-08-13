@@ -430,6 +430,11 @@ const routes = [
             name: 'userrole',
             component: './Setting/UserRole',
           },
+          {
+            path: '/setting/revenuecategory',
+            name: 'revenuecategory',
+            component: './Setting/RevenueCategory',
+          },
         ],
       },
       // Settings
