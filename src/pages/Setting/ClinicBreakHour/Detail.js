@@ -16,17 +16,17 @@ import {
 const styles = (theme) => ({})
 
 const clinics = [
-    { value: 'angmokioave1', name: 'Ang Mo Kio Ave 1' },
-    { value: 'bedokave3', name: 'Bedok Ave 3' },
-  ]
+  { value: 'angmokioave1', name: 'Ang Mo Kio Ave 1' },
+  { value: 'bedokave3', name: 'Bedok Ave 3' },
+]
 
 @withFormik({
   mapPropsToValues: ({ settingClinicBreakHour }) =>
-  settingClinicBreakHour.entity || settingClinicBreakHour.default,
+    settingClinicBreakHour.entity || settingClinicBreakHour.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array().of(Yup.date()).required().min(2),
     clinicName: Yup.string().required(),
     monFromTiming: Yup.string().required(),
     monToTiming: Yup.string().required(),
@@ -116,23 +116,23 @@ class Detail extends PureComponent {
               />
             </GridItem>
             <GridItem xs md={12}>
-            <FastField
-              name='clinicName'
-              render={(args) => (
-                <Select {...args} allowClear label='Clinic' options={clinics} />
-              )}
-            />
-          </GridItem>
-          <GridItem md={6}>
+              <FastField
+                name='clinicName'
+                render={(args) => (
+                  <Select
+                    {...args}
+                    allowClear
+                    label='Clinic'
+                    options={clinics}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={6}>
               <FastField
                 name='monFromTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Monday From'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Monday From' {...args} />
                 }}
               />
             </GridItem>
@@ -140,12 +140,7 @@ class Detail extends PureComponent {
               <FastField
                 name='monToTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Monday To'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Monday To' {...args} />
                 }}
               />
             </GridItem>
@@ -153,12 +148,7 @@ class Detail extends PureComponent {
               <FastField
                 name='tuesFromTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Tuesday From'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Tuesday From' {...args} />
                 }}
               />
             </GridItem>
@@ -166,12 +156,7 @@ class Detail extends PureComponent {
               <FastField
                 name='tuesToTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Tuesday To'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Tuesday To' {...args} />
                 }}
               />
             </GridItem>
@@ -179,12 +164,7 @@ class Detail extends PureComponent {
               <FastField
                 name='wedFromTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Wednesday From'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Wednesday From' {...args} />
                 }}
               />
             </GridItem>
@@ -192,12 +172,7 @@ class Detail extends PureComponent {
               <FastField
                 name='wedToTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Wednesday To'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Wednesday To' {...args} />
                 }}
               />
             </GridItem>
@@ -205,12 +180,7 @@ class Detail extends PureComponent {
               <FastField
                 name='thursFromTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Thursday From'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Thursday From' {...args} />
                 }}
               />
             </GridItem>
@@ -218,12 +188,7 @@ class Detail extends PureComponent {
               <FastField
                 name='thursToTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Thursday To'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Thursday To' {...args} />
                 }}
               />
             </GridItem>
@@ -231,12 +196,7 @@ class Detail extends PureComponent {
               <FastField
                 name='friFromTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Friday From'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Friday From' {...args} />
                 }}
               />
             </GridItem>
@@ -244,12 +204,7 @@ class Detail extends PureComponent {
               <FastField
                 name='friToTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Friday To'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Friday To' {...args} />
                 }}
               />
             </GridItem>
@@ -257,12 +212,7 @@ class Detail extends PureComponent {
               <FastField
                 name='satFromTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Saturday From'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Saturday From' {...args} />
                 }}
               />
             </GridItem>
@@ -270,12 +220,7 @@ class Detail extends PureComponent {
               <FastField
                 name='satToTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Saturday To'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Saturday To' {...args} />
                 }}
               />
             </GridItem>
@@ -283,12 +228,7 @@ class Detail extends PureComponent {
               <FastField
                 name='sunFromTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Sunday From'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Sunday From' {...args} />
                 }}
               />
             </GridItem>
@@ -296,12 +236,7 @@ class Detail extends PureComponent {
               <FastField
                 name='sunToTiming'
                 render={(args) => {
-                  return (
-                    <TimePicker
-                      label='Sunday To'
-                      {...args}
-                    />
-                  )
+                  return <TimePicker label='Sunday To' {...args} />
                 }}
               />
             </GridItem>

@@ -134,7 +134,7 @@ const initValues = {
     doctor: Yup.array().of(Yup.string().required()).required(),
     doctorRadio: Yup.string().required(),
     isPersist: Yup.boolean().required(),
-    fromto: Yup.array().of(Yup.date().min(2)).required().required(),
+    fromto: Yup.array().of(Yup.date()).required().min(2),
     numberField: Yup.number().required(),
     contact: Yup.object().shape({
       contactAddress: Yup.array().of(

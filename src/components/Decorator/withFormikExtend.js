@@ -7,8 +7,44 @@ import AuthorizedContext from '@/components/Context/Authorized'
 window.beforeReloadHandlerAdded = false
 const withFormikExtend = (props) => (Component) => {
   const { displayName, authority } = props
+  const updateDirtyState = (ps) => {
+    if (!displayName || displayName.indexOf('Filter') > 0) return
+    const { errors, dirty } = ps
+    // console.log(Object.values(errors).length > 0, dirty)
 
-  @withFormik(props)
+    window.g_app._store.dispatch({
+      type: 'formik/updateState',
+      payload: {
+        [displayName]: {
+          displayName,
+          errors,
+          hasError: Object.values(errors).length > 0,
+          dirty,
+        },
+      },
+    })
+    if (dirty && !window.beforeReloadHandlerAdded) {
+      window.beforeReloadHandlerAdded = true
+      window.addEventListener('beforeunload', confirmBeforeReload)
+    } else if (!dirty && window.beforeReloadHandlerAdded) {
+      window.beforeReloadHandlerAdded = false
+      window.removeEventListener('beforeunload', confirmBeforeReload)
+    }
+  }
+  @withFormik({
+    ...props,
+    handleSubmit: (values, ps, a, b) => {
+      const { handleSubmit: orghandleSubmit } = props
+      orghandleSubmit.call(this, values, ps)
+      setTimeout(() => {
+        updateDirtyState({
+          displayName,
+          errors: {},
+          dirty: false,
+        })
+      }, 200)
+    },
+  })
   class BasicComponent extends React.Component {
     // shouldComponentUpdate (nextProps, nextStates) {
     //   return false
@@ -26,27 +62,7 @@ const withFormikExtend = (props) => (Component) => {
 
     componentWillReceiveProps (nextProps) {
       // console.log(nextProps)
-      if (!displayName || displayName.indexOf('Filter') > 0) return
-      const { errors, dirty } = nextProps
-      // console.log(Object.values(errors).length > 0, dirty)
-      window.g_app._store.dispatch({
-        type: 'formik/updateState',
-        payload: {
-          [props.displayName]: {
-            displayName,
-            errors,
-            hasError: Object.values(errors).length > 0,
-            dirty,
-          },
-        },
-      })
-      if (dirty && !window.beforeReloadHandlerAdded) {
-        window.beforeReloadHandlerAdded = true
-        window.addEventListener('beforeunload', confirmBeforeReload)
-      } else if (!dirty && window.beforeReloadHandlerAdded) {
-        window.beforeReloadHandlerAdded = false
-        window.removeEventListener('beforeunload', confirmBeforeReload)
-      }
+      updateDirtyState(nextProps)
     }
 
     render () {
@@ -59,6 +75,7 @@ const withFormikExtend = (props) => (Component) => {
           rights.edit = { name: authority.edit, rights: 'enable' }
         }
       }
+      // console.log(this.props)
 
       return authority ? (
         <AuthorizedContext.Provider value={rights}>

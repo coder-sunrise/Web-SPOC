@@ -339,9 +339,9 @@ export const defaultTheme = createMuiTheme({
           top: 3,
           position: 'relative',
         },
-        '& > p': {
-          fontSize: defaultFontSize,
-        },
+        // '& > p': {
+        //   fontSize: defaultFontSize,
+        // },
         '& > div': {
           width: '16px !important',
           height: '16px !important',
@@ -470,7 +470,7 @@ export const smallTheme = createMuiTheme({
         '& textarea:first-of-type': {
           position: 'relative',
           marginBottom: 3,
-          top: 0,
+          top: 3,
         },
       },
     },
@@ -491,14 +491,15 @@ export const smallTheme = createMuiTheme({
     MuiInputAdornment: {
       root: {
         ...sharedInputAdornmentRoot,
-        marginTop: 2,
+        top: 3,
+        position: 'relative',
         '& svg': {
           top: 3,
           position: 'relative',
         },
-        '& > p': {
-          fontSize: smallFontSize,
-        },
+        // '& > p': {
+        //   fontSize: smallFontSize,
+        // },
         '& > div': {
           width: '12px !important',
           height: '12px !important',
@@ -653,9 +654,9 @@ export const largeTheme = createMuiTheme({
           top: 2,
           position: 'relative',
         },
-        '& > p': {
-          fontSize: largeFontSize,
-        },
+        // '& > p': {
+        //   fontSize: largeFontSize,
+        // },
         '& > div': {
           width: '20px !important',
           height: '20px !important',

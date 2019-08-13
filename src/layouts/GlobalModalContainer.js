@@ -65,7 +65,7 @@ class GlobalModalContainer extends PureComponent {
           fullScreen
           showFooter={false}
         >
-          <PatientDetail {...this.props} />
+          {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
           {/* {global.currentPatientId} */}
         </CommonModal>
 

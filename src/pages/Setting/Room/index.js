@@ -1,27 +1,10 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import { withFormik, FastField } from 'formik'
 
 import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import {
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  CardContainer,
-  Transition,
-  TextField,
-  AntdInput,
-  Select,
-  Accordion,
-  Button,
-  CommonTableGrid,
-  DatePicker,
-  NumberInput,
-  CommonModal,
-} from '@/components'
+import { CardContainer, CommonModal } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'

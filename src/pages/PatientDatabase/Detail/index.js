@@ -17,6 +17,7 @@ import {
   notification,
   CodeSelect,
   dateFormatLong,
+  DateRangePicker,
   DatePicker,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
@@ -38,8 +39,8 @@ moment.updateLocale('en', {
 const styles = () => ({
   menuItem:{
     paddingLeft:0,
-    paddingRight:0
-  }
+    paddingRight:0,
+  },
 })
 
 @connect(({ patient, global }) => ({
@@ -288,10 +289,10 @@ class PatientDetail extends PureComponent {
                       value={entity.dob}
                     />{' '}
                     ({moment(entity.dob).fromNow()}, {<CodeSelect
-                        code='ctGender'
-                        text
-                        value={entity.genderFK}
-                      />})
+                      code='ctGender'
+                      text
+                      value={entity.genderFK}
+                    />})
                   </p>
                   <Divider light />
                   <div
@@ -327,19 +328,14 @@ class PatientDetail extends PureComponent {
                             </p>
                             {o.validFrom && (
                               <>
-                                <p>Balance: <NumberInput value={80} currency text />
+                                <p><NumberInput prefix='Balance: ' value={80} currency text />
                                 </p>
                                 <p>
-                                Validity:{' '}
-                                  <DatePicker
+                                  <DateRangePicker
+                                    prefix='Validity: '
                                     text
                                     format={dateFormatLong}
-                                    value={o.validFrom}
-                                  />{' '}-{' '}
-                                  <DatePicker
-                                    text
-                                    format={dateFormatLong}
-                                    value={o.validTo}
+                                    value={[o.validFrom,o.validTo]}
                                   />
                                 </p>
                               </>
@@ -398,7 +394,7 @@ class PatientDetail extends PureComponent {
                                 left: 6,
                           }}
                           />:null}
-                        </span>}
+                                               </span>}
                         />
                         
                         

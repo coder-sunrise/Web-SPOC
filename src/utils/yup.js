@@ -4,61 +4,61 @@ import _ from 'lodash'
 import { camelizeKeys, pascalizeKeys } from 'humps'
 
 // console.log(Yup)
-function _printValue (value, quoteStrings) {
-  let toString = Object.prototype.toString
-  let errorToString = Error.prototype.toString
-  let regExpToString = RegExp.prototype.toString
-  let symbolToString =
-    typeof Symbol !== 'undefined'
-      ? Symbol.prototype.toString
-      : function () {
-          return ''
-        }
-  let SYMBOL_REGEXP = /^Symbol\((.*)\)(.*)$/
+// function _printValue (value, quoteStrings) {
+//   let toString = Object.prototype.toString
+//   let errorToString = Error.prototype.toString
+//   let regExpToString = RegExp.prototype.toString
+//   let symbolToString =
+//     typeof Symbol !== 'undefined'
+//       ? Symbol.prototype.toString
+//       : function () {
+//           return ''
+//         }
+//   let SYMBOL_REGEXP = /^Symbol\((.*)\)(.*)$/
 
-  function printNumber (val) {
-    if (val != +val) return 'NaN'
-    let isNegativeZero = val === 0 && 1 / val < 0
-    return isNegativeZero ? '-0' : `${val}`
-  }
+//   function printNumber (val) {
+//     if (val != +val) return 'NaN'
+//     let isNegativeZero = val === 0 && 1 / val < 0
+//     return isNegativeZero ? '-0' : `${val}`
+//   }
 
-  function printSimpleValue (val, quoteStrings) {
-    if (quoteStrings === void 0) {
-      quoteStrings = false
-    }
+//   function printSimpleValue (val, quoteStrings) {
+//     if (quoteStrings === void 0) {
+//       quoteStrings = false
+//     }
 
-    if (val == null || val === true || val === false) return `${val}`
-    let typeOf = typeof val
-    if (typeOf === 'number') return printNumber(val)
-    if (typeOf === 'string') return quoteStrings ? `"${val}"` : val
-    if (typeOf === 'function') return `[Function ${val.name || 'anonymous'}]`
-    if (typeOf === 'symbol')
-      return symbolToString.call(val).replace(SYMBOL_REGEXP, 'Symbol($1)')
-    let tag = toString.call(val).slice(8, -1)
-    if (tag === 'Date')
-      return isNaN(val.getTime()) ? `${val}` : val.toISOString(val)
-    if (tag === 'Error' || val instanceof Error)
-      return `[${errorToString.call(val)}]`
-    if (tag === 'RegExp') return regExpToString.call(val)
-    return null
-  }
-  let r = printSimpleValue(value, quoteStrings)
-  if (r !== null) return r
-  return JSON.stringify(
-    value,
-    function (key, v) {
-      let r2 = printSimpleValue(this[key], quoteStrings)
-      if (r2 !== null) return r
-      return v
-    },
-    2,
-  )
-}
-
+//     if (val == null || val === true || val === false) return `${val}`
+//     let typeOf = typeof val
+//     if (typeOf === 'number') return printNumber(val)
+//     if (typeOf === 'string') return quoteStrings ? `"${val}"` : val
+//     if (typeOf === 'function') return `[Function ${val.name || 'anonymous'}]`
+//     if (typeOf === 'symbol')
+//       return symbolToString.call(val).replace(SYMBOL_REGEXP, 'Symbol($1)')
+//     let tag = toString.call(val).slice(8, -1)
+//     if (tag === 'Date')
+//       return isNaN(val.getTime()) ? `${val}` : val.toISOString(val)
+//     if (tag === 'Error' || val instanceof Error)
+//       return `[${errorToString.call(val)}]`
+//     if (tag === 'RegExp') return regExpToString.call(val)
+//     return null
+//   }
+//   let r = printSimpleValue(value, quoteStrings)
+//   if (r !== null) return r
+//   return JSON.stringify(
+//     value,
+//     function (key, v) {
+//       let r2 = printSimpleValue(this[key], quoteStrings)
+//       if (r2 !== null) return r
+//       return v
+//     },
+//     2,
+//   )
+// }
+const requiredMsg = 'This is a required field'
 Yup.setLocale({
   mixed: {
     //   default: 'Não é válido',
-    required: 'This is a required field',
+    required: requiredMsg,
     number: '',
     notType: function notType (_ref) {
       // console.log(_ref)
@@ -143,6 +143,19 @@ Yup.addMethod(Yup.array, 'unique', function (
     return true
   })
 })
+
+Yup.string.prototype.required = function (message) {
+  if (message === undefined) {
+    message = requiredMsg
+  }
+  const next = Yup.mixed.prototype.required.call(this, message)
+  return next.test({
+    message,
+    name: 'required',
+    test: (v) => v !== undefined && v.trim().length > 0,
+  })
+}
+
 export default Yup
 
 // module.exports = Yup.date().transform(function (value, originalValue) {
