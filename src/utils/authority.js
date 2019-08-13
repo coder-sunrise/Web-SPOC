@@ -6,6 +6,7 @@ const roleAccessRightsMapping = {
     { name: 'patient.edit', rights: 'enable' },
     { name: 'patient.view', rights: 'enable' },
     { name: 'patient.history', rights: 'disable' },
+    { name: 'systemSettings.edit', rights: 'enable' },
   ],
   editor: [
     { name: 'editor', rights: 'enable' },

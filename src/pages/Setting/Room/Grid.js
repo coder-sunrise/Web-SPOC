@@ -41,7 +41,10 @@ class Grid extends PureComponent {
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
           { name: 'isActive', title: 'Status' },
-          { name: 'action', title: 'Action' },
+          {
+            name: 'action',
+            title: 'Action',
+          },
         ]}
         // FuncProps={{ pager: false }}
         columnExtensions={[
@@ -51,29 +54,25 @@ class Grid extends PureComponent {
             type: 'select',
             options: status,
           },
-        ]}
-        ActionProps={{
-          TableCellComponent: ({ column, row, ...props }) => {
-            if (column.name === 'action') {
+          {
+            columnName: 'action',
+            align: 'center',
+            render: (row) => {
               return (
-                <Table.Cell {...props}>
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      this.editRow(row)
-                    }}
-                    justIcon
-                    color='primary'
-                    style={{ marginRight: 5 }}
-                  >
-                    <Edit />
-                  </Button>
-                </Table.Cell>
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    this.editRow(row)
+                  }}
+                  justIcon
+                  color='primary'
+                >
+                  <Edit />
+                </Button>
               )
-            }
-            return <Table.Cell {...props} />
+            },
           },
-        }}
+        ]}
       />
     )
   }
