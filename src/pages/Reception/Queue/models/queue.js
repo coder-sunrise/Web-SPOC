@@ -121,25 +121,32 @@ export default createListViewModel({
           })
         return true
       },
-      *fetchQueueListing ({ sessionID, visitStatus }, { call, put }) {
-        const filterByStatus = visitStatus
-          ? {
-              prop: 'visitFkNavigation.visitStatus',
-              val: visitStatus,
-              opr: 'eql',
-            }
-          : {}
-        const response = yield call(
-          service.getQueueListing,
-          sessionID,
-          filterByStatus,
-        )
-        const { data: { data = [] } } = response
+      *fetchQueueListing ({ visitStatus }, { select, call, put }) {
+        const { sessionInfo } = yield select((state) => state.queueLog)
 
-        return yield put({
-          type: 'updateQueueListing',
-          queueListing: data,
-        })
+        if (sessionInfo) {
+          const { id: sessionID } = sessionInfo
+
+          const filterByStatus = visitStatus
+            ? {
+                prop: 'visitFkNavigation.visitStatus',
+                val: visitStatus,
+                opr: 'eql',
+              }
+            : {}
+          const response = yield call(
+            service.getQueueListing,
+            sessionID,
+            filterByStatus,
+          )
+          const { data: { data = [] } } = response
+
+          return yield put({
+            type: 'updateQueueListing',
+            queueListing: data,
+          })
+        }
+        return false
       },
       *fetchPatientListByName ({ payload }, { call, put }) {
         try {

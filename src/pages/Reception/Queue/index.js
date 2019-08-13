@@ -26,7 +26,6 @@ import EmptySession from './EmptySession'
 import DetailsActionBar from './Details/DetailsActionBar'
 import DetailsGrid from './Details/DetailsGrid'
 import PatientSearchModal from './PatientSearch'
-import ViewPatient from '../../PatientDatabase/Detail'
 import EndSessionSummary from './Details/EndSessionSummary'
 import { StatusIndicator, modelKey } from './variables'
 
@@ -77,7 +76,6 @@ const styles = (theme) => ({
 class Queue extends PureComponent {
   state = {
     showPatientSearch: false,
-    showViewPatientProfile: false,
     showEndSessionSummary: false,
     currentFilter: StatusIndicator.ALL,
     currentQuery: '',
@@ -120,16 +118,7 @@ class Queue extends PureComponent {
     })
   }
 
-  toggleViewPatientProfile = () => {
-    const { showViewPatientProfile } = this.state
-    this.setState({ showViewPatientProfile: !showViewPatientProfile })
-  }
-
   togglePatientSearch = () => {
-    // const { dispatch } = this.props
-    // dispatch({
-    //   type: `${modelKey}togglePatientSearch`,
-    // })
     const { showPatientSearch } = this.state
     this.setState({ showPatientSearch: !showPatientSearch })
   }
@@ -142,7 +131,6 @@ class Queue extends PureComponent {
   }
 
   onEndSessionClick = () => {
-    // const { showEndSessionConfirm } = this.state
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
     const { sessionNo } = sessionInfo
@@ -170,7 +158,6 @@ class Queue extends PureComponent {
 
   onEnterPressed = (searchQuery) => {
     const { dispatch } = this.props
-    // const { currentQuery } = this.state
     searchQuery !== '' &&
       dispatch({
         type: `${modelKey}fetchPatientListByName`,
@@ -182,27 +169,25 @@ class Queue extends PureComponent {
     const { queueLog } = this.props
     const { patientList } = queueLog
 
-    if (patientList.length === 1) {
-      this.showVisitRegistration({ patientID: patientList[0].id })
-    } else if (patientList.length > 1) {
-      this.setState({ showPatientSearch: true })
-    } else {
-      this.toggleRegisterNewPatient()
-    }
+    if (patientList.length === 1)
+      return this.showVisitRegistration({ patientID: patientList[0].id })
+
+    if (patientList.length > 1)
+      return this.setState({ showPatientSearch: true })
+
+    return this.toggleRegisterNewPatient()
   }
 
   onRefreshClick = () => {
-    const { queueLog, dispatch } = this.props
+    const { dispatch } = this.props
     dispatch({
       type: `${modelKey}fetchQueueListing`,
-      sessionID: queueLog.sessionInfo.id,
     })
   }
 
   render () {
     const { classes, queueLog, loading } = this.props
     const {
-      showViewPatientProfile,
       showEndSessionSummary,
       showPatientSearch,
       currentQuery,
@@ -211,7 +196,6 @@ class Queue extends PureComponent {
 
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    // console.log('queuelisting state', this.props)
 
     return (
       <PageHeaderWrapper
@@ -265,6 +249,7 @@ class Queue extends PureComponent {
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
+                  history={this.props.history}
                   onViewDispenseClick={this.toggleDispense}
                   handleEditVisitClick={this.showVisitRegistration}
                   currentFilter={currentFilter}
@@ -285,18 +270,6 @@ class Queue extends PureComponent {
                 onViewRegisterVisit={this.showVisitRegistration}
                 onViewRegisterPatient={this.toggleRegisterNewPatient}
               />
-            </CommonModal>
-            <CommonModal
-              open={showViewPatientProfile}
-              title={formatMessage({
-                id: 'reception.queue.editVisit',
-              })}
-              onClose={this.toggleViewPatientProfile}
-              onConfirm={this.toggleViewPatientProfile}
-              fullScreen
-              showFooter={false}
-            >
-              <ViewPatient />
             </CommonModal>
             <CommonModal
               open={showEndSessionSummary}

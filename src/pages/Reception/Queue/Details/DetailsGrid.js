@@ -26,6 +26,7 @@ import AppointmentActionButton from './AppointmentActionButton'
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
 import { filterData, filterDoctorBlock, todayOnly } from '../utils'
 import { StatusIndicator } from '../variables'
+import { getAppendUrl } from '@/utils/utils'
 // assets
 import { tooltip } from '@/assets/jss/index'
 
@@ -152,7 +153,7 @@ const ContextMenuOptions = [
     id: 3,
     label: 'Patient Profile',
     Icon: Person,
-    disabled: true,
+    disabled: false,
   },
   {
     id: 4,
@@ -209,8 +210,18 @@ class DetailsGrid extends PureComponent {
   }
 
   onViewPatientProfileClick = (row) => {
-    const { patientAccountNo, patientReferenceNo, patientName } = row
+    const { patientProfileFK } = row
     const { dispatch } = this.props
+    // dispatch({
+    //   type: 'patient'
+    // })
+    this.props.history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: '1',
+        pid: patientProfileFK,
+      }),
+    )
     // dispatch({
     //   type: 'queueLog/getPatientID',
     //   payload: {
@@ -236,15 +247,13 @@ class DetailsGrid extends PureComponent {
   }
 
   deleteQueue = (queueID) => {
-    const { dispatch, queueLog } = this.props
-    const { sessionInfo } = queueLog
+    const { dispatch } = this.props
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
       queueID,
     })
     dispatch({
       type: 'queueLog/fetchQueueListing',
-      sessionID: sessionInfo.id,
     })
   }
 
