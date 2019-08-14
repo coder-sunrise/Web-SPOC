@@ -430,6 +430,21 @@ const routes = [
             name: 'userrole',
             component: './Setting/UserRole',
           },
+          {
+            path: '/setting/servicecenter',
+            name: 'servicecenter',
+            component: './Setting/serviceCenter',
+          },
+          {
+            path: '/setting/servicecentercategory',
+            name: 'servicecentercategory',
+            component: './Setting/serviceCenterCategory',
+          },
+          {
+            path: '/setting/servicecategory',
+            name: 'servicecategory',
+            component: './Setting/serviceCategory',
+          },
         ],
       },
       // Settings

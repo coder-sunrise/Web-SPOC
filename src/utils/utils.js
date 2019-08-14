@@ -402,7 +402,7 @@ const convertToQuery = (
             prop: p,
             val,
             // valueType: valType,
-            opr: typeof val === 'boolean' ? filterType.eql : filterType.like,
+            opr: ['boolean','number'].indexOf(typeof val)>=0 ? filterType.eql : filterType.like,
           })
         }
       }

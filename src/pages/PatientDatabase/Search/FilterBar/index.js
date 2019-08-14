@@ -96,6 +96,7 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'patientSearch/query',
                     payload: {
+                      [`${prefix}patientReferenceNo`]: search,
                       [`${prefix}name`]: search,
                       [`${prefix}patientAccountNo`]: search,
                       [`${prefix}contactFkNavigation.contactNumber.number`]: search,
