@@ -82,10 +82,12 @@ class Queue extends PureComponent {
   }
 
   componentWillMount = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: `${modelKey}getSessionInfo`,
-    })
+    const { dispatch, queueLog } = this.props
+    const { sessionInfo } = queueLog
+    if (sessionInfo.id === '')
+      dispatch({
+        type: `${modelKey}getSessionInfo`,
+      })
   }
 
   showVisitRegistration = ({ visitID = undefined, patientID = undefined }) => {
@@ -185,7 +187,7 @@ class Queue extends PureComponent {
   onRefreshClick = () => {
     const { dispatch } = this.props
     dispatch({
-      type: `${modelKey}fetchQueueListing`,
+      type: `${modelKey}refresh`,
     })
   }
 
@@ -208,7 +210,7 @@ class Queue extends PureComponent {
     } = this.state
 
     const { sessionInfo, error } = queueLog
-    const { sessionNo, isClinicSessionClosed } = sessionInfo
+    const { sessionNo, id: sessionID, isClinicSessionClosed } = sessionInfo
 
     return (
       <PageHeaderWrapper
@@ -226,7 +228,7 @@ class Queue extends PureComponent {
                   color='info'
                   size='sm'
                   onClick={this.onRefreshClick}
-                  submitKey={`${modelKey}fetchQueueListing`}
+                  submitKey={`${modelKey}refresh`}
                   icon={<Refresh />}
                 >
                   Refresh
@@ -248,15 +250,13 @@ class Queue extends PureComponent {
             {isClinicSessionClosed ? (
               <EmptySession
                 handleStartSession={this.onStartSession}
-                loadingProps={loading}
+                sessionInfo={sessionInfo}
+                loading={loading}
                 errorState={error}
               />
             ) : (
               <React.Fragment>
                 <DetailsActionBar
-                  isFetching={
-                    loading.effects[`${modelKey}fetchPatientListByName`]
-                  }
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   togglePatientSearch={this.togglePatientSearch}
                   toggleNewPatient={this.toggleRegisterNewPatient}
@@ -264,6 +264,7 @@ class Queue extends PureComponent {
                 <DetailsGrid
                   onViewPatientProfileClick={this.onViewPatientProfileClick}
                   onViewDispenseClick={this.toggleDispense}
+                  onRegisterPatientClick={this.toggleRegisterNewPatient}
                   handleEditVisitClick={this.showVisitRegistration}
                   currentFilter={currentFilter}
                 />

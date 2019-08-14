@@ -30,8 +30,6 @@ export default createListViewModel({
     state: {
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
-      // queueListing: generateRowData().reduce(mergeGenderAndAge, [])
-      queueListing: [],
       currentFilter: StatusIndicator.ALL,
       error: {
         hasError: false,
@@ -50,9 +48,6 @@ export default createListViewModel({
             })
           },
         },
-      })
-      history.listen((location) => {
-        console.log({ location })
       })
     },
     effects: {
@@ -88,16 +83,21 @@ export default createListViewModel({
         return status >= 204
       },
       *getSessionInfo (_, { call, put }) {
-        const response = yield call(service.getActiveSession)
+        const payload = {
+          eql_IsClinicSessionClosed: false,
+        }
+        const response = yield call(service.getActiveSession, payload)
+
         const { status, data } = response
         // data = null when get session failed
-
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
-
           yield put({
-            type: 'fetchQueueListing',
-            sessionID: sessionData[0].id,
+            type: 'query',
+            payload: {
+              pagesize: 999999,
+              'eql_VisitFKNavigation.BizSessionFK': sessionData[0].id,
+            },
           })
 
           yield put({
@@ -105,13 +105,13 @@ export default createListViewModel({
             error: { hasError: false, message: '' },
           })
 
-          return yield put({
+          yield put({
             type: 'updateSessionInfo',
             payload: { ...sessionData[0] },
           })
         }
         if (status >= 400)
-          return yield put({
+          yield put({
             type: 'toggleError',
             error: {
               hasError: true,
@@ -119,60 +119,32 @@ export default createListViewModel({
                 'Failed to get session info. Please contact system Administrator',
             },
           })
+      },
+      *deleteQueueByQueueID ({ queueID }, { call, put }) {
+        const response = yield call(service.deleteQueue, queueID)
+        console.log({ response })
+        yield put({
+          type: 'refresh',
+        })
         return true
       },
-      *fetchQueueListing ({ visitStatus }, { select, call, put }) {
-        const { sessionInfo } = yield select((state) => state.queueLog)
-
-        if (sessionInfo) {
-          const { id: sessionID } = sessionInfo
-
-          const filterByStatus = visitStatus
+      *refresh (_, { select, put }) {
+        const queueLogState = yield select((state) => state.queueLog)
+        const { currentFilter, sessionInfo } = queueLogState
+        const filter =
+          currentFilter !== StatusIndicator.ALL
             ? {
-                prop: 'visitFkNavigation.visitStatus',
-                val: visitStatus,
-                opr: 'eql',
+                'visitFkNavigation.visitStatus': currentFilter,
               }
             : {}
-          const response = yield call(
-            service.getQueueListing,
-            sessionID,
-            filterByStatus,
-          )
-          const { data: { data = [] } } = response
-
-          return yield put({
-            type: 'updateQueueListing',
-            queueListing: data,
-          })
-        }
-        return false
-      },
-      *fetchPatientListByName ({ payload }, { call, put }) {
-        try {
-          const response = yield call(service.fetchPatientList, payload)
-          const { data } = response
-          return yield put({
-            type: 'updatePatientList',
-            payload: [
-              ...data.data,
-            ],
-          })
-        } catch (error) {
-          notification.error({
-            message: (
-              <MessageWrapper>Failed to retrieve patient list</MessageWrapper>
-            ),
-            duration: 0,
-          })
-          return yield put({
-            type: 'updatePatientList',
-            payload: [],
-          })
-        }
-      },
-      *deleteQueueByQueueID ({ queueID }, { call }) {
-        yield call(service.deleteQueue, queueID)
+        yield put({
+          type: 'query',
+          payload: {
+            pagesize: 999999,
+            'eql_VisitFKNavigation.BizSessionFK': sessionInfo.id,
+            ...filter,
+          },
+        })
         return true
       },
     },
@@ -189,12 +161,6 @@ export default createListViewModel({
           patientList: [
             ...payload,
           ],
-        }
-      },
-      updateQueueListing (state, { queueListing }) {
-        return {
-          ...state,
-          queueListing,
         }
       },
       showError (state, { payload }) {

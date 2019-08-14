@@ -24,7 +24,7 @@ const style = (theme) => ({
       },
     },
     '& > .ant-dropdown-menu-item-disabled': {
-      '& span': {
+      '& span, & svg': {
         color: 'rgba(0, 0, 0, 0.25) !important',
       },
     },

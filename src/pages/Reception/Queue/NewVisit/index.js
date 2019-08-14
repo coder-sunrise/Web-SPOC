@@ -9,18 +9,20 @@ import {
   SizeContainer,
   withFormikExtend,
 } from '@/components'
+// medisys-components
+import { ErrorWrapper, LoadingWrapper } from 'medisys-components'
 // Sub-components
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
 // import ParticipantCard from './ParticipantCard'
-// medisys-components
-import { ErrorWrapper, LoadingWrapper } from 'medisys-components'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
 // services
 import { deleteFileByFileID } from '@/services/file'
+// misc utils
+import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -63,136 +65,13 @@ const styles = (theme) => ({
   displayName: 'VisitRegistration',
   enableReinitialize: true,
   validationSchema: VisitValidationSchema,
-  mapPropsToValues: ({ queueLog, visitRegistration }) => {
-    let qNo = 0.0
-    if (queueLog) {
-      const { queueListing } = queueLog
-      const largestQNo = queueListing.reduce(
-        (largest, { queueNo }) =>
-          parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
-        0,
-      )
-      qNo = parseFloat(largestQNo + 1).toFixed(1)
-    }
-
-    const { visitInfo } = visitRegistration
-
-    if (Object.keys(visitInfo).length > 0) {
-      qNo = visitInfo.queueNo
-    }
-    const { visit = {} } = visitInfo
-
-    const visitEntries = Object.keys(visit).reduce(
-      (entries, key) => ({
-        ...entries,
-        [key]: visit[key] === null ? undefined : visit[key],
-      }),
-      {},
-    )
-
-    return {
-      queueNo: qNo,
-      visitPurposeFK: 1,
-      ...visitEntries,
-    }
-  },
-  handleSubmit: async (values, { props, setSubmitting }) => {
-    const { queueNo, visitAttachment, ...restValues } = values
-    const { dispatch, queueLog, visitRegistration, onConfirm } = props
-
-    const { sessionInfo } = queueLog
-    const {
-      visitInfo: { id = undefined, visit, ...restVisitInfo },
-      patientInfo,
-    } = visitRegistration
-    const bizSessionFK = sessionInfo.id
-
-    const visitReferenceNo = `${sessionInfo.sessionNo}-${parseFloat(id).toFixed(
-      1,
-    )}`
-
-    const patientProfileFK = patientInfo.id
-
-    let uploaded = []
-    if (visitAttachment) {
-      uploaded = visitAttachment
-        .filter((item) => {
-          // filter out not yet confirmed files
-          if (item.fileIndexFK === undefined && item.isDeleted) return false
-          return true
-        })
-        .map(
-          (
-            { fileIndexFK, fileName, attachmentType, isDeleted, ...rest },
-            index,
-          ) =>
-            !fileIndexFK
-              ? {
-                  // file status === uploaded, only 4 info needed for API
-                  fileIndexFK: rest.id,
-                  sortOrder: index,
-                  fileName,
-                  attachmentType,
-                  isDeleted,
-                }
-              : {
-                  // file status === confirmed, need to provide full object for API
-                  ...rest,
-                  fileIndexFK,
-                  fileName,
-                  attachmentType,
-                  isDeleted,
-                  sortOrder: index,
-                },
-        )
-    }
-    const payload = {
-      id,
-      ...restVisitInfo,
-      queueNo: parseFloat(queueNo).toFixed(1),
-      queueNoPrefix: sessionInfo.sessionNoPrefix,
-      visit: {
-        visitAttachment: uploaded,
-        patientProfileFK,
-        bizSessionFK,
-        visitReferenceNo,
-        visitStatus: 'WAITING',
-        visitRemarks: null,
-        temperatureC: null,
-        bpSysMMHG: null,
-        bpDiaMMHG: null,
-        heightCM: null,
-        weightKG: null,
-        bmi: null,
-        pulseRateBPM: null,
-        priorityTime: null,
-        priorityType: null,
-        referralPersonFK: null,
-        referralCompanyFK: null,
-        referralPerson: null,
-        referralDate: null,
-        ...restValues, // override values from formik values
-      },
-    }
-
-    const type =
-      id === undefined
-        ? 'visitRegistration/registerVisitInfo'
-        : 'visitRegistration/saveVisitInfo'
-
-    // console.log({ payload })
-    dispatch({
-      type,
-      payload,
-    }).then((response) => {
-      setSubmitting(false)
-      return response && onConfirm()
-    })
-  },
+  mapPropsToValues: formikMapPropsToValues,
+  handleSubmit: formikHandleSubmit,
 })
 class NewVisit extends PureComponent {
   componentWillUnmount () {
-    // delete Attachments where fileStatus === 'Uploaded'
+    // call file index API METHOD='DELETE'
+    // for Attachments where fileStatus === 'Uploaded' but not 'Confirmed'
     // unmount will be invoked too when submit succeeded,
     // but this.props.values will be empty after submit succeeed
 
@@ -269,7 +148,6 @@ class NewVisit extends PureComponent {
     const fetchingInfoText = fetchingVisitInfo
       ? 'Loading visit info...'
       : undefined
-
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
 
     return (

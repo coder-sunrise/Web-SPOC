@@ -143,7 +143,7 @@ export default createFormViewModel({
         if (status >= 200 && status < 300) {
           // const { bizSessionFK } = visit
           return yield put({
-            type: 'queueLog/fetchQueueListing',
+            type: 'queueLog/refresh',
           })
         }
         return false

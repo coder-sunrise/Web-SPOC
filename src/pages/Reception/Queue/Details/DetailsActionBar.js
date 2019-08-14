@@ -58,13 +58,7 @@ class DetailsActionBar extends PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      toggleNewPatient,
-      isFetching,
-      handleSubmit,
-      values,
-    } = this.props
+    const { classes, toggleNewPatient, handleSubmit, values } = this.props
     return (
       <GridContainer className={classnames(classes.actionBar)}>
         <GridItem xs md={3}>
@@ -73,7 +67,6 @@ class DetailsActionBar extends PureComponent {
             render={(args) => {
               return (
                 <TextField
-                  suffix={isFetching && <CircularProgress size={16} />}
                   label={formatMessage({
                     id: 'reception.queue.registerVisitTextBox',
                   })}
@@ -91,7 +84,7 @@ class DetailsActionBar extends PureComponent {
             icon={<Search />}
             onClick={handleSubmit}
             size='sm'
-            submitKey='queueLog/fetchPatientListByName'
+            submitKey='patientSearch/query'
           >
             Search
           </ProgressButton>

@@ -61,7 +61,6 @@ const TableConfig = {
     { name: 'queueNo', title: 'Q. No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'gender/age', title: 'Gender / Age' },
-
     { name: 'doctor', title: 'Doctor' },
     { name: 'roomNo', title: 'Room No.' },
     { name: 'timeIn', title: 'Time In' },
@@ -69,61 +68,36 @@ const TableConfig = {
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceAmount', title: 'Invoice Amount' },
     { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'accNo', title: 'Acc No.' },
+    { name: 'patientAccountNo', title: 'Acc No.' },
     { name: 'gst', title: 'GST' },
     { name: 'payment', title: 'Payment' },
     { name: 'paymentMode', title: 'Payment Mode' },
     { name: 'company', title: 'Company' },
     { name: 'outstandingBalance', title: 'Outstanding' },
-    { name: 'scheme', title: 'Scheme' },
-    { name: 'contactNo', title: 'Phone' },
-    // { name: 'gender', title: 'Gender' },
-    // { name: 'age', title: 'Age' },
-    // { name: 'refNo', title: 'Ref. No.' },
-    // { name: 'visitRefNo', title: 'Visit Ref No.' },
-    // { name: 'referralCompany', title: 'Referral Company' },
-    // { name: 'referralPerson', title: 'Referral Person' },
-    // { name: 'referralRemarks', title: 'Referral Remarks' },
-    { name: 'Action', title: 'Action' },
+    { name: 'patientScheme', title: 'Scheme' },
+    { name: 'patientMobile', title: 'Phone' },
+    { name: 'action', title: 'Action' },
   ],
   leftColumns: [
     'visitStatus',
     'queueNo',
   ],
-  columnExtensions: [
-    { columnName: 'queueNo', width: 80, compare: compareQueueNo },
-    { columnName: 'visitStatus', type: 'status', width: 150 },
-    { columnName: 'paymentMode', width: 150 },
-    { columnName: 'patientName', width: 250 },
-    { columnName: 'referralCompany', width: 150 },
-    { columnName: 'referralPerson', width: 150 },
-    { columnName: 'referralRemarks', width: 150 },
-    { columnName: 'invoiceAmount', type: 'number', currency: true },
-    { columnName: 'payment', type: 'number', currency: true },
-    { columnName: 'gst', type: 'number', currency: true },
-    { columnName: 'outstandingBalance', type: 'number', currency: true },
-    { columnName: 'Action', width: 100, align: 'center' },
-    { columnName: 'timeIn', width: 160, type: 'time' },
-    { columnName: 'timeOut', width: 160, type: 'time' },
-    {
-      columnName: 'gender/age',
-      render: (row) =>
-        row.gender && row.age ? `${row.gender}/${row.age}` : '',
-      sortBy: 'genderFK',
-    },
-    {
-      columnName: 'appointmentTime',
-      width: 160,
-      render: (row) => {
-        if (row.appointmentTime) {
-          return DateFormatter({ value: row.appointmentTime, full: true })
-        }
-        if (row.start) return DateFormatter({ value: row.start, full: true })
-        return ''
-      },
-    },
-  ],
 }
+
+const AppointmentContextMenu = [
+  {
+    id: 8,
+    label: 'Register Visit',
+    Icon: Edit,
+    disabled: true,
+  },
+  {
+    id: 9,
+    label: 'Register Patient',
+    Icon: Person,
+    disabled: false,
+  },
+]
 
 const ContextMenuOptions = [
   {
@@ -185,6 +159,47 @@ const ContextMenuOptions = [
   loading,
 }))
 class DetailsGrid extends PureComponent {
+  state = {
+    columnExtensions: [
+      { columnName: 'queueNo', width: 80, compare: compareQueueNo },
+      { columnName: 'visitStatus', type: 'status', width: 150 },
+      { columnName: 'paymentMode', width: 150 },
+      { columnName: 'patientName', width: 250 },
+      { columnName: 'referralCompany', width: 150 },
+      { columnName: 'referralPerson', width: 150 },
+      { columnName: 'referralRemarks', width: 150 },
+      { columnName: 'invoiceAmount', type: 'number', currency: true },
+      { columnName: 'payment', type: 'number', currency: true },
+      { columnName: 'gst', type: 'number', currency: true },
+      { columnName: 'outstandingBalance', type: 'number', currency: true },
+      { columnName: 'Action', width: 100, align: 'center' },
+      { columnName: 'timeIn', width: 160, type: 'time' },
+      { columnName: 'timeOut', width: 160, type: 'time' },
+      {
+        columnName: 'gender/age',
+        render: (row) =>
+          row.gender && row.age ? `${row.gender}/${row.age}` : '',
+        sortBy: 'genderFK',
+      },
+      {
+        columnName: 'appointmentTime',
+        width: 160,
+        render: (row) => {
+          if (row.appointmentTime) {
+            return DateFormatter({ value: row.appointmentTime, full: true })
+          }
+          if (row.start) return DateFormatter({ value: row.start, full: true })
+          return ''
+        },
+      },
+      {
+        columnName: 'action',
+        align: 'center',
+        render: (row) => this.Cell(row),
+      },
+    ],
+  }
+
   onRowDoubleClick = (row) => {
     this.props.handleEditVisitClick({
       visitID: row.id,
@@ -230,9 +245,6 @@ class DetailsGrid extends PureComponent {
       type: 'queueLog/deleteQueueByQueueID',
       queueID,
     })
-    dispatch({
-      type: 'queueLog/fetchQueueListing',
-    })
   }
 
   onContextButtonClick = (row, id) => {
@@ -257,83 +269,62 @@ class DetailsGrid extends PureComponent {
       case '5':
         router.push('/reception/queue/patientdashboard/consultation/new')
         break
+      case '9':
+        this.props.onRegisterPatientClick()
+        break
       default:
         break
     }
   }
 
-  Cell = (props) => {
-    const { classes, ...tableProps } = props
-    if (tableProps.column.name === 'Action') {
-      if (
-        tableProps.row.visitStatus === StatusIndicator.APPOINTMENT.toUpperCase()
-      ) {
-        return (
-          <Table.Cell {...tableProps}>
-            <Tooltip title='More Actions'>
-              <div style={{ display: 'inline-block' }}>
-                <AppointmentActionButton
-                  row={tableProps.row}
-                  Icon={<Pageview />}
-                  onClick={this.onContextButtonClick}
-                />
-              </div>
-            </Tooltip>
-          </Table.Cell>
-        )
-      }
-
-      const { row } = tableProps
-      const enabledDispense = [
-        'DISPENSE',
-        'PAID',
-        'OVERPAID',
-      ]
-      const shouldDisableDelete = row.visitStatus !== 'WAITING'
-      const shouldDisableDispense = !enabledDispense.includes(row.visitStatus)
-      const newContextMenuOptions = ContextMenuOptions.map((opt) => {
-        if (opt.id === 1) return { ...opt, disabled: shouldDisableDispense }
-        if (opt.id === 2) return { ...opt, disabled: shouldDisableDelete }
-        return { ...opt }
-      })
-
+  Cell = (row) => {
+    const { visitStatus } = row
+    if (visitStatus === StatusIndicator.APPOINTMENT.toUpperCase()) {
       return (
-        <Table.Cell {...tableProps}>
-          <Tooltip
-            title='More Actions'
-            placement='bottom'
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <div style={{ display: 'inline-block' }}>
-              <GridButton
-                row={tableProps.row}
-                onClick={this.onContextButtonClick}
-                contextMenuOptions={newContextMenuOptions}
-              />
-            </div>
-          </Tooltip>
-        </Table.Cell>
+        <div style={{ display: 'inline-block' }}>
+          <GridButton
+            row={row}
+            onClick={this.onContextButtonClick}
+            contextMenuOptions={AppointmentContextMenu}
+          />
+        </div>
       )
     }
 
-    return <Table.Cell {...tableProps} />
-  }
+    const enabledDispense = [
+      'DISPENSE',
+      'PAID',
+      'OVERPAID',
+    ]
+    const shouldDisableDelete = row.visitStatus !== 'WAITING'
+    const shouldDisableDispense = !enabledDispense.includes(row.visitStatus)
+    const newContextMenuOptions = ContextMenuOptions.map((opt) => {
+      if (opt.id === 1) return { ...opt, disabled: shouldDisableDispense }
+      if (opt.id === 2) return { ...opt, disabled: shouldDisableDelete }
+      return { ...opt }
+    })
 
-  TableCell = (props) => {
-    return this.Cell({ ...props })
+    return (
+      <Tooltip title='More Actions'>
+        <div style={{ display: 'inline-block' }}>
+          <GridButton
+            row={row}
+            onClick={this.onContextButtonClick}
+            contextMenuOptions={newContextMenuOptions}
+          />
+        </div>
+      </Tooltip>
+    )
   }
 
   render () {
-    const ActionProps = {
-      TableCellComponent: withStyles(styles)(this.TableCell),
-    }
     const {
       calendar = { calendarEvents: [] },
       queueLog,
       loading,
       global,
     } = this.props
-    const { currentFilter, queueListing } = queueLog
+    const { currentFilter, list } = queueLog
     const { calendarEvents } = calendar
 
     const flattenedCalendarData = calendarEvents
@@ -343,11 +334,11 @@ class DetailsGrid extends PureComponent {
     const data =
       currentFilter === StatusIndicator.APPOINTMENT
         ? filterDoctorBlock(flattenedCalendarData)
-        : filterData(currentFilter, queueListing)
+        : filterData(currentFilter, list)
 
     const isLoading = global.showVisitRegistration
       ? false
-      : loading.effects['queueLog/fetchQueueListing']
+      : loading.effects['queueLog/query']
 
     return (
       <LoadingWrapper
@@ -358,8 +349,9 @@ class DetailsGrid extends PureComponent {
         <CommonTableGrid
           height={600}
           rows={data}
-          ActionProps={ActionProps}
+          // ActionProps={ActionProps}
           {...TableConfig}
+          columnExtensions={this.state.columnExtensions}
           size='sm'
           FuncProps={FuncConfig}
           onRowDoubleClick={this.onRowDoubleClick}
