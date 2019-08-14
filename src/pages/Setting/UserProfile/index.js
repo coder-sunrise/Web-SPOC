@@ -143,6 +143,18 @@ class UserProfile extends React.Component {
       currentSelectedUser,
     } = settingUserProfile
 
+    const userProfileList = list.reduce(
+      (userProfiles, profile) => [
+        ...userProfiles,
+        {
+          name: profile.name,
+          status: profile.isActive,
+          ...profile.userProfile,
+        },
+      ],
+      [],
+    )
+
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -178,7 +190,10 @@ class UserProfile extends React.Component {
             </Button>
           </GridItem>
           <GridItem md={12}>
-            <CommonTableGrid rows={list} {...this.state.gridConfig} />
+            <CommonTableGrid
+              rows={userProfileList}
+              {...this.state.gridConfig}
+            />
           </GridItem>
         </GridContainer>
         <CommonModal
