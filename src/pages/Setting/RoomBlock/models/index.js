@@ -37,6 +37,7 @@ export default createListViewModel({
                 o.effectiveStartDate,
                 o.effectiveEndDate,
               ],
+              parentId: o.id === 30 ? null : 30,
             }
           }),
         }
