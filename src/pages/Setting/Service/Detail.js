@@ -2,10 +2,9 @@ import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { withStyles, Tooltip } from '@material-ui/core'
+import { withStyles, Tooltip, Divider } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import {
@@ -21,6 +20,7 @@ import {
   EditableTableGrid,
   notification,
   SizeContainer,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -67,11 +67,13 @@ class Detail extends PureComponent {
   tableParas = {
     columns: [
       { name: 'serviceCenter', title: 'Service Center' },
+      { name: 'cost', title: 'Cost' },
       { name: 'sellingPrice', title: 'Selling Price/Unit' },
       { name: 'isDefault', title: 'Default' },
     ],
     columnExtensions: [
       { columnName: 'sellingPrice', type: 'number', currency: true },
+      { columnName: 'cost', type: 'number', currency: true },
       {
         columnName: 'isDefault',
         type: 'radio',
@@ -118,6 +120,8 @@ class Detail extends PureComponent {
       <React.Fragment>
         <SizeContainer size='sm'>
           <div style={{ margin: theme.spacing(1) }}>
+            <h5 className={classes.detailHeader}>Service Details</h5>
+            <Divider />
             <GridContainer>
               <GridItem md={6}>
                 <FastField
@@ -187,6 +191,57 @@ class Detail extends PureComponent {
                 />
               </GridItem>
             </GridContainer>
+            <h5 className={classes.detailHeader}>Medisave Settings</h5>
+            <Divider />
+            <GridContainer>
+              <GridItem
+                xs={12}
+                md={6}
+                className={classes.detailHeaderContainer}
+              >
+                <Checkbox
+                  formControlProps={{ className: classes.medisaveCheck }}
+                />
+                <FastField
+                  name='serviceCategory'
+                  render={(args) => {
+                    return (
+                      <CodeSelect
+                        style={{ paddingLeft: 20 }}
+                        prefix='Medisave Health Screening'
+                        code='ctMedisaveHealthScreeningDiagnosis'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+            <GridContainer>
+              <GridItem
+                xs={12}
+                md={6}
+                className={classes.detailHeaderContainer}
+              >
+                <Checkbox
+                  formControlProps={{ className: classes.medisaveCheck }}
+                />
+                <FastField
+                  name='revenueCategory'
+                  render={(args) => {
+                    return (
+                      <Select
+                        style={{ paddingLeft: 20 }}
+                        prefix='OutPatient Scan'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+            <h5 className={classes.detailHeader}>Service Settings</h5>
+            <Divider />
             <EditableTableGrid
               style={{ marginTop: theme.spacing(1) }}
               rows={values.items}

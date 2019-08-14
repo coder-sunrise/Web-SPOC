@@ -48,7 +48,7 @@ class Room extends PureComponent {
         <CommonModal
           open={settingRoom.showModal}
           observe='RoomDetail'
-          title='Add Room'
+          title={settingRoom.entity ? 'Edit Room' : 'Add Room'}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

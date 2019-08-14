@@ -78,10 +78,6 @@ const styles = (theme) => ({
     marginTop: 15,
     marginBottom: 10,
   },
-  enableOccurenceCheckbox: {
-    textAlign: 'left',
-    paddingLeft: '16px !important',
-  },
   conflictContent: {
     fontWeight: 'bold',
   },

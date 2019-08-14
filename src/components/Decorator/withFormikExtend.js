@@ -33,17 +33,17 @@ const withFormikExtend = (props) => (Component) => {
   }
   @withFormik({
     ...props,
-    handleSubmit: (values, ps, a, b) => {
-      const { handleSubmit: orghandleSubmit } = props
-      orghandleSubmit.call(this, values, ps)
-      setTimeout(() => {
-        updateDirtyState({
-          displayName,
-          errors: {},
-          dirty: false,
-        })
-      }, 200)
-    },
+    // handleSubmit: (values, ps, a, b) => {
+    //   const { handleSubmit: orghandleSubmit } = props
+    //   orghandleSubmit.call(this, values, ps)
+    //   setTimeout(() => {
+    //     updateDirtyState({
+    //       displayName,
+    //       errors: {},
+    //       dirty: false,
+    //     })
+    //   }, 200)
+    // },
   })
   class BasicComponent extends React.Component {
     // shouldComponentUpdate (nextProps, nextStates) {

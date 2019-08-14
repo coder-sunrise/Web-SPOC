@@ -10,7 +10,7 @@ import {
   GridItem,
   Select,
   RadioGroup,
-  CommonCard,
+  FieldSet,
   NumberInput,
   DatePicker,
 } from '@/components'
@@ -27,28 +27,31 @@ import {
 
 import styles from './style'
 
-const Recurrence = ({ classes, values, isDoctorBlock }) => {
-  const labelSize = isDoctorBlock ? 4 : 2
-  const inputSize = isDoctorBlock ? 4 : 3
+const Recurrence = ({
+  classes,
+  values = {},
+  isDoctorBlock,
+  labelSize = 2,
+  inputSize = 3,
+}) => {
+  const _labelSize = isDoctorBlock ? 4 : labelSize
+  const _inputSize = isDoctorBlock ? 4 : inputSize
 
   return (
-    <CommonCard size='sm' title='Recurrence'>
-      <GridContainer item md={12}>
-        <GridItem xs md={12} className={classes.enableOccurenceCheckbox}>
-          <FastField
-            name='enableRecurrence'
-            render={(args) => {
-              return <Checkbox simple label='Enable Recurrence' {...args} />
-            }}
-          />
-        </GridItem>
-
-        {values.enableRecurrence && (
-          <React.Fragment>
-            <GridItem md={labelSize} className={classes.inlineLabel}>
+    <div>
+      <FastField
+        name='enableRecurrence'
+        render={(args) => {
+          return <Checkbox simple label='Enable Recurrence' {...args} />
+        }}
+      />
+      {values.enableRecurrence && (
+        <FieldSet size='sm' title='Recurrence'>
+          <GridContainer item md={12}>
+            <GridItem md={_labelSize} className={classes.inlineLabel}>
               <span>Recurrence Pattern</span>
             </GridItem>
-            <GridItem xs md={inputSize}>
+            <GridItem xs md={_inputSize}>
               <FastField
                 name='recurrencePattern'
                 render={(args) => (
@@ -60,25 +63,25 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
             {values.recurrencePattern === RECURRENCE_PATTERN.DAILY && (
               <RecurrenceDailyInput
                 values={values}
-                labelSize={labelSize}
-                inputSize={inputSize}
+                labelSize={_labelSize}
+                inputSize={_inputSize}
               />
             )}
             {values.recurrencePattern === RECURRENCE_PATTERN.WEEKLY && (
               <RecurrenceWeeklyInput
                 values={values}
-                labelSize={labelSize}
-                inputSize={inputSize}
+                labelSize={_labelSize}
+                inputSize={_inputSize}
               />
             )}
             {values.recurrencePattern === RECURRENCE_PATTERN.MONTHLY && (
               <RecurrenceMonthlyInput
                 values={values}
-                labelSize={labelSize}
-                inputSize={inputSize}
+                labelSize={_labelSize}
+                inputSize={_inputSize}
               />
             )}
-            <GridItem md={labelSize} className={classes.inlineLabel}>
+            <GridItem md={_labelSize} className={classes.inlineLabel}>
               <span>Range of Recurrence</span>
             </GridItem>
             <GridContainer item md={6}>
@@ -104,7 +107,7 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
                   )}
                 />
               </GridItem>
-              <GridItem md={inputSize * 2}>
+              <GridItem md={_inputSize * 2}>
                 {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
                   <FastField
                     name='occurence'
@@ -122,7 +125,7 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
               </GridItem>
             </GridContainer>
             <GridContainer item md={12}>
-              <GridItem md={labelSize} className={classes.recurrenceListLabel}>
+              <GridItem md={_labelSize} className={classes.recurrenceListLabel}>
                 <span>Recurrence</span>
               </GridItem>
               <GridItem className={classes.recurrenceListLabel}>
@@ -135,10 +138,10 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
                 )}
               </GridItem>
             </GridContainer>
-          </React.Fragment>
-        )}
-      </GridContainer>
-    </CommonCard>
+          </GridContainer>
+        </FieldSet>
+      )}
+    </div>
   )
 }
 
