@@ -127,6 +127,11 @@ const menuData = [
     url: '/setting/participantrole',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Room Block',
+    url: '/setting/roomblock',
+  },
+  {
     title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',

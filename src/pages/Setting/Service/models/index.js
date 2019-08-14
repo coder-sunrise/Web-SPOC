@@ -1,7 +1,7 @@
-import { createFormViewModel } from 'medisys-model'
+import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
-export default createFormViewModel({
+export default createListViewModel({
   namespace: 'settingClinicService',
   config: {
     // queryOnLoad: false,
@@ -17,6 +17,7 @@ export default createFormViewModel({
             serviceCenter: 'Doctor Consultation',
             isDefault: true,
             sellingPrice: 40,
+            cost: 5,
           },
           {
             id: 2,

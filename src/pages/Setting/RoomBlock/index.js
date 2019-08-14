@@ -1,27 +1,10 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import { withFormik, FastField } from 'formik'
 
 import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import {
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  CardContainer,
-  Transition,
-  TextField,
-  AntdInput,
-  Select,
-  Accordion,
-  Button,
-  CommonTableGrid,
-  DatePicker,
-  NumberInput,
-  CommonModal,
-} from '@/components'
+import { CardContainer, CommonModal } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
@@ -29,29 +12,26 @@ import Detail from './Detail'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
-  detailHeaderContainer: { position: 'relative', lineHeight: '45px' },
-  detailHeader: {
-    fontWeight: 500,
-    marginTop: theme.spacing(1),
-    '&:first-of-type': {
-      marginTop: 0,
-    },
-  },
-  medisaveCheck: { position: 'absolute', zIndex: 1, top: 11, width: 20 },
 })
 
-@connect(({ settingClinicService, global }) => ({
-  settingClinicService,
+@connect(({ settingRoomBlock, global }) => ({
+  settingRoomBlock,
   global,
 }))
-class Service extends PureComponent {
+class RoomBlock extends PureComponent {
   state = {}
+
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'settingRoomBlock/query',
+    })
+  }
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingClinicService/updateState',
+      type: 'settingRoomBlock/updateState',
       payload: {
-        showModal: !this.props.settingClinicService.showModal,
+        showModal: !this.props.settingRoomBlock.showModal,
       },
     })
   }
@@ -59,7 +39,7 @@ class Service extends PureComponent {
   render () {
     const {
       classes,
-      settingClinicService,
+      settingRoomBlock,
       dispatch,
       theme,
       ...restProps
@@ -67,15 +47,15 @@ class Service extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
         <Grid {...cfg} {...this.props} />
         <CommonModal
-          open={settingClinicService.showModal}
-          title='Add Service'
-          maxWidth='md'
+          open={settingRoomBlock.showModal}
+          observe='RoomDetail'
+          title={settingRoomBlock.entity ? 'Edit Room Block' : 'Add Room Block'}
+          maxWidth='sm'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
@@ -87,4 +67,4 @@ class Service extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Service)
+export default withStyles(styles, { withTheme: true })(RoomBlock)

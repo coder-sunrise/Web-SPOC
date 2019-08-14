@@ -352,9 +352,9 @@ class AntdSelect extends React.PureComponent {
             ) : (
               <p>
                 {this.state.fetchId > 0 && (autoComplete || query) ? (
-                  'Not Found'
-                ) : (
                   'Input Search Text'
+                ) : (
+                  'Not Found'
                 )}
               </p>
             )

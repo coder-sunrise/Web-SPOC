@@ -8,6 +8,45 @@ import Edit from '@material-ui/icons/Edit'
 import * as service from './services'
 
 class Grid extends PureComponent {
+  configs = {
+    columns: [
+      { name: 'code', title: 'Code' },
+      { name: 'displayValue', title: 'Display Value' },
+      { name: 'description', title: 'Description' },
+      { name: 'isActive', title: 'Status' },
+      {
+        name: 'action',
+        title: 'Action',
+      },
+    ],
+    columnExtensions: [
+      {
+        columnName: 'isActive',
+        sortingEnabled: false,
+        type: 'select',
+        options: status,
+      },
+      {
+        columnName: 'action',
+        align: 'center',
+        render: (row) => {
+          return (
+            <Button
+              size='sm'
+              onClick={() => {
+                this.editRow(row)
+              }}
+              justIcon
+              color='primary'
+            >
+              <Edit />
+            </Button>
+          )
+        },
+      },
+    ],
+  }
+
   editRow = (row, e) => {
     const { dispatch, settingRoom } = this.props
 
@@ -36,43 +75,7 @@ class Grid extends PureComponent {
         style={{ margin: 0 }}
         type='settingRoom'
         onRowDoubleClick={this.editRow}
-        columns={[
-          { name: 'code', title: 'Code' },
-          { name: 'displayValue', title: 'Display Value' },
-          { name: 'description', title: 'Description' },
-          { name: 'isActive', title: 'Status' },
-          {
-            name: 'action',
-            title: 'Action',
-          },
-        ]}
-        // FuncProps={{ pager: false }}
-        columnExtensions={[
-          {
-            columnName: 'isActive',
-            sortingEnabled: false,
-            type: 'select',
-            options: status,
-          },
-          {
-            columnName: 'action',
-            align: 'center',
-            render: (row) => {
-              return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
-              )
-            },
-          },
-        ]}
+        {...this.configs}
       />
     )
   }

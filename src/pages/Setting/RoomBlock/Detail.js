@@ -8,14 +8,23 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  CodeSelect,
   DateRangePicker,
+  NumberInput,
+  DatePicker,
+  TimePicker,
+  Checkbox,
+  fullDateTime,
+  FieldSet,
 } from '@/components'
+
+import Recurrence from '@/pages/Reception/BigCalendar/components/form/Recurrence'
 
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingRoom }) =>
-    settingRoom.entity || settingRoom.default,
+  mapPropsToValues: ({ settingRoomBlock }) =>
+    settingRoomBlock.entity || settingRoomBlock.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -25,7 +34,7 @@ const styles = (theme) => ({})
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
-      type: 'settingRoom/upsert',
+      type: 'settingRoomBlock/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -36,7 +45,7 @@ const styles = (theme) => ({})
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingRoom/query',
+          type: 'settingRoomBlock/query',
         })
       }
     })
@@ -54,46 +63,45 @@ class Detail extends PureComponent {
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
-            <GridItem md={6}>
+            <GridItem md={12}>
               <FastField
-                name='code'
+                name='roomFK'
                 render={(args) => (
-                  <TextField
-                    label='Code'
-                    autoFocused
-                    disabled={!!values.id}
-                    {...args}
-                  />
+                  <CodeSelect label='Room' code='ctRoom' {...args} />
                 )}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                name='eventDate'
+                render={(args) => (
+                  <DatePicker
+                    label='Event Date'
+                    format={fullDateTime}
+                    showTime={{ format: 'HH:mm' }}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
-            <GridItem md={12}>
+
+            <GridItem md={6}>
               <FastField
-                name='effectiveDates'
+                name='duration'
                 render={(args) => {
                   return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
+                    <TimePicker use12Hours={false} label='Duration' {...args} />
                   )
                 }}
               />
             </GridItem>
             <GridItem md={12}>
               <FastField
-                name='description'
+                name='remarks'
                 render={(args) => {
                   return (
                     <TextField
-                      label='Description'
+                      label='Remarks'
                       multiline
                       rowsMax={4}
                       {...args}
@@ -101,6 +109,9 @@ class Detail extends PureComponent {
                   )
                 }}
               />
+            </GridItem>
+            <GridItem md={12}>
+              <Recurrence values={values} labelSize={4} inputSize={4} />
             </GridItem>
           </GridContainer>
         </div>
