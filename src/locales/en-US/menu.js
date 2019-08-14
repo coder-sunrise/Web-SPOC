@@ -87,6 +87,7 @@ export default {
   'menu.setting.clinicbreakhour': 'Clinic Break Hour',
   'menu.setting.publicholiday': 'Public Holiday',
   'menu.setting.participantrole': 'Participant Role',
+  'menu.setting.roomblock': 'Room Block',
   'menu.setting.doctorblock': 'Doctor Block',
   'menu.setting.clinicSetting': 'Clinic Setting',
   'menu.setting.systemSetting': 'System Setting',

@@ -1,50 +1,26 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Search, PermIdentity } from '@material-ui/icons'
-import { withStyles, Tooltip } from '@material-ui/core'
-import { standardRowHeight } from 'mui-pro-jss'
-import { getAppendUrl } from '@/utils/utils'
 import { status } from '@/utils/codes'
-
 import {
+  withFormikExtend,
+  FastField,
   GridContainer,
   GridItem,
   Button,
   TextField,
   Checkbox,
-  CodeSelect,
   Select,
   ProgressButton,
 } from '@/components'
 
-const styles = (theme) => ({
-  filterBar: {
-    marginBottom: '10px',
-  },
-  filterBtn: {
-    lineHeight: standardRowHeight,
-    textAlign: 'left',
-    '& > button': {
-      marginRight: theme.spacing.unit,
-    },
-  },
-  tansactionCheck: {
-    position: 'absolute',
-    bottom: 0,
-    width: 30,
-    right: 0,
-  },
-})
-
-@withFormik({
+@withFormikExtend({
+  mapPropsToValues: ({ settingRoomBlock }) => settingRoomBlock.filter || {},
   handleSubmit: () => {},
-  displayName: 'ServiceFilter',
+  displayName: 'RoomFilter',
 })
 class Filter extends PureComponent {
   render () {
     const { classes } = this.props
-
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -66,40 +42,21 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='serviceCenter'
-              render={(args) => {
-                return (
-                  <CodeSelect
-                    code='ctServiceCenter'
-                    label='Service Center'
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
               name='isActive'
               render={(args) => {
                 return <Select label='Status' options={status} {...args} />
               }}
             />
           </GridItem>
-          <GridItem xs={12} md={12}>
+          <GridItem xs={6} md={3}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const prefix = this.props.values.isExactSearch
-                    ? 'eql_'
-                    : 'like_'
                   this.props.dispatch({
-                    type: 'settingClinicService/query',
-                    payload: {
-                      [`${prefix}name`]: this.props.values.search,
-                    },
+                    type: 'settingRoomBlock/query',
+                    payload: this.props.values,
                   })
                 }}
               >
@@ -109,10 +66,13 @@ class Filter extends PureComponent {
               <Button
                 color='primary'
                 onClick={() => {
-                  this.props.toggleModal()
                   this.props.dispatch({
-                    type: 'settingClinicService/reset',
+                    type: 'settingRoomBlock/updateState',
+                    payload: {
+                      entity: undefined,
+                    },
                   })
+                  this.props.toggleModal()
                 }}
               >
                 Add New

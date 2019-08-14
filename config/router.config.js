@@ -406,6 +406,11 @@ const routes = [
             component: './Setting/ParticipantRole',
           },
           {
+            path: '/setting/roomblock',
+            name: 'roomblock',
+            component: './Setting/RoomBlock',
+          },
+          {
             path: '/setting/doctorblock',
             name: 'doctorblock',
             component: './Setting/DoctorBlock',

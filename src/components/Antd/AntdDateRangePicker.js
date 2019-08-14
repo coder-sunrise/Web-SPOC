@@ -53,7 +53,6 @@ const STYLES = (theme) => ({
     },
     '& .ant-calendar-range-picker-separator': {
       marginRight: 10,
-      marginTop: 3,
     },
   },
 })

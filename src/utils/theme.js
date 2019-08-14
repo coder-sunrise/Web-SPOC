@@ -67,6 +67,13 @@ const sharedPalette = {
   primary: primaryColor,
   secondary: secondaryColor,
 }
+const sharedCircularProgress = {
+  // indeterminate: {
+  //   animation:
+  //     'MuiCircularProgress-keyframes-mui-progress-circular-rotate 1.4s linear infinite',
+  //   animationName: 'none',
+  // },
+}
 const sharedOverrides = {
   // CustomInputWrapper: {
   //   labelRoot: {
@@ -177,13 +184,6 @@ const sharedOverrides = {
         '0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12)',
     },
   },
-  MuiCircularProgress: {
-    indeterminate: {
-      animation:
-        'MuiCircularProgress-keyframes-mui-progress-circular-rotate 1.4s linear infinite',
-      animationName: 'none',
-    },
-  },
   // MuiTableBody: {
   //   root: {
   //     // '& tr.moveable:last-of-type td.td-move-cell button:last-of-type': {
@@ -280,16 +280,15 @@ export const defaultTheme = createMuiTheme({
         '& .ant-select-selection--single .ant-select-selection__clear': {
           top: 5,
         },
-        '& .ant-select-selection--multiple .ant-select-selection__rendered': {
-          height: '28px !important',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          marginRight: 28,
-          marginBottom: '-9px',
-        },
+        // '& .ant-select-selection--multiple .ant-select-selection__rendered': {
+        //   height: '28px !important',
+        //   overflowY: 'auto',
+        //   overflowX: 'hidden',
+        //   marginRight: 28,
+        //   marginBottom: '-9px',
+        // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '25px',
-          lineHeight: '24px',
+          top: -1,
         },
         '& .Mui-disabled': {
           cursor: 'not-allowed',
@@ -335,17 +334,17 @@ export const defaultTheme = createMuiTheme({
         ...sharedInputAdornmentRoot,
         position: 'relative',
         top: 3,
-        '& svg': {
-          top: 3,
-          position: 'relative',
-        },
-        // '& > p': {
-        //   fontSize: defaultFontSize,
+      },
+    },
+    MuiCircularProgress: {
+      ...sharedCircularProgress,
+      root: {
+        width: '16px !important',
+        height: '16px !important',
+        // '& svg': {
+        //   top: 3,
+        //   position: 'relative',
         // },
-        '& > div': {
-          width: '16px !important',
-          height: '16px !important',
-        },
       },
     },
     MuiButton: {
@@ -448,16 +447,14 @@ export const smallTheme = createMuiTheme({
         // '& .ant-calendar-picker-input': {
         //   paddingTop: 3,
         // },
-        '& .ant-select-selection--multiple .ant-select-selection__rendered': {
-          height: '22px !important',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          marginRight: 27,
-        },
+        // '& .ant-select-selection--multiple .ant-select-selection__rendered': {
+        //   height: '22px !important',
+        //   overflowY: 'auto',
+        //   overflowX: 'hidden',
+        //   marginRight: 27,
+        // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '22px',
-          lineHeight: '22px',
-          marginTop: 0,
+          top: -1,
         },
       },
       input: {
@@ -493,17 +490,17 @@ export const smallTheme = createMuiTheme({
         ...sharedInputAdornmentRoot,
         top: 3,
         position: 'relative',
-        '& svg': {
-          top: 3,
-          position: 'relative',
-        },
-        // '& > p': {
-        //   fontSize: smallFontSize,
+      },
+    },
+    MuiCircularProgress: {
+      ...sharedCircularProgress,
+      root: {
+        width: '12px !important',
+        height: '12px !important',
+        // '& svg': {
+        //   top: 3,
+        //   position: 'relative',
         // },
-        '& > div': {
-          width: '12px !important',
-          height: '12px !important',
-        },
       },
     },
     MuiButton: {
@@ -607,15 +604,14 @@ export const largeTheme = createMuiTheme({
         '& .ant-calendar-picker': {
           fontSize: largeFontSize,
         },
-        '& .ant-select-selection--multiple .ant-select-selection__rendered': {
-          height: '30px !important',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          marginRight: 30,
-        },
+        // '& .ant-select-selection--multiple .ant-select-selection__rendered': {
+        //   height: '30px !important',
+        //   overflowY: 'auto',
+        //   overflowX: 'hidden',
+        //   marginRight: 30,
+        // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          height: '27px',
-          lineHeight: '26px',
+          top: -1,
         },
       },
       input: {
@@ -650,17 +646,17 @@ export const largeTheme = createMuiTheme({
       root: {
         ...sharedInputAdornmentRoot,
         marginTop: 4,
-        '& svg': {
-          top: 2,
-          position: 'relative',
-        },
-        // '& > p': {
-        //   fontSize: largeFontSize,
+      },
+    },
+    MuiCircularProgress: {
+      ...sharedCircularProgress,
+      root: {
+        width: '20px !important',
+        height: '20px !important',
+        // '& svg': {
+        //   top: 2,
+        //   position: 'relative',
         // },
-        '& > div': {
-          width: '20px !important',
-          height: '20px !important',
-        },
       },
     },
     MuiButton: {
