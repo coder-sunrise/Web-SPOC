@@ -27,64 +27,70 @@ const clinics = [
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
-    clinicName: Yup.string().required(),
-    monFromTiming: Yup.string().required(),
-    monToTiming: Yup.string().required(),
-    tuesFromTiming: Yup.string().required(),
-    tuesToTiming: Yup.string().required(),
-    wedFromTiming: Yup.string().required(),
-    wedToTiming: Yup.string().required(),
-    thursFromTiming: Yup.string().required(),
-    thursToTiming: Yup.string().required(),
-    friFromTiming: Yup.string().required(),
-    friToTiming: Yup.string().required(),
-    satFromTiming: Yup.string().required(),
-    satToTiming: Yup.string().required(),
-    sunFromTiming: Yup.string().required(),
-    sunToTiming: Yup.string().required(),
+    // clinicName: Yup.string().required(),
+    monFromBreak: Yup.string().required(),
+    monToBreak: Yup.string().required(),
+    tueFromBreak: Yup.string().required(),
+    tueToBreak: Yup.string().required(),
+    wedFromBreak: Yup.string().required(),
+    wedToBreak: Yup.string().required(),
+    thursFromBreak: Yup.string().required(),
+    thursToBreak: Yup.string().required(),
+    friFromBreak: Yup.string().required(),
+    friToBreak: Yup.string().required(),
+    satFromBreak: Yup.string().required(),
+    satToBreak: Yup.string().required(),
+    sunFromBreak: Yup.string().required(),
+    sunToBreak: Yup.string().required(),
   }),
   handleSubmit: (values, { props }) => {
-    props
-      .dispatch({
+    const { effectiveDates, ...restValues } = values
+		const { dispatch, onConfirm } = props
+
+      dispatch({
         type: 'settingClinicBreakHour/upsert',
-        payload: values,
+        payload: {
+          ...restValues,
+          effectiveStartDate: effectiveDates[0],
+          effectiveEndDate: effectiveDates[1]
+        }
       })
       .then((r) => {
-        if (r && r.message === 'Ok') {
-          // toast.success('test')
-          notification.success({
-            // duration:0,
-            message: 'Done',
+        if (r) {
+          if (onConfirm) onConfirm()
+          dispatch({
+            type: 'settingClinicBreakHour/query'
           })
-          if (props.onConfirm) props.onConfirm()
         }
       })
   },
   displayName: 'ClinicBreakHourModal',
 })
 class Detail extends PureComponent {
-  state = {
-    editingRowIds: [],
-    rowChanges: {},
-  }
+  state={}
 
-  changeEditingRowIds = (editingRowIds) => {
-    this.setState({ editingRowIds })
-  }
+  // state = {
+  //   editingRowIds: [],
+  //   rowChanges: {},
+  // }
 
-  changeRowChanges = (rowChanges) => {
-    this.setState({ rowChanges })
-  }
+  // changeEditingRowIds = (editingRowIds) => {
+  //   this.setState({ editingRowIds })
+  // }
 
-  commitChanges = ({ rows, added, changed, deleted }) => {
-    const { setFieldValue } = this.props
-    setFieldValue('items', rows)
-  }
+  // changeRowChanges = (rowChanges) => {
+  //   this.setState({ rowChanges })
+  // }
+
+  // commitChanges = ({ rows, added, changed, deleted }) => {
+  //   const { setFieldValue } = this.props
+  //   setFieldValue('items', rows)
+  // }
 
   render () {
     const { props } = this
     const { classes, theme, footer, values } = props
-    console.log('detail', props)
+    // console.log('detail', props)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -115,7 +121,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs md={12}>
+            {/* <GridItem xs md={12}>
               <FastField
                 name='clinicName'
                 render={(args) => (
@@ -127,10 +133,10 @@ class Detail extends PureComponent {
                   />
                 )}
               />
-            </GridItem>
+            </GridItem> */}
             <GridItem md={6}>
               <FastField
-                name='monFromTiming'
+                name='monFromBreak'
                 render={(args) => {
                   return <TimePicker label='Monday From' {...args} />
                 }}
@@ -138,7 +144,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='monToTiming'
+                name='monToBreak'
                 render={(args) => {
                   return <TimePicker label='Monday To' {...args} />
                 }}
@@ -146,7 +152,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='tuesFromTiming'
+                name='tueFromBreak'
                 render={(args) => {
                   return <TimePicker label='Tuesday From' {...args} />
                 }}
@@ -154,7 +160,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='tuesToTiming'
+                name='tueToBreak'
                 render={(args) => {
                   return <TimePicker label='Tuesday To' {...args} />
                 }}
@@ -162,7 +168,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='wedFromTiming'
+                name='wedFromBreak'
                 render={(args) => {
                   return <TimePicker label='Wednesday From' {...args} />
                 }}
@@ -170,7 +176,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='wedToTiming'
+                name='wedToBreak'
                 render={(args) => {
                   return <TimePicker label='Wednesday To' {...args} />
                 }}
@@ -178,7 +184,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='thursFromTiming'
+                name='thursFromBreak'
                 render={(args) => {
                   return <TimePicker label='Thursday From' {...args} />
                 }}
@@ -186,7 +192,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='thursToTiming'
+                name='thursToBreak'
                 render={(args) => {
                   return <TimePicker label='Thursday To' {...args} />
                 }}
@@ -194,7 +200,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='friFromTiming'
+                name='friFromBreak'
                 render={(args) => {
                   return <TimePicker label='Friday From' {...args} />
                 }}
@@ -202,7 +208,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='friToTiming'
+                name='friToBreak'
                 render={(args) => {
                   return <TimePicker label='Friday To' {...args} />
                 }}
@@ -210,7 +216,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='satFromTiming'
+                name='satFromBreak'
                 render={(args) => {
                   return <TimePicker label='Saturday From' {...args} />
                 }}
@@ -218,7 +224,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='satToTiming'
+                name='satToBreak'
                 render={(args) => {
                   return <TimePicker label='Saturday To' {...args} />
                 }}
@@ -226,7 +232,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='sunFromTiming'
+                name='sunFromBreak'
                 render={(args) => {
                   return <TimePicker label='Sunday From' {...args} />
                 }}
@@ -234,7 +240,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='sunToTiming'
+                name='sunToBreak'
                 render={(args) => {
                   return <TimePicker label='Sunday To' {...args} />
                 }}
