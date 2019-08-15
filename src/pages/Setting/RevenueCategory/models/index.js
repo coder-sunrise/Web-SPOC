@@ -3,10 +3,8 @@ import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({
-	namespace: 'settingPublicHoliday',
-	config: {
-		// queryOnLoad: false,
-	},
+	namespace: 'settingRevenue',
+	config: {},
 	param: {
 		service,
 		state: {
@@ -38,8 +36,7 @@ export default createListViewModel({
 							effectiveDates: [
 								o.effectiveStartDate,
 								o.effectiveEndDate
-							],
-							dates: [ o.startDate, o.endDate ]
+							]
 						}
 					})
 				}
