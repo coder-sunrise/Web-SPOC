@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import moment from 'moment'
 import * as colorManipulator from '@material-ui/core/styles/colorManipulator'
 import {
@@ -40,7 +41,10 @@ import {
   SummaryState,
   DataTypeProvider,
   CustomPaging,
+  TreeDataState,
+  CustomTreeData,
 } from '@devexpress/dx-react-grid'
+
 import {
   DragDropProvider,
   Grid as DevGrid,
@@ -54,6 +58,7 @@ import {
   Toolbar,
   TableFixedColumns,
   VirtualTable,
+  TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -245,6 +250,7 @@ class CommonTableGrid extends React.Component {
       },
       grouping: false,
       groupingConfig: {},
+      tree: false,
       sort: true,
       sortConfig: {},
       summary: false,
@@ -370,14 +376,17 @@ class CommonTableGrid extends React.Component {
 
   static getDerivedStateFromProps (nextProps, preState) {
     const { entity, type, columnExtensions } = nextProps
+    // console.log(nextProps)
     let _entity = entity
-    if (!_entity && type) {
+    if (type) {
       _entity = window.g_app._store.getState()[type]
     }
     if (
       _entity &&
-      (_entity.pagination !== preState.pagination ||
-        _entity.filter !== preState.filter)
+      !_.isEqual(_entity, preState.entity)
+      // (_entity.pagination !== preState.pagination ||
+      //   _entity.filter !== preState.filter ||
+      //   )
     ) {
       // console.log(_entity.filter)
       if (_entity.filter && _entity.filter.sorting) {
@@ -539,6 +548,21 @@ class CommonTableGrid extends React.Component {
     return <Table.Cell {...restProps} />
   }
 
+  getChildRows = (row, rootRows) => {
+    // if (row) {
+    //   return null
+    // }
+    // const childRows = rows.filter((r) => r.parentId === (row ? row.id : 0))
+    // console.log(row, rows, childRows)
+    // return childRows.length ? childRows : null
+
+    const childRows = rootRows.filter(
+      (r) => r.parentId === (row ? row.id : null),
+    )
+    console.log(childRows)
+    return childRows.length ? childRows : null
+  }
+
   render () {
     const {
       classes,
@@ -595,6 +619,8 @@ class CommonTableGrid extends React.Component {
       pager,
       pagerConfig = {},
       pagerStateConfig,
+      tree,
+      treeColumnConfig,
       groupingConfig,
       summary,
       summaryConfig,
@@ -725,6 +751,7 @@ class CommonTableGrid extends React.Component {
       ].concat(newLeftCols)
       newColumns.unshift({ name: 'rowIndex', title: 'No.' })
     }
+    // console.log(extraGetter, extraColumn, extraState)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -793,7 +820,7 @@ class CommonTableGrid extends React.Component {
                   {...pagerStateConfig}
                 />
               )}
-
+              {tree && <TreeDataState />}
               {extraState.map((o) => o)}
 
               {grouping && <IntegratedGrouping />}
@@ -820,6 +847,7 @@ class CommonTableGrid extends React.Component {
               <RowErrorTypeProvider {...cellComponentConfig} />
 
               {grouping && <DragDropProvider />}
+              {tree && <CustomTreeData getChildRows={this.getChildRows} />}
 
               <TableBase
                 height={height}
@@ -846,6 +874,7 @@ class CommonTableGrid extends React.Component {
                 <GroupingPanel showSortingControls />
               )}
               {summary && <TableSummaryRow {...summaryConfig.row} />}
+              {tree && <TableTreeColumn {...treeColumnConfig} />}
               {extraColumn.map((o) => o)}
               <TableFixedColumns
                 rightColumns={

@@ -5,6 +5,16 @@ import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 
+import {
+  DataTypeProvider,
+  TreeDataState, SortingState, SelectionState, FilteringState, PagingState,
+  CustomTreeData, IntegratedFiltering, IntegratedPaging, IntegratedSorting, IntegratedSelection,
+} from '@devexpress/dx-react-grid'
+import {
+  Table, TableHeaderRow, TableFilterRow, TableTreeColumn,
+  PagingPanel, TableColumnResizing, Toolbar, TableColumnVisibility, ColumnChooser,
+} from '@devexpress/dx-react-grid-material-ui'
+import * as service from './services'
 
 class Grid extends PureComponent {
   configs = {
@@ -60,8 +70,21 @@ class Grid extends PureComponent {
       // pager: true,
       tree:true,
       treeColumnConfig:{
-        for:'displayValue',
-      },
+        for:'name'
+      }
+      // grouping: true,
+      // groupingConfig: {
+      //   showToolbar: false,
+      //   state: {
+      //     grouping: [
+      //       { columnName: 'displayValue' },
+      //     ],
+      //     // defaultExpandedGroups: [
+      //     //   'Drug',
+      //     //   'Service',
+      //     // ],
+      //   },
+      // },
     },
   }
 
@@ -97,8 +120,25 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingRoomBlock'
+        // type='settingRoomBlock'
+        rows={[{
+          id:1,
+          parentId:null,
+          displayValue:1,
+          code:'1c'
+        },{
+          id:2,
+          parentId:1,
+          displayValue:2,
+          code:'2c'
+        },{
+          id:3,
+          parentId:null,
+          displayValue:3,
+          code:'3c'
+        }]}
         onRowDoubleClick={this.editRow}
+
         {...this.configs}
       />
     )

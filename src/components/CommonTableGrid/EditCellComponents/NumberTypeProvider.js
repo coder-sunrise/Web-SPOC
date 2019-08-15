@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import numeral from 'numeral'
@@ -9,6 +10,11 @@ import {
 } from '@/components'
 
 import config from '@/utils/config'
+import {
+  updateGlobalVariable,
+  updateCellValue,
+  difference,
+} from '@/utils/utils'
 
 const { currencyFormat, qtyFormat, currencySymbol } = config
 
@@ -27,48 +33,89 @@ const styles = (theme) => ({
   },
 })
 
-const numberOnChangeFormatter = (onChangeEvent) => (value) =>
-  onChangeEvent(numeral(value)._value)
-
-const NumberEditorBase = (columnExtensions) => (props) => {
-  const {
-    column: { name: columnName },
-    value,
-    onValueChange,
-    classes,
-    row,
-  } = props
-  const cfg =
-    columnExtensions.find(
-      ({ columnName: currentColumnName }) => currentColumnName === columnName,
-    ) || {}
-  const { type, isDisabled = () => false, gridId, ...restProps } = cfg
-
-  const commonCfg = {
-    disabled: isDisabled(
-      window.$tempGridRow[gridId]
-        ? window.$tempGridRow[gridId][row.id] || {}
-        : row,
-    ),
+class NumberEditor extends PureComponent {
+  state = {
+    error: false,
   }
-  return (
-    <NumberInput
-      inputProps={{
-        fullWidth: true,
-      }}
-      classes={{ input: classes.alignRight }}
-      defaultValue={value}
-      onChange={(event) => {
-        // console.log(event)
-        numberOnChangeFormatter(onValueChange)(event.target.value)
-      }}
-      currency
-      noWrapper
-      {...commonCfg}
-      {...restProps}
-    />
-  )
+
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
+  }
+
+  componentDidMount () {
+    this.setState({
+      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+    })
+  }
+
+  render () {
+    const {
+      columnExtensions,
+      column: { name: columnName },
+      value,
+      onValueChange,
+      row,
+    } = this.props
+    const cfg =
+      columnExtensions.find(
+        ({ columnName: currentColumnName }) => currentColumnName === columnName,
+      ) || {}
+    const {
+      type,
+      code,
+      validationSchema,
+      isDisabled = () => false,
+      onChange,
+      gridId,
+      ...restProps
+    } = cfg
+
+    const _onChange = (event) => {
+      const v = numeral(event.target.value)._value
+      const error = updateCellValue(this.props, this.myRef.current, v)
+      this.setState({
+        error,
+      })
+      if (!error) {
+        if (onChange)
+          onChange({
+            value: v,
+            row: window.$tempGridRow[gridId]
+              ? window.$tempGridRow[gridId][row.id] || {}
+              : row,
+            error,
+          })
+      }
+    }
+    // console.log(window.$tempGridRow)
+    const commonCfg = {
+      noWrapper: true,
+      showErrorIcon: true,
+      error: this.state.error,
+      defaultValue: value,
+      disabled: isDisabled(
+        window.$tempGridRow[gridId]
+          ? window.$tempGridRow[gridId][row.id] || {}
+          : row,
+      ),
+      currency: true,
+      ...restProps,
+      onChange: _onChange,
+    }
+    return (
+      <NumberInput
+        inputProps={{
+          fullWidth: true,
+        }}
+        // classes={{ input: classes.alignRight }}
+        {...commonCfg}
+        {...restProps}
+      />
+    )
+  }
 }
+
 const NumberFormatter = (columnExtensions) =>
   React.memo(
     (props) => {
@@ -113,6 +160,13 @@ class NumberTypeProvider extends PureComponent {
     columnExtensions: PropTypes.array,
   }
 
+  constructor (props) {
+    super(props)
+    this.NumberEditor = (ces) => (editorProps) => {
+      return <NumberEditor columnExtensions={ces} {...editorProps} />
+    }
+  }
+
   render () {
     const { columnExtensions } = this.props
     return (
@@ -127,7 +181,7 @@ class NumberTypeProvider extends PureComponent {
           )
           .map((o) => o.columnName)}
         formatterComponent={NumberFormatter(columnExtensions)}
-        editorComponent={withStyles(styles)(NumberEditorBase(columnExtensions))}
+        editorComponent={this.NumberEditor(columnExtensions)}
       />
     )
   }
