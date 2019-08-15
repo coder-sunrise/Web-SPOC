@@ -12,7 +12,12 @@ export default createListViewModel({
 		state: {
 			default: {
 				isUserMaintainable: true,
-				effectiveDates: [ moment(), moment('2099-12-31') ]
+				effectiveDates: [
+					moment().utc().set({ hour: 0, minute: 0, second: 0 }),
+					moment('2099-12-31')
+						.utc()
+						.set({ hour: 23, minute: 59, second: 59 })
+				]
 			}
 		},
 		subscriptions: ({ dispatch, history }) => {

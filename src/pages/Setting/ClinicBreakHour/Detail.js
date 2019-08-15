@@ -15,10 +15,10 @@ import {
 
 const styles = (theme) => ({})
 
-const clinics = [
-  { value: 'angmokioave1', name: 'Ang Mo Kio Ave 1' },
-  { value: 'bedokave3', name: 'Bedok Ave 3' },
-]
+// const clinics = [
+//   { value: 'angmokioave1', name: 'Ang Mo Kio Ave 1' },
+//   { value: 'bedokave3', name: 'Bedok Ave 3' },
+// ]
 
 @withFormik({
   mapPropsToValues: ({ settingClinicBreakHour }) =>
@@ -28,8 +28,8 @@ const clinics = [
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
     // clinicName: Yup.string().required(),
-    monFromBreak: Yup.string().required(),
-    monToBreak: Yup.string().required(),
+    monFromBreak: Yup.date().required(),
+    monToBreak: Yup.date().required(),
     tueFromBreak: Yup.string().required(),
     tueToBreak: Yup.string().required(),
     wedFromBreak: Yup.string().required(),
@@ -89,7 +89,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values } = props
+    const { classes, theme, footer, values,settingClinicBreakHour } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -98,7 +98,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => <TextField label='Code' {...args} />}
+                render={(args) => <TextField label='Code' {...args} disabled={settingClinicBreakHour.entity ? true : false}/>}
               />
             </GridItem>
             <GridItem md={6}>

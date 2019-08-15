@@ -47,7 +47,7 @@ class Detail extends PureComponent {
 
 	render() {
 		const { props } = this
-		const { classes, theme, footer, values } = props
+		const { classes, theme, footer, values, settingRevenue } = props
 		// console.log('detail', props)
 		return (
 			<React.Fragment>
@@ -61,6 +61,9 @@ class Detail extends PureComponent {
 										label='Code'
 										autoFocused
 										{...args}
+										disabled={
+											settingRevenue.entity ? true : false
+										}
 									/>
 								)}
 							/>
