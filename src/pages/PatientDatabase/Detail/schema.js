@@ -2,6 +2,13 @@ import Yup from '@/utils/yup'
 import moment from 'moment'
 import { notification } from '@/components'
 
+import { getCodes } from '@/utils/codes'
+
+let schemeTypes = []
+getCodes('ctSchemeType').then((codetableData) => {
+  schemeTypes = codetableData
+})
+
 // prettier-ignore
 const _multiples = [2,7,6,5,4,3,2]
 Yup.addMethod(Yup.string, 'NRIC', function (message) {
@@ -189,6 +196,11 @@ const schemaSchemes = {
     .of(
       Yup.object().shape({
         schemeTypeFK: Yup.number().required(),
+        coPaymentSchemeFK: Yup.number().when('schemeTypeFK', {
+          is: (val) =>
+            val === schemeTypes.find((o) => o.code === 'Corporate').id,
+          then: Yup.number().required(),
+        }),
         validRange: Yup.array().when('schemeTypeFK', {
           is: (val) => val <= 10,
           then: Yup.array().of(Yup.date()).required().min(2),
