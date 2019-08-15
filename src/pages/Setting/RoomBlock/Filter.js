@@ -9,9 +9,26 @@ import {
   Button,
   TextField,
   Checkbox,
+  CodeSelect,
   Select,
+  DatePicker,
   ProgressButton,
 } from '@/components'
+
+const recurrenceTypes = [
+  {
+    id: 'daily',
+    name: 'Daily',
+  },
+  {
+    id: 'weekly',
+    name: 'Weekly',
+  },
+  {
+    id: 'monthly',
+    name: 'Monthly',
+  },
+]
 
 @withFormikExtend({
   mapPropsToValues: ({ settingRoomBlock }) => settingRoomBlock.filter || {},
@@ -28,15 +45,23 @@ class Filter extends PureComponent {
             <FastField
               name='code'
               render={(args) => {
-                return <TextField label='Code' {...args} />
+                return <CodeSelect label='Room' code='ctRoom' {...args} />
               }}
             />
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='displayValue'
+              name='dateFrom'
               render={(args) => {
-                return <TextField label='Display Value' {...args} />
+                return <DatePicker label='Date From' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='dateTo'
+              render={(args) => {
+                return <DatePicker label='Date To' {...args} />
               }}
             />
           </GridItem>
@@ -44,7 +69,13 @@ class Filter extends PureComponent {
             <FastField
               name='isActive'
               render={(args) => {
-                return <Select label='Status' options={status} {...args} />
+                return (
+                  <Select
+                    label='Recurrence Type'
+                    options={recurrenceTypes}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
