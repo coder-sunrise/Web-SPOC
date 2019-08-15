@@ -1,56 +1,30 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
-import { FormattedMessage } from 'umi/locale'
-import { standardRowHeight } from 'mui-pro-jss'
+import { formatMessage, FormattedMessage } from 'umi/locale'
 import { status } from '@/utils/codes'
 import {
 	withFormikExtend,
+	FastField,
 	GridContainer,
 	GridItem,
 	Button,
 	TextField,
+	Checkbox,
 	Select,
 	ProgressButton
 } from '@/components'
 
-const styles = (theme) => ({
-	filterBar: {
-		marginBottom: '10px'
-	},
-	filterBtn: {
-		lineHeight: standardRowHeight,
-		textAlign: 'left',
-		'& > button': {
-			marginRight: theme.spacing.unit
-		}
-	},
-	tansactionCheck: {
-		position: 'absolute',
-		bottom: 0,
-		width: 30,
-		right: 0
-	}
-})
-
-// @withFormik({
-// 	handleSubmit: () => {},
-// 	displayName: 'ClinicBreakHourFilter'
-// })
-
 @withFormikExtend({
-	mapPropsToValues: ({ settingClinicBreakHour }) =>
-		settingClinicBreakHour.filter || {},
+	mapPropsToValues: ({ settingRevenue }) => settingRevenue.filter || {},
 	handleSubmit: () => {},
-	displayName: 'ClinicBreakHourFilter'
+	displayName: 'RevenueFilter'
 })
 class Filter extends PureComponent {
 	render() {
 		const { classes } = this.props
-
 		return (
 			<div className={classes.filterBar}>
 				<GridContainer>
-					<GridItem xs={6} md={4}>
+					<GridItem xs={6} md={3}>
 						<FastField
 							name='code'
 							render={(args) => {
@@ -58,53 +32,42 @@ class Filter extends PureComponent {
 							}}
 						/>
 					</GridItem>
-					<GridItem xs={6} md={4}>
+					<GridItem xs={6} md={3}>
 						<FastField
 							name='displayValue'
 							render={(args) => {
-								return (
-									<TextField
-										label='Display Value'
-										{...args}
-									/>
-								)
+								return <TextField label='Display Value' {...args} />
 							}}
 						/>
 					</GridItem>
-					<GridItem xs={6} md={4}>
+					<GridItem xs={6} md={3}>
 						<FastField
 							name='isActive'
 							render={(args) => {
-								return (
-									<Select
-										label='Status'
-										{...args}
-										options={status}
-									/>
-								)
+								return <Select label='Status' options={status} {...args} />
 							}}
 						/>
 					</GridItem>
-					<GridItem xs={6} md={4}>
+					<GridItem xs={6} md={3}>
 						<div className={classes.filterBtn}>
 							<ProgressButton
 								color='primary'
 								icon={null}
 								onClick={() => {
 									this.props.dispatch({
-										type: 'settingClinicBreakHour/query',
+										type: 'settingRevenue/query',
 										payload: this.props.values
 									})
 								}}
 							>
 								<FormattedMessage id='form.search' />
 							</ProgressButton>
+
 							<Button
 								color='primary'
 								onClick={() => {
 									this.props.dispatch({
-										type:
-											'settingClinicBreakHour/updateState',
+										type: 'settingRevenue/updateState',
 										payload: {
 											entity: undefined
 										}
