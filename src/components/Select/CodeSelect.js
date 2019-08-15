@@ -19,27 +19,28 @@ class CodeSelect extends React.PureComponent {
         type: 'codetable/fetchCodes',
         code: props.code,
       })
-    } else if (props.tenantCode) {
-      getTenantCodes(props.tenantCode).then((response) => {
-        const { data = [] } = response
-
-        const tenantCodeOptions = data.reduce((options, opt) => {
-          return [
-            ...options,
-            {
-              name:
-                opt && opt.clinicianInfomation
-                  ? opt.clinicianInfomation.name
-                  : '',
-              id: opt.id,
-            },
-          ]
-        }, [])
-        this.setState({
-          options: tenantCodeOptions,
-        })
-      })
     }
+    // else if (props.tenantCode) {
+    //   getTenantCodes(props.tenantCode).then((response) => {
+    //     const { data = [] } = response
+
+    //     const tenantCodeOptions = data.reduce((options, opt) => {
+    //       return [
+    //         ...options,
+    //         {
+    //           name:
+    //             opt && opt.clinicianInfomation
+    //               ? opt.clinicianInfomation.name
+    //               : '',
+    //           id: opt.id,
+    //         },
+    //       ]
+    //     }, [])
+    //     this.setState({
+    //       options: tenantCodeOptions,
+    //     })
+    //   })
+    // }
   }
 
   render () {

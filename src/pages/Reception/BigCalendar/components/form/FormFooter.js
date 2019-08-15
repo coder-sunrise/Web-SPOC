@@ -19,17 +19,16 @@ const ButtonText = {
 const FormFooter = ({
   classes,
   isNew,
-  isDraft,
-  onCancelAppointmentClick,
-  onSaveDraftClick,
   onClose,
-  onConfirmClick,
+  onCancelAppointmentClick,
+  handleSaveDraftClick,
+  handleConfirmClick,
 }) => {
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,
   }
 
-  const confirmBtnText = isNew || isDraft ? ButtonText.ADD : ButtonText.EDIT
+  const confirmBtnText = isNew ? ButtonText.ADD : ButtonText.EDIT
 
   return (
     <div className={classnames(classes.footer)}>
@@ -51,12 +50,10 @@ const FormFooter = ({
           <Button onClick={onClose} color='danger'>
             {ButtonText.CANCEL}
           </Button>
-          {isDraft && (
-            <Button onClick={onSaveDraftClick} color='info'>
-              {ButtonText.DRAFT}
-            </Button>
-          )}
-          <Button onClick={onConfirmClick} color='primary'>
+          <Button onClick={handleSaveDraftClick} color='info'>
+            {ButtonText.DRAFT}
+          </Button>
+          <Button onClick={handleConfirmClick} color='primary'>
             {confirmBtnText}
           </Button>
         </GridItem>

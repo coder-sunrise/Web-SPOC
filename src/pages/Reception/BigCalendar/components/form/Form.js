@@ -17,9 +17,9 @@ import {
   OutlinedTextField,
   Checkbox,
   Select,
+  timeFormat,
 } from '@/components'
 // custom components
-import NewPatient from '../../../../PatientDatabase/New'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
@@ -33,12 +33,12 @@ import {
   fetchPatientListByName,
   fetchPatientInfoByPatientID,
 } from '../../service/appointment'
+// utils
 import {
   handleSubmit as submitForm,
   mapPropsToValues,
   getEventSeriesByID,
 } from './formikUtils'
-
 import { getUniqueGUID } from '@/utils/utils'
 import styles from './style'
 
@@ -48,7 +48,11 @@ const AppointmentSchema = Yup.object().shape({
   startDate: Yup.string().required(),
 })
 
-@connect(({ loginSEMR }) => ({ loginSEMR }))
+@connect(({ loginSEMR, user, codetable }) => ({
+  loginSEMR,
+  user: user.data,
+  appointmentStatuses: codetable.ltappointmentstatus,
+}))
 @withFormik({
   enableReinitialize: true,
   validationSchema: AppointmentSchema,
@@ -57,21 +61,26 @@ const AppointmentSchema = Yup.object().shape({
 })
 class Form extends React.PureComponent {
   state = {
-    showNewPatientModal: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
-    patientList: [],
     eventSeries: getEventSeriesByID(
       this.props.slotInfo._appointmentID,
       this.props.calendarEvents,
     ),
-    isRegisteredPatient: false,
     showSeriesUpdateConfirmation: false,
   }
 
+  componentWillMount () {
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      code: 'ltappointmentstatus',
+    })
+  }
+
   toggleNewPatientModal = () => {
-    const { showNewPatientModal } = this.state
-    this.setState({ showNewPatientModal: !showNewPatientModal })
+    this.props.dispatch({
+      type: 'patient/openPatientModal',
+    })
   }
 
   openSearchPatientModal = () => {
@@ -82,50 +91,58 @@ class Form extends React.PureComponent {
     this.setState({ showSearchPatientModal: false })
   }
 
-  onSearchPatient = () => {
-    const { values } = this.props
-    this.searchPatient(values.patientName)
+  onSearchPatient = async () => {
+    const { dispatch, values } = this.props
+    // this.searchPatient(values.patientName)
+    const prefix = 'like_'
+    const result = await dispatch({
+      type: 'patientSearch/query',
+      payload: {
+        [`${prefix}name`]: values.patientName,
+      },
+    })
+    result && this.openSearchPatientModal()
   }
 
-  searchPatient = (patientName) => {
-    fetchPatientListByName(patientName).then((response) => {
-      if (response) {
-        const { data: { data = [] } } = response
-        this.setState({
-          patientList: [
-            ...data,
-          ],
-          showSearchPatientModal: true,
-        })
-      }
-    })
-  }
+  // handleSelectPatient = (patientID) => {
+  //   fetchPatientInfoByPatientID(patientID).then((response) => {
+  //     if (response) {
+  //       const patientInfo = { ...response.data }
+  //       const { name, contact } = patientInfo
+  //       const patientName = name !== undefined ? name : ''
+  //       let contactNumber = ''
+  //       if (contact) {
+  //         const { mobileContactNumber } = contact
+  //         contactNumber = mobileContactNumber.number
+  //       }
+  //       const { setFieldValue, setFieldTouched } = this.props
 
-  handleSelectPatient = (patientID) => {
-    fetchPatientInfoByPatientID(patientID).then((response) => {
-      if (response) {
-        const patientInfo = { ...response.data }
-        const { name, contact } = patientInfo
-        const patientName = name !== undefined ? name : ''
-        let contactNumber = ''
-        if (contact) {
-          const { mobileContactNumber } = contact
-          contactNumber = mobileContactNumber.number
-        }
-        const { setFieldValue, setFieldTouched } = this.props
+  //       setFieldValue('patientName', patientName)
+  //       setFieldValue('contactNo', contactNumber)
 
-        setFieldValue('patientName', patientName)
-        setFieldValue('contactNo', contactNumber)
+  //       setFieldTouched('patientName', true)
+  //       setFieldTouched('contactNo', true)
 
-        setFieldTouched('patientName', true)
-        setFieldTouched('contactNo', true)
+  //       this.setState({
+  //         showSearchPatientModal: false,
+  //         isRegisteredPatient: true,
+  //       })
+  //     }
+  //   })
+  // }
 
-        this.setState({
-          showSearchPatientModal: false,
-          isRegisteredPatient: true,
-        })
-      }
-    })
+  onSelectPatientClick = (patientProfile) => {
+    const { id, patientAccountNo, name, mobileNo } = patientProfile
+    const { setFieldValue, setFieldTouched } = this.props
+    setFieldValue('patientProfileFK', id)
+    setFieldValue('patientAccountNo', patientAccountNo)
+    setFieldValue('patientName', name)
+    setFieldValue('patientContactNo', mobileNo)
+
+    setFieldTouched('patientName', true)
+    setFieldTouched('contactNo', true)
+
+    this.closeSearchPatientModal()
   }
 
   closeDeleteConfirmation = () => {
@@ -176,71 +193,88 @@ class Form extends React.PureComponent {
     }
   }
 
+  onSaveDraftClick = () => {
+    console.log({ appointmentStatus: this.props.appointmentStatuses })
+  }
+
   _confirm = () => {
-    const { eventSeries, isRegisteredPatient } = this.state
+    const appointmentStatusFK = this.props.appointmentStatuses.find(
+      (item) => item.code === 'SCHEDULED',
+    ).id
+
+    const { eventSeries } = this.state
+    const { values, onClose, dispatch, resetForm } = this.props
+
     const {
-      values,
-      handleUpdateEventSeries,
-      resetForm,
-      slotInfo,
-      resources,
-    } = this.props
+      _appointmentID,
+      appointmentRemarks,
+      appointmentDate,
+      isEnableRecurrence,
+      recurrenceDto,
+      ...appointmentValues
+    } = values
 
-    const { _appointmentID, patientName, contactNo, remarks } = values
+    const calendarEvents = eventSeries.map((event, index) => {
+      // const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
 
-    const calendarEvents = eventSeries.map((event) => {
-      const { timeFrom, timeTo, doctor, id, ...restColumn } = event
-      const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
-      const timeIn = moment(timeFrom).format(dateTimeFormat)
-      const timeOut = moment(timeTo).format(dateTimeFormat)
+      // const matchedResource = resources.find(
+      //   (resource) =>
+      //     resource.doctorName.toUpperCase() === clinicianFk.toUpperCase(),
+      // )
 
-      const matchedResource = resources.find(
-        (resource) =>
-          resource.doctorName.toUpperCase() === doctor.toUpperCase(),
-      )
+      // const doctorResource =
+      //   matchedResource !== undefined ? matchedResource.doctorProfileFK : '4'
 
-      const doctorResource =
-        matchedResource !== undefined ? matchedResource.doctorProfileFK : '4'
-
-      return {
-        ...event,
-        id: id !== undefined ? id : getUniqueGUID(),
-        resourceId: doctorResource,
-        start: timeFrom,
-        end: timeTo,
-      }
       // return {
-      //   _appointmentID,
-      //   id:
-      //   ...restColumn,
-      //   patientName,
-      //   isRegisteredPatient,
-      //   contactNo,
-      //   remarks,
-      //   timeFrom,
-      //   timeTo,
-      //   doctor,
-      //   // doctorProfileFK: doctorResource,
+      //   ...event,
+      //   id: id !== undefined ? id : getUniqueGUID(),
       //   resourceId: doctorResource,
       //   start: timeFrom,
       //   end: timeTo,
-      //   // for Queue Listing
-      //   visitStatus: 'APPOINTMENT',
-      //   timeIn,
-      //   timeOut,
       // }
+      const { timeFrom, timeTo, clinicianFK, isPrimaryClinician } = event
+      const startTime = moment(timeFrom).format(timeFormat)
+      const endTime = moment(timeTo).format(timeFormat)
+      return {
+        clinicianFK,
+        isPrimaryClinician,
+        startTime,
+        endTime,
+        sortOrder: index,
+        isDeleted: false,
+      }
     })
+
+    const appointments = [
+      {
+        appointmentStatusFK,
+        appointmentRemarks,
+        appointmentDate,
+        appointments_Resources: [
+          ...calendarEvents,
+        ],
+      },
+    ]
+
     const updated = {
-      ...values,
-      appointmentResources: calendarEvents,
+      ...appointmentValues,
+      recurrenceDto: !isEnableRecurrence ? undefined : recurrenceDto,
+      appointments,
     }
 
-    handleUpdateEventSeries({
-      [slotInfo.type]: updated,
-      _appointmentID,
+    console.log({ updated })
+    onClose && onClose()
+    dispatch({
+      type: 'calendar/saveAppointment',
+      payload: updated,
     })
-
     resetForm()
+
+    // handleUpdateEventSeries({
+    //   [slotInfo.type]: updated,
+    //   _appointmentID,
+    // })
+    // resetForm()
   }
 
   openSeriesUpdateConfirmation = () => {
@@ -263,13 +297,12 @@ class Form extends React.PureComponent {
     const { classes, onClose, slotInfo, isLoading, values } = this.props
 
     const {
-      showNewPatientModal,
       showSearchPatientModal,
       showDeleteConfirmationModal,
       showSeriesUpdateConfirmation,
-      patientList,
       eventSeries,
     } = this.state
+    console.log({ values })
 
     return (
       <SizeContainer>
@@ -290,14 +323,14 @@ class Form extends React.PureComponent {
               <PatientInfoInput
                 onSearchPatient={this.onSearchPatient}
                 onCreatePatient={this.toggleNewPatientModal}
-                isRegisteredPatient={values.isRegisteredPatient}
                 patientName={values.patientName}
+                patientProfileFK={values.patientProfileFK}
               />
               <AppointmentDateInput />
             </GridItem>
             <GridItem xs md={6} className={classnames(classes.remarksField)}>
               <FastField
-                name='remarks'
+                name='appointmentRemarks'
                 render={(args) => (
                   <OutlinedTextField
                     {...args}
@@ -325,22 +358,11 @@ class Form extends React.PureComponent {
 
           <FormFooter
             isNew={slotInfo.type === 'add'}
-            isDraft={slotInfo.draft}
             onCancelAppointmentClick={this.onCancelAppointmentClick}
             onClose={onClose}
-            onConfirmClick={this.onConfirmClick}
+            handleSaveDraftClick={this.onSaveDraftClick}
+            handleConfirmClick={this.onConfirmClick}
           />
-
-          <CommonModal
-            open={showNewPatientModal}
-            title='Register New Patient'
-            onClose={this.toggleNewPatientModal}
-            onConfirm={this.toggleNewPatientModal}
-            fullScreen
-            showFooter={false}
-          >
-            {showNewPatientModal ? <NewPatient /> : null}
-          </CommonModal>
           <CommonModal
             open={showSearchPatientModal}
             title='Search Patient'
@@ -348,14 +370,9 @@ class Form extends React.PureComponent {
             onConfirm={this.closeSearchPatientModal}
             maxWidth='md'
             showFooter={false}
+            overrideLoading
           >
-            <PatientSearchModal
-              searchPatientName={values.patientName}
-              patientList={patientList}
-              handleSearchPatient={this.searchPatient}
-              onBackClick={this.closeSearchPatientModal}
-              onSelectClick={this.handleSelectPatient}
-            />
+            <PatientSearchModal handleSelectClick={this.onSelectPatientClick} />
           </CommonModal>
           <CommonModal
             open={showDeleteConfirmationModal}

@@ -360,6 +360,8 @@ class AntdSelect extends React.PureComponent {
   }
 
   render () {
+    if (this.props.columnName === 'clinicianFK')
+      console.log({ props: this.props })
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state

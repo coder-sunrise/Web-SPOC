@@ -1,4 +1,5 @@
 import React from 'react'
+import moment from 'moment'
 import { connect } from 'dva'
 // common component
 import { Button, CardContainer, CommonModal } from '@/components'
@@ -12,6 +13,17 @@ class Report extends React.Component {
   }
 
   componentDidMount () {
+    const today = moment(value)
+    const utc = today.utc().set({ hour: 0, minute: 0, second: 0 })
+    const time = '00:00:00'
+    const date = today.format('DD-MM-YYYY')
+    console.log({
+      today,
+      utcFormat: utc.format(),
+      date: today.toDate(),
+      formatted: today.format('DD-MM-YYYY'),
+      new: moment.utc(`${date}T${time}`).local(),
+    })
     const { dispatch } = this.props
     dispatch({
       type: 'codetable/watchFetchCodes',

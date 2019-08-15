@@ -5,5 +5,6 @@ export async function query () {
 }
 
 export async function queryCurrent () {
-  return request('/api/UserProfile/Current')
+  return request('/api/clinicianProfile/current')
+  // return request('/api/UserProfile/Current')
 }

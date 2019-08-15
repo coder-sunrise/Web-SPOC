@@ -1,9 +1,7 @@
-import moment from 'moment'
-
 export const RECURRENCE_PATTERN = {
-  DAILY: 'daily',
-  WEEKLY: 'weekly',
-  MONTHLY: 'monthly',
+  DAILY: 1,
+  WEEKLY: 2,
+  MONTHLY: 3,
 }
 
 export const recurrencePattern = [
@@ -39,12 +37,12 @@ export const days = [
 
 export const AppointmentDataColumn = [
   // { name: 'conflict', title: ' ' },
-  { name: 'doctor', title: 'Doctor' },
-  { name: 'appointmentType', title: 'Appointment Type' },
+  { name: 'clinicianFK', title: 'Doctor' },
+  { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'timeFrom', title: 'Time From' },
   { name: 'timeTo', title: 'Time To' },
-  { name: 'roomNo', title: 'Room' },
-  { name: 'primaryDoctor', title: 'Primary Doctor' },
+  { name: 'roomFK', title: 'Room' },
+  { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
 export const AppointmentDataColExtensions = [
@@ -58,38 +56,30 @@ export const AppointmentDataColExtensions = [
   { columnName: 'timeFrom', type: 'time', format: 'hh:mm a' },
   { columnName: 'timeTo', type: 'time', format: 'hh:mm a' },
   {
-    columnName: 'primaryDoctor',
+    columnName: 'isPrimaryClinician',
     type: 'radio',
   },
   {
-    columnName: 'doctor',
+    columnName: 'clinicianFK',
     type: 'select',
-    options: [
-      { name: 'Medisys', value: 'medisys' },
-      { name: 'Levinne', value: 'levinne' },
-      { name: 'Cheah', value: 'cheah' },
-      { name: 'Tab', value: 'tan' },
-    ],
+    labelField: 'name',
+    valueField: 'id',
   },
   {
-    columnName: 'roomNo',
-    type: 'select',
-    options: [
-      { name: 'Room 1', value: 'room1' },
-      { name: 'Room 2', value: 'room2' },
-      { name: 'Room 3', value: 'room3' },
-    ],
+    columnName: 'roomFK',
+    type: 'codeSelect',
+    code: 'ctroom',
   },
-  { columnName: 'appointmentType', type: 'select' },
+  {
+    columnName: 'appointmentTypeFK',
+    type: 'codeSelect',
+    code: 'ctappointmenttype',
+    mode: 'multiple',
+  },
 ]
-
-export const _dateFormat = 'DD MMM YYYY'
 
 export const initialAptInfo = {
   patientName: '',
-  isRegisteredPatient: false,
-  contactNo: '',
-  doctor: '',
-  remarks: '',
-  enableRecurrence: false,
+  patientContactNo: '',
+  isEnableRecurrence: false,
 }

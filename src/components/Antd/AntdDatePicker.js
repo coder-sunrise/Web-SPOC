@@ -21,19 +21,16 @@ import {
 
 const _toMoment = (value, format) => {
   if (!value) return ''
-  // console.log(value, format)
-  // console.log(moment.zone())
-  // console.log(value)
   const m = moment.utc(value)
-
   return m.local()
-  if (!value) return value
-  try {
-    if (moment(value, format).isValid()) return moment(value, format)
-    return null
-  } catch (error) {
-    return null
-  }
+
+  // if (!value) return value
+  // try {
+  //   if (moment(value, format).isValid()) return moment(value, format)
+  //   return null
+  // } catch (error) {
+  //   return null
+  // }
 }
 
 const STYLES = (theme) => ({

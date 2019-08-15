@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services/calendar'
-import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
+// import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
 
 export default createListViewModel({
   namespace: 'calendar',
@@ -10,12 +10,21 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      calendarEvents: [
-        ...newEvents,
-      ],
+      calendarEvents: [],
     },
     subscriptions: {},
-    effects: {},
+    effects: {
+      *queryAppointment ({ payload }, { call }) {
+        const result = yield call(service.queryAppointment, payload)
+        console.log({ result })
+      },
+      *saveAppointment ({ payload }, { call }) {
+        const result = yield call(service.saveAppointment, payload)
+        console.log({ result })
+
+        return false
+      },
+    },
     reducers: {
       moveEvent (state, { updatedEvent, id, _appointmentID }) {
         const { calendarEvents } = state

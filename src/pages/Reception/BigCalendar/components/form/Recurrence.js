@@ -5,10 +5,10 @@ import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common component
 import {
+  CodeSelect,
   Checkbox,
   GridContainer,
   GridItem,
-  Select,
   RadioGroup,
   CommonCard,
   NumberInput,
@@ -36,42 +36,42 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
       <GridContainer item md={12}>
         <GridItem xs md={12} className={classes.enableOccurenceCheckbox}>
           <FastField
-            name='enableRecurrence'
+            name='isEnableRecurrence'
             render={(args) => {
               return <Checkbox simple label='Enable Recurrence' {...args} />
             }}
           />
         </GridItem>
 
-        {values.enableRecurrence && (
+        {values.isEnableRecurrence && (
           <React.Fragment>
             <GridItem md={labelSize} className={classes.inlineLabel}>
               <span>Recurrence Pattern</span>
             </GridItem>
             <GridItem xs md={inputSize}>
               <FastField
-                name='recurrencePattern'
+                name='recurrenceDto.recurrencePatternFK'
                 render={(args) => (
-                  <Select {...args} options={recurrencePattern} />
+                  <CodeSelect {...args} code='ltRecurrencePattern' />
                 )}
               />
             </GridItem>
 
-            {values.recurrencePattern === RECURRENCE_PATTERN.DAILY && (
+            {values.recurrencePatternFK === RECURRENCE_PATTERN.DAILY && (
               <RecurrenceDailyInput
                 values={values}
                 labelSize={labelSize}
                 inputSize={inputSize}
               />
             )}
-            {values.recurrencePattern === RECURRENCE_PATTERN.WEEKLY && (
+            {values.recurrencePatternFK === RECURRENCE_PATTERN.WEEKLY && (
               <RecurrenceWeeklyInput
                 values={values}
                 labelSize={labelSize}
                 inputSize={inputSize}
               />
             )}
-            {values.recurrencePattern === RECURRENCE_PATTERN.MONTHLY && (
+            {values.recurrencePatternFK === RECURRENCE_PATTERN.MONTHLY && (
               <RecurrenceMonthlyInput
                 values={values}
                 labelSize={labelSize}
@@ -107,7 +107,7 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
               <GridItem md={inputSize * 2}>
                 {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
                   <FastField
-                    name='occurence'
+                    name='recurrenceDto.recurrenceCount'
                     render={(args) => (
                       <NumberInput {...args} suffix='occurences' />
                     )}
@@ -115,7 +115,7 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
                 )}
                 {values.recurrenceRange === RECURRENCE_RANGE.BY && (
                   <FastField
-                    name='stopDate'
+                    name='recurrenceDto.recurrenceEndDate'
                     render={(args) => <DatePicker {...args} />}
                   />
                 )}
@@ -126,7 +126,7 @@ const Recurrence = ({ classes, values, isDoctorBlock }) => {
                 <span>Recurrence</span>
               </GridItem>
               <GridItem className={classes.recurrenceListLabel}>
-                {values.enableRecurrence && (
+                {values.isEnableRecurrence && (
                   <RecurrenceList
                     values={values}
                     isDoctorBlock={isDoctorBlock}

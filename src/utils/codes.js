@@ -521,12 +521,14 @@ const orderTypes = [
 // }
 
 const _fetchAndSaveCodeTable = async (code) => {
-  const response = await axiosRequest(`/api/CodeTable?ctnames=${code}`, {
+  const codetableUrl = `/api/CodeTable?ctnames=${code}`
+  const response = await request(codetableUrl, {
     method: 'GET',
   })
+
   const { status: statusCode, data } = response
 
-  if (statusCode === 200) {
+  if (parseInt(statusCode, 10) === 200) {
     await db.codetable.put({
       code,
       data: response.data[code],

@@ -2,9 +2,13 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 // custom component
-import { GridContainer, GridItem, DatePicker, TextField } from '@/components'
-
-const _dateFormat = 'DD MMM YYYY'
+import {
+  dateFormat,
+  GridContainer,
+  GridItem,
+  DatePicker,
+  TextField,
+} from '@/components'
 
 const AppointmentDate = () => (
   <GridContainer item xs md={12}>
@@ -14,26 +18,18 @@ const AppointmentDate = () => (
         // validate={this.startDateValidation}
         render={(args) => (
           <DatePicker
+            format={dateFormat}
+            allowClear={false}
             label='Appointment Date'
             {...args}
-            allowClear={false}
-            format={_dateFormat}
           />
         )}
       />
     </GridItem>
     <GridItem xs md={6}>
       <FastField
-        name='bookedBy'
-        render={(args) => (
-          <TextField
-            label='Booked By'
-            disabled
-            {...args}
-            options={[]}
-            format={_dateFormat}
-          />
-        )}
+        name='bookedByUserName'
+        render={(args) => <TextField label='Booked By' disabled {...args} />}
       />
     </GridItem>
   </GridContainer>

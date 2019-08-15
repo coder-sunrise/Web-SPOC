@@ -85,6 +85,12 @@ class Appointment extends React.PureComponent {
     isDragging: false,
   }
 
+  componentWillMount () {
+    this.props.dispatch({
+      type: 'calendar/queryAppointment',
+    })
+  }
+
   _dispatchAction = ({ action, ...args }, callback) => {
     const { dispatch } = this.props
     dispatch({ type: action, ...args })

@@ -89,7 +89,8 @@ class SelectEditor extends PureComponent {
       ...restProps,
       onChange: _onChange,
     }
-    // console.log(commonCfg)
+
+    // console.log({ commonCfg, restProps, cfg })
     if (columnName) {
       if (type === 'select') {
         return (
@@ -209,7 +210,38 @@ class SelectTypeProvider extends React.Component {
     // console.log(nextProps, this.props)
     // console.log(nextState, this.state)
 
+    // check if new column extensions has new options
+    const { columnExtensions: nextColExt } = nextProps
+    const { columnExtensions: thisColExt } = this.props
+    const nextColFor = nextColExt.filter(
+      (o) =>
+        [
+          'select',
+          'codeSelect',
+        ].indexOf(o.type) >= 0,
+    )
+    const thisColFor = thisColExt.filter(
+      (o) =>
+        [
+          'select',
+          'codeSelect',
+        ].indexOf(o.type) >= 0,
+    )
+
+    let optionsUpdate = false
+    nextColFor.forEach((column) => {
+      const oldColumn = thisColFor.find(
+        (col) => col.columnName === column.columnName,
+      )
+      if (
+        oldColumn &&
+        Object.keys(column).length !== Object.keys(oldColumn).length
+      )
+        optionsUpdate = true
+    })
+
     return (
+      optionsUpdate ||
       this.props.editingRowIds !== nextProps.editingRowIds ||
       Object.keys(this.state).length !== Object.keys(nextState).length ||
       this.props.commitCount !== nextProps.commitCount

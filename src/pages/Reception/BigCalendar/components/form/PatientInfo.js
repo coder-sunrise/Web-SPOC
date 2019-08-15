@@ -12,9 +12,10 @@ const PatientInfoInput = ({
   classes,
   onSearchPatient,
   onCreatePatient,
-  isRegisteredPatient,
   patientName,
+  patientProfileFK,
 }) => {
+  const isRegisteredPatient = patientProfileFK !== undefined
   return (
     <React.Fragment>
       <GridItem xs md={6}>
@@ -60,7 +61,7 @@ const PatientInfoInput = ({
       </GridItem>
       <GridItem xs md={6}>
         <FastField
-          name='contactNo'
+          name='patientContactNo'
           render={(args) => <AntdInput {...args} label='Contact No.' />}
         />
       </GridItem>

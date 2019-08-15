@@ -100,18 +100,18 @@ export function QtyFormatter ({ value }) {
 // }
 let dateFormatLong = 'DD-MMM-YYYY'
 let dateFormat = 'DD-MM-YYYY'
-const timeFormat = 'hh:mm a'
+const timeFormat = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm a'
 
 const TimeFormatter = ({ value }) => {
   if (!value) return null
 
   if (moment.isMoment(value)) {
-    return value.format(fullDateTime)
+    return value.format(timeFormat)
   }
 
   if (moment(value).isValid()) {
-    return moment(value).format(fullDateTime)
+    return moment(value).format(timeFormat)
   }
 
   return value
@@ -170,5 +170,6 @@ module.exports = {
   qtyFormat,
   dateFormat,
   dateFormatLong,
+  timeFormat,
   ...module.exports,
 }

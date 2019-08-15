@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { initialAptInfo, _dateFormat } from './variables'
+import { dateFormat } from '@/components'
+import { initialAptInfo } from './variables'
 
 // export const handleSubmit = (values, { props, resetForm }) => {
 //   const {
@@ -13,7 +14,7 @@ import { initialAptInfo, _dateFormat } from './variables'
 //     doctor,
 //   } = values
 //   const { handleAddEvents, handleUpdateEvents, slotInfo, resources } = props
-
+//   const longDateTimeFormat = 'DD-MM-YYYY'
 //   const startDate = moment(_utcStartDate).format(_dateFormat)
 //   const endDate = moment(_utcEndDate).format(_dateFormat)
 
@@ -65,23 +66,28 @@ export const handleSubmit = (values, { props }) => {
 }
 
 const initDailyRecurrence = {
-  every: 1,
-  recurrencePattern: 'daily',
-  recurrenceRange: 'after',
-  occurence: 1,
+  recurrencePatternFK: 1,
+  recurrenceFrequency: 1,
+  recurrenceDayOfTheMonth: 1,
+  recurrenceDaysOfTheWeek: '',
+  recurrenceRange: '',
+  recurrenceCount: 1,
+  recurrenceEndDate: '2019-07-15T10:05:29.4405139+08:00',
 }
 
-export const mapPropsToValues = ({ slotInfo }) => {
+export const mapPropsToValues = ({ slotInfo, user }) => {
   return {
     ...initialAptInfo,
-    ...slotInfo,
-    ...initDailyRecurrence,
-    appointmentDate: moment(slotInfo.start).format(_dateFormat),
+    // ...slotInfo,
+    recurrenceDto: { ...initDailyRecurrence },
+    appointmentDate: slotInfo.start,
     // startDate,
     // startTime,
     // endDate,
     // endTime,
-    bookedBy: 'medisys', // TODO: connect to user model in the future
+    bookedByUserFK: user ? user.userProfileFK : '',
+    bookedByUserName: user ? user.name : '',
+    appointments: [],
   }
 }
 

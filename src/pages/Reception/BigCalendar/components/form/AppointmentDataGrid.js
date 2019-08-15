@@ -5,7 +5,7 @@ import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
-import { EditableTableGrid } from '@/components'
+import { EditableTableGrid, dateFormat } from '@/components'
 import {
   AppointmentTypeOptions,
   getColorClassByAppointmentType,
@@ -15,13 +15,15 @@ import {
   AppointmentDataColExtensions,
   AppointmentDataColumn,
 } from './variables'
+// services
+import request from '@/utils/request'
 
 const validationSchema = Yup.object().shape({
   timeFrom: Yup.date().required(),
   timeTo: Yup.date()
     .min(Yup.ref('timeFrom'), 'Time To must be later than Time From')
     .required(),
-  doctor: Yup.string().required(),
+  clinicianFK: Yup.string().required(),
 })
 
 const styles = () => ({
@@ -42,9 +44,89 @@ const styles = () => ({
 })
 
 class AppointmentDataGrid extends React.PureComponent {
-  state = {
-    editingRowIds: [],
-    rowChanges: [],
+  // state = {
+  //   editingRowIds: [],
+  //   rowChanges: [],
+  //   clinicianFK: [],
+  // }
+
+  constructor (props) {
+    super(props)
+    const { appointmentDate } = this.props
+    const columnExtensions = AppointmentDataColExtensions.map((column) => {
+      if (column.columnName === 'isPrimaryClinician') {
+        return {
+          ...column,
+          checkedValue: true,
+          uncheckedValue: false,
+          onRadioChange: this.onRadioChange,
+        }
+      }
+
+      if (column.type === 'time') {
+        return {
+          ...column,
+          currentDate: appointmentDate
+            ? moment(appointmentDate, dateFormat)
+            : moment(),
+        }
+      }
+
+      if (column.columnName === 'appointmentType') {
+        return {
+          ...column,
+          // renderDropdown: (option) => {
+          //   return (
+          //     <React.Fragment>
+          //       {option.value !== 'all' && (
+          //         <span
+          //           className={classnames([
+          //             classes.colorDot,
+          //             getColorClassByAppointmentType(option.value, classes),
+          //           ])}
+          //         />
+          //       )}
+          //       <span>{option.name}</span>
+          //     </React.Fragment>
+          //   )
+          // },
+        }
+      }
+      return { ...column }
+    })
+
+    this.state = {
+      editingRowIds: [],
+      rowChanges: [],
+      columnExtensions,
+    }
+    this.getClinicianFK()
+  }
+
+  // async componentDidMount () {
+  //   await this.getClinicianFK()
+  // }
+
+  getClinicianFK = async () => {
+    const url = '/api/ClinicianProfile'
+    const result = await request(url, { pagesize: 9999 })
+    const { status, data } = result
+    if (parseInt(status, 10) === 200) {
+      const { columnExtensions } = this.state
+      this.setState((prevState) => ({
+        columnExtensions: columnExtensions.map(
+          (column) =>
+            column.columnName === 'clinicianFK'
+              ? {
+                  ...column,
+                  options: [
+                    ...data.data,
+                  ],
+                }
+              : { ...column },
+        ),
+      }))
+    }
   }
 
   changeEditingRowIds = (editingRowIds) => {
@@ -72,54 +154,7 @@ class AppointmentDataGrid extends React.PureComponent {
   }
 
   render () {
-    const { classes, appointmentDate, data, handleCommitChanges } = this.props
-    // const { rows } = this.state
-    const columnExtensions = AppointmentDataColExtensions.map((column) => {
-      if (column.columnName === 'primaryDoctor') {
-        return {
-          ...column,
-          checkedValue: true,
-          uncheckedValue: false,
-          onRadioChange: this.onRadioChange,
-        }
-      }
-
-      if (column.type === 'time') {
-        return {
-          ...column,
-          currentDate: appointmentDate
-            ? moment(appointmentDate, 'DD MMM YYYY')
-            : moment(),
-        }
-      }
-
-      if (column.columnName === 'appointmentType') {
-        return {
-          ...column,
-          options: AppointmentTypeOptions,
-          mode: 'multiple',
-
-          renderDropdown: (option) => {
-            return (
-              <React.Fragment>
-                {option.value !== 'all' && (
-                  <span
-                    className={classnames([
-                      classes.colorDot,
-                      getColorClassByAppointmentType(option.value, classes),
-                    ])}
-                  />
-                )}
-                <span>{option.name}</span>
-              </React.Fragment>
-            )
-          },
-        }
-      }
-      return { ...column }
-    })
-
-    console.log({ state: this.state })
+    const { data, handleCommitChanges } = this.props
 
     return (
       <div>
@@ -145,7 +180,7 @@ class AppointmentDataGrid extends React.PureComponent {
             // onRowChangesChange: this.changeRowChanges,
           }}
           columns={AppointmentDataColumn}
-          columnExtensions={columnExtensions}
+          columnExtensions={this.state.columnExtensions}
         />
       </div>
     )

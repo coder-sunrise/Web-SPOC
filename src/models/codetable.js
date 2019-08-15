@@ -16,7 +16,6 @@ export default createListViewModel({
     effects: {
       *fetchCodes ({ code }, { select, call, put, delay, ...rest }) {
         const codetableState = yield select((state) => state.codetable)
-
         if (code !== undefined) {
           const lowerCaseCode = code.toLowerCase()
           if (codetableState[lowerCaseCode] === undefined) {
