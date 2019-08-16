@@ -132,6 +132,31 @@ const menuData = [
     url: '/setting/roomblock',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Drug UOM',
+    url: '/setting/medicationuom',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Consumable UOM',
+    url: '/setting/consumableuom',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Category',
+    url: '/setting/medicationgroup',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Consumable Category',
+    url: '/setting/consumablegroup',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Dosage',
+    url: '/setting/medicationdosage',
+  },
+  {
     title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',

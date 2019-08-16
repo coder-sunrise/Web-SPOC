@@ -440,6 +440,44 @@ const routes = [
             name: 'revenuecategory',
             component: './Setting/RevenueCategory',
           },
+          {
+            path: '/setting/consumableuom',
+            name: 'consumableuom',
+            component: './Setting/ConsumableUOM',
+          },
+          {
+            path: '/setting/medicationUOM',
+            name: 'medicationUOM',
+            component: './Setting/MedicationUOM',
+          },
+          {
+            path: '/setting/medicationgroup',
+            name: 'medicationgroup',
+            component: './Setting/MedicationGroup',
+          },
+          {
+            path: '/setting/consumablegroup',
+            name: 'consumablegroup',
+            component: './Setting/ConsumableGroup',
+          },
+          {
+            path: '/setting/medicationdosage',
+            name: 'medicationdosage',
+            component: './Setting/MedicationDosage',
+          },
+          {
+            path: '/setting/clinicoperationhour',
+            name: 'clinicoperationhour',
+            component: './Setting/ClinicOperationHour',
+          }, 
+          {
+            path: '/setting/gstsetup',
+            name: 'gstsetup',
+            component: './Setting/GST',
+          },
+          
+
+          
         ],
       },
       // Settings

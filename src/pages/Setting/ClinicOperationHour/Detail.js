@@ -21,34 +21,35 @@ const styles = (theme) => ({})
 // ]
 
 @withFormik({
-  mapPropsToValues: ({ settingClinicBreakHour }) =>
-    settingClinicBreakHour.entity || settingClinicBreakHour.default,
+  mapPropsToValues: ({ settingClinicOperationHour }) =>
+    settingClinicOperationHour.entity || settingClinicOperationHour.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
     // clinicName: Yup.string().required(),
-    monFromBreak: Yup.string().required(),
-    monToBreak: Yup.string().required(),
-    tueFromBreak: Yup.string().required(),
-    tueToBreak: Yup.string().required(),
-    wedFromBreak: Yup.string().required(),
-    wedToBreak: Yup.string().required(),
-    thursFromBreak: Yup.string().required(),
-    thursToBreak: Yup.string().required(),
-    friFromBreak: Yup.string().required(),
-    friToBreak: Yup.string().required(),
-    satFromBreak: Yup.string().required(),
-    satToBreak: Yup.string().required(),
-    sunFromBreak: Yup.string().required(),
-    sunToBreak: Yup.string().required(),
+    monFromOpHour: Yup.string().required(),
+    monToOpHour: Yup.string().required(),
+    // monToOpHour: Yup.date().min(Yup.ref('monFromOpHour'), 'Time To must be later than Time From').required(),
+    tueFromOpHour: Yup.string().required(),
+    tueToOpHour: Yup.string().required(),
+    wedFromOpHour: Yup.string().required(),
+    wedToOpHour: Yup.string().required(),
+    thursFromOpHour: Yup.string().required(),
+    thursToOpHour: Yup.string().required(),
+    friFromOpHour: Yup.string().required(),
+    friToOpHour: Yup.string().required(),
+    satFromOpHour: Yup.string().required(),
+    satToOpHour: Yup.string().required(),
+    sunFromOpHour: Yup.string().required(),
+    sunToOpHour: Yup.string().required(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
 		const { dispatch, onConfirm } = props
 
       dispatch({
-        type: 'settingClinicBreakHour/upsert',
+        type: 'settingClinicOperationHour/upsert',
         payload: {
           ...restValues,
           effectiveStartDate: effectiveDates[0],
@@ -59,12 +60,12 @@ const styles = (theme) => ({})
         if (r) {
           if (onConfirm) onConfirm()
           dispatch({
-            type: 'settingClinicBreakHour/query'
+            type: 'settingClinicOperationHour/query'
           })
         }
       })
   },
-  displayName: 'ClinicBreakHourModal',
+  displayName: 'ClinicOperationHourModal',
 })
 class Detail extends PureComponent {
   state={}
@@ -89,7 +90,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values,settingClinicBreakHour } = props
+    const { classes, theme, footer, values,settingClinicOperationHour } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -98,7 +99,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => <TextField label='Code' {...args} disabled={settingClinicBreakHour.entity ? true : false}/>}
+                render={(args) => <TextField label='Code' {...args} disabled={settingClinicOperationHour.entity ? true : false}/>}
               />
             </GridItem>
             <GridItem md={6}>
@@ -136,7 +137,7 @@ class Detail extends PureComponent {
             </GridItem> */}
             <GridItem md={6}>
               <FastField
-                name='monFromBreak'
+                name='monFromOpHour'
                 render={(args) => {
                   return <TimePicker label='Monday From' {...args} />
                 }}
@@ -144,7 +145,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='monToBreak'
+                name='monToOpHour'
                 render={(args) => {
                   return <TimePicker label='Monday To' {...args} />
                 }}
@@ -152,7 +153,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='tueFromBreak'
+                name='tueFromOpHour'
                 render={(args) => {
                   return <TimePicker label='Tuesday From' {...args} />
                 }}
@@ -160,7 +161,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='tueToBreak'
+                name='tueToOpHour'
                 render={(args) => {
                   return <TimePicker label='Tuesday To' {...args} />
                 }}
@@ -168,7 +169,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='wedFromBreak'
+                name='wedFromOpHour'
                 render={(args) => {
                   return <TimePicker label='Wednesday From' {...args} />
                 }}
@@ -176,7 +177,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='wedToBreak'
+                name='wedToOpHour'
                 render={(args) => {
                   return <TimePicker label='Wednesday To' {...args} />
                 }}
@@ -184,7 +185,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='thursFromBreak'
+                name='thursFromOpHour'
                 render={(args) => {
                   return <TimePicker label='Thursday From' {...args} />
                 }}
@@ -192,7 +193,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='thursToBreak'
+                name='thursToOpHour'
                 render={(args) => {
                   return <TimePicker label='Thursday To' {...args} />
                 }}
@@ -200,7 +201,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='friFromBreak'
+                name='friFromOpHour'
                 render={(args) => {
                   return <TimePicker label='Friday From' {...args} />
                 }}
@@ -208,7 +209,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='friToBreak'
+                name='friToOpHour'
                 render={(args) => {
                   return <TimePicker label='Friday To' {...args} />
                 }}
@@ -216,7 +217,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='satFromBreak'
+                name='satFromOpHour'
                 render={(args) => {
                   return <TimePicker label='Saturday From' {...args} />
                 }}
@@ -224,7 +225,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='satToBreak'
+                name='satToOpHour'
                 render={(args) => {
                   return <TimePicker label='Saturday To' {...args} />
                 }}
@@ -232,7 +233,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='sunFromBreak'
+                name='sunFromOpHour'
                 render={(args) => {
                   return <TimePicker label='Sunday From' {...args} />
                 }}
@@ -240,7 +241,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='sunToBreak'
+                name='sunToOpHour'
                 render={(args) => {
                   return <TimePicker label='Sunday To' {...args} />
                 }}
