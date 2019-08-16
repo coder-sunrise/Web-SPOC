@@ -7,7 +7,10 @@ import { suppliers, dispUOMs } from '@/utils/codes'
 import { Button, CommonTableGrid } from '@/components'
 
 const Grid = ({ history, dispatch, scheme: { list } }) => {
-  const [ tableParas, setTableParas ] = useState({
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
       { name: 'refNo', title: 'Co-Payer Type' },
       { name: 'patientName', title: 'Scheme Name' },
@@ -21,7 +24,10 @@ const Grid = ({ history, dispatch, scheme: { list } }) => {
     ],
     leftColumns: [],
   })
-  const [ colExtenstions, setColExtenstions ] = useState([
+  const [
+    colExtenstions,
+    setColExtenstions,
+  ] = useState([
     { columnName: 'Action', width: 110, align: 'center' },
     {
       columnName: 'supplier',
@@ -38,11 +44,12 @@ const Grid = ({ history, dispatch, scheme: { list } }) => {
     { columnName: 'payments', type: 'number', currency: true },
     { columnName: 'expenseAmount', type: 'number', currency: true },
   ])
-  useEffect(() => {
-    dispatch({
-      type: 'scheme/query',
-    })
-  }, [])
+
+  // useEffect(() => {
+  //   dispatch({
+  //     type: 'scheme/query',
+  //   })
+  // }, [])
 
   const showDetail = (row, vmode) => () => {
     history.push(`/finance/scheme/details?uid=${row.id}`)
