@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal } from '@/components'
@@ -37,7 +37,7 @@ class ServiceCenter extends PureComponent {
   }
 
   render () {
-    const { classes, settingServiceCenter, dispatch, theme, ...restProps } = this.props
+    const { settingServiceCenter, dispatch } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -48,7 +48,6 @@ class ServiceCenter extends PureComponent {
         <CommonModal
           open={settingServiceCenter.showModal}
           observe='ServiceCenterDetail'
-          //title='Add Service Center'
           title={settingServiceCenter.entity ? 'Edit Service Center' : 'Add Service Center'} 
           maxWidth='md'
           bodyNoPadding

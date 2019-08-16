@@ -9,9 +9,7 @@ import {
 	Button,
 	TextField,
 	Checkbox,
-	Select,
 	ProgressButton,
-	CodeSelect
 } from '@/components'
 
 @withFormikExtend({
@@ -21,7 +19,7 @@ import {
 })
 class Filter extends PureComponent {
 	render() {
-		console.log({ props: this.props.values })
+		// console.log({ props: this.props.values })
 		const { classes } = this.props
 		return (
 			<div className={classes.filterBar}>

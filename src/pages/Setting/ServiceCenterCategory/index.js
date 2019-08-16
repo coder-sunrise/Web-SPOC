@@ -28,8 +28,6 @@ class ServiceCenterCategory extends PureComponent {
   }
 
   render () {
-    const { classes, settingServiceCenterCategory, dispatch, theme, ...restProps } = this.props
-
     return (
       <CardContainer hideHeader>
         <Filter {...this.props} />

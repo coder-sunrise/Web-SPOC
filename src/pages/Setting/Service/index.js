@@ -1,25 +1,12 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import { withFormik, FastField } from 'formik'
 
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import {
-	PictureUpload,
-	GridContainer,
-	GridItem,
 	CardContainer,
-	Transition,
-	TextField,
-	AntdInput,
-	Select,
-	Accordion,
-	Button,
-	CommonTableGrid,
-	DatePicker,
-	NumberInput,
 	CommonModal
 } from '@/components'
 
@@ -63,7 +50,7 @@ class Service extends PureComponent {
 	}
 
 	render() {
-		const { classes, settingClinicService, dispatch, theme, ...restProps } = this.props
+		const { settingClinicService } = this.props
 		const cfg = {
 			toggleModal: this.toggleModal
 		}

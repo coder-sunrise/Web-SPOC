@@ -12,14 +12,6 @@ class Grid extends PureComponent {
 		const { dispatch, settingServiceCenter } = this.props
 
 		const { list } = settingServiceCenter
-		// For complex object retrieve from server
-		// dispatch({
-		//   type: 'settingRoom/querySingle',
-		//   payload: {
-		//     id: row.id,
-		//   },
-		// }).then(toggleModal)
-		// console.log(settingRoom, row.id, e)
 		dispatch({
 			type: 'settingServiceCenter/updateState',
 			payload: {
@@ -30,7 +22,6 @@ class Grid extends PureComponent {
 	}
 
 	render() {
-		const { dispatch, classes, settingServiceCenter, toggleModal } = this.props
 		return (
 			<CommonTableGrid
 				style={{ margin: 0 }}
@@ -47,7 +38,6 @@ class Grid extends PureComponent {
 						title: 'Action'
 					}
 				]}
-				// FuncProps={{ pager: false }}
 				columnExtensions={[
 					{
 						columnName: 'isActive',

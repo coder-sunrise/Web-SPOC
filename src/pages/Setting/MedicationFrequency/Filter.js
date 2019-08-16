@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
 import { status } from '@/utils/codes'
 import {
 	withFormikExtend,
@@ -9,9 +9,7 @@ import {
 	Button,
 	TextField,
 	Checkbox,
-	Select,
 	ProgressButton,
-	CodeSelect
 } from '@/components'
 
 @withFormikExtend({
@@ -21,7 +19,7 @@ import {
 })
 class Filter extends PureComponent {
 	render() {
-		console.log({ props: this.props.values })
+		//console.log({ props: this.props.values })
 		const { classes } = this.props
 		return (
 			<div className={classes.filterBar}>

@@ -23,7 +23,6 @@ class Grid extends PureComponent {
 	}
 
 	render() {
-		const { dispatch, classes, settingMedicationFrequency, toggleModal } = this.props
 		return (
 			<CommonTableGrid
 				style={{ margin: 0 }}

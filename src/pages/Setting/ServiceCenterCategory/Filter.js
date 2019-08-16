@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { status } from '@/utils/codes'
+import { FormattedMessage } from 'umi/locale'
 import {
 	withFormikExtend,
 	FastField,
@@ -8,10 +7,8 @@ import {
 	GridItem,
 	Button,
 	TextField,
-	Checkbox,
 	Select,
 	ProgressButton,
-	CodeSelect
 } from '@/components'
 
 @withFormikExtend({

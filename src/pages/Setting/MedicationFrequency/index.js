@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal } from '@/components'
@@ -37,7 +37,7 @@ class ServiceCenter extends PureComponent {
   }
 
   render () {
-    const { classes, settingMedicationFrequency, dispatch, theme, ...restProps } = this.props
+    const { settingMedicationFrequency } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -48,7 +48,13 @@ class ServiceCenter extends PureComponent {
         <CommonModal
           open={settingMedicationFrequency.showModal}
           observe='MedicationFrequencyDetail'
-          title={settingMedicationFrequency.entity ? 'Edit Medication Frequency' : 'Add Medication Frequency'} 
+          title={
+            settingMedicationFrequency.entity ? (
+              'Edit Medication Frequency'
+            ) : (
+              'Add Medication Frequency'
+            )
+          }
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

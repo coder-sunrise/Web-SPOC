@@ -1,14 +1,13 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
 import {
 	withFormikExtend,
 	FastField,
 	GridContainer,
 	GridItem,
 	TextField,
-	CodeSelect,
 	DateRangePicker
 } from '@/components'
 
@@ -48,7 +47,7 @@ class Detail extends PureComponent {
 
 	render() {
 		const { props } = this
-		const { classes, theme, footer, values, settingMedicationConsumptionMethod } = props
+		const { theme, footer, settingMedicationConsumptionMethod } = props
 		// console.log('detail', props)
 		return (
 			<React.Fragment>

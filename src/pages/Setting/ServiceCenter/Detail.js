@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
 import {
   withFormikExtend,
   FastField,
@@ -16,7 +15,7 @@ const styles = (theme) => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingServiceCenter }) =>
-  settingServiceCenter.entity || settingServiceCenter.default,
+    settingServiceCenter.entity || settingServiceCenter.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -33,7 +32,7 @@ const styles = (theme) => ({})
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         //serviceCenterCategoryFK: 1,
-        serviceCenterCategoryFKNavigation: null
+        serviceCenterCategoryFKNavigation: null,
       },
     }).then((r) => {
       if (r) {
@@ -51,9 +50,8 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values } = props
+    const { theme, footer, settingServiceCenter } = props
     // console.log('detail', props)
-    console.log('valueInfo', values)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -62,7 +60,12 @@ class Detail extends PureComponent {
               <FastField
                 name='code'
                 render={(args) => (
-                  <TextField label='Code' autoFocused {...args} />
+                  <TextField
+                    label='Code'
+                    autoFocused
+                    {...args}
+                    disabled={settingServiceCenter.entity ? true : false}
+                  />
                 )}
               />
             </GridItem>
@@ -75,7 +78,13 @@ class Detail extends PureComponent {
             <GridItem md={4}>
               <FastField
                 name='serviceCenterCategoryFK'
-                render={(args) => <CodeSelect  label='Service Center Category' code='CTServiceCenterCategory' {...args} />}
+                render={(args) => (
+                  <CodeSelect
+                    label='Service Center Category'
+                    code='CTServiceCenterCategory'
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
             <GridItem md={12}>
