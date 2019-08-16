@@ -234,6 +234,8 @@ class Form extends React.PureComponent {
     onClose && onClose()
   }
 
+  onDeleteClick = () => {}
+
   onSaveDraftClick = () => {
     const appointmentStatusFK = this.props.appointmentStatuses.find(
       (item) => item.code === 'DRAFT',
@@ -335,6 +337,7 @@ class Form extends React.PureComponent {
             appointmentStatusFK={values.appointmentStatusFk}
             onCancelAppointmentClick={this.onCancelAppointmentClick}
             onClose={onClose}
+            handleDeleteClick={this.onDeleteClick}
             handleSaveDraftClick={this.onSaveDraftClick}
             handleConfirmClick={this.onConfirmClick}
           />
