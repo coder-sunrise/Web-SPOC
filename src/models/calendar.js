@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services/calendar'
+import { notification } from '@/components'
 // import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
 
 export default createListViewModel({
@@ -14,15 +15,12 @@ export default createListViewModel({
     },
     subscriptions: {},
     effects: {
-      *queryAppointment ({ payload }, { call }) {
-        const result = yield call(service.queryAppointment, payload)
+      *deleteDraft ({ id }, { call }) {
+        const result = yield call(service.deleteDraft, id)
         console.log({ result })
-      },
-      *saveAppointment ({ payload }, { call }) {
-        const result = yield call(service.saveAppointment, payload)
-        console.log({ result })
-
-        return false
+        notification.sucess({
+          message: 'Deleted',
+        })
       },
     },
     reducers: {

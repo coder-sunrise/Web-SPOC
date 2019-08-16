@@ -19,10 +19,10 @@ import {
 import request from '@/utils/request'
 
 const validationSchema = Yup.object().shape({
-  timeFrom: Yup.date().required(),
-  timeTo: Yup.date()
-    .min(Yup.ref('timeFrom'), 'Time To must be later than Time From')
-    .required(),
+  // startTime: Yup.date().required(),
+  // endTime: Yup.date()
+  //   .min(Yup.ref('timeFrom'), 'Time To must be later than Time From')
+  //   .required(),
   clinicianFK: Yup.string().required(),
 })
 

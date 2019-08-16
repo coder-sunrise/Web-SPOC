@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 // material ui
 import { Popover, withStyles } from '@material-ui/core'
 // common component
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, serverDateFormat } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import CalendarView from './components/CalendarView'
@@ -83,11 +84,19 @@ class Appointment extends React.PureComponent {
       ],
     },
     isDragging: false,
+    selectedAppointmentFK: -1,
   }
 
   componentWillMount () {
+    const startOfMonth = moment().startOf('month').format(serverDateFormat)
+    const endOfMonth = moment().endOf('month').format(serverDateFormat)
     this.props.dispatch({
-      type: 'calendar/queryAppointment',
+      type: 'calendar/query',
+      payload: {
+        combineCondition: 'or',
+        lgt_appintmentDate: startOfMonth,
+        lst_appintmentDate: endOfMonth,
+      },
     })
   }
 
@@ -97,7 +106,8 @@ class Appointment extends React.PureComponent {
     callback && callback()
   }
 
-  closeAppointmentForm = () => this.setState({ showAppointmentForm: false })
+  closeAppointmentForm = () =>
+    this.setState({ selectedAppointmentFK: -1, showAppointmentForm: false })
 
   updateEventSeries = ({ _appointmentID, add, update }) => {
     add &&
@@ -144,46 +154,47 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = ({ start }) => {
-    let hour = {
-      _appointmentID: getUniqueGUID(),
+    const selectedSlot = {
       allDay: false,
       start,
-      // start: event.start,
-      // end: event.end,
-      type: 'add',
     }
 
     this.setState({
-      selectedSlot: { ...hour },
+      selectedSlot,
       isDragging: false,
       showAppointmentForm: true,
     })
   }
 
   onSelectEvent = (selectedEvent) => {
+    this.setState({
+      // selectedSlot: { ...selectedEvent },
+      selectedAppointmentFK: selectedEvent.appointmentFK,
+      showAppointmentForm: true,
+    })
     // start and end are unwated values,
     // the important values are the ...restEvent
-    const { start, end, ...restEvent } = selectedEvent
-    const { isDoctorEvent, series } = restEvent
+    // const { start, end, ...restEvent } = selectedEvent
+    // const { isDoctorEvent, series } = restEvent
 
-    if (series) {
-      this.setState({
-        showSeriesConfirmation: true,
-        selectedSlot: { ...restEvent, type: 'update' },
-        // showAppointmentForm: !isDoctorEvent && true,
-        // showDoctorEventModal: isDoctorEvent,
-      })
-    } else {
-      this.setState({
-        showPopup: false,
-        isDragging: false,
-        popoverEvent: { ...InitialPopoverEvent },
-        popupAnchor: null,
-        selectedSlot: { ...restEvent, type: 'update' },
-        showAppointmentForm: !isDoctorEvent && true,
-        showDoctorEventModal: isDoctorEvent,
-      })
-    }
+    // if (series) {
+    //   this.setState({
+    //     showSeriesConfirmation: true,
+    //     selectedSlot: { ...restEvent, type: 'update' },
+    //     // showAppointmentForm: !isDoctorEvent && true,
+    //     // showDoctorEventModal: isDoctorEvent,
+    //   })
+    // } else {
+    //   this.setState({
+    //     showPopup: false,
+    //     isDragging: false,
+    //     popoverEvent: { ...InitialPopoverEvent },
+    //     popupAnchor: null,
+    //     selectedSlot: { ...restEvent, type: 'update' },
+    //     showAppointmentForm: !isDoctorEvent && true,
+    //     showDoctorEventModal: isDoctorEvent,
+    //   })
+    // }
   }
 
   onEventMouseOver = (event, syntheticEvent) => {
@@ -275,13 +286,45 @@ class Appointment extends React.PureComponent {
       resources,
       popoverEvent,
       filter,
+      selectedAppointmentFK,
     } = this.state
 
-    const { calendarEvents } = CalendarModel
+    const { calendarEvents, list } = CalendarModel
     const flattenedCalendarData = calendarEvents.reduce(
       flattenAppointmentDateToCalendarEvents,
       [],
     )
+
+    const flattenedList = list.reduce((events, appointment) => {
+      const {
+        appintmentDate,
+        patientName,
+        patientContactNo,
+        // eslint-disable-next-line camelcase
+        appointment_Resources,
+      } = appointment
+      const appointmentDate = moment(appintmentDate).format(serverDateFormat)
+      const apptEvents = appointment_Resources.map((item) => ({
+        ...item,
+        patientName,
+        patientContactNo,
+        start: moment(
+          `${appointmentDate} ${item.startTime}`,
+          `${serverDateFormat} HH:mm`,
+        ).toDate(),
+        end: moment(
+          `${appointmentDate} ${item.endTime}`,
+          `${serverDateFormat} HH:mm`,
+        ).toDate(),
+      }))
+
+      return [
+        ...events,
+        ...apptEvents,
+      ]
+    }, [])
+
+    // console.log({ flattenedList })
 
     return (
       <CardContainer hideHeader size='sm'>
@@ -312,7 +355,8 @@ class Appointment extends React.PureComponent {
         />
         <div style={{ marginTop: 16 }}>
           <CalendarView
-            calendarEvents={applyFilter(flattenedCalendarData, filter)}
+            // calendarEvents={applyFilter(flattenedCalendarData, filter)}
+            calendarEvents={flattenedList}
             resources={resources}
             handleSelectSlot={this.onSelectSlot}
             handleSelectEvent={this.onSelectEvent}
@@ -333,8 +377,9 @@ class Appointment extends React.PureComponent {
         >
           <Form
             resources={resources}
-            slotInfo={selectedSlot}
-            calendarEvents={calendarEvents}
+            selectedAppointmentID={selectedAppointmentFK}
+            selectedSlot={selectedSlot}
+            // calendarEvents={calendarEvents}
             handleUpdateEventSeries={this.updateEventSeries}
             handleDeleteEvent={this.deleteEvent}
           />

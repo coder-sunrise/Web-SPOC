@@ -1,23 +1,18 @@
 import React from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import moment from 'moment'
 import * as Yup from 'yup'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
-import { Divider, CircularProgress, withStyles } from '@material-ui/core'
+import { CircularProgress, withStyles } from '@material-ui/core'
 // custom component
 import {
-  CardContainer,
   CommonModal,
   GridContainer,
   GridItem,
   SizeContainer,
   OutlinedTextField,
-  Checkbox,
-  Select,
-  timeFormat,
 } from '@/components'
 // custom components
 import PatientSearchModal from '../../PatientSearch'
@@ -28,44 +23,39 @@ import AppointmentDateInput from './AppointmentDate'
 import Recurrence from './Recurrence'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
-// services
-import {
-  fetchPatientListByName,
-  fetchPatientInfoByPatientID,
-} from '../../service/appointment'
 // utils
 import {
-  handleSubmit as submitForm,
   mapPropsToValues,
   getEventSeriesByID,
+  parseDateToServerDateFormatString,
+  mapDatagridToAppointmentResources,
 } from './formikUtils'
-import { getUniqueGUID } from '@/utils/utils'
 import styles from './style'
 
 const AppointmentSchema = Yup.object().shape({
-  patientName: Yup.string().required(),
-  contactNo: Yup.string().required(),
-  startDate: Yup.string().required(),
+  patientName: Yup.string().required('Patient Name is required'),
+  patientContactNo: Yup.string().required('Contact No. is required'),
+  appointmentDate: Yup.date().required('Appointment Date is required'),
 })
 
-@connect(({ loginSEMR, user, codetable }) => ({
+@connect(({ loginSEMR, user, calendar, codetable }) => ({
   loginSEMR,
   user: user.data,
+  events: calendar.list,
   appointmentStatuses: codetable.ltappointmentstatus,
 }))
 @withFormik({
   enableReinitialize: true,
   validationSchema: AppointmentSchema,
-  handleSubmit: submitForm,
   mapPropsToValues,
 })
 class Form extends React.PureComponent {
   state = {
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
-    eventSeries: getEventSeriesByID(
-      this.props.slotInfo._appointmentID,
-      this.props.calendarEvents,
+    datagrid: getEventSeriesByID(
+      this.props.selectedAppointmentID,
+      this.props.events,
     ),
     showSeriesUpdateConfirmation: false,
   }
@@ -158,55 +148,55 @@ class Form extends React.PureComponent {
   }
 
   onConfirmCancelAppointment = ({ deleteType, reasonType, reason }) => {
-    const { handleDeleteEvent, slotInfo } = this.props
-
-    this.setState(
-      {
-        showDeleteConfirmationModal: false,
-      },
-      () => {
-        handleDeleteEvent(slotInfo.id, slotInfo._appointmentID)
-      },
-    )
+    // const { handleDeleteEvent, slotInfo } = this.props
+    // this.setState(
+    //   {
+    //     showDeleteConfirmationModal: false,
+    //   },
+    //   () => {
+    //     handleDeleteEvent(slotInfo.id, slotInfo._appointmentID)
+    //   },
+    // )
   }
 
   onCommitChanges = ({ rows, deleted }) => {
     if (rows) {
       this.setState({
-        eventSeries: rows,
+        datagrid: rows,
       })
     }
     if (deleted) {
-      const { eventSeries } = this.state
+      const { datagrid } = this.state
       this.setState({
-        eventSeries: eventSeries.filter((event) => !deleted.includes(event.id)),
+        datagrid: datagrid.filter((event) => !deleted.includes(event.id)),
       })
     }
   }
 
   onConfirmClick = () => {
-    const { slotInfo } = this.props
-    if (slotInfo.series) {
-      this.openSeriesUpdateConfirmation()
-    } else {
-      this._confirm()
+    // const { slotInfo } = this.props
+    // if (slotInfo.series) {
+    //   this.openSeriesUpdateConfirmation()
+    // } else {
+    //   this._confirm()
+    // }
+    this._confirm()
+  }
+
+  submit = async (appointmentStatusFK) => {
+    const { validateForm, setSubmitting } = this.props
+    setSubmitting(true)
+    const formError = await validateForm()
+
+    if (Object.keys(formError).length > 0) {
+      setSubmitting(false)
+      return
     }
-  }
 
-  onSaveDraftClick = () => {
-    console.log({ appointmentStatus: this.props.appointmentStatuses })
-  }
-
-  _confirm = () => {
-    const appointmentStatusFK = this.props.appointmentStatuses.find(
-      (item) => item.code === 'SCHEDULED',
-    ).id
-
-    const { eventSeries } = this.state
+    const { datagrid } = this.state
     const { values, onClose, dispatch, resetForm } = this.props
 
     const {
-      _appointmentID,
       appointmentRemarks,
       appointmentDate,
       isEnableRecurrence,
@@ -214,67 +204,51 @@ class Form extends React.PureComponent {
       ...appointmentValues
     } = values
 
-    const calendarEvents = eventSeries.map((event, index) => {
-      // const dateTimeFormat = 'DD-MM-YYYY hh:mm a'
-
-      // const matchedResource = resources.find(
-      //   (resource) =>
-      //     resource.doctorName.toUpperCase() === clinicianFk.toUpperCase(),
-      // )
-
-      // const doctorResource =
-      //   matchedResource !== undefined ? matchedResource.doctorProfileFK : '4'
-
-      // return {
-      //   ...event,
-      //   id: id !== undefined ? id : getUniqueGUID(),
-      //   resourceId: doctorResource,
-      //   start: timeFrom,
-      //   end: timeTo,
-      // }
-      const { timeFrom, timeTo, clinicianFK, isPrimaryClinician } = event
-      const startTime = moment(timeFrom).format(timeFormat)
-      const endTime = moment(timeTo).format(timeFormat)
-      return {
-        clinicianFK,
-        isPrimaryClinician,
-        startTime,
-        endTime,
-        sortOrder: index,
-        isDeleted: false,
-      }
-    })
+    const appointmentResources = datagrid.map(mapDatagridToAppointmentResources)
 
     const appointments = [
       {
         appointmentStatusFK,
         appointmentRemarks,
-        appointmentDate,
+        appintmentDate: parseDateToServerDateFormatString(appointmentDate),
         appointments_Resources: [
-          ...calendarEvents,
+          ...appointmentResources,
         ],
       },
     ]
 
     const updated = {
       ...appointmentValues,
+      isEnableRecurrence,
       recurrenceDto: !isEnableRecurrence ? undefined : recurrenceDto,
       appointments,
     }
 
     console.log({ updated })
-    onClose && onClose()
+    setSubmitting(false)
     dispatch({
-      type: 'calendar/saveAppointment',
+      type: 'calendar/upsert',
       payload: updated,
     })
     resetForm()
+    onClose && onClose()
+  }
 
-    // handleUpdateEventSeries({
-    //   [slotInfo.type]: updated,
-    //   _appointmentID,
-    // })
-    // resetForm()
+  onSaveDraftClick = () => {
+    const appointmentStatusFK = this.props.appointmentStatuses.find(
+      (item) => item.code === 'DRAFT',
+    ).id
+    console.log({ appointmentStatus: this.props.appointmentStatuses })
+
+    this.submit(appointmentStatusFK)
+  }
+
+  _confirm = () => {
+    const appointmentStatusFK = this.props.appointmentStatuses.find(
+      (item) => item.code === 'SCHEDULED',
+    ).id
+
+    this.submit(appointmentStatusFK)
   }
 
   openSeriesUpdateConfirmation = () => {
@@ -294,13 +268,13 @@ class Form extends React.PureComponent {
   }
 
   render () {
-    const { classes, onClose, slotInfo, isLoading, values } = this.props
+    const { classes, onClose, isLoading, values } = this.props
 
     const {
       showSearchPatientModal,
       showDeleteConfirmationModal,
       showSeriesUpdateConfirmation,
-      eventSeries,
+      datagrid,
     } = this.state
     console.log({ values })
 
@@ -346,7 +320,7 @@ class Form extends React.PureComponent {
             <GridItem xs md={12} className={classes.verticalSpacing}>
               <AppointmentDataGrid
                 appointmentDate={values.appointmentDate}
-                data={eventSeries}
+                data={datagrid}
                 handleCommitChanges={this.onCommitChanges}
               />
             </GridItem>
@@ -357,7 +331,8 @@ class Form extends React.PureComponent {
           </GridContainer>
 
           <FormFooter
-            isNew={slotInfo.type === 'add'}
+            // isNew={slotInfo.type === 'add'}
+            appointmentStatusFK={values.appointmentStatusFk}
             onCancelAppointmentClick={this.onCancelAppointmentClick}
             onClose={onClose}
             handleSaveDraftClick={this.onSaveDraftClick}

@@ -28,7 +28,7 @@ const AppointmentDate = () => (
     </GridItem>
     <GridItem xs md={6}>
       <FastField
-        name='bookedByUserName'
+        name='bookedByUser'
         render={(args) => <TextField label='Booked By' disabled {...args} />}
       />
     </GridItem>

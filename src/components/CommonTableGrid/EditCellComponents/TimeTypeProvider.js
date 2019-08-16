@@ -93,6 +93,7 @@ class TimeEditorBase extends PureComponent {
       ),
       value,
     }
+
     return (
       <div ref={this.myRef}>
         <TimePicker
@@ -123,6 +124,7 @@ class TimeTypeProvider extends PureComponent {
 
   render () {
     const { columnExtensions } = this.props
+
     return (
       <TimeTypeProviderOrg
         for={columnExtensions

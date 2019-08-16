@@ -39,9 +39,9 @@ export const AppointmentDataColumn = [
   // { name: 'conflict', title: ' ' },
   { name: 'clinicianFK', title: 'Doctor' },
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
-  { name: 'timeFrom', title: 'Time From' },
-  { name: 'timeTo', title: 'Time To' },
-  { name: 'roomFK', title: 'Room' },
+  { name: 'startTime', title: 'Time From' },
+  { name: 'endTime', title: 'Time To' },
+  { name: 'roomFk', title: 'Room' },
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
@@ -53,28 +53,31 @@ export const AppointmentDataColExtensions = [
     disabled: true,
     width: 60,
   },
-  { columnName: 'timeFrom', type: 'time', format: 'hh:mm a' },
-  { columnName: 'timeTo', type: 'time', format: 'hh:mm a' },
-  {
-    columnName: 'isPrimaryClinician',
-    type: 'radio',
-  },
   {
     columnName: 'clinicianFK',
     type: 'select',
     labelField: 'name',
     valueField: 'id',
-  },
-  {
-    columnName: 'roomFK',
-    type: 'codeSelect',
-    code: 'ctroom',
+    width: 200,
   },
   {
     columnName: 'appointmentTypeFK',
     type: 'codeSelect',
     code: 'ctappointmenttype',
     mode: 'multiple',
+  },
+  { columnName: 'startTime', type: 'time', width: 120, format: 'HH:mm' },
+  { columnName: 'endTime', type: 'time', width: 120, format: 'HH:mm' },
+  {
+    columnName: 'roomFk',
+    width: 110,
+    type: 'codeSelect',
+    code: 'ctroom',
+  },
+  {
+    columnName: 'isPrimaryClinician',
+    width: 110,
+    type: 'radio',
   },
 ]
 

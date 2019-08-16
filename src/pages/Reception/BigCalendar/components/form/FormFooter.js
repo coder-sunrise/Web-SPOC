@@ -9,6 +9,7 @@ import style from './style'
 
 const ButtonText = {
   DELETE: 'Delete',
+  CANCEL_APPOINTMENT: 'Cancel Appointment',
   CANCEL: 'Cancel',
   CHECK: 'Check Availability',
   DRAFT: 'Save Draft',
@@ -18,12 +19,16 @@ const ButtonText = {
 
 const FormFooter = ({
   classes,
-  isNew,
+  appointmentStatusFK,
   onClose,
   onCancelAppointmentClick,
   handleSaveDraftClick,
   handleConfirmClick,
 }) => {
+  console.log({ appointmentStatusFK })
+  const isNew = appointmentStatusFK === undefined
+  const isDraft = appointmentStatusFK === '2'
+
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,
   }
@@ -39,7 +44,7 @@ const FormFooter = ({
             className={classnames(hideCancelAppointmentClass)}
             onClick={onCancelAppointmentClick}
           >
-            {ButtonText.DELETE}
+            {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>
         </GridItem>
 
@@ -50,9 +55,11 @@ const FormFooter = ({
           <Button onClick={onClose} color='danger'>
             {ButtonText.CANCEL}
           </Button>
-          <Button onClick={handleSaveDraftClick} color='info'>
-            {ButtonText.DRAFT}
-          </Button>
+          {(isNew || isDraft) && (
+            <Button onClick={handleSaveDraftClick} color='info'>
+              {ButtonText.DRAFT}
+            </Button>
+          )}
           <Button onClick={handleConfirmClick} color='primary'>
             {confirmBtnText}
           </Button>

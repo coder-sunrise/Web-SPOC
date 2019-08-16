@@ -35,7 +35,7 @@ class Event extends PureComponent {
     const { isDoctorEvent, hasConflict, series } = event
 
     const title = isDoctorEvent ? event.doctor : event.patientName
-    const subtitle = isDoctorEvent ? event.eventType : event.contactNo
+    const subtitle = isDoctorEvent ? event.eventType : event.patientContactNo
     return (
       <div
         className={classes.container}
