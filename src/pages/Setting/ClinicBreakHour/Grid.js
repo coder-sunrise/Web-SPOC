@@ -32,6 +32,7 @@ export default class Grid extends PureComponent {
 			<CommonTableGrid
 				style={{ margin: 0 }}
 				type='settingClinicBreakHour'
+				onRowDoubleClick={this.editRow}
 				columns={[
 					{ name: 'displayValue', title: 'Display Value' },
 					{ name: 'code', title: 'Code' },
