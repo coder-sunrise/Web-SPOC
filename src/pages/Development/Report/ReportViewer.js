@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import printJS from 'print-js'
 // react pdf
-import { Document, Page, pdfjs } from 'react-pdf'
+// import { Document, Page, pdfjs } from 'react-pdf'
 // material ui
 import { CircularProgress, withStyles } from '@material-ui/core'
 // common component
@@ -9,7 +9,7 @@ import { Button, CardContainer } from '@/components'
 // utils
 import { axiosRequest } from '@/utils/request'
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 const _arrayBufferToBase64 = (buffer) => {
   let binary = ''

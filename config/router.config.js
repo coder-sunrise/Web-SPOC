@@ -245,13 +245,13 @@ const routes = [
             path: '/finance/deposit',
             name: 'deposit',
             mini: 'DP',
-            // component: './Finance/Deposit',
+            component: './Finance/Deposit',
           },
           {
             path: '/finance/deposit/:depositNo',
             name: 'invoice/detail',
             hideInMenu: true,
-            // component: './Finance/Deposit/Detail/index.js',
+            component: './Finance/Deposit/Detail/index.js',
           },
           {
             path: '/finance/statement',
@@ -447,6 +447,7 @@ const routes = [
         hideInMenu: process.env.NODE_ENV === 'production',
         path: '/development',
         name: 'Development',
+
         routes: [
           {
             path: '/development/control',

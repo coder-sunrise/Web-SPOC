@@ -122,6 +122,15 @@ const sharedOverrides = {
         },
       },
     },
+    root: {
+      '&$focused .rdw-editor-main': {
+        transform: 'scaleX(1)',
+        border: '2px solid #303f9f',
+      },
+      '& .rdw-editor-main': {
+        border: '1px solid rgba(0, 0, 0, 0.42)',
+      },
+    },
   },
   // RadioGroup: {
   //   label: {
@@ -454,7 +463,7 @@ export const smallTheme = createMuiTheme({
         //   marginRight: 27,
         // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          top: -1,
+          top: -4,
         },
       },
       input: {
