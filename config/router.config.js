@@ -15,7 +15,7 @@ const routes = [
 	{
 		path: '/login',
 		component: './Login',
-		hideInMenu: true
+		hideInMenu: true,
 	},
 	//
 	// CMS
@@ -27,7 +27,7 @@ const routes = [
 			{ name: 'admin', rights: 'enable' },
 			{ name: 'user', rights: 'enable' },
 			{ name: 'guest', rights: 'enable' },
-			{ name: 'tester', rights: 'enable' }
+			{ name: 'tester', rights: 'enable' },
 		],
 		routes: [
 			// Main Landing Page.
@@ -43,41 +43,41 @@ const routes = [
 						name: 'queue',
 						component: './Reception/Queue',
 						mini: 'QE',
-						exact: true
+						exact: true,
 					},
 					{
 						path: '/reception/queue/dispense/:visitRefNo',
 						name: 'dispense',
 						hideInMenu: true,
 						exact: true,
-						component: './Dispense'
+						component: './Dispense',
 					},
 					{
 						path: '/reception/queue/dispense/:visitRefNo/billing',
 						name: 'billing',
 						hideInMenu: true,
 						exact: true,
-						component: './Dispense/Billing'
+						component: './Dispense/Billing',
 					},
 					{
 						path: '/reception/appointment',
 						name: 'appointment',
 						mini: 'AP',
-						component: './Reception/BigCalendar'
+						component: './Reception/BigCalendar',
 					},
 					{
 						hideInMenu: true,
 						path: '/reception/queue/patientdashboard',
 						name: 'patientdashboard',
-						component: './PatientDashboard'
+						component: './PatientDashboard',
 					},
 					{
 						path: '/reception/queue/patientdashboard/consultation/:id',
 						name: 'consultation',
 						hideInMenu: true,
-						component: './PatientDashboard/Consultation'
-					}
-				]
+						component: './PatientDashboard/Consultation',
+					},
+				],
 			},
 			//
 			// Patient Database
@@ -119,9 +119,9 @@ const routes = [
 						path: '/patientdb/search',
 						name: 'search',
 						mini: 'SP',
-						component: './PatientDatabase/Search'
-					}
-				]
+						component: './PatientDatabase/Search',
+					},
+				],
 			},
 			//
 			// SMS
@@ -134,14 +134,14 @@ const routes = [
 					{
 						path: '/communication/sms',
 						name: 'sms',
-						component: './sms'
-					}
+						component: './sms',
+					},
 					// {
 					//   path: '/sms/adhoc',
 					//   name: 'Adhoc',
 					//   // component: './sms/adhoc',
 					// },
-				]
+				],
 			},
 			//
 			// Inventory
@@ -155,32 +155,32 @@ const routes = [
 						path: '/inventory/master',
 						name: 'master',
 						component: './Inventory/Master',
-						mini: 'IM'
+						mini: 'IM',
 					},
 					{
 						path: '/inventory/master/consumable',
 						name: 'consumable.detail',
 						hideInMenu: true,
-						component: './Inventory/Master/Consumable/Details'
+						component: './Inventory/Master/Consumable/Details',
 					},
 					{
 						path: '/inventory/master/medication',
 						name: 'medication.detail',
 						hideInMenu: true,
-						component: './Inventory/Master/Medication/Details'
+						component: './Inventory/Master/Medication/Details',
 					},
 					{
 						path: '/inventory/master/vaccination',
 						name: 'vaccination.detail',
 						hideInMenu: true,
-						component: './Inventory/Master/Vaccination/Details'
+						component: './Inventory/Master/Vaccination/Details',
 					},
 					{
 						path: '/inventory/master/package',
 						name: 'package.detail',
 						hideInMenu: true,
-						component: './Inventory/Master/Package/Details'
-					}
+						component: './Inventory/Master/Package/Details',
+					},
 					// {
 					//   path: '/inventory/pd',
 					//   name: 'pd',
@@ -193,7 +193,7 @@ const routes = [
 					//   hideInMenu: true,
 					//   component: './Inventory/PurchaseDelivery/Detail',
 					// },
-				]
+				],
 			},
 			//
 			// Test Component
@@ -210,86 +210,86 @@ const routes = [
 						name: 'invoice/list',
 						component: './Finance/Invoice',
 						mini: 'IP',
-						exact: true
+						exact: true,
 					},
 					{
 						path: '/finance/invoice/:invoiceNo',
 						name: 'invoice/detail',
 						hideInMenu: true,
-						component: './Finance/Invoice/Details'
+						component: './Finance/Invoice/Details',
 					},
 					{
 						path: '/finance/note',
 						name: 'credit/debitnote',
 						hideInMenu: true,
 						// component: './Finance/CreditDebitNote',
-						mini: 'CD'
+						mini: 'CD',
 					},
 					{
 						path: '/finance/billing',
 						name: 'corporate-billing',
 						mini: 'CB',
-						exact: true
+						exact: true,
 						// component: './Finance/CorporateBilling',
 					},
 					{
 						path: '/finance/billing/:companyName',
 						name: 'corporate-billing/detail',
-						hideInMenu: true
+						hideInMenu: true,
 						// component:
 						//   './Finance/CorporateBilling/Detail/CorporateBillingDetail',
 					},
 					{
 						path: '/finance/deposit',
 						name: 'deposit',
-						mini: 'DP'
+						mini: 'DP',
 						// component: './Finance/Deposit',
 					},
 					{
 						path: '/finance/deposit/:depositNo',
 						name: 'invoice/detail',
-						hideInMenu: true
+						hideInMenu: true,
 						// component: './Finance/Deposit/Detail/index.js',
 					},
 					{
 						path: '/finance/statement',
 						name: 'statement',
 						mini: 'ST',
-						component: './Finance/Statement'
+						component: './Finance/Statement',
 					},
 					{
 						path: '/finance/statement/details/:statementNo',
 						name: 'statement/details',
 						hideInMenu: true,
-						component: './Finance/Statement/Details/StatementDetails'
+						component: './Finance/Statement/Details/StatementDetails',
 					},
 					{
 						path: '/finance/expense',
 						name: 'doctor-expense',
 						mini: 'DE',
 						exact: true,
-						component: './Finance/DoctorExpense'
+						component: './Finance/DoctorExpense',
 					},
 					{
 						path: '/finance/scheme',
 						name: 'scheme',
 						mini: 'SC',
-						component: './Finance/Scheme'
+						component: './Finance/Scheme',
 					},
 					{
 						path: '/finance/scheme/details',
 						name: 'scheme/detail',
 						hideInMenu: true,
-						component: './Finance/Scheme/Details'
-					}
-				]
+						component: './Finance/Scheme/Details',
+					},
+				],
 			},
 			// Forms
 			{
 				path: '/forms',
 				icon: 'assignment',
 				name: 'forms',
-				hideInMenu: true
+				hideInMenu: true,
 				// component: './Forms',
 			},
 			// Forms
@@ -298,7 +298,7 @@ const routes = [
 			{
 				path: '/labsresult',
 				icon: 'poll',
-				name: 'labsresult'
+				name: 'labsresult',
 				// component: '',
 			},
 			// Lab Report
@@ -308,7 +308,7 @@ const routes = [
 				path: '/report',
 				icon: 'library_books',
 				name: 'report',
-				component: './Report'
+				component: './Report',
 			},
 			// Report
 			//
@@ -317,7 +317,7 @@ const routes = [
 				path: '/human-resource',
 				icon: 'perm_identity',
 				name: 'humanResource',
-				hideInMenu: true
+				hideInMenu: true,
 				// component: '',
 			},
 			// Human Resource
@@ -332,31 +332,31 @@ const routes = [
 					{
 						path: '/claim-submission',
 						name: 'chas',
-						component: './ClaimSubmission'
+						component: './ClaimSubmission',
 					},
 					{
 						path: '/claim-submission/chas',
 						name: 'chas',
-						component: './ClaimSubmission/chas'
+						component: './ClaimSubmission/chas',
 					},
 					{
 						path: '/claim-submission/chas/invoice/:invoiceNo',
 						name: 'patientInvoice',
 						hideInMenu: true,
-						component: './Finance/Invoice/Details'
+						component: './Finance/Invoice/Details',
 					},
 					{
 						path: '/claim-submission/medisave',
 						name: 'medisave',
-						component: './ClaimSubmission/medisave'
+						component: './ClaimSubmission/medisave',
 					},
 					{
 						path: '/claim-submission/medisave/invoice/:invoiceNo',
 						name: 'patientInvoice',
 						hideInMenu: true,
-						component: './Finance/Invoice/Details'
-					}
-				]
+						component: './Finance/Invoice/Details',
+					},
+				],
 			},
 			// Claim Submission
 			//
@@ -370,105 +370,110 @@ const routes = [
 					{
 						path: '/setting',
 						name: 'setting',
-						component: './Setting'
+						component: './Setting',
 						// hideInMenu: true,
 					},
 					{
 						path: '/setting/clinicinfo',
 						name: 'clinicinfo',
-						component: './Setting/ClinicInfo'
+						component: './Setting/ClinicInfo',
 					},
 					{
 						path: '/setting/service',
 						name: 'service',
-						component: './Setting/Service'
+						component: './Setting/Service',
 					},
 					{
 						path: '/setting/room',
 						name: 'room',
-						component: './Setting/Room'
+						component: './Setting/Room',
 					},
 					{
 						path: '/setting/clinicbreakhour',
 						name: 'clinicbreakhour',
-						component: './Setting/ClinicBreakHour'
+						component: './Setting/ClinicBreakHour',
 					},
 					{
 						path: '/setting/publicholiday',
 						name: 'publicholiday',
-						component: './Setting/PublicHoliday'
+						component: './Setting/PublicHoliday',
 					},
 					{
 						path: '/setting/participantrole',
 						name: 'participantrole',
-						component: './Setting/ParticipantRole'
+						component: './Setting/ParticipantRole',
 					},
 					{
 						path: '/setting/roomblock',
 						name: 'roomblock',
-						component: './Setting/RoomBlock'
+						component: './Setting/RoomBlock',
 					},
 					{
 						path: '/setting/doctorblock',
 						name: 'doctorblock',
-						component: './Setting/DoctorBlock'
+						component: './Setting/DoctorBlock',
 					},
 					{
 						path: '/setting/userprofile',
 						name: 'userprofile',
-						component: './Setting/UserProfile'
+						component: './Setting/UserProfile',
 					},
 					{
 						path: '/setting/userprofile/new',
 						name: 'newuserprofile',
-						component: './Setting/UserProfile/Details'
+						component: './Setting/UserProfile/Details',
 					},
 					{
 						path: '/setting/userprofile/:id',
 						name: 'edituserprofile',
-						component: './Setting/UserProfile/Details'
+						component: './Setting/UserProfile/Details',
 					},
 					{
 						path: '/setting/userrole',
 						name: 'userrole',
-						component: './Setting/UserRole'
+						component: './Setting/UserRole',
+					},
+					{
+						path: '/setting/revenuecategory',
+						name: 'revenuecategory',
+						component: './Setting/RevenueCategory',
 					},
 					{
 						path: '/setting/servicecenter',
 						name: 'servicecenter',
-						component: './Setting/serviceCenter'
+						component: './Setting/serviceCenter',
 					},
 					{
 						path: '/setting/servicecentercategory',
 						name: 'servicecentercategory',
-						component: './Setting/serviceCenterCategory'
+						component: './Setting/serviceCenterCategory',
 					},
 					{
 						path: '/setting/servicecategory',
 						name: 'servicecategory',
-						component: './Setting/serviceCategory'
+						component: './Setting/serviceCategory',
 					},
 					{
 						path: '/setting/medicationfrequency',
 						name: 'medicationfrequency',
-						component: './Setting/medicationFrequency'
+						component: './Setting/medicationFrequency',
 					},
 					{
 						path: '/setting/medicationprecautions',
 						name: 'medicationprecautions',
-						component: './Setting/medicationPrecautions'
+						component: './Setting/medicationPrecautions',
 					},
 					{
 						path: '/setting/medicationconsumptionmethod',
 						name: 'medicationconsumptionmethod',
-						component: './Setting/medicationConsumptionMethod'
+						component: './Setting/medicationConsumptionMethod',
 					},
 					{
 						path: '/setting/smstemplate',
 						name: 'smstemplate',
-						component: './Setting/smsTemplate'
+						component: './Setting/smsTemplate',
 					},
-				]
+				],
 			},
 			// Settings
 			{
@@ -480,7 +485,7 @@ const routes = [
 						path: '/development/control',
 						name: 'Control',
 						mini: 'C',
-						component: './Development/Control'
+						component: './Development/Control',
 					},
 					// {
 					//   path: '/development/imageeditor',
@@ -492,26 +497,26 @@ const routes = [
 						path: '/development/imageeditor2',
 						name: 'LCImageEditor',
 						mini: 'CA',
-						component: './Development/LCImageEditor'
+						component: './Development/LCImageEditor',
 					},
 					{
 						path: '/development/scribble',
 						name: 'Scribble',
 						mini: 'CA',
-						component: './Development/Scribble'
+						component: './Development/Scribble',
 					},
 					{
 						path: '/development/reportviewer',
 						name: 'Report Sample',
 						mini: 'RS',
-						component: './Development/Report'
-					}
-				]
+						component: './Development/Report',
+					},
+				],
 			},
 			{
-				component: '404'
-			}
-		]
-	}
+				component: '404',
+			},
+		],
+	},
 ]
 export default routes

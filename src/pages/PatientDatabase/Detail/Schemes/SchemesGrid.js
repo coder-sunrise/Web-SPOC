@@ -57,7 +57,7 @@ class SchemesGrid extends PureComponent {
           type: 'codeSelect',
           code: 'ctSchemeType',
           onChange: ({ val, option, row, onValueChange }) => {
-            // console.log(row)
+            console.log('schemeTypeFK')
             let rows = this.props.rows
             if (!row.id) {
               rows = rows.concat([
@@ -114,7 +114,7 @@ class SchemesGrid extends PureComponent {
               })
               return
             }
-            if (st.code === 'Corporate') {
+            if (st.code !== 'Corporate' && row.coPaymentSchemeFK) {
               row.coPaymentSchemeFK = undefined
               this.props.dispatch({
                 // force current edit row components to update
@@ -146,6 +146,8 @@ class SchemesGrid extends PureComponent {
           },
           onChange: ({ val, option, row, onValueChange }) => {
             // console.log(row)
+            console.log('coPaymentSchemeFK')
+
             let rows = this.props.rows
             if (!row.id) {
               rows = rows.concat([
