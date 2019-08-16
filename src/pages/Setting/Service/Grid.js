@@ -21,39 +21,6 @@ class Grid extends PureComponent {
 		})
 	}
 
-	// configs = {
-	//   columns: [
-	//     { name: 'type', title: 'Code' },
-	//     { name: 'displayValue', title: 'Display Value' },
-	//     { name: 'description', title: 'Description' },
-	//     { name: 'serviceCenter', title: 'Service Center' },
-	//     { name: 'sellingPrice', title: 'Unit Selling Price' },
-	//     { name: 'status', title: 'Status' },
-	//     { name: 'action', title: 'Action' },
-	//   ],
-	//   columnExtensions: [
-	//     { columnName: 'sellingPrice', type: 'number', currency: true },
-	//     {
-	//       columnName: 'action',
-	//       align: 'center',
-	//       render: (row) => {
-	//         return (
-	//           <Button
-	//             size='sm'
-	//             onClick={() => {
-	//               this.editRow(row)
-	//             }}
-	//             justIcon
-	//             color='primary'
-	//           >
-	//             <Edit />
-	//           </Button>
-	//         )
-	//       },
-	//     },
-	//   ],
-	// }
-
 	render() {
 		const { dispatch, classes, settingClinicService, toggleModal } = this.props
 		return (
@@ -97,7 +64,6 @@ class Grid extends PureComponent {
 						}
 					}
 				]}
-				//{...this.configs}
 			/>
 		)
 	}

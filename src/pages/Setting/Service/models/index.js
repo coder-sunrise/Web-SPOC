@@ -30,7 +30,6 @@ export default createListViewModel({
 						return {
 							...o,
 							effectiveDates: [ o.effectiveStartDate, o.effectiveEndDate ],
-							//ctServiceCenter_ServiceNavigation: o.ctServiceCenter_ServiceNavigation
 						}
 					})
 				}
