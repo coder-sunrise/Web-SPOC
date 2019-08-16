@@ -267,7 +267,7 @@ class AntdSelect extends React.PureComponent {
   }
 
   getSelectOptions = (source, renderDropdown) => {
-    const { valueField, labelField } = this.props
+    const { valueField, labelField, optionLabelLength = 0 } = this.props
     return source
       .map((s) => ({
         ...s,
@@ -279,7 +279,13 @@ class AntdSelect extends React.PureComponent {
           data={option}
           key={option.value}
           title={option.label}
-          label={option.label}
+          label={
+            optionLabelLength ? (
+              option.label.substring(0, optionLabelLength)
+            ) : (
+              option.label
+            )
+          }
           value={option.value}
           disabled={!!option.disabled}
         >
@@ -309,6 +315,7 @@ class AntdSelect extends React.PureComponent {
       dropdownMatchSelectWidth = false,
       autoComplete,
       query,
+      optionLabelLength,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -339,7 +346,14 @@ class AntdSelect extends React.PureComponent {
       const match = source.find((o) => o[this.props.valueField] === value)
       let text = ''
       if (match) text = match[this.props.labelField]
-      return <AutosizeInput inputClassName={props.className} value={text} />
+      return (
+        <AutosizeInput
+          inputClassName={props.className}
+          value={
+            optionLabelLength ? text.substring(0, optionLabelLength) : text
+          }
+        />
+      )
     }
 
     return (
