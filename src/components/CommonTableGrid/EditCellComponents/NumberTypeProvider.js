@@ -70,7 +70,9 @@ class NumberEditor extends PureComponent {
       gridId,
       ...restProps
     } = cfg
-
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][row.id] || {}
+      : row
     const _onChange = (event) => {
       const v = numeral(event.target.value)._value
       const error = updateCellValue(this.props, this.myRef.current, v)
@@ -81,9 +83,7 @@ class NumberEditor extends PureComponent {
         if (onChange)
           onChange({
             value: v,
-            row: window.$tempGridRow[gridId]
-              ? window.$tempGridRow[gridId][row.id] || {}
-              : row,
+            row: latestRow,
             error,
           })
       }
@@ -94,11 +94,7 @@ class NumberEditor extends PureComponent {
       showErrorIcon: true,
       error: this.state.error,
       defaultValue: value,
-      disabled: isDisabled(
-        window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][row.id] || {}
-          : row,
-      ),
+      disabled: isDisabled(latestRow),
       currency: true,
       ...restProps,
       onChange: _onChange,

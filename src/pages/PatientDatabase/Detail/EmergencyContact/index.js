@@ -130,7 +130,7 @@ class EmergencyContact extends PureComponent {
 
   onAddExistPatient = async (row) => {
     const { props } = this
-    const { values, setFieldValue } = props
+    const { values, setFieldValue, dispatch } = props
     if (!row || !row.id) return
     const r = await query(row.id)
     const o = r.data
@@ -175,6 +175,12 @@ class EmergencyContact extends PureComponent {
           newId,
         ]),
       }
+    })
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: true,
+      },
     })
     this.toggleModal()
   }

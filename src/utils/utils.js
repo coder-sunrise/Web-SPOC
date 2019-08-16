@@ -484,6 +484,7 @@ export const updateCellValue = (
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
   const { validationSchema, gridId, ...restConfig } = cfg
+  // console.log(columnName, val)
   if (!window.$tempGridRow[gridId]) {
     window.$tempGridRow[gridId] = {}
   }
@@ -492,7 +493,7 @@ export const updateCellValue = (
   }
 
   window.$tempGridRow[gridId][row.id][columnName] = val
-  // console.log(val)
+  // console.log(val, columnName)
 
   if (validationSchema) {
     try {
@@ -524,7 +525,7 @@ export const updateCellValue = (
       //     return
       //   }
       // }
-      $(element).parents('tr').find('.grid-commit').attr('disabled', true)
+      // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
       // console.log(er)
       const actualError = er.inner.find((o) => o.path === columnName)
       return actualError ? actualError.message : ''

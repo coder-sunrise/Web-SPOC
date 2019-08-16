@@ -91,11 +91,23 @@ class AntdSelect extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { form, field, mode } = props
+    const {
+      form,
+      field,
+      mode,
+      options = [],
+      autoComplete,
+      valueField,
+      max = 50,
+    } = props
+    const v = form && field ? field.value : props.value || props.defaultValue
     this.state = {
       shrink: false,
-      value: form && field ? field.value : props.value || props.defaultValue,
-      data: props.options || [],
+      value: v,
+      data:
+        autoComplete && options && options.length > max
+          ? _.filter(options, (o) => o[valueField] === v)
+          : options,
       fetching: false,
       fetchId: 0,
     }
@@ -351,7 +363,7 @@ class AntdSelect extends React.PureComponent {
               <Spin size='small' />
             ) : (
               <p>
-                {this.state.fetchId > 0 && (autoComplete || query) ? (
+                {this.state.fetchId === 0 && (autoComplete || query) ? (
                   'Input Search Text'
                 ) : (
                   'Not Found'

@@ -112,10 +112,19 @@ class EditableTableGrid extends PureComponent {
         onRowDoubleClick()
       } else {
         this.setState((prevState) => {
+          const ids = prevState.editingRowIds.concat([
+            row.id,
+          ])
+          if (prevState.editingRowIds.length === 0) {
+            window.g_app._store.dispatch({
+              type: 'global/updateState',
+              payload: {
+                disableSave: true,
+              },
+            })
+          }
           return {
-            editingRowIds: prevState.editingRowIds.concat([
-              row.id,
-            ]),
+            editingRowIds: ids,
           }
         })
       }
@@ -132,20 +141,27 @@ class EditableTableGrid extends PureComponent {
     // console.log('commitChanges')
     // const { values, setFieldValue } = this.props
     let newRows = _.cloneDeep(rows)
-    // console.log(patientEmergencyContact)
     if (added) {
       // console.log(added, window.$tempGridRow, window.$tempGridRow[this.gridId])
       const tempNewData = window.$tempGridRow[this.gridId][undefined] || {}
+      // console.log(tempNewData)
+
       newRows = added
         .map((o) => {
-          return {
-            id: getUniqueNumericId(),
+          const id = getUniqueNumericId()
+          window.$tempGridRow[this.gridId][id] = {
+            id,
             isNew: true,
             ...tempNewData,
             ...o,
           }
+          return window.$tempGridRow[this.gridId][id]
         })
         .concat(newRows)
+      // this.setState({
+      //   addedRows: [],
+      // })
+      delete window.$tempGridRow[this.gridId][undefined]
     }
 
     if (changed) {
@@ -177,7 +193,7 @@ class EditableTableGrid extends PureComponent {
         o.isDeleted = true
       })
     }
-
+    console.log(newRows, added, changed, deleted, window.$tempGridRow)
     // if (schema) {
     //   for (let index = 0; index < newRows.length; index++) {
     //     const row = newRows[index]
