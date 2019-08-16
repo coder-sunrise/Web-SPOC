@@ -173,9 +173,9 @@ class CommonTableGrid extends React.Component {
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       return height ? (
         <VirtualTable
-          tableComponent={TableComponent}
-          height={height}
           {...restProps}
+          height={height}
+          tableComponent={TableComponent}
         />
       ) : (
         <Table tableComponent={TableComponent} {...restProps} />
