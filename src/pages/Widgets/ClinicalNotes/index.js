@@ -49,7 +49,7 @@ class ClinicalNotes extends PureComponent {
     console.log(this.props.values)
     return (
       <div>
-        <h6>Clinical Notes</h6>
+        {/* <h6>Clinical Notes</h6> */}
         <FastField
           name='clinicalNotes'
           render={(args) => {
