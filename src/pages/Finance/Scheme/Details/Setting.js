@@ -17,15 +17,11 @@ import {
   CardText,
   CardBody,
   SizeContainer,
+  CardContainer,
+  FieldSet,
 } from '@/components'
 
-const styles = () => ({
-  buttonGroupDiv: {
-    margin: 'auto',
-  },
-})
-
-const Setting = ({ schemeDetail, dispatch, classes }) => {
+const Setting = ({ schemeDetail, dispatch, height, classes }) => {
   const options = [
     {
       label: '$',
@@ -37,10 +33,16 @@ const Setting = ({ schemeDetail, dispatch, classes }) => {
     },
   ]
   return (
-    <SizeContainer size='sm'>
-      <React.Fragment>
+    <CardContainer
+      hideHeader
+      style={{
+        height,
+        overflow: 'auto',
+      }}
+    >
+      <SizeContainer size='sm'>
         <GridContainer>
-          <GridItem xs={4} md={4}>
+          <GridItem xs={12} md={6}>
             <FastField
               name='minimumPatientPayableAmount'
               render={(args) => (
@@ -48,44 +50,41 @@ const Setting = ({ schemeDetail, dispatch, classes }) => {
                   label={formatMessage({
                     id: 'inventory.master.pricing.maxDiscount',
                   })}
+                  suffix={
+                    <ButtonGroup
+                      options={[
+                        {
+                          label: '$',
+                          value: '$',
+                        },
+                        {
+                          label: '%',
+                          value: '%',
+                        },
+                      ]}
+                    />
+                  }
                   {...args}
                 />
               )}
             />
           </GridItem>
-          <GridItem xs={8} md={8} className={classes.buttonGroupDiv}>
-            <ButtonGroup options={options} />
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={12} md={6}>
+            <FieldSet size='sm' title='Coverage Cap'>
+              <CoverageCap />
+            </FieldSet>
           </GridItem>
-          <GridItem xs={6} md={6}>
-            <Card>
-              <CardHeader color='primary' text>
-                <CardText color='primary'>
-                  <h5 className={classes.cardTitle}>Coverage Cap</h5>
-                </CardText>
-              </CardHeader>
-              <CardBody>
-                <CoverageCap />
-              </CardBody>
-            </Card>
-          </GridItem>
-          <GridItem xs={6} md={6}>
-            <Card>
-              <CardHeader color='primary' text>
-                <CardText color='primary'>
-                  <h5 className={classes.cardTitle}>Co-Payment</h5>
-                </CardText>
-              </CardHeader>
-              <CardBody>
-                <CoPayment />
-              </CardBody>
-            </Card>
+          <GridItem xs={12} md={6}>
+            <FieldSet size='sm' title='Co-Payment'>
+              <CoPayment />
+            </FieldSet>
           </GridItem>
         </GridContainer>
-      </React.Fragment>
-    </SizeContainer>
+      </SizeContainer>
+    </CardContainer>
   )
 }
 
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  Setting,
-)
+export default Setting

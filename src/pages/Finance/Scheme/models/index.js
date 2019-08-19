@@ -10,20 +10,7 @@ export default createListViewModel({
   param: {
     service,
     state: {},
-    subscriptions: ({ dispatch, history }) => {
-      history.listen((loct, method) => {
-        const { pathname, search, query = {} } = loct
-        // console.log(pathname)
-        if (pathname.indexOf('/finance/scheme/') === 0) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentTab: Number(query.t) || 0,
-            },
-          })
-        }
-      })
-    },
+    subscriptions: ({ dispatch, history }) => {},
     effects: {
       // *fetchList ({ payload }, { call, put }) {
       //   const response = yield call(queryFakeList)
