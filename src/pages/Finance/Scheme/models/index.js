@@ -3,9 +3,9 @@ import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'scheme',
+  namespace: 'copaymentScheme',
   config: {
-    queryOnLoad: false,
+    // queryOnLoad: false,
   },
   param: {
     service,
@@ -25,18 +25,18 @@ export default createListViewModel({
       })
     },
     effects: {
-      *fetchList ({ payload }, { call, put }) {
-        const response = yield call(queryFakeList)
-        yield put({
-          type: 'updateState',
-          payload: {
-            list: Array.isArray(response) ? response : [],
-          },
-        })
-      },
-      *submit ({ payload }, { call }) {
-        return yield call(fakeSubmitForm, payload)
-      },
+      // *fetchList ({ payload }, { call, put }) {
+      //   const response = yield call(queryFakeList)
+      //   yield put({
+      //     type: 'updateState',
+      //     payload: {
+      //       list: Array.isArray(response) ? response : [],
+      //     },
+      //   })
+      // },
+      // *submit ({ payload }, { call }) {
+      //   return yield call(fakeSubmitForm, payload)
+      // },
     },
     reducers: {
       updateCollectPaymentList (state, { payload }) {

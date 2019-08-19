@@ -28,13 +28,13 @@ import Authorized from '@/utils/Authorized'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import schema from './schema'
 
-moment.updateLocale('en', {
-  relativeTime: {
-    past: '%s',
-    yy: '%d yr',
-  },
+// moment.updateLocale('en', {
+//   relativeTime: {
+//     past: '%s',
+//     yy: '%d',
+//   },
 
-})
+// })
 
 const styles = () => ({
   menuItem:{
@@ -288,8 +288,9 @@ class PatientDetail extends PureComponent {
                       format={dateFormatLong}
                       value={entity.dob}
                     />{' '}
-                    ({moment(entity.dob).fromNow()}, {<CodeSelect
+                    ({Math.floor(moment.duration(moment().diff(entity.dob)).asYears())}/{<CodeSelect
                       code='ctGender'
+                      optionLabelLength={1}
                       text
                       value={entity.genderFK}
                     />})
@@ -394,7 +395,7 @@ class PatientDetail extends PureComponent {
                                 left: 6,
                           }}
                           />:null}
-                                               </span>}
+                        </span>}
                         />
                         
                         

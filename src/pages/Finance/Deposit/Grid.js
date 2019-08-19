@@ -130,7 +130,7 @@ class Grid extends PureComponent {
 
     return (
       <React.Fragment>
-        <CommonTableGrid rows={list} {...this.tableParas} />
+        <CommonTableGrid type='deposit' {...this.tableParas} />
         <CommonModal
           open={showDepositRefundModal}
           title={isDeposit ? 'Deposit' : 'Refund'}

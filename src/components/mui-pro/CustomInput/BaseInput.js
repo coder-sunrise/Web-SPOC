@@ -44,9 +44,11 @@ const _config = {
 const inputIdPrefix = 'medsysinput'
 let inputIdCounter = 0
 class BaseInput extends React.PureComponent {
-  // constructor (props) {
-  //   super(props)
-  // }
+  constructor (props) {
+    super(props)
+    this.uid = inputIdPrefix + inputIdCounter
+    inputIdCounter += 1
+  }
 
   _onKeyUp = (e) => {
     // console.log(e.target.tagName==='TEXTAREA')
@@ -200,7 +202,6 @@ class BaseInput extends React.PureComponent {
       onKeyUp,
       text,
     } = props
-    inputIdCounter += 1
 
     // console.log(this.state, this.state.value)
     // if (this.state && this.state.value !== undefined) {
