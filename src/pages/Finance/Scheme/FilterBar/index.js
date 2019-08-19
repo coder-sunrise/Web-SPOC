@@ -101,7 +101,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.cptype',
                   })}
-                  code='ctGender'
+                  code='ctCopayerType'
                   {...args}
                 />
               )
@@ -131,7 +131,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
               color='primary'
               onClick={() => {
                 dispatch({
-                  type: 'scheme/query',
+                  type: 'copaymentScheme/query',
                 })
               }}
             >

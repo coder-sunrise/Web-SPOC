@@ -1,6 +1,8 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
-import { EditorState, convertToRaw } from 'draft-js'
+import _ from 'lodash'
+import { EditorState, ContentState, convertToRaw, Modifier } from 'draft-js'
+import draftToHtml from 'draftjs-to-html'
 import { Editor } from 'react-draft-wysiwyg'
 import withStyles from '@material-ui/core/styles/withStyles'
 import classnames from 'classnames'
@@ -30,9 +32,9 @@ class RichEditor extends React.PureComponent {
     const { form, field } = props
     const v = form && field ? field.value : props.value || props.defaultValue
     this.state = {
-      shrink: false,
-      value: v,
-      editorState: EditorState.createEmpty(),
+      value: v
+        ? EditorState.createWithContent(ContentState.createFromText(v))
+        : EditorState.createEmpty(),
     }
 
     this.editorCfg = {
@@ -57,85 +59,58 @@ class RichEditor extends React.PureComponent {
         link: { inDropdown: true },
       },
     }
+
+    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
   }
 
-  componentDidMount () {
-    if (this.state.value && this.props.query && this.state.data.length === 0) {
-      // for remote datasouce, get the selected value by default
-      // console.log(this.state.value)
-      this.fetchData(this.state.value)
-    }
-  }
+  componentDidMount () {}
 
   componentWillReceiveProps (nextProps) {
     const { field, value } = nextProps
     let v = this.state.value
     if (field) {
       v = field.value
-      this.setState({
-        value: field.value,
-      })
+      // this.setState({
+      //   value: field.value,
+      // })
+      Modifier.replaceText(
+        this.state.value.getCurrentContent(),
+        this.state.value.getSelection(),
+        v,
+      )
     } else if (value) {
       v = value
 
       this.setState({
-        value,
+        value: v,
       })
     }
   }
 
-  onEditorStateChange = (editorState) => {
+  onChange = (editorState) => {
+    // console.log(event)
     this.setState({
-      editorState,
+      value: editorState,
     })
+    this.debouncedOnChange(editorState)
   }
 
-  handleFocus = () => {
-    this.setState({ shrink: true })
-  }
+  _onChange = (editorState) => {
+    const { props } = this
+    const { onChange } = props
 
-  handleBlur = () => {
-    // console.log(this.state.value)
-    if (
-      this.state.value === undefined ||
-      this.state.value === null ||
-      this.state.value === '' ||
-      (this.state.value && this.state.value.length === 0)
-    ) {
-      this.setState({ shrink: false })
+    const v = {
+      target: {
+        value: draftToHtml(convertToRaw(editorState.getCurrentContent())),
+        // name: props.field.name,
+      },
     }
-  }
-
-  handleValueChange = (val) => {
-    const {
-      form,
-      field,
-      all,
-      mode,
-      onChange,
-      options,
-      autoComplete,
-      query,
-      valueField,
-    } = this.props
-    let newVal = val
-
-    let proceed = true
+    if (props.field && props.field.onChange) {
+      v.target.name = props.field.name
+      props.field.onChange(v)
+    }
     if (onChange) {
-      const option = (autoComplete || query ? this.state.data : options).find(
-        (o) => o[valueField] === newVal,
-      )
-      proceed = onChange(newVal, option) !== false
-    }
-    if (proceed) {
-      if (form && field) {
-        form.setFieldValue(field.name, newVal)
-        form.setFieldTouched(field.name, true)
-      }
-      this.setState({
-        shrink: newVal !== undefined,
-        value: newVal,
-      })
+      onChange(v)
     }
   }
 
@@ -149,12 +124,12 @@ class RichEditor extends React.PureComponent {
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-    // console.log(options)
+    // console.log(this.state.value)
 
     return (
       <div style={{ width: '100%', height: 'auto' }} {...props}>
         <Editor
-          editorState={this.state.editorState}
+          editorState={this.state.value}
           wrapperClassName={classnames({
             [classes.wrapper]: true,
             [this.wrapperClassName]: true,
@@ -163,7 +138,7 @@ class RichEditor extends React.PureComponent {
             [classes.editor]: true,
             [this.editorClassName]: true,
           })}
-          onEditorStateChange={this.onEditorStateChange}
+          onEditorStateChange={this.onChange}
           {...this.editorCfg}
           {...this.props}
         />
@@ -174,12 +149,10 @@ class RichEditor extends React.PureComponent {
   render () {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
-    const { value } = this.state
 
     const labelProps = {
       shrink: true,
     }
-
     return (
       <CustomInput
         labelProps={labelProps}

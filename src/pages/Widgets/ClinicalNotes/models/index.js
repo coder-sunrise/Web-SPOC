@@ -9,7 +9,9 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
-      default: {},
+      default: {
+        clinicalNotes: 'Test notes',
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

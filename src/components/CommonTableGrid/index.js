@@ -173,13 +173,15 @@ class CommonTableGrid extends React.Component {
     }
 
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
-      return (
+      return height ? (
         <VirtualTable
           {...restProps}
           // height={height}
           height='auto'
           tableComponent={TableComponent}
         />
+      ) : (
+        <Table {...restProps} tableComponent={TableComponent} />
       )
     }
 
@@ -764,7 +766,7 @@ class CommonTableGrid extends React.Component {
           })}
           style={{
             ...this.props.style,
-            height: height,
+            height,
           }}
         >
           {isLoading && (

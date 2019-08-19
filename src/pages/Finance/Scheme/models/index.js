@@ -3,9 +3,9 @@ import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'scheme',
+  namespace: 'copaymentScheme',
   config: {
-    queryOnLoad: false,
+    // queryOnLoad: false,
   },
   param: {
     service,

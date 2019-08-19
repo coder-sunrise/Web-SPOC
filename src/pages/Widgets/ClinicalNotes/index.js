@@ -46,6 +46,7 @@ class ClinicalNotes extends PureComponent {
   // }
 
   render () {
+    console.log(this.props.values)
     return (
       <div>
         <h6>Clinical Notes</h6>
