@@ -440,6 +440,36 @@ const routes = [
             name: 'revenuecategory',
             component: './Setting/RevenueCategory',
           },
+          {
+            path: '/setting/servicecenter',
+            name: 'servicecenter',
+            component: './Setting/serviceCenter',
+          },
+          {
+            path: '/setting/servicecentercategory',
+            name: 'servicecentercategory',
+            component: './Setting/serviceCenterCategory',
+          },
+          {
+            path: '/setting/servicecategory',
+            name: 'servicecategory',
+            component: './Setting/serviceCategory',
+          },
+          {
+            path: '/setting/medicationfrequency',
+            name: 'medicationfrequency',
+            component: './Setting/medicationFrequency',
+          },
+          {
+            path: '/setting/medicationprecautions',
+            name: 'medicationprecautions',
+            component: './Setting/medicationPrecautions',
+          },
+          {
+            path: '/setting/medicationconsumptionmethod',
+            name: 'medicationconsumptionmethod',
+            component: './Setting/medicationConsumptionMethod',
+          },
         ],
       },
       // Settings

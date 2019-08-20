@@ -8,12 +8,12 @@ import Edit from '@material-ui/icons/Edit'
 import * as service from './services'
 
 class Grid extends PureComponent {
-	editRow = (row) => {
-		const { dispatch, settingClinicService } = this.props
+	editRow = (row, e) => {
+		const { dispatch, settingServiceCenter } = this.props
 
-		const { list } = settingClinicService
+		const { list } = settingServiceCenter
 		dispatch({
-			type: 'settingClinicService/updateState',
+			type: 'settingServiceCenter/updateState',
 			payload: {
 				showModal: true,
 				entity: list.find((o) => o.id === row.id)
@@ -25,27 +25,29 @@ class Grid extends PureComponent {
 		return (
 			<CommonTableGrid
 				style={{ margin: 0 }}
-				type='settingClinicService'
+				type='settingServiceCenter'
 				onRowDoubleClick={this.editRow}
 				columns={[
 					{ name: 'code', title: 'Code' },
 					{ name: 'displayValue', title: 'Display Value' },
 					{ name: 'description', title: 'Description' },
-					{ name: 'serviceCenter', title: 'Service Center' },
-					{ name: 'sellingPrice', title: 'Unit Selling Price' },
+					{ name: 'serviceCenterCategoryFK', title: 'Service Center Category' },
 					{ name: 'isActive', title: 'Status' },
-					{ name: 'action', title: 'Action' }
+					{
+						name: 'action',
+						title: 'Action'
+					}
 				]}
 				columnExtensions={[
-					{ columnName: 'sellingPrice', type: 'number', currency: true },
 					{
 						columnName: 'isActive',
 						sortingEnabled: false,
 						type: 'select',
 						options: status
-					},
+          },
 					{
-						columnName: 'action',
+            columnName: 'action',
+            sortingEnabled: false,
 						align: 'center',
 						render: (row) => {
 							return (
@@ -61,6 +63,13 @@ class Grid extends PureComponent {
 								</Button>
 							)
 						}
+					},
+					{
+            columnName: 'serviceCenterCategoryFK',
+            sortingEnabled: false,
+						render: (row) => {
+							return <React.Fragment>{row.serviceCenterCategoryFKNavigation.displayValue}</React.Fragment>
+						},
 					}
 				]}
 			/>

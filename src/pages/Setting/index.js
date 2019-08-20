@@ -132,6 +132,21 @@ const menuData = [
     url: '/setting/roomblock',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Drug Frequency',
+    url: '/setting/medicationfrequency',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Precautions',
+    url: '/setting/medicationprecautions',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Consumption Method',
+    url: '/setting/medicationconsumptionmethod',
+  },
+  {
     title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',
@@ -151,7 +166,8 @@ const menuData = [
   },
   {
     title: 'Templates',
-    text: 'TBD',
+    text: 'SMS Template',
+    url: '/setting/smstemplate',
   },
   {
     title: 'Contact',
