@@ -297,7 +297,7 @@ class DetailsGrid extends PureComponent {
       'OVERPAID',
     ]
     const shouldDisableDelete = row.visitStatus !== 'WAITING'
-    const shouldDisableDispense = !enabledDispense.includes(row.visitStatus)
+    const shouldDisableDispense = false // !enabledDispense.includes(row.visitStatus)
     const newContextMenuOptions = ContextMenuOptions.map((opt) => {
       if (opt.id === 1) return { ...opt, disabled: shouldDisableDispense }
       if (opt.id === 2) return { ...opt, disabled: shouldDisableDelete }
@@ -347,7 +347,7 @@ class DetailsGrid extends PureComponent {
         text='Getting queue listing...'
       >
         <CommonTableGrid
-          height={600}
+          height={700}
           rows={data}
           // ActionProps={ActionProps}
           {...TableConfig}
