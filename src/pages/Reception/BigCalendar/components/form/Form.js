@@ -210,7 +210,7 @@ class Form extends React.PureComponent {
       {
         appointmentStatusFK,
         appointmentRemarks,
-        appintmentDate: parseDateToServerDateFormatString(appointmentDate),
+        appointmentDate: parseDateToServerDateFormatString(appointmentDate),
         appointments_Resources: [
           ...appointmentResources,
         ],
@@ -226,12 +226,12 @@ class Form extends React.PureComponent {
 
     console.log({ updated })
     setSubmitting(false)
-    dispatch({
-      type: 'calendar/upsert',
-      payload: updated,
-    })
-    resetForm()
-    onClose && onClose()
+    // dispatch({
+    //   type: 'calendar/upsert',
+    //   payload: updated,
+    // })
+    // resetForm()
+    // onClose && onClose()
   }
 
   onDeleteClick = () => {}

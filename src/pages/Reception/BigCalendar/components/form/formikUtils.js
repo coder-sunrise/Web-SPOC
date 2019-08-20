@@ -91,7 +91,7 @@ export const mapPropsToValues = ({
       appointmentStatusFk,
       appointmentRemarks,
     } = appointment
-    const appointmentDate = moment(appointment.appintmentDate).toDate()
+    const appointmentDate = moment(appointment.appointmentDate).toDate()
 
     return {
       id,

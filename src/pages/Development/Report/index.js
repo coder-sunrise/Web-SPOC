@@ -13,7 +13,7 @@ class Report extends React.Component {
   }
 
   componentDidMount () {
-    const today = moment(value)
+    const today = moment()
     const utc = today.utc().set({ hour: 0, minute: 0, second: 0 })
     const time = '00:00:00'
     const date = today.format('DD-MM-YYYY')

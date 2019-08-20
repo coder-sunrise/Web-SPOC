@@ -94,8 +94,8 @@ class Appointment extends React.PureComponent {
       type: 'calendar/query',
       payload: {
         combineCondition: 'or',
-        lgt_appintmentDate: startOfMonth,
-        lst_appintmentDate: endOfMonth,
+        lgt_appointmentDate: startOfMonth,
+        lst_appointmentDate: endOfMonth,
       },
     })
   }
@@ -297,13 +297,13 @@ class Appointment extends React.PureComponent {
 
     const flattenedList = list.reduce((events, appointment) => {
       const {
-        appintmentDate,
+        appointmentDate,
         patientName,
         patientContactNo,
         // eslint-disable-next-line camelcase
         appointment_Resources,
       } = appointment
-      const appointmentDate = moment(appintmentDate).format(serverDateFormat)
+      // const appointmentDate = moment(appointmentDate).format(serverDateFormat)
       const apptEvents = appointment_Resources.map((item) => ({
         ...item,
         patientName,
