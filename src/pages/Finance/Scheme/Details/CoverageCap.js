@@ -6,6 +6,7 @@ import {
   RadioGroup,
   GridContainer,
   GridItem,
+  TextField,
   NumberInput,
 } from '@/components'
 
@@ -13,7 +14,7 @@ const CoverageCap = ({ values, classes }) => {
   return (
     <GridContainer>
       <GridItem xs={1}>
-        <FastField
+        <Field
           name='itemGroupMaxCapacityDtoRdoValue'
           render={(args) => (
             <RadioGroup
@@ -35,7 +36,7 @@ const CoverageCap = ({ values, classes }) => {
         />
       </GridItem>
       <GridItem xs={11}>
-        <FastField
+        <Field
           name='coverageMaxCap'
           render={(args) => (
             <NumberInput
@@ -47,7 +48,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='consumableMaxCapacity'
           render={(args) => (
             <NumberInput
@@ -59,7 +60,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='medicationMaxCapacity'
           render={(args) => (
             <NumberInput
@@ -70,7 +71,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='vaccinationMaxCapacity'
           render={(args) => (
             <NumberInput
@@ -82,7 +83,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='serviceMaxCapacity'
           render={(args) => (
             <NumberInput
@@ -94,7 +95,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='packageMaxCapacity'
           render={(args) => (
             <NumberInput

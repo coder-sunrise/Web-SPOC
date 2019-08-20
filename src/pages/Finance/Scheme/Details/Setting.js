@@ -68,18 +68,6 @@ const Setting = (props) => {
                 />
               )}
             />
-            <FastField
-              name='coverageMaxCap'
-              render={(args) => (
-                <NumberInput
-                  disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'all'}
-                  label={formatMessage({
-                    id: 'finance.scheme.setting.maximumCapAll',
-                  })}
-                  {...args}
-                />
-              )}
-            />
           </GridItem>
           <GridItem xs={4} md={1}>
             <FastField name='patientMinCoPaymentAmountType' render={CPSwitch} />
