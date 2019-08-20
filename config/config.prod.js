@@ -70,7 +70,7 @@ export default {
   },
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
-    'process.env.url': 'https://semr2dev2010.emr.com.sg',
+    'process.env.url': 'https://semr2prod.emr.com.sg',
   },
   // 路由配置
   routes: pageRoutes,

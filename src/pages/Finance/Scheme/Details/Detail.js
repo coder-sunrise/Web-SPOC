@@ -20,16 +20,16 @@ import {
 const styles = () => ({})
 
 const Detail = ({ schemeDetail, dispatch, height }) => {
-  useEffect(() => {
-    if (schemeDetail.currentId) {
-      dispatch({
-        type: 'schemeDetail/query',
-        payload: {
-          id: schemeDetail.currentId,
-        },
-      })
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (schemeDetail.currentId) {
+  //     dispatch({
+  //       type: 'schemeDetail/query',
+  //       payload: {
+  //         id: schemeDetail.currentId,
+  //       },
+  //     })
+  //   }
+  // }, [])
 
   return (
     <CardContainer

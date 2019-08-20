@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react'
 import { formatMessage } from 'umi/locale'
-import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
-import { FastField } from 'formik'
-import { compose } from 'redux'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
 
 import {
+  Field,
+  FastField,
   GridContainer,
   GridItem,
   ButtonGroup,
@@ -19,9 +18,23 @@ import {
   SizeContainer,
   CardContainer,
   FieldSet,
+  Switch,
 } from '@/components'
 
-const Setting = ({ schemeDetail, dispatch, height, classes }) => {
+const CPSwitch = (args) => {
+  return (
+    <Switch
+      checkedChildren='$'
+      checkedValue='$'
+      unCheckedChildren='%'
+      unCheckedValue='%'
+      label=''
+      {...args}
+    />
+  )
+}
+const Setting = (props) => {
+  const { schemeDetail, dispatch, height, classes, values } = props
   const options = [
     {
       label: '$',
@@ -32,6 +45,7 @@ const Setting = ({ schemeDetail, dispatch, height, classes }) => {
       value: '%',
     },
   ]
+  console.log(values.patientMinCoPaymentAmountType === '$', values)
   return (
     <CardContainer
       hideHeader
@@ -42,38 +56,39 @@ const Setting = ({ schemeDetail, dispatch, height, classes }) => {
     >
       <SizeContainer size='sm'>
         <GridContainer>
-          <GridItem xs={12} md={6}>
+          <GridItem xs={8} md={5}>
             <FastField
-              name='minimumPatientPayableAmount'
+              name='patientMinCoPaymentAmount'
               render={(args) => (
                 <NumberInput
+                  label='Minimum Patient Payable Amount'
+                  currency={values.patientMinCoPaymentAmountType === '$'}
+                  percentage={values.patientMinCoPaymentAmountType === '%'}
+                  {...args}
+                />
+              )}
+            />
+            <FastField
+              name='coverageMaxCap'
+              render={(args) => (
+                <NumberInput
+                  disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'all'}
                   label={formatMessage({
-                    id: 'inventory.master.pricing.maxDiscount',
+                    id: 'finance.scheme.setting.maximumCapAll',
                   })}
-                  suffix={
-                    <ButtonGroup
-                      options={[
-                        {
-                          label: '$',
-                          value: '$',
-                        },
-                        {
-                          label: '%',
-                          value: '%',
-                        },
-                      ]}
-                    />
-                  }
                   {...args}
                 />
               )}
             />
           </GridItem>
+          <GridItem xs={4} md={1}>
+            <FastField name='patientMinCoPaymentAmountType' render={CPSwitch} />
+          </GridItem>
         </GridContainer>
         <GridContainer>
           <GridItem xs={12} md={6}>
             <FieldSet size='sm' title='Coverage Cap'>
-              <CoverageCap />
+              <CoverageCap {...props} />
             </FieldSet>
           </GridItem>
           <GridItem xs={12} md={6}>

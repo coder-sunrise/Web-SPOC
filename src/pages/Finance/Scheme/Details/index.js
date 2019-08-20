@@ -24,21 +24,24 @@ const styles = (theme) => ({
     // marginTop: '22px',
     // marginRight: '10px',
   },
+  rdoInput: {
+    marginBottom: 30,
+  },
 })
 
-const Detail = ({
-  classes,
-  dispatch,
-  schemeDetail,
-  history,
-  height,
-  handleSubmit,
-  ...restProps
-}) => {
-  const detailProps = {
-    schemeDetail,
+const Detail = (props) => {
+  const {
+    classes,
     dispatch,
+    schemeDetail,
+    history,
+    height,
+    handleSubmit,
+    ...restProps
+  } = props
+  const detailProps = {
     height: 'calc(100vh - 183px)',
+    ...props,
   }
   const { currentTab } = schemeDetail
   console.log(restProps)

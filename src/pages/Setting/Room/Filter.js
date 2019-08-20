@@ -24,19 +24,19 @@ class Filter extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          {/* <GridItem xs={6} md={3}>
             <FastField
               name='code'
               render={(args) => {
                 return <TextField label='Code' {...args} />
               }}
             />
-          </GridItem>
+          </GridItem> */}
           <GridItem xs={6} md={3}>
             <FastField
-              name='displayValue'
+              name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Display Value' {...args} />
+                return <TextField label='Code / Display Value' {...args} />
               }}
             />
           </GridItem>
@@ -54,9 +54,19 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
+                  const { codeDisplayValue, ...restProps } = this.props.values
                   this.props.dispatch({
                     type: 'settingRoom/query',
-                    payload: this.props.values,
+                    payload: {
+                      ...restProps,
+                      group: [
+                        {
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
+                          combineCondition: 'or',
+                        },
+                      ],
+                    },
                   })
                 }}
               >
