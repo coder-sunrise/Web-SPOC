@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { CardContainer } from '@/components'
@@ -7,13 +7,18 @@ import FilterBar from './FilterBar'
 import Grid from './Grid'
 
 const styles = () => ({})
-const Scheme = ({ classes, dispatch, history, scheme }) => {
+const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
   const props = {
     classes,
     dispatch,
     history,
-    scheme,
+    copaymentScheme,
   }
+  useEffect(() => {
+    dispatch({
+      type: 'copaymentScheme/query',
+    })
+  }, [])
   return (
     <CardContainer
       hideHeader
@@ -31,7 +36,7 @@ const Scheme = ({ classes, dispatch, history, scheme }) => {
 export default compose(
   withStyles(styles),
   React.memo,
-  connect(({ scheme }) => ({
-    scheme,
+  connect(({ copaymentScheme }) => ({
+    copaymentScheme,
   })),
 )(Scheme)

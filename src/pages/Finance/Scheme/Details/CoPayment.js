@@ -29,8 +29,14 @@ const options = [
 ]
 
 const CoPayment = ({ classes }) => {
-  const [ radioSelectedValue, setRadioSelectedValue ] = useState('all')
-  const [ allDisabled, setAllDisabled ] = useState(false)
+  const [
+    radioSelectedValue,
+    setRadioSelectedValue,
+  ] = useState('all')
+  const [
+    allDisabled,
+    setAllDisabled,
+  ] = useState(false)
 
   const handleChange = (event) => {
     setRadioSelectedValue(event.target.value)

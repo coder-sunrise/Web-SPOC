@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 export const TableConfig = {
-  FuncProps: { pager: false },
+  // FuncProps: { pager: false },
 }
 
 export const InvoiceGridColumns = [

@@ -5,6 +5,7 @@ import { Search, PermIdentity } from '@material-ui/icons'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import { getAppendUrl } from '@/utils/utils'
+import { status } from '@/utils/codes'
 
 import {
   GridContainer,
@@ -12,6 +13,7 @@ import {
   Button,
   TextField,
   Checkbox,
+  CodeSelect,
   Select,
   ProgressButton,
 } from '@/components'
@@ -46,31 +48,45 @@ class Filter extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='code'
               render={(args) => {
-                return <TextField label='Code/Display Value' {...args} />
+                return <TextField label='Code' {...args} />
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='displayValue'
+              render={(args) => {
+                return <TextField label='Display Value' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
             <FastField
               name='serviceCenter'
               render={(args) => {
-                return <Select label='Service Center' {...args} />
+                return (
+                  <CodeSelect
+                    code='ctServiceCenter'
+                    label='Service Center'
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={3}>
             <FastField
-              name='status'
+              name='isActive'
               render={(args) => {
-                return <Select label='Status' {...args} />
+                return <Select label='Status' options={status} {...args} />
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={4}>
+          <GridItem xs={12} md={12}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'

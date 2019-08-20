@@ -1,4 +1,5 @@
 import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({
@@ -9,6 +10,10 @@ export default createListViewModel({
     state: {
       default: {
         isUserMaintainable: true,
+        effectiveDates: [
+          moment(),
+          moment('2099-12-31'),
+        ],
       },
     },
     subscriptions: ({ dispatch, history }) => {

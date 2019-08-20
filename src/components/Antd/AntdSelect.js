@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
+import AutosizeInput from 'react-input-autosize'
 import _ from 'lodash'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -90,11 +91,23 @@ class AntdSelect extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { form, field, mode } = props
+    const {
+      form,
+      field,
+      mode,
+      options = [],
+      autoComplete,
+      valueField,
+      max = 50,
+    } = props
+    const v = form && field ? field.value : props.value || props.defaultValue
     this.state = {
       shrink: false,
-      value: form && field ? field.value : props.value || props.defaultValue,
-      data: props.options || [],
+      value: v,
+      data:
+        autoComplete && options && options.length > max
+          ? _.filter(options, (o) => o[valueField] === v)
+          : options,
       fetching: false,
       fetchId: 0,
     }
@@ -254,7 +267,7 @@ class AntdSelect extends React.PureComponent {
   }
 
   getSelectOptions = (source, renderDropdown) => {
-    const { valueField, labelField } = this.props
+    const { valueField, labelField, optionLabelLength = 0 } = this.props
     return source
       .map((s) => ({
         ...s,
@@ -266,7 +279,13 @@ class AntdSelect extends React.PureComponent {
           data={option}
           key={option.value}
           title={option.label}
-          label={option.label}
+          label={
+            optionLabelLength ? (
+              option.label.substring(0, optionLabelLength)
+            ) : (
+              option.label
+            )
+          }
           value={option.value}
           disabled={!!option.disabled}
         >
@@ -296,6 +315,7 @@ class AntdSelect extends React.PureComponent {
       dropdownMatchSelectWidth = false,
       autoComplete,
       query,
+      optionLabelLength,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -321,6 +341,21 @@ class AntdSelect extends React.PureComponent {
     } else {
       opts = this.getSelectOptions(source, renderDropdown)
     }
+
+    if (this.props.text) {
+      const match = source.find((o) => o[this.props.valueField] === value)
+      let text = ''
+      if (match) text = match[this.props.labelField]
+      return (
+        <AutosizeInput
+          inputClassName={props.className}
+          value={
+            optionLabelLength ? text.substring(0, optionLabelLength) : text
+          }
+        />
+      )
+    }
+
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -342,10 +377,10 @@ class AntdSelect extends React.PureComponent {
               <Spin size='small' />
             ) : (
               <p>
-                {this.state.fetchId > 0 && (autoComplete || query) ? (
-                  'Not Found'
-                ) : (
+                {this.state.fetchId === 0 && (autoComplete || query) ? (
                   'Input Search Text'
+                ) : (
+                  'Not Found'
                 )}
               </p>
             )
@@ -363,16 +398,6 @@ class AntdSelect extends React.PureComponent {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state
-
-    if (this.props.text) {
-      if (value === undefined) return null
-      const match = this.props.options.find(
-        (o) => o[this.props.valueField] === value,
-      )
-      if (match) return match[this.props.labelField]
-
-      return null
-    }
 
     const labelProps = {}
     if (!mode || mode === 'default') {

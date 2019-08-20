@@ -17,6 +17,7 @@ import {
   notification,
   CodeSelect,
   dateFormatLong,
+  DateRangePicker,
   DatePicker,
 } from '@/components'
 // medisys-components
@@ -36,12 +37,13 @@ import Authorized from '@/utils/Authorized'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import schema from './schema'
 
-moment.updateLocale('en', {
-  relativeTime: {
-    past: '%s',
-    yy: '%d yr',
-  },
-})
+// moment.updateLocale('en', {
+//   relativeTime: {
+//     past: '%s',
+//     yy: '%d',
+//   },
+
+// })
 
 const styles = () => ({
   menuItem: {

@@ -12,30 +12,38 @@ import {
   GridItem,
   SizeContainer,
   TextField,
+  DatePicker,
   Tooltip,
 } from '@/components'
-import STYLES from '../styles'
 
-const FilterBar = ({ classes }) => {
+const FilterBar = ({ classes, dispatch }) => {
   return (
     <SizeContainer>
       <React.Fragment>
         <GridContainer>
-          <GridItem md={2}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='invoiceNo'
               render={(args) => <TextField label='Invoice No' {...args} />}
             />
           </GridItem>
-          <GridItem md={4}>
+          <GridItem xs={6} md={3}>
             <FastField
-              name='invoiceDate'
+              name='invoiceDateFrom'
               render={(args) => (
-                <DateRangePicker label='Invoice Date' {...args} />
+                <DatePicker label='Invoice Date From' {...args} />
               )}
             />
           </GridItem>
-          <GridItem md={2}>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='invoiceDateTo'
+              render={(args) => (
+                <DatePicker label='Invoice Date To' {...args} />
+              )}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
             <FastField
               name='outstandingBalance'
               render={(args) => <TextField label='O/S Balance' {...args} />}
@@ -43,13 +51,15 @@ const FilterBar = ({ classes }) => {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem md={2}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='patientID'
-              render={(args) => <TextField label='Patient ID' {...args} />}
+              render={(args) => (
+                <TextField label='Patient Acc. No.' {...args} />
+              )}
             />
           </GridItem>
-          <GridItem md={2}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='patientName'
               render={(args) => <TextField label='Patient Name' {...args} />}
@@ -57,12 +67,28 @@ const FilterBar = ({ classes }) => {
           </GridItem>
         </GridContainer>
         <div className={classes.searchButton}>
-          <Button color='primary'>Search</Button>
-          <i>Double click on record to view invoice</i>
+          <Button
+            color='primary'
+            onClick={() => {
+              dispatch({
+                type: 'invoiceList/query',
+                payload: {
+                  // [`${prefix}patientReferenceNo`]: search,
+                  // [`${prefix}name`]: search,
+                  // [`${prefix}patientAccountNo`]: search,
+                  // [`${prefix}contactFkNavigation.contactNumber.number`]: search,
+                  // combineCondition: 'or',
+                },
+              })
+            }}
+          >
+            Search
+          </Button>
+          {/* <i>Double click on record to view invoice</i> */}
         </div>
       </React.Fragment>
     </SizeContainer>
   )
 }
 
-export default withStyles(STYLES, { name: 'InvoiceFilterBar' })(FilterBar)
+export default FilterBar

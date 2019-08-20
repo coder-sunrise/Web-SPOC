@@ -1,12 +1,12 @@
 import * as React from 'react'
 import {
-  PluginHost,
+  // PluginHost,
   Plugin,
-  Getter,
+  // Getter,
   Action,
-  Template,
-  TemplatePlaceholder,
-  TemplateConnector,
+  // Template,
+  // TemplatePlaceholder,
+  // TemplateConnector,
 } from '@devexpress/dx-react-core'
 
 class EditPlugin extends React.PureComponent {

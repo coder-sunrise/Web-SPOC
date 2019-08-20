@@ -29,8 +29,23 @@ class SelectEditor extends PureComponent {
   }
 
   componentDidMount () {
+    const { columnExtensions, row, column: { name: columnName } } = this.props
+    // console.log('componentDidMount', columnName)
+    const cfg =
+      columnExtensions.find(
+        ({ columnName: currentColumnName }) => currentColumnName === columnName,
+      ) || {}
+    const { gridId } = cfg
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][row.id] || {}
+      : row
+    // console.log(columnName, latestRow)
     this.setState({
-      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+      error: updateCellValue(
+        this.props,
+        this.myRef.current,
+        latestRow[columnName],
+      ),
     })
   }
 
@@ -55,6 +70,10 @@ class SelectEditor extends PureComponent {
       gridId,
       ...restProps
     } = cfg
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][row.id] || {}
+      : row
+    // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
 
     const _onChange = (val, option) => {
       // console.log(val, option)
@@ -67,29 +86,22 @@ class SelectEditor extends PureComponent {
           onChange({
             val,
             option,
-            row: window.$tempGridRow[gridId]
-              ? window.$tempGridRow[gridId][row.id] || {}
-              : row,
+            row: latestRow,
             onValueChange,
             error,
           })
       }
     }
-    // console.log(window.$tempGridRow)
+    // console.log(window.$tempGridRow, row, latestRow[columnName])
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
       error: this.state.error,
-      defaultValue: value,
-      disabled: isDisabled(
-        window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][row.id] || {}
-          : row,
-      ),
+      value: latestRow[columnName],
+      disabled: isDisabled(latestRow),
       ...restProps,
       onChange: _onChange,
     }
-    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
