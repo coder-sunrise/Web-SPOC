@@ -504,6 +504,89 @@ const orderTypes = [
   { name: 'Consumable', value: '4' },
   { name: 'Open Prescription', value: '5' },
 ]
+
+const currencyRounding = [
+  {
+    name: 'Up',
+    value: 'Up',
+  },
+  {
+    name: 'Down',
+    value: 'Down',
+  },
+]
+
+const currencyRoundingToTheClosest = [
+  {
+    name: '5 Cents',
+    value: '0.05',
+  },
+  {
+    name: '10 Cents',
+    value: '0.10',
+  },
+  {
+    name: '50 Cents',
+    value: '0.50',
+  },
+  {
+    name: '1 Dollars',
+    value: '1',
+  },
+]
+
+const currencies = [
+  {
+    value: 'SGD',
+    name: 'S$',
+  },
+  {
+    value: 'USD',
+    name: '$',
+  },
+  {
+    value: 'EUR',
+    name: '€',
+  },
+  {
+    value: 'BTC',
+    name: '฿',
+  },
+  {
+    value: 'JPY',
+    name: '¥',
+  },
+]
+
+const coPayerType =[
+  {
+    value: 'corporate',
+    name: 'Corporate',
+  },
+  {
+    value: 'government',
+    name: 'Government',
+  },
+]
+
+const country =[
+  {
+    value: 'singapore',
+    name: 'Singapore',
+  },
+  {
+    value: 'malaysia',
+    name: 'Malaysia',
+  },
+  {
+    value: 'china',
+    name: 'China',
+  },
+  {
+    value: 'india',
+    name: 'India',
+  },
+]
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -611,5 +694,10 @@ module.exports = {
   schemes,
   addressTypes,
   orderTypes,
+  currencies,
+  currencyRounding,
+  currencyRoundingToTheClosest,
+  coPayerType,
+  country,
   ...module.exports,
 }

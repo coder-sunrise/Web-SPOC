@@ -180,7 +180,13 @@ const menuData = [
   },
   {
     title: 'Contact',
-    text: 'TBD',
+    text: 'Co-Payer',
+    url: '/setting/company/1',
+  },
+  {
+    title: 'Contact',
+    text: 'Supplier',
+    url: '/setting/company/2',
   },
 ]
 const styles = (theme) => ({

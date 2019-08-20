@@ -1,25 +1,21 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useEffect } from 'react'
 import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import { withFormik, FastField } from 'formik'
-
-import { withStyles, Divider } from '@material-ui/core'
+import clsx from 'clsx'
+import { withStyles, Divider, Tooltip } from '@material-ui/core'
+import { getActiveSession } from '@/pages/Reception/Queue/services'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import {
-  PictureUpload,
+  Checkbox,
+  withFormikExtend,
+  FastField,
+  Field,
   GridContainer,
   GridItem,
   CardContainer,
-  Transition,
   TextField,
-  AntdInput,
-  Select,
-  Accordion,
   Button,
-  CommonTableGrid,
-  DatePicker,
-  NumberInput,
 } from '@/components'
 
 // import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
@@ -29,94 +25,156 @@ const styles = (theme) => ({
 })
 
 @connect(({ settingGst }) => ({
-  settingMasterClinicInfo,
+  settingGst,
 }))
-@withFormik({
-  mapPropsToValues: ({ settingMasterClinicInfo }) => {
-    console.log(settingMasterClinicInfo)
-    return settingMasterClinicInfo.entity
-      ? settingMasterClinicInfo.entity
-      : settingMasterClinicInfo.default
+@withFormikExtend({
+  mapPropsToValues: ({ settingGst }) => {
+    console.log(settingGst)
+    return settingGst.entity ? settingGst.entity : settingGst.default
   },
-  validationSchema: Yup.object().shape({
-    name: Yup.string().required(),
-    address: Yup.object().shape({
-      postcode: Yup.number().required(),
-      countryFK: Yup.string().required(),
-    }),
-  }),
+  // validationSchema: Yup.object().shape({
+  //   name: Yup.string().required(),
+  //   address: Yup.object().shape({
+  //     postcode: Yup.number().required(),
+  //     countryFK: Yup.string().required(),
+  //   }),
+  // }),
 
   handleSubmit: () => {},
-  displayName: 'ClinicInfo',
+  displayName: 'GstSetupInfo',
 })
-class ClinicInfo extends PureComponent {
-  state = {}
+class GstSetup extends PureComponent {
+  state = {
+    enableGst: false,
+    inclusiveGst: false,
+    hasActiveSession: true,
+  }
+
+  componentDidMount () {
+    this.checkHasActiveSession()
+  }
+
+  checkHasActiveSession = async () => {
+    const result = await getActiveSession()
+    let { data } = result.data
+    // data = false
+    this.setState({
+      hasActiveSession: !!data,
+    })
+  }
+
+  handleOnChange = () => {
+    this.setState(
+      (prevState) => {
+        return {
+          enableGst: !prevState.enableGst,
+        }
+      },
+      (v) => {
+        if (!this.state.enableGst) {
+          this.props.setFieldValue('inclusiveGst', false)
+        }
+      },
+    )
+  }
 
   render () {
-    const { classes, clinicInfo, dispatch, theme, ...restProps } = this.props
+    const {
+      form,
+      classes,
+      gstSetupInfo,
+      dispatch,
+      theme,
+      ...restProps
+    } = this.props
+    const { enableGst, hasActiveSession } = this.state
+    const tooltipMsg = `Active session detected.`
 
+    // const tooltipStyle = {
+    //   fontSize: '20px',
+    // }
+
+    console.log('inclusiveGst', this.props.values)
     return (
       <CardContainer hideHeader>
         <GridContainer>
-          <GridItem md={6}>
-            <FastField
-              name='name'
-              render={(args) => <TextField label='Clinic Name' {...args} />}
-            />
-          </GridItem>
           <GridItem md={3}>
-            <FastField
-              name='hciCode'
+            <Field
+              name='enableGst'
               render={(args) => (
-                <TextField label='Clinic ID (HCI Code)' disabled {...args} />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <FastField
-              name='hospitalCode'
-              render={(args) => (
-                <TextField label='Hospital Code' disabled {...args} />
+                <div>
+                  {hasActiveSession ? (
+                    <Tooltip
+                      title={tooltipMsg}
+                      placement='right'
+                      // style={tooltipStyle}
+                    >
+                      <span>
+                        <Checkbox
+                          label='Enable GST'
+                          onChange={this.handleOnChange}
+                          disabled={!!hasActiveSession}
+                          {...args}
+                        />
+                      </span>
+                    </Tooltip>
+                  ) : (
+                    <Checkbox
+                      label='Enable GST'
+                      onChange={this.handleOnChange}
+                      disabled={!!hasActiveSession}
+                      {...args}
+                    />
+                  )}
+                </div>
               )}
             />
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem md={6}>
-            <FastField
-              name='primaryClinician'
+          <GridItem md={3}>
+            <Field
+              name='gstRegNum'
               render={(args) => (
-                <Select
-                  label='Primary Clinician'
-                  options={[
-                    { value: 1, name: 'Dr Levine Choong' },
-                  ]}
+                <TextField
+                  label='GST Registration Number'
+                  {...args}
+                  disabled={!enableGst}
+                />
+              )}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem md={3}>
+            <Field
+              name='gstRate'
+              render={(args) => (
+                <TextField
+                  label='GST Rate'
+                  {...args}
+                  disabled={!enableGst}
+                  suffix='%'
+                />
+              )}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem md={3}>
+            <Field
+              name='inclusiveGst'
+              render={(args) => (
+                <Checkbox
+                  label='Inclusive GST'
+                  disabled={!enableGst}
                   {...args}
                 />
               )}
             />
           </GridItem>
-          <GridItem md={3}>
-            <FastField
-              name='primaryClinicianMCR'
-              render={(args) => (
-                <TextField label='Primary Clinician MCR Number' {...args} />
-              )}
-            />
-          </GridItem>
         </GridContainer>
-        <div
-          style={{
-            marginLeft: theme.spacing(1),
-            marginRight: theme.spacing(1),
-            marginTop: theme.spacing(3),
-          }}
-        >
-          <h5>Address</h5>
-          <Divider />
-        </div>
 
-        <Address propName='address' {...this.props} />
         <div className={classes.actionBtn}>
           <Button
             color='danger'
@@ -141,4 +199,4 @@ class ClinicInfo extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(ClinicInfo)
+export default withStyles(styles, { withTheme: true })(GstSetup)

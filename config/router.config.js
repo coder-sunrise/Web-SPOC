@@ -469,15 +469,27 @@ const routes = [
             path: '/setting/clinicoperationhour',
             name: 'clinicoperationhour',
             component: './Setting/ClinicOperationHour',
-          }, 
+          },
           {
             path: '/setting/gstsetup',
             name: 'gstsetup',
             component: './Setting/GST',
           },
-          
-
-          
+          {
+            path: '/setting/generalsetting',
+            name: 'generalsetting',
+            component: './Setting/GeneralSetting',
+          },
+          {
+            path: '/setting/company/1',
+            name: 'copayer',
+            component: './Setting/Company',
+          },
+          {
+            path: '/setting/company/2',
+            name: 'supplier',
+            component: './Setting/Company',
+          },
         ],
       },
       // Settings
