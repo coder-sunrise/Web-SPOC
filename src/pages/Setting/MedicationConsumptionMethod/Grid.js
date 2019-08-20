@@ -8,12 +8,13 @@ import Edit from '@material-ui/icons/Edit'
 import * as service from './services'
 
 class Grid extends PureComponent {
-	editRow = (row) => {
-		const { dispatch, settingClinicService } = this.props
+	editRow = (row, e) => {
+		const { dispatch, settingMedicationConsumptionMethod } = this.props
 
-		const { list } = settingClinicService
+		const { list } = settingMedicationConsumptionMethod
+
 		dispatch({
-			type: 'settingClinicService/updateState',
+			type: 'settingMedicationConsumptionMethod/updateState',
 			payload: {
 				showModal: true,
 				entity: list.find((o) => o.id === row.id)
@@ -25,19 +26,21 @@ class Grid extends PureComponent {
 		return (
 			<CommonTableGrid
 				style={{ margin: 0 }}
-				type='settingClinicService'
+				type='settingMedicationConsumptionMethod'
 				onRowDoubleClick={this.editRow}
 				columns={[
 					{ name: 'code', title: 'Code' },
 					{ name: 'displayValue', title: 'Display Value' },
 					{ name: 'description', title: 'Description' },
-					{ name: 'serviceCenter', title: 'Service Center' },
-					{ name: 'sellingPrice', title: 'Unit Selling Price' },
+					{ name: 'sortOrder', title: 'Sort Order' },
 					{ name: 'isActive', title: 'Status' },
-					{ name: 'action', title: 'Action' }
+					{
+						name: 'action',
+						title: 'Action'
+					}
 				]}
+				// FuncProps={{ pager: false }}
 				columnExtensions={[
-					{ columnName: 'sellingPrice', type: 'number', currency: true },
 					{
 						columnName: 'isActive',
 						sortingEnabled: false,
@@ -46,6 +49,7 @@ class Grid extends PureComponent {
 					},
 					{
 						columnName: 'action',
+						sortingEnabled: false,
 						align: 'center',
 						render: (row) => {
 							return (
