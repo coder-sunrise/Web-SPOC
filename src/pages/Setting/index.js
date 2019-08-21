@@ -170,6 +170,11 @@ const menuData = [
     url: '/setting/smstemplate',
   },
   {
+    title: 'Templates',
+    text: 'Referral Letter Template',
+    url: '/setting/referrallettertemplate',
+  },
+  {
     title: 'Contact',
     text: 'TBD',
   },

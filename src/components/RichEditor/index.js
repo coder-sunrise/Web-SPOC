@@ -8,6 +8,11 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import classnames from 'classnames'
 import { CustomInput } from '@/components'
 import { control } from '@/components/Decorator'
+import htmlToDraft from 'html-to-draftjs'
+import htmlEscape from 'react-escape-html'
+import Button from '@material-ui/core/Button'
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 
 const STYLES = (theme) => {
   return {
@@ -31,10 +36,18 @@ class RichEditor extends React.PureComponent {
     super(props)
     const { form, field } = props
     const v = form && field ? field.value : props.value || props.defaultValue
+    let editorState
+    if (v) {
+      const contentBlock = htmlToDraft(v)
+      editorState = EditorState.createWithContent(
+        ContentState.createFromBlockArray(contentBlock.contentBlocks),
+      )
+    } else {
+      editorState = EditorState.createEmpty()
+    }
     this.state = {
-      value: v
-        ? EditorState.createWithContent(ContentState.createFromText(v))
-        : EditorState.createEmpty(),
+      value: editorState,
+      anchorEl: null,
     }
 
     this.editorCfg = {
@@ -66,10 +79,11 @@ class RichEditor extends React.PureComponent {
   componentDidMount () {}
 
   componentWillReceiveProps (nextProps) {
+    //console.log(nextProps)
     const { field, value } = nextProps
     let v = this.state.value
     if (field) {
-      v = field.value
+      v = field.value || ''
       // this.setState({
       //   value: field.value,
       // })
@@ -88,7 +102,8 @@ class RichEditor extends React.PureComponent {
   }
 
   onChange = (editorState) => {
-    // console.log(event)
+    //console.log(editorState)
+    // const {onChange}=this.props
     this.setState({
       value: editorState,
     })
@@ -99,12 +114,18 @@ class RichEditor extends React.PureComponent {
     const { props } = this
     const { onChange } = props
 
+    const textEditorValue = this.state.value.getCurrentContent().getPlainText()
+
     const v = {
       target: {
-        value: draftToHtml(convertToRaw(editorState.getCurrentContent())),
+        value:
+          textEditorValue == ''
+            ? ''
+            : draftToHtml(convertToRaw(editorState.getCurrentContent())),
         // name: props.field.name,
       },
     }
+    //console.log(props.field, props.field.onChange)
     if (props.field && props.field.onChange) {
       v.target.name = props.field.name
       props.field.onChange(v)
@@ -114,6 +135,75 @@ class RichEditor extends React.PureComponent {
     }
   }
 
+  tagButtonOnClick = (selectedValue) => {
+    const newEditorState = this.insertSelectedTagToEditor(selectedValue)
+
+    this.setState({
+      value: EditorState.push(
+        this.state.value,
+        newEditorState.getCurrentContent(),
+        'insert-fragment',
+      ),
+    })
+
+    this.debouncedOnChange(newEditorState)
+  }
+
+  // For the TagButton
+  tagButtonHandleClick = (event) => {
+    this.setState({ anchorEl: event.currentTarget })
+  }
+
+  tagButtonHandleClose = () => {
+    this.setState({ anchorEl: null })
+  }
+
+  insertSelectedTagToEditor = (selectedValue) => {
+    const { value } = this.state
+    const currentEditorSelection = value.getSelection()
+    const currentContentState = value.getCurrentContent()
+
+    let newEditorState, newContentState
+
+    // 判断是否有选中，有则替换，无则插入
+    const selectionEnd = currentEditorSelection.getEndOffset()
+    const selectionStart = currentEditorSelection.getStartOffset()
+    if (selectionEnd === selectionStart) {
+      newContentState = Modifier.insertText(
+        currentContentState,
+        currentEditorSelection,
+        selectedValue.toLowerCase(),
+      )
+    } else {
+      newContentState = Modifier.replaceText(
+        currentContentState,
+        currentEditorSelection,
+        selectedValue.toLowerCase(),
+      )
+    }
+
+    newEditorState = EditorState.push(value, newContentState, 'insert-fragment')
+
+    const selectedValueHtml = htmlEscape`${selectedValue.toLowerCase()}`.__html
+
+    const currentEditorHtml = draftToHtml(
+      convertToRaw(newEditorState.getCurrentContent()),
+    )
+
+    const editorToHtml = currentEditorHtml.replace(
+      selectedValueHtml,
+      `&nbsp;<a href="javascript:void(0);" class="wysiwyg-mention" data-mention data-value="${selectedValue}">${selectedValue}</a>&nbsp;`,
+    )
+
+    const contentBlock = htmlToDraft(editorToHtml)
+
+    newEditorState = EditorState.createWithContent(
+      ContentState.createFromBlockArray(contentBlock.contentBlocks),
+    )
+
+    return newEditorState
+  }
+
   getComponent = ({ inputRef, ...props }) => {
     const {
       classes,
@@ -121,10 +211,11 @@ class RichEditor extends React.PureComponent {
       onChange,
       onFocus,
       onBlur,
+      tagList,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-    // console.log(this.state.value)
+    //console.log(this.state.value)
 
     return (
       <div style={{ width: '100%', height: 'auto' }} {...props}>
@@ -139,6 +230,10 @@ class RichEditor extends React.PureComponent {
             [this.editorClassName]: true,
           })}
           onEditorStateChange={this.onChange}
+          mention={{
+            //trigger: '<',
+            suggestions: tagList,
+          }}
           {...this.editorCfg}
           {...this.props}
         />
@@ -146,23 +241,86 @@ class RichEditor extends React.PureComponent {
     )
   }
 
+  getTagButtonComponent = () => {
+    const { tagList } = this.props
+    const { anchorEl } = this.state
+    const ITEM_HEIGHT = 64
+
+    return (
+      <div>
+        <Button
+          onClick={this.tagButtonHandleClick}
+          aria-controls='customized-menu'
+          aria-haspopup='true'
+          variant='contained'
+          color='primary'
+        >
+          Tag
+        </Button>
+        <Menu
+          id='long-menu'
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={this.tagButtonHandleClose}
+          PaperProps={{
+            style: {
+              maxHeight: ITEM_HEIGHT * 4.5,
+              width: 250,
+            },
+          }}
+        >
+          {tagList.map((tag) => (
+            <MenuItem
+              key={tag.id}
+              onClick={() => {
+                this.tagButtonOnClick(tag.text)
+                this.tagButtonHandleClose()
+              }}
+            >
+              {tag.text}
+            </MenuItem>
+          ))}
+        </Menu>
+      </div>
+    )
+  }
+
   render () {
     const { props } = this
-    const { classes, mode, onChange, ...restProps } = props
+    const { classes, mode, onChange, tagList, ...restProps } = props
 
     const labelProps = {
       shrink: true,
     }
-    return (
-      <CustomInput
-        labelProps={labelProps}
-        inputComponent={this.getComponent}
-        noUnderLine
-        preventDefaultChangeEvent
-        preventDefaultKeyDownEvent
-        {...restProps}
-      />
-    )
+
+    if (tagList != undefined) {
+      return (
+        <React.Fragment>
+          <CustomInput
+            labelProps={labelProps}
+            inputComponent={this.getComponent}
+            noUnderLine
+            preventDefaultChangeEvent
+            preventDefaultKeyDownEvent
+            {...restProps}
+          />
+          {/* <TagButton onChange={this.tagButtonOnClick} tagList={tagList} /> */}
+          {this.getTagButtonComponent()}
+        </React.Fragment>
+      )
+    } else {
+      return (
+        <CustomInput
+          labelProps={labelProps}
+          inputComponent={this.getComponent}
+          noUnderLine
+          preventDefaultChangeEvent
+          preventDefaultKeyDownEvent
+          {...restProps}
+        />
+      )
+    }
   }
 }
 
