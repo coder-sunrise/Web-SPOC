@@ -3,8 +3,8 @@ import { withStyles, Divider, Paper } from '@material-ui/core'
 import Remove from '@material-ui/icons/Remove'
 
 import { Button, GridContainer, GridItem, CommonModal } from '@/components'
-import AddPayment from '../../Invoice/Detail/Payment/AddPayment'
-import AddCreditNote from '../../Invoice/Detail/Payment/AddCreditNote'
+// import AddPayment from '../../Invoice/Detail/Payment/AddPayment'
+// import AddCreditNote from '../../Invoice/Detail/Payment/AddCreditNote'
 
 const styles = () => ({
   item: {
@@ -257,7 +257,7 @@ class DetailsMode extends PureComponent {
           list={itemList}
           onVoidClick={this.voidContentRow}
         />
-        <CommonModal
+        {/* <CommonModal
           open={showAddPayment}
           title='Make Payment'
           onClose={this.toggleShowAddPayment}
@@ -274,7 +274,7 @@ class DetailsMode extends PureComponent {
           onConfirm={this.toggleShowAddCreditNote}
         >
           <AddCreditNote />
-        </CommonModal>
+        </CommonModal> */}
       </React.Fragment>
     )
   }

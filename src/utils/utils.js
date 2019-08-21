@@ -363,6 +363,7 @@ const convertToQuery = (
   let newQuery = {}
   const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
   newQuery.criteria = []
+  newQuery.conditionGroups = []
   // //console.log('convert to query')
   // sort[0][sortby]=patientaccountno&sort[0][order]=desc
   // sorting.forEach((s) => {
@@ -372,28 +373,41 @@ const convertToQuery = (
   const { valueType, filterType } = config
   for (let p in customQuerys) {
     if (Object.prototype.hasOwnProperty.call(customQuerys, p)) {
+      console.log(customQuerys[p])
       if (customQuerys[p] !== undefined && customQuerys[p] !== '') {
         let val = customQuerys[p]
         if (typeof val === 'string') {
           val = val.trim()
-        }
-        const match = refilter.exec(p)
-        if (!!match && match.length > 1) {
-          let s = ''
-          match[2].split('$').forEach((item) => {
-            s += `${item}.`
-          })
-          match[2] = s.substring(0, s.length - 1)
-          const prop = match[3] || match[2]
-          const combineKey = prop.split('/')
-          // console.log(match)
-          newQuery.criteria.push({
-            prop: combineKey.length > 1 ? combineKey : prop,
-            val,
-            opr: filterType[match[1]],
-            // property: match[3] ? s.substring(0, s.length - 1) : null,
-            // valueType: match[4] ? valueType[match[4]] : null,
-          })
+          const match = refilter.exec(p)
+          if (!!match && match.length > 1) {
+            let s = ''
+            match[2].split('$').forEach((item) => {
+              s += `${item}.`
+            })
+            match[2] = s.substring(0, s.length - 1)
+            const prop = match[3] || match[2]
+            const combineKey = prop.split('/')
+            // console.log(match)
+            newQuery.criteria.push({
+              prop: combineKey.length > 1 ? combineKey : prop,
+              val,
+              opr: filterType[match[1]],
+              // property: match[3] ? s.substring(0, s.length - 1) : null,
+              // valueType: match[4] ? valueType[match[4]] : null,
+            })
+          } else {
+            newQuery.criteria.push({
+              prop: p,
+              val,
+              opr: filterType.like,
+            })
+          }
+        } else if (Array.isArray(val)) {
+          for (let i = 0; i < val.length; i++) {
+            const obj = convertToQuery(val[i])
+            console.log(val[i], obj)
+            newQuery.conditionGroups.push(obj)
+          }
         } else if (convertExcludeFields.indexOf(p) < 0) {
           // let valType = null
           // if (typeof val === 'boolean') valType = valueType.b
@@ -402,7 +416,7 @@ const convertToQuery = (
             prop: p,
             val,
             // valueType: valType,
-            opr: typeof val === 'boolean' ? filterType.eql : filterType.like,
+            opr: ['boolean','number'].indexOf(typeof val)>=0 ? filterType.eql : filterType.like,
           })
         }
       }

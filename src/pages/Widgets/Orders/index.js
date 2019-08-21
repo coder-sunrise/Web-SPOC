@@ -39,30 +39,6 @@ const styles = (theme) => ({})
 @connect(({ orders }) => ({
   orders,
 }))
-@withFormik({
-  mapPropsToValues: ({ orders }) => {
-    console.log(orders)
-    return orders.entity ? orders.entity : orders.default
-  },
-  validationSchema: Yup.object().shape({
-    name: Yup.string().required(),
-    dob: Yup.date().required(),
-    patientAccountNo: Yup.string().required(),
-    genderFK: Yup.string().required(),
-    dialect: Yup.string().required(),
-    contact: Yup.object().shape({
-      contactAddress: Yup.array().of(
-        Yup.object().shape({
-          postcode: Yup.number().required(),
-          countryFK: Yup.string().required(),
-        }),
-      ),
-    }),
-  }),
-
-  handleSubmit: () => {},
-  displayName: 'Orders',
-})
 class Orders extends Component {
   render () {
     const { state, props } = this

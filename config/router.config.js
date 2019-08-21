@@ -245,13 +245,13 @@ const routes = [
             path: '/finance/deposit',
             name: 'deposit',
             mini: 'DP',
-            // component: './Finance/Deposit',
+            component: './Finance/Deposit',
           },
           {
             path: '/finance/deposit/:depositNo',
             name: 'invoice/detail',
             hideInMenu: true,
-            // component: './Finance/Deposit/Detail/index.js',
+            component: './Finance/Deposit/Detail/index.js',
           },
           {
             path: '/finance/statement',
@@ -489,6 +489,34 @@ const routes = [
             path: '/setting/company/2',
             name: 'supplier',
             component: './Setting/Company',
+            path: '/setting/servicecenter',
+            name: 'servicecenter',
+            component: './Setting/serviceCenter',
+          },
+          {
+            path: '/setting/servicecentercategory',
+            name: 'servicecentercategory',
+            component: './Setting/serviceCenterCategory',
+          },
+          {
+            path: '/setting/servicecategory',
+            name: 'servicecategory',
+            component: './Setting/serviceCategory',
+          },
+          {
+            path: '/setting/medicationfrequency',
+            name: 'medicationfrequency',
+            component: './Setting/medicationFrequency',
+          },
+          {
+            path: '/setting/medicationprecautions',
+            name: 'medicationprecautions',
+            component: './Setting/medicationPrecautions',
+          },
+          {
+            path: '/setting/medicationconsumptionmethod',
+            name: 'medicationconsumptionmethod',
+            component: './Setting/medicationConsumptionMethod',
           },
         ],
       },
@@ -497,6 +525,7 @@ const routes = [
         hideInMenu: process.env.NODE_ENV === 'production',
         path: '/development',
         name: 'Development',
+
         routes: [
           {
             path: '/development/control',

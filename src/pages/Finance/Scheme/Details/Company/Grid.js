@@ -34,9 +34,9 @@ class Grid extends PureComponent {
   }
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'schemeCompany/query',
-    })
+    // this.props.dispatch({
+    //   type: 'schemeCompany/query',
+    // })
   }
 
   showDetail = (row, vmode) => () => {

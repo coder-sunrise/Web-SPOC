@@ -133,7 +133,6 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug UOM',
     url: '/setting/medicationuom',
   },
   {
@@ -155,9 +154,19 @@ const menuData = [
     title: 'Clinic Setting',
     text: 'Drug Dosage',
     url: '/setting/medicationdosage',
+    text: 'Drug Frequency',
   },
   {
-    title: 'System User',
+    title: 'Clinic Setting',
+    text: 'Drug Precautions',
+    url: '/setting/medicationprecautions',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Consumption Method',
+    url: '/setting/medicationconsumptionmethod',
+  },
+  {
     text: 'System User',
     url: '/setting/userprofile',
   },
@@ -176,7 +185,8 @@ const menuData = [
   },
   {
     title: 'Templates',
-    text: 'TBD',
+    text: 'SMS Template',
+    url: '/setting/smstemplate',
   },
   {
     title: 'Contact',

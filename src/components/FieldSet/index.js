@@ -9,28 +9,34 @@ import { Card, CardBody } from '@/components'
 // style
 import CardStyle from './style'
 
-const FieldSet = ({ classes, title, size, children }) => {
-  return (
-    <TextField
-      label={title}
-      margin='normal'
-      variant='outlined'
-      fullWidth
-      InputLabelProps={{
-        shrink: true,
-        focused: false,
-      }}
-      InputProps={{
-        inputComponent: ({ inputRef, ...ps }) => {
-          return (
-            <div style={{ width: '100%', height: 'auto' }} {...ps}>
-              {children}
-            </div>
-          )
-        },
-      }}
-    />
-  )
+// <div>
+// {children}
+// </div>
+class FieldSet extends React.PureComponent {
+  render () {
+    const { classes, title, size, children } = this.props
+    return (
+      <TextField
+        label={title}
+        margin='normal'
+        variant='outlined'
+        fullWidth
+        InputLabelProps={{
+          shrink: true,
+          focused: false,
+        }}
+        InputProps={{
+          inputComponent: ({ inputRef, ...ps }) => {
+            return (
+              <div style={{ width: '100%', height: 'auto' }} {...ps}>
+                {children}
+              </div>
+            )
+          },
+        }}
+      />
+    )
+  }
 }
 
 FieldSet.propTypes = {

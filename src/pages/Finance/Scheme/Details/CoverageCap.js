@@ -1,46 +1,46 @@
 import React, { useEffect, useState } from 'react'
 import { formatMessage } from 'umi/locale'
-import { withStyles } from '@material-ui/core/styles'
-import { Field } from 'formik'
-import { compose } from 'redux'
-import Radio from '@material-ui/core/Radio'
-import { GridContainer, GridItem, NumberInput } from '@/components'
+import {
+  Field,
+  FastField,
+  RadioGroup,
+  GridContainer,
+  GridItem,
+  TextField,
+  NumberInput,
+} from '@/components'
 
-const styles = () => ({
-  radioDiv: {
-    marginTop: '25px',
-  },
-})
-
-const CoverageCap = ({ classes }) => {
-  const [ radioSelectedValue, setRadioSelectedValue ] = useState('all')
-  const [ allDisabled, setAllDisabled ] = useState(false)
-
-  const handleChange = (event) => {
-    setRadioSelectedValue(event.target.value)
-
-    if (event.target.value === 'all') {
-      setAllDisabled(false)
-    } else {
-      setAllDisabled(true)
-    }
-  }
+const CoverageCap = ({ values, classes }) => {
   return (
     <GridContainer>
-      <GridItem md={1} className={classes.radioDiv}>
-        <Radio
-          checked={radioSelectedValue === 'all'}
-          onChange={handleChange}
-          value='all'
-          name='all'
+      <GridItem xs={1}>
+        <Field
+          name='itemGroupMaxCapacityDtoRdoValue'
+          render={(args) => (
+            <RadioGroup
+              label=''
+              inputClass={classes.rdoInput}
+              options={[
+                {
+                  value: 'all',
+                  label: '',
+                },
+                {
+                  value: 'sub',
+                  label: '',
+                },
+              ]}
+              {...args}
+            />
+          )}
         />
       </GridItem>
-      <GridItem md={11}>
+      <GridItem xs={11}>
         <Field
-          name='maximumCapAll'
+          name='coverageMaxCap'
           render={(args) => (
             <NumberInput
-              disabled={allDisabled}
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'all'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapAll',
               })}
@@ -48,15 +48,11 @@ const CoverageCap = ({ classes }) => {
             />
           )}
         />
-      </GridItem>
-      <GridItem md={12} style={{ marginBottom: '20px' }} />
-      <GridItem md={1} />
-      <GridItem md={11}>
         <Field
-          name='maximumCapConsumables'
+          name='consumableMaxCapacity'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapConsumables',
               })}
@@ -64,14 +60,10 @@ const CoverageCap = ({ classes }) => {
             />
           )}
         />
-      </GridItem>
-      <GridItem md={1} />
-      <GridItem md={11}>
         <Field
-          name='maximumCapMedications'
+          name='medicationMaxCapacity'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapMedications',
               })}
@@ -79,21 +71,11 @@ const CoverageCap = ({ classes }) => {
             />
           )}
         />
-      </GridItem>
-      <GridItem md={1} className={classes.radioDiv}>
-        <Radio
-          checked={radioSelectedValue === 'sub'}
-          onChange={handleChange}
-          value='sub'
-          name='sub'
-        />
-      </GridItem>
-      <GridItem md={11}>
         <Field
-          name='maximumCapVaccines'
+          name='vaccinationMaxCapacity'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapVaccines',
               })}
@@ -101,14 +83,11 @@ const CoverageCap = ({ classes }) => {
             />
           )}
         />
-      </GridItem>
-      <GridItem md={1} />
-      <GridItem md={11}>
         <Field
-          name='maximumCapServices'
+          name='serviceMaxCapacity'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapServices',
               })}
@@ -116,14 +95,11 @@ const CoverageCap = ({ classes }) => {
             />
           )}
         />
-      </GridItem>
-      <GridItem md={1} />
-      <GridItem md={11}>
         <Field
-          name='maximumCapPackages'
+          name='packageMaxCapacity'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapPackages',
               })}
@@ -135,6 +111,4 @@ const CoverageCap = ({ classes }) => {
     </GridContainer>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  CoverageCap,
-)
+export default CoverageCap

@@ -80,7 +80,7 @@ class HeaderLinks extends React.Component {
     const managerClasses = classNames({
       [classes.managerClasses]: true,
     })
-    const name = user.data ? user.data.name : ''
+    const name = user.data ? user.data.userName : ''
     return (
       <div className={wrapper}>
         {/*
