@@ -62,7 +62,7 @@ class RadioGroup extends React.Component {
       inputClass,
       ...resetProps
     } = this.props
-    console.log(inputClass)
+    // console.log(inputClass)
     return (
       <div
         className={classnames({

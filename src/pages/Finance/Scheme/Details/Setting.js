@@ -3,6 +3,7 @@ import { formatMessage } from 'umi/locale'
 import { Divider } from '@material-ui/core'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
+import ItemList from './ItemList'
 
 import {
   Field,
@@ -25,32 +26,42 @@ const CPSwitch = (args) => {
   return (
     <Switch
       checkedChildren='$'
-      checkedValue='$'
+      checkedValue='ExactAmount'
       unCheckedChildren='%'
-      unCheckedValue='%'
-      label=''
+      unCheckedValue='Percentage'
+      label=' '
+      {...args}
+    />
+  )
+}
+const CPNumber = (label, type) => (args) => {
+  return (
+    <NumberInput
+      label={label}
+      currency={type === 'ExactAmount'}
+      percentage={type === 'Percentage'}
       {...args}
     />
   )
 }
 const Setting = (props) => {
   const { schemeDetail, dispatch, height, classes, values } = props
-  const options = [
-    {
-      label: '$',
-      value: '$',
-    },
-    {
-      label: '%',
-      value: '%',
-    },
-  ]
-  console.log(values.patientMinCoPaymentAmountType === '$', values)
+  // const options = [
+  //   {
+  //     label: '$',
+  //     value: 'ExactAmount',
+  //   },
+  //   {
+  //     label: '%',
+  //     value: 'Percentage',
+  //   },
+  // ]
   return (
     <CardContainer
       hideHeader
       style={{
         height,
+
         overflow: 'auto',
       }}
     >
@@ -59,13 +70,9 @@ const Setting = (props) => {
           <GridItem xs={8} md={5}>
             <FastField
               name='patientMinCoPaymentAmount'
-              render={(args) => (
-                <NumberInput
-                  label='Minimum Patient Payable Amount'
-                  currency={values.patientMinCoPaymentAmountType === '$'}
-                  percentage={values.patientMinCoPaymentAmountType === '%'}
-                  {...args}
-                />
+              render={CPNumber(
+                'Minimum Patient Payable Amount',
+                values.patientMinCoPaymentAmountType,
               )}
             />
           </GridItem>
@@ -81,10 +88,11 @@ const Setting = (props) => {
           </GridItem>
           <GridItem xs={12} md={6}>
             <FieldSet size='sm' title='Co-Payment'>
-              <CoPayment />
+              <CoPayment {...props} CPSwitch={CPSwitch} CPNumber={CPNumber} />
             </FieldSet>
           </GridItem>
         </GridContainer>
+        <ItemList {...props} CPSwitch={CPSwitch} CPNumber={CPNumber} />
       </SizeContainer>
     </CardContainer>
   )

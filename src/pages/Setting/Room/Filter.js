@@ -54,11 +54,11 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue, ...restProps } = this.props.values
+                  const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingRoom/query',
                     payload: {
-                      ...restProps,
+                      isActive,
                       group: [
                         {
                           code: codeDisplayValue,

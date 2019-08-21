@@ -1,5 +1,4 @@
 import { Switch } from 'antd'
-import ErrorOutline from '@material-ui/icons/ErrorOutline'
 
 import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
@@ -110,7 +109,7 @@ class AntdSwitch extends React.PureComponent {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const labelProps = {
-      shrink: true,
+      shrink: restProps.label && restProps.label.length > 0,
     }
 
     return (
