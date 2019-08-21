@@ -40,7 +40,7 @@ const styles = (theme) => ({})
     } = values
 
     const { dispatch, onConfirm, settingCompany } = props
-    const { id, code, name } = settingCompany.companyType
+    const { id, name } = settingCompany.companyType
     dispatch({
       type: 'settingCompany/upsert',
       payload: {
@@ -167,7 +167,7 @@ class Detail extends PureComponent {
             </GridItem>
           </GridContainer>
 
-          <Contact theme={theme} name={name} />
+          <Contact theme={theme} type={name} />
         </div>
         {footer &&
           footer({

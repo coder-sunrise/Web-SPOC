@@ -11,7 +11,7 @@ import {
 } from '@/components'
 
 const Contact = (props) => {
-  const { theme, name } = props
+  const { theme, type } = props
   console.log(props.values)
   return (
     <React.Fragment>
@@ -51,7 +51,7 @@ const Contact = (props) => {
           </GridItem>
 
           <GridItem md={6}>
-            {name === 'copayer' ? (
+            {type === 'copayer' ? (
               []
             ) : (
               <FastField
@@ -63,14 +63,14 @@ const Contact = (props) => {
             )}
           </GridItem>
 
-          <GridItem md={name === 'copayer' ? 12 : 6}>
+          <GridItem md={type === 'copayer' ? 12 : 6}>
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => <TextField label='Contact Number' {...args} />}
             />
           </GridItem>
           <GridItem md={6}>
-            {name === 'copayer' ? (
+            {type === 'copayer' ? (
               []
             ) : (
               <FastField
@@ -81,7 +81,7 @@ const Contact = (props) => {
           </GridItem>
 
           <GridItem md={6}>
-            {name === 'copayer' ? (
+            {type === 'copayer' ? (
               []
             ) : (
               <FastField
@@ -91,7 +91,7 @@ const Contact = (props) => {
             )}
           </GridItem>
 
-          {name === 'copayer' ? (
+          {type === 'copayer' ? (
             <GridContainer>
               <GridItem md={6}>
                 <FastField

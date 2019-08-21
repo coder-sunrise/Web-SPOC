@@ -49,7 +49,7 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={3}>
             {name === 'copayer' ? (
               <FastField
-                name='eql_coPayerTypeFK'
+                name='coPayerTypeFK'
                 render={(args) => {
                   return (
                     <CodeSelect
@@ -71,11 +71,11 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue, ...restProps } = this.props.values
+                  const { codeDisplayValue, coPayerTypeFK } = this.props.values
                   this.props.dispatch({
                     type: 'settingCompany/query',
                     payload: {
-                      ...restProps,
+                      coPayerTypeFK,
                       group: [
                         {
                           code: codeDisplayValue,
