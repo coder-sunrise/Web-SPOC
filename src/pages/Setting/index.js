@@ -172,6 +172,7 @@ const menuData = [
     url: '/setting/medicationconsumptionmethod',
   },
   {
+    title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',
   },
