@@ -1,124 +1,76 @@
 import React, { useEffect, useState } from 'react'
 import { formatMessage } from 'umi/locale'
-import { Divider } from '@material-ui/core'
-import { withStyles } from '@material-ui/core/styles'
-import { Field } from 'formik'
-import { compose } from 'redux'
-import { GridContainer, GridItem, ButtonGroup, NumberInput } from '@/components'
-import Radio from '@material-ui/core/Radio'
+import {
+  Field,
+  FastField,
+  RadioGroup,
+  GridContainer,
+  GridItem,
+  TextField,
+  NumberInput,
+} from '@/components'
 
-const styles = () => ({
-  buttonGroupDiv: {
-    margin: 'auto',
-    textAlign: 'right',
-  },
-  radioDiv: {
-    marginTop: '25px',
-  },
-})
-
-const options = [
-  {
-    label: '$',
-    value: '$',
-  },
-  {
-    label: '%',
-    value: '%',
-  },
-]
-
-const CoPayment = ({ classes }) => {
-  const [ radioSelectedValue, setRadioSelectedValue ] = useState('all')
-  const [ allDisabled, setAllDisabled ] = useState(false)
-
-  const handleChange = (event) => {
-    setRadioSelectedValue(event.target.value)
-
-    if (event.target.value === 'all') {
-      setAllDisabled(false)
-    } else {
-      setAllDisabled(true)
-    }
-  }
+const CoPayment = ({ values, classes, CPSwitch, CPNumber }) => {
   return (
     <GridContainer>
-      <GridItem md={1} className={classes.radioDiv}>
-        <Radio
-          checked={radioSelectedValue === 'all'}
-          onChange={handleChange}
-          value='all'
-          name='all'
-        />
-      </GridItem>
-      <GridItem md={8}>
-        <Field
-          name='allItem'
+      <GridItem xs={1}>
+        <FastField
+          name='itemGroupValueDtoRdoValue'
           render={(args) => (
-            <NumberInput
-              disabled={allDisabled}
-              label={formatMessage({
-                id: 'finance.scheme.setting.allItems',
-              })}
+            <RadioGroup
+              label=''
+              inputClass={classes.rdoInput}
+              options={[
+                {
+                  value: 'all',
+                  label: '',
+                },
+                {
+                  value: 'sub',
+                  label: '',
+                },
+              ]}
               {...args}
             />
           )}
         />
       </GridItem>
-      <GridItem md={3} className={classes.buttonGroupDiv}>
-        <ButtonGroup options={options} disabled={allDisabled} />
-      </GridItem>
-      <GridItem md={12} style={{ marginBottom: '20px' }} />
-      <GridItem md={1} />
-      <GridItem md={8}>
-        <Field
-          name='consumables'
-          render={(args) => (
-            <NumberInput
-              disabled={!allDisabled}
-              label={formatMessage({
-                id: 'finance.scheme.setting.consumables',
-              })}
-              {...args}
-            />
+      <GridItem xs={9}>
+        <FastField
+          name='overalCoPaymentValue'
+          render={CPNumber(
+            formatMessage({
+              id: 'finance.scheme.setting.allItems',
+            }),
+            values.overalCoPaymentValueType,
           )}
         />
-      </GridItem>
-      <GridItem md={3} className={classes.buttonGroupDiv}>
-        <ButtonGroup options={options} disabled={!allDisabled} />
-      </GridItem>
-      <GridItem md={1} />
-      <GridItem md={8}>
-        <Field
-          name='medications'
+        <FastField
+          name='itemGroupValueDto.consumableGroupValue.itemGroupValue'
+          render={CPNumber(
+            formatMessage({
+              id: 'finance.scheme.setting.consumables',
+            }),
+            values.itemGroupValueDto.consumableGroupValue.groupValueType,
+          )}
+        />
+        <FastField
+          name='itemGroupValueDto.medicationGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
+              disabled={values.itemGroupValueDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.medications',
               })}
-              disabled={!allDisabled}
               {...args}
             />
           )}
         />
-      </GridItem>
-      <GridItem md={3} className={classes.buttonGroupDiv}>
-        <ButtonGroup options={options} disabled={!allDisabled} />
-      </GridItem>
-      <GridItem md={1} className={classes.radioDiv}>
-        <Radio
-          checked={radioSelectedValue === 'sub'}
-          onChange={handleChange}
-          value='sub'
-          name='sub'
-        />
-      </GridItem>
-      <GridItem md={8}>
-        <Field
-          name='vaccines'
+        <FastField
+          name='itemGroupValueDto.vaccinationGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
+              disabled={values.itemGroupValueDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.vaccines',
               })}
@@ -126,17 +78,11 @@ const CoPayment = ({ classes }) => {
             />
           )}
         />
-      </GridItem>
-      <GridItem md={3} className={classes.buttonGroupDiv}>
-        <ButtonGroup options={options} disabled={!allDisabled} />
-      </GridItem>
-      <GridItem md={1} />
-      <GridItem md={8}>
-        <Field
-          name='services'
+        <FastField
+          name='itemGroupValueDto.serviceGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
+              disabled={values.itemGroupValueDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.services',
               })}
@@ -144,17 +90,11 @@ const CoPayment = ({ classes }) => {
             />
           )}
         />
-      </GridItem>
-      <GridItem md={3} className={classes.buttonGroupDiv}>
-        <ButtonGroup options={options} disabled={!allDisabled} />
-      </GridItem>
-      <GridItem md={1} />
-      <GridItem md={8}>
-        <Field
-          name='packages'
+        <FastField
+          name='itemGroupValueDto.packageGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
-              disabled={!allDisabled}
+              disabled={values.itemGroupValueDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.packages',
               })}
@@ -163,12 +103,30 @@ const CoPayment = ({ classes }) => {
           )}
         />
       </GridItem>
-      <GridItem md={3} className={classes.buttonGroupDiv}>
-        <ButtonGroup options={options} disabled={!allDisabled} />
+      <GridItem xs={2}>
+        <FastField name='overalCoPaymentValueType' render={CPSwitch} />
+        <FastField
+          name='itemGroupValueDto.consumableGroupValue.groupValueType'
+          render={CPSwitch}
+        />
+        <FastField
+          name='itemGroupValueDto.medicationGroupValue.groupValueType'
+          render={CPSwitch}
+        />
+        <FastField
+          name='itemGroupValueDto.vaccinationGroupValue.groupValueType'
+          render={CPSwitch}
+        />
+        <FastField
+          name='itemGroupValueDto.serviceGroupValue.groupValueType'
+          render={CPSwitch}
+        />
+        <FastField
+          name='itemGroupValueDto.packageGroupValue.groupValueType'
+          render={CPSwitch}
+        />
       </GridItem>
     </GridContainer>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  CoPayment,
-)
+export default CoPayment

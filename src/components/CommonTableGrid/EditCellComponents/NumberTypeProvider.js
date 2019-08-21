@@ -95,7 +95,7 @@ class NumberEditor extends PureComponent {
       error: this.state.error,
       defaultValue: value,
       disabled: isDisabled(latestRow),
-      currency: true,
+      currency: cfg && (cfg.currency || type === 'currency'),
       ...restProps,
       onChange: _onChange,
     }
@@ -133,7 +133,7 @@ const NumberFormatter = (columnExtensions) =>
       if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
         color = 'red'
 
-      if (cfg && cfg.currency) {
+      if (cfg && (cfg.currency || type === 'currency')) {
         if (text) return numeral(value).format(currencyFormat)
         return (
           <b style={{ color }}>

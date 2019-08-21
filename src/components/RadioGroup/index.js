@@ -42,7 +42,8 @@ class RadioGroup extends React.Component {
     }
     if (form && field) {
       field.onChange(v)
-    } else if (onChange) {
+    }
+    if (onChange) {
       onChange(v)
     }
   }
@@ -58,9 +59,10 @@ class RadioGroup extends React.Component {
       valueField = 'value',
       textField = 'label',
       disabled,
+      inputClass,
       ...resetProps
     } = this.props
-    // console.log(this.state.selectedValue)
+    // console.log(inputClass)
     return (
       <div
         className={classnames({
@@ -94,10 +96,9 @@ class RadioGroup extends React.Component {
                     // checkedIcon={
                     //   <FiberManualRecord className={classes.radioChecked} />
                     // }
-                    // classes={{
-                    //   checked: classes.radio,
-                    //   root: classes.radioRoot,
-                    // }}
+                    className={classnames({
+                      [inputClass]: true,
+                    })}
                   />
                 }
                 // classes={{

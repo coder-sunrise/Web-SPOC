@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { formatMessage } from 'umi/locale'
-import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
-import { FastField } from 'formik'
-import { compose } from 'redux'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
+import ItemList from './ItemList'
 
 import {
+  Field,
+  FastField,
   GridContainer,
   GridItem,
   ButtonGroup,
@@ -17,75 +17,85 @@ import {
   CardText,
   CardBody,
   SizeContainer,
+  CardContainer,
+  FieldSet,
+  Switch,
 } from '@/components'
 
-const styles = () => ({
-  buttonGroupDiv: {
-    margin: 'auto',
-  },
-})
-
-const Setting = ({ schemeDetail, dispatch, classes }) => {
-  const options = [
-    {
-      label: '$',
-      value: '$',
-    },
-    {
-      label: '%',
-      value: '%',
-    },
-  ]
+const CPSwitch = (args) => {
   return (
-    <SizeContainer size='sm'>
-      <React.Fragment>
+    <Switch
+      checkedChildren='$'
+      checkedValue='ExactAmount'
+      unCheckedChildren='%'
+      unCheckedValue='Percentage'
+      label=' '
+      {...args}
+    />
+  )
+}
+const CPNumber = (label, type) => (args) => {
+  return (
+    <NumberInput
+      label={label}
+      currency={type === 'ExactAmount'}
+      percentage={type === 'Percentage'}
+      {...args}
+    />
+  )
+}
+const Setting = (props) => {
+  const { schemeDetail, dispatch, height, classes, values } = props
+  // const options = [
+  //   {
+  //     label: '$',
+  //     value: 'ExactAmount',
+  //   },
+  //   {
+  //     label: '%',
+  //     value: 'Percentage',
+  //   },
+  // ]
+  return (
+    <CardContainer
+      hideHeader
+      style={{
+        height,
+
+        overflow: 'auto',
+      }}
+    >
+      <SizeContainer size='sm'>
         <GridContainer>
-          <GridItem xs={4} md={4}>
+          <GridItem xs={8} md={5}>
             <FastField
-              name='minimumPatientPayableAmount'
-              render={(args) => (
-                <NumberInput
-                  label={formatMessage({
-                    id: 'inventory.master.pricing.maxDiscount',
-                  })}
-                  {...args}
-                />
+              name='patientMinCoPaymentAmount'
+              render={CPNumber(
+                'Minimum Patient Payable Amount',
+                values.patientMinCoPaymentAmountType,
               )}
             />
           </GridItem>
-          <GridItem xs={8} md={8} className={classes.buttonGroupDiv}>
-            <ButtonGroup options={options} />
-          </GridItem>
-          <GridItem xs={6} md={6}>
-            <Card>
-              <CardHeader color='primary' text>
-                <CardText color='primary'>
-                  <h5 className={classes.cardTitle}>Coverage Cap</h5>
-                </CardText>
-              </CardHeader>
-              <CardBody>
-                <CoverageCap />
-              </CardBody>
-            </Card>
-          </GridItem>
-          <GridItem xs={6} md={6}>
-            <Card>
-              <CardHeader color='primary' text>
-                <CardText color='primary'>
-                  <h5 className={classes.cardTitle}>Co-Payment</h5>
-                </CardText>
-              </CardHeader>
-              <CardBody>
-                <CoPayment />
-              </CardBody>
-            </Card>
+          <GridItem xs={4} md={1}>
+            <FastField name='patientMinCoPaymentAmountType' render={CPSwitch} />
           </GridItem>
         </GridContainer>
-      </React.Fragment>
-    </SizeContainer>
+        <GridContainer>
+          <GridItem xs={12} md={6}>
+            <FieldSet size='sm' title='Coverage Cap'>
+              <CoverageCap {...props} />
+            </FieldSet>
+          </GridItem>
+          <GridItem xs={12} md={6}>
+            <FieldSet size='sm' title='Co-Payment'>
+              <CoPayment {...props} CPSwitch={CPSwitch} CPNumber={CPNumber} />
+            </FieldSet>
+          </GridItem>
+        </GridContainer>
+        <ItemList {...props} CPSwitch={CPSwitch} CPNumber={CPNumber} />
+      </SizeContainer>
+    </CardContainer>
   )
 }
 
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(
-  Setting,
-)
+export default Setting

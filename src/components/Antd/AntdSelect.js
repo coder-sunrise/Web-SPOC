@@ -78,6 +78,7 @@ class AntdSelect extends React.PureComponent {
     disabled: PropTypes.bool,
     size: PropTypes.string,
     renderDropdown: PropTypes.func,
+    max: PropTypes.number,
   }
 
   static defaultProps = {
@@ -87,6 +88,7 @@ class AntdSelect extends React.PureComponent {
     valueField: 'value',
     disabled: false,
     size: 'default',
+    max: 50,
   }
 
   constructor (props) {
@@ -98,7 +100,7 @@ class AntdSelect extends React.PureComponent {
       options = [],
       autoComplete,
       valueField,
-      max = 50,
+      max,
     } = props
     const v = form && field ? field.value : props.value || props.defaultValue
     this.state = {
@@ -254,7 +256,7 @@ class AntdSelect extends React.PureComponent {
       const search = value.toLowerCase()
 
       const { props } = this
-      const { options, valueField, labelField, max = 50 } = props
+      const { options, valueField, labelField, max } = props
 
       this.setState({
         data: _.filter(

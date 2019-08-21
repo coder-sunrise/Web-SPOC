@@ -98,6 +98,7 @@ const TextFormatter = (columnExtensions) =>
             currentColumnName === columnName,
         ) || {}
       const { type, render, ...restProps } = cfg
+      // console.log(props)
       if (render) {
         return render(row)
       }

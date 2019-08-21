@@ -44,33 +44,33 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
                 `\\/${urlPatten || listUrl}\\/detail\\?{0,1}(.*)`,
               )
               // //console.log(match)
-              if (match) {
-                if (!match[1]) {
-                  history.push(`/${urlPatten || listUrl}`)
-                }
-                // //console.log(decrypt(match[1]))
-                // //console.log(url)
-                const search = decrypt(match[1])
-                // if (search.bread) {
-                //   location.bread = search.bread
-                //   dispatch({
-                //     type: 'app/updateMenu',
-                //     payload: { location },
-                //   })
+              // if (match) {
+              //   if (!match[1]) {
+              //     history.push(`/${urlPatten || listUrl}`)
+              //   }
+              //   // //console.log(decrypt(match[1]))
+              //   // //console.log(url)
+              //   const search = decrypt(match[1])
+              //   // if (search.bread) {
+              //   //   location.bread = search.bread
+              //   //   dispatch({
+              //   //     type: 'app/updateMenu',
+              //   //     payload: { location },
+              //   //   })
 
-                //   delete search.bread
-                // }
+              //   //   delete search.bread
+              //   // }
 
-                dispatch({
-                  type: 'query',
-                  payload: {
-                    ...search,
-                    defaultQuery: true,
-                  },
-                  history,
-                })
-                // console.log(history)
-              }
+              //   dispatch({
+              //     type: 'query',
+              //     payload: {
+              //       ...search,
+              //       defaultQuery: true,
+              //     },
+              //     history,
+              //   })
+              //   // console.log(history)
+              // }
             })
           }
 

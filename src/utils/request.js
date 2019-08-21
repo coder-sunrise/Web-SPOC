@@ -9,7 +9,8 @@ import { isAntdPro, updateLoadingState } from './utils'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
-export const baseUrl = 'https://semr2dev2010.emr.com.sg'
+export const baseUrl = process.env.url
+
 let dynamicURL = baseUrl
 
 // const codeMessage = {
@@ -216,7 +217,7 @@ export default function request (
   // }
   // const isProd = process.env.NODE_ENV === 'production'
   // if (isProd) url = `/prod${url}`
-  if (options.uat) console.log(url)
+  // if (options.uat) console.log(url)
   if (
     [
       '/api/fake_chart_data',
@@ -226,7 +227,6 @@ export default function request (
   ) {
     newUrl = dynamicURL + newUrl
   }
-  // console.log(newOptions)
   try {
     let r = $.when(
       $.ajax({
