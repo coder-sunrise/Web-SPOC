@@ -25,7 +25,14 @@ import * as commonService from '@/services/common'
 const url = '/api/Appointment'
 
 export const upsert = (params) => commonService.upsert(url, params)
+
+export const save = (params) =>
+  request(url, { method: params.id ? 'PUT' : 'POST', body: params })
+
 export const queryList = (params) =>
   commonService.queryList(url, { pagesize: 9999, ...params })
 
 export const deleteDraft = (id) => commonService.remove(`${url}/${id}`)
+
+export const validate = (params) =>
+  request(`${url}/validate`, { method: 'POST', body: params })

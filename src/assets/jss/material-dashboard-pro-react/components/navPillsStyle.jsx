@@ -84,14 +84,14 @@ const navPillsStyle = (theme) => ({
     color: 'inherit',
   },
   contentWrapper: {
-    marginTop: '10px',
+    // marginTop: '10px',
   },
   primary: {
     '&,&:hover': {
       color: '#FFFFFF',
       backgroundColor: primaryColor,
       boxShadow:
-        '0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(28, 26, 124, 0.4)',
+        '0 2px 2px 0 rgba(28, 26, 124, 0.14), 0 3px 1px -2px rgba(28, 26, 124, 0.2), 0 1px 5px 0 rgba(28, 26, 124, 0.12)',
     },
   },
   info: {
@@ -99,7 +99,7 @@ const navPillsStyle = (theme) => ({
       color: '#FFFFFF',
       backgroundColor: infoColor,
       boxShadow:
-        '0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(76, 175, 80, 0.4)',
+        '0 2px 2px 0 rgba(20, 186, 206, 0.14), 0 3px 1px -2px rgba(20, 186, 206, 0.2), 0 1px 5px 0 rgba(20, 186, 206, 0.12)',
     },
   },
   success: {

@@ -5,6 +5,8 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 const styles = (theme) => ({
   progress: {
     margin: theme.spacing.unit * 2,
+    width: '50px !important',
+    height: '50px !important',
   },
 })
 

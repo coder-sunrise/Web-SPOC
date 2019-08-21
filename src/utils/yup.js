@@ -2,6 +2,7 @@ import Moment from 'moment'
 import * as Yup from 'yup'
 import _ from 'lodash'
 import { camelizeKeys, pascalizeKeys } from 'humps'
+import { timeFormat24Hour, timeFormat } from '@/components'
 
 // console.log(Yup)
 // function _printValue (value, quoteStrings) {
@@ -143,6 +144,73 @@ Yup.addMethod(Yup.array, 'unique', function (
     return true
   })
 })
+
+const getTimeObject = (value) => {
+  try {
+    if (value === undefined || value === null)
+      throw Error('Value is undefined | null')
+
+    let validTimeFormat = value.length === 5
+    let format = timeFormat24Hour
+    let timeValue = value
+    if (value.includes('AM') || value.includes('PM')) {
+      format = timeFormat
+      // parse value to 24hour format
+      timeValue = Moment(value, format).format(timeFormat24Hour)
+      validTimeFormat = timeValue.length === 5
+    }
+
+    if (!validTimeFormat) throw Error('Invalid time format')
+
+    const [
+      hour,
+      minute,
+    ] = timeValue.split(':')
+
+    if (hour.length === 2 && minute.length === 2)
+      return { hour: parseInt(hour, 10), minute: parseInt(minute, 10) }
+  } catch (error) {
+    console.error(error)
+  }
+  return undefined
+}
+
+const compare = (start, end) => {
+  const { hour: startHour, minute: startMinute } = start
+  const { hour: endHour, minute: endMinute } = end
+  if (
+    startHour > endHour ||
+    (startHour === endHour && startMinute > endMinute) ||
+    (startHour === endHour && startMinute === endMinute)
+  )
+    return false
+
+  return true
+}
+
+function laterThan (ref, msg) {
+  return this.test({
+    name: 'laterThan',
+    exclusive: false,
+    // eslint-disable-next-line no-template-curly-in-string
+    message: msg || '${path} must be later than ${reference}',
+    params: {
+      reference: ref.path,
+    },
+    test (value) {
+      const start = this.resolve(ref)
+      const startTimeObject = getTimeObject(start)
+      const endTimeObject = getTimeObject(value)
+
+      if (startTimeObject && endTimeObject)
+        return compare(startTimeObject, endTimeObject)
+
+      return false
+    },
+  })
+}
+
+Yup.addMethod(Yup.string, 'laterThan', laterThan)
 
 Yup.string.prototype.required = function (message) {
   if (message === undefined) {

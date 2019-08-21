@@ -100,10 +100,12 @@ export function QtyFormatter ({ value }) {
 // }
 let dateFormatLong = 'DD-MMM-YYYY'
 let dateFormat = 'DD-MM-YYYY'
-const timeFormat = 'HH:mm:ss'
+// const timeFormat = 'HH:mm:ss'
 const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm a'
 const serverDateFormat = 'YYYY-MM-DD'
+const timeFormat = 'hh:mm A'
+const timeFormat24Hour = 'HH:mm'
 
 const TimeFormatter = ({ value, ...rest }) => {
   if (!value) return null
@@ -113,7 +115,7 @@ const TimeFormatter = ({ value, ...rest }) => {
   }
 
   if (moment(value, timeFormat).isValid()) {
-    return moment(value, timeFormat).format(timeFormatWithoutSecond)
+    return moment(value, timeFormat).format(timeFormat)
   }
 
   return value
@@ -172,8 +174,10 @@ module.exports = {
   qtyFormat,
   dateFormat,
   dateFormatLong,
+  fullDateTime,
   serverDateFormat,
   timeFormat,
   timeFormatWithoutSecond,
+  timeFormat24Hour,
   ...module.exports,
 }

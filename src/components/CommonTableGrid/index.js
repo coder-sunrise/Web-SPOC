@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import moment from 'moment'
 import * as colorManipulator from '@material-ui/core/styles/colorManipulator'
 import {
@@ -40,7 +41,10 @@ import {
   SummaryState,
   DataTypeProvider,
   CustomPaging,
+  TreeDataState,
+  CustomTreeData,
 } from '@devexpress/dx-react-grid'
+
 import {
   DragDropProvider,
   Grid as DevGrid,
@@ -54,6 +58,7 @@ import {
   Toolbar,
   TableFixedColumns,
   VirtualTable,
+  TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -112,6 +117,8 @@ const styles = (theme) => ({
   },
 })
 
+const Root = (props) => <DevGrid.Root {...props} style={{ height: '100%' }} />
+
 const DefaultTableCell = React.memo(
   ({ dispatch, ...props }) => <Table.Cell {...props} />,
   (prevProps, nextProps) => {
@@ -157,7 +164,7 @@ class CommonTableGrid extends React.Component {
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
-    this.myRef = React.createRef()
+    // this.myRef = React.createRef()
     const cls = classNames({
       [classes.tableStriped]: oddEven,
     })
@@ -168,12 +175,13 @@ class CommonTableGrid extends React.Component {
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       return height ? (
         <VirtualTable
-          tableComponent={TableComponent}
-          height={height}
           {...restProps}
+          // height={height}
+          height='auto'
+          tableComponent={TableComponent}
         />
       ) : (
-        <Table tableComponent={TableComponent} {...restProps} />
+        <Table {...restProps} tableComponent={TableComponent} />
       )
     }
 
@@ -245,6 +253,7 @@ class CommonTableGrid extends React.Component {
       },
       grouping: false,
       groupingConfig: {},
+      tree: false,
       sort: true,
       sortConfig: {},
       summary: false,
@@ -370,14 +379,18 @@ class CommonTableGrid extends React.Component {
 
   static getDerivedStateFromProps (nextProps, preState) {
     const { entity, type, columnExtensions } = nextProps
+    // console.log(nextProps)
     let _entity = entity
-    if (!_entity && type) {
+    if (type) {
       _entity = window.g_app._store.getState()[type]
     }
+
     if (
       _entity &&
-      (_entity.pagination !== preState.pagination ||
-        _entity.filter !== preState.filter)
+      !_.isEqual(_entity, preState.entity)
+      // (_entity.pagination !== preState.pagination ||
+      //   _entity.filter !== preState.filter ||
+      //   )
     ) {
       // console.log(_entity.filter)
       if (_entity.filter && _entity.filter.sorting) {
@@ -539,6 +552,21 @@ class CommonTableGrid extends React.Component {
     return <Table.Cell {...restProps} />
   }
 
+  getChildRows = (row, rootRows) => {
+    // if (row) {
+    //   return null
+    // }
+    // const childRows = rows.filter((r) => r.parentId === (row ? row.id : 0))
+    // console.log(row, rows, childRows)
+    // return childRows.length ? childRows : null
+
+    const childRows = rootRows.filter(
+      (r) => r.parentId === (row ? row.id : null),
+    )
+    console.log(childRows)
+    return childRows.length ? childRows : null
+  }
+
   render () {
     const {
       classes,
@@ -595,6 +623,8 @@ class CommonTableGrid extends React.Component {
       pager,
       pagerConfig = {},
       pagerStateConfig,
+      tree,
+      treeColumnConfig,
       groupingConfig,
       summary,
       summaryConfig,
@@ -725,6 +755,7 @@ class CommonTableGrid extends React.Component {
       ].concat(newLeftCols)
       newColumns.unshift({ name: 'rowIndex', title: 'No.' })
     }
+    // console.log(extraGetter, extraColumn, extraState)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -733,7 +764,10 @@ class CommonTableGrid extends React.Component {
             [this.props.className]: true,
             'medisys-table': true,
           })}
-          style={this.props.style}
+          style={{
+            ...this.props.style,
+            height,
+          }}
         >
           {isLoading && (
             <div>
@@ -741,129 +775,128 @@ class CommonTableGrid extends React.Component {
               <span>{loadingMessage}</span>
             </div>
           )}
-          <div ref={this.myRef}>
-            <DevGrid
-              rows={getIndexedRows(
-                this.state.entity
-                  ? this.state.entity.list
-                  : rows.filter((o) => !o.isDeleted),
-                this.state.pagination,
-              )} // this.state.data ||
-              columns={newColumns}
-              getRowId={getRowId}
-            >
-              {filter && (
-                <FilteringState
-                  defaultFilters={defaultFilters}
-                  onFiltersChange={onFiltersChange}
-                  columnExtensions={filterColumnExtensions}
-                />
-              )}
-              {sort && (
-                <SortingState
-                  sorting={this.state.pagination.sorting}
-                  defaultSorting={defaultSorting}
-                  onSortingChange={(sorting) => {
-                    sorting.forEach((o) => {
-                      const c = newColumExtensions.find(
-                        (m) => m.columnName === o.columnName,
-                      )
-                      o.columnName = c.sortBy || c.columnName
-                    })
-                    this.search({
-                      sorting,
-                    })
-                  }}
-                  columnExtensions={newColumExtensions}
-                  {...sortConfig}
-                />
-              )}
-              {selectable && (
-                <SelectionState
-                  selection={selection}
-                  onSelectionChange={onSelectionChange}
-                />
-              )}
-              {summary && <SummaryState {...summaryConfig.state} />}
-              {grouping && <GroupingState {...groupingConfig.state} />}
-              {pager && (
-                <PagingState
-                  currentPage={this.state.pagination.current - 1}
-                  pageSize={this.state.pagination.pagesize}
-                  {...pagerStateConfig}
-                />
-              )}
-
-              {extraState.map((o) => o)}
-
-              {grouping && <IntegratedGrouping />}
-              {/* <IntegratedFiltering /> */}
-              {sort &&
-              !type && (
-                <IntegratedSorting columnExtensions={newColumExtensions} />
-              )}
-              {summary && <IntegratedSummary {...summaryConfig.integrated} />}
-              {pager && !this.state.entity && <IntegratedPaging />}
-              {pager &&
-              this.state.entity && (
-                <CustomPaging totalCount={this.state.pagination.totalRecords} />
-              )}
-              {selectable && <IntegratedSelection />}
-              <TextTypeProvider {...cellComponentConfig} />
-              <SelectTypeProvider {...cellComponentConfig} />
-              <NumberTypeProvider {...cellComponentConfig} />
-              <DateTypeProvider {...cellComponentConfig} />
-              <RangeDateTypeProvider {...cellComponentConfig} />
-              <RadioTypeProvider {...cellComponentConfig} />
-              <StatusTypeProvider {...cellComponentConfig} />
-              <TimeTypeProvider {...cellComponentConfig} />
-              <RowErrorTypeProvider {...cellComponentConfig} />
-
-              {grouping && <DragDropProvider />}
-
-              <TableBase
-                height={height}
-                rowComponent={this.TableRow}
-                {...tableProps}
+          <DevGrid
+            rows={getIndexedRows(
+              this.state.entity
+                ? this.state.entity.list
+                : rows.filter((o) => !o.isDeleted),
+              this.state.pagination,
+            )} // this.state.data ||
+            columns={newColumns}
+            getRowId={getRowId}
+            rootComponent={Root}
+          >
+            {filter && (
+              <FilteringState
+                defaultFilters={defaultFilters}
+                onFiltersChange={onFiltersChange}
+                columnExtensions={filterColumnExtensions}
               />
-              {selectable && (
-                <TableSelection
-                  highlightRow
-                  selectByRowClick={allowSelectRowByClick}
-                  showSelectionColumn
-                  {...selectConfig}
-                />
-              )}
-
-              {header && <HeaderRow showSortingControls />}
-              {extraRow.map((o) => o)}
-              {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
-
-              {grouping && <TableGroupRow {...groupingConfig.row} />}
-              {grouping && groupingConfig.showToolbar && <Toolbar />}
-              {grouping &&
-              groupingConfig.showToolbar && (
-                <GroupingPanel showSortingControls />
-              )}
-              {summary && <TableSummaryRow {...summaryConfig.row} />}
-              {extraColumn.map((o) => o)}
-              <TableFixedColumns
-                rightColumns={
-                  rightColumns.length > 0 ? (
-                    rightColumns
-                  ) : (
-                    [
-                      'action',
-                      'Action',
-                      'editCommand',
-                    ]
-                  )
-                }
-                leftColumns={newLeftCols}
+            )}
+            {sort && (
+              <SortingState
+                sorting={this.state.pagination.sorting}
+                defaultSorting={defaultSorting}
+                onSortingChange={(sorting) => {
+                  sorting.forEach((o) => {
+                    const c = newColumExtensions.find(
+                      (m) => m.columnName === o.columnName,
+                    )
+                    o.columnName = c.sortBy || c.columnName
+                  })
+                  this.search({
+                    sorting,
+                  })
+                }}
+                columnExtensions={newColumExtensions}
+                {...sortConfig}
               />
-              {extraGetter.map((o) => o)}
-            </DevGrid>
-          </div>
+            )}
+            {selectable && (
+              <SelectionState
+                selection={selection}
+                onSelectionChange={onSelectionChange}
+              />
+            )}
+            {summary && <SummaryState {...summaryConfig.state} />}
+            {grouping && <GroupingState {...groupingConfig.state} />}
+            {pager && (
+              <PagingState
+                currentPage={this.state.pagination.current - 1}
+                pageSize={this.state.pagination.pagesize}
+                {...pagerStateConfig}
+              />
+            )}
+            {tree && <TreeDataState />}
+            {extraState.map((o) => o)}
+
+            {grouping && <IntegratedGrouping />}
+            {/* <IntegratedFiltering /> */}
+            {sort &&
+            !type && (
+              <IntegratedSorting columnExtensions={newColumExtensions} />
+            )}
+            {summary && <IntegratedSummary {...summaryConfig.integrated} />}
+            {pager && !this.state.entity && <IntegratedPaging />}
+            {pager &&
+            this.state.entity && (
+              <CustomPaging totalCount={this.state.pagination.totalRecords} />
+            )}
+            {selectable && <IntegratedSelection />}
+            <TextTypeProvider {...cellComponentConfig} />
+            <SelectTypeProvider {...cellComponentConfig} />
+            <NumberTypeProvider {...cellComponentConfig} />
+            <DateTypeProvider {...cellComponentConfig} />
+            <RangeDateTypeProvider {...cellComponentConfig} />
+            <RadioTypeProvider {...cellComponentConfig} />
+            <StatusTypeProvider {...cellComponentConfig} />
+            <TimeTypeProvider {...cellComponentConfig} />
+            <RowErrorTypeProvider {...cellComponentConfig} />
+
+            {grouping && <DragDropProvider />}
+            {tree && <CustomTreeData getChildRows={this.getChildRows} />}
+
+            <TableBase
+              // height={height}
+              rowComponent={this.TableRow}
+              {...tableProps}
+            />
+            {selectable && (
+              <TableSelection
+                highlightRow
+                selectByRowClick={allowSelectRowByClick}
+                showSelectionColumn
+                {...selectConfig}
+              />
+            )}
+
+            {header && <HeaderRow showSortingControls />}
+            {extraRow.map((o) => o)}
+            {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
+
+            {grouping && <TableGroupRow {...groupingConfig.row} />}
+            {grouping && groupingConfig.showToolbar && <Toolbar />}
+            {grouping &&
+            groupingConfig.showToolbar && <GroupingPanel showSortingControls />}
+            {summary && <TableSummaryRow {...summaryConfig.row} />}
+            {tree && <TableTreeColumn {...treeColumnConfig} />}
+            {extraColumn.map((o) => o)}
+            <TableFixedColumns
+              rightColumns={
+                rightColumns.length > 0 ? (
+                  rightColumns
+                ) : (
+                  [
+                    'action',
+                    'Action',
+                    'editCommand',
+                  ]
+                )
+              }
+              leftColumns={newLeftCols}
+            />
+            {extraGetter.map((o) => o)}
+          </DevGrid>
         </Paper>
       </MuiThemeProvider>
     )

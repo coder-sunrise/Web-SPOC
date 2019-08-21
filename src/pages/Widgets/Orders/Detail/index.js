@@ -1,11 +1,12 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import { orderTypes } from '@/utils/codes'
 import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 import {
+  withFormikExtend,
+  FastField,
   Button,
   CommonHeader,
   CommonModal,
@@ -61,10 +62,9 @@ const styles = (theme) => ({
 @connect(({ orders }) => ({
   orders,
 }))
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ orders }) => {
-    // console.log(diagnosis)
-    return orders.default
+    return orders.entity || orders.default
   },
   validationSchema: Yup.object().shape({
     type: Yup.string().required(),
@@ -89,7 +89,7 @@ const styles = (theme) => ({
   }),
 
   handleSubmit: () => {},
-  displayName: 'Details',
+  displayName: 'WidgetOrderDetails',
 })
 class Details extends PureComponent {
   state = {

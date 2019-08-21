@@ -29,6 +29,15 @@ import Detail from './Detail'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
+  detailHeaderContainer: { position: 'relative', lineHeight: '45px' },
+  detailHeader: {
+    fontWeight: 500,
+    marginTop: theme.spacing(1),
+    '&:first-of-type': {
+      marginTop: 0,
+    },
+  },
+  medisaveCheck: { position: 'absolute', zIndex: 1, top: 11, width: 20 },
 })
 
 @connect(({ settingClinicService, global }) => ({

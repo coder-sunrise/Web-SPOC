@@ -19,10 +19,10 @@ import {
 import request from '@/utils/request'
 
 const validationSchema = Yup.object().shape({
-  // startTime: Yup.date().required(),
-  // endTime: Yup.date()
-  //   .min(Yup.ref('startTime'), 'Time To must be later than Time From')
-  //   .required(),
+  startTime: Yup.string().required(),
+  endTime: Yup.string()
+    .laterThan(Yup.ref('startTime'), 'Time From must be later than Time To')
+    .required(),
   clinicianFK: Yup.string().required(),
 })
 
@@ -155,7 +155,7 @@ class AppointmentDataGrid extends React.PureComponent {
 
   render () {
     const { data, handleCommitChanges } = this.props
-
+    // console.log({ data })
     return (
       <div>
         <EditableTableGrid

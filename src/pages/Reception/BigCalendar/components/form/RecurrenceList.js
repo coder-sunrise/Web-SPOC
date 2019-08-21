@@ -16,16 +16,15 @@ const mapRecurrencePatternToRRuleFeq = {
 }
 
 const getRRule = (
+  { eventDate: doctorBlockStartDate, appointmentDate: eventStartDate },
   {
-    eventDate: doctorBlockStartDate,
-    appointmentDate: eventStartDate,
-    stopDate,
-    recurrencePattern: freq,
-    every,
+    recurrencePatternFK: freq,
+    recurrenceFrequency: every,
+    recurrenceDayOfTheMonth: day,
+    recurrenceDaysOfTheWeek: days,
     recurrenceRange,
-    occurence = 1,
-    day,
-    days = [],
+    recurrenceCount: occurence,
+    recurrenceEndDate: stopDate,
   },
   isDoctorBlock,
 ) => {
@@ -87,6 +86,7 @@ const getRRule = (
     console.error({ error })
     rule = undefined
   }
+  console.log({ rule })
   return rule
 }
 
@@ -105,12 +105,18 @@ const joinWeekDays = (selectedDays) => {
 
 const formatRecurrenceLabel = (
   {
-    recurrencePattern,
-    every,
-    day: dayOfMonth,
-    days: weekdays = [],
+    // recurrencePattern,
+    // recurrenceFrequency: every,
+    // day: dayOfMonth,
+    // days: weekdays = [],
     appointmentDate,
     eventDate: doctorBlockStartDate,
+  },
+  {
+    recurrencePatternFK: recurrencePattern,
+    recurrenceFrequency: every,
+    recurrenceDayOfTheMonth: dayOfMonth,
+    recurrenceDaysOfTheWeek: weekdays,
   },
   rule,
 ) => {
@@ -165,9 +171,15 @@ const formatRecurrenceLabel = (
   return result
 }
 
-const RecurrenceList = ({ values, isDoctorBlock, ...restProps }) => {
-  const rule = getRRule(values, isDoctorBlock)
-  const label = rule !== undefined ? formatRecurrenceLabel(values, rule) : ''
+const RecurrenceList = ({
+  values,
+  recurrenceDto,
+  isDoctorBlock,
+  ...restProps
+}) => {
+  const rule = getRRule(values, recurrenceDto, isDoctorBlock)
+  const label =
+    rule !== undefined ? formatRecurrenceLabel(values, recurrenceDto, rule) : ''
 
   return (
     <div {...restProps}>

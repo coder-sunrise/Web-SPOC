@@ -94,33 +94,6 @@ class Form extends React.PureComponent {
     result && this.openSearchPatientModal()
   }
 
-  // handleSelectPatient = (patientID) => {
-  //   fetchPatientInfoByPatientID(patientID).then((response) => {
-  //     if (response) {
-  //       const patientInfo = { ...response.data }
-  //       const { name, contact } = patientInfo
-  //       const patientName = name !== undefined ? name : ''
-  //       let contactNumber = ''
-  //       if (contact) {
-  //         const { mobileContactNumber } = contact
-  //         contactNumber = mobileContactNumber.number
-  //       }
-  //       const { setFieldValue, setFieldTouched } = this.props
-
-  //       setFieldValue('patientName', patientName)
-  //       setFieldValue('contactNo', contactNumber)
-
-  //       setFieldTouched('patientName', true)
-  //       setFieldTouched('contactNo', true)
-
-  //       this.setState({
-  //         showSearchPatientModal: false,
-  //         isRegisteredPatient: true,
-  //       })
-  //     }
-  //   })
-  // }
-
   onSelectPatientClick = (patientProfile) => {
     const { id, patientAccountNo, name, mobileNo } = patientProfile
     const { setFieldValue, setFieldTouched } = this.props
@@ -141,10 +114,33 @@ class Form extends React.PureComponent {
     })
   }
 
-  onCancelAppointmentClick = () => {
-    this.setState({
-      showDeleteConfirmationModal: true,
+  deleteDraft = (id) => {
+    const { onClose, dispatch } = this.props
+    dispatch({
+      type: 'calendar/deleteDraft',
+      id,
+      callback: onClose,
     })
+  }
+
+  onCancelOrDeleteClick = () => {
+    const { values, dispatch } = this.props
+    if (values.appointmentStatusFk !== undefined) {
+      if (values.appointmentStatusFk === '2') {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: `Are you sure want to delete this draft appointment?`,
+            onOpenConfirm: () => this.deleteDraft(values.id),
+          },
+        })
+      } else {
+        this.setState({
+          showDeleteConfirmationModal: true,
+        })
+      }
+    }
   }
 
   onConfirmCancelAppointment = ({ deleteType, reasonType, reason }) => {
@@ -180,10 +176,10 @@ class Form extends React.PureComponent {
     // } else {
     //   this._confirm()
     // }
-    this._confirm()
+    this.confirm()
   }
 
-  submit = async (appointmentStatusFK) => {
+  _submit = async (appointmentStatusFK, validate = false) => {
     const { validateForm, setSubmitting } = this.props
     setSubmitting(true)
     const formError = await validateForm()
@@ -201,6 +197,8 @@ class Form extends React.PureComponent {
       appointmentDate,
       isEnableRecurrence,
       recurrenceDto,
+      concurrencyToken,
+      appointmentGroupFK,
       ...appointmentValues
     } = values
 
@@ -208,6 +206,9 @@ class Form extends React.PureComponent {
 
     const appointments = [
       {
+        id: appointmentGroupFK,
+        concurrencyToken,
+        appointmentGroupFK,
         appointmentStatusFK,
         appointmentRemarks,
         appointmentDate: parseDateToServerDateFormatString(appointmentDate),
@@ -219,38 +220,50 @@ class Form extends React.PureComponent {
 
     const updated = {
       ...appointmentValues,
+      concurrencyToken,
       isEnableRecurrence,
       recurrenceDto: !isEnableRecurrence ? undefined : recurrenceDto,
       appointments,
     }
 
     console.log({ updated })
+    const actionKey = validate
+      ? 'calendar/validate'
+      : 'calendar/saveAppointment'
+
     setSubmitting(false)
-    // dispatch({
-    //   type: 'calendar/upsert',
-    //   payload: updated,
-    // })
+    dispatch({
+      type: actionKey,
+      payload: updated,
+    })
     // resetForm()
     // onClose && onClose()
   }
 
   onDeleteClick = () => {}
 
+  onValidateClick = () => {
+    const appointmentStatusFK = this.props.appointmentStatuses.find(
+      (item) => item.code === 'DRAFT',
+    ).id
+
+    this._submit(appointmentStatusFK, true)
+  }
+
   onSaveDraftClick = () => {
     const appointmentStatusFK = this.props.appointmentStatuses.find(
       (item) => item.code === 'DRAFT',
     ).id
-    console.log({ appointmentStatus: this.props.appointmentStatuses })
 
-    this.submit(appointmentStatusFK)
+    this._submit(appointmentStatusFK)
   }
 
-  _confirm = () => {
+  confirm = () => {
     const appointmentStatusFK = this.props.appointmentStatuses.find(
       (item) => item.code === 'SCHEDULED',
     ).id
 
-    this.submit(appointmentStatusFK)
+    this._submit(appointmentStatusFK)
   }
 
   openSeriesUpdateConfirmation = () => {
@@ -278,7 +291,7 @@ class Form extends React.PureComponent {
       showSeriesUpdateConfirmation,
       datagrid,
     } = this.state
-    console.log({ values })
+    // console.log({ values })
 
     return (
       <SizeContainer>
@@ -335,11 +348,11 @@ class Form extends React.PureComponent {
           <FormFooter
             // isNew={slotInfo.type === 'add'}
             appointmentStatusFK={values.appointmentStatusFk}
-            onCancelAppointmentClick={this.onCancelAppointmentClick}
             onClose={onClose}
-            handleDeleteClick={this.onDeleteClick}
+            handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
             handleSaveDraftClick={this.onSaveDraftClick}
             handleConfirmClick={this.onConfirmClick}
+            handleValidateClick={this.onValidateClick}
           />
           <CommonModal
             open={showSearchPatientModal}

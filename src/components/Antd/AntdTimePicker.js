@@ -9,7 +9,10 @@ import { DatePicker, TimePicker } from 'antd'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
 import { extendFunc } from '@/utils/utils'
-import { CustomInput } from '@/components'
+import {
+  CustomInput,
+  timeFormat24Hour as defaultTimeFormat,
+} from '@/components'
 import { control } from '@/components/Decorator'
 
 const _dateFormat = 'YYYY-MM-DD'
@@ -103,11 +106,12 @@ class AntdTimePicker extends PureComponent {
     this.setState({
       value: time,
     })
+
     const { form, field, format, onChange } = this.props
     if (form && field) {
       form.setFieldValue(
         field.name,
-        moment.isMoment(time) ? time.format(format) : '',
+        moment.isMoment(time) ? time.format(defaultTimeFormat) : '',
       )
     }
 
@@ -128,7 +132,7 @@ class AntdTimePicker extends PureComponent {
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
-
+    // console.log(format)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     return (

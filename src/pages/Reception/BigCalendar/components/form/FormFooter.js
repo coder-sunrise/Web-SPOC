@@ -21,11 +21,11 @@ const FormFooter = ({
   classes,
   appointmentStatusFK,
   onClose,
-  onCancelAppointmentClick,
+  handleCancelOrDeleteClick,
   handleSaveDraftClick,
   handleConfirmClick,
+  handleValidateClick,
 }) => {
-  console.log({ appointmentStatusFK })
   const isNew = appointmentStatusFK === undefined
   const isDraft = appointmentStatusFK === '2'
 
@@ -42,14 +42,14 @@ const FormFooter = ({
           <Button
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
-            onClick={onCancelAppointmentClick}
+            onClick={handleCancelOrDeleteClick}
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>
         </GridItem>
 
         <GridItem xs md={8} container justify='flex-end'>
-          <Button color='success' disabled>
+          <Button color='success' onClick={handleValidateClick}>
             {ButtonText.CHECK}
           </Button>
           <Button onClick={onClose} color='danger'>

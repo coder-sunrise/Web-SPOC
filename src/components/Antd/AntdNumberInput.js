@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import AutosizeInput from 'react-input-autosize'
 import _ from 'lodash'
 import numeral from 'numeral'
 
@@ -307,10 +308,15 @@ class AntdNumberInput extends React.PureComponent {
     //   cfg.value = selectValue
     // }
     // console.log(props)
+
     if (this.props.text) {
       const cfg = this.getConfig()
-      if (cfg.formatter) return <span>{cfg.formatter(this.state.value)}</span>
-      return <span>{this.state.value}</span>
+      return (
+        <AutosizeInput
+          inputClassName={props.className}
+          value={cfg.formatter(this.state.value)}
+        />
+      )
     }
 
     return (

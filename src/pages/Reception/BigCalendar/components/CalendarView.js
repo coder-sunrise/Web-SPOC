@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'dva'
 // moment
 import moment from 'moment'
 // big calendar
@@ -46,10 +47,12 @@ const styles = () => ({
 
 const today = new Date()
 
+@connect(({ calendar }) => ({
+  displayDate: calendar.currentViewDate,
+  calendarView: calendar.calendarView,
+}))
 class CalendarView extends React.PureComponent {
   state = {
-    displayDate: new Date(),
-    calendarView: BigCalendar.Views.MONTH,
     minTime: new Date(
       today.getFullYear(),
       today.getMonth(),
@@ -89,9 +92,8 @@ class CalendarView extends React.PureComponent {
   }
 
   _customDayPropGetter = (date) => {
-    const { calendarView } = this.state
     if (
-      calendarView === BigCalendar.Views.MONTH &&
+      this.props.calendarView === BigCalendar.Views.MONTH &&
       (date.getDate() === 7 ||
         date.getDate() === 17 ||
         date.getDate() === 19 ||
@@ -108,17 +110,13 @@ class CalendarView extends React.PureComponent {
     return {}
   }
 
-  _customSlotPropGetter = (props) => {
-    console.log({ props })
-    return props.child
-  }
-
   _jumpToDate = (date) => {
-    this.setState({ displayDate: date })
+    this.props.dispatch({ type: 'calendar/navigateCalendar', date })
+    // this.props.dispatch({ type: 'calendar/setCurrentViewDate', date })
   }
 
   _onViewChange = (view) => {
-    this.setState({ calendarView: view })
+    this.props.dispatch({ type: 'calendar/setCalendarView', view })
   }
 
   _moveEvent = ({ event, start, end, resourceId }) => {
@@ -140,7 +138,7 @@ class CalendarView extends React.PureComponent {
     return (
       <CalendarToolbar
         {...toolbarProps}
-        displayDate={this.state.displayDate}
+        displayDate={this.props.displayDate}
         handleViewChange={this._onViewChange}
         handleDateChange={this._jumpToDate}
       />
@@ -188,9 +186,11 @@ class CalendarView extends React.PureComponent {
       // --- variables ---
       calendarEvents,
       resources,
+      displayDate,
+      calendarView,
     } = this.props
 
-    const { displayDate, minTime, maxTime, calendarView } = this.state
+    const { minTime, maxTime } = this.state
 
     return (
       <DragAndDropCalendar

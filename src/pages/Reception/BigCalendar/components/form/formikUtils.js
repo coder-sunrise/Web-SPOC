@@ -2,6 +2,7 @@ import moment from 'moment'
 import {
   serverDateFormat,
   timeFormat,
+  timeFormat24Hour,
   timeFormatWithoutSecond,
 } from '@/components'
 import { initialAptInfo } from './variables'
@@ -67,10 +68,10 @@ const initDailyRecurrence = {
   recurrencePatternFK: 1,
   recurrenceFrequency: 1,
   recurrenceDayOfTheMonth: 1,
-  recurrenceDaysOfTheWeek: '',
+  recurrenceDaysOfTheWeek: [],
   recurrenceRange: '',
   recurrenceCount: 1,
-  recurrenceEndDate: '2019-07-15T10:05:29.4405139+08:00',
+  recurrenceEndDate: undefined,
 }
 
 export const mapPropsToValues = ({
@@ -82,19 +83,25 @@ export const mapPropsToValues = ({
   const appointment = events.find((item) => item.id === selectedAppointmentID)
   if (appointment) {
     const {
+      // eslint-disable-next-line camelcase
+      appointment_Resources,
       id,
+      concurrencyToken,
       bookedByUserFk,
       isEnableRecurrence,
       patientName,
       patientContactNo,
       patientProfileFk,
       appointmentStatusFk,
+      appointmentGroupFK,
       appointmentRemarks,
+      ...restValues
     } = appointment
     const appointmentDate = moment(appointment.appointmentDate).toDate()
 
     return {
       id,
+      concurrencyToken,
       bookedByUserFK: bookedByUserFk,
       isEnableRecurrence,
       patientName,
@@ -102,16 +109,20 @@ export const mapPropsToValues = ({
       patientProfileFK: patientProfileFk,
       appointmentDate,
       appointmentStatusFk,
+      appointmentGroupFK,
       appointmentRemarks,
+      recurrenceDto: { ...initDailyRecurrence },
+      ...restValues,
     }
   }
 
   return {
     id: undefined,
     isEnableRecurrence: false,
-    bookedByUserFK: user.userProfileFK,
-    bookedByUser: user.name,
+    bookedByUserFK: user.id,
+    bookedByUser: user.userName,
     appointmentDate: selectedSlot.start,
+    recurrenceDto: { ...initDailyRecurrence },
   }
   // return {
   //   ...initialAptInfo,
@@ -172,17 +183,22 @@ export const parseDateToServerDateFormatString = (date, format) => {
 }
 
 export const mapDatagridToAppointmentResources = (event, index) => {
+  console.log({ event })
   const {
     startTime: timeFrom,
     endTime: timeTo,
     clinicianFK,
     isPrimaryClinician,
     roomFk,
+    id,
+    concurrencyToken,
   } = event
-  const startTime = moment(timeFrom, timeFormatWithoutSecond).format(timeFormat)
-  const endTime = moment(timeTo, timeFormatWithoutSecond).format(timeFormat)
+  const startTime = moment(timeFrom, timeFormat).format(timeFormat24Hour)
+  const endTime = moment(timeTo, timeFormat).format(timeFormat24Hour)
   return {
+    id: id < 0 ? undefined : id,
     clinicianFK,
+    concurrencyToken,
     isPrimaryClinician,
     roomFk,
     startTime,

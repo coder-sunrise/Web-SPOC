@@ -15,7 +15,7 @@ const RecurrenceDaily = ({ classes, labelSize, inputSize }) => {
       </GridItem>
       <GridItem md={inputSize}>
         <FastField
-          name='every'
+          name='recurrenceFrequency'
           render={(args) => <NumberInput {...args} suffix='day(s)' />}
         />
       </GridItem>

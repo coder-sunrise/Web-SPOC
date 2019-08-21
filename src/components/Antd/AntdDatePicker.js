@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import AutosizeInput from 'react-input-autosize'
 import moment from 'moment'
 import classnames from 'classnames'
 // material ui
@@ -20,6 +21,7 @@ import {
 } from '@/components'
 
 const _toMoment = (value, format) => {
+  // console.log({ value })
   if (!value) return ''
   const m = moment.utc(value)
   return m.local()
@@ -199,7 +201,18 @@ class AntdDatePicker extends PureComponent {
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     if (text)
-      return <span>{_toMoment(this.state.value, format).format(format)}</span>
+      return (
+        <AutosizeInput
+          inputClassName={props.className}
+          value={
+            this.state.value !== undefined ? (
+              _toMoment(this.state.value, format).format(format)
+            ) : (
+              ''
+            )
+          }
+        />
+      )
     return (
       <div style={{ width: '100%' }} {...props}>
         <DatePicker

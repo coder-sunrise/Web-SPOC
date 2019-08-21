@@ -54,7 +54,7 @@ class Vaccination extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6}>
+          {/* <GridItem xs={6}>
             <FastField
               name='sequence'
               render={(args) => {
@@ -69,7 +69,7 @@ class Vaccination extends PureComponent {
                 )
               }}
             />
-          </GridItem>
+          </GridItem> */}
         </GridContainer>
         <GridContainer>
           <GridItem xs={4}>

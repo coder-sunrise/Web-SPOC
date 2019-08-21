@@ -49,6 +49,11 @@ class TextEditorBase extends PureComponent {
       gridId,
       ...restConfig
     } = cfg
+
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][row.id] || {}
+      : row
+
     const submitValue = (e) => {
       const error = updateCellValue(
         this.props,
@@ -59,21 +64,11 @@ class TextEditorBase extends PureComponent {
         error,
       })
       if (!error) {
-        if (onChange)
-          onChange(
-            e.target.value,
-            window.$tempGridRow[gridId]
-              ? window.$tempGridRow[gridId][row.id] || {}
-              : row,
-          )
+        if (onChange) onChange(e.target.value, latestRow)
       }
     }
     const commonCfg = {
-      disabled: isDisabled(
-        window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][row.id] || {}
-          : row,
-      ),
+      disabled: isDisabled(latestRow),
     }
     return (
       <div ref={this.myRef}>

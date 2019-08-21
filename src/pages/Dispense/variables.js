@@ -5,6 +5,7 @@ export const tableConfig = {
 }
 
 export const PrescriptionColumns = [
+  // { name: 'id', title: 'id' },
   {
     name: 'name',
     title: 'Name',
@@ -62,7 +63,7 @@ const generatePrescriptionData = () => {
       name: 'Anarex',
       desription: '',
       batchNo: '324792',
-      expiryDate: moment(),
+      expiryDate: moment().format(),
       qtyOrdered: 10,
       qtyDispensed: 10,
       unitPrice: 50,

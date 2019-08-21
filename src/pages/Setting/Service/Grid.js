@@ -1,23 +1,12 @@
+import React, { PureComponent } from 'react'
 import { CommonTableGrid, Button } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 
-export default ({ dispatch, classes }) => (
-  <CommonTableGrid
-    style={{ margin: 0 }}
-    rows={[
-      {
-        id: 1,
-        type: 'SV/000001',
-        displayValue: 'Surgery - Minor Procedure',
-        description: 'Surgery - Minor Procedure',
-        serviceCenter: 'Doctor Consultation',
-        status: 'Active',
-        sellingPrice: 40,
-      },
-    ]}
-    columns={[
+class Grid extends PureComponent {
+  configs = {
+    columns: [
       { name: 'type', title: 'Code' },
       { name: 'displayValue', title: 'Display Value' },
       { name: 'description', title: 'Description' },
@@ -25,38 +14,53 @@ export default ({ dispatch, classes }) => (
       { name: 'sellingPrice', title: 'Unit Selling Price' },
       { name: 'status', title: 'Status' },
       { name: 'action', title: 'Action' },
-    ]}
-    FuncProps={{ pager: false }}
-    columnExtensions={[
+    ],
+    columnExtensions: [
       { columnName: 'sellingPrice', type: 'number', currency: true },
-    ]}
-    ActionProps={{
-      TableCellComponent: ({ column, row, ...props }) => {
-        if (column.name === 'action') {
+      {
+        columnName: 'action',
+        align: 'center',
+        render: (row) => {
           return (
-            <Table.Cell {...props}>
-              <Button
-                size='sm'
-                onClick={() => {
-                  // props.history.push(
-                  //   getAppendUrl({
-                  //     md: 'pt',
-                  //     cmt: '1',
-                  //     pid: row.id,
-                  //   }),
-                  // )
-                }}
-                justIcon
-                color='primary'
-                style={{ marginRight: 5 }}
-              >
-                <Edit />
-              </Button>
-            </Table.Cell>
+            <Button
+              size='sm'
+              onClick={() => {
+                this.editRow(row)
+              }}
+              justIcon
+              color='primary'
+            >
+              <Edit />
+            </Button>
           )
-        }
-        return <Table.Cell {...props} />
+        },
       },
-    }}
-  />
-)
+    ],
+  }
+
+  editRow = (row) => {
+    const { dispatch, settingClinicService } = this.props
+
+    const { list } = settingClinicService
+    dispatch({
+      type: 'settingClinicService/updateState',
+      payload: {
+        showModal: true,
+        entity: list.find((o) => o.id === row.id),
+      },
+    })
+  }
+
+  render () {
+    return (
+      <CommonTableGrid
+        style={{ margin: 0 }}
+        type='settingClinicService'
+        onRowDoubleClick={this.editRow}
+        {...this.configs}
+      />
+    )
+  }
+}
+
+export default Grid

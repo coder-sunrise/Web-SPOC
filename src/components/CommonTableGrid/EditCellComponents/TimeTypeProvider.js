@@ -6,6 +6,7 @@ import { updateCellValue } from 'utils'
 import {
   TimePicker,
   TimeTypeProvider as TimeTypeProviderOrg,
+  timeFormat24Hour,
 } from '@/components'
 
 const dateFormat = 'DD-MMM-YYYY'
@@ -28,9 +29,9 @@ class TimeEditorBase extends PureComponent {
     })
   }
 
-  onChange = (date) => {
+  onChange = (time) => {
     this.setState({
-      tempValue: date,
+      tempValue: time,
     })
   }
 
@@ -50,19 +51,23 @@ class TimeEditorBase extends PureComponent {
       }
 
       const timeString = tempValue.format(cfg.format ? cfg.format : timeFormat)
-      const currentDateString = cfg.currentDate.format(dateFormat)
+      // const timeString24HourFormat = tempValue.format(timeFormat24Hour)
+      // const currentDateString = cfg.currentDate.format(dateFormat)
 
-      const fullDateTime = moment(
-        `${currentDateString} ${timeString}`,
-        `${dateFormat} ${timeFormat}`,
-      )
+      // const fullDateTime = moment(
+      //   `${currentDateString} ${timeString}`,
+      //   `${dateFormat} ${timeFormat}`,
+      // )
+
+      // const time = moment(
+      //   timeString,
+      //   cfg.format ? cfg.format : timeFormat,
+      // ).format(cfg.format ? cfg.format : timeFormat)
+
+      // console.log({ time, timeString })
 
       this.setState({
-        error: updateCellValue(
-          this.props,
-          this.myRef.current,
-          fullDateTime.toDate(),
-        ),
+        error: updateCellValue(this.props, this.myRef.current, timeString),
       })
     }
   }
@@ -97,7 +102,7 @@ class TimeEditorBase extends PureComponent {
     return (
       <div ref={this.myRef}>
         <TimePicker
-          format='hh:mm a'
+          // format='hh:mm a'
           showErrorIcon
           allowClear={false}
           error={this.state.error}

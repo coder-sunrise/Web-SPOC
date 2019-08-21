@@ -18,7 +18,7 @@ const RecurrenceMonthly = ({ classes, labelSize, inputSize }) => {
       </GridItem>
       <GridItem md={inputSize}>
         <FastField
-          name='every'
+          name='recurrenceFrequency'
           render={(args) => (
             <NumberInput {...args} prefix='of every: ' suffix='month(s)' />
           )}

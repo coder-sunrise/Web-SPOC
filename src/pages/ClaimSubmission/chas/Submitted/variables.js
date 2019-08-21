@@ -87,5 +87,7 @@ const generateNewCHASData = () => {
 export const NewCHASTableData = generateNewCHASData()
 
 export const TableConfig = {
-  FuncProps: {},
+  FuncProps: {
+    selectable: true,
+  },
 }

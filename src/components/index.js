@@ -55,6 +55,7 @@ export * from './mui-pro'
 export * from './Sketch'
 
 export CommonCard from './CommonCard'
+export FieldSet from './FieldSet'
 
 export * from './Decorator'
 

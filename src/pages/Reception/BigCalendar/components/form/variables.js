@@ -1,3 +1,5 @@
+import { timeFormat } from '@/components'
+
 export const RECURRENCE_PATTERN = {
   DAILY: 1,
   WEEKLY: 2,
@@ -66,8 +68,13 @@ export const AppointmentDataColExtensions = [
     code: 'ctappointmenttype',
     mode: 'multiple',
   },
-  { columnName: 'startTime', type: 'time', width: 120, format: 'HH:mm' },
-  { columnName: 'endTime', type: 'time', width: 120, format: 'HH:mm' },
+  {
+    columnName: 'startTime',
+    type: 'time',
+    width: 140,
+    format: timeFormat,
+  },
+  { columnName: 'endTime', type: 'time', width: 140, format: timeFormat },
   {
     columnName: 'roomFk',
     width: 110,

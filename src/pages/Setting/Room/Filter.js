@@ -42,7 +42,7 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='status'
+              name='isActive'
               render={(args) => {
                 return <Select label='Status' options={status} {...args} />
               }}

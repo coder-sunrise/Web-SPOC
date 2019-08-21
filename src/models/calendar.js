@@ -1,6 +1,13 @@
+// big calendar
+import BigCalendar from 'react-big-calendar'
+// moment
+import moment from 'moment'
+// common components
+import { notification, serverDateFormat } from '@/components'
+
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services/calendar'
-import { notification } from '@/components'
+
 // import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
 
 export default createListViewModel({
@@ -12,18 +19,82 @@ export default createListViewModel({
     service,
     state: {
       calendarEvents: [],
+      currentViewDate: new Date(),
+      calendarView: BigCalendar.Views.MONTH,
     },
     subscriptions: {},
     effects: {
-      *deleteDraft ({ id }, { call }) {
-        const result = yield call(service.deleteDraft, id)
+      *validate ({ payload }, { call, put }) {
+        const result = yield call(service.validate, payload)
         console.log({ result })
-        notification.sucess({
-          message: 'Deleted',
+      },
+      *refresh (_, { select, put }) {
+        const calendarState = yield select((state) => state.calendar)
+        const { date, calendarView } = calendarState
+        let start
+        let end
+        if (calendarView === BigCalendar.Views.MONTH) {
+          start = moment(date).startOf('month').format(serverDateFormat)
+          end = moment(date).endOf('month').format(serverDateFormat)
+        }
+
+        const payload = {
+          combineCondition: 'and',
+          lgt_appointmentDate: start,
+          lst_appointmentDate: end,
+        }
+        yield put({ type: 'getCalendarList', payload })
+      },
+      *getCalendarList ({ payload }, { call, put }) {
+        const result = yield call(service.queryList, payload)
+        const { status, data } = result
+        if (status === '200' && data.data) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              list: data.data,
+            },
+          })
+        }
+      },
+      *saveAppointment ({ payload }, { call, put }) {
+        const result = yield call(service.save, payload)
+        if (result) yield put({ type: 'refresh' })
+      },
+      *deleteDraft ({ id, callback }, { call, put }) {
+        const result = yield call(service.deleteDraft, id)
+        if (result === 204) notification.success({ message: 'Deleted' })
+        yield put({ type: 'refresh' })
+        callback && callback()
+      },
+      *navigateCalendar ({ date }, { select, call, put }) {
+        const calendarState = yield select((state) => state.calendar)
+        yield put({
+          type: 'setCurrentViewDate',
+          date,
         })
+        let start
+        let end
+        if (calendarState.calendarView === BigCalendar.Views.MONTH) {
+          start = moment(date).startOf('month').format(serverDateFormat)
+          end = moment(date).endOf('month').format(serverDateFormat)
+        }
+
+        const payload = {
+          combineCondition: 'and',
+          lgt_appointmentDate: start,
+          lst_appointmentDate: end,
+        }
+        yield put({ type: 'getCalendarList', payload })
       },
     },
     reducers: {
+      setCurrentViewDate (state, { date }) {
+        return { ...state, currentViewDate: date }
+      },
+      setCalendarView (state, { view }) {
+        return { ...state, calendarView: view }
+      },
       moveEvent (state, { updatedEvent, id, _appointmentID }) {
         const { calendarEvents } = state
         const appointment = calendarEvents.find(

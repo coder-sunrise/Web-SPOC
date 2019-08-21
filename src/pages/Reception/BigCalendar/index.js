@@ -93,10 +93,14 @@ class Appointment extends React.PureComponent {
     this.props.dispatch({
       type: 'calendar/query',
       payload: {
-        combineCondition: 'or',
+        combineCondition: 'and',
         lgt_appointmentDate: startOfMonth,
         lst_appointmentDate: endOfMonth,
       },
+    })
+    this.props.dispatch({
+      type: 'calendar/setCurrentViewDate',
+      date: moment().toDate(),
     })
   }
 

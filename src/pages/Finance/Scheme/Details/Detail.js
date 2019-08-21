@@ -13,12 +13,13 @@ import {
   GridItem,
   Select,
   DatePicker,
+  DateRangePicker,
   Switch,
 } from '@/components'
 
 const styles = () => ({})
 
-const Detail = ({ schemeDetail, dispatch }) => {
+const Detail = ({ schemeDetail, dispatch, height }) => {
   useEffect(() => {
     if (schemeDetail.currentId) {
       dispatch({
@@ -34,8 +35,8 @@ const Detail = ({ schemeDetail, dispatch }) => {
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        height,
+        overflow: 'auto',
       }}
     >
       <GridContainer gutter={0}>
@@ -58,7 +59,7 @@ const Detail = ({ schemeDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='displayValue'
+                name='name'
                 render={(args) => {
                   return (
                     <TextField
@@ -110,13 +111,14 @@ const Detail = ({ schemeDetail, dispatch }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='schemeType'
+                name='schemeTypeFK'
                 render={(args) => {
                   return (
-                    <TextField
+                    <CodeSelect
                       label={formatMessage({
                         id: 'finance.scheme.detail.type',
                       })}
+                      code='ctSchemeType'
                       {...args}
                     />
                   )
@@ -125,13 +127,14 @@ const Detail = ({ schemeDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='schemeCategory'
+                name='schemeCategoryFK'
                 render={(args) => {
                   return (
-                    <TextField
+                    <CodeSelect
                       label={formatMessage({
                         id: 'finance.scheme.detail.category',
                       })}
+                      code='ctCopayerType'
                       {...args}
                     />
                   )
@@ -146,8 +149,8 @@ const Detail = ({ schemeDetail, dispatch }) => {
                     label={formatMessage({
                       id: 'finance.scheme.detail.coPayer',
                     })}
-                    code='ctcoPayer'
-                    max={10}
+                    code='ctCompany'
+                    max={50}
                     {...args}
                   />
                 )}
@@ -155,34 +158,21 @@ const Detail = ({ schemeDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='effectiveStartDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'finance.scheme.detail.effectiveStartDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='effectiveEndDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'finance.scheme.detail.effectiveEndDate',
-                    })}
-                    {...args}
-                  />
-                )}
+                name='effectiveDates'
+                render={(args) => {
+                  return (
+                    <DateRangePicker
+                      label='Effective Start Date'
+                      label2='End Date'
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
           </GridContainer>
         </GridItem>
       </GridContainer>
-      <Divider style={{ margin: '40px 0 20px 0' }} />
     </CardContainer>
   )
 }

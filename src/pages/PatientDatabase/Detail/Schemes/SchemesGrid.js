@@ -11,7 +11,7 @@ import { getCodes } from '@/utils/codes'
 // })
 
 const ctSchemeType = 'ctSchemeType'
-
+let commitCount = 1000 // uniqueNumber
 @connect(({ codetable }) => ({ codetable }))
 class SchemesGrid extends PureComponent {
   state = {
@@ -19,120 +19,170 @@ class SchemesGrid extends PureComponent {
     rowChanges: {},
   }
 
-  tableParas = {
-    columns: [
-      { name: 'schemeTypeFK', title: 'Scheme Type' },
-      { name: 'coPaymentSchemeFK', title: 'Scheme Name' },
-      { name: 'accountNumber', title: 'Account Number' },
-      { name: 'validRange', title: 'Valid Period' },
-    ],
-    columnExtensions: [
-      {
-        columnName: 'validRange',
-        type: 'daterange',
-        getInitialValue: (row) => {
-          return [
-            row.validFrom,
-            row.validTo,
-          ]
-        },
-        isDisabled: (row) => {
-          return this.isMedisave(row)
-        },
-        // onChange: (date, moments, org, row) => {
-        //   row.validFrom = date[0]
-        //   row.validTo = date[1]
-
-        //   console.log(date, row)
-        // },
-      },
-      {
-        columnName: 'schemeTypeFK',
-        type: 'codeSelect',
-        code: 'ctSchemeType',
-        onChange: ({ val, option, row, onValueChange }) => {
-          // console.log(row)
-          let rows = this.props.rows
-          if (!row.id) {
-            rows = rows.concat([
-              row,
-            ])
-          }
-          if (
-            rows.filter(
-              (o) => !o.isDeleted && o.schemeTypeFK === val && o.id !== row.id,
-            ).length >= 1
-          ) {
-            notification.error({
-              message: 'The Schemes record already exists in the system',
-            })
-            onValueChange(undefined)
-            return
-          }
-          if (
-            this.isCHAS(val) &&
-            rows.filter(
-              (o) =>
-                !o.isDeleted && this.isCHAS(o.schemeTypeFK) && o.id !== row.id,
-            ).length > 0
-          ) {
-            notification.error({
-              message: 'Patient already has a CHAS Scheme Added',
-            })
-            onValueChange(undefined)
-            return
-          }
-          // console.log(row, rows)
-          if (
-            this.medisaveCheck(row) &&
-            rows.filter(
-              (o) => !o.isDeleted && this.medisaveCheck(o) && o.id !== row.id,
-            ).length > 0
-          ) {
-            notification.error({
-              message:
-                'Patient can only either Medisave 500 Visit or Outpantient Scan at any point of time',
-            })
-            onValueChange(undefined)
-            return
-          }
-          if (this.isMedisave(row)) {
-            row.validRange = []
-            row.validFrom = ''
-            row.validTo = ''
-          }
-          // console.log(val)
-          onValueChange(val)
-        },
-      },
-      {
-        columnName: 'coPaymentSchemeFK',
-        // type: 'codeSelect',
-        // code: 'ctSchemeCategory',
-        type: 'select', // TODO: get from api
-        options: [
-          { value: 1, name: 'Test 01' },
-          { value: 2, name: 'Test 02' },
-          { value: 3, name: 'Test 03' },
-        ],
-        isDisabled: (row) => {
-          return !this.isCorporate(row)
-        },
-      },
-      {
-        columnName: 'accountNumber',
-        isDisabled: (row) => {
-          return !this.isCorporate(row)
-        },
-      },
-    ],
-  }
-
   constructor (props) {
     super(props)
 
     const { title, titleChildren, dispatch, type } = props
     const { state } = this
+
+    this.tableParas = {
+      columns: [
+        { name: 'schemeTypeFK', title: 'Scheme Type' },
+        { name: 'coPaymentSchemeFK', title: 'Scheme Name' },
+        { name: 'accountNumber', title: 'Account Number' },
+        { name: 'validRange', title: 'Valid Period' },
+      ],
+      columnExtensions: [
+        {
+          columnName: 'validRange',
+          type: 'daterange',
+          getInitialValue: (row) => {
+            return [
+              row.validFrom,
+              row.validTo,
+            ]
+          },
+          isDisabled: (row) => {
+            return this.isMedisave(row)
+          },
+          // onChange: (date, moments, org, row) => {
+          //   row.validFrom = date[0]
+          //   row.validTo = date[1]
+
+          //   console.log(date, row)
+          // },
+        },
+        {
+          columnName: 'schemeTypeFK',
+          type: 'codeSelect',
+          code: 'ctSchemeType',
+          onChange: ({ val, option, row, onValueChange }) => {
+            console.log('schemeTypeFK')
+            let rows = this.props.rows
+            if (!row.id) {
+              rows = rows.concat([
+                row,
+              ])
+            }
+            const ctSchemeTypes = this.props.codetable[
+              ctSchemeType.toLowerCase()
+            ]
+            const st = ctSchemeTypes.find((o) => o.id === val)
+            // console.log(st)
+            const rs = rows.filter(
+              (o) =>
+                !o.isDeleted &&
+                o.schemeTypeFK === val &&
+                st.code !== 'Corporate' &&
+                o.id !== row.id,
+            )
+            if (rs.length >= 1) {
+              row.schemeTypeFK = undefined
+              notification.error({
+                message: 'The Schemes record already exists in the system',
+              })
+              return
+            }
+            if (
+              this.isCHAS(val) &&
+              rows.filter(
+                (o) =>
+                  !o.isDeleted &&
+                  this.isCHAS(o.schemeTypeFK) &&
+                  o.id !== row.id,
+              ).length > 0
+            ) {
+              row.schemeTypeFK = undefined
+
+              notification.error({
+                message: 'Patient already has a CHAS Scheme Added',
+              })
+              return
+            }
+            // console.log(row, rows)
+            if (
+              this.medisaveCheck(row) &&
+              rows.filter(
+                (o) => !o.isDeleted && this.medisaveCheck(o) && o.id !== row.id,
+              ).length > 0
+            ) {
+              row.schemeTypeFK = undefined
+
+              notification.error({
+                message:
+                  'Patient can only either Medisave 500 Visit or Outpantient Scan at any point of time',
+              })
+              return
+            }
+            if (st.code !== 'Corporate' && row.coPaymentSchemeFK) {
+              row.coPaymentSchemeFK = undefined
+              this.props.dispatch({
+                // force current edit row components to update
+                type: 'global/updateState',
+                payload: {
+                  commitCount: commitCount++,
+                },
+              })
+            }
+            if (this.isMedisave(row)) {
+              row.validRange = []
+              row.validFrom = undefined
+              row.validTo = undefined
+            }
+          },
+        },
+        {
+          columnName: 'coPaymentSchemeFK',
+          // type: 'codeSelect',
+          // code: 'ctSchemeCategory',
+          type: 'select', // TODO: get from api
+          options: [
+            { value: 1, name: 'Test 01' },
+            { value: 2, name: 'Test 02' },
+            { value: 3, name: 'Test 03' },
+          ],
+          isDisabled: (row) => {
+            return !this.isCorporate(row)
+          },
+          onChange: ({ val, option, row, onValueChange }) => {
+            // console.log(row)
+            console.log('coPaymentSchemeFK')
+
+            let rows = this.props.rows
+            if (!row.id) {
+              rows = rows.concat([
+                row,
+              ])
+            }
+            const ctSchemeTypes = this.props.codetable[
+              ctSchemeType.toLowerCase()
+            ]
+            const st = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
+            // console.log(st)
+            const rs = rows.filter(
+              (o) =>
+                !o.isDeleted &&
+                o.coPaymentSchemeFK === val &&
+                st.code === 'Corporate' &&
+                o.id !== row.id,
+            )
+            if (rs.length >= 1) {
+              row.coPaymentSchemeFK = undefined
+
+              notification.error({
+                message: 'The Schemes record already exists in the system',
+              })
+            }
+          },
+        },
+        {
+          columnName: 'accountNumber',
+          isDisabled: (row) => {
+            return !this.isCorporate(row)
+          },
+        },
+      ],
+    }
 
     this.commitChanges = ({ rows, added, changed, deleted }) => {
       const { setFieldValue } = this.props

@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import { Button } from '@/components'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
+import BG from '@material-ui/core/ButtonGroup'
+import classnames from 'classnames'
 
 const styles = () => ({
   buttonMargin: {
@@ -15,31 +17,39 @@ const ButtonGroup = ({
   defaultValue = '',
   classes,
 }) => {
-  const [ selectedValue, setSelectedValue ] = useState(defaultValue)
+  const [
+    selectedValue,
+    setSelectedValue,
+  ] = useState(defaultValue)
 
   const handleClick = (value) => () => {
     setSelectedValue(value)
   }
 
   const buttonComponent = options.map((op, index) => {
-    if (op.value === selectedValue) {
-      return (
-        <Button
-          key={index}
-          className={classes.buttonMargin}
-          color='primary'
-          disabled={disabled}
-          onClick={handleClick(op.value)}
-        >
-          {op.label}
-        </Button>
-      )
-    }
+    // if (op.value === selectedValue) {
+    //   return (
+    //     <Button
+    //       key={index}
+    //       className={classes.buttonMargin}
+    //       color='primary'
+    //       disabled={disabled}
+    //       onClick={handleClick(op.value)}
+    //     >
+    //       {op.label}
+    //     </Button>
+    //   )
+    // }
     return (
       <Button
         key={index}
-        className={classes.buttonMargin}
+        // className={classnames({
+        //   // [classes.buttonMargin]: true,
+        //   [classes.firstButton]: index === 0,
+        //   [classes.lastButton]: index === options.length - 1,
+        // })}
         disabled={disabled}
+        color='primary'
         onClick={handleClick(op.value)}
       >
         {op.label}
@@ -47,7 +57,11 @@ const ButtonGroup = ({
     )
   })
 
-  return <div>{buttonComponent}</div>
+  return (
+    <BG size='small' aria-label='small outlined button group'>
+      {buttonComponent}
+    </BG>
+  )
 }
 ButtonGroup.propTypes = {
   options: PropTypes.array.isRequired,

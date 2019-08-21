@@ -34,12 +34,9 @@ import {
 
 const Invoice = (props) => {
   const amountProps = {
-    style: { margin: 0 },
-    noUnderline: true,
+    text: true,
     currency: true,
-    disabled: true,
     rightAlign: true,
-    normalText: true,
   }
   return (
     <div>
