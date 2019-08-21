@@ -1,83 +1,81 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
-import { FormattedMessage } from 'umi/locale'
-import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
+import { formatMessage, FormattedMessage } from 'umi/locale'
 import {
   withFormikExtend,
+  FastField,
   GridContainer,
   GridItem,
   Button,
   TextField,
+  Checkbox,
   Select,
   ProgressButton,
+  CodeSelect,
 } from '@/components'
 
-const styles = (theme) => ({
-  filterBar: {
-    marginBottom: '10px',
-  },
-  filterBtn: {
-    lineHeight: standardRowHeight,
-    textAlign: 'left',
-    '& > button': {
-      marginRight: theme.spacing.unit,
-    },
-  },
-  tansactionCheck: {
-    position: 'absolute',
-    bottom: 0,
-    width: 30,
-    right: 0,
-  },
-})
-
-// @withFormik({
-// 	handleSubmit: () => {},
-// 	displayName: 'ClinicBreakHourFilter'
-// })
-
 @withFormikExtend({
-  mapPropsToValues: ({ settingClinicBreakHour }) =>
-    settingClinicBreakHour.filter || {},
+  mapPropsToValues: ({ settingCompany }) => settingCompany.filter || {},
   handleSubmit: () => {},
-  displayName: 'ClinicBreakHourFilter',
+  displayName: 'CompanyFilter',
 })
 class Filter extends PureComponent {
   render () {
-    const { classes } = this.props
+    const { classes, route } = this.props
+    const { name } = route
 
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code / Display Value' {...args} />
+                return (
+                  <TextField
+                    label={
+                      name === 'copayer' ? (
+                        'Co-Payer Code/Name'
+                      ) : (
+                        'Supplier Code/Name'
+                      )
+                    }
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
 
-          <GridItem xs={6} md={4}>
-            <FastField
-              name='isActive'
-              render={(args) => {
-                return <Select label='Status' {...args} options={status} />
-              }}
-            />
+          <GridItem xs={6} md={3}>
+            {name === 'copayer' ? (
+              <FastField
+                name='coPayerTypeFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Co-Payer Type'
+                      code='ctCopayerType'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            ) : (
+              []
+            )}
           </GridItem>
-          <GridItem xs={6} md={4}>
+
+          <GridItem xs={6} md={3}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue, isActive } = this.props.values
+                  const { codeDisplayValue, coPayerTypeFK } = this.props.values
                   this.props.dispatch({
-                    type: 'settingClinicBreakHour/query',
+                    type: 'settingCompany/query',
                     payload: {
-                      isActive,
+                      coPayerTypeFK,
                       group: [
                         {
                           code: codeDisplayValue,
@@ -91,11 +89,12 @@ class Filter extends PureComponent {
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
+
               <Button
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingClinicBreakHour/updateState',
+                    type: 'settingCompany/updateState',
                     payload: {
                       entity: undefined,
                     },

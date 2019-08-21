@@ -38,10 +38,10 @@ const styles = (theme) => ({
 // })
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingClinicBreakHour }) =>
-    settingClinicBreakHour.filter || {},
+  mapPropsToValues: ({ settingClinicOperationHour }) =>
+    settingClinicOperationHour.filter || {},
   handleSubmit: () => {},
-  displayName: 'ClinicBreakHourFilter',
+  displayName: 'ClinicOperationHourFilter',
 })
 class Filter extends PureComponent {
   render () {
@@ -75,7 +75,7 @@ class Filter extends PureComponent {
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
-                    type: 'settingClinicBreakHour/query',
+                    type: 'settingClinicOperationHour/query',
                     payload: {
                       isActive,
                       group: [
@@ -95,7 +95,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingClinicBreakHour/updateState',
+                    type: 'settingClinicOperationHour/updateState',
                     payload: {
                       entity: undefined,
                     },

@@ -1,13 +1,13 @@
-import React from 'react'
+import React from 'react';
 // formik
-import { withFormik } from 'formik'
+import { withFormik } from 'formik';
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core';
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import { Button, CardContainer, GridContainer, GridItem } from '@/components';
 // sub components
-import BaseSearchBar from '../../common/BaseSearchBar'
-import TableGrid from '../../common/TableGrid'
+import BaseSearchBar from '../../common/BaseSearchBar';
+import TableGrid from '../../common/TableGrid';
 // variables
 import { NewCHASColumnExtensions, NewCHASColumns, NewCHASTableData, TableConfig } from './variables'
 
@@ -59,4 +59,4 @@ class SubmittedCHAS extends React.Component {
 	}
 }
 
-export default withStyles(styles, { name: 'SubmittedCHAS' })(SubmittedCHAS)
+export default withStyles(styles, { name: 'SubmittedCHAS' })(SubmittedCHAS);
