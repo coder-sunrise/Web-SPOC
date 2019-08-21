@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/ctmedicationprecaution'
+const url = '/api/ctmedicationusage'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),

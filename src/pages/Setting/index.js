@@ -164,7 +164,7 @@ const menuData = [
   {
     title: 'Clinic Setting',
     text: 'Drug Frequency',
-    url: '/setting/medicalfrequency',
+    url: '/setting/medicationfrequency',
   },
   {
     title: 'Clinic Setting',
