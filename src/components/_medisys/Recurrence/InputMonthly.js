@@ -5,7 +5,8 @@ import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common component
 import { GridContainer, GridItem, NumberInput } from '@/components'
-import styles from './style'
+// styles
+import styles from './styles'
 
 const RecurrenceMonthly = ({ classes, labelSize, inputSize }) => {
   return (
@@ -14,11 +15,14 @@ const RecurrenceMonthly = ({ classes, labelSize, inputSize }) => {
         <span>Day</span>
       </GridItem>
       <GridItem md={inputSize}>
-        <FastField name='day' render={(args) => <NumberInput {...args} />} />
+        <FastField
+          name='recurrenceDto.recurrenceDayOfTheMonth'
+          render={(args) => <NumberInput {...args} />}
+        />
       </GridItem>
       <GridItem md={inputSize}>
         <FastField
-          name='recurrenceFrequency'
+          name='recurrenceDto.recurrenceFrequency'
           render={(args) => (
             <NumberInput {...args} prefix='of every: ' suffix='month(s)' />
           )}

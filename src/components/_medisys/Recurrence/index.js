@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
 // formik
 import { FastField } from 'formik'
 // material ui
@@ -14,39 +15,58 @@ import {
   NumberInput,
   DatePicker,
 } from '@/components'
-// sub component
-import RecurrenceDailyInput from './RecurrenceDaily'
-import RecurrenceWeeklyInput from './RecurrenceWeekly'
-import RecurrenceMonthlyInput from './RecurrenceMonthly'
-import RecurrenceList from './RecurrenceList'
-import {
-  recurrencePattern,
-  RECURRENCE_PATTERN,
-  RECURRENCE_RANGE,
-} from './variables'
+// sub components
+import InputDaily from './InputDaily'
+import InputWeekly from './InputWeekly'
+import InputMonthly from './InputMonthly'
+import ResultLabel from './ResultLabel'
+// constants
+import { RECURRENCE_PATTERN, RECURRENCE_RANGE } from './const.js'
+// styles
+import styles from './styles'
 
-import styles from './style'
+const labelSize = {
+  sm: 1,
+  md: 2,
+  lg: 4,
+}
+
+const inputSize = {
+  sm: 2,
+  md: 3,
+  lg: 4,
+}
+
+const RecurrenceDTO = {
+  recurrencePatternFK: 1,
+  recurrenceFrequency: 1,
+  recurrenceDayOfTheMonth: 1,
+  recurrenceDaysOfTheWeek: [],
+  recurrenceRange: '',
+  recurrenceCount: 1,
+  recurrenceEndDate: undefined,
+}
 
 const Recurrence = ({
   classes,
-  values = {},
-  isDoctorBlock,
-  labelSize = 2,
-  inputSize = 3,
+  formValues,
+  recurrenceDto = RecurrenceDTO,
+  size = 'md',
 }) => {
-  const _labelSize = isDoctorBlock ? 4 : labelSize
-  const _inputSize = isDoctorBlock ? 4 : inputSize
-
+  const { isEnableRecurrence, appointmentDate } = formValues
+  const { recurrencePatternFK, recurrenceRange } = recurrenceDto
+  const _labelSize = labelSize[size]
+  const _inputSize = inputSize[size]
   return (
-    <div>
+    <Fragment>
       <FastField
         name='isEnableRecurrence'
         render={(args) => {
           return <Checkbox simple label='Enable Recurrence' {...args} />
         }}
       />
-      {values.isEnableRecurrence && (
-        <FieldSet size='sm' title='Recurrence'>
+      {isEnableRecurrence && (
+        <FieldSet>
           <GridContainer item md={12}>
             <GridItem md={_labelSize} className={classes.inlineLabel}>
               <span>Recurrence Pattern</span>
@@ -59,42 +79,28 @@ const Recurrence = ({
                 )}
               />
             </GridItem>
+            {recurrencePatternFK === RECURRENCE_PATTERN.DAILY && (
+              <InputDaily labelSize={_labelSize} inputSize={_inputSize} />
+            )}
+            {recurrencePatternFK === RECURRENCE_PATTERN.WEEKLY && (
+              <InputWeekly
+                recurrenceDto={recurrenceDto}
+                labelSize={_labelSize}
+                inputSize={_inputSize}
+              />
+            )}
 
-            {values.isEnableRecurrence &&
-            values.recurrenceDto.recurrencePatternFK ===
-              RECURRENCE_PATTERN.DAILY && (
-              <RecurrenceDailyInput
-                values={values}
-                labelSize={_labelSize}
-                inputSize={_inputSize}
-              />
+            {recurrencePatternFK === RECURRENCE_PATTERN.MONTHLY && (
+              <InputMonthly labelSize={_labelSize} inputSize={_inputSize} />
             )}
-            {values.isEnableRecurrence &&
-            values.recurrenceDto.recurrencePatternFK ===
-              RECURRENCE_PATTERN.WEEKLY && (
-              <RecurrenceWeeklyInput
-                // values={values}
-                recurrenceDto={values.recurrenceDto}
-                labelSize={_labelSize}
-                inputSize={_inputSize}
-              />
-            )}
-            {values.isEnableRecurrence &&
-            values.recurrenceDto.recurrencePatternFK ===
-              RECURRENCE_PATTERN.MONTHLY && (
-              <RecurrenceMonthlyInput
-                values={values}
-                labelSize={_labelSize}
-                inputSize={_inputSize}
-              />
-            )}
+
             <GridItem md={_labelSize} className={classes.inlineLabel}>
               <span>Range of Recurrence</span>
             </GridItem>
             <GridContainer item md={6}>
               <GridItem md={12}>
                 <FastField
-                  name='recurrenceRange'
+                  name='recurrenceDto.recurrenceRange'
                   render={(args) => (
                     <RadioGroup
                       // label='Range of Recurrence'
@@ -115,7 +121,7 @@ const Recurrence = ({
                 />
               </GridItem>
               <GridItem md={_inputSize * 2}>
-                {values.recurrenceRange === RECURRENCE_RANGE.AFTER && (
+                {recurrenceRange === RECURRENCE_RANGE.AFTER && (
                   <FastField
                     name='recurrenceDto.recurrenceCount'
                     render={(args) => (
@@ -123,7 +129,7 @@ const Recurrence = ({
                     )}
                   />
                 )}
-                {values.recurrenceRange === RECURRENCE_RANGE.BY && (
+                {recurrenceRange === RECURRENCE_RANGE.BY && (
                   <FastField
                     name='recurrenceDto.recurrenceEndDate'
                     render={(args) => <DatePicker {...args} />}
@@ -136,12 +142,10 @@ const Recurrence = ({
                 <span>Recurrence</span>
               </GridItem>
               <GridItem className={classes.recurrenceListLabel}>
-                {values.isEnableRecurrence && (
-                  <RecurrenceList
-                    values={values}
-                    recurrenceDto={values.recurrenceDto}
-                    isDoctorBlock={isDoctorBlock}
-                    // className={classes.recurrenceListLabel}
+                {isEnableRecurrence && (
+                  <ResultLabel
+                    date={appointmentDate}
+                    recurrenceDto={recurrenceDto}
                   />
                 )}
               </GridItem>
@@ -149,8 +153,17 @@ const Recurrence = ({
           </GridContainer>
         </FieldSet>
       )}
-    </div>
+    </Fragment>
   )
 }
 
-export default withStyles(styles, { name: 'Recurrence' })(Recurrence)
+Recurrence.propTypes = {
+  formValues: PropTypes.object,
+  size: PropTypes.oneOf([
+    'sm',
+    'md',
+    'lg',
+  ]),
+}
+
+export default withStyles(styles, { name: 'RecurrenceComponent' })(Recurrence)

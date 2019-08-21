@@ -1,14 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
-// custom components
-import { Card, CardBody } from '@/components'
 // style
 import CardStyle from './style'
 
 const FieldSet = ({ classes, title, size, children }) => {
+  // TODO: enhance -> padding and margin for size = sm || lg
   return (
     <div style={{ width: '100%', height: 'auto' }}>
       <fieldset className={classes.fieldset}>

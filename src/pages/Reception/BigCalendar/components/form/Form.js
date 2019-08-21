@@ -14,13 +14,15 @@ import {
   SizeContainer,
   OutlinedTextField,
 } from '@/components'
+// medisys components
+import { Recurrence } from '@/components/_medisys'
 // custom components
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
 import PatientInfoInput from './PatientInfo'
 import AppointmentDateInput from './AppointmentDate'
-import Recurrence from './Recurrence'
+// import Recurrence from './Recurrence'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 // utils
@@ -341,7 +343,11 @@ class Form extends React.PureComponent {
             </GridItem>
 
             <GridItem xs md={12}>
-              <Recurrence values={values} />
+              {/* <Recurrence values={values} /> */}
+              <Recurrence
+                formValues={values}
+                recurrenceDto={values.recurrenceDto}
+              />
             </GridItem>
           </GridContainer>
 

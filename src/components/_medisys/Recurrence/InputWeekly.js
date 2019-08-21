@@ -5,10 +5,12 @@ import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common component
 import { GridContainer, GridItem, NumberInput, Select } from '@/components'
-import { days } from './variables'
-import styles from './style'
+// constants
+import { WeekDays } from './const'
+// styles
+import styles from './styles'
 
-const RecurrenceWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
+const InputWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
   const { recurrenceDaysOfTheWeek: selectedDays = [] } = recurrenceDto
 
   const maxTagCount = selectedDays.length === 1 ? 1 : 0
@@ -35,7 +37,7 @@ const RecurrenceWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
               {...args}
               prefix='On'
               mode='multiple'
-              options={days}
+              options={WeekDays}
               maxTagCount={maxTagCount}
               maxTagPlaceholder={maxTagPlaceholder}
             />
@@ -46,6 +48,4 @@ const RecurrenceWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
   )
 }
 
-export default withStyles(styles, { name: 'RecurrenceWeekly' })(
-  RecurrenceWeekly,
-)
+export default withStyles(styles, { name: 'InputWeekly' })(InputWeekly)

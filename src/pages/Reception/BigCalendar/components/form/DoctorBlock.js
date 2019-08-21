@@ -18,7 +18,8 @@ import {
   TextField,
 } from '@/components'
 // sub components
-import Recurrence from './Recurrence'
+// import Recurrence from './Recurrence'
+import { Recurrence } from '@/components/_medisys'
 import { getUniqueGUID } from '@/utils/utils'
 import style from './style'
 import { tooltip } from '@/assets/jss/index'
@@ -234,7 +235,10 @@ const DoctorEventForm = ({
         </GridItem>
 
         <GridItem md={12}>
-          <Recurrence values={values} isDoctorBlock />
+          <Recurrence
+            formValues={values}
+            recurrenceDto={values.recurrenceDto}
+          />
         </GridItem>
       </GridContainer>
       {footer &&
