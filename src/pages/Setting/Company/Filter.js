@@ -20,7 +20,7 @@ import {
 })
 class Filter extends PureComponent {
   render () {
-    const { classes, settingCompany, route } = this.props
+    const { classes, route } = this.props
     const { name } = route
 
     return (
@@ -28,27 +28,16 @@ class Filter extends PureComponent {
         <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
-              name='code'
+              name='codeDisplayValue'
               render={(args) => {
                 return (
                   <TextField
                     label={
-                      name === 'copayer' ? 'Co-Payer Code' : 'Supplier Code'
-                    }
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='displayValue'
-              render={(args) => {
-                return (
-                  <TextField
-                    label={
-                      name === 'copayer' ? 'Co-Payer Name' : 'Supplier Name'
+                      name === 'copayer' ? (
+                        'Co-Payer Code/Name'
+                      ) : (
+                        'Supplier Code/Name'
+                      )
                     }
                     {...args}
                   />
@@ -82,9 +71,19 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
+                  const { codeDisplayValue, ...restProps } = this.props.values
                   this.props.dispatch({
                     type: 'settingCompany/query',
-                    payload: this.props.values,
+                    payload: {
+                      ...restProps,
+                      group: [
+                        {
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
+                          combineCondition: 'or',
+                        },
+                      ],
+                    },
                   })
                 }}
               >

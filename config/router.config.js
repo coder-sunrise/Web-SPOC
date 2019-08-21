@@ -489,6 +489,8 @@ const routes = [
             path: '/setting/company/2',
             name: 'supplier',
             component: './Setting/Company',
+          },
+          {
             path: '/setting/servicecenter',
             name: 'servicecenter',
             component: './Setting/serviceCenter',

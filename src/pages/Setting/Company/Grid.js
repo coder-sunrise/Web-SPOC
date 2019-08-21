@@ -97,15 +97,27 @@ class Grid extends PureComponent {
           name === 'copayer'
             ? {
                 columnName: 'url',
+
                 render: (row) => (
-                  <span>
+                  <a
+                    rel='noopener noreferrer'
+                    target='_blank'
+                    href={
+                      row.contact.contactWebsite &&
+                      row.contact.contactWebsite.website !== '' ? (
+                        row.contact.contactWebsite.website
+                      ) : (
+                        '-'
+                      )
+                    }
+                  >
                     {row.contact.contactWebsite &&
                     row.contact.contactWebsite.website !== '' ? (
                       row.contact.contactWebsite.website
                     ) : (
                       '-'
                     )}
-                  </span>
+                  </a>
                 ),
               }
             : {
