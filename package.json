@@ -59,6 +59,7 @@
     "formik": "^1.5.7",
     "hash.js": "^1.1.5",
     "html-to-draftjs": "^1.4.0",
+    "html-to-text": "^5.1.1",
     "humps": "^2.0.1",
     "jquery": "^3.4.1",
     "jsonp": "^0.2.1",

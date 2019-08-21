@@ -6,6 +6,8 @@ import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import * as service from './services'
+import htmlToText from 'html-to-text'
+
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -41,12 +43,12 @@ class Grid extends PureComponent {
         ]}
         // FuncProps={{ pager: false }}
         columnExtensions={[
-          // {
-          //   columnName: 'templateMessage',
-          //   render: (row) => {
-          //     return row.templateMessage
-          //   },
-          // },
+          {
+            columnName: 'templateMessage',
+            render: (row) => {
+              return htmlToText.fromString(row.templateMessage)
+            },
+          },
           {
             columnName: 'effectiveStartDate',
             type: 'date',

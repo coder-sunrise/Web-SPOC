@@ -192,7 +192,7 @@ class RichEditor extends React.PureComponent {
 
     const editorToHtml = currentEditorHtml.replace(
       selectedValueHtml,
-      `&nbsp;<a href="javascript:void(0);" class="wysiwyg-mention" data-mention data-value="${selectedValue}">${selectedValue}</a>&nbsp;`,
+      `&nbsp;<a class="wysiwyg-mention" data-mention data-value="${selectedValue}">${selectedValue}</a>&nbsp;`,
     )
 
     const contentBlock = htmlToDraft(editorToHtml)

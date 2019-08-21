@@ -26,17 +26,9 @@ class Filter extends PureComponent {
         <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
-              name='code'
+              name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code' {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='displayValue'
-              render={(args) => {
-                return <TextField label='Display Value' {...args} />
+                return <TextField label='Code / Display Value' {...args} />
               }}
             />
           </GridItem>
@@ -46,9 +38,18 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
+                  const { codeDiplayValue } = this.props.values
                   this.props.dispatch({
                     type: 'settingServiceCategory/query',
-                    payload: this.props.values,
+                    payload: {
+                      group: [
+                        {
+                          code: codeDiplayValue,
+                          codeDisplayValue: codeDiplayValue,
+                          combineCondition: 'or',
+                        },
+                      ],
+                    },
                   })
                 }}
               >
