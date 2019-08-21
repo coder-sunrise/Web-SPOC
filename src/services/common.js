@@ -4,16 +4,18 @@ import { getUniqueGUID, convertToQuery } from '@/utils/utils'
 export async function queryList (url, params, convertExcludeFields) {
   // //console.log('querylist')
   // console.log(params)
+  const parsedParams = convertToQuery(
+    {
+      pagesize: 10,
+      current: 1,
+      ...params,
+    },
+    convertExcludeFields,
+  )
+
   return request(url, {
     method: 'GET',
-    data: convertToQuery(
-      {
-        pagesize: 10,
-        current: 1,
-        ...params,
-      },
-      convertExcludeFields,
-    ),
+    data: parsedParams,
   })
 }
 

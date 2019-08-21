@@ -36,6 +36,8 @@ export Switch from './Antd/AntdSwitch'
 
 export Popconfirm from './Antd/AntdPopconfirm'
 export Popover from './Antd/AntdPopover'
+export Tabs from './Antd/AntdTab'
+
 export NumberInput from './Antd/AntdNumberInput'
 export SimpleAlert from './SimpleAlert'
 export SimpleModal from './SimpleModal'

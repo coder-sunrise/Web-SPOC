@@ -22,7 +22,7 @@ import {
 })
 class Filter extends PureComponent {
   render () {
-    //console.log({ props: this.props.values })
+    // console.log({ props: this.props.values })
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -45,7 +45,7 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='serviceCenterCategoryFK'
+              name='serviceCenterCategoryFKNavigation.id'
               render={(args) => {
                 return (
                   <CodeSelect
@@ -73,7 +73,10 @@ class Filter extends PureComponent {
                 onClick={() => {
                   this.props.dispatch({
                     type: 'settingServiceCenter/query',
-                    payload: this.props.values,
+                    payload: {
+                      ...this.props.values,
+                      combineCondition: 'or',
+                    },
                   })
                 }}
               >

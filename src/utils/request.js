@@ -217,7 +217,7 @@ export default function request (
   // }
   // const isProd = process.env.NODE_ENV === 'production'
   // if (isProd) url = `/prod${url}`
-  if (options.uat) console.log(url)
+  // if (options.uat) console.log(url)
   if (
     [
       '/api/fake_chart_data',
@@ -227,7 +227,6 @@ export default function request (
   ) {
     newUrl = dynamicURL + newUrl
   }
-  // console.log(newOptions)
   try {
     let r = $.when(
       $.ajax({

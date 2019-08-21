@@ -361,7 +361,7 @@ const convertToQuery = (
 
   // console.log(query)
   let newQuery = {}
-  const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
+  const refilter = /(.*?)_([^!_.]*)!?([^_.]*)_?([^_.]*)\b/
   newQuery.criteria = []
   newQuery.conditionGroups = []
   // //console.log('convert to query')
@@ -373,7 +373,7 @@ const convertToQuery = (
   const { valueType, filterType } = config
   for (let p in customQuerys) {
     if (Object.prototype.hasOwnProperty.call(customQuerys, p)) {
-      console.log(customQuerys[p])
+      // console.log(customQuerys[p])
       if (customQuerys[p] !== undefined && customQuerys[p] !== '') {
         let val = customQuerys[p]
         if (typeof val === 'string') {
@@ -405,8 +405,32 @@ const convertToQuery = (
         } else if (Array.isArray(val)) {
           for (let i = 0; i < val.length; i++) {
             const obj = convertToQuery(val[i])
-            console.log(val[i], obj)
-            newQuery.conditionGroups.push(obj)
+            // console.log(val[i], obj, JSON.stringify(obj))
+            // newQuery.conditionGroups.push(obj)
+            if (obj.criteria && obj.criteria.length > 0) {
+              obj.criteria.forEach((c, j) => {
+                newQuery[`conditionGroups[${i}].criteria[${j}][prop]`] = c.prop
+                newQuery[`conditionGroups[${i}].criteria[${j}][val]`] = c.val
+                newQuery[`conditionGroups[${i}].criteria[${j}][opr]`] = c.opr
+              })
+              newQuery[`conditionGroups[${i}].combineCondition`] =
+                obj.combineCondition
+            }
+          }
+        } else if (typeof val === 'object' && Object.keys(val).length === 1) {
+          const v = val[Object.keys(val)[0]]
+          if (v !== undefined) {
+            newQuery.criteria.push({
+              prop: `${p}.${Object.keys(val)[0]}`,
+              val: v,
+              opr:
+                [
+                  'boolean',
+                  'number',
+                ].indexOf(typeof v) >= 0
+                  ? filterType.eql
+                  : filterType.like,
+            })
           }
         } else if (convertExcludeFields.indexOf(p) < 0) {
           // let valType = null
@@ -416,7 +440,13 @@ const convertToQuery = (
             prop: p,
             val,
             // valueType: valType,
-            opr: ['boolean','number'].indexOf(typeof val)>=0 ? filterType.eql : filterType.like,
+            opr:
+              [
+                'boolean',
+                'number',
+              ].indexOf(typeof val) >= 0
+                ? filterType.eql
+                : filterType.like,
           })
         }
       }
@@ -441,7 +471,6 @@ const convertToQuery = (
   // if (returnVal.criteria && returnVal.criteria.length > 0) {
   //   returnVal.criteria = JSON.stringify(returnVal.criteria)
   // }
-  // console.log(returnVal)
   return returnVal
 }
 

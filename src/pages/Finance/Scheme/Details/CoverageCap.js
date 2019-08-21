@@ -14,7 +14,7 @@ const CoverageCap = ({ values, classes }) => {
   return (
     <GridContainer>
       <GridItem xs={1}>
-        <Field
+        <FastField
           name='itemGroupMaxCapacityDtoRdoValue'
           render={(args) => (
             <RadioGroup
@@ -36,7 +36,7 @@ const CoverageCap = ({ values, classes }) => {
         />
       </GridItem>
       <GridItem xs={11}>
-        <Field
+        <FastField
           name='coverageMaxCap'
           render={(args) => (
             <NumberInput
@@ -48,10 +48,10 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <Field
+        <FastField
           name='consumableMaxCapacity'
           render={(args) => (
-            <NumberInput
+            <TextField
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapConsumables',
@@ -60,10 +60,11 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <Field
+        <FastField
           name='medicationMaxCapacity'
           render={(args) => (
             <NumberInput
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapMedications',
               })}
@@ -71,7 +72,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <Field
+        <FastField
           name='vaccinationMaxCapacity'
           render={(args) => (
             <NumberInput
@@ -83,7 +84,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <Field
+        <FastField
           name='serviceMaxCapacity'
           render={(args) => (
             <NumberInput
@@ -95,7 +96,7 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <Field
+        <FastField
           name='packageMaxCapacity'
           render={(args) => (
             <NumberInput

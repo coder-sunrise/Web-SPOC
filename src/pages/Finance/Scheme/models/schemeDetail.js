@@ -23,7 +23,40 @@ export default createFormViewModel({
         ],
         itemGroupMaxCapacityDtoRdoValue: 'all',
         itemGroupValueDtoRdoValue: 'all',
-        patientMinCoPaymentAmountType: '$',
+        patientMinCoPaymentAmountType: 'ExactAmount',
+        overalCoPaymentValueType: 'ExactAmount',
+        itemGroupMaxCapacityDto: {
+          medicationMaxCapacity: {},
+          vaccinationMaxCapacity: {},
+          consumableMaxCapacity: {},
+          serviceMaxCapacity: {},
+          packageMaxCapacity: {},
+        },
+        itemGroupValueDto: {
+          medicationGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          vaccinationGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          consumableGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          serviceGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          packageGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+        },
+        packageValueDto: [
+          {
+            id: 1,
+            itemValueType: 'ExactAmount',
+            unitPrice: 5,
+            inventoryPackageFK: 1,
+          },
+        ],
       },
     },
     subscriptions: ({ dispatch, history }) => {
