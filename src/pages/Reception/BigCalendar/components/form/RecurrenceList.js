@@ -1,13 +1,12 @@
 import React from 'react'
 import moment from 'moment'
 import { RRule } from 'rrule'
+// common components
+import { serverDateFormat } from '@/components'
 // constant variables
-import {
-  RECURRENCE_RANGE,
-  RECURRENCE_PATTERN,
-  DAYS_OF_WEEK,
-  _dateFormat,
-} from './variables'
+import { RECURRENCE_RANGE, RECURRENCE_PATTERN, DAYS_OF_WEEK } from './variables'
+// utils
+import { formatDateToText } from '@/utils/dateUtils'
 
 const mapRecurrencePatternToRRuleFeq = {
   [RECURRENCE_PATTERN.DAILY]: RRule.DAILY,
@@ -16,13 +15,16 @@ const mapRecurrencePatternToRRuleFeq = {
 }
 
 const getRRule = (
-  { eventDate: doctorBlockStartDate, appointmentDate: eventStartDate },
+  {
+    eventDate: doctorBlockStartDate,
+    appointmentDate: eventStartDate,
+    recurrenceRange,
+  },
   {
     recurrencePatternFK: freq,
     recurrenceFrequency: every,
     recurrenceDayOfTheMonth: day,
     recurrenceDaysOfTheWeek: days,
-    recurrenceRange,
     recurrenceCount: occurence,
     recurrenceEndDate: stopDate,
   },
@@ -86,7 +88,6 @@ const getRRule = (
     console.error({ error })
     rule = undefined
   }
-  console.log({ rule })
   return rule
 }
 
@@ -124,17 +125,18 @@ const formatRecurrenceLabel = (
 
   const startDate =
     appointmentDate === undefined
-      ? moment(doctorBlockStartDate).format(_dateFormat)
-      : appointmentDate
+      ? moment(doctorBlockStartDate).format(serverDateFormat)
+      : formatDateToText(appointmentDate)
 
   let until = ''
-  if (rule.options.until == null) {
+
+  if (rule.options.until === null) {
     const lastDate = rule.all()[rule.all().length - 1]
-    const parsedLastDate = moment(lastDate).format(_dateFormat)
+    const parsedLastDate = moment(lastDate).format(serverDateFormat)
     until = parsedLastDate
   } else {
     const parsedDate = moment(rule.options.until)
-    until = parsedDate.format(_dateFormat)
+    until = parsedDate.format(serverDateFormat)
   }
 
   if (recurrencePattern === RECURRENCE_PATTERN.DAILY && !every) return ''
@@ -168,6 +170,7 @@ const formatRecurrenceLabel = (
     default:
       break
   }
+
   return result
 }
 

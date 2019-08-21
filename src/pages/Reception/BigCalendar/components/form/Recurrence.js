@@ -73,7 +73,8 @@ const Recurrence = ({
             values.recurrenceDto.recurrencePatternFK ===
               RECURRENCE_PATTERN.WEEKLY && (
               <RecurrenceWeeklyInput
-                values={values}
+                // values={values}
+                recurrenceDto={values.recurrenceDto}
                 labelSize={_labelSize}
                 inputSize={_inputSize}
               />

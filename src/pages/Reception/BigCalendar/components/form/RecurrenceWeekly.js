@@ -8,8 +8,8 @@ import { GridContainer, GridItem, NumberInput, Select } from '@/components'
 import { days } from './variables'
 import styles from './style'
 
-const RecurrenceWeekly = ({ classes, values, labelSize, inputSize }) => {
-  const { days: selectedDays = [] } = values
+const RecurrenceWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
+  const { recurrenceDaysOfTheWeek: selectedDays = [] } = recurrenceDto
 
   const maxTagCount = selectedDays.length === 1 ? 1 : 0
   const everyDay = 'Every day'
@@ -23,13 +23,13 @@ const RecurrenceWeekly = ({ classes, values, labelSize, inputSize }) => {
       </GridItem>
       <GridItem md={inputSize}>
         <FastField
-          name='recurrenceFrequency'
+          name='recurrenceDto.recurrenceFrequency'
           render={(args) => <NumberInput suffix='week(s)' {...args} />}
         />
       </GridItem>
       <GridItem md={inputSize}>
         <FastField
-          name='days'
+          name='recurrenceDto.recurrenceDaysOfTheWeek'
           render={(args) => (
             <Select
               {...args}
