@@ -45,7 +45,7 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='serviceCenterCategoryFKNavigation.id'
+              name='serviceCenterCategoryFK'
               render={(args) => {
                 return (
                   <CodeSelect
@@ -75,7 +75,6 @@ class Filter extends PureComponent {
                     type: 'settingServiceCenter/query',
                     payload: {
                       ...this.props.values,
-                      combineCondition: 'or',
                     },
                   })
                 }}
