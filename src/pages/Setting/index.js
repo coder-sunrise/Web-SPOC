@@ -133,13 +133,38 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug Frequency',
-    url: '/setting/medicationfrequency',
+    text: 'Drug UOM',
+    url: '/setting/medicationuom',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Consumable UOM',
+    url: '/setting/consumableuom',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Category',
+    url: '/setting/medicationgroup',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Consumable Category',
+    url: '/setting/consumablegroup',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Dosage',
+    url: '/setting/medicationdosage',
   },
   {
     title: 'Clinic Setting',
     text: 'Drug Precautions',
     url: '/setting/medicationprecautions',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Frequency',
+    url: '/setting/medicalfrequency',
   },
   {
     title: 'Clinic Setting',
@@ -171,7 +196,13 @@ const menuData = [
   },
   {
     title: 'Contact',
-    text: 'TBD',
+    text: 'Co-Payer',
+    url: '/setting/company/1',
+  },
+  {
+    title: 'Contact',
+    text: 'Supplier',
+    url: '/setting/company/2',
   },
 ]
 const styles = (theme) => ({
