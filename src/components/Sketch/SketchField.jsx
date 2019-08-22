@@ -273,9 +273,9 @@ class SketchField extends PureComponent {
       bi.height *= hfactor
     }
     let objects = canvas.getObjects()
-    console.log(canvas, objects)
+    // console.log(canvas, objects)
     for (let i in objects) {
-      console.log(i)
+      // console.log(i)
       let obj = objects[i]
       let scaleX = obj.scaleX
       let scaleY = obj.scaleY
@@ -289,7 +289,7 @@ class SketchField extends PureComponent {
       obj.scaleY = tempScaleY
       obj.left = tempLeft
       obj.top = tempTop
-      console.log(obj)
+      // console.log(obj)
       obj.setCoords()
     }
     this.setState({

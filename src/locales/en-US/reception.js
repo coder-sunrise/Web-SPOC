@@ -115,7 +115,7 @@ export default {
   'reception.queue.patientSearch.registerNewPatient': 'Register New Patient',
   'reception.queue.patientSearch.registerVisit': 'Register Visit',
   'reception.queue.registerVisitTextBox':
-    'Register Visit (Patient Name, ID, Phone No.)',
+    'Register Visit (Patient Name, Acc No., Phone No.)',
   'reception.queue.patientSearch': 'Search Patient',
   'reception.queue.patientSearch.retrieving': 'Retrieving patient list',
   'reception.queue.visitRegistration': 'Visit Registration',

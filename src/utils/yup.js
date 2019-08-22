@@ -144,6 +144,57 @@ Yup.addMethod(Yup.array, 'unique', function (
   })
 })
 
+const getTimeObject = (value) => {
+  try {
+    if (value === undefined) return undefined
+    const [
+      hour,
+      minute,
+    ] = value.split(':')
+    if (hour.length === 2 && minute.length === 2)
+      return { hour: parseInt(hour, 10), minute: parseInt(minute, 10) }
+  } catch (error) {
+    console.log(error)
+  }
+  return undefined
+}
+
+const compare = (start, end) => {
+  const { hour: startHour, minute: startMinute } = start
+  const { hour: endHour, minute: endMinute } = end
+  if (
+    startHour > endHour ||
+    (startHour === endHour && startMinute > endMinute) ||
+    (startHour === endHour && startMinute === endMinute)
+  )
+    return false
+
+  return true
+}
+
+function laterThan (ref, msg) {
+  return this.test({
+    name: 'laterThan',
+    exclusive: false,
+    // eslint-disable-next-line no-template-curly-in-string
+    message: msg || '${path} must be later than ${reference}',
+    params: {
+      reference: ref.path,
+    },
+    test (value) {
+      const start = this.resolve(ref)
+      const startTimeObject = getTimeObject(start)
+      const endTimeObject = getTimeObject(value)
+      if (startTimeObject && endTimeObject)
+        return compare(startTimeObject, endTimeObject)
+
+      return false
+    },
+  })
+}
+
+Yup.addMethod(Yup.string, 'laterThan', laterThan)
+
 Yup.string.prototype.required = function (message) {
   if (message === undefined) {
     message = requiredMsg

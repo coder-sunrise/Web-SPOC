@@ -113,6 +113,7 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.height.suffix',
                   })}
+                  // formatter={(value) => Math.floor(value)}
                   onChange={handleCalculateBMI}
                 />
               )}

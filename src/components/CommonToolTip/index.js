@@ -14,10 +14,17 @@ class CommonTooltip extends PureComponent {
   }
 
   render () {
-    const { classes, title, children, ...restProps } = this.props
+    const {
+      classes,
+      title,
+      children,
+      enterDelay = 500,
+      ...restProps
+    } = this.props
     return (
       <Tooltip
         title={title}
+        enterDelay={enterDelay}
         classes={{ tooltip: classes.tooltip }}
         {...restProps}
       >
