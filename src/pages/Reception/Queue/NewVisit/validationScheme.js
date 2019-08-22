@@ -11,7 +11,7 @@ const VitalSignMessage = {
   [FormField['vitalsign.bpDiaMMHG']]:
     'Blood pressure must be between 0 and 999',
   [FormField['vitalsign.pulseRateBPM']]: 'Heart rate must be between 0 and 999',
-  [FormField['vitalsign.weightKG']]: 'Weight must be between 0 and 999',
+  [FormField['vitalsign.weightKG']]: 'Weight must be between 0 and 999.9',
   [FormField['vitalsign.heightCM']]: 'Height must be between 0 and 999',
 }
 
@@ -36,8 +36,9 @@ export default Yup.object().shape({
     .max(999, VitalSignMessage[FormField['vitalsign.pulseRateBPM']]),
   [FormField['vitalsign.weightKG']]: Yup.number()
     .min(0, VitalSignMessage[FormField['vitalsign.weightKG']])
-    .max(999, VitalSignMessage[FormField['vitalsign.weightKG']]),
+    .max(999.9, VitalSignMessage[FormField['vitalsign.weightKG']]),
   [FormField['vitalsign.heightCM']]: Yup.number()
+    .integer('Height can only be a whole number')
     .min(0, VitalSignMessage[FormField['vitalsign.heightCM']])
     .max(999, VitalSignMessage[FormField['vitalsign.heightCM']]),
 })

@@ -28,10 +28,8 @@ class CodeSelect extends React.PureComponent {
             ...options,
             {
               name:
-                opt &&
-                opt.clinicianInfomation &&
-                opt.clinicianInfomation.userProfile
-                  ? opt.clinicianInfomation.userProfile.name
+                opt && opt.clinicianInfomation
+                  ? opt.clinicianInfomation.name
                   : '',
               id: opt.id,
             },

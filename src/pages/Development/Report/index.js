@@ -1,60 +1,77 @@
 import React from 'react'
 import { connect } from 'dva'
-import {
-  DragDropProvider,
-  Grid as DevGrid,
-  GroupingPanel,
-  PagingPanel,
-  Table,
-  TableGroupRow,
-  TableHeaderRow,
-  TableSummaryRow,
-  TableSelection,
-  Toolbar,
-  TableFixedColumns,
-  VirtualTable,
-  TableTreeColumn,
-} from '@devexpress/dx-react-grid-material-ui'
+import * as Yup from 'yup'
+// custom type
+import TimeSchemaType from './YupTime'
+// formik
+import { FastField, withFormik } from 'formik'
 // common component
-import { Button, CardContainer, CommonModal } from '@/components'
+import {
+  Button,
+  CardContainer,
+  GridContainer,
+  GridItem,
+  TimePicker,
+  CommonModal,
+} from '@/components'
 // component
 import ReportViewer from './ReportViewer'
 
 @connect(({ codetable }) => ({ codetable }))
+@withFormik({
+  enableReinitialize: true,
+  mapPropsToValues: () => ({
+    start: '14:00',
+    end: '13:00',
+  }),
+  validationSchema: Yup.object().shape({
+    start: Yup.string().required(),
+    end: Yup.string()
+      .laterThan(Yup.ref('start'), 'End must be later than Start')
+      .required(),
+  }),
+  handleSubmit: (values, formikBag) => {
+    console.log({ values })
+  },
+})
 class Report extends React.Component {
   state = {
     showReport: false,
   }
 
-  componentDidMount () {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/watchFetchCodes',
-    })
-  }
+  // componentDidMount () {
+  //   const { dispatch } = this.props
+  //   dispatch({
+  //     type: 'codetable/watchFetchCodes',
+  //   })
+  // }
 
-  viewReport = () => {
-    this.setState({ showReport: true })
-  }
+  // viewReport = () => {
+  //   this.setState({ showReport: true })
+  // }
 
-  closeModal = () => {
-    this.setState({ showReport: false })
-  }
+  // closeModal = () => {
+  //   this.setState({ showReport: false })
+  // }
 
-  getCodeTable = () => {
-    const code = 'ctnationality'
-    const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      code,
-    })
-  }
+  // getCodeTable = () => {
+  //   const code = 'ctnationality'
+  //   const { dispatch } = this.props
+  //   dispatch({
+  //     type: 'codetable/fetchCodes',
+  //     code,
+  //   })
+  // }
 
-  testWatch = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/TEST',
-    })
+  // testWatch = () => {
+  //   const { dispatch } = this.props
+  //   dispatch({
+  //     type: 'codetable/TEST',
+  //   })
+  // }
+
+  validate = () => {
+    this.props.validateForm()
   }
 
   render () {
@@ -80,41 +97,48 @@ class Report extends React.Component {
     //     </CommonModal>
     //   </CardContainer>
     // )
+    console.log({ props: this.props })
     return (
-      <div>
-        <DevGrid
-          columns={[
-            {
-              name: 'name',
-              title: 'Name',
-            },
-            {
-              name: 'description',
-              title: 'Description',
-            },
-          ]}
-          rows={[
-            { id: '1', name: '123', description: '123' },
-            { id: '2', name: '123', description: '123' },
-            { id: '3', name: '123', description: '123' },
-            { id: '4', name: '123', description: '123' },
-            { id: '5', name: '123', description: '123' },
-            { id: '6', name: '123', description: '123' },
-            { id: '7', name: '123', description: '123' },
-            { id: '8', name: '123', description: '123' },
-            { id: '9', name: '123', description: '123' },
-            { id: '10', name: '123', description: '123' },
-            { id: '11', name: '123', description: '123' },
-            { id: '12', name: '123', description: '123' },
-            { id: '13', name: '123', description: '123' },
-            { id: '14', name: '123', description: '123' },
-            { id: '15', name: '123', description: '123' },
-          ]}
+      <CardContainer hideHeader size='sm'>
+        {/* <Button color='primary&#39;' onClick={this.viewReport}>
+          View Report
+        </Button>
+        <Button color='primary&#39;' onClick={this.getCodeTable}>
+          Get Codetable
+        </Button>
+        <Button color='primary&#39;' onClick={this.testWatch}>
+          Test Watch
+        </Button>
+        <CommonModal
+          open={showReport}
+          onClose={this.closeModal}
+          title='Report'
+          maxWidth='lg'
         >
-          <VirtualTable />
-          <TableHeaderRow />
-        </DevGrid>
-      </div>
+          <ReportViewer />
+        </CommonModal> */}
+        <Button onClick={this.validate} color='primary'>
+          Submit
+        </Button>
+        <GridContainer>
+          <GridItem md={3}>
+            <FastField
+              name='start'
+              render={(args) => (
+                <TimePicker {...args} label='Start' format='hh:mm A' />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='end'
+              render={(args) => (
+                <TimePicker {...args} label='End' format='hh:mm A' />
+              )}
+            />
+          </GridItem>
+        </GridContainer>
+      </CardContainer>
     )
   }
 }
