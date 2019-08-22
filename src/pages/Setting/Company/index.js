@@ -22,9 +22,9 @@ class Supplier extends PureComponent {
   state = {}
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'settingCompany/query',
-    })
+    //   // this.props.dispatch({
+    //   //   type: 'settingCompany/query',
+    //   // })
   }
 
   toggleModal = () => {
