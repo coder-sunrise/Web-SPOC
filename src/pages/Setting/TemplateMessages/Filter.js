@@ -9,18 +9,20 @@ import {
   Button,
   TextField,
   Checkbox,
+  Select,
   ProgressButton,
+  CodeSelect,
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingMedicationPrecautions }) =>
-    settingMedicationPrecautions.filter || {},
+  mapPropsToValues: ({ settingTemplateMessage }) =>
+    settingTemplateMessage.filter || {},
   handleSubmit: () => {},
-  displayName: 'MedicationPrecautionsFilter',
+  displayName: 'TemplateMessageFilter',
 })
 class Filter extends PureComponent {
   render () {
-    // console.log({ props: this.props.values })
+    console.log({ props: this.props.values })
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -29,7 +31,15 @@ class Filter extends PureComponent {
             <FastField
               name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code / Display Value' {...args} />
+                return <TextField label='Code Display Value' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='displayValue'
+              render={(args) => {
+                return <TextField label='Display Value' {...args} />
               }}
             />
           </GridItem>
@@ -39,15 +49,14 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDiplayValue } = this.props.values
-
+                  const { codeDisplayValue } = this.props.values
                   this.props.dispatch({
-                    type: 'settingMedicationPrecautions/query',
+                    type: 'settingTemplateMessage/query',
                     payload: {
                       group: [
                         {
-                          code: codeDiplayValue,
-                          codeDisplayValue: codeDiplayValue,
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
                           combineCondition: 'or',
                         },
                       ],
@@ -62,7 +71,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingMedicationPrecautions/updateState',
+                    type: 'settingTemplateMessage/updateState',
                     payload: {
                       entity: undefined,
                     },

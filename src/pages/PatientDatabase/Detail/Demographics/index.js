@@ -53,7 +53,7 @@ class Demographic extends PureComponent {
         query={(v) => {
           const search = {}
           if (typeof v === 'number') {
-            search.eql_id = v // for default getter based on id
+            search.id = v // for default getter based on id
           } else {
             search.name = v
             search.patientAccountNo = v

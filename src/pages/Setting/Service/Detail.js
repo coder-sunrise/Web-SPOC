@@ -128,7 +128,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, settingClinicService } = props
+    const { classes, theme, footer, values, settingClinicService } = props
     //console.log('detail', props)
 
     return (

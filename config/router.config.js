@@ -520,6 +520,16 @@ const routes = [
             name: 'medicationconsumptionmethod',
             component: './Setting/medicationConsumptionMethod',
           },
+          {
+            path: '/setting/smstemplate',
+            name: 'smstemplate',
+            component: './Setting/TemplateMessages',
+          },
+          {
+            path: '/setting/referrallettertemplate',
+            name: 'referrallettertemplate',
+            component: './Setting/TemplateMessages',
+          },
         ],
       },
       // Settings
