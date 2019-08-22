@@ -10,7 +10,13 @@ import { WeekDays } from './const'
 // styles
 import styles from './styles'
 
-const InputWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
+const InputWeekly = ({
+  classes,
+  disabled,
+  recurrenceDto,
+  labelSize,
+  inputSize,
+}) => {
   const { recurrenceDaysOfTheWeek: selectedDays = [] } = recurrenceDto
 
   const maxTagCount = selectedDays.length === 1 ? 1 : 0
@@ -26,7 +32,9 @@ const InputWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
       <GridItem md={inputSize}>
         <FastField
           name='recurrenceDto.recurrenceFrequency'
-          render={(args) => <NumberInput suffix='week(s)' {...args} />}
+          render={(args) => (
+            <NumberInput disabled={disabled} suffix='week(s)' {...args} />
+          )}
         />
       </GridItem>
       <GridItem md={inputSize}>
@@ -35,6 +43,7 @@ const InputWeekly = ({ classes, recurrenceDto, labelSize, inputSize }) => {
           render={(args) => (
             <Select
               {...args}
+              disabled={disabled}
               prefix='On'
               mode='multiple'
               options={WeekDays}

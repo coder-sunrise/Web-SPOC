@@ -14,7 +14,7 @@ const AppointmentDate = () => (
   <GridContainer item xs md={12}>
     <GridItem xs md={6}>
       <FastField
-        name='appointmentDate'
+        name='appointment.appointmentDate'
         // validate={this.startDateValidation}
         render={(args) => (
           <DatePicker

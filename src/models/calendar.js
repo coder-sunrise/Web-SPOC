@@ -20,6 +20,9 @@ export default createListViewModel({
     state: {
       calendarEvents: [],
       currentViewDate: new Date(),
+      currentViewAppointment: {
+        appointments: [],
+      },
       calendarView: BigCalendar.Views.MONTH,
     },
     subscriptions: {},
@@ -44,6 +47,16 @@ export default createListViewModel({
           lst_appointmentDate: end,
         }
         yield put({ type: 'getCalendarList', payload })
+      },
+      *getAppointmentDetails ({ appointmentID }, { call, put }) {
+        const result = yield call(service.query, appointmentID)
+        const { status, data } = result
+        if (parseInt(status, 10) === 200) {
+          yield put({
+            type: 'setViewAppointment',
+            data,
+          })
+        }
       },
       *getCalendarList ({ payload }, { call, put }) {
         const result = yield call(service.queryList, payload)
@@ -91,6 +104,9 @@ export default createListViewModel({
     reducers: {
       setCurrentViewDate (state, { date }) {
         return { ...state, currentViewDate: date }
+      },
+      setViewAppointment (state, { data }) {
+        return { ...state, currentViewAppointment: { ...data } }
       },
       setCalendarView (state, { view }) {
         return { ...state, calendarView: view }

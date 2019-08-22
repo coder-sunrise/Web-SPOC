@@ -120,18 +120,18 @@ class CalendarView extends React.PureComponent {
   }
 
   _moveEvent = ({ event, start, end, resourceId }) => {
-    const { handleMoveEvent } = this.props
-    const { id, _appointmentID } = event
+    console.log({ event, start, end, resourceId })
+    // const { handleMoveEvent } = this.props
+    // const { id, _appointmentID } = event
 
-    const resourceID = resourceId !== undefined ? resourceId : event.resourceId
+    // const resourceID = resourceId !== undefined ? resourceId : event.resourceId
 
-    const updatedEvent = {
-      start,
-      end,
-      resourceId: resourceID,
-    }
-
-    handleMoveEvent({ updatedEvent, id, _appointmentID })
+    // const updatedEvent = {
+    //   start,
+    //   end,
+    //   resourceId: resourceID,
+    // }
+    // handleMoveEvent({ updatedEvent, id, _appointmentID })
   }
 
   Toolbar = (toolbarProps) => {
@@ -221,7 +221,7 @@ class CalendarView extends React.PureComponent {
         // --- functional props ---
         // --- resources ---
         resources={resources}
-        resourceIdAccessor='doctorProfileFK'
+        resourceIdAccessor='clinicianFK'
         resourceTitleAccessor='doctorName'
         // --- resources ---
         // --- event handlers ---

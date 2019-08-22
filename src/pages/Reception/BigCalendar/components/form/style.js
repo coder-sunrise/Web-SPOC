@@ -54,6 +54,7 @@ const styles = (theme) => ({
     justifyContent: 'space-between',
     paddingLeft: theme.spacing.unit * 2,
     // margin: `${theme.spacing(2)}px 0px ${theme.spacing.unit}px`,
+    marginTop: theme.spacing(2),
     marginBottom: theme.spacing(1),
   },
   actionsBtnGroup: {

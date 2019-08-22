@@ -22,7 +22,7 @@ const styles = (theme) => ({
   },
 })
 
-const SeriesUpdateConfirmation = ({ classes, footer, onConfirm }) => {
+const SeriesUpdateConfirmation = ({ classes, footer, handleConfirm }) => {
   const [
     type,
     setType,
@@ -43,7 +43,7 @@ const SeriesUpdateConfirmation = ({ classes, footer, onConfirm }) => {
     if (type === '') {
       setError('Please choose an option')
     } else {
-      onConfirm(type)
+      handleConfirm(type)
     }
   }
 

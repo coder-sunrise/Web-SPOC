@@ -32,7 +32,7 @@ class Event extends PureComponent {
 
   render () {
     const { event, classes } = this.props
-    const { isDoctorEvent, hasConflict, series } = event
+    const { isDoctorEvent, hasConflict, isEnableRecurrence } = event
 
     const title = isDoctorEvent ? event.doctor : event.patientName
     const subtitle = isDoctorEvent ? event.eventType : event.patientContactNo
@@ -47,7 +47,7 @@ class Event extends PureComponent {
             <strong>{title ? title.toUpperCase() : ''}</strong>
           </span>
           {hasConflict && <ErrorOutline />}
-          {series && <Cached />}
+          {isEnableRecurrence && <Cached />}
         </div>
         <span className={classes.blockDiv}>
           {subtitle ? subtitle.toUpperCase() : ''}

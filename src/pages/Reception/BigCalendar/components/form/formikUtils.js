@@ -1,173 +1,25 @@
 import moment from 'moment'
+import * as Yup from 'yup'
 import {
   serverDateFormat,
   timeFormat,
   timeFormat24Hour,
   timeFormatWithoutSecond,
 } from '@/components'
+import { computeRRule } from '@/components/_medisys'
 import { initialAptInfo } from './variables'
-
-// export const handleSubmit = (values, { props, resetForm }) => {
-//   const {
-//     patientName,
-//     contactNo,
-//     startDate: _utcStartDate,
-//     endDate: _utcEndDate,
-//     startTime,
-//     endTime,
-//     appointmentType = '',
-//     doctor,
-//   } = values
-//   const { handleAddEvents, handleUpdateEvents, slotInfo, resources } = props
-//   const longDateTimeFormat = 'DD-MM-YYYY'
-//   const startDate = moment(_utcStartDate).format(_dateFormat)
-//   const endDate = moment(_utcEndDate).format(_dateFormat)
-
-//   const _momentStartDate = moment(
-//     `${startDate} ${startTime}`,
-//     `${_dateFormat} hh:mm a`,
-//   )
-//   const _nativeStartDate = _momentStartDate.toDate()
-
-//   const _momentEndDate = moment(
-//     `${endDate} ${endTime}`,
-//     `${_dateFormat} hh:mm a`,
-//   )
-//   const _nativeEndDate = _momentEndDate.toDate()
-
-//   const assignedResource = resources.find(
-//     (resource) => resource.resourceId === doctor,
-//   )
-//   let resourceId = assignedResource ? assignedResource.resourceId : 'other'
-
-//   if (!_momentStartDate.isValid() && !_momentEndDate.isValid()) return
-
-//   const event = {
-//     ...slotInfo,
-//     ...values,
-//     tooltip: `${patientName}(${contactNo})`,
-//     start: _nativeStartDate,
-//     end: _nativeEndDate,
-//     title: `${patientName}(${contactNo})`,
-//     color: getColorByAppointmentType(appointmentType),
-//     resourceId,
-//   }
-
-//   switch (slotInfo.type) {
-//     case 'update':
-//       handleUpdateEvents(event)
-//       break
-//     default:
-//       handleAddEvents(event)
-//       break
-//   }
-//   resetForm()
-// }
 
 const initDailyRecurrence = {
   recurrencePatternFK: 1,
   recurrenceFrequency: 1,
-  recurrenceDayOfTheMonth: 1,
-  recurrenceDaysOfTheWeek: [],
-  recurrenceRange: '',
+  recurrenceRange: 'after',
   recurrenceCount: 1,
-  recurrenceEndDate: undefined,
-}
-
-export const mapPropsToValues = ({
-  selectedAppointmentID,
-  selectedSlot,
-  events,
-  user,
-}) => {
-  const appointment = events.find((item) => item.id === selectedAppointmentID)
-  if (appointment) {
-    const {
-      // eslint-disable-next-line camelcase
-      appointment_Resources,
-      id,
-      concurrencyToken,
-      bookedByUserFk,
-      isEnableRecurrence,
-      patientName,
-      patientContactNo,
-      patientProfileFk,
-      appointmentStatusFk,
-      appointmentGroupFK,
-      appointmentRemarks,
-      ...restValues
-    } = appointment
-    const appointmentDate = moment(appointment.appointmentDate).toDate()
-
-    return {
-      id,
-      concurrencyToken,
-      bookedByUserFK: bookedByUserFk,
-      isEnableRecurrence,
-      patientName,
-      patientContactNo,
-      patientProfileFK: patientProfileFk,
-      appointmentDate,
-      appointmentStatusFk,
-      appointmentGroupFK,
-      appointmentRemarks,
-      recurrenceDto: { ...initDailyRecurrence },
-      ...restValues,
-    }
-  }
-
-  return {
-    id: undefined,
-    isEnableRecurrence: false,
-    bookedByUserFK: user.id,
-    bookedByUser: user.userName,
-    appointmentDate: selectedSlot.start,
-    recurrenceDto: { ...initDailyRecurrence },
-  }
-  // return {
-  //   ...initialAptInfo,
-
-  //   // ...slotInfo,
-  //   recurrenceDto: { ...initDailyRecurrence },
-  //   appointmentDate: slotInfo.start,
-  //   // startDate,
-  //   // startTime,
-  //   // endDate,
-  //   // endTime,
-  //   bookedByUserFK: user ? user.userProfileFK : '',
-  //   bookedByUserName: user ? user.name : '',
-  //   appointments: [],
-  // }
-}
-
-export const getEventSeriesByID = (appointmentID, data) => {
-  const appointment = data.find((item) => item.id === appointmentID)
-  if (appointment) {
-    const { appointment_Resources: apptResources } = appointment
-    return apptResources
-  }
-  return []
-  // if (!data && !appointmentID) return []
-
-  // const appointment = data.find(
-  //   (eachData) => eachData._appointmentID === appointmentID,
-  // )
-
-  // if (!appointment) return []
-
-  // const appointmentDataGrid = appointment.appointmentResources.map(
-  //   (resource, index) => ({
-  //     ...resource,
-  //     id: `${appointmentID}-resource-${index}`,
-  //     timeFrom: resource.start,
-  //     timeTo: resource.end,
-  //   }),
-  // )
-  // console.log({ appointmentDataGrid })
-  // return appointmentDataGrid
+  recurrenceDaysOfTheWeek: [],
+  recurrenceDayOfTheMonth: undefined,
 }
 
 export const parseDateToServerDateFormatString = (date, format) => {
+  console.log({ date, format })
   if (moment.isMoment(date)) return date.format(serverDateFormat)
 
   if (format) {
@@ -182,28 +34,142 @@ export const parseDateToServerDateFormatString = (date, format) => {
   return date
 }
 
-export const mapDatagridToAppointmentResources = (event, index) => {
-  console.log({ event })
-  const {
-    startTime: timeFrom,
-    endTime: timeTo,
-    clinicianFK,
-    isPrimaryClinician,
-    roomFk,
-    id,
-    concurrencyToken,
-  } = event
-  const startTime = moment(timeFrom, timeFormat).format(timeFormat24Hour)
-  const endTime = moment(timeTo, timeFormat).format(timeFormat24Hour)
-  return {
-    id: id < 0 ? undefined : id,
-    clinicianFK,
-    concurrencyToken,
-    isPrimaryClinician,
-    roomFk,
-    startTime,
-    endTime,
-    sortOrder: index,
-    isDeleted: false,
+const endOfMonth = moment().endOf('month').date()
+export const ValidationSchema = Yup.object().shape({
+  patientName: Yup.string().required('Patient Name is required'),
+  patientContactNo: Yup.string().required('Contact No. is required'),
+  // 'appointment.appointmentDate': Yup.string().required(
+  //   'Appointment Date is required',
+  // ),
+  isEnableRecurrence: Yup.boolean().required(),
+  recurrenceDto: Yup.object().when('isEnableRecurrence', {
+    is: true,
+    then: Yup.object().shape({
+      recurrenceDayOfTheMonth: Yup.number()
+        .transform((value) => {
+          if (Number.isNaN(value)) return -1
+          return value
+        })
+        .when('recurrencePatternFK', {
+          is: (recurrencePatternFK) => recurrencePatternFK === 3,
+          then: Yup.number()
+            .min(1, 'Day of month cannot be less than 1')
+            .max(endOfMonth, `Day of month cannot exceed ${endOfMonth}`),
+        }),
+      recurrenceDaysOfTheWeek: Yup.array()
+        .transform((value) => (value === null ? [] : value))
+        .when('recurrencePatternFK', {
+          is: (recurrencePatternFK) => recurrencePatternFK === 2,
+          then: Yup.array()
+            .min(1, 'Day(s) of week is required')
+            .required('Day(s) of week is required'),
+        }),
+    }),
+  }),
+})
+
+export const mapPropsToValues = ({
+  viewingAppointment,
+  selectedAppointmentID,
+  selectedSlot,
+  events,
+  user,
+}) => {
+  if (viewingAppointment.id) {
+    const appointment = viewingAppointment.appointments.find(
+      (item) => item.id === selectedAppointmentID,
+    )
+    const {
+      id: appointmentGroupID,
+      concurrencyToken,
+      bookedByUserFk,
+      bookedByUser,
+      patientName,
+      patientContactNo,
+      patientProfileFK,
+      isEnableRecurrence,
+      recurrenceDto,
+    } = viewingAppointment
+
+    return {
+      ...viewingAppointment,
+      recurrenceDto:
+        recurrenceDto === undefined || recurrenceDto === null
+          ? { ...initDailyRecurrence }
+          : recurrenceDto,
+      appointment,
+    }
   }
+  return {
+    isEnableRecurrence: false,
+    bookedByUser: user.userName,
+    bookedByUserFK: user.id,
+    appointment: {
+      appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),
+      appointments_Resources: [],
+    },
+    recurrenceDto: { ...initDailyRecurrence },
+  }
+}
+
+export const getEventSeriesByID = (appointmentID, data) => {
+  const appointment = data.find((item) => item.id === appointmentID)
+  if (appointment) {
+    const { appointment_Resources: apptResources } = appointment
+    return apptResources
+  }
+  return []
+}
+
+export const mapDatagridToAppointmentResources = (event, index) => {
+  const { id, startTime: timeFrom, endTime: timeTo, ...restEvent } = event
+  if (id < 0) {
+    const startTime = moment(timeFrom, timeFormat).format(timeFormat24Hour)
+    const endTime = moment(timeTo, timeFormat).format(timeFormat24Hour)
+    return { ...restEvent, startTime, endTime }
+  }
+  return { ...event }
+}
+
+export const generateRecurringAppointments = (recurrenceDto, appointment) => {
+  const rrule = computeRRule({
+    recurrenceDto,
+    startDate: appointment.appointmentDate,
+  })
+  if (rrule) {
+    const allDates = rrule.all() || []
+    console.log({ allDates })
+    return allDates.map((date) => ({
+      ...appointment,
+      appointmentDate: parseDateToServerDateFormatString(date),
+    }))
+  }
+  return null
+}
+
+export const filterRecurrenceDto = (recurrenceDto) => {
+  const { recurrencePatternFK } = recurrenceDto
+  // daily
+  if (recurrencePatternFK === 1) {
+    return {
+      ...recurrenceDto,
+      recurrenceDaysOfTheWeek: undefined,
+      recurrenceDayOfTheMonth: undefined,
+    }
+  }
+  // weekly
+  if (recurrencePatternFK === 2) {
+    return {
+      ...recurrenceDto,
+      recurrenceDayOfTheMonth: undefined,
+    }
+  }
+  // monthly
+  if (recurrencePatternFK === 3) {
+    return {
+      ...recurrenceDto,
+      recurrenceDaysOfTheWeek: undefined,
+    }
+  }
+  return { ...recurrenceDto }
 }

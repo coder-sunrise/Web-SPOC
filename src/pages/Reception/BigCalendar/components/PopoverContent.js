@@ -12,8 +12,9 @@ import {
   GridItem,
   TextField,
   Danger,
+  timeFormat,
+  timeFormat24Hour,
 } from '@/components'
-import { timeFormat } from '../const'
 
 const styles = () => ({
   icon: {
@@ -27,7 +28,13 @@ const styles = () => ({
 })
 
 const getTimeString = (value) => {
-  return moment(value).isValid() ? moment(value).format(timeFormat) : 'N/A'
+  if (moment(value, timeFormat).isValid()) {
+    return moment(value, timeFormat).format(timeFormat)
+  }
+  if (moment(value, timeFormat24Hour).isValid()) {
+    return moment(value, timeFormat24Hour).format(timeFormat24Hour)
+  }
+  return 'N/A'
 }
 
 const DoctorEventContent = ({ popoverEvent, classes }) => {
@@ -86,8 +93,8 @@ class PopoverContent extends React.PureComponent {
             <GridItem className={classnames(classes.iconRow)}>
               <AccessTime className={classnames(classes.icon)} />
               <span>
-                {getTimeString(popoverEvent.timeFrom)} -{' '}
-                {getTimeString(popoverEvent.timeTo)}
+                {getTimeString(popoverEvent.startTime)} -{' '}
+                {getTimeString(popoverEvent.endTime)}
               </span>
             </GridItem>
 

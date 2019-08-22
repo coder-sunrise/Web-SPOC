@@ -5,11 +5,11 @@ import { withStyles } from '@material-ui/core'
 // style
 import CardStyle from './style'
 
-const FieldSet = ({ classes, title, size, children }) => {
+const FieldSet = ({ classes, title, size, disabled, children }) => {
   // TODO: enhance -> padding and margin for size = sm || lg
   return (
     <div style={{ width: '100%', height: 'auto' }}>
-      <fieldset className={classes.fieldset}>
+      <fieldset className={classes.fieldset} disabled={disabled}>
         <legend className={classes.legend}>{title}</legend>
         {children}
       </fieldset>

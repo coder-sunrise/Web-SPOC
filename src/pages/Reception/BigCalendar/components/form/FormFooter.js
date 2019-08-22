@@ -27,13 +27,13 @@ const FormFooter = ({
   handleValidateClick,
 }) => {
   const isNew = appointmentStatusFK === undefined
-  const isDraft = appointmentStatusFK === '2'
+  const isDraft = appointmentStatusFK === 2
 
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,
   }
 
-  const confirmBtnText = isNew ? ButtonText.ADD : ButtonText.EDIT
+  const confirmBtnText = isNew || isDraft ? ButtonText.ADD : ButtonText.EDIT
 
   return (
     <div className={classnames(classes.footer)}>

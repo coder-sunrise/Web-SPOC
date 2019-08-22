@@ -29,6 +29,8 @@ export const upsert = (params) => commonService.upsert(url, params)
 export const save = (params) =>
   request(url, { method: params.id ? 'PUT' : 'POST', body: params })
 
+export const query = (id) => commonService.query(url, { id })
+
 export const queryList = (params) =>
   commonService.queryList(url, { pagesize: 9999, ...params })
 

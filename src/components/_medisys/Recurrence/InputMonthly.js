@@ -8,7 +8,7 @@ import { GridContainer, GridItem, NumberInput } from '@/components'
 // styles
 import styles from './styles'
 
-const RecurrenceMonthly = ({ classes, labelSize, inputSize }) => {
+const RecurrenceMonthly = ({ classes, disabled, labelSize, inputSize }) => {
   return (
     <GridContainer item xs md={12}>
       <GridItem md={labelSize} className={classes.inlineLabel}>
@@ -17,14 +17,19 @@ const RecurrenceMonthly = ({ classes, labelSize, inputSize }) => {
       <GridItem md={inputSize}>
         <FastField
           name='recurrenceDto.recurrenceDayOfTheMonth'
-          render={(args) => <NumberInput {...args} />}
+          render={(args) => <NumberInput disabled={disabled} {...args} />}
         />
       </GridItem>
       <GridItem md={inputSize}>
         <FastField
           name='recurrenceDto.recurrenceFrequency'
           render={(args) => (
-            <NumberInput {...args} prefix='of every: ' suffix='month(s)' />
+            <NumberInput
+              {...args}
+              disabled={disabled}
+              prefix='of every: '
+              suffix='month(s)'
+            />
           )}
         />
       </GridItem>

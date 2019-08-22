@@ -66,11 +66,11 @@ class Appointment extends React.PureComponent {
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: [
-      { doctorProfileFK: '0', doctorName: 'Medisys' },
-      { doctorProfileFK: '1', doctorName: 'Levinne' },
-      { doctorProfileFK: '2', doctorName: 'Cheah' },
-      { doctorProfileFK: '3', doctorName: 'Tan' },
-      { doctorProfileFK: '4', doctorName: 'Other' },
+      { clinicianFK: 1, doctorName: 'Medisys' },
+      { clinicianFK: '2', doctorName: 'Levinne' },
+      { clinicianFK: '3', doctorName: 'Cheah' },
+      { clinicianFK: '4', doctorName: 'Tan' },
+      { clinicianFK: '5', doctorName: 'Other' },
     ],
     // calendarEvents: dndEvents,
     selectedSlot: {},
@@ -110,51 +110,29 @@ class Appointment extends React.PureComponent {
     callback && callback()
   }
 
-  closeAppointmentForm = () =>
+  closeAppointmentForm = () => {
     this.setState({ selectedAppointmentFK: -1, showAppointmentForm: false })
 
-  updateEventSeries = ({ _appointmentID, add, update }) => {
-    add &&
-      this._dispatchAction(
-        {
-          action: CalendarActions.AddEventSeries,
-          series: add,
-        },
-        this.closeAppointmentForm,
-      )
-
-    update &&
-      this._dispatchAction(
-        {
-          action: CalendarActions.UpdateEventByEventID,
-          series: update,
-          _appointmentID,
-        },
-        this.closeAppointmentForm,
-      )
-  }
-
-  deleteEvent = (eventID, appointmentID) => {
-    this._dispatchAction(
-      {
-        action: CalendarActions.DeleteEventByEventID,
-        eventID,
-        appointmentID,
-      },
-      this.closeAppointmentForm,
-    )
+    this.props.dispatch({
+      type: 'calendar/setViewAppointment',
+      data: { appointments: [] },
+    })
   }
 
   moveEvent = ({ updatedEvent, id, _appointmentID }) => {
-    this.setState({
-      isDragging: false,
-    })
-    this._dispatchAction({
-      action: CalendarActions.MoveEvent,
+    console.log({
       updatedEvent,
       id,
-      _appointmentID,
     })
+    // this.setState({
+    //   isDragging: false,
+    // })
+    // this._dispatchAction({
+    //   action: CalendarActions.MoveEvent,
+    //   updatedEvent,
+    //   id,
+    //   _appointmentID,
+    // })
   }
 
   onSelectSlot = ({ start }) => {
@@ -171,11 +149,19 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectEvent = (selectedEvent) => {
-    this.setState({
-      // selectedSlot: { ...selectedEvent },
-      selectedAppointmentFK: selectedEvent.appointmentFK,
-      showAppointmentForm: true,
-    })
+    console.log({ selectedEvent })
+    this.props
+      .dispatch({
+        type: 'calendar/getAppointmentDetails',
+        appointmentID: selectedEvent.appointmentFK,
+      })
+      .then(() => {
+        this.setState({
+          selectedAppointmentFK: selectedEvent.appointmentFK,
+          showSeriesConfirmation: selectedEvent.isEnableRecurrence,
+          showAppointmentForm: !selectedEvent.isEnableRecurrence,
+        })
+      })
     // start and end are unwated values,
     // the important values are the ...restEvent
     // const { start, end, ...restEvent } = selectedEvent
@@ -259,22 +245,41 @@ class Appointment extends React.PureComponent {
   }
 
   closeSeriesConfirmation = () => {
+    this.props.dispatch({
+      type: 'calendar/setViewAppointment',
+      data: { appointments: [] },
+    })
     this.setState({ showSeriesConfirmation: false })
   }
 
-  confirmSeriesConfirmation = () => {
-    const { selectedSlot } = this.state
-    const { isDoctorEvent } = selectedSlot
+  editSeriesConfirmation = (editEntireSeries = false) => {
+    const { calendar, dispatch } = this.props
+    dispatch({
+      type: 'calendar/setViewAppointment',
+      data: {
+        ...calendar.currentViewAppointment,
+        editEntireSeries,
+      },
+    })
     this.setState({
-      showSeriesConfirmation: false,
       showPopup: false,
       isDragging: false,
-      popoverEvent: { ...InitialPopoverEvent },
       popupAnchor: null,
-      // selectedSlot: { ...selectedEvent, type: 'update' },
-      showAppointmentForm: !isDoctorEvent && true,
-      showDoctorEventModal: isDoctorEvent,
+      showSeriesConfirmation: false,
+      showAppointmentForm: true,
     })
+    // const { selectedSlot } = this.state
+    // const { isDoctorEvent } = selectedSlot
+    // this.setState({
+    //   showSeriesConfirmation: false,
+    //   showPopup: false,
+    //   isDragging: false,
+    //   popoverEvent: { ...InitialPopoverEvent },
+    //   popupAnchor: null,
+    //   // selectedSlot: { ...selectedEvent, type: 'update' },
+    //   showAppointmentForm: !isDoctorEvent && true,
+    //   showDoctorEventModal: isDoctorEvent,
+    // })
   }
 
   render () {
@@ -294,24 +299,27 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     const { calendarEvents, list } = CalendarModel
-    const flattenedCalendarData = calendarEvents.reduce(
-      flattenAppointmentDateToCalendarEvents,
-      [],
-    )
+    // const flattenedCalendarData = calendarEvents.reduce(
+    //   flattenAppointmentDateToCalendarEvents,
+    //   [],
+    // )
 
     const flattenedList = list.reduce((events, appointment) => {
       const {
         appointmentDate,
         patientName,
         patientContactNo,
+        isEnableRecurrence,
         // eslint-disable-next-line camelcase
         appointment_Resources,
       } = appointment
       // const appointmentDate = moment(appointmentDate).format(serverDateFormat)
       const apptEvents = appointment_Resources.map((item) => ({
         ...item,
+        resourceId: item.clinicianFK,
         patientName,
         patientContactNo,
+        isEnableRecurrence,
         start: moment(
           `${appointmentDate} ${item.startTime}`,
           `${serverDateFormat} HH:mm`,
@@ -328,7 +336,7 @@ class Appointment extends React.PureComponent {
       ]
     }, [])
 
-    // console.log({ flattenedList })
+    console.log({ flattenedList })
 
     return (
       <CardContainer hideHeader size='sm'>
@@ -384,8 +392,6 @@ class Appointment extends React.PureComponent {
             selectedAppointmentID={selectedAppointmentFK}
             selectedSlot={selectedSlot}
             // calendarEvents={calendarEvents}
-            handleUpdateEventSeries={this.updateEventSeries}
-            handleDeleteEvent={this.deleteEvent}
           />
         </CommonModal>
         <CommonModal
@@ -405,10 +411,9 @@ class Appointment extends React.PureComponent {
           open={showSeriesConfirmation}
           title='Alert'
           onClose={this.closeSeriesConfirmation}
-          onConfirm={this.confirmSeriesConfirmation}
           maxWidth='sm'
         >
-          <SeriesConfirmation />
+          <SeriesConfirmation onConfirmClick={this.editSeriesConfirmation} />
         </CommonModal>
       </CardContainer>
     )

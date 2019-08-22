@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Warning'
@@ -19,7 +19,22 @@ const styles = (theme) => ({
   },
 })
 
-const SeriesConfirmation = ({ classes, footer, onConfirm }) => {
+const SeriesConfirmation = ({ classes, footer, onConfirmClick }) => {
+  const [
+    editEntire,
+    setEditEntire,
+  ] = useState('1')
+
+  const onInputChange = (event) => {
+    const { target } = event
+    setEditEntire(target.value)
+  }
+
+  const handleConfirm = () => {
+    const editEntireSeries = editEntire === '2'
+    onConfirmClick(editEntireSeries)
+  }
+
   return (
     <React.Fragment>
       <GridContainer justify='center'>
@@ -36,15 +51,15 @@ const SeriesConfirmation = ({ classes, footer, onConfirm }) => {
             label=''
             simple
             vertical
-            defaultValue='one'
-            onChange={() => ({})}
+            value={editEntire}
+            onChange={onInputChange}
             options={[
               {
-                value: 'one',
+                value: '1',
                 label: 'Just this one',
               },
               {
-                value: 'entire',
+                value: '2',
                 label: 'The entire series',
               },
             ]}
@@ -53,7 +68,7 @@ const SeriesConfirmation = ({ classes, footer, onConfirm }) => {
       </GridContainer>
       {footer &&
         footer({
-          onConfirm,
+          onConfirm: handleConfirm,
           confirmText: 'Confirm',
         })}
     </React.Fragment>

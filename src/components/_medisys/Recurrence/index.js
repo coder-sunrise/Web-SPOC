@@ -49,24 +49,34 @@ const RecurrenceDTO = {
 
 const Recurrence = ({
   classes,
+  disabled,
   formValues,
   recurrenceDto = RecurrenceDTO,
   size = 'md',
+  handleRecurrencePatternChange = (f) => f,
 }) => {
   const { isEnableRecurrence, appointmentDate } = formValues
   const { recurrencePatternFK, recurrenceRange } = recurrenceDto
   const _labelSize = labelSize[size]
   const _inputSize = inputSize[size]
+
   return (
     <Fragment>
       <FastField
         name='isEnableRecurrence'
         render={(args) => {
-          return <Checkbox simple label='Enable Recurrence' {...args} />
+          return (
+            <Checkbox
+              {...args}
+              disabled={disabled}
+              simple
+              label='Enable Recurrence'
+            />
+          )
         }}
       />
       {isEnableRecurrence && (
-        <FieldSet>
+        <FieldSet title='Recurrence' disabled={disabled}>
           <GridContainer item md={12}>
             <GridItem md={_labelSize} className={classes.inlineLabel}>
               <span>Recurrence Pattern</span>
@@ -75,15 +85,25 @@ const Recurrence = ({
               <FastField
                 name='recurrenceDto.recurrencePatternFK'
                 render={(args) => (
-                  <CodeSelect {...args} code='ltRecurrencePattern' />
+                  <CodeSelect
+                    {...args}
+                    disabled={disabled}
+                    code='ltRecurrencePattern'
+                    onChange={handleRecurrencePatternChange}
+                  />
                 )}
               />
             </GridItem>
             {recurrencePatternFK === RECURRENCE_PATTERN.DAILY && (
-              <InputDaily labelSize={_labelSize} inputSize={_inputSize} />
+              <InputDaily
+                disabled={disabled}
+                labelSize={_labelSize}
+                inputSize={_inputSize}
+              />
             )}
             {recurrencePatternFK === RECURRENCE_PATTERN.WEEKLY && (
               <InputWeekly
+                disabled={disabled}
                 recurrenceDto={recurrenceDto}
                 labelSize={_labelSize}
                 inputSize={_inputSize}
@@ -91,7 +111,11 @@ const Recurrence = ({
             )}
 
             {recurrencePatternFK === RECURRENCE_PATTERN.MONTHLY && (
-              <InputMonthly labelSize={_labelSize} inputSize={_inputSize} />
+              <InputMonthly
+                disabled={disabled}
+                labelSize={_labelSize}
+                inputSize={_inputSize}
+              />
             )}
 
             <GridItem md={_labelSize} className={classes.inlineLabel}>
@@ -104,6 +128,7 @@ const Recurrence = ({
                   render={(args) => (
                     <RadioGroup
                       // label='Range of Recurrence'
+                      disabled={disabled}
                       textField='name'
                       options={[
                         {
@@ -125,14 +150,20 @@ const Recurrence = ({
                   <FastField
                     name='recurrenceDto.recurrenceCount'
                     render={(args) => (
-                      <NumberInput {...args} suffix='occurences' />
+                      <NumberInput
+                        {...args}
+                        disabled={disabled}
+                        suffix='occurences'
+                      />
                     )}
                   />
                 )}
                 {recurrenceRange === RECURRENCE_RANGE.BY && (
                   <FastField
                     name='recurrenceDto.recurrenceEndDate'
-                    render={(args) => <DatePicker {...args} />}
+                    render={(args) => (
+                      <DatePicker disabled={disabled} {...args} />
+                    )}
                   />
                 )}
               </GridItem>
