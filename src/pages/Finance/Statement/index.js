@@ -214,7 +214,7 @@ class Statement extends PureComponent {
     }
 
     const ActionProps = this.getActionProps()
-
+    const { history } = this.props
     return (
       <CommonHeader Icon={<Book />} titleId='finance.statement.title'>
         {/* Testing EditableTableGrid reusable components
@@ -229,6 +229,7 @@ class Statement extends PureComponent {
         />
         */}
         <SearchBar
+          history={history}
           handleSearch={this.handleSearch}
           handleAddNew={this.toggleAddNewStatementModal}
         />
@@ -239,7 +240,7 @@ class Statement extends PureComponent {
           columnExtensions={columnExtensions}
           ActionProps={ActionProps}
         />
-        <CommonModal
+        {/* <CommonModal
           open={showAddNewStatement}
           title={formatMessage({
             id: 'finance.statement.title.newStatement',
@@ -250,7 +251,7 @@ class Statement extends PureComponent {
           showFooter={false}
         >
           <AddNewStatement />
-        </CommonModal>
+        </CommonModal> */}
       </CommonHeader>
     )
   }

@@ -12,6 +12,8 @@ import {
   Button,
   CustomDropdown,
   Tooltip,
+  DateRangePicker,
+  Select,
 } from '@/components'
 
 const styles = () => ({
@@ -50,7 +52,7 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { handleSubmit, classes, handleAddNew } = this.props
+    const { handleSubmit, classes, handleAddNew, history } = this.props
 
     const { allCompanies, allStatementDate, allStatementDueDate } = this.state
 
@@ -63,39 +65,22 @@ class SearchBar extends PureComponent {
               render={(args) => <TextField label='Statement No.' {...args} />}
             />
           </GridItem>
-          <GridItem xs sm={2} md={2}>
-            <Field
-              name='StatementStartDate'
-              render={(args) => (
-                <DatePicker
-                  disabled={allStatementDate}
-                  label={formatMessage({
-                    id: 'finance.statement.statementDate',
-                  })}
-                  prefix={formatMessage({ id: 'finance.statement.date.from' })}
-                  timeFormat={false}
-                  {...args}
-                />
-              )}
+          <GridItem md={6}>
+            <FastField
+              name='statementDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    label='Statement From Date'
+                    label2='Statement To Date'
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
-          <GridItem xs sm={2} md={2}>
-            <Field
-              name='StatementEndDate'
-              render={(args) => (
-                <DatePicker
-                  disabled={allStatementDate}
-                  label={formatMessage({
-                    id: 'finance.statement.statementDate',
-                  })}
-                  prefix={formatMessage({ id: 'finance.statement.date.to' })}
-                  timeFormat={false}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs sm={1} md={1}>
+
+          <GridItem xs sm={1} md={1} style={{ paddingTop: 13 }}>
             <Checkbox
               label={formatMessage({ id: 'form.date.placeholder.allDate' })}
               checked={allStatementDate}
@@ -105,7 +90,7 @@ class SearchBar extends PureComponent {
         </GridItem>
         <GridItem container xs md={12}>
           <GridItem xs sm={3} md={3} style={{ position: 'relative' }}>
-            <Field
+            {/* <Field
               name='Company'
               render={(args) => (
                 <TextField
@@ -114,60 +99,52 @@ class SearchBar extends PureComponent {
                   {...args}
                 />
               )}
+            /> */}
+            {/* <div className={classes.allCompaniesCheck}> */}
+            <FastField
+              name='AllCompanies'
+              render={(args) => {
+                return (
+                  // <Tooltip title='AllCompanies' placement='top-end'>
+                  //   <Checkbox
+                  //     simple
+                  //     onClick={this.onAllDateClick('allCompanies')}
+                  //     {...args}
+                  //   />
+                  // </Tooltip>
+                  <Select
+                    {...args}
+                    label='Company'
+                    options={[
+                      { name: 'All Company', value: 'allCompany' },
+                      { name: 'AIA', value: 'AIA' },
+                      { name: '3M', value: '3M' },
+                    ]}
+                  />
+                )
+              }}
             />
-            <div className={classes.allCompaniesCheck}>
-              <FastField
-                name='AllCompanies'
-                render={(args) => {
-                  return (
-                    <Tooltip title='AllCompanies' placement='top-end'>
-                      <Checkbox
-                        simple
-                        onClick={this.onAllDateClick('allCompanies')}
-                        {...args}
-                      />
-                    </Tooltip>
-                  )
-                }}
-              />
-            </div>
+            {/* </div> */}
           </GridItem>
 
-          <GridItem xs sm={2} md={2}>
-            <Field
-              name='StatementDueStartDate'
-              render={(args) => (
-                <DatePicker
-                  label={formatMessage({
-                    id: 'finance.statement.statementDueDate',
-                  })}
-                  prefix={formatMessage({ id: 'finance.statement.date.from' })}
-                  disabled={allStatementDueDate}
-                  timeFormat={false}
-                  {...args}
-                />
-              )}
+          <GridItem md={6}>
+            <FastField
+              name='statementDueDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    label='Statement Due From Date'
+                    label2='Statement Due To Date'
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
-          <GridItem xs sm={2} md={2}>
-            <Field
-              name='StatementDueEndDate'
-              render={(args) => (
-                <DatePicker
-                  label={formatMessage({
-                    id: 'finance.statement.statementDueDate',
-                  })}
-                  prefix={formatMessage({ id: 'finance.statement.date.to' })}
-                  disabled={allStatementDueDate}
-                  timeFormat={false}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs sm={1} md={1}>
+
+          <GridItem xs sm={1} md={1} style={{ paddingTop: 13 }}>
             <Checkbox
-              label={formatMessage({ id: 'form.date.placeholder.allDate' })}
+              label='All Date'
               checked={allStatementDueDate}
               onClick={this.onAllDateClick('allStatementDueDate')}
             />
@@ -177,13 +154,32 @@ class SearchBar extends PureComponent {
               <Search />
               <FormattedMessage id='form.search' />
             </Button>
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={() => {
+                history.push('/finance/statement/details')
+              }}
+            >
+              Add New
+            </Button>
           </GridItem>
           <GridItem xs sm={6} md={6} lg={4} container justify='flex-end'>
             <div>
-              <Button color='primary' onClick={handleAddNew}>
+              {/* <Button color='primary' onClick={handleAddNew}>
                 <AddBox />
                 <FormattedMessage id='form.addNew' />
-              </Button>
+              </Button> */}
+              {/* <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  history.push('/finance/statement/details')
+                }}
+              >
+                {/* <Add /> */}
+              {/* Add New
+              // </Button> */}
               <CustomDropdown
                 buttonText='Print'
                 buttonProps={{

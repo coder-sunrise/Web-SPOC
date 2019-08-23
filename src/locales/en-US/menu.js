@@ -45,6 +45,7 @@ export default {
   'menu.finance.corporate-billing': 'Corporate Billing',
   'menu.finance.corporate-billing.detail': 'Invoices',
   'menu.finance.statement': 'Statement',
+  'menu.finance.statement/detail': 'Statement Detail',
   'menu.finance.scheme': 'Scheme',
   'menu.finance.scheme/detail': 'Scheme Detail',
 
