@@ -6,6 +6,8 @@ import { suppliers, dispUOMs ,status} from '@/utils/codes'
 
 import { Button, CommonTableGrid } from '@/components'
 
+
+
 const Grid = ({ history, dispatch, copaymentScheme }) => {
   const [
     tableParas,
@@ -16,16 +18,18 @@ const Grid = ({ history, dispatch, copaymentScheme }) => {
       { name: 'code', title: 'Scheme Code' },
       { name: 'coPayerType', title: 'Scheme Type' },
       { name: 'coPayerName', title: 'Co-Payer Name' },
-      { name: 'schemeCategoryName', title: 'Scheme Category' },
+      // { name: 'schemeCategoryName', title: 'Scheme Category' },
       { name: 'isActive', title: 'Status' },
       { name: 'description', title: 'Description' },
       { name: 'action', title: 'Action' },
     ],
     leftColumns: [],
   })
-  const [
-    colExtenstions,
-  ] = useState([
+  const editRow = (row, e) => {
+    history.push(`/finance/scheme/details?id=${row.id}`)
+  }
+  
+  const colExtenstions =[
     { columnName: 'action', align: 'center', render:(row)=>{
       return <>
         {/* <Tooltip title='Detail' placement='bottom'>
@@ -43,7 +47,7 @@ const Grid = ({ history, dispatch, copaymentScheme }) => {
         <Tooltip title='Edit' placement='bottom'>
           <Button
             size='sm'
-            onClick={()=> history.push(`/finance/scheme/details?uid=${row.id}`)}
+            onClick={()=>editRow(row)}
             justIcon
             color='primary'
             style={{ marginRight: 5 }}
@@ -73,14 +77,17 @@ const Grid = ({ history, dispatch, copaymentScheme }) => {
     },
     { columnName: 'payments', type: 'number', currency: true },
     { columnName: 'expenseAmount', type: 'number', currency: true },
-  ])
+  ]
+
+
 
   return (
     <React.Fragment>
       <CommonTableGrid
         type='copaymentScheme'
         columnExtensions={colExtenstions}
-        FuncProps={{ pager: true }}
+        onRowDoubleClick={editRow}
+        // FuncProps={{ pager: true }}
         {...tableParas}
       />
     </React.Fragment>

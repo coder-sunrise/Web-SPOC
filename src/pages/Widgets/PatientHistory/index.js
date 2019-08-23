@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
+import moment from 'moment'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
@@ -27,6 +27,7 @@ import {
   CardContainer,
   confirm,
   Accordion,
+  withFormikExtend,
 } from '@/components'
 import {
   withStyles,
@@ -136,7 +137,7 @@ const data = [
     date: '08 Dec 2018',
   },
 ]
-@withFormik({
+@withFormikExtend({
   // mapPropsToValues: ({ patientHistory }) => {
   //   console.log(patientHistory)
   //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
@@ -261,17 +262,48 @@ class PatientHistory extends Component {
     ]
   }
 
-  getTitle = () => (
+  componentDidMount () {
+    // if (this.props.patientHistory.patientId) {
+    //   console.log(1)
+    //   this.props
+    //     .dispatch({
+    //       type: 'patientHistory/query',
+    //       payload: {
+    //         patientProfileFK: this.props.patientHistory.patientId,
+    //         sorting: {
+    //           columnName: 'VisitDate',
+    //           direction: 'asc',
+    //         },
+    //       },
+    //     })
+    //     .then((o) => {
+    //       this.props.resetForm(o)
+    //     })
+    // }
+  }
+
+  getTitle = (row) => (
     <div className={this.props.classes.title}>
       <GridContainer>
         <GridItem sm={7}>
-          <span>Consultation Visit</span>
-          <div className={this.props.classes.note}>V4, Dr Levine</div>
+          <p
+            onClick={() => {
+              console.log(row)
+              this.props.dispatch({
+                type: 'patientHistory/queryOne',
+                payload: row.id,
+              })
+            }}
+          >
+            <span>Consultation Visit</span>
+            <div className={this.props.classes.note}>
+              V4, {row.doctorTitle} {row.doctorName}
+            </div>
+          </p>
         </GridItem>
         <GridItem sm={5}>
           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-            {/* <DateRange style={{ position: 'absolute', left: 0 }} /> */}
-            12 Apr 2019
+            <DatePicker text defaultValue={moment(row.visitDate)} />
           </span>
           <div className={this.props.classes.note}>&nbsp;</div>
         </GridItem>
@@ -337,7 +369,7 @@ class PatientHistory extends Component {
   }
 
   render () {
-    const { theme, style, classes, override = {} } = this.props
+    const { theme, style, classes, override = {}, patientHistory } = this.props
     return (
       <div style={style}>
         <CardContainer
@@ -350,20 +382,10 @@ class PatientHistory extends Component {
         >
           <Accordion
             active={0}
-            collapses={[
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-            ]}
+            collapses={patientHistory.list.map((o) => ({
+              title: this.getTitle(o),
+              content: this.getContent(o),
+            }))}
           />
         </CardContainer>
         <CardContainer

@@ -53,7 +53,7 @@ class Grid extends PureComponent {
     const { list } = settingRoom
     // For complex object retrieve from server
     // dispatch({
-    //   type: 'settingRoom/querySingle',
+    //   type: 'settingRoom/queryOne',
     //   payload: {
     //     id: row.id,
     //   },
