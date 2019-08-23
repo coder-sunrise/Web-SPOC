@@ -17,6 +17,8 @@ import {
   Select,
   TextField,
 } from '@/components'
+// services
+import { getRoles } from './services'
 
 const styles = (theme) => ({
   container: {
@@ -71,7 +73,7 @@ const styles = (theme) => ({
               currentSelectedUser.effectiveStartDate,
               currentSelectedUser.effectiveEndDate,
             ],
-      role: '1',
+      role: 1,
     }
   },
   handleSubmit: (values, { props }) => {
@@ -138,6 +140,21 @@ const styles = (theme) => ({
   },
 })
 class UserProfileForm extends React.PureComponent {
+  state = {
+    roles: [],
+  }
+
+  componentWillMount () {
+    getRoles().then((response) => {
+      const { data } = response
+      const { data: roles = [] } = data
+      console.log('willmount', { roles })
+      this.setState({
+        roles,
+      })
+    })
+  }
+
   render () {
     const {
       classes,
@@ -147,6 +164,10 @@ class UserProfileForm extends React.PureComponent {
       settingUserProfile,
     } = this.props
     const { currentSelectedUser } = settingUserProfile
+
+    const { roles } = this.state
+
+    console.log({ roles })
 
     const isEdit = currentSelectedUser.userName !== undefined
     return (
@@ -290,10 +311,16 @@ class UserProfileForm extends React.PureComponent {
           </GridItem>
           <GridContainer className={classes.indent}>
             <GridItem md={6}>
-              <FastField
+              <Field
                 name='role'
                 render={(args) => (
-                  <Select {...args} label='Role' options={[]} />
+                  <Select
+                    {...args}
+                    label='Role'
+                    valueField='id'
+                    labelField='name'
+                    options={roles}
+                  />
                 )}
               />
             </GridItem>
@@ -308,13 +335,5 @@ class UserProfileForm extends React.PureComponent {
     )
   }
 }
-
-// const ConnectedUserProfileForm = connect(({ settingUserProfile }) => ({
-//   settingUserProfile,
-// }))(UserProfileForm)
-
-// const StyledUserProfileForm = withStyles(styles, { name: 'UserProfileForm' })(
-//   ConnectedUserProfileForm,
-// )
 
 export default withStyles(styles, { name: 'UserProfileForm' })(UserProfileForm)

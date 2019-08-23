@@ -25,6 +25,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      entity: {},
       patientInfo: {},
       visitInfo: {},
       errorState: {},
@@ -138,12 +139,11 @@ export default createFormViewModel({
       },
       *registerVisitInfo ({ payload }, { call, put }) {
         const response = yield call(service.registerVisit, payload)
-        const { status, data: { visit = {} } } = response
+        const { status } = response
         if (status >= 200 && status < 300) {
-          const { bizSessionFK } = visit
+          // const { bizSessionFK } = visit
           return yield put({
-            type: 'queueLog/fetchQueueListing',
-            sessionID: bizSessionFK,
+            type: 'queueLog/refresh',
           })
         }
         return false

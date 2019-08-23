@@ -16,6 +16,10 @@ export const UserProfileTableConfig = {
         return row.role ? row.role.name : ''
       },
     },
+    {
+      columnName: 'status',
+      render: (row) => (row.status ? 'Active' : 'Inactive'),
+    },
   ],
   FuncProps: {
     pager: false,

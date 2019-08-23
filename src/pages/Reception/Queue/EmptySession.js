@@ -21,11 +21,6 @@ const STYLES = () => ({
   },
 })
 
-const LOADING_KEY = {
-  GET_SESSION_INFO: 'queueLog/getSessionInfo',
-  START_SESSION: 'queueLog/startSession',
-}
-
 class EmptySession extends PureComponent {
   onStartClick = () => {
     const { handleStartSession } = this.props
@@ -33,46 +28,32 @@ class EmptySession extends PureComponent {
   }
 
   render () {
-    const { classes, loadingProps, errorState } = this.props
-    const notLoadingSessionInfo =
-      !loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] &&
-      !loadingProps.effects[LOADING_KEY.START_SESSION]
+    const { classes, loading, sessionInfo } = this.props
+    const { id } = sessionInfo
+    const showLoading = loading.effects['queueLog/getSessionInfo']
+    const showStartSession = id === ''
+
     return (
       <div className={classnames(classes.emptyStateContainer)}>
         <div className={classnames(classes.content)}>
-          {errorState.hasError ? (
-            <Danger>
-              <h4 style={{ fontWeight: 'bold' }}>{errorState.message}</h4>
-            </Danger>
-          ) : (
+          {showLoading && (
             <React.Fragment>
-              {loadingProps.effects[LOADING_KEY.GET_SESSION_INFO] && (
-                <React.Fragment>
-                  <h3>
-                    <FormattedMessage id='reception.queue.gettingSessionInfo' />
-                  </h3>
-                  <LinearProgress />
-                </React.Fragment>
-              )}
-              {loadingProps.effects[LOADING_KEY.START_SESSION] && (
-                <React.Fragment>
-                  <h3>
-                    <FormattedMessage id='reception.queue.startingASession' />
-                  </h3>
-                  <LinearProgress />
-                </React.Fragment>
-              )}
-              {notLoadingSessionInfo && (
-                <React.Fragment>
-                  <h3>
-                    <FormattedMessage id='reception.queue.emptyState' />
-                  </h3>
-                  <Button color='primary' onClick={this.onStartClick}>
-                    <PlayCircleOutline />
-                    <FormattedMessage id='reception.queue.startSession' />
-                  </Button>
-                </React.Fragment>
-              )}
+              <h3>
+                <FormattedMessage id='reception.queue.gettingSessionInfo' />
+              </h3>
+              <LinearProgress />
+            </React.Fragment>
+          )}
+          {!showLoading &&
+          showStartSession && (
+            <React.Fragment>
+              <h3>
+                <FormattedMessage id='reception.queue.emptyState' />
+              </h3>
+              <Button color='primary' onClick={this.onStartClick}>
+                <PlayCircleOutline />
+                <FormattedMessage id='reception.queue.startSession' />
+              </Button>
             </React.Fragment>
           )}
         </div>

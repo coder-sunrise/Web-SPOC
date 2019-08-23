@@ -4,7 +4,13 @@ import React, { useState, useEffect, useRef } from 'react'
 import AttachFile from '@material-ui/icons/AttachFile'
 import { Chip, withStyles } from '@material-ui/core'
 // custom components
-import { Button, CommonCard, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  CommonCard,
+  Danger,
+  GridContainer,
+  GridItem,
+} from '@/components'
 // services
 import { uploadFile, downloadFile, deleteFileByFileID } from '@/services/file'
 // utils
@@ -38,6 +44,8 @@ const styles = (theme) => ({
   },
 })
 
+const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
+
 const convertToBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -63,6 +71,11 @@ const withAttachment = ({
     setFileStatusList,
   ] = useState([])
 
+  const [
+    errorText,
+    setErrorText,
+  ] = useState('')
+
   useEffect(() => {
     getCodes('ltfilestatus').then((response) => {
       setFileStatusList([
@@ -79,6 +92,7 @@ const withAttachment = ({
   const inputEl = useRef(null)
 
   const mapFileToUploadObject = async (file) => {
+    // file type and file size validation
     const base64 = await convertToBase64(file)
     const fileStatusFK = fileStatusList.find(
       (item) => item.code.toUpperCase() === 'UPLOADED',
@@ -100,17 +114,50 @@ const withAttachment = ({
   }
 
   const onUploadClick = () => {
+    setErrorText('')
     inputEl.current.click()
     // this.refs.visitAttachment && this.refs.visitAttachment.click()
+  }
+
+  const validateFileSize = (files) => {
+    const maxMB = 5242880
+    const skippedFiles = Object.keys(files).reduce(
+      (skipped, key) =>
+        files[key].size > maxMB
+          ? [
+              ...skipped,
+              files[key].name,
+            ]
+          : [
+              ...skipped,
+            ],
+      [],
+    )
+    if (skippedFiles.length === 0) return []
+
+    const errTxt = `Skipped ${skippedFiles.join(
+      ', ',
+    )}. Reason: File(s) is larger than 5mb`
+    setErrorText(errTxt)
+
+    return skippedFiles
   }
 
   const onFileChange = async (event) => {
     try {
       const { files } = event.target
-      const selectedFiles = await Promise.all(
-        Object.keys(files).map((key) => mapFileToUploadObject(files[key])),
-      )
+      const numberOfNewFiles = Object.keys(files).length
+      if (numberOfNewFiles + attachments.length > 5) {
+        setErrorText('Cannot upload more than 5 attachments')
+        return
+      }
+      const skipped = validateFileSize(files)
 
+      const selectedFiles = await Promise.all(
+        Object.keys(files)
+          .filter((key) => !skipped.includes(files[key].name))
+          .map((key) => mapFileToUploadObject(files[key])),
+      )
       handleUpdateAttachments({
         added: selectedFiles,
       })
@@ -135,7 +182,7 @@ const withAttachment = ({
 
   return (
     <CommonCard size='sm' title={title}>
-      <GridContainer>
+      <GridContainer alignItems='center'>
         {children}
         <GridItem className={classes.verticalSpacing}>
           <span className={classes.attachmentLabel}>Attachment:</span>
@@ -160,15 +207,26 @@ const withAttachment = ({
           <input
             style={{ display: 'none' }}
             type='file'
+            accept={allowedFiles}
             id='uploadVisitAttachment'
             ref={inputEl}
             multiple='multiple'
             onChange={onFileChange}
           />
-          <Button color='rose' size='sm' onClick={onUploadClick}>
+          <Button
+            color='rose'
+            size='sm'
+            onClick={onUploadClick}
+            disabled={attachments.length >= 5}
+          >
             <AttachFile />
             Upload
           </Button>
+        </GridItem>
+        <GridItem>
+          <Danger>
+            <span>{errorText}</span>
+          </Danger>
         </GridItem>
       </GridContainer>
     </CommonCard>
