@@ -22,12 +22,16 @@ import * as commonService from '@/services/common'
 //   return response
 // }
 
-const url = '/api/Appointment'
+const url = '/api/appointment'
+const rescheduleURL = '/api/appointment/reschedule'
 
 export const upsert = (params) => commonService.upsert(url, params)
 
 export const save = (params) =>
   request(url, { method: params.id ? 'PUT' : 'POST', body: params })
+
+export const reschedule = (params) =>
+  request(rescheduleURL, { method: 'PUT', body: params })
 
 export const query = (id) => commonService.query(url, { id })
 

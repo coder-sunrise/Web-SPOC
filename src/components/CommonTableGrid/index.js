@@ -563,7 +563,7 @@ class CommonTableGrid extends React.Component {
     const childRows = rootRows.filter(
       (r) => r.parentId === (row ? row.id : null),
     )
-    console.log(childRows)
+    // console.log(childRows)
     return childRows.length ? childRows : null
   }
 
@@ -697,6 +697,7 @@ class CommonTableGrid extends React.Component {
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,
     }
+
     // const extraPagerConfig = {
     //   ...pagerConfig,
     // }

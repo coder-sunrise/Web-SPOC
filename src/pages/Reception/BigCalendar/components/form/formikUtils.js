@@ -17,9 +17,9 @@ const initDailyRecurrence = {
   recurrenceDaysOfTheWeek: [],
   recurrenceDayOfTheMonth: undefined,
 }
+const endOfMonth = moment().endOf('month').date()
 
 export const parseDateToServerDateFormatString = (date, format) => {
-  console.log({ date, format })
   if (moment.isMoment(date)) return date.format(serverDateFormat)
 
   if (format) {
@@ -34,7 +34,6 @@ export const parseDateToServerDateFormatString = (date, format) => {
   return date
 }
 
-const endOfMonth = moment().endOf('month').date()
 export const ValidationSchema = Yup.object().shape({
   patientName: Yup.string().required('Patient Name is required'),
   patientContactNo: Yup.string().required('Contact No. is required'),
@@ -93,6 +92,7 @@ export const mapPropsToValues = ({
 
     return {
       ...viewingAppointment,
+      updateAllOthers: false,
       recurrenceDto:
         recurrenceDto === undefined || recurrenceDto === null
           ? { ...initDailyRecurrence }
@@ -102,6 +102,8 @@ export const mapPropsToValues = ({
   }
   return {
     isEnableRecurrence: false,
+    editSingleAppointment: false,
+    updateAllOthers: false,
     bookedByUser: user.userName,
     bookedByUserFK: user.id,
     appointment: {
@@ -112,35 +114,47 @@ export const mapPropsToValues = ({
   }
 }
 
-export const getEventSeriesByID = (appointmentID, data) => {
-  const appointment = data.find((item) => item.id === appointmentID)
-  if (appointment) {
-    const { appointment_Resources: apptResources } = appointment
-    return apptResources
-  }
-  return []
-}
-
-export const mapDatagridToAppointmentResources = (event, index) => {
+export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
   const { id, startTime: timeFrom, endTime: timeTo, ...restEvent } = event
   if (id < 0) {
     const startTime = moment(timeFrom, timeFormat).format(timeFormat24Hour)
     const endTime = moment(timeTo, timeFormat).format(timeFormat24Hour)
     return { ...restEvent, startTime, endTime }
   }
-  return { ...event }
+  return { ...event, [id]: !shouldDumpID }
 }
 
-export const generateRecurringAppointments = (recurrenceDto, appointment) => {
+export const compareDto = (value, original) => {
+  if (value === undefined || original === undefined) return false
+  let isChanged = false
+  Object.keys(original).forEach((key) => {
+    if (value[key] === undefined) isChanged = true
+    else if (original[key] !== value[key]) isChanged = true
+  })
+  return isChanged
+}
+
+export const generateRecurringAppointments = (
+  recurrenceDto,
+  appointment,
+  editSingle,
+  shouldDumpID,
+) => {
+  if (editSingle)
+    return [
+      appointment,
+    ]
+
   const rrule = computeRRule({
     recurrenceDto,
     startDate: appointment.appointmentDate,
   })
   if (rrule) {
     const allDates = rrule.all() || []
-    console.log({ allDates })
+    const { id, ...restAppointmentValues } = appointment
     return allDates.map((date) => ({
-      ...appointment,
+      ...restAppointmentValues,
+      [id]: !shouldDumpID,
       appointmentDate: parseDateToServerDateFormatString(date),
     }))
   }
@@ -172,4 +186,18 @@ export const filterRecurrenceDto = (recurrenceDto) => {
     }
   }
   return { ...recurrenceDto }
+}
+
+export const constructPayload = (payload, appointmentStatusFK) => {
+  const { updateAllOthers, editSingleAppointment } = payload
+  console.log({ updateAllOthers, editSingleAppointment, appointmentStatusFK })
+  // DRAFT
+  if (appointmentStatusFK === 5) {
+    return {
+      updateAllOthers,
+      editSingleAppointment,
+      appointmentGroupDto: payload,
+    }
+  }
+  return payload
 }

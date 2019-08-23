@@ -252,13 +252,13 @@ class Appointment extends React.PureComponent {
     this.setState({ showSeriesConfirmation: false })
   }
 
-  editSeriesConfirmation = (editEntireSeries = false) => {
+  editSeriesConfirmation = (editSingleAppointment = false) => {
     const { calendar, dispatch } = this.props
     dispatch({
       type: 'calendar/setViewAppointment',
       data: {
         ...calendar.currentViewAppointment,
-        editEntireSeries,
+        editSingleAppointment,
       },
     })
     this.setState({
@@ -298,7 +298,7 @@ class Appointment extends React.PureComponent {
       selectedAppointmentFK,
     } = this.state
 
-    const { calendarEvents, list } = CalendarModel
+    const { calendarEvents, list, currentViewAppointment } = CalendarModel
     // const flattenedCalendarData = calendarEvents.reduce(
     //   flattenAppointmentDateToCalendarEvents,
     //   [],
@@ -336,7 +336,12 @@ class Appointment extends React.PureComponent {
       ]
     }, [])
 
-    console.log({ flattenedList })
+    const formTitle =
+      currentViewAppointment.editSingleAppointment === undefined
+        ? 'Appointment'
+        : `Appointment ${currentViewAppointment.editSingleAppointment
+            ? '(Editing Single)'
+            : '(Editing Entire Series)'}`
 
     return (
       <CardContainer hideHeader size='sm'>
@@ -381,7 +386,7 @@ class Appointment extends React.PureComponent {
 
         <CommonModal
           open={showAppointmentForm}
-          title='Appointment'
+          title={formTitle}
           onClose={this.closeAppointmentForm}
           onConfirm={this.closeAppointmentForm}
           showFooter={false}

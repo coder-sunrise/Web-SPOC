@@ -5,14 +5,12 @@ import classnames from 'classnames'
 import { FastField, withFormik } from 'formik'
 // material ui
 import { CircularProgress, withStyles } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
 // custom component
 import {
   CommonModal,
   GridContainer,
   GridItem,
   SizeContainer,
-  Switch,
   OutlinedTextField,
 } from '@/components'
 // medisys components
@@ -33,6 +31,8 @@ import {
   generateRecurringAppointments,
   mapDatagridToAppointmentResources,
   filterRecurrenceDto,
+  compareDto,
+  constructPayload,
 } from './formikUtils'
 import styles from './style'
 
@@ -57,6 +57,7 @@ class Form extends React.PureComponent {
         ? this.props.values.appointment.appointments_Resources
         : [],
     showSeriesUpdateConfirmation: false,
+    tempNewAppointmentStatusFK: -1,
   }
 
   componentWillMount () {
@@ -66,23 +67,27 @@ class Form extends React.PureComponent {
     })
   }
 
-  onRecurrencePatternChange = (recurrencePatternFK) => {
+  onRecurrencePatternChange = async (recurrencePatternFK) => {
     const { setFieldValue, setFieldTouched } = this.props
     // reset other field first
-    setFieldValue('recurrenceDto.recurrenceDaysOfTheWeek', undefined)
-    setFieldValue('recurrenceDto.recurrenceDayOfTheMonth', undefined)
-    setFieldTouched('recurrenceDto.recurrenceDayOfTheMonth', false, false)
-    setFieldTouched('recurrenceDto.recurrenceDaysOfTheWeek', false, false)
+    await setFieldValue('recurrenceDto.recurrenceDaysOfTheWeek', [])
+    await setFieldValue('recurrenceDto.recurrenceDayOfTheMonth', null)
+    await setFieldTouched('recurrenceDto.recurrenceDayOfTheMonth', false, false)
+    await setFieldTouched('recurrenceDto.recurrenceDaysOfTheWeek', false, false)
 
     // initialize value accordingly
     if (recurrencePatternFK === 3) {
-      setFieldValue('recurrenceDto.recurrenceDayOfTheMonth', 1)
-      setFieldTouched('recurrenceDto.recurrenceDayOfTheMonth', true, true)
+      await setFieldValue('recurrenceDto.recurrenceDayOfTheMonth', 1)
+      await setFieldTouched('recurrenceDto.recurrenceDayOfTheMonth', true, true)
     }
 
     if (recurrencePatternFK === 2) {
-      setFieldValue('recurrenceDto.recurrenceDaysOfTheWeek', [])
-      setFieldTouched('recurrenceDto.recurrenceDaysOfTheWeek', true, false)
+      await setFieldValue('recurrenceDto.recurrenceDaysOfTheWeek', [])
+      await setFieldTouched(
+        'recurrenceDto.recurrenceDaysOfTheWeek',
+        true,
+        false,
+      )
     }
   }
 
@@ -92,12 +97,9 @@ class Form extends React.PureComponent {
     })
   }
 
-  openSearchPatientModal = () => {
-    this.setState({ showSearchPatientModal: true })
-  }
-
-  closeSearchPatientModal = () => {
-    this.setState({ showSearchPatientModal: false })
+  toggleSearchPatientModal = () => {
+    const { showSearchPatientModal } = this.state
+    this.setState({ showSearchPatientModal: !showSearchPatientModal })
   }
 
   onSearchPatient = async () => {
@@ -110,7 +112,7 @@ class Form extends React.PureComponent {
         [`${prefix}name`]: values.patientName,
       },
     })
-    result && this.openSearchPatientModal()
+    result && this.toggleSearchPatientModal()
   }
 
   onSelectPatientClick = (patientProfile) => {
@@ -124,7 +126,7 @@ class Form extends React.PureComponent {
     setFieldTouched('patientName', true)
     setFieldTouched('contactNo', true)
 
-    this.closeSearchPatientModal()
+    this.toggleSearchPatientModal()
   }
 
   closeDeleteConfirmation = () => {
@@ -188,105 +190,108 @@ class Form extends React.PureComponent {
     }
   }
 
-  onConfirmClick = () => {
-    // const { slotInfo } = this.props
-    // if (slotInfo.series) {
-    //   this.openSeriesUpdateConfirmation()
-    // } else {
-    //   this._confirm()
-    // }
-    this.confirm()
-  }
+  _submit = async (validate = false) => {
+    try {
+      const {
+        validateForm,
+        resetForm,
+        setSubmitting,
+        handleSubmit,
+        values,
+        viewingAppointment,
+        onClose,
+        dispatch,
+      } = this.props
+      const {
+        datagrid,
+        tempNewAppointmentStatusFK: appointmentStatusFK,
+      } = this.state
 
-  _submit = async (appointmentStatusFK, validate = false) => {
-    const { validateForm, setSubmitting, handleSubmit } = this.props
-    handleSubmit() // fake submit to touch all fields
-    setSubmitting(true)
-    const formError = await validateForm()
+      handleSubmit() // fake submit to touch all fields
+      setSubmitting(true)
+      const formError = await validateForm(values)
 
-    if (Object.keys(formError).length > 0) {
-      console.log({ formError })
+      if (Object.keys(formError).length > 0) {
+        console.log({ formError })
+        setSubmitting(false)
+        return
+      }
+      const { appointment, recurrenceDto, ...restValues } = values
+      const { recurrenceDto: originalRecurrenceDto } = viewingAppointment
+
+      const isRecurrenceChanged = compareDto(
+        recurrenceDto,
+        originalRecurrenceDto,
+      )
+      const appointmentResources = datagrid.map(
+        mapDatagridToAppointmentResources(
+          isRecurrenceChanged || restValues.updateAllOthers,
+        ),
+      )
+
+      const singleAppointment = {
+        ...appointment,
+        appointmentStatusFk: appointmentStatusFK,
+        appointments_Resources: [
+          ...appointmentResources,
+        ],
+      }
+      const appointments = generateRecurringAppointments(
+        recurrenceDto,
+        singleAppointment,
+        restValues.editSingleAppointment,
+        isRecurrenceChanged || restValues.updateAllOthers,
+      )
+      if (!appointments) {
+        setSubmitting(false)
+        return
+      }
+
+      const filteredRecurrenceDto = restValues.isEnableRecurrence
+        ? filterRecurrenceDto(recurrenceDto)
+        : null
+
+      const updated = {
+        ...restValues,
+        recurrenceDto: filteredRecurrenceDto,
+        appointments,
+      }
+
+      const payload = constructPayload(updated, appointmentStatusFK)
+      console.log({ payload, values })
+      const updateKey =
+        appointmentStatusFK === 1
+          ? 'calendar/saveAppointment'
+          : 'calendar/rescheduleAppointment'
+      const actionKey = validate ? 'calendar/validate' : updateKey
+
       setSubmitting(false)
-      return
+      dispatch({
+        type: actionKey,
+        payload,
+      })
+      resetForm()
+      onClose && onClose()
+    } catch (error) {
+      console.log({ error })
     }
-
-    const { datagrid } = this.state
-    const { values, onClose, dispatch, resetForm } = this.props
-
-    // const {
-    //   appointmentRemarks,
-    //   appointmentDate,
-    //   isEnableRecurrence,
-    //   recurrenceDto,
-    //   concurrencyToken,
-    //   appointmentGroupFK,
-    //   ...restValues
-    // } = values
-
-    // const appointments = [
-    //   {
-    //     id: appointmentGroupFK,
-    //     concurrencyToken,
-    //     appointmentGroupFK,
-    //     appointmentStatusFK,
-    //     appointmentRemarks,
-    //     appointmentDate: parseDateToServerDateFormatString(appointmentDate),
-    //     appointments_Resources: [
-    //       ...appointmentResources,
-    //     ],
-    //   },
-    // ]
-
-    const appointmentResources = datagrid.map(mapDatagridToAppointmentResources)
-    const { appointment, recurrenceDto, ...restValues } = this.props.values
-    const singleAppointment = {
-      ...appointment,
-      appointmentStatusFk: appointmentStatusFK,
-      appointments_Resources: [
-        ...appointmentResources,
-      ],
-    }
-    const appointments = generateRecurringAppointments(
-      recurrenceDto,
-      singleAppointment,
-    )
-    if (!appointments) {
-      setSubmitting(false)
-      return
-    }
-
-    const filteredRecurrenceDto = restValues.isEnableRecurrence
-      ? filterRecurrenceDto(recurrenceDto)
-      : null
-
-    const updated = {
-      ...restValues,
-      recurrenceDto: filteredRecurrenceDto,
-      appointments,
-    }
-
-    console.log({ updated, values })
-    const actionKey = validate
-      ? 'calendar/validate'
-      : 'calendar/saveAppointment'
-
-    setSubmitting(false)
-    dispatch({
-      type: actionKey,
-      payload: updated,
-    })
-    resetForm()
-    onClose && onClose()
   }
 
   onDeleteClick = () => {}
 
   onValidateClick = () => {
-    const appointmentStatusFK = this.props.appointmentStatuses.find(
+    const appointmentStatus = this.props.appointmentStatuses.find(
       (item) => item.code === 'SCHEDULED',
-    ).id
-
-    this._submit(appointmentStatusFK, true)
+    )
+    const { tempNewAppointmentStatusFK } = this.state
+    this.setState(
+      {
+        tempNewAppointmentStatusFK: appointmentStatus
+          ? appointmentStatus.id
+          : tempNewAppointmentStatusFK,
+      },
+      () => this._submit(true),
+    )
   }
 
   onSaveDraftClick = () => {
@@ -294,16 +299,48 @@ class Form extends React.PureComponent {
     const appointmentStatusFK = appointmentStatuses.find(
       (item) => item.code === 'DRAFT',
     ).id
-    if (values.editEntireSeries) this.openSeriesUpdateConfirmation()
-    else this._submit(appointmentStatusFK)
+    this.setState(
+      {
+        tempNewAppointmentStatusFK: appointmentStatusFK,
+      },
+      () => {
+        if (values.editSingleAppointment) this.openSeriesUpdateConfirmation()
+        else this._submit()
+      },
+    )
   }
 
-  confirm = () => {
-    const appointmentStatusFK = this.props.appointmentStatuses.find(
-      (item) => item.code === 'SCHEDULED',
-    ).id
+  onConfirmClick = () => {
+    const { appointmentStatuses, values } = this.props
+    const isScheduled =
+      values.appointment &&
+      (values.appointment.appointmentStatusFk === 1 ||
+        values.appointment.appointmentStatusFk === 5)
+    try {
+      let newAppointmentStatusFK = appointmentStatuses.find(
+        (item) => item.code === 'SCHEDULED',
+      ).id
+      const rescheduleFK = appointmentStatuses.find(
+        (item) => item.code === 'RESCHEDULED',
+      ).id
+      if (values.appointment && values.appointment.appointmentStatusFk === 1)
+        newAppointmentStatusFK = rescheduleFK
+      this.setState(
+        {
+          tempNewAppointmentStatusFK: newAppointmentStatusFK,
+        },
+        () => {
+          if (isScheduled)
+            return !values.editSingleAppointment
+              ? this.openSeriesUpdateConfirmation()
+              : this._submit()
 
-    this._submit(appointmentStatusFK)
+          return this._submit()
+        },
+      )
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   openSeriesUpdateConfirmation = () => {
@@ -312,13 +349,13 @@ class Form extends React.PureComponent {
     })
   }
 
-  closeSeriesUpdateConfirmation = () => {
-    this.setState({ showSeriesUpdateConfirmation: false })
+  closeSeriesUpdateConfirmation = (callback = (f) => f) => {
+    this.setState({ showSeriesUpdateConfirmation: false }, callback)
   }
 
-  onConfirmSeriesUpdate = (type) => {
-    console.log({ type })
-    this.closeSeriesUpdateConfirmation()
+  onConfirmSeriesUpdate = async (type) => {
+    await this.props.setFieldValue('updateAllOthers', type === '2', false)
+    this.closeSeriesUpdateConfirmation(this._submit)
   }
 
   render () {
@@ -330,8 +367,8 @@ class Form extends React.PureComponent {
       showSeriesUpdateConfirmation,
       datagrid,
     } = this.state
-    console.log({ values })
-
+    // console.log({ props: this.props })
+    // console.log({ values: this.props.values })
     return (
       <SizeContainer>
         <React.Fragment>
@@ -354,19 +391,9 @@ class Form extends React.PureComponent {
                 patientName={values.patientName}
                 patientProfileFK={values.patientProfileFK}
               />
-              <AppointmentDateInput />
+              <AppointmentDateInput disabled={values.isEnableRecurrence} />
             </GridItem>
             <GridItem xs md={6} className={classnames(classes.remarksField)}>
-              {values.isEnableRecurrence && (
-                <div style={{ float: 'right', paddingRight: '4px' }}>
-                  <FastField
-                    name='editEntireSeries'
-                    render={(args) => (
-                      <Switch {...args} suffix='Edit entire series' disabled />
-                    )}
-                  />
-                </div>
-              )}
               <FastField
                 name='appointment.appointmentRemarks'
                 render={(args) => (
@@ -391,7 +418,9 @@ class Form extends React.PureComponent {
 
             <GridItem xs md={12}>
               <Recurrence
-                disabled={!values.updateEntireSeries}
+                disabled={
+                  values.id !== undefined && !values.editSingleAppointment
+                }
                 formValues={values}
                 recurrenceDto={values.recurrenceDto}
                 handleRecurrencePatternChange={this.onRecurrencePatternChange}
@@ -403,6 +432,7 @@ class Form extends React.PureComponent {
             // isNew={slotInfo.type === 'add'}
             appointmentStatusFK={values.appointment.appointmentStatusFk}
             onClose={onClose}
+            disabled={datagrid.length === 0}
             handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
             handleSaveDraftClick={this.onSaveDraftClick}
             handleConfirmClick={this.onConfirmClick}
@@ -411,8 +441,8 @@ class Form extends React.PureComponent {
           <CommonModal
             open={showSearchPatientModal}
             title='Search Patient'
-            onClose={this.closeSearchPatientModal}
-            onConfirm={this.closeSearchPatientModal}
+            onClose={this.toggleSearchPatientModal}
+            onConfirm={this.toggleSearchPatientModal}
             maxWidth='md'
             showFooter={false}
             overrideLoading

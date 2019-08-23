@@ -68,11 +68,11 @@ const SeriesUpdateConfirmation = ({ classes, footer, handleConfirm }) => {
             onChange={onChange}
             options={[
               {
-                value: 'single',
+                value: '1',
                 label: 'Only appointment that has not been modified',
               },
               {
-                value: 'all',
+                value: '2',
                 label: 'All appointment',
               },
             ]}

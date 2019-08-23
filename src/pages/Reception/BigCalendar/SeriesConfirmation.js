@@ -31,8 +31,8 @@ const SeriesConfirmation = ({ classes, footer, onConfirmClick }) => {
   }
 
   const handleConfirm = () => {
-    const editEntireSeries = editEntire === '2'
-    onConfirmClick(editEntireSeries)
+    const editSingleAppointment = editEntire === '1'
+    onConfirmClick(editSingleAppointment)
   }
 
   return (

@@ -74,6 +74,10 @@ export default createListViewModel({
         const result = yield call(service.save, payload)
         if (result) yield put({ type: 'refresh' })
       },
+      *rescheduleAppointment ({ payload }, { call, put }) {
+        const result = yield call(service.reschedule, payload)
+        if (result) yield put({ type: 'refresh' })
+      },
       *deleteDraft ({ id, callback }, { call, put }) {
         const result = yield call(service.deleteDraft, id)
         if (result === 204) notification.success({ message: 'Deleted' })

@@ -19,6 +19,7 @@ const ButtonText = {
 
 const FormFooter = ({
   classes,
+  disabled = false,
   appointmentStatusFK,
   onClose,
   handleCancelOrDeleteClick,
@@ -43,24 +44,37 @@ const FormFooter = ({
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
             onClick={handleCancelOrDeleteClick}
+            disabled={disabled}
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>
         </GridItem>
 
         <GridItem xs md={8} container justify='flex-end'>
-          <Button color='success' onClick={handleValidateClick}>
+          <Button
+            disabled={disabled}
+            color='success'
+            onClick={handleValidateClick}
+          >
             {ButtonText.CHECK}
           </Button>
           <Button onClick={onClose} color='danger'>
             {ButtonText.CANCEL}
           </Button>
           {(isNew || isDraft) && (
-            <Button onClick={handleSaveDraftClick} color='info'>
+            <Button
+              disabled={disabled}
+              onClick={handleSaveDraftClick}
+              color='info'
+            >
               {ButtonText.DRAFT}
             </Button>
           )}
-          <Button onClick={handleConfirmClick} color='primary'>
+          <Button
+            disabled={disabled}
+            onClick={handleConfirmClick}
+            color='primary'
+          >
             {confirmBtnText}
           </Button>
         </GridItem>

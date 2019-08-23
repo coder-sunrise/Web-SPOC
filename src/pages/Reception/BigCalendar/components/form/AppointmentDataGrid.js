@@ -114,6 +114,7 @@ class AppointmentDataGrid extends React.PureComponent {
     if (parseInt(status, 10) === 200) {
       const { columnExtensions } = this.state
       this.setState((prevState) => ({
+        ...prevState,
         columnExtensions: columnExtensions.map(
           (column) =>
             column.columnName === 'clinicianFK'
