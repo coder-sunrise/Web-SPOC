@@ -12,8 +12,6 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      currentId: '',
-      entity: [],
       default: {
         schemeType: 'Corporate',
         schemeCategory: 'Corporate',
@@ -49,6 +47,7 @@ export default createFormViewModel({
             groupValueType: 'ExactAmount',
           },
         },
+
         packageValueDto: [
           {
             id: 1,
@@ -68,22 +67,7 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               currentTab: Number(query.t) || 0,
-            },
-          })
-        }
-        if (query.uid) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: query.uid,
-            },
-          })
-        } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: '',
-              entity: '',
+              currentId: query.id,
             },
           })
         }

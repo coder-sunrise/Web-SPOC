@@ -578,7 +578,7 @@ class CommonTableGrid extends React.Component {
       ],
       columns = [],
       type,
-      rows,
+      rows = [],
       TableCell = DefaultTableCell,
       columnExtensions = [],
       filteringColExtensions = [],
