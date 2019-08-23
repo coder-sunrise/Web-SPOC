@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { standardRowHeight } from 'mui-pro-jss'
+import { status } from '@/utils/codes'
+
 import {
   GridContainer,
   GridItem,
@@ -43,17 +45,17 @@ class Filter extends PureComponent {
         <GridContainer>
           <GridItem xs={6} md={4}>
             <FastField
-              name='code'
+              name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code/Display Value' {...args} />
+                return <TextField label='Code / Display Value' {...args} />
               }}
             />
           </GridItem>
           <GridItem xs={6} md={4}>
             <FastField
-              name='status'
+              name='isActive'
               render={(args) => {
-                return <Select label='Status' {...args} />
+                return <Select label='Status' options={status} {...args} />
               }}
             />
           </GridItem>
@@ -63,13 +65,18 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const prefix = this.props.values.isExactSearch
-                    ? 'eql_'
-                    : 'like_'
+                  const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingParticipantRole/query',
                     payload: {
-                      [`${prefix}name`]: this.props.values.search,
+                      isActive,
+                      group: [
+                        {
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
+                          combineCondition: 'or',
+                        },
+                      ],
                     },
                   })
                 }}
@@ -82,7 +89,7 @@ class Filter extends PureComponent {
                 onClick={() => {
                   this.props.toggleModal()
                   this.props.dispatch({
-                    type: 'settingParticipantRole/reset',
+                    type: 'settingParticipantRole/updateState',
                   })
                 }}
               >
