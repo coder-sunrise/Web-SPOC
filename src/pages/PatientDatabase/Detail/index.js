@@ -3,6 +3,7 @@ import Loadable from 'react-loadable'
 import { connect } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
+import router from 'umi/router'
 
 import avatar from '@/assets/img/faces/marc.jpg'
 import {
@@ -19,6 +20,7 @@ import {
   dateFormatLong,
   DateRangePicker,
   DatePicker,
+  Button,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { withStyles, MenuItem, MenuList, Divider,ListItemIcon,ListItemText } from '@material-ui/core'
@@ -228,6 +230,10 @@ class PatientDetail extends PureComponent {
     }
   }
 
+  registerVisit=()=>{
+    router.push(`/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`)
+  }
+
   render () {
     const {
       theme,
@@ -403,6 +409,9 @@ class PatientDetail extends PureComponent {
                     </Authorized>
                   ))}
               </MenuList>
+              {entity && <Divider light />}
+              {entity && <Button color='primary' style={{marginTop:theme.spacing(1)}} onClick={this.registerVisit}>Register Visit</Button>}
+
             </CardBody>
           </Card>
         </GridItem>

@@ -14,7 +14,7 @@ class Grid extends PureComponent {
     const { list } = settingRevenue
     // For complex object retrieve from server
     // dispatch({
-    //   type: 'settingRevenue/querySingle',
+    //   type: 'settingRevenue/queryOne',
     //   payload: {
     //     id: row.id,
     //   },

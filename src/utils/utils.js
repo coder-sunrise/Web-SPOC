@@ -359,7 +359,7 @@ const convertToQuery = (
   delete customQuerys.totalRecords
   delete customQuerys.combineCondition
 
-  console.log(query)
+  // console.log(query)
   let newQuery = {}
   const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
   newQuery.criteria = []

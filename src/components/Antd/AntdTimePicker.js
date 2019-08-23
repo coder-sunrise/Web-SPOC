@@ -128,7 +128,7 @@ class AntdTimePicker extends PureComponent {
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
-    console.log(format)
+    // console.log(format)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     return (

@@ -57,7 +57,7 @@ export default createFormViewModel({
           },
         })
       },
-      // *querySingle ({ payload }, { call, put }) {
+      // *queryOne ({ payload }, { call, put }) {
       //   const response = yield call(service.query, payload)
       //   yield put({
       //     type: 'updateState',

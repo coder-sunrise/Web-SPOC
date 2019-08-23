@@ -56,27 +56,27 @@ export default class BaseNaviViewModel extends BaseListViewModel {
           const { data } = response
           const { data: obj } = data
           if (response.success) {
-            yield put({ type: 'querySingle', payload: { id: obj.id } })
+            yield put({ type: 'queryOne', payload: { id: obj.id } })
           } else {
             throw response
           }
         },
 
         *update ({ payload }, { select, call, put }) {
-          const id = yield select(st => st[namespace].currentItem.id)
+          const id = yield select((st) => st[namespace].currentItem.id)
           const newEntity = { ...payload, id }
           const response = yield call(service.update, newEntity)
           if (response.success) {
-            yield put({ type: 'querySingle', payload: { id } })
+            yield put({ type: 'queryOne', payload: { id } })
           } else {
             throw response
           }
         },
 
-        *querySingle ({ payload }, { select, call, put }) {
+        *queryOne ({ payload }, { select, call, put }) {
           const response = yield call(service.query, { id: payload.id })
           const { data: newObj } = response
-          const list = yield select(st => st[namespace].list)
+          const list = yield select((st) => st[namespace].list)
           const id = newObj.id
           let index = lodash.findIndex(list, { id })
           list.splice(index, 1, newObj)
@@ -135,7 +135,6 @@ export default class BaseNaviViewModel extends BaseListViewModel {
           return naviItem(st, '-')
         },
         ...reducers,
-
       },
     }
   }
