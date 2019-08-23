@@ -53,11 +53,7 @@ class StatisticIndicator extends PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      calendar,
-      queueLog: { currentFilter, queueListing },
-    } = this.props
+    const { classes, calendar, queueLog: { currentFilter, list } } = this.props
     const { calendarEvents } = calendar
 
     const flattenedCalendarData = calendarEvents
@@ -65,10 +61,10 @@ class StatisticIndicator extends PureComponent {
       .filter(todayOnly)
 
     const statistic = {
-      all: getStatisticCount(StatusIndicator.ALL, queueListing),
-      waiting: getStatisticCount(StatusIndicator.WAITING, queueListing),
-      inProgress: getStatisticCount(StatusIndicator.IN_PROGRESS, queueListing),
-      completed: getStatisticCount(StatusIndicator.COMPLETED, queueListing),
+      all: getStatisticCount(StatusIndicator.ALL, list),
+      waiting: getStatisticCount(StatusIndicator.WAITING, list),
+      inProgress: getStatisticCount(StatusIndicator.IN_PROGRESS, list),
+      completed: getStatisticCount(StatusIndicator.COMPLETED, list),
       appointment: flattenedCalendarData.length,
     }
 

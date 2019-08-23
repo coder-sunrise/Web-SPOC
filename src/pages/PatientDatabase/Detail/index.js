@@ -22,8 +22,17 @@ import {
   DatePicker,
   Button,
 } from '@/components'
+// medisys-components
+import { PatientInfoSideBanner } from 'medisys-components'
 import Loading from '@/components/PageLoading/index'
-import { withStyles, MenuItem, MenuList, Divider,ListItemIcon,ListItemText } from '@material-ui/core'
+import {
+  withStyles,
+  MenuItem,
+  MenuList,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core'
 import Error from '@material-ui/icons/Error'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import Authorized from '@/utils/Authorized'
@@ -39,9 +48,9 @@ import schema from './schema'
 // })
 
 const styles = () => ({
-  menuItem:{
-    paddingLeft:0,
-    paddingRight:0,
+  menuItem: {
+    paddingLeft: 0,
+    paddingRight: 0,
   },
 })
 
@@ -264,96 +273,7 @@ class PatientDetail extends PureComponent {
         <GridItem xs={12} sm={12} md={2}>
           <Card profile>
             <CardBody profile>
-              {entity && entity.id && (
-                <React.Fragment>
-                  <h4
-                    className={classes.cardCategory}
-                    style={{ marginBottom: theme.spacing(1), fontWeight: 500 }}
-                  >
-                    <CodeSelect
-                      // authority='none'
-                      text
-                      code='ctSalutation'
-                      value={entity.salutationFK}
-                    />{' '}
-                    {entity.name}
-                  </h4>
-                  <p>{entity.patientReferenceNo}</p>
-                  <p>
-                    {entity.patientAccountNo},{' '}
-                    <CodeSelect
-                      text
-                      code='ctNationality'
-                      value={entity.nationalityFK}
-                    />
-                  </p>
-
-                  <p>
-                    <DatePicker
-                      text
-                      format={dateFormatLong}
-                      value={entity.dob}
-                    />{' '}
-                    ({Math.floor(moment.duration(moment().diff(entity.dob)).asYears())}/{<CodeSelect
-                      code='ctGender'
-                      optionLabelLength={1}
-                      text
-                      value={entity.genderFK}
-                    />})
-                  </p>
-                  <Divider light />
-                  <div
-                    style={{
-                      textAlign: 'left',
-                      fontSize: '0.8rem',
-                      paddingTop: theme.spacing(1),
-                      maxHeight: height - 455 - 20,
-                      overflow: 'auto',
-                    }}
-                  >
-                    {entity.patientScheme
-                      .filter((o) => o.schemeTypeFK <= 5)
-                      .map((o) => {
-                        return (
-                          <div style={{ marginBottom: theme.spacing(1) }}>
-                            <p style={{ fontWeight: 500 }}>
-                              <CodeSelect
-                                text
-                                code='ctSchemeType'
-                                value={o.schemeTypeFK}
-                              />
-                              <CodeSelect
-                                text
-                                // code='ctSchemeType'
-                                options={[
-                                  { value: 1, name: 'Test 01' },
-                                  { value: 2, name: 'Test 02' },
-                                  { value: 3, name: 'Test 03' },
-                                ]}
-                                value={o.coPaymentSchemeFK}
-                              />
-                            </p>
-                            {o.validFrom && (
-                              <>
-                                <p><NumberInput prefix='Balance: ' value={80} currency text />
-                                </p>
-                                <p>
-                                  <DateRangePicker
-                                    prefix='Validity: '
-                                    text
-                                    format={dateFormatLong}
-                                    value={[o.validFrom,o.validTo]}
-                                  />
-                                </p>
-                              </>
-                            )}
-                          </div>
-                        )
-                      })}
-                  </div>
-                  {entity.patientScheme.length > 0 && <Divider light />}
-                </React.Fragment>
-              )}
+              <PatientInfoSideBanner entity={entity} />
               <MenuList>
                 {this.widgets
                   .filter(
@@ -386,25 +306,29 @@ class PatientDetail extends PureComponent {
                           )
                         }}
                       >
-                        <ListItemIcon style={{minWidth:25}}>
+                        <ListItemIcon style={{ minWidth: 25 }}>
                           <KeyboardArrowRight />
                         </ListItemIcon>
-                        <ListItemText primary={<span
-                          style={{
-                            color: menuErrors[o.id] ? 'red' : 'inherit',
-                          }}
-                        >
-                          {o.name}
-                          {menuErrors[o.id]?<Error style={{
-                                position: 'relative',
-                                top: 5,
-                                left: 6,
-                          }}
-                          />:null}
-                        </span>}
+                        <ListItemText
+                          primary={
+                            <span
+                              style={{
+                                color: menuErrors[o.id] ? 'red' : 'inherit',
+                              }}
+                            >
+                              {o.name}
+                              {menuErrors[o.id] ? (
+                                <Error
+                                  style={{
+                                    position: 'relative',
+                                    top: 5,
+                                    left: 6,
+                                  }}
+                                />
+                              ) : null}
+                            </span>
+                          }
                         />
-                        
-                        
                       </MenuItem>
                     </Authorized>
                   ))}

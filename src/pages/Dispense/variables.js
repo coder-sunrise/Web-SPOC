@@ -57,7 +57,7 @@ export const PrescriptionColumnExtensions = [
 
 const generatePrescriptionData = () => {
   let data = []
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 15; i++) {
     data.push({
       id: i,
       name: 'Anarex',

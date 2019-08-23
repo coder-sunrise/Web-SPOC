@@ -9,7 +9,10 @@ import { DatePicker, TimePicker } from 'antd'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
 import { extendFunc } from '@/utils/utils'
-import { CustomInput } from '@/components'
+import {
+  CustomInput,
+  timeFormat24Hour as defaultTimeFormat,
+} from '@/components'
 import { control } from '@/components/Decorator'
 
 const _dateFormat = 'YYYY-MM-DD'
@@ -107,7 +110,7 @@ class AntdTimePicker extends PureComponent {
     if (form && field) {
       form.setFieldValue(
         field.name,
-        moment.isMoment(time) ? time.format(format) : '',
+        moment.isMoment(time) ? time.format(defaultTimeFormat) : '',
       )
     }
 
