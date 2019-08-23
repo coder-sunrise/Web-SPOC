@@ -282,28 +282,17 @@ class PatientHistory extends Component {
     // }
   }
 
-  getTitle = (row) => (
+  getTitle = () => (
     <div className={this.props.classes.title}>
       <GridContainer>
         <GridItem sm={7}>
-          <p
-            onClick={() => {
-              console.log(row)
-              this.props.dispatch({
-                type: 'patientHistory/queryOne',
-                payload: row.id,
-              })
-            }}
-          >
-            <span>Consultation Visit</span>
-            <div className={this.props.classes.note}>
-              V4, {row.doctorTitle} {row.doctorName}
-            </div>
-          </p>
+          <span>Consultation Visit</span>
+          <div className={this.props.classes.note}>V4, Dr Levine</div>
         </GridItem>
         <GridItem sm={5}>
           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-            <DatePicker text defaultValue={moment(row.visitDate)} />
+            {/* <DateRange style={{ position: 'absolute', left: 0 }} /> */}
+            12 Apr 2019
           </span>
           <div className={this.props.classes.note}>&nbsp;</div>
         </GridItem>
@@ -382,10 +371,20 @@ class PatientHistory extends Component {
         >
           <Accordion
             active={0}
-            collapses={patientHistory.list.map((o) => ({
-              title: this.getTitle(o),
-              content: this.getContent(o),
-            }))}
+            collapses={[
+              {
+                title: this.getTitle(),
+                content: this.getContent(),
+              },
+              {
+                title: this.getTitle(),
+                content: this.getContent(),
+              },
+              {
+                title: this.getTitle(),
+                content: this.getContent(),
+              },
+            ]}
           />
         </CardContainer>
         <CardContainer

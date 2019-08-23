@@ -29,18 +29,18 @@ export default createListViewModel({
               patientId: Number(query.pid) || 0,
             },
           })
-          dispatch({
-            type: 'query',
-            payload: {
-              patientProfileFK: Number(query.pid),
-              sorting: [
-                {
-                  columnName: 'VisitDate',
-                  direction: 'desc',
-                },
-              ],
-            },
-          })
+          // dispatch({
+          //   type: 'query',
+          //   payload: {
+          //     patientProfileFK: Number(query.pid),
+          //     sorting: [
+          //       {
+          //         columnName: 'VisitDate',
+          //         direction: 'desc',
+          //       },
+          //     ],
+          //   },
+          // })
         }
       })
     },
