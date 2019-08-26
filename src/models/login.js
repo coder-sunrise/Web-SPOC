@@ -1,88 +1,63 @@
-import { routerRedux } from 'dva/router'
-import { stringify } from 'qs'
-import { fakeAccountLogin, getFakeCaptcha } from '@/services/api'
-import { setAuthority } from '@/utils/authority'
-import { getPageQuery } from '@/utils/utils'
+import { createFormViewModel } from 'medisys-model'
+import router from 'umi/router'
+import moment from 'moment'
+import Cookies from 'universal-cookie'
+import * as service from '../services/login'
 import { reloadAuthorized } from '@/utils/Authorized'
+import { setAuthority } from '@/utils/authority'
 
-export default {
+const { login } = service
+
+export default createFormViewModel({
   namespace: 'login',
-
-  state: {
-    status: undefined,
+  config: {
+    queryOnLoad: false,
   },
-
-  effects: {
-    *login ({ payload }, { call, put }) {
-      const response = yield call(fakeAccountLogin, payload)
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      })
-      // Login successfully
-
-      if (response && response.access_token) {
-        localStorage.setItem('token', response.access_token)
+  param: {
+    service,
+    state: {
+      isInvalidLogin: false,
+      userInfo: {},
+    },
+    subscriptions: {},
+    effects: {
+      *getToken ({ credentialPayload }, { call, put }) {
+        const response = yield call(login, credentialPayload)
+        // const { status } = response
+        // console.log({ status })
         reloadAuthorized()
-        const urlParams = new URL(window.location.href)
-        const params = getPageQuery()
-        let { redirect } = params
-        if (redirect) {
-          const redirectUrlParams = new URL(redirect)
-          if (redirectUrlParams.origin === urlParams.origin) {
-            redirect = redirect.substr(urlParams.origin.length)
-            if (redirect.match(/^\/.*#/)) {
-              redirect = redirect.substr(redirect.indexOf('#') + 1)
-            }
-          } else {
-            window.location.href = redirect
-            return
-          }
+
+        return yield put({
+          type: 'updateLoginStatus',
+          payload: { ...response },
+        })
+
+        // if (response.status === 200) {
+        //   yield put(router.push('reception/queue'))
+        // }
+      },
+    },
+    reducers: {
+      updateLoginStatus (state, { payload }) {
+        const isInvalidLogin = payload.access_token === undefined
+        if (!isInvalidLogin) {
+          const {
+            access_token: accessToken,
+            currentAuthority = [
+              'tester',
+              // 'editor',
+            ],
+          } = payload
+          setAuthority(currentAuthority)
+          localStorage.setItem('token', accessToken)
+          const cookies = new Cookies()
+          cookies.set('_lastLogin', new Date(), {
+            expires: new Date(9999, 11, 31),
+          })
         }
-        yield put(routerRedux.replace(redirect || '/'))
-      }
-    },
-
-    *getCaptcha ({ payload }, { call }) {
-      yield call(getFakeCaptcha, payload)
-    },
-
-    *logout (_, { put }) {
-      yield put({
-        type: 'changeLoginStatus',
-        payload: {
-          status: false,
-          currentAuthority: 'guest',
-        },
-      })
-      yield put({
-        type: 'global/updateState',
-        payload: {
-          showSessionTimeout: false,
-        },
-      })
-      localStorage.removeItem('token')
-      reloadAuthorized()
-      yield put(
-        routerRedux.push({
-          pathname: '/login',
-          search: stringify({
-            redirect: window.location.href,
-          }),
-        }),
-      )
-      return true
+        reloadAuthorized()
+        return { ...state, isInvalidLogin }
+      },
     },
   },
-
-  reducers: {
-    changeLoginStatus (state, { payload }) {
-      setAuthority(payload.currentAuthority)
-      return {
-        ...state,
-        status: payload.status,
-        type: payload.type,
-      }
-    },
-  },
-}
+})

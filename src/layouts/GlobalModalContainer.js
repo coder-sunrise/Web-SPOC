@@ -6,6 +6,7 @@ import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { ChangePassword } from 'medisys-components'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
+import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
 
@@ -35,6 +36,20 @@ class GlobalModalContainer extends PureComponent {
         })
       }, 10000)
     }
+  }
+
+  closeUserProfile = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        showUserProfile: false,
+      },
+    })
+    dispatch({
+      type: 'user/saveProfileDetails',
+      profileDetails: undefined,
+    })
   }
 
   render () {
@@ -91,6 +106,14 @@ class GlobalModalContainer extends PureComponent {
           maxWidth='sm'
         >
           <ChangePassword />
+        </CommonModal>
+        <CommonModal
+          title='My Account'
+          open={global.showUserProfile}
+          onClose={this.closeUserProfile}
+          onConfirm={this.closeUserProfile}
+        >
+          <UserProfileForm />
         </CommonModal>
 
         <CommonModal
