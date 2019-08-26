@@ -115,7 +115,7 @@ class Filter extends PureComponent {
                 onClick={() => {
                   this.props.toggleModal()
                   this.props.dispatch({
-                    type: 'settingClinicService/reset',
+                    type: 'settingClinicService/updateState',
                   })
                 }}
               >

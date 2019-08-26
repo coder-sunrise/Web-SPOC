@@ -186,6 +186,38 @@ const widgets = [
       },
     },
   },
+  {
+    id: '1003',
+    name: 'Vital Sign',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/VitalSign'),
+      loading: Loading,
+    }),
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: '0 5px',
+      },
+    },
+    toolbarAddon: (
+      <Tooltip title='Add Vital Sign'>
+        <IconButton
+          style={{ float: 'left' }}
+          onClick={() => {
+            window.g_app._store.dispatch({
+              type: 'patientVitalSign/updateState',
+              payload: {
+                shouldAddNew: true,
+              },
+            })
+          }}
+        >
+          <Add />
+        </IconButton>
+      </Tooltip>
+    ),
+  },
 ]
 
 module.exports = {
