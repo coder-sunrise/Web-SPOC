@@ -9,6 +9,9 @@ import {
   NumberInput,
   EditableTableGrid,
   CommonTableGrid,
+  Select,
+  TextField,
+  Button,
 } from '@/components'
 
 const styles = () => ({
@@ -34,33 +37,53 @@ class CollectPaymentConfirm extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
-        outstandingBalance: 100,
-        distributedAmount: 30,
+        adminCharge: 1.66,
+        payableAmount: 50,
+        outstandingBalance: 48.34,
+        payment: 48.34,
       },
     ],
     columns: [
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'amount', title: 'Payable Amount' },
-      { name: 'outstandingBalance', title: 'O/S Balance' },
-      { name: 'distributedAmount', title: 'Distributed Amount' },
+      { name: 'adminCharge', title: 'Admin Charge' },
+      { name: 'payableAmount', title: 'Payable Amount' },
+      { name: 'outstandingBalance', title: 'Outstanding' },
+      { name: 'payment', title: 'Payment' },
     ],
     columnExtensions: [
-      { columName: 'amount', type: 'number', currency: true },
-      { columName: 'outstandingBalance', type: 'number', currency: true },
+      { columName: 'payableAmount', type: 'number', currency: true },
+      {
+        columName: 'outstandingBalance',
+        type: 'number',
+        currency: true,
+      },
       { columName: 'invoiceDate', type: 'date' },
+      {
+        columnName: 'payment',
+        // type: 'number',
+        currency: true,
+        render: (row) => {
+          return (
+            <GridItem xs={8}>
+              <FastField
+                name={`packageValueDto[${row.rowIndex - 1}].itemValue`}
+                render={(args) => <NumberInput {...args} />}
+              />
+            </GridItem>
+          )
+        },
+      },
     ],
   }
 
   render () {
     const { rows, columns, columnExtensions } = this.state
-    const { classes, footer, onConfirm } = this.props
-
+    const { classes, onConfirm } = this.props
     return (
       <React.Fragment>
-        <GridContainer
+        {/* <GridContainer
           direction='column'
           justify='space-between'
           alignItems='center'
@@ -81,15 +104,15 @@ class CollectPaymentConfirm extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs>
-            <CommonTableGrid
-              rows={rows}
-              columns={columns}
-              columnExtensions={columnExtensions}
-              FuncProps={{ page: false }}
-              height={300}
-            />
-          </GridItem>
+          <GridItem xs> */}
+        <CommonTableGrid
+          rows={rows}
+          columns={columns}
+          columnExtensions={columnExtensions}
+          FuncProps={{ pager: false }}
+          // height={300}
+        />
+        {/* </GridItem>
         </GridContainer>
         <GridContainer
           classes={{ grid: classes.grid }}
@@ -111,18 +134,52 @@ class CollectPaymentConfirm extends PureComponent {
                 />
               )}
             />
+          </GridItem> */}
+        {/* </GridContainer> */}
+
+        <GridContainer style={{ marginTop: 20 }}>
+          <GridItem container>
+            <GridItem md={6}>
+              <FastField
+                name='amount'
+                render={(args) => (
+                  <NumberInput {...args} disabled currency label='Amount' />
+                )}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='paymentMode'
+                render={(args) => (
+                  <Select
+                    {...args}
+                    label='Payment Mode'
+                    options={[
+                      { value: 'Giro', name: 'Giro' },
+                      { value: 'Cash', name: 'Cash' },
+                    ]}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridItem>
+
+          <GridItem container>
+            <GridItem md={12}>
+              <FastField
+                name='remarks'
+                render={(args) => (
+                  <TextField {...args} multiline label='Remarks' />
+                )}
+              />
+            </GridItem>
           </GridItem>
         </GridContainer>
-        {footer &&
-          footer({
-            onConfirm,
-            confirmBtnText: formatMessage({
-              id: 'finance.collectPayment.confirmPayment',
-            }),
-            confirmProps: {
-              disabled: false,
-            },
-          })}
+        <GridItem container>
+          <GridItem style={{ marginTop: 10 }}>
+            <Button color='primary'>Confirm Payment</Button>
+          </GridItem>
+        </GridItem>
       </React.Fragment>
     )
   }

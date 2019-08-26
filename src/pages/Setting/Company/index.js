@@ -48,7 +48,7 @@ class Supplier extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    console.log('comapny', this.props)
     const { name } = route
     const companyType = name === 'copayer' ? 'Co-Payer' : 'Supplier'
     return (

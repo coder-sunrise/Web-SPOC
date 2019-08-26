@@ -21,39 +21,60 @@ const styles = () => ({
 
 @withFormik({
   mapPropsToValues: () => ({
-    StatementNo: 'SM-000002',
-    StatementDate: moment().add(-1, 'months'),
-    Company: 'AIA/AIA',
-    TotalAmount: 1233,
-    OutstandingBalance: 490,
-    PaymentTerms: '30 Days',
-    PaymentDueDate: moment().add(+1, 'months'),
+    statementNo: 'SM-000002',
+    coPayer: 'AIA/AIA',
+    adminCharge: 10,
+    paid: 0,
+    statementDate: moment().add(-1, 'months'),
+    paymentTerm: '30 Days',
+    payableAmount: 1233,
+    outstandingBalance: 490,
+    // paymentDueDate: moment().add(+1, 'months'),
   }),
 })
 class DetailsHeader extends PureComponent {
   render () {
-    const { classes } = this.props
-
+    const { classes, history } = this.props
+    console.log('histroy', this.props)
+    const boldFont = {
+      fontWeight: 'bold',
+    }
     return (
       <Paper className={classes.root}>
-        <GridContainer>
-          <GridItem xs md={7} lg={6} container>
-            <GridContainer item>
-              <GridItem xs>
-                <FastField
-                  name='StatementDate'
-                  render={(args) => (
-                    <DatePicker
-                      disabled
-                      label={formatMessage({
-                        id: 'finance.statement.statementDate',
-                      })}
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs>
+        <GridContainer item style={boldFont}>
+          <GridItem xs>
+            <FastField
+              name='statementNo'
+              render={(args) => (
+                <TextField disabled label='Statement No.' {...args} />
+              )}
+            />
+          </GridItem>
+
+          <GridItem xs>
+            <FastField
+              name='coPayer'
+              render={(args) => (
+                <TextField disabled label='Co-Payer' {...args} />
+              )}
+            />
+          </GridItem>
+
+          <GridItem xs>
+            <FastField
+              name='adminCharge'
+              render={(args) => (
+                <TextField disabled label='Admin Charge' {...args} />
+              )}
+            />
+          </GridItem>
+          <GridItem xs>
+            <FastField
+              name='paid'
+              render={(args) => <DatePicker disabled label='Paid' {...args} />}
+            />
+          </GridItem>
+          {/* <GridItem xs>
                 <FastField
                   name='Company'
                   render={(args) => (
@@ -66,10 +87,11 @@ class DetailsHeader extends PureComponent {
                     />
                   )}
                 />
-              </GridItem>
-            </GridContainer>
-            <GridContainer item>
-              <GridItem xs>
+              </GridItem> */}
+        </GridContainer>
+
+        <GridContainer item style={{ fontWeight: 'bold', paddingBottom: 40 }}>
+          {/* <GridItem xs>
                 <FastField
                   name='TotalAmount'
                   render={(args) => (
@@ -98,40 +120,60 @@ class DetailsHeader extends PureComponent {
                     />
                   )}
                 />
-              </GridItem>
-            </GridContainer>
+              </GridItem> */}
+          <GridItem xs>
+            <FastField
+              name='statementDate'
+              render={(args) => (
+                <DatePicker disabled label='Statement Date' {...args} />
+              )}
+            />
           </GridItem>
-          <GridItem xs md={5} lg={2} container direction='column'>
-            <GridItem xs>
-              <FastField
-                name='PaymentTerms'
-                render={(args) => (
-                  <CustomInput
-                    disabled
-                    label={formatMessage({
-                      id: 'finance.statement.paymentTerms',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs>
-              <FastField
-                name='PaymentDueDate'
-                render={(args) => (
-                  <DatePicker
-                    disabled
-                    label={formatMessage({
-                      id: 'finance.statement.paymentDueDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
+          <GridItem xs>
+            <FastField
+              name='paymentTerm'
+              render={(args) => (
+                <CustomInput disabled label='Payment Term' {...args} />
+              )}
+            />
           </GridItem>
-          <GridItem xs lg={4}>
+          <GridItem xs>
+            <FastField
+              name='payableAmount'
+              render={(args) => (
+                <NumberInput
+                  currency
+                  disabled
+                  label='Payable Amount'
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs>
+            <FastField
+              name='outstandingBalance'
+              render={(args) => (
+                <NumberInput currency disabled label='O/S Balance' {...args} />
+              )}
+            />
+          </GridItem>
+
+          {/* <GridItem xs>
+            <FastField
+              name='PaymentDueDate'
+              render={(args) => (
+                <DatePicker
+                  disabled
+                  label={formatMessage({
+                    id: 'finance.statement.paymentDueDate',
+                  })}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem> */}
+          {/* <GridItem xs lg={4}>
             <FastField
               name='Remark'
               render={(args) => (
@@ -143,8 +185,18 @@ class DetailsHeader extends PureComponent {
                 />
               )}
             />
-          </GridItem>
+          </GridItem> */}
         </GridContainer>
+        <a
+          style={{
+            float: 'right',
+            marginTop: -25,
+            marginRight: 6,
+          }}
+          onClick={() => history.push(`/finance/statement/editstatement`)}
+        >
+          Edit statement
+        </a>
       </Paper>
     )
   }

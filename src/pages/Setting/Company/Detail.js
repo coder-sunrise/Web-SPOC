@@ -101,8 +101,7 @@ class Detail extends PureComponent {
     const { classes, theme, footer, values, settingCompany, route } = props
     const { name } = route
     const type = 'copayer'
-    console.log('detail', settingCompany)
-    console.log({ values })
+    // console.log('detail', settingCompany)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

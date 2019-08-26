@@ -260,11 +260,22 @@ const routes = [
             component: './Finance/Statement',
           },
           {
+            path: '/finance/statement/newstatement',
+            name: 'statement/newstatement',
+            hideInMenu: true,
+            component: './Finance/Statement/NewStatement/AddNewStatement',
+          },
+          {
+            path: '/finance/statement/editstatement',
+            name: 'statement/editstatement',
+            hideInMenu: true,
+            component: './Finance/Statement/NewStatement/AddNewStatement',
+          },
+          {
             path: '/finance/statement/details',
             name: 'statement/detail',
             hideInMenu: true,
-            // component: './Finance/Statement/Details',
-            component: './Finance/Statement/NewStatement/AddNewStatement',
+            component: './Finance/Statement/Details/StatementDetails',
           },
           {
             path: '/finance/statement/details/:statementNo',

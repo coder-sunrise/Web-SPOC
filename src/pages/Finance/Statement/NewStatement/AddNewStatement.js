@@ -18,6 +18,7 @@ import {
   CardContainer,
   Switch,
   DateRangePicker,
+  Field,
 } from '@/components'
 
 const styles = () => ({
@@ -43,7 +44,8 @@ class AddNewStatement extends PureComponent {
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'amount', title: 'Payable Amount' },
-      { name: 'outstandingBalance', title: 'O/S Balance' },
+      { name: 'outstandingBalance', title: 'Outstanding Amount' },
+      { name: 'remarks', title: 'Remarks' },
     ],
     currencyColumns: [
       'amount',
@@ -64,11 +66,21 @@ class AddNewStatement extends PureComponent {
         outstandingBalance: 100,
       },
     ],
+    selectedRows: [],
+  }
+
+  handleSelectionChange = (selection) => {
+    this.setState({ selectedRows: selection })
   }
 
   render () {
-    const { classes, footer, onConfirm, theme } = this.props
+    const { classes, footer, onConfirm, theme, values, history } = this.props
     const { rows, columns, currencyColumns, dateColumns } = this.state
+
+    const editRow = (row, e) => {
+      history.push(`/finance/statement`)
+    }
+
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -117,15 +129,22 @@ class AddNewStatement extends PureComponent {
             </GridItem>
             <GridContainer>
               <GridItem md={3}>
-                <FastField
+                <Field
                   name='xxxxx'
-                  render={(args) => (
-                    <NumberInput currency label='Admin Charge' {...args} />
-                  )}
+                  render={(args) => {
+                    if (values.adminChargeType) {
+                      return (
+                        <NumberInput currency label='Admin Charge' {...args} />
+                      )
+                    }
+                    return (
+                      <NumberInput percentage label='Admin Charge' {...args} />
+                    )
+                  }}
                 />
               </GridItem>
               <GridItem md={3}>
-                <FastField
+                <Field
                   name='adminChargeType'
                   render={(args) => (
                     <Switch
@@ -255,8 +274,8 @@ class AddNewStatement extends PureComponent {
                   render={(args) => {
                     return (
                       <DateRangePicker
-                        label='Effective Start Date'
-                        label2='End Date'
+                        label='Invoice From Date'
+                        label2='Invoice To Date'
                         {...args}
                       />
                     )
@@ -290,19 +309,29 @@ class AddNewStatement extends PureComponent {
                 />
               </GridItem> */}
               <GridItem classes={{ grid: classes.searchBtn }} xs md={3}>
-                <Button color='rose'>
+                <Button color='primary'>
                   <Search />
                   <FormattedMessage id='form.search' />
                 </Button>
               </GridItem>
             </GridItem>
-            {/* <EditableTableGrid */}
+            <EditableTableGrid
+              style={{ marginTop: 10 }}
+              rows={rows}
+              columns={columns}
+              currencyColumns={currencyColumns}
+              dateColumns={dateColumns}
+              // height={300}
+              FuncProps={{ selectable: true }}
+              selection={this.state.selectedRows}
+              onSelectionChange={this.handleSelectionChange}
+            />
             {/* // rows={rows}
             // columns={columns}
             // currencyColumns={currencyColumns}
             // dateColumns={dateColumns}
             // height={300}
-            // /> */}
+            // />
             {/* <GridItem classes={{ grid: classes.invoicesList }}>
               <EditableTableGrid
                 rows={rows}
@@ -314,17 +343,32 @@ class AddNewStatement extends PureComponent {
             </GridItem> */}
             {/* </GridItem> */}
           </GridContainer>
+          {/* {footer &&
+            footer({
+              onConfirm,
+              confirmBtnText: formatMessage({
+                id: 'form.create',
+              }),
+              confirmProps: {
+                disabled: false,
+              },
+            })} */}
+          <GridItem
+            container
+            style={{
+              marginTop: 10,
+              justifyContent: 'flex-end',
+            }}
+          >
+            <Button
+              color='danger'
+              onClick={() => history.push(`/finance/statement`)}
+            >
+              Cancel
+            </Button>
+            <Button color='primary'>Save</Button>
+          </GridItem>
         </CardContainer>
-        {footer &&
-          footer({
-            onConfirm,
-            confirmBtnText: formatMessage({
-              id: 'form.create',
-            }),
-            confirmProps: {
-              disabled: false,
-            },
-          })}
       </React.Fragment>
     )
   }
