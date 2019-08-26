@@ -42,9 +42,12 @@ class AntdSwitch extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { form, field } = props
+    const { form, field, checkedValue } = props
     this.state = {
-      value: form && field ? field.value : props.value || props.defaultValue,
+      value:
+        form && field
+          ? field.value === checkedValue
+          : props.value || props.defaultValue,
     }
   }
 

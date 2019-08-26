@@ -8,6 +8,7 @@ import {
   GridItem,
   TextField,
   NumberInput,
+  Switch,
 } from '@/components'
 
 const CoPayment = ({ values, classes, CPSwitch, CPNumber }) => {
@@ -36,25 +37,82 @@ const CoPayment = ({ values, classes, CPSwitch, CPNumber }) => {
         />
       </GridItem>
       <GridItem xs={9}>
-        <FastField
+        <Field
           name='overalCoPaymentValue'
-          render={CPNumber(
-            formatMessage({
-              id: 'finance.scheme.setting.allItems',
-            }),
-            values.overalCoPaymentValueType,
-          )}
+          // render={CPNumber(
+          //   formatMessage({
+          //     id: 'finance.scheme.setting.allItems',
+          //   }),
+          //   values.overalCoPaymentValueType,
+          // )}
+          render={(args) => {
+            if (values.overalCoPaymentValueType) {
+              return (
+                <NumberInput
+                  currency
+                  disabled={values.itemGroupValueDtoRdoValue !== 'all'}
+                  label={formatMessage({
+                    id: 'finance.scheme.setting.allItems',
+                  })}
+                  {...args}
+                />
+              )
+            }
+            return (
+              <NumberInput
+                percentage
+                disabled={values.itemGroupValueDtoRdoValue !== 'all'}
+                label={formatMessage({
+                  id: 'finance.scheme.setting.allItems',
+                })}
+                {...args}
+              />
+            )
+          }}
+
+          // render={(args) =>
+          //   CPNumber(
+          //     formatMessage({
+          //       id: 'finance.scheme.setting.allItems',
+          //     }),
+          //     // values.overalCoPaymentValueType,
+          //     { ...args },
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.consumableGroupValue.itemGroupValue'
-          render={CPNumber(
-            formatMessage({
-              id: 'finance.scheme.setting.consumables',
-            }),
-            values.itemGroupValueDto.consumableGroupValue.groupValueType,
+          render={(args) => (
+            <NumberInput
+              disabled={values.itemGroupValueDtoRdoValue !== 'sub'}
+              label={formatMessage({
+                id: 'finance.scheme.setting.consumables',
+              })}
+              {...args}
+            />
+            // <GridItem xs={8} md={5}>
+            //   <Field
+            //     name='patientMinCoPaymentAmount'
+            //     render={CPNumber(
+            //       'Minimum Patient Payable Amount',
+            //       values.patientMinCoPaymentAmountType,
+            //     )}
+            //   />
+            // </GridItem>
+            // <GridItem xs={4} md={1}>
+            //   <Field name='patientMinCoPaymentAmountType' render={CPSwitch} />
+            // </GridItem>
+            // render={CPNumber(
+            //   formatMessage({
+            //     id: 'finance.scheme.setting.consumables',
+            //   }),
+            //   values.itemGroupValueDto.consumableGroupValue.groupValueType,
+            // )}
+
+            // render={CPNumber(
+            //   'Minimum Patient Payable Amount',
+            //   values.itemGroupValueDto.consumableGroupValue.groupValueType,
           )}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.medicationGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
@@ -66,7 +124,7 @@ const CoPayment = ({ values, classes, CPSwitch, CPNumber }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.vaccinationGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
@@ -78,7 +136,7 @@ const CoPayment = ({ values, classes, CPSwitch, CPNumber }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.serviceGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
@@ -90,7 +148,7 @@ const CoPayment = ({ values, classes, CPSwitch, CPNumber }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.packageGroupValue.itemGroupValue'
           render={(args) => (
             <NumberInput
@@ -104,24 +162,25 @@ const CoPayment = ({ values, classes, CPSwitch, CPNumber }) => {
         />
       </GridItem>
       <GridItem xs={2}>
-        <FastField name='overalCoPaymentValueType' render={CPSwitch} />
-        <FastField
+        <Field name='overalCoPaymentValueType' render={CPSwitch} />
+
+        <Field
           name='itemGroupValueDto.consumableGroupValue.groupValueType'
           render={CPSwitch}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.medicationGroupValue.groupValueType'
           render={CPSwitch}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.vaccinationGroupValue.groupValueType'
           render={CPSwitch}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.serviceGroupValue.groupValueType'
           render={CPSwitch}
         />
-        <FastField
+        <Field
           name='itemGroupValueDto.packageGroupValue.groupValueType'
           render={CPSwitch}
         />
