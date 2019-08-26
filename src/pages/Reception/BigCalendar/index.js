@@ -370,6 +370,7 @@ class Appointment extends React.PureComponent {
           onConfirm={this.closeAppointmentForm}
           showFooter={false}
           maxWidth='lg'
+          overrideLoading
         >
           <Form
             resources={resources}

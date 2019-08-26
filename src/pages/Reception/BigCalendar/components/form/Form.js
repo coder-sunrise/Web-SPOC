@@ -4,7 +4,7 @@ import classnames from 'classnames'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
-import { CircularProgress, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 // custom component
 import {
   CommonModal,
@@ -14,7 +14,7 @@ import {
   OutlinedTextField,
 } from '@/components'
 // medisys components
-import { Recurrence } from '@/components/_medisys'
+import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
@@ -36,8 +36,9 @@ import {
 } from './formikUtils'
 import styles from './style'
 
-@connect(({ loginSEMR, user, calendar, codetable }) => ({
+@connect(({ loginSEMR, loading, user, calendar, codetable }) => ({
   loginSEMR,
+  loading,
   user: user.data,
   events: calendar.list,
   viewingAppointment: calendar.currentViewAppointment,
@@ -270,6 +271,7 @@ class Form extends React.PureComponent {
         type: actionKey,
         payload,
       })
+      if (validate) return
       resetForm()
       onClose && onClose()
     } catch (error) {
@@ -359,7 +361,7 @@ class Form extends React.PureComponent {
   }
 
   render () {
-    const { classes, onClose, isLoading, values } = this.props
+    const { classes, onClose, loading, values, isSubmitting } = this.props
 
     const {
       showSearchPatientModal,
@@ -369,105 +371,101 @@ class Form extends React.PureComponent {
     } = this.state
     // console.log({ props: this.props })
     // console.log({ values: this.props.values })
+    const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
-      <SizeContainer>
-        <React.Fragment>
-          {isLoading && (
-            <div className={classnames(classes.loading)}>
-              <CircularProgress />
-              <h3 style={{ fontWeight: 400 }}>Populating patient info...</h3>
-            </div>
-          )}
+      <LoadingWrapper loading={show} text='Loading...'>
+        <SizeContainer>
+          <React.Fragment>
+            <GridContainer className={classnames(classes.formContent)}>
+              <GridItem container xs md={6}>
+                <PatientInfoInput
+                  onSearchPatient={this.onSearchPatient}
+                  onCreatePatient={this.toggleNewPatientModal}
+                  patientName={values.patientName}
+                  patientProfileFK={values.patientProfileFK}
+                />
+                <AppointmentDateInput disabled={values.isEnableRecurrence} />
+              </GridItem>
+              <GridItem xs md={6} className={classnames(classes.remarksField)}>
+                <FastField
+                  name='appointment.appointmentRemarks'
+                  render={(args) => (
+                    <OutlinedTextField
+                      {...args}
+                      multiline
+                      rowsMax={3}
+                      rows={3}
+                      label='Appointment Remarks'
+                    />
+                  )}
+                />
+              </GridItem>
 
-          <GridContainer
-            className={classnames(classes.formContent)}
-            // alignItems='center'
-            // justify='center'
-          >
-            <GridItem container xs md={6}>
-              <PatientInfoInput
-                onSearchPatient={this.onSearchPatient}
-                onCreatePatient={this.toggleNewPatientModal}
-                patientName={values.patientName}
-                patientProfileFK={values.patientProfileFK}
-              />
-              <AppointmentDateInput disabled={values.isEnableRecurrence} />
-            </GridItem>
-            <GridItem xs md={6} className={classnames(classes.remarksField)}>
-              <FastField
-                name='appointment.appointmentRemarks'
-                render={(args) => (
-                  <OutlinedTextField
-                    {...args}
-                    multiline
-                    rowsMax={3}
-                    rows={3}
-                    label='Appointment Remarks'
-                  />
-                )}
-              />
-            </GridItem>
+              <GridItem xs md={12} className={classes.verticalSpacing}>
+                <AppointmentDataGrid
+                  appointmentDate={values.appointment.appointmentDate}
+                  data={datagrid}
+                  handleCommitChanges={this.onCommitChanges}
+                />
+              </GridItem>
 
-            <GridItem xs md={12} className={classes.verticalSpacing}>
-              <AppointmentDataGrid
-                appointmentDate={values.appointment.appointmentDate}
-                data={datagrid}
-                handleCommitChanges={this.onCommitChanges}
-              />
-            </GridItem>
+              <GridItem xs md={12}>
+                <Recurrence
+                  disabled={
+                    values.id !== undefined && values.isEnableRecurrence
+                  }
+                  formValues={values}
+                  recurrenceDto={values.recurrenceDto}
+                  handleRecurrencePatternChange={this.onRecurrencePatternChange}
+                />
+              </GridItem>
+            </GridContainer>
 
-            <GridItem xs md={12}>
-              <Recurrence
-                disabled={values.id !== undefined && values.isEnableRecurrence}
-                formValues={values}
-                recurrenceDto={values.recurrenceDto}
-                handleRecurrencePatternChange={this.onRecurrencePatternChange}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <FormFooter
-            // isNew={slotInfo.type === 'add'}
-            appointmentStatusFK={values.appointment.appointmentStatusFk}
-            onClose={onClose}
-            disabled={datagrid.length === 0}
-            handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
-            handleSaveDraftClick={this.onSaveDraftClick}
-            handleConfirmClick={this.onConfirmClick}
-            handleValidateClick={this.onValidateClick}
-          />
-          <CommonModal
-            open={showSearchPatientModal}
-            title='Search Patient'
-            onClose={this.toggleSearchPatientModal}
-            onConfirm={this.toggleSearchPatientModal}
-            maxWidth='md'
-            showFooter={false}
-            overrideLoading
-          >
-            <PatientSearchModal handleSelectClick={this.onSelectPatientClick} />
-          </CommonModal>
-          <CommonModal
-            open={showDeleteConfirmationModal}
-            title='Alert'
-            onClose={this.closeDeleteConfirmation}
-            onConfirm={this.onConfirmCancelAppointment}
-            maxWidth='sm'
-          >
-            <DeleteConfirmation isSeries={values.series} />
-          </CommonModal>
-          <CommonModal
-            open={showSeriesUpdateConfirmation}
-            title='Alert'
-            onClose={this.closeSeriesUpdateConfirmation}
-            maxWidth='sm'
-          >
-            <SeriesUpdateConfirmation
-              handleConfirm={this.onConfirmSeriesUpdate}
+            <FormFooter
+              // isNew={slotInfo.type === 'add'}
+              appointmentStatusFK={values.appointment.appointmentStatusFk}
+              onClose={onClose}
+              disabled={datagrid.length === 0}
+              handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
+              handleSaveDraftClick={this.onSaveDraftClick}
+              handleConfirmClick={this.onConfirmClick}
+              handleValidateClick={this.onValidateClick}
             />
-          </CommonModal>
-        </React.Fragment>
-      </SizeContainer>
+            <CommonModal
+              open={showSearchPatientModal}
+              title='Search Patient'
+              onClose={this.toggleSearchPatientModal}
+              onConfirm={this.toggleSearchPatientModal}
+              maxWidth='md'
+              showFooter={false}
+              overrideLoading
+            >
+              <PatientSearchModal
+                handleSelectClick={this.onSelectPatientClick}
+              />
+            </CommonModal>
+            <CommonModal
+              open={showDeleteConfirmationModal}
+              title='Alert'
+              onClose={this.closeDeleteConfirmation}
+              onConfirm={this.onConfirmCancelAppointment}
+              maxWidth='sm'
+            >
+              <DeleteConfirmation isSeries={values.series} />
+            </CommonModal>
+            <CommonModal
+              open={showSeriesUpdateConfirmation}
+              title='Alert'
+              onClose={this.closeSeriesUpdateConfirmation}
+              maxWidth='sm'
+            >
+              <SeriesUpdateConfirmation
+                handleConfirm={this.onConfirmSeriesUpdate}
+              />
+            </CommonModal>
+          </React.Fragment>
+        </SizeContainer>
+      </LoadingWrapper>
     )
   }
 }

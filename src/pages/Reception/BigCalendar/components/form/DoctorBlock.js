@@ -236,6 +236,7 @@ const DoctorEventForm = ({
 
         <GridItem md={12}>
           <Recurrence
+            block
             formValues={values}
             recurrenceDto={values.recurrenceDto}
           />
@@ -316,6 +317,14 @@ export default withFormik({
     enableRecurrence: false,
     recurrencePattern: 'daily',
     recurrenceRange: RECURRENCE_RANGE.AFTER,
+    recurrenceDto: {
+      recurrencePatternFK: 1,
+      recurrenceFrequency: 1,
+      recurrenceRange: 'after',
+      recurrenceCount: 1,
+      recurrenceDaysOfTheWeek: [],
+      recurrenceDayOfTheMonth: undefined,
+    },
     ...initialProps,
   }),
 })(withStyles(STYLES, { name: 'DoctorForm' })(DoctorEventForm))

@@ -141,11 +141,19 @@ export const generateRecurringAppointments = (
   if (rrule) {
     const allDates = rrule.all() || []
     const { id, ...restAppointmentValues } = appointment
-    return allDates.map((date) => ({
-      ...restAppointmentValues,
-      [id]: !shouldDumpID,
-      appointmentDate: parseDateToServerDateFormatString(date),
-    }))
+    return allDates.map(
+      (date) =>
+        shouldDumpID || id === undefined
+          ? {
+              ...restAppointmentValues,
+              appointmentDate: parseDateToServerDateFormatString(date),
+            }
+          : {
+              ...restAppointmentValues,
+              id,
+              appointmentDate: parseDateToServerDateFormatString(date),
+            },
+    )
   }
   return null
 }

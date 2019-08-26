@@ -177,6 +177,7 @@ class AppointmentDataGrid extends React.PureComponent {
           }}
           EditingProps={{
             showAddCommand: true,
+            onCommitChanges: handleCommitChanges,
           }}
           columns={AppointmentDataColumn}
           columnExtensions={this.state.columnExtensions}

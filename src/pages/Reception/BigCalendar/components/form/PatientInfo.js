@@ -5,7 +5,7 @@ import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
-import { Button, GridItem, AntdInput, TextField } from '@/components'
+import { Button, GridItem, TextField, ProgressButton } from '@/components'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -24,10 +24,10 @@ const PatientInfoInput = ({
             name='patientName'
             render={(args) => {
               return (
-                <AntdInput
+                <TextField
                   {...args}
                   autoFocus
-                  onEnterPressed={onSearchPatient}
+                  // onEnterPressed={onSearchPatient}
                   label='Patient Name'
                 />
               )
@@ -45,9 +45,16 @@ const PatientInfoInput = ({
         <div className={classnames(classes.buttonGroup)}>
           {!isRegisteredPatient ? (
             <React.Fragment>
-              <Button size='sm' color='primary' onClick={onSearchPatient}>
+              <ProgressButton
+                size='sm'
+                color='primary'
+                variant='contained'
+                submitKey='patientSearch/query'
+                onClick={onSearchPatient}
+                icon={null}
+              >
                 Search
-              </Button>
+              </ProgressButton>
               <Button size='sm' color='primary' onClick={onCreatePatient}>
                 Create Patient
               </Button>
@@ -62,7 +69,7 @@ const PatientInfoInput = ({
       <GridItem xs md={6}>
         <FastField
           name='patientContactNo'
-          render={(args) => <AntdInput {...args} label='Contact No.' />}
+          render={(args) => <TextField {...args} label='Contact No.' />}
         />
       </GridItem>
     </React.Fragment>

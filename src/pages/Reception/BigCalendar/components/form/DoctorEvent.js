@@ -17,6 +17,8 @@ import {
   NumberInput,
   RadioGroup,
 } from '@/components'
+// medisys components
+import { Recurrence } from '@/components/_medisys'
 
 const STYLES = (theme) => ({
   paperContainer: {
@@ -161,7 +163,7 @@ function DoctorEventForm ({ classes, handleSubmit, values, ...props }) {
               )}
             />
           </GridItem>
-          <GridItem xs md={12}>
+          {/* <GridItem xs md={12}>
             <FastField
               name='recurrencePattern'
               render={(args) => (
@@ -208,7 +210,12 @@ function DoctorEventForm ({ classes, handleSubmit, values, ...props }) {
                 render={(args) => <DatePicker {...args} label='Stop Date' />}
               />
             )}
-          </GridItem>
+          </GridItem> */}
+          <Recurrence
+            block
+            formValues={values}
+            recurrenceDto={values.recurrenceDto}
+          />
         </GridContainer>
       </Paper>
       <GridContainer justify='flex-end' className={classes.buttonContainer}>
@@ -280,5 +287,13 @@ export default withFormik({
     occurence: 0,
     recurrencePattern: 'daily',
     recurrenceRange: RECURRENCE_RANGE.AFTER,
+    recurrenceDto: {
+      recurrencePatternFK: 1,
+      recurrenceFrequency: 1,
+      recurrenceRange: 'after',
+      recurrenceCount: 1,
+      recurrenceDaysOfTheWeek: [],
+      recurrenceDayOfTheMonth: undefined,
+    },
   }),
 })(withStyles(STYLES, { name: 'DoctorForm' })(DoctorEventForm))

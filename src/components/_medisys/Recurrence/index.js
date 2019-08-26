@@ -49,16 +49,18 @@ const RecurrenceDTO = {
 
 const Recurrence = ({
   classes,
-  disabled,
+  disabled = false,
+  block = false,
+  size = 'md',
   formValues,
   recurrenceDto = RecurrenceDTO,
-  size = 'md',
   handleRecurrencePatternChange = (f) => f,
 }) => {
   const { isEnableRecurrence, appointmentDate } = formValues
   const { recurrencePatternFK, recurrenceRange } = recurrenceDto
   const _labelSize = labelSize[size]
-  const _inputSize = inputSize[size]
+  const blockSize = (12 - _labelSize) / 2
+  const _inputSize = block ? blockSize : inputSize[size]
 
   return (
     <Fragment>
