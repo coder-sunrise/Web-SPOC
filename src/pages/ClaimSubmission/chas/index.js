@@ -29,8 +29,7 @@ class CHAS extends React.Component {
     history.push(`/claim-submission/chas/invoice/${processedInvoiceNo}`)
   }
 
-  handleContextMenuItemClick = (currentTarget, row) => {
-    const { id } = currentTarget
+  handleContextMenuItemClick = (row, id) => {
     switch (id) {
       case '0':
         this.openClaimDetails({ claimDetails: row })
