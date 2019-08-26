@@ -1,6 +1,7 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
 import request, { axiosRequest } from './request'
+import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
 
 const status = [
@@ -558,7 +559,7 @@ const currencies = [
   },
 ]
 
-const coPayerType =[
+const coPayerType = [
   {
     value: 'corporate',
     name: 'Corporate',
@@ -569,7 +570,7 @@ const coPayerType =[
   },
 ]
 
-const country =[
+const country = [
   {
     value: 'singapore',
     name: 'Singapore',
@@ -603,16 +604,23 @@ const country =[
 //   return localCodes[code]
 // }
 
-const _fetchAndSaveCodeTable = async (code) => {
-  const response = await axiosRequest(`/api/CodeTable?ctnames=${code}`, {
+const _fetchAndSaveCodeTable = async (code, params) => {
+  const baseURL = '/api/CodeTable'
+  const generalCodetableURL = `${baseURL}?ctnames=`
+  const searchURL = `${baseURL}/search?ctname=`
+  const useGeneral = params === undefined || Object.keys(params).length === 0
+  const url = useGeneral ? generalCodetableURL : searchURL
+
+  const response = await request(`${url}${code}`, {
     method: 'GET',
+    body: convertToQuery(params),
   })
   const { status: statusCode, data } = response
 
-  if (statusCode === 200) {
+  if (parseInt(statusCode, 10) === 200) {
     await db.codetable.put({
       code,
-      data: response.data[code],
+      data: useGeneral ? data[code] : data.data,
       createDate: new Date(),
       updateDate: new Date(),
     })
@@ -622,13 +630,19 @@ const _fetchAndSaveCodeTable = async (code) => {
   return []
 }
 
-export const getCodes = async (_code) => {
-  const code = _code.toLowerCase()
+export const getCodes = async (payload) => {
+  let ctcode
+  let params
+  if (typeof payload === 'string') ctcode = payload.toLowerCase()
+  if (typeof payload === 'object') {
+    ctcode = payload.code
+    params = payload.filter
+  }
 
   let result = []
   try {
     await db.open()
-    const ct = await db.codetable.get(code)
+    const ct = await db.codetable.get(ctcode)
 
     const cookies = new Cookies()
     const lastLoginDate = cookies.get('_lastLogin')
@@ -636,7 +650,7 @@ export const getCodes = async (_code) => {
 
     // not exist in current table, make network call to retrieve data
     if (ct === undefined) {
-      result = _fetchAndSaveCodeTable(code)
+      result = _fetchAndSaveCodeTable(ctcode, params)
     } else {
       // compare updateDate with lastLoginDate
       // if updateDate > lastLoginDate, do nothing
@@ -645,7 +659,7 @@ export const getCodes = async (_code) => {
       const parsedUpdateDate = moment(updateDate)
 
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(code)
+        ? _fetchAndSaveCodeTable(ctcode, params)
         : existedData
     }
   } catch (error) {
