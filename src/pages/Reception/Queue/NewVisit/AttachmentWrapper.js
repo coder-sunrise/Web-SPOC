@@ -58,7 +58,7 @@ const getFileExtension = (filename) => {
   return filename.split('.').pop()
 }
 
-const withAttachment = ({
+const AttachmentWrapper = ({
   classes,
   children,
   handleUpdateAttachments,
@@ -116,7 +116,6 @@ const withAttachment = ({
   const onUploadClick = () => {
     setErrorText('')
     inputEl.current.click()
-    // this.refs.visitAttachment && this.refs.visitAttachment.click()
   }
 
   const validateFileSize = (files) => {
@@ -235,5 +234,5 @@ const withAttachment = ({
 }
 
 export default withStyles(styles, { name: 'withAttachmentForm' })(
-  withAttachment,
+  AttachmentWrapper,
 )
