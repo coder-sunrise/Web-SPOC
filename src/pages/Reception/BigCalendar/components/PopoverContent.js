@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import classnames from 'classnames'
 import moment from 'moment'
 // material icon
 import { withStyles } from '@material-ui/core'
 import AccessTime from '@material-ui/icons/AccessTime'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
+// big calendar
+import BigCalendar from 'react-big-calendar'
 // common component
 import {
   CardBody,
@@ -70,11 +72,36 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
 }
 
 class PopoverContent extends React.PureComponent {
+  getTimeRange = () => {
+    const { classes, popoverEvent, calendarView } = this.props
+    if (calendarView === BigCalendar.Views.MONTH) return ''
+
+    return (
+      <Fragment>
+        <AccessTime className={classnames(classes.icon)} />
+        <span>
+          {getTimeString(popoverEvent.startTime)} -&nbsp;
+          {getTimeString(popoverEvent.endTime)}
+        </span>
+      </Fragment>
+    )
+  }
+
   render () {
     const { popoverEvent, classes } = this.props
+    const {
+      hasConflict,
+      isDoctorEvent,
+      patientName,
+      patientContactNo,
+      doctor,
+      appointmentType,
+      appointmentStatusFk,
+    } = popoverEvent
+
     return (
       <CardBody>
-        {popoverEvent.isDoctorEvent ? (
+        {isDoctorEvent ? (
           <DoctorEventContent {...this.props} />
         ) : (
           <GridContainer
@@ -82,7 +109,7 @@ class PopoverContent extends React.PureComponent {
             justify='center'
             alignItems='center'
           >
-            {popoverEvent.hasConflict && (
+            {hasConflict && (
               <GridItem className={classnames(classes.iconRow)}>
                 <ErrorOutline className={classnames(classes.icon)} />
                 <Danger style={{ display: 'inline' }}>
@@ -90,36 +117,33 @@ class PopoverContent extends React.PureComponent {
                 </Danger>
               </GridItem>
             )}
+            <GridItem>
+              {appointmentStatusFk === '2' && (
+                <span style={{ textAlign: 'right' }}>DRAFT</span>
+              )}
+            </GridItem>
             <GridItem className={classnames(classes.iconRow)}>
-              <AccessTime className={classnames(classes.icon)} />
-              <span>
-                {getTimeString(popoverEvent.startTime)} -{' '}
-                {getTimeString(popoverEvent.endTime)}
-              </span>
+              {this.getTimeRange()}
             </GridItem>
 
             <GridItem>
-              <TextField
-                disabled
-                label='Patient Name'
-                value={popoverEvent.patientName}
-              />
+              <TextField disabled label='Patient Name' value={patientName} />
             </GridItem>
             <GridItem>
               <TextField
                 disabled
                 label='Contact No.'
-                value={popoverEvent.contactNo}
+                value={patientContactNo}
               />
             </GridItem>
             <GridItem>
-              <TextField disabled label='Doctor' value={popoverEvent.doctor} />
+              <TextField disabled label='Doctor' value={doctor} />
             </GridItem>
             <GridItem>
               <TextField
                 disabled
                 label='Appointment Type'
-                value={popoverEvent.appointmentType}
+                value={appointmentType}
               />
             </GridItem>
           </GridContainer>

@@ -258,9 +258,9 @@ class Form extends React.PureComponent {
       }
 
       const payload = constructPayload(updated, appointmentStatusFK)
-      console.log({ payload, values })
+      console.log({ payload, values, appointmentStatusFK })
       const updateKey =
-        appointmentStatusFK === 1
+        appointmentStatusFK === 1 || appointmentStatusFK === 2
           ? 'calendar/saveAppointment'
           : 'calendar/rescheduleAppointment'
       const actionKey = validate ? 'calendar/validate' : updateKey
@@ -418,9 +418,7 @@ class Form extends React.PureComponent {
 
             <GridItem xs md={12}>
               <Recurrence
-                disabled={
-                  values.id !== undefined && !values.editSingleAppointment
-                }
+                disabled={values.id !== undefined && values.isEnableRecurrence}
                 formValues={values}
                 recurrenceDto={values.recurrenceDto}
                 handleRecurrencePatternChange={this.onRecurrencePatternChange}

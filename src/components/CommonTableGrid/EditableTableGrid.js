@@ -38,13 +38,18 @@ class EditableTableGrid extends PureComponent {
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
+    console.log({ nextProps, preState })
     const { EditingProps = {}, rows, errors = [] } = nextProps
-    const { editingRowIds } = EditingProps
+    const { editingRowIds, addedRows } = EditingProps
     // console.log(nextProps.EditingRowIds, preState.editingRowIds)
     if (editingRowIds)
       return {
         editingRowIds,
       }
+
+    if (addedRows) {
+      return { addedRows }
+    }
 
     return null
   }
@@ -317,6 +322,7 @@ class EditableTableGrid extends PureComponent {
   // }
 
   render () {
+    console.log({ state: this.state })
     const {
       theme,
       columnExtensions = [],

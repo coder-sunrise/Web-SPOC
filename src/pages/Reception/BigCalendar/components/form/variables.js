@@ -1,4 +1,5 @@
 import { timeFormat } from '@/components'
+import { primaryColor } from '@/assets/jss'
 
 export const RECURRENCE_PATTERN = {
   DAILY: 1,
@@ -47,6 +48,58 @@ export const AppointmentDataColumn = [
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
+export const AppointmentTypeOptions = [
+  {
+    name: 'All Appointment Type',
+    code: 'all',
+    color: 'primary',
+    colorValue: primaryColor,
+    colorActive: primaryColor,
+  },
+  {
+    name: 'Checkup',
+    code: 'checkup',
+    color: 'red',
+    colorValue: '#ef5350',
+    colorActive: '#e53935',
+  },
+  {
+    name: 'Aesthetic',
+    code: 'aesthetic',
+    color: 'green',
+    colorValue: '#66bb6a',
+    colorActive: '#43a047',
+  },
+  {
+    name: 'Dental',
+    code: 'dental',
+    color: 'blue',
+    colorValue: '#42a5f5',
+    colorActive: '#1976d2',
+  },
+  {
+    name: 'Consultation',
+    code: 'consultation',
+    color: 'cyan',
+    colorValue: '#26c6da',
+    colorActive: '#00acc1',
+  },
+  {
+    name: 'Pill Checks',
+    code: 'pillChecks',
+    color: 'pink',
+    colorValue: '#ec407a',
+    colorActive: '#d81b60',
+  },
+  {
+    name: 'Urgent',
+    code: 'urgent',
+    color: 'indigo',
+    colorValue: '#5c6bc0',
+    colorActive: '#3949ab',
+  },
+]
+
 export const AppointmentDataColExtensions = [
   {
     columnName: 'conflict',
@@ -66,7 +119,6 @@ export const AppointmentDataColExtensions = [
     columnName: 'appointmentTypeFK',
     type: 'codeSelect',
     code: 'ctappointmenttype',
-    mode: 'multiple',
   },
   {
     columnName: 'startTime',

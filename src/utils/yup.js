@@ -170,7 +170,7 @@ const getTimeObject = (value) => {
     if (hour.length === 2 && minute.length === 2)
       return { hour: parseInt(hour, 10), minute: parseInt(minute, 10) }
   } catch (error) {
-    console.error(error)
+    // console.error(error)
   }
   return undefined
 }

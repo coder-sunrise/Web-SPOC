@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
 import Cached from '@material-ui/icons/Cached'
+import Draft from '@material-ui/icons/Edit'
 
 const style = (theme) => ({
   blockDiv: {
@@ -16,6 +17,9 @@ const style = (theme) => ({
   title: {
     display: 'flex',
     justifyContent: 'space-between',
+  },
+  icons: {
+    float: 'right',
   },
 })
 
@@ -32,10 +36,16 @@ class Event extends PureComponent {
 
   render () {
     const { event, classes } = this.props
-    const { isDoctorEvent, hasConflict, isEnableRecurrence } = event
+    const {
+      appointmentStatusFk,
+      isDoctorEvent,
+      hasConflict,
+      isEnableRecurrence,
+    } = event
 
     const title = isDoctorEvent ? event.doctor : event.patientName
     const subtitle = isDoctorEvent ? event.eventType : event.patientContactNo
+
     return (
       <div
         className={classes.container}
@@ -46,8 +56,11 @@ class Event extends PureComponent {
           <span>
             <strong>{title ? title.toUpperCase() : ''}</strong>
           </span>
-          {hasConflict && <ErrorOutline />}
-          {isEnableRecurrence && <Cached />}
+          <div className={classes.icons}>
+            {hasConflict && <ErrorOutline />}
+            {isEnableRecurrence && <Cached />}
+            {appointmentStatusFk === '2' && <Draft />}
+          </div>
         </div>
         <span className={classes.blockDiv}>
           {subtitle ? subtitle.toUpperCase() : ''}

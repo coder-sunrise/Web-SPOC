@@ -52,7 +52,7 @@ class AppointmentDataGrid extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { appointmentDate } = this.props
+    const { appointmentDate, classes } = this.props
     const columnExtensions = AppointmentDataColExtensions.map((column) => {
       if (column.columnName === 'isPrimaryClinician') {
         return {
@@ -72,24 +72,31 @@ class AppointmentDataGrid extends React.PureComponent {
         }
       }
 
-      if (column.columnName === 'appointmentType') {
+      if (column.columnName === 'appointmentTypeFK') {
         return {
           ...column,
-          // renderDropdown: (option) => {
-          //   return (
-          //     <React.Fragment>
-          //       {option.value !== 'all' && (
-          //         <span
-          //           className={classnames([
-          //             classes.colorDot,
-          //             getColorClassByAppointmentType(option.value, classes),
-          //           ])}
-          //         />
-          //       )}
-          //       <span>{option.name}</span>
-          //     </React.Fragment>
-          //   )
-          // },
+          render: (row) => {
+            console.log({ row })
+            return <div>123</div>
+          },
+          renderDropdown: (option) => {
+            return (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {option.value !== 'all' && (
+                  <span
+                    className={classnames([
+                      classes.colorDot,
+                      // getColorClassByAppointmentType(option, classes),
+                    ])}
+                    style={{
+                      backgroundColor: '#42a5f5',
+                    }}
+                  />
+                )}
+                <span>{option.name}</span>
+              </div>
+            )
+          },
         }
       }
       return { ...column }
@@ -156,7 +163,7 @@ class AppointmentDataGrid extends React.PureComponent {
 
   render () {
     const { data, handleCommitChanges } = this.props
-    // console.log({ data })
+
     return (
       <div>
         <EditableTableGrid
@@ -165,20 +172,11 @@ class AppointmentDataGrid extends React.PureComponent {
           leftColumns={[
             'conflict',
           ]}
-          // onRowDoubleClick={() => {
-          //   console.log('double click row')
-          // }}
           FuncProps={{
-            // pagerConfig: {},
             pager: false,
           }}
           EditingProps={{
             showAddCommand: true,
-            editingRowIds: this.state.editingRowIds,
-            onEditingRowIdsChange: this.changeEditingRowIds,
-            onCommitChanges: handleCommitChanges,
-            // rowChanges: this.state.rowChanges,
-            // onRowChangesChange: this.changeRowChanges,
           }}
           columns={AppointmentDataColumn}
           columnExtensions={this.state.columnExtensions}

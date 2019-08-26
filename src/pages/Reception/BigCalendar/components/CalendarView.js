@@ -7,6 +7,8 @@ import BigCalendar from 'react-big-calendar'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // material ui
 import { withStyles } from '@material-ui/core'
+// components
+import { serverDateFormat } from '@/components'
 // setting
 import {
   defaultColorOpts,
@@ -16,17 +18,14 @@ import {
 // sub component
 import CalendarToolbar from './Toolbar'
 import Event from './Event'
+import { getFirstAppointmentType } from './form/formikUtils'
+// assets
+import { primaryColor } from '@/assets/jss'
 
 const DragAndDropCalendar = withDragAndDrop(BigCalendar)
 const localizer = BigCalendar.momentLocalizer(moment)
 
 const styles = () => ({
-  defaultColor: {
-    background: defaultColorOpts.value,
-    '&:hover': {
-      backgroundColor: defaultColorOpts.activeColor,
-    },
-  },
   doctorEvent: {
     background: doctorEventColorOpts.value,
     '&:hover': {
@@ -42,7 +41,6 @@ const styles = () => ({
     fontWeight: '450',
     color: '#6f6f6f',
   },
-  ...AppointmentTypeAsColor,
 })
 
 const today = new Date()
@@ -50,6 +48,7 @@ const today = new Date()
 @connect(({ calendar }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
+  calendarEvents: calendar.list,
 }))
 class CalendarView extends React.PureComponent {
   state = {
@@ -72,22 +71,12 @@ class CalendarView extends React.PureComponent {
   }
 
   _eventColors = (event) => {
-    // eventPropGetters = (event, start ,end, isSelected) => {}
-    const { classes } = this.props
-    const bg = 'background-'
-    const hover = 'hover-'
-    if (event.isDoctorEvent) {
-      return { className: classes.doctorEvent }
-    }
-    const eventClassName = event.appointmentType
-      ? [
-          classes[`${bg}${event.appointmentType}`],
-          classes[`${hover}${event.appointmentType}`],
-        ].join(' ')
-      : classes.defaultColor
-
+    const appointmentTypeFK = getFirstAppointmentType(event)
+    // TODO: get appointment type color here
     return {
-      className: eventClassName,
+      style: {
+        backgroundColor: !appointmentTypeFK ? primaryColor : '#26c6da',
+      },
     }
   }
 
@@ -190,6 +179,45 @@ class CalendarView extends React.PureComponent {
       calendarView,
     } = this.props
 
+    const flattenedList =
+      calendarView === BigCalendar.Views.MONTH
+        ? calendarEvents.map((appointment) => ({
+            ...appointment,
+            start: appointment.appointmentDate,
+            end: appointment.appointmentDate,
+          }))
+        : calendarEvents.reduce((events, appointment) => {
+            const {
+              appointmentDate,
+              patientName,
+              patientContactNo,
+              isEnableRecurrence,
+              // eslint-disable-next-line camelcase
+              appointment_Resources,
+            } = appointment
+            // const appointmentDate = moment(appointmentDate).format(serverDateFormat)
+            const apptEvents = appointment_Resources.map((item) => ({
+              ...item,
+              resourceId: item.clinicianFK,
+              patientName,
+              patientContactNo,
+              isEnableRecurrence,
+              start: moment(
+                `${appointmentDate} ${item.startTime}`,
+                `${serverDateFormat} HH:mm`,
+              ).toDate(),
+              end: moment(
+                `${appointmentDate} ${item.endTime}`,
+                `${serverDateFormat} HH:mm`,
+              ).toDate(),
+            }))
+
+            return [
+              ...events,
+              ...apptEvents,
+            ]
+          }, [])
+
     const { minTime, maxTime } = this.state
 
     return (
@@ -208,7 +236,7 @@ class CalendarView extends React.PureComponent {
         max={maxTime}
         view={calendarView}
         // --- values props ---
-        events={calendarEvents}
+        events={flattenedList}
         // --- values props ---
         // --- functional props ---
         selectable='ignoreEvents'

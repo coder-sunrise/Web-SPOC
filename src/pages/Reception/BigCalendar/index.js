@@ -149,15 +149,18 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectEvent = (selectedEvent) => {
-    console.log({ selectedEvent })
     this.props
       .dispatch({
         type: 'calendar/getAppointmentDetails',
-        appointmentID: selectedEvent.appointmentFK,
+        appointmentID: selectedEvent.id
+          ? selectedEvent.id
+          : selectedEvent.appointmentFK,
       })
       .then(() => {
         this.setState({
-          selectedAppointmentFK: selectedEvent.appointmentFK,
+          selectedAppointmentFK: selectedEvent.id
+            ? selectedEvent.id
+            : selectedEvent.appointmentFK,
           showSeriesConfirmation: selectedEvent.isEnableRecurrence,
           showAppointmentForm: !selectedEvent.isEnableRecurrence,
         })
@@ -298,43 +301,18 @@ class Appointment extends React.PureComponent {
       selectedAppointmentFK,
     } = this.state
 
-    const { calendarEvents, list, currentViewAppointment } = CalendarModel
+    const {
+      calendarEvents,
+      list,
+      currentViewAppointment,
+      calendarView,
+    } = CalendarModel
     // const flattenedCalendarData = calendarEvents.reduce(
     //   flattenAppointmentDateToCalendarEvents,
     //   [],
     // )
 
-    const flattenedList = list.reduce((events, appointment) => {
-      const {
-        appointmentDate,
-        patientName,
-        patientContactNo,
-        isEnableRecurrence,
-        // eslint-disable-next-line camelcase
-        appointment_Resources,
-      } = appointment
-      // const appointmentDate = moment(appointmentDate).format(serverDateFormat)
-      const apptEvents = appointment_Resources.map((item) => ({
-        ...item,
-        resourceId: item.clinicianFK,
-        patientName,
-        patientContactNo,
-        isEnableRecurrence,
-        start: moment(
-          `${appointmentDate} ${item.startTime}`,
-          `${serverDateFormat} HH:mm`,
-        ).toDate(),
-        end: moment(
-          `${appointmentDate} ${item.endTime}`,
-          `${serverDateFormat} HH:mm`,
-        ).toDate(),
-      }))
-
-      return [
-        ...events,
-        ...apptEvents,
-      ]
-    }, [])
+    // console.log({ flattenedList })
 
     const formTitle =
       currentViewAppointment.editSingleAppointment === undefined
@@ -362,7 +340,10 @@ class Appointment extends React.PureComponent {
           }}
           disableRestoreFocus
         >
-          <PopoverContent popoverEvent={popoverEvent} />
+          <PopoverContent
+            popoverEvent={popoverEvent}
+            calendarView={calendarView}
+          />
         </Popover>
 
         <FilterBar
@@ -372,8 +353,6 @@ class Appointment extends React.PureComponent {
         />
         <div style={{ marginTop: 16 }}>
           <CalendarView
-            // calendarEvents={applyFilter(flattenedCalendarData, filter)}
-            calendarEvents={flattenedList}
             resources={resources}
             handleSelectSlot={this.onSelectSlot}
             handleSelectEvent={this.onSelectEvent}

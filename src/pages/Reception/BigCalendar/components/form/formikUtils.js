@@ -71,24 +71,13 @@ export const mapPropsToValues = ({
   viewingAppointment,
   selectedAppointmentID,
   selectedSlot,
-  events,
   user,
 }) => {
   if (viewingAppointment.id) {
     const appointment = viewingAppointment.appointments.find(
       (item) => item.id === selectedAppointmentID,
     )
-    const {
-      id: appointmentGroupID,
-      concurrencyToken,
-      bookedByUserFk,
-      bookedByUser,
-      patientName,
-      patientContactNo,
-      patientProfileFK,
-      isEnableRecurrence,
-      recurrenceDto,
-    } = viewingAppointment
+    const { recurrenceDto } = viewingAppointment
 
     return {
       ...viewingAppointment,
@@ -200,4 +189,16 @@ export const constructPayload = (payload, appointmentStatusFK) => {
     }
   }
   return payload
+}
+
+export const getFirstAppointmentType = (appointment) => {
+  if (
+    appointment.appointment_Resources &&
+    appointment.appointment_Resources.length >= 1
+  )
+    return appointment.appointment_Resources[0].appointmentTypeFK
+
+  return appointment.appointmentTypeFK
+    ? appointment.appointmentTypeFK
+    : undefined
 }
