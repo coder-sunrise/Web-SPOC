@@ -166,7 +166,7 @@ class Detail extends PureComponent {
 
             <GridItem md={6}>
               <Field
-                name='paymentTerm'
+                name='adminCharge'
                 render={(args) => {
                   if (values.adminChargeType) {
                     return <NumberInput currency label='Admin Fee' {...args} />
@@ -181,8 +181,10 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <Switch
                     checkedChildren='$'
+                    checkedValue='ExactAmount'
                     unCheckedChildren='%'
-                    label=''
+                    unCheckedValue='Percentage'
+                    label=' '
                     {...args}
                   />
                 )}
