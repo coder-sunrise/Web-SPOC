@@ -605,10 +605,11 @@ const country = [
 // }
 
 const _fetchAndSaveCodeTable = async (code, params) => {
+  const useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?ctnames=`
   const searchURL = `${baseURL}/search?ctname=`
-  const useGeneral = params === undefined || Object.keys(params).length === 0
+
   const url = useGeneral ? generalCodetableURL : searchURL
 
   const response = await request(`${url}${code}`, {

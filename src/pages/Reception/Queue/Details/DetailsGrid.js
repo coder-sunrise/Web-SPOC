@@ -2,18 +2,6 @@ import React, { PureComponent } from 'react'
 import router from 'umi/router'
 // dva
 import { connect } from 'dva'
-// table grid component
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-// material ui
-import { withStyles } from '@material-ui/core'
-import Pageview from '@material-ui/icons/Pageview'
-import Edit from '@material-ui/icons/Edit'
-import Money from '@material-ui/icons/AttachMoney'
-import Delete from '@material-ui/icons/Delete'
-import Person from '@material-ui/icons/Person'
-import Book from '@material-ui/icons/LibraryBooks'
-import Play from '@material-ui/icons/PlayArrow'
-import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
 // custom components
 import { CommonTableGrid, DateFormatter, Tooltip } from '@/components'
 // medisys component
@@ -22,19 +10,13 @@ import {
   LoadingWrapper,
 } from 'medisys-components'
 // sub component
-import AppointmentActionButton from './AppointmentActionButton'
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
 import { filterData, filterDoctorBlock, todayOnly } from '../utils'
-import { StatusIndicator } from '../variables'
-
-const styles = () => ({
-  fullscreenBtn: {
-    float: 'right',
-    top: '-15px',
-    left: '20px',
-    zIndex: 999,
-  },
-})
+import {
+  StatusIndicator,
+  AppointmentContextMenu,
+  ContextMenuOptions,
+} from '../variables'
 
 const compareQueueNo = (a, b) => {
   const floatA = parseFloat(a)
@@ -83,74 +65,6 @@ const TableConfig = {
     'queueNo',
   ],
 }
-
-const AppointmentContextMenu = [
-  {
-    id: 8,
-    label: 'Register Visit',
-    Icon: Edit,
-    disabled: true,
-  },
-  {
-    id: 9,
-    label: 'Register Patient',
-    Icon: Person,
-    disabled: false,
-  },
-]
-
-const ContextMenuOptions = [
-  {
-    id: 0,
-    label: 'Edit Visit',
-    Icon: Edit,
-    disabled: false,
-  },
-  {
-    id: 1,
-    label: 'Dispense & Bill',
-    Icon: Money,
-    disabled: false,
-  },
-  {
-    id: 2,
-    label: 'Delete Visit',
-    Icon: Delete,
-    disabled: false,
-  },
-  { isDivider: true },
-  {
-    id: 3,
-    label: 'Patient Profile',
-    Icon: Person,
-    disabled: false,
-  },
-  {
-    id: 4,
-    label: 'Patient Dashboard',
-    Icon: Book,
-    disabled: false,
-  },
-  { isDivider: true },
-  {
-    id: 5,
-    label: 'Start Consultation',
-    Icon: Play,
-    disabled: false,
-  },
-  {
-    id: 6,
-    label: 'Resume Consultation',
-    Icon: PlayCircle,
-    disabled: true,
-  },
-  {
-    id: 7,
-    label: 'Edit Consultation',
-    Icon: Edit,
-    disabled: true,
-  },
-]
 
 @connect(({ queueLog, calendar, global, loading }) => ({
   queueLog,
@@ -298,11 +212,16 @@ class DetailsGrid extends PureComponent {
       'PAID',
       'OVERPAID',
     ]
-    const shouldDisableDelete = row.visitStatus !== 'WAITING'
+    const isStatusWaiting = row.visitStatus === 'WAITING'
+    const isStatusInProgress = [
+      'IN CONS',
+    ].includes(row.visitStatus)
     const shouldDisableDispense = false // !enabledDispense.includes(row.visitStatus)
     const newContextMenuOptions = ContextMenuOptions.map((opt) => {
       if (opt.id === 1) return { ...opt, disabled: shouldDisableDispense }
-      if (opt.id === 2) return { ...opt, disabled: shouldDisableDelete }
+      if (opt.id === 2) return { ...opt, disabled: !isStatusWaiting }
+      if (opt.id === 6 || opt.id === 7)
+        return { ...opt, hidden: !isStatusInProgress }
       return { ...opt }
     })
 
