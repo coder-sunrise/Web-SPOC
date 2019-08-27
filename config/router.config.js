@@ -74,7 +74,7 @@ const routes = [
             component: './PatientDashboard',
           },
           {
-            path: '/reception/queue/patientdashboard/consultation/new',
+            path: '/reception/queue/patientdashboard/consultation/:id?',
             name: 'consultation',
             hideInMenu: true,
             component: './PatientDashboard/Consultation',

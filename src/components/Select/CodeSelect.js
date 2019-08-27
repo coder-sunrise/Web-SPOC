@@ -47,7 +47,7 @@ class CodeSelect extends React.PureComponent {
 
     const options =
       code !== undefined ? codetable[code.toLowerCase()] : this.state.options
-
+    // console.log(options, code)
     return <Select options={options || []} valueField='id' {...this.props} />
   }
 }

@@ -5,6 +5,7 @@ import { RichEditor, withFormikExtend, FastField } from '@/components'
 
 import model from './models'
 
+console.log(1)
 window.g_app.replaceModel(model)
 
 @connect(({ clinicalnotes }) => ({

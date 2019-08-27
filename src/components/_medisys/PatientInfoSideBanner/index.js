@@ -36,8 +36,7 @@ const PatientInfoSideBanner = ({ height, theme, classes, entity }) => {
       </p>
 
       <p>
-        <DatePicker text format={dateFormatLong} value={entity.dob} />&nbsp; ({moment(entity.dob).fromNow()},&nbsp;
-        {<CodeSelect code='ctGender' text value={entity.genderFK} />})
+        <DatePicker text format={dateFormatLong} value={entity.dob} /> ({Math.floor(moment.duration(moment().diff(entity.dob)).asYears())}/{<CodeSelect code='ctGender' optionLabelLength={1} text value={entity.genderFK} />})
       </p>
       <Divider light />
       <div

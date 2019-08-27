@@ -20,8 +20,18 @@ export async function queryList (url, params, convertExcludeFields) {
 }
 
 export async function remove (url, params) {
+  if (params.id) {
+    return request(`${url}/${params.id}`, {
+      method: 'DELETE',
+    })
+  }
+  if (typeof params === 'number') {
+    return request(`${url}/${params}`, {
+      method: 'DELETE',
+    })
+  }
   return request(url, {
-    method: 'delete',
+    method: 'DELETE',
     data: params,
   })
 }

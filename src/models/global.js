@@ -41,11 +41,20 @@ export default createFormViewModel({
               showPatientInfoPanel: true,
             },
           })
+        } else if (query.md === 'cons') {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              fullscreen: true,
+              showConsultationPanel: true,
+            },
+          })
         } else {
           dispatch({
             type: 'updateState',
             payload: {
               showPatientInfoPanel: false,
+              showConsultationPanel: false,
             },
           })
         }
