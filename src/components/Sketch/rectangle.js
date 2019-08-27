@@ -2,25 +2,24 @@
 
 import FabricCanvasTool from './fabrictool'
 
-const fabric = require('fabric').fabric;
+const fabric = require('fabric').fabric
 
 class Rectangle extends FabricCanvasTool {
-
-  configureCanvas(props) {
-    let canvas = this._canvas;
-    canvas.isDrawingMode = canvas.selection = false;
-    canvas.forEachObject((o) => o.selectable = o.evented = false);
-    this._width = props.lineWidth;
-    this._color = props.lineColor;
-    this._fill = props.fillColor;
+  configureCanvas (props) {
+    let canvas = this._canvas
+    canvas.isDrawingMode = canvas.selection = false
+    canvas.forEachObject((o) => (o.selectable = o.evented = false))
+    this._width = props.lineWidth
+    this._color = props.lineColor
+    this._fill = props.fillColor
   }
 
-  doMouseDown(o) {
-    let canvas = this._canvas;
-    this.isDown = true;
-    let pointer = canvas.getPointer(o.e);
-    this.startX = pointer.x;
-    this.startY = pointer.y;
+  doMouseDown (o) {
+    let canvas = this._canvas
+    this.isDown = true
+    let pointer = canvas.getPointer(o.e)
+    this.startX = pointer.x
+    this.startY = pointer.y
     this.rect = new fabric.Rect({
       left: this.startX,
       top: this.startY,
@@ -35,30 +34,30 @@ class Rectangle extends FabricCanvasTool {
       transparentCorners: false,
       selectable: false,
       evented: false,
-      angle: 0
-    });
-    canvas.add(this.rect);
+      angle: 0,
+    })
+    canvas.add(this.rect)
   }
 
-  doMouseMove(o) {
-    if (!this.isDown) return;
-    let canvas = this._canvas;
-    let pointer = canvas.getPointer(o.e);
+  doMouseMove (o) {
+    if (!this.isDown) return
+    let canvas = this._canvas
+    let pointer = canvas.getPointer(o.e)
     if (this.startX > pointer.x) {
-      this.rect.set({ left: Math.abs(pointer.x) });
+      this.rect.set({ left: Math.abs(pointer.x) })
     }
     if (this.startY > pointer.y) {
-      this.rect.set({ top: Math.abs(pointer.y) });
+      this.rect.set({ top: Math.abs(pointer.y) })
     }
-    this.rect.set({ width: Math.abs(this.startX - pointer.x) });
-    this.rect.set({ height: Math.abs(this.startY - pointer.y) });
-    this.rect.setCoords();
-    canvas.renderAll();
+    this.rect.set({ width: Math.abs(this.startX - pointer.x) })
+    this.rect.set({ height: Math.abs(this.startY - pointer.y) })
+    this.rect.setCoords()
+    canvas.renderAll()
   }
 
-  doMouseUp(o) {
-    this.isDown = false;
+  doMouseUp (o) {
+    this.isDown = false
   }
 }
 
-export default Rectangle;
+export default Rectangle

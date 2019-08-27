@@ -2,12 +2,12 @@
  * Maintains the history of an object
  */
 class History {
-  constructor(undoLimit = 10, debug = false) {
-    this.undoLimit = undoLimit;
-    this.undoList = [];
-    this.redoList = [];
-    this.current = null;
-    this.debug = debug;
+  constructor (undoLimit = 10, debug = false) {
+    this.undoLimit = undoLimit
+    this.undoList = []
+    this.redoList = []
+    this.current = null
+    this.debug = debug
   }
 
   /**
@@ -15,8 +15,8 @@ class History {
    *
    * @returns {number|*} the undo limit, as it is configured when constructing the history instance
    */
-  getUndoLimit() {
-    return this.undoLimit;
+  getUndoLimit () {
+    return this.undoLimit
   }
 
   /**
@@ -24,8 +24,8 @@ class History {
    *
    * @returns {null|*}
    */
-  getCurrent() {
-    return this.current;
+  getCurrent () {
+    return this.current
   }
 
   /**
@@ -35,18 +35,19 @@ class History {
    *
    * @param obj
    */
-  keep(obj) {
+  keep (obj) {
     try {
-      this.redoList = [];
+      this.redoList = []
       if (this.current) {
-        this.undoList.push(this.current);
+        this.undoList.push(this.current)
       }
       if (this.undoList.length > this.undoLimit) {
-        this.undoList.shift();
+        this.undoList.shift()
       }
-      this.current = obj;
+      this.current = obj
+      console.log(this.undoList)
     } finally {
-      this.print();
+      this.print()
     }
   }
 
@@ -55,22 +56,24 @@ class History {
    *
    * @returns the new current value after the undo operation, else null if no undo operation was possible
    */
-  undo() {
+  undo () {
     try {
       if (this.current) {
-        this.redoList.push(this.current);
+        this.redoList.push(this.current)
         if (this.redoList.length > this.undoLimit) {
-          this.redoList.shift();
+          this.redoList.shift()
         }
-        if (this.undoList.length === 0) this.current = null;
+        if (this.undoList.length === 0) this.current = null
       }
       if (this.undoList.length > 0) {
-        this.current = this.undoList.pop();
-        return this.current;
+        this.current = this.undoList.pop()
+        console.log(this.undoList)
+        return this.current
       }
-      return null;
+
+      return null
     } finally {
-      this.print();
+      this.print()
     }
   }
 
@@ -79,16 +82,16 @@ class History {
    *
    * @returns the new current value after the redo operation, or null if no redo operation was possible
    */
-  redo() {
+  redo () {
     try {
       if (this.redoList.length > 0) {
-        if (this.current) this.undoList.push(this.current);
-        this.current = this.redoList.pop();
-        return this.current;
+        if (this.current) this.undoList.push(this.current)
+        this.current = this.redoList.pop()
+        return this.current
       }
-      return null;
+      return null
     } finally {
-      this.print();
+      this.print()
     }
   }
 
@@ -97,8 +100,8 @@ class History {
    *
    * @returns {boolean}
    */
-  canRedo() {
-    return this.redoList.length > 0;
+  canRedo () {
+    return this.redoList.length > 0
   }
 
   /**
@@ -106,30 +109,30 @@ class History {
    *
    * @returns {boolean}
    */
-  canUndo() {
-    return this.undoList.length > 0 || this.current !== null;
+  canUndo () {
+    return this.undoList.length > 0 || this.current !== null
   }
 
   /**
    * Clears the history maintained, can be undone
    */
-  clear() {
-    this.undoList = [];
-    this.redoList = [];
-    this.current = null;
-    this.print();
+  clear () {
+    this.undoList = []
+    this.redoList = []
+    this.current = null
+    this.print()
   }
 
-  print() {
+  print () {
     if (this.debug) {
       /* eslint-disable no-console */
       console.log(
         this.undoList,
         ' -> ' + this.current + ' <- ',
         this.redoList.slice(0).reverse(),
-      );
+      )
     }
   }
 }
 
-export default History;
+export default History
