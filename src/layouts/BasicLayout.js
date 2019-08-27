@@ -377,77 +377,6 @@ class BasicLayout extends React.PureComponent {
       [classes.mainPanelSidebarMini]: collapsed,
     })}`
     // console.log(this.props)
-    const layout = (
-      <div className={classes.wrapper}>
-        {isTop && !isMobile ? null : (
-          <SiderMenu
-            logo={logo}
-            logoText='SEMR V2'
-            theme={navTheme}
-            // onCollapse={this.handleMenuCollapse}
-            menuData={menuData}
-            isMobile={isMobile}
-            image={image}
-            // handleDrawerToggle={this.handleDrawerToggle}
-            // open={this.state.mobileOpen}
-            open={this.state.mobileOpen}
-            color='blue'
-            bgColor='black'
-            handleDrawerToggle={this.handleDrawerToggle}
-            {...props}
-          />
-          // <Sidebar
-          //   routes={menuData}
-          //   logoText="Creative Tim"
-          //   logo={logo}
-          //   image={image}
-          //   handleDrawerToggle={this.handleDrawerToggle}
-          //   open={this.state.mobileOpen}
-          //   color="blue"
-          //   bgColor="black"
-          //   miniActive={collapsed}
-          //   {...this.props}
-          // />
-        )}
-        <div
-          className={mainPanel}
-          ref={(node) => {
-            // this.mainPanel = node
-            window.mainPanel = node
-          }}
-        >
-          {/* <Header
-            menuData={menuData}
-            handleMenuCollapse={this.handleMenuCollapse}
-            logo={logo}
-            isMobile={isMobile}
-            {...props}
-          /> */}
-          {/* <Affix target={() => window.mainPanel}> */}
-          <Header
-            sidebarMinimize={this.sidebarMinimize}
-            miniActive={collapsed}
-            menuData={menuData}
-            breadcrumbNameMap={this.breadcrumbNameMap}
-            // routes={dashboardRoutes}
-            handleDrawerToggle={this.handleDrawerToggle}
-            {...props}
-          />
-          {/* </Affix> */}
-
-          <div className={classes.content}>
-            <div className={classes.container}>{children}</div>
-            {/* <Authorized
-                authority={routerConfig && routerConfig.authority}
-                noMatch={<Exception403 />}
-              >
-                {children}
-              </Authorized> */}
-          </div>
-          {/* <Footer fluid /> */}
-        </div>
-      </div>
-    )
     // console.log(this)
     return (
       <React.Fragment>
@@ -457,12 +386,86 @@ class BasicLayout extends React.PureComponent {
             <ContainerQuery query={query}>
               {(params) => (
                 <Context.Provider value={this.getContext()}>
-                  <div id='main-page' className={cx(params)}>
-                    <ErrorBoundary>
-                      {!global.fullscreen && layout}
+                  <ErrorBoundary>
+                    <div id='main-page' className={cx(params)}>
+                      {!global.fullscreen && (
+                        <div className={classes.wrapper}>
+                          {isTop && !isMobile ? null : (
+                            <SiderMenu
+                              logo={logo}
+                              logoText='SEMR V2'
+                              theme={navTheme}
+                              // onCollapse={this.handleMenuCollapse}
+                              menuData={menuData}
+                              isMobile={isMobile}
+                              image={image}
+                              // handleDrawerToggle={this.handleDrawerToggle}
+                              // open={this.state.mobileOpen}
+                              open={this.state.mobileOpen}
+                              color='blue'
+                              bgColor='black'
+                              handleDrawerToggle={this.handleDrawerToggle}
+                              {...props}
+                            />
+                            // <Sidebar
+                            //   routes={menuData}
+                            //   logoText="Creative Tim"
+                            //   logo={logo}
+                            //   image={image}
+                            //   handleDrawerToggle={this.handleDrawerToggle}
+                            //   open={this.state.mobileOpen}
+                            //   color="blue"
+                            //   bgColor="black"
+                            //   miniActive={collapsed}
+                            //   {...this.props}
+                            // />
+                          )}
+                          <div
+                            className={mainPanel}
+                            ref={(node) => {
+                              // this.mainPanel = node
+                              window.mainPanel = node
+                            }}
+                          >
+                            {/* <Header
+            menuData={menuData}
+            handleMenuCollapse={this.handleMenuCollapse}
+            logo={logo}
+            isMobile={isMobile}
+            {...props}
+          /> */}
+                            {/* <Affix target={() => window.mainPanel}> */}
+                            <Header
+                              sidebarMinimize={this.sidebarMinimize}
+                              miniActive={collapsed}
+                              menuData={menuData}
+                              breadcrumbNameMap={this.breadcrumbNameMap}
+                              // routes={dashboardRoutes}
+                              handleDrawerToggle={this.handleDrawerToggle}
+                              {...props}
+                            />
+                            {/* </Affix> */}
+                            <ErrorBoundary>
+                              <div className={classes.content}>
+                                <div className={classes.container}>
+                                  {children}
+                                </div>
+                                {/* <Authorized
+                authority={routerConfig && routerConfig.authority}
+                noMatch={<Exception403 />}
+              >
+                {children}
+              </Authorized> */}
+                              </div>
+                            </ErrorBoundary>
+                            {/* <Footer fluid /> */}
+                          </div>
+                        </div>
+                      )}
+
                       <GlobalModalContainer {...props} />
-                    </ErrorBoundary>
-                  </div>
+                    </div>
+                  </ErrorBoundary>
                 </Context.Provider>
               )}
             </ContainerQuery>

@@ -26,8 +26,9 @@ import {
 const styles = (theme) => ({})
 
 const itemSchema = Yup.object().shape({
-  serviceCenter: Yup.string().required(),
-  sellingPrice: Yup.number().required(),
+  serviceCenterFK: Yup.string().required(),
+  costPrice: Yup.number().required(),
+  unitPrice: Yup.number().required(),
 })
 
 @withFormik({
@@ -36,25 +37,30 @@ const itemSchema = Yup.object().shape({
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
+    serviceCategoryFK: Yup.string().required(),
+    revenueCategoryFK: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    items: Yup.array().compact((v) => v.isDeleted).of(itemSchema),
+    serviceSettingItem: Yup.array().compact((v) => v.isDeleted).of(itemSchema),
   }),
   handleSubmit: (values, { props }) => {
-    props
-      .dispatch({
-        type: 'settingClinicService/upsert',
-        payload: values,
-      })
-      .then((r) => {
-        if (r && r.message === 'Ok') {
-          // toast.success('test')
-          notification.success({
-            // duration:0,
-            message: 'Done',
-          })
-          if (props.onConfirm) props.onConfirm()
-        }
-      })
+    const { effectiveDates, ...restValues } = values
+    const { dispatch, onConfirm } = props
+
+    dispatch({
+      type: 'settingClinicService/upsert',
+      payload: {
+        ...restValues,
+        effectiveStartDate: effectiveDates[0],
+        effectiveEndDate: effectiveDates[1],
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'settingClinicService/query',
+        })
+      }
+    })
   },
   displayName: 'ServiceModal',
 })
@@ -66,14 +72,19 @@ class Detail extends PureComponent {
 
   tableParas = {
     columns: [
-      { name: 'serviceCenter', title: 'Service Center' },
-      { name: 'cost', title: 'Cost' },
-      { name: 'sellingPrice', title: 'Selling Price/Unit' },
+      { name: 'serviceCenterFK', title: 'Service Center' },
+      { name: 'costPrice', title: 'Cost' },
+      { name: 'unitPrice', title: 'Selling Price/Unit' },
       { name: 'isDefault', title: 'Default' },
     ],
     columnExtensions: [
-      { columnName: 'sellingPrice', type: 'number', currency: true },
-      { columnName: 'cost', type: 'number', currency: true },
+      {
+        columnName: 'serviceCenterFK',
+        type: 'codeSelect',
+        code: 'ctServiceCenter',
+      },
+      { columnName: 'costPrice', type: 'number', currency: true },
+      { columnName: 'unitPrice', type: 'number', currency: true },
       {
         columnName: 'isDefault',
         type: 'radio',
@@ -83,39 +94,43 @@ class Detail extends PureComponent {
           // console.log(this)
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
-            const items = _.cloneDeep(values.items)
-            items.forEach((pec) => {
+            const serviceSettingItem = _.cloneDeep(
+              values.ctServiceCenter_ServiceNavigation,
+            )
+            serviceSettingItem.forEach((pec) => {
               pec.isDefault = false
             })
-            const r = items.find((o) => o.id === row.id)
+            const r = serviceSettingItem.find((o) => o.id === row.id)
             if (r) {
               r.isDefault = true
             }
-            setFieldValue('items', items)
-            setFieldTouched('items', true)
+            setFieldValue(
+              'ctServiceCenter_ServiceNavigation',
+              serviceSettingItem,
+            )
+            setFieldTouched('ctServiceCenter_ServiceNavigation', true)
           }
         },
       },
     ],
   }
 
-  changeEditingRowIds = (editingRowIds) => {
-    this.setState({ editingRowIds })
-  }
-
-  changeRowChanges = (rowChanges) => {
-    this.setState({ rowChanges })
-  }
-
   commitChanges = ({ rows, added, changed, deleted }) => {
-    const { setFieldValue } = this.props
-    setFieldValue('items', rows)
+    //commitChanges = ({ rows }) => {
+
+    const { setFieldValue, values } = this.props
+    rows.forEach((val) => {
+      val.serviceFK = values.id
+    })
+
+    setFieldValue('ctServiceCenter_ServiceNavigation', rows)
   }
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values } = props
-    // console.log('detail', props)
+    const { classes, theme, footer, values, settingClinicService } = props
+    //console.log('detail', props)
+
     return (
       <React.Fragment>
         <SizeContainer size='sm'>
@@ -126,7 +141,13 @@ class Detail extends PureComponent {
               <GridItem md={6}>
                 <FastField
                   name='code'
-                  render={(args) => <TextField label='Code' {...args} />}
+                  render={(args) => (
+                    <TextField
+                      label='Code'
+                      {...args}
+                      disabled={settingClinicService.entity ? true : false}
+                    />
+                  )}
                 />
               </GridItem>
               <GridItem md={6}>
@@ -153,7 +174,7 @@ class Detail extends PureComponent {
               </GridItem>
               <GridItem md={2}>
                 <FastField
-                  name='autoOrder'
+                  name='isAutoOrder'
                   render={(args) => {
                     return <Switch label='Auto Order' {...args} />
                   }}
@@ -161,17 +182,29 @@ class Detail extends PureComponent {
               </GridItem>
               <GridItem md={6}>
                 <FastField
-                  name='serviceCategory'
+                  name='serviceCategoryFK'
                   render={(args) => {
-                    return <Select label='Service Category' {...args} />
+                    return (
+                      <CodeSelect
+                        label='Service Category'
+                        code='CTServiceCategory'
+                        {...args}
+                      />
+                    )
                   }}
                 />
               </GridItem>
               <GridItem md={6}>
                 <FastField
-                  name='revenueCategory'
+                  name='revenueCategoryFK'
                   render={(args) => {
-                    return <Select label='Revenue Category' {...args} />
+                    return (
+                      <CodeSelect
+                        label='Revenue Category'
+                        code='CTRevenueCategory'
+                        {...args}
+                      />
+                    )
                   }}
                 />
               </GridItem>
@@ -244,8 +277,7 @@ class Detail extends PureComponent {
             <Divider />
             <EditableTableGrid
               style={{ marginTop: theme.spacing(1) }}
-              rows={values.items}
-              onRowDoubleClick={this.onRowDoubleClick}
+              rows={values.ctServiceCenter_ServiceNavigation}
               FuncProps={{
                 pagerConfig: {
                   containerExtraComponent: this.PagerContent,
@@ -253,10 +285,6 @@ class Detail extends PureComponent {
               }}
               EditingProps={{
                 showAddCommand: true,
-                editingRowIds: this.state.editingRowIds,
-                rowChanges: this.state.rowChanges,
-                onEditingRowIdsChange: this.changeEditingRowIds,
-                onRowChangesChange: this.changeRowChanges,
                 onCommitChanges: this.commitChanges,
               }}
               schema={itemSchema}

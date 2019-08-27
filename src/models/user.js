@@ -1,4 +1,5 @@
 import { query as queryUsers, queryCurrent } from '@/services/user'
+import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 
 export default {
   namespace: 'user',
@@ -6,6 +7,7 @@ export default {
   state: {
     accessRights: [],
     data: {},
+    profileDetails: undefined,
   },
 
   effects: {
@@ -22,6 +24,15 @@ export default {
         type: 'saveCurrentUser',
         payload: response.data.userProfileDto,
       })
+    },
+    *fetchProfileDetails ({ id }, { call, put }) {
+      const result = yield call(fetchUserProfileByID, id)
+      const { status, data } = result
+      if (parseInt(status, 10) === 200)
+        yield put({
+          type: 'saveProfileDetails',
+          profileDetails: { ...data },
+        })
     },
   },
 
@@ -47,6 +58,9 @@ export default {
           unreadCount: action.payload.unreadCount,
         },
       }
+    },
+    saveProfileDetails (state, { profileDetails }) {
+      return { ...state, profileDetails }
     },
   },
 }

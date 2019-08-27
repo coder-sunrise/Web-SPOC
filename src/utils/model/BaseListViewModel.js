@@ -15,7 +15,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
     return {
       ...super.effects({ queryFnName: 'queryList' }),
 
-      *querySingle (
+      *queryOne (
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {

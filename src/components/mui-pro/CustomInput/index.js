@@ -108,6 +108,14 @@ class TextField extends React.PureComponent {
     }
   }
 
+  handleFocus = () => {
+    window.$_inputFocused = true
+  }
+
+  handleBlur = () => {
+    window.$_inputFocused = false
+  }
+
   render () {
     const { state, props } = this
     // console.log(props)
@@ -142,6 +150,8 @@ class TextField extends React.PureComponent {
       focus = false,
       shrink = false,
       onKeyUp,
+      onFocus,
+      onBlur,
       preventDefaultChangeEvent,
       value,
       uppercase,
@@ -189,6 +199,8 @@ class TextField extends React.PureComponent {
     if (!preventDefaultChangeEvent) {
       cfg.onChange = this.onChange
     }
+    // cfg.onFocus = extendFunc(onFocus, this.handleFocus)
+    // cfg.onBlur = extendFunc(onBlur, this.handleBlur)
     cfg.negative = state.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
     if (uppercase) {

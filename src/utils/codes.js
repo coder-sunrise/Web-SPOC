@@ -1,6 +1,7 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
 import request, { axiosRequest } from './request'
+import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
 
 const status = [
@@ -504,6 +505,89 @@ const orderTypes = [
   { name: 'Consumable', value: '4' },
   { name: 'Open Prescription', value: '5' },
 ]
+
+const currencyRounding = [
+  {
+    name: 'Up',
+    value: 'Up',
+  },
+  {
+    name: 'Down',
+    value: 'Down',
+  },
+]
+
+const currencyRoundingToTheClosest = [
+  {
+    name: '5 Cents',
+    value: '0.05',
+  },
+  {
+    name: '10 Cents',
+    value: '0.10',
+  },
+  {
+    name: '50 Cents',
+    value: '0.50',
+  },
+  {
+    name: '1 Dollars',
+    value: '1',
+  },
+]
+
+const currencies = [
+  {
+    value: 'SGD',
+    name: 'S$',
+  },
+  {
+    value: 'USD',
+    name: '$',
+  },
+  {
+    value: 'EUR',
+    name: '€',
+  },
+  {
+    value: 'BTC',
+    name: '฿',
+  },
+  {
+    value: 'JPY',
+    name: '¥',
+  },
+]
+
+const coPayerType = [
+  {
+    value: 'corporate',
+    name: 'Corporate',
+  },
+  {
+    value: 'government',
+    name: 'Government',
+  },
+]
+
+const country = [
+  {
+    value: 'singapore',
+    name: 'Singapore',
+  },
+  {
+    value: 'malaysia',
+    name: 'Malaysia',
+  },
+  {
+    value: 'china',
+    name: 'China',
+  },
+  {
+    value: 'india',
+    name: 'India',
+  },
+]
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -520,10 +604,17 @@ const orderTypes = [
 //   return localCodes[code]
 // }
 
-const _fetchAndSaveCodeTable = async (code) => {
-  const codetableUrl = `/api/CodeTable?ctnames=${code}`
-  const response = await request(codetableUrl, {
+const _fetchAndSaveCodeTable = async (code, params) => {
+  const useGeneral = params === undefined || Object.keys(params).length === 0
+  const baseURL = '/api/CodeTable'
+  const generalCodetableURL = `${baseURL}?ctnames=`
+  const searchURL = `${baseURL}/search?ctname=`
+
+  const url = useGeneral ? generalCodetableURL : searchURL
+
+  const response = await request(`${url}${code}`, {
     method: 'GET',
+    body: convertToQuery(params),
   })
 
   const { status: statusCode, data } = response
@@ -531,7 +622,7 @@ const _fetchAndSaveCodeTable = async (code) => {
   if (parseInt(statusCode, 10) === 200) {
     await db.codetable.put({
       code,
-      data: response.data[code],
+      data: useGeneral ? data[code] : data.data,
       createDate: new Date(),
       updateDate: new Date(),
     })
@@ -541,13 +632,19 @@ const _fetchAndSaveCodeTable = async (code) => {
   return []
 }
 
-export const getCodes = async (_code) => {
-  const code = _code.toLowerCase()
+export const getCodes = async (payload) => {
+  let ctcode
+  let params
+  if (typeof payload === 'string') ctcode = payload.toLowerCase()
+  if (typeof payload === 'object') {
+    ctcode = payload.code
+    params = payload.filter
+  }
 
   let result = []
   try {
     await db.open()
-    const ct = await db.codetable.get(code)
+    const ct = await db.codetable.get(ctcode)
 
     const cookies = new Cookies()
     const lastLoginDate = cookies.get('_lastLogin')
@@ -555,7 +652,7 @@ export const getCodes = async (_code) => {
 
     // not exist in current table, make network call to retrieve data
     if (ct === undefined) {
-      result = _fetchAndSaveCodeTable(code)
+      result = _fetchAndSaveCodeTable(ctcode, params)
     } else {
       // compare updateDate with lastLoginDate
       // if updateDate > lastLoginDate, do nothing
@@ -564,7 +661,7 @@ export const getCodes = async (_code) => {
       const parsedUpdateDate = moment(updateDate)
 
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(code)
+        ? _fetchAndSaveCodeTable(ctcode, params)
         : existedData
     }
   } catch (error) {
@@ -613,5 +710,10 @@ module.exports = {
   schemes,
   addressTypes,
   orderTypes,
+  currencies,
+  currencyRounding,
+  currencyRoundingToTheClosest,
+  coPayerType,
+  country,
   ...module.exports,
 }

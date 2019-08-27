@@ -1,5 +1,4 @@
 import { Switch } from 'antd'
-import ErrorOutline from '@material-ui/icons/ErrorOutline'
 
 import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
@@ -30,11 +29,15 @@ class AntdSwitch extends React.PureComponent {
     label: PropTypes.string,
     onChange: PropTypes.func,
     disabled: PropTypes.bool,
+    checkedValue: PropTypes.any,
+    unCheckedValue: PropTypes.any,
   }
 
   static defaultProps = {
     label: undefined,
     disabled: false,
+    checkedValue: true,
+    unCheckedValue: false,
   }
 
   constructor (props) {
@@ -46,26 +49,26 @@ class AntdSwitch extends React.PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
+    const { field, value, checkedValue, unCheckedValue } = nextProps
     if (field) {
       this.setState({
-        value: field.value,
+        value: field.value === checkedValue,
       })
     } else if (value) {
       this.setState({
-        value,
+        value: value === checkedValue,
       })
     }
   }
 
   handleValueChange = (checked) => {
-    const { form, field, onChange } = this.props
+    const { form, field, onChange, checkedValue, unCheckedValue } = this.props
     if (form && field) {
-      form.setFieldValue(field.name, checked)
+      form.setFieldValue(field.name, checked ? checkedValue : unCheckedValue)
       form.setFieldTouched(field.name, true)
     }
     if (onChange) {
-      onChange(checked)
+      onChange(checked ? checkedValue : unCheckedValue)
     }
     this.setState({
       value: checked,
@@ -106,7 +109,7 @@ class AntdSwitch extends React.PureComponent {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const labelProps = {
-      shrink: true,
+      shrink: restProps.label && restProps.label.length > 0,
     }
 
     return (

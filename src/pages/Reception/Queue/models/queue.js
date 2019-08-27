@@ -84,7 +84,7 @@ export default createListViewModel({
       },
       *getSessionInfo (_, { call, put }) {
         const payload = {
-          eql_IsClinicSessionClosed: false,
+          IsClinicSessionClosed: false,
         }
         const response = yield call(service.getActiveSession, payload)
 
@@ -96,7 +96,7 @@ export default createListViewModel({
             type: 'query',
             payload: {
               pagesize: 999999,
-              'eql_VisitFKNavigation.BizSessionFK': sessionData[0].id,
+              'VisitFKNavigation.BizSessionFK': sessionData[0].id,
             },
           })
 

@@ -60,7 +60,7 @@ export default {
   'inventory.master.pricing.profitMarginPercentage': 'Markup Margin (%)',
   'inventory.master.pricing.suggestedSellingPrice': 'Suggested Selling Price',
   'inventory.master.pricing.sellingPrice': 'Selling Price',
-  'inventory.master.pricing.maxDiscount': 'Max Discount (%)',
+  'inventory.master.pricing.maxDiscount': 'Maximum Cap (All)',
 
   'inventory.master.setting.dosage': 'Dosage',
   'inventory.master.setting.frequency': 'Frequency',

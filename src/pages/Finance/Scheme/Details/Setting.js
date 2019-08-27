@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { formatMessage } from 'umi/locale'
-import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
-import { FastField } from 'formik'
-import { compose } from 'redux'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
+import ItemList from './ItemList'
 
 import {
+  Field,
+  FastField,
   GridContainer,
   GridItem,
   ButtonGroup,
@@ -19,69 +19,80 @@ import {
   SizeContainer,
   CardContainer,
   FieldSet,
+  Switch,
 } from '@/components'
 
-const Setting = ({ schemeDetail, dispatch, height, classes }) => {
-  const options = [
-    {
-      label: '$',
-      value: '$',
-    },
-    {
-      label: '%',
-      value: '%',
-    },
-  ]
+const CPSwitch = (args) => {
+  return (
+    <Switch
+      checkedChildren='$'
+      checkedValue='ExactAmount'
+      unCheckedChildren='%'
+      unCheckedValue='Percentage'
+      label=' '
+      {...args}
+    />
+  )
+}
+const CPNumber = (label, type) => (args) => {
+  return (
+    <NumberInput
+      label={label}
+      currency={type === 'ExactAmount'}
+      percentage={type === 'Percentage'}
+      {...args}
+    />
+  )
+}
+const Setting = (props) => {
+  const { schemeDetail, dispatch, height, classes, values } = props
+  // const options = [
+  //   {
+  //     label: '$',
+  //     value: 'ExactAmount',
+  //   },
+  //   {
+  //     label: '%',
+  //     value: 'Percentage',
+  //   },
+  // ]
   return (
     <CardContainer
       hideHeader
       style={{
         height,
+
         overflow: 'auto',
       }}
     >
       <SizeContainer size='sm'>
         <GridContainer>
-          <GridItem xs={12} md={6}>
+          <GridItem xs={8} md={5}>
             <FastField
-              name='minimumPatientPayableAmount'
-              render={(args) => (
-                <NumberInput
-                  label={formatMessage({
-                    id: 'inventory.master.pricing.maxDiscount',
-                  })}
-                  suffix={
-                    <ButtonGroup
-                      options={[
-                        {
-                          label: '$',
-                          value: '$',
-                        },
-                        {
-                          label: '%',
-                          value: '%',
-                        },
-                      ]}
-                    />
-                  }
-                  {...args}
-                />
+              name='patientMinCoPaymentAmount'
+              render={CPNumber(
+                'Minimum Patient Payable Amount',
+                values.patientMinCoPaymentAmountType,
               )}
             />
+          </GridItem>
+          <GridItem xs={4} md={1}>
+            <FastField name='patientMinCoPaymentAmountType' render={CPSwitch} />
           </GridItem>
         </GridContainer>
         <GridContainer>
           <GridItem xs={12} md={6}>
             <FieldSet size='sm' title='Coverage Cap'>
-              <CoverageCap />
+              <CoverageCap {...props} />
             </FieldSet>
           </GridItem>
           <GridItem xs={12} md={6}>
             <FieldSet size='sm' title='Co-Payment'>
-              <CoPayment />
+              <CoPayment {...props} CPSwitch={CPSwitch} CPNumber={CPNumber} />
             </FieldSet>
           </GridItem>
         </GridContainer>
+        <ItemList {...props} CPSwitch={CPSwitch} CPNumber={CPNumber} />
       </SizeContainer>
     </CardContainer>
   )

@@ -98,6 +98,7 @@ const TextFormatter = (columnExtensions) =>
             currentColumnName === columnName,
         ) || {}
       const { type, render, ...restProps } = cfg
+      // console.log(props)
       if (render) {
         return render(row)
       }
@@ -114,7 +115,16 @@ const TextFormatter = (columnExtensions) =>
       )
     },
     (prevProps, nextProps) => {
-      return prevProps === nextProps || prevProps.value === nextProps.value
+      const { column: { name: columnName }, value, row } = nextProps
+      const cfg =
+        columnExtensions.find(
+          ({ columnName: currentColumnName }) =>
+            currentColumnName === columnName,
+        ) || {}
+      return (
+        (prevProps === nextProps || prevProps.value === nextProps.value) &&
+        typeof cfg.render !== 'function'
+      )
     },
   )
 

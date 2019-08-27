@@ -173,19 +173,19 @@ const widgets = [
       style: {},
     },
   },
-  {
-    id: '1002',
-    name: 'Dental Chart',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/DentalChartDemo'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {
-        height: 'calc(100% - 36px)',
-      },
-    },
-  },
+  // {
+  //   id: '1002',
+  //   name: 'Dental Chart',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/DentalChartDemo'),
+  //     loading: Loading,
+  //   }),
+  //   layoutConfig: {
+  //     style: {
+  //       height: 'calc(100% - 36px)',
+  //     },
+  //   },
+  // },
 ]
 
 module.exports = {

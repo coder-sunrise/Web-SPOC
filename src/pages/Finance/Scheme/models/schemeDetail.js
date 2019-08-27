@@ -12,14 +12,49 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      currentId: '',
-      entity: [],
       default: {
         schemeType: 'Corporate',
         schemeCategory: 'Corporate',
         effectiveDates: [
           moment(),
           moment('2099-12-31'),
+        ],
+        itemGroupMaxCapacityDtoRdoValue: 'all',
+        itemGroupValueDtoRdoValue: 'all',
+        patientMinCoPaymentAmountType: 'ExactAmount',
+        overalCoPaymentValueType: 'ExactAmount',
+        itemGroupMaxCapacityDto: {
+          medicationMaxCapacity: {},
+          vaccinationMaxCapacity: {},
+          consumableMaxCapacity: {},
+          serviceMaxCapacity: {},
+          packageMaxCapacity: {},
+        },
+        itemGroupValueDto: {
+          medicationGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          vaccinationGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          consumableGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          serviceGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+          packageGroupValue: {
+            groupValueType: 'ExactAmount',
+          },
+        },
+
+        packageValueDto: [
+          {
+            id: 1,
+            itemValueType: 'ExactAmount',
+            unitPrice: 5,
+            inventoryPackageFK: 1,
+          },
         ],
       },
     },
@@ -32,22 +67,7 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               currentTab: Number(query.t) || 0,
-            },
-          })
-        }
-        if (query.uid) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: query.uid,
-            },
-          })
-        } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: '',
-              entity: '',
+              currentId: query.id,
             },
           })
         }

@@ -132,6 +132,46 @@ const menuData = [
     url: '/setting/roomblock',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Drug UOM',
+    url: '/setting/medicationuom',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Consumable UOM',
+    url: '/setting/consumableuom',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Category',
+    url: '/setting/medicationgroup',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Consumable Category',
+    url: '/setting/consumablegroup',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Dosage',
+    url: '/setting/medicationdosage',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Precautions',
+    url: '/setting/medicationprecautions',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Frequency',
+    url: '/setting/medicalfrequency',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Drug Consumption Method',
+    url: '/setting/medicationconsumptionmethod',
+  },
+  {
     title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',
@@ -151,11 +191,23 @@ const menuData = [
   },
   {
     title: 'Templates',
-    text: 'TBD',
+    text: 'SMS Template',
+    url: '/setting/smstemplate',
+  },
+  {
+    title: 'Templates',
+    text: 'Referral Letter Template',
+    url: '/setting/referrallettertemplate',
   },
   {
     title: 'Contact',
-    text: 'TBD',
+    text: 'Co-Payer',
+    url: '/setting/company/1',
+  },
+  {
+    title: 'Contact',
+    text: 'Supplier',
+    url: '/setting/company/2',
   },
 ]
 const styles = (theme) => ({

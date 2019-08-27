@@ -20,16 +20,16 @@ import {
 const styles = () => ({})
 
 const Detail = ({ schemeDetail, dispatch, height }) => {
-  useEffect(() => {
-    if (schemeDetail.currentId) {
-      dispatch({
-        type: 'schemeDetail/query',
-        payload: {
-          id: schemeDetail.currentId,
-        },
-      })
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (schemeDetail.currentId) {
+  //     dispatch({
+  //       type: 'schemeDetail/query',
+  //       payload: {
+  //         id: schemeDetail.currentId,
+  //       },
+  //     })
+  //   }
+  // }, [])
 
   return (
     <CardContainer
@@ -134,7 +134,7 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
                       label={formatMessage({
                         id: 'finance.scheme.detail.category',
                       })}
-                      code='ctCopayerType'
+                      code='ctSchemeCategory'
                       {...args}
                     />
                   )
@@ -143,7 +143,7 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='coPayer'
+                name='companyCoPaymentSchemeDto[0].companyFk'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({

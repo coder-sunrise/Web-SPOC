@@ -51,11 +51,17 @@ class Grid extends PureComponent {
         {
           columnName: 'action',
           align: 'center',
+          sortingEnabled: false,
           render: (row) => {
             const { renderActionFn = (f) => f } = props
             return renderActionFn(row)
           },
         },
+        { columnName: 'status', sortBy: 'isActive' },
+        { columnName: 'nationality', sortBy: 'nationalityFK' },  
+        { columnName: 'mobileNo', sortingEnabled: false },       
+        { columnName: 'homeNo', sortingEnabled: false },
+        { columnName: 'officeNo', sortingEnabled: false },      
       ],
       FuncProps: {
         pager: true,

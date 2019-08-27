@@ -4,6 +4,8 @@ import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
+import ErrorBoundary from '@/layouts/ErrorBoundary'
+
 import {
   Button,
   DatePicker,

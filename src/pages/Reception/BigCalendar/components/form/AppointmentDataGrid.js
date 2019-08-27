@@ -143,7 +143,7 @@ class AppointmentDataGrid extends React.PureComponent {
 
   render () {
     const { data, handleCommitChanges } = this.props
-    console.log({ state: this.state })
+
     return (
       <div>
         <EditableTableGrid

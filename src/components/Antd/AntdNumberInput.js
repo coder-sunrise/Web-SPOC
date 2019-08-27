@@ -140,6 +140,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleFocus = () => {
+    window.$_inputFocused = true
     this.setState({
       shrink: true,
       focused: true,
@@ -153,6 +154,8 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleBlur = () => {
+    window.$_inputFocused = false
+
     if (
       this.state.value === undefined ||
       this.state.value === null ||
@@ -212,7 +215,6 @@ class AntdNumberInput extends React.PureComponent {
     })
 
     this.debouncedOnChange(newV)
-    return false
   }
 
   // debouncedParser = (value) => {
@@ -353,6 +355,8 @@ class AntdNumberInput extends React.PureComponent {
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
+        preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
         {...restProps}
       />
     )

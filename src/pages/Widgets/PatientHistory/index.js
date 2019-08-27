@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
+import moment from 'moment'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
@@ -27,6 +27,7 @@ import {
   CardContainer,
   confirm,
   Accordion,
+  withFormikExtend,
 } from '@/components'
 import {
   withStyles,
@@ -136,7 +137,7 @@ const data = [
     date: '08 Dec 2018',
   },
 ]
-@withFormik({
+@withFormikExtend({
   // mapPropsToValues: ({ patientHistory }) => {
   //   console.log(patientHistory)
   //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
@@ -261,6 +262,26 @@ class PatientHistory extends Component {
     ]
   }
 
+  componentDidMount () {
+    // if (this.props.patientHistory.patientId) {
+    //   console.log(1)
+    //   this.props
+    //     .dispatch({
+    //       type: 'patientHistory/query',
+    //       payload: {
+    //         patientProfileFK: this.props.patientHistory.patientId,
+    //         sorting: {
+    //           columnName: 'VisitDate',
+    //           direction: 'asc',
+    //         },
+    //       },
+    //     })
+    //     .then((o) => {
+    //       this.props.resetForm(o)
+    //     })
+    // }
+  }
+
   getTitle = () => (
     <div className={this.props.classes.title}>
       <GridContainer>
@@ -337,7 +358,7 @@ class PatientHistory extends Component {
   }
 
   render () {
-    const { theme, style, classes, override = {} } = this.props
+    const { theme, style, classes, override = {}, patientHistory } = this.props
     return (
       <div style={style}>
         <CardContainer

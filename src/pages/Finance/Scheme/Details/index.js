@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import {
   NavPills,
   ProgressButton,
@@ -24,21 +24,40 @@ const styles = (theme) => ({
     // marginTop: '22px',
     // marginRight: '10px',
   },
+  rdoInput: {
+    marginBottom: 30,
+  },
 })
 
-const Detail = ({
-  classes,
-  dispatch,
-  schemeDetail,
-  history,
-  height,
-  handleSubmit,
-  ...restProps
-}) => {
-  const detailProps = {
-    schemeDetail,
+const Detail = (props) => {
+  useEffect(() => {
+    if (props.schemeDetail.currentId) {
+      props
+        .dispatch({
+          type: 'schemeDetail/query',
+          payload: {
+            id: props.schemeDetail.currentId,
+          },
+        })
+        .then((o) => {
+          console.log(o)
+          props.resetForm(o)
+        })
+    }
+  }, [])
+
+  const {
+    classes,
     dispatch,
+    schemeDetail,
+    history,
+    height,
+    handleSubmit,
+    ...restProps
+  } = props
+  const detailProps = {
     height: 'calc(100vh - 183px)',
+    ...props,
   }
   const { currentTab } = schemeDetail
   console.log(restProps)
@@ -91,6 +110,7 @@ export default compose(
   })),
   withFormikExtend({
     mapPropsToValues: ({ schemeDetail }) => {
+      // console.log(1, 2, schemeDetail)
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
@@ -99,26 +119,50 @@ export default compose(
       // effectiveStartDate: Yup.string().required(),
       // effectiveEndDate: Yup.string().required(),
     }),
-    handleSubmit: (values, { props }) => {
+    handleSubmit: (values, { props, resetForm }) => {
       const { effectiveDates, ...restValues } = values
-      const { dispatch, onConfirm } = props
+
+      const { dispatch, history, onConfirm } = props
       dispatch({
         type: 'schemeDetail/upsert',
         payload: {
           ...restValues,
           effectiveStartDate: effectiveDates[0],
           effectiveEndDate: effectiveDates[1],
-          roomStatusFK: 1,
         },
       }).then((r) => {
+        // if (r) {
+        //   if (onConfirm) onConfirm()
+        //   dispatch({
+        //     type: 'schemeDetail/query',
+        //     payload: {
+        //       id: r.id,
+        //     },
+        //   })
+        // }
+
         if (r) {
-          if (onConfirm) onConfirm()
+          if (r.id) {
+            history.push(
+              getRemovedUrl(
+                [
+                  'new',
+                ],
+                getAppendUrl({
+                  id: r.id,
+                }),
+              ),
+            )
+          }
           dispatch({
-            type: 'schemeDetail/query',
+            type: 'patient/query',
             payload: {
-              id: r.id,
+              id: r.id || restValues.id,
             },
+          }).then((value) => {
+            resetForm(value)
           })
+          if (onConfirm) onConfirm()
         }
       })
     },
