@@ -262,25 +262,34 @@ class PatientHistory extends Component {
     ]
   }
 
-  componentDidMount () {
-    // if (this.props.patientHistory.patientId) {
-    //   console.log(1)
-    //   this.props
-    //     .dispatch({
-    //       type: 'patientHistory/query',
-    //       payload: {
-    //         patientProfileFK: this.props.patientHistory.patientId,
-    //         sorting: {
-    //           columnName: 'VisitDate',
-    //           direction: 'asc',
-    //         },
-    //       },
-    //     })
-    //     .then((o) => {
-    //       this.props.resetForm(o)
-    //     })
-    // }
+  componentWillReceiveProps (nextProps) {
+    // console.log(this.props, nextProps)
+    if (
+      nextProps.patientHistory.patientID &&
+      this.props.patientHistory.patientID !== nextProps.patientHistory.patientID
+    ) {
+      nextProps
+        .dispatch({
+          type: 'patientHistory/query',
+          payload: {
+            patientProfileFK: nextProps.patientHistory.patientID,
+            sorting: [
+              {
+                columnName: 'VisitDate',
+                direction: 'asc',
+              },
+            ],
+          },
+        })
+        .then((o) => {
+          this.props.resetForm(o)
+        })
+    }
   }
+
+  // componentDidMount () {
+
+  // }
 
   getTitle = (row) => (
     <div className={this.props.classes.title}>
@@ -291,7 +300,7 @@ class PatientHistory extends Component {
               console.log(row)
               this.props.dispatch({
                 type: 'patientHistory/queryOne',
-                payload: row.id,
+                payload: row.coHistory[0].id,
               })
             }}
           >
@@ -311,56 +320,46 @@ class PatientHistory extends Component {
     </div>
   )
 
-  getContent = () => (
-    <List
-      component='nav'
-      classes={{
-        root: this.props.classes.listRoot,
-      }}
-      disablePadding
-    >
-      <ListItem
-        alignItems='flex-start'
+  getContent = (row) => {
+    return (
+      <List
+        component='nav'
         classes={{
-          root: this.props.classes.listItemRoot,
+          root: this.props.classes.listRoot,
         }}
-        divider
-        disableGutters
-        button
+        disablePadding
       >
-        <ListItemText
-          primary={
-            <div style={{ width: '100%', paddingRight: 20 }}>
-              <GridContainer>
-                <GridItem sm={7}>V3, Dr Levine</GridItem>
-                <GridItem sm={5}>12 Apr 2019</GridItem>
-              </GridContainer>
-            </div>
-          }
-        />
-      </ListItem>
-      <ListItem
-        alignItems='flex-start'
-        classes={{
-          root: this.props.classes.listItemRoot,
-        }}
-        divider
-        disableGutters
-        button
-      >
-        <ListItemText
-          primary={
-            <div style={{ width: '100%', paddingRight: 20 }}>
-              <GridContainer>
-                <GridItem sm={7}>V2, Dr Levine</GridItem>
-                <GridItem sm={5}>11 Apr 2019</GridItem>
-              </GridContainer>
-            </div>
-          }
-        />
-      </ListItem>
-    </List>
-  )
+        {row.coHistory.map((o) => {
+          return (
+            <ListItem
+              alignItems='flex-start'
+              classes={{
+                root: this.props.classes.listItemRoot,
+              }}
+              divider
+              disableGutters
+              button
+            >
+              <ListItemText
+                primary={
+                  <div style={{ width: '100%', paddingRight: 20 }}>
+                    <GridContainer>
+                      <GridItem sm={7}>
+                        V{o.versionNumber}, {row.doctorTitle} {row.doctorName}
+                      </GridItem>
+                      <GridItem sm={5}>
+                        <DatePicker text defaultValue={moment(row.visitDate)} />
+                      </GridItem>
+                    </GridContainer>
+                  </div>
+                }
+              />
+            </ListItem>
+          )
+        })}
+      </List>
+    )
+  }
 
   onSelectChange = (val) => {
     this.setState({

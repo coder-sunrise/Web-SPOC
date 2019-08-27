@@ -95,7 +95,7 @@ export default createListViewModel({
           yield put({
             type: 'query',
             payload: {
-              pagesize: 999999,
+              pagesize: 0,
               'VisitFKNavigation.BizSessionFK': sessionData[0].id,
             },
           })
@@ -140,8 +140,8 @@ export default createListViewModel({
         yield put({
           type: 'query',
           payload: {
-            pagesize: 999999,
-            'eql_VisitFKNavigation.BizSessionFK': sessionInfo.id,
+            pagesize: 0,
+            'VisitFKNavigation.BizSessionFK': sessionInfo.id,
             ...filter,
           },
         })

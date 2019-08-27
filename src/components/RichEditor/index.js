@@ -212,14 +212,16 @@ class RichEditor extends React.PureComponent {
       onFocus,
       onBlur,
       tagList,
+      disabled,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-    //console.log(this.state.value)
+    // console.log('getComponent', restProps)
 
     return (
       <div style={{ width: '100%', height: 'auto' }} {...props}>
         <Editor
+          readOnly={disabled}
           editorState={this.state.value}
           wrapperClassName={classnames({
             [classes.wrapper]: true,

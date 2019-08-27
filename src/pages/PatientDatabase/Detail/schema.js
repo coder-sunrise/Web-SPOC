@@ -123,10 +123,10 @@ const schemaDemographic = {
   genderFK: Yup.number().required(),
 
   referredBy: Yup.string(),
-  referralRemarks: Yup.string().when('referredBy', {
-    is: 'Company',
-    then: Yup.string().required(),
-  }),
+  // referralRemarks: Yup.string().when('referredBy', {
+  //   is: 'Company',
+  //   then: Yup.string().required(),
+  // }),
   referralCompanyReferenceNo: Yup.string().when('referredBy', {
     is: 'Company',
     then: Yup.string().required(),

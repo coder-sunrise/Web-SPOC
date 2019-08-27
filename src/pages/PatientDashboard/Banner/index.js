@@ -73,18 +73,22 @@ class Banner extends PureComponent {
   render () {
     // console.log(this.props)
     const { props, state } = this
-    const { theme, classes, setValues, extraCmt } = props
+    const {
+      theme,
+      classes,
+      setValues,
+      extraCmt,
+      style = {
+        position: 'sticky',
+        top: headerHeight,
+        zIndex: 1000,
+        paddingLeft: 16,
+        paddingRight: 16,
+      },
+    } = props
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
-      <Paper
-        style={{
-          position: 'sticky',
-          top: headerHeight,
-          zIndex: 1000,
-          paddingLeft: 16,
-          paddingRight: 16,
-        }}
-      >
+      <Paper style={style}>
         <GridContainer>
           {/* <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
