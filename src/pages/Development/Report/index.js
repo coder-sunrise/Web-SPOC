@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 // custom type
 import TimeSchemaType from './YupTime'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField, Field, withFormik } from 'formik'
 // common component
 import {
   Button,
@@ -14,9 +14,13 @@ import {
   GridItem,
   TimePicker,
   CommonModal,
+  CodeSelect,
+  Select,
 } from '@/components'
 // component
 import ReportViewer from './ReportViewer'
+// common
+import { queryList } from '@/services/common'
 
 @connect(({ codetable }) => ({ codetable }))
 @withFormik({
@@ -98,7 +102,7 @@ class Report extends React.Component {
     //     </CommonModal>
     //   </CardContainer>
     // )
-    console.log({ props: this.props })
+    console.log({ values: this.props.values })
     return (
       <CardContainer hideHeader size='sm'>
         {/* <Button color='primary&#39;' onClick={this.viewReport}>
@@ -135,6 +139,58 @@ class Report extends React.Component {
               name='end'
               render={(args) => (
                 <TimePicker {...args} label='End' format='hh:mm A' />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <Field
+              name='doctorProfileFK'
+              render={(args) => (
+                <Select
+                  label='Doctor Profile'
+                  // code='doctorprofile'
+                  // useCustomUrl
+                  query={(value) => {
+                    return queryList('/api/doctorprofile', {
+                      doctorMCRNo: value,
+                      // 'clinicianInfomation.name': value,
+                    })
+                  }}
+                  renderDropdown={(option) => {
+                    return (
+                      <div>
+                        <p>MCR No.: {option.doctorMCRNo}</p>
+                        <p>
+                          {`${option.clinicianInfomation.title} ${option
+                            .clinicianInfomation.name}`}
+                        </p>
+                      </div>
+                    )
+                  }}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <Field
+              name='doctorProfile'
+              render={(args) => (
+                <CodeSelect
+                  label='Doctor Profile Codetable'
+                  code='doctorprofile'
+                  labelField='clinicianInfomation.name'
+                  renderDropdown={(option) => (
+                    <div>
+                      <p>MCR No.: {option.doctorMCRNo}</p>
+                      <p>
+                        {`${option.clinicianInfomation.title} ${option
+                          .clinicianInfomation.name}`}
+                      </p>
+                    </div>
+                  )}
+                  {...args}
+                />
               )}
             />
           </GridItem>

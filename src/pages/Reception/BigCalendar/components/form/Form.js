@@ -64,7 +64,7 @@ class Form extends React.PureComponent {
   componentWillMount () {
     this.props.dispatch({
       type: 'codetable/fetchCodes',
-      code: 'ltappointmentstatus',
+      payload: { code: 'ltappointmentstatus' },
     })
   }
 

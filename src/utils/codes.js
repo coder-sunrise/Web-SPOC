@@ -604,13 +604,23 @@ const country = [
 //   return localCodes[code]
 // }
 
-const _fetchAndSaveCodeTable = async (code, params) => {
-  const useGeneral = params === undefined || Object.keys(params).length === 0
+const tenantCode = [
+  'doctorprofile',
+  'clinicianprofile',
+  'ctappointmenttype',
+]
+
+const _fetchAndSaveCodeTable = async (code, params = {}) => {
+  let useGeneral = Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?ctnames=`
   const searchURL = `${baseURL}/search?ctname=`
 
-  const url = useGeneral ? generalCodetableURL : searchURL
+  let url = useGeneral ? generalCodetableURL : searchURL
+  if (tenantCode.includes(code.toLowerCase())) {
+    url = '/api/'
+    useGeneral = false
+  }
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -618,15 +628,15 @@ const _fetchAndSaveCodeTable = async (code, params) => {
   })
 
   const { status: statusCode, data } = response
-
   if (parseInt(statusCode, 10) === 200) {
+    const result = useGeneral ? data[code] : data.data
     await db.codetable.put({
       code,
-      data: useGeneral ? data[code] : data.data,
+      data: result,
       createDate: new Date(),
       updateDate: new Date(),
     })
-    return data[code]
+    return result
   }
 
   return []
@@ -650,13 +660,14 @@ export const getCodes = async (payload) => {
     const lastLoginDate = cookies.get('_lastLogin')
     const parsedLastLoginDate = moment(lastLoginDate)
 
-    // not exist in current table, make network call to retrieve data
+    /* not exist in current table, make network call to retrieve data */
     if (ct === undefined) {
       result = _fetchAndSaveCodeTable(ctcode, params)
     } else {
-      // compare updateDate with lastLoginDate
-      // if updateDate > lastLoginDate, do nothing
-      // else perform network call and update indexedDB
+      /*  compare updateDate with lastLoginDate
+          if updateDate > lastLoginDate, do nothing
+          else perform network call and update indexedDB 
+      */
       const { updateDate, data: existedData } = ct
       const parsedUpdateDate = moment(updateDate)
 

@@ -1,5 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
@@ -126,6 +127,7 @@ class SelectEditor extends PureComponent {
 const SelectDisplay = (columnExtensions, state) => ({
   value,
   column: { name: columnName },
+  row,
   ...restProps
 }) => {
   const cfg =
@@ -138,47 +140,23 @@ const SelectDisplay = (columnExtensions, state) => ({
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
 
-  const { labelField = 'name' } = cfg
+  const { labelField = 'name', render } = cfg
+  const label = Object.byString(v, labelField)
 
   const vEl = v ? (
-    <Tooltip title={v[labelField]} enterDelay={1500}>
-      <span>{v[labelField]}</span>
+    <Tooltip title={label} enterDelay={1500}>
+      <span>{label}</span>
     </Tooltip>
   ) : (
     ''
   )
 
-  if (v.colorValue) {
-    return (
-      <div>
-        <span
-          style={{
-            height: '0.8rem',
-            width: '1.5rem',
-            borderRadius: '20%',
-            display: 'inline-block',
-            marginRight: 10,
-            backgroundColor: v.colorValue,
-          }}
-        />
-        {vEl}
-      </div>
-    )
-  }
-  if (v.color) {
-    return (
-      <div
-        style={{
-          color: v.color,
-        }}
-      >
-        {vEl}
-      </div>
-    )
-  }
+  if (render) return render(row)
+
   return vEl
 }
 
+@connect(() => ({}))
 class SelectTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
@@ -201,15 +179,30 @@ class SelectTypeProvider extends React.Component {
       codeLoaded: 0,
     }
     // console.log(props)
+
     colFor.forEach((f) => {
       if (f.code) {
-        getCodes(f.code).then((o) => {
-          // console.log(o)
-          this.setState((prevState) => ({
-            [`${f.columnName}Option`]: o,
-            codeLoaded: ++prevState.codeLoaded,
-          }))
-        })
+        this.props
+          .dispatch({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: f.code,
+            },
+          })
+          .then((response) => {
+            if (response) {
+              this.setState((prevState) => ({
+                [`${f.columnName}Option`]: response,
+                codeLoaded: ++prevState.codeLoaded,
+              }))
+            }
+          })
+        // getCodes(f.code).then((o) => {
+        //   this.setState((prevState) => ({
+        //     [`${f.columnName}Option`]: o,
+        //     codeLoaded: ++prevState.codeLoaded,
+        //   }))
+        // })
       }
     })
 
@@ -256,6 +249,7 @@ class SelectTypeProvider extends React.Component {
       optionsUpdate ||
       this.props.editingRowIds !== nextProps.editingRowIds ||
       Object.keys(this.state).length !== Object.keys(nextState).length ||
+      // this.state.codeLoaded !== nextState.codeLoaded ||
       this.props.commitCount !== nextProps.commitCount
     )
   }

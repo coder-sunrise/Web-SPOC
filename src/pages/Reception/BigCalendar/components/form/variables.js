@@ -110,15 +110,26 @@ export const AppointmentDataColExtensions = [
   },
   {
     columnName: 'clinicianFK',
-    type: 'select',
-    labelField: 'name',
-    valueField: 'id',
     width: 200,
+    type: 'codeSelect',
+    code: 'clinicianprofile',
+    labelField: 'name',
+    // valueField: 'id',
+    renderDropdown: (option) => {
+      return (
+        <div>
+          <p>MCR No.: {option.doctorMCRNo}</p>
+          <p>{`${option.title} ${option.name}`}</p>
+        </div>
+      )
+    },
   },
   {
     columnName: 'appointmentTypeFK',
     type: 'codeSelect',
     code: 'ctappointmenttype',
+    labelField: 'displayValue',
+    valueField: 'id',
   },
   {
     columnName: 'startTime',

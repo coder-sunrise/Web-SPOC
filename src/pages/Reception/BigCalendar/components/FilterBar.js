@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import debounce from 'lodash/debounce'
+// formik
+import { withFormik, FastField } from 'formik'
 // umi/locale
 import { formatMessage } from 'umi/locale'
 // material ui
@@ -13,10 +15,11 @@ import {
   GridItem,
   TextField,
   Select,
+  CodeSelect,
   SizeContainer,
 } from '@/components'
 // sub components
-import { AppointmentTypeSelect } from 'medisys-components'
+import { AppointmentTypeLabel } from 'medisys-components'
 
 const styles = () => ({
   selectorContainer: {
@@ -37,6 +40,13 @@ const doctors = [
   { value: 'liu', name: 'Dr Liu' },
 ]
 
+@withFormik({
+  enableReinitialize: true,
+  mapPropsToValues: () => ({
+    appointmentType: [],
+    doctorProfile: [],
+  }),
+})
 class FilterBar extends PureComponent {
   state = {
     searchQuery: '',
@@ -59,12 +69,13 @@ class FilterBar extends PureComponent {
   }, 500)
 
   onFilterAppointmentTypeChange = (values) => {
-    const { handleUpdateFilter, filter } = this.props
+    console.log({ values })
+    // const { handleUpdateFilter, filter } = this.props
 
-    handleUpdateFilter({
-      ...filter,
-      appointmentType: this.processValues(values),
-    })
+    // handleUpdateFilter({
+    //   ...filter,
+    //   appointmentType: this.processValues(values),
+    // })
   }
 
   processValues = (values) => {
@@ -100,14 +111,14 @@ class FilterBar extends PureComponent {
 
   render () {
     const { searchQuery, isTyping } = this.state
-    const { classes, filter, onDoctorEventClick } = this.props
+    const { classes, filter, onDoctorEventClick, values } = this.props
 
-    const maxDoctorTagCount = filter.doctors.length === 1 ? 1 : 0
-    const maxDoctorTagPlaceholder = `${filter.doctors
+    const maxDoctorTagCount = values.doctorProfile.length === 1 ? 1 : 0
+    const maxDoctorTagPlaceholder = `${values.doctorProfile
       .length} doctors selected...`
 
-    const maxAppointmentTagCount = filter.appointmentType.length === 1 ? 1 : 0
-    const maxAppointmentTagPlaceholder = `${filter.appointmentType
+    const maxAppointmentTagCount = values.appointmentType.length === 1 ? 1 : 0
+    const maxAppointmentTagPlaceholder = `${values.appointmentType
       .length} appointment types selected...`
 
     return (
@@ -125,14 +136,30 @@ class FilterBar extends PureComponent {
               />
             </GridItem>
             <GridItem xs md={3}>
-              <Select
-                label='Filter by Doctor'
-                mode='multiple'
-                options={doctors}
-                value={filter.doctors}
-                maxTagCount={maxDoctorTagCount}
-                maxTagPlaceholder={maxDoctorTagPlaceholder}
-                onChange={this.onFilterByDoctorChange}
+              <FastField
+                name='doctorProfile'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    code='doctorprofile'
+                    label='Filter by Doctor'
+                    mode='multiple'
+                    labelField='clinicianInfomation.name'
+                    maxTagCount={maxDoctorTagCount}
+                    maxTagPlaceholder={maxDoctorTagPlaceholder}
+                    renderDropdown={(option) => {
+                      return (
+                        <div>
+                          <p>MCR No.: {option.doctorMCRNo}</p>
+                          <p>
+                            {`${option.clinicianInfomation.title} ${option
+                              .clinicianInfomation.name}`}
+                          </p>
+                        </div>
+                      )
+                    }}
+                  />
+                )}
               />
             </GridItem>
             <GridItem
@@ -140,14 +167,25 @@ class FilterBar extends PureComponent {
               md={3}
               className={classnames(classes.selectorContainer)}
             >
-              <AppointmentTypeSelect
-                label='Filter by Appointment Type'
-                value={filter.appointmentType}
-                maxTagCount={maxAppointmentTagCount}
-                maxTagPlaceholder={maxAppointmentTagPlaceholder}
-                onChange={this.onFilterAppointmentTypeChange}
-                // helpText='Leave blank to show all appointment type'
-                mode='multiple'
+              <FastField
+                name='appointmentType'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    mode='multiple'
+                    label='Filter by Appointment Type'
+                    code='ctappointmenttype'
+                    labelField='displayValue'
+                    renderDropdown={(option) => (
+                      <AppointmentTypeLabel
+                        color={option.tagColorHex}
+                        label={option.displayValue}
+                      />
+                    )}
+                    maxTagCount={maxAppointmentTagCount}
+                    maxTagPlaceholder={maxAppointmentTagPlaceholder}
+                  />
+                )}
               />
             </GridItem>
 

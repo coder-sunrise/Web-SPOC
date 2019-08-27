@@ -274,7 +274,7 @@ class AntdSelect extends React.PureComponent {
       .map((s) => ({
         ...s,
         value: s[valueField],
-        label: s[labelField],
+        label: Object.byString(s, labelField),
       }))
       .map((option) => (
         <Select.Option

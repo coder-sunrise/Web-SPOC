@@ -63,8 +63,17 @@ class VisitInfoCard extends PureComponent {
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.doctor',
                   })}
-                  tenantCode='doctorprofile'
-                  // code='ctgender'
+                  code='doctorprofile'
+                  labelField='clinicianInfomation.name'
+                  renderDropdown={(option) => (
+                    <div>
+                      <p>MCR No.: {option.doctorMCRNo}</p>
+                      <p>
+                        {`${option.clinicianInfomation.title} ${option
+                          .clinicianInfomation.name}`}
+                      </p>
+                    </div>
+                  )}
                   {...args}
                 />
               )}

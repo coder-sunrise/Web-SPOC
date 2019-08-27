@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'dva'
 import * as Yup from 'yup'
 import moment from 'moment'
 import classnames from 'classnames'
@@ -6,6 +7,7 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
+import { AppointmentTypeLabel } from '@/components/_medisys'
 import { AppointmentTypeOptions, reduceToColorClass } from '../../setting'
 import {
   AppointmentDataColExtensions,
@@ -39,6 +41,10 @@ const styles = () => ({
   },
 })
 
+@connect(({ codetable }) => ({
+  appointmentTypes: codetable.ctappointmenttype,
+  clinicianProfiles: codetable.clinicianprofile,
+}))
 class AppointmentDataGrid extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -62,29 +68,47 @@ class AppointmentDataGrid extends React.PureComponent {
         }
       }
 
+      if (column.columnName === 'clinicianFK') {
+        return {
+          ...column,
+          render: (row) => {
+            const { clinicianFK } = row
+
+            const { clinicianProfiles = [] } = this.props
+            const clinicianProfile = clinicianProfiles.find(
+              (item) => item.id === clinicianFK,
+            )
+
+            if (!clinicianProfile) return null
+            return <p>{`${clinicianProfile.title} ${clinicianProfile.name}`}</p>
+          },
+        }
+      }
+
       if (column.columnName === 'appointmentTypeFK') {
         return {
           ...column,
           render: (row) => {
-            console.log({ row })
-            return <div>123</div>
+            const { appointmentTypeFK } = row
+            const { appointmentTypes = [] } = this.props
+            const appointmentType = appointmentTypes.find(
+              (item) => item.id === appointmentTypeFK,
+            )
+
+            if (!appointmentType) return null
+            return (
+              <AppointmentTypeLabel
+                color={appointmentType.tagColorHex}
+                label={appointmentType.displayValue}
+              />
+            )
           },
           renderDropdown: (option) => {
+            const color = option.tagColorHex.includes('#')
+              ? option.tagColorHex
+              : `#${option.tagColorHex}`
             return (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {option.value !== 'all' && (
-                  <span
-                    className={classnames([
-                      classes.colorDot,
-                      // getColorClassByAppointmentType(option, classes),
-                    ])}
-                    style={{
-                      backgroundColor: '#42a5f5',
-                    }}
-                  />
-                )}
-                <span>{option.name}</span>
-              </div>
+              <AppointmentTypeLabel color={color} label={option.displayValue} />
             )
           },
         }
@@ -95,7 +119,7 @@ class AppointmentDataGrid extends React.PureComponent {
       columnExtensions,
     }
 
-    this.getClinicianFK()
+    // this.getClinicianFK()
   }
 
   getClinicianFK = async () => {
