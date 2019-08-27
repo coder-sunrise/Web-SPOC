@@ -137,9 +137,9 @@ const SelectDisplay = (columnExtensions, state) => ({
   const v =
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
-  // console.log(cfg)
+
   const { labelField = 'name' } = cfg
-  // console.log(v, labelField)
+
   const vEl = v ? (
     <Tooltip title={v[labelField]} enterDelay={1500}>
       <span>{v[labelField]}</span>
@@ -147,6 +147,7 @@ const SelectDisplay = (columnExtensions, state) => ({
   ) : (
     ''
   )
+
   if (v.colorValue) {
     return (
       <div>

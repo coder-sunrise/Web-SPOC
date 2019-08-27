@@ -6,11 +6,7 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
-import {
-  AppointmentTypeOptions,
-  getColorClassByAppointmentType,
-  reduceToColorClass,
-} from '../../setting'
+import { AppointmentTypeOptions, reduceToColorClass } from '../../setting'
 import {
   AppointmentDataColExtensions,
   AppointmentDataColumn,
@@ -44,12 +40,6 @@ const styles = () => ({
 })
 
 class AppointmentDataGrid extends React.PureComponent {
-  // state = {
-  //   editingRowIds: [],
-  //   rowChanges: [],
-  //   clinicianFK: [],
-  // }
-
   constructor (props) {
     super(props)
     const { appointmentDate, classes } = this.props
@@ -101,18 +91,12 @@ class AppointmentDataGrid extends React.PureComponent {
       }
       return { ...column }
     })
-
     this.state = {
-      editingRowIds: [],
-      rowChanges: [],
       columnExtensions,
     }
+
     this.getClinicianFK()
   }
-
-  // async componentDidMount () {
-  //   await this.getClinicianFK()
-  // }
 
   getClinicianFK = async () => {
     const url = '/api/ClinicianProfile'
@@ -137,14 +121,6 @@ class AppointmentDataGrid extends React.PureComponent {
     }
   }
 
-  changeEditingRowIds = (editingRowIds) => {
-    this.setState({ editingRowIds })
-  }
-
-  changeRowChanges = (rowChanges) => {
-    this.setState({ rowChanges })
-  }
-
   onRadioChange = (row, e, checked) => {
     if (checked) {
       const { data, handleCommitChanges } = this.props
@@ -161,9 +137,13 @@ class AppointmentDataGrid extends React.PureComponent {
     }
   }
 
+  onCommitChanges = ({ rows, deleted }) => {
+    this.props.handleCommitChanges({ rows, deleted })
+  }
+
   render () {
     const { data, handleCommitChanges } = this.props
-
+    console.log({ state: this.state })
     return (
       <div>
         <EditableTableGrid
@@ -178,6 +158,19 @@ class AppointmentDataGrid extends React.PureComponent {
           EditingProps={{
             showAddCommand: true,
             onCommitChanges: handleCommitChanges,
+            addedRows:
+              data.length === 0
+                ? [
+                    {
+                      clinicianFK: undefined,
+                      appointmentTypeFK: undefined,
+                      startTime: undefined,
+                      endTime: undefined,
+                      roomFk: undefined,
+                      isPrimaryClinician: undefined,
+                    },
+                  ]
+                : [],
           }}
           columns={AppointmentDataColumn}
           columnExtensions={this.state.columnExtensions}

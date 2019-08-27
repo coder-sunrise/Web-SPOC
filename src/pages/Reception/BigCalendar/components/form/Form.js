@@ -243,7 +243,7 @@ class Form extends React.PureComponent {
         restValues.editSingleAppointment,
         isRecurrenceChanged || restValues.updateAllOthers,
       )
-      if (!appointments) {
+      if (appointments.length === 0) {
         setSubmitting(false)
         return
       }
@@ -267,13 +267,13 @@ class Form extends React.PureComponent {
       const actionKey = validate ? 'calendar/validate' : updateKey
 
       setSubmitting(false)
-      dispatch({
-        type: actionKey,
-        payload,
-      })
-      if (validate) return
-      resetForm()
-      onClose && onClose()
+      // dispatch({
+      //   type: actionKey,
+      //   payload,
+      // })
+      // if (validate) return
+      // resetForm()
+      // onClose && onClose()
     } catch (error) {
       console.log({ error })
     }
