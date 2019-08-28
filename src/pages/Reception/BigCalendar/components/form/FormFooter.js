@@ -62,7 +62,11 @@ const FormFooter = ({
             {ButtonText.CANCEL}
           </Button>
           {(isNew || isDraft) && (
-            <Button onClick={handleSaveDraftClick} color='info'>
+            <Button
+              disabled={disabled}
+              onClick={handleSaveDraftClick}
+              color='info'
+            >
               {ButtonText.DRAFT}
             </Button>
           )}

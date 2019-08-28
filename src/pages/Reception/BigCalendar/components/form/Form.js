@@ -59,6 +59,7 @@ class Form extends React.PureComponent {
         : [],
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
+    isDataGridValid: false,
   }
 
   componentWillMount () {
@@ -66,6 +67,7 @@ class Form extends React.PureComponent {
       type: 'codetable/fetchCodes',
       payload: { code: 'ltappointmentstatus' },
     })
+    this.validateDataGrid()
   }
 
   onRecurrencePatternChange = async (recurrencePatternFK) => {
@@ -179,16 +181,40 @@ class Form extends React.PureComponent {
 
   onCommitChanges = ({ rows, deleted }) => {
     if (rows) {
-      this.setState({
-        datagrid: rows,
-      })
+      this.setState(
+        {
+          datagrid: rows,
+        },
+        this.validateDataGrid,
+      )
     }
     if (deleted) {
       const { datagrid } = this.state
-      this.setState({
-        datagrid: datagrid.filter((event) => !deleted.includes(event.id)),
-      })
+      this.setState(
+        {
+          datagrid: datagrid.filter((event) => !deleted.includes(event.id)),
+        },
+        this.validateDataGrid,
+      )
     }
+  }
+
+  validateDataGrid = () => {
+    const { datagrid } = this.state
+
+    let isDataGridValid = true
+
+    // has at least 1 row of appointment_resources
+    if (datagrid.length === 0) isDataGridValid = false
+
+    // has 1 primary doctor
+    const hasPrimaryDoctor = datagrid.reduce(
+      (hasPrimary, row) => row.isPrimaryClinician,
+      false,
+    )
+    if (!hasPrimaryDoctor) isDataGridValid = false
+
+    this.setState({ isDataGridValid })
   }
 
   _submit = async (validate = false) => {
@@ -368,9 +394,11 @@ class Form extends React.PureComponent {
       showDeleteConfirmationModal,
       showSeriesUpdateConfirmation,
       datagrid,
+      isDataGridValid,
     } = this.state
     // console.log({ props: this.props })
     // console.log({ values: this.props.values })
+
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
       <LoadingWrapper loading={show} text='Loading...'>
@@ -425,7 +453,11 @@ class Form extends React.PureComponent {
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={values.appointment.appointmentStatusFk}
               onClose={onClose}
-              disabled={datagrid.length === 0}
+              disabled={
+                !isDataGridValid ||
+                !values.patientName ||
+                !values.patientContactNo
+              }
               handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
               handleSaveDraftClick={this.onSaveDraftClick}
               handleConfirmClick={this.onConfirmClick}

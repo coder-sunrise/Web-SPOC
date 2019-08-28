@@ -26,5 +26,10 @@ export const todayOnly = (event) => {
     ? moment(event.appointmentDate)
     : moment(event.eventDate)
   const today = moment()
+  console.log({
+    diff: today.diff(eventDate, 'days'),
+    target: eventDate.format(),
+    today: today.format(),
+  })
   return today.diff(eventDate, 'days') === 0
 }

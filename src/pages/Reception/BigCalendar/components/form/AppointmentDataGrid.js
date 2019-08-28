@@ -153,10 +153,11 @@ class AppointmentDataGrid extends React.PureComponent {
           eachRow.id !== row.id
             ? {
                 ...eachRow,
-                primaryDoctor: false,
+                isPrimaryClinician: false,
               }
-            : { ...eachRow, primaryDoctor: checked },
+            : { ...eachRow, isPrimaryClinician: checked },
       )
+      console.log({ checked, data, row, newRows })
       handleCommitChanges({ rows: newRows })
     }
   }

@@ -50,7 +50,7 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
       ]
     : [
         ...massaged,
-        ...event.appointmentResources.map((appointment) => {
+        ...event.appointment_Resources.map((appointment) => {
           const { appointmentResources, ...restEvent } = event
           return { ...restEvent, ...appointment }
         }),
