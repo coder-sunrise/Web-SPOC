@@ -619,13 +619,23 @@ const multiplyCodetable = (data, multiplier) => {
   return result
 }
 
+const tenantCode = [
+  'doctorprofile',
+  'clinicianprofile',
+  'ctappointmenttype',
+]
+
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
-  const useGeneral = params === undefined || Object.keys(params).length === 0
+  let useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?ctnames=`
   const searchURL = `${baseURL}/search?ctname=`
 
-  const url = useGeneral ? generalCodetableURL : searchURL
+  let url = useGeneral ? generalCodetableURL : searchURL
+  if (tenantCode.includes(code.toLowerCase())) {
+    url = '/api/'
+    useGeneral = false
+  }
 
   const response = await request(`${url}${code}`, {
     method: 'GET',

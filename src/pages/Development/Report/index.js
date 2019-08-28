@@ -115,7 +115,7 @@ class Report extends React.Component {
         >
           <ReportViewer />
         </CommonModal>
-        <CodeSelect code='ctOccupation' multiplier={10} />
+        <CodeSelect code='clinicianprofile' />
         {/* <Button onClick={this.validate} color='primary'>
           Submit
         </Button>
