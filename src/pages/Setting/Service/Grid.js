@@ -12,7 +12,6 @@ class Grid extends PureComponent {
   editRow = async (row) => {
     const { dispatch, settingClinicService } = this.props
 
-    const { list } = settingClinicService
     const queryServiceDetails = async () => {
       return await queryOne(row.serviceId)
     }
