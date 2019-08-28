@@ -604,7 +604,22 @@ const country = [
 //   return localCodes[code]
 // }
 
-const _fetchAndSaveCodeTable = async (code, params) => {
+const multiplyCodetable = (data, multiplier) => {
+  if (multiplier === 1) return data
+  let result = [
+    ...data,
+  ]
+  const maxLength = data.length
+  for (let i = 1; i <= multiplier; i++) {
+    result = [
+      ...result,
+      ...data.map((item) => ({ ...item, id: maxLength * i + item.id })),
+    ]
+  }
+  return result
+}
+
+const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
   const useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?ctnames=`
@@ -617,15 +632,18 @@ const _fetchAndSaveCodeTable = async (code, params) => {
     body: convertToQuery(params),
   })
   const { status: statusCode, data } = response
-
+  const result = multiplyCodetable(
+    useGeneral ? data[code] : data.data,
+    multiplier,
+  )
   if (parseInt(statusCode, 10) === 200) {
     await db.codetable.put({
       code,
-      data: useGeneral ? data[code] : data.data,
+      data: result,
       createDate: new Date(),
       updateDate: new Date(),
     })
-    return data[code]
+    return result
   }
 
   return []
@@ -634,10 +652,12 @@ const _fetchAndSaveCodeTable = async (code, params) => {
 export const getCodes = async (payload) => {
   let ctcode
   let params
+  let multiply = 1
   if (typeof payload === 'string') ctcode = payload.toLowerCase()
   if (typeof payload === 'object') {
     ctcode = payload.code
     params = payload.filter
+    multiply = payload.multiplier
   }
 
   let result = []
@@ -651,7 +671,7 @@ export const getCodes = async (payload) => {
 
     // not exist in current table, make network call to retrieve data
     if (ct === undefined) {
-      result = _fetchAndSaveCodeTable(ctcode, params)
+      result = _fetchAndSaveCodeTable(ctcode, params, multiply)
     } else {
       // compare updateDate with lastLoginDate
       // if updateDate > lastLoginDate, do nothing
@@ -660,7 +680,7 @@ export const getCodes = async (payload) => {
       const parsedUpdateDate = moment(updateDate)
 
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(ctcode, params)
+        ? _fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData
     }
   } catch (error) {
