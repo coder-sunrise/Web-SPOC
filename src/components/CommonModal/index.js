@@ -32,7 +32,12 @@ function Transition (props) {
   return <Slide direction='up' {...props} />
 }
 function getContainerHeight (props) {
-  return window.innerHeight - 44 - (props.showFooter ? 63 : 0)
+  return (
+    window.innerHeight -
+    44 -
+    (props.showFooter ? 63 : 0) -
+    (props.bodyNoPadding ? -16 : 0)
+  )
 }
 
 @connect(({ loading, global }) => ({ loading, global }))

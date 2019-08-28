@@ -59,6 +59,7 @@ class StatisticIndicator extends PureComponent {
     const flattenedCalendarData = calendarEvents
       .reduce(flattenAppointmentDateToCalendarEvents, [])
       .filter(todayOnly)
+    console.log({ flattenedCalendarData })
 
     const statistic = {
       all: getStatisticCount(StatusIndicator.ALL, list),

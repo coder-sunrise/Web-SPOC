@@ -369,7 +369,7 @@ const convertToQuery = (
   // sorting.forEach((s) => {
   //   // sort[0][sortby]=patientaccountno&sort[0][order]=desc
   // })
-
+  // console.log(query)
   const { valueType, filterType } = config
   for (let p in customQuerys) {
     if (Object.prototype.hasOwnProperty.call(customQuerys, p)) {
@@ -532,8 +532,10 @@ export const updateCellValue = (
     window.$tempGridRow[gridId] = {}
   }
   if (!window.$tempGridRow[gridId][row.id]) {
+    // console.log(row)
     window.$tempGridRow[gridId][row.id] = row
   }
+  // console.log(columnName, val)
 
   window.$tempGridRow[gridId][row.id][columnName] = val
   // console.log(val, columnName)

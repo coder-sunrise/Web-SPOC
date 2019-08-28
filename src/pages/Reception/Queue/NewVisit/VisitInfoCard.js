@@ -6,7 +6,7 @@ import { FastField } from 'formik'
 import { formatMessage } from 'umi/locale'
 // custom components
 import { TextField, NumberInput, GridItem, CodeSelect } from '@/components'
-import AttachmentWrapper from './withAttachment'
+import AttachmentWrapper from './AttachmentWrapper'
 import FormField from './formField'
 
 const styles = (theme) => ({

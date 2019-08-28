@@ -17,7 +17,7 @@ import loginBackground from '../../assets/img/login.jpeg'
 const styles = (theme) => ({
   ...authStyle(theme),
 })
-@connect(({ loginSEMR, loading }) => ({ loginSEMR, loading }))
+@connect(({ login, loading }) => ({ login, loading }))
 class LoginPage extends PureComponent {
   getBgImage = () => {
     return loginBackground
@@ -27,7 +27,7 @@ class LoginPage extends PureComponent {
     const { dispatch } = this.props
     const credential = { username, password, clinic_code: clinicCode }
     dispatch({
-      type: 'loginSEMR/getToken',
+      type: 'login/getToken',
       credentialPayload: credential,
     })
       .then((props) => {

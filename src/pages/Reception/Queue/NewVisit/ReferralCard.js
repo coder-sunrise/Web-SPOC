@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
 // custom components
 import { DatePicker, TextField, GridItem } from '@/components'
-import AttachmentWrapper from './withAttachment'
+import AttachmentWrapper from './AttachmentWrapper'
 import FormField from './formField'
 
 class ReferralCard extends PureComponent {

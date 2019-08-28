@@ -11,6 +11,7 @@ import {
 } from '@/components'
 
 const CoverageCap = ({ values, classes }) => {
+  console.log(values)
   return (
     <GridContainer>
       <GridItem xs={1}>

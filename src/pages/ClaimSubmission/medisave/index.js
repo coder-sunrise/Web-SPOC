@@ -28,8 +28,7 @@ class Medisave extends React.Component {
     )
   }
 
-  handleContextMenuItemClick = (currentTarget, row) => {
-    const { id } = currentTarget
+  handleContextMenuItemClick = (row, id) => {
     switch (id) {
       case '0':
         this.openClaimDetails({ claimDetails: row })

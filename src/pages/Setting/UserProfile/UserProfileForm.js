@@ -6,6 +6,7 @@ import { FastField, Field, withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Key from '@material-ui/icons/VpnKey'
+import Info from '@material-ui/icons/Info'
 // common component
 import {
   Button,
@@ -16,9 +17,12 @@ import {
   GridItem,
   Select,
   TextField,
+  Tooltip,
 } from '@/components'
 // services
-import { getRoles } from './services'
+import { getRoles, getRoleByID } from '../UserRole/services'
+// utils
+import { constructUserProfile } from './utils'
 
 const styles = (theme) => ({
   container: {
@@ -39,104 +43,92 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserProfile }) => ({
+@connect(({ settingUserProfile, user }) => ({
   settingUserProfile,
+  currentUser: user.profileDetails,
 }))
 @withFormik({
   enableReinitialize: true,
-  validationSchema: Yup.object().shape({
-    userName: Yup.string().required('Login ID is a required field'),
-    password: Yup.string().required('Password is a required field'),
-    name: Yup.string().required('Name is a required field'),
-    phoneNumber: Yup.string().required('Contact No. is a required field'),
-    userAccountNo: Yup.string().required(
-      'User Account No. is a required field',
-    ),
-    // effectiveStartDate: Yup.date().required(
-    //   'Effective Start Date is a required field',
-    // ),
-    // effectiveEndDate: Yup.date().required(
-    //   'Effective End Date is a required field',
-    // ),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-
-    role: Yup.string().required('Role is a required field'),
-  }),
-  mapPropsToValues: (props) => {
-    const { settingUserProfile: { currentSelectedUser = {} } } = props
-    return {
-      ...currentSelectedUser,
-      effectiveDates:
-        Object.entries(currentSelectedUser).length <= 0
-          ? []
-          : [
-              currentSelectedUser.effectiveStartDate,
-              currentSelectedUser.effectiveEndDate,
-            ],
-      role: 1,
+  validationSchema: (props) => {
+    const { settingUserProfile, currentUser } = props
+    const { currentSelectedUser } = settingUserProfile
+    const isEdit =
+      (currentSelectedUser &&
+        currentSelectedUser.userProfile &&
+        currentSelectedUser.userProfile.userName) ||
+      (currentUser && currentUser.userProfile.userName)
+    console.log({ props, isEdit })
+    const baseValidationRule = {
+      userName: Yup.string().required('Login ID is a required field'),
+      name: Yup.string().required('Name is a required field'),
+      phoneNumber: Yup.string().required('Contact No. is a required field'),
+      userAccountNo: Yup.string().required(
+        'User Account No. is a required field',
+      ),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      role: Yup.string().required('Role is a required field'),
     }
+    return isEdit
+      ? Yup.object().shape(baseValidationRule)
+      : Yup.object().shape({
+          ...baseValidationRule,
+          password: Yup.string().required('Password is a required field'),
+        })
   },
-  handleSubmit: (values, { props }) => {
-    // console.log('submit', values, props)
-    const { dispatch, onConfirm } = props
-
-    // const { role, ...restValues } = values
-    const hardcodedProfileValue = {
-      // role: '1',
-
-      // effectiveEndDate: '2019-07-31T08:36:14Z',
-      // effectiveStartDate: '2019-07-25T08:36:12Z',
-      // name: 'test medisys',
-      // password: '123456',
-      // phoneNumber: '12345678',
-      // userAccountNo: '00001',
-      // userName: 'test',
-
-      email: '',
-      title: '',
-      userCode: '',
-      dob: '2019-07-26T08:26:07.254Z',
-      isUserMaintainable: true,
-      genderFk: 1,
-      qualificationCodeFk: 0,
-      registrationStatusFk: 0,
-      registrationTypeFk: 0,
-      boardNameFk: 0,
-      roleSpecialityFk: 0,
-      languageSpokenFk: 0,
-      designation: '',
-      principalUserProfileFk: 0,
-      lastLoginDate: '2019-07-26T08:26:07.254Z',
-      createDate: '2019-07-26T08:26:07.254Z',
-      createByUserFk: 1,
-      createByClinicFk: 0,
-      updateDate: '2019-07-26T08:26:07.254Z',
-      updateByUserFk: 1,
-      updateByClinicFk: 0,
-      // userRoles: [
-      //   {
-      //     id: 0,
-      //     name: 'doctor',
-      //     normalizedName: 'doctor',
-      //   },
-      // ],
-      userRole: 'doctor',
-      doctorMCRNo: '12345A',
-      isDoctor: true,
-      // id: 0,
-      isDeleted: false,
-      concurrencyToken: 0,
-      ...values,
+  mapPropsToValues: (props) => {
+    const { settingUserProfile, currentUser } = props
+    if (currentUser) {
+      return {
+        ...currentUser,
+        ...currentUser.userProfile,
+        effectiveDates: [
+          currentUser.effectiveStartDate,
+          currentUser.effectiveEndDate,
+        ],
+        role: 1,
+      }
     }
-    // console.log({ hardcodedProfileValue })
+    if (settingUserProfile) {
+      const { currentSelectedUser = {} } = settingUserProfile
+      return {
+        ...currentSelectedUser,
+        ...currentSelectedUser.userProfile,
+        effectiveDates:
+          Object.entries(currentSelectedUser).length <= 0
+            ? []
+            : [
+                currentSelectedUser.effectiveStartDate,
+                currentSelectedUser.effectiveEndDate,
+              ],
+        role: 1,
+      }
+    }
+    console.log({ currentUser })
+    return {}
+  },
+  handleSubmit: async (values, { props, resetForm }) => {
+    const { dispatch, currentUser, onConfirm } = props
+    const { effectiveDates, role: roleFK, ...restValues } = values
+    const getRoleResult = await getRoleByID(roleFK)
+    const { data: role } = getRoleResult
+    const userProfile = constructUserProfile(values, role)
+
+    const payload = {
+      userProfile,
+      effectiveStartDate: values.effectiveDates[0],
+      effectiveEndDate: values.effectiveDates[1],
+      ...restValues,
+    }
+
+    console.log({ payload })
+
     dispatch({
       type: 'settingUserProfile/upsert',
-      payload: hardcodedProfileValue,
+      payload,
     }).then((response) => {
-      console.log('handleSubmit', { response })
+      resetForm()
       response && onConfirm()
     })
-    // onSubmit(hardcodedProfileValue)
   },
 })
 class UserProfileForm extends React.PureComponent {
@@ -148,7 +140,6 @@ class UserProfileForm extends React.PureComponent {
     getRoles().then((response) => {
       const { data } = response
       const { data: roles = [] } = data
-      console.log('willmount', { roles })
       this.setState({
         roles,
       })
@@ -161,18 +152,27 @@ class UserProfileForm extends React.PureComponent {
       onChangePasswordClick,
       footer,
       handleSubmit,
+      values,
+      currentUser,
       settingUserProfile,
     } = this.props
-    const { currentSelectedUser } = settingUserProfile
 
     const { roles } = this.state
+    const { currentSelectedUser = {} } = settingUserProfile || {}
+    // console.log({ props: this.props })
+    const isEdit =
+      (currentSelectedUser &&
+        currentSelectedUser.userProfile &&
+        currentSelectedUser.userProfile.userName) ||
+      (currentUser && currentUser.userProfile.userName)
 
-    console.log({ roles })
-
-    const isEdit = currentSelectedUser.userName !== undefined
     return (
       <React.Fragment>
-        <GridContainer alignItems='center' className={classes.container}>
+        <GridContainer
+          alignItems='center'
+          justify='space-between'
+          className={classes.container}
+        >
           <GridItem md={12} className={classes.verticalSpacing}>
             <h4>Login Info</h4>
           </GridItem>
@@ -196,7 +196,7 @@ class UserProfileForm extends React.PureComponent {
                   />
                 </GridItem>
                 <GridItem md={6} />
-                <GridItem md={6}>
+                <GridItem>
                   <i>User must create a new password at next sign in.</i>
                 </GridItem>
               </React.Fragment>
@@ -207,6 +207,16 @@ class UserProfileForm extends React.PureComponent {
                 </Button>
               </GridItem>
             )}
+            <GridItem md={6} />
+            <GridItem md={6}>
+              <span>Password must be</span>
+              <ul>
+                <li>8 to 18 characters long</li>
+                <li>
+                  contain a mix of letters, numbers, and/or special characters
+                </li>
+              </ul>
+            </GridItem>
           </GridContainer>
 
           <GridItem md={12} className={classes.verticalSpacing}>
@@ -242,8 +252,8 @@ class UserProfileForm extends React.PureComponent {
               />
             </GridItem>
             <GridItem md={6}>
-              <Field
-                name='mcrNo'
+              <FastField
+                name='doctorMCRNo'
                 render={(args) => (
                   <TextField
                     {...args}

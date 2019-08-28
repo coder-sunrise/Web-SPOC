@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 // import fetch from 'dva/fetch'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
-import { Chip, withStyles } from '@material-ui/core'
+import { CircularProgress, Chip, withStyles } from '@material-ui/core'
 // custom components
 import {
   Button,
@@ -12,7 +12,11 @@ import {
   GridItem,
 } from '@/components'
 // services
-import { uploadFile, downloadFile, deleteFileByFileID } from '@/services/file'
+import {
+  uploadFile,
+  downloadAttachment,
+  deleteFileByFileID,
+} from '@/services/file'
 // utils
 import { getCodes } from '@/utils/codes'
 
@@ -24,6 +28,7 @@ const styles = (theme) => ({
   attachmentLabel: {
     fontSize: '0.9rem',
     fontWeight: 300,
+    marginRight: theme.spacing(1),
   },
   attachmentItem: {
     marginLeft: theme.spacing(0.5),
@@ -58,7 +63,7 @@ const getFileExtension = (filename) => {
   return filename.split('.').pop()
 }
 
-const withAttachment = ({
+const AttachmentWrapper = ({
   classes,
   children,
   handleUpdateAttachments,
@@ -66,6 +71,10 @@ const withAttachment = ({
   attachments = [],
   title = '',
 }) => {
+  const [
+    uploading,
+    setUploading,
+  ] = useState(false)
   const [
     fileStatusList,
     setFileStatusList,
@@ -116,7 +125,6 @@ const withAttachment = ({
   const onUploadClick = () => {
     setErrorText('')
     inputEl.current.click()
-    // this.refs.visitAttachment && this.refs.visitAttachment.click()
   }
 
   const validateFileSize = (files) => {
@@ -145,6 +153,7 @@ const withAttachment = ({
 
   const onFileChange = async (event) => {
     try {
+      setUploading(true)
       const { files } = event.target
       const numberOfNewFiles = Object.keys(files).length
       if (numberOfNewFiles + attachments.length > 5) {
@@ -158,6 +167,7 @@ const withAttachment = ({
           .filter((key) => !skipped.includes(files[key].name))
           .map((key) => mapFileToUploadObject(files[key])),
       )
+      setUploading(false)
       handleUpdateAttachments({
         added: selectedFiles,
       })
@@ -177,7 +187,7 @@ const withAttachment = ({
   }
 
   const onClick = (attachment) => {
-    downloadFile(attachment)
+    downloadAttachment(attachment)
   }
 
   return (
@@ -186,6 +196,7 @@ const withAttachment = ({
         {children}
         <GridItem className={classes.verticalSpacing}>
           <span className={classes.attachmentLabel}>Attachment:</span>
+          {uploading && <CircularProgress />}
         </GridItem>
         <GridItem md={10} className={classes.verticalSpacing}>
           <div>
@@ -217,7 +228,7 @@ const withAttachment = ({
             color='rose'
             size='sm'
             onClick={onUploadClick}
-            disabled={attachments.length >= 5}
+            disabled={uploading || attachments.length >= 5}
           >
             <AttachFile />
             Upload
@@ -235,5 +246,5 @@ const withAttachment = ({
 }
 
 export default withStyles(styles, { name: 'withAttachmentForm' })(
-  withAttachment,
+  AttachmentWrapper,
 )

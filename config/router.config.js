@@ -74,7 +74,7 @@ const routes = [
             component: './PatientDashboard',
           },
           {
-            path: '/reception/queue/patientdashboard/consultation/:id',
+            path: '/reception/queue/patientdashboard/consultation/:id?',
             name: 'consultation',
             hideInMenu: true,
             component: './PatientDashboard/Consultation',
@@ -310,7 +310,20 @@ const routes = [
         path: '/report',
         icon: 'library_books',
         name: 'report',
-        component: './Report',
+        hideChildrenInMenu: true,
+
+        routes: [
+          {
+            path: '/report',
+            name: 'report',
+            component: './Report',
+          },
+          {
+            path: '/report/queuelisting',
+            name: 'queueListingReport',
+            component: './Report/QueueListing',
+          },
+        ],
       },
       // Report
       //

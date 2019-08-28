@@ -57,6 +57,21 @@ class HeaderLinks extends React.Component {
     location.href = '/login'
   }
 
+  openUserProfileForm = () => {
+    const { dispatch, user } = this.props
+    user.data &&
+      dispatch({
+        type: 'user/fetchProfileDetails',
+        id: user.data.id,
+      })
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        showUserProfile: true,
+      },
+    })
+  }
+
   updateAPIType (type) {
     updateAPIType(type)
   }
@@ -285,7 +300,10 @@ class HeaderLinks extends React.Component {
                   <ClickAwayListener onClickAway={this.handleClose('Account')}>
                     <MenuList role='menu'>
                       <MenuItem
-                        onClick={this.handleClose('Account')}
+                        onClick={this.handleClose(
+                          'Account',
+                          this.openUserProfileForm,
+                        )}
                         className={dropdownItem}
                       >
                         My Account
