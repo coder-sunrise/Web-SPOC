@@ -20,6 +20,7 @@ class CodeSelect extends React.PureComponent {
         payload: {
           code: props.code.toLowerCase(),
           filter: props.filter,
+          multiplier: props.multiplier, // for stress testing purpose only
         },
       })
     } else if (props.tenantCode) {
