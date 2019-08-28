@@ -15,17 +15,19 @@ export default createListViewModel({
     subscriptions: {},
     effects: {
       *fetchCodes ({ payload }, { select, call, put, delay, ...rest }) {
-        const { code } = payload
+        let ctcode = payload
+        if (typeof payload === 'object') ctcode = payload.code
+        // const { code } = payload
         const codetableState = yield select((state) => state.codetable)
 
-        if (code !== undefined) {
-          if (codetableState[code] === undefined) {
+        if (ctcode !== undefined) {
+          if (codetableState[ctcode] === undefined) {
             const response = yield call(getCodes, payload)
             if (response.length > 0) {
               // list = { ...list, [lowerCaseCode]: response }
               yield put({
                 type: 'saveCodetable',
-                code,
+                code: ctcode,
                 data: response,
               })
             }

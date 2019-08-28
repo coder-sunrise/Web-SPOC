@@ -29,6 +29,7 @@ import {
   Select,
   Accordion,
   Button,
+  notification,
 } from '@/components'
 import { Icon, Input, AutoComplete, Form } from 'antd'
 
@@ -78,8 +79,9 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
   },
 })
-@connect(({ patientDashboard, global }) => ({
+@connect(({ patientDashboard, visitRegistration, global }) => ({
   patientDashboard,
+  visitRegistration,
   global,
 }))
 class PatientDashboard extends PureComponent {
@@ -101,8 +103,32 @@ class PatientDashboard extends PureComponent {
   }
 
   startConsultation = () => {
+    // this.props.dispatch({
+    //   type: 'patientDashboard/openConsultationModal',
+    // })
+    // this.props.history.push(
+    //   '/reception/queue/patientdashboard/consultation/new',
+    // )
+    // const { clinicalObjectRecordID } = this.props.patientDashboard
+    // if (clinicalObjectRecordID) {
+    //   this.props.history.push(
+    //     getAppendUrl({
+    //       md: 'cons',
+    //       // vid: visitID,
+    //     }),
+    //   )
+    // } else {
+    //   notification.error({
+    //     message: 'Visit info not found, please start over',
+    //   })
+    // }
+    const { visitRegistration } = this.props
+    const { visitInfo = {} } = visitRegistration
+
     this.props.history.push(
-      '/reception/queue/patientdashboard/consultation/new',
+      getAppendUrl({
+        md: 'cons',
+      }),
     )
   }
 
@@ -116,8 +142,9 @@ class PatientDashboard extends PureComponent {
       ...resetProps
     } = this.props
 
-    const { patientDashboard, global, history } = resetProps
-    if (!patientDashboard) return null
+    const { patientDashboard, visitRegistration, global, history } = resetProps
+
+    const { visitInfo = {} } = visitRegistration
 
     return (
       <div className={classes.root}>

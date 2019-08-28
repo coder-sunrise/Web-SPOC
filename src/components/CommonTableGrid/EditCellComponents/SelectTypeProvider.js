@@ -39,7 +39,13 @@ class SelectEditor extends PureComponent {
     const latestRow = window.$tempGridRow[gridId]
       ? window.$tempGridRow[gridId][row.id] || {}
       : row
-    // console.log(columnName, latestRow)
+    // console.log(
+    //   columnName,
+    //   latestRow,
+    //   latestRow[columnName],
+    //   window.$tempGridRow,
+    //   gridId,
+    // )
     this.setState({
       error: updateCellValue(
         this.props,
@@ -102,6 +108,7 @@ class SelectEditor extends PureComponent {
       ...restProps,
       onChange: _onChange,
     }
+    // console.log(columnName)
     if (columnName) {
       if (type === 'select') {
         return (

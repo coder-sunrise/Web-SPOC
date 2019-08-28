@@ -4,8 +4,12 @@ import _ from 'lodash'
 import $ from 'jquery'
 import classnames from 'classnames'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
+import Yup from '@/utils/yup'
 import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
+import AuthorizedContext from '@/components/Context/Authorized'
+
 import { Menu, Dropdown } from 'antd'
 import {
   FormControl,
@@ -54,6 +58,7 @@ import {
   confirm,
   SizeContainer,
   Popconfirm,
+  withFormikExtend,
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 
@@ -68,8 +73,6 @@ const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
-const topHeight = headerHeight + 107
-const getLayoutRowHeight = () => (window.innerHeight - topHeight) / 6
 
 // let layout = {
 //   lg: [
@@ -83,10 +86,12 @@ const styles = (theme) => ({
   ...basicStyle(theme),
   root: {
     position: 'relative',
+    // overflowY: 'hidden',
   },
   layout: {
     marginLeft: -3,
     marginRight: -3,
+    // height: 'auto',
   },
   layoutOnDrag: {
     marginBottom: 200,
@@ -107,7 +112,7 @@ const styles = (theme) => ({
   fullscreen: {
     position: 'initial !important',
     width: '100% !important',
-    height: `calc(100vh - ${topHeight}px) !important`,
+    // height: `calc(100vh - ${topHeight}px) !important`,
   },
   block: {
     padding: '4px 2px 0px 2px',
@@ -177,6 +182,45 @@ let lasActivedWidget = null
   consultation,
   global,
 }))
+@withFormikExtend({
+  mapPropsToValues: ({ consultation = {} }) => {
+    return consultation.entity || consultation.default
+  },
+  validationSchema: Yup.object().shape(
+    {
+      // type: Yup.string().required(),
+      // to: Yup.string().when('type', {
+      //   is: (val) => val !== '2',
+      //   then: Yup.string().required(),
+      // }),
+      // from: Yup.string().required(),
+      // date: Yup.date().required(),
+      // subject: Yup.string().required(),
+      // // 3->MC
+      // days: Yup.number().when('type', {
+      //   is: (val) => val === '3',
+      //   then: Yup.number().required(),
+      // }),
+      // fromto: Yup.array().when('type', {
+      //   is: (val) => val === '3',
+      //   then: Yup.array().of(Yup.date()).min(2).required(),
+      // }),
+    },
+  ),
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, history, consultation } = props
+    dispatch({
+      type: 'consultation/sign',
+      payload: values,
+    }).then(() => {
+      history.push(
+        `/reception/queue/patientdashboard?qid=${consultation.queueID}&v=${Date.now()}`,
+      )
+    })
+  },
+  displayName: 'ConsultationPage',
+})
 class Consultation extends PureComponent {
   constructor (props) {
     super(props)
@@ -325,7 +369,7 @@ class Consultation extends PureComponent {
     this.state = {
       mode: 'edit',
       breakpoint: 'lg',
-      rowHeight: getLayoutRowHeight(),
+      rowHeight: this.getLayoutRowHeight(),
       showInvoiceAdjustment: false,
       collapsed: global.collapsed,
       currentLayout: defaultLayout,
@@ -353,6 +397,8 @@ class Consultation extends PureComponent {
     // console.log($(this.container.current).width())
     // console.log($(this.container.current).innerWidth())
     // $('.react-resizable-handle').on('mouseover',)
+    const { consultation, dispatch } = this.props
+    // console.log(this.props)
     $(this.layoutContainer.current)
       .on(
         'mouseenter',
@@ -364,6 +410,36 @@ class Consultation extends PureComponent {
         '.react-resizable-handle',
         this.delayedHideBottomPadding,
       )
+    // if (consultation) {
+    //   if (consultation.consultationID) {
+    //     dispatch({
+    //       type: 'consultation/query',
+    //       payload: consultation.consultationID,
+    //     })
+    //   } else if (consultation.visitFK) {
+    //     dispatch({
+    //       type: 'consultation/newConsultation',
+    //       payload: consultation.visitFK,
+    //     })
+    //   }
+    // }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // console.log('componentWillReceiveProps', this.props, nextProps)
+    // console.log(
+    //   nextProps.consultation,
+    //   nextProps.consultation.consultationID,
+    //   this.props.consultation.consultationID !==
+    //     nextProps.consultation.consultationID,
+    // )
+    if (
+      nextProps.consultation &&
+      nextProps.consultation.entity &&
+      Object.values(nextProps.values).length === 0
+    ) {
+      nextProps.resetForm(nextProps.consultation.entity)
+    }
   }
 
   componentWillUnmount () {
@@ -374,7 +450,7 @@ class Consultation extends PureComponent {
   resize = (e) => {
     // console.log(e)
     this.setState({
-      rowHeight: getLayoutRowHeight(),
+      rowHeight: this.getLayoutRowHeight(),
     })
   }
 
@@ -428,7 +504,7 @@ class Consultation extends PureComponent {
           y: Infinity,
         }
         layout[s].push(n)
-        console.log(n)
+        // console.log(n)
       }
     })
     this.changeLayout(layout)
@@ -438,7 +514,7 @@ class Consultation extends PureComponent {
     const keys = Object.keys(changes)
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index]
-      console.log(key)
+      // console.log(key)
       if (changes[key]) {
         this.addWidget(key)
       } else {
@@ -583,10 +659,21 @@ class Consultation extends PureComponent {
   //   }
   // }
 
+  getLayoutRowHeight = () => {
+    const topHeight = (this.props.height ? 0 : headerHeight) + 130
+    // console.log(
+    //   this.props,
+    //   (this.props.height || window.innerHeight - topHeight) / 6,
+    //   ((this.props.height || window.innerHeight) - topHeight) / 6,
+    // )
+
+    return ((this.props.height || window.innerHeight) - topHeight) / 6
+  }
+
   getLayoutWidgets = () => {
     const { state, props } = this
-    const { classes } = props
-    console.log(state.currentLayout)
+    const { classes, height } = props
+    // console.log(state.currentLayout)
 
     const layoutCfg = {
       className: classes.layout,
@@ -607,7 +694,7 @@ class Consultation extends PureComponent {
         this.setState({
           breakpoint: newBreakpoint,
         })
-        console.log('onBreakpointChange', newBreakpoint, newCols)
+        // console.log('onBreakpointChange', newBreakpoint, newCols)
       },
       onLayoutChange: (_currentLayout, allLayouts) => {
         // console.log(window.mainPanel)
@@ -619,18 +706,18 @@ class Consultation extends PureComponent {
             this.compareNodeLayoutChange,
           )
         ) {
-          console.log('onLayoutChange')
+          // console.log('onLayoutChange')
           this.delayedChangeLayout(allLayouts)
         }
       },
       onWidthChange: (containerWidth, margin, cols, containerPadding) => {
-        console.log(
-          'onWidthChange',
-          containerWidth,
-          margin,
-          cols,
-          containerPadding,
-        )
+        // console.log(
+        //   'onWidthChange',
+        //   containerWidth,
+        //   margin,
+        //   cols,
+        //   containerPadding,
+        // )
       },
       onResizeStart: (e) => {
         // $(this.layoutContainer.current).addClass(classes.layoutOnDrag)
@@ -640,9 +727,17 @@ class Consultation extends PureComponent {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
       },
     }
-
+    // console.log(state.rowHeight)
     return (
-      <div ref={this.layoutContainer}>
+      <div
+        ref={this.layoutContainer}
+        style={{
+          height: height ? this.props.height - 116 : 'auto',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          marginTop: 1,
+        }}
+      >
         <ResponsiveGridLayout {...layoutCfg}>
           {state.currentLayout.widgets.map((id) => {
             const w = widgets.find((o) => o.id === id)
@@ -753,6 +848,60 @@ class Consultation extends PureComponent {
     }))
   }
 
+  pauseConsultation = () => {
+    const { dispatch, values, history, consultation } = this.props
+    dispatch({
+      type: 'consultation/pause',
+      payload: values,
+    }).then((r) => {
+      if (r) {
+        notification.success({
+          message: 'Consultation paused',
+        })
+        dispatch({
+          type: 'consultation/query',
+          payload: values.id,
+        }).then(() => {
+          history.push(
+            `/reception/queue/patientdashboard?qid=${consultation.queueID}`,
+          )
+        })
+      }
+    })
+  }
+
+  resumeConsultation = () => {
+    const { dispatch, values, history, consultation, resetForm } = this.props
+    dispatch({
+      type: 'consultation/resume',
+      payload: consultation.visitID,
+    }).then((r) => {
+      if (r) {
+        resetForm(r)
+        notification.success({
+          message: 'Consultation resumed',
+        })
+      }
+    })
+  }
+
+  discardConsultation = () => {
+    const { dispatch, values, history, consultation, resetForm } = this.props
+    console.log('delete', values)
+    if (values.id) {
+      dispatch({
+        type: 'consultation/delete',
+        payload: values.id,
+      }).then((r) => {
+        if (r) {
+          history.push(
+            `/reception/queue/patientdashboard?qid=${consultation.queueID}&v=${Date.now()}`,
+          )
+        }
+      })
+    }
+  }
+
   render () {
     const { props, state } = this
     const {
@@ -760,78 +909,83 @@ class Consultation extends PureComponent {
       classes,
       theme,
       dispatch,
-      consultation,
+      values,
+      consultation = {},
       ...resetProps
     } = this.props
     const { currentLayout } = state
-    // console.log(props)
+    const { entity } = consultation
+    console.log(values)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
-        <Banner
-          extraCmt={
-            <div style={{ textAlign: 'center', paddingTop: 16 }}>
-              <p style={{ position: 'relative' }}>
-                Total Invoice
-                <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item onClick={this.toggleInvoiceAdjustment}>
-                        Add Invoice Adjustment
-                      </Menu.Item>
-                      <Menu.Divider />
+        {true && (
+          <Banner
+            style={{}}
+            extraCmt={
+              <div style={{ textAlign: 'center', paddingTop: 16 }}>
+                <p style={{ position: 'relative' }}>
+                  Total Invoice
+                  <Dropdown
+                    overlay={
+                      <Menu>
+                        <Menu.Item onClick={this.toggleInvoiceAdjustment}>
+                          Add Invoice Adjustment
+                        </Menu.Item>
+                        <Menu.Divider />
 
-                      <Menu.Item>Absorb GST</Menu.Item>
-                    </Menu>
-                  }
-                  trigger={[
-                    'click',
-                  ]}
-                >
-                  <IconButton className={classes.iconButton}>
-                    <MoreHoriz />
-                  </IconButton>
-                </Dropdown>
-              </p>
-              <h5>{NumberFormatter(210)}</h5>
-              <SizeContainer size='sm'>
-                <Button
-                  color='danger'
-                  onClick={() => {
-                    history.push('/reception/queue/patientdashboard')
-                  }}
-                >
-                  Discard
-                </Button>
-                <ProgressButton color='info' icon={null}>
-                  Pause
-                </ProgressButton>
-                <ProgressButton
-                  color='primary'
-                  onClick={() => {
-                    dispatch({
-                      type: 'global/sendNotification',
-                      payload: {
-                        type: 'Consultation',
-                        data: {
-                          message: 'reception update',
-                          sender: 'Mr Test',
-                        },
-                      },
-                    })
-                    history.push('/reception/queue')
-                  }}
-                  icon={null}
-                >
-                  Sign Off
-                </ProgressButton>
-              </SizeContainer>
-            </div>
-          }
-          {...this.props}
-        />
+                        <Menu.Item>Absorb GST</Menu.Item>
+                      </Menu>
+                    }
+                    trigger={[
+                      'click',
+                    ]}
+                  >
+                    <IconButton className={classes.iconButton}>
+                      <MoreHoriz />
+                    </IconButton>
+                  </Dropdown>
+                </p>
+                <h5>{NumberFormatter(210)}</h5>
+                <SizeContainer size='sm'>
+                  {values.status !== 'Paused' && (
+                    <Popconfirm onConfirm={this.discardConsultation}>
+                      <ProgressButton color='danger'>Discard</ProgressButton>
+                    </Popconfirm>
+                  )}
+                  {values.status !== 'Paused' && (
+                    <ProgressButton
+                      onClick={this.pauseConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Pause
+                    </ProgressButton>
+                  )}
+                  {values.status === 'Paused' && (
+                    <ProgressButton
+                      onClick={this.resumeConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Resume
+                    </ProgressButton>
+                  )}
+                  <ProgressButton
+                    color='primary'
+                    onClick={this.props.handleSubmit}
+                    icon={null}
+                  >
+                    Sign Off
+                  </ProgressButton>
+                </SizeContainer>
+              </div>
+            }
+            {...this.props}
+          />
+        )}
         {/* <CardContainer
           hideHeader
           style={{
@@ -842,8 +996,20 @@ class Consultation extends PureComponent {
         >
           
         </CardContainer> */}
-        {this.getLayoutWidgets()}
-
+        <AuthorizedContext.Provider
+          value={{
+            view: {
+              name: 'consultation.view',
+              rights: values.status === 'Paused' ? 'disable' : 'enable',
+            },
+            edit: {
+              name: 'consultation.edit',
+              rights: values.status === 'Paused' ? 'disable' : 'enable',
+            },
+          }}
+        >
+          {this.getLayoutWidgets()}
+        </AuthorizedContext.Provider>
         {!state.fullScreenWidget && (
           <React.Fragment>
             <div className={classes.fabContainer}>

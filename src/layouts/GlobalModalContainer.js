@@ -6,6 +6,7 @@ import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { ChangePassword } from 'medisys-components'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
+import Consultation from '@/pages/PatientDashboard/Consultation'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
@@ -82,6 +83,23 @@ class GlobalModalContainer extends PureComponent {
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
           {/* {global.currentPatientId} */}
+        </CommonModal>
+
+        <CommonModal
+          open={global.showConsultationPanel}
+          title='Consultation'
+          observe='Consultation'
+          authority='consultation'
+          bodyNoPadding
+          onClose={(e) => {
+            dispatch({
+              type: 'consultation/closeConsultationModal',
+            })
+          }}
+          fullScreen
+          showFooter={false}
+        >
+          {global.showConsultationPanel && <Consultation {...this.props} />}
         </CommonModal>
 
         <CommonModal
@@ -168,6 +186,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <VisitRegistration />
         </CommonModal>
+
         <CommonModal
           open={global.openConfirm}
           title={global.openConfirmTitle}
