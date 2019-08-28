@@ -17,7 +17,10 @@ class CodeSelect extends React.PureComponent {
     if (props.code) {
       dispatch({
         type: 'codetable/fetchCodes',
-        code: props.code,
+        payload: {
+          code: props.code.toLowerCase(),
+          filter: props.filter,
+        },
       })
     } else if (props.tenantCode) {
       getTenantCodes(props.tenantCode).then((response) => {

@@ -44,14 +44,14 @@ const styles = (theme) => ({
 
 const cardAnimationDuration = 350
 
-const submitKey = 'loginSEMR/getToken'
+const submitKey = 'login/getToken'
 
 const LoginSchema = Yup.object().shape({
   username: Yup.string().trim().required('Please enter Username'),
   password: Yup.string().trim().required('Please enter Password'),
   clinic_code: Yup.string().trim().required('Please enter Clinic Code'),
 })
-@connect(({ loginSEMR }) => ({ loginSEMR }))
+@connect(({ login }) => ({ login }))
 @withFormik({
   mapPropsToValues: () => {
     if (process.env.NODE_ENV === 'development')
@@ -111,8 +111,8 @@ class LoginCard extends PureComponent {
   }
 
   render () {
-    const { classes, loginSEMR } = this.props
-    const { isInvalidLogin } = loginSEMR
+    const { classes, login } = this.props
+    const { isInvalidLogin } = login
     const { cardAnimation } = this.state
 
     return (
