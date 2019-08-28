@@ -382,20 +382,10 @@ class PatientHistory extends Component {
         >
           <Accordion
             active={0}
-            collapses={[
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-            ]}
+            collapses={patientHistory.list.map((o) => ({
+              title: this.getTitle(o),
+              content: this.getContent(o),
+            }))}
           />
         </CardContainer>
         <CardContainer
