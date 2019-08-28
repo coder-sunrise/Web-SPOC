@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 // import fetch from 'dva/fetch'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
-import { Chip, withStyles } from '@material-ui/core'
+import { CircularProgress, Chip, withStyles } from '@material-ui/core'
 // custom components
 import {
   Button,
@@ -12,7 +12,11 @@ import {
   GridItem,
 } from '@/components'
 // services
-import { uploadFile, downloadFile, deleteFileByFileID } from '@/services/file'
+import {
+  uploadFile,
+  downloadAttachment,
+  deleteFileByFileID,
+} from '@/services/file'
 // utils
 import { getCodes } from '@/utils/codes'
 
@@ -24,6 +28,7 @@ const styles = (theme) => ({
   attachmentLabel: {
     fontSize: '0.9rem',
     fontWeight: 300,
+    marginRight: theme.spacing(1),
   },
   attachmentItem: {
     marginLeft: theme.spacing(0.5),
@@ -66,6 +71,10 @@ const AttachmentWrapper = ({
   attachments = [],
   title = '',
 }) => {
+  const [
+    uploading,
+    setUploading,
+  ] = useState(false)
   const [
     fileStatusList,
     setFileStatusList,
@@ -144,6 +153,7 @@ const AttachmentWrapper = ({
 
   const onFileChange = async (event) => {
     try {
+      setUploading(true)
       const { files } = event.target
       const numberOfNewFiles = Object.keys(files).length
       if (numberOfNewFiles + attachments.length > 5) {
@@ -157,6 +167,7 @@ const AttachmentWrapper = ({
           .filter((key) => !skipped.includes(files[key].name))
           .map((key) => mapFileToUploadObject(files[key])),
       )
+      setUploading(false)
       handleUpdateAttachments({
         added: selectedFiles,
       })
@@ -176,7 +187,7 @@ const AttachmentWrapper = ({
   }
 
   const onClick = (attachment) => {
-    downloadFile(attachment)
+    downloadAttachment(attachment)
   }
 
   return (
@@ -185,6 +196,7 @@ const AttachmentWrapper = ({
         {children}
         <GridItem className={classes.verticalSpacing}>
           <span className={classes.attachmentLabel}>Attachment:</span>
+          {uploading && <CircularProgress />}
         </GridItem>
         <GridItem md={10} className={classes.verticalSpacing}>
           <div>
@@ -216,7 +228,7 @@ const AttachmentWrapper = ({
             color='rose'
             size='sm'
             onClick={onUploadClick}
-            disabled={attachments.length >= 5}
+            disabled={uploading || attachments.length >= 5}
           >
             <AttachFile />
             Upload

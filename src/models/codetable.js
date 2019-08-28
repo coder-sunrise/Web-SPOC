@@ -23,7 +23,7 @@ export default createListViewModel({
             const response = yield call(getCodes, payload)
             if (response.length > 0) {
               // list = { ...list, [lowerCaseCode]: response }
-              return yield put({
+              yield put({
                 type: 'saveCodetable',
                 code,
                 data: response,
@@ -31,7 +31,6 @@ export default createListViewModel({
             }
           }
         }
-        return false
       },
     },
     reducers: {
