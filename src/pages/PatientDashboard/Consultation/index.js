@@ -135,7 +135,7 @@ const styles = (theme) => ({
   paperRoot: {
     // boxSizing: 'content-box',
     // height: 'calc(100% + 10px)',
-    height: '100%',
+    // height: '100%',
     overflow: 'hidden',
     // paddingTop: 30,
     // '&> div': {
