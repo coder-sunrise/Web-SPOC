@@ -99,10 +99,15 @@ export default class BaseCRUDViewModel {
         // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
         // if (!disableAutoQuery) {
         if (!payload.keepFilter) {
-          filter = {
-            ...filter,
-            ...payload,
+          if (typeof payload === 'object') {
+            filter = {
+              ...filter,
+              ...payload,
+            }
+          } else {
+            filter = payload
           }
+
           // yield put({
           //   type: 'queryBegin',
           //   payload: {
@@ -110,7 +115,6 @@ export default class BaseCRUDViewModel {
           //   },
           // })
         }
-        // console.log(filter)
 
         // const { list = {} } = config
         // filter = {
