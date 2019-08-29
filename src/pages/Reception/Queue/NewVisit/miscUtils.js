@@ -60,6 +60,7 @@ export const formikMapPropsToValues = ({ queueLog, visitRegistration }) => {
   return {
     queueNo: qNo,
     visitPurposeFK: 1,
+    visitStatus: VISIT_STATUS.WAITING,
     ...visitEntries,
   }
 }
@@ -126,12 +127,12 @@ export const formikHandleSubmit = (
   }).then((response) => {
     if (response) {
       resetForm({})
+      dispatch({
+        type: 'queueLog/refresh',
+      })
       onConfirm()
     } else {
       setSubmitting(false)
     }
-  })
-  dispatch({
-    type: 'visitRegistration/refresh',
   })
 }

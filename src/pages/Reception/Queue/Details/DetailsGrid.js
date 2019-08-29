@@ -215,9 +215,8 @@ class DetailsGrid extends PureComponent {
     }
 
     const enabledDispense = [
-      'DISPENSE',
-      'PAID',
-      'OVERPAID',
+      VISIT_STATUS.DISPENSE,
+      VISIT_STATUS.ORDER_UPDATED,
     ]
     const isStatusWaiting = filterMap[StatusIndicator.WAITING].includes(
       row.visitStatus,
@@ -225,9 +224,10 @@ class DetailsGrid extends PureComponent {
     const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
       row.visitStatus,
     )
-    const shouldDisableDispense = false // !enabledDispense.includes(row.visitStatus)
+    const shouldDisableDispense = !enabledDispense.includes(row.visitStatus)
     const newContextMenuOptions = ContextMenuOptions.map((opt) => {
-      if (opt.id === 1) return { ...opt, disabled: shouldDisableDispense }
+      if (opt.id === 1 || opt.id === 1.1)
+        return { ...opt, disabled: shouldDisableDispense }
       if (opt.id === 2) return { ...opt, disabled: !isStatusWaiting }
       if (opt.id === 6 || opt.id === 7)
         return { ...opt, hidden: !isStatusInProgress }

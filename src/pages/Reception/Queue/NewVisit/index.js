@@ -133,6 +133,38 @@ class NewVisit extends PureComponent {
     setFieldValue('visitAttachment', updated)
   }
 
+  validatePatient = () => {
+    const {
+      queueLog: { list = [] } = { list: [] },
+      visitRegistration: { patientInfo },
+      dispatch,
+      handleSubmit,
+      errors,
+    } = this.props
+
+    if (Object.keys(errors).length > 0) return handleSubmit()
+
+    const alreadyRegisteredVisit = list.reduce(
+      (registered, queue) =>
+        !registered ? queue.patientProfileFK === patientInfo.id : registered,
+      false,
+    )
+    if (alreadyRegisteredVisit)
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: 'Confirm Register New Visit',
+          openConfirmContent:
+            'This patient already registered in current session, are you sure to continue?',
+          onOpenConfirm: handleSubmit,
+        },
+      })
+    else {
+      handleSubmit()
+    }
+  }
+
   render () {
     const {
       classes,
@@ -218,7 +250,7 @@ class NewVisit extends PureComponent {
         {footer &&
           footer({
             confirmBtnText: isEdit ? 'Save' : 'Register visit',
-            onConfirm: handleSubmit,
+            onConfirm: this.validatePatient,
             confirmProps: {
               disabled: isReadOnly,
             },
