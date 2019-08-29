@@ -1,3 +1,5 @@
+import { VISIT_STATUS } from '../variables'
+
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
   // fileIndexFK ===
@@ -62,7 +64,10 @@ export const formikMapPropsToValues = ({ queueLog, visitRegistration }) => {
   }
 }
 
-export const formikHandleSubmit = (values, { props, resetForm }) => {
+export const formikHandleSubmit = (
+  values,
+  { props, resetForm, setSubmitting },
+) => {
   const { queueNo, visitAttachment, ...restValues } = values
   const { dispatch, queueLog, visitRegistration, onConfirm } = props
 
@@ -96,7 +101,7 @@ export const formikHandleSubmit = (values, { props, resetForm }) => {
       patientProfileFK,
       bizSessionFK,
       visitReferenceNo,
-      visitStatus: 'WAITING',
+      visitStatus: VISIT_STATUS.WAITING,
       visitRemarks: null,
       temperatureC: null,
       bpSysMMHG: null,
@@ -115,19 +120,18 @@ export const formikHandleSubmit = (values, { props, resetForm }) => {
     },
   }
 
-  const type =
-    id === undefined
-      ? 'visitRegistration/registerVisitInfo'
-      : 'visitRegistration/saveVisitInfo'
-
-  resetForm({})
-  if (onConfirm) onConfirm()
-
   dispatch({
-    type,
+    type: 'visitRegistration/upsert',
     payload,
   }).then((response) => {
-    resetForm({})
-    return response && onConfirm()
+    if (response) {
+      resetForm({})
+      onConfirm()
+    } else {
+      setSubmitting(false)
+    }
+  })
+  dispatch({
+    type: 'visitRegistration/refresh',
   })
 }

@@ -23,14 +23,15 @@ import FormFieldName from './formField'
 import { deleteFileByFileID } from '@/services/file'
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
+import { VISIT_STATUS } from '../variables'
 
 const styles = (theme) => ({
   gridContainer: {
-    marginBottom: theme.spacing.unit * 2,
+    marginBottom: theme.spacing(1),
   },
   formContent: {
     minHeight: '50vh',
-    maxHeight: '80vh',
+    maxHeight: '85vh',
     overflow: 'auto',
   },
   cardContent: {
@@ -137,11 +138,27 @@ class NewVisit extends PureComponent {
       classes,
       footer,
       handleSubmit,
+      queueLog: { list = [] } = { list: [] },
       loading,
       visitRegistration: { visitInfo, errorState },
       values,
       isSubmitting,
     } = this.props
+    const existingQNo = list.reduce(
+      (queueNumbers, queue) =>
+        queue.visitFK === values.id
+          ? [
+              ...queueNumbers,
+            ]
+          : [
+              ...queueNumbers,
+              queue.queueNo,
+            ],
+      [],
+    )
+
+    const isReadOnly = values.visitStatus !== VISIT_STATUS.WAITING
+
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
@@ -149,7 +166,7 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-
+    // console.log({ values, list, existingQNo })
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -166,15 +183,21 @@ class NewVisit extends PureComponent {
                   <React.Fragment>
                     <GridItem xs md={12} className={classes.row}>
                       <VisitInfoCard
+                        isReadOnly={isReadOnly}
+                        existingQNo={existingQNo}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
                       />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
-                      <VitalSignCard handleCalculateBMI={this.calculateBMI} />
+                      <VitalSignCard
+                        isReadOnly={isReadOnly}
+                        handleCalculateBMI={this.calculateBMI}
+                      />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
                       <ReferralCard
+                        isReadOnly={isReadOnly}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
                       />
@@ -196,6 +219,9 @@ class NewVisit extends PureComponent {
           footer({
             confirmBtnText: isEdit ? 'Save' : 'Register visit',
             onConfirm: handleSubmit,
+            confirmProps: {
+              disabled: isReadOnly,
+            },
           })}
       </React.Fragment>
     )

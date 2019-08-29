@@ -88,63 +88,54 @@ export default createListViewModel({
         }
         const response = yield call(service.getActiveSession, payload)
 
-        const { status, data } = response
+        const { data } = response
         // data = null when get session failed
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
           yield put({
             type: 'query',
             payload: {
-              pagesize: 0,
+              pagesize: 999999,
               'VisitFKNavigation.BizSessionFK': sessionData[0].id,
             },
           })
-
-          yield put({
-            type: 'toggleError',
-            error: { hasError: false, message: '' },
-          })
-
           yield put({
             type: 'updateSessionInfo',
             payload: { ...sessionData[0] },
           })
+          return true
         }
-        if (status >= 400)
-          yield put({
-            type: 'toggleError',
-            error: {
-              hasError: true,
-              message:
-                'Failed to get session info. Please contact system Administrator',
-            },
-          })
+        return false
       },
-      *deleteQueueByQueueID ({ queueID }, { call, put }) {
-        const response = yield call(service.deleteQueue, queueID)
-        console.log({ response })
+      *deleteQueueByQueueID ({ payload }, { call, put }) {
+        yield call(service.deleteQueue, payload)
         yield put({
           type: 'refresh',
         })
-        return true
       },
       *refresh (_, { select, put }) {
         const queueLogState = yield select((state) => state.queueLog)
         const { currentFilter, sessionInfo } = queueLogState
-        const filter =
-          currentFilter !== StatusIndicator.ALL
-            ? {
-                'visitFkNavigation.visitStatus': currentFilter,
-              }
-            : {}
         yield put({
-          type: 'query',
-          payload: {
-            pagesize: 0,
-            'VisitFKNavigation.BizSessionFK': sessionInfo.id,
-            ...filter,
-          },
+          type: 'getSessionInfo',
         })
+        // if (sessionInfo.id !== '') {
+        //   const filter =
+        //     currentFilter !== StatusIndicator.ALL
+        //       ? {
+        //           'visitFkNavigation.visitStatus': currentFilter,
+        //         }
+        //       : {}
+        //   yield put({
+        //     type: 'query',
+        //     payload: {
+        //       pagesize: 999999,
+        //       'VisitFKNavigation.BizSessionFK': sessionInfo.id,
+        //       ...filter,
+        //     },
+        //   })
+        // }
+
         return true
       },
     },
@@ -154,14 +145,6 @@ export default createListViewModel({
       },
       updateSessionInfo (state, { payload }) {
         return { ...state, sessionInfo: { ...payload } }
-      },
-      updatePatientList (state, { payload }) {
-        return {
-          ...state,
-          patientList: [
-            ...payload,
-          ],
-        }
       },
       showError (state, { payload }) {
         return { ...state, errorMessage: payload }

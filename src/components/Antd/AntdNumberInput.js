@@ -166,6 +166,9 @@ class AntdNumberInput extends React.PureComponent {
     this.setState({
       focused: false,
     })
+    const { form, field } = this.props
+    if (form && field) form.setFieldTouched(field.name, true)
+
     // const { formatter } = this.props
     // if (formatter) {
     //   this.setState({

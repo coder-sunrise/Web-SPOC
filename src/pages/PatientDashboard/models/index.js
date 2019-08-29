@@ -70,7 +70,7 @@ export default createFormViewModel({
         ) {
           yield put({
             type: 'visitRegistration/fetchVisitInfo',
-            visitID: queueID,
+            payload: { id: queueID },
           })
           yield take('visitRegistration/fetchVisitInfo/@@end')
 
