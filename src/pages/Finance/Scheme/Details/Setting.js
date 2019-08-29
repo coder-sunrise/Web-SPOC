@@ -68,7 +68,7 @@ const Setting = (props) => {
       <SizeContainer size='sm'>
         <GridContainer>
           <GridItem xs={8} md={5}>
-            <FastField
+            <Field
               name='patientMinCoPaymentAmount'
               render={CPNumber(
                 'Minimum Patient Payable Amount',
@@ -77,7 +77,7 @@ const Setting = (props) => {
             />
           </GridItem>
           <GridItem xs={4} md={1}>
-            <FastField name='patientMinCoPaymentAmountType' render={CPSwitch} />
+            <Field name='patientMinCoPaymentAmountType' render={CPSwitch} />
           </GridItem>
         </GridContainer>
         <GridContainer>

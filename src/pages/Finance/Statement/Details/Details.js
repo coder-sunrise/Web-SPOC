@@ -5,6 +5,8 @@ import { FastField } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Refresh, Print, Payment } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
+import { Delete } from '@material-ui/icons'
+
 import {
   Button,
   GridContainer,
@@ -12,9 +14,11 @@ import {
   EditableTableGrid,
   CommonTableGrid,
   CommonModal,
+  NavPills,
 } from '@/components'
 import CollectPayment from './CollectPayment'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 
 const styles = () => ({
   gridContainer: {
@@ -33,18 +37,40 @@ const styles = () => ({
 }))
 class Details extends PureComponent {
   state = {
+    selectedRows: [],
     lastRefresh: moment().add(-1, 'months').format('DD MMM YYYY HH:mm'),
     columns: [
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'amount', title: 'Payable Amount' },
-      { name: 'outstandingBalance', title: 'O/S Balance' },
+      { name: 'adminCharge', title: 'Admin Charge' },
+      { name: 'payableAmount', title: 'Payable Amount' },
+      { name: 'outstandingBalance', title: 'Outstanding' },
+      { name: 'remarks', title: 'Remarks' },
+      { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
       { columName: 'amount', type: 'number', currency: true },
       { columName: 'outstandingBalance', type: 'number', currency: true },
       { columName: 'invoiceDate', type: 'date' },
+      {
+        columnName: 'action',
+        align: 'center',
+        render: (row) => {
+          return (
+            <Button
+              size='sm'
+              // onClick={() => {
+              //   editRow(row)
+              // }}
+              justIcon
+              color='primary'
+            >
+              <Delete />
+            </Button>
+          )
+        },
+      },
     ],
     editingRowIds: [],
     rowChanges: {},
@@ -190,6 +216,7 @@ class Details extends PureComponent {
         outstandingBalance: 100,
       },
     ],
+    FuncProps: { selectable: true },
 
     showCollectPayment: false,
   }
@@ -209,6 +236,10 @@ class Details extends PureComponent {
 
   gridGetRowID = (row) => row.invoiceNo
 
+  handleSelectionChange = (selection) => {
+    this.setState({ selectedRows: selection })
+  }
+
   render () {
     const {
       rows,
@@ -216,41 +247,51 @@ class Details extends PureComponent {
       columnExtensions,
       lastRefresh,
       showCollectPayment,
+      FuncProps,
     } = this.state
 
-    const FuncProps = { pager: false }
-    const { classes } = this.props
+    // const FuncProps = { pager: false }
+    const { classes, history } = this.props
+    console.log('asd', this.props)
     return (
       <div>
         <GridContainer classes={{ grid: classes.gridContainer }}>
-          <GridItem
-            classes={{ grid: classes.buttonContainer }}
-            container
-            xs={12}
-            sm={12}
-            md={12}
-            lg={9}
-          >
-            <GridItem>
-              <Button color='rose' onClick={this.handleRefresh}>
+          <GridContainer direction='row' justify='flex-end'>
+            <GridItem style={{ marginRight: -16 }}>
+              <Button color='primary' onClick={this.handleRefresh}>
                 <Refresh />
                 <FormattedMessage id='finance.statement.details.refreshStatement' />
               </Button>
-              <Button color='rose'>
+              <Button color='primary'>
                 <Print />
                 <FormattedMessage id='finance.statement.details.printStatement' />
               </Button>
             </GridItem>
-          </GridItem>
-          <GridContainer item lg={3} justify='flex-end'>
-            <GridItem classes={{ grid: classes.collectPaymentBtn }}>
-              <Button color='primary' onClick={this.toggleCollectPayment}>
-                <Payment />
-                <FormattedMessage id='finance.collectPayment' />
-              </Button>
-            </GridItem>
           </GridContainer>
         </GridContainer>
+
+        {/* <NavPills
+          color='info'
+          onChange={(event, active) => {
+            history.push(
+              getAppendUrl({
+                t: active,
+              }),
+            )
+          }}
+          // index={currentTab}
+          contentStyle={{}}
+          tabs={[
+            {
+              tabButton: 'Statement Details',
+              tabContent: <p />, //<DetailPanel {...detailProps} />,
+            },
+            {
+              tabButton: 'Payment Details',
+              tabContent: <p />, //<Setting {...detailProps} />,
+            },
+          ]}
+        /> */}
         {/*
           <EditableTableGrid
             rows={rows}
@@ -266,8 +307,10 @@ class Details extends PureComponent {
           rows={rows}
           columns={columns}
           columnExtensions={columnExtensions}
-          // FuncProps={FuncProps}
+          FuncProps={FuncProps}
           getRowId={this.gridGetRowID}
+          selection={this.state.selectedRows}
+          onSelectionChange={this.handleSelectionChange}
         />
         <h5>{`Last Refreshed On ${lastRefresh}`}</h5>
         <CommonModal
@@ -285,6 +328,10 @@ class Details extends PureComponent {
           */}
           <CollectPaymentConfirm />
         </CommonModal>
+
+        <Button style={{ marginTop: 10 }} color='primary'>
+          Extract As Single
+        </Button>
       </div>
     )
   }

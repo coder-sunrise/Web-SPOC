@@ -1,10 +1,9 @@
 import React, { PureComponent, useEffect } from 'react'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import clsx from 'clsx'
 import { withStyles, Divider, Tooltip } from '@material-ui/core'
-import { getActiveSession } from '@/pages/Reception/Queue/services'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import Yup from '@/utils/yup'
+import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 import {
   Checkbox,
@@ -17,8 +16,7 @@ import {
   TextField,
   Button,
 } from '@/components'
-
-// import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
+import WarningSnackbar from '../GeneralSetting/WarningSnackbar'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -29,16 +27,9 @@ const styles = (theme) => ({
 }))
 @withFormikExtend({
   mapPropsToValues: ({ settingGst }) => {
-    console.log(settingGst)
+    // console.log(settingGst)
     return settingGst.entity ? settingGst.entity : settingGst.default
   },
-  // validationSchema: Yup.object().shape({
-  //   name: Yup.string().required(),
-  //   address: Yup.object().shape({
-  //     postcode: Yup.number().required(),
-  //     countryFK: Yup.string().required(),
-  //   }),
-  // }),
 
   handleSubmit: () => {},
   displayName: 'GstSetupInfo',
@@ -56,7 +47,7 @@ class GstSetup extends PureComponent {
 
   checkHasActiveSession = async () => {
     const result = await getActiveSession()
-    let { data } = result.data
+    const { data } = result.data
     // data = false
     this.setState({
       hasActiveSession: !!data,
@@ -88,13 +79,8 @@ class GstSetup extends PureComponent {
       ...restProps
     } = this.props
     const { enableGst, hasActiveSession } = this.state
-    const tooltipMsg = `Active session detected.`
 
-    // const tooltipStyle = {
-    //   fontSize: '20px',
-    // }
-
-    console.log('inclusiveGst', this.props.values)
+    // console.log('inclusiveGst', this.props.values)
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -102,31 +88,12 @@ class GstSetup extends PureComponent {
             <Field
               name='enableGst'
               render={(args) => (
-                <div>
-                  {hasActiveSession ? (
-                    <Tooltip
-                      title={tooltipMsg}
-                      placement='right'
-                      // style={tooltipStyle}
-                    >
-                      <span>
-                        <Checkbox
-                          label='Enable GST'
-                          onChange={this.handleOnChange}
-                          disabled={!!hasActiveSession}
-                          {...args}
-                        />
-                      </span>
-                    </Tooltip>
-                  ) : (
-                    <Checkbox
-                      label='Enable GST'
-                      onChange={this.handleOnChange}
-                      disabled={!!hasActiveSession}
-                      {...args}
-                    />
-                  )}
-                </div>
+                <Checkbox
+                  label='Enable GST'
+                  onChange={this.handleOnChange}
+                  disabled={!!hasActiveSession}
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -175,25 +142,35 @@ class GstSetup extends PureComponent {
           </GridItem>
         </GridContainer>
 
-        <div className={classes.actionBtn}>
-          <Button
-            color='danger'
-            onClick={() => {
-              this.props.history.push('/setting')
-            }}
-          >
-            Cancel
-          </Button>
+        {hasActiveSession ? (
+          <div style={{ paddingTop: 5 }}>
+            <WarningSnackbar
+              variant='warning'
+              className={classes.margin}
+              message='Active Session detected!'
+            />
+          </div>
+        ) : (
+          <div className={classes.actionBtn}>
+            <Button
+              color='danger'
+              onClick={() => {
+                this.props.history.push('/setting')
+              }}
+            >
+              Cancel
+            </Button>
 
-          <Button
-            color='primary'
-            onClick={() => {
-              this.props.handleSubmit
-            }}
-          >
-            Save
-          </Button>
-        </div>
+            <Button
+              color='primary'
+              onClick={() => {
+                this.props.handleSubmit
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        )}
       </CardContainer>
     )
   }

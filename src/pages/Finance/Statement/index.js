@@ -7,15 +7,23 @@ import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
 // material ui
-import { Book, Pageview } from '@material-ui/icons'
+import { Book, Pageview, Edit, Delete } from '@material-ui/icons'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom components
+import {
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+} from '@material-ui/core'
 import {
   Button,
   CommonHeader,
   CommonModal,
   CommonTableGrid,
   Tooltip,
+  GridItem,
 } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
@@ -53,207 +61,363 @@ const Cell = (props) => {
 @withFormik({ mapPropsToValues: () => ({}) })
 class Statement extends PureComponent {
   state = {
-    columns: [
-      { name: 'patientRefNo', title: 'Patient Ref No.' },
-      { name: 'patientName', title: 'Patient Name' },
-      // { name: 'invoiceNo', title: 'Invoice No' },
-      { name: 'amount', title: 'Amount' },
-      { name: 'outstandingBalance', title: 'O/S Balance' },
-      { name: 'invoiceDate', title: 'Invoice Date' },
-      { name: 'action', title: 'Action' },
-    ],
-    columnExtensions: [
-      { columName: 'amount', type: 'number', currency: true },
-      { columName: 'outstandingBalance', type: 'number', currency: true },
-      { columName: 'invoiceDate', type: 'date' },
-    ],
-    editingRowIds: [],
-    rowChanges: {},
-    rows: [
-      {
-        id: 'PT-000001A',
-        patientRefNo: 'PT-000001A',
-        patientName: 'Patient 01',
-        invoiceNo: 'IV-000001',
-        amount: 100,
-        outstandingBalance: 100,
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-      },
-      {
-        id: 'PT-000005A',
-        patientRefNo: 'PT-000005A',
-        patientName: 'Patient 05',
-        invoiceNo: 'IV-000005',
-        amount: 10,
-        outstandingBalance: 100,
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-      },
-      {
-        id: 'PT-000002A',
-        patientRefNo: 'PT-000002A',
-        patientName: 'Patient 02',
-        invoiceNo: 'IV-000002',
-        amount: 20,
-        outstandingBalance: 100,
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-      },
-      {
-        id: 'PT-000003A',
-        patientRefNo: 'PT-000003A',
-        patientName: 'Patient 03',
-        invoiceNo: 'IV-000003',
-        amount: 130,
-        outstandingBalance: 100,
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-      },
-      {
-        id: 'PT-000004A',
-        patientRefNo: 'PT-000004A',
-        patientName: 'Patient 04',
-        invoiceNo: 'IV-000004',
-        amount: 400,
-        outstandingBalance: 100,
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-      },
-    ],
-    showAddNewStatement: false,
+    selectedRows: [],
+    open: false,
+    selectedStatementNo: '',
   }
 
-  changeEditingRowIds = (editingRowIds) => this.setState({ editingRowIds })
-
-  changeRowChanges = (rowChanges) => {
-    this.setState({ rowChanges })
+  handleSelectionChange = (selection) => {
+    this.setState({ selectedRows: selection })
   }
 
-  commitChanges = ({ changed }) => {
-    const { rows } = this.state
-    console.log('commitChanges', changed)
-    // let updatedRows = []
-    // if (changed) {
-    //   updatedRows = rows.map(
-    //     (row) => (changed[row.id] ? { ...row, ...changed[row.id] } : row),
-    //   )
-    // }
+  // editRow = (row, e) => {
+  //   const { dispatch, corporateBilling } = this.props
 
-    // this.setState({
-    //   rows: updatedRows,
-    // })
-  }
+  //   const { list } = corporateBilling
 
-  handleSearch = (props) => {
-    console.log('handleSearch', props)
-  }
+  //   dispatch({
+  //     type: 'corporateBilling/updateState',
+  //     payload: {
+  //       showModal: true,
+  //       entity: list.find((o) => o.id === row.id),
+  //     },
+  //   })
+  // }
 
-  handleShowDetails = (row) => {
-    const { dispatch } = this.props
-    const href = `/finance/statement/details/${row.id}`
-    dispatch({
-      type: 'menu/updateBreadcrumb',
-      payload: {
-        href,
-        name: row.id,
-      },
+  handleClickOpen = (row) => {
+    this.setState((prevState) => {
+      return {
+        open: !prevState.open,
+        selectedStatementNo: row.statementNo,
+      }
     })
-    router.push(href)
+    // console.log('pop', this.state.open),
   }
 
-  toggleAddNewStatementModal = () => {
-    const { showAddNewStatement } = this.state
-    this.setState({ showAddNewStatement: !showAddNewStatement })
-  }
-
-  getActionProps = () => {
-    const ActionCell = (p) =>
-      Cell({
-        ...p,
-        onShowDetails: this.handleShowDetails,
-      })
-
-    return { TableCellComponent: ActionCell }
+  handleClose = () => {
+    this.setState((prevState) => {
+      return { open: false }
+    })
   }
 
   render () {
-    const {
-      rows,
-      columns,
-      columnExtensions,
-      editingRowIds,
-      rowChanges,
-      showAddNewStatement,
-    } = this.state
+    const { history } = this.props
+    const dateFormat = 'DD MMM YYYY'
 
-    const editingProps = {
-      editingRowIds,
-      rowChanges,
-      onEditingRowIdsChange: this.changeEditingRowIds,
-      onRowChangesChange: this.changeRowChanges,
-      onCommitChanges: this.commitChanges,
-      columnExtensions: [
-        { columnName: 'patientRefNo', editingEnabled: false },
-        { columnName: 'outstandingBalance', editingEnabled: false },
-        { columnName: 'invoiceDate', editingEnabled: false },
-        // { columnName: 'patientName', editingEnabled: false },
-      ],
-      availableColumns: {
-        patientName: [
-          { name: 'Patient 01', value: 'Patient 01' },
-          { name: 'Patient 02', value: 'Patient 02' },
-          { name: 'Patient 03', value: 'Patient 03' },
-        ],
-      },
+    const editRow = (row, e) => {
+      history.push(`/finance/statement/details?id=${row.id}`)
     }
-
-    const ActionProps = this.getActionProps()
-
     return (
-      <CommonHeader Icon={<Book />} titleId='finance.statement.title'>
-        {/* Testing EditableTableGrid reusable components
-        <EditableTableGrid
-          rows={rows}
-          columns={columns}
-          currencyColumns={currencyColumns}
-          dateColumns={dateColumns}
-          getRowId={getRowId}
-          FuncProps={{ edit: false, filter: false }}
-          ActionProps={ActionProps}
-        />
-        */}
+      <React.Fragment>
         <SearchBar
+          history={history}
           handleSearch={this.handleSearch}
           handleAddNew={this.toggleAddNewStatementModal}
         />
         <CommonTableGrid
-          rows={rows}
-          columns={columns}
-          getRowId={getRowId}
-          columnExtensions={columnExtensions}
-          ActionProps={ActionProps}
+          style={{ margin: 0 }}
+          // type='corporateBilling'
+          selection={this.state.selectedRows}
+          onSelectionChange={this.handleSelectionChange}
+          onRowDoubleClick={this.editRow}
+          rows={[
+            {
+              id: 'SM/00001',
+              statementNo: 'SM/00001',
+              statementDate: '2019-08-14 09:50:59',
+              // moment()
+              //   .add(Math.ceil(Math.random() * 100) - 100, 'days')
+              //   .format('LLL'),
+              company: 'Prudential',
+              payableAmount: '100',
+              paid: '20',
+              outstanding: 180,
+              dueDate: '2019-09-14 09:50:59',
+              remarks: 'Remarks for this statement',
+            },
+            {
+              id: 'SM/00002',
+              statementNo: 'SM/00002',
+              statementDate: moment()
+                .add(Math.ceil(Math.random() * 100) - 100, 'days')
+                .format('LLL'),
+              company: 'AVIVA',
+              payableAmount: 200,
+              paid: 200,
+              outstanding: 0,
+              dueDate: moment()
+                .add(Math.ceil(Math.random() * 100) - 100, 'days')
+                .format('LLL'),
+              remarks: '',
+            },
+          ]}
+          columns={[
+            { name: 'statementNo', title: 'Statement No.' },
+            { name: 'statementDate', title: 'Statement Date' },
+            { name: 'company', title: 'Company' },
+            { name: 'payableAmount', title: 'Payable Amount' },
+            { name: 'paid', title: 'Paid' },
+            { name: 'outstanding', title: 'Outstanding' },
+            { name: 'dueDate', title: 'Due Date' },
+            { name: 'remarks', title: 'Remarks' },
+            { name: 'action', title: 'Action' },
+          ]}
+          FuncProps={{ selectable: true }}
+          columnExtensions={[
+            {
+              columnName: 'action',
+              align: 'center',
+              render: (row) => {
+                return (
+                  <React.Fragment>
+                    <Button
+                      size='sm'
+                      onClick={() => {
+                        editRow(row)
+                      }}
+                      justIcon
+                      color='primary'
+                    >
+                      <Edit />
+                    </Button>
+                    <Button
+                      size='sm'
+                      onClick={() => {
+                        this.handleClickOpen(row)
+                      }}
+                      justIcon
+                      color='primary'
+                    >
+                      <Delete />
+                    </Button>
+                  </React.Fragment>
+                )
+              },
+            },
+
+            { columName: 'statementDate', type: 'date', format: dateFormat },
+            {
+              columName: 'paid',
+              type: 'currency',
+              currency: true,
+              alignment: 'right',
+            },
+            {
+              columName: 'outstanding',
+              type: 'number',
+              currency: true,
+              align: 'right',
+            },
+            { columName: 'dueDate', type: 'date', format: 'DD MMM YYYY' },
+          ]}
         />
-        <CommonModal
-          open={showAddNewStatement}
-          title={formatMessage({
-            id: 'finance.statement.title.newStatement',
-          })}
-          onClose={this.toggleAddNewStatementModal}
-          onConfirm={this.toggleAddNewStatementModal}
-          maxWidth='lg'
-          showFooter={false}
+        <Dialog
+          open={this.state.open}
+          onClose={this.handleClose}
+          aria-labelledby='alert-dialog-title'
+          aria-describedby='alert-dialog-description'
         >
-          <AddNewStatement />
-        </CommonModal>
-      </CommonHeader>
+          <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='alert-dialog-description'>
+              Cancel this statement - <b>{this.state.selectedStatementNo}</b> ?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color='danger'>
+              No
+            </Button>
+            <Button onClick={this.handleClose} color='primary' autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
     )
   }
 }
+
+// state = {
+//   columns: [
+//     { name: 'statementNo', title: 'Statement No.' },
+//     { name: 'statementDate', title: 'Statement Date' },
+//     { name: 'company', title: 'Company' },
+//     { name: 'payableAmount', title: 'Payable Amount' },
+//     { name: 'paid', title: 'Paid' },
+//     { name: 'outstanding', title: 'Outstanding' },
+//     { name: 'dueDate', title: 'Due Date' },
+//     { name: 'remarks', title: 'Remarks' },
+//     { name: 'action', title: 'Action' },
+//   ],
+//   columnExtensions: [
+//     { columName: 'statementDate', type: 'date', format: 'DD MMM YYYY' },
+//     { columName: 'paid', type: 'currency', currency: true },
+//     { columName: 'outstanding', type: 'currency', currency: true },
+//     { columName: 'dueDate', type: 'date', format: 'DD MMM YYYY' },
+//   ],
+//   editingRowIds: [],
+//   rowChanges: {},
+//   rows: [
+//     {
+//       id: 'SM/00001',
+//       statementNo: 'SM/00001',
+//       statementDate: moment()
+//         .add(Math.ceil(Math.random() * 100) - 100, 'days')
+//         .format('LLL'),
+//       company: 'Prudential',
+//       payableAmount: 100,
+//       paid: 20,
+//       outstanding: 180,
+//       dueDate: moment()
+//         .add(Math.ceil(Math.random() * 100) - 100, 'days')
+//         .format('LLL'),
+//       remarks: 'Remarks for this statement',
+//     },
+//     {
+//       id: 'SM/00002',
+//       statementNo: 'SM/00002',
+//       statementDate: moment()
+//         .add(Math.ceil(Math.random() * 100) - 100, 'days')
+//         .format('LLL'),
+//       company: 'AVIVA',
+//       payableAmount: 200,
+//       paid: 200,
+//       outstanding: 0,
+//       dueDate: moment()
+//         .add(Math.ceil(Math.random() * 100) - 100, 'days')
+//         .format('LLL'),
+//       remarks: '',
+//     },
+//   ],
+//   showAddNewStatement: false,
+// }
+
+// changeEditingRowIds = (editingRowIds) => this.setState({ editingRowIds })
+
+// changeRowChanges = (rowChanges) => {
+//   this.setState({ rowChanges })
+// }
+
+// commitChanges = ({ changed }) => {
+//   const { rows } = this.state
+//   console.log('commitChanges', changed)
+//   // let updatedRows = []
+//   // if (changed) {
+//   //   updatedRows = rows.map(
+//   //     (row) => (changed[row.id] ? { ...row, ...changed[row.id] } : row),
+//   //   )
+//   // }
+
+//   // this.setState({
+//   //   rows: updatedRows,
+//   // })
+// }
+
+// handleSearch = (props) => {
+//   console.log('handleSearch', props)
+// }
+
+// handleShowDetails = (row) => {
+//   const { dispatch } = this.props
+//   const href = `/finance/statement/details/${row.id}`
+//   dispatch({
+//     type: 'menu/updateBreadcrumb',
+//     payload: {
+//       href,
+//       name: row.id,
+//     },
+//   })
+//   router.push(href)
+// }
+
+// toggleAddNewStatementModal = () => {
+//   const { showAddNewStatement } = this.state
+//   this.setState({ showAddNewStatement: !showAddNewStatement })
+// }
+
+// getActionProps = () => {
+//   const ActionCell = (p) =>
+//     Cell({
+//       ...p,
+//       onShowDetails: this.handleShowDetails,
+//     })
+
+//   return { TableCellComponent: ActionCell }
+// }
+
+// render () {
+//   const {
+//     rows,
+//     columns,
+//     columnExtensions,
+//     editingRowIds,
+//     rowChanges,
+//     showAddNewStatement,
+//   } = this.state
+
+//   const editingProps = {
+//     editingRowIds,
+//     rowChanges,
+//     onEditingRowIdsChange: this.changeEditingRowIds,
+//     onRowChangesChange: this.changeRowChanges,
+//     onCommitChanges: this.commitChanges,
+//     columnExtensions: [
+//       { columnName: 'patientRefNo', editingEnabled: false },
+//       { columnName: 'outstandingBalance', editingEnabled: false },
+//       { columnName: 'invoiceDate', editingEnabled: false },
+//       // { columnName: 'patientName', editingEnabled: false },
+//     ],
+//     availableColumns: {
+//       patientName: [
+//         { name: 'Patient 01', value: 'Patient 01' },
+//         { name: 'Patient 02', value: 'Patient 02' },
+//         { name: 'Patient 03', value: 'Patient 03' },
+//       ],
+//     },
+//   }
+
+//   const ActionProps = this.getActionProps()
+//   const { history } = this.props
+//   return (
+//     <CommonHeader Icon={<Book />} titleId='finance.statement.title'>
+//       {/* Testing EditableTableGrid reusable components
+//       <EditableTableGrid
+//         rows={rows}
+//         columns={columns}
+//         currencyColumns={currencyColumns}
+//         dateColumns={dateColumns}
+//         getRowId={getRowId}
+//         FuncProps={{ edit: false, filter: false }}
+//         ActionProps={ActionProps}
+//       />
+//       */}
+//       <SearchBar
+//         history={history}
+//         handleSearch={this.handleSearch}
+//         handleAddNew={this.toggleAddNewStatementModal}
+//       />
+//       <CommonTableGrid
+//         rows={rows}
+//         columns={columns}
+//         getRowId={getRowId}
+//         columnExtensions={columnExtensions}
+//         ActionProps={ActionProps}
+//       />
+//       {/* <CommonModal
+//         open={showAddNewStatement}
+//         title={formatMessage({
+//           id: 'finance.statement.title.newStatement',
+//         })}
+//         onClose={this.toggleAddNewStatementModal}
+//         onConfirm={this.toggleAddNewStatementModal}
+//         maxWidth='lg'
+//         showFooter={false}
+//       >
+//         <AddNewStatement />
+//       </CommonModal> */}
+//     </CommonHeader>
+//     )
+//   }
+// }
 
 export default Statement

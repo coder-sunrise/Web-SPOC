@@ -13,8 +13,8 @@ export default createFormViewModel({
     service,
     state: {
       default: {
-        schemeType: 'Corporate',
-        schemeCategory: 'Corporate',
+        schemeTypeFK: 11,
+        coPaymentSchemeFk: 1,
         effectiveDates: [
           moment(),
           moment('2099-12-31'),
@@ -55,6 +55,9 @@ export default createFormViewModel({
             unitPrice: 5,
             inventoryPackageFK: 1,
           },
+        ],
+        companyCoPaymentSchemeDto: [
+          {},
         ],
       },
     },

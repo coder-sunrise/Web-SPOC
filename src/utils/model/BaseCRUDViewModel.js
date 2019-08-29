@@ -94,12 +94,15 @@ export default class BaseCRUDViewModel {
       ) {
         // console.log(namespace, queryFnName, payload, service)
         if (!service || !service[queryFnName]) return
-        let filter = yield select((st) => st[namespace].filter)
+        let filter = yield select((st) => st[namespace].filter) || {}
         let exclude = yield select((st) => st[namespace].exclude)
         // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
         // if (!disableAutoQuery) {
         if (!payload.keepFilter) {
-          filter = payload
+          filter = {
+            ...filter,
+            ...payload,
+          }
           // yield put({
           //   type: 'queryBegin',
           //   payload: {

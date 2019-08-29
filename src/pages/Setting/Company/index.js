@@ -22,9 +22,9 @@ class Supplier extends PureComponent {
   state = {}
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'settingCompany/query',
-    })
+    //   // this.props.dispatch({
+    //   //   type: 'settingCompany/query',
+    //   // })
   }
 
   toggleModal = () => {
@@ -48,7 +48,7 @@ class Supplier extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
+    console.log('comapny', this.props)
     const { name } = route
     const companyType = name === 'copayer' ? 'Co-Payer' : 'Supplier'
     return (
