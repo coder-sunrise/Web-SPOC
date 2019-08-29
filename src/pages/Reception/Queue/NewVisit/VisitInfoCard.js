@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { withStyles } from '@material-ui/core'
 // formik
-import { FastField } from 'formik'
+import { Field } from 'formik'
 // umi
 import { formatMessage } from 'umi/locale'
 // custom components
@@ -52,7 +52,7 @@ const VisitInfoCard = ({
     >
       <React.Fragment>
         <GridItem xs md={4}>
-          <FastField
+          <Field
             name={FormField['visit.visitType']}
             render={(args) => (
               <CodeSelect
@@ -67,7 +67,7 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={4}>
-          <FastField
+          <Field
             name={FormField['visit.doctorProfileFk']}
             render={(args) => (
               <CodeSelect
@@ -83,7 +83,7 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={4}>
-          <FastField
+          <Field
             name={FormField['visit.queueNo']}
             validate={validateQNo}
             render={(args) => (
@@ -102,7 +102,7 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={12}>
-          <FastField
+          <Field
             name={FormField['visit.visitRemarks']}
             render={(args) => (
               <TextField

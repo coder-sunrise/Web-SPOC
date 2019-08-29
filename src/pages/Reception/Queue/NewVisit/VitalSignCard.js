@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 // formik
-import { FastField } from 'formik'
+import { Field } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
@@ -19,7 +19,7 @@ class VitalSignCard extends PureComponent {
       >
         <GridContainer>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.temperatureC']}
               render={(args) => (
                 <NumberInput
@@ -36,7 +36,7 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.bpSysMMHG']}
               render={(args) => (
                 <NumberInput
@@ -51,7 +51,7 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.bpDiaMMHG']}
               render={(args) => (
                 <NumberInput
@@ -66,7 +66,7 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.pulseRateBPM']}
               render={(args) => (
                 <NumberInput
@@ -83,7 +83,7 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.weightKG']}
               render={(args) => (
                 <NumberInput
@@ -101,7 +101,7 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.heightCM']}
               render={(args) => (
                 <NumberInput
@@ -121,7 +121,7 @@ class VitalSignCard extends PureComponent {
           </GridItem>
           <GridItem xs md={4} />
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.bmi']}
               render={(args) => (
                 <NumberInput

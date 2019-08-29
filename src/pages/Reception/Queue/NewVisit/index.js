@@ -186,8 +186,8 @@ class NewVisit extends PureComponent {
             ],
       [],
     )
-
     const isReadOnly = values.visitStatus !== VISIT_STATUS.WAITING
+    console.log({ isReadOnly, visitStatus: values.visitStatus })
 
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =

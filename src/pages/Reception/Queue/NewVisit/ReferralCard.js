@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 // formik
-import { FastField } from 'formik'
+import { Field } from 'formik'
 // custom components
 import { DatePicker, TextField, GridItem } from '@/components'
 import AttachmentWrapper from './AttachmentWrapper'
@@ -20,7 +20,7 @@ class ReferralCard extends PureComponent {
       >
         <React.Fragment>
           <GridItem xs md={4}>
-            <FastField
+            <Field
               name={FormField['referral.referralPersonFK']}
               render={(args) => (
                 <TextField
@@ -32,7 +32,7 @@ class ReferralCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={4}>
-            <FastField
+            <Field
               name={FormField['referral.referralDate']}
               render={(args) => (
                 <DatePicker
@@ -45,7 +45,7 @@ class ReferralCard extends PureComponent {
           </GridItem>
           <GridItem xs md={4} />
           <GridItem xs md={4}>
-            <FastField
+            <Field
               name={FormField['referral.referralCompanyFK']}
               render={(args) => (
                 <TextField

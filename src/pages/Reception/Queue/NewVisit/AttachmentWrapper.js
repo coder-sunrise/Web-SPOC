@@ -210,7 +210,7 @@ const AttachmentWrapper = ({
                 color={attachment.id ? 'primary' : ''}
                 onClick={() => onClick(attachment)}
                 onDelete={
-                  isReadOnly ? (
+                  !isReadOnly ? (
                     () => onDelete(attachment.fileIndexFK, attachment.id)
                   ) : null
                 }
