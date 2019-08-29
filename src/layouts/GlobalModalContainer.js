@@ -88,7 +88,7 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
-          observe='Consultation'
+          observe='ConsultationPage'
           authority='consultation'
           bodyNoPadding
           onClose={(e) => {

@@ -398,7 +398,7 @@ class Consultation extends PureComponent {
     // console.log($(this.container.current).innerWidth())
     // $('.react-resizable-handle').on('mouseover',)
     const { consultation, dispatch } = this.props
-    // console.log(this.props)
+    console.log(this.props.values)
     $(this.layoutContainer.current)
       .on(
         'mouseenter',

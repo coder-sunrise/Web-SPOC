@@ -79,30 +79,33 @@ class RichEditor extends React.PureComponent {
   componentDidMount () {}
 
   componentWillReceiveProps (nextProps) {
-    //console.log(nextProps)
+    // console.log(nextProps)
     const { field, value } = nextProps
-    let v = this.state.value
+    let v = value || ''
     if (field) {
       v = field.value || ''
       // this.setState({
       //   value: field.value,
       // })
+    }
+    if (this.state.value.getCurrentContent().getPlainText().length) {
       Modifier.replaceText(
         this.state.value.getCurrentContent(),
         this.state.value.getSelection(),
         v,
       )
-    } else if (value) {
-      v = value
-
+    } else {
+      const contentBlock = htmlToDraft(v)
       this.setState({
-        value: v,
+        value: EditorState.createWithContent(
+          ContentState.createFromBlockArray(contentBlock.contentBlocks),
+        ),
       })
     }
   }
 
   onChange = (editorState) => {
-    //console.log(editorState)
+    // console.log(editorState)
     // const {onChange}=this.props
     this.setState({
       value: editorState,
@@ -125,7 +128,7 @@ class RichEditor extends React.PureComponent {
         // name: props.field.name,
       },
     }
-    //console.log(props.field, props.field.onChange)
+    // console.log(props.field, props.field.onChange)
     if (props.field && props.field.onChange) {
       v.target.name = props.field.name
       props.field.onChange(v)
@@ -163,7 +166,8 @@ class RichEditor extends React.PureComponent {
     const currentEditorSelection = value.getSelection()
     const currentContentState = value.getCurrentContent()
 
-    let newEditorState, newContentState
+    let newEditorState
+    let newContentState
 
     // 判断是否有选中，有则替换，无则插入
     const selectionEnd = currentEditorSelection.getEndOffset()
@@ -233,7 +237,7 @@ class RichEditor extends React.PureComponent {
           })}
           onEditorStateChange={this.onChange}
           mention={{
-            //trigger: '<',
+            // trigger: '<',
             suggestions: tagList,
           }}
           {...this.editorCfg}
@@ -311,18 +315,17 @@ class RichEditor extends React.PureComponent {
           {this.getTagButtonComponent()}
         </React.Fragment>
       )
-    } else {
-      return (
-        <CustomInput
-          labelProps={labelProps}
-          inputComponent={this.getComponent}
-          noUnderLine
-          preventDefaultChangeEvent
-          preventDefaultKeyDownEvent
-          {...restProps}
-        />
-      )
     }
+    return (
+      <CustomInput
+        labelProps={labelProps}
+        inputComponent={this.getComponent}
+        noUnderLine
+        preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
+        {...restProps}
+      />
+    )
   }
 }
 
