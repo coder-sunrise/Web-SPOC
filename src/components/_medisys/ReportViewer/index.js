@@ -4,20 +4,17 @@ import printJS from 'print-js'
 // react pdf
 import { Document, Page, pdfjs } from 'react-pdf'
 // ant design
-import { Dropdown, Menu } from 'antd'
+import { Dropdown, Menu, InputNumber } from 'antd'
 // material ui
-import { CircularProgress, withStyles } from '@material-ui/core'
+import { CircularProgress, Divider, withStyles } from '@material-ui/core'
+import ArrowLeft from '@material-ui/icons/ArrowLeft'
+import ArrowRight from '@material-ui/icons/ArrowRight'
 import ZoomIn from '@material-ui/icons/ZoomIn'
 import ZoomOut from '@material-ui/icons/ZoomOut'
 import Down from '@material-ui/icons/ArrowDropDown'
+import Print from '@material-ui/icons/Print'
 // common component
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  NumberInput,
-} from '@/components'
+import { Button, GridContainer, GridItem, NumberInput } from '@/components'
 // utils
 import {
   fetchReport,
@@ -33,7 +30,7 @@ import styles from './styles'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
-const ReportViewer = ({ classes }) => {
+const ReportViewer = ({ classes, showTopDivider = true }) => {
   const [
     scale,
     setScale,
@@ -90,25 +87,15 @@ const ReportViewer = ({ classes }) => {
     downloadFile(result, `${fileName}${fileExtension}`)
   }
 
-  const onPageNumberChange = (event) => {
-    const { target } = event
-    const targetPage = parseInt(target.value, 10)
-    if (!Number.isNaN(targetPage) && targetPage <= numOfPages && targetPage > 0)
-      setPageNumber(targetPage)
+  const onPageNumberChange = (value) => {
+    if (value <= numOfPages && value > 0) setPageNumber(value)
   }
 
   return (
-    <CardContainer className={classes.root} hideHeader>
+    <div className={classes.root}>
+      {showTopDivider && <Divider className={classes.divider} />}
       <GridContainer>
         <GridItem md={3}>
-          <Button
-            onClick={onPrintClick}
-            size='sm'
-            color='info'
-            disabled={!pdfData}
-          >
-            Print
-          </Button>
           <Dropdown
             disabled={!pdfData}
             overlay={
@@ -130,52 +117,65 @@ const ReportViewer = ({ classes }) => {
               Export As
             </Button>
           </Dropdown>
+          <Button
+            onClick={onPrintClick}
+            size='sm'
+            justIcon
+            color='info'
+            disabled={!pdfData}
+          >
+            <Print />
+          </Button>
         </GridItem>
         <GridItem md={6} className={classes.midButtonGroup}>
           <Button
             size='sm'
+            justIcon
             color='primary'
             className={classes.previousPageBtn}
             disabled={!pdfData || pageNumber <= 1}
             onClick={onPreviousClick}
           >
-            Previous Page
+            <ArrowLeft />
           </Button>
           <div className={classes.pageNumber}>
-            <NumberInput
+            <span>Page: </span>
+            <InputNumber
+              min={1}
+              max={numOfPages}
               value={pageNumber}
               onChange={onPageNumberChange}
-              prefix='Page: '
-              suffix={`of ${numOfPages}`}
             />
+            <span> of {numOfPages}</span>
           </div>
           <Button
             onClick={onNextClick}
             size='sm'
+            justIcon
             color='primary'
             disabled={!pdfData || pageNumber >= numOfPages}
           >
-            Next Page
+            <ArrowRight />
           </Button>
         </GridItem>
         <GridItem md={3} className={classes.rightButtonGroup}>
           <Button
             color='primary'
-            size='sm'
+            // size='sm'
+            justIcon
             disabled={!pdfData || scale === maxScale}
             onClick={zoom(0)}
           >
             <ZoomIn />
-            Zoom In
           </Button>
           <Button
             color='primary'
-            size='sm'
+            // size='sm'
+            justIcon
             disabled={!pdfData || scale === minScale}
             onClick={zoom(1)}
           >
             <ZoomOut />
-            Zoom Out
           </Button>
         </GridItem>
       </GridContainer>
@@ -192,7 +192,7 @@ const ReportViewer = ({ classes }) => {
               pageNumber={pageNumber}
               width={screenSize - 200}
               height={screenSize - 200}
-              scale={scale}
+              scale={1.25}
             />
           </Document>
         ) : (
@@ -202,7 +202,7 @@ const ReportViewer = ({ classes }) => {
           </React.Fragment>
         )}
       </div>
-    </CardContainer>
+    </div>
   )
 }
 

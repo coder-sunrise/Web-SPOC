@@ -1,6 +1,7 @@
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/visit'
+import { query as queryPatient } from '@/services/patient'
 import { getRemovedUrl } from '@/utils/utils'
 
 const openModal = {
@@ -37,11 +38,11 @@ export default createFormViewModel({
           query.vis
             ? dispatch({
                 type: 'fetchVisitInfo',
-                visitID: query.vis,
+                payload: { id: query.vis },
               })
             : dispatch({
                 type: 'fetchPatientInfoByPatientID',
-                payload: { patientID: query.pid },
+                payload: { id: query.pid },
               })
 
           dispatch(openModal)
@@ -71,29 +72,29 @@ export default createFormViewModel({
         })
         return yield put(closeModal)
       },
-      *fetchVisitInfo ({ visitID }, { call, put }) {
+      *fetchVisitInfo ({ payload }, { call, put, take }) {
         yield put({
           type: 'updateErrorState',
           errorKey: 'visitInfo',
           errorMessage: undefined,
         })
         try {
-          const response = yield call(service.fetchVisitInfo, visitID)
+          const response = yield call(service.query, payload)
           const { data = {} } = response
-
           const { visit: { patientProfileFK } } = data
 
           if (patientProfileFK) {
             // const { patientProfileFK } = visit
-            const patientInfoResponse = patientProfileFK
-              ? yield call(
-                  service.fetchPatientInfoByPatientID,
-                  patientProfileFK,
-                )
-              : {}
-
-            const { data: patientInfo = {} } = patientInfoResponse
-
+            if (patientProfileFK) {
+              const patientPayload = {
+                id: patientProfileFK,
+              }
+              yield put({
+                type: 'fetchPatientInfoByPatientID',
+                payload: patientPayload,
+              })
+            }
+            yield take('fetchPatientInfoByPatientID/@@end')
             yield put({
               type: 'updateState',
               payload: {
@@ -101,7 +102,6 @@ export default createFormViewModel({
                 attachmentOriList: [
                   ...data.visit.visitAttachment,
                 ],
-                patientInfo,
               },
             })
           }
@@ -109,18 +109,15 @@ export default createFormViewModel({
           console.log({ error })
           yield put({
             type: 'updateErrorState',
-
-            errorKey: 'visitInfo',
-            errorMessage: 'Failed to retrieve visit info...',
+            payload: {
+              visitInfo: 'Failed to retrieve visit info...',
+            },
           })
         }
       },
       *fetchPatientInfoByPatientID ({ payload }, { call, put }) {
         try {
-          const response = yield call(
-            service.fetchPatientInfoByPatientID,
-            payload.patientID,
-          )
+          const response = yield call(queryPatient, payload)
           const { data } = response
 
           yield put({
@@ -132,35 +129,18 @@ export default createFormViewModel({
         } catch (error) {
           yield put({
             type: 'updateErrorState',
-            errorKey: 'patientInfo',
-            errorMessage: 'Failed to retrieve patient info',
+            payload: {
+              patientInfo: 'Failed to retrieve patient info',
+            },
           })
         }
-      },
-      *registerVisitInfo ({ payload }, { call, put }) {
-        const response = yield call(service.registerVisit, payload)
-        const { status } = response
-        if (status >= 200 && status < 300) {
-          // const { bizSessionFK } = visit
-          return yield put({
-            type: 'queueLog/refresh',
-          })
-        }
-        return false
-        // return true
-      },
-      *saveVisitInfo ({ payload }, { call }) {
-        const response = yield call(service.saveVisit, payload)
-        const { status = -1 } = response
-        return status >= 200 || status < 300
-        // return true
       },
     },
     reducers: {
-      updateErrorState (state, { errorKey, errorMessage }) {
+      updateErrorState (state, { payload }) {
         return {
           ...state,
-          errorState: { ...state.errorState, [errorKey]: errorMessage },
+          errorState: { ...state.errorState, ...payload },
         }
       },
     },

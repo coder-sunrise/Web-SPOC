@@ -1,6 +1,8 @@
 import React from 'react'
 import classnames from 'classnames'
 import moment from 'moment'
+// antd
+import { Skeleton } from 'antd'
 // material ui
 import { withStyles, Divider } from '@material-ui/core'
 // common components
@@ -10,6 +12,7 @@ import {
   dateFormatLong,
   DatePicker,
 } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 // assets
 import styles from './styles.js'
 
@@ -36,8 +39,20 @@ const PatientInfoSideBanner = ({ height, theme, classes, entity }) => {
       </p>
 
       <p>
-        <DatePicker text format={dateFormatLong} value={entity.dob} /> ({Math.floor(moment.duration(moment().diff(entity.dob)).asYears())}/{<CodeSelect code='ctGender' optionLabelLength={1} text value={entity.genderFK} />})
+        <DatePicker text format={dateFormatLong} value={entity.dob} />
+        ({Math.floor(
+          moment.duration(moment().diff(entity.dob)).asYears(),
+        )},&nbsp;
+        {
+          <CodeSelect
+            code='ctGender'
+            // optionLabelLength={1}
+            text
+            value={entity.genderFK}
+          />
+        })
       </p>
+
       <Divider light />
       <div
         className={classes.schemeContainer}
@@ -78,7 +93,9 @@ const PatientInfoSideBanner = ({ height, theme, classes, entity }) => {
         <Divider light />
       )}
     </React.Fragment>
-  ) : null
+  ) : (
+    <Skeleton active />
+  )
 }
 
 export default withStyles(styles, {

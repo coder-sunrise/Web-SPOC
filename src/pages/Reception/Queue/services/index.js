@@ -24,5 +24,5 @@ export const query = (params) => commonServices.query(bizSessionAPIURL, params)
 export const queryList = (params) =>
   commonServices.queryList(queueAPIUrl, params)
 
-export const deleteQueue = (queueID) =>
-  commonServices.remove(`${queueAPIUrl}/${queueID}`)
+export const deleteQueue = (params) =>
+  commonServices.remove(queueAPIUrl, params)

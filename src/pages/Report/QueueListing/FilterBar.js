@@ -7,13 +7,13 @@ import { Button, DatePicker, GridContainer, GridItem } from '@/components'
 const FilterBar = ({ handleSubmit }) => {
   return (
     <GridContainer>
-      <GridItem md={3}>
+      <GridItem md={2}>
         <FastField
           name='listingFrom'
           render={(args) => <DatePicker {...args} prefix='From' />}
         />
       </GridItem>
-      <GridItem md={3}>
+      <GridItem md={2}>
         <FastField
           name='listingTo'
           render={(args) => <DatePicker {...args} prefix='To' />}

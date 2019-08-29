@@ -75,19 +75,32 @@ const styles = (theme) => ({
 }))
 @withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends PureComponent {
-  state = {
-    showPatientSearch: false,
-    showEndSessionSummary: false,
-    currentFilter: StatusIndicator.ALL,
+  constructor (props) {
+    super(props)
+    this.state = {
+      showPatientSearch: false,
+      showEndSessionSummary: false,
+      currentFilter: StatusIndicator.ALL,
+    }
+    this._timer = null
   }
 
   componentWillMount = () => {
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
-    if (sessionInfo.id === '')
+
+    if (sessionInfo.id === '') {
       dispatch({
         type: `${modelKey}getSessionInfo`,
       })
+    }
+    this._timer = setInterval(() => {
+      dispatch({ type: `${modelKey}refresh` })
+    }, 900000)
+  }
+
+  componentWillUnmount () {
+    clearInterval(this._timer)
   }
 
   showVisitRegistration = ({ visitID = undefined, patientID = undefined }) => {
@@ -201,6 +214,15 @@ class Queue extends PureComponent {
     )
   }
 
+  sendNotification = () => {
+    this.props.dispatch({
+      type: 'global/sendNotification',
+      payload: {
+        test: '123',
+      },
+    })
+  }
+
   render () {
     const { classes, queueLog, loading } = this.props
     const {
@@ -210,7 +232,7 @@ class Queue extends PureComponent {
     } = this.state
 
     const { sessionInfo, error } = queueLog
-    const { sessionNo, id: sessionID, isClinicSessionClosed } = sessionInfo
+    const { sessionNo, isClinicSessionClosed } = sessionInfo
 
     return (
       <PageHeaderWrapper
@@ -233,6 +255,13 @@ class Queue extends PureComponent {
                 >
                   Refresh
                 </ProgressButton>
+                {/* <Button
+                  color='success'
+                  size='sm'
+                  onClikc={this.sendNotification}
+                >
+                  Send Notification
+                </Button> */}
                 <Button
                   color='danger'
                   size='sm'

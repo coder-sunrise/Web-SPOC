@@ -1,6 +1,7 @@
 import moment from 'moment'
 import { AppointmentTypeOptions } from './setting'
 import { getUniqueGUID } from '@/utils/utils'
+import { VISIT_STATUS } from '../Queue/variables'
 
 const patientName = [
   'Tan Ah Kow',
@@ -214,7 +215,7 @@ const generateAppointmentData = () => {
       appointmentDate: appointmentDate[i % max],
       bookedBy: 'medisys',
       appointmentResources: appointmentResources[i],
-      visitStatus: 'APPOINTMENT',
+      visitStatus: VISIT_STATUS.UPCOMING_APPT,
     }
     data.push(appointment)
   }
@@ -252,7 +253,7 @@ const generateDoctorBlock = () => {
       isDoctorEvent: true,
       resourceId: '0',
       eventType: 'vacation',
-      visitStatus: 'APPOINTMENT',
+      visitStatus: VISIT_STATUS.UPCOMING_APPT,
       hasConflict: i === max - 1,
     }
     data.push(doctorBlock)

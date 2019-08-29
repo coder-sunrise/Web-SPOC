@@ -23,21 +23,39 @@ export default Yup.object().shape({
     'Must select an assigned doctor',
   ),
   [FormField['vitalsign.temperatureC']]: Yup.number()
+    .transform(
+      (value) => (value === null || Number.isNaN(value) ? undefined : value),
+    )
     .min(0, VitalSignMessage[FormField['vitalsign.temperatureC']])
     .max(200, VitalSignMessage[FormField['vitalsign.temperatureC']]),
   [FormField['vitalsign.bpSysMMHG']]: Yup.number()
+    .transform(
+      (value) => (value === null || Number.isNaN(value) ? undefined : value),
+    )
     .min(0, VitalSignMessage[FormField['vitalsign.bpSysMMHG']])
     .max(999, VitalSignMessage[FormField['vitalsign.bpSysMMHG']]),
   [FormField['vitalsign.bpDiaMMHG']]: Yup.number()
+    .transform(
+      (value) => (value === null || Number.isNaN(value) ? undefined : value),
+    )
     .min(0, VitalSignMessage[FormField['vitalsign.bpDiaMMHG']])
     .max(999, VitalSignMessage[FormField['vitalsign.bpDiaMMHG']]),
   [FormField['vitalsign.pulseRateBPM']]: Yup.number()
+    .transform(
+      (value) => (value === null || Number.isNaN(value) ? undefined : value),
+    )
     .min(0, VitalSignMessage[FormField['vitalsign.pulseRateBPM']])
     .max(999, VitalSignMessage[FormField['vitalsign.pulseRateBPM']]),
   [FormField['vitalsign.weightKG']]: Yup.number()
+    .transform(
+      (value) => (value === null || Number.isNaN(value) ? undefined : value),
+    )
     .min(0, VitalSignMessage[FormField['vitalsign.weightKG']])
     .max(999.9, VitalSignMessage[FormField['vitalsign.weightKG']]),
   [FormField['vitalsign.heightCM']]: Yup.number()
+    .transform(
+      (value) => (value === null || Number.isNaN(value) ? undefined : value),
+    )
     .integer('Height can only be a whole number')
     .min(0, VitalSignMessage[FormField['vitalsign.heightCM']])
     .max(999, VitalSignMessage[FormField['vitalsign.heightCM']]),
