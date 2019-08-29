@@ -41,6 +41,7 @@ class EmergencyContact extends PureComponent {
         columnName: 'relationshipFK',
         type: 'codeSelect',
         code: 'ctrelationship',
+        sortingEnabled: false,
       },
       {
         columnName: 'accountNoTypeFK',
@@ -56,6 +57,7 @@ class EmergencyContact extends PureComponent {
         columnName: 'salutationFK',
         type: 'codeSelect',
         code: 'ctSalutation',
+        sortingEnabled: false,
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
@@ -63,6 +65,7 @@ class EmergencyContact extends PureComponent {
         type: 'radio',
         checkedValue: true,
         uncheckedValue: false,
+        sortingEnabled: false,
         onRadioChange: (row, e, checked) => {
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
