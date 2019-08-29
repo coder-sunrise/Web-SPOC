@@ -168,7 +168,6 @@ class CommonModal extends React.PureComponent {
 
   onClose = (force) => {
     const ob = window.g_app._store.getState().formik[this.props.observe]
-    // console.log(ob)
     if (ob) {
       if (ob.dirty && force !== true) {
         this.setState({
@@ -345,29 +344,36 @@ class CommonModal extends React.PureComponent {
             </h3>
           </DialogContent>
           <DialogActions className={classes.modalFooter}>
-            <Button
-              onClick={() => {
-                this.setState({
-                  openConfirm: false,
-                })
-              }}
-              color='danger'
-            >
-              Cancel
-            </Button>
-            <Button
-              color='primary'
-              onClick={() => {
-                this.setState({
-                  openConfirm: false,
-                })
-                window.beforeReloadHandlerAdded = false
-                window.removeEventListener('beforeunload', confirmBeforeReload)
-                this.onClose(true)
-              }}
-            >
-              Confirm
-            </Button>
+            <SizeContainer size='md'>
+              <>
+                <Button
+                  onClick={() => {
+                  this.setState({
+                    openConfirm: false,
+                  })
+                }}
+                  color='danger'
+                >
+                Cancel
+                </Button>
+                <Button
+                  color='primary'
+                  onClick={() => {
+                  this.setState({
+                    openConfirm: false,
+                  })
+                  window.beforeReloadHandlerAdded = false
+                  window.removeEventListener(
+                    'beforeunload',
+                    confirmBeforeReload,
+                  )
+                  this.onClose(true)
+                }}
+                >
+                Confirm
+                </Button>
+              </>
+            </SizeContainer>
           </DialogActions>
         </Dialog>
       </React.Fragment>

@@ -41,7 +41,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        // type='settingCompany'
+        type='settingCompany'
         rows={data}
         onRowDoubleClick={this.editRow}
         columns={
@@ -103,7 +103,6 @@ class Grid extends PureComponent {
                     rel='noopener noreferrer'
                     target='_blank'
                     href={
-                      row.contact.contactWebsite &&
                       row.contact.contactWebsite.website !== '' ? (
                         row.contact.contactWebsite.website
                       ) : (
@@ -111,8 +110,7 @@ class Grid extends PureComponent {
                       )
                     }
                   >
-                    {row.contact.contactWebsite &&
-                    row.contact.contactWebsite.website !== '' ? (
+                    {row.contact.contactWebsite.website !== '' ? (
                       row.contact.contactWebsite.website
                     ) : (
                       '-'
@@ -124,8 +122,7 @@ class Grid extends PureComponent {
                 columnName: 'officeNum',
                 render: (row) => (
                   <span>
-                    {row.contact.officeContactNumber &&
-                    row.contact.officeContactNumber.number !== '' ? (
+                    {row.contact.officeContactNumber.number !== '' ? (
                       row.contact.officeContactNumber.number
                     ) : (
                       '-'
@@ -134,11 +131,16 @@ class Grid extends PureComponent {
                 ),
               },
           {
+            columnName: 'contactPerson',
+            render: (row) => (
+              <span>{row.contactPerson ? row.contactPerson : '-'}</span>
+            ),
+          },
+          {
             columnName: 'faxNo',
             render: (row) => (
               <span>
-                {row.contact.faxContactNumber &&
-                row.contact.faxContactNumber.number !== '' ? (
+                {row.contact.faxContactNumber.number !== '' ? (
                   row.contact.faxContactNumber.number
                 ) : (
                   '-'
@@ -152,8 +154,7 @@ class Grid extends PureComponent {
 
             render: (row) => (
               <span>
-                {row.contact.mobileContactNumber &&
-                row.contact.mobileContactNumber.number !== '' ? (
+                {row.contact.mobileContactNumber.number !== '' ? (
                   row.contact.mobileContactNumber.number
                 ) : (
                   '-'

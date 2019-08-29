@@ -1,9 +1,10 @@
 import React, { PureComponent, useEffect } from 'react'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import { withStyles, Divider, InputAdornment } from '@material-ui/core'
-import { getActiveSession } from '@/pages/Reception/Queue/services'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+
+import { getActiveSession } from '@/pages/Reception/Queue/services'
+import Yup from '@/utils/yup'
 import {
   currencies,
   currencyRounding,
@@ -29,8 +30,7 @@ import {
   DatePicker,
   NumberInput,
 } from '@/components'
-
-// import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
+import WarningSnackbar from './WarningSnackbar'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -69,9 +69,9 @@ class GeneralSetting extends PureComponent {
   checkHasActiveSession = async () => {
     const result = await getActiveSession()
     const { data } = result.data
-
+    // data = false
     this.setState({
-      hasActiveSession: data ? true : false,
+      hasActiveSession: !!data,
     })
   }
 
@@ -96,7 +96,7 @@ class GeneralSetting extends PureComponent {
                   label='System Currency'
                   {...args}
                   options={currencies}
-                  disabled={hasActiveSession ? true : false}
+                  disabled={!!hasActiveSession}
                 />
               )}
             />
@@ -111,7 +111,7 @@ class GeneralSetting extends PureComponent {
                   label='Currency Rounding'
                   options={currencyRounding}
                   {...args}
-                  disabled={hasActiveSession ? true : false}
+                  disabled={!!hasActiveSession}
                 />
               )}
             />
@@ -125,32 +125,41 @@ class GeneralSetting extends PureComponent {
                   label='To The Closest'
                   options={currencyRoundingToTheClosest}
                   {...args}
-                  disabled={hasActiveSession ? true : false}
+                  disabled={!!hasActiveSession}
                 />
               )}
             />
           </GridItem>
         </GridContainer>
+        {hasActiveSession ? (
+          <div style={{ paddingTop: 5 }}>
+            <WarningSnackbar
+              variant='warning'
+              className={classes.margin}
+              message='Active Session detected!'
+            />
+          </div>
+        ) : (
+          <div className={classes.actionBtn}>
+            <Button
+              color='danger'
+              onClick={() => {
+                this.props.history.push('/setting')
+              }}
+            >
+              Cancel
+            </Button>
 
-        <div className={classes.actionBtn}>
-          <Button
-            color='danger'
-            onClick={() => {
-              this.props.history.push('/setting')
-            }}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            color='primary'
-            onClick={() => {
-              this.props.handleSubmit
-            }}
-          >
-            Save
-          </Button>
-        </div>
+            <Button
+              color='primary'
+              onClick={() => {
+                this.props.handleSubmit
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        )}
       </CardContainer>
     )
   }

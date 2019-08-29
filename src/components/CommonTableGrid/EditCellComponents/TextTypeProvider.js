@@ -97,14 +97,24 @@ const TextFormatter = (columnExtensions) =>
           ({ columnName: currentColumnName }) =>
             currentColumnName === columnName,
         ) || {}
-      const { type, render, ...restProps } = cfg
+      const { type, render, onClick, ...restProps } = cfg
       // console.log(props)
       if (render) {
         return render(row)
       }
       // console.log(props, cfg)
       if (type === 'link') {
-        return <a href={cfg.link || '#'}>{value}</a>
+        return (
+          <a
+            onClick={() => {
+              console.log(onClick)
+              if (onClick) onClick(row)
+            }}
+            href={cfg.link || '#'}
+          >
+            {value}
+          </a>
+        )
       }
       return (
         (

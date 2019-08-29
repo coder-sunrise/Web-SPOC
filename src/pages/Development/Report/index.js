@@ -9,6 +9,7 @@ import { FastField, withFormik } from 'formik'
 import {
   Button,
   CardContainer,
+  CodeSelect,
   GridContainer,
   GridItem,
   TimePicker,
@@ -114,6 +115,7 @@ class Report extends React.Component {
         >
           <ReportViewer />
         </CommonModal>
+        <CodeSelect code='clinicianprofile' />
         {/* <Button onClick={this.validate} color='primary'>
           Submit
         </Button>
