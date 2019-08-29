@@ -150,7 +150,7 @@ class NewVisit extends PureComponent {
       false,
     )
     if (alreadyRegisteredVisit)
-      dispatch({
+      return dispatch({
         type: 'global/updateAppState',
         payload: {
           openConfirm: true,
@@ -160,9 +160,7 @@ class NewVisit extends PureComponent {
           onOpenConfirm: handleSubmit,
         },
       })
-    else {
-      handleSubmit()
-    }
+    return handleSubmit()
   }
 
   render () {
