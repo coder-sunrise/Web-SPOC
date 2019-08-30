@@ -27,7 +27,7 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = ({ classes, dispatch, history }) => {
+const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -137,6 +137,12 @@ const FilterBar = ({ classes, dispatch, history }) => {
               variant='contained'
               color='primary'
               onClick={() => {
+                dispatch({
+                  type: 'schemeDetail/updateState',
+                  payload: {
+                    entity: undefined,
+                  },
+                })
                 history.push('/finance/scheme/details')
               }}
             >

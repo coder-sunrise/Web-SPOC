@@ -17,25 +17,35 @@ import {
 import Delete from '@material-ui/icons/Delete'
 
 function callback (key) {
-  console.log(key)
+  console.log('key', key)
 }
-const addContent = (type) => {
+
+// let rows = []
+
+// const handleOnClick = (values) => {
+//   rows = values.tempRow
+// }
+
+const addContent = (type, values) => {
   return (
     <GridContainer>
       <GridItem xs={8}>
-        <CodeSelect autoComplete code={type} />
+        <FastField
+          name='tempRow'
+          render={(args) => <CodeSelect autoComplete code={type} {...args} />}
+        />
       </GridItem>
       <GridItem xs={4}>
-        <Button color='info'>Add</Button>
+        <Button color='primary'>Add</Button>
       </GridItem>
     </GridContainer>
   )
 }
-const options = [
+const options = (values) => [
   {
     id: 1,
     name: 'Consumables',
-    content: addContent('ctVaccination'),
+    content: addContent('ctVaccination', values),
   },
   {
     id: 2,
@@ -61,7 +71,11 @@ const ItemList = ({ values, CPSwitch, classes }) => {
   console.log(values)
   return (
     <div>
-      <Tabs defaultActiveKey='1' onChange={callback} options={options} />
+      <Tabs
+        defaultActiveKey='1'
+        onChange={callback}
+        options={options(values)}
+      />
       <CommonTableGrid
         rows={values.packageValueDto}
         FuncProps={{ pager: false }}

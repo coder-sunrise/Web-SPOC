@@ -4,8 +4,10 @@ import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
+import { connect } from 'dva'
 
 import {
+  withFormikExtend,
   CodeSelect,
   CardContainer,
   TextField,
@@ -30,7 +32,6 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
   //     })
   //   }
   // }, [])
-  console.log('asd', this)
   return (
     <CardContainer
       hideHeader
@@ -149,7 +150,7 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
           <GridContainer> */}
             <GridItem xs={6}>
               <FastField
-                name='coPaymentSchemeFk'
+                name='companyCoPaymentSchemeDto[0].coPaymentSchemeFk'
                 render={(args) => (
                   <CodeSelect
                     label='Co-Payer Type'
@@ -196,10 +197,6 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
     </CardContainer>
   )
 }
-export default compose(
-  withStyles(styles, { withTheme: true }),
-  React.memo,
-  // connect(({ schemeDetail }) => ({
-  //   schemeDetail,
-  // })),
-)(Detail)
+export default compose(withStyles(styles, { withTheme: true }), React.memo)(
+  Detail,
+)

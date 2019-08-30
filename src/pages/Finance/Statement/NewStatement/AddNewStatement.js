@@ -19,6 +19,7 @@ import {
   Switch,
   DateRangePicker,
   Field,
+  CommonTableGrid,
 } from '@/components'
 
 const styles = () => ({
@@ -47,13 +48,30 @@ class AddNewStatement extends PureComponent {
       { name: 'outstandingBalance', title: 'Outstanding Amount' },
       { name: 'remarks', title: 'Remarks' },
     ],
-    currencyColumns: [
-      'amount',
-      'outstandingBalance',
+    columnExtensions: [
+      {
+        columnName: 'amount',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'outstandingBalance',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'invoiceDate',
+        type: 'date',
+        format: 'DD MMM YYYY',
+      },
     ],
-    dateColumns: [
-      'invoiceDate',
-    ],
+    // currencyColumns: [
+    //   'amount',
+    //   'outstandingBalance',
+    // ],
+    // dateColumns: [
+    //   'invoiceDate',
+    // ],
     rows: [
       {
         id: 'PT-000001A',
@@ -75,8 +93,14 @@ class AddNewStatement extends PureComponent {
 
   render () {
     const { classes, footer, onConfirm, theme, values, history } = this.props
-    const { rows, columns, currencyColumns, dateColumns } = this.state
-
+    const {
+      rows,
+      columns,
+      currencyColumns,
+      dateColumns,
+      columnExtensions,
+    } = this.state
+    console.log(columns)
     const editRow = (row, e) => {
       history.push(`/finance/statement`)
     }
@@ -315,12 +339,13 @@ class AddNewStatement extends PureComponent {
                 </Button>
               </GridItem>
             </GridItem>
-            <EditableTableGrid
+            <CommonTableGrid
               style={{ marginTop: 10 }}
               rows={rows}
               columns={columns}
-              currencyColumns={currencyColumns}
-              dateColumns={dateColumns}
+              // currencyColumns={currencyColumns}
+              // dateColumns={dateColumns}
+              columnExtensions={columnExtensions}
               // height={300}
               FuncProps={{ selectable: true }}
               selection={this.state.selectedRows}
