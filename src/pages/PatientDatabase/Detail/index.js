@@ -265,8 +265,8 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
-    console.log('patient', patient)
-    console.log('xx', resetProps)
+    // console.log('patient', patient)
+    // console.log('xx', resetProps)
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}
     const CurrentComponent = currentMenu.component
@@ -296,13 +296,11 @@ class PatientDetail extends PureComponent {
                         }
                         onClick={(e) => {
                           onMenuClick(e, o)
+                          console.log('here', entity, values)
                           dispatch({
                             type: 'patient/updateState',
                             payload: {
-                              entity:
-                                values.patientAccountNo !== ''
-                                  ? values
-                                  : undefined,
+                              entity: entity || undefined,
                             },
                           })
                           this.props.history.push(
