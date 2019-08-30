@@ -559,9 +559,9 @@ class CommonTableGrid extends React.Component {
     // const childRows = rows.filter((r) => r.parentId === (row ? row.id : 0))
     // console.log(row, rows, childRows)
     // return childRows.length ? childRows : null
-
+    const { getRowId } = this.props
     const childRows = rootRows.filter(
-      (r) => r.parentId === (row ? row.id : null),
+      (r) => r.parentId === (row ? getRowId(row) : null),
     )
     console.log(childRows)
     return childRows.length ? childRows : null

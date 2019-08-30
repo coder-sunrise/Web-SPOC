@@ -104,7 +104,7 @@ class AntdSelect extends React.PureComponent {
     } = props
     const v = form && field ? field.value : props.value || props.defaultValue
     this.state = {
-      shrink: false,
+      shrink: !!v,
       value: v,
       data:
         autoComplete && options && options.length > max
@@ -400,7 +400,6 @@ class AntdSelect extends React.PureComponent {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state
-
     const labelProps = {}
     if (!mode || mode === 'default') {
       labelProps.shrink =

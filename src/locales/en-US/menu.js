@@ -81,7 +81,6 @@ export default {
   'menu.patientdb': 'Patient Database',
   'menu.forms': 'Forms',
   'menu.labsresult': 'Labs Result',
-  'menu.report': 'Report',
   'menu.humanResource': 'Human Resource',
   'menu.setting': 'Setting',
   'menu.setting.clinicinfo': 'Clinic Information',
@@ -121,4 +120,7 @@ export default {
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
+
+  'menu.report': 'Report',
+  'menu.report.queueListingReport': 'Queue Listing Report',
 }

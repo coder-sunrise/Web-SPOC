@@ -1,6 +1,7 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
 import request, { axiosRequest } from './request'
+import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
 
 const status = [
@@ -558,7 +559,7 @@ const currencies = [
   },
 ]
 
-const coPayerType =[
+const coPayerType = [
   {
     value: 'corporate',
     name: 'Corporate',
@@ -569,7 +570,7 @@ const coPayerType =[
   },
 ]
 
-const country =[
+const country = [
   {
     value: 'singapore',
     name: 'Singapore',
@@ -603,32 +604,76 @@ const country =[
 //   return localCodes[code]
 // }
 
-const _fetchAndSaveCodeTable = async (code) => {
-  const response = await axiosRequest(`/api/CodeTable?ctnames=${code}`, {
+const multiplyCodetable = (data, multiplier) => {
+  if (multiplier === 1) return data
+  let result = [
+    ...data,
+  ]
+  const maxLength = data.length
+  for (let i = 1; i <= multiplier; i++) {
+    result = [
+      ...result,
+      ...data.map((item) => ({ ...item, id: maxLength * i + item.id })),
+    ]
+  }
+  return result
+}
+
+const tenantCode = [
+  'doctorprofile',
+  'clinicianprofile',
+  'ctappointmenttype',
+]
+
+const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
+  let useGeneral = params === undefined || Object.keys(params).length === 0
+  const baseURL = '/api/CodeTable'
+  const generalCodetableURL = `${baseURL}?ctnames=`
+  const searchURL = `${baseURL}/search?ctname=`
+
+  let url = useGeneral ? generalCodetableURL : searchURL
+  if (tenantCode.includes(code.toLowerCase())) {
+    url = '/api/'
+    useGeneral = false
+  }
+
+  const response = await request(`${url}${code}`, {
     method: 'GET',
+    body: convertToQuery(params),
   })
   const { status: statusCode, data } = response
-
-  if (statusCode === 200) {
+  const result = multiplyCodetable(
+    useGeneral ? data[code] : data.data,
+    multiplier,
+  )
+  if (parseInt(statusCode, 10) === 200) {
     await db.codetable.put({
       code,
-      data: response.data[code],
+      data: result,
       createDate: new Date(),
       updateDate: new Date(),
     })
-    return data[code]
+    return result
   }
 
   return []
 }
 
-export const getCodes = async (_code) => {
-  const code = _code.toLowerCase()
+export const getCodes = async (payload) => {
+  let ctcode
+  let params
+  let multiply = 1
+  if (typeof payload === 'string') ctcode = payload.toLowerCase()
+  if (typeof payload === 'object') {
+    ctcode = payload.code
+    params = payload.filter
+    multiply = payload.multiplier
+  }
 
   let result = []
   try {
     await db.open()
-    const ct = await db.codetable.get(code)
+    const ct = await db.codetable.get(ctcode)
 
     const cookies = new Cookies()
     const lastLoginDate = cookies.get('_lastLogin')
@@ -636,7 +681,7 @@ export const getCodes = async (_code) => {
 
     // not exist in current table, make network call to retrieve data
     if (ct === undefined) {
-      result = _fetchAndSaveCodeTable(code)
+      result = _fetchAndSaveCodeTable(ctcode, params, multiply)
     } else {
       // compare updateDate with lastLoginDate
       // if updateDate > lastLoginDate, do nothing
@@ -645,7 +690,7 @@ export const getCodes = async (_code) => {
       const parsedUpdateDate = moment(updateDate)
 
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(code)
+        ? _fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData
     }
   } catch (error) {

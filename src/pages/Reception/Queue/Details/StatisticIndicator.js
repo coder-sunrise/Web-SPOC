@@ -59,6 +59,7 @@ class StatisticIndicator extends PureComponent {
     const flattenedCalendarData = calendarEvents
       .reduce(flattenAppointmentDateToCalendarEvents, [])
       .filter(todayOnly)
+    console.log({ flattenedCalendarData })
 
     const statistic = {
       all: getStatisticCount(StatusIndicator.ALL, list),
@@ -133,6 +134,7 @@ class StatisticIndicator extends PureComponent {
             block
             id={StatusIndicator.IN_PROGRESS}
             onClick={this.onButtonClick}
+            simple={!currentFilter === StatusIndicator.IN_PROGRESS}
           >
             {currentFilter === StatusIndicator.IN_PROGRESS && <Check />}
             {StatusIndicator.IN_PROGRESS}

@@ -42,6 +42,7 @@ class SchemesGrid extends PureComponent {
               row.validTo,
             ]
           },
+          sortingEnabled: false,
           isDisabled: (row) => {
             return this.isMedisave(row)
           },
@@ -56,6 +57,7 @@ class SchemesGrid extends PureComponent {
           columnName: 'schemeTypeFK',
           type: 'codeSelect',
           code: 'ctSchemeType',
+          sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
             console.log('schemeTypeFK')
             let rows = this.props.rows
@@ -133,6 +135,7 @@ class SchemesGrid extends PureComponent {
         },
         {
           columnName: 'coPaymentSchemeFK',
+          sortingEnabled: false,
           // type: 'codeSelect',
           // code: 'ctSchemeCategory',
           type: 'select', // TODO: get from api
@@ -177,6 +180,7 @@ class SchemesGrid extends PureComponent {
         },
         {
           columnName: 'accountNumber',
+          sortingEnabled: false,
           isDisabled: (row) => {
             return !this.isCorporate(row)
           },

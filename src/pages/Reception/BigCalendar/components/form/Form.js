@@ -48,7 +48,7 @@ const AppointmentSchema = Yup.object().shape({
   startDate: Yup.string().required(),
 })
 
-@connect(({ loginSEMR }) => ({ loginSEMR }))
+@connect(({ login }) => ({ login }))
 @withFormik({
   enableReinitialize: true,
   validationSchema: AppointmentSchema,
