@@ -37,15 +37,24 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      // console.log('queueLog subscriptions')
+      console.log('queueLog subscriptions')
       dispatch({
         type: 'global/subscribeNotification',
         payload: {
           type: 'Consultation',
           callback: () => {
             dispatch({
-              type: 'fetchQueueListing',
+              type: 'refresh',
             })
+          },
+        },
+      })
+      dispatch({
+        type: 'global/subscribeNotification',
+        payload: {
+          type: 'QueueListing',
+          callback: () => {
+            dispatch({ type: 'refresh' })
           },
         },
       })
@@ -69,16 +78,27 @@ export default createListViewModel({
           },
         })
       },
-      *endSession ({ sessionID }, { call, put }) {
+      *endSession ({ sessionID }, { select, call, put }) {
         const response = yield call(service.endSession, sessionID)
         const { status } = response
-        console.log({ response })
-        if (status >= 204 && status < 400)
+
+        if (status >= 204 && status < 400) {
           // end session successfully, reset session info
           yield put({
             type: 'updateSessionInfo',
             payload: { ...InitialSessionInfo },
           })
+          yield put({
+            type: 'global/sendNotification',
+            payload: {
+              type: 'QueueListing',
+              data: {
+                sender: 'End Session',
+                message: 'Session has been ended',
+              },
+            },
+          })
+        }
 
         return status >= 204
       },

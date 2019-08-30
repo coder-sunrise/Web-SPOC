@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import moment from 'moment'
 import * as Yup from 'yup'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField, Field, withFormik } from 'formik'
 // material ui
 import { Popover, withStyles } from '@material-ui/core'
 import Info from '@material-ui/icons/Info'
@@ -12,6 +12,7 @@ import {
   GridContainer,
   GridItem,
   Select,
+  CodeSelect,
   DatePicker,
   TimePicker,
   SizeContainer,
@@ -52,14 +53,6 @@ const STYLES = (theme) => ({
 
 const _dateFormat = 'DD MMM YYYY'
 const _timeFormat = 'hh:mm a'
-const doctors = [
-  { value: 'medisys', name: 'Medisys' },
-  { value: 'levinne', name: 'Dr Levinne' },
-  { value: 'cheah', name: 'Dr Cheah' },
-  { value: 'tan', name: 'Dr Tan' },
-  { value: 'lim', name: 'Dr Lim' },
-  { value: 'liu', name: 'Dr Liu' },
-]
 
 const eventType = [
   { value: 'family day', name: 'Family Day' },
@@ -151,10 +144,16 @@ const DoctorEventForm = ({
       </Popover>
       <GridContainer>
         <GridItem xs md={12}>
-          <FastField
-            name='doctor'
+          <Field
+            name='doctorBlockUserFk'
             render={(args) => (
-              <Select {...args} allowClear label='Doctor' options={doctors} />
+              <CodeSelect
+                {...args}
+                label='Doctor'
+                code='doctorprofile'
+                labelField='clinicianInfomation.name'
+                allowClear
+              />
             )}
           />
         </GridItem>

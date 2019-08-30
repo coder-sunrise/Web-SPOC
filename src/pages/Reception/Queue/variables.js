@@ -6,6 +6,7 @@ import Person from '@material-ui/icons/Person'
 import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
+import Pageview from '@material-ui/icons/Pageview'
 
 export const StatusIndicator = {
   ALL: 'all',
@@ -71,6 +72,12 @@ export const ContextMenuOptions = [
     disabled: false,
   },
   {
+    id: 0.1,
+    label: 'View Visit',
+    Icon: Pageview,
+    disabled: false,
+  },
+  {
     id: 1,
     label: 'Dispense',
     Icon: Money,
@@ -78,7 +85,7 @@ export const ContextMenuOptions = [
   },
   {
     id: 1.1,
-    label: 'Bill',
+    label: 'Billing',
     Icon: Money,
     disabled: false,
   },

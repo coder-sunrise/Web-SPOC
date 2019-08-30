@@ -28,6 +28,8 @@ import DetailsGrid from './Details/DetailsGrid'
 import PatientSearchModal from './PatientSearch'
 import EndSessionSummary from './Details/EndSessionSummary'
 import { StatusIndicator, modelKey } from './variables'
+// utils
+import { SendNotification } from '@/utils/notification'
 
 const drawerWidth = 400
 
@@ -215,12 +217,17 @@ class Queue extends PureComponent {
   }
 
   sendNotification = () => {
-    this.props.dispatch({
-      type: 'global/sendNotification',
-      payload: {
-        test: '123',
-      },
-    })
+    // this.props.dispatch({
+    //   type: 'global/sendNotification',
+    //   payload: {
+    //     type: 'QueueListing',
+    //     data: {
+    //       sender: 'queue_listing',
+    //       message: 'test test',
+    //     },
+    //   },
+    // })
+    SendNotification({ test: '123' })
   }
 
   render () {
@@ -258,7 +265,7 @@ class Queue extends PureComponent {
                 {/* <Button
                   color='success'
                   size='sm'
-                  onClikc={this.sendNotification}
+                  onClick={this.sendNotification}
                 >
                   Send Notification
                 </Button> */}

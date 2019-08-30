@@ -8,6 +8,7 @@ import { CommonTableGrid, DateFormatter, Tooltip } from '@/components'
 import {
   GridContextMenuButton as GridButton,
   LoadingWrapper,
+  DoctorLabel,
 } from 'medisys-components'
 // sub component
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
@@ -109,6 +110,10 @@ class DetailsGrid extends PureComponent {
         },
       },
       {
+        columnName: 'doctor',
+        render: (row) => <DoctorLabel doctor={row.doctor} />,
+      },
+      {
         columnName: 'action',
         align: 'center',
         render: (row) => this.Cell(row),
@@ -168,6 +173,7 @@ class DetailsGrid extends PureComponent {
   onContextButtonClick = (row, id) => {
     switch (id) {
       case '0':
+      case '0.1':
         this.props.handleEditVisitClick({
           visitID: row.id,
         })
@@ -214,24 +220,56 @@ class DetailsGrid extends PureComponent {
       )
     }
 
-    const enabledDispense = [
+    const dispensedStatuses = [
       VISIT_STATUS.DISPENSE,
       VISIT_STATUS.ORDER_UPDATED,
     ]
+
+    const inProgressStatuses = [
+      VISIT_STATUS.IN_CONS,
+      VISIT_STATUS.PAUSED,
+    ]
+
     const isStatusWaiting = filterMap[StatusIndicator.WAITING].includes(
       row.visitStatus,
     )
     const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
       row.visitStatus,
     )
-    const shouldDisableDispense = !enabledDispense.includes(row.visitStatus)
+
+    const enableDispense = dispensedStatuses.includes(row.visitStatus)
     const newContextMenuOptions = ContextMenuOptions.map((opt) => {
-      if (opt.id === 1 || opt.id === 1.1)
-        return { ...opt, disabled: shouldDisableDispense }
-      if (opt.id === 2) return { ...opt, disabled: !isStatusWaiting }
-      if (opt.id === 6 || opt.id === 7)
-        return { ...opt, hidden: !isStatusInProgress }
-      return { ...opt }
+      switch (opt.id) {
+        case 0: // view visit
+          return { ...opt, hidden: !isStatusWaiting }
+        case 0.1: // edit visit
+          return { ...opt, hidden: isStatusWaiting }
+        case 1: // dispense
+          return { ...opt, disabled: !enableDispense }
+        case 1.1: // billing
+          return { ...opt, disabled: row.visitStatus !== VISIT_STATUS.BILLING }
+        case 2: // delete visit
+          return { ...opt, disabled: !isStatusWaiting }
+        case 5: // start consultation
+          return {
+            ...opt,
+            disabled: inProgressStatuses.includes(row.visitStatus),
+          }
+        case 6: // resume consultation
+          return {
+            ...opt,
+            disabled: !inProgressStatuses.includes(row.visitStatus),
+            hidden: !isStatusInProgress,
+          }
+        case 7: // edit consultation
+          return {
+            ...opt,
+            disabled: !enableDispense,
+            hidden: !isStatusInProgress,
+          }
+        default:
+          return { ...opt }
+      }
     })
 
     return (

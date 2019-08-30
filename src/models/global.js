@@ -158,7 +158,7 @@ export default createFormViewModel({
         // console.log(connection)
         connection.on('NewNotification', (type, response) => {
           const { sender, message } = response
-          console.log(type, response)
+          // console.log({ type, response, connectionObserver })
           notification.info({
             // icon: WarningIcon,
             icon: null,
@@ -209,7 +209,8 @@ export default createFormViewModel({
 
       sendNotification ({ payload }, { put, select }) {
         const { type, data } = payload
-        console.log(payload)
+        // console.log(payload)
+        // console.log({ connection })
         connection.invoke('SendNotification', type, data).catch((err) => {
           return console.error(err)
         })

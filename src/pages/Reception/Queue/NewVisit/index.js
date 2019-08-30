@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { Chip, withStyles } from '@material-ui/core'
 // custom component
 import {
   GridContainer,
@@ -54,6 +54,12 @@ const styles = (theme) => ({
     '& > p': {
       fontSize: '1.1rem',
     },
+  },
+  readOnlyChip: {
+    position: 'absolute',
+    zIndex: 20,
+    top: 0,
+    right: 0,
   },
 })
 
@@ -187,8 +193,6 @@ class NewVisit extends PureComponent {
       [],
     )
     const isReadOnly = values.visitStatus !== VISIT_STATUS.WAITING
-    console.log({ isReadOnly, visitStatus: values.visitStatus })
-
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
@@ -196,13 +200,14 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-    // console.log({ values, list, existingQNo })
+
     return (
       <React.Fragment>
         <LoadingWrapper
           loading={isSubmitting || fetchingVisitInfo}
           text={!fetchingInfoText ? loadingText : fetchingInfoText}
         >
+          {/* <Chip label='Read Only' className={classes.readOnlyChip} /> */}
           <GridContainer className={classes.gridContainer}>
             <GridItem xs sm={12} md={3}>
               <PatientInfoCard />

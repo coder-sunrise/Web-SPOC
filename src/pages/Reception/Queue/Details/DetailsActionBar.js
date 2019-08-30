@@ -40,6 +40,9 @@ const styles = () => ({
   toolBtns: {
     marginBottom: 20,
   },
+  textBox: {
+    width: '50%',
+  },
 })
 
 @withFormik({
@@ -61,7 +64,7 @@ class DetailsActionBar extends PureComponent {
     const { classes, toggleNewPatient, handleSubmit, values } = this.props
     return (
       <GridContainer className={classnames(classes.actionBar)}>
-        <GridItem xs md={3}>
+        <GridItem xs={6} sm={6} md={6} lg={7} container alignItems='center'>
           <FastField
             name='search'
             render={(args) => {
@@ -70,14 +73,13 @@ class DetailsActionBar extends PureComponent {
                   label={formatMessage({
                     id: 'reception.queue.registerVisitTextBox',
                   })}
+                  fullWidth={false}
+                  className={classes.textBox}
                   {...args}
                 />
               )
             }}
           />
-        </GridItem>
-
-        <GridItem xs md={3} container alignItems='center'>
           <ProgressButton
             variant='contained'
             color='primary'
@@ -94,7 +96,15 @@ class DetailsActionBar extends PureComponent {
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </GridItem>
-        <GridItem xs md={6} container justify='flex-end' alignItems='center'>
+        <GridItem
+          xs={12}
+          sm={12}
+          md={12}
+          lg={5}
+          container
+          justify='flex-end'
+          alignItems='center'
+        >
           <StatisticIndicator />
         </GridItem>
       </GridContainer>

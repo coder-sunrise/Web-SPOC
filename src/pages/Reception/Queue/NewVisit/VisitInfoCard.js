@@ -6,6 +6,8 @@ import { Field } from 'formik'
 import { formatMessage } from 'umi/locale'
 // custom components
 import { TextField, NumberInput, GridItem, CodeSelect } from '@/components'
+// medisys components
+import { DoctorLabel } from '@/components/_medisys'
 import AttachmentWrapper from './AttachmentWrapper'
 import FormField from './formField'
 
@@ -75,8 +77,14 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.doctor',
                 })}
-                tenantCode='doctorprofile'
-                // code='ctgender'
+                code='doctorprofile'
+                labelField='clinicianProfile.name'
+                renderDropdown={(option) => (
+                  <React.Fragment>
+                    <p>MCR: {option.doctorMCRNo}</p>
+                    <DoctorLabel doctor={option} />
+                  </React.Fragment>
+                )}
                 {...args}
               />
             )}
