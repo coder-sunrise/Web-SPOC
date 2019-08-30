@@ -270,12 +270,16 @@ class AntdSelect extends React.PureComponent {
 
   getSelectOptions = (source, renderDropdown) => {
     const { valueField, labelField, optionLabelLength = 0 } = this.props
+
     return source
-      .map((s) => ({
-        ...s,
-        value: s[valueField],
-        label: s[labelField],
-      }))
+      .map((s) => {
+        return {
+          ...s,
+          value: s[valueField],
+          label: Object.byString(s, labelField),
+          // label: s[labelField],
+        }
+      })
       .map((option) => (
         <Select.Option
           data={option}
