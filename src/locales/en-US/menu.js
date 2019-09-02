@@ -60,7 +60,7 @@ export default {
   'menu.patient.new': 'New Patient',
 
   'menu.inventory': 'Inventory',
-  'menu.inventory.pd': 'PO & DO',
+  'menu.inventory.pd': 'Purchasing & Receiving',
   'menu.inventory.pd.detail': 'PO & DO Detail',
   'menu.inventory.master': 'Inventory Master',
   'menu.inventory.consumable.detail': 'Consumable Detail',

@@ -14,6 +14,7 @@ import {
   TextField,
   NumberField,
   Checkbox,
+  DatePicker,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -59,26 +60,51 @@ class FilterBar extends PureComponent {
                 )
               }}
             />
-            <div className={classes.tansactionCheck}>
-              <FastField
-                name='TansactionOnly'
-                render={(args) => {
-                  return (
-                    <Tooltip
-                      title={formatMessage({
-                        id: 'finance.deposit.search.tansaction',
-                      })}
-                      placement='bottom'
-                    >
-                      <Checkbox simple {...args} />
-                    </Tooltip>
-                  )
-                }}
-              />
-            </div>
+            {/* <div className={classes.tansactionCheck} /> */}
           </GridItem>
 
-          <GridItem xs sm={12} md={2}>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='transactionDateFrom'
+              render={(args) => (
+                <DatePicker label='Transaction Date From' {...args} />
+              )}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='transactionDateTo'
+              render={(args) => (
+                <DatePicker label='Transaction Date To' {...args} />
+              )}
+            />
+          </GridItem>
+
+          <GridItem xs sm={6} md={3}>
+            <FastField
+              name='TansactionOnly'
+              render={(args) => {
+                return (
+                  <Tooltip
+                    title={formatMessage({
+                      id: 'finance.deposit.search.tansaction',
+                    })}
+                    placement='bottom'
+                  >
+                    <Checkbox
+                      label={formatMessage({
+                        id: 'finance.deposit.search.tansaction',
+                      })}
+                      simple
+                      {...args}
+                    />
+                  </Tooltip>
+                )
+              }}
+            />
+          </GridItem>
+
+          {/*<GridItem xs sm={12} md={2}>
             <FastField
               name='ExpenseType'
               render={(args) => {
@@ -100,7 +126,7 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs sm={6} md={1}>
+           <GridItem xs sm={6} md={1}>
             <FastField
               name='AgeStart'
               render={(args) => {
@@ -129,8 +155,8 @@ class FilterBar extends PureComponent {
                 )
               }}
             />
-          </GridItem>
-          <GridItem>
+          </GridItem> */}
+          <GridItem xs={12} md={12}>
             <div className={classes.filterBtn}>
               <Button
                 variant='contained'

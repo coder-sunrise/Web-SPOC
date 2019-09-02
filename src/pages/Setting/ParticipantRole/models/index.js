@@ -1,7 +1,8 @@
-import { createFormViewModel } from 'medisys-model'
+import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
 import * as service from '../services'
 
-export default createFormViewModel({
+export default createListViewModel({
   namespace: 'settingParticipantRole',
   config: {
     // queryOnLoad: false,
@@ -9,7 +10,13 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-
+      default: {
+        isUserMaintainable: true,
+        effectiveDates: [
+          moment(),
+          moment('2099-12-31'),
+        ],
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -17,6 +24,23 @@ export default createFormViewModel({
       })
     },
     effects: {},
-    reducers: {},
+    reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+
+        return {
+          ...st,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+              effectiveDates: [
+                o.effectiveStartDate,
+                o.effectiveEndDate,
+              ],
+            }
+          }),
+        }
+      },
+    },
   },
 })

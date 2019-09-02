@@ -58,7 +58,7 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='serviceCenter'
+              name='serviceCenterFK'
               render={(args) => {
                 return (
                   <CodeSelect
@@ -88,7 +88,7 @@ class Filter extends PureComponent {
                   const {
                     codeDisplayValue,
                     isActive,
-                    serviceCenter,
+                    serviceCenterFK,
                   } = this.props.values
                   this.props.dispatch({
                     type: 'settingClinicService/query',
@@ -97,9 +97,9 @@ class Filter extends PureComponent {
                       isActive,
                       group: [
                         {
-                          code: codeDiplayValue,
-                          codeDisplayValue: codeDiplayValue,
-                          serviceCenter: serviceCenter,
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
+                          serviceCenterFK: serviceCenterFK,
                           combineCondition: 'or',
                         },
                       ],
@@ -115,7 +115,7 @@ class Filter extends PureComponent {
                 onClick={() => {
                   this.props.toggleModal()
                   this.props.dispatch({
-                    type: 'settingClinicService/reset',
+                    type: 'settingClinicService/updateState',
                   })
                 }}
               >
