@@ -6,6 +6,7 @@ import Person from '@material-ui/icons/Person'
 import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
+import Pageview from '@material-ui/icons/Pageview'
 
 export const StatusIndicator = {
   ALL: 'all',
@@ -15,38 +16,36 @@ export const StatusIndicator = {
   COMPLETED: 'completed',
 }
 
-export const visitStatusCode = [
-  'WAITING',
-  'APPOINTMENT',
-  'TO DISPENSE',
-  'IN CONS',
-  'PAUSED',
-  'PAID',
-  'OVERPAID',
-  'COMPLETED',
-]
-
 export const modelKey = 'queueLog/'
+
+export const VISIT_STATUS = {
+  WAITING: 'WAITING',
+  IN_CONS: 'IN CONS',
+  PAUSED: 'PAUSED',
+  DISPENSE: 'DISPENSE',
+  BILLING: 'BILLING',
+  ORDER_UPDATED: 'ORDER UPDATED',
+  COMPLETED: 'COMPLETED',
+  UPCOMING_APPT: 'UPCOMING APPT.',
+}
 
 export const filterMap = {
   [StatusIndicator.ALL]: [
-    ...visitStatusCode,
-  ].filter((item) => item !== 'APPOINTMENT'),
+    ...Object.keys(VISIT_STATUS).map((key) => VISIT_STATUS[key]),
+  ].filter((item) => item !== VISIT_STATUS.UPCOMING_APPT),
   [StatusIndicator.APPOINTMENT]: [
-    'APPOINTMENT',
+    VISIT_STATUS.UPCOMING_APPT,
   ],
   [StatusIndicator.WAITING]: [
-    'WAITING',
+    VISIT_STATUS.WAITING,
   ],
   [StatusIndicator.IN_PROGRESS]: [
-    'TO DISPENSE',
-    'IN CONS',
-    'PAUSED',
+    VISIT_STATUS.DISPENSE,
+    VISIT_STATUS.IN_CONS,
+    VISIT_STATUS.PAUSED,
   ],
   [StatusIndicator.COMPLETED]: [
-    'PAID',
-    'OVERPAID',
-    'COMPLETED',
+    VISIT_STATUS.COMPLETED,
   ],
 }
 
@@ -73,8 +72,20 @@ export const ContextMenuOptions = [
     disabled: false,
   },
   {
+    id: 0.1,
+    label: 'View Visit',
+    Icon: Pageview,
+    disabled: false,
+  },
+  {
     id: 1,
-    label: 'Dispense & Bill',
+    label: 'Dispense',
+    Icon: Money,
+    disabled: false,
+  },
+  {
+    id: 1.1,
+    label: 'Billing',
     Icon: Money,
     disabled: false,
   },

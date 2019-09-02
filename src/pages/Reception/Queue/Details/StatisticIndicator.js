@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import classnames from 'classnames'
 // material ui
 import { Divider, Paper, withStyles } from '@material-ui/core'
+import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab'
 import Check from '@material-ui/icons/ArrowForward'
 // common component
 import { Button } from '@/components'
@@ -18,7 +19,7 @@ const StatisticStyles = () => ({
     textAlign: 'center',
     marginLeft: '5px',
     marginRight: '5px',
-    width: '120px',
+    width: '100px',
   },
   number: {
     padding: '0px 10px',
@@ -134,6 +135,7 @@ class StatisticIndicator extends PureComponent {
             block
             id={StatusIndicator.IN_PROGRESS}
             onClick={this.onButtonClick}
+            simple={!currentFilter === StatusIndicator.IN_PROGRESS}
           >
             {currentFilter === StatusIndicator.IN_PROGRESS && <Check />}
             {StatusIndicator.IN_PROGRESS}
@@ -183,6 +185,12 @@ class StatisticIndicator extends PureComponent {
             {StatusIndicator.APPOINTMENT}
           </Button>
         </Paper>
+        {/* <ToggleButtonGroup>
+          <ToggleButton color='primary'>
+            <p>12</p>
+            <p>ALL</p>
+          </ToggleButton>
+        </ToggleButtonGroup> */}
       </React.Fragment>
     )
   }

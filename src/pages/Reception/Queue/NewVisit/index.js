@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { Chip, withStyles } from '@material-ui/core'
 // custom component
 import {
   GridContainer,
@@ -23,14 +23,15 @@ import FormFieldName from './formField'
 import { deleteFileByFileID } from '@/services/file'
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
+import { VISIT_STATUS } from '../variables'
 
 const styles = (theme) => ({
   gridContainer: {
-    marginBottom: theme.spacing.unit * 2,
+    marginBottom: theme.spacing(1),
   },
   formContent: {
     minHeight: '50vh',
-    maxHeight: '80vh',
+    maxHeight: '85vh',
     overflow: 'auto',
   },
   cardContent: {
@@ -53,6 +54,12 @@ const styles = (theme) => ({
     '& > p': {
       fontSize: '1.1rem',
     },
+  },
+  readOnlyChip: {
+    position: 'absolute',
+    zIndex: 20,
+    top: 0,
+    right: 0,
   },
 })
 
@@ -132,16 +139,60 @@ class NewVisit extends PureComponent {
     setFieldValue('visitAttachment', updated)
   }
 
+  validatePatient = () => {
+    const {
+      queueLog: { list = [] } = { list: [] },
+      visitRegistration: { patientInfo },
+      dispatch,
+      handleSubmit,
+      errors,
+    } = this.props
+
+    if (Object.keys(errors).length > 0) return handleSubmit()
+
+    const alreadyRegisteredVisit = list.reduce(
+      (registered, queue) =>
+        !registered ? queue.patientProfileFK === patientInfo.id : registered,
+      false,
+    )
+    if (alreadyRegisteredVisit)
+      return dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: 'Confirm Register New Visit',
+          openConfirmContent:
+            'This patient already registered in current session, are you sure to continue?',
+          onOpenConfirm: handleSubmit,
+        },
+      })
+    return handleSubmit()
+  }
+
   render () {
     const {
       classes,
       footer,
       handleSubmit,
+      queueLog: { list = [] } = { list: [] },
       loading,
       visitRegistration: { visitInfo, errorState },
       values,
       isSubmitting,
     } = this.props
+    const existingQNo = list.reduce(
+      (queueNumbers, queue) =>
+        queue.visitFK === values.id
+          ? [
+              ...queueNumbers,
+            ]
+          : [
+              ...queueNumbers,
+              queue.queueNo,
+            ],
+      [],
+    )
+    const isReadOnly = values.visitStatus !== VISIT_STATUS.WAITING
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
@@ -156,6 +207,7 @@ class NewVisit extends PureComponent {
           loading={isSubmitting || fetchingVisitInfo}
           text={!fetchingInfoText ? loadingText : fetchingInfoText}
         >
+          {/* <Chip label='Read Only' className={classes.readOnlyChip} /> */}
           <GridContainer className={classes.gridContainer}>
             <GridItem xs sm={12} md={3}>
               <PatientInfoCard />
@@ -166,15 +218,21 @@ class NewVisit extends PureComponent {
                   <React.Fragment>
                     <GridItem xs md={12} className={classes.row}>
                       <VisitInfoCard
+                        isReadOnly={isReadOnly}
+                        existingQNo={existingQNo}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
                       />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
-                      <VitalSignCard handleCalculateBMI={this.calculateBMI} />
+                      <VitalSignCard
+                        isReadOnly={isReadOnly}
+                        handleCalculateBMI={this.calculateBMI}
+                      />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
                       <ReferralCard
+                        isReadOnly={isReadOnly}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
                       />
@@ -195,7 +253,10 @@ class NewVisit extends PureComponent {
         {footer &&
           footer({
             confirmBtnText: isEdit ? 'Save' : 'Register visit',
-            onConfirm: handleSubmit,
+            onConfirm: this.validatePatient,
+            confirmProps: {
+              disabled: isReadOnly,
+            },
           })}
       </React.Fragment>
     )

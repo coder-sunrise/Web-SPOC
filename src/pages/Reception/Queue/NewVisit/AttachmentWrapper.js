@@ -69,6 +69,7 @@ const AttachmentWrapper = ({
   handleUpdateAttachments,
   attachmentType = '',
   attachments = [],
+  isReadOnly,
   title = '',
 }) => {
   const [
@@ -208,7 +209,11 @@ const AttachmentWrapper = ({
                 label={attachment.fileName}
                 color={attachment.id ? 'primary' : ''}
                 onClick={() => onClick(attachment)}
-                onDelete={() => onDelete(attachment.fileIndexFK, attachment.id)}
+                onDelete={
+                  !isReadOnly ? (
+                    () => onDelete(attachment.fileIndexFK, attachment.id)
+                  ) : null
+                }
                 className={classes.chip}
               />
             ))}
@@ -228,7 +233,7 @@ const AttachmentWrapper = ({
             color='rose'
             size='sm'
             onClick={onUploadClick}
-            disabled={uploading || attachments.length >= 5}
+            disabled={isReadOnly || (uploading || attachments.length >= 5)}
           >
             <AttachFile />
             Upload

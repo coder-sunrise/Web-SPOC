@@ -4,6 +4,10 @@ export default (theme) => ({
     padding: theme.spacing(2),
     overflow: 'hidden',
   },
+  divider: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  },
   midButtonGroup: {
     textAlign: 'center',
   },
@@ -15,9 +19,13 @@ export default (theme) => ({
   },
   pageNumber: {
     display: 'inline-block',
-    maxWidth: '150px',
+    maxWidth: '200px',
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
+    '& span': {
+      // display: 'inline-block',
+      fontSize: '1rem',
+    },
   },
   reportContainer: {
     display: 'flex',
@@ -31,9 +39,9 @@ export default (theme) => ({
     maxHeight: '88vh',
     overflow: 'scroll',
     marginTop: theme.spacing(1),
+    boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.28)',
   },
   page: {
-    boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.28)',
     padding: 8,
   },
 })
