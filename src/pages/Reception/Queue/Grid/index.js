@@ -84,7 +84,7 @@ const columnExtensions = [
   { columnName: 'timeOut', width: 160, type: 'time' },
   {
     columnName: 'gender/age',
-    render: (row) => (row.gender && row.age ? `${row.gender}/${row.age}` : ''),
+    render: (row) => `${row.gender}/${row.age < 0 ? 0 : row.age}`,
     sortBy: 'genderFK',
   },
   {
@@ -95,12 +95,11 @@ const columnExtensions = [
         return DateFormatter({ value: row.appointmentTime, full: true })
       }
       if (row.start) return DateFormatter({ value: row.start, full: true })
-      return ''
+      return '-'
     },
   },
   {
     columnName: 'doctor',
-    // render: (row) => <span>123</span>,
     render: (row) => <DoctorLabel doctor={row.doctor} />,
   },
 ]
@@ -150,7 +149,7 @@ const Grid = ({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Are you sure want to delete this visit - (Q No. - ${queueNo})?`,
+        openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
         onOpenConfirm: () => deleteQueue(id),
       },
     })
@@ -206,7 +205,11 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingData
 
   return (
-    <LoadingWrapper linear loading={isLoading} text='Getting queue listing...'>
+    <LoadingWrapper
+      linear
+      loading={isLoading}
+      text='Refreshing queue listing...'
+    >
       <CommonTableGrid
         size='sm'
         height={700}
