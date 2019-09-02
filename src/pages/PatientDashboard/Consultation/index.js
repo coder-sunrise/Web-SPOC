@@ -8,6 +8,8 @@ import Yup from '@/utils/yup'
 import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
+import { consultationDocumentTypes } from '@/utils/codes'
+
 import AuthorizedContext from '@/components/Context/Authorized'
 
 import { Menu, Dropdown } from 'antd'
@@ -178,9 +180,10 @@ const styles = (theme) => ({
 
 let lasActivedWidget = null
 
-@connect(({ consultation, global }) => ({
+@connect(({ consultation, global, consultationDocument }) => ({
   consultation,
   global,
+  consultationDocument,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ consultation = {} }) => {
@@ -278,8 +281,8 @@ class Consultation extends PureComponent {
       {
         id: '4',
         config: {
-          lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
-          md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
+          lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 4 },
+          md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 3 },
         },
       },
       {
@@ -287,6 +290,13 @@ class Consultation extends PureComponent {
         config: {
           lg: { x: 6, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
           md: { x: 5, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
+        },
+      },
+      {
+        id: '7',
+        config: {
+          lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
+          md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
         },
       },
       // {
@@ -849,7 +859,18 @@ class Consultation extends PureComponent {
   }
 
   pauseConsultation = () => {
-    const { dispatch, values, history, consultation } = this.props
+    const {
+      dispatch,
+      values,
+      history,
+      consultation,
+      consultationDocument,
+    } = this.props
+    const { rows } = consultationDocument
+    consultationDocumentTypes.forEach((p) => {
+      values[p.prop] = rows.filter((o) => o.type === p.value)
+    })
+
     dispatch({
       type: 'consultation/pause',
       payload: values,

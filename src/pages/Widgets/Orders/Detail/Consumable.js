@@ -30,7 +30,7 @@ class Consumable extends PureComponent {
         <GridContainer>
           <GridItem xs={12}>
             <FastField
-              name='name'
+              name='stockConsumableFK'
               render={(args) => {
                 return (
                   <Select
@@ -59,7 +59,7 @@ class Consumable extends PureComponent {
           </GridItem>
           <GridItem xs={4}>
             <FastField
-              name='total'
+              name='totalPrice'
               render={(args) => {
                 return <NumberInput label='Total' currency {...args} />
               }}
@@ -67,7 +67,7 @@ class Consumable extends PureComponent {
           </GridItem>
           <GridItem xs={4}>
             <FastField
-              name='totalAfterAdj'
+              name='totalAfterItemAdjustment'
               render={(args) => {
                 return (
                   <NumberInput
@@ -83,7 +83,12 @@ class Consumable extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={12} className={classes.editor}>
-            <RichEditor placeholder='Remarks' />
+            <FastField
+              name='remark'
+              render={(args) => {
+                return <RichEditor placeholder='Remarks' {...args} />
+              }}
+            />
           </GridItem>
         </GridContainer>
       </div>

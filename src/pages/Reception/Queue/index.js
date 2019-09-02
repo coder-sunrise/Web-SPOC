@@ -23,10 +23,10 @@ import {
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
-import DetailsActionBar from './Details/DetailsActionBar'
-import DetailsGrid from './Details/DetailsGrid'
+import DetailsActionBar from './Filterbar'
+import DetailsGrid from './Grid'
+import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'
-import EndSessionSummary from './Details/EndSessionSummary'
 import { StatusIndicator, modelKey } from './variables'
 // utils
 import { SendNotification } from '@/utils/notification'

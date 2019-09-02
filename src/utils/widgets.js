@@ -188,31 +188,7 @@ const widgets = [
     },
   },
   {
-    id: '1001',
-    name: 'Test Widget',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/TestWidget'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {},
-    },
-  },
-  // {
-  //   id: '1002',
-  //   name: 'Dental Chart',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/DentalChartDemo'),
-  //     loading: Loading,
-  //   }),
-  //   layoutConfig: {
-  //     style: {
-  //       height: 'calc(100% - 36px)',
-  //     },
-  //   },
-  // },
-  {
-    id: '1003',
+    id: '7',
     name: 'Vital Sign',
     component: Loadable({
       loader: () => import('@/pages/Widgets/VitalSign'),
@@ -243,6 +219,30 @@ const widgets = [
       </Tooltip>
     ),
   },
+  {
+    id: '1001',
+    name: 'Test Widget',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/TestWidget'),
+      loading: Loading,
+    }),
+    layoutConfig: {
+      style: {},
+    },
+  },
+  // {
+  //   id: '1002',
+  //   name: 'Dental Chart',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/DentalChartDemo'),
+  //     loading: Loading,
+  //   }),
+  //   layoutConfig: {
+  //     style: {
+  //       height: 'calc(100% - 36px)',
+  //     },
+  //   },
+  // },
 ]
 
 module.exports = {

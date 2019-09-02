@@ -2,45 +2,34 @@ import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import {  Tooltip } from '@material-ui/core'
 import { CommonTableGrid, Button, CommonModal,Popconfirm } from '@/components'
+import {consultationDocumentTypes} from '@/utils/codes'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import AddConsultationDocument from './AddConsultationDocument'
 import model from './models'
 
-const types = [
-  {
-    value: '3',
-    name: 'Medical Certificate',
-  },
-  {
-    value: '4',
-    name: 'Certificate of Attendance',
-  },
-  {
-    value: '1',
-    name: 'Referral Letter',
-  },
-  {
-    value: '2',
-    name: 'Memo',
-  },
-  {
-    value: '5',
-    name: 'Others',
-  },
-]
+
 window.g_app.replaceModel(model)
-@connect(({ consultationDocument }) => ({
-  consultationDocument,
+@connect(({ consultationDocument,codetable,patientDashboard }) => ({
+  consultationDocument,codetable,patientDashboard,
 }))
 class ConsultationDocument extends PureComponent {
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
 
-  
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+      },
+    })
+  }
+
   toggleModal = () => {
     const { consultationDocument } = this.props
     const { showModal } = consultationDocument
-
     this.props.dispatch({
       type: 'consultationDocument/updateState',
       payload: {
@@ -50,6 +39,7 @@ class ConsultationDocument extends PureComponent {
   }
 
   editRow =(row)=>{
+    console.log(row)
     this.props.dispatch({
       type: 'consultationDocument/updateState',
       payload: {
@@ -61,7 +51,8 @@ class ConsultationDocument extends PureComponent {
   }
 
   render () {
-    const { consultationDocument,dispatch } = this.props
+    const { consultationDocument,dispatch} = this.props
+
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
     return (
@@ -71,16 +62,22 @@ class ConsultationDocument extends PureComponent {
           size='sm'
           style={{ margin: 0 }}
           rows={rows}
+          onRowDoubleClick={this.editRow}
           columns={[
             { name: 'type', title: 'Type' },
             { name: 'subject', title: 'Subject' },
-            { name: 'from', title: 'From' },
+            { name: 'issuedByUserFK', title: 'From' },
             { name: 'action', title: 'Action' },
           ]}
           FuncProps={{ pager: false }}
           columnExtensions={[
-            { columnName: 'type', type: 'select', options:types },
-
+            { columnName: 'type', type: 'select', options:consultationDocumentTypes },
+            { columnName: 'issuedByUserFK',render:(r)=>{
+              const {codetable}=this.props
+              const {clinicianprofile}=codetable
+              const obj = clinicianprofile.find(o=>o.id===(r.issuedByUserFK?r.issuedByUserFK: r.referredByUserFK)) || {}
+              return `${obj.title || ''} ${ obj.name || ''}`
+            } },
             { columnName: 'subject', onClick:this.editRow, type: 'link', linkField: 'href' },
             { columnName: 'action', render:(row)=>{
               return (
@@ -134,7 +131,7 @@ class ConsultationDocument extends PureComponent {
           //   confirmBtnText: 'Save',
           // }}
         >
-          <AddConsultationDocument {...this.props} types={types} />
+          <AddConsultationDocument {...this.props} types={consultationDocumentTypes} />
         </CommonModal>
       </div>
     )

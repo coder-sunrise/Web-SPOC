@@ -32,6 +32,7 @@ import Memo from './Memo'
 import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
+import VaccinationCertificate from './VaccinationCertificate'
 
 const styles = (theme) => ({
   editor: {
@@ -40,8 +41,9 @@ const styles = (theme) => ({
   },
   editorBtn: {
     position: 'absolute',
+    zIndex: 1,
     right: 0,
-    top: 4,
+    top: 12,
   },
 })
 
@@ -75,9 +77,10 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'AddConsultationDocument',
 // })
-@connect(({ consultationDocument, user }) => ({
+@connect(({ consultationDocument, user, codetable }) => ({
   consultationDocument,
   user,
+  codetable,
 }))
 class AddConsultationDocument extends PureComponent {
   toggleModal = () => {
@@ -106,7 +109,10 @@ class AddConsultationDocument extends PureComponent {
     } = props
     // console.log(props)
     const { entity = {}, editType } = consultationDocument
-    const cfg = props
+    const cfg = {
+      ...props,
+      currentType: types.find((o) => o.value === editType),
+    }
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
@@ -134,6 +140,7 @@ class AddConsultationDocument extends PureComponent {
           {editType === '3' && <MedicalCertificate {...cfg} />}
           {editType === '4' && <CertificateAttendance {...cfg} />}
           {editType === '5' && <Others {...cfg} />}
+          {editType === '6' && <VaccinationCertificate {...cfg} />}
         </div>
       </div>
     )

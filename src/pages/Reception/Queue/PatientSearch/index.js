@@ -67,7 +67,7 @@ class PatientSearch extends PureComponent {
   SearchPatient = Loadable({
     loader: () => import('@/pages/PatientDatabase/Search'),
     loading: Loading,
-    render: (loaded, props) => {
+    render: (loaded) => {
       const Component = loaded.default
       return (
         <Component

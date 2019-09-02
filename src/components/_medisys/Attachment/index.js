@@ -1,16 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
+import classnames from 'classnames'
 // import fetch from 'dva/fetch'
 // material ui
 import AttachFile from '@material-ui/icons/AttachFile'
 import { CircularProgress, Chip, withStyles } from '@material-ui/core'
 // custom components
-import {
-  Button,
-  CommonCard,
-  Danger,
-  GridContainer,
-  GridItem,
-} from '@/components'
+import { Button, Danger, GridContainer, GridItem } from '@/components'
 // services
 import {
   uploadFile,
@@ -21,6 +16,10 @@ import {
 import { getCodes } from '@/utils/codes'
 
 const styles = (theme) => ({
+  noPadding: {
+    paddingLeft: '0px !important',
+    paddingRight: '0px !important',
+  },
   verticalSpacing: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
@@ -63,14 +62,12 @@ const getFileExtension = (filename) => {
   return filename.split('.').pop()
 }
 
-const AttachmentWrapper = ({
+const Attachment = ({
   classes,
-  children,
   handleUpdateAttachments,
   attachmentType = '',
   attachments = [],
   isReadOnly,
-  title = '',
 }) => {
   const [
     uploading,
@@ -159,6 +156,7 @@ const AttachmentWrapper = ({
       const numberOfNewFiles = Object.keys(files).length
       if (numberOfNewFiles + attachments.length > 5) {
         setErrorText('Cannot upload more than 5 attachments')
+        setUploading(false)
         return
       }
       const skipped = validateFileSize(files)
@@ -190,66 +188,63 @@ const AttachmentWrapper = ({
   const onClick = (attachment) => {
     downloadAttachment(attachment)
   }
-
+  const labelClass = classnames({
+    [classes.verticalSpacing]: true,
+    [classes.noPadding]: true,
+  })
   return (
-    <CommonCard size='sm' title={title}>
-      <GridContainer alignItems='center'>
-        {children}
-        <GridItem className={classes.verticalSpacing}>
-          <span className={classes.attachmentLabel}>Attachment:</span>
-          {uploading && <CircularProgress />}
-        </GridItem>
-        <GridItem md={10} className={classes.verticalSpacing}>
-          <div>
-            {fileAttachments.map((attachment) => (
-              <Chip
-                key={attachment.id}
-                size='small'
-                variant='outlined'
-                label={attachment.fileName}
-                color={attachment.id ? 'primary' : ''}
-                onClick={() => onClick(attachment)}
-                onDelete={
-                  !isReadOnly ? (
-                    () => onDelete(attachment.fileIndexFK, attachment.id)
-                  ) : null
-                }
-                className={classes.chip}
-              />
-            ))}
-          </div>
-        </GridItem>
-        <GridItem>
-          <input
-            style={{ display: 'none' }}
-            type='file'
-            accept={allowedFiles}
-            id='uploadVisitAttachment'
-            ref={inputEl}
-            multiple='multiple'
-            onChange={onFileChange}
-          />
-          <Button
-            color='rose'
-            size='sm'
-            onClick={onUploadClick}
-            disabled={isReadOnly || (uploading || attachments.length >= 5)}
-          >
-            <AttachFile />
-            Upload
-          </Button>
-        </GridItem>
-        <GridItem>
-          <Danger>
-            <span>{errorText}</span>
-          </Danger>
-        </GridItem>
-      </GridContainer>
-    </CommonCard>
+    <GridContainer>
+      <GridItem className={labelClass}>
+        <span className={classes.attachmentLabel}>Attachment:</span>
+        {uploading && <CircularProgress />}
+      </GridItem>
+      <GridItem md={10} className={classes.verticalSpacing}>
+        <div>
+          {fileAttachments.map((attachment) => (
+            <Chip
+              key={attachment.id}
+              size='small'
+              variant='outlined'
+              label={attachment.fileName}
+              color={attachment.id ? 'primary' : ''}
+              onClick={() => onClick(attachment)}
+              onDelete={
+                !isReadOnly ? (
+                  () => onDelete(attachment.fileIndexFK, attachment.id)
+                ) : null
+              }
+              className={classes.chip}
+            />
+          ))}
+        </div>
+      </GridItem>
+      <GridItem className={classes.noPadding}>
+        <input
+          style={{ display: 'none' }}
+          type='file'
+          accept={allowedFiles}
+          id='uploadVisitAttachment'
+          ref={inputEl}
+          multiple='multiple'
+          onChange={onFileChange}
+        />
+        <Button
+          color='rose'
+          size='sm'
+          onClick={onUploadClick}
+          disabled={isReadOnly || uploading || fileAttachments.length >= 5}
+        >
+          <AttachFile />
+          Upload
+        </Button>
+      </GridItem>
+      <GridItem>
+        <Danger>
+          <span>{errorText}</span>
+        </Danger>
+      </GridItem>
+    </GridContainer>
   )
-  // return <div>{children}</div>
 }
 
-export default withStyles(styles, { name: 'withAttachmentForm' })(
-  AttachmentWrapper,
-)
+export default withStyles(styles, { name: 'Attachment' })(Attachment)

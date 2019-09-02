@@ -146,6 +146,7 @@ class NewVisit extends PureComponent {
       dispatch,
       handleSubmit,
       errors,
+      values,
     } = this.props
 
     if (Object.keys(errors).length > 0) return handleSubmit()
@@ -155,7 +156,7 @@ class NewVisit extends PureComponent {
         !registered ? queue.patientProfileFK === patientInfo.id : registered,
       false,
     )
-    if (alreadyRegisteredVisit)
+    if (!values.id && alreadyRegisteredVisit)
       return dispatch({
         type: 'global/updateAppState',
         payload: {

@@ -24,7 +24,7 @@ const styles = () => ({
     statementNo: 'SM-000002',
     coPayer: 'AIA/AIA',
     adminCharge: 10,
-    paid: 0,
+    paid: 20,
     statementDate: moment().add(-1, 'months'),
     paymentTerm: '30 Days',
     payableAmount: 1233,
@@ -64,14 +64,16 @@ class DetailsHeader extends PureComponent {
             <FastField
               name='adminCharge'
               render={(args) => (
-                <TextField disabled label='Admin Charge' {...args} />
+                <NumberInput disabled currency label='Admin Charge' {...args} />
               )}
             />
           </GridItem>
           <GridItem xs>
             <FastField
               name='paid'
-              render={(args) => <DatePicker disabled label='Paid' {...args} />}
+              render={(args) => (
+                <NumberInput disabled currency label='Paid' {...args} />
+              )}
             />
           </GridItem>
           {/* <GridItem xs>

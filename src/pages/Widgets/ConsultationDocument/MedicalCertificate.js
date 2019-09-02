@@ -1,5 +1,4 @@
 import React, { Component, PureComponent } from 'react'
-import { connect } from 'dva'
 import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
@@ -24,41 +23,38 @@ import {
   withFormikExtend,
   FastField,
   Field,
+  ClinicianSelect,
 } from '@/components'
 
-@connect(({ codetable }) => ({
-  codetable,
-}))
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument }) => {
-    // console.log(diagnosis)
     return (
       consultationDocument.entity ||
       consultationDocument.defaultMedicalCertificate
     )
   },
-  validationSchema: Yup.object().shape(
-    {
-      // mcIssueDate: Yup.date().required(),
-      // issuedByUserFK: Yup.number().required(),
-      // mcDays: Yup.number().required(),
-      // mcStartEndDate: Yup.array().of(Yup.date()).min(2).required(),
-      // unfitTypeFK: Yup.number().required(),
-    },
-  ),
+  validationSchema: Yup.object().shape({
+    mcIssueDate: Yup.date().required(),
+    issuedByUserFK: Yup.number().required(),
+    mcDays: Yup.number().required(),
+    mcStartEndDate: Yup.array().of(Yup.date()).min(2).required(),
+    unfitTypeFK: Yup.number().required(),
+  }),
 
   handleSubmit: (values, { props }) => {
-    console.log(values)
-    const { dispatch, onConfirm } = props
-    const { mcStartEndDate, mcDays } = values
+    const { dispatch, onConfirm, consultationDocument, currentType } = props
+    const { mcStartEndDate } = values
+    const { rows } = consultationDocument
+    const data = {
+      sequence: rows.length,
+      ...values,
+      mcStartDate: mcStartEndDate[0],
+      mcEndDate: mcStartEndDate[1],
+    }
+    // data.subject = currentType.getSubject(data)
     dispatch({
       type: 'consultationDocument/upsertRow',
-      payload: {
-        ...values,
-        subject: `${mcStartEndDate[0].format(
-          dateFormatLong,
-        )} - ${mcStartEndDate[1].format(dateFormatLong)} - ${mcDays} Day(s)`,
-      },
+      payload: data,
     })
     if (onConfirm) onConfirm()
   },
@@ -77,18 +73,7 @@ class MedicalCertificate extends PureComponent {
   }
 
   render () {
-    const {
-      theme,
-      footer,
-      classes,
-      consultationDocument,
-      codetable,
-      user,
-      handleSubmit,
-      values,
-    } = this.props
-    const { clinicianprofile = [] } = codetable
-    console.log(clinicianprofile, user)
+    const { footer, handleSubmit, classes, values } = this.props
     return (
       <div>
         {values.mcReferenceNo && (
@@ -116,21 +101,7 @@ class MedicalCertificate extends PureComponent {
             <Field
               name='issuedByUserFK'
               render={(args) => {
-                if (!args.field.value && clinicianprofile.length) {
-                  const obj = clinicianprofile.find(
-                    (o) => o.userProfileFK === user.data.id,
-                  )
-                  if (obj) {
-                    args.field.value = obj.id
-                  }
-                }
-                return (
-                  <CodeSelect
-                    code='clinicianprofile'
-                    label='Issue by'
-                    {...args}
-                  />
-                )
+                return <ClinicianSelect label='Issue By' {...args} />
               }}
             />
           </GridItem>

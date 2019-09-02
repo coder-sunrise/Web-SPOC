@@ -1,5 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 import Yup from '@/utils/yup'
+import moment from 'moment'
+import { connect } from 'dva'
 
 import {
   Button,
@@ -20,13 +22,18 @@ import {
   withFormikExtend,
   FastField,
   Field,
-  ButtonSelect,
   ClinicianSelect,
 } from '@/components'
 
+@connect(({ patientDashboard }) => ({
+  patientDashboard,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument }) => {
-    return consultationDocument.entity || consultationDocument.defaultMemo
+    return (
+      consultationDocument.entity ||
+      consultationDocument.defaultVaccinationCertificate
+    )
   },
   validationSchema: Yup.object().shape({
     issuedByUserFK: Yup.number().required(),
@@ -36,16 +43,20 @@ import {
 
   handleSubmit: (values, { props }) => {
     console.log(values)
-    const { dispatch, onConfirm } = props
+    const { dispatch, onConfirm, consultationDocument } = props
+    const { rows } = consultationDocument
     dispatch({
       type: 'consultationDocument/upsertRow',
-      payload: values,
+      payload: {
+        sequence: rows.length,
+        ...values,
+      },
     })
     if (onConfirm) onConfirm()
   },
   displayName: 'AddConsultationDocument',
 })
-class Memo extends PureComponent {
+class VaccinationCertificate extends PureComponent {
   constructor (props) {
     super(props)
     const { dispatch } = props
@@ -53,7 +64,7 @@ class Memo extends PureComponent {
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'ctReferralLetterTemplate',
+        code: 'ctgender',
       },
     })
   }
@@ -63,18 +74,16 @@ class Memo extends PureComponent {
       footer,
       handleSubmit,
       classes,
+      patientDashboard,
       codetable,
-      rowHeight,
-      setFieldValue,
     } = this.props
-    const { ctReferralLetterTemplate } = codetable
 
     return (
       <div>
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='memoDate'
+              name='certificateDate'
               render={(args) => {
                 return <DatePicker label='Date' {...args} />
               }}
@@ -90,41 +99,32 @@ class Memo extends PureComponent {
               }}
             />
           </GridItem>
-          {/* <GridItem xs={12}>
-            <FastField
-              name='address'
-              render={(args) => {
-                return (
-                  <TextField label='Address' multiline rowsMax={3} {...args} />
-                )
-              }}
-            />
-          </GridItem> */}
           <GridItem xs={9}>
             <FastField
               name='subject'
               render={(args) => {
+                const { form, field } = args
+                if (!field.value) {
+                  const { patientInfo } = patientDashboard
+                  const { name, patientAccountNo, genderFK, dob } = patientInfo
+
+                  const { ctgender = [] } = codetable
+                  if (ctgender.length > 0) {
+                    const gender = ctgender.find((o) => o.id === genderFK) || {}
+                    const v = `Vaccination Certificate - ${name}, ${patientAccountNo}, ${gender.code ||
+                      ''}, ${Math.floor(
+                      moment.duration(moment().diff(dob)).asYears(),
+                    )}`
+                    form.setFieldValue(field.name, v)
+                  }
+                }
                 return <TextField label='Subject' {...args} />
               }}
             />
           </GridItem>
-          <GridItem
-            xs={3}
-            style={{ lineHeight: rowHeight, textAlign: 'right' }}
-          >
-            <ButtonSelect
-              options={ctReferralLetterTemplate}
-              textField='displayValue'
-              onClick={(option) => {
-                setFieldValue('content', option.templateMessage)
-              }}
-            >
-              Load Template
-            </ButtonSelect>
-          </GridItem>
           <GridItem xs={12} className={classes.editor}>
             <Button link className={classes.editorBtn}>
-              Add Diagnosis
+              Add Vaccine
             </Button>
             <FastField
               name='content'
@@ -143,4 +143,4 @@ class Memo extends PureComponent {
     )
   }
 }
-export default Memo
+export default VaccinationCertificate

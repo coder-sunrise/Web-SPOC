@@ -16,6 +16,8 @@ export CheckboxGroup from './CheckboxGroup'
 export NumberField from './NumberInput'
 
 // export { default as MUISelect } from './Select'
+export ClinicianSelect from './Select/ClinicianSelect'
+export ButtonSelect from './Select/ButtonSelect'
 export CodeSelect from './Select/CodeSelect'
 // export MUICodeSelect from './Select/MUICodeSelect'
 // export { default as MUISelect } from './Select/AntDSelect.js'

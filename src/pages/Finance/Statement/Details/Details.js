@@ -19,6 +19,7 @@ import {
 import CollectPayment from './CollectPayment'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import ExtractAsSingle from './ExtractAsSingle'
 
 const styles = () => ({
   gridContainer: {
@@ -37,6 +38,7 @@ const styles = () => ({
 }))
 class Details extends PureComponent {
   state = {
+    showModal: false,
     selectedRows: [],
     lastRefresh: moment().add(-1, 'months').format('DD MMM YYYY HH:mm'),
     columns: [
@@ -49,10 +51,28 @@ class Details extends PureComponent {
       { name: 'remarks', title: 'Remarks' },
       { name: 'action', title: 'Action' },
     ],
+
     columnExtensions: [
-      { columName: 'amount', type: 'number', currency: true },
-      { columName: 'outstandingBalance', type: 'number', currency: true },
-      { columName: 'invoiceDate', type: 'date' },
+      {
+        columnName: 'adminCharge',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'payableAmount',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'outstandingBalance',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'invoiceDate',
+        type: 'date',
+        format: 'DD MMM YYYY',
+      },
       {
         columnName: 'action',
         align: 'center',
@@ -82,7 +102,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -92,7 +113,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -102,7 +124,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -112,7 +135,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -122,7 +146,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -132,7 +157,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -142,7 +168,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -152,7 +179,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -162,7 +190,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -172,7 +201,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -182,7 +212,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -192,7 +223,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -202,7 +234,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
       {
@@ -212,7 +245,8 @@ class Details extends PureComponent {
           .add(Math.ceil(Math.random() * 100) - 100, 'days')
           .format('LLL'),
         patientName: 'Patient 01',
-        amount: 100,
+        adminCharge: 10,
+        payableAmount: 100,
         outstandingBalance: 100,
       },
     ],
@@ -240,7 +274,14 @@ class Details extends PureComponent {
     this.setState({ selectedRows: selection })
   }
 
+  handleClick = () => {
+    this.setState((prevState) => {
+      return { showModal: !prevState.showModal }
+    })
+  }
+
   render () {
+    console.log('state', this.state)
     const {
       rows,
       columns,
@@ -248,6 +289,7 @@ class Details extends PureComponent {
       lastRefresh,
       showCollectPayment,
       FuncProps,
+      showModal,
     } = this.state
 
     // const FuncProps = { pager: false }
@@ -328,8 +370,20 @@ class Details extends PureComponent {
           */}
           <CollectPaymentConfirm />
         </CommonModal>
-
-        <Button style={{ marginTop: 10 }} color='primary'>
+        <CommonModal
+          open={showModal}
+          maxWidth='md'
+          bodyNoPadding
+          onClose={this.handleClick}
+          onConfirm={this.handleClick}
+        >
+          <ExtractAsSingle selectedRows={this.state.selectedRows} />
+        </CommonModal>
+        <Button
+          style={{ marginTop: 10 }}
+          color='primary'
+          onClick={this.handleClick}
+        >
           Extract As Single
         </Button>
       </div>
@@ -337,4 +391,4 @@ class Details extends PureComponent {
   }
 }
 
-export default withStyles(styles)(Details)
+export default withStyles(styles, { withTheme: true })(Details)

@@ -8,7 +8,7 @@ import { Button, GridContainer, GridItem } from '@/components'
 // sub component
 // import PatientBanner from './components/PatientBanner'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from './components/DispenseDetails'
+import DispenseDetails from './DispenseDetails'
 import style from './style'
 
 class Dispense extends Component {
