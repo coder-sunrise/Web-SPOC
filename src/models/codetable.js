@@ -27,13 +27,16 @@ export default createListViewModel({
               // list = { ...list, [lowerCaseCode]: response }
               yield put({
                 type: 'saveCodetable',
-                code: ctcode,
-                data: response,
+                payload: {
+                  code: ctcode,
+                  data: response,
+                },
               })
               return response
             }
           }
         }
+        return []
       },
     },
     reducers: {

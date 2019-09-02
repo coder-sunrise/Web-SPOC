@@ -113,9 +113,15 @@ class FilterBar extends PureComponent {
     const { searchQuery, isTyping } = this.state
     const { classes, filter, onDoctorEventClick, values } = this.props
 
-    const maxDoctorTagCount = values.doctorProfile.length === 1 ? 1 : 0
-    const maxDoctorTagPlaceholder = `${values.doctorProfile
-      .length} doctors selected...`
+    const { doctorProfile } = values
+
+    console.log({ doctorProfile })
+
+    const maxDoctorTagCount =
+      doctorProfile !== null && doctorProfile.length === 1 ? 1 : 0
+    const maxDoctorTagPlaceholder = doctorProfile
+      ? `${doctorProfile.length} doctors selected...`
+      : ''
 
     const maxAppointmentTagCount = values.appointmentType.length === 1 ? 1 : 0
     const maxAppointmentTagPlaceholder = `${values.appointmentType
@@ -144,7 +150,7 @@ class FilterBar extends PureComponent {
                     code='doctorprofile'
                     label='Filter by Doctor'
                     mode='multiple'
-                    labelField='clinicianInfomation.name'
+                    labelField='clinicianProfile.name'
                     maxTagCount={maxDoctorTagCount}
                     maxTagPlaceholder={maxDoctorTagPlaceholder}
                     renderDropdown={(option) => {
@@ -152,8 +158,8 @@ class FilterBar extends PureComponent {
                         <div>
                           <p>MCR No.: {option.doctorMCRNo}</p>
                           <p>
-                            {`${option.clinicianInfomation.title} ${option
-                              .clinicianInfomation.name}`}
+                            {`${option.clinicianProfile.title} ${option
+                              .clinicianProfile.name}`}
                           </p>
                         </div>
                       )
