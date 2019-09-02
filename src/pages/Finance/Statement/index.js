@@ -24,6 +24,7 @@ import {
   CommonTableGrid,
   Tooltip,
   GridItem,
+  EditableTableGrid,
 } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
@@ -64,6 +65,49 @@ class Statement extends PureComponent {
     selectedRows: [],
     open: false,
     selectedStatementNo: '',
+
+    columns: [
+      { name: 'statementNo', title: 'Statement No.' },
+      { name: 'statementDate', title: 'Statement Date' },
+      { name: 'company', title: 'Company' },
+      { name: 'payableAmount', title: 'Payable Amount' },
+      { name: 'paid', title: 'Paid' },
+      { name: 'outstanding', title: 'Outstanding' },
+      { name: 'dueDate', title: 'Due Date' },
+      { name: 'remarks', title: 'Remarks' },
+      { name: 'action', title: 'Action' },
+    ],
+    rows: [
+      {
+        id: 'SM/00001',
+        statementNo: 'SM/00001',
+        statementDate: '2019-08-14 09:50:59',
+        // moment()
+        //   .add(Math.ceil(Math.random() * 100) - 100, 'days')
+        //   .format('LLL'),
+        company: 'Prudential',
+        payableAmount: '100',
+        paid: '20',
+        outstanding: 180,
+        dueDate: '2019-09-14 09:50:59',
+        remarks: 'Remarks for this statement',
+      },
+      {
+        id: 'SM/00002',
+        statementNo: 'SM/00002',
+        statementDate: moment()
+          .add(Math.ceil(Math.random() * 100) - 100, 'days')
+          .format('LLL'),
+        company: 'AVIVA',
+        payableAmount: 200,
+        paid: 200,
+        outstanding: 0,
+        dueDate: moment()
+          .add(Math.ceil(Math.random() * 100) - 100, 'days')
+          .format('LLL'),
+        remarks: '',
+      },
+    ],
   }
 
   handleSelectionChange = (selection) => {
@@ -91,22 +135,31 @@ class Statement extends PureComponent {
         selectedStatementNo: row.statementNo,
       }
     })
-    // console.log('pop', this.state.open),
   }
 
-  handleClose = () => {
-    this.setState((prevState) => {
-      return { open: false }
-    })
+  handleClose = (e) => {
+    this.setState(
+      (prevState) => {
+        return { open: false }
+      },
+      () => {
+        return {
+          rows: this.state.rows.filter(
+            (row) => row.statementNo !== this.state.selectedStatementNo,
+          ),
+        }
+      },
+    )
   }
 
   render () {
-    const { history } = this.props
-    const dateFormat = 'DD MMM YYYY'
+    console.log('rows', this.state.rows)
 
+    const { history } = this.props
     const editRow = (row, e) => {
       history.push(`/finance/statement/details?id=${row.id}`)
     }
+    const { rows, columns } = this.state
     return (
       <React.Fragment>
         <SearchBar
@@ -119,51 +172,20 @@ class Statement extends PureComponent {
           // type='corporateBilling'
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
-          onRowDoubleClick={this.editRow}
-          rows={[
-            {
-              id: 'SM/00001',
-              statementNo: 'SM/00001',
-              statementDate: '2019-08-14 09:50:59',
-              // moment()
-              //   .add(Math.ceil(Math.random() * 100) - 100, 'days')
-              //   .format('LLL'),
-              company: 'Prudential',
-              payableAmount: '100',
-              paid: '20',
-              outstanding: 180,
-              dueDate: '2019-09-14 09:50:59',
-              remarks: 'Remarks for this statement',
-            },
-            {
-              id: 'SM/00002',
-              statementNo: 'SM/00002',
-              statementDate: moment()
-                .add(Math.ceil(Math.random() * 100) - 100, 'days')
-                .format('LLL'),
-              company: 'AVIVA',
-              payableAmount: 200,
-              paid: 200,
-              outstanding: 0,
-              dueDate: moment()
-                .add(Math.ceil(Math.random() * 100) - 100, 'days')
-                .format('LLL'),
-              remarks: '',
-            },
-          ]}
-          columns={[
-            { name: 'statementNo', title: 'Statement No.' },
-            { name: 'statementDate', title: 'Statement Date' },
-            { name: 'company', title: 'Company' },
-            { name: 'payableAmount', title: 'Payable Amount' },
-            { name: 'paid', title: 'Paid' },
-            { name: 'outstanding', title: 'Outstanding' },
-            { name: 'dueDate', title: 'Due Date' },
-            { name: 'remarks', title: 'Remarks' },
-            { name: 'action', title: 'Action' },
-          ]}
+          onRowDoubleClick={editRow}
+          rows={rows}
+          columns={columns}
           FuncProps={{ selectable: true }}
           columnExtensions={[
+            { columnName: 'payableAmount', type: 'number', currency: true },
+            { columnName: 'paid', type: 'number', currency: true },
+            { columnName: 'outstanding', type: 'number', currency: true },
+            {
+              columnName: 'statementDate',
+              type: 'date',
+              format: 'DD MMM YYYY',
+            },
+            { columnName: 'dueDate', type: 'date', format: 'DD MMM YYYY' },
             {
               columnName: 'action',
               align: 'center',
@@ -194,26 +216,64 @@ class Statement extends PureComponent {
                 )
               },
             },
-
-            { columName: 'statementDate', type: 'date', format: dateFormat },
-            {
-              columName: 'paid',
-              type: 'currency',
-              currency: true,
-              alignment: 'right',
-            },
-            {
-              columName: 'outstanding',
-              type: 'number',
-              currency: true,
-              align: 'right',
-            },
-            { columName: 'dueDate', type: 'date', format: 'DD MMM YYYY' },
           ]}
+          // EditingProps={{
+          //   showAddCommand: true,
+          //   showEditCommand: true,
+          //   showDeleteCommand: true,
+          //   onCommitChanges: this.commitChanges,
+          //   onAddedRowsChange: this.onAddedRowsChange,
+          // }}
+          // columnExtensions={[
+          //   {
+          //     columnName: 'action',
+          //     align: 'center',
+          //     render: (row) => {
+          //       return (
+          //         <React.Fragment>
+          //           <Button
+          //             size='sm'
+          //             onClick={() => {
+          //               editRow(row)
+          //             }}
+          //             justIcon
+          //             color='primary'
+          //           >
+          //             <Edit />
+          //           </Button>
+          //           <Button
+          //             size='sm'
+          //             onClick={() => {
+          //               this.handleClickOpen(row)
+          //             }}
+          //             justIcon
+          //             color='primary'
+          //           >
+          //             <Delete />
+          //           </Button>
+          //         </React.Fragment>
+          //       )
+          //     },
+          //   },
+          //   { columName: 'statementDate', type: 'date', format: dateFormat },
+          //   {
+          //     columName: 'paid',
+          //     type: 'number',
+          //     currency: true,
+          //     alignment: 'right',
+          //   },
+          //   {
+          //     columName: 'outstanding',
+          //     type: 'number',
+          //     currency: true,
+          //     align: 'right',
+          //   },
+          //   { columName: 'dueDate', type: 'date', format: 'DD MMM YYYY' },
+          // ]}
         />
         <Dialog
           open={this.state.open}
-          onClose={this.handleClose}
+          // onClose={this.handleClose}
           aria-labelledby='alert-dialog-title'
           aria-describedby='alert-dialog-description'
         >
@@ -224,10 +284,15 @@ class Statement extends PureComponent {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleClose} color='danger'>
+            <Button onClick={this.handleClose} value='false' color='danger'>
               No
             </Button>
-            <Button onClick={this.handleClose} color='primary' autoFocus>
+            <Button
+              onClick={this.handleClose}
+              value='true'
+              color='primary'
+              autoFocus
+            >
               Yes
             </Button>
           </DialogActions>

@@ -287,7 +287,7 @@ class SchemesGrid extends PureComponent {
   render () {
     const { editingRowIds, rowChanges } = this.state
     const { type, rows, schema } = this.props
-
+    console.log('schema', schema)
     const EditingProps = {
       showAddCommand: true,
 

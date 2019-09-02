@@ -29,6 +29,12 @@ const Grid = ({ history, dispatch, copaymentScheme }) => {
 
   const colExtenstions = [
     {
+      columnName: 'isActive',
+      sortingEnabled: false,
+      type: 'select',
+      options: status,
+    },
+    {
       columnName: 'action',
       align: 'center',
       render: (row) => (

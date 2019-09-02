@@ -4,7 +4,7 @@ import { Field, withFormik } from 'formik'
 import moment from 'moment'
 import * as Yup from 'yup'
 import { formatMessage } from 'umi/locale'
-import { withStyles, Grid, Divider } from '@material-ui/core'
+import { withStyles, Grid } from '@material-ui/core'
 import { paymentMethods } from '@/utils/codes'
 
 import {
@@ -14,7 +14,6 @@ import {
   TextField,
   DatePicker,
   Select,
-  notification,
 } from '@/components'
 
 const style = () => ({
@@ -30,66 +29,129 @@ const style = () => ({
   deposit,
 }))
 @withFormik({
-  mapPropsToValues: () => ({
-    Date: moment(),
-    Mode: '',
-    Remark: '',
-    Balance: 100,
-    ODBalance: 0,
-    Amount: 0,
-  }),
+  mapPropsToValues: ({ deposit }) => {
+    if (deposit.entity) {
+      return { ...deposit.entity, date: moment(), amount: 0, mode: 'cash' }
+    } else {
+      return deposit.default
+    }
+  },
   validationSchema: Yup.object().shape({
-    Date: Yup.string().required('Date is required'),
-    Mode: Yup.string().required('Mode is required'),
-    Remark: Yup.string().required('Remark is required'),
-    Amount: Yup.number().moreThan(0, 'Please type in correct amount'),
-    // VoidReason: Yup.string().required(),
+    date: Yup.string().required('Date is required'),
+    mode: Yup.string().required('Mode is required'),
+    amount: Yup.number().moreThan(0, 'Please type in correct amount'),
   }),
+  validate: (values, props) => {
+    let errors = {}
+
+    if (
+      moment(values.date).format('YYMMDD') == moment().format('YYMMDD') &&
+      props.isDeposit
+    ) {
+    } else {
+      if (!values.session) {
+        errors.session = 'This is a required field'
+      }
+    }
+
+    return errors
+  },
   handleSubmit: (values, { props }) => {
-    props
-      .dispatch({
-        type: 'deposit/submit',
-        payload: values,
-      })
-      .then((r) => {
-        if (r && r.message === 'Ok') {
-          // toast.success('test')
-          notification.success({
-            // duration:0,
-            message: 'Done',
-          })
-          if (props.onConfirm) props.onConfirm()
-        }
-      })
+    // props
+    //   .dispatch({
+    //     type: 'deposit/submit',
+    //     payload: values,
+    //   })
+    //   .then((r) => {
+    //     if (r && r.message === 'Ok') {
+    //       // toast.success('test')
+    //       notification.success({
+    //         // duration:0,
+    //         message: 'Done',
+    //       })
+    //       if (props.onConfirm) props.onConfirm()
+    //     }
+    //   })
   },
 })
 class Modal extends PureComponent {
-  // getTotalPayAmount = () => {
-  //   const { deposit } = this.props
+  constructor (props) {
+    super(props)
+    const { isDeposit, deposit } = this.props
+    const { entity } = deposit
+    this.state = {
+      balanceAfter: entity.balance || 0,
+      isSessionRequired: isDeposit ? false : true,
+      isCardPayment: false,
+    }
+  }
 
-  //   const getSum = (sum, payment) => sum + payment.payAmount
-  //   const totalAmount = collectPaymentList.reduce(getSum, 0)
+  onChangeDate = (event) => {
+    const { dispatch, setFieldValue, isDeposit } = this.props
+    const selectedDate = moment(event).format('YYMMDD')
 
-  //   return totalAmount
-  // }
+    if (isDeposit && selectedDate == moment().format('YYMMDD')) {
+      this.setState({ isSessionRequired: false })
+    } else {
+      this.setState({ isSessionRequired: true })
+
+      dispatch({
+        type: 'deposit/bizSessionList',
+        payload: {
+          sessionNoPrefix: selectedDate,
+        },
+      }).then(() => {
+        const { bizSessionList } = this.props.deposit
+        setFieldValue(
+          'session',
+          bizSessionList.length == 0 || bizSessionList === undefined
+            ? ''
+            : bizSessionList[0].value,
+        )
+      })
+    }
+  }
+
+  onChangePaymentMode = (event) => {
+    const { setFieldValue } = this.props
+    const selectedValue = event || ''
+
+    if (selectedValue.trim().toLowerCase() == 'creditcard') {
+      this.setState({ isCardPayment: true })
+      setFieldValue('cardType', 'Visa')
+    } else {
+      this.setState({ isCardPayment: false })
+      setFieldValue('cardNumber', '')
+    }
+  }
+
+  calculateBalanceAfter = () => {
+    console.log('props', this.props)
+    const { isDeposit, errors, initialValues } = this.props
+    const { balance, amount } = this.props.values || 0
+
+    if (!errors.amount) {
+      this.setState({
+        balanceAfter: isDeposit ? balance + amount : balance - amount,
+      })
+    } else {
+      this.setState({
+        balanceAfter: initialValues.balance,
+      })
+    }
+  }
 
   render () {
     const { state, props } = this
-    const { theme, classes, footer, onConfirm, values } = props
-
-    const summaryCfg = {
-      currency: true,
-      formControlProps: {
-        className: classes.summaryLabel,
-      },
-    }
+    const { theme, footer, onConfirm, values, isDeposit, deposit } = props
+    const { bizSessionList, entity } = deposit
+    const { isSessionRequired, isCardPayment } = this.state
     const commonAmountOpts = {
       currency: true,
       prefixProps: {
         style: { width: '100%' },
       },
     }
-    // console.log(this.props)
     return (
       <React.Fragment>
         <div style={{ padding: '0 0' }}>
@@ -100,31 +162,93 @@ class Modal extends PureComponent {
           >
             <GridItem xs={12}>
               <Field
-                name='Date'
+                name='date'
                 render={(args) => (
-                  <DatePicker timeFomat={false} label='Date' {...args} />
+                  <DatePicker
+                    timeFomat={false}
+                    onChange={this.onChangeDate}
+                    disabledDate={(d) => !d || d.isAfter(moment())}
+                    label='Date'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              {isSessionRequired ? (
+                <Field
+                  name='session'
+                  render={(args) => (
+                    <Select
+                      label='Session'
+                      options={bizSessionList}
+                      {...args}
+                    />
+                  )}
+                />
+              ) : (
+                ''
+              )}
+            </GridItem>
+            <GridItem xs={12}>
+              <Field
+                name='mode'
+                render={(args) => (
+                  <Select
+                    label='Mode'
+                    onChange={this.onChangePaymentMode}
+                    options={paymentMethods}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem xs={12}>
+              {isCardPayment ? (
+                <Field
+                  name='cardType'
+                  render={(args) => <Select label='Card Type' {...args} />}
+                />
+              ) : (
+                ''
+              )}
+            </GridItem>
+            <GridItem xs={12}>
+              {isCardPayment ? (
+                <Field
+                  name='cardNumber'
+                  render={(args) => <TextField label='Card Number' {...args} />}
+                />
+              ) : (
+                ''
+              )}
+            </GridItem>
+            <GridItem xs={12}>
+              <Field
+                name='remarks'
+                render={(args) => (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
                 )}
               />
             </GridItem>
             <GridItem xs={12}>
               <Field
-                name='Mode'
+                name='depositRefundRemarks'
                 render={(args) => (
-                  <Select label='Mode' options={paymentMethods} {...args} />
+                  <TextField
+                    multiline
+                    rowsMax='5'
+                    prefix={isDeposit ? 'Deposit Remarks' : 'Refund Remarks'}
+                    label={isDeposit ? 'Deposit Remarks' : 'Refund Remarks'}
+                    {...args}
+                  />
                 )}
               />
             </GridItem>
             <GridItem xs={12}>
               <Field
-                name='Remark'
-                render={(args) => (
-                  <TextField multiline rowsMax='5' label='Remark' {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <Field
-                name='Balance'
+                name='balance'
                 render={(args) => (
                   <NumberInput
                     {...commonAmountOpts}
@@ -141,17 +265,12 @@ class Modal extends PureComponent {
             </GridItem>
             <GridItem xs={12}>
               <Field
-                name='ODBalance'
+                name='amount'
                 render={(args) => (
                   <NumberInput
+                    onChange={this.calculateBalanceAfter}
                     {...commonAmountOpts}
-                    prefixProps={{
-                      style: { width: '267%' },
-                    }}
-                    disabled
-                    simple
-                    suffix='(Offset Deposit Balance)'
-                    prefix=' '
+                    prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
                     {...args}
                   />
                 )}
@@ -159,26 +278,14 @@ class Modal extends PureComponent {
             </GridItem>
             <GridItem xs={12}>
               <Field
-                name='Amount'
-                render={(args) => (
-                  <NumberInput
-                    {...commonAmountOpts}
-                    prefix='Amount'
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <Field
-                name='NewBalance'
+                name='balanceAfter'
                 render={(args) => (
                   <NumberInput
                     {...commonAmountOpts}
                     disabled
                     simple
+                    value={this.state.balanceAfter}
                     prefix=' '
-                    value={values.Amount - values.Balance}
                     {...args}
                   />
                 )}
