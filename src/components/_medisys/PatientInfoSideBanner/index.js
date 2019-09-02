@@ -21,6 +21,7 @@ const PatientInfoSideBanner = ({ height, theme, classes, entity }) => {
     [classes.cardCategory]: true,
     [classes.entityName]: true,
   })
+  console.log({ entity })
   return entity && entity.id ? (
     <React.Fragment>
       <h4 className={entityNameClass}>
@@ -93,9 +94,7 @@ const PatientInfoSideBanner = ({ height, theme, classes, entity }) => {
         <Divider light />
       )}
     </React.Fragment>
-  ) : (
-    <Skeleton active />
-  )
+  ) : null
 }
 
 export default withStyles(styles, {
