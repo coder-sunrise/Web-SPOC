@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 // common component
 import { CommonTableGrid } from '@/components'
 // variables
@@ -20,4 +20,4 @@ const TableData = ({ title, height, columns, colExtensions, data }) => {
   )
 }
 
-export default TableData
+export default memo(TableData)

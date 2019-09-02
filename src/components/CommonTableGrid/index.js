@@ -82,6 +82,9 @@ const cellStyle = {
 
 // console.log(colorManipulator)
 const styles = (theme) => ({
+  tableCursorPointer: {
+    cursor: 'pointer',
+  },
   tableStriped: {
     '& > tbody > tr:nth-of-type(odd), & > thead > tr': {
       // backgroundColor: colorManipulator.fade(
@@ -158,7 +161,7 @@ class CommonTableGrid extends React.Component {
       classes,
       theme,
       oddEven = true,
-      onRowDoubleClick = (f) => f,
+      onRowDoubleClick = undefined,
       onRowClick = (f) => f,
       rowMoveable = (f) => false,
     } = props
@@ -167,6 +170,7 @@ class CommonTableGrid extends React.Component {
     // this.myRef = React.createRef()
     const cls = classNames({
       [classes.tableStriped]: oddEven,
+      [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
     })
     const TableComponent = ({ ...restProps }) => {
       return <Table.Table {...restProps} className={cls} />
@@ -189,7 +193,7 @@ class CommonTableGrid extends React.Component {
       <Table.Row
         {...restProps}
         onDoubleClick={(event) => {
-          onRowDoubleClick(row, event)
+          onRowDoubleClick && onRowDoubleClick(row, event)
         }}
         onClick={(event) => {
           onRowClick(row, event)

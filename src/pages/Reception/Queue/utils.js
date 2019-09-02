@@ -15,9 +15,8 @@ export const filterDoctorBlock = (data) => {
   )
 }
 
-export const getStatisticCount = (type, data) => {
+export const getCount = (type, data) => {
   const filteredData = filterData(type, data)
-
   return filteredData.length
 }
 

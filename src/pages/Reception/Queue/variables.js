@@ -6,7 +6,7 @@ import Person from '@material-ui/icons/Person'
 import Book from '@material-ui/icons/LibraryBooks'
 import Play from '@material-ui/icons/PlayArrow'
 import PlayCircle from '@material-ui/icons/PlayCircleOutlineOutlined'
-import Pageview from '@material-ui/icons/Pageview'
+import Assignment from '@material-ui/icons/Assignment'
 
 export const StatusIndicator = {
   ALL: 'all',
@@ -74,8 +74,9 @@ export const ContextMenuOptions = [
   {
     id: 0.1,
     label: 'View Visit',
-    Icon: Pageview,
+    Icon: Assignment,
     disabled: false,
+    hidden: true,
   },
   {
     id: 1,
@@ -120,11 +121,13 @@ export const ContextMenuOptions = [
     label: 'Resume Consultation',
     Icon: PlayCircle,
     disabled: true,
+    hidden: true,
   },
   {
     id: 7,
     label: 'Edit Consultation',
     Icon: Edit,
     disabled: true,
+    hidden: true,
   },
 ]

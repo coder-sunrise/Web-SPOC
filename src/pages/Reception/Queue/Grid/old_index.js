@@ -31,6 +31,8 @@ const compareQueueNo = (a, b) => {
   return floatA < floatB ? -1 : 1
 }
 
+const compareString = (a, b) => a.localeCompare(b)
+
 const FuncConfig = {
   pager: false,
   sort: true,
@@ -79,9 +81,14 @@ class DetailsGrid extends PureComponent {
   state = {
     columnExtensions: [
       { columnName: 'queueNo', width: 80, compare: compareQueueNo },
+      { columnName: 'patientAccountNo', compare: compareString },
       { columnName: 'visitStatus', type: 'status', width: 150 },
       { columnName: 'paymentMode', width: 150 },
-      { columnName: 'patientName', width: 250 },
+      {
+        columnName: 'patientName',
+        width: 250,
+        compare: compareString,
+      },
       { columnName: 'referralCompany', width: 150 },
       { columnName: 'referralPerson', width: 150 },
       { columnName: 'referralRemarks', width: 150 },
@@ -232,11 +239,6 @@ class DetailsGrid extends PureComponent {
       VISIT_STATUS.ORDER_UPDATED,
     ]
 
-    const inProgressStatuses = [
-      VISIT_STATUS.IN_CONS,
-      VISIT_STATUS.PAUSED,
-    ]
-
     const isStatusWaiting = filterMap[StatusIndicator.WAITING].includes(
       row.visitStatus,
     )
@@ -260,12 +262,12 @@ class DetailsGrid extends PureComponent {
         case 5: // start consultation
           return {
             ...opt,
-            disabled: inProgressStatuses.includes(row.visitStatus),
+            disabled: isStatusInProgress,
           }
         case 6: // resume consultation
           return {
             ...opt,
-            disabled: !inProgressStatuses.includes(row.visitStatus),
+            disabled: !isStatusInProgress,
             hidden: !isStatusInProgress,
           }
         case 7: // edit consultation
@@ -281,13 +283,11 @@ class DetailsGrid extends PureComponent {
 
     return (
       <Tooltip title='More Actions'>
-        <div style={{ display: 'inline-block' }}>
-          <GridButton
-            row={row}
-            onClick={this.onContextButtonClick}
-            contextMenuOptions={newContextMenuOptions}
-          />
-        </div>
+        <GridButton
+          row={row}
+          onClick={this.onContextButtonClick}
+          contextMenuOptions={newContextMenuOptions}
+        />
       </Tooltip>
     )
   }
@@ -314,7 +314,7 @@ class DetailsGrid extends PureComponent {
     const isLoading = global.showVisitRegistration
       ? false
       : loading.effects['queueLog/query']
-
+    console.log('render grid')
     return (
       <LoadingWrapper
         linear
@@ -322,9 +322,10 @@ class DetailsGrid extends PureComponent {
         text='Getting queue listing...'
       >
         <CommonTableGrid
-          height={700}
+          // type='queueLog'
+          // entity={queueLog}
           rows={data}
-          // ActionProps={ActionProps}
+          height={700}
           {...TableConfig}
           columnExtensions={this.state.columnExtensions}
           size='sm'

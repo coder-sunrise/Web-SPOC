@@ -2,7 +2,7 @@ import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 // sub components
-import TableData from '../TableData'
+import TableData from './TableData'
 // common component
 import { GridItem } from '@/components'
 // variables
@@ -16,7 +16,7 @@ import {
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
   OtherOrdersData,
-} from '../../variables'
+} from '../variables'
 
 const styles = (theme) => ({
   gridRow: {
