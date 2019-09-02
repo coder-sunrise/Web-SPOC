@@ -8,7 +8,7 @@ import { LoadingWrapper, DoctorLabel } from 'medisys-components'
 // sub component
 import ActionButton from './ActionButton'
 // utils
-import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
+import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { filterData, filterDoctorBlock, todayOnly } from '../utils'
 import { StatusIndicator } from '../variables'
 

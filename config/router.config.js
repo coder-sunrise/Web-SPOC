@@ -65,7 +65,7 @@ const routes = [
             path: '/reception/appointment',
             name: 'appointment',
             mini: 'AP',
-            component: './Reception/BigCalendar',
+            component: './Reception/Appointment',
           },
           {
             hideInMenu: true,

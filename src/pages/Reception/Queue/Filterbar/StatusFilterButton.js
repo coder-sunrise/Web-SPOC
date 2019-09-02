@@ -8,7 +8,7 @@ import { Button } from '@/components'
 // styling
 import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
 // variables
-import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
+import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { StatusIndicator } from '../variables'
 import { getCount, todayOnly } from '../utils'
 
