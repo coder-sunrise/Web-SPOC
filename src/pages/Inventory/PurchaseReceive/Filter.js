@@ -32,7 +32,14 @@ class Filter extends PureComponent {
             <FastField
               name='poNo'
               render={(args) => {
-                return <TextField label='Purchase Order #' {...args} />
+                return (
+                  <TextField
+                    label={formatMessage({
+                      id: 'inventory.pr.pono',
+                    })}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
@@ -40,7 +47,12 @@ class Filter extends PureComponent {
             <FastField
               name='transactionDateFrom'
               render={(args) => (
-                <DatePicker label='Transaction Date From' {...args} />
+                <DatePicker
+                  label={formatMessage({
+                    id: 'inventory.pr.filter.datefrom',
+                  })}
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -48,7 +60,12 @@ class Filter extends PureComponent {
             <FastField
               name='transactionDateTo'
               render={(args) => (
-                <DatePicker label='Transaction Date To' {...args} />
+                <DatePicker
+                  label={formatMessage({
+                    id: 'inventory.pr.filter.dateto',
+                  })}
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -67,7 +84,7 @@ class Filter extends PureComponent {
                       label={formatMessage({
                         id: 'form.date.placeholder.allDate',
                       })}
-                      simple
+                      inputLabel=' '
                       {...args}
                     />
                   </Tooltip>
@@ -79,7 +96,14 @@ class Filter extends PureComponent {
             <FastField
               name='supplier'
               render={(args) => {
-                return <Select label='Supplier' {...args} />
+                return (
+                  <Select
+                    label={formatMessage({
+                      id: 'inventory.pr.supplier',
+                    })}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
@@ -87,7 +111,15 @@ class Filter extends PureComponent {
             <FastField
               name='status'
               render={(args) => {
-                return <Select label='Status' options={status} {...args} />
+                return (
+                  <Select
+                    label={formatMessage({
+                      id: 'inventory.pr.status',
+                    })}
+                    options={status}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

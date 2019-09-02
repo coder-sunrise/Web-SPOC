@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { formatMessage } from 'umi/locale'
 import {
   TextField,
   GridContainer,
@@ -30,7 +31,13 @@ class Detail extends PureComponent {
               <FastField
                 name='reason'
                 render={(args) => (
-                  <TextField label='Reason' autoFocused {...args} />
+                  <TextField
+                    label={formatMessage({
+                      id: 'inventory.pr.reason',
+                    })}
+                    autoFocused
+                    {...args}
+                  />
                 )}
               />
             </GridItem>

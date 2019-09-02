@@ -30,7 +30,7 @@ export default createListViewModel({
               expectedDeliveryDate: moment(),
               status: 'partially',
               total: 200,
-              ourstanding: 0,
+              outstanding: 0,
               remarks: 'Will provide on 31 Jun 2018',
             },
             {
@@ -40,7 +40,7 @@ export default createListViewModel({
               expectedDeliveryDate: moment(),
               status: 'final',
               total: 200,
-              ourstanding: 0,
+              outstanding: 0,
               remarks: 'Completed',
             },
             {
@@ -50,7 +50,7 @@ export default createListViewModel({
               expectedDeliveryDate: moment(),
               status: 'fully',
               total: 200,
-              ourstanding: 0,
+              outstanding: 0,
               remarks: 'Need Another Orders',
             },
             {
@@ -60,7 +60,7 @@ export default createListViewModel({
               expectedDeliveryDate: moment(),
               status: 'draft',
               total: 200,
-              ourstanding: 0,
+              outstanding: 0,
               remarks: 'Need Another Orders',
             },
             {
@@ -70,7 +70,7 @@ export default createListViewModel({
               expectedDeliveryDate: moment(),
               status: 'writeoff',
               total: 200,
-              ourstanding: 0,
+              outstanding: 12,
               remarks: 'Need Another Orders',
             },
           ],

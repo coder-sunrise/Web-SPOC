@@ -198,14 +198,14 @@ const routes = [
           {
             path: '/inventory/pr',
             name: 'pd',
-            component: './Inventory/PurchaseReceive/Main',
+            component: './Inventory/PurchaseReceive',
             mini: 'PR',
           },
           {
             path: '/inventory/pr/pdodetails',
             name: 'pd.detail',
             hideInMenu: true,
-            component: './Inventory/PurchaseReceive/Detail',
+            component: './Inventory/PurchaseReceive/Details',
           },
         ],
       },
