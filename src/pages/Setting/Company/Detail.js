@@ -17,15 +17,47 @@ import {
 import Contact from './Contact'
 
 const styles = (theme) => ({})
-
 @withFormikExtend({
   mapPropsToValues: ({ settingCompany }) =>
     settingCompany.entity || settingCompany.default,
-  validationSchema: Yup.object().shape({
-    code: Yup.string().required(),
-    displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-  }),
+
+  validationSchema: ({ settingCompany }) =>
+    Yup.object().shape({
+      code: Yup.string().required(),
+      displayValue: Yup.string().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      coPayerTypeFK: Yup.number().when('settingCompany', {
+        is: (val) => settingCompany.companyType.id === 1,
+        then: Yup.number().required(),
+      }),
+
+      url: Yup.object().when('settingCompany', {
+        is: (val) => settingCompany.companyType.id === 1,
+        then: Yup.object().shape({
+          contactWebsite: Yup.object().shape({
+            website: Yup.string().url(),
+          }),
+        }),
+      }),
+
+      contact: Yup.object().when('settingCompany', {
+        is: (val) => settingCompany.companyType.id === 1,
+        then: Yup.object().shape({
+          // mobilContactNumber: Yup.object().shape({
+          //   number: Yup.string().required(),
+          // }),
+          contactEmailAddress: Yup.object().shape({
+            emailAddress: Yup.string().email(),
+          }),
+        }),
+        // otherwise: Yup.object().shape({
+        //   mobilContactNumber: Yup.object().shape({
+        //     number: Yup.number().required(),
+        //   }),
+        // }),
+      }),
+    }),
+
   handleSubmit: (values, { props }) => {
     const {
       url,
@@ -49,15 +81,6 @@ const styles = (theme) => ({})
         effectiveEndDate: effectiveDates[1],
         companyTypeFK: id,
         companyTypeName: name,
-        // contact: {
-        //   contactAddress: [
-        //     {
-        //       street: address,
-        //       postcode: postalCode,
-        //       countryFK: country,
-        //     },
-        //   ],
-        // },
       },
     }).then((r) => {
       if (r) {
@@ -78,7 +101,7 @@ class Detail extends PureComponent {
     const { classes, theme, footer, values, settingCompany, route } = props
     const { name } = route
     const type = 'copayer'
-    console.log('detail', settingCompany)
+    // console.log('detail', settingCompany)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -143,7 +166,7 @@ class Detail extends PureComponent {
 
             <GridItem md={6}>
               <Field
-                name='paymentTerm'
+                name='adminCharge'
                 render={(args) => {
                   if (values.adminChargeType) {
                     return <NumberInput currency label='Admin Fee' {...args} />
@@ -158,8 +181,10 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <Switch
                     checkedChildren='$'
+                    checkedValue='ExactAmount'
                     unCheckedChildren='%'
-                    label=''
+                    unCheckedValue='Percentage'
+                    label=' '
                     {...args}
                   />
                 )}

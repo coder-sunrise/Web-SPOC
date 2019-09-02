@@ -239,8 +239,10 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  registerVisit=()=>{
-    router.push(`/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`)
+  registerVisit = () => {
+    router.push(
+      `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
+    )
   }
 
   render () {
@@ -263,6 +265,8 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
+    console.log('patient', patient)
+    console.log('xx', resetProps)
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}
     const CurrentComponent = currentMenu.component
@@ -295,7 +299,10 @@ class PatientDetail extends PureComponent {
                           dispatch({
                             type: 'patient/updateState',
                             payload: {
-                              entity: values,
+                              entity:
+                                values.patientAccountNo !== ''
+                                  ? values
+                                  : undefined,
                             },
                           })
                           this.props.history.push(
@@ -334,8 +341,15 @@ class PatientDetail extends PureComponent {
                   ))}
               </MenuList>
               {entity && <Divider light />}
-              {entity && <Button color='primary' style={{marginTop:theme.spacing(1)}} onClick={this.registerVisit}>Register Visit</Button>}
-
+              {entity && (
+                <Button
+                  color='primary'
+                  style={{ marginTop: theme.spacing(1) }}
+                  onClick={this.registerVisit}
+                >
+                  Register Visit
+                </Button>
+              )}
             </CardBody>
           </Card>
         </GridItem>

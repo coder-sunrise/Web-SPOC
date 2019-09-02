@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { withStyles, Chip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { Badge } from '@/components'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const styles = (theme) => ({
   badge: {
@@ -28,32 +29,33 @@ const StatusTypeBase = (props) => {
   let color = 'primary'
 
   // WAITING, TO DISPENSE, IN CONS, PAUSED, PAID, OVERPAID, COMPLETED
-  const hasBadge = [
-    'WAITING',
-    'IN CONS',
-    'PAUSED',
-    'TO DISPENSE',
-    'PAID',
-    'OVERPAID',
-  ]
+  // const hasBadge = [
+  //   'WAITING',
+  //   'IN CONS',
+  //   'PAUSED',
+  //   'DISPENSE',
+  //   'BILLING',
+  //   'ORDER UPDATED',
+  //   'COMPLETED',
+  //   'UPCOMING APPT.',
+  // ]
+  const hasBadge = Object.keys(VISIT_STATUS).map((key) => VISIT_STATUS[key])
   switch (value.toUpperCase()) {
-    case 'WAITING':
+    case VISIT_STATUS.WAITING:
       color = 'primary'
       break
-    case 'TO DISPENSE':
+    case VISIT_STATUS.DISPENSE:
+    case VISIT_STATUS.BILLING:
+    case VISIT_STATUS.ORDER_UPDATED:
       color = 'success'
       break
-    case 'IN CONS':
-    case 'PAUSED':
+    case VISIT_STATUS.IN_CONS:
+    case VISIT_STATUS.PAUSED:
       color = 'danger'
       break
-    case 'PAID':
-    case 'OVERPAID':
+    case VISIT_STATUS.UPCOMING_APPT:
       color = 'gray'
       break
-    // case 'APPOINTMENT':
-    //   color = 'rose'
-    //   break
     default:
       color = 'gray'
       break

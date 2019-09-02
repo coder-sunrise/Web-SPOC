@@ -1,5 +1,9 @@
+import router from 'umi/router'
+import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services'
+import * as service from '../services/consultation'
+import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
+import { consultationDocumentTypes } from '@/utils/codes'
 
 export default createFormViewModel({
   namespace: 'consultation',
@@ -16,29 +20,92 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       // history.listen(async (loct, method) => {
       //   const { pathname, search, query = {} } = loct
+      //   if (query.md === 'cons') {
+      //     dispatch({
+      //       type: 'updateState',
+      //       payload: {
+      //         queueID: Number(query.qid),
+      //       },
+      //     })
+      //   }
       // })
     },
     effects: {
-      // *fetchList ({ payload }, { call, put }) {
-      //   const response = yield call(service.queryList)
-      //   console.log(response)
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: {
-      //       list: Array.isArray(response) ? response : [],
-      //     },
-      //   })
-      // },
-      // *queryOne ({ payload }, { call, put }) {
-      //   const response = yield call(service.query, payload)
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: {
-      //       entity: response.data,
-      //     },
-      //   })
-      //   return response.data
-      // },
+      *newConsultation ({ payload }, { call, put }) {
+        // console.log(22, payload)
+        const response = yield call(service.create, payload)
+        // console.log(11, response)
+        const { id } = response
+        if (id) {
+          yield put({
+            type: 'query',
+            payload: id,
+          })
+        }
+      },
+      *pause ({ payload }, { call, put }) {
+        const response = yield call(service.pause, payload)
+        return response
+      },
+      *resume ({ payload }, { call, put }) {
+        const response = yield call(service.resume, payload)
+        return response
+      },
+      *sign ({ payload }, { call, put }) {
+        const response = yield call(service.sign, payload)
+        return response
+      },
+      *closeConsultationModal ({ payload }, { call, put }) {
+        router.push(
+          getRemovedUrl([
+            'md',
+            'cmt',
+            // 'pid',
+            'new',
+          ]),
+        )
+        yield put({
+          type: 'updateState',
+          payload: {
+            entity: undefined,
+          },
+        })
+        yield put({
+          type: 'global/updateAppState',
+          payload: {
+            disableSave: false,
+            showConsultationPanel: false,
+            fullscreen: false,
+          },
+        })
+      },
+      *queryDone ({ payload }, { call, put, select }) {
+        console.log('queryDone', payload)
+        const { data } = payload
+        let rows = []
+        consultationDocumentTypes.forEach((p) => {
+          rows = rows.concat(
+            (data[p.prop] || []).map((o) => {
+              const d = {
+                uid: getUniqueId(),
+                type: p.value,
+                subject: p.getSubject ? p.getSubject(o) : '',
+                ...o,
+              }
+              return p.convert ? p.convert(d) : d
+            }),
+          )
+        })
+        console.log(rows)
+
+        yield put({
+          type: 'consultationDocument/updateState',
+          payload: {
+            rows: _.sortBy(rows, 'sequence'),
+          },
+        })
+        return payload
+      },
       // *submit ({ payload }, { call }) {
       //   // console.log(payload)
       //   return yield call(service.upsert, payload)

@@ -32,6 +32,7 @@ import Memo from './Memo'
 import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
+import VaccinationCertificate from './VaccinationCertificate'
 
 const styles = (theme) => ({
   editor: {
@@ -40,65 +41,47 @@ const styles = (theme) => ({
   },
   editorBtn: {
     position: 'absolute',
+    zIndex: 1,
     right: 0,
-    top: 4,
+    top: 12,
   },
 })
-const types = [
-  {
-    value: '3',
-    name: 'Medical Certificate',
-  },
-  {
-    value: '4',
-    name: 'Certificate of Attendance',
-  },
-  {
-    value: '1',
-    name: 'Referral Letter',
-  },
-  {
-    value: '2',
-    name: 'Memo',
-  },
-  {
-    value: '5',
-    name: 'Others',
-  },
-]
-@connect(({ consultationDocument }) => ({
+
+// @withFormikExtend({
+//   mapPropsToValues: ({ consultationDocument }) => {
+//     // console.log(diagnosis)
+//     return consultationDocument.entity || consultationDocument.default
+//   },
+//   validationSchema: Yup.object().shape({
+//     type: Yup.string().required(),
+//     to: Yup.string().when('type', {
+//       is: (val) => val !== '2',
+//       then: Yup.string().required(),
+//     }),
+//     from: Yup.string().required(),
+//     date: Yup.date().required(),
+//     subject: Yup.string().required(),
+
+//     // 3->MC
+
+//     days: Yup.number().when('type', {
+//       is: (val) => val === '3',
+//       then: Yup.number().required(),
+//     }),
+//     fromto: Yup.array().when('type', {
+//       is: (val) => val === '3',
+//       then: Yup.array().of(Yup.date()).min(2).required(),
+//     }),
+//   }),
+
+//   handleSubmit: () => {},
+//   displayName: 'AddConsultationDocument',
+// })
+@connect(({ consultationDocument, user, codetable }) => ({
   consultationDocument,
+  user,
+  codetable,
 }))
-@withFormikExtend({
-  mapPropsToValues: ({ consultationDocument }) => {
-    // console.log(diagnosis)
-    return consultationDocument.default
-  },
-  validationSchema: Yup.object().shape({
-    type: Yup.string().required(),
-    to: Yup.string().when('type', {
-      is: (val) => val !== '2',
-      then: Yup.string().required(),
-    }),
-    from: Yup.string().required(),
-    date: Yup.date().required(),
-    subject: Yup.string().required(),
-
-    // 3->MC
-
-    days: Yup.number().when('type', {
-      is: (val) => val === '3',
-      then: Yup.number().required(),
-    }),
-    fromto: Yup.array().when('type', {
-      is: (val) => val === '3',
-      then: Yup.array().of(Yup.date()).min(2).required(),
-    }),
-  }),
-
-  handleSubmit: () => {},
-  displayName: 'AddConsultationDocument',
-})
 class AddConsultationDocument extends PureComponent {
   toggleModal = () => {
     const { consultationDocument } = this.props
@@ -121,45 +104,44 @@ class AddConsultationDocument extends PureComponent {
       values,
       rowHeight,
       footer,
+      dispatch,
+      types,
     } = props
     // console.log(props)
-    const cfg = props
-    const { type } = values
-    // console.log(type)
+    const { entity = {}, editType } = consultationDocument
+    const cfg = {
+      ...props,
+      currentType: types.find((o) => o.value === editType),
+    }
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem xs={6}>
-              <FastField
-                name='type'
-                render={(args) => {
-                  return (
-                    <Select
-                      label='Type'
-                      options={types}
-                      allowClear={false}
-                      {...args}
-                    />
-                  )
+              <Select
+                label='Type'
+                options={types}
+                allowClear={false}
+                value={editType}
+                disabled={entity.id || entity.uid}
+                onChange={(v) => {
+                  dispatch({
+                    type: 'consultationDocument/updateState',
+                    payload: {
+                      editType: v,
+                    },
+                  })
                 }}
               />
             </GridItem>
           </GridContainer>
-          {type === '1' && <ReferralLetter {...cfg} />}
-          {type === '2' && <Memo {...cfg} />}
-          {type === '3' && <MedicalCertificate {...cfg} />}
-          {type === '4' && <CertificateAttendance {...cfg} />}
-          {type === '5' && <Others {...cfg} />}
+          {editType === '1' && <ReferralLetter {...cfg} />}
+          {editType === '2' && <Memo {...cfg} />}
+          {editType === '3' && <MedicalCertificate {...cfg} />}
+          {editType === '4' && <CertificateAttendance {...cfg} />}
+          {editType === '5' && <Others {...cfg} />}
+          {editType === '6' && <VaccinationCertificate {...cfg} />}
         </div>
-        {footer &&
-          footer({
-            onConfirm: props.handleSubmit,
-            confirmBtnText: 'Save',
-            confirmProps: {
-              disabled: false,
-            },
-          })}
       </div>
     )
   }

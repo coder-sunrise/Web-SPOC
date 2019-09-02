@@ -11,7 +11,9 @@ import {
   Button,
   TextField,
   CodeSelect,
+  Select,
 } from '@/components'
+import { status } from '@/utils/codes'
 
 const styles = (theme) => ({
   filterBar: {
@@ -25,7 +27,7 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = ({ classes, dispatch, history }) => {
+const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -53,7 +55,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.type',
                   })}
-                  code='ctGender'
+                  code='ctSchemeType'
                   {...args}
                 />
               )
@@ -69,7 +71,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.category',
                   })}
-                  code='ctGender'
+                  code='ctSchemeCategory'
                   {...args}
                 />
               )
@@ -78,14 +80,14 @@ const FilterBar = ({ classes, dispatch, history }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='Co-Pyaer Name'
+            name='Co-Payer Name'
             render={(args) => {
               return (
                 <CodeSelect
                   label={formatMessage({
                     id: 'finance.scheme.search.cpname',
                   })}
-                  code='ctGender'
+                  code='ctCompany'
                   {...args}
                 />
               )
@@ -110,17 +112,9 @@ const FilterBar = ({ classes, dispatch, history }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='Status'
+            name='isActive'
             render={(args) => {
-              return (
-                <CodeSelect
-                  label={formatMessage({
-                    id: 'finance.scheme.search.status',
-                  })}
-                  code='ctGender'
-                  {...args}
-                />
-              )
+              return <Select label='Status' {...args} options={status} />
             }}
           />
         </GridItem>
@@ -143,6 +137,12 @@ const FilterBar = ({ classes, dispatch, history }) => {
               variant='contained'
               color='primary'
               onClick={() => {
+                dispatch({
+                  type: 'schemeDetail/updateState',
+                  payload: {
+                    entity: undefined,
+                  },
+                })
                 history.push('/finance/scheme/details')
               }}
             >

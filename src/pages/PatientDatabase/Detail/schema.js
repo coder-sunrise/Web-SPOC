@@ -123,10 +123,10 @@ const schemaDemographic = {
   genderFK: Yup.number().required(),
 
   referredBy: Yup.string(),
-  referralRemarks: Yup.string().when('referredBy', {
-    is: 'Company',
-    then: Yup.string().required(),
-  }),
+  // referralRemarks: Yup.string().when('referredBy', {
+  //   is: 'Company',
+  //   then: Yup.string().required(),
+  // }),
   referralCompanyReferenceNo: Yup.string().when('referredBy', {
     is: 'Company',
     then: Yup.string().required(),
@@ -202,8 +202,10 @@ const schemaSchemes = {
           then: Yup.number().required(),
         }),
         validRange: Yup.array().when('schemeTypeFK', {
-          is: (val) => val <= 10,
+          is: (val) => val <= 10, // val === undefined,
           then: Yup.array().of(Yup.date()).required().min(2),
+          // otherwise: null,
+          // otherwise: Yup.array().of(Yup.date().min(2)),
         }),
       }),
     ),

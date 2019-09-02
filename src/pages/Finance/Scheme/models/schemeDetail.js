@@ -13,8 +13,8 @@ export default createFormViewModel({
     service,
     state: {
       default: {
-        schemeType: 'Corporate',
-        schemeCategory: 'Corporate',
+        schemeTypeFK: 11,
+
         effectiveDates: [
           moment(),
           moment('2099-12-31'),
@@ -23,30 +23,30 @@ export default createFormViewModel({
         itemGroupValueDtoRdoValue: 'all',
         patientMinCoPaymentAmountType: 'ExactAmount',
         overalCoPaymentValueType: 'ExactAmount',
-        itemGroupMaxCapacityDto: {
-          medicationMaxCapacity: {},
-          vaccinationMaxCapacity: {},
-          consumableMaxCapacity: {},
-          serviceMaxCapacity: {},
-          packageMaxCapacity: {},
-        },
-        itemGroupValueDto: {
-          medicationGroupValue: {
-            groupValueType: 'ExactAmount',
-          },
-          vaccinationGroupValue: {
-            groupValueType: 'ExactAmount',
-          },
-          consumableGroupValue: {
-            groupValueType: 'ExactAmount',
-          },
-          serviceGroupValue: {
-            groupValueType: 'ExactAmount',
-          },
-          packageGroupValue: {
-            groupValueType: 'ExactAmount',
-          },
-        },
+        // itemGroupMaxCapacityDto: {
+        //   medicationMaxCapacity: {},
+        //   vaccinationMaxCapacity: {},
+        //   consumableMaxCapacity: {},
+        //   serviceMaxCapacity: {},
+        //   packageMaxCapacity: {},
+        // },
+        // itemGroupValueDto: {
+        //   medicationGroupValue: {
+        //     // groupValueType: 'ExactAmount',
+        //   },
+        //   vaccinationGroupValue: {
+        //     // groupValueType: 'ExactAmount',
+        //   },
+        //   consumableGroupValue: {
+        //     // groupValueType: 'ExactAmount',
+        //   },
+        //   serviceGroupValue: {
+        //     // groupValueType: 'ExactAmount',
+        //   },
+        //   packageGroupValue: {
+        //     // groupValueType: 'ExactAmount',
+        //   },
+        // },
 
         packageValueDto: [
           {
@@ -55,6 +55,9 @@ export default createFormViewModel({
             unitPrice: 5,
             inventoryPackageFK: 1,
           },
+        ],
+        companyCoPaymentSchemeDto: [
+          { coPaymentSchemeFk: 1 },
         ],
       },
     },

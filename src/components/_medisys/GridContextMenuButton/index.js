@@ -52,7 +52,6 @@ const GridContextMenuButton = ({
 }) => {
   const handleClick = (event) => {
     const { key } = event
-
     onClick(row, key)
   }
 
@@ -79,6 +78,7 @@ const GridContextMenuButton = ({
       trigger={[
         'click',
       ]}
+      placement='bottomRight'
     >
       <Button justIcon round color={color} size='sm'>
         <MoreVert />

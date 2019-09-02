@@ -94,12 +94,20 @@ export default class BaseCRUDViewModel {
       ) {
         // console.log(namespace, queryFnName, payload, service)
         if (!service || !service[queryFnName]) return
-        let filter = yield select((st) => st[namespace].filter)
+        let filter = yield select((st) => st[namespace].filter) || {}
         let exclude = yield select((st) => st[namespace].exclude)
         // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
         // if (!disableAutoQuery) {
         if (!payload.keepFilter) {
-          filter = payload
+          if (typeof payload === 'object') {
+            filter = {
+              ...filter,
+              ...payload,
+            }
+          } else {
+            filter = payload
+          }
+
           // yield put({
           //   type: 'queryBegin',
           //   payload: {
@@ -107,14 +115,15 @@ export default class BaseCRUDViewModel {
           //   },
           // })
         }
+
+        // const { list = {} } = config
+        // filter = {
+        //   ...filter,
+        //   // queryExcludeFields: list.exclude || exclude,
+        // }
+        // console.log({ filter })
         // console.log(filter)
 
-        const { list = {} } = config
-        filter = {
-          ...filter,
-          // queryExcludeFields: list.exclude || exclude,
-        }
-        // console.log({ filter })
         const response = yield call(service[queryFnName], filter)
         // console.log(response)
         const { data, status, message } = response
@@ -155,6 +164,12 @@ export default class BaseCRUDViewModel {
 
         return r
       },
+      *delete ({ payload }, { call, put }) {
+        const response = yield call(service.remove, payload)
+        console.log(response)
+        return response
+      },
+
       *lock ({ payload, history }, { call, put, select, take }) {
         const s = yield select((st) => st[namespace])
         const { currentItem, newDetailPath } = s

@@ -18,14 +18,30 @@ export default createListViewModel({
           moment().utc().set({ hour: 0, minute: 0, second: 0 }),
           moment('2099-12-31').utc().set({ hour: 23, minute: 59, second: 59 }),
         ],
-        // contact:{
-        //   mobileContactNumber:{
-        //     number:0
-        //   }
-        // }
-        // arrrr:[{
-
-        // }]
+        contact: {
+          contactAddress: [
+            {
+              street: '',
+              postcode: '',
+              countryFK: undefined,
+            },
+          ],
+          mobileContactNumber: {
+            number: '',
+          },
+          officeContactNumber: {
+            number: '',
+          },
+          faxContactNumber: {
+            number: '',
+          },
+          contactWebsite: {
+            website: '',
+          },
+          contactEmailAddress: {
+            emailAddress: undefined,
+          },
+        },
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -38,17 +54,22 @@ export default createListViewModel({
               companyTypes,
               Number(pathname.toLowerCase().replace('/setting/company/', '')),
             )
+            const companyType = companyTypes.find(
+              (o) =>
+                o.id ===
+                Number(pathname.toLowerCase().replace('/setting/company/', '')),
+            )
             dispatch({
               type: 'updateState',
               payload: {
-                companyType: companyTypes.find(
-                  (o) =>
-                    o.id ===
-                    Number(
-                      pathname.toLowerCase().replace('/setting/company/', ''),
-                    ),
-                ),
+                companyType,
+                filter: {
+                  companyTypeFK: companyType.id,
+                },
               },
+            })
+            dispatch({
+              type: 'query',
             })
           })
         }

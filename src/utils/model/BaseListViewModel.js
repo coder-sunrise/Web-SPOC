@@ -19,6 +19,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {
+        console.log('queryOne', payload)
         const response = yield call(service.query, payload)
         // console.log(response)
         const { data, status, message } = response
@@ -75,16 +76,6 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
           } else {
             throw response
           }
-        }
-      },
-
-      *delete ({ payload }, { call, put }) {
-        const response = yield call(service.remove, payload)
-        if (response.success) {
-          yield put({ type: 'updateState', payload: { selectedRowKeys: [] } })
-          yield put({ type: 'query', payload: { keepFilter: true } })
-        } else {
-          throw response
         }
       },
 

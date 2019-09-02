@@ -20,6 +20,7 @@ class CodeSelect extends React.PureComponent {
         payload: {
           code: props.code.toLowerCase(),
           filter: props.filter,
+          multiplier: props.multiplier, // for stress testing purpose only
         },
       })
     }
@@ -51,7 +52,7 @@ class CodeSelect extends React.PureComponent {
 
     const options =
       code !== undefined ? codetable[code.toLowerCase()] : this.state.options
-
+    // console.log(options, code)
     return <Select options={options || []} valueField='id' {...this.props} />
   }
 }

@@ -1,21 +1,35 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
-import { CommonTableGrid, Button, CommonModal } from '@/components'
+import {  Tooltip } from '@material-ui/core'
+import { CommonTableGrid, Button, CommonModal,Popconfirm } from '@/components'
+import {consultationDocumentTypes} from '@/utils/codes'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import AddConsultationDocument from './AddConsultationDocument'
 import model from './models'
 
+
 window.g_app.replaceModel(model)
-@connect(({ consultationDocument }) => ({
-  consultationDocument,
+@connect(({ consultationDocument,codetable,patientDashboard }) => ({
+  consultationDocument,codetable,patientDashboard,
 }))
 class ConsultationDocument extends PureComponent {
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+      },
+    })
+  }
+
   toggleModal = () => {
     const { consultationDocument } = this.props
     const { showModal } = consultationDocument
-
     this.props.dispatch({
       type: 'consultationDocument/updateState',
       payload: {
@@ -24,108 +38,92 @@ class ConsultationDocument extends PureComponent {
     })
   }
 
-  render () {
-    const { consultationDocument } = this.props
-    const { showModal } = consultationDocument
+  editRow =(row)=>{
+    console.log(row)
+    this.props.dispatch({
+      type: 'consultationDocument/updateState',
+      payload: {
+        entity: row,
+        editType:row.type,
+      },
+    })
+    this.toggleModal()
+  }
 
+  render () {
+    const { consultationDocument,dispatch} = this.props
+
+    const { showModal } = consultationDocument
+    const { rows } = consultationDocument
     return (
       <div>
         <CommonTableGrid
+          getRowId={(r) => r.uid}
           size='sm'
           style={{ margin: 0 }}
-          rows={[
-            {
-              id: 1,
-              type: 'Referral Letter',
-              subject: 'Referral Letter To Dr Ong',
-              from: 'Dr Johnny',
-            },
-            {
-              id: 2,
-              type: 'Others',
-              subject: 'Vaccination Certificate',
-              from: 'Dr Levine',
-            },
-            {
-              id: 3,
-              type: 'Memo',
-              subject: 'Patient Visit Reminder',
-              from: 'Dr Levine',
-            },
-            {
-              id: 4,
-              type: 'Medical Certificate',
-              subject: '09 May 2019 - 09 May 2019 - 1 Day(s)',
-              from: 'Dr Levine',
-            },
-            {
-              id: 5,
-              type: 'Certificate of Attendance',
-              subject: '09 May 2019 - 09 May 2019 - 1 Day',
-              from: 'Dr Levine',
-            },
-          ]}
+          rows={rows}
+          onRowDoubleClick={this.editRow}
           columns={[
             { name: 'type', title: 'Type' },
             { name: 'subject', title: 'Subject' },
-            { name: 'from', title: 'From' },
+            { name: 'issuedByUserFK', title: 'From' },
             { name: 'action', title: 'Action' },
           ]}
           FuncProps={{ pager: false }}
           columnExtensions={[
-            { columnName: 'subject', type: 'link', linkField: 'href' },
+            { columnName: 'type', type: 'select', options:consultationDocumentTypes },
+            { columnName: 'issuedByUserFK',render:(r)=>{
+              const {codetable}=this.props
+              const {clinicianprofile}=codetable
+              const obj = clinicianprofile.find(o=>o.id===(r.issuedByUserFK?r.issuedByUserFK: r.referredByUserFK)) || {}
+              return `${obj.title || ''} ${ obj.name || ''}`
+            } },
+            { columnName: 'subject', onClick:this.editRow, type: 'link', linkField: 'href' },
+            { columnName: 'action', render:(row)=>{
+              return (
+                <>
+                  <Button
+                    size='sm'
+                    onClick={()=>{
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 5 }}
+                  >
+                    <Edit />
+                  </Button>
+                  <Popconfirm
+                    onConfirm={() =>
+                      dispatch({
+                        type: 'consultationDocument/deleteRow',
+                        payload: {
+                          id: row.uid,
+                        },
+                      })}
+                  >
+                    <Tooltip title='Delete'>
+                      <Button
+                        size='sm'
+                        color='danger'
+                        justIcon
+                      >
+                        <Delete />
+                      </Button>
+                    </Tooltip>
+                  </Popconfirm>
+                  
+                </>
+              )
+            } },
           ]}
-          ActionProps={{
-            TableCellComponent: ({
-              column,
-              row,
-              dispatch,
-              classes,
-              renderActionFn,
-              ...props
-            }) => {
-              // console.log(this)
-              if (column.name === 'action') {
-                return (
-                  <Table.Cell {...props}>
-                    <Button
-                      size='sm'
-                      onClick={this.toggleModal}
-                      justIcon
-                      color='primary'
-                      style={{ marginRight: 5 }}
-                    >
-                      <Edit />
-                    </Button>
-                    <Button
-                      size='sm'
-                      onClick={() => {
-                        // props.history.push(
-                        //   getAppendUrl({
-                        //     md: 'pt',
-                        //     cmt: '1',
-                        //     pid: row.id,
-                        //   }),
-                        // )
-                      }}
-                      justIcon
-                      color='primary'
-                    >
-                      <Delete />
-                    </Button>
-                  </Table.Cell>
-                )
-              }
-              return <Table.Cell {...props} />
-            },
-          }}
         />
         <CommonModal
           open={showModal}
           title='Add Consultation Document'
           onClose={this.toggleModal}
+          onConfirm={this.toggleModal}
           observe='AddConsultationDocument'
-          // onConfirm={this.toggleCollectPayment}
           maxWidth='md'
           bodyNoPadding
           // showFooter=
@@ -133,7 +131,7 @@ class ConsultationDocument extends PureComponent {
           //   confirmBtnText: 'Save',
           // }}
         >
-          <AddConsultationDocument {...this.props} />
+          <AddConsultationDocument {...this.props} types={consultationDocumentTypes} />
         </CommonModal>
       </div>
     )

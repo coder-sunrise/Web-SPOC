@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-
+import { connect } from 'dva'
 import {
   Field,
   FastField,
@@ -13,6 +13,7 @@ import {
   CodeSelect,
   DatePicker,
   RadioGroup,
+  CheckboxGroup,
 } from '@/components'
 import Call from '@material-ui/icons/Call'
 import { Add } from '@material-ui/icons'
@@ -20,7 +21,7 @@ import { withStyles, Paper } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
-
+import { widgets } from '@/utils/widgets'
 import Address from './Address'
 
 const styles = () => ({
@@ -32,6 +33,9 @@ const styles = () => ({
   },
 })
 
+@connect(({ streetAddress }) => ({
+  streetAddress,
+}))
 @Authorized.Secured('patient.view')
 class Demographic extends PureComponent {
   state = {}
@@ -343,6 +347,72 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Preferred Contact Mode'
                       code='ctContactMode'
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name='pdpaConsent'
+                  render={(args) => (
+                    <CheckboxGroup
+                      // style={{
+                      //   margin: theme.spacing(2),
+                      // }}
+                      label='PDPA Consent'
+                      horizontal
+                      simple
+                      // value={currentLayout.widgets}
+                      valueField='id'
+                      textField='name'
+                      options={[
+                        {
+                          id: '1',
+                          name: 'Phone Call',
+                          // component: Loadable({
+                          //   loader: () =>
+                          //     import('@/pages/Widgets/ResultHistory'),
+                          //   loading: Loading,
+                          // }),
+                          layoutConfig: {
+                            style: {},
+                          },
+                        },
+                        {
+                          id: '2',
+                          name: 'Text Message',
+                          // component: Loadable({
+                          //   loader: () => import('@/pages/Widgets/TestWidget'),
+                          //   loading: Loading,
+                          // }),
+                          layoutConfig: {
+                            style: {},
+                          },
+                        },
+                        {
+                          id: '3',
+                          name: 'Email',
+                          // component: Loadable({
+                          //   loader: () => import('@/pages/Widgets/TestWidget'),
+                          //   loading: Loading,
+                          // }),
+                          layoutConfig: {
+                            style: {},
+                          },
+                        },
+                      ]}
+                      onChange={(e, s) => {
+                        // console.log(e)
+                        // dispatch({
+                        //   type: 'consultation/updateState',
+                        //   payload: {
+                        //     selectedWidgets: e.target.value,
+                        //   },
+                        // })
+                        // console.log(e.target.value, s)
+                        // this.updateWidget(e.target.value, s)
+                      }}
                       {...args}
                     />
                   )}

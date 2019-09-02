@@ -1,3 +1,4 @@
+import { VISIT_STATUS } from '../Queue/variables'
 const now = new Date()
 
 export const calendarEvents = [
@@ -18,7 +19,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 15, 9, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 15, 7, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 15, 9, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
     hasConflict: true,
   },
   {
@@ -38,7 +39,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 15, 14, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 15, 11, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 15, 14, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series1',
@@ -57,7 +58,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 15, 15, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 15, 14, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 15, 15, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series2',
@@ -90,7 +91,7 @@ export const calendarEvents = [
     ),
     start: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0),
     end: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series2',
@@ -130,7 +131,7 @@ export const calendarEvents = [
     ),
     start: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0),
     end: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
 
   {
@@ -149,7 +150,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 11, 8, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 11, 9, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 11, 8, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
     series: true,
   },
   {
@@ -169,7 +170,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 11, 12, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 11, 11, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 11, 12, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series3',
@@ -188,7 +189,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 11, 15, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 11, 14, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 11, 15, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series3',
@@ -207,7 +208,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 11, 17, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 11, 16, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 11, 17, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series4',
@@ -226,7 +227,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 12, 10, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 12, 9, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 12, 10, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
 
   {
@@ -246,7 +247,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 14, 10, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 14, 9, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 14, 10, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series6',
@@ -265,7 +266,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 17, 12, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 17, 8, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 17, 12, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series7',
@@ -284,7 +285,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 19, 15, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 19, 10, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 19, 15, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series8',
@@ -303,7 +304,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 24, 15, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 24, 10, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 24, 15, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
   {
     seriesID: 'series9',
@@ -321,7 +322,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 4, 15, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 4, 10, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 4, 15, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
     hasConflict: true,
   },
   {
@@ -341,7 +342,7 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 6, 15, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 6, 10, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 6, 15, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
     hasConflict: true,
   },
   {
@@ -362,6 +363,6 @@ export const calendarEvents = [
     timeOut: new Date(now.getFullYear(), now.getMonth(), 6, 15, 30, 0),
     start: new Date(now.getFullYear(), now.getMonth(), 6, 10, 30, 0),
     end: new Date(now.getFullYear(), now.getMonth(), 6, 15, 30, 0),
-    visitStatus: 'APPOINTMENT',
+    visitStatus: VISIT_STATUS.UPCOMMING_APPT,
   },
 ]

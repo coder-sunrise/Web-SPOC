@@ -48,12 +48,12 @@ class DepositDetail extends PureComponent {
 
   toggleCollectPayment = () => {
     const { showCollectPayment, columns } = this.state
-    const { depoist: { list }, dispatch } = this.props
+    const { deposit: { list }, dispatch } = this.props
 
     // opening showCollectPayment
     if (!showCollectPayment) {
       dispatch({
-        type: 'depoist/updateCollectPaymentList',
+        type: 'deposit/updateCollectPaymentList',
         payload: list.map(this.filterList),
       })
     }

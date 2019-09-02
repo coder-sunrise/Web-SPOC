@@ -40,9 +40,19 @@ const Detail = (props) => {
           },
         })
         .then((o) => {
-          console.log(o)
-          props.resetForm(o)
+          return {
+            ...o,
+            effectiveDates: [
+              o.effectiveStartDate,
+              o.effectiveEndDate,
+            ],
+            itemGroupMaxCapacityDtoRdoValue: o.itemGroupMaxCapacityDto
+              ? 'sub'
+              : 'all',
+            itemGroupValueDtoRdoValue: o.itemGroupValueDto ? 'sub' : 'all',
+          }
         })
+        .then((o) => props.resetForm(o))
     }
   }, [])
 
@@ -60,11 +70,11 @@ const Detail = (props) => {
     ...props,
   }
   const { currentTab } = schemeDetail
-  console.log(restProps)
+  // console.log(restProps)
   return (
     <div>
       <NavPills
-        color='info'
+        color='primary'
         onChange={(event, active) => {
           history.push(
             getAppendUrl({
@@ -116,13 +126,20 @@ export default compose(
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       name: Yup.string().required(),
+      schemeCategoryFK: Yup.number().required(),
+      companyCoPaymentSchemeDto: Yup.array().of(
+        Yup.object().shape({
+          companyFk: Yup.number().required(),
+        }),
+      ),
+
       // effectiveStartDate: Yup.string().required(),
       // effectiveEndDate: Yup.string().required(),
     }),
     handleSubmit: (values, { props, resetForm }) => {
       const { effectiveDates, ...restValues } = values
-
-      const { dispatch, history, onConfirm } = props
+      console.log('restValues', restValues)
+      const { dispatch, history, onConfirm, schemeDetail } = props
       dispatch({
         type: 'schemeDetail/upsert',
         payload: {
@@ -140,29 +157,37 @@ export default compose(
         //     },
         //   })
         // }
-
+        // if (r) {
+        //   if (r.id) {
+        //     history.push(
+        //       getRemovedUrl(
+        //         [
+        //           'new',
+        //         ],
+        //         getAppendUrl({
+        //           id: r.id,
+        //         }),
+        //       ),
+        //     )
+        //   }
+        //   dispatch({
+        //     type: 'schemeDetail/query',
+        //     payload: {
+        //       id: r.id || restValues.id,
+        //       effectiveDates: [
+        //         r.effectiveStartDate,
+        //         r.effectiveEndDate,
+        //       ],
+        //     },
+        //   }).then((value) => {
+        //     resetForm(value)
+        //   })
         if (r) {
-          if (r.id) {
-            history.push(
-              getRemovedUrl(
-                [
-                  'new',
-                ],
-                getAppendUrl({
-                  id: r.id,
-                }),
-              ),
-            )
-          }
-          dispatch({
-            type: 'patient/query',
-            payload: {
-              id: r.id || restValues.id,
-            },
-          }).then((value) => {
-            resetForm(value)
-          })
           if (onConfirm) onConfirm()
+          dispatch({
+            type: 'schemeDetail/query',
+          })
+          history.push('/finance/scheme')
         }
       })
     },

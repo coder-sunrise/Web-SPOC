@@ -1,6 +1,7 @@
 import React, { Component, PureComponent } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import moment from 'moment'
+import Yup from '@/utils/yup'
+
 import {
   Button,
   GridContainer,
@@ -20,28 +21,86 @@ import {
   NumberInput,
   RichEditor,
   TimePicker,
+  withFormikExtend,
+  FastField,
+  Field,
+  ClinicianSelect,
 } from '@/components'
 
+@withFormikExtend({
+  mapPropsToValues: ({ consultationDocument }) => {
+    return (
+      consultationDocument.entity ||
+      consultationDocument.defaultCertOfAttendance
+    )
+  },
+  validationSchema: Yup.object().shape({
+    issueDate: Yup.date().required(),
+    issuedByUserFK: Yup.number().required(),
+    accompaniedBy: Yup.string().required(),
+    attendanceStartTime: Yup.string().required(),
+    attendanceEndTime: Yup.string()
+      .laterThan(
+        Yup.ref('attendanceStartTime'),
+        'Time From must be later than Time To',
+      )
+      .required(),
+  }),
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, consultationDocument, currentType } = props
+    const { rows } = consultationDocument
+
+    dispatch({
+      type: 'consultationDocument/upsertRow',
+      payload: {
+        sequence: rows.length,
+        ...values,
+        // subject: currentType.getSubject(values),
+      },
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'AddConsultationDocument',
+})
 class CertificateAttendance extends PureComponent {
   render () {
-    const { theme, classes, consultationDocument, rowHeight } = this.props
-    console.log('CertificateAttendance')
+    const { footer, handleSubmit, classes, values } = this.props
     return (
       <div>
+        {values.referenceNo && (
+          <GridContainer>
+            <GridItem xs={6}>
+              <FastField
+                name='referenceNo'
+                render={(args) => {
+                  return <TextField disabled label='Reference No' {...args} />
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+        )}
+
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='referenceNo'
+              name='issueDate'
               render={(args) => {
-                return <TextField disabled label='Reference No' {...args} />
+                return <DatePicker label='Issue Date' {...args} />
               }}
             />
           </GridItem>
-        </GridContainer>
-        <GridContainer>
+          <GridItem xs={6}>
+            <Field
+              name='issuedByUserFK'
+              render={(args) => {
+                return <ClinicianSelect label='Issue By' {...args} />
+              }}
+            />
+          </GridItem>
           <GridItem xs={6}>
             <FastField
-              name='fromtime'
+              name='attendanceStartTime'
               render={(args) => {
                 return <TimePicker label='From' {...args} />
               }}
@@ -49,7 +108,7 @@ class CertificateAttendance extends PureComponent {
           </GridItem>
           <GridItem xs={6}>
             <FastField
-              name='totime'
+              name='attendanceEndTime'
               render={(args) => {
                 return <TimePicker label='To' {...args} />
               }}
@@ -63,11 +122,20 @@ class CertificateAttendance extends PureComponent {
               }}
             />
           </GridItem>
-
           <GridItem xs={12} className={classes.editor}>
-            <RichEditor />
+            <FastField
+              name='remarks'
+              render={(args) => {
+                return <RichEditor placeholder='Remarks' {...args} />
+              }}
+            />
           </GridItem>
         </GridContainer>
+        {footer &&
+          footer({
+            onConfirm: handleSubmit,
+            confirmBtnText: 'Save',
+          })}
       </div>
     )
   }

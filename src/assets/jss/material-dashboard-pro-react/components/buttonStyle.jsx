@@ -98,8 +98,8 @@ const buttonStyle = {
     backgroundColor: 'transparent',
     '&:hover': {
       backgroundColor: 'transparent',
-      borderColor: primaryColor,
-      color: primaryColor,
+      borderColor: grayColor,
+      color: grayColor,
     },
     // borderWidth: 1,
   },
@@ -128,6 +128,8 @@ const buttonStyle = {
     color: primaryColor,
     '&:hover': {
       backgroundColor: color(primaryColor).lighten(0.8).hex(),
+      borderColor: primaryColor,
+      color: primaryColor,
     },
   },
   info: {
@@ -148,6 +150,8 @@ const buttonStyle = {
     color: infoColor,
     '&:hover': {
       backgroundColor: color(infoColor).lighten(0.8).hex(),
+      borderColor: infoColor,
+      color: infoColor,
     },
   },
   success: {
@@ -168,6 +172,8 @@ const buttonStyle = {
     color: successColor,
     '&:hover': {
       backgroundColor: color(successColor).lighten(0.8).hex(),
+      borderColor: successColor,
+      color: successColor,
     },
   },
   warning: {
@@ -188,6 +194,8 @@ const buttonStyle = {
     color: warningColor,
     '&:hover': {
       backgroundColor: color(warningColor).lighten(0.8).hex(),
+      borderColor: warningColor,
+      color: warningColor,
     },
   },
   danger: {
@@ -208,6 +216,8 @@ const buttonStyle = {
     color: dangerColor,
     '&:hover': {
       backgroundColor: color(dangerColor).lighten(0.8).hex(),
+      borderColor: dangerColor,
+      color: dangerColor,
     },
   },
   rose: {

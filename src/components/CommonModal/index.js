@@ -32,7 +32,12 @@ function Transition (props) {
   return <Slide direction='up' {...props} />
 }
 function getContainerHeight (props) {
-  return window.innerHeight - 44 - (props.showFooter ? 63 : 0)
+  return (
+    window.innerHeight -
+    44 -
+    (props.showFooter ? 63 : 0) -
+    (props.bodyNoPadding ? -16 : 0)
+  )
 }
 
 @connect(({ loading, global }) => ({ loading, global }))
@@ -163,7 +168,6 @@ class CommonModal extends React.PureComponent {
 
   onClose = (force) => {
     const ob = window.g_app._store.getState().formik[this.props.observe]
-    // console.log(ob)
     if (ob) {
       if (ob.dirty && force !== true) {
         this.setState({
@@ -340,29 +344,36 @@ class CommonModal extends React.PureComponent {
             </h3>
           </DialogContent>
           <DialogActions className={classes.modalFooter}>
-            <Button
-              onClick={() => {
-                this.setState({
-                  openConfirm: false,
-                })
-              }}
-              color='danger'
-            >
-              Cancel
-            </Button>
-            <Button
-              color='primary'
-              onClick={() => {
-                this.setState({
-                  openConfirm: false,
-                })
-                window.beforeReloadHandlerAdded = false
-                window.removeEventListener('beforeunload', confirmBeforeReload)
-                this.onClose(true)
-              }}
-            >
-              Confirm
-            </Button>
+            <SizeContainer size='md'>
+              <>
+                <Button
+                  onClick={() => {
+                  this.setState({
+                    openConfirm: false,
+                  })
+                }}
+                  color='danger'
+                >
+                Cancel
+                </Button>
+                <Button
+                  color='primary'
+                  onClick={() => {
+                  this.setState({
+                    openConfirm: false,
+                  })
+                  window.beforeReloadHandlerAdded = false
+                  window.removeEventListener(
+                    'beforeunload',
+                    confirmBeforeReload,
+                  )
+                  this.onClose(true)
+                }}
+                >
+                Confirm
+                </Button>
+              </>
+            </SizeContainer>
           </DialogActions>
         </Dialog>
       </React.Fragment>

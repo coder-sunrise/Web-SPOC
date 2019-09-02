@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { formatMessage } from 'umi/locale'
 import {
   Field,
@@ -10,7 +10,34 @@ import {
   NumberInput,
 } from '@/components'
 
-const CoverageCap = ({ values, classes }) => {
+const CoverageCap = ({ values, classes, setFieldValue }) => {
+  const onRadioButtonChange = (event) => {
+    const { target } = event
+
+    if (target.value === 'sub') setFieldValue('coverageMaxCap', undefined)
+    else {
+      setFieldValue(
+        'itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue',
+        undefined,
+      )
+      setFieldValue(
+        'itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue',
+        undefined,
+      )
+      setFieldValue(
+        'itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue',
+        undefined,
+      )
+      setFieldValue(
+        'itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue',
+        undefined,
+      )
+      setFieldValue(
+        'itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue',
+        undefined,
+      )
+    }
+  }
   return (
     <GridContainer>
       <GridItem xs={1}>
@@ -20,6 +47,7 @@ const CoverageCap = ({ values, classes }) => {
             <RadioGroup
               label=''
               inputClass={classes.rdoInput}
+              onChange={onRadioButtonChange}
               options={[
                 {
                   value: 'all',
@@ -36,7 +64,7 @@ const CoverageCap = ({ values, classes }) => {
         />
       </GridItem>
       <GridItem xs={11}>
-        <FastField
+        <Field
           name='coverageMaxCap'
           render={(args) => (
             <NumberInput
@@ -48,10 +76,10 @@ const CoverageCap = ({ values, classes }) => {
             />
           )}
         />
-        <FastField
-          name='consumableMaxCapacity'
+        <Field
+          name='itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue'
           render={(args) => (
-            <TextField
+            <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapConsumables',
@@ -61,7 +89,7 @@ const CoverageCap = ({ values, classes }) => {
           )}
         />
         <FastField
-          name='medicationMaxCapacity'
+          name='itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
@@ -73,7 +101,7 @@ const CoverageCap = ({ values, classes }) => {
           )}
         />
         <FastField
-          name='vaccinationMaxCapacity'
+          name='itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
@@ -85,7 +113,7 @@ const CoverageCap = ({ values, classes }) => {
           )}
         />
         <FastField
-          name='serviceMaxCapacity'
+          name='itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
@@ -97,7 +125,7 @@ const CoverageCap = ({ values, classes }) => {
           )}
         />
         <FastField
-          name='packageMaxCapacity'
+          name='itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
@@ -112,4 +140,4 @@ const CoverageCap = ({ values, classes }) => {
     </GridContainer>
   )
 }
-export default CoverageCap
+export default memo(CoverageCap)

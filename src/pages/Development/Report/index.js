@@ -10,17 +10,15 @@ import { FastField, Field, withFormik } from 'formik'
 import {
   Button,
   CardContainer,
+  CodeSelect,
   GridContainer,
   GridItem,
   TimePicker,
   CommonModal,
-  CodeSelect,
   Select,
 } from '@/components'
 // component
-import ReportViewer from './ReportViewer'
-// common
-import { queryList } from '@/services/common'
+import { ReportViewer } from '@/components/_medisys'
 
 @connect(({ codetable }) => ({ codetable }))
 @withFormik({
@@ -51,13 +49,8 @@ class Report extends React.Component {
   //   })
   // }
 
-  // viewReport = () => {
-  //   this.setState({ showReport: true })
-  // }
-
-  // closeModal = () => {
-  //   this.setState({ showReport: false })
-  // }
+  toggleReport = () =>
+    this.setState((preState) => ({ showReport: !preState.showReport }))
 
   // getCodeTable = () => {
   //   const code = 'ctnationality'
@@ -102,10 +95,9 @@ class Report extends React.Component {
     //     </CommonModal>
     //   </CardContainer>
     // )
-    console.log({ values: this.props.values })
     return (
       <CardContainer hideHeader size='sm'>
-        {/* <Button color='primary&#39;' onClick={this.viewReport}>
+        <Button color='primary&#39;' onClick={this.toggleReport}>
           View Report
         </Button>
         <Button color='primary&#39;' onClick={this.getCodeTable}>
@@ -115,14 +107,17 @@ class Report extends React.Component {
           Test Watch
         </Button>
         <CommonModal
+          bodyNoPadding
           open={showReport}
-          onClose={this.closeModal}
+          onClose={this.toggleReport}
           title='Report'
           maxWidth='lg'
+          // fullScreen
         >
           <ReportViewer />
-        </CommonModal> */}
-        <Button onClick={this.validate} color='primary'>
+        </CommonModal>
+        <CodeSelect code='clinicianprofile' />
+        {/* <Button onClick={this.validate} color='primary'>
           Submit
         </Button>
         <GridContainer>
@@ -141,60 +136,7 @@ class Report extends React.Component {
                 <TimePicker {...args} label='End' format='hh:mm A' />
               )}
             />
-          </GridItem>
-          <GridItem md={3}>
-            <Field
-              name='doctorProfileFK'
-              render={(args) => (
-                <Select
-                  label='Doctor Profile'
-                  // code='doctorprofile'
-                  // useCustomUrl
-                  query={(value) => {
-                    return queryList('/api/doctorprofile', {
-                      doctorMCRNo: value,
-                      // 'clinicianInfomation.name': value,
-                    })
-                  }}
-                  renderDropdown={(option) => {
-                    return (
-                      <div>
-                        <p>MCR No.: {option.doctorMCRNo}</p>
-                        <p>
-                          {`${option.clinicianInfomation.title} ${option
-                            .clinicianInfomation.name}`}
-                        </p>
-                      </div>
-                    )
-                  }}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <Field
-              name='doctorProfile'
-              render={(args) => (
-                <CodeSelect
-                  label='Doctor Profile Codetable'
-                  code='doctorprofile'
-                  labelField='clinicianInfomation.name'
-                  renderDropdown={(option) => (
-                    <div>
-                      <p>MCR No.: {option.doctorMCRNo}</p>
-                      <p>
-                        {`${option.clinicianInfomation.title} ${option
-                          .clinicianInfomation.name}`}
-                      </p>
-                    </div>
-                  )}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
+          </GridItem></GridContainer> */}
       </CardContainer>
     )
   }

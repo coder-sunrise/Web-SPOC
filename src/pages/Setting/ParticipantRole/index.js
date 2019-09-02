@@ -2,10 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import {
-  CardContainer,
-  CommonModal,
-} from '@/components'
+import { CardContainer, CommonModal } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
@@ -15,10 +12,16 @@ const styles = (theme) => ({
 })
 
 @connect(({ settingParticipantRole }) => ({
-    settingParticipantRole,
+  settingParticipantRole,
 }))
 class ParticipantRole extends PureComponent {
   state = {}
+
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'settingParticipantRole/query',
+    })
+  }
 
   toggleModal = () => {
     this.props.dispatch({
@@ -30,13 +33,7 @@ class ParticipantRole extends PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      settingParticipantRole,
-      dispatch,
-      theme,
-      ...restProps
-    } = this.props
+    const { settingParticipantRole } = this.props
 
     const cfg = {
       toggleModal: this.toggleModal,
@@ -48,7 +45,14 @@ class ParticipantRole extends PureComponent {
         <Grid {...cfg} {...this.props} />
         <CommonModal
           open={settingParticipantRole.showModal}
-          title='Add Participant Role'
+          observe='ParticipantRoleDetail'
+          title={
+            settingParticipantRole.entity ? (
+              'Edit Participant Role'
+            ) : (
+              'Add Participant Role'
+            )
+          }
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

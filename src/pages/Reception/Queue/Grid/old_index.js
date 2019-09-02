@@ -8,6 +8,7 @@ import { CommonTableGrid, DateFormatter, Tooltip } from '@/components'
 import {
   GridContextMenuButton as GridButton,
   LoadingWrapper,
+  DoctorLabel,
 } from 'medisys-components'
 // sub component
 import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
@@ -16,6 +17,8 @@ import {
   StatusIndicator,
   AppointmentContextMenu,
   ContextMenuOptions,
+  filterMap,
+  VISIT_STATUS,
 } from '../variables'
 
 const compareQueueNo = (a, b) => {
@@ -27,6 +30,8 @@ const compareQueueNo = (a, b) => {
 
   return floatA < floatB ? -1 : 1
 }
+
+const compareString = (a, b) => a.localeCompare(b)
 
 const FuncConfig = {
   pager: false,
@@ -76,9 +81,14 @@ class DetailsGrid extends PureComponent {
   state = {
     columnExtensions: [
       { columnName: 'queueNo', width: 80, compare: compareQueueNo },
+      { columnName: 'patientAccountNo', compare: compareString },
       { columnName: 'visitStatus', type: 'status', width: 150 },
       { columnName: 'paymentMode', width: 150 },
-      { columnName: 'patientName', width: 250 },
+      {
+        columnName: 'patientName',
+        width: 250,
+        compare: compareString,
+      },
       { columnName: 'referralCompany', width: 150 },
       { columnName: 'referralPerson', width: 150 },
       { columnName: 'referralRemarks', width: 150 },
@@ -105,6 +115,10 @@ class DetailsGrid extends PureComponent {
           if (row.start) return DateFormatter({ value: row.start, full: true })
           return ''
         },
+      },
+      {
+        columnName: 'doctor',
+        render: (row) => <DoctorLabel doctor={row.doctor} />,
       },
       {
         columnName: 'action',
@@ -153,23 +167,29 @@ class DetailsGrid extends PureComponent {
     })
   }
 
-  deleteQueue = (queueID) => {
+  deleteQueue = (id) => {
     const { dispatch } = this.props
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
-      queueID,
+      payload: {
+        id,
+      },
     })
   }
 
   onContextButtonClick = (row, id) => {
     switch (id) {
       case '0':
+      case '0.1':
         this.props.handleEditVisitClick({
           visitID: row.id,
         })
         break
       case '1':
-        router.push(`/reception/queue/dispense/${row.visitRefNo}`)
+        router.push(`/reception/queue/dispense/${row.visitReferenceNo}`)
+        break
+      case '1.1':
+        router.push(`/reception/queue/dispense/${row.visitReferenceNo}/billing`)
         break
       case '2':
         this.deleteQueueConfirmation(row)
@@ -178,12 +198,19 @@ class DetailsGrid extends PureComponent {
         this.onViewPatientProfileClick(row)
         break
       case '4':
-        router.push(
-          `/reception/queue/patientdashboard?pid=${row.patientProfileFK}`,
-        )
+        router.push(`/reception/queue/patientdashboard?qid=${row.id}`)
         break
       case '5':
-        router.push(`/reception/queue/patientdashboard/consultation/new`)
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
+        )
+
+        break
+      case '6':
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons&action=resume`,
+        )
+
         break
       case '9':
         this.props.onRegisterPatientClick()
@@ -195,7 +222,7 @@ class DetailsGrid extends PureComponent {
 
   Cell = (row) => {
     const { visitStatus } = row
-    if (visitStatus === StatusIndicator.APPOINTMENT.toUpperCase()) {
+    if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
       return (
         <div style={{ display: 'inline-block' }}>
           <GridButton
@@ -207,33 +234,60 @@ class DetailsGrid extends PureComponent {
       )
     }
 
-    const enabledDispense = [
-      'DISPENSE',
-      'PAID',
-      'OVERPAID',
+    const dispensedStatuses = [
+      VISIT_STATUS.DISPENSE,
+      VISIT_STATUS.ORDER_UPDATED,
     ]
-    const isStatusWaiting = row.visitStatus === 'WAITING'
-    const isStatusInProgress = [
-      'IN CONS',
-    ].includes(row.visitStatus)
-    const shouldDisableDispense = false // !enabledDispense.includes(row.visitStatus)
+
+    const isStatusWaiting = filterMap[StatusIndicator.WAITING].includes(
+      row.visitStatus,
+    )
+    const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
+      row.visitStatus,
+    )
+
+    const enableDispense = dispensedStatuses.includes(row.visitStatus)
     const newContextMenuOptions = ContextMenuOptions.map((opt) => {
-      if (opt.id === 1) return { ...opt, disabled: shouldDisableDispense }
-      if (opt.id === 2) return { ...opt, disabled: !isStatusWaiting }
-      if (opt.id === 6 || opt.id === 7)
-        return { ...opt, hidden: !isStatusInProgress }
-      return { ...opt }
+      switch (opt.id) {
+        case 0: // view visit
+          return { ...opt, hidden: !isStatusWaiting }
+        case 0.1: // edit visit
+          return { ...opt, hidden: isStatusWaiting }
+        case 1: // dispense
+          return { ...opt, disabled: !enableDispense }
+        case 1.1: // billing
+          return { ...opt, disabled: row.visitStatus !== VISIT_STATUS.BILLING }
+        case 2: // delete visit
+          return { ...opt, disabled: !isStatusWaiting }
+        case 5: // start consultation
+          return {
+            ...opt,
+            disabled: isStatusInProgress,
+          }
+        case 6: // resume consultation
+          return {
+            ...opt,
+            disabled: !isStatusInProgress,
+            hidden: !isStatusInProgress,
+          }
+        case 7: // edit consultation
+          return {
+            ...opt,
+            disabled: !enableDispense,
+            hidden: !isStatusInProgress,
+          }
+        default:
+          return { ...opt }
+      }
     })
 
     return (
       <Tooltip title='More Actions'>
-        <div style={{ display: 'inline-block' }}>
-          <GridButton
-            row={row}
-            onClick={this.onContextButtonClick}
-            contextMenuOptions={newContextMenuOptions}
-          />
-        </div>
+        <GridButton
+          row={row}
+          onClick={this.onContextButtonClick}
+          contextMenuOptions={newContextMenuOptions}
+        />
       </Tooltip>
     )
   }
@@ -260,7 +314,7 @@ class DetailsGrid extends PureComponent {
     const isLoading = global.showVisitRegistration
       ? false
       : loading.effects['queueLog/query']
-
+    console.log('render grid')
     return (
       <LoadingWrapper
         linear
@@ -268,9 +322,10 @@ class DetailsGrid extends PureComponent {
         text='Getting queue listing...'
       >
         <CommonTableGrid
-          height={700}
+          // type='queueLog'
+          // entity={queueLog}
           rows={data}
-          // ActionProps={ActionProps}
+          height={700}
           {...TableConfig}
           columnExtensions={this.state.columnExtensions}
           size='sm'

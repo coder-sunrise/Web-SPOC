@@ -1,5 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
+import router from 'umi/router'
 import * as service from '../services'
+import { sleep, getRemovedUrl } from '@/utils/utils'
 
 export default createFormViewModel({
   namespace: 'patientDashboard',
@@ -41,21 +43,113 @@ export default createFormViewModel({
         patientEmergencyContact: [],
       },
     },
-    subscriptions: ({ dispatch, history }) => {
+    subscriptions: ({ dispatch, history, ...restProps }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
+        if (pathname.indexOf('/reception/queue/patientdashboard') === 0) {
+          dispatch({
+            type: 'initState',
+            payload: {
+              queueID: Number(query.qid) || 0,
+              showConsultation: Number(query.md === 'cons'),
+              version: query.v,
+              action: query.action,
+            },
+          })
+        }
       })
     },
     effects: {
-      *fetchList ({ payload }, { call, put }) {
-        const response = yield call(service.queryList)
-        console.log(response)
-        yield put({
-          type: 'updateState',
-          payload: {
-            list: Array.isArray(response) ? response : [],
-          },
-        })
+      *initState ({ payload }, { call, put, select, take }) {
+        const { queueID, showConsultation, version, action } = payload
+        let {
+          patientDashboard,
+          visitRegistration,
+          consultation,
+        } = yield select((st) => st)
+        if (
+          patientDashboard.queueID !== queueID ||
+          version !== patientDashboard.version
+        ) {
+          yield put({
+            type: 'visitRegistration/fetchVisitInfo',
+            payload: { id: queueID },
+          })
+          yield take('visitRegistration/fetchVisitInfo/@@end')
+
+          visitRegistration = yield select((st) => st.visitRegistration)
+
+          const { patientInfo } = visitRegistration
+          yield put({
+            type: 'patientHistory/updateState',
+            payload: {
+              patientID: patientInfo.id,
+            },
+          })
+          yield put({
+            type: 'updateState',
+            payload: {
+              queueID,
+              version,
+              patientInfo,
+            },
+          })
+        }
+        console.log(visitRegistration)
+        if (visitRegistration) {
+          yield put({
+            type: 'consultation/updateState',
+            payload: {
+              consultationID:
+                visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+              visitID: visitRegistration.visitInfo.visit.id,
+              queueID,
+              entity: undefined,
+            },
+          })
+          // console.log(
+          //   showConsultation,
+          //   !visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+          // )
+          if (
+            showConsultation &&
+            !visitRegistration.visitInfo.visit.clinicalObjectRecordFK
+          ) {
+            yield put({
+              type: 'consultation/newConsultation',
+              payload: visitRegistration.visitInfo.visit.id,
+            })
+            yield take('consultation/newConsultation/@@end')
+          } else if (action === 'resume') {
+            yield put({
+              type: 'consultation/resume',
+              payload: visitRegistration.visitInfo.visit.id,
+            })
+            yield take('consultation/resume/@@end')
+            router.push(
+              getRemovedUrl([
+                'action',
+              ]),
+            )
+            return
+          }
+          // console.log(
+          //   visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+          //   !consultation.entity,
+          // )
+
+          if (
+            showConsultation &&
+            visitRegistration.visitInfo.visit.clinicalObjectRecordFK &&
+            !consultation.entity
+          ) {
+            yield put({
+              type: 'consultation/query',
+              payload: visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+            })
+            yield take('consultation/query/@@end')
+          }
+        }
       },
       // *queryOne ({ payload }, { call, put }) {
       //   const response = yield call(service.query, payload)

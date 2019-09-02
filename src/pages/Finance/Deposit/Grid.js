@@ -1,12 +1,10 @@
 import React, { PureComponent } from 'react'
-import router from 'umi/router'
 import moment from 'moment'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 import { Tooltip, withStyles } from '@material-ui/core'
-import { PanTool, Payment, AccountCircle } from '@material-ui/icons'
+import { PanTool, Payment } from '@material-ui/icons'
 import Modal from './Modal'
-import { sleep, getAppendUrl } from '@/utils/utils'
 
 import { Button, CommonModal, CommonTableGrid } from '@/components'
 
@@ -15,47 +13,60 @@ class Grid extends PureComponent {
     showDepositRefundModal: false,
   }
 
+  editRow = (row, isDeposit) => {
+    const { dispatch, deposit } = this.props
+    const { list } = deposit
+
+    dispatch({
+      type: 'deposit/updateState',
+      payload: {
+        entity: list.find((o) => o.id === row.id),
+      },
+    })
+
+    this.setState({
+      showDepositRefundModal: true,
+      isDeposit: isDeposit,
+    })
+  }
+
   tableParas = {
     columns: [
-      { name: 'depositNo', title: 'Reference No.' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'outstandingBalance', title: 'Balance' },
-      { name: 'lastPayment', title: 'Refundable Amt.' },
-      { name: 'amount', title: 'Last Transaction' },
-      { name: 'officeNo', title: 'Office No.' },
-      { name: 'Action', title: 'Action' },
-    ],
-    currencyColumns: [
-      'outstandingBalance',
-      'lastPayment',
+      { name: 'accountNo', title: 'Account No' },
+      { name: 'balance', title: 'Balance' },
+      { name: 'lastTxnDate', title: 'Last Transaction' },
+      { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
       {
-        columnName: 'outstandingBalance',
+        columnName: 'balance',
         type: 'number',
         currency: true,
       },
       {
-        columnName: 'amount',
-        type: 'number',
-        currency: true,
+        columnName: 'lastTxnDate',
+        type: 'date',
+        format: 'DD MMM YYYY',
+      },
+      {
+        columnName: 'Action',
+        width: 110,
+        align: 'center',
+        sortingEnabled: false,
       },
     ],
     ActionProps: {
       TableCellComponent: ({ column, row, dispatch, classes, ...props }) => {
         // console.log(this)
-        if (column.name === 'Action') {
+        if (column.name === 'action') {
           return (
             <Table.Cell {...props}>
               <Tooltip title='Deposit' placement='bottom'>
                 <Button
                   size='sm'
                   onClick={() => {
-                    this.setState({
-                      showDepositRefundModal: true,
-                      isDeposit: true,
-                    })
+                    this.editRow(row, true)
                   }}
                   justIcon
                   round
@@ -68,11 +79,9 @@ class Grid extends PureComponent {
               <Tooltip title='Refund' placement='bottom'>
                 <Button
                   size='sm'
+                  disabled={row.balance < 1}
                   onClick={() => {
-                    this.setState({
-                      showDepositRefundModal: true,
-                      isDeposit: false,
-                    })
+                    this.editRow(row, false)
                   }}
                   justIcon
                   round
@@ -80,26 +89,6 @@ class Grid extends PureComponent {
                   style={{ marginRight: 5 }}
                 >
                   <Payment />
-                </Button>
-              </Tooltip>
-              <Tooltip title='Detail' placement='bottom'>
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.props.history.push(
-                      getAppendUrl({
-                        md: 'pt',
-                        cmt: '1',
-                        pid: row.Id,
-                      }),
-                    )
-                  }}
-                  justIcon
-                  round
-                  color='primary'
-                  style={{ marginRight: 5 }}
-                >
-                  <AccountCircle />
                 </Button>
               </Tooltip>
             </Table.Cell>
@@ -127,7 +116,6 @@ class Grid extends PureComponent {
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
     const { deposit: { list }, dispatch } = this.props
-
     return (
       <React.Fragment>
         <CommonTableGrid type='deposit' {...this.tableParas} />

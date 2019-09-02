@@ -4,8 +4,10 @@ import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
+import { connect } from 'dva'
 
 import {
+  withFormikExtend,
   CodeSelect,
   CardContainer,
   TextField,
@@ -30,7 +32,6 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
   //     })
   //   }
   // }, [])
-
   return (
     <CardContainer
       hideHeader
@@ -109,7 +110,7 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
         <GridItem xs={12} md={2} />
         <GridItem xs={12} md={5}>
           <GridContainer>
-            <GridItem xs={12}>
+            <GridItem xs={6}>
               <FastField
                 name='schemeTypeFK'
                 render={(args) => {
@@ -119,13 +120,15 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
                         id: 'finance.scheme.detail.type',
                       })}
                       code='ctSchemeType'
+                      disabled
                       {...args}
                     />
                   )
                 }}
               />
             </GridItem>
-            <GridItem xs={12}>
+
+            <GridItem xs={6}>
               <FastField
                 name='schemeCategoryFK'
                 render={(args) => {
@@ -141,7 +144,25 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
                 }}
               />
             </GridItem>
-            <GridItem xs={12}>
+            {/* </GridContainer>
+        </GridItem>
+        <GridItem xs={12} md={5}>
+          <GridContainer> */}
+            <GridItem xs={6}>
+              <FastField
+                name='companyCoPaymentSchemeDto[0].coPaymentSchemeFk'
+                render={(args) => (
+                  <CodeSelect
+                    label='Co-Payer Type'
+                    code='ctCopayerType'
+                    disabled
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem xs={6}>
               <FastField
                 name='companyCoPaymentSchemeDto[0].companyFk'
                 render={(args) => (
@@ -176,10 +197,6 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
     </CardContainer>
   )
 }
-export default compose(
-  withStyles(styles, { withTheme: true }),
-  React.memo,
-  // connect(({ schemeDetail }) => ({
-  //   schemeDetail,
-  // })),
-)(Detail)
+export default compose(withStyles(styles, { withTheme: true }), React.memo)(
+  Detail,
+)

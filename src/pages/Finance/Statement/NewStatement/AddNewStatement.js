@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import moment from 'moment'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { withStyles } from '@material-ui/core'
+import { withStyles, Divider } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import ErrorBoundary from '@/layouts/ErrorBoundary'
 
@@ -15,6 +15,11 @@ import {
   NumberInput,
   Select,
   TextField,
+  CardContainer,
+  Switch,
+  DateRangePicker,
+  Field,
+  CommonTableGrid,
 } from '@/components'
 
 const styles = () => ({
@@ -40,15 +45,33 @@ class AddNewStatement extends PureComponent {
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'amount', title: 'Payable Amount' },
-      { name: 'outstandingBalance', title: 'O/S Balance' },
+      { name: 'outstandingBalance', title: 'Outstanding Amount' },
+      { name: 'remarks', title: 'Remarks' },
     ],
-    currencyColumns: [
-      'amount',
-      'outstandingBalance',
+    columnExtensions: [
+      {
+        columnName: 'amount',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'outstandingBalance',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'invoiceDate',
+        type: 'date',
+        format: 'DD MMM YYYY',
+      },
     ],
-    dateColumns: [
-      'invoiceDate',
-    ],
+    // currencyColumns: [
+    //   'amount',
+    //   'outstandingBalance',
+    // ],
+    // dateColumns: [
+    //   'invoiceDate',
+    // ],
     rows: [
       {
         id: 'PT-000001A',
@@ -61,14 +84,31 @@ class AddNewStatement extends PureComponent {
         outstandingBalance: 100,
       },
     ],
+    selectedRows: [],
+  }
+
+  handleSelectionChange = (selection) => {
+    this.setState({ selectedRows: selection })
   }
 
   render () {
-    const { classes, footer, onConfirm } = this.props
-    const { rows, columns, currencyColumns, dateColumns } = this.state
+    const { classes, footer, onConfirm, theme, values, history } = this.props
+    const {
+      rows,
+      columns,
+      currencyColumns,
+      dateColumns,
+      columnExtensions,
+    } = this.state
+    console.log(columns)
+    const editRow = (row, e) => {
+      history.push(`/finance/statement`)
+    }
+
     return (
       <React.Fragment>
-        <GridContainer>
+        <CardContainer hideHeader>
+          {/* <GridContainer>
           <GridItem xs lg={4}>
             <h4>
               <FormattedMessage id='finance.statement.detailsTitle' />
@@ -79,9 +119,78 @@ class AddNewStatement extends PureComponent {
               <FormattedMessage id='finance.statement.title.selectInvoice' />
             </h4>
           </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem
+        </GridContainer> */}
+          <GridContainer>
+            <GridContainer>
+              <GridItem md={3}>
+                <FastField
+                  name='coPayer'
+                  render={(args) => {
+                    return <TextField label='Co-Payer' {...args} />
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+
+            <GridItem md={3}>
+              <DatePicker label='Statement Date' />
+            </GridItem>
+
+            <GridItem md={3}>
+              <FastField
+                name='PaymentTerms'
+                render={(args) => (
+                  <NumberInput
+                    suffix='Days'
+                    qty
+                    label={formatMessage({
+                      id: 'finance.statement.paymentTerms',
+                    })}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridContainer>
+              <GridItem md={3}>
+                <Field
+                  name='xxxxx'
+                  render={(args) => {
+                    if (values.adminChargeType) {
+                      return (
+                        <NumberInput currency label='Admin Charge' {...args} />
+                      )
+                    }
+                    return (
+                      <NumberInput percentage label='Admin Charge' {...args} />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem md={3}>
+                <Field
+                  name='adminChargeType'
+                  render={(args) => (
+                    <Switch
+                      checkedChildren='$'
+                      unCheckedChildren='%'
+                      label=''
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+
+            <GridItem md={6}>
+              <FastField
+                name='remarks'
+                render={(args) => {
+                  return <TextField label='Remarks' multiline {...args} />
+                }}
+              />
+            </GridItem>
+            {/* <GridItem
             xs
             lg={4}
             container
@@ -101,8 +210,8 @@ class AddNewStatement extends PureComponent {
                   />
                 )}
               />
-            </GridItem>
-            <GridItem>
+            </GridItem> */}
+            {/* <GridItem>
               <FastField
                 name='Company'
                 render={(args) => (
@@ -121,22 +230,9 @@ class AddNewStatement extends PureComponent {
                   />
                 )}
               />
-            </GridItem>
-            <GridItem>
-              <FastField
-                name='PaymentTerms'
-                render={(args) => (
-                  <NumberInput
-                    qty
-                    label={formatMessage({
-                      id: 'finance.statement.paymentTerms',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem>
+            </GridItem> */}
+
+            {/* <GridItem>
               <FastField
                 name='Remarks'
                 render={(args) => (
@@ -148,36 +244,69 @@ class AddNewStatement extends PureComponent {
                   />
                 )}
               />
-            </GridItem>
-          </GridItem>
-          <GridItem
-            xs
-            lg={8}
-            container
-            direction='column'
-            justify='flex-start'
-            alignItems='stretch'
+            </GridItem> */}
+          </GridContainer>
+          <div
+            style={{
+              marginLeft: 9,
+              marginTop: 20,
+            }}
+            // style={{
+            //   marginLeft: theme.spacing(1),
+            //   marginRight: theme.spacing(1),
+            //   marginTop: theme.spacing(3),
+            // }}
           >
-            <GridItem>
-              <h5 style={{ textAlign: 'left' }}>
-                <FormattedMessage id='finance.statement.title.selectInvoiceSub' />
-              </h5>
-            </GridItem>
+            <h5>
+              Select outstanding invoices to be included in this statement
+            </h5>
+            <Divider />
+          </div>
+          <GridContainer>
+            {/* <GridItem
+              xs
+              lg={8}
+              container
+              direction='column'
+              justify='flex-start'
+              alignItems='stretch'
+            > */}
+            {/* <GridItem>
+                <h5 style={{ textAlign: 'left' }}>
+                  <FormattedMessage id='finance.statement.title.selectInvoiceSub' />
+                </h5>
+              </GridItem> */}
             <GridItem container direction='row' spacing={0}>
               <GridItem xs md={3}>
                 <FastField
                   name='InvoiceNo'
                   render={(args) => (
                     <TextField
+                      label='Invoice No'
                       {...args}
-                      label={formatMessage({
-                        id: 'finance.invoice.search.invoice',
-                      })}
+                      // label={formatMessage({
+                      //   id: 'finance.invoice.search.invoice',
+                      // })}
                     />
                   )}
                 />
               </GridItem>
-              <GridItem xs md={3}>
+
+              <GridItem md={6}>
+                <FastField
+                  name='effectiveDates'
+                  render={(args) => {
+                    return (
+                      <DateRangePicker
+                        label='Invoice From Date'
+                        label2='Invoice To Date'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              {/* <GridItem xs md={3}>
                 <FastField
                   name='StatementDate'
                   render={(args) => (
@@ -202,16 +331,33 @@ class AddNewStatement extends PureComponent {
                     />
                   )}
                 />
-              </GridItem>
+              </GridItem> */}
               <GridItem classes={{ grid: classes.searchBtn }} xs md={3}>
-                <Button color='rose'>
+                <Button color='primary'>
                   <Search />
                   <FormattedMessage id='form.search' />
                 </Button>
               </GridItem>
             </GridItem>
-
-            <GridItem classes={{ grid: classes.invoicesList }}>
+            <CommonTableGrid
+              style={{ marginTop: 10 }}
+              rows={rows}
+              columns={columns}
+              // currencyColumns={currencyColumns}
+              // dateColumns={dateColumns}
+              columnExtensions={columnExtensions}
+              // height={300}
+              FuncProps={{ selectable: true }}
+              selection={this.state.selectedRows}
+              onSelectionChange={this.handleSelectionChange}
+            />
+            {/* // rows={rows}
+            // columns={columns}
+            // currencyColumns={currencyColumns}
+            // dateColumns={dateColumns}
+            // height={300}
+            // />
+            {/* <GridItem classes={{ grid: classes.invoicesList }}>
               <EditableTableGrid
                 rows={rows}
                 columns={columns}
@@ -219,19 +365,35 @@ class AddNewStatement extends PureComponent {
                 dateColumns={dateColumns}
                 height={300}
               />
-            </GridItem>
+            </GridItem> */}
+            {/* </GridItem> */}
+          </GridContainer>
+          {/* {footer &&
+            footer({
+              onConfirm,
+              confirmBtnText: formatMessage({
+                id: 'form.create',
+              }),
+              confirmProps: {
+                disabled: false,
+              },
+            })} */}
+          <GridItem
+            container
+            style={{
+              marginTop: 10,
+              justifyContent: 'flex-end',
+            }}
+          >
+            <Button
+              color='danger'
+              onClick={() => history.push(`/finance/statement`)}
+            >
+              Cancel
+            </Button>
+            <Button color='primary'>Save</Button>
           </GridItem>
-        </GridContainer>
-        {footer &&
-          footer({
-            onConfirm,
-            confirmBtnText: formatMessage({
-              id: 'form.create',
-            }),
-            confirmProps: {
-              disabled: false,
-            },
-          })}
+        </CardContainer>
       </React.Fragment>
     )
   }

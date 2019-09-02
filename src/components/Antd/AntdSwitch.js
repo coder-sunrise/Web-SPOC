@@ -42,14 +42,18 @@ class AntdSwitch extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const { form, field } = props
+    const { form, field, checkedValue } = props
     this.state = {
-      value: form && field ? field.value : props.value || props.defaultValue,
+      value:
+        form && field
+          ? field.value === checkedValue
+          : props.value || props.defaultValue,
     }
   }
 
   componentWillReceiveProps (nextProps) {
     const { field, value, checkedValue, unCheckedValue } = nextProps
+    console.log(checkedValue, field.value)
     if (field) {
       this.setState({
         value: field.value === checkedValue,
@@ -63,6 +67,8 @@ class AntdSwitch extends React.PureComponent {
 
   handleValueChange = (checked) => {
     const { form, field, onChange, checkedValue, unCheckedValue } = this.props
+    console.log(checkedValue, field.value)
+
     if (form && field) {
       form.setFieldValue(field.name, checked ? checkedValue : unCheckedValue)
       form.setFieldTouched(field.name, true)

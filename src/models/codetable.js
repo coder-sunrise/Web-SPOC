@@ -14,11 +14,12 @@ export default createListViewModel({
     },
     subscriptions: {},
     effects: {
-      *fetchCodes ({ payload }, { select, call, put }) {
+      *fetchCodes ({ payload }, { select, call, put, delay, ...rest }) {
         let ctcode = payload
-
         if (typeof payload === 'object') ctcode = payload.code
+        // const { code } = payload
         const codetableState = yield select((state) => state.codetable)
+
         if (ctcode !== undefined) {
           if (codetableState[ctcode] === undefined) {
             const response = yield call(getCodes, payload)
@@ -26,16 +27,13 @@ export default createListViewModel({
               // list = { ...list, [lowerCaseCode]: response }
               yield put({
                 type: 'saveCodetable',
-                payload: {
-                  code: ctcode,
-                  data: response,
-                },
+                code: ctcode,
+                data: response,
               })
               return response
             }
           }
         }
-        return false
       },
     },
     reducers: {
