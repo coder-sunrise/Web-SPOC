@@ -197,6 +197,13 @@ class DetailsGrid extends PureComponent {
         router.push(
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
         )
+
+        break
+      case '6':
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons&action=resume`,
+        )
+
         break
       case '9':
         this.props.onRegisterPatientClick()

@@ -118,19 +118,19 @@ class SchemesGrid extends PureComponent {
             }
             if (st.code !== 'Corporate' && row.coPaymentSchemeFK) {
               row.coPaymentSchemeFK = undefined
-              this.props.dispatch({
-                // force current edit row components to update
-                type: 'global/updateState',
-                payload: {
-                  commitCount: commitCount++,
-                },
-              })
             }
             if (this.isMedisave(row)) {
               row.validRange = []
               row.validFrom = undefined
               row.validTo = undefined
             }
+            this.props.dispatch({
+              // force current edit row components to update
+              type: 'global/updateState',
+              payload: {
+                commitCount: commitCount++,
+              },
+            })
           },
         },
         {

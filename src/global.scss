@@ -320,7 +320,8 @@
   // color: rgba(0, 0, 0, 0.75);
   cursor: inherit;
 }
-.ant-input[disabled] {
+.ant-input[disabled],
+.ant-time-picker-input[disabled] {
   background: transparent;
   color: rgba(0, 0, 0, 1.0);
 }

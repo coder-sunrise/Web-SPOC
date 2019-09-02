@@ -8,6 +8,8 @@ import Yup from '@/utils/yup'
 import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
+import { consultationDocumentTypes } from '@/utils/codes'
+
 import AuthorizedContext from '@/components/Context/Authorized'
 
 import { Menu, Dropdown } from 'antd'
@@ -178,9 +180,10 @@ const styles = (theme) => ({
 
 let lasActivedWidget = null
 
-@connect(({ consultation, global }) => ({
+@connect(({ consultation, global, consultationDocument }) => ({
   consultation,
   global,
+  consultationDocument,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ consultation = {} }) => {
@@ -849,7 +852,18 @@ class Consultation extends PureComponent {
   }
 
   pauseConsultation = () => {
-    const { dispatch, values, history, consultation } = this.props
+    const {
+      dispatch,
+      values,
+      history,
+      consultation,
+      consultationDocument,
+    } = this.props
+    const { rows } = consultationDocument
+    consultationDocumentTypes.forEach((p) => {
+      values[p.prop] = rows.filter((o) => o.type === p.value)
+    })
+
     dispatch({
       type: 'consultation/pause',
       payload: values,

@@ -3,6 +3,7 @@ import moment from 'moment'
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
+import { dateFormatLong, CodeSelect } from '@/components'
 
 const status = [
   { value: false, name: 'Inactive', color: 'red' },
@@ -588,6 +589,89 @@ const country = [
     name: 'India',
   },
 ]
+
+const consultationDocumentTypes = [
+  {
+    value: '3',
+    name: 'Medical Certificate',
+    prop: 'corMedicalCertificate',
+    getSubject: (r) =>
+      `${moment
+        .utc(r.mcStartDate)
+        .local()
+        .format(dateFormatLong)} - ${moment
+        .utc(r.mcEndDate)
+        .local()
+        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+    convert: (r) => {
+      return {
+        ...r,
+        mcStartEndDate: [
+          moment(r.mcStartDate),
+          moment(r.mcEndDate),
+        ],
+      }
+    },
+  },
+  {
+    value: '4',
+    name: 'Certificate of Attendance',
+    prop: 'corCertificateOfAttendance',
+    getSubject: (r) => {
+      console.log(r)
+      // return `${moment
+      //   .utc(r.attendanceStartTime)
+      //   .local()
+      //   .format('HH:mm')} - ${moment
+      //   .utc(r.attendanceEndTime)
+      //   .local()
+      //   .format('HH:mm')}`
+      return `Certificate of Attendance ${r.accompaniedBy}`
+    },
+    convert: (r) => {
+      return {
+        ...r,
+        attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
+        attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
+      }
+    },
+  },
+  {
+    value: '1',
+    name: 'Referral Letter',
+    prop: 'corReferralLetter',
+  },
+  {
+    value: '2',
+    name: 'Memo',
+    prop: 'corMemo',
+  },
+  {
+    value: '6',
+    name: 'Vaccination Certificate',
+    prop: 'corVaccinationCert',
+    // getSubject: (r, patientInfo) => {
+    //   console.log(patientInfo)
+    //   const { name, patientAccountNo, genderFK, dob } = patientInfo
+    //   return (
+    //     <div>
+    //       Vaccination Certificate - {name}, {patientAccountNo},{' '}
+    //       <CodeSelect
+    //         code='ctGender'
+    //         text
+    //         value={genderFK}
+    //         optionLabelLength={1}
+    //       />, {Math.floor(moment.duration(moment().diff(dob)).asYears())}
+    //     </div>
+    //   )
+    // },
+  },
+  {
+    value: '5',
+    name: 'Others',
+    prop: 'corOtherDocuments',
+  },
+]
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -623,6 +707,7 @@ const tenantCode = [
   'doctorprofile',
   'clinicianprofile',
   'ctappointmenttype',
+  'ctreferrallettertemplate',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -744,5 +829,6 @@ module.exports = {
   currencyRoundingToTheClosest,
   coPayerType,
   country,
+  consultationDocumentTypes,
   ...module.exports,
 }
