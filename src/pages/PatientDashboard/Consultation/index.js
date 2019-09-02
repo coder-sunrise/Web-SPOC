@@ -281,8 +281,8 @@ class Consultation extends PureComponent {
       {
         id: '4',
         config: {
-          lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
-          md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
+          lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 4 },
+          md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 3 },
         },
       },
       {
@@ -290,6 +290,13 @@ class Consultation extends PureComponent {
         config: {
           lg: { x: 6, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
           md: { x: 5, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
+        },
+      },
+      {
+        id: '7',
+        config: {
+          lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
+          md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
         },
       },
       // {
