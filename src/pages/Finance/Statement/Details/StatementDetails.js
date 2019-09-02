@@ -4,7 +4,7 @@ import { Affix } from 'antd'
 import { withFormik } from 'formik'
 import { Book } from '@material-ui/icons'
 import { withStyles, Paper } from '@material-ui/core'
-import { NavPills, CommonHeader } from '@/components'
+import { NavPills, CommonHeader, CommonModal } from '@/components'
 import DetailsHeader from './DetailsHeader'
 import Details from './Details'
 // import CollectPayment from './CollectPayment'
@@ -20,7 +20,7 @@ const styles = () => ({})
 class StatementDetails extends PureComponent {
   render () {
     const { values, theme } = this.props
-    console.log('propss', this.props)
+    console.log('propss', this.state)
     return (
       <React.Fragment>
         <Paper>

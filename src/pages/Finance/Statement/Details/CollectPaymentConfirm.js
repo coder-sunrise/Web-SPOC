@@ -53,13 +53,22 @@ class CollectPaymentConfirm extends PureComponent {
       { name: 'payment', title: 'Payment' },
     ],
     columnExtensions: [
-      { columName: 'payableAmount', type: 'number', currency: true },
       {
-        columName: 'outstandingBalance',
+        columnName: 'adminCharge',
         type: 'number',
         currency: true,
       },
-      { columName: 'invoiceDate', type: 'date' },
+      {
+        columnName: 'payableAmount',
+        type: 'number',
+        currency: true,
+      },
+      {
+        columnName: 'outstandingBalance',
+        type: 'number',
+        currency: true,
+      },
+      { columnName: 'invoiceDate', type: 'date', format: 'DD MMM YYYY' },
       {
         columnName: 'payment',
         // type: 'number',
