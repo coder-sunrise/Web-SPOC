@@ -183,6 +183,11 @@ const Grid = ({
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
         )
         break
+      case '6': // start consultation
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons&action=resume`,
+        )
+        break
       case '9':
         onRegisterPatientClick()
         break

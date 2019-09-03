@@ -499,14 +499,6 @@ const addressTypes = [
   { label: 'Primary Address', value: '2' },
 ]
 
-const orderTypes = [
-  { name: 'Medication', value: '1' },
-  { name: 'Vaccination', value: '2' },
-  { name: 'Service', value: '3' },
-  { name: 'Consumable', value: '4' },
-  { name: 'Open Prescription', value: '5' },
-]
-
 const currencyRounding = [
   {
     name: 'Up',
@@ -618,14 +610,6 @@ const consultationDocumentTypes = [
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
     getSubject: (r) => {
-      console.log(r)
-      // return `${moment
-      //   .utc(r.attendanceStartTime)
-      //   .local()
-      //   .format('HH:mm')} - ${moment
-      //   .utc(r.attendanceEndTime)
-      //   .local()
-      //   .format('HH:mm')}`
       return `Certificate of Attendance ${r.accompaniedBy}`
     },
     convert: (r) => {
@@ -650,26 +634,37 @@ const consultationDocumentTypes = [
     value: '6',
     name: 'Vaccination Certificate',
     prop: 'corVaccinationCert',
-    // getSubject: (r, patientInfo) => {
-    //   console.log(patientInfo)
-    //   const { name, patientAccountNo, genderFK, dob } = patientInfo
-    //   return (
-    //     <div>
-    //       Vaccination Certificate - {name}, {patientAccountNo},{' '}
-    //       <CodeSelect
-    //         code='ctGender'
-    //         text
-    //         value={genderFK}
-    //         optionLabelLength={1}
-    //       />, {Math.floor(moment.duration(moment().diff(dob)).asYears())}
-    //     </div>
-    //   )
-    // },
   },
   {
     value: '5',
     name: 'Others',
     prop: 'corOtherDocuments',
+  },
+]
+
+const orderTypes = [
+  {
+    name: 'Medication',
+    value: '1',
+    prop: 'corPrescriptionItem',
+    filter: (r) => !r.stockDrugFK,
+  },
+  {
+    name: 'Vaccination',
+    value: '2',
+    prop: 'corVaccinationItem',
+  },
+  {
+    name: 'Service',
+    value: '3',
+    prop: 'corService',
+  },
+  { name: 'Consumable', value: '4', prop: 'corConsumable' },
+  {
+    name: 'Open Prescription',
+    value: '5',
+    prop: 'corPrescriptionItem',
+    filter: (r) => !!r.stockDrugFK,
   },
 ]
 // const localCodes = {}
