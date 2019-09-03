@@ -1,6 +1,24 @@
 import { createListViewModel } from 'medisys-model'
 // import * as service from '../services'
+import { getUniqueId } from '@/utils/utils'
 
+const sharedMedicationValue = {
+  quantity: 1,
+  corPrescriptionItemPrecaution: [
+    {},
+  ],
+  corPrescriptionItemInstruction: [
+    {
+      usageMethodFK: 1,
+      dosageFK: 1,
+      prescribeUOMFK: 1,
+      drugFrequencyFK: 1,
+      dispenseUOMFK: 1,
+      duration: 1,
+      stepdose: 'AND',
+    },
+  ],
+}
 export default createListViewModel({
   namespace: 'orders',
   config: {
@@ -9,16 +27,20 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
+      editType: '1',
+      rows: [],
+      defaultMedication: {
+        ...sharedMedicationValue,
+      },
       default: {
-        type: '1',
-        precautions: [
+        corPrescriptionItemPrecaution: [
           {
             action: '1',
             count: 1,
             unit: '1',
             frequency: '1',
             day: 1,
-            precaution: '1',
+            // precaution: '1',
             operator: '1',
           },
         ],
@@ -39,11 +61,47 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-      })
+      // history.listen(async (loct, method) => {
+      //   const { pathname, search, query = {} } = loct
+      // })
     },
     effects: {},
-    reducers: {},
+    reducers: {
+      upsertRow (state, { payload }) {
+        let { rows } = state
+        if (payload.uid) {
+          rows = rows.map((row) => {
+            const n =
+              row.uid === payload.uid
+                ? {
+                    ...row,
+                    ...payload,
+                  }
+                : row
+            return n
+          })
+        } else {
+          rows.push({
+            ...payload,
+            uid: getUniqueId(),
+          })
+        }
+
+        return {
+          ...state,
+          rows,
+          entity: undefined,
+        }
+      },
+
+      deleteRow (state, { payload }) {
+        const { rows } = state
+
+        return {
+          ...state,
+          rows: rows.filter((o) => o.uid !== payload.id),
+        }
+      },
+    },
   },
 })

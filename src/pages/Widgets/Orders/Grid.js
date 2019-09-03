@@ -1,84 +1,48 @@
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button,Popconfirm,Tooltip } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { orderTypes } from '@/utils/codes'
 
-export default ({}) => (
-  <CommonTableGrid
-    size='sm'
-    style={{ margin: 0 }}
-    rows={[
-      {
-        id: 1,
-        type: 'Medication',
-        subject: 'Biogesic tab 500 mg',
-        description: 'Take Twice A Day',
-        total: 40,
-      },
-      {
-        id: 2,
-        type: 'Medication',
-        subject: 'AMLODIPINE 5MG',
-        description: 'Take Twice A Day',
-        total: 40,
-      },
-      {
-        id: 3,
-        type: 'Medication',
-        subject: 'Take Once A Day',
-        description: 'Dr Levine',
-        total: 40,
-      },
-      {
-        id: 4,
-        type: 'Vaccination',
-        subject: 'ACTACEL Vaccine Injection (0.5 mL)',
-        description: 'Vaccination Remarks',
-        total: 40,
-      },
-      {
-        id: 5,
-        type: 'Service',
-        subject: 'Consultation Service',
-        description: '',
-        total: 40,
-      },
-    ]}
-    columns={[
-      { name: 'type', title: 'Type' },
-      { name: 'subject', title: 'Name' },
-      { name: 'description', title: 'Description' },
-      { name: 'total', title: 'Total' },
+export default ({ orders,dispatch }) => {
+  const { rows } = orders
 
-      { name: 'action', title: 'Action' },
-    ]}
-    FuncProps={{ pager: false }}
-    columnExtensions={[
-      { columnName: 'total', type: 'number', currency: true },
-    ]}
-    ActionProps={{
-      TableCellComponent: ({
-        column,
-        row,
-        dispatch,
-        classes,
-        renderActionFn,
-        ...props
-      }) => {
-        // console.log(this)
-        if (column.name === 'action') {
+  const editRow =(row)=>{
+
+    dispatch({
+      type: 'orders/updateState',
+      payload: {
+        entity: row,
+        editType:row.editType,
+      },
+    })
+  }
+
+  return (
+    <CommonTableGrid
+      size='sm'
+      style={{ margin: 0 }}
+      rows={rows}
+      onRowDoubleClick={editRow}
+      columns={[
+        { name: 'editType', title: 'Type' },
+        { name: 'subject', title: 'Name' },
+        { name: 'remarks', title: 'Description' },
+        { name: 'total', title: 'Total' },
+        { name: 'action', title: 'Action' },
+      ]}
+      FuncProps={{ pager: false }}
+      columnExtensions={[
+        { columnName: 'editType', type: 'select', options: orderTypes },
+
+        { columnName: 'total', type: 'number', currency: true },
+        { columnName: 'action', render:(row)=>{
           return (
-            <Table.Cell {...props}>
+            <>
               <Button
                 size='sm'
-                onClick={() => {
-                  // props.history.push(
-                  //   getAppendUrl({
-                  //     md: 'pt',
-                  //     cmt: '1',
-                  //     pid: row.id,
-                  //   }),
-                  // )
+                onClick={()=>{
+                  editRow(row)
                 }}
                 justIcon
                 color='primary'
@@ -86,27 +50,29 @@ export default ({}) => (
               >
                 <Edit />
               </Button>
-              <Button
-                size='sm'
-                onClick={() => {
-                  // props.history.push(
-                  //   getAppendUrl({
-                  //     md: 'pt',
-                  //     cmt: '1',
-                  //     pid: row.id,
-                  //   }),
-                  // )
-                }}
-                justIcon
-                color='primary'
+              <Popconfirm
+                onConfirm={() =>
+                  dispatch({
+                    type: 'orders/deleteRow',
+                    payload: {
+                      id: row.uid,
+                    },
+                  })}
               >
-                <Delete />
-              </Button>
-            </Table.Cell>
+                <Tooltip title='Delete'>
+                  <Button
+                    size='sm'
+                    color='danger'
+                    justIcon
+                  >
+                    <Delete />
+                  </Button>
+                </Tooltip>
+              </Popconfirm>
+            </>
           )
-        }
-        return <Table.Cell {...props} />
-      },
-    }}
-  />
-)
+        } },
+      ]}
+    />
+  )
+}

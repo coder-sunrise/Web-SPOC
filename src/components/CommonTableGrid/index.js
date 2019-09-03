@@ -83,7 +83,7 @@ const cellStyle = {
 // console.log(colorManipulator)
 const styles = (theme) => ({
   tableCursorPointer: {
-    cursor: 'pointer',
+    cursor: 'default',
   },
   tableStriped: {
     '& > tbody > tr:nth-of-type(odd), & > thead > tr': {

@@ -51,7 +51,7 @@ import {
       mcStartDate: mcStartEndDate[0],
       mcEndDate: mcStartEndDate[1],
     }
-    // data.subject = currentType.getSubject(data)
+    data.subject = currentType.getSubject(data)
     dispatch({
       type: 'consultationDocument/upsertRow',
       payload: data,

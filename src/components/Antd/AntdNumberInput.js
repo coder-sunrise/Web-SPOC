@@ -127,6 +127,8 @@ class AntdNumberInput extends React.PureComponent {
           : defaultValue || value,
       focused: false,
     }
+    // console.log(this.state.value)
+
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
   }
 
@@ -137,6 +139,7 @@ class AntdNumberInput extends React.PureComponent {
         value: field.value === undefined ? '' : field.value,
       })
     }
+    // console.log(field)
   }
 
   handleFocus = () => {

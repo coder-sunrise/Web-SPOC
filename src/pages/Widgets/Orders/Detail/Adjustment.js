@@ -62,7 +62,7 @@ class Adjustment extends PureComponent {
           <GridContainer>
             <GridItem xs={8}>
               <Field
-                name='adjustment'
+                name='adjValue'
                 render={(args) => {
                   if (values.type) {
                     return (
@@ -87,7 +87,7 @@ class Adjustment extends PureComponent {
             </GridItem>
             <GridItem xs={4}>
               <FastField
-                name='type'
+                name='adjType'
                 render={(args) => {
                   return (
                     <Switch
