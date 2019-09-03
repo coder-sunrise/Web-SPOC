@@ -871,8 +871,8 @@ class Consultation extends PureComponent {
       values,
       history,
       consultation,
-      consultationDocument,
-      orders,
+      consultationDocument = {},
+      orders = {},
     } = this.props
     const { rows } = consultationDocument
     consultationDocumentTypes.forEach((p) => {

@@ -70,7 +70,7 @@ import Yup from '@/utils/yup'
   }),
 
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+    const { dispatch, onConfirm, orders, editType } = props
     const { rows, entity } = orders
     const data = {
       sequence: rows.length,
@@ -80,15 +80,29 @@ import Yup from '@/utils/yup'
       type: 'orders/upsertRow',
       payload: data,
     })
-    console.log(data)
-    if (!entity) {
-      resetForm(orders.defaultMedication)
-    }
+    resetForm({
+      ...orders.defaultMedication,
+      editType,
+    })
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
 })
 class Medication extends React.Component {
+  componentWillReceiveProps (nextProps) {
+    const { values, orders, resetForm } = nextProps
+    const { entity } = orders
+    if (entity && entity.uid !== values.uid) {
+      resetForm(entity)
+      // console.log(
+      //   'componentWillReceiveProps',
+      //   orders,
+      //   values,
+      //   this.props.values,
+      // )
+    }
+  }
+
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
     const { theme, values } = this.props
     return (
