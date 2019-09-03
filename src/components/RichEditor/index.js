@@ -92,9 +92,8 @@ class RichEditor extends React.PureComponent {
       //   value: field.value,
       // })
     }
+    // console.log(isEditorFocused)
     if (!isEditorFocused) {
-      console.log('componentWillReceiveProps', v)
-
       if (!v) {
         this.setState({
           value: EditorState.createEmpty(),
