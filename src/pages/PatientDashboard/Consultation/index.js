@@ -8,7 +8,7 @@ import Yup from '@/utils/yup'
 import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
-import { consultationDocumentTypes } from '@/utils/codes'
+import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 
 import AuthorizedContext from '@/components/Context/Authorized'
 
@@ -189,27 +189,34 @@ let lasActivedWidget = null
   mapPropsToValues: ({ consultation = {} }) => {
     return consultation.entity || consultation.default
   },
-  validationSchema: Yup.object().shape(
-    {
-      // type: Yup.string().required(),
-      // to: Yup.string().when('type', {
-      //   is: (val) => val !== '2',
-      //   then: Yup.string().required(),
-      // }),
-      // from: Yup.string().required(),
-      // date: Yup.date().required(),
-      // subject: Yup.string().required(),
-      // // 3->MC
-      // days: Yup.number().when('type', {
-      //   is: (val) => val === '3',
-      //   then: Yup.number().required(),
-      // }),
-      // fromto: Yup.array().when('type', {
-      //   is: (val) => val === '3',
-      //   then: Yup.array().of(Yup.date()).min(2).required(),
-      // }),
-    },
-  ),
+  validationSchema: Yup.object().shape({
+    // type: Yup.string().required(),
+    // to: Yup.string().when('type', {
+    //   is: (val) => val !== '2',
+    //   then: Yup.string().required(),
+    // }),
+    // from: Yup.string().required(),
+    // date: Yup.date().required(),
+    // subject: Yup.string().required(),
+    // // 3->MC
+    // days: Yup.number().when('type', {
+    //   is: (val) => val === '3',
+    //   then: Yup.number().required(),
+    // }),
+    corPrescriptionItem: Yup.array().of(
+      Yup.object().shape({
+        // Description: Yup.string().required('Description is required'),
+        // UnitPrice: Yup.number().required('Unit Price is required'),
+        corPrescriptionItemPrecaution: Yup.array().of(
+          Yup.object().shape(
+            {
+              // prescriptionItemFK:
+            },
+          ),
+        ),
+      }),
+    ),
+  }),
 
   handleSubmit: (values, { props }) => {
     const { dispatch, history, consultation } = props
@@ -865,10 +872,16 @@ class Consultation extends PureComponent {
       history,
       consultation,
       consultationDocument,
+      orders,
     } = this.props
     const { rows } = consultationDocument
     consultationDocumentTypes.forEach((p) => {
       values[p.prop] = rows.filter((o) => o.type === p.value)
+    })
+
+    const { rows: orderRows } = orders
+    orderTypes.forEach((p) => {
+      values[p.prop] = orderRows.filter((o) => o.type === p.value)
     })
 
     dispatch({

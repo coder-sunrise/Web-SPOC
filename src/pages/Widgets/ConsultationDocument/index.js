@@ -39,7 +39,6 @@ class ConsultationDocument extends PureComponent {
   }
 
   editRow =(row)=>{
-    console.log(row)
     this.props.dispatch({
       type: 'consultationDocument/updateState',
       payload: {
@@ -74,7 +73,7 @@ class ConsultationDocument extends PureComponent {
             { columnName: 'type', type: 'select', options:consultationDocumentTypes },
             { columnName: 'issuedByUserFK',render:(r)=>{
               const {codetable}=this.props
-              const {clinicianprofile}=codetable
+              const {clinicianprofile=[]}=codetable
               const obj = clinicianprofile.find(o=>o.id===(r.issuedByUserFK?r.issuedByUserFK: r.referredByUserFK)) || {}
               return `${obj.title || ''} ${ obj.name || ''}`
             } },
