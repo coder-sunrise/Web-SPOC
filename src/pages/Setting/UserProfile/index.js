@@ -6,22 +6,17 @@ import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
-// devexpress react grid
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common component
 import {
   Button,
   CardContainer,
   CommonTableGrid,
-  CommonModal,
   GridContainer,
   GridItem,
   Select,
   TextField,
   Tooltip,
 } from '@/components'
-// sub component
-import UserProfileForm from './UserProfileForm'
 import { UserProfileTableConfig } from './const'
 
 const styles = (theme) => ({
@@ -34,7 +29,7 @@ const styles = (theme) => ({
 @connect(({ settingUserProfile }) => ({ settingUserProfile }))
 @withFormik({
   mapPropsToValues: () => ({
-    status: 'Active',
+    status: true,
   }),
 })
 class UserProfile extends React.Component {
@@ -67,10 +62,12 @@ class UserProfile extends React.Component {
   handleActionButtonClick = (event) => {
     const { currentTarget } = event
     const { dispatch } = this.props
+
     dispatch({
       type: 'settingUserProfile/fetchUserProfileByID',
-      id: currentTarget.id,
+      payload: { id: currentTarget.id },
     })
+    this.openModal()
   }
 
   Cell = (row) => {
@@ -94,18 +91,21 @@ class UserProfile extends React.Component {
     dispatch({
       type: 'settingUserProfile/query',
       payload: {
-        [`${prefix}userName`]: values.searchQuery,
-        [`${prefix}name`]: values.searchQuery,
+        // group: [
+        //   {
+        //     'userProfileFKNavigation.userName': values.searchQuery,
+        //     name: values.searchQuery,
+        //     isActive: values.status,
+        //     combineCondition: 'or',
+        //   },
+        // ],
+        'userProfileFKNavigation.userName': values.searchQuery,
+        name: values.searchQuery,
         combineCondition: 'or',
-      },
-    })
-  }
-
-  handleChangePassword = () => {
-    this.props.dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        showChangePasswordModal: true,
+        // isActive: values.status,
+        // [`${prefix}userName`]: values.searchQuery,
+        // [`${prefix}name`]: values.searchQuery,
+        // combineCondition: 'or',
       },
     })
   }
@@ -116,44 +116,20 @@ class UserProfile extends React.Component {
 
   openModal = () => {
     this.props.dispatch({
-      type: 'settingUserProfile/openModal',
+      type: 'global/updateState',
+      payload: {
+        showUserProfile: true,
+      },
     })
   }
 
-  closeModal = () => {
-    this.props.dispatch({
-      type: 'settingUserProfile/closeModal',
-    })
-  }
-
-  onConfirmClick = (values) => {
-    const { dispatch } = this.props
-    console.log({ values })
-    // dispatch({
-    //   type: 'settingUserProfile/upsert',
-    //   payload: values,
-    // })
+  handleDoubleClick = (row) => {
+    this.handleActionButtonClick({ currentTarget: { id: row.id } })
   }
 
   render () {
     const { classes, settingUserProfile } = this.props
-    const {
-      list,
-      showUserProfileModal,
-      currentSelectedUser,
-    } = settingUserProfile
-
-    const userProfileList = list.reduce(
-      (userProfiles, profile) => [
-        ...userProfiles,
-        {
-          name: profile.name,
-          status: profile.isActive,
-          ...profile.userProfile,
-        },
-      ],
-      [],
-    )
+    const { list } = settingUserProfile
 
     return (
       <CardContainer hideHeader>
@@ -174,8 +150,8 @@ class UserProfile extends React.Component {
                   {...args}
                   label='Status'
                   options={[
-                    { name: 'Active', value: 'Active' },
-                    { name: 'Inactive', value: 'Inactive' },
+                    { name: 'Active', value: true },
+                    { name: 'Inactive', value: false },
                   ]}
                 />
               )}
@@ -191,28 +167,12 @@ class UserProfile extends React.Component {
           </GridItem>
           <GridItem md={12}>
             <CommonTableGrid
-              rows={userProfileList}
+              rows={list}
               {...this.state.gridConfig}
+              onRowDoubleClick={this.handleDoubleClick}
             />
           </GridItem>
         </GridContainer>
-        <CommonModal
-          title={
-            Object.entries(currentSelectedUser).length === 0 ? (
-              'Add User Profile'
-            ) : (
-              'Edit User Profile'
-            )
-          }
-          open={showUserProfileModal}
-          onClose={this.closeModal}
-          onConfirm={this.onConfirmClick}
-        >
-          <UserProfileForm
-            // selectedUser={currentSelectedUser}
-            onChangePasswordClick={this.handleChangePassword}
-          />
-        </CommonModal>
       </CardContainer>
     )
   }
