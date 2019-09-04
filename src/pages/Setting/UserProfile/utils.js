@@ -1,6 +1,6 @@
 export const constructUserProfile = (values, role) => {
   return {
-    userName: values.userName,
+    password: values.userProfile.password,
     phoneNumber: values.phoneNumber,
     email: values.email,
     role: {
@@ -9,8 +9,7 @@ export const constructUserProfile = (values, role) => {
     },
     effectiveStartDate: values.effectiveDates[0],
     effectiveEndDate: values.effectiveDates[1],
-    password: values.password,
     concurrencyToken: values.concurrencyToken,
-    id: values.id,
+    ...values.userProfile,
   }
 }
