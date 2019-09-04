@@ -5,6 +5,7 @@ import { CardContainer } from '@/components'
 import { compose } from 'redux'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
+import { status } from '@/utils/codes'
 
 const styles = () => ({})
 const Consumable = ({ dispatch, history, consumable }) => {
@@ -16,12 +17,12 @@ const Consumable = ({ dispatch, history, consumable }) => {
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
       { name: 'supplier', title: 'Supplier' },
-      { name: 'dispensingUOMFk', title: 'Disp. UOM' },
+      { name: 'uom', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
-      { name: 'sellingPriceBefDiscount', title: 'Selling Price' },
+      { name: 'sellingPrice', title: 'Selling Price' },
       { name: 'isActive', title: 'Status' },
-      { name: 'Action', title: 'Action' },
+      { name: 'action', title: 'Action' },
     ],
     leftColumns: [],
   })
@@ -30,21 +31,20 @@ const Consumable = ({ dispatch, history, consumable }) => {
     colExtensions,
     setColExtensions,
   ] = useState([
-    { columnName: 'Action', width: 110, align: 'center' },
     {
-      columnName: 'supplier',
-      type: 'select',
-      options: [],
-      label: 'Supplier',
+      columnName: 'uom',
+      type: 'number',
     },
+
+    { columnName: 'action', width: 110, align: 'center' },
     {
-      columnName: 'dispUOM',
+      columnName: 'isActive',
+      sortingEnabled: false,
       type: 'select',
-      options: [],
-      label: 'DispUOM',
+      options: status,
     },
-    { columnName: 'payments', type: 'number', currency: true },
-    { columnName: 'expenseAmount', type: 'number', currency: true },
+    { columnName: 'averageCostPrice', type: 'number', currency: true },
+    { columnName: 'sellingPrice', type: 'number', currency: true },
   ])
 
   const filterProps = {

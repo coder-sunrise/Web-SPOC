@@ -24,8 +24,8 @@ import {
 const styles = () => ({})
 
 const Detail = ({ vaccinationDetail, dispatch, values }) => {
-  console.log('props', vaccinationDetail)
-  console.log('props', values)
+  // console.log('props', vaccinationDetail)
+  // console.log('props', values)
   useEffect(() => {
     if (vaccinationDetail.currentId) {
       dispatch({
@@ -79,7 +79,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='Description'
+                name='description'
                 render={(args) => {
                   return (
                     <TextField
@@ -94,7 +94,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='Remarks'
+                name='remarks'
                 render={(args) => {
                   return (
                     <TextField
@@ -121,13 +121,13 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
             <GridItem xs={2} />
             <GridItem xs={10}>
               <FastField
-                name='Supplier'
+                name='favouriteSupplierFK'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.vaccination.supplier',
                     })}
-                    options={[]}
+                    code='ctCompany'
                     {...args}
                   />
                 )}
@@ -136,7 +136,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
             <GridItem xs={2} />
             <GridItem xs={10}>
               <FastField
-                name='revenueCategoryFk'
+                name='revenueCategoryFK'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({
@@ -161,7 +161,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
                 )}
               />
             </GridItem>
-            <GridItem xs={2}>
+            {/* <GridItem xs={2}>
               <Field
                 name='enableVaccinationGroup'
                 render={(args) => (
@@ -193,7 +193,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
                   />
                 )}
               />
-            </GridItem>
+            </GridItem> */}
           </GridContainer>
         </GridItem>
       </GridContainer>
@@ -202,7 +202,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
       <GridContainer>
         <GridItem xs={5}>
           <FastField
-            name='sddFk'
+            name='sddfk'
             render={(args) => {
               return (
                 <TextField
@@ -230,7 +230,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
         </GridItem>
         <GridItem xs={5}>
           <FastField
-            name='sDDDescription'
+            name='sddDescription'
             render={(args) => {
               return (
                 <Select

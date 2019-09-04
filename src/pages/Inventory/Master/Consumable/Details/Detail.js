@@ -112,7 +112,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='supplier'
+                name='favouriteSupplierFK'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({
@@ -127,7 +127,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='baseUOM'
+                name='uomfk'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({
@@ -142,13 +142,13 @@ const Detail = ({ consumableDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='consumableCategory'
+                name='consumableCategoryFK'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.consumable.category',
                     })}
-                    options={[]}
+                    code='ctConsumableCategory'
                     {...args}
                   />
                 )}
@@ -156,7 +156,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='revenueCategoryFk'
+                name='revenueCategoryFK'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({

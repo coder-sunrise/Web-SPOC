@@ -119,14 +119,14 @@ export default compose(
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      revenueCategoryFk: Yup.number().required(),
+      revenueCategoryFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-      prescribingUOMFk: Yup.number().required(),
-      dispensingUOMFk: Yup.number().required(),
+      prescribingUOMFK: Yup.number().required(),
+      dispensingUOMFK: Yup.number().required(),
       averageCostPrice: Yup.number().positive(
         'Average Cost Price must between 0 to 999,999.99',
       ),
-      profitMarginPercentage: Yup.number().positive(
+      markupMargin: Yup.number().positive(
         'Markup Margin must between 0 to 999,999.99',
       ),
       sellingPriceBefDiscount: Yup.number().positive(

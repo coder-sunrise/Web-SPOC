@@ -45,7 +45,7 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
     }),
     limit: 3,
     setFieldValue,
-    fieldName: 'stockDrugDrugPrecaution',
+    fieldName: 'inventoryMedication_MedicationPrecaution',
   }
   return (
     <GridContainer>
