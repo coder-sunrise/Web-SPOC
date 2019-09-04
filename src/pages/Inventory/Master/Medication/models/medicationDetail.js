@@ -19,7 +19,6 @@ export default createFormViewModel({
           moment(),
           moment('2099-12-31'),
         ],
-        stockDrugDrugPrecaution: [],
       },
     },
     subscriptions: ({ dispatch, history }) => {

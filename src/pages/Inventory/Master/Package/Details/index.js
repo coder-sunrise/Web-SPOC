@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
@@ -15,7 +15,6 @@ import {
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getUniqueNumericId } from '@/utils/utils'
 
 const styles = () => ({
   actionDiv: {
@@ -35,6 +34,18 @@ const Detail = ({
   handleSubmit,
   ...props
 }) => {
+  const field = packDetail.entity ? 'entity' : 'default'
+
+  const handleServiceOnChange = (e) => {
+    console.log('er', e)
+    const { row, option } = e
+    const serviceUnitPrice = option.unitPrice
+    return {
+      ...row,
+      unitPrice: serviceUnitPrice,
+    }
+  }
+
   console.log('propsss', props)
   const { ServiceList } = props
   const { currentTab } = pack
@@ -51,19 +62,23 @@ const Detail = ({
         { name: 'medicationName', title: 'Medication Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
+        { name: 'subTotal', title: 'Amount' },
       ],
       leftColumns: [],
     },
     medicationColExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
+      {
+        columnName: 'medicationName',
+        type: 'codeSelect',
+        code: 'inventoryMedication',
+        labelField: 'displayValue',
+        valueField: 'id',
+      },
       { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
+      { columnName: 'subTotal', type: 'number', currency: true },
     ],
     medicationList: [
-      { medicationName: 'Panadol', quantity: 1, unitPrice: 5, amount: 5 },
-      { medicationName: 'Paracetemol', quantity: 1, unitPrice: 5, amount: 5 },
-      { medicationName: 'Cough Juice', quantity: 1, unitPrice: 10, amount: 10 },
+      props.values.medicationPackageItem,
     ],
   }
 
@@ -134,9 +149,12 @@ const Detail = ({
     serviceColExtensions: [
       {
         columnName: 'serviceName',
-        type: 'select',
+        type: 'codeSelect',
         code: 'ctservice',
         labelField: 'displayValue',
+        valueField: 'serviceId',
+        filter: {},
+        onChange: handleServiceOnChange,
       },
       {
         columnName: 'unitPrice',
@@ -153,27 +171,53 @@ const Detail = ({
     ServiceList: props.values.servicePackageItem,
   }
 
-  const commitChanges = ({ rows, added, changed, deleted }) => {
-    console.log('rows', rows)
+  const commitChanges = (type) => ({ rows, added, changed, deleted }) => {
+    console.log('packDetail', packDetail)
+
     const newRow = rows[0]
     console.log('newRow', newRow)
 
     const calSubtotal = newRow.quantity * newRow.unitPrice
     newRow.subTotal = calSubtotal
-    newRow.id = getUniqueNumericId()
-    const { servicePackageItem } = props.values
-    const newServicePackageItem = servicePackageItem.concat(newRow)
+    // console.log('asdas', getUniqueNumericId())
+    // newRow.id = getUniqueNumericId()
 
-    const field = packDetail.entity ? 'entity' : 'default'
-    dispatch({
-      type: 'packDetail/updateState',
-      payload: {
-        default: {
-          ...props.values,
-          servicePackageItem: newServicePackageItem,
-        },
-      },
-    })
+    const {
+      medicationPackageItem,
+      consumablePackageItem,
+      vaccinationPackageItem,
+      servicePackageItem,
+    } = props.values
+
+    switch (type) {
+      case 'medicationPackageItem': {
+        const newPackageItem = medicationPackageItem.concat(newRow)
+        return dispatch({
+          type: 'packDetail/updateState',
+          payload: {
+            [field]: {
+              ...props.values,
+              medicationPackageItem: newPackageItem,
+            },
+          },
+        })
+      }
+      case 'servicePackageItem': {
+        const newPackageItem = servicePackageItem.concat(newRow)
+        return dispatch({
+          type: 'packDetail/updateState',
+          payload: {
+            [field]: {
+              ...props.values,
+              servicePackageItem: newPackageItem,
+            },
+          },
+        })
+      }
+
+      default:
+        return newRow
+    }
   }
 
   const onAddedRowsChange = (addedRows) => {
@@ -188,34 +232,48 @@ const Detail = ({
     //   //   type,
     //   // })
     // )
-  }
-
-  const onRowChangesChange = (changes) => {
-    console.log('changes', changes)
-
-    // this.setState((preSate) => {
-    //   return {
-    //     rows: preSate.rows.map(
-    //       (row) => (changes[row.id] ? { ...row, ...changes[row.id] } : row),
-    //     ),
-    //   }
-    // })
-    // return changes
+    return [
+      { ...addedRows, unitPrice: 123 },
+    ]
   }
 
   const onDeletedRowIdsChange = (ids) => {
-    console.log('ids', ids)
-
     const rows = props.values.servicePackageItem.filter(
       (service) => ids.indexOf(service.id) < 0,
     )
-    console.log('rows', rows)
-    // this.setState((preSate) => {
-    //   return {
-    //     rows: preSate.rows.filter((o) => ids.indexOf(o.id) < 0),
-    //   }
-    // })
-    // return ids
+    console.log('deleterow', rows)
+    dispatch({
+      type: 'packDetail/updateState',
+      payload: {
+        default: {
+          ...props.values,
+          medicationPackageItem: rows,
+        },
+      },
+    })
+
+    return ids
+  }
+
+  const [
+    rowChange,
+    setRowChange,
+  ] = useState([])
+
+  const onRowChangesChange = (rowChanges) => {
+    console.log('rowChanges', rowChanges)
+
+    setRowChange(rowChanges)
+    console.log('rowChange', rowChange)
+
+    return rowChanges
+  }
+
+  const editableGridProps = {
+    commitChanges,
+    onAddedRowsChange,
+    onRowChangesChange,
+    onDeletedRowIdsChange,
   }
 
   return (
@@ -257,11 +315,10 @@ const Detail = ({
                 service={serviceProps}
                 packDetail={packDetail}
                 setFieldValue={setFieldValue}
-                commitChanges={commitChanges}
-                onAddedRowsChange={onAddedRowsChange}
-                onRowChangesChange={onRowChangesChange}
-                onDeletedRowIdsChange={onDeletedRowIdsChange}
+                {...editableGridProps}
                 {...props}
+                rowChange={rowChange}
+                setRowChange={setRowChange}
               />
             ),
           },

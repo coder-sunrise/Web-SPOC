@@ -22,20 +22,16 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
   const settingProps = {
     items: [
       {
-        value: 'Anti-Inflmation',
-        id: 1,
+        medicationPrecautionFK: 1,
       },
       {
-        value: 'Anti-Swelling',
-        id: 2,
+        medicationPrecautionFK: 2,
       },
       {
-        value: 'Apply as instructed',
-        id: 3,
+        medicationPrecautionFK: 3,
       },
       {
-        value: 'Apply on the ear only',
-        id: 4,
+        medicationPrecautionFK: 4,
       },
     ],
     classes,
@@ -66,7 +62,13 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.dosage',
                       })}
-                      code='ctMedicationDosage'
+                      code={
+                        showTransfer ? (
+                          'ctMedicationDosage'
+                        ) : (
+                          'ctVaccinationDosage'
+                        )
+                      }
                       {...args}
                     />
                   )}
@@ -80,7 +82,13 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.uom',
                       })}
-                      code='ctmedicationunitofmeasurement'
+                      code={
+                        showTransfer ? (
+                          'ctmedicationunitofmeasurement'
+                        ) : (
+                          'ctvaccinationunitofmeasurement'
+                        )
+                      }
                       {...args}
                     />
                   )}
@@ -94,7 +102,13 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.frequency',
                       })}
-                      code='ctMedicationFrequency'
+                      code={
+                        showTransfer ? (
+                          'ctMedicationFrequency'
+                        ) : (
+                          'ctvaccinationfrequency'
+                        )
+                      }
                       {...args}
                     />
                   )}
@@ -136,7 +150,13 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.usage',
                       })}
-                      code='ctMedicationUsage'
+                      code={
+                        showTransfer ? (
+                          'ctMedicationUsage'
+                        ) : (
+                          'ctvaccinationusage'
+                        )
+                      }
                       {...args}
                     />
                   )}
