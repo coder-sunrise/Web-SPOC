@@ -703,8 +703,11 @@ const tenantCode = [
   'clinicianprofile',
   'ctappointmenttype',
   'ctservice',
+<<<<<<< HEAD
   'ctreferrallettertemplate',
   'inventoryMedication',
+=======
+>>>>>>> dev_limky
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {

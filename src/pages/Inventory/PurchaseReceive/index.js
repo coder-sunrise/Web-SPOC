@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Filter from './Filter'
 import Detail from './Detail'
+import DuplicatePO from './DuplicatePO'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -41,6 +42,16 @@ class PurchaseReceive extends PureComponent {
     })
   }
 
+  toggleDuplicatePOModal = () => {
+    this.props.dispatch({
+      type: 'purchasingReceiving/updateState',
+      payload: {
+        showDuplicatePOModal: !this.props.purchasingReceiving
+          .showDuplicatePOModal,
+      },
+    })
+  }
+
   render () {
     console.log(this.props)
 
@@ -64,13 +75,20 @@ class PurchaseReceive extends PureComponent {
         >
           <Detail {...this.props} />
         </CommonModal>
+        <CommonModal
+          open={purchasingReceiving.showDuplicatePOModal}
+          observe='PurchaseOrderConfirmationDetail'
+          title={'Duplicate Purchase Order'}
+          maxWidth='xs'
+          onClose={this.toggleDuplicatePOModal}
+          onConfirm={this.toggleDuplicatePOModal}
+        >
+          <DuplicatePO {...this.props} />
+        </CommonModal>
         <GridItem md={4} className={classes.buttonGroup}>
           <Button
             color='primary'
             onClick={() => {
-              dispatch({
-                type: 'purchasingReceiving/updateState',
-              })
               this.toggleWriteOffModal()
             }}
           >

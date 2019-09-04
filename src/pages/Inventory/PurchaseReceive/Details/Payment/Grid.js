@@ -1,26 +1,24 @@
 import React, { PureComponent } from 'react'
 import { CardContainer, CommonTableGrid, Button } from '@/components'
-import Edit from '@material-ui/icons/Edit'
+import DeleteOutline from '@material-ui/icons/DeleteOutline'
 
 class Grid extends PureComponent {
-  editRow = (row, e) => {}
+  deleteRow = (row, e) => {}
   render () {
     return (
       <CardContainer hideHeader>
         <CommonTableGrid
           style={{ margin: 0 }}
-          type='deliveryOrder'
+          type='purchaseReceivePayment'
           onRowDoubleClick={this.editRow}
           columns={[
-            { name: 'doDate', title: 'Delivery Order Date' },
-            { name: 'doNo', title: 'Delivery Order No.' },
-            { name: 'total', title: 'Total Qty Received' },
-            { name: 'outstanding', title: 'Outstanding Qty' },
+            { name: 'paymentNo', title: 'Payment No.' },
+            { name: 'paymentDate', title: 'Date' },
+            { name: 'paymentMode', title: 'Payment Mode' },
+            { name: 'reference', title: 'Reference' },
+            { name: 'paymentAmount', title: 'Payment Amount' },
             { name: 'remarks', title: 'Remarks' },
-            {
-              name: 'action',
-              title: 'Action',
-            },
+            { name: 'action', title: 'Action' },
           ]}
           // FuncProps={{ pager: false }}
           columnExtensions={[
@@ -29,6 +27,7 @@ class Grid extends PureComponent {
               type: 'date',
               format: 'DD MMM YYYY',
             },
+            { columnName: 'paymentAmount', type: 'number', currency: true },
             {
               columnName: 'action',
               sortingEnabled: false,
@@ -38,12 +37,12 @@ class Grid extends PureComponent {
                   <Button
                     size='sm'
                     onClick={() => {
-                      this.editRow(row)
+                      this.deleteRow(row)
                     }}
                     justIcon
                     color='primary'
                   >
-                    <Edit />
+                    <DeleteOutline />
                   </Button>
                 )
               },

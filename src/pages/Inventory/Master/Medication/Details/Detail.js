@@ -43,6 +43,14 @@ const Detail = ({ medicationDetail, dispatch, ...props }) => {
     setToggle(!toggle)
   }
 
+  const handleSelectSdd = (row) => {
+    const { setFieldValue, setFieldTouched } = props
+    const { id } = row
+    setFieldValue('sddfk', row.code)
+    setFieldValue('sddDescription', row.name)
+    setToggle(!toggle)
+  }
+
   return (
     <CardContainer
       hideHeader
@@ -236,7 +244,7 @@ const Detail = ({ medicationDetail, dispatch, ...props }) => {
         onClose={toggleModal}
         onConfirm={toggleModal}
       >
-        <Sdd dispatch={dispatch} {...props} />
+        <Sdd dispatch={dispatch} handleSelectSdd={handleSelectSdd} {...props} />
       </CommonModal>
     </CardContainer>
   )
