@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
@@ -13,7 +13,33 @@ import {
 
 const styles = () => ({})
 
-const Pricing = () => {
+const Pricing = ({ values, setFieldValue }) => {
+  const [
+    acp,
+    setAcp,
+  ] = useState()
+  const [
+    markupMargin,
+    setMarkupMargin,
+  ] = useState()
+
+  const calculate = () => {
+    const suggestedSellingPrice =
+      parseFloat(acp) + parseFloat(acp) * parseFloat(markupMargin)
+    setFieldValue('suggestSellingPrice', suggestedSellingPrice)
+  }
+
+  useEffect(
+    () => {
+      if (acp && markupMargin) {
+        calculate()
+      }
+    },
+    [
+      acp,
+      markupMargin,
+    ],
+  )
   return (
     <CardContainer
       hideHeader
@@ -67,6 +93,7 @@ const Pricing = () => {
                       label={formatMessage({
                         id: 'inventory.master.pricing.averageCostPrice',
                       })}
+                      onBlur={(e) => setAcp(e.target.value)}
                       {...args}
                     />
                   )
@@ -80,12 +107,13 @@ const Pricing = () => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='profitMarginPercentage'
+                name='markupMargin'
                 render={(args) => (
                   <NumberInput
                     label={formatMessage({
                       id: 'inventory.master.pricing.profitMarginPercentage',
                     })}
+                    onBlur={(e) => setMarkupMargin(e.target.value)}
                     {...args}
                   />
                 )}
@@ -100,6 +128,7 @@ const Pricing = () => {
                     label={formatMessage({
                       id: 'inventory.master.pricing.suggestedSellingPrice',
                     })}
+                    disabled
                     {...args}
                   />
                 )}
@@ -107,7 +136,7 @@ const Pricing = () => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='sellingPriceBefDiscount'
+                name='sellingPrice'
                 render={(args) => (
                   <NumberInput
                     currency

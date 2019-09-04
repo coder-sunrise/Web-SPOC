@@ -42,7 +42,7 @@ export default {
   'inventory.master.vaccination.effectiveEndDate': 'Effective End Date',
   'inventory.master.vaccination.status': 'Status',
 
-  'inventory.master.package.code': 'Package Code',
+  'inventory.master.package.code': 'Package Code/Name',
   'inventory.master.package.name': 'Package Name',
   'inventory.master.package.description': 'Description',
   'inventory.master.package.remarks': 'Remarks',
@@ -60,7 +60,7 @@ export default {
   'inventory.master.pricing.profitMarginPercentage': 'Markup Margin (%)',
   'inventory.master.pricing.suggestedSellingPrice': 'Suggested Selling Price',
   'inventory.master.pricing.sellingPrice': 'Selling Price',
-  'inventory.master.pricing.maxDiscount': 'Maximum Cap (All)',
+  'inventory.master.pricing.maxDiscount': 'Max Discount(%)',
 
   'inventory.master.setting.dosage': 'Dosage',
   'inventory.master.setting.frequency': 'Frequency',

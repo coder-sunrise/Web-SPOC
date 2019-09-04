@@ -19,24 +19,22 @@ const styles = (theme) => ({
 })
 
 const Stock = ({ classes }) => {
-  const [ tableParas, setTableParas ] = useState({
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
-      { name: 'refNo', title: 'Batch No.' },
-      { name: 'expenseDate', title: 'Receiving Date' },
-      { name: 'invoiceDate', title: 'Expiry Date' },
-      { name: 'quantity', title: 'Quantity' },
+      { name: 'batchNo', title: 'Batch No.' },
+      { name: 'expiryDate', title: 'Expiry Date' },
+      { name: 'stock', title: 'Quantity' },
     ],
     columnExtensions: [
       {
-        columnName: 'quantity',
+        columnName: 'stock',
         type: 'number',
       },
       {
-        columnName: 'invoiceDate',
-        type: 'date',
-      },
-      {
-        columnName: 'expenseDate',
+        columnName: 'expiryDate',
         type: 'date',
       },
     ],
@@ -59,6 +57,7 @@ const Stock = ({ classes }) => {
                   label={formatMessage({
                     id: 'inventory.master.stock.currentStock',
                   })}
+                  disabled
                   {...args}
                 />
               )

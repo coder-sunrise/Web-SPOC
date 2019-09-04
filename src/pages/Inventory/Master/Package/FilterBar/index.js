@@ -27,13 +27,13 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = ({ classes, dispatch, history }) => {
+const FilterBar = ({ classes, dispatch, history, values }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
         <GridItem xs={6} md={3}>
           <FastField
-            name='Code'
+            name='codeDisplayValue'
             render={(args) => {
               return (
                 <TextField
@@ -48,38 +48,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
         </GridItem>
         <GridItem xs={6} md={3}>
           <FastField
-            name='Name'
-            render={(args) => {
-              return (
-                <TextField
-                  label={formatMessage({
-                    id: 'inventory.master.package.name',
-                  })}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={6} md={3}>
-          <FastField
-            name='Supplier'
-            render={(args) => {
-              return (
-                <Select
-                  label={formatMessage({
-                    id: 'inventory.master.package.supplier',
-                  })}
-                  options={[]}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={6} md={3}>
-          <FastField
-            name='Status'
+            name='isActive'
             render={(args) => {
               return (
                 <Select
@@ -100,8 +69,20 @@ const FilterBar = ({ classes, dispatch, history }) => {
               variant='contained'
               color='primary'
               onClick={() => {
+                const { isActive, codeDisplayValue } = values
+                console.log('values', values)
                 dispatch({
                   type: 'pack/query',
+                  payload: {
+                    isActive,
+                    group: [
+                      {
+                        code: codeDisplayValue,
+                        displayValue: codeDisplayValue,
+                        combineCondition: 'or',
+                      },
+                    ],
+                  },
                 })
               }}
             >
