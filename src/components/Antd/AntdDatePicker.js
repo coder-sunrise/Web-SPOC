@@ -21,8 +21,7 @@ import {
 } from '@/components'
 
 const _toMoment = (value, format) => {
-  // console.log({ value })
-  if (!value) return ''
+  if (!value) return null
   const m = moment.utc(value)
   return m.local()
 
@@ -205,7 +204,8 @@ class AntdDatePicker extends PureComponent {
         <AutosizeInput
           inputClassName={props.className}
           value={
-            this.state.value !== undefined ? (
+            this.state.value !== undefined &&
+            _toMoment(this.state.value, format) ? (
               _toMoment(this.state.value, format).format(format)
             ) : (
               ''

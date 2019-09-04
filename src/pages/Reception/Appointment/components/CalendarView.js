@@ -5,6 +5,8 @@ import moment from 'moment'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
+// import 'react-big-calendar/lib/sass/styles.scss'
+// import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss'
 // material ui
 import { withStyles } from '@material-ui/core'
 // components
@@ -135,8 +137,15 @@ class CalendarView extends React.PureComponent {
   }
 
   Event = (eventProps) => {
-    const { handleEventMouseOver } = this.props
-    return <Event {...eventProps} handleMouseOver={handleEventMouseOver} />
+    const { handleEventMouseOver, calendarView } = this.props
+
+    return (
+      <Event
+        {...eventProps}
+        calendarView={calendarView}
+        handleMouseOver={handleEventMouseOver}
+      />
+    )
   }
 
   MonthDateHeader = ({
@@ -167,6 +176,7 @@ class CalendarView extends React.PureComponent {
 
   render () {
     const {
+      classes,
       // --- event handlers ---
       handleSelectSlot,
       handleSelectEvent,
@@ -192,11 +202,10 @@ class CalendarView extends React.PureComponent {
               patientName,
               patientContactNo,
               isEnableRecurrence,
-              // eslint-disable-next-line camelcase
-              appointment_Resources,
+              appointment_Resources: apptResources,
             } = appointment
             // const appointmentDate = moment(appointmentDate).format(serverDateFormat)
-            const apptEvents = appointment_Resources.map((item) => ({
+            const apptEvents = apptResources.map((item) => ({
               ...item,
               resourceId: item.clinicianFK,
               patientName,

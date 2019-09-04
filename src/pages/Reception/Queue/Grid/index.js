@@ -80,8 +80,16 @@ const columnExtensions = [
   { columnName: 'gst', type: 'number', currency: true },
   { columnName: 'outstandingBalance', type: 'number', currency: true },
   { columnName: 'Action', width: 100, align: 'center' },
-  { columnName: 'timeIn', width: 160, type: 'time' },
-  { columnName: 'timeOut', width: 160, type: 'time' },
+  {
+    columnName: 'timeIn',
+    width: 160,
+    render: (row) =>
+      DateFormatter({
+        value: row.timeIn,
+        full: true,
+      }),
+  },
+  { columnName: 'timeOut', width: 160 },
   {
     columnName: 'gender/age',
     render: (row) => `${row.gender}/${row.age < 0 ? 0 : row.age}`,
@@ -92,7 +100,10 @@ const columnExtensions = [
     width: 160,
     render: (row) => {
       if (row.appointmentTime) {
-        return DateFormatter({ value: row.appointmentTime, full: true })
+        return DateFormatter({
+          value: row.appointmentTime,
+          full: true,
+        })
       }
       if (row.start) return DateFormatter({ value: row.start, full: true })
       return '-'

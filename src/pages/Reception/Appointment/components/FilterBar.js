@@ -1,13 +1,14 @@
-import React, { PureComponent } from 'react'
+import React, { memo } from 'react'
 import classnames from 'classnames'
 import debounce from 'lodash/debounce'
 // formik
-import { withFormik, FastField } from 'formik'
+import { withFormik, Field, FastField } from 'formik'
 // umi/locale
 import { formatMessage } from 'umi/locale'
 // material ui
 import { CircularProgress, withStyles } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
+import Search from '@material-ui/icons/Search'
 // custom component
 import {
   Button,
@@ -30,190 +31,140 @@ const styles = () => ({
   },
 })
 
-const doctors = [
-  { value: 'all', name: 'All' },
-  { value: 'medisys', name: 'Medisys' },
-  { value: 'levinne', name: 'Dr Levinne' },
-  { value: 'cheah', name: 'Dr Cheah' },
-  { value: 'tan', name: 'Dr Tan' },
-  { value: 'lim', name: 'Dr Lim' },
-  { value: 'liu', name: 'Dr Liu' },
-]
+const FilterBar = ({
+  classes,
+  onDoctorEventClick,
+  onAddAppointmentClick,
+  handleUpdateFilter,
+  values,
+}) => {
+  const onFilterClick = () => handleUpdateFilter(values)
 
-@withFormik({
-  enableReinitialize: true,
-  mapPropsToValues: () => ({
-    appointmentType: [],
-    doctorProfile: [],
-  }),
-})
-class FilterBar extends PureComponent {
-  state = {
-    searchQuery: '',
-    isTyping: false,
-  }
-
-  onSearchQueryChange = (event) => {
-    const { target } = event
-    this.setState({ searchQuery: target.value, isTyping: true })
-
-    this.onSearchDebounced(target.value)
-  }
-
-  onSearchDebounced = debounce((value) => {
-    const { handleUpdateFilter, filter } = this.props
-    handleUpdateFilter({ ...filter, searchQuery: value })
-    this.setState({
-      isTyping: false,
-    })
-  }, 500)
-
-  onFilterAppointmentTypeChange = (values) => {
-    console.log({ values })
-    // const { handleUpdateFilter, filter } = this.props
-
-    // handleUpdateFilter({
-    //   ...filter,
-    //   appointmentType: this.processValues(values),
-    // })
-  }
-
-  processValues = (values) => {
-    const newItemAll = values.indexOf('all') === values.length - 1
-
-    let processedValues = [
-      ...values,
-    ]
-    if (newItemAll) {
-      // new item === 'all', clear list and left 'all' only
-      processedValues = values.filter((eachValue) => eachValue === 'all')
-    } else {
-      // new item !== 'all'
-      processedValues =
-        values.includes('all') && values.length > 1
-          ? values.filter((eachValue) => eachValue !== 'all')
-          : values
-    }
-
-    return processedValues
-  }
-
-  onFilterByDoctorChange = (event) => {
-    const { target } = event
-    const { handleUpdateFilter, filter } = this.props
-
-    const values = target !== undefined ? target : event
-    handleUpdateFilter({
-      ...filter,
-      doctors: this.processValues(values),
-    })
-  }
-
-  render () {
-    const { searchQuery, isTyping } = this.state
-    const { classes, filter, onDoctorEventClick, values } = this.props
-
-    const { doctorProfile } = values
-
-    console.log({ doctorProfile })
-
-    const maxDoctorTagCount =
-      doctorProfile !== null && doctorProfile.length === 1 ? 1 : 0
-    const maxDoctorTagPlaceholder = doctorProfile
-      ? `${doctorProfile.length} doctors selected...`
-      : ''
-
-    const maxAppointmentTagCount = values.appointmentType.length === 1 ? 1 : 0
-    const maxAppointmentTagPlaceholder = `${values.appointmentType
-      .length} appointment types selected...`
-
-    return (
-      <SizeContainer>
-        <React.Fragment>
-          <GridContainer>
-            <GridItem xs md={3}>
-              <TextField
-                value={searchQuery}
-                onChange={this.onSearchQueryChange}
-                label={formatMessage({
-                  id: 'reception.appt.searchByPatientName',
-                })}
-                suffix={isTyping && <CircularProgress />}
-              />
-            </GridItem>
-            <GridItem xs md={3}>
-              <FastField
-                name='doctorProfile'
-                render={(args) => (
-                  <CodeSelect
-                    {...args}
-                    code='doctorprofile'
-                    label='Filter by Doctor'
-                    mode='multiple'
-                    labelField='clinicianProfile.name'
-                    maxTagCount={maxDoctorTagCount}
-                    maxTagPlaceholder={maxDoctorTagPlaceholder}
-                    renderDropdown={(option) => {
-                      return (
-                        <div>
-                          <p>MCR No.: {option.doctorMCRNo}</p>
-                          <p>
-                            {`${option.clinicianProfile.title} ${option
-                              .clinicianProfile.name}`}
-                          </p>
-                        </div>
-                      )
-                    }}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem
-              xs
-              md={3}
-              className={classnames(classes.selectorContainer)}
-            >
-              <FastField
-                name='appointmentType'
-                render={(args) => (
-                  <CodeSelect
-                    {...args}
-                    mode='multiple'
-                    label='Filter by Appointment Type'
-                    code='ctappointmenttype'
-                    labelField='displayValue'
-                    renderDropdown={(option) => (
-                      <AppointmentTypeLabel
-                        color={option.tagColorHex}
-                        label={option.displayValue}
-                      />
-                    )}
-                    maxTagCount={maxAppointmentTagCount}
-                    maxTagPlaceholder={maxAppointmentTagPlaceholder}
-                  />
-                )}
-              />
-            </GridItem>
-
-            <GridItem
-              xs
-              md={3}
-              container
-              justify='flex-end'
-              alignItems='center'
-            >
-              <GridItem>
-                <Button color='info' onClick={onDoctorEventClick} size='sm'>
-                  <AddIcon />
-                  Doctor Block
-                </Button>
-              </GridItem>
-            </GridItem>
-          </GridContainer>
-        </React.Fragment>
-      </SizeContainer>
+  const renderDropdown = (option) => {
+    const title =
+      option.clinicianProfile.title !== null
+        ? option.clinicianProfile.title
+        : ''
+    return option.isExtra ? (
+      <p>{option.clinicianProfile.name}</p>
+    ) : (
+      <p>
+        {`${title} ${option.clinicianProfile.name} (${option.doctorMCRNo})`}
+      </p>
     )
   }
+  const { filterByDoctor = [], filterByApptType = [] } = values
+  const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
+  const maxDoctorTagPlaceholder = filterByDoctor
+    ? `${filterByDoctor.length} doctors selected...`
+    : ''
+
+  const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
+  const maxAppointmentTagPlaceholder = `${filterByApptType.length} appointment types selected...`
+
+  return (
+    <SizeContainer>
+      <React.Fragment>
+        <GridContainer>
+          <GridItem xs md={3}>
+            <FastField
+              name='search'
+              render={(args) => (
+                <TextField
+                  {...args}
+                  label={formatMessage({
+                    id: 'reception.appt.searchByPatientName',
+                  })}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={3}>
+            <Field
+              name='filterByDoctor'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  all={-99}
+                  code='doctorprofile'
+                  label='Filter by Doctor'
+                  mode='multiple'
+                  labelField='clinicianProfile.name'
+                  maxTagCount={maxDoctorTagCount}
+                  maxTagPlaceholder={maxDoctorTagPlaceholder}
+                  renderDropdown={renderDropdown}
+                  defaultOptions={[
+                    {
+                      isExtra: true,
+                      id: -99,
+                      clinicianProfile: { name: 'All Doctors' },
+                    },
+                  ]}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={3} className={classnames(classes.selectorContainer)}>
+            <Field
+              name='filterByApptType'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  mode='multiple'
+                  all={-99}
+                  label='Filter by Appointment Type'
+                  code='ctappointmenttype'
+                  labelField='displayValue'
+                  renderDropdown={(option) => (
+                    <AppointmentTypeLabel
+                      color={option.tagColorHex}
+                      label={option.displayValue}
+                    />
+                  )}
+                  defaultOptions={[
+                    {
+                      isExtra: true,
+                      id: -99,
+                      displayValue: 'All appointment types',
+                    },
+                  ]}
+                  maxTagCount={maxAppointmentTagCount}
+                  maxTagPlaceholder={maxAppointmentTagPlaceholder}
+                />
+              )}
+            />
+          </GridItem>
+
+          <GridItem xs md={12}>
+            <Button color='primary' size='sm' onClick={onFilterClick}>
+              <Search />
+              Filter
+            </Button>
+            <Button color='primary' size='sm' onClick={onAddAppointmentClick}>
+              <AddIcon />
+              Add Appointment
+            </Button>
+            <Button color='primary' size='sm' onClick={onDoctorEventClick}>
+              <AddIcon />
+              Add Doctor Block
+            </Button>
+          </GridItem>
+        </GridContainer>
+      </React.Fragment>
+    </SizeContainer>
+  )
 }
 
-export default withStyles(styles, { name: 'CalendarFilterBar' })(FilterBar)
+const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
+  FilterBar,
+)
+
+export default memo(
+  withFormik({
+    enableReinitialize: true,
+    mapPropsToValues: () => ({
+      // appointmentType: [],
+      // doctorProfile: undefined,
+    }),
+  })(StyledFilterBar),
+)

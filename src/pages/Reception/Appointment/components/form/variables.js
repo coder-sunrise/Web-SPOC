@@ -136,8 +136,15 @@ export const AppointmentDataColExtensions = [
     type: 'time',
     width: 140,
     format: timeFormat,
+    // value: '00:00',
   },
-  { columnName: 'endTime', type: 'time', width: 140, format: timeFormat },
+  {
+    columnName: 'endTime',
+    type: 'time',
+    width: 140,
+    format: timeFormat,
+    // value: '00:00',
+  },
   {
     columnName: 'roomFk',
     width: 110,

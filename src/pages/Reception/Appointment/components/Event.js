@@ -1,25 +1,54 @@
 import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
 import Cached from '@material-ui/icons/Cached'
 import Draft from '@material-ui/icons/Edit'
+// big calendar
+import BigCalendar from 'react-big-calendar'
 
 const style = (theme) => ({
   blockDiv: {
     display: 'block',
   },
-  container: {
-    height: '100%',
+  baseContainer: {
+    minHeight: '1em',
     cursor: 'pointer',
+  },
+  otherViewEvent: {
+    width: 'auto',
+    '& span': {
+      width: 'auto',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
+  },
+  monthViewEvent: {
+    fontSize: '.85rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingLeft: theme.spacing(0.5),
+    '& svg': {
+      width: '.85rem',
+      height: '.85rem',
+    },
+    '& span': {
+      width: 'auto',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+    },
   },
   title: {
     display: 'flex',
+    alignItems: 'center',
     justifyContent: 'space-between',
   },
   icons: {
     float: 'right',
+    width: '.8rem',
+    height: '.8rem',
   },
 })
 
@@ -35,7 +64,7 @@ class Event extends PureComponent {
   }
 
   render () {
-    const { event, classes } = this.props
+    const { event, classes, calendarView } = this.props
     const {
       appointmentStatusFk,
       isDoctorEvent,
@@ -46,16 +75,34 @@ class Event extends PureComponent {
     const title = isDoctorEvent ? event.doctor : event.patientName
     const subtitle = isDoctorEvent ? event.eventType : event.patientContactNo
 
-    return (
+    const monthViewClass = classnames({
+      [classes.baseContainer]: true,
+      [classes.monthViewEvent]: true,
+    })
+
+    const otherViewClass = classnames({
+      [classes.baseContainer]: true,
+      [classes.otherViewEvent]: true,
+    })
+
+    return calendarView === BigCalendar.Views.MONTH ? (
       <div
-        className={classes.container}
+        className={monthViewClass}
+        onMouseEnter={this._handleMouseEnter}
+        onMouseLeave={this._handleMouseLeave}
+      >
+        <span>{title} (S1234567D)</span>
+        {hasConflict && <ErrorOutline className={classes.icon} />}
+        {isEnableRecurrence && <Cached />}
+      </div>
+    ) : (
+      <div
+        className={otherViewClass}
         onMouseEnter={this._handleMouseEnter}
         onMouseLeave={this._handleMouseLeave}
       >
         <div className={classes.title}>
-          <span>
-            <strong>{title ? title.toUpperCase() : ''}</strong>
-          </span>
+          <span>{title ? title.toUpperCase() : ''}</span>
           <div className={classes.icons}>
             {hasConflict && <ErrorOutline />}
             {isEnableRecurrence && <Cached />}
@@ -67,6 +114,15 @@ class Event extends PureComponent {
         </span>
       </div>
     )
+    // return (
+    //   <div
+    //     className={classes.monthViewEvent}
+    //     onMouseEnter={this._handleMouseEnter}
+    //     onMouseLeave={this._handleMouseLeave}
+    //   >
+    //     {title} (S1234567D)
+    //   </div>
+    // )
   }
 }
 

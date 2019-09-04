@@ -4,13 +4,7 @@ import { connect } from 'dva'
 import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import {
-  MUISelect,
-  MUICodeSelect,
-  CodeSelect,
-  Select,
-  TextField,
-} from '@/components'
+import { CodeSelect, Select, TextField } from '@/components'
 import { getCodes } from '@/utils/codes'
 import {
   updateGlobalVariable,

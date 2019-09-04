@@ -16,7 +16,11 @@ import { Button, GridContainer, GridItem } from '@/components'
 const styles = () => ({
   btnContainer: {
     display: 'flex',
+    '& button': {
+      marginRight: '0px',
+    },
   },
+
   container: {
     marginBottom: 15,
   },
@@ -101,13 +105,13 @@ class CalendarToolbar extends React.PureComponent {
       <GridContainer className={classnames(classes.container)}>
         <GridItem xs md={2}>
           <div>
-            <IconButton color='primary' onClick={this.subtractDate}>
+            <IconButton color='info' onClick={this.subtractDate}>
               <ChevronLeft />
             </IconButton>
-            <Button simple color='primary' onClick={this.returnToday}>
+            <Button simple color='info' onClick={this.returnToday}>
               Today
             </Button>
-            <IconButton color='primary' onClick={this.addDate}>
+            <IconButton color='info' onClick={this.addDate}>
               <ChevronRight />
             </IconButton>
           </div>
@@ -118,7 +122,7 @@ class CalendarToolbar extends React.PureComponent {
             simple
             size='lg'
             className={classnames(classes.dateButton)}
-            color='primary'
+            color='info'
             onClick={this.onDateButtonClick}
           >
             {label}
@@ -152,8 +156,7 @@ class CalendarToolbar extends React.PureComponent {
             {CalendarViews.map((cv) => (
               <Button
                 simple={view !== cv}
-                // size='sm'
-                color='primary'
+                color='info'
                 id={cv}
                 onClick={this.handleClick}
               >

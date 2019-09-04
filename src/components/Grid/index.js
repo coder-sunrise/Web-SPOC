@@ -108,7 +108,7 @@ const timeFormat = 'hh:mm A'
 const timeFormat24Hour = 'HH:mm'
 
 const TimeFormatter = ({ value, ...rest }) => {
-  if (!value) return null
+  if (!value) return value
 
   if (moment.isMoment(value)) {
     return value.format(timeFormat)
@@ -122,7 +122,6 @@ const TimeFormatter = ({ value, ...rest }) => {
 }
 
 const DateFormatter = ({ value, full = false }) => {
-  // console.log(value)
   const format = full ? fullDateTime : dateFormatLong
   if (!value) return null
 

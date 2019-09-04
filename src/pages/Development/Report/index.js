@@ -97,7 +97,7 @@ class Report extends React.Component {
     // )
     return (
       <CardContainer hideHeader size='sm'>
-        <Button color='primary&#39;' onClick={this.toggleReport}>
+        {/* <Button color='primary&#39;' onClick={this.toggleReport}>
           View Report
         </Button>
         <Button color='primary&#39;' onClick={this.getCodeTable}>
@@ -116,8 +116,8 @@ class Report extends React.Component {
         >
           <ReportViewer />
         </CommonModal>
-        <CodeSelect code='clinicianprofile' />
-        {/* <Button onClick={this.validate} color='primary'>
+        <CodeSelect code='clinicianprofile' /> */}
+        <Button onClick={this.validate} color='primary'>
           Submit
         </Button>
         <GridContainer>
@@ -136,7 +136,8 @@ class Report extends React.Component {
                 <TimePicker {...args} label='End' format='hh:mm A' />
               )}
             />
-          </GridItem></GridContainer> */}
+          </GridItem>
+        </GridContainer>
       </CardContainer>
     )
   }

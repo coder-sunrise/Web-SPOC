@@ -183,6 +183,12 @@ class AppointmentDataGrid extends React.PureComponent {
           EditingProps={{
             showAddCommand: true,
             onCommitChanges: handleCommitChanges,
+            // onAddedRowsChange: (addedRows) => {
+            //   console.log('added rows', { addedRows })
+            //   return [
+            //     { ...addedRows, endTime: moment() },
+            //   ]
+            // },
             addedRows:
               data.length === 0
                 ? [

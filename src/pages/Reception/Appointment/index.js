@@ -56,7 +56,10 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         }),
       ]
 
-@connect(({ calendar }) => ({ calendar }))
+@connect(({ calendar, codetable }) => ({
+  calendar,
+  doctorProfiles: codetable.doctorprofile || [],
+}))
 class Appointment extends React.PureComponent {
   state = {
     showPopup: false,
@@ -64,13 +67,7 @@ class Appointment extends React.PureComponent {
     showDoctorEventModal: false,
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
-    resources: [
-      { clinicianFK: 1, doctorName: 'Medisys' },
-      { clinicianFK: '2', doctorName: 'Levinne' },
-      { clinicianFK: '3', doctorName: 'Cheah' },
-      { clinicianFK: '4', doctorName: 'Tan' },
-      { clinicianFK: '5', doctorName: 'Other' },
-    ],
+    resources: null,
     // calendarEvents: dndEvents,
     selectedSlot: {},
     filter: {
@@ -135,6 +132,7 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = ({ start }) => {
+    console.log({ start })
     const selectedSlot = {
       allDay: false,
       start,
@@ -220,10 +218,32 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onFilterUpdate = (newFilter) => {
-    this.setState({
-      filter: { ...newFilter },
-    })
+  onFilterUpdate = (filter) => {
+    const { filterByDoctor } = filter
+    const { doctorProfiles } = this.props
+    const newResources = doctorProfiles.reduce(
+      (resources, doctor) =>
+        filterByDoctor.includes(doctor.id)
+          ? [
+              ...resources,
+              {
+                clinicianFK: doctor.id,
+                doctorName: doctor.clinicianProfile.name,
+              },
+            ]
+          : [
+              ...resources,
+            ],
+      [],
+    )
+    this.setState({ resources: newResources.length > 0 ? newResources : null })
+    // this.setState({
+    //   filter: { ...newFilter },
+    // })
+  }
+
+  handleAddAppointmentClick = () => {
+    this.onSelectSlot({ start: new Date() })
   }
 
   handleDoctorEventClick = () => {
@@ -346,11 +366,11 @@ class Appointment extends React.PureComponent {
         </Popover>
 
         <FilterBar
-          filter={filter}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
+          onAddAppointmentClick={this.handleAddAppointmentClick}
         />
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
           <CalendarView
             resources={resources}
             handleSelectSlot={this.onSelectSlot}

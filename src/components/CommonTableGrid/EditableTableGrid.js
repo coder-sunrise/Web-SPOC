@@ -51,6 +51,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   _onAddedRowsChange = (addedRows) => {
+    console.log({ addedRows })
     let row = addedRows
     if (this.props.EditingProps.onAddedRowsChange) {
       row = this.props.EditingProps.onAddedRowsChange(addedRows)
@@ -261,7 +262,7 @@ class EditableTableGrid extends PureComponent {
             }}
             color='primary'
             link
-            disabled={this.state.addedRows.length > 0}
+            disabled={this.state.addedRows && this.state.addedRows.length > 0}
             {...addCommandProps}
           >
             <Add />New
