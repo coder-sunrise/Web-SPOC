@@ -5,8 +5,16 @@ import { Field } from 'formik'
 // umi
 import { formatMessage } from 'umi/locale'
 // custom components
-import { TextField, NumberInput, GridItem, CodeSelect } from '@/components'
-import AttachmentWrapper from './AttachmentWrapper'
+import {
+  TextField,
+  NumberInput,
+  GridContainer,
+  CommonCard,
+  GridItem,
+  CodeSelect,
+} from '@/components'
+// medisys components
+import { DoctorLabel, Attachment } from '@/components/_medisys'
 import FormField from './formField'
 
 const styles = (theme) => ({
@@ -43,14 +51,8 @@ const VisitInfoCard = ({
   }
 
   return (
-    <AttachmentWrapper
-      title='Visit Information'
-      attachmentType='Visit'
-      handleUpdateAttachments={handleUpdateAttachments}
-      attachments={attachments}
-      isReadOnly={isReadOnly}
-    >
-      <React.Fragment>
+    <CommonCard title='Visit Information'>
+      <GridContainer alignItems='center'>
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.visitType']}
@@ -75,8 +77,14 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.doctor',
                 })}
-                tenantCode='doctorprofile'
-                // code='ctgender'
+                code='doctorprofile'
+                labelField='clinicianProfile.name'
+                renderDropdown={(option) => (
+                  <React.Fragment>
+                    <p>MCR: {option.doctorMCRNo}</p>
+                    <DoctorLabel doctor={option} />
+                  </React.Fragment>
+                )}
                 {...args}
               />
             )}
@@ -117,8 +125,17 @@ const VisitInfoCard = ({
             )}
           />
         </GridItem>
-      </React.Fragment>
-    </AttachmentWrapper>
+        <GridItem xs md={12}>
+          <Attachment
+            title='Visit Information'
+            attachmentType='Visit'
+            handleUpdateAttachments={handleUpdateAttachments}
+            attachments={attachments}
+            isReadOnly={isReadOnly}
+          />
+        </GridItem>
+      </GridContainer>
+    </CommonCard>
   )
 }
 

@@ -6,7 +6,9 @@ export default {
 
   state: {
     accessRights: [],
-    data: {},
+    data: {
+      clinicianProfile: {},
+    },
     profileDetails: undefined,
   },
 
@@ -22,7 +24,7 @@ export default {
       const response = yield call(queryCurrent)
       yield put({
         type: 'saveCurrentUser',
-        payload: response.data.userProfileDto,
+        payload: response.data.userProfileDetailDto,
       })
     },
     *fetchProfileDetails ({ id }, { call, put }) {

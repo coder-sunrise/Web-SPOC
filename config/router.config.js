@@ -219,6 +219,18 @@ const routes = [
           //   hideInMenu: true,
           //   component: './Inventory/PurchaseDelivery/Detail',
           // },
+          {
+            path: '/inventory/pr',
+            name: 'pd',
+            component: './Inventory/PurchaseReceive',
+            mini: 'PR',
+          },
+          {
+            path: '/inventory/pr/pdodetails',
+            name: 'pd.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseReceive/Details',
+          },
         ],
       },
       //

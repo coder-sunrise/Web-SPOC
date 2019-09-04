@@ -1,6 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
-import router from 'umi/router'
-import moment from 'moment'
+import { routerRedux } from 'dva/router'
+import { stringify } from 'qs'
 import Cookies from 'universal-cookie'
 import * as service from '../services/login'
 import { reloadAuthorized } from '@/utils/Authorized'
@@ -35,6 +35,33 @@ export default createFormViewModel({
         // if (response.status === 200) {
         //   yield put(router.push('reception/queue'))
         // }
+      },
+      *logout (_, { put }) {
+        console.log('logout')
+        // yield put({
+        //   type: 'changeLoginStatus',
+        //   payload: {
+        //     status: false,
+        //     currentAuthority: 'guest',
+        //   },
+        // })
+        yield put({
+          type: 'global/updateState',
+          payload: {
+            showSessionTimeout: false,
+          },
+        })
+        localStorage.removeItem('token')
+        reloadAuthorized()
+        yield put(
+          routerRedux.push({
+            pathname: '/login',
+            search: stringify({
+              redirect: window.location.href,
+            }),
+          }),
+        )
+        return true
       },
     },
     reducers: {

@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
-
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles, Tooltip, Divider } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
@@ -12,6 +11,7 @@ import {
   GridItem,
   Button,
   TextField,
+  Field,
   Checkbox,
   Select,
   ProgressButton,
@@ -22,6 +22,7 @@ import {
   SizeContainer,
   CodeSelect,
 } from '@/components'
+import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = (theme) => ({})
 
@@ -41,11 +42,12 @@ const itemSchema = Yup.object().shape({
     revenueCategoryFK: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     serviceSettingItem: Yup.array().compact((v) => v.isDeleted).of(itemSchema),
+    //medisaveHealthScreeningDiagnosisFK: Yup.string().required(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-
+    console.log('handleSubmit', values)
     dispatch({
       type: 'settingClinicService/upsert',
       payload: {
@@ -62,12 +64,65 @@ const itemSchema = Yup.object().shape({
       }
     })
   },
+  validate: (values) => {
+    const errors = {}
+    if (
+      values.isMedisaveHealthScreening &&
+      values.medisaveHealthScreeningDiagnosisFK == null
+    ) {
+      errors.medisaveHealthScreeningDiagnosisFK = 'This is a required field'
+    }
+
+    if (values.isOutpatientScan && values.outPatientScanDiagnosisFK == null) {
+      errors.outPatientScanDiagnosisFK = 'This is a required field'
+    }
+    return errors
+  },
   displayName: 'ServiceModal',
 })
 class Detail extends PureComponent {
+  componentDidMount () {
+    this.checkHasActiveSession()
+    //this.initMedisaveSetting()
+  }
+
+  checkHasActiveSession = async () => {
+    const result = await getActiveSession()
+    const { data } = result.data
+
+    this.setState({
+      hasActiveSession: data ? true : false,
+    })
+  }
+
   state = {
     editingRowIds: [],
     rowChanges: {},
+    ddlMedisaveHealthScreening: true,
+    ddlOutpatientScan: true,
+  }
+
+  initMedisaveSetting = () => {
+    const { settingClinicService } = this.props
+    if (settingClinicService.entity) {
+      this.setState({
+        ddlMedisaveHealthScreening:
+          settingClinicService.entity.isMedisaveHealthScreening,
+        ddlOutpatientScan: settingClinicService.entity.isOutpatientScan,
+      })
+    }
+  }
+
+  onChangeMedisaveHealthScreening = () => {
+    this.setState(({ ddlMedisaveHealthScreening }) => ({
+      ddlMedisaveHealthScreening: !ddlMedisaveHealthScreening,
+    }))
+  }
+
+  onChangeOutpatientScan = () => {
+    this.setState(({ ddlOutpatientScan }) => ({
+      ddlOutpatientScan: !ddlOutpatientScan,
+    }))
   }
 
   tableParas = {
@@ -120,7 +175,7 @@ class Detail extends PureComponent {
 
     const { setFieldValue, values } = this.props
     rows.forEach((val) => {
-      val.serviceFK = values.id
+      ;(val.serviceFK = values.id), (val.serviceCenterFKNavigation = null)
     })
 
     setFieldValue('ctServiceCenter_ServiceNavigation', rows)
@@ -129,6 +184,17 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { classes, theme, footer, values, settingClinicService } = props
+    const { hasActiveSession } = this.state
+    const medisaveSettingValue = {
+      MedisaveHealthScreeningValue: [
+        { value: 1, name: 'Mammogram' },
+        { value: 1, name: 'Mammogram' },
+      ],
+      OutpatientScanValue: [
+        { value: 1, name: 'CT' },
+        { value: 1, name: 'CT' },
+      ],
+    }
     //console.log('detail', props)
 
     return (
@@ -166,6 +232,13 @@ class Detail extends PureComponent {
                       <DateRangePicker
                         label='Effective Start Date'
                         label2='End Date'
+                        disabled={
+                          settingClinicService.entity ? (
+                            !this.state.hasActiveSession
+                          ) : (
+                            false
+                          )
+                        }
                         {...args}
                       />
                     )
@@ -232,19 +305,38 @@ class Detail extends PureComponent {
                 md={6}
                 className={classes.detailHeaderContainer}
               >
-                <Checkbox
-                  formControlProps={{ className: classes.medisaveCheck }}
-                />
                 <FastField
-                  name='serviceCategory'
+                  name='isMedisaveHealthScreening'
                   render={(args) => {
                     return (
-                      <CodeSelect
-                        style={{ paddingLeft: 20 }}
-                        prefix='Medisave Health Screening'
-                        code='ctMedisaveHealthScreeningDiagnosis'
+                      <Checkbox
+                        onChange={this.onChangeMedisaveHealthScreening}
+                        formControlProps={{ className: classes.medisaveCheck }}
                         {...args}
                       />
+                    )
+                  }}
+                />
+
+                <Field
+                  name='medisaveHealthScreeningDiagnosisFK'
+                  render={(args) => {
+                    return (
+                      <Select
+                        style={{ paddingLeft: 20 }}
+                        prefix='Medisave Health Screening'
+                        disabled={this.state.ddlMedisaveHealthScreening}
+                        options={
+                          medisaveSettingValue.MedisaveHealthScreeningValue
+                        }
+                        {...args}
+                      />
+                      // <CodeSelect
+                      //   style={{ paddingLeft: 20 }}
+                      //   prefix='Medisave Health Screening'
+                      //   code='ctMedisaveHealthScreeningDiagnosis'
+                      //   {...args}
+                      // />
                     )
                   }}
                 />
@@ -256,16 +348,27 @@ class Detail extends PureComponent {
                 md={6}
                 className={classes.detailHeaderContainer}
               >
-                <Checkbox
-                  formControlProps={{ className: classes.medisaveCheck }}
-                />
                 <FastField
-                  name='revenueCategory'
+                  name='isOutpatientScan'
+                  render={(args) => {
+                    return (
+                      <Checkbox
+                        formControlProps={{ className: classes.medisaveCheck }}
+                        onChange={this.onChangeOutpatientScan}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+                <Field
+                  name='outPatientScanDiagnosisFK'
                   render={(args) => {
                     return (
                       <Select
                         style={{ paddingLeft: 20 }}
                         prefix='OutPatient Scan'
+                        disabled={this.state.ddlOutpatientScan}
+                        options={medisaveSettingValue.OutpatientScanValue}
                         {...args}
                       />
                     )

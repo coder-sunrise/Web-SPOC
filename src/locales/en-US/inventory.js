@@ -75,4 +75,35 @@ export default {
   'inventory.master.stock.currentStock': 'Current Stock',
   'inventory.master.stock.reorderThreshold': 'Re-Order Threshold',
   'inventory.master.stock.criticalThreshold': 'Critical Threshold',
+
+  //Purchasing & Receiving
+  'inventory.pr.reason': 'Reason',
+  'inventory.pr.addnew': 'Add New',
+  'inventory.pr.pono': 'Purchase Order #',
+  'inventory.pr.supplier': 'Supplier',
+  'inventory.pr.status': 'Status',
+  'inventory.pr.detail.print': 'Print',
+
+  'inventory.pr.filter.datefrom': 'Transaction Date From',
+  'inventory.pr.filter.dateto': 'Transaction Date To',
+
+  'inventory.pr.detail.pod': 'Purchase Order Details',
+  'inventory.pr.detail.dod': 'Delivery Order Details',
+  'inventory.pr.detail.payment': 'Payment',
+
+  'inventory.pr.detail.pod.expectedDeliveryDate': 'Expected Delivery Date',
+  'inventory.pr.detail.pod.invoiceDate': 'Invoice Date',
+  'inventory.pr.detail.pod.poDate': 'Purchase Order Date',
+  'inventory.pr.detail.pod.shippingAdd': 'Shipping Address',
+  'inventory.pr.detail.pod.invoiceNo': 'Invoice No',
+  'inventory.pr.detail.pod.supplierInfo': 'Supplier Info',
+  'inventory.pr.detail.pod.contactPerson': 'Contact Person',
+  'inventory.pr.detail.pod.supplierAdd': 'Supplier Address',
+  'inventory.pr.detail.pod.contactNo': 'Contact No',
+  'inventory.pr.detail.pod.faxNo': 'Fax No',
+  'inventory.pr.detail.pod.cancelpo': 'Cancel PO',
+  'inventory.pr.detail.pod.save': 'Save',
+  'inventory.pr.detail.pod.finalize': 'Finalize Order',
+
+  'inventory.pr.detail.dod.do': 'Delivery Order',
 }

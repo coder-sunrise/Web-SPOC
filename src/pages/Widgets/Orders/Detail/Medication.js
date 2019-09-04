@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+
 import {
   Button,
   GridContainer,
@@ -19,12 +19,91 @@ import {
   NumberInput,
   CustomInputWrapper,
   Popconfirm,
+  withFormikExtend,
+  FastField,
+  FieldArray,
+  Tooltip,
 } from '@/components'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
+import Yup from '@/utils/yup'
 
-class Medication extends PureComponent {
-  getActionItem = (i, arrayHelpers, prop) => {
+@withFormikExtend({
+  mapPropsToValues: ({ orders = {}, editType, ...resetProps }) => {
+    // console.log('resetProps', resetProps)
+    const v = orders.entity || orders.defaultMedication
+    v.editType = editType
+    console.log(v)
+    return v
+  },
+  validationSchema: Yup.object().shape({
+    // stockDrugFK: Yup.string().required(),
+    quantity: Yup.number().required(),
+    // totalAfterItemAdjustment: Yup.number().required(),
+    // totalAfterOverallAdjustment: Yup.number().required(),
+
+    // type: Yup.string().required(),
+    // to: Yup.string().when('type', {
+    //   is: (val) => val !== '2',
+    //   then: Yup.string().required(),
+    // }),
+    // from: Yup.string().required(),
+    // date: Yup.date().required(),
+    // subject: Yup.string().required(),
+    // // 3->MC
+    // days: Yup.number().when('type', {
+    //   is: (val) => val === '3',
+    //   then: Yup.number().required(),
+    // }),
+    corPrescriptionItemPrecaution: Yup.array().of(
+      Yup.object().shape({
+        prescriptionItemFK: Yup.number().required(),
+      }),
+    ),
+    corPrescriptionItemInstruction: Yup.array().of(
+      Yup.object().shape(
+        {
+          // prescriptionItemFK: Yup.number().required(),
+        },
+      ),
+    ),
+  }),
+
+  handleSubmit: (values, { props, resetForm }) => {
+    const { dispatch, onConfirm, orders, editType } = props
+    const { rows, entity } = orders
+    const data = {
+      sequence: rows.length,
+      ...values,
+    }
+    dispatch({
+      type: 'orders/upsertRow',
+      payload: data,
+    })
+    resetForm({
+      ...orders.defaultMedication,
+      editType,
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'OrderPage',
+})
+class Medication extends React.Component {
+  componentWillReceiveProps (nextProps) {
+    const { values, orders, resetForm } = nextProps
+    const { entity } = orders
+    if (entity && entity.uid !== values.uid) {
+      resetForm(entity)
+      // console.log(
+      //   'componentWillReceiveProps',
+      //   orders,
+      //   values,
+      //   this.props.values,
+      // )
+    }
+  }
+
+  getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
     const { theme, values } = this.props
     return (
       <GridItem
@@ -51,44 +130,54 @@ class Medication extends PureComponent {
           justIcon
           color='info'
           onClick={() => {
-            arrayHelpers.push({
-              action: '1',
-              count: 1,
-              unit: '1',
-              frequency: '1',
-              day: 1,
-              precaution: '1',
-              operator: '1',
-            })
+            arrayHelpers.push(defaultValue)
           }}
         >
-          <Add />
+          <Tooltip title={tooltip}>
+            <Add />
+          </Tooltip>
         </Button>
       </GridItem>
     )
   }
 
   render () {
-    const { theme, classes, values } = this.props
-    // console.log('Medication', this.props)
+    const {
+      theme,
+      classes,
+      values,
+      openPrescription,
+      footer,
+      handleSubmit,
+    } = this.props
+    console.log('Medication', this.props)
     return (
       <div>
         <GridContainer>
           <GridItem xs={10}>
-            <FastField
-              name='type'
-              render={(args) => {
-                return (
-                  <Select
-                    label='Name'
-                    options={[
-                      { value: '1', name: 'Biogesic tab 500 mg' },
-                    ]}
-                    {...args}
-                  />
-                )
-              }}
-            />
+            {openPrescription ? (
+              <FastField
+                name='drugName'
+                render={(args) => {
+                  return <TextField label='Name' {...args} />
+                }}
+              />
+            ) : (
+              <FastField
+                name='stockDrugFK'
+                render={(args) => {
+                  return (
+                    <Select
+                      label='Name'
+                      options={[
+                        { value: '1', name: 'Biogesic tab 500 mg' },
+                      ]}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            )}
           </GridItem>
         </GridContainer>
         <GridContainer gutter={0}>
@@ -102,18 +191,19 @@ class Medication extends PureComponent {
               }}
             >
               <FieldArray
-                name='descriptions'
+                name='corPrescriptionItemInstruction'
                 render={(arrayHelpers) => {
                   this.descriptionArrayHelpers = arrayHelpers
-                  if (!values || !values.descriptions) return null
-                  return values.descriptions.map((val, i) => {
+                  if (!values || !values.corPrescriptionItemInstruction)
+                    return null
+                  return values.corPrescriptionItemInstruction.map((val, i) => {
                     return (
                       <div key={i}>
                         <GridContainer>
                           {i > 0 && (
                             <GridItem xs={2}>
                               <FastField
-                                name={`descriptions[${i}].operator`}
+                                name={`corPrescriptionItemInstruction[${i}].stepdose`}
                                 render={(args) => {
                                   return (
                                     <Select
@@ -123,8 +213,8 @@ class Medication extends PureComponent {
                                       allowClear={false}
                                       simple
                                       options={[
-                                        { value: '1', name: 'And' },
-                                        { value: '2', name: 'Or' },
+                                        { value: 'AND', name: 'And' },
+                                        { value: 'OR', name: 'Or' },
                                       ]}
                                       {...args}
                                     />
@@ -136,7 +226,7 @@ class Medication extends PureComponent {
                           {i > 0 && <GridItem xs={10} />}
                           <GridItem xs={2}>
                             <FastField
-                              name={`descriptions[${i}].action`}
+                              name={`corPrescriptionItemInstruction[${i}].usageMethodFK`}
                               render={(args) => {
                                 return (
                                   <div style={{ position: 'relative' }}>
@@ -148,13 +238,11 @@ class Medication extends PureComponent {
                                     >
                                       {i + 1}.
                                     </span>
-                                    <Select
+                                    <CodeSelect
                                       simple
                                       allowClear={false}
                                       style={{ paddingLeft: 15 }}
-                                      options={[
-                                        { value: '1', name: 'Take' },
-                                      ]}
+                                      code='ctMedicationUsage'
                                       {...args}
                                     />
                                   </div>
@@ -162,16 +250,15 @@ class Medication extends PureComponent {
                               }}
                             />
                           </GridItem>
-                          <GridItem xs={1}>
+                          <GridItem xs={2}>
                             <FastField
-                              name={`descriptions[${i}].count`}
+                              name={`corPrescriptionItemInstruction[${i}].dosageFK`}
                               render={(args) => {
                                 return (
-                                  <NumberInput
+                                  <CodeSelect
                                     simple
-                                    allowEmpty={false}
-                                    step={0.5}
-                                    min={0.5}
+                                    allowClear={false}
+                                    code='ctMedicationDosage'
                                     {...args}
                                   />
                                 )
@@ -180,32 +267,13 @@ class Medication extends PureComponent {
                           </GridItem>
                           <GridItem xs={2}>
                             <FastField
-                              name={`descriptions[${i}].unit`}
+                              name={`corPrescriptionItemInstruction[${i}].prescribeUOMFK`}
                               render={(args) => {
                                 return (
-                                  <Select
+                                  <CodeSelect
                                     simple
                                     allowClear={false}
-                                    options={[
-                                      { value: '1', name: 'Tab/s' },
-                                    ]}
-                                    {...args}
-                                  />
-                                )
-                              }}
-                            />
-                          </GridItem>
-                          <GridItem xs={3}>
-                            <FastField
-                              name={`descriptions[${i}].frequency`}
-                              render={(args) => {
-                                return (
-                                  <Select
-                                    simple
-                                    allowClear={false}
-                                    options={[
-                                      { value: '1', name: 'Every Night' },
-                                    ]}
+                                    code='ctMedicationUnitOfMeasurement'
                                     {...args}
                                   />
                                 )
@@ -214,7 +282,22 @@ class Medication extends PureComponent {
                           </GridItem>
                           <GridItem xs={2}>
                             <FastField
-                              name={`descriptions[${i}].day`}
+                              name={`corPrescriptionItemInstruction[${i}].drugFrequencyFK`}
+                              render={(args) => {
+                                return (
+                                  <CodeSelect
+                                    simple
+                                    allowClear={false}
+                                    code='ctMedicationFrequency'
+                                    {...args}
+                                  />
+                                )
+                              }}
+                            />
+                          </GridItem>
+                          <GridItem xs={2}>
+                            <FastField
+                              name={`corPrescriptionItemInstruction[${i}].duration`}
                               render={(args) => {
                                 return (
                                   <NumberInput
@@ -230,7 +313,21 @@ class Medication extends PureComponent {
                               }}
                             />
                           </GridItem>
-                          {this.getActionItem(i, arrayHelpers, 'descriptions')}
+                          {this.getActionItem(
+                            i,
+                            arrayHelpers,
+                            'corPrescriptionItemInstruction',
+                            'Add step dose',
+                            {
+                              action: '1',
+                              count: 1,
+                              unit: '1',
+                              frequency: '1',
+                              day: 1,
+                              precaution: '1',
+                              operator: '1',
+                            },
+                          )}
                         </GridContainer>
                       </div>
                     )
@@ -252,43 +349,35 @@ class Medication extends PureComponent {
               }}
             >
               <FieldArray
-                name='precautions'
+                name='corPrescriptionItemPrecaution'
                 render={(arrayHelpers) => {
-                  if (!values || !values.precautions) return null
-                  return values.precautions.map((val, i) => {
+                  if (!values || !values.corPrescriptionItemPrecaution)
+                    return null
+                  return values.corPrescriptionItemPrecaution.map((val, i) => {
                     return (
                       <div key={i}>
                         <GridContainer>
                           <GridItem xs={10}>
                             <FastField
-                              name={`precautions[${i}].precaution`}
+                              name={`corPrescriptionItemPrecaution[${i}].prescriptionItemFK`}
                               render={(args) => {
                                 return (
                                   <div style={{ position: 'relative' }}>
                                     <span
                                       style={{
                                         position: 'absolute',
-                                        bottom: 4,
+                                        top: 5,
                                       }}
                                     >
                                       {i + 1}.
                                     </span>
-                                    <Select
+                                    <CodeSelect
                                       style={{
                                         paddingLeft: 15,
                                       }}
                                       // label='Precaution'
                                       simple
-                                      options={[
-                                        {
-                                          value: '1',
-                                          name: 'Discard 1 month upon opening',
-                                        },
-                                        {
-                                          value: '2',
-                                          name: 'Discard 3 days upon opening',
-                                        },
-                                      ]}
+                                      code='ctMedicationPrecaution'
                                       {...args}
                                     />
                                   </div>
@@ -296,7 +385,21 @@ class Medication extends PureComponent {
                               }}
                             />
                           </GridItem>
-                          {this.getActionItem(i, arrayHelpers, 'precautions')}
+                          {this.getActionItem(
+                            i,
+                            arrayHelpers,
+                            'corPrescriptionItemPrecaution',
+                            'Add precaution',
+                            {
+                              action: '1',
+                              count: 1,
+                              unit: '1',
+                              frequency: '1',
+                              day: 1,
+                              precaution: '1',
+                              operator: '1',
+                            },
+                          )}
                         </GridContainer>
                       </div>
                     )
@@ -308,14 +411,14 @@ class Medication extends PureComponent {
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={4}>
+          <GridItem xs={2}>
             <FastField
               name='quantity'
               render={(args) => {
                 return (
                   <NumberInput
                     label='Quantity'
-                    formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
+                    // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
                     min={1}
                     {...args}
@@ -324,9 +427,24 @@ class Medication extends PureComponent {
               }}
             />
           </GridItem>
+          <GridItem xs={2}>
+            <FastField
+              name='uom'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label=''
+                    allowClear={false}
+                    code='ctMedicationUnitOfMeasurement'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
           <GridItem xs={3}>
             <FastField
-              name='total'
+              name='totalPrice'
               render={(args) => {
                 return <NumberInput label='Total' currency {...args} />
               }}
@@ -353,16 +471,21 @@ class Medication extends PureComponent {
             {/* <Button link className={classes.editorBtn}>
               Add Diagnosis
             </Button> */}
-            <RichEditor placeholder='Remarks' />
+
+            <FastField
+              name='remarks'
+              render={(args) => {
+                return <RichEditor placeholder='Remarks' {...args} />
+              }}
+            />
           </GridItem>
           <GridItem xs={12}>
             <FastField
-              name='externalPrescription'
+              name='isExternalPrescription'
               render={(args) => {
                 return (
                   <Checkbox
-                    label='External
-                    Prescription'
+                    label='External Prescription'
                     labelPlacement='start'
                     {...args}
                   />
@@ -371,6 +494,9 @@ class Medication extends PureComponent {
             />
           </GridItem>
         </GridContainer>
+        {footer({
+          onSave: handleSubmit,
+        })}
       </div>
     )
   }

@@ -93,9 +93,7 @@ const PatientInfoSideBanner = ({ height, theme, classes, entity }) => {
         <Divider light />
       )}
     </React.Fragment>
-  ) : (
-    <Skeleton active />
-  )
+  ) : null
 }
 
 export default withStyles(styles, {

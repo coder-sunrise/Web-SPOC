@@ -149,6 +149,7 @@ class AntdTimePicker extends PureComponent {
           onChange={this.handleChange}
           onOpenChange={onOpenChange}
           value={this.state.value}
+          {...restProps}
         />
       </div>
     )

@@ -1,8 +1,9 @@
 import router from 'umi/router'
-
+import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
+import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 
 export default createFormViewModel({
   namespace: 'consultation',
@@ -78,16 +79,55 @@ export default createFormViewModel({
           },
         })
       },
-      // *queryOne ({ payload }, { call, put }) {
-      //   const response = yield call(service.query, payload)
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: {
-      //       entity: response.data,
-      //     },
-      //   })
-      //   return response.data
-      // },
+      *queryDone ({ payload }, { call, put, select }) {
+        console.log('queryDone', payload)
+        const { data } = payload
+        let cdRows = []
+        consultationDocumentTypes.forEach((p) => {
+          cdRows = cdRows.concat(
+            (data[p.prop] || []).map((o) => {
+              const d = {
+                uid: getUniqueId(),
+                type: p.value,
+                subject: p.getSubject ? p.getSubject(o) : '',
+                ...o,
+              }
+              return p.convert ? p.convert(d) : d
+            }),
+          )
+        })
+        yield put({
+          type: 'consultationDocument/updateState',
+          payload: {
+            rows: _.sortBy(cdRows, 'sequence'),
+          },
+        })
+
+        let oRows = []
+        orderTypes.forEach((p) => {
+          oRows = oRows.concat(
+            ((p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || [])
+              .map((o) => {
+                const d = {
+                  uid: getUniqueId(),
+                  type: p.value,
+                  // subject: p.getSubject ? p.getSubject(o) : '',
+                  ...o,
+                }
+                return p.convert ? p.convert(d) : d
+              }),
+          )
+        })
+        console.log(cdRows)
+        yield put({
+          type: 'orders/updateState',
+          payload: {
+            rows: _.sortBy(oRows, 'sequence'),
+          },
+        })
+
+        return payload
+      },
       // *submit ({ payload }, { call }) {
       //   // console.log(payload)
       //   return yield call(service.upsert, payload)

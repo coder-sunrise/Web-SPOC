@@ -3,6 +3,7 @@ import moment from 'moment'
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
+import { dateFormatLong, CodeSelect } from '@/components'
 
 const status = [
   { value: false, name: 'Inactive', color: 'red' },
@@ -498,14 +499,6 @@ const addressTypes = [
   { label: 'Primary Address', value: '2' },
 ]
 
-const orderTypes = [
-  { name: 'Medication', value: '1' },
-  { name: 'Vaccination', value: '2' },
-  { name: 'Service', value: '3' },
-  { name: 'Consumable', value: '4' },
-  { name: 'Open Prescription', value: '5' },
-]
-
 const currencyRounding = [
   {
     name: 'Up',
@@ -588,6 +581,92 @@ const country = [
     name: 'India',
   },
 ]
+
+const consultationDocumentTypes = [
+  {
+    value: '3',
+    name: 'Medical Certificate',
+    prop: 'corMedicalCertificate',
+    getSubject: (r) =>
+      `${moment
+        .utc(r.mcStartDate)
+        .local()
+        .format(dateFormatLong)} - ${moment
+        .utc(r.mcEndDate)
+        .local()
+        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+    convert: (r) => {
+      return {
+        ...r,
+        mcStartEndDate: [
+          moment(r.mcStartDate),
+          moment(r.mcEndDate),
+        ],
+      }
+    },
+  },
+  {
+    value: '4',
+    name: 'Certificate of Attendance',
+    prop: 'corCertificateOfAttendance',
+    getSubject: (r) => {
+      return `Certificate of Attendance ${r.accompaniedBy}`
+    },
+    convert: (r) => {
+      return {
+        ...r,
+        attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
+        attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
+      }
+    },
+  },
+  {
+    value: '1',
+    name: 'Referral Letter',
+    prop: 'corReferralLetter',
+  },
+  {
+    value: '2',
+    name: 'Memo',
+    prop: 'corMemo',
+  },
+  {
+    value: '6',
+    name: 'Vaccination Certificate',
+    prop: 'corVaccinationCert',
+  },
+  {
+    value: '5',
+    name: 'Others',
+    prop: 'corOtherDocuments',
+  },
+]
+
+const orderTypes = [
+  {
+    name: 'Medication',
+    value: '1',
+    prop: 'corPrescriptionItem',
+    filter: (r) => !r.stockDrugFK,
+  },
+  {
+    name: 'Vaccination',
+    value: '2',
+    prop: 'corVaccinationItem',
+  },
+  {
+    name: 'Service',
+    value: '3',
+    prop: 'corService',
+  },
+  { name: 'Consumable', value: '4', prop: 'corConsumable' },
+  {
+    name: 'Open Prescription',
+    value: '5',
+    prop: 'corPrescriptionItem',
+    filter: (r) => !!r.stockDrugFK,
+  },
+]
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -623,7 +702,11 @@ const tenantCode = [
   'doctorprofile',
   'clinicianprofile',
   'ctappointmenttype',
+<<<<<<< HEAD
   'ctservice',
+=======
+  'ctreferrallettertemplate',
+>>>>>>> dev
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -745,5 +828,6 @@ module.exports = {
   currencyRoundingToTheClosest,
   coPayerType,
   country,
+  consultationDocumentTypes,
   ...module.exports,
 }

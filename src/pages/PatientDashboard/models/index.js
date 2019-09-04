@@ -1,5 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
+import router from 'umi/router'
 import * as service from '../services'
+import { sleep, getRemovedUrl } from '@/utils/utils'
 
 export default createFormViewModel({
   namespace: 'patientDashboard',
@@ -51,6 +53,7 @@ export default createFormViewModel({
               queueID: Number(query.qid) || 0,
               showConsultation: Number(query.md === 'cons'),
               version: query.v,
+              action: query.action,
             },
           })
         }
@@ -58,7 +61,7 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { queueID, showConsultation, version } = payload
+        const { queueID, showConsultation, version, action } = payload
         let {
           patientDashboard,
           visitRegistration,
@@ -88,6 +91,7 @@ export default createFormViewModel({
             payload: {
               queueID,
               version,
+              patientInfo,
             },
           })
         }
@@ -103,10 +107,10 @@ export default createFormViewModel({
               entity: undefined,
             },
           })
-          console.log(
-            showConsultation,
-            !visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
-          )
+          // console.log(
+          //   showConsultation,
+          //   !visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+          // )
           if (
             showConsultation &&
             !visitRegistration.visitInfo.visit.clinicalObjectRecordFK
@@ -116,11 +120,23 @@ export default createFormViewModel({
               payload: visitRegistration.visitInfo.visit.id,
             })
             yield take('consultation/newConsultation/@@end')
+          } else if (action === 'resume') {
+            yield put({
+              type: 'consultation/resume',
+              payload: visitRegistration.visitInfo.visit.id,
+            })
+            yield take('consultation/resume/@@end')
+            router.push(
+              getRemovedUrl([
+                'action',
+              ]),
+            )
+            return
           }
-          console.log(
-            visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
-            !consultation.entity,
-          )
+          // console.log(
+          //   visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+          //   !consultation.entity,
+          // )
 
           if (
             showConsultation &&

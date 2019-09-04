@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import Yup from '@/utils/yup'
 
 import {
   Button,
@@ -17,18 +17,64 @@ import {
   Checkbox,
   SizeContainer,
   RichEditor,
+  withFormikExtend,
+  FastField,
+  Field,
+  ButtonSelect,
+  ClinicianSelect,
 } from '@/components'
 
+@withFormikExtend({
+  mapPropsToValues: ({ consultationDocument }) => {
+    return consultationDocument.entity || consultationDocument.defaultMemo
+  },
+  validationSchema: Yup.object().shape({
+    issuedByUserFK: Yup.number().required(),
+    subject: Yup.string().required(),
+    content: Yup.string().required(),
+  }),
+
+  handleSubmit: (values, { props }) => {
+    console.log(values)
+    const { dispatch, onConfirm } = props
+    dispatch({
+      type: 'consultationDocument/upsertRow',
+      payload: values,
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'AddConsultationDocument',
+})
 class Memo extends PureComponent {
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctReferralLetterTemplate',
+      },
+    })
+  }
+
   render () {
-    const { theme, classes, consultationDocument, rowHeight } = this.props
-    console.log('Memo')
+    const {
+      footer,
+      handleSubmit,
+      classes,
+      codetable,
+      rowHeight,
+      setFieldValue,
+    } = this.props
+    const { ctReferralLetterTemplate } = codetable
+
     return (
       <div>
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='date'
+              name='memoDate'
               render={(args) => {
                 return <DatePicker label='Date' {...args} />
               }}
@@ -37,14 +83,14 @@ class Memo extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={6}>
-            <FastField
-              name='from'
+            <Field
+              name='issuedByUserFK'
               render={(args) => {
-                return <TextField disabled label='From' {...args} />
+                return <ClinicianSelect label='From' {...args} />
               }}
             />
           </GridItem>
-          <GridItem xs={12}>
+          {/* <GridItem xs={12}>
             <FastField
               name='address'
               render={(args) => {
@@ -53,7 +99,7 @@ class Memo extends PureComponent {
                 )
               }}
             />
-          </GridItem>
+          </GridItem> */}
           <GridItem xs={9}>
             <FastField
               name='subject'
@@ -66,15 +112,33 @@ class Memo extends PureComponent {
             xs={3}
             style={{ lineHeight: rowHeight, textAlign: 'right' }}
           >
-            <Button color='info'>Load Template</Button>
+            <ButtonSelect
+              options={ctReferralLetterTemplate}
+              textField='displayValue'
+              onClick={(option) => {
+                setFieldValue('content', option.templateMessage)
+              }}
+            >
+              Load Template
+            </ButtonSelect>
           </GridItem>
           <GridItem xs={12} className={classes.editor}>
             <Button link className={classes.editorBtn}>
               Add Diagnosis
             </Button>
-            <RichEditor />
+            <FastField
+              name='content'
+              render={(args) => {
+                return <RichEditor {...args} />
+              }}
+            />
           </GridItem>
         </GridContainer>
+        {footer &&
+          footer({
+            onConfirm: handleSubmit,
+            confirmBtnText: 'Save',
+          })}
       </div>
     )
   }

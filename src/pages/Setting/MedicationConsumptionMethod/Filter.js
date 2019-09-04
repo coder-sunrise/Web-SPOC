@@ -39,13 +39,14 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
+                  const { codeDisplayValue } = this.props.values
                   this.props.dispatch({
                     type: 'settingMedicationConsumptionMethod/query',
                     payload: {
                       group: [
                         {
-                          code: codeDiplayValue,
-                          codeDisplayValue: codeDiplayValue,
+                          code: codeDisplayValue,
+                          displayValue: codeDisplayValue,
                           combineCondition: 'or',
                         },
                       ],

@@ -37,6 +37,7 @@ class RichEditor extends React.PureComponent {
     const { form, field } = props
     const v = form && field ? field.value : props.value || props.defaultValue
     let editorState
+
     if (v) {
       const contentBlock = htmlToDraft(v)
       editorState = EditorState.createWithContent(
@@ -45,9 +46,11 @@ class RichEditor extends React.PureComponent {
     } else {
       editorState = EditorState.createEmpty()
     }
+
     this.state = {
       value: editorState,
       anchorEl: null,
+      isEditorFocused: false,
     }
 
     this.editorCfg = {
@@ -79,28 +82,30 @@ class RichEditor extends React.PureComponent {
   componentDidMount () {}
 
   componentWillReceiveProps (nextProps) {
-    // console.log(nextProps)
     const { field, value } = nextProps
+    const { isEditorFocused } = this.state
     let v = value || ''
     if (field) {
       v = field.value || ''
+      // v = field.value || ''
       // this.setState({
       //   value: field.value,
       // })
     }
-    if (this.state.value.getCurrentContent().getPlainText().length) {
-      Modifier.replaceText(
-        this.state.value.getCurrentContent(),
-        this.state.value.getSelection(),
-        v,
-      )
-    } else {
-      const contentBlock = htmlToDraft(v)
-      this.setState({
-        value: EditorState.createWithContent(
-          ContentState.createFromBlockArray(contentBlock.contentBlocks),
-        ),
-      })
+    // console.log(isEditorFocused)
+    if (!isEditorFocused) {
+      if (!v) {
+        this.setState({
+          value: EditorState.createEmpty(),
+        })
+      } else if (!this.state.value.getCurrentContent().getPlainText().length) {
+        const contentBlock = htmlToDraft(v)
+        this.setState({
+          value: EditorState.createWithContent(
+            ContentState.createFromBlockArray(contentBlock.contentBlocks),
+          ),
+        })
+      }
     }
   }
 
@@ -136,6 +141,14 @@ class RichEditor extends React.PureComponent {
     if (onChange) {
       onChange(v)
     }
+  }
+
+  _onFocus = () => {
+    this.setState({ isEditorFocused: true })
+  }
+
+  _onBlur = () => {
+    this.setState({ isEditorFocused: false })
   }
 
   tagButtonOnClick = (selectedValue) => {
@@ -240,6 +253,8 @@ class RichEditor extends React.PureComponent {
             // trigger: '<',
             suggestions: tagList,
           }}
+          onFocus={this._onFocus}
+          onBlur={this._onBlur}
           {...this.editorCfg}
           {...this.props}
         />

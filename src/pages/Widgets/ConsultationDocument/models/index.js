@@ -14,8 +14,6 @@ export default createFormViewModel({
       editType: '2',
       defaultMedicalCertificate: {
         type: '3',
-        from: 'Dr Johhy',
-        // mcReferenceNo: 'MC203918-29',
         mcDays: 1,
         mcStartEndDate: [
           moment(),
@@ -23,6 +21,24 @@ export default createFormViewModel({
         ],
         mcIssueDate: moment(),
         unfitTypeFK: 1,
+      },
+      defaultMemo: {
+        type: '2',
+        memoDate: moment(),
+      },
+      defaultCertOfAttendance: {
+        type: '4',
+        issueDate: moment(),
+        attendanceStartTime: moment().format('HH:mm'),
+        attendanceEndTime: moment().add(30, 'minutes').format('HH:mm'),
+      },
+      defaultReferralLetter: {
+        type: '1',
+        referralDate: moment(),
+      },
+      defaultVaccinationCertificate: {
+        type: '6',
+        certificateDate: moment(),
       },
       default: {},
       rows: [],
@@ -38,12 +54,13 @@ export default createFormViewModel({
         let { rows } = state
         if (payload.uid) {
           rows = rows.map((row) => {
-            const n = rows[payload.uid]
-              ? {
-                  ...row,
-                  ...payload,
-                }
-              : row
+            const n =
+              row.uid === payload.uid
+                ? {
+                    ...row,
+                    ...payload,
+                  }
+                : row
             return n
           })
         } else {

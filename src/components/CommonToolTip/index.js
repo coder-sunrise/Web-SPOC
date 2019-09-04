@@ -25,7 +25,7 @@ class CommonTooltip extends PureComponent {
       <Tooltip
         title={title}
         enterDelay={enterDelay}
-        classes={{ tooltip: classes.tooltip }}
+        // classes={{ tooltip: classes.tooltip }}
         {...restProps}
       >
         {children}

@@ -2,8 +2,14 @@ import React, { PureComponent } from 'react'
 // formik
 import { Field } from 'formik'
 // custom components
-import { DatePicker, TextField, GridItem } from '@/components'
-import AttachmentWrapper from './AttachmentWrapper'
+import {
+  CommonCard,
+  DatePicker,
+  TextField,
+  GridContainer,
+  GridItem,
+} from '@/components'
+import { Attachment } from '@/components/_medisys'
 import FormField from './formField'
 
 class ReferralCard extends PureComponent {
@@ -11,14 +17,8 @@ class ReferralCard extends PureComponent {
     const { attachments, handleUpdateAttachments, isReadOnly } = this.props
 
     return (
-      <AttachmentWrapper
-        title='Referral'
-        attachmentType='VisitReferral'
-        handleUpdateAttachments={handleUpdateAttachments}
-        attachments={attachments}
-        isReadOnly={isReadOnly}
-      >
-        <React.Fragment>
+      <CommonCard title='Referral'>
+        <GridContainer>
           <GridItem xs md={4}>
             <Field
               name={FormField['referral.referralPersonFK']}
@@ -57,8 +57,16 @@ class ReferralCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={8} />
-        </React.Fragment>
-      </AttachmentWrapper>
+          <GridItem xs md={12}>
+            <Attachment
+              attachmentType='VisitReferral'
+              handleUpdateAttachments={handleUpdateAttachments}
+              attachments={attachments}
+              isReadOnly={isReadOnly}
+            />
+          </GridItem>
+        </GridContainer>
+      </CommonCard>
     )
   }
 }

@@ -7,7 +7,7 @@ import Reset from '@material-ui/icons/Cached'
 // common components
 import { Button, GridItem } from '@/components'
 // sub components
-import TableData from '../../components/TableData'
+import TableData from '../../DispenseDetails/TableData'
 import {
   ItemData,
   ItemTableColumn,
