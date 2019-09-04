@@ -2,7 +2,12 @@ import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl } from '@/utils/utils'
-import { NavPills, ProgressButton, Button } from '@/components'
+import {
+  NavPills,
+  ProgressButton,
+  Button,
+  withFormikExtend,
+} from '@/components'
 import { withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import { compose } from 'redux'
@@ -26,12 +31,14 @@ const Detail = ({
   consumableDetail,
   history,
   handleSubmit,
+  setFieldValue,
 }) => {
   const { currentTab } = consumable
 
   const detailProps = {
     consumableDetail,
     dispatch,
+    setFieldValue,
   }
   return (
     <React.Fragment>
@@ -50,7 +57,7 @@ const Detail = ({
         </Button>
       </div>
       <NavPills
-        color='info'
+        color='primary'
         onChange={(event, active) => {
           history.push(
             getAppendUrl({
@@ -67,7 +74,7 @@ const Detail = ({
           },
           {
             tabButton: 'Pricing',
-            tabContent: <Pricing />,
+            tabContent: <Pricing {...detailProps} />,
           },
           {
             tabButton: 'Stock',
@@ -84,30 +91,46 @@ export default compose(
     consumable,
     consumableDetail,
   })),
-  withFormik({
+  withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ consumableDetail }) => {
-      return consumableDetail.entity ? consumableDetail.entity : {}
+      return consumableDetail.entity
+        ? consumableDetail.entity
+        : consumableDetail.default
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      revenueCategory: Yup.string().required(),
-      effectiveStartDate: Yup.string().required(),
-      effectiveEndDate: Yup.string().required(),
+      revenueCategoryFk: Yup.string().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      averageCostPrice: Yup.number().positive(
+        'Average Cost Price must between 0 to 999,999.99',
+      ),
+      profitMarginPercentage: Yup.number().positive(
+        'Markup Margin must between 0 to 999,999.99',
+      ),
+      sellingPriceBefDiscount: Yup.number().positive(
+        'Selling Price must between 0 to 999,999.99',
+      ),
+      maxDiscount: Yup.number().positive(
+        'Max Discount must between 0 to 999,999.99',
+      ),
     }),
+
     handleSubmit: (values, { props }) => {
-      const { dispatch } = props
-      // dispatch({
-      //   type: `${modelType}/submit`,
-      //   payload: test,
-      // }).then((r) => {
-      //   if (r.message === 'Ok') {
-      //     notification.success({
-      //       message: 'Done',
-      //     })
-      //   }
-      // })
+      const { dispatch, history } = props
+      dispatch({
+        type: 'consumableDetail/upsert',
+        payload: {
+          ...values,
+          effectiveStartDate: values.effectiveDates[0],
+          effectiveEndDate: values.effectiveDates[1],
+        },
+      }).then((r) => {
+        if (r) {
+          history.push('/inventory/master?t=1')
+        }
+      })
     },
     displayName: 'InventoryConsumableDetail',
   }),

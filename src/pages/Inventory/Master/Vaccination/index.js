@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { CardContainer } from '@/components'
@@ -9,22 +9,28 @@ import Grid from '../Grid'
 const styles = () => ({})
 
 const Vaccination = ({ dispatch, history, vaccination }) => {
-  const [ tableParas, setTableParas ] = useState({
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
-      { name: 'refNo', title: 'Code' },
-      { name: 'patientName', title: 'Name' },
+      { name: 'code', title: 'Code' },
+      { name: 'displayValue', title: 'Name' },
       { name: 'supplier', title: 'Supplier' },
-      { name: 'dispUOM', title: 'Disp. UOM' },
+      { name: 'dispensingUOMFk', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
-      { name: 'payments', title: 'Avg Cost Price' },
-      { name: 'expenseAmount', title: 'Selling Price' },
-      { name: 'status', title: 'Status' },
+      { name: 'averageCostPrice', title: 'Avg Cost Price' },
+      { name: 'sellingPriceBefDiscount', title: 'Selling Price' },
+      { name: 'isActive', title: 'Status' },
       { name: 'Action', title: 'Action' },
     ],
     leftColumns: [],
   })
 
-  const [ colExtensions, setColExtensions ] = useState([
+  const [
+    colExtensions,
+    setColExtensions,
+  ] = useState([
     { columnName: 'Action', width: 110, align: 'center' },
     {
       columnName: 'supplier',
@@ -55,6 +61,12 @@ const Vaccination = ({ dispatch, history, vaccination }) => {
     tableParas,
     colExtensions,
   }
+
+  useEffect(() => {
+    dispatch({
+      type: 'vaccination/query',
+    })
+  }, [])
 
   return (
     <CardContainer

@@ -1,10 +1,15 @@
 import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
-import { NavPills, ProgressButton, Button } from '@/components'
+// import { withFormik } from 'formik'
 import { compose } from 'redux'
-import { withFormik } from 'formik'
+import { getAppendUrl } from '@/utils/utils'
+import {
+  NavPills,
+  ProgressButton,
+  Button,
+  withFormikExtend,
+} from '@/components'
 import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
@@ -27,6 +32,8 @@ const Detail = ({
   history,
   handleSubmit,
   setFieldValue,
+  values,
+  ...props
 }) => {
   const { currentTab } = medication
 
@@ -35,7 +42,10 @@ const Detail = ({
     dispatch,
     setFieldValue,
     showTransfer: true,
+    values,
+    ...props,
   }
+
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -53,7 +63,7 @@ const Detail = ({
         </Button>
       </div>
       <NavPills
-        color='info'
+        color='primary'
         onChange={(event, active) => {
           history.push(
             getAppendUrl({
@@ -74,7 +84,7 @@ const Detail = ({
           },
           {
             tabButton: 'Pricing',
-            tabContent: <Pricing />,
+            tabContent: <Pricing {...detailProps} />,
           },
           {
             tabButton: 'Stock',
@@ -91,35 +101,91 @@ export default compose(
     medication,
     medicationDetail,
   })),
-  withFormik({
+  // withFormik({
+  //   enableReinitialize: true,
+  //   mapPropsToValues: ({ medicationDetail }) => {
+  //     return medicationDetail.entity ? medicationDetail.entity : {}
+  //   },
+  //   handleSubmit: (values, { props }) => {
+  //     console.log(values)
+  //     const { dispatch } = props
+  //     // dispatch({
+  //     //   type: `${modelType}/submit`,
+  //     //   payload: test,
+  //     // }).then((r) => {
+  //     //   if (r.message === 'Ok') {
+  //     //     notification.success({
+  //     //       message: 'Done',
+  //     //     })
+  //     //   }
+  //     // })
+  //   },
+  //   validationSchema: Yup.object().shape(
+  //     {
+  //       // code: Yup.string().required(),
+  //       // displayValue: Yup.string().required(),
+  //       // // revenueCategory: Yup.string().required(),
+  //       // effectiveStartDate: Yup.string().required(),
+  //       // effectiveEndDate: Yup.string().required(),
+  //       // SellingPrice: Yup.number().required(),
+  //     },
+  //   ),
+  //   displayName: 'InventoryMedicationDetail',
+  // }),
+
+  withFormikExtend({
     enableReinitialize: true,
+
     mapPropsToValues: ({ medicationDetail }) => {
-      return medicationDetail.entity ? medicationDetail.entity : {}
+      console.log('medicationDetail', medicationDetail)
+      return medicationDetail.entity
+        ? medicationDetail.entity
+        : medicationDetail.default
     },
-    handleSubmit: (values, { props }) => {
-      console.log(values)
-      const { dispatch } = props
-      // dispatch({
-      //   type: `${modelType}/submit`,
-      //   payload: test,
-      // }).then((r) => {
-      //   if (r.message === 'Ok') {
-      //     notification.success({
-      //       message: 'Done',
-      //     })
-      //   }
-      // })
+    validationSchema: Yup.object().shape({
+      code: Yup.string().required(),
+      displayValue: Yup.string().required(),
+      revenueCategoryFK: Yup.number().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      prescribingUOMFK: Yup.number().required(),
+      dispensingUOMFK: Yup.number().required(),
+      averageCostPrice: Yup.number().positive(
+        'Average Cost Price must between 0 to 999,999.99',
+      ),
+      profitMarginPercentage: Yup.number().positive(
+        'Markup Margin must between 0 to 999,999.99',
+      ),
+      sellingPriceBefDiscount: Yup.number().positive(
+        'Selling Price must between 0 to 999,999.99',
+      ),
+      maxDiscount: Yup.number().positive(
+        'Max Discount must between 0 to 999,999.99',
+      ),
+    }),
+    handleSubmit: (values, { props, resetForm }) => {
+      // console.log('restValues')
+      // console.log('restValues', values)
+
+      const { effectiveDates, ...restValues } = values
+      const { dispatch, history, onConfirm, medicationDetail } = props
+      dispatch({
+        type: 'medicationDetail/upsert',
+        payload: {
+          ...restValues,
+          effectiveStartDate: effectiveDates[0],
+          effectiveEndDate: effectiveDates[1],
+        },
+      }).then((r) => {
+        if (r) {
+          if (onConfirm) onConfirm()
+          dispatch({
+            type: 'medicationDetail/query',
+          })
+          history.push('/inventory/master')
+        }
+      })
     },
-    validationSchema: Yup.object().shape(
-      {
-        // code: Yup.string().required(),
-        // displayValue: Yup.string().required(),
-        // // revenueCategory: Yup.string().required(),
-        // effectiveStartDate: Yup.string().required(),
-        // effectiveEndDate: Yup.string().required(),
-        // SellingPrice: Yup.number().required(),
-      },
-    ),
-    displayName: 'InventoryMedicationDetail',
+
+    displayName: 'medicationDetail',
   }),
 )(Detail)

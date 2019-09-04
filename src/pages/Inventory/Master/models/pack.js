@@ -14,18 +14,19 @@ export default createListViewModel({
     service,
     state: {
       currentTab: 0,
+      list: [],
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
-        if (pathname === '/inventory/master/package' && !query.uid) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentTab: Number(query.t) || 0,
-            },
-          })
-        }
+        // if (pathname === '/inventory/master/package' && !query.uid) {
+        //   dispatch({
+        //     type: 'updateState',
+        //     payload: {
+        //       currentTab: Number(query.t) || 0,
+        //     },
+        //   })
+        // }
       })
     },
     effects: {
@@ -81,6 +82,23 @@ export default createListViewModel({
       //   return yield call(upsert, payload)
       // },
     },
-    reducers: {},
+    reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+        console.log('this is pack reducer', data)
+        return {
+          ...st,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+              effectiveDates: [
+                o.effectiveStartDate,
+                o.effectiveEndDate,
+              ],
+            }
+          }),
+        }
+      },
+    },
   },
 })

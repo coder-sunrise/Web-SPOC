@@ -14,6 +14,7 @@ import {
   GridItem,
   DatePicker,
   Switch,
+  DateRangePicker,
 } from '@/components'
 
 const styles = () => ({})
@@ -29,7 +30,6 @@ const Detail = ({ packDetail, dispatch }) => {
       })
     }
   }, [])
-
   return (
     <CardContainer
       hideHeader
@@ -125,25 +125,11 @@ const Detail = ({ packDetail, dispatch }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='effectiveStartDate'
+                name='effectiveDates'
                 render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.package.effectiveStartDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='effectiveEndDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.package.effectiveEndDate',
-                    })}
+                  <DateRangePicker
+                    label='Effective Start Date'
+                    label2='End Date'
                     {...args}
                   />
                 )}
@@ -159,7 +145,7 @@ const Detail = ({ packDetail, dispatch }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ vaccinationDetail }) => ({
-    vaccinationDetail,
+  connect(({ packDetail }) => ({
+    packDetail,
   })),
 )(Detail)
