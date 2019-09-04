@@ -46,6 +46,8 @@ const Detail = ({
     ...props,
   }
 
+  console.log({ values })
+
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -152,7 +154,7 @@ export default compose(
       averageCostPrice: Yup.number().positive(
         'Average Cost Price must between 0 to 999,999.99',
       ),
-      profitMarginPercentage: Yup.number().positive(
+      markupMargin: Yup.number().positive(
         'Markup Margin must between 0 to 999,999.99',
       ),
       sellingPriceBefDiscount: Yup.number().positive(
@@ -168,13 +170,14 @@ export default compose(
 
       const { effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
+      const payload = {
+        ...restValues,
+        effectiveStartDate: effectiveDates[0],
+        effectiveEndDate: effectiveDates[1],
+      }
       dispatch({
         type: 'medicationDetail/upsert',
-        payload: {
-          ...restValues,
-          effectiveStartDate: effectiveDates[0],
-          effectiveEndDate: effectiveDates[1],
-        },
+        payload,
       }).then((r) => {
         if (r) {
           if (onConfirm) onConfirm()

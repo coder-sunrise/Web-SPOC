@@ -35,11 +35,24 @@ const Transfer = ({
   setFieldValue,
   fieldName,
 }) => {
-  const [ addedList, setAddedList ] = useState(items || [])
-  const [ removedList, setRemovedList ] = useState([])
-  const [ searchField, setSearchField ] = useState('')
+  console.log({ fieldName })
+  const [
+    addedList,
+    setAddedList,
+  ] = useState(items || [])
+  const [
+    removedList,
+    setRemovedList,
+  ] = useState([])
+  const [
+    searchField,
+    setSearchField,
+  ] = useState('')
   const addClick = (index) => () => {
-    const tempList = [ ...removedList, ...addedList.slice(index, index + 1) ]
+    const tempList = [
+      ...removedList,
+      ...addedList.slice(index, index + 1),
+    ]
     setRemovedList(tempList)
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, tempList)
@@ -52,7 +65,10 @@ const Transfer = ({
   }
 
   const removeClick = (index) => () => {
-    setAddedList([ ...addedList, ...removedList.slice(index, index + 1) ])
+    setAddedList([
+      ...addedList,
+      ...removedList.slice(index, index + 1),
+    ])
     const tempList = [
       ...removedList.slice(0, index),
       ...removedList.slice(index + 1, removedList.length),
@@ -68,7 +84,10 @@ const Transfer = ({
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, [])
     }
-    setAddedList([ ...addedList, ...removedList ])
+    setAddedList([
+      ...addedList,
+      ...removedList,
+    ])
   }
 
   return (

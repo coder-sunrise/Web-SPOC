@@ -36,14 +36,12 @@ const InventoryTypeListing = ({
   onAddedRowsChange,
   onRowChangesChange,
   onDeletedRowIdsChange,
+  setRowChange,
+  rowChange,
   ...props
 }) => {
-  console.log('packDetail', packDetail)
-  console.log(packDetail.servicePackageItem)
-  console.log('service', service)
-  console.log('values', props)
-  const { values } = props
-  console.log('hi', values.servicePackageItem)
+  const { medicationPackageItem, servicePackageItem } = props.values
+  console.log('values', medicationPackageItem)
   const {
     medicationTableParas,
     medicationColExtensions,
@@ -119,14 +117,14 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...medicationTableParas}
             columnExtensions={medicationColExtensions}
-            rows={medicationList}
+            rows={medicationPackageItem}
             FuncProps={{ pager: false }}
             ActionProps={{ TableCellComponent: TableCell }}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              // onCommitChanges: this.commitChanges,
-              // onAddedRowsChange: this.onAddedRowsChange,
+              onDeletedRowIdsChange: onDeletedRowIdsChange,
+              onCommitChanges: commitChanges('medicationPackageItem'),
             }}
           />
         </GridItem>
@@ -167,16 +165,19 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...serviceTableParas}
             columnExtensions={serviceColExtensions}
-            rows={values.servicePackageItem ? values.servicePackageItem : []}
+            rows={servicePackageItem ? servicePackageItem : []}
             FuncProps={{ pager: false }}
             onRowClick={clickRow}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
+              rowChanges: rowChange,
+              onAddedRowsChange: onAddedRowsChange,
               // onEditingRowIdsChange: { changeEditingRowIds },
               // onRowChangesChange: { onRowChangesChange },
-              onDeletedRowIdsChange: onDeletedRowIdsChange,
-              onCommitChanges: commitChanges,
+              // onRowChangesChange: onRowChangesChange,
+              // onDeletedRowIdsChange: onDeletedRowIdsChange,
+              onCommitChanges: commitChanges('servicePackageItem'),
               // onAddedRowsChange: onAddedRowsChange,
             }}
           />

@@ -10,7 +10,6 @@ module.exports = {
     return service.query(url, params)
   },
   querySdd: (params) => {
-    console.log('query')
     return service.querySdd(sddUrl, params)
   },
   upsert: (params) => {

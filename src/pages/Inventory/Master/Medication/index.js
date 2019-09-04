@@ -21,7 +21,7 @@ const Medication = ({ dispatch, history, medication }) => {
       { name: 'uom', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
-      { name: 'suggestSellingPrice', title: 'Selling Price' },
+      { name: 'sellingPrice', title: 'Selling Price' },
       { name: 'isActive', title: 'Status' },
       { name: 'action', title: 'Action' },
     ],
@@ -33,13 +33,18 @@ const Medication = ({ dispatch, history, medication }) => {
     setColExtensions,
   ] = useState([
     { columnName: 'action', width: 110, align: 'center' },
+
+    {
+      columnName: 'uom',
+      type: 'number',
+    },
     {
       columnName: 'isActive',
       sortingEnabled: false,
       type: 'select',
       options: status,
     },
-    { columnName: 'avgPrice', type: 'number', currency: true },
+    { columnName: 'averageCostPrice', type: 'number', currency: true },
     { columnName: 'sellingPrice', type: 'number', currency: true },
   ])
 

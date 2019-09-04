@@ -25,7 +25,7 @@ const Grid = ({
   }
 
   const Cell = ({ column, row, classes, ...p }) => {
-    if (column.name === 'Action') {
+    if (column.name === 'action') {
       return (
         <Table.Cell {...p}>
           <Tooltip title='Edit Medication' placement='bottom'>

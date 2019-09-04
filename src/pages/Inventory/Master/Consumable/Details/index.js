@@ -101,12 +101,12 @@ export default compose(
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      revenueCategoryFk: Yup.string().required(),
+      revenueCategoryFK: Yup.string().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       averageCostPrice: Yup.number().positive(
         'Average Cost Price must between 0 to 999,999.99',
       ),
-      profitMarginPercentage: Yup.number().positive(
+      markupMargin: Yup.number().positive(
         'Markup Margin must between 0 to 999,999.99',
       ),
       sellingPriceBefDiscount: Yup.number().positive(
