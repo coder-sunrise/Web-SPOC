@@ -46,7 +46,21 @@ const styles = (theme) => ({})
   displayName: 'ServiceCenterDetail',
 })
 class Detail extends PureComponent {
-  state = {}
+  state = {
+    isSaveDisabled: false,
+  }
+
+  checkSaveButtonStatus = () => {
+    const { errors } = this.props
+
+    this.setState({
+      isSaveDisabled: _.isEmpty(errors) ? false : true,
+    })
+  }
+
+  componentDidUpdate () {
+    this.checkSaveButtonStatus()
+  }
 
   render () {
     const { props } = this
@@ -123,7 +137,7 @@ class Detail extends PureComponent {
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: false,
+              disabled: this.state.isSaveDisabled,
             },
           })}
       </React.Fragment>
