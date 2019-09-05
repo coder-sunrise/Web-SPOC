@@ -9,6 +9,7 @@ import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
 
 import AuthorizedContext from '@/components/Context/Authorized'
 
@@ -64,12 +65,13 @@ import {
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 
-import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
 import InvoiceAdjustment from './InvoiceAdjustment'
+
+import schema from './schema'
+import styles from './style'
 
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
@@ -84,139 +86,22 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 //   ],
 // }
 // console.log(basicStyle)
-const styles = (theme) => ({
-  ...basicStyle(theme),
-  root: {
-    position: 'relative',
-    // overflowY: 'hidden',
-  },
-  layout: {
-    marginLeft: -3,
-    marginRight: -3,
-    // height: 'auto',
-  },
-  layoutOnDrag: {
-    marginBottom: 200,
-  },
-  container: {
-    width: '100%',
-  },
-  item: {
-    width: 100,
-    border: '1px solid #ccc',
-  },
-  hide: {
-    display: 'none',
-  },
-  show: {
-    display: 'inherit',
-  },
-  fullscreen: {
-    position: 'initial !important',
-    width: '100% !important',
-    // height: `calc(100vh - ${topHeight}px) !important`,
-  },
-  block: {
-    padding: '4px 2px 0px 2px',
-  },
-  blockHeader: {
-    position: 'sticky',
-    textAlign: 'right',
-    cursor: 'pointer',
-    top: 0,
-    zIndex: 2,
-    backgroundColor: '#ffffff',
-  },
-  blockName: {
-    lineHeight: '26px',
-    fontWeight: 400,
-    float: 'left',
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-  },
-  paperRoot: {
-    // boxSizing: 'content-box',
-    // height: 'calc(100% + 10px)',
-    height: '100%',
-    overflow: 'hidden',
-    // paddingTop: 30,
-    // '&> div': {
-    //   overflow: 'auto',
-    //   // height: '100%',
-    // },
-    // padding: 10,
-  },
-  moreWidgetsBtn: {
-    position: 'absolute',
-    right: -13,
-    top: 0,
-  },
-  actionContainer: {
-    position: 'sticky',
-    bottom: 0,
-    width: '100%',
-  },
-  fabContainer: {
-    position: 'fixed',
-    right: -3,
-    top: '50%',
-    zIndex: 1000,
-    '& button': {
-      borderRadius: '0px !important',
-      borderTopLeftRadius: '3px !important',
-      borderBottomLeftRadius: '3px !important',
-    },
-  },
-  widgetPopper: {
-    zIndex: 101,
-    width: 300,
-  },
-  iconButton: {
-    position: 'absolute',
-    top: -3,
-    marginLeft: 10,
-  },
-})
 
 let lasActivedWidget = null
 
-@connect(({ consultation, global, consultationDocument }) => ({
-  consultation,
-  global,
-  consultationDocument,
-}))
+@connect(
+  ({ consultation, global, consultationDocument, patientDashboard }) => ({
+    consultation,
+    global,
+    consultationDocument,
+    patientDashboard,
+  }),
+)
 @withFormikExtend({
   mapPropsToValues: ({ consultation = {} }) => {
     return consultation.entity || consultation.default
   },
-  validationSchema: Yup.object().shape({
-    // type: Yup.string().required(),
-    // to: Yup.string().when('type', {
-    //   is: (val) => val !== '2',
-    //   then: Yup.string().required(),
-    // }),
-    // from: Yup.string().required(),
-    // date: Yup.date().required(),
-    // subject: Yup.string().required(),
-    // // 3->MC
-    // days: Yup.number().when('type', {
-    //   is: (val) => val === '3',
-    //   then: Yup.number().required(),
-    // }),
-    corPrescriptionItem: Yup.array().of(
-      Yup.object().shape({
-        // Description: Yup.string().required('Description is required'),
-        // UnitPrice: Yup.number().required('Unit Price is required'),
-        corPrescriptionItemPrecaution: Yup.array().of(
-          Yup.object().shape(
-            {
-              // prescriptionItemFK:
-            },
-          ),
-        ),
-      }),
-    ),
-  }),
+  validationSchema: schema,
 
   handleSubmit: (values, { props }) => {
     const { dispatch, history, consultation } = props
@@ -415,7 +300,15 @@ class Consultation extends PureComponent {
     // console.log($(this.container.current).innerWidth())
     // $('.react-resizable-handle').on('mouseover',)
     const { consultation, dispatch } = this.props
-    console.log(this.props.values)
+    // console.log(this.props.values)
+    // dispatch({
+    //   type:'formik/mergeState',
+    //   payload:{
+    //     ConsultationPage:{
+    //       dirty:true
+    //     }
+    //   }
+    // })
     $(this.layoutContainer.current)
       .on(
         'mouseenter',
@@ -453,7 +346,8 @@ class Consultation extends PureComponent {
     if (
       nextProps.consultation &&
       nextProps.consultation.entity &&
-      Object.values(nextProps.values).length === 0
+      nextProps.consultation.entity.concurrencyToken !==
+        nextProps.values.concurrencyToken
     ) {
       nextProps.resetForm(nextProps.consultation.entity)
     }
@@ -865,47 +759,77 @@ class Consultation extends PureComponent {
     }))
   }
 
-  pauseConsultation = () => {
+  saveConsultation = ({ action, confirmMessage, successMessage }) => {
     const {
       dispatch,
       values,
       history,
       consultation,
+      patientDashboard,
       consultationDocument = {},
       orders = {},
     } = this.props
-    const { rows } = consultationDocument
-    consultationDocumentTypes.forEach((p) => {
-      values[p.prop] = rows.filter((o) => o.type === p.value)
-    })
-
-    const { rows: orderRows } = orders
-    orderTypes.forEach((p) => {
-      values[p.prop] = orderRows.filter((o) => o.type === p.value)
-    })
-
     dispatch({
-      type: 'consultation/pause',
-      payload: values,
-    }).then((r) => {
-      if (r) {
-        notification.success({
-          message: 'Consultation paused',
-        })
-        dispatch({
-          type: 'consultation/query',
-          payload: values.id,
-        }).then(() => {
-          history.push(
-            `/reception/queue/patientdashboard?qid=${consultation.queueID}`,
-          )
-        })
-      }
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: confirmMessage,
+        onOpenConfirm: () => {
+          const { rows = [] } = consultationDocument
+          consultationDocumentTypes.forEach((p) => {
+            values[p.prop] = rows.filter((o) => o.type === p.value)
+          })
+
+          const { rows: orderRows = [] } = orders
+          orderTypes.forEach((p) => {
+            values[p.prop] = orderRows.filter((o) => o.type === p.value)
+          })
+          console.log(values)
+          dispatch({
+            type: `consultation/${action}`,
+            payload: values,
+          }).then((r) => {
+            if (r) {
+              if (successMessage) {
+                notification.success({
+                  message: successMessage,
+                })
+              }
+
+              // dispatch({
+              //   type: 'consultation/query',
+              //   payload: values.id,
+              // }).then(() => {
+              //   history.push(
+              //     `/reception/queue/patientdashboard?qid=${consultation.queueID}`,
+              //   )
+              // })
+              history.push(`/reception/queue`)
+            }
+          })
+        },
+      },
+    })
+  }
+
+  pauseConsultation = () => {
+    this.saveConsultation({
+      confirmMessage: 'Confirm pause current consultation?',
+      successMessage: 'Consultation paused',
+      action: 'pause',
     })
   }
 
   resumeConsultation = () => {
-    const { dispatch, values, history, consultation, resetForm } = this.props
+    const {
+      dispatch,
+      values,
+      history,
+      consultation,
+      resetForm,
+      user,
+      patientDashboard,
+    } = this.props
     dispatch({
       type: 'consultation/resume',
       payload: consultation.visitID,
@@ -921,17 +845,23 @@ class Consultation extends PureComponent {
 
   discardConsultation = () => {
     const { dispatch, values, history, consultation, resetForm } = this.props
-    console.log('delete', values)
     if (values.id) {
       dispatch({
-        type: 'consultation/delete',
-        payload: values.id,
-      }).then((r) => {
-        if (r) {
-          history.push(
-            `/reception/queue/patientdashboard?qid=${consultation.queueID}&v=${Date.now()}`,
-          )
-        }
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: 'Confirm to discard current consultation?',
+          onOpenConfirm: () => {
+            dispatch({
+              type: 'consultation/discard',
+              payload: values.id,
+            }).then((r) => {
+              if (r) {
+                history.push(`/reception/queue`)
+              }
+            })
+          },
+        },
       })
     }
   }
@@ -955,71 +885,72 @@ class Consultation extends PureComponent {
     // console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
-        {true && (
-          <Banner
-            style={{}}
-            extraCmt={
-              <div style={{ textAlign: 'center', paddingTop: 16 }}>
-                <p style={{ position: 'relative' }}>
-                  Total Invoice
-                  <Dropdown
-                    overlay={
-                      <Menu>
-                        <Menu.Item onClick={this.toggleInvoiceAdjustment}>
-                          Add Invoice Adjustment
-                        </Menu.Item>
-                        <Menu.Divider />
+        <Banner
+          style={{}}
+          extraCmt={
+            <div style={{ textAlign: 'center', paddingTop: 16 }}>
+              <p style={{ position: 'relative' }}>
+                Total Invoice
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item onClick={this.toggleInvoiceAdjustment}>
+                        Add Invoice Adjustment
+                      </Menu.Item>
+                      <Menu.Divider />
 
-                        <Menu.Item>Absorb GST</Menu.Item>
-                      </Menu>
-                    }
-                    trigger={[
-                      'click',
-                    ]}
-                  >
-                    <IconButton className={classes.iconButton}>
-                      <MoreHoriz />
-                    </IconButton>
-                  </Dropdown>
-                </p>
-                <h5>{NumberFormatter(210)}</h5>
-                <SizeContainer size='sm'>
-                  {values.status !== 'Paused' && (
-                    <Popconfirm onConfirm={this.discardConsultation}>
-                      <ProgressButton color='danger'>Discard</ProgressButton>
-                    </Popconfirm>
-                  )}
-                  {values.status !== 'Paused' && (
-                    <ProgressButton
-                      onClick={this.pauseConsultation}
-                      color='info'
-                      icon={null}
-                    >
-                      Pause
-                    </ProgressButton>
-                  )}
-                  {values.status === 'Paused' && (
-                    <ProgressButton
-                      onClick={this.resumeConsultation}
-                      color='info'
-                      icon={null}
-                    >
-                      Resume
-                    </ProgressButton>
-                  )}
+                      <Menu.Item>Absorb GST</Menu.Item>
+                    </Menu>
+                  }
+                  trigger={[
+                    'click',
+                  ]}
+                >
+                  <IconButton className={classes.iconButton}>
+                    <MoreHoriz />
+                  </IconButton>
+                </Dropdown>
+              </p>
+              <h5>{NumberFormatter(210)}</h5>
+              <SizeContainer size='sm'>
+                {values.status !== 'Paused' && (
                   <ProgressButton
-                    color='primary'
-                    onClick={this.props.handleSubmit}
+                    color='danger'
+                    onClick={this.discardConsultation}
+                  >
+                    Discard
+                  </ProgressButton>
+                )}
+                {values.status !== 'Paused' && (
+                  <ProgressButton
+                    onClick={this.pauseConsultation}
+                    color='info'
                     icon={null}
                   >
-                    Sign Off
+                    Pause
                   </ProgressButton>
-                </SizeContainer>
-              </div>
-            }
-            {...this.props}
-          />
-        )}
+                )}
+                {values.status === 'Paused' && (
+                  <ProgressButton
+                    onClick={this.resumeConsultation}
+                    color='info'
+                    icon={null}
+                  >
+                    Resume
+                  </ProgressButton>
+                )}
+                <ProgressButton
+                  color='primary'
+                  onClick={this.props.handleSubmit}
+                  icon={null}
+                >
+                  Sign Off
+                </ProgressButton>
+              </SizeContainer>
+            </div>
+          }
+          {...this.props}
+        />
         {/* <CardContainer
           hideHeader
           style={{

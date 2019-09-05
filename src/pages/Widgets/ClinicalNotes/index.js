@@ -7,7 +7,9 @@ import {
   FastField,
   CommonModal,
 } from '@/components'
+import { Attachment } from '@/components/_medisys'
 
+import UploadAttachment from './UploadAttachment'
 import model from './models'
 
 window.g_app.replaceModel(model)
@@ -50,9 +52,55 @@ class ClinicalNotes extends PureComponent {
   //   // console.log(this.state, props)
   // }
 
+  toggleAttachmentModal = () => {
+    const { clinicalnotes } = this.props
+
+    this.props.dispatch({
+      type: 'clinicalnotes/updateState',
+      payload: {
+        showAttachmentModal: !clinicalnotes.showAttachmentModal,
+      },
+    })
+  }
+
+  updateAttachments = (args) => ({ added, deleted }) => {
+    console.log({ added, deleted }, args)
+    const { form, field } = args
+    let updated = [
+      ...(field.value || []),
+    ]
+    if (added)
+      updated = [
+        ...updated,
+        ...added.map((o) => ({
+          ...o,
+          fileIndexFK: o.id,
+        })),
+      ]
+
+    if (deleted)
+      updated = updated.reduce((attachments, item) => {
+        if (
+          (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
+          (item.fileIndexFK === undefined && item.id === deleted)
+        )
+          return [
+            ...attachments,
+            { ...item, isDeleted: true },
+          ]
+
+        return [
+          ...attachments,
+          { ...item },
+        ]
+      }, [])
+    console.log(updated)
+    form.setFieldValue('corAttachment', updated)
+  }
+
   render () {
-    console.log(this.props.values)
-    const { prefix = 'corDoctorNote[0].' } = this.props
+    console.log('ClinicalNotes', this.props)
+    const { prefix = 'corDoctorNote[0].', clinicalnotes } = this.props
 
     return (
       <div>
@@ -79,9 +127,20 @@ class ClinicalNotes extends PureComponent {
         />
 
         <h6 style={{ marginTop: 10 }}>Attachment</h6>
-        <p>
-          <a>Attachment001.xlsx</a>
-        </p>
+        <FastField
+          name='corAttachment'
+          render={(args) => (
+            <Attachment
+              attachmentType='ClinicalNotes'
+              handleUpdateAttachments={this.updateAttachments(args)}
+              attachments={args.field.value}
+              label=''
+              isReadOnly
+            />
+          )}
+        />
+
+        {/*         
         <p>
           <a>Attachment002.pdf</a>
         </p>
@@ -90,17 +149,16 @@ class ClinicalNotes extends PureComponent {
         </p>
         <p>
           <a>Scribble 01</a>
-        </p>
-        {/* <CommonModal
-          open={this.state.showInvoiceAdjustment}
+        </p> */}
+        <CommonModal
+          open={clinicalnotes.showAttachmentModal}
           title='Upload Attachment'
           maxWidth='sm'
           bodyNoPadding
-          onClose={() => this.toggleInvoiceAdjustment()}
-          onConfirm={() => this.toggleInvoiceAdjustment()}
+          onClose={() => this.toggleAttachmentModal()}
         >
-          <InvoiceAdjustment />
-        </CommonModal> */}
+          <UploadAttachment updateAttachments={this.updateAttachments} />
+        </CommonModal>
       </div>
     )
   }

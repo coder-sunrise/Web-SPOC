@@ -12,6 +12,7 @@ import {
   GridItem,
   Popover,
   Button,
+  Popconfirm,
 } from '@/components'
 import DeleteIcon from '@material-ui/icons/Delete'
 import { withStyles, Divider, Paper } from '@material-ui/core'
@@ -33,7 +34,7 @@ export default ({
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
         <GridItem xs md={3}>
           <FastField
-            name={`patientVitalSign[${index}].temperatureC`}
+            name={`corPatientNoteVitalSign[${index}].temperatureC`}
             render={(args) => (
               <NumberInput
                 {...args}
@@ -49,7 +50,7 @@ export default ({
         </GridItem>
         <GridItem xs md={3}>
           <FastField
-            name={`patientVitalSign[${index}].bpSysMMHG`}
+            name={`corPatientNoteVitalSign[${index}].bpSysMMHG`}
             render={(args) => (
               <NumberInput
                 {...args}
@@ -63,7 +64,7 @@ export default ({
         </GridItem>
         <GridItem xs md={3}>
           <FastField
-            name={`patientVitalSign[${index}].bpDiaMMHG`}
+            name={`corPatientNoteVitalSign[${index}].bpDiaMMHG`}
             render={(args) => (
               <NumberInput
                 {...args}
@@ -77,7 +78,7 @@ export default ({
         </GridItem>
         <GridItem xs md={3}>
           <FastField
-            name={`patientVitalSign[${index}].pulseRateBPM`}
+            name={`corPatientNoteVitalSign[${index}].pulseRateBPM`}
             render={(args) => (
               <NumberInput
                 {...args}
@@ -93,7 +94,7 @@ export default ({
         </GridItem>
         <GridItem xs md={3}>
           <FastField
-            name={`patientVitalSign[${index}].weightKG`}
+            name={`corPatientNoteVitalSign[${index}].weightKG`}
             render={(args) => (
               <NumberInput
                 {...args}
@@ -103,14 +104,14 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}
-                onChange={handleCalculateBMI(index)}
+                onChange={handleCalculateBMI(index, args.form)}
               />
             )}
           />
         </GridItem>
         <GridItem xs md={3}>
           <FastField
-            name={`patientVitalSign[${index}].heightCM`}
+            name={`corPatientNoteVitalSign[${index}].heightCM`}
             render={(args) => (
               <NumberInput
                 {...args}
@@ -121,7 +122,7 @@ export default ({
                   id: 'reception.queue.visitRegistration.height.suffix',
                 })}
                 // formatter={(value) => Math.floor(value)}
-                onChange={handleCalculateBMI(index)}
+                onChange={handleCalculateBMI(index, args.form)}
               />
             )}
           />
@@ -129,7 +130,7 @@ export default ({
         <GridItem xs md={4} />
         <GridItem xs md={3}>
           <FastField
-            name={`patientVitalSign[${index}].bmi`}
+            name={`corPatientNoteVitalSign[${index}].bmi`}
             render={(args) => (
               <NumberInput
                 {...args}
@@ -145,7 +146,7 @@ export default ({
           />
         </GridItem>
         <GridItem xs={1} style={{ position: 'relative' }}>
-          <Popover
+          {/* <Popover
             content={
               <div>
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
@@ -178,6 +179,19 @@ export default ({
             }}
           >
             <Button
+              // style={{ position: 'absolute', bottom: theme.spacing(1) }}
+              justIcon
+              color='danger'
+              size='sm'
+            >
+              <DeleteIcon />
+            </Button>
+          </Popover> */}
+          <Popconfirm
+            title='Confirm to remove this Vital Sign?'
+            onConfirm={() => arrayHelpers.remove(index)}
+          >
+            <Button
               style={{ position: 'absolute', bottom: theme.spacing(1) }}
               justIcon
               color='danger'
@@ -185,7 +199,7 @@ export default ({
             >
               <DeleteIcon />
             </Button>
-          </Popover>
+          </Popconfirm>
         </GridItem>
       </GridContainer>
       <Divider />

@@ -38,6 +38,7 @@ const _config = {
       'type',
       'disabled',
       'inputComponent',
+      'maxlength',
     ],
   },
 }

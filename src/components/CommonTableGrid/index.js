@@ -657,7 +657,12 @@ class CommonTableGrid extends React.Component {
     // )
     // console.log(this.state)
     const { TableBase } = this
-    const actionColCfg = { columnName: 'action', width: 95, align: 'center' }
+    const actionColCfg = {
+      columnName: 'action',
+      width: 95,
+      align: 'center',
+      sortingEnabled: false,
+    }
     const newColumExtensions = columnExtensions.concat([
       ...[
         actionColCfg,

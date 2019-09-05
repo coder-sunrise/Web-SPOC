@@ -88,7 +88,10 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
-          observe='ConsultationPage'
+          observe={[
+            'ConsultationPage',
+            'OrderPage',
+          ]}
           authority='consultation'
           bodyNoPadding
           onClose={(e) => {
@@ -190,6 +193,7 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.openConfirm}
           title={global.openConfirmTitle}
+          cancelText='Cancel'
           maxWidth='sm'
           onClose={(e) => {
             clearTimeout(this._timer)

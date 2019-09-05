@@ -1,3 +1,4 @@
+import { subscribeNotification } from '@/utils/realtime'
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 import { StatusIndicator } from '../variables'
@@ -29,24 +30,9 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ dispatch }) => {
-      dispatch({
-        type: 'global/subscribeNotification',
-        payload: {
-          type: 'Consultation',
-          callback: () => {
-            dispatch({
-              type: 'refresh',
-            })
-          },
-        },
-      })
-      dispatch({
-        type: 'global/subscribeNotification',
-        payload: {
-          type: 'QueueListing',
-          callback: () => {
-            dispatch({ type: 'refresh' })
-          },
+      subscribeNotification('QueueListing', {
+        callback: () => {
+          dispatch({ type: 'refresh' })
         },
       })
     },
@@ -79,16 +65,16 @@ export default createListViewModel({
             type: 'updateSessionInfo',
             payload: { ...InitialSessionInfo },
           })
-          yield put({
-            type: 'global/sendNotification',
-            payload: {
-              type: 'QueueListing',
-              data: {
-                sender: 'End Session',
-                message: 'Session has been ended',
-              },
-            },
-          })
+          // yield put({
+          //   type: 'global/sendNotification',
+          //   payload: {
+          //     type: 'QueueListing',
+          //     data: {
+          //       sender: 'End Session',
+          //       message: 'Session has been ended',
+          //     },
+          //   },
+          // })
         }
 
         return status >= 204
