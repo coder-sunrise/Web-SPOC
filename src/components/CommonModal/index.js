@@ -32,11 +32,9 @@ let ps
 // function Transition (props) {
 //   return <Slide direction='up' {...props} />
 // }
-const Transition = React.forwardRef((props, ref) => {
-  // console.log('Transition',props)
-  return <Slide direction="up" ref={ref} {...props} />
-})
-
+function Transition (props) {
+  return <Slide direction='up' {...props} />
+}
 function getContainerHeight (props) {
   return (
     window.innerHeight -
@@ -274,25 +272,21 @@ class CommonModal extends React.PureComponent {
     return (
       <React.Fragment>
         <Dialog
-          // classes={{
-          //   root: `${classes.modalRoot}`,
-          //   paper: classes.modal,
-          // }}
+          classes={{
+            root: `${classes.modalRoot}`,
+            paper: classes.modal,
+          }}
           disableBackdropClick={disableBackdropClick}
           open={open}
           fullScreen={this.props.fullScreen}
           fullWidth={adaptFullWidth}
           maxWidth={maxWidth}
           TransitionComponent={Transition}
-          // transitionDuration={{
-          //   enter:1000,
-          //   exit:1000
-          // }}
           keepMounted={keepMounted}
           onClose={this.onClose}
           aria-labelledby='classic-modal-slide-title'
           aria-describedby='classic-modal-slide-description'
-          // style={{ overflow: 'hidden' }}
+          style={{ overflow: 'hidden' }}
           onEscapeKeyDown={this.onClose}
         >
           {title && (
