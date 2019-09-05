@@ -67,12 +67,17 @@ const styles = (theme) => ({
       ),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       role: Yup.string().required('Role is a required field'),
-      doctorProfile: Yup.object().when('role', {
-        is: (val) => val === '1',
-        then: Yup.object().shape({
-          doctorMCRNo: Yup.string().required(),
+      doctorProfile: Yup.object()
+        .transform((value, original) => {
+          console.log({ value, original })
+          return value === null ? {} : value
+        })
+        .when('role', {
+          is: (val) => val === '1',
+          then: Yup.object().shape({
+            doctorMCRNo: Yup.string().required(),
+          }),
         }),
-      }),
     }
     return isEdit
       ? Yup.object().shape(baseValidationRule)
@@ -86,6 +91,7 @@ const styles = (theme) => ({
   },
   mapPropsToValues: (props) => {
     const { settingUserProfile, currentUser } = props
+
     if (currentUser) {
       return {
         ...currentUser,
@@ -94,7 +100,10 @@ const styles = (theme) => ({
           currentUser.effectiveStartDate,
           currentUser.effectiveEndDate,
         ],
-        role: 1,
+        role:
+          currentUser.userProfile && currentUser.userProfile.role
+            ? currentUser.userProfile.role.id
+            : undefined,
       }
     }
     if (settingUserProfile) {
@@ -110,7 +119,9 @@ const styles = (theme) => ({
                 currentSelectedUser.effectiveStartDate,
                 currentSelectedUser.effectiveEndDate,
               ],
-        role: 1,
+        role: currentSelectedUser.userProfile
+          ? currentSelectedUser.userProfile.role.id
+          : undefined,
       }
     }
     return {}
