@@ -39,6 +39,11 @@ class DateEditorBase extends PureComponent {
       gridId,
       ...restProps
     } = cfg
+
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][row.id] || {}
+      : row
+
     const _onChange = (date, moments, org) => {
       const error = updateCellValue(this.props, this.myRef.current, date)
 
@@ -46,28 +51,16 @@ class DateEditorBase extends PureComponent {
         error,
       })
       if (!error) {
-        if (onChange)
-          onChange(
-            date,
-            moments,
-            org,
-            window.$tempGridRow[gridId]
-              ? window.$tempGridRow[gridId][row.id] || {}
-              : row,
-          )
+        if (onChange) onChange(date, moments, org, latestRow)
       }
     }
     const commonCfg = {
       onChange: _onChange,
-      disabled: isDisabled(
-        window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][row.id] || {}
-          : row,
-      ),
+      disabled: isDisabled(latestRow),
       defaultValue: getInitialValue ? getInitialValue(row) : value,
-      value,
+      value: latestRow[columnName],
     }
-    // console.log(cfg, value, commonCfg)
+    // console.log('RangeDateTypeProvider', cfg, value, commonCfg)
     return (
       <div ref={this.myRef}>
         <DateRangePicker

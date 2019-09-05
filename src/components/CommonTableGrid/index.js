@@ -710,7 +710,7 @@ class CommonTableGrid extends React.Component {
     } else {
       newColumExtensions.push(actionColDefaultCfg)
     }
-    console.log(errors, newColumExtensions)
+    // console.log(errors, newColumExtensions)
 
     const tableProps = {
       columnExtensions: newColumExtensions,
