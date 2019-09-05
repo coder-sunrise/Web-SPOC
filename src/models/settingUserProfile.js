@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+import * as service from '@/pages/Setting/UserProfile/services'
 
 export default createListViewModel({
   namespace: 'settingUserProfile',
@@ -14,10 +14,9 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {
-      *fetchUserProfileByID ({ id }, { call, put }) {
-        const response = yield call(service.fetchUserProfileByID, id)
+      *fetchUserProfileByID ({ payload }, { call, put }) {
+        const response = yield call(service.query, payload)
         const { data = {}, status } = response
-
         return yield put({
           type: 'updateCurrentSelected',
           userProfile: { ...data },
@@ -38,7 +37,7 @@ export default createListViewModel({
       updateCurrentSelected (state, { userProfile }) {
         return {
           ...state,
-          showUserProfileModal: !!userProfile,
+          // showUserProfileModal: !!userProfile,
           currentSelectedUser: { ...userProfile },
         }
       },

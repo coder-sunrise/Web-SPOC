@@ -62,7 +62,7 @@ class HeaderLinks extends React.Component {
     user.data &&
       dispatch({
         type: 'user/fetchProfileDetails',
-        id: user.data.id,
+        id: user.data.clinicianProfile.id,
       })
     dispatch({
       type: 'global/updateAppState',
