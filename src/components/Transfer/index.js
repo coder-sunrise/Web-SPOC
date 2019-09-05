@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
@@ -28,6 +28,7 @@ const styles = () => ({
 
 const Transfer = ({
   items,
+  addedItems,
   classes,
   label,
   limitTitle,
@@ -35,19 +36,60 @@ const Transfer = ({
   setFieldValue,
   fieldName,
 }) => {
-  console.log({ fieldName })
+  //console.log({ fieldName })
   const [
     addedList,
     setAddedList,
   ] = useState(items || [])
+
   const [
     removedList,
     setRemovedList,
   ] = useState([])
+
   const [
     searchField,
     setSearchField,
   ] = useState('')
+
+  useEffect(
+    () => {
+      setAddedList(items || [])
+    },
+    [
+      items,
+    ],
+  )
+
+  useEffect(
+    () => {
+      if (addedItems) {
+        const filter = addedList.filter((x) =>
+          addedItems.find(
+            (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
+          ),
+        )
+        initAddedItems(filter)
+      }
+    },
+    [
+      addedItems,
+    ],
+  )
+
+  const initAddedItems = (items) => {
+    setRemovedList(items)
+
+    const tempList = addedList.filter(
+      (x) =>
+        !items.find(
+          (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
+        ),
+    )
+
+    setAddedList(tempList)
+  }
+
   const addClick = (index) => () => {
     const tempList = [
       ...removedList,
