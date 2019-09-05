@@ -704,11 +704,7 @@ const tenantCodes = [
   'ctappointmenttype',
   'ctservice',
   'ctreferrallettertemplate',
-<<<<<<< HEAD
-  'inventoryMedication',
-=======
   'role',
->>>>>>> dev
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
