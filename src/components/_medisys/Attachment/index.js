@@ -34,8 +34,9 @@ const styles = (theme) => ({
     marginRight: theme.spacing(0.5),
   },
   chip: {
-    marginLeft: theme.spacing(1),
+    // marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
+    marginBottom: 2,
     '& > span': {
       paddingLeft: theme.spacing(2),
       paddingRight: theme.spacing(2),
@@ -68,6 +69,7 @@ const Attachment = ({
   attachmentType = '',
   attachments = [],
   isReadOnly,
+  label = 'Attachment:',
 }) => {
   const [
     uploading,
@@ -194,10 +196,12 @@ const Attachment = ({
   })
   return (
     <GridContainer>
-      <GridItem className={labelClass}>
-        <span className={classes.attachmentLabel}>Attachment:</span>
-        {uploading && <CircularProgress />}
-      </GridItem>
+      {label && (
+        <GridItem className={labelClass}>
+          <span className={classes.attachmentLabel}>{label}</span>
+          {uploading && <CircularProgress />}
+        </GridItem>
+      )}
       <GridItem md={10} className={classes.verticalSpacing}>
         <div>
           {fileAttachments.map((attachment) => (
@@ -228,15 +232,17 @@ const Attachment = ({
           multiple='multiple'
           onChange={onFileChange}
         />
-        <Button
-          color='rose'
-          size='sm'
-          onClick={onUploadClick}
-          disabled={isReadOnly || uploading || fileAttachments.length >= 5}
-        >
-          <AttachFile />
-          Upload
-        </Button>
+        {!isReadOnly && (
+          <Button
+            color='rose'
+            size='sm'
+            onClick={onUploadClick}
+            disabled={uploading || fileAttachments.length >= 5}
+          >
+            <AttachFile />
+            Upload
+          </Button>
+        )}
       </GridItem>
       <GridItem>
         <Danger>

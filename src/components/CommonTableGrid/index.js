@@ -155,6 +155,10 @@ class CommonTableGrid extends React.Component {
     },
   }
 
+  static defaultProps = {
+    columnExtensions: [],
+  }
+
   constructor (props) {
     super(props)
     const {
@@ -657,10 +661,14 @@ class CommonTableGrid extends React.Component {
     // )
     // console.log(this.state)
     const { TableBase } = this
-    const actionColCfg = { columnName: 'action', width: 95, align: 'center' }
-    const newColumExtensions = columnExtensions.concat([
+    const actionColDefaultCfg = {
+      columnName: 'action',
+      width: 95,
+      align: 'center',
+      sortingEnabled: false,
+    }
+    let newColumExtensions = columnExtensions.concat([
       ...[
-        actionColCfg,
         {
           columnName: 'rowIndex',
           width: 80,
@@ -675,16 +683,12 @@ class CommonTableGrid extends React.Component {
         },
       ],
       ...columns
-        .filter(
-          (o) =>
-            !columnExtensions.find((m) => m.columnName === o.name) ||
-            o.name === 'action',
-        )
+        .filter((o) => !columnExtensions.find((m) => m.columnName === o.name))
         .map((o) => {
           let extraCfg = {}
           if (o.name === 'action') {
             extraCfg = {
-              ...actionColCfg,
+              ...actionColDefaultCfg,
             }
           }
           return {
@@ -694,6 +698,18 @@ class CommonTableGrid extends React.Component {
           }
         }),
     ])
+    let actionCol = newColumExtensions.find((o) => o.columnName === 'action')
+    if (actionCol) {
+      newColumExtensions = newColumExtensions.filter(
+        (o) => o.columnName !== 'action',
+      )
+      newColumExtensions.push({
+        ...actionColDefaultCfg,
+        ...actionCol,
+      })
+    } else {
+      newColumExtensions.push(actionColDefaultCfg)
+    }
     // console.log(errors, newColumExtensions)
 
     const tableProps = {

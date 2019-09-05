@@ -11,8 +11,9 @@ import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
 
-@connect(({ global, loading }) => ({
+@connect(({ global, loading, user }) => ({
   global,
+  loggedInUserID: user.data.id,
 }))
 class GlobalModalContainer extends PureComponent {
   // componentDidMount () {
@@ -51,10 +52,14 @@ class GlobalModalContainer extends PureComponent {
       type: 'user/saveProfileDetails',
       profileDetails: undefined,
     })
+    dispatch({
+      type: 'settingUserProfile/updateCurrentSelected',
+      userProfile: {},
+    })
   }
 
   render () {
-    const { global, dispatch, history } = this.props
+    const { global, dispatch, loggedInUserID, history } = this.props
     return (
       <div>
         {/* <SimpleModal
@@ -88,7 +93,10 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
-          observe='ConsultationPage'
+          observe={[
+            'ConsultationPage',
+            'OrderPage',
+          ]}
           authority='consultation'
           bodyNoPadding
           onClose={(e) => {
@@ -123,7 +131,7 @@ class GlobalModalContainer extends PureComponent {
           }}
           maxWidth='sm'
         >
-          <ChangePassword />
+          <ChangePassword userID={loggedInUserID} />
         </CommonModal>
         <CommonModal
           title='My Account'
@@ -190,6 +198,7 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.openConfirm}
           title={global.openConfirmTitle}
+          cancelText='Cancel'
           maxWidth='sm'
           onClose={(e) => {
             clearTimeout(this._timer)

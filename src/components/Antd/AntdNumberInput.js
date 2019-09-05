@@ -170,8 +170,11 @@ class AntdNumberInput extends React.PureComponent {
       focused: false,
     })
     const { form, field } = this.props
-    if (form && field) form.setFieldTouched(field.name, true)
-
+    if (form && field) {
+      // form.setFieldTouched(field.name, true)
+      field.onChange(this.state.value)
+    }
+    // console.log('handleBlur')
     // const { formatter } = this.props
     // if (formatter) {
     //   this.setState({
@@ -254,7 +257,10 @@ class AntdNumberInput extends React.PureComponent {
 
   getConfig = () => {
     const { currency, percentage, formatter } = this.props
-    const extraCfg = {}
+    const extraCfg = {
+      max: 999999999999,
+      min: -999999999999,
+    }
 
     if (currency) {
       extraCfg.formatter = (v) => {

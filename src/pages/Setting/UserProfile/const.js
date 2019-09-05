@@ -6,19 +6,21 @@ export const UserProfileTableConfig = {
       name: 'role',
       title: 'Role',
     },
-    { name: 'status', title: 'Status' },
+    { name: 'isActive', title: 'Status' },
     { name: 'action', title: 'Action' },
   ],
   columnExtensions: [
     {
-      columnName: 'role',
-      render: (row) => {
-        return row.role ? row.role.name : ''
-      },
+      columnName: 'userName',
+      render: (row) => row.userProfile.userName,
     },
     {
-      columnName: 'status',
-      render: (row) => (row.status ? 'Active' : 'Inactive'),
+      columnName: 'role',
+      render: (row) => (row.userProfile.role ? row.userProfile.role.name : ''),
+    },
+    {
+      columnName: 'isActive',
+      render: (row) => (row.isActive ? 'Active' : 'Inactive'),
     },
   ],
   FuncProps: {

@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 import { FieldArray, withFormik } from 'formik'
 import { connect } from 'dva'
+import { withStyles } from '@material-ui/core'
 import VisitValidationSchema from './validationScheme'
 import model from './models'
 import VitalSignCard from './VitalSignCard'
-import { withStyles } from '@material-ui/core'
 
 window.g_app.replaceModel(model)
 
@@ -13,14 +13,6 @@ const styles = (theme) => ({})
 @connect(({ patientVitalSign }) => ({
   patientVitalSign,
 }))
-@withFormik({
-  displayName: 'patientVitalSign',
-  mapPropsToValues: ({ patientVitalSign }) => {
-    return patientVitalSign.entity || patientVitalSign.default
-  },
-  validationSchema: VisitValidationSchema,
-  handleSubmit: () => {},
-})
 class index extends PureComponent {
   componentWillReceiveProps (nextProps) {
     if (
@@ -50,15 +42,15 @@ class index extends PureComponent {
     })
   }
 
-  handleCalculateBMI = (index) => {
-    const { heightCM, weightKG } = this.props.values.patientVitalSign[index]
-    const { setFieldValue, setFieldTouched } = this.props
+  handleCalculateBMI = (i, form) => {
+    const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
+    const { setFieldValue, setFieldTouched } = form
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
       const bmi = weightKG / heightM ** 2
       const bmiInTwoDecimal = Math.round(bmi * 100) / 100
-      setFieldValue(`patientVitalSign[${index}].bmi`, bmiInTwoDecimal)
-      setFieldTouched(`patientVitalSign[${index}].bmi`, true)
+      setFieldValue(`corPatientNoteVitalSign[${i}].bmi`, bmiInTwoDecimal)
+      setFieldTouched(`corPatientNoteVitalSign[${i}].bmi`, true)
     }
   }
 
@@ -67,21 +59,22 @@ class index extends PureComponent {
     return (
       <div>
         <FieldArray
-          name='patientVitalSign'
+          name='corPatientNoteVitalSign'
           render={(arrayHelpers) => {
             this.arrayHelpers = arrayHelpers
-            return values.patientVitalSign.map((v, i) => {
-              return (
-                <div key={i}>
-                  <VitalSignCard
-                    {...this.props}
-                    index={i}
-                    arrayHelpers={arrayHelpers}
-                    handleCalculateBMI={this.handleCalculateBMI}
-                  />
-                </div>
-              )
-            })
+            return (arrayHelpers.form.values.corPatientNoteVitalSign || [])
+              .map((v, i) => {
+                return (
+                  <div key={i}>
+                    <VitalSignCard
+                      {...this.props}
+                      index={i}
+                      arrayHelpers={arrayHelpers}
+                      handleCalculateBMI={this.handleCalculateBMI}
+                    />
+                  </div>
+                )
+              })
           }}
         >
           {/* <VitalSignCard handleCalculateBMI={this.calculateBMI} /> */}

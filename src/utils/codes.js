@@ -698,13 +698,17 @@ const multiplyCodetable = (data, multiplier) => {
   return result
 }
 
-const tenantCode = [
-  'doctorprofile',
+const tenantCodes = [
+  'doctorProfile',
   'clinicianprofile',
   'ctappointmenttype',
   'ctservice',
   'ctreferrallettertemplate',
+<<<<<<< HEAD
   'inventoryMedication',
+=======
+  'role',
+>>>>>>> dev
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -714,14 +718,24 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
   const searchURL = `${baseURL}/search?ctname=`
 
   let url = useGeneral ? generalCodetableURL : searchURL
-  if (tenantCode.includes(code.toLowerCase())) {
+  let criteriaForTenantCodes = { pagesize: 99999 }
+  if (
+    tenantCodes.reduce(
+      (codes, tenantCode) =>
+        tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
+      false,
+    )
+  ) {
     url = '/api/'
     useGeneral = false
   }
+  const body = useGeneral
+    ? convertToQuery({ ...params })
+    : convertToQuery({ ...params, ...criteriaForTenantCodes })
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
-    body: convertToQuery(params),
+    body,
   })
   const { status: statusCode, data } = response
   const result = multiplyCodetable(
