@@ -157,7 +157,7 @@ class TextField extends React.PureComponent {
       uppercase,
       lowercase,
     } = props
-    const { field, form, ...resetProps } = props
+    const { field, form, maxlength, ...resetProps } = props
     // console.log(this.state, this.state.value)
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
@@ -199,6 +199,9 @@ class TextField extends React.PureComponent {
     }
     // cfg.onFocus = extendFunc(onFocus, this.handleFocus)
     // cfg.onBlur = extendFunc(onBlur, this.handleBlur)
+    if (!maxlength) {
+      cfg.maxlength = 200
+    }
     cfg.negative = state.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
     if (uppercase) {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
@@ -18,22 +18,16 @@ import {
 } from '@/components'
 
 const styles = () => ({})
-const Setting = ({ classes, setFieldValue, showTransfer }) => {
+const Setting = ({ classes, setFieldValue, showTransfer, ...props }) => {
+  const { medicationDetail } = props
+  const { ctmedicationprecaution, entity } = medicationDetail
+  const entityData = entity || []
+
   const settingProps = {
-    items: [
-      {
-        medicationPrecautionFK: 1,
-      },
-      {
-        medicationPrecautionFK: 2,
-      },
-      {
-        medicationPrecautionFK: 3,
-      },
-      {
-        medicationPrecautionFK: 4,
-      },
-    ],
+    items: ctmedicationprecaution,
+    addedItems: entityData
+      ? entityData.inventoryMedication_MedicationPrecaution
+      : [],
     classes,
     label: 'Precaution',
     limitTitle: formatMessage({
@@ -43,6 +37,9 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
     setFieldValue,
     fieldName: 'inventoryMedication_MedicationPrecaution',
   }
+
+  console.log('Setting', props)
+
   return (
     <GridContainer>
       <GridItem xs={6}>

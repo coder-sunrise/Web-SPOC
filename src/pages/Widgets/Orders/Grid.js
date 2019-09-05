@@ -24,6 +24,7 @@ export default ({ orders,dispatch }) => {
       style={{ margin: 0 }}
       rows={rows}
       onRowDoubleClick={editRow}
+      getRowId={(r) => r.uid}
       columns={[
         { name: 'editType', title: 'Type' },
         { name: 'subject', title: 'Name' },

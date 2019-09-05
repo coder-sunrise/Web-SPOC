@@ -1,4 +1,4 @@
-import * as Yup from 'yup'
+import Yup from '@/utils/yup'
 
 const VitalSignMessage = {
   temperatureC: 'Temperature must be between 0 and 200 °C',
@@ -9,8 +9,21 @@ const VitalSignMessage = {
   heightCM: 'Height must be between 0 and 999',
 }
 
-export default Yup.object().shape({
-  patientVitalSign: Yup.array().of(
+const schema = Yup.object().shape({
+  corPrescriptionItem: Yup.array().of(
+    Yup.object().shape({
+      // Description: Yup.string().required('Description is required'),
+      // UnitPrice: Yup.number().required('Unit Price is required'),
+      corPrescriptionItemPrecaution: Yup.array().of(
+        Yup.object().shape(
+          {
+            // prescriptionItemFK:
+          },
+        ),
+      ),
+    }),
+  ),
+  corPatientNoteVitalSign: Yup.array().of(
     Yup.object().shape({
       temperatureC: Yup.number()
         .min(0, VitalSignMessage.temperatureC)
@@ -33,3 +46,5 @@ export default Yup.object().shape({
     }),
   ),
 })
+
+export default schema

@@ -4,6 +4,7 @@ import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
 import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
 
 export default createFormViewModel({
   namespace: 'consultation',
@@ -13,6 +14,10 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      default: {
+        corAttachment: [],
+        corPatientNoteVitalSign: [],
+      },
       selectedWidgets: [
         '1',
       ],
@@ -37,6 +42,9 @@ export default createFormViewModel({
         // console.log(11, response)
         const { id } = response
         if (id) {
+          sendNotification('QueueListing', {
+            message: `Consultation started`,
+          })
           yield put({
             type: 'query',
             payload: id,
@@ -45,14 +53,38 @@ export default createFormViewModel({
       },
       *pause ({ payload }, { call, put }) {
         const response = yield call(service.pause, payload)
+        if (response) {
+          sendNotification('QueueListing', {
+            message: `Consultation paused`,
+          })
+        }
         return response
       },
       *resume ({ payload }, { call, put }) {
         const response = yield call(service.resume, payload)
+        // if (response) {
+        //   sendNotification('QueueListing', {
+        //     message: `Consultation resumed`,
+        //   })
+        // }
         return response
       },
       *sign ({ payload }, { call, put }) {
         const response = yield call(service.sign, payload)
+        if (response) {
+          sendNotification('QueueListing', {
+            message: `Consultation signed`,
+          })
+        }
+        return response
+      },
+      *discard ({ payload }, { call, put }) {
+        const response = yield call(service.delete, payload)
+        if (response) {
+          sendNotification('QueueListing', {
+            message: `Consultation discarded`,
+          })
+        }
         return response
       },
       *closeConsultationModal ({ payload }, { call, put }) {

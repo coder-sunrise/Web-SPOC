@@ -202,7 +202,16 @@ const schemaSchemes = {
           then: Yup.number().required(),
         }),
         validRange: Yup.array().when('schemeTypeFK', {
-          is: (val) => val <= 10, // val === undefined,
+          is: (val) => {
+            const st = schemeTypes.find((o) => o.id === val)
+            return (
+              [
+                'MEDI500VISUT',
+                'FLEXIMEDI',
+                'OPSCAN',
+              ].indexOf(st.code) < 0 && !st.code.startsWith('PHPC')
+            )
+          }, // val === undefined,
           then: Yup.array().of(Yup.date()).required().min(2),
           // otherwise: null,
           // otherwise: Yup.array().of(Yup.date().min(2)),

@@ -17,6 +17,7 @@ import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
 import Authorized from '@/utils/Authorized'
+import { initStream } from '@/utils/realtime'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
@@ -200,9 +201,7 @@ class BasicLayout extends React.PureComponent {
     // dispatch({
     //   type: 'setting/getSetting',
     // })
-    dispatch({
-      type: 'global/initStream',
-    })
+    initStream()
   }
 
   componentDidUpdate (e) {
