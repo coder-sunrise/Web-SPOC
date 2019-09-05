@@ -78,7 +78,7 @@ const Detail = ({
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock />,
+            tabContent: <Stock consumableDetail={consumableDetail} />,
           },
         ]}
       />
@@ -103,6 +103,7 @@ export default compose(
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.string().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      uomfk: Yup.number().required(),
       averageCostPrice: Yup.number().positive(
         'Average Cost Price must between 0 to 999,999.99',
       ),

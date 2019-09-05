@@ -34,6 +34,11 @@ const Detail = ({
   handleSubmit,
   ...props
 }) => {
+  const [
+    selectedItem,
+    setSelectedItem,
+  ] = useState({})
+
   const field = packDetail.entity ? 'entity' : 'default'
 
   const handleServiceOnChange = (e) => {
@@ -46,8 +51,23 @@ const Detail = ({
     }
   }
 
-  console.log('propsss', props)
-  const { ServiceList } = props
+  const handleItemOnChange = (e) => {
+    const { option, row } = e
+    const { sellingPrice } = option
+    setSelectedItem(option)
+    console.log('er', e)
+    console.log('er', option)
+
+    return { ...row, unitPrice: sellingPrice }
+  }
+
+  // console.log('propsss', props)
+  const {
+    medicationPackageItem,
+    consumablePackageItem,
+    vaccinationPackageItem,
+    servicePackageItem,
+  } = props.values
   const { currentTab } = pack
   const detailProps = {
     packDetail,
@@ -73,31 +93,62 @@ const Detail = ({
         code: 'inventoryMedication',
         labelField: 'displayValue',
         valueField: 'id',
+        onChange: handleItemOnChange,
       },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'subTotal', type: 'number', currency: true },
+      {
+        columnName: 'quantity',
+        type: 'number',
+      },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
     ],
-    medicationList: [
-      props.values.medicationPackageItem,
-    ],
+    medicationList: medicationPackageItem,
   }
 
   const vaccinationProps = {
     vaccinationTableParas: {
       columns: [
-        { name: 'vaccination', title: 'Vaccination' },
+        { name: 'vaccinationName', title: 'Vaccination' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
+        { name: 'subTotal', title: 'Amount' },
       ],
       leftColumns: [],
     },
     vaccinationColExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
+      {
+        columnName: 'vaccinationName',
+        type: 'codeSelect',
+        code: 'inventoryVaccination',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: handleItemOnChange,
+      },
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
     ],
-    vaccinationList: [],
+    vaccinationList: vaccinationPackageItem,
   }
 
   const consumableProps = {
@@ -106,35 +157,34 @@ const Detail = ({
         { name: 'consumableName', title: 'Consumable Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
+        { name: 'subTotal', title: 'Amount' },
       ],
       leftColumns: [],
     },
     consumableColExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
-    ],
-    consumableList: [
       {
-        consumableName: 'Colgate Active Fast',
-        quantity: 1,
-        unitPrice: 15,
-        amount: 15,
+        columnName: 'consumableName',
+        type: 'codeSelect',
+        code: 'inventoryConsumable',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: handleItemOnChange,
+      },
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
       },
       {
-        consumableName: 'Sensidive Whitening',
-        quantity: 1,
-        unitPrice: 15,
-        amount: 15,
-      },
-      {
-        consumableName: 'Fruit Juice (Orange) Sugar Free',
-        quantity: 1,
-        unitPrice: 2,
-        amount: 2,
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
       },
     ],
+    consumableList: consumablePackageItem,
   }
   const serviceProps = {
     serviceTableParas: {
@@ -160,6 +210,7 @@ const Detail = ({
         columnName: 'unitPrice',
         type: 'number',
         currency: true,
+        disabled: true,
       },
       {
         columnName: 'subTotal',
@@ -168,112 +219,29 @@ const Detail = ({
         disabled: true,
       },
     ],
-    ServiceList: props.values.servicePackageItem,
+    ServiceList: servicePackageItem,
   }
-
-  const commitChanges = (type) => ({ rows, added, changed, deleted }) => {
-    console.log('packDetail', packDetail)
-
-    const newRow = rows[0]
-    console.log('newRow', newRow)
-
-    const calSubtotal = newRow.quantity * newRow.unitPrice
-    newRow.subTotal = calSubtotal
-    // console.log('asdas', getUniqueNumericId())
-    // newRow.id = getUniqueNumericId()
-
-    const {
-      medicationPackageItem,
-      consumablePackageItem,
-      vaccinationPackageItem,
-      servicePackageItem,
-    } = props.values
-
-    switch (type) {
-      case 'medicationPackageItem': {
-        const newPackageItem = medicationPackageItem.concat(newRow)
-        return dispatch({
-          type: 'packDetail/updateState',
-          payload: {
-            [field]: {
-              ...props.values,
-              medicationPackageItem: newPackageItem,
-            },
-          },
-        })
-      }
-      case 'servicePackageItem': {
-        const newPackageItem = servicePackageItem.concat(newRow)
-        return dispatch({
-          type: 'packDetail/updateState',
-          payload: {
-            [field]: {
-              ...props.values,
-              servicePackageItem: newPackageItem,
-            },
-          },
-        })
-      }
-
-      default:
-        return newRow
-    }
-  }
-
-  const onAddedRowsChange = (addedRows) => {
-    console.log('addedRows', addedRows)
-    // return addedRows.map(
-    //   (row) => console.log('row', row),
-    //   //  ({
-    //   //   onsetDate: moment(),
-    //   //   ...row,
-    //   //   confirmedByUserFK: props.user.data.id,
-    //   //   isConfirmed: true,
-    //   //   type,
-    //   // })
-    // )
-    return [
-      { ...addedRows, unitPrice: 123 },
-    ]
-  }
-
-  const onDeletedRowIdsChange = (ids) => {
-    const rows = props.values.servicePackageItem.filter(
-      (service) => ids.indexOf(service.id) < 0,
-    )
-    console.log('deleterow', rows)
-    dispatch({
-      type: 'packDetail/updateState',
-      payload: {
-        default: {
-          ...props.values,
-          medicationPackageItem: rows,
-        },
-      },
+  const [
+    total,
+    setTotal,
+  ] = useState(0)
+  const calTotal = () => {
+    setTotal(0)
+    medicationPackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
     })
 
-    return ids
-  }
+    servicePackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
 
-  const [
-    rowChange,
-    setRowChange,
-  ] = useState([])
+    consumablePackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
 
-  const onRowChangesChange = (rowChanges) => {
-    console.log('rowChanges', rowChanges)
-
-    setRowChange(rowChanges)
-    console.log('rowChange', rowChange)
-
-    return rowChanges
-  }
-
-  const editableGridProps = {
-    commitChanges,
-    onAddedRowsChange,
-    onRowChangesChange,
-    onDeletedRowIdsChange,
+    vaccinationPackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
   }
 
   return (
@@ -309,16 +277,16 @@ const Detail = ({
             tabButton: 'Order Item',
             tabContent: (
               <InventoryTypeListing
+                calTotal={calTotal}
                 medication={medicationProps}
                 consumable={consumableProps}
                 vaccination={vaccinationProps}
                 service={serviceProps}
                 packDetail={packDetail}
                 setFieldValue={setFieldValue}
-                {...editableGridProps}
                 {...props}
-                rowChange={rowChange}
-                setRowChange={setRowChange}
+                selectedItem={selectedItem}
+                setSelectedItem={setSelectedItem}
               />
             ),
           },

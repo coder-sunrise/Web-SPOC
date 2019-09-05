@@ -21,17 +21,11 @@ import { compose } from 'redux'
 import { connect } from 'dva'
 
 const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
-  //console.log('prospss', props)
   useEffect(() => {
-    //console.log('afterefffect')
-    //console.log('ctsdd', props)
-
     dispatch({
       type: 'sddDetail/query',
     })
   }, [])
-
-  //console.log('propsSddList', props)
 
   const selectRow = (row, e) => {
     handleSelectSdd(row)
@@ -64,7 +58,6 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
         render: (row) => {
           return (
             <Button
-              color='info'
               link
               justIcon
               onClick={() => {
@@ -117,7 +110,7 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
                 group: [
                   {
                     code: sddIdName,
-                    //name: sddIdName,
+                    // name: sddIdName,
                     combineCondition: 'or',
                   },
                 ],

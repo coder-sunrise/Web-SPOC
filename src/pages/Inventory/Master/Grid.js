@@ -19,10 +19,11 @@ const Grid = ({
     })
   }, [])
 
-  const showDetail = (row, vmode) => () => {
-    console.log('shodetail')
+  const showDetail = (row, vmode) => () =>
     history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
-  }
+
+  const handleDoubleClick = (row) =>
+    history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
 
   const Cell = ({ column, row, classes, ...p }) => {
     if (column.name === 'action') {
@@ -52,7 +53,7 @@ const Grid = ({
     <React.Fragment>
       <CommonTableGrid
         rows={list}
-        onRowDoubleClick={(row) => showDetail(row)}
+        onRowDoubleClick={(row) => handleDoubleClick(row)}
         columnExtensions={colExtensions}
         ActionProps={ActionProps}
         FuncProps={{ pager: true }}

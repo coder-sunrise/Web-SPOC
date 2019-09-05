@@ -49,6 +49,21 @@ export default createFormViewModel({
         return yield call(upsert, payload)
       },
     },
-    reducers: {},
+    reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+        console.log('data', data)
+        return {
+          ...st,
+          entity: {
+            ...data,
+            effectiveDates: [
+              data.effectiveStartDate,
+              data.effectiveEndDate,
+            ],
+          },
+        }
+      },
+    },
   },
 })

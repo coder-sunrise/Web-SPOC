@@ -35,7 +35,7 @@ const Transfer = ({
   setFieldValue,
   fieldName,
 }) => {
-  console.log({ fieldName })
+  // console.log({ fieldName })
   const [
     addedList,
     setAddedList,

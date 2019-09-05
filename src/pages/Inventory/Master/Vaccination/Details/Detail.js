@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
 import { FastField } from 'formik'
 import { connect } from 'dva'
 import { compose } from 'redux'
-
+import Sdd from '../../Sdd'
 import {
+  CommonModal,
   CardContainer,
   TextField,
   GridContainer,
@@ -23,9 +24,15 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ vaccinationDetail, dispatch, values }) => {
-  // console.log('props', vaccinationDetail)
-  // console.log('props', values)
+const Detail = ({
+  vaccinationDetail,
+  dispatch,
+  setFieldValue,
+  values,
+  ...props
+}) => {
+  const field = vaccinationDetail.entity ? 'entity' : 'default'
+
   useEffect(() => {
     if (vaccinationDetail.currentId) {
       dispatch({
@@ -33,9 +40,50 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
         payload: {
           id: vaccinationDetail.currentId,
         },
+      }).then((vac) => {
+        const { sddfk } = vac
+        if (sddfk) {
+          dispatch({
+            type: 'sddDetail/query',
+            payload: {
+              id: sddfk,
+            },
+          }).then((sdd) => {
+            const { data } = sdd
+            const { code, name } = data[0]
+            setFieldValue('sddCode', code)
+            setFieldValue('sddDescription', name)
+          })
+        }
       })
     }
   }, [])
+
+  const [
+    toggle,
+    setToggle,
+  ] = useState(false)
+
+  const toggleModal = () => {
+    setToggle(!toggle)
+  }
+  const handleSelectSdd = (row) => {
+    const { setFieldTouched } = props
+    const { id, code, name } = row
+    setToggle(!toggle)
+    dispatch({
+      type: 'vaccinationDetail/updateState',
+      payload: {
+        [field]: {
+          ...props.values,
+          sddfk: id,
+          sddCode: code,
+          sddDescription: name,
+        },
+      },
+    })
+  }
+
   return (
     <CardContainer
       hideHeader
@@ -202,7 +250,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
       <GridContainer>
         <GridItem xs={5}>
           <FastField
-            name='sddfk'
+            name='sddCode'
             render={(args) => {
               return (
                 <TextField
@@ -216,15 +264,7 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
           />
         </GridItem>
         <GridItem xs={5} style={{ marginTop: 10 }}>
-          <Button
-            variant='contained'
-            color='primary'
-            // onClick={() => {
-            //   dispatch({
-            //     type: 'medication/query',
-            //   })
-            // }}
-          >
+          <Button variant='contained' color='primary' onClick={toggleModal}>
             Search
           </Button>
         </GridItem>
@@ -246,6 +286,18 @@ const Detail = ({ vaccinationDetail, dispatch, values }) => {
         </GridItem>
       </GridContainer>
       <Divider style={{ margin: '40px 0 20px 0' }} />
+
+      <CommonModal
+        open={toggle}
+        observe='VaccinationDetail'
+        title='Standard Drug Dictionary'
+        maxWidth='md'
+        bodyNoPadding
+        onClose={toggleModal}
+        onConfirm={toggleModal}
+      >
+        <Sdd dispatch={dispatch} handleSelectSdd={handleSelectSdd} {...props} />
+      </CommonModal>
     </CardContainer>
   )
 }

@@ -704,7 +704,9 @@ const tenantCode = [
   'ctappointmenttype',
   'ctservice',
   'ctreferrallettertemplate',
-  'inventoryMedication',
+  'inventorymedication',
+  'inventoryconsumable',
+  'inventoryvaccination',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -718,7 +720,6 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     url = '/api/'
     useGeneral = false
   }
-
   const response = await request(`${url}${code}`, {
     method: 'GET',
     body: convertToQuery(params),

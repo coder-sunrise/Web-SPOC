@@ -22,7 +22,9 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ medicationDetail, dispatch, ...props }) => {
+const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
+  const field = medicationDetail.entity ? 'entity' : 'default'
+
   useEffect(() => {
     if (medicationDetail.currentId) {
       dispatch({
@@ -30,6 +32,21 @@ const Detail = ({ medicationDetail, dispatch, ...props }) => {
         payload: {
           id: medicationDetail.currentId,
         },
+      }).then((med) => {
+        const { sddfk } = med
+        if (sddfk) {
+          dispatch({
+            type: 'sddDetail/query',
+            payload: {
+              id: sddfk,
+            },
+          }).then((sdd) => {
+            const { data } = sdd
+            const { code, name } = data[0]
+            setFieldValue('sddCode', code)
+            setFieldValue('sddDescription', name)
+          })
+        }
       })
     }
   }, [])
@@ -42,13 +59,21 @@ const Detail = ({ medicationDetail, dispatch, ...props }) => {
   const toggleModal = () => {
     setToggle(!toggle)
   }
-
   const handleSelectSdd = (row) => {
-    const { setFieldValue, setFieldTouched } = props
-    const { id } = row
-    setFieldValue('sddfk', row.code)
-    setFieldValue('sddDescription', row.name)
+    const { setFieldTouched } = props
+    const { id, code, name } = row
     setToggle(!toggle)
+    dispatch({
+      type: 'medicationDetail/updateState',
+      payload: {
+        [field]: {
+          ...props.values,
+          sddfk: id,
+          sddCode: code,
+          sddDescription: name,
+        },
+      },
+    })
   }
 
   return (
@@ -196,7 +221,7 @@ const Detail = ({ medicationDetail, dispatch, ...props }) => {
       <GridContainer>
         <GridItem xs={5}>
           <FastField
-            name='sddfk'
+            name='sddCode'
             render={(args) => {
               return (
                 <TextField

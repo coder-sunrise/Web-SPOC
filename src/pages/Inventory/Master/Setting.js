@@ -62,13 +62,7 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.dosage',
                       })}
-                      code={
-                        showTransfer ? (
-                          'ctMedicationDosage'
-                        ) : (
-                          'ctVaccinationDosage'
-                        )
-                      }
+                      code='ctMedicationDosage'
                       {...args}
                     />
                   )}
@@ -102,13 +96,7 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.frequency',
                       })}
-                      code={
-                        showTransfer ? (
-                          'ctMedicationFrequency'
-                        ) : (
-                          'ctvaccinationfrequency'
-                        )
-                      }
+                      code='ctMedicationFrequency'
                       {...args}
                     />
                   )}
@@ -185,7 +173,13 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.uom',
                       })}
-                      code='ctmedicationunitofmeasurement'
+                      code={
+                        showTransfer ? (
+                          'ctmedicationunitofmeasurement'
+                        ) : (
+                          'ctvaccinationunitofmeasurement'
+                        )
+                      }
                       {...args}
                     />
                   )}

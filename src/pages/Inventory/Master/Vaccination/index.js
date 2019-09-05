@@ -56,7 +56,7 @@ const Vaccination = ({ dispatch, history, vaccination }) => {
   const gridProps = {
     ...filterProps,
     vaccination,
-    namespace: vaccination.namespace,
+    namespace: 'vaccination',
     list: vaccination.list || [],
     tableParas,
     colExtensions,

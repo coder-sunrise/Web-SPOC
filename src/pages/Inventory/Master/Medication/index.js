@@ -56,7 +56,7 @@ const Medication = ({ dispatch, history, medication }) => {
   const gridProps = {
     ...filterProps,
     medication,
-    namespace: medication.namespace,
+    namespace: 'medication',
     list: medication.list || [],
 
     tableParas,

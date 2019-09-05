@@ -54,7 +54,7 @@ const Consumable = ({ dispatch, history, consumable }) => {
   const gridProps = {
     ...filterProps,
     consumable,
-    namespace: consumable.namespace,
+    namespace: 'consumable',
     list: consumable.list || [],
     tableParas,
     colExtensions,

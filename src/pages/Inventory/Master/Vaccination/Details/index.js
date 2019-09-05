@@ -28,6 +28,7 @@ const Detail = ({
   handleSubmit,
   setFieldValue,
   values,
+  ...props
 }) => {
   const { currentTab } = vaccination
 
@@ -37,6 +38,7 @@ const Detail = ({
     setFieldValue,
     showTransfer: false,
     values,
+    ...props,
   }
   return (
     <React.Fragment>
@@ -80,7 +82,7 @@ const Detail = ({
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock />,
+            tabContent: <Stock vaccinationDetail={vaccinationDetail} />,
           },
         ]}
       />
