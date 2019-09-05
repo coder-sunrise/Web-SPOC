@@ -1,10 +1,15 @@
 import React from 'react'
 import * as Yup from 'yup'
+// dva
+import { connect } from 'dva'
 // formik
 import { withFormik, FastField } from 'formik'
 // common components
-import { TextField, GridContainer, GridItem } from '@/components'
+import { TextField, GridContainer, GridItem, notification } from '@/components'
+// services
+import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
 
+@connect(({ user }) => ({ currentUser: user.data }))
 @withFormik({
   validationSchema: Yup.object().shape({
     currentPassword: Yup.string().required(
@@ -22,9 +27,29 @@ import { TextField, GridContainer, GridItem } from '@/components'
       .required('Current Password is a required field'),
   }),
   mapPropsToValues: () => ({}),
-  handleSubmit: (values, { props }) => {
-    const { onConfirm } = props
-    onConfirm()
+  handleSubmit: async (values, { props }) => {
+    const { onConfirm, userID, currentUser } = props
+    const payload = {
+      userID,
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
+    }
+    const isCurrentLogin = userID === currentUser.id
+    let response
+    if (isCurrentLogin) response = await changeCurrentUserPassword(payload)
+    else response = await changeUserPassword(payload)
+
+    const { data } = response
+    if (data.succeeded) {
+      notification.success({
+        message: 'Change password success.',
+      })
+      onConfirm()
+    } else {
+      notification.error({
+        message: 'Failed to change password.',
+      })
+    }
   },
 })
 class ChangePassword extends React.Component {
