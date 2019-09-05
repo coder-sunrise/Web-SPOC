@@ -146,22 +146,49 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectEvent = (selectedEvent) => {
-    this.props
-      .dispatch({
-        type: 'calendar/getAppointmentDetails',
-        appointmentID: selectedEvent.id
+    // console.log({ selectedEvent })
+    const { isEnableRecurrence, id } = selectedEvent
+    // const urlPrefix = isEnableRecurrence ? '/series' : '/single'
+    if (!selectedEvent.isEnableRecurrence) {
+      this.props
+        .dispatch({
+          type: 'calendar/getAppointmentDetails',
+          payload: {
+            id: selectedEvent.id
+              ? selectedEvent.id
+              : selectedEvent.appointmentFK,
+            isEditedAsSingleAppointment: false,
+          },
+        })
+        .then((response) => {
+          if (response)
+            this.setState({
+              selectedAppointmentFK: selectedEvent.id
+                ? selectedEvent.id
+                : selectedEvent.appointmentFK,
+              showAppointmentForm: true,
+            })
+        })
+    } else {
+      this.setState({
+        selectedAppointmentFK: selectedEvent.id
           ? selectedEvent.id
           : selectedEvent.appointmentFK,
+        showSeriesConfirmation: true,
+        // showAppointmentForm: !selectedEvent.isEnableRecurrence,
       })
-      .then(() => {
-        this.setState({
-          selectedAppointmentFK: selectedEvent.id
-            ? selectedEvent.id
-            : selectedEvent.appointmentFK,
-          showSeriesConfirmation: selectedEvent.isEnableRecurrence,
-          showAppointmentForm: !selectedEvent.isEnableRecurrence,
-        })
-      })
+    }
+
+    // this.props
+    //   .dispatch({
+    //     type: 'calendar/getAppointmentDetails',
+    //     appointmentID: selectedEvent.id
+    //       ? selectedEvent.id
+    //       : selectedEvent.appointmentFK,
+    //   })
+    //   .then(() => {
+
+    //   })
     // start and end are unwated values,
     // the important values are the ...restEvent
     // const { start, end, ...restEvent } = selectedEvent
@@ -274,22 +301,39 @@ class Appointment extends React.PureComponent {
     this.setState({ showSeriesConfirmation: false })
   }
 
-  editSeriesConfirmation = (editSingleAppointment = false) => {
+  editSeriesConfirmation = (isEditedAsSingleAppointment = false) => {
     const { calendar, dispatch } = this.props
+    const { selectedAppointmentFK } = this.state
     dispatch({
-      type: 'calendar/setViewAppointment',
-      data: {
-        ...calendar.currentViewAppointment,
-        editSingleAppointment,
+      type: 'calendar/getAppointmentDetails',
+      payload: {
+        id: selectedAppointmentFK,
+        isEditedAsSingleAppointment,
       },
+    }).then((response) => {
+      if (response)
+        this.setState({
+          showPopup: false,
+          isDragging: false,
+          popupAnchor: null,
+          showSeriesConfirmation: false,
+          showAppointmentForm: true,
+        })
     })
-    this.setState({
-      showPopup: false,
-      isDragging: false,
-      popupAnchor: null,
-      showSeriesConfirmation: false,
-      showAppointmentForm: true,
-    })
+    // dispatch({
+    //   type: 'calendar/setViewAppointment',
+    //   data: {
+    //     ...calendar.currentViewAppointment,
+    //     isEditedAsSingleAppointment,
+    //   },
+    // })
+    // this.setState({
+    //   showPopup: false,
+    //   isDragging: false,
+    //   popupAnchor: null,
+    //   showSeriesConfirmation: false,
+    //   showAppointmentForm: true,
+    // })
     // const { selectedSlot } = this.state
     // const { isDoctorEvent } = selectedSlot
     // this.setState({
@@ -324,6 +368,7 @@ class Appointment extends React.PureComponent {
       calendarEvents,
       list,
       currentViewAppointment,
+      isEditedAsSingleAppointment,
       calendarView,
     } = CalendarModel
     // const flattenedCalendarData = calendarEvents.reduce(
@@ -334,9 +379,9 @@ class Appointment extends React.PureComponent {
     // console.log({ flattenedList })
 
     const formTitle =
-      currentViewAppointment.editSingleAppointment === undefined
+      currentViewAppointment.id === undefined
         ? 'Appointment'
-        : `Appointment ${currentViewAppointment.editSingleAppointment
+        : `Appointment ${isEditedAsSingleAppointment
             ? '(Editing Single)'
             : '(Editing Entire Series)'}`
 

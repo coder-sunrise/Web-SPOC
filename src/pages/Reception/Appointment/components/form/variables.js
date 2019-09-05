@@ -1,4 +1,5 @@
-import { timeFormat } from '@/components'
+import { timeFormat, timeFormat24Hour } from '@/components'
+import { DoctorLabel } from '@/components/_medisys'
 import { primaryColor } from '@/assets/jss'
 
 export const RECURRENCE_PATTERN = {
@@ -115,14 +116,7 @@ export const AppointmentDataColExtensions = [
     code: 'clinicianprofile',
     labelField: 'name',
     // valueField: 'id',
-    renderDropdown: (option) => {
-      return (
-        <div>
-          <p>MCR No.: {option.doctorMCRNo}</p>
-          <p>{`${option.title} ${option.name}`}</p>
-        </div>
-      )
-    },
+    renderDropdown: (option) => <DoctorLabel doctor={option} />,
   },
   {
     columnName: 'appointmentTypeFK',

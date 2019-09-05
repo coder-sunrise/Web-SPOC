@@ -80,7 +80,9 @@ class AppointmentDataGrid extends React.PureComponent {
             )
 
             if (!clinicianProfile) return null
-            return <p>{`${clinicianProfile.title} ${clinicianProfile.name}`}</p>
+            const title =
+              clinicianProfile.title !== null ? clinicianProfile.title : ''
+            return <p>{`${title} ${clinicianProfile.name}`}</p>
           },
         }
       }
@@ -189,19 +191,19 @@ class AppointmentDataGrid extends React.PureComponent {
             //     { ...addedRows, endTime: moment() },
             //   ]
             // },
-            addedRows:
-              data.length === 0
-                ? [
-                    {
-                      clinicianFK: undefined,
-                      appointmentTypeFK: undefined,
-                      startTime: undefined,
-                      endTime: undefined,
-                      roomFk: undefined,
-                      isPrimaryClinician: undefined,
-                    },
-                  ]
-                : [],
+            // addedRows:
+            //   data.length === 0
+            //     ? [
+            //         {
+            //           clinicianFK: undefined,
+            //           appointmentTypeFK: undefined,
+            //           startTime: undefined,
+            //           endTime: undefined,
+            //           roomFk: undefined,
+            //           isPrimaryClinician: undefined,
+            //         },
+            //       ]
+            //     : [],
           }}
           columns={AppointmentDataColumn}
           columnExtensions={this.state.columnExtensions}

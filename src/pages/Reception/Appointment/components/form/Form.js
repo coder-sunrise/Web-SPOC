@@ -36,12 +36,20 @@ import {
 } from './formikUtils'
 import styles from './style'
 
+const actionKeys = {
+  insert: 'calendar/insertAppointment',
+  save: 'calendar/saveAppointment',
+  reschedule: 'calendar/rescheduleAppointment',
+  delete: 'calendar/deleteDraft',
+}
+
 @connect(({ loginSEMR, loading, user, calendar, codetable }) => ({
   loginSEMR,
   loading,
   user: user.data,
   events: calendar.list,
   viewingAppointment: calendar.currentViewAppointment,
+  isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
   appointmentStatuses: codetable.ltappointmentstatus,
 }))
 @withFormik({
@@ -200,7 +208,7 @@ class Form extends React.PureComponent {
   }
 
   validateDataGrid = () => {
-    const { datagrid } = this.state
+    const { datagrid = [] } = this.state
 
     let isDataGridValid = true
 
@@ -209,7 +217,7 @@ class Form extends React.PureComponent {
 
     // has 1 primary doctor
     const hasPrimaryDoctor = datagrid.reduce(
-      (hasPrimary, row) => row.isPrimaryClinician,
+      (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
       false,
     )
     if (!hasPrimaryDoctor) isDataGridValid = false
@@ -226,6 +234,7 @@ class Form extends React.PureComponent {
         handleSubmit,
         values,
         viewingAppointment,
+        isEditedAsSingleAppointment,
         onClose,
         dispatch,
       } = this.props
@@ -233,7 +242,7 @@ class Form extends React.PureComponent {
         datagrid,
         tempNewAppointmentStatusFK: appointmentStatusFK,
       } = this.state
-
+      console.log({ appointmentStatusFK })
       handleSubmit() // fake submit to touch all fields
       setSubmitting(true)
       const formError = await validateForm(values)
@@ -243,63 +252,200 @@ class Form extends React.PureComponent {
         setSubmitting(false)
         return
       }
-      const { appointment, recurrenceDto, ...restValues } = values
-      const { recurrenceDto: originalRecurrenceDto } = viewingAppointment
-
-      const isRecurrenceChanged = compareDto(
+      const {
+        appointment,
+        appointments,
         recurrenceDto,
-        originalRecurrenceDto,
-      )
-      const appointmentResources = datagrid.map(
-        mapDatagridToAppointmentResources(
-          isRecurrenceChanged || restValues.updateAllOthers,
-        ),
-      )
+        overwriteEntireSeries,
+        ...restValues
+      } = values
+      const appointmentGroupDto = {
+        ...restValues,
+      }
+      const { recurrenceDto: originalRecurrenceDto = {} } = viewingAppointment
 
+      const isEdit = restValues.id !== undefined
+      const isRecurrenceChanged = values.isEnableRecurrence
+        ? compareDto(recurrenceDto, originalRecurrenceDto)
+        : false
+
+      console.log({ isRecurrenceChanged })
+
+      let payload = {}
+      let actionKey = actionKeys.insert
+
+      const appointmentResources = datagrid.map(
+        mapDatagridToAppointmentResources(isRecurrenceChanged),
+      )
       const singleAppointment = {
         ...appointment,
+        isEditedAsSingleAppointment:
+          isEditedAsSingleAppointment ||
+          appointment.isEditedAsSingleAppointment,
         appointmentStatusFk: appointmentStatusFK,
         appointments_Resources: [
-          ...appointmentResources,
+          ...appointmentResources.map((item, index) => ({
+            ...item,
+            sortOrder: index,
+          })),
         ],
       }
-      const appointments = generateRecurringAppointments(
-        recurrenceDto,
-        singleAppointment,
-        restValues.editSingleAppointment,
-        isRecurrenceChanged || restValues.updateAllOthers,
-      )
-      if (appointments.length === 0) {
-        setSubmitting(false)
-        return
+      const [
+        newRecurringAppointments,
+        recurrenceEndDate,
+      ] =
+        !isEdit || isRecurrenceChanged
+          ? generateRecurringAppointments(
+              recurrenceDto,
+              singleAppointment,
+              restValues.isEnableRecurrence,
+              isRecurrenceChanged,
+            )
+          : [
+              appointments.reduce(
+                (updated, appt) =>
+                  appt.isEditedAsSingleAppointment && !overwriteEntireSeries
+                    ? [
+                        ...updated,
+                      ]
+                    : [
+                        ...updated,
+                        {
+                          ...appt,
+                          appointmentStatusFk: appointmentStatusFK,
+                          appointmentRemarks: appointment.appointmentRemarks,
+                          appointments_Resources: [
+                            ...appt.appointments_Resources,
+                          ],
+                          isEditedAsSingleAppointment:
+                            isEditedAsSingleAppointment ||
+                            appt.isEditedAsSingleAppointment,
+                        },
+                      ],
+                [],
+              ),
+              recurrenceDto.recurrenceEndDate,
+            ]
+
+      const newResources = appointmentResources.filter((item) => item.isNew)
+      const oldResources = appointmentResources.filter((item) => !item.isNew)
+
+      const finalAppointments = newRecurringAppointments.map((item) => {
+        return {
+          ...item,
+          appointments_Resources: [
+            ...item.appointments_Resources.map((apptResource) => {
+              const old = oldResources.find(
+                (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+              )
+              if (old === undefined) {
+                return { ...apptResource }
+              }
+              const {
+                clinicianFK,
+                appointmentTypeFK,
+                startTime,
+                endTime,
+                roomFK,
+                isPrimaryClinician,
+              } = old
+              return {
+                ...apptResource,
+                clinicianFK,
+                appointmentTypeFK,
+                startTime,
+                endTime,
+                roomFK,
+                isPrimaryClinician,
+              }
+            }),
+            ...newResources,
+          ],
+        }
+      })
+
+      let recurrence = null
+      if (restValues.isEnableRecurrence) {
+        if (isEdit && isRecurrenceChanged) {
+          recurrence = { ...recurrenceDto, recurrenceEndDate }
+        } else if (!isEdit) {
+          recurrence = { ...recurrenceDto, recurrenceEndDate }
+        } else {
+          recurrence = { ...recurrenceDto }
+        }
       }
-
-      const filteredRecurrenceDto = restValues.isEnableRecurrence
-        ? filterRecurrenceDto(recurrenceDto)
-        : null
-
-      const updated = {
-        ...restValues,
-        recurrenceDto: filteredRecurrenceDto,
-        appointments,
+      payload = {
+        ...appointmentGroupDto,
+        recurrenceDto: recurrence,
+        appointments: newRecurringAppointments,
       }
+      if (isEdit) {
+        payload = {
+          appointmentGroupDto: {
+            ...appointmentGroupDto,
+            appointments: finalAppointments,
+          },
+          recurrenceDto: recurrence,
+          recurrenceChanged: isRecurrenceChanged,
+          overwriteEntireSeries,
+          editSingleAppointment: !viewingAppointment.isEnableRecurrence
+            ? false
+            : isEditedAsSingleAppointment,
+        }
+        actionKey =
+          appointmentStatusFK === 5 ? actionKeys.reschedule : actionKeys.save
+      }
+      console.log({ payload })
 
-      const payload = constructPayload(updated, appointmentStatusFK)
-      console.log({ payload, values, appointmentStatusFK })
+      setSubmitting(false)
+      dispatch({
+        type: actionKey,
+        payload,
+      }).then((response) => {
+        console.log({ response })
+      })
+
+      if (validate) return
+      resetForm()
+      onClose && onClose()
+
+      /* -------------------------------------------------- */
+
+      // const singleAppointment = {
+      //   ...appointment,
+      //   appointmentStatusFk: appointmentStatusFK,
+      //   appointments_Resources: [
+      //     ...appointmentResources,
+      //   ],
+      // }
+      // const appointments = generateRecurringAppointments(
+      //   recurrenceDto,
+      //   singleAppointment,
+      //   restValues.editSingleAppointment,
+      //   isRecurrenceChanged || restValues.updateAllOthers,
+      // )
+      // if (appointments.length === 0) {
+      //   setSubmitting(false)
+      //   return
+      // }
+
+      // const filteredRecurrenceDto = restValues.isEnableRecurrence
+      //   ? filterRecurrenceDto(recurrenceDto)
+      //   : null
+
+      // const updated = {
+      //   ...restValues,
+      //   recurrenceDto: filteredRecurrenceDto,
+      //   appointments,
+      // }
+
+      // const payload = constructPayload(updated, appointmentStatusFK)
+      // console.log({ payload })
       const updateKey =
         appointmentStatusFK === 1 || appointmentStatusFK === 2
           ? 'calendar/saveAppointment'
           : 'calendar/rescheduleAppointment'
-      const actionKey = validate ? 'calendar/validate' : updateKey
-
-      setSubmitting(false)
-      // dispatch({
-      //   type: actionKey,
-      //   payload,
-      // })
-      // if (validate) return
-      // resetForm()
-      // onClose && onClose()
+      // const actionKey = validate ? 'calendar/validate' : updateKey
     } catch (error) {
       console.log({ error })
     }
@@ -323,7 +469,12 @@ class Form extends React.PureComponent {
   }
 
   onSaveDraftClick = () => {
-    const { appointmentStatuses, values } = this.props
+    const {
+      appointmentStatuses,
+      values,
+      isEditedAsSingleAppointment,
+      viewingAppointment,
+    } = this.props
     const appointmentStatusFK = appointmentStatuses.find(
       (item) => item.code === 'DRAFT',
     ).id
@@ -332,18 +483,25 @@ class Form extends React.PureComponent {
         tempNewAppointmentStatusFK: appointmentStatusFK,
       },
       () => {
-        if (values.editSingleAppointment) this.openSeriesUpdateConfirmation()
+        if (
+          values.id !== undefined &&
+          !isEditedAsSingleAppointment &&
+          viewingAppointment.isEnableRecurrence
+        )
+          this.openSeriesUpdateConfirmation()
         else this._submit()
       },
     )
   }
 
   onConfirmClick = () => {
-    const { appointmentStatuses, values } = this.props
-    const isScheduled =
-      values.appointment &&
-      (values.appointment.appointmentStatusFk === 1 ||
-        values.appointment.appointmentStatusFk === 5)
+    const {
+      appointmentStatuses,
+      values,
+      isEditedAsSingleAppointment,
+      viewingAppointment,
+    } = this.props
+
     try {
       let newAppointmentStatusFK = appointmentStatuses.find(
         (item) => item.code === 'SCHEDULED',
@@ -353,17 +511,27 @@ class Form extends React.PureComponent {
       ).id
       if (values.appointment && values.appointment.appointmentStatusFk === 1)
         newAppointmentStatusFK = rescheduleFK
+
       this.setState(
         {
           tempNewAppointmentStatusFK: newAppointmentStatusFK,
         },
         () => {
-          if (isScheduled)
-            return !values.editSingleAppointment
-              ? this.openSeriesUpdateConfirmation()
-              : this._submit()
+          if (
+            values.id !== undefined &&
+            !isEditedAsSingleAppointment &&
+            viewingAppointment.isEnableRecurrence
+          )
+            this.openSeriesUpdateConfirmation()
+          else {
+            this._submit()
+          }
+          // if (isScheduled)
+          //   return !values.editSingleAppointment
+          //     ? this.openSeriesUpdateConfirmation()
+          //     : this._submit()
 
-          return this._submit()
+          // return this._submit()
         },
       )
     } catch (error) {
@@ -382,12 +550,19 @@ class Form extends React.PureComponent {
   }
 
   onConfirmSeriesUpdate = async (type) => {
-    await this.props.setFieldValue('updateAllOthers', type === '2', false)
+    await this.props.setFieldValue('overwriteEntireSeries', type === '2', false)
     this.closeSeriesUpdateConfirmation(this._submit)
   }
 
   render () {
-    const { classes, onClose, loading, values, isSubmitting } = this.props
+    const {
+      classes,
+      onClose,
+      loading,
+      values,
+      viewingAppointment,
+      isSubmitting,
+    } = this.props
 
     const {
       showSearchPatientModal,
@@ -397,7 +572,7 @@ class Form extends React.PureComponent {
       isDataGridValid,
     } = this.state
     // console.log({ props: this.props })
-    // console.log({ values: this.props.values })
+    console.log({ values: this.props.values })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
@@ -440,7 +615,8 @@ class Form extends React.PureComponent {
               <GridItem xs md={12}>
                 <Recurrence
                   disabled={
-                    values.id !== undefined && values.isEnableRecurrence
+                    values.id !== undefined &&
+                    values.appointment.appointmentStatusFk !== 2
                   }
                   formValues={values}
                   recurrenceDto={values.recurrenceDto}

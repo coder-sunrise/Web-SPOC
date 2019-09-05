@@ -106,6 +106,7 @@ const fullDateTime = 'DD-MM-YYYY hh:mm a'
 const serverDateFormat = 'YYYY-MM-DD'
 const timeFormat = 'hh:mm A'
 const timeFormat24Hour = 'HH:mm'
+const timeFormat24HourWithSecond = 'HH:mm:ss'
 
 const TimeFormatter = ({ value, ...rest }) => {
   if (!value) return value

@@ -14,7 +14,7 @@ const initDailyRecurrence = {
   recurrenceFrequency: 1,
   recurrenceRange: 'after',
   recurrenceCount: 1,
-  recurrenceDaysOfTheWeek: [],
+  recurrenceDaysOfTheWeek: undefined,
   recurrenceDayOfTheMonth: undefined,
 }
 const endOfMonth = moment().endOf('month').date()
@@ -70,6 +70,7 @@ export const ValidationSchema = Yup.object().shape({
 export const mapPropsToValues = ({
   viewingAppointment,
   selectedAppointmentID,
+  isEditedAsSingleAppointment = false,
   selectedSlot,
   user,
 }) => {
@@ -81,18 +82,22 @@ export const mapPropsToValues = ({
 
     return {
       ...viewingAppointment,
-      updateAllOthers: false,
+      overwriteEntireSeries: false,
+      recurrenceChanged: false,
       recurrenceDto:
         recurrenceDto === undefined || recurrenceDto === null
           ? { ...initDailyRecurrence }
           : recurrenceDto,
-      appointment,
+      appointment: { ...appointment },
+      appointments: viewingAppointment.appointments.map((item) => ({
+        ...item,
+      })),
     }
   }
   return {
     isEnableRecurrence: false,
-    editSingleAppointment: false,
-    updateAllOthers: false,
+    isEditedAsSingleAppointment: false,
+    overwriteEntireSeries: false,
     bookedByUser: user.userName,
     bookedByUserFK: user.id,
     appointment: {
@@ -105,16 +110,31 @@ export const mapPropsToValues = ({
 
 export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
   const { id, startTime: timeFrom, endTime: timeTo, ...restEvent } = event
-  if (id < 0) {
-    const startTime = moment(timeFrom, timeFormat).format(timeFormat24Hour)
-    const endTime = moment(timeTo, timeFormat).format(timeFormat24Hour)
+  const startTime =
+    timeFrom.includes('AM') || timeFrom.includes('PM')
+      ? moment(timeFrom, timeFormat).format(timeFormat24Hour)
+      : timeFrom
+  const endTime =
+    timeTo.includes('AM') || timeTo.includes('PM')
+      ? moment(timeTo, timeFormat).format(timeFormat24Hour)
+      : timeTo
+  if (id < 0 || shouldDumpID) {
     return { ...restEvent, startTime, endTime }
   }
-  return { ...event, [id]: !shouldDumpID }
+  return { ...event, startTime, endTime }
 }
 
 export const compareDto = (value, original) => {
-  if (value === undefined || original === undefined) return false
+  console.log({ value, original })
+  if ((original === null || original === undefined) && value) return true
+
+  if (
+    value === undefined ||
+    value === null ||
+    original === null ||
+    original === undefined
+  )
+    return false
   let isChanged = false
   Object.keys(original).forEach((key) => {
     if (value[key] === undefined) isChanged = true
@@ -126,12 +146,14 @@ export const compareDto = (value, original) => {
 export const generateRecurringAppointments = (
   recurrenceDto,
   appointment,
-  editSingle,
+  shouldGenerate,
   shouldDumpID,
 ) => {
-  if (editSingle)
+  if (!shouldGenerate)
     return [
-      appointment,
+      [
+        appointment,
+      ],
     ]
 
   const rrule = computeRRule({
@@ -141,19 +163,26 @@ export const generateRecurringAppointments = (
   if (rrule) {
     const allDates = rrule.all() || []
     const { id, ...restAppointmentValues } = appointment
-    return allDates.map(
-      (date) =>
-        shouldDumpID || id === undefined
-          ? {
-              ...restAppointmentValues,
-              appointmentDate: parseDateToServerDateFormatString(date),
-            }
-          : {
-              ...restAppointmentValues,
-              id,
-              appointmentDate: parseDateToServerDateFormatString(date),
-            },
-    )
+    const endDate =
+      allDates.length > 0
+        ? moment(allDates[allDates.length - 1]).format()
+        : undefined
+    return [
+      allDates.map(
+        (date) =>
+          shouldDumpID || id === undefined
+            ? {
+                ...restAppointmentValues,
+                appointmentDate: parseDateToServerDateFormatString(date),
+              }
+            : {
+                ...restAppointmentValues,
+                id,
+                appointmentDate: parseDateToServerDateFormatString(date),
+              },
+      ),
+      endDate,
+    ]
   }
   return null
 }
@@ -186,13 +215,12 @@ export const filterRecurrenceDto = (recurrenceDto) => {
 }
 
 export const constructPayload = (payload, appointmentStatusFK) => {
-  const { updateAllOthers, editSingleAppointment } = payload
-  console.log({ updateAllOthers, editSingleAppointment, appointmentStatusFK })
+  const { overwriteEntireSeries } = payload
+
   // DRAFT
   if (appointmentStatusFK === 5) {
     return {
-      updateAllOthers,
-      editSingleAppointment,
+      overwriteEntireSeries,
       appointmentGroupDto: payload,
     }
   }

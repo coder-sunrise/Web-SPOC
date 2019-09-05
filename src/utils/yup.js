@@ -150,12 +150,16 @@ const getTimeObject = (value) => {
     if (value === undefined || value === null)
       throw Error('Value is undefined | null')
 
-    let validTimeFormat = value.length === 5
+    let validTimeFormat = value.length <= 8
     let format = timeFormat24Hour
     let timeValue = value
     if (value.includes('AM') || value.includes('PM')) {
       format = timeFormat
       // parse value to 24hour format
+      timeValue = Moment(value, format).format(timeFormat24Hour)
+      validTimeFormat = timeValue.length === 5
+    } else if (value.length === 8) {
+      format = 'HH:mm:ss'
       timeValue = Moment(value, format).format(timeFormat24Hour)
       validTimeFormat = timeValue.length === 5
     }
@@ -201,7 +205,6 @@ function laterThan (ref, msg) {
       const start = this.resolve(ref)
       const startTimeObject = getTimeObject(start)
       const endTimeObject = getTimeObject(value)
-
       if (startTimeObject && endTimeObject)
         return compare(startTimeObject, endTimeObject)
 

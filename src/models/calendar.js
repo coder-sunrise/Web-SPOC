@@ -24,6 +24,7 @@ export default createListViewModel({
         appointments: [],
       },
       calendarView: BigCalendar.Views.MONTH,
+      isEditedAsSingleAppointment: false,
     },
     subscriptions: {},
     effects: {
@@ -48,15 +49,21 @@ export default createListViewModel({
         }
         yield put({ type: 'getCalendarList', payload })
       },
-      *getAppointmentDetails ({ appointmentID }, { call, put }) {
-        const result = yield call(service.query, appointmentID)
+      *getAppointmentDetails ({ payload }, { call, put }) {
+        const result = yield call(service.query, payload)
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
           yield put({
             type: 'setViewAppointment',
             data,
           })
+          yield put({
+            type: 'setEditType',
+            payload: payload.isEditedAsSingleAppointment,
+          })
+          return true
         }
+        return false
       },
       *getCalendarList ({ payload }, { call, put }) {
         const result = yield call(service.queryList, payload)
@@ -70,9 +77,19 @@ export default createListViewModel({
           })
         }
       },
+      *insertAppointment ({ payload }, { call, put }) {
+        const result = yield call(service.insert, payload)
+        if (result) {
+          yield put({ type: 'refresh' })
+          notification.success({ message: 'Appointment created' })
+        }
+      },
       *saveAppointment ({ payload }, { call, put }) {
         const result = yield call(service.save, payload)
-        if (result) yield put({ type: 'refresh' })
+        if (result) {
+          yield put({ type: 'refresh' })
+          notification.success({ message: 'Appointment(s) updated' })
+        }
       },
       *rescheduleAppointment ({ payload }, { call, put }) {
         const result = yield call(service.reschedule, payload)
@@ -106,6 +123,9 @@ export default createListViewModel({
       },
     },
     reducers: {
+      setEditType (state, { payload }) {
+        return { ...state, isEditedAsSingleAppointment: payload }
+      },
       setCurrentViewDate (state, { date }) {
         return { ...state, currentViewDate: date }
       },
