@@ -2,10 +2,11 @@
  * Maintains the history of an object
  */
 class History {
-  constructor (undoLimit = 10, debug = false) {
+  constructor (undoLimit = 100, debug = false) {
     this.undoLimit = undoLimit
     this.undoList = []
     this.redoList = []
+    this.allList = []
     this.current = null
     this.debug = debug
   }
@@ -27,6 +28,12 @@ class History {
   getCurrent () {
     return this.current
   }
+/*
+  Get all list
+*/
+  getAllList () {
+    return this.allList
+  }
 
   /**
    * Keep an object to history
@@ -38,6 +45,7 @@ class History {
   keep (obj) {
     try {
       this.redoList = []
+      this.allList.push(obj)
       if (this.current) {
         this.undoList.push(this.current)
       }
@@ -45,7 +53,6 @@ class History {
         this.undoList.shift()
       }
       this.current = obj
-      console.log(this.undoList)
     } finally {
       this.print()
     }
@@ -67,7 +74,6 @@ class History {
       }
       if (this.undoList.length > 0) {
         this.current = this.undoList.pop()
-        console.log(this.undoList)
         return this.current
       }
 

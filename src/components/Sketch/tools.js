@@ -6,4 +6,6 @@ export default {
   Rectangle: 'rectangle',
   Select: 'select',
   Pan: 'pan',
+  Eraser: 'eraser',
+  ArrowBend: 'arrowBend'
 }

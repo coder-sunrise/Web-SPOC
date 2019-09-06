@@ -1,20 +1,21 @@
 /*eslint no-unused-vars: 0*/
 
 import FabricCanvasTool from './fabrictool'
-import zIndex from '@material-ui/core/styles/zIndex';
 
 const fabric = require('fabric').fabric
 
-class Arrow extends FabricCanvasTool {
+class ArrowBend extends FabricCanvasTool {
   configureCanvas (props) {
     let canvas = this._canvas
-    canvas.isDrawingMode = canvas.selection = false
+    canvas.isDrawingMode = false
+    canvas.selection = false
     canvas.forEachObject((o) => (o.selectable = o.evented = false))
     this._width = props.lineWidth
     this._color = props.lineColor
   }
 
   doMouseDown (o) {
+    
     this.isDown = true
     let canvas = this._canvas
     var pointer = canvas.getPointer(o.e)
@@ -24,7 +25,7 @@ class Arrow extends FabricCanvasTool {
       pointer.x,
       pointer.y,
     ]
-    this.line = new fabric.Line(points, {
+    this.pencil = new fabric.PatternBrush( {
       strokeWidth: this._width,
       fill: this._color,
       stroke: this._color,
@@ -49,7 +50,7 @@ class Arrow extends FabricCanvasTool {
       angle: 90,
     })
 
-    canvas.add(this.line)
+    canvas.add(this.pencil)
     canvas.add(this.head)
   }
 
@@ -57,11 +58,11 @@ class Arrow extends FabricCanvasTool {
     if (!this.isDown) return
     let canvas = this._canvas
     var pointer = canvas.getPointer(o.e)
-    this.line.set({ x2: pointer.x, y2: pointer.y })
-    this.line.setCoords()
+   // this.pencil.set({ x2: pointer.x, y2: pointer.y })
+  //  this.pencil.setCoords()
 
-    let x_delta = pointer.x - this.line.x1
-    let y_delta = pointer.y - this.line.y1
+    let x_delta = pointer.x - this.pencil.x1
+    let y_delta = pointer.y - this.pencil.y1
 
     this.head.set({
       left: pointer.x,
@@ -76,16 +77,15 @@ class Arrow extends FabricCanvasTool {
     this.isDown = false
     let canvas = this._canvas
 
-    canvas.remove(this.line)
+     canvas.remove(this.pencil)
     canvas.remove(this.head)
-    let arrow = new fabric.Group([
-      this.line,
+    let arrowBend = new fabric.Group([
+      this.pencil,
       this.head,
     ])
-    arrow.selectable = false
-    arrow.evented = false
-    arrow.id ="abc"
-    canvas.add(arrow)
+    arrowBend.selectable = false
+    arrowBend.evented = false
+    canvas.add(arrowBend)
   }
 
   doMouseOut (o) {
@@ -93,4 +93,4 @@ class Arrow extends FabricCanvasTool {
   }
 }
 
-export default Arrow
+export default ArrowBend

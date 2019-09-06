@@ -39,6 +39,7 @@ class Circle extends FabricCanvasTool {
       radius: 1,
     })
     canvas.add(this.circle)
+    canvas.moveTo(this.circle, 100);
   }
 
   doMouseMove (o) {
