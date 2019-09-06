@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import _ from 'lodash'
 import axios from 'axios'
-
+import { connect } from 'dva'
+import { Close, Search } from '@material-ui/icons'
+import Yup from '@/utils/yup'
 import {
   Button,
   GridContainer,
@@ -13,41 +15,60 @@ import {
   Popconfirm,
   notification,
   Checkbox,
+  withFormikExtend,
+  ProgressButton,
 } from '@/components'
-import { Close, Search } from '@material-ui/icons'
 
-//TODO: To update api to our server api
-const API =
-  'https://developers.onemap.sg/commonapi/search?returnGeom=Y&getAddrDetails=Y&searchVal='
+// TODO: To update api to our server api
+// const API =
+// 'https://developers.onemap.sg/commonapi/search?returnGeom=Y&getAddrDetails=Y&searchVal='
+// 'https://semr2webdev2010.emr.com.sg/api/streetaddress?'
 
+@connect(({ streetAddress }) => ({
+  streetAddress,
+}))
+@withFormikExtend({
+  handleSubmit: () => {},
+  displayName: 'streetAddressFilter',
+})
 class Address extends Component {
+  state = {
+    postcode: '',
+  }
+
+  handleOnChange = (e) => {
+    this.setState((prevState) => {
+      return { postcode: e.target.value }
+    })
+  }
+
   handleAddressType = (e) => {
     console.log(e, 'address-handleAddressType')
   }
 
-  handleGetAddress = (i, prefix, postcode) => () => {
-    const { values, setFieldValue, propName } = this.props
-
-    if (postcode === '') return
-
-    axios
-      .get(`${API}${postcode}`)
-      .then((result) => {
-        // console.log(result)
-        if (result.data.found > 0) {
-          const { BLK_NO, BUILDING, ROAD_NAME, POSTAL } = result.data.results[0]
-
-          setFieldValue(`${prefix}postcode`, POSTAL)
-          setFieldValue(`${prefix}blockNo`, BLK_NO)
-          setFieldValue(`${prefix}buildingName`, BUILDING)
-          setFieldValue(`${prefix}street`, ROAD_NAME)
-        } else {
-          notification.warn('Not able to find this postcode')
-        }
-      })
-      .catch((error) => {
-        notification.error('Not able to get this address')
-      })
+  handleGetAddress = () => {
+    const { values, addressIndex, setFieldValue } = this.props
+    const { postcode } = this.state
+    postcode === ''
+      ? (setFieldValue(`${addressIndex}postcode`, ''),
+        setFieldValue(`${addressIndex}blockNo`, ''),
+        setFieldValue(`${addressIndex}buildingName`, ''),
+        setFieldValue(`${addressIndex}street`, ''))
+      : this.props
+          .dispatch({
+            type: 'streetAddress/fetchAddress',
+            payload: {
+              postalCode: postcode,
+            },
+          })
+          .then((o) => {
+            const { data } = o
+            const { postalCode, blkHseNo, building, street } = data[0]
+            setFieldValue(`${addressIndex}postcode`, postalCode)
+            setFieldValue(`${addressIndex}blockNo`, blkHseNo)
+            setFieldValue(`${addressIndex}buildingName`, building)
+            setFieldValue(`${addressIndex}street`, street)
+          })
   }
 
   deleteAddress = (id) => () => {
@@ -76,28 +97,23 @@ class Address extends Component {
     prefix += '.'
     if (Object.byString(values, `${prefix}isDeleted`)) return null
     const btnSearch = (
-      <Button
-        key='search'
-        color='info'
-        aria-label='Get Address'
-        size='sm'
-        onClick={this.handleGetAddress(
-          addressIndex,
-          prefix,
-          Object.byString(values, `${prefix}postcode`),
-        )}
+      <ProgressButton
+        color='primary'
+        icon={null}
+        onClick={this.handleGetAddress}
       >
         <Search />
         Get Address
-      </Button>
+      </ProgressButton>
     )
+    // console.log({ values, props: this.props })
     return (
       <div style={style}>
         {isArray && (
           <GridContainer>
             <GridItem xs={6} md={2}>
               <Field
-                name={`${prefix}isMailing`}
+                name={`${addressIndex}isMailing`}
                 render={(args) => (
                   <Checkbox
                     label='Mailing Address'
@@ -113,7 +129,7 @@ class Address extends Component {
             </GridItem>
             <GridItem xs={6} md={3}>
               <Field
-                name={`${prefix}isPrimary`}
+                name={`${addressIndex}isPrimary`}
                 render={(args) => (
                   <Checkbox
                     label='Primary Address'
@@ -130,7 +146,13 @@ class Address extends Component {
             <GridItem xs={6} md={5}>
               <FastField
                 name={`${prefix}postcode`}
-                render={(args) => <TextField label='Postal Code' {...args} />}
+                render={(args) => (
+                  <TextField
+                    label='Postal Code'
+                    onChange={this.handleOnChange}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
             <GridItem
@@ -166,7 +188,13 @@ class Address extends Component {
             <GridItem xs={6} md={5}>
               <FastField
                 name={`${prefix}postcode`}
-                render={(args) => <TextField label='Postal Code' {...args} />}
+                render={(args) => (
+                  <TextField
+                    label='Postal Code'
+                    onChange={this.handleOnChange}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
             <GridItem
@@ -181,19 +209,19 @@ class Address extends Component {
         <GridContainer>
           <GridItem xs={12} md={5}>
             <FastField
-              name={`${prefix}blockNo`}
+              name={`${addressIndex}blockNo`}
               render={(args) => <TextField label='Block No.' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={3}>
             <FastField
-              name={`${prefix}unitNo`}
+              name={`${addressIndex}unitNo`}
               render={(args) => <TextField label='Unit No.' {...args} />}
             />
           </GridItem>
           <GridItem xs={12} md={4}>
             <FastField
-              name={`${prefix}buildingName`}
+              name={`${addressIndex}buildingName`}
               render={(args) => <TextField label='Building Name' {...args} />}
             />
           </GridItem>
@@ -201,7 +229,7 @@ class Address extends Component {
         <GridContainer>
           <GridItem xs={12} md={8}>
             <FastField
-              name={`${prefix}street`}
+              name={`${addressIndex}street`}
               render={(args) => (
                 <TextField multiline rowsMax='2' label='Street' {...args} />
               )}
@@ -210,7 +238,7 @@ class Address extends Component {
           {/* <GridItem xs={12} md={2} /> */}
           <GridItem xs={12} md={4}>
             <FastField
-              name={`${prefix}countryFK`}
+              name={`${addressIndex}countryFK`}
               render={(args) => (
                 <CodeSelect
                   label='Country'

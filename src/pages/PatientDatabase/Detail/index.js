@@ -3,6 +3,7 @@ import Loadable from 'react-loadable'
 import { connect } from 'dva'
 import moment from 'moment'
 import _ from 'lodash'
+import router from 'umi/router'
 
 import avatar from '@/assets/img/faces/marc.jpg'
 import {
@@ -19,6 +20,7 @@ import {
   dateFormatLong,
   DateRangePicker,
   DatePicker,
+  Button,
 } from '@/components'
 // medisys-components
 import { PatientInfoSideBanner } from 'medisys-components'
@@ -237,6 +239,12 @@ class PatientDetail extends PureComponent {
     }
   }
 
+  registerVisit = () => {
+    router.push(
+      `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
+    )
+  }
+
   render () {
     const {
       theme,
@@ -257,6 +265,8 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
+    // console.log('patient', patient)
+    // console.log('xx', resetProps)
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}
     const CurrentComponent = currentMenu.component
@@ -289,7 +299,10 @@ class PatientDetail extends PureComponent {
                           dispatch({
                             type: 'patient/updateState',
                             payload: {
-                              entity: values,
+                              entity:
+                                values.patientAccountNo !== ''
+                                  ? values
+                                  : undefined,
                             },
                           })
                           this.props.history.push(
@@ -327,6 +340,16 @@ class PatientDetail extends PureComponent {
                     </Authorized>
                   ))}
               </MenuList>
+              {entity && <Divider light />}
+              {entity && (
+                <Button
+                  color='primary'
+                  style={{ marginTop: theme.spacing(1) }}
+                  onClick={this.registerVisit}
+                >
+                  Register Visit
+                </Button>
+              )}
             </CardBody>
           </Card>
         </GridItem>

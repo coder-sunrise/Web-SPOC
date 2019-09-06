@@ -15,54 +15,39 @@ const styles = (theme) => ({})
 
 @withFormik({
   mapPropsToValues: ({ settingParticipantRole }) =>
-  settingParticipantRole.entity || settingParticipantRole.default,
+    settingParticipantRole.entity || settingParticipantRole.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    dates: Yup.array().of(Yup.date()).min(2).required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
-    props
-      .dispatch({
-        type: 'settingParticipantRole/upsert',
-        payload: values,
-      })
-      .then((r) => {
-        if (r && r.message === 'Ok') {
-          // toast.success('test')
-          notification.success({
-            // duration:0,
-            message: 'Done',
-          })
-          if (props.onConfirm) props.onConfirm()
-        }
-      })
+    const { effectiveDates, ...restValues } = values
+    const { dispatch, onConfirm } = props
+    dispatch({
+      type: 'settingParticipantRole/upsert',
+      payload: {
+        ...values,
+        effectiveStartDate: effectiveDates[0],
+        effectiveEndDate: effectiveDates[1],
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'settingParticipantRole/query',
+        })
+      }
+    })
   },
-  displayName: 'ParticipantRoleModal',
+  displayName: 'ParticipantRoleDetail',
 })
 class Detail extends PureComponent {
-  state = {
-    editingRowIds: [],
-    rowChanges: {},
-  }
-
-  changeEditingRowIds = (editingRowIds) => {
-    this.setState({ editingRowIds })
-  }
-
-  changeRowChanges = (rowChanges) => {
-    this.setState({ rowChanges })
-  }
-
-  commitChanges = ({ rows, added, changed, deleted }) => {
-    const { setFieldValue } = this.props
-    setFieldValue('items', rows)
-  }
+  state = {}
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values } = props
+    const { classes, theme, footer, values, settingParticipantRole } = props
     console.log('detail', props)
     return (
       <React.Fragment>
@@ -71,7 +56,13 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => <TextField label='Code' {...args} />}
+                render={(args) => (
+                  <TextField
+                    label='Code'
+                    {...args}
+                    disabled={settingParticipantRole.entity ? true : false}
+                  />
+                )}
               />
             </GridItem>
             <GridItem md={6}>

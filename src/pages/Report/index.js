@@ -55,7 +55,7 @@ const menuData = [
   {
     title: 'Finance',
     text: 'Queue Listing Report',
-    url: '',
+    url: '/report/queuelisting',
   },
   {
     title: 'Finance',

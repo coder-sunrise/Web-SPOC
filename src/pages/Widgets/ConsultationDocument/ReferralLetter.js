@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import Yup from '@/utils/yup'
 
 import {
   Button,
@@ -17,18 +17,60 @@ import {
   Checkbox,
   SizeContainer,
   RichEditor,
+  withFormikExtend,
+  FastField,
+  Field,
+  ButtonSelect,
+  ClinicianSelect,
 } from '@/components'
 
+@withFormikExtend({
+  mapPropsToValues: ({ consultationDocument }) => {
+    return (
+      consultationDocument.entity || consultationDocument.defaultReferralLetter
+    )
+  },
+  validationSchema: Yup.object().shape({
+    referralDate: Yup.date().required(),
+    referredByUserFK: Yup.number().required(),
+    to: Yup.string().required(),
+    address: Yup.string().required(),
+    subject: Yup.string().required(),
+    content: Yup.string().required(),
+  }),
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, consultationDocument, currentType } = props
+    const { rows } = consultationDocument
+
+    dispatch({
+      type: 'consultationDocument/upsertRow',
+      payload: {
+        sequence: rows.length,
+        ...values,
+      },
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'AddConsultationDocument',
+})
 class ReferralLetter extends PureComponent {
   render () {
-    const { theme, classes, consultationDocument, rowHeight } = this.props
-    console.log('ReferralLetter')
+    const {
+      footer,
+      handleSubmit,
+      classes,
+      codetable,
+      rowHeight,
+      setFieldValue,
+    } = this.props
+    const { ctReferralLetterTemplate } = codetable
     return (
       <div>
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='date'
+              name='referralDate'
               render={(args) => {
                 return <DatePicker label='Date' {...args} />
               }}
@@ -45,10 +87,10 @@ class ReferralLetter extends PureComponent {
             />
           </GridItem>
           <GridItem xs={6}>
-            <FastField
-              name='from'
+            <Field
+              name='referredByUserFK'
               render={(args) => {
-                return <TextField disabled label='From' {...args} />
+                return <ClinicianSelect label='From' {...args} />
               }}
             />
           </GridItem>
@@ -74,15 +116,33 @@ class ReferralLetter extends PureComponent {
             xs={3}
             style={{ lineHeight: rowHeight, textAlign: 'right' }}
           >
-            <Button color='info'>Load Template</Button>
+            <ButtonSelect
+              options={ctReferralLetterTemplate}
+              textField='displayValue'
+              onClick={(option) => {
+                setFieldValue('content', option.templateMessage)
+              }}
+            >
+              Load Template
+            </ButtonSelect>
           </GridItem>
           <GridItem xs={12} className={classes.editor}>
             <Button link className={classes.editorBtn}>
               Add Diagnosis
             </Button>
-            <RichEditor />
+            <FastField
+              name='content'
+              render={(args) => {
+                return <RichEditor {...args} />
+              }}
+            />
           </GridItem>
         </GridContainer>
+        {footer &&
+          footer({
+            onConfirm: handleSubmit,
+            confirmBtnText: 'Save',
+          })}
       </div>
     )
   }

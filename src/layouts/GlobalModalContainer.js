@@ -6,11 +6,14 @@ import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import { ChangePassword } from 'medisys-components'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
+import Consultation from '@/pages/PatientDashboard/Consultation'
+import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
 
-@connect(({ global, loading }) => ({
+@connect(({ global, loading, user }) => ({
   global,
+  loggedInUserID: user.data.id,
 }))
 class GlobalModalContainer extends PureComponent {
   // componentDidMount () {
@@ -37,8 +40,26 @@ class GlobalModalContainer extends PureComponent {
     }
   }
 
+  closeUserProfile = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        showUserProfile: false,
+      },
+    })
+    dispatch({
+      type: 'user/saveProfileDetails',
+      profileDetails: undefined,
+    })
+    dispatch({
+      type: 'settingUserProfile/updateCurrentSelected',
+      userProfile: {},
+    })
+  }
+
   render () {
-    const { global, dispatch, history } = this.props
+    const { global, dispatch, loggedInUserID, history } = this.props
     return (
       <div>
         {/* <SimpleModal
@@ -70,6 +91,26 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
+          open={global.showConsultationPanel}
+          title='Consultation'
+          observe={[
+            'ConsultationPage',
+            'OrderPage',
+          ]}
+          authority='consultation'
+          bodyNoPadding
+          onClose={(e) => {
+            dispatch({
+              type: 'consultation/closeConsultationModal',
+            })
+          }}
+          fullScreen
+          showFooter={false}
+        >
+          {global.showConsultationPanel && <Consultation {...this.props} />}
+        </CommonModal>
+
+        <CommonModal
           title='Change Password'
           open={global.showChangePasswordModal}
           onClose={() => {
@@ -90,7 +131,15 @@ class GlobalModalContainer extends PureComponent {
           }}
           maxWidth='sm'
         >
-          <ChangePassword />
+          <ChangePassword userID={loggedInUserID} />
+        </CommonModal>
+        <CommonModal
+          title='My Account'
+          open={global.showUserProfile}
+          onClose={this.closeUserProfile}
+          onConfirm={this.closeUserProfile}
+        >
+          <UserProfileForm />
         </CommonModal>
 
         <CommonModal
@@ -145,9 +194,11 @@ class GlobalModalContainer extends PureComponent {
         >
           <VisitRegistration />
         </CommonModal>
+
         <CommonModal
           open={global.openConfirm}
           title={global.openConfirmTitle}
+          cancelText='Cancel'
           maxWidth='sm'
           onClose={(e) => {
             clearTimeout(this._timer)

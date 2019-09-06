@@ -39,6 +39,7 @@ import {
   ProgressButton,
   CardContainer,
   confirm,
+  dateFormatLong,
 } from '@/components'
 import InboxIcon from '@material-ui/icons/MoveToInbox'
 import DraftsIcon from '@material-ui/icons/Drafts'
@@ -71,20 +72,27 @@ class Banner extends PureComponent {
   }
 
   render () {
-    // console.log(this.props)
     const { props, state } = this
-    const { theme, classes, setValues, extraCmt } = props
+    const {
+      theme,
+      classes,
+      setValues,
+      patientDashboard,
+      extraCmt,
+      style = {
+        position: 'sticky',
+        top: headerHeight,
+        zIndex: 1000,
+        paddingLeft: 16,
+        paddingRight: 16,
+      },
+    } = props
+    if (!patientDashboard) return null
+    const { patientInfo } = patientDashboard
+    if (!patientInfo) return null
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
-      <Paper
-        style={{
-          position: 'sticky',
-          top: headerHeight,
-          zIndex: 1000,
-          paddingLeft: 16,
-          paddingRight: 16,
-        }}
-      >
+      <Paper style={style}>
         <GridContainer>
           {/* <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
@@ -92,10 +100,54 @@ class Banner extends PureComponent {
             </CardAvatar>
           </GridItem> */}
           <GridItem xs={6} md={2}>
-            <Block h3='Mr John Smith' body='G512345R, Malaysian' />
+            <Block
+              h3={
+                <div>
+                  <CodeSelect
+                    // authority='none'
+                    text
+                    code='ctSalutation'
+                    value={patientInfo.salutationFK}
+                  />{' '}
+                  {patientInfo.name}
+                </div>
+              }
+              body={
+                <div>
+                  {patientInfo.patientAccountNo}{' '}
+                  <CodeSelect
+                    text
+                    code='ctNationality'
+                    value={patientInfo.nationalityFK}
+                  />
+                </div>
+              }
+            />
           </GridItem>
           <GridItem xs={6} md={2}>
-            <Block header='Info' body='32, Male, 19-03-1988' />
+            <Block
+              header='Info'
+              body={
+                <div>
+                  <DatePicker
+                    text
+                    format={dateFormatLong}
+                    value={patientInfo.dob}
+                  />
+                  ({Math.floor(
+                    moment.duration(moment().diff(patientInfo.dob)).asYears(),
+                  )},&nbsp;
+                  {
+                    <CodeSelect
+                      code='ctGender'
+                      // optionLabelLength={1}
+                      text
+                      value={patientInfo.genderFK}
+                    />
+                  })
+                </div>
+              }
+            />
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block header='Allergies' body='Penicillin' />

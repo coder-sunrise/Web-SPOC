@@ -1,7 +1,9 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
 import request, { axiosRequest } from './request'
+import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
+import { dateFormatLong, CodeSelect } from '@/components'
 
 const status = [
   { value: false, name: 'Inactive', color: 'red' },
@@ -497,14 +499,6 @@ const addressTypes = [
   { label: 'Primary Address', value: '2' },
 ]
 
-const orderTypes = [
-  { name: 'Medication', value: '1' },
-  { name: 'Vaccination', value: '2' },
-  { name: 'Service', value: '3' },
-  { name: 'Consumable', value: '4' },
-  { name: 'Open Prescription', value: '5' },
-]
-
 const currencyRounding = [
   {
     name: 'Up',
@@ -558,7 +552,7 @@ const currencies = [
   },
 ]
 
-const coPayerType =[
+const coPayerType = [
   {
     value: 'corporate',
     name: 'Corporate',
@@ -569,7 +563,7 @@ const coPayerType =[
   },
 ]
 
-const country =[
+const country = [
   {
     value: 'singapore',
     name: 'Singapore',
@@ -585,6 +579,92 @@ const country =[
   {
     value: 'india',
     name: 'India',
+  },
+]
+
+const consultationDocumentTypes = [
+  {
+    value: '3',
+    name: 'Medical Certificate',
+    prop: 'corMedicalCertificate',
+    getSubject: (r) =>
+      `${moment
+        .utc(r.mcStartDate)
+        .local()
+        .format(dateFormatLong)} - ${moment
+        .utc(r.mcEndDate)
+        .local()
+        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+    convert: (r) => {
+      return {
+        ...r,
+        mcStartEndDate: [
+          moment(r.mcStartDate),
+          moment(r.mcEndDate),
+        ],
+      }
+    },
+  },
+  {
+    value: '4',
+    name: 'Certificate of Attendance',
+    prop: 'corCertificateOfAttendance',
+    getSubject: (r) => {
+      return `Certificate of Attendance ${r.accompaniedBy}`
+    },
+    convert: (r) => {
+      return {
+        ...r,
+        attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
+        attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
+      }
+    },
+  },
+  {
+    value: '1',
+    name: 'Referral Letter',
+    prop: 'corReferralLetter',
+  },
+  {
+    value: '2',
+    name: 'Memo',
+    prop: 'corMemo',
+  },
+  {
+    value: '6',
+    name: 'Vaccination Certificate',
+    prop: 'corVaccinationCert',
+  },
+  {
+    value: '5',
+    name: 'Others',
+    prop: 'corOtherDocuments',
+  },
+]
+
+const orderTypes = [
+  {
+    name: 'Medication',
+    value: '1',
+    prop: 'corPrescriptionItem',
+    filter: (r) => !r.stockDrugFK,
+  },
+  {
+    name: 'Vaccination',
+    value: '2',
+    prop: 'corVaccinationItem',
+  },
+  {
+    name: 'Service',
+    value: '3',
+    prop: 'corService',
+  },
+  { name: 'Consumable', value: '4', prop: 'corConsumable' },
+  {
+    name: 'Open Prescription',
+    value: '5',
+    prop: 'corPrescriptionItem',
+    filter: (r) => !!r.stockDrugFK,
   },
 ]
 // const localCodes = {}
@@ -603,32 +683,88 @@ const country =[
 //   return localCodes[code]
 // }
 
-const _fetchAndSaveCodeTable = async (code) => {
-  const response = await axiosRequest(`/api/CodeTable?ctnames=${code}`, {
+const multiplyCodetable = (data, multiplier) => {
+  if (multiplier === 1) return data
+  let result = [
+    ...data,
+  ]
+  const maxLength = data.length
+  for (let i = 1; i <= multiplier; i++) {
+    result = [
+      ...result,
+      ...data.map((item) => ({ ...item, id: maxLength * i + item.id })),
+    ]
+  }
+  return result
+}
+
+const tenantCodes = [
+  'doctorProfile',
+  'clinicianprofile',
+  'ctappointmenttype',
+  'ctreferrallettertemplate',
+  'role',
+]
+
+const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
+  let useGeneral = params === undefined || Object.keys(params).length === 0
+  const baseURL = '/api/CodeTable'
+  const generalCodetableURL = `${baseURL}?ctnames=`
+  const searchURL = `${baseURL}/search?ctname=`
+
+  let url = useGeneral ? generalCodetableURL : searchURL
+  let criteriaForTenantCodes = { pagesize: 99999 }
+  if (
+    tenantCodes.reduce(
+      (codes, tenantCode) =>
+        tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
+      false,
+    )
+  ) {
+    url = '/api/'
+    useGeneral = false
+  }
+  const body = useGeneral
+    ? convertToQuery({ ...params })
+    : convertToQuery({ ...params, ...criteriaForTenantCodes })
+
+  const response = await request(`${url}${code}`, {
     method: 'GET',
+    body,
   })
   const { status: statusCode, data } = response
-
-  if (statusCode === 200) {
+  const result = multiplyCodetable(
+    useGeneral ? data[code] : data.data,
+    multiplier,
+  )
+  if (parseInt(statusCode, 10) === 200) {
     await db.codetable.put({
       code,
-      data: response.data[code],
+      data: result,
       createDate: new Date(),
       updateDate: new Date(),
     })
-    return data[code]
+    return result
   }
 
   return []
 }
 
-export const getCodes = async (_code) => {
-  const code = _code.toLowerCase()
+export const getCodes = async (payload) => {
+  let ctcode
+  let params
+  let multiply = 1
+  if (typeof payload === 'string') ctcode = payload.toLowerCase()
+  if (typeof payload === 'object') {
+    ctcode = payload.code
+    params = payload.filter
+    multiply = payload.multiplier
+  }
 
   let result = []
   try {
     await db.open()
-    const ct = await db.codetable.get(code)
+    const ct = await db.codetable.get(ctcode)
 
     const cookies = new Cookies()
     const lastLoginDate = cookies.get('_lastLogin')
@@ -636,7 +772,7 @@ export const getCodes = async (_code) => {
 
     // not exist in current table, make network call to retrieve data
     if (ct === undefined) {
-      result = _fetchAndSaveCodeTable(code)
+      result = _fetchAndSaveCodeTable(ctcode, params, multiply)
     } else {
       // compare updateDate with lastLoginDate
       // if updateDate > lastLoginDate, do nothing
@@ -645,7 +781,7 @@ export const getCodes = async (_code) => {
       const parsedUpdateDate = moment(updateDate)
 
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(code)
+        ? _fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData
     }
   } catch (error) {
@@ -699,5 +835,6 @@ module.exports = {
   currencyRoundingToTheClosest,
   coPayerType,
   country,
+  consultationDocumentTypes,
   ...module.exports,
 }

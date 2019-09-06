@@ -27,25 +27,32 @@ export const getFileByFileID = async (fileID) => {
   return response
 }
 
-export const downloadFile = async (attachment) => {
+export const downloadFile = async (data, fileName) => {
+  try {
+    const dataUrl = window.URL.createObjectURL(
+      new Blob([
+        data,
+      ]),
+    )
+    console.log({ dataUrl })
+    const link = document.createElement('a')
+    link.href = dataUrl
+    link.setAttribute('download', fileName)
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode.removeChild(link)
+  } catch (error) {
+    console.log({ error })
+  }
+}
+
+export const downloadAttachment = async (attachment) => {
   try {
     const { fileIndexFK, id } = attachment
     const response = await getFileByFileID(!fileIndexFK ? id : fileIndexFK)
 
     const { data, status } = response
-    if (status >= 200 && status < 300) {
-      const dataUrl = window.URL.createObjectURL(
-        new Blob([
-          data,
-        ]),
-      )
-      const link = document.createElement('a')
-      link.href = dataUrl
-      link.setAttribute('download', attachment.fileName)
-      document.body.appendChild(link)
-      link.click()
-      link.parentNode.removeChild(link)
-    }
+    if (status >= 200 && status < 300) downloadFile(data, attachment.fileName)
   } catch (error) {
     console.log({ error })
   }

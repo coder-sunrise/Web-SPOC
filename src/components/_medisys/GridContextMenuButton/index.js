@@ -52,22 +52,22 @@ const GridContextMenuButton = ({
 }) => {
   const handleClick = (event) => {
     const { key } = event
-
     onClick(row, key)
   }
 
   const MenuItemsOverlay = (
     <Menu onClick={handleClick} className={classes.menu}>
       {contextMenuOptions.map(
-        ({ disabled, label, Icon, id, isDivider }, index) =>
-          isDivider ? (
-            <Menu.Divider key={`divider-${index}`} />
-          ) : (
+        ({ disabled, label, Icon, id, isDivider, hidden }, index) => {
+          if (isDivider) return <Menu.Divider key={`divider-${index}`} />
+
+          return hidden ? null : (
             <Menu.Item key={id} id={id} disabled={disabled}>
               <Icon className={classes.icon} />
               <span>{label}</span>
             </Menu.Item>
-          ),
+          )
+        },
       )}
     </Menu>
   )
@@ -78,6 +78,7 @@ const GridContextMenuButton = ({
       trigger={[
         'click',
       ]}
+      placement='bottomRight'
     >
       <Button justIcon round color={color} size='sm'>
         <MoreVert />

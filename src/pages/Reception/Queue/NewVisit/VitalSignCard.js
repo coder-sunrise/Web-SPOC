@@ -1,21 +1,15 @@
 import React, { PureComponent } from 'react'
 // formik
-import { FastField } from 'formik'
+import { Field } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
-import {
-  TextField,
-  NumberInput,
-  CommonCard,
-  GridContainer,
-  GridItem,
-} from '@/components'
+import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
 import FormField from './formField'
 
 class VitalSignCard extends PureComponent {
   render () {
-    const { handleCalculateBMI } = this.props
+    const { handleCalculateBMI, isReadOnly = false } = this.props
     return (
       <CommonCard
         size='sm'
@@ -25,11 +19,12 @@ class VitalSignCard extends PureComponent {
       >
         <GridContainer>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.temperatureC']}
               render={(args) => (
                 <NumberInput
                   {...args}
+                  disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.temperature',
                   })}
@@ -41,11 +36,12 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.bpSysMMHG']}
               render={(args) => (
                 <NumberInput
                   {...args}
+                  disabled={isReadOnly}
                   label='Blood Pressure SYS'
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
@@ -55,11 +51,12 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.bpDiaMMHG']}
               render={(args) => (
                 <NumberInput
                   {...args}
+                  disabled={isReadOnly}
                   label='Blood Pressure DIA'
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
@@ -69,11 +66,12 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.pulseRateBPM']}
               render={(args) => (
                 <NumberInput
                   {...args}
+                  disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.heartRate',
                   })}
@@ -85,11 +83,12 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.weightKG']}
               render={(args) => (
                 <NumberInput
                   {...args}
+                  disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.weight',
                   })}
@@ -102,11 +101,12 @@ class VitalSignCard extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.heightCM']}
               render={(args) => (
                 <NumberInput
                   {...args}
+                  disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.height',
                   })}
@@ -121,7 +121,7 @@ class VitalSignCard extends PureComponent {
           </GridItem>
           <GridItem xs md={4} />
           <GridItem xs md={3}>
-            <FastField
+            <Field
               name={FormField['vitalsign.bmi']}
               render={(args) => (
                 <NumberInput

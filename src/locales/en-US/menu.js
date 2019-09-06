@@ -45,6 +45,9 @@ export default {
   'menu.finance.corporate-billing': 'Corporate Billing',
   'menu.finance.corporate-billing.detail': 'Invoices',
   'menu.finance.statement': 'Statement',
+  'menu.finance.statement/newstatement': 'New Statement',
+  'menu.finance.statement/editstatement': 'Edit Statement',
+  'menu.finance.statement/detail': 'Statement Details',
   'menu.finance.scheme': 'Scheme',
   'menu.finance.scheme/detail': 'Scheme Detail',
 
@@ -57,7 +60,7 @@ export default {
   'menu.patient.new': 'New Patient',
 
   'menu.inventory': 'Inventory',
-  'menu.inventory.pd': 'PO & DO',
+  'menu.inventory.pd': 'Purchasing & Receiving',
   'menu.inventory.pd.detail': 'PO & DO Detail',
   'menu.inventory.master': 'Inventory Master',
   'menu.inventory.consumable.detail': 'Consumable Detail',
@@ -78,7 +81,6 @@ export default {
   'menu.patientdb': 'Patient Database',
   'menu.forms': 'Forms',
   'menu.labsresult': 'Labs Result',
-  'menu.report': 'Report',
   'menu.humanResource': 'Human Resource',
   'menu.setting': 'Setting',
   'menu.setting.clinicinfo': 'Clinic Information',
@@ -118,4 +120,7 @@ export default {
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
+
+  'menu.report': 'Report',
+  'menu.report.queueListingReport': 'Queue Listing Report',
 }

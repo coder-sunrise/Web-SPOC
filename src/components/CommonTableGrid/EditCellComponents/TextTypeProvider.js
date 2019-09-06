@@ -97,14 +97,25 @@ const TextFormatter = (columnExtensions) =>
           ({ columnName: currentColumnName }) =>
             currentColumnName === columnName,
         ) || {}
-      const { type, render, ...restProps } = cfg
+      const { type, render, onClick, ...restProps } = cfg
       // console.log(props)
       if (render) {
         return render(row)
       }
       // console.log(props, cfg)
       if (type === 'link') {
-        return <a href={cfg.link || '#'}>{value}</a>
+        return (
+          <Tooltip title={value} enterDelay={1500}>
+            <a
+              onClick={() => {
+                if (onClick) onClick(row)
+              }}
+              href={cfg.link || '#'}
+            >
+              {value}
+            </a>
+          </Tooltip>
+        )
       }
       return (
         (
@@ -115,7 +126,16 @@ const TextFormatter = (columnExtensions) =>
       )
     },
     (prevProps, nextProps) => {
-      return prevProps === nextProps || prevProps.value === nextProps.value
+      const { column: { name: columnName }, value, row } = nextProps
+      const cfg =
+        columnExtensions.find(
+          ({ columnName: currentColumnName }) =>
+            currentColumnName === columnName,
+        ) || {}
+      return (
+        (prevProps === nextProps || prevProps.value === nextProps.value) &&
+        typeof cfg.render !== 'function'
+      )
     },
   )
 

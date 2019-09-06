@@ -46,7 +46,6 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
   event.isDoctorEvent
     ? [
         ...massaged,
-        event,
       ]
     : [
         ...massaged,

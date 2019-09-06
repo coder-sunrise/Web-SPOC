@@ -4,8 +4,15 @@ import _ from 'lodash'
 import $ from 'jquery'
 import classnames from 'classnames'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
+import Yup from '@/utils/yup'
 import { widgets } from '@/utils/widgets'
 import { getUniqueId } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
+import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
+
+import AuthorizedContext from '@/components/Context/Authorized'
+
 import { Menu, Dropdown } from 'antd'
 import {
   FormControl,
@@ -54,22 +61,22 @@ import {
   confirm,
   SizeContainer,
   Popconfirm,
+  withFormikExtend,
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
-
-import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
 import InvoiceAdjustment from './InvoiceAdjustment'
 
+import schema from './schema'
+import styles from './style'
+
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
-const topHeight = headerHeight + 107
-const getLayoutRowHeight = () => (window.innerHeight - topHeight) / 6
 
 // let layout = {
 //   lg: [
@@ -79,104 +86,36 @@ const getLayoutRowHeight = () => (window.innerHeight - topHeight) / 6
 //   ],
 // }
 // console.log(basicStyle)
-const styles = (theme) => ({
-  ...basicStyle(theme),
-  root: {
-    position: 'relative',
-  },
-  layout: {
-    marginLeft: -3,
-    marginRight: -3,
-  },
-  layoutOnDrag: {
-    marginBottom: 200,
-  },
-  container: {
-    width: '100%',
-  },
-  item: {
-    width: 100,
-    border: '1px solid #ccc',
-  },
-  hide: {
-    display: 'none',
-  },
-  show: {
-    display: 'inherit',
-  },
-  fullscreen: {
-    position: 'initial !important',
-    width: '100% !important',
-    height: `calc(100vh - ${topHeight}px) !important`,
-  },
-  block: {
-    padding: '4px 2px 0px 2px',
-  },
-  blockHeader: {
-    position: 'sticky',
-    textAlign: 'right',
-    cursor: 'pointer',
-    top: 0,
-    zIndex: 2,
-    backgroundColor: '#ffffff',
-  },
-  blockName: {
-    lineHeight: '26px',
-    fontWeight: 400,
-    float: 'left',
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-  },
-  paperRoot: {
-    // boxSizing: 'content-box',
-    // height: 'calc(100% + 10px)',
-    height: '100%',
-    overflow: 'hidden',
-    // paddingTop: 30,
-    // '&> div': {
-    //   overflow: 'auto',
-    //   // height: '100%',
-    // },
-    // padding: 10,
-  },
-  moreWidgetsBtn: {
-    position: 'absolute',
-    right: -13,
-    top: 0,
-  },
-  actionContainer: {
-    position: 'sticky',
-    bottom: 0,
-    width: '100%',
-  },
-  fabContainer: {
-    position: 'fixed',
-    right: -3,
-    top: '50%',
-    zIndex: 1000,
-    '& button': {
-      borderRadius: '0px !important',
-      borderTopLeftRadius: '3px !important',
-      borderBottomLeftRadius: '3px !important',
-    },
-  },
-  widgetPopper: {
-    zIndex: 101,
-    width: 300,
-  },
-  iconButton: {
-    position: 'absolute',
-    top: -3,
-    marginLeft: 10,
-  },
-})
 
 let lasActivedWidget = null
 
-@connect(({ consultation, global }) => ({
-  consultation,
-  global,
-}))
+@connect(
+  ({ consultation, global, consultationDocument, patientDashboard }) => ({
+    consultation,
+    global,
+    consultationDocument,
+    patientDashboard,
+  }),
+)
+@withFormikExtend({
+  mapPropsToValues: ({ consultation = {} }) => {
+    return consultation.entity || consultation.default
+  },
+  validationSchema: schema,
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, history, consultation } = props
+    dispatch({
+      type: 'consultation/sign',
+      payload: values,
+    }).then(() => {
+      history.push(
+        `/reception/queue/patientdashboard?qid=${consultation.queueID}&v=${Date.now()}`,
+      )
+    })
+  },
+  displayName: 'ConsultationPage',
+})
 class Consultation extends PureComponent {
   constructor (props) {
     super(props)
@@ -234,8 +173,8 @@ class Consultation extends PureComponent {
       {
         id: '4',
         config: {
-          lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
-          md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
+          lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 4 },
+          md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 3 },
         },
       },
       {
@@ -246,12 +185,19 @@ class Consultation extends PureComponent {
         },
       },
       {
-        id: '1002',
+        id: '7',
         config: {
-          lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
-          md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
+          lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
+          md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
         },
       },
+      // {
+      //   id: '1002',
+      //   config: {
+      //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
+      //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
+      //   },
+      // },
     ]
     let defaultLayout
 
@@ -325,7 +271,7 @@ class Consultation extends PureComponent {
     this.state = {
       mode: 'edit',
       breakpoint: 'lg',
-      rowHeight: getLayoutRowHeight(),
+      rowHeight: this.getLayoutRowHeight(),
       showInvoiceAdjustment: false,
       collapsed: global.collapsed,
       currentLayout: defaultLayout,
@@ -353,6 +299,16 @@ class Consultation extends PureComponent {
     // console.log($(this.container.current).width())
     // console.log($(this.container.current).innerWidth())
     // $('.react-resizable-handle').on('mouseover',)
+    const { consultation, dispatch } = this.props
+    // console.log(this.props.values)
+    // dispatch({
+    //   type:'formik/mergeState',
+    //   payload:{
+    //     ConsultationPage:{
+    //       dirty:true
+    //     }
+    //   }
+    // })
     $(this.layoutContainer.current)
       .on(
         'mouseenter',
@@ -364,6 +320,37 @@ class Consultation extends PureComponent {
         '.react-resizable-handle',
         this.delayedHideBottomPadding,
       )
+    // if (consultation) {
+    //   if (consultation.consultationID) {
+    //     dispatch({
+    //       type: 'consultation/query',
+    //       payload: consultation.consultationID,
+    //     })
+    //   } else if (consultation.visitFK) {
+    //     dispatch({
+    //       type: 'consultation/newConsultation',
+    //       payload: consultation.visitFK,
+    //     })
+    //   }
+    // }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    // console.log('componentWillReceiveProps', this.props, nextProps)
+    // console.log(
+    //   nextProps.consultation,
+    //   nextProps.consultation.consultationID,
+    //   this.props.consultation.consultationID !==
+    //     nextProps.consultation.consultationID,
+    // )
+    if (
+      nextProps.consultation &&
+      nextProps.consultation.entity &&
+      nextProps.consultation.entity.concurrencyToken !==
+        nextProps.values.concurrencyToken
+    ) {
+      nextProps.resetForm(nextProps.consultation.entity)
+    }
   }
 
   componentWillUnmount () {
@@ -374,7 +361,7 @@ class Consultation extends PureComponent {
   resize = (e) => {
     // console.log(e)
     this.setState({
-      rowHeight: getLayoutRowHeight(),
+      rowHeight: this.getLayoutRowHeight(),
     })
   }
 
@@ -428,7 +415,7 @@ class Consultation extends PureComponent {
           y: Infinity,
         }
         layout[s].push(n)
-        console.log(n)
+        // console.log(n)
       }
     })
     this.changeLayout(layout)
@@ -438,7 +425,7 @@ class Consultation extends PureComponent {
     const keys = Object.keys(changes)
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index]
-      console.log(key)
+      // console.log(key)
       if (changes[key]) {
         this.addWidget(key)
       } else {
@@ -583,10 +570,21 @@ class Consultation extends PureComponent {
   //   }
   // }
 
+  getLayoutRowHeight = () => {
+    const topHeight = (this.props.height ? 0 : headerHeight) + 130
+    // console.log(
+    //   this.props,
+    //   (this.props.height || window.innerHeight - topHeight) / 6,
+    //   ((this.props.height || window.innerHeight) - topHeight) / 6,
+    // )
+
+    return ((this.props.height || window.innerHeight) - topHeight) / 6
+  }
+
   getLayoutWidgets = () => {
     const { state, props } = this
-    const { classes } = props
-    console.log(state.currentLayout)
+    const { classes, height } = props
+    // console.log(state.currentLayout)
 
     const layoutCfg = {
       className: classes.layout,
@@ -607,7 +605,7 @@ class Consultation extends PureComponent {
         this.setState({
           breakpoint: newBreakpoint,
         })
-        console.log('onBreakpointChange', newBreakpoint, newCols)
+        // console.log('onBreakpointChange', newBreakpoint, newCols)
       },
       onLayoutChange: (_currentLayout, allLayouts) => {
         // console.log(window.mainPanel)
@@ -619,18 +617,18 @@ class Consultation extends PureComponent {
             this.compareNodeLayoutChange,
           )
         ) {
-          console.log('onLayoutChange')
+          // console.log('onLayoutChange')
           this.delayedChangeLayout(allLayouts)
         }
       },
       onWidthChange: (containerWidth, margin, cols, containerPadding) => {
-        console.log(
-          'onWidthChange',
-          containerWidth,
-          margin,
-          cols,
-          containerPadding,
-        )
+        // console.log(
+        //   'onWidthChange',
+        //   containerWidth,
+        //   margin,
+        //   cols,
+        //   containerPadding,
+        // )
       },
       onResizeStart: (e) => {
         // $(this.layoutContainer.current).addClass(classes.layoutOnDrag)
@@ -640,9 +638,17 @@ class Consultation extends PureComponent {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
       },
     }
-
+    // console.log(state.rowHeight)
     return (
-      <div ref={this.layoutContainer}>
+      <div
+        ref={this.layoutContainer}
+        style={{
+          height: height ? this.props.height - 116 : 'auto',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          marginTop: 1,
+        }}
+      >
         <ResponsiveGridLayout {...layoutCfg}>
           {state.currentLayout.widgets.map((id) => {
             const w = widgets.find((o) => o.id === id)
@@ -753,6 +759,113 @@ class Consultation extends PureComponent {
     }))
   }
 
+  saveConsultation = ({ action, confirmMessage, successMessage }) => {
+    const {
+      dispatch,
+      values,
+      history,
+      consultation,
+      patientDashboard,
+      consultationDocument = {},
+      orders = {},
+    } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: confirmMessage,
+        onOpenConfirm: () => {
+          const { rows = [] } = consultationDocument
+          consultationDocumentTypes.forEach((p) => {
+            values[p.prop] = rows.filter((o) => o.type === p.value)
+          })
+
+          const { rows: orderRows = [] } = orders
+          orderTypes.forEach((p) => {
+            values[p.prop] = orderRows.filter((o) => o.type === p.value)
+          })
+          console.log(values)
+          dispatch({
+            type: `consultation/${action}`,
+            payload: values,
+          }).then((r) => {
+            if (r) {
+              if (successMessage) {
+                notification.success({
+                  message: successMessage,
+                })
+              }
+
+              // dispatch({
+              //   type: 'consultation/query',
+              //   payload: values.id,
+              // }).then(() => {
+              //   history.push(
+              //     `/reception/queue/patientdashboard?qid=${consultation.queueID}`,
+              //   )
+              // })
+              history.push(`/reception/queue`)
+            }
+          })
+        },
+      },
+    })
+  }
+
+  pauseConsultation = () => {
+    this.saveConsultation({
+      confirmMessage: 'Confirm pause current consultation?',
+      successMessage: 'Consultation paused',
+      action: 'pause',
+    })
+  }
+
+  resumeConsultation = () => {
+    const {
+      dispatch,
+      values,
+      history,
+      consultation,
+      resetForm,
+      user,
+      patientDashboard,
+    } = this.props
+    dispatch({
+      type: 'consultation/resume',
+      payload: consultation.visitID,
+    }).then((r) => {
+      if (r) {
+        resetForm(r)
+        notification.success({
+          message: 'Consultation resumed',
+        })
+      }
+    })
+  }
+
+  discardConsultation = () => {
+    const { dispatch, values, history, consultation, resetForm } = this.props
+    if (values.id) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: 'Confirm to discard current consultation?',
+          onOpenConfirm: () => {
+            dispatch({
+              type: 'consultation/discard',
+              payload: values.id,
+            }).then((r) => {
+              if (r) {
+                history.push(`/reception/queue`)
+              }
+            })
+          },
+        },
+      })
+    }
+  }
+
   render () {
     const { props, state } = this
     const {
@@ -760,17 +873,20 @@ class Consultation extends PureComponent {
       classes,
       theme,
       dispatch,
-      consultation,
+      values,
+      consultation = {},
       ...resetProps
     } = this.props
     const { currentLayout } = state
-    // console.log(props)
+    const { entity } = consultation
+    console.log(values)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
+          style={{}}
           extraCmt={
             <div style={{ textAlign: 'center', paddingTop: 16 }}>
               <p style={{ position: 'relative' }}>
@@ -797,32 +913,35 @@ class Consultation extends PureComponent {
               </p>
               <h5>{NumberFormatter(210)}</h5>
               <SizeContainer size='sm'>
-                <Button
-                  color='danger'
-                  onClick={() => {
-                    history.push('/reception/queue/patientdashboard')
-                  }}
-                >
-                  Discard
-                </Button>
-                <ProgressButton color='info' icon={null}>
-                  Pause
-                </ProgressButton>
+                {values.status !== 'Paused' && (
+                  <ProgressButton
+                    color='danger'
+                    onClick={this.discardConsultation}
+                  >
+                    Discard
+                  </ProgressButton>
+                )}
+                {values.status !== 'Paused' && (
+                  <ProgressButton
+                    onClick={this.pauseConsultation}
+                    color='info'
+                    icon={null}
+                  >
+                    Pause
+                  </ProgressButton>
+                )}
+                {values.status === 'Paused' && (
+                  <ProgressButton
+                    onClick={this.resumeConsultation}
+                    color='info'
+                    icon={null}
+                  >
+                    Resume
+                  </ProgressButton>
+                )}
                 <ProgressButton
                   color='primary'
-                  onClick={() => {
-                    dispatch({
-                      type: 'global/sendNotification',
-                      payload: {
-                        type: 'Consultation',
-                        data: {
-                          message: 'reception update',
-                          sender: 'Mr Test',
-                        },
-                      },
-                    })
-                    history.push('/reception/queue')
-                  }}
+                  onClick={this.props.handleSubmit}
                   icon={null}
                 >
                   Sign Off
@@ -842,8 +961,20 @@ class Consultation extends PureComponent {
         >
           
         </CardContainer> */}
-        {this.getLayoutWidgets()}
-
+        <AuthorizedContext.Provider
+          value={{
+            view: {
+              name: 'consultation.view',
+              rights: values.status === 'Paused' ? 'disable' : 'enable',
+            },
+            edit: {
+              name: 'consultation.edit',
+              rights: values.status === 'Paused' ? 'disable' : 'enable',
+            },
+          }}
+        >
+          {this.getLayoutWidgets()}
+        </AuthorizedContext.Provider>
         {!state.fullScreenWidget && (
           <React.Fragment>
             <div className={classes.fabContainer}>

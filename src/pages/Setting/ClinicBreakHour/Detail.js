@@ -15,11 +15,6 @@ import {
 
 const styles = (theme) => ({})
 
-// const clinics = [
-//   { value: 'angmokioave1', name: 'Ang Mo Kio Ave 1' },
-//   { value: 'bedokave3', name: 'Bedok Ave 3' },
-// ]
-
 @withFormik({
   mapPropsToValues: ({ settingClinicBreakHour }) =>
     settingClinicBreakHour.entity || settingClinicBreakHour.default,
@@ -27,47 +22,59 @@ const styles = (theme) => ({})
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
-    // clinicName: Yup.string().required(),
     monFromBreak: Yup.string().required(),
-    monToBreak: Yup.string().required(),
+    monToBreak: Yup.string()
+      .laterThan(Yup.ref('monFromBreak'), 'TO must be later than FROM')
+      .required(),
     tueFromBreak: Yup.string().required(),
-    tueToBreak: Yup.string().required(),
+    tueToBreak: Yup.string()
+      .laterThan(Yup.ref('tueFromBreak'), 'TO must be later than FROM')
+      .required(),
     wedFromBreak: Yup.string().required(),
-    wedToBreak: Yup.string().required(),
+    wedToBreak: Yup.string()
+      .laterThan(Yup.ref('wedFromBreak'), 'TO must be later than FROM')
+      .required(),
     thursFromBreak: Yup.string().required(),
-    thursToBreak: Yup.string().required(),
+    thursToBreak: Yup.string()
+      .laterThan(Yup.ref('thursFromBreak'), 'TO must be later than FROM')
+      .required(),
     friFromBreak: Yup.string().required(),
-    friToBreak: Yup.string().required(),
+    friToBreak: Yup.string()
+      .laterThan(Yup.ref('friFromBreak'), 'TO must be later than FROM')
+      .required(),
     satFromBreak: Yup.string().required(),
-    satToBreak: Yup.string().required(),
+    satToBreak: Yup.string()
+      .laterThan(Yup.ref('satFromBreak'), 'TO must be later than FROM')
+      .required(),
     sunFromBreak: Yup.string().required(),
-    sunToBreak: Yup.string().required(),
+    sunToBreak: Yup.string()
+      .laterThan(Yup.ref('sunFromBreak'), 'TO must be later than FROM')
+      .required(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
-		const { dispatch, onConfirm } = props
+    const { dispatch, onConfirm } = props
 
-      dispatch({
-        type: 'settingClinicBreakHour/upsert',
-        payload: {
-          ...restValues,
-          effectiveStartDate: effectiveDates[0],
-          effectiveEndDate: effectiveDates[1]
-        }
-      })
-      .then((r) => {
-        if (r) {
-          if (onConfirm) onConfirm()
-          dispatch({
-            type: 'settingClinicBreakHour/query'
-          })
-        }
-      })
+    dispatch({
+      type: 'settingClinicBreakHour/upsert',
+      payload: {
+        ...restValues,
+        effectiveStartDate: effectiveDates[0],
+        effectiveEndDate: effectiveDates[1],
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'settingClinicBreakHour/query',
+        })
+      }
+    })
   },
   displayName: 'ClinicBreakHourModal',
 })
 class Detail extends PureComponent {
-  state={}
+  state = {}
 
   // state = {
   //   editingRowIds: [],
@@ -89,7 +96,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values,settingClinicBreakHour } = props
+    const { classes, theme, footer, values, settingClinicBreakHour } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -98,7 +105,13 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => <TextField label='Code' {...args} disabled={settingClinicBreakHour.entity ? true : false}/>}
+                render={(args) => (
+                  <TextField
+                    label='Code'
+                    {...args}
+                    disabled={settingClinicBreakHour.entity ? true : false}
+                  />
+                )}
               />
             </GridItem>
             <GridItem md={6}>

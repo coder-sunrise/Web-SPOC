@@ -41,6 +41,7 @@ class EmergencyContact extends PureComponent {
         columnName: 'relationshipFK',
         type: 'codeSelect',
         code: 'ctrelationship',
+        sortingEnabled: false,
       },
       {
         columnName: 'accountNoTypeFK',
@@ -54,15 +55,19 @@ class EmergencyContact extends PureComponent {
       },
       {
         columnName: 'salutationFK',
+        width: 80,
         type: 'codeSelect',
         code: 'ctSalutation',
+        sortingEnabled: false,
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
         columnName: 'isPrimaryContact',
         type: 'radio',
+        width: 60,
         checkedValue: true,
         uncheckedValue: false,
+        sortingEnabled: false,
         onRadioChange: (row, e, checked) => {
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
@@ -212,6 +217,7 @@ class EmergencyContact extends PureComponent {
         <EditableTableGrid
           rows={values.patientEmergencyContact}
           schema={schema}
+          showRowNumber
           onRowDoubleClick={this.onRowDoubleClick}
           FuncProps={{
             pagerConfig: {

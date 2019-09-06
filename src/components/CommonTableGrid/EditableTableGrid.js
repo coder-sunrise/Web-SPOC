@@ -332,7 +332,10 @@ class EditableTableGrid extends PureComponent {
 
     // console.log('editabletablegrid', { props: this.props })
 
-    const { FuncProps: { pager = true } } = props
+    const { FuncProps: { pager = true } } = {
+      FuncProps: {},
+      ...props,
+    }
     const { editingRowIds, deletedRowIds, rowChanges, addedRows } = this.state
     // console.log(this.state, this.props)
     // console.log(editingRowIds, this.state.errorRows)

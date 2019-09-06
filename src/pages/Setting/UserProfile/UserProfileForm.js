@@ -9,6 +9,7 @@ import Key from '@material-ui/icons/VpnKey'
 // common component
 import {
   Button,
+  CommonModal,
   CodeSelect,
   DatePicker,
   DateRangePicker,
@@ -17,8 +18,9 @@ import {
   Select,
   TextField,
 } from '@/components'
-// services
-import { getRoles } from './services'
+import { ChangePassword } from '@/components/_medisys'
+// utils
+import { constructUserProfile } from './utils'
 
 const styles = (theme) => ({
   container: {
@@ -39,147 +41,144 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserProfile }) => ({
+@connect(({ settingUserProfile, user, codetable }) => ({
   settingUserProfile,
+  currentUser: user.profileDetails,
+  ctRole: codetable.role,
 }))
 @withFormik({
   enableReinitialize: true,
-  validationSchema: Yup.object().shape({
-    userName: Yup.string().required('Login ID is a required field'),
-    password: Yup.string().required('Password is a required field'),
-    name: Yup.string().required('Name is a required field'),
-    phoneNumber: Yup.string().required('Contact No. is a required field'),
-    userAccountNo: Yup.string().required(
-      'User Account No. is a required field',
-    ),
-    // effectiveStartDate: Yup.date().required(
-    //   'Effective Start Date is a required field',
-    // ),
-    // effectiveEndDate: Yup.date().required(
-    //   'Effective End Date is a required field',
-    // ),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-
-    role: Yup.string().required('Role is a required field'),
-  }),
-  mapPropsToValues: (props) => {
-    const { settingUserProfile: { currentSelectedUser = {} } } = props
-    return {
-      ...currentSelectedUser,
-      effectiveDates:
-        Object.entries(currentSelectedUser).length <= 0
-          ? []
-          : [
-              currentSelectedUser.effectiveStartDate,
-              currentSelectedUser.effectiveEndDate,
-            ],
-      role: 1,
+  validationSchema: (props) => {
+    const { settingUserProfile, currentUser } = props
+    const { currentSelectedUser } = settingUserProfile
+    const isEdit =
+      (currentSelectedUser &&
+        currentSelectedUser.userProfile &&
+        currentSelectedUser.userProfile.userName) ||
+      (currentUser && currentUser.userProfile.userName)
+    const baseValidationRule = {
+      userProfile: Yup.object().shape({
+        userName: Yup.string().required('Login ID is a required field'),
+      }),
+      name: Yup.string().required('Name is a required field'),
+      phoneNumber: Yup.string().required('Contact No. is a required field'),
+      userAccountNo: Yup.string().required(
+        'User Account No. is a required field',
+      ),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      role: Yup.string().required('Role is a required field'),
+      doctorProfile: Yup.object()
+        .transform((value, original) => {
+          console.log({ value, original })
+          return value === null ? {} : value
+        })
+        .when('role', {
+          is: (val) => val === '1',
+          then: Yup.object().shape({
+            doctorMCRNo: Yup.string().required(),
+          }),
+        }),
     }
+    return isEdit
+      ? Yup.object().shape(baseValidationRule)
+      : Yup.object().shape({
+          ...baseValidationRule,
+          userProfile: Yup.object().shape({
+            userName: Yup.string().required('Login ID is a required field'),
+            password: Yup.string().required('Password is a required field'),
+          }),
+        })
   },
-  handleSubmit: (values, { props }) => {
-    // console.log('submit', values, props)
-    const { dispatch, onConfirm } = props
+  mapPropsToValues: (props) => {
+    const { settingUserProfile, currentUser } = props
 
-    // const { role, ...restValues } = values
-    const hardcodedProfileValue = {
-      // role: '1',
-
-      // effectiveEndDate: '2019-07-31T08:36:14Z',
-      // effectiveStartDate: '2019-07-25T08:36:12Z',
-      // name: 'test medisys',
-      // password: '123456',
-      // phoneNumber: '12345678',
-      // userAccountNo: '00001',
-      // userName: 'test',
-
-      email: '',
-      title: '',
-      userCode: '',
-      dob: '2019-07-26T08:26:07.254Z',
-      isUserMaintainable: true,
-      genderFk: 1,
-      qualificationCodeFk: 0,
-      registrationStatusFk: 0,
-      registrationTypeFk: 0,
-      boardNameFk: 0,
-      roleSpecialityFk: 0,
-      languageSpokenFk: 0,
-      designation: '',
-      principalUserProfileFk: 0,
-      lastLoginDate: '2019-07-26T08:26:07.254Z',
-      createDate: '2019-07-26T08:26:07.254Z',
-      createByUserFk: 1,
-      createByClinicFk: 0,
-      updateDate: '2019-07-26T08:26:07.254Z',
-      updateByUserFk: 1,
-      updateByClinicFk: 0,
-      // userRoles: [
-      //   {
-      //     id: 0,
-      //     name: 'doctor',
-      //     normalizedName: 'doctor',
-      //   },
-      // ],
-      userRole: 'doctor',
-      doctorMCRNo: '12345A',
-      isDoctor: true,
-      // id: 0,
-      isDeleted: false,
-      concurrencyToken: 0,
-      ...values,
+    if (currentUser) {
+      return {
+        ...currentUser,
+        // ...currentUser.userProfile,
+        effectiveDates: [
+          currentUser.effectiveStartDate,
+          currentUser.effectiveEndDate,
+        ],
+        role:
+          currentUser.userProfile && currentUser.userProfile.role
+            ? currentUser.userProfile.role.id
+            : undefined,
+      }
     }
-    // console.log({ hardcodedProfileValue })
+    if (settingUserProfile) {
+      const { currentSelectedUser = {} } = settingUserProfile
+      return {
+        ...currentSelectedUser,
+        // ...currentSelectedUser.userProfile,
+        // ...currentSelectedUser.doctorProfile,
+        effectiveDates:
+          Object.entries(currentSelectedUser).length <= 0
+            ? []
+            : [
+                currentSelectedUser.effectiveStartDate,
+                currentSelectedUser.effectiveEndDate,
+              ],
+        role: currentSelectedUser.userProfile
+          ? currentSelectedUser.userProfile.role.id
+          : undefined,
+      }
+    }
+    return {}
+  },
+  handleSubmit: (values, { props, resetForm }) => {
+    const { dispatch, ctRole, onConfirm } = props
+    const { effectiveDates, role: roleFK, ...restValues } = values
+    const role = ctRole.find((item) => item.id === roleFK)
+    const userProfile = constructUserProfile(values, role)
+
+    const payload = {
+      ...restValues,
+      effectiveStartDate: values.effectiveDates[0],
+      effectiveEndDate: values.effectiveDates[1],
+      userProfile,
+    }
+
     dispatch({
       type: 'settingUserProfile/upsert',
-      payload: hardcodedProfileValue,
+      payload,
     }).then((response) => {
-      console.log('handleSubmit', { response })
+      resetForm()
+      dispatch({ type: 'settingUserProfile/query' })
       response && onConfirm()
     })
-    // onSubmit(hardcodedProfileValue)
   },
 })
 class UserProfileForm extends React.PureComponent {
   state = {
-    roles: [],
+    showChangePassword: false,
   }
 
-  componentWillMount () {
-    getRoles().then((response) => {
-      const { data } = response
-      const { data: roles = [] } = data
-      console.log('willmount', { roles })
-      this.setState({
-        roles,
-      })
-    })
+  toggleChangePasswordModal = () => {
+    this.setState((preState) => ({
+      showChangePassword: !preState.showChangePassword,
+    }))
   }
 
   render () {
-    const {
-      classes,
-      onChangePasswordClick,
-      footer,
-      handleSubmit,
-      settingUserProfile,
-    } = this.props
-    const { currentSelectedUser } = settingUserProfile
+    const { classes, footer, handleSubmit, values } = this.props
+    const { showChangePassword } = this.state
+    const isEdit = values.userProfileFK !== undefined
 
-    const { roles } = this.state
-
-    console.log({ roles })
-
-    const isEdit = currentSelectedUser.userName !== undefined
     return (
       <React.Fragment>
-        <GridContainer alignItems='center' className={classes.container}>
+        <GridContainer
+          alignItems='center'
+          justify='space-between'
+          className={classes.container}
+        >
           <GridItem md={12} className={classes.verticalSpacing}>
             <h4>Login Info</h4>
           </GridItem>
           <GridContainer className={classes.indent} alignItems='center'>
             <GridItem md={6}>
               <FastField
-                name='userName'
+                name='userProfile.userName'
                 render={(args) => (
                   <TextField {...args} label='Username' disabled={isEdit} />
                 )}
@@ -189,7 +188,7 @@ class UserProfileForm extends React.PureComponent {
               <React.Fragment>
                 <GridItem md={6}>
                   <FastField
-                    name='password'
+                    name='userProfile.password'
                     render={(args) => (
                       <TextField {...args} label='Password' type='password' />
                     )}
@@ -199,10 +198,24 @@ class UserProfileForm extends React.PureComponent {
                 <GridItem md={6}>
                   <i>User must create a new password at next sign in.</i>
                 </GridItem>
+                <GridItem md={6} />
+                <GridItem md={6}>
+                  <span>Password must be</span>
+                  <ul>
+                    <li>8 to 18 characters long</li>
+                    <li>
+                      contain a mix of letters, numbers, and/or special
+                      characters
+                    </li>
+                  </ul>
+                </GridItem>
               </React.Fragment>
             ) : (
               <GridItem md={6}>
-                <Button color='primary' onClick={onChangePasswordClick}>
+                <Button
+                  color='primary'
+                  onClick={this.toggleChangePasswordModal}
+                >
                   <Key />Change Password
                 </Button>
               </GridItem>
@@ -242,13 +255,13 @@ class UserProfileForm extends React.PureComponent {
               />
             </GridItem>
             <GridItem md={6}>
-              <Field
-                name='mcrNo'
+              <FastField
+                name='doctorProfile.doctorMCRNo'
                 render={(args) => (
                   <TextField
                     {...args}
                     label='Doctor MCR No.'
-                    // disabled={!values.isDoctor}
+                    disabled={isEdit}
                   />
                 )}
               />
@@ -261,7 +274,7 @@ class UserProfileForm extends React.PureComponent {
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='genderFk'
+                name='genderFK'
                 render={(args) => (
                   <CodeSelect {...args} label='Gender' code='ctgender' />
                 )}
@@ -314,18 +327,23 @@ class UserProfileForm extends React.PureComponent {
               <Field
                 name='role'
                 render={(args) => (
-                  <Select
-                    {...args}
-                    label='Role'
-                    valueField='id'
-                    labelField='name'
-                    options={roles}
-                  />
+                  <CodeSelect {...args} label='Role' code='role' />
                 )}
               />
             </GridItem>
           </GridContainer>
         </GridContainer>
+        {isEdit && (
+          <CommonModal
+            title='Change Password'
+            open={showChangePassword}
+            onClose={this.toggleChangePasswordModal}
+            onConfirm={this.toggleChangePasswordModal}
+            maxWidth='sm'
+          >
+            <ChangePassword userID={values.userProfileFK} />
+          </CommonModal>
+        )}
         {footer &&
           footer({
             onConfirm: handleSubmit,

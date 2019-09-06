@@ -1,6 +1,8 @@
 import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
+import { queryBizSession } from '../services'
+import moment from 'moment'
 
 export default createListViewModel({
   namespace: 'deposit',
@@ -9,31 +11,89 @@ export default createListViewModel({
   },
   param: {
     service,
-    state: {
-      collectPaymentList: [],
+    state: {},
+    subscriptions: ({ dispatch, history }) => {
+      history.listen(async (loct, method) => {
+        const { pathname, search, query = {} } = loct
+      })
     },
-    subscriptions: {},
     effects: {
-      *fetchList ({ payload }, { call, put }) {
-        const response = yield call(queryFakeList)
+      *bizSessionList ({ payload }, { call, put }) {
+        const response = yield call(queryBizSession, payload)
         yield put({
-          type: 'updateState',
-          payload: {
-            list: Array.isArray(response) ? response : [],
-          },
+          type: 'updateBizSessionList',
+          payload: response.status == '200' ? response.data : {},
         })
-      },
-      *submit ({ payload }, { call }) {
-        return yield call(fakeSubmitForm, payload)
       },
     },
     reducers: {
-      updateCollectPaymentList (state, { payload }) {
+      queryDone (state, { payload }) {
+        const { data } = payload
+
         return {
           ...state,
-          collectPaymentList: [
-            ...payload,
+          list: [
+            {
+              id: 1,
+              patientName: 'Ali Bin Abu',
+              accountNo: 'S1234567890',
+              balance: 9999,
+              lastTxnDate: moment(),
+            },
+            {
+              id: 2,
+              patientName: 'Abu Bin Ali',
+              accountNo: 'S1234567890',
+              balance: 8888,
+              lastTxnDate: moment(),
+            },
+            {
+              id: 3,
+
+              patientName: 'Ali Bin Abu',
+              accountNo: 'S1234567890',
+              balance: 7777,
+              lastTxnDate: moment(),
+            },
+            {
+              id: 4,
+              patientName: 'Abu Bin Ali',
+              accountNo: 'S1234567890',
+              balance: 6666,
+              lastTxnDate: moment(),
+            },
+            {
+              id: 5,
+              patientName: 'Ali Bin Abu',
+              accountNo: 'S1234567890',
+              balance: 0,
+              lastTxnDate: moment(),
+            },
+            {
+              id: 6,
+              patientName: 'Abu Bin Ali',
+              accountNo: 'S1234567890',
+              balance: 0,
+              lastTxnDate: moment(),
+            },
           ],
+          // list: data.data.map((o) => {
+          //   return {
+          //     ...o,
+          //   }
+          // }),
+        }
+      },
+      updateBizSessionList (state, { payload }) {
+        const { data } = payload
+        return {
+          ...state,
+          bizSessionList: data.map((x) => {
+            return {
+              value: x.sessionNo,
+              name: x.sessionNo,
+            }
+          }),
         }
       },
     },

@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import {
   NavPills,
   ProgressButton,
@@ -30,6 +30,32 @@ const styles = (theme) => ({
 })
 
 const Detail = (props) => {
+  useEffect(() => {
+    if (props.schemeDetail.currentId) {
+      props
+        .dispatch({
+          type: 'schemeDetail/query',
+          payload: {
+            id: props.schemeDetail.currentId,
+          },
+        })
+        .then((o) => {
+          return {
+            ...o,
+            effectiveDates: [
+              o.effectiveStartDate,
+              o.effectiveEndDate,
+            ],
+            itemGroupMaxCapacityDtoRdoValue: o.itemGroupMaxCapacityDto
+              ? 'sub'
+              : 'all',
+            itemGroupValueDtoRdoValue: o.itemGroupValueDto ? 'sub' : 'all',
+          }
+        })
+        .then((o) => props.resetForm(o))
+    }
+  }, [])
+
   const {
     classes,
     dispatch,
@@ -44,11 +70,11 @@ const Detail = (props) => {
     ...props,
   }
   const { currentTab } = schemeDetail
-  console.log(restProps)
+  // console.log(restProps)
   return (
     <div>
       <NavPills
-        color='info'
+        color='primary'
         onChange={(event, active) => {
           history.push(
             getAppendUrl({
@@ -94,34 +120,74 @@ export default compose(
   })),
   withFormikExtend({
     mapPropsToValues: ({ schemeDetail }) => {
+      // console.log(1, 2, schemeDetail)
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       name: Yup.string().required(),
+      schemeCategoryFK: Yup.number().required(),
+      companyCoPaymentSchemeDto: Yup.array().of(
+        Yup.object().shape({
+          companyFk: Yup.number().required(),
+        }),
+      ),
+
       // effectiveStartDate: Yup.string().required(),
       // effectiveEndDate: Yup.string().required(),
     }),
-    handleSubmit: (values, { props }) => {
+    handleSubmit: (values, { props, resetForm }) => {
       const { effectiveDates, ...restValues } = values
-      const { dispatch, onConfirm } = props
+      console.log('restValues', restValues)
+      const { dispatch, history, onConfirm, schemeDetail } = props
       dispatch({
         type: 'schemeDetail/upsert',
         payload: {
           ...restValues,
           effectiveStartDate: effectiveDates[0],
           effectiveEndDate: effectiveDates[1],
-          roomStatusFK: 1,
         },
       }).then((r) => {
+        // if (r) {
+        //   if (onConfirm) onConfirm()
+        //   dispatch({
+        //     type: 'schemeDetail/query',
+        //     payload: {
+        //       id: r.id,
+        //     },
+        //   })
+        // }
+        // if (r) {
+        //   if (r.id) {
+        //     history.push(
+        //       getRemovedUrl(
+        //         [
+        //           'new',
+        //         ],
+        //         getAppendUrl({
+        //           id: r.id,
+        //         }),
+        //       ),
+        //     )
+        //   }
+        //   dispatch({
+        //     type: 'schemeDetail/query',
+        //     payload: {
+        //       id: r.id || restValues.id,
+        //       effectiveDates: [
+        //         r.effectiveStartDate,
+        //         r.effectiveEndDate,
+        //       ],
+        //     },
+        //   }).then((value) => {
+        //     resetForm(value)
+        //   })
         if (r) {
           if (onConfirm) onConfirm()
           dispatch({
             type: 'schemeDetail/query',
-            payload: {
-              id: r.id,
-            },
           })
+          history.push('/finance/scheme')
         }
       })
     },

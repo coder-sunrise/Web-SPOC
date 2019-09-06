@@ -82,6 +82,9 @@ const cellStyle = {
 
 // console.log(colorManipulator)
 const styles = (theme) => ({
+  tableCursorPointer: {
+    cursor: 'default',
+  },
   tableStriped: {
     '& > tbody > tr:nth-of-type(odd), & > thead > tr': {
       // backgroundColor: colorManipulator.fade(
@@ -152,13 +155,17 @@ class CommonTableGrid extends React.Component {
     },
   }
 
+  static defaultProps = {
+    columnExtensions: [],
+  }
+
   constructor (props) {
     super(props)
     const {
       classes,
       theme,
       oddEven = true,
-      onRowDoubleClick = (f) => f,
+      onRowDoubleClick = undefined,
       onRowClick = (f) => f,
       rowMoveable = (f) => false,
     } = props
@@ -167,6 +174,7 @@ class CommonTableGrid extends React.Component {
     // this.myRef = React.createRef()
     const cls = classNames({
       [classes.tableStriped]: oddEven,
+      [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
     })
     const TableComponent = ({ ...restProps }) => {
       return <Table.Table {...restProps} className={cls} />
@@ -189,7 +197,7 @@ class CommonTableGrid extends React.Component {
       <Table.Row
         {...restProps}
         onDoubleClick={(event) => {
-          onRowDoubleClick(row, event)
+          onRowDoubleClick && onRowDoubleClick(row, event)
         }}
         onClick={(event) => {
           onRowClick(row, event)
@@ -559,11 +567,11 @@ class CommonTableGrid extends React.Component {
     // const childRows = rows.filter((r) => r.parentId === (row ? row.id : 0))
     // console.log(row, rows, childRows)
     // return childRows.length ? childRows : null
-
+    const { getRowId = (r) => (r.Id ? r.Id : r.id) } = this.props
     const childRows = rootRows.filter(
-      (r) => r.parentId === (row ? row.id : null),
+      (r) => r.parentId === (row ? getRowId(row) : null),
     )
-    console.log(childRows)
+    // console.log(childRows)
     return childRows.length ? childRows : null
   }
 
@@ -578,7 +586,7 @@ class CommonTableGrid extends React.Component {
       ],
       columns = [],
       type,
-      rows,
+      rows = [],
       TableCell = DefaultTableCell,
       columnExtensions = [],
       filteringColExtensions = [],
@@ -653,10 +661,14 @@ class CommonTableGrid extends React.Component {
     // )
     // console.log(this.state)
     const { TableBase } = this
-    const actionColCfg = { columnName: 'action', width: 95, align: 'center' }
-    const newColumExtensions = columnExtensions.concat([
+    const actionColDefaultCfg = {
+      columnName: 'action',
+      width: 95,
+      align: 'center',
+      sortingEnabled: false,
+    }
+    let newColumExtensions = columnExtensions.concat([
       ...[
-        actionColCfg,
         {
           columnName: 'rowIndex',
           width: 80,
@@ -671,16 +683,12 @@ class CommonTableGrid extends React.Component {
         },
       ],
       ...columns
-        .filter(
-          (o) =>
-            !columnExtensions.find((m) => m.columnName === o.name) ||
-            o.name === 'action',
-        )
+        .filter((o) => !columnExtensions.find((m) => m.columnName === o.name))
         .map((o) => {
           let extraCfg = {}
           if (o.name === 'action') {
             extraCfg = {
-              ...actionColCfg,
+              ...actionColDefaultCfg,
             }
           }
           return {
@@ -690,6 +698,18 @@ class CommonTableGrid extends React.Component {
           }
         }),
     ])
+    let actionCol = newColumExtensions.find((o) => o.columnName === 'action')
+    if (actionCol) {
+      newColumExtensions = newColumExtensions.filter(
+        (o) => o.columnName !== 'action',
+      )
+      newColumExtensions.push({
+        ...actionColDefaultCfg,
+        ...actionCol,
+      })
+    } else {
+      newColumExtensions.push(actionColDefaultCfg)
+    }
     // console.log(errors, newColumExtensions)
 
     const tableProps = {

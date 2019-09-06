@@ -59,93 +59,68 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ orders }) => ({
-  orders,
-}))
-@withFormikExtend({
-  mapPropsToValues: ({ orders }) => {
-    return orders.entity || orders.default
-  },
-  validationSchema: Yup.object().shape({
-    type: Yup.string().required(),
-    to: Yup.string().when('type', {
-      is: (val) => val !== '2',
-      then: Yup.string().required(),
-    }),
-    from: Yup.string().required(),
-    date: Yup.date().required(),
-    subject: Yup.string().required(),
-
-    // 3->MC
-
-    days: Yup.number().when('type', {
-      is: (val) => val === '3',
-      then: Yup.number().required(),
-    }),
-    fromto: Yup.array().when('type', {
-      is: (val) => val === '3',
-      then: Yup.array().of(Yup.date()).min(2).required(),
-    }),
-  }),
-
-  handleSubmit: () => {},
-  displayName: 'WidgetOrderDetails',
-})
 class Details extends PureComponent {
   state = {
-    showModal: false,
   }
 
-  toggleModal = () => {
-    this.setState((prevState) => ({
-      showModal: !prevState.showModal,
-    }))
+  footerBtns = ({onSave}) => {
+    const { classes } = this.props
+    return (
+      <>
+        <Divider />
+
+        <div className={classnames(classes.footer)}>
+          <Button link style={{ float: 'left' }} onClick={this.toggleModal}>
+            {currencySymbol} Adjustment
+          </Button>
+          <Button color='danger'>Cancel</Button>
+
+          <Button color='primary' onClick={onSave}>Save</Button>
+        </div>
+      </>
+    )
   }
 
   render () {
     const { props, state } = this
-    const { theme, classes, orders, values, rowHeight, footer } = props
+    const { theme, classes, orders, values, rowHeight, footer,dispatch } = props
+    const {editType}=orders
     // console.log(props)
-    const cfg = props
-    const { type } = values
-    // console.log(type)
+    const cfg = {
+      footer:this.footerBtns,
+      currentType: orderTypes.find((o) => o.value === editType),
+      editType,
+      ...props,
+    }
     return (
       <div>
         <div className={classes.detail}>
           <GridContainer>
             <GridItem xs={6}>
-              <FastField
-                name='type'
-                render={(args) => {
-                  return (
-                    <Select
-                      label='Type'
-                      options={orderTypes}
-                      allowClear={false}
-                      {...args}
-                    />
-                  )
+              <Select
+                label='Type'
+                options={orderTypes}
+                allowClear={false}
+                value={editType}
+                onChange={(v) => {
+                  dispatch({
+                    type: 'orders/updateState',
+                    payload: {
+                      editType: v,
+                    },
+                  })
                 }}
               />
             </GridItem>
           </GridContainer>
-          <div style={{ marginBottom: theme.spacing(1) }}>
-            {type === '1' && <Medication {...cfg} />}
-            {type === '2' && <Vaccination {...cfg} />}
-            {type === '3' && <Service {...cfg} />}
-            {type === '4' && <Consumable {...cfg} />}
-            {type === '5' && <Medication {...cfg} />}
+          <div>
+            {editType === '1' && <Medication {...cfg} />}
+            {editType === '2' && <Vaccination {...cfg} />}
+            {editType === '3' && <Service {...cfg} />}
+            {editType === '4' && <Consumable {...cfg} />}
+            {editType === '5' && <Medication {...cfg} openPrescription />}
           </div>
 
-          <Divider />
-          <div className={classnames(classes.footer)}>
-            <Button link style={{ float: 'left' }} onClick={this.toggleModal}>
-              {currencySymbol} Adjustment
-            </Button>
-            <Button color='danger'>Cancel</Button>
-
-            <Button color='primary'>Save</Button>
-          </div>
           <CommonModal
             open={state.showModal}
             title='Adjustment'

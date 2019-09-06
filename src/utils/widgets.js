@@ -27,6 +27,8 @@ import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 
+import { AuthorizedContext } from '@/components'
+
 const widgets = [
   {
     id: '1',
@@ -44,22 +46,41 @@ const widgets = [
       },
     },
     toolbarAddon: (
-      <Dropdown
-        overlay={
-          <Menu>
-            <Menu.Item>Upload Attachment</Menu.Item>
-            <Menu.Divider />
-            <Menu.Item>Add Scribble Notes</Menu.Item>
-          </Menu>
-        }
-        trigger={[
-          'click',
-        ]}
-      >
-        <IconButton style={{ float: 'left' }}>
-          <MoreHoriz />
-        </IconButton>
-      </Dropdown>
+      <AuthorizedContext>
+        {(r) => {
+          if (r.edit.rights === 'disable') return null
+          return (
+            <Dropdown
+              overlay={
+                <Menu>
+                  <Menu.Item
+                    onClick={() => {
+                      console.log(123)
+                      window.g_app._store.dispatch({
+                        type: 'clinicalnotes/updateState',
+                        payload: {
+                          showAttachmentModal: true,
+                        },
+                      })
+                    }}
+                  >
+                    Upload Attachment
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Item>Add Scribble Notes</Menu.Item>
+                </Menu>
+              }
+              trigger={[
+                'click',
+              ]}
+            >
+              <IconButton style={{ float: 'left' }}>
+                <MoreHoriz />
+              </IconButton>
+            </Dropdown>
+          )
+        }}
+      </AuthorizedContext>
     ),
   },
   {
@@ -77,21 +98,28 @@ const widgets = [
       },
     },
     toolbarAddon: (
-      <Tooltip title='Add Diagnosis'>
-        <IconButton
-          style={{ float: 'left' }}
-          onClick={() => {
-            window.g_app._store.dispatch({
-              type: 'diagnosis/updateState',
-              payload: {
-                shouldAddNew: true,
-              },
-            })
-          }}
-        >
-          <Add />
-        </IconButton>
-      </Tooltip>
+      <AuthorizedContext>
+        {(r) => {
+          if (r.edit.rights === 'disable') return null
+          return (
+            <Tooltip title='Add Diagnosis'>
+              <IconButton
+                style={{ float: 'left' }}
+                onClick={() => {
+                  window.g_app._store.dispatch({
+                    type: 'diagnosis/updateState',
+                    payload: {
+                      shouldAddNew: true,
+                    },
+                  })
+                }}
+              >
+                <Add />
+              </IconButton>
+            </Tooltip>
+          )
+        }}
+      </AuthorizedContext>
     ),
   },
   {
@@ -103,21 +131,30 @@ const widgets = [
     }),
     layoutConfig: {},
     toolbarAddon: (
-      <Tooltip title='Add Consultation Document'>
-        <IconButton
-          style={{ float: 'left' }}
-          onClick={() => {
-            window.g_app._store.dispatch({
-              type: 'consultationDocument/updateState',
-              payload: {
-                showModal: true,
-              },
-            })
-          }}
-        >
-          <Add />
-        </IconButton>
-      </Tooltip>
+      <AuthorizedContext>
+        {(r) => {
+          if (r.edit.rights === 'disable') return null
+          return (
+            <Tooltip title='Add Consultation Document'>
+              <IconButton
+                style={{ float: 'left' }}
+                onClick={() => {
+                  window.g_app._store.dispatch({
+                    type: 'consultationDocument/updateState',
+                    payload: {
+                      showModal: true,
+                      editType: '2',
+                      entity: undefined,
+                    },
+                  })
+                }}
+              >
+                <Add />
+              </IconButton>
+            </Tooltip>
+          )
+        }}
+      </AuthorizedContext>
     ),
   },
   {
@@ -163,6 +200,38 @@ const widgets = [
     },
   },
   {
+    id: '7',
+    name: 'Vital Sign',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/VitalSign'),
+      loading: Loading,
+    }),
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: '0 5px',
+      },
+    },
+    toolbarAddon: (
+      <Tooltip title='Add Vital Sign'>
+        <IconButton
+          style={{ float: 'left' }}
+          onClick={() => {
+            window.g_app._store.dispatch({
+              type: 'patientVitalSign/updateState',
+              payload: {
+                shouldAddNew: true,
+              },
+            })
+          }}
+        >
+          <Add />
+        </IconButton>
+      </Tooltip>
+    ),
+  },
+  {
     id: '1001',
     name: 'Test Widget',
     component: Loadable({
@@ -173,19 +242,19 @@ const widgets = [
       style: {},
     },
   },
-  {
-    id: '1002',
-    name: 'Dental Chart',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/DentalChartDemo'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {
-        height: 'calc(100% - 36px)',
-      },
-    },
-  },
+  // {
+  //   id: '1002',
+  //   name: 'Dental Chart',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/DentalChartDemo'),
+  //     loading: Loading,
+  //   }),
+  //   layoutConfig: {
+  //     style: {
+  //       height: 'calc(100% - 36px)',
+  //     },
+  //   },
+  // },
 ]
 
 module.exports = {

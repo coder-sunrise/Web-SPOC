@@ -74,7 +74,7 @@ const routes = [
             component: './PatientDashboard',
           },
           {
-            path: '/reception/queue/patientdashboard/consultation/:id',
+            path: '/reception/queue/patientdashboard/consultation/:id?',
             name: 'consultation',
             hideInMenu: true,
             component: './PatientDashboard/Consultation',
@@ -195,6 +195,18 @@ const routes = [
           //   hideInMenu: true,
           //   component: './Inventory/PurchaseDelivery/Detail',
           // },
+          {
+            path: '/inventory/pr',
+            name: 'pd',
+            component: './Inventory/PurchaseReceive',
+            mini: 'PR',
+          },
+          {
+            path: '/inventory/pr/pdodetails',
+            name: 'pd.detail',
+            hideInMenu: true,
+            component: './Inventory/PurchaseReceive/Details',
+          },
         ],
       },
       //
@@ -260,6 +272,24 @@ const routes = [
             component: './Finance/Statement',
           },
           {
+            path: '/finance/statement/newstatement',
+            name: 'statement/newstatement',
+            hideInMenu: true,
+            component: './Finance/Statement/NewStatement/AddNewStatement',
+          },
+          {
+            path: '/finance/statement/editstatement',
+            name: 'statement/editstatement',
+            hideInMenu: true,
+            component: './Finance/Statement/NewStatement/AddNewStatement',
+          },
+          {
+            path: '/finance/statement/details',
+            name: 'statement/detail',
+            hideInMenu: true,
+            component: './Finance/Statement/Details/StatementDetails',
+          },
+          {
             path: '/finance/statement/details/:statementNo',
             name: 'statement/details',
             hideInMenu: true,
@@ -310,7 +340,20 @@ const routes = [
         path: '/report',
         icon: 'library_books',
         name: 'report',
-        component: './Report',
+        hideChildrenInMenu: true,
+
+        routes: [
+          {
+            path: '/report',
+            name: 'report',
+            component: './Report',
+          },
+          {
+            path: '/report/queuelisting',
+            name: 'queueListingReport',
+            component: './Report/QueueListing',
+          },
+        ],
       },
       // Report
       //

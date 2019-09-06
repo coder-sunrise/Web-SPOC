@@ -22,6 +22,7 @@ export default class Grid extends PureComponent {
       },
     })
   }
+
   render () {
     const {
       dispatch,

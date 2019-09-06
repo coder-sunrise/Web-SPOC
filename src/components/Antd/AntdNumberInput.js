@@ -127,6 +127,8 @@ class AntdNumberInput extends React.PureComponent {
           : defaultValue || value,
       focused: false,
     }
+    // console.log(this.state.value)
+
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
   }
 
@@ -137,6 +139,7 @@ class AntdNumberInput extends React.PureComponent {
         value: field.value === undefined ? '' : field.value,
       })
     }
+    // console.log(field)
   }
 
   handleFocus = () => {
@@ -166,6 +169,12 @@ class AntdNumberInput extends React.PureComponent {
     this.setState({
       focused: false,
     })
+    const { form, field } = this.props
+    if (form && field) {
+      // form.setFieldTouched(field.name, true)
+      field.onChange(this.state.value)
+    }
+    // console.log('handleBlur')
     // const { formatter } = this.props
     // if (formatter) {
     //   this.setState({
@@ -248,7 +257,10 @@ class AntdNumberInput extends React.PureComponent {
 
   getConfig = () => {
     const { currency, percentage, formatter } = this.props
-    const extraCfg = {}
+    const extraCfg = {
+      max: 999999999999,
+      min: -999999999999,
+    }
 
     if (currency) {
       extraCfg.formatter = (v) => {

@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { filterMap } from './variables'
 
-export const filterData = (filter, data) => {
+export const filterData = (filter, data = []) => {
   let newData = data.filter((eachRow) => {
     return filterMap[filter].includes(eachRow.visitStatus)
   })
@@ -15,9 +15,8 @@ export const filterDoctorBlock = (data) => {
   )
 }
 
-export const getStatisticCount = (type, data) => {
+export const getCount = (type, data) => {
   const filteredData = filterData(type, data)
-
   return filteredData.length
 }
 

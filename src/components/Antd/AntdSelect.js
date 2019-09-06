@@ -104,7 +104,7 @@ class AntdSelect extends React.PureComponent {
     } = props
     const v = form && field ? field.value : props.value || props.defaultValue
     this.state = {
-      shrink: false,
+      shrink: !!v,
       value: v,
       data:
         autoComplete && options && options.length > max
@@ -270,12 +270,16 @@ class AntdSelect extends React.PureComponent {
 
   getSelectOptions = (source, renderDropdown) => {
     const { valueField, labelField, optionLabelLength = 0 } = this.props
+
     return source
-      .map((s) => ({
-        ...s,
-        value: s[valueField],
-        label: s[labelField],
-      }))
+      .map((s) => {
+        return {
+          ...s,
+          value: s[valueField],
+          label: Object.byString(s, labelField),
+          // label: s[labelField],
+        }
+      })
       .map((option) => (
         <Select.Option
           data={option}
@@ -400,7 +404,6 @@ class AntdSelect extends React.PureComponent {
     const { props } = this
     const { classes, mode, onChange, ...restProps } = props
     const { value } = this.state
-
     const labelProps = {}
     if (!mode || mode === 'default') {
       labelProps.shrink =

@@ -359,7 +359,7 @@ const convertToQuery = (
   delete customQuerys.totalRecords
   delete customQuerys.combineCondition
 
-  console.log(query)
+  // console.log(query)
   let newQuery = {}
   const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
   newQuery.criteria = []
@@ -369,7 +369,7 @@ const convertToQuery = (
   // sorting.forEach((s) => {
   //   // sort[0][sortby]=patientaccountno&sort[0][order]=desc
   // })
-
+  // console.log(query)
   const { valueType, filterType } = config
   for (let p in customQuerys) {
     if (Object.prototype.hasOwnProperty.call(customQuerys, p)) {
@@ -532,8 +532,10 @@ export const updateCellValue = (
     window.$tempGridRow[gridId] = {}
   }
   if (!window.$tempGridRow[gridId][row.id]) {
+    // console.log(row)
     window.$tempGridRow[gridId][row.id] = row
   }
+  // console.log(columnName, val)
 
   window.$tempGridRow[gridId][row.id][columnName] = val
   // console.log(val, columnName)
@@ -570,7 +572,7 @@ export const updateCellValue = (
       // }
       // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
       // console.log(er)
-      const actualError = er.inner.find((o) => o.path === columnName)
+      const actualError = (er.inner || []).find((o) => o.path === columnName)
       return actualError ? actualError.message : ''
       // row._$error = true
     }

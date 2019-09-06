@@ -23,6 +23,9 @@ import {
 } from '@/components'
 
 const CPSwitch = (args) => {
+  if (!args.field.value) {
+    args.field.value = 'ExactAmount'
+  }
   return (
     <Switch
       checkedChildren='$'
@@ -45,7 +48,20 @@ const CPNumber = (label, type) => (args) => {
   )
 }
 const Setting = (props) => {
-  const { schemeDetail, dispatch, height, classes, values } = props
+  const {
+    schemeDetail,
+    dispatch,
+    height,
+    classes,
+    values,
+    setFieldValue,
+  } = props
+  const changeFieldValue = (value, type, args) => {
+    if (value !== type) {
+      return null
+    }
+    return args.field.value
+  }
   // const options = [
   //   {
   //     label: '$',
@@ -68,7 +84,7 @@ const Setting = (props) => {
       <SizeContainer size='sm'>
         <GridContainer>
           <GridItem xs={8} md={5}>
-            <FastField
+            <Field
               name='patientMinCoPaymentAmount'
               render={CPNumber(
                 'Minimum Patient Payable Amount',
@@ -77,18 +93,27 @@ const Setting = (props) => {
             />
           </GridItem>
           <GridItem xs={4} md={1}>
-            <FastField name='patientMinCoPaymentAmountType' render={CPSwitch} />
+            <Field name='patientMinCoPaymentAmountType' render={CPSwitch} />
           </GridItem>
         </GridContainer>
         <GridContainer>
           <GridItem xs={12} md={6}>
             <FieldSet size='sm' title='Coverage Cap'>
-              <CoverageCap {...props} />
+              <CoverageCap
+                setFieldValue={setFieldValue}
+                values={values}
+                classes={classes}
+              />
             </FieldSet>
           </GridItem>
           <GridItem xs={12} md={6}>
             <FieldSet size='sm' title='Co-Payment'>
-              <CoPayment {...props} CPSwitch={CPSwitch} CPNumber={CPNumber} />
+              <CoPayment
+                schemeDetail={schemeDetail}
+                setFieldValue={setFieldValue}
+                values={values}
+                classes={classes}
+              />
             </FieldSet>
           </GridItem>
         </GridContainer>

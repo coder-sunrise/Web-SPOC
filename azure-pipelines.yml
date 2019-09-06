@@ -19,7 +19,7 @@ steps:
   displayName: 'npm build'
 - task: S3Upload@1
   inputs:
-    awsCredentials: 'semr2-dev-deployment'
+    awsCredentials: 'semr2-deployment'
     regionName: 'ap-southeast-1'
     bucketName: 'semr2-frontend-dev'
     sourceFolder: './dist'

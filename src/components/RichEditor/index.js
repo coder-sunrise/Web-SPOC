@@ -37,6 +37,7 @@ class RichEditor extends React.PureComponent {
     const { form, field } = props
     const v = form && field ? field.value : props.value || props.defaultValue
     let editorState
+
     if (v) {
       const contentBlock = htmlToDraft(v)
       editorState = EditorState.createWithContent(
@@ -45,9 +46,11 @@ class RichEditor extends React.PureComponent {
     } else {
       editorState = EditorState.createEmpty()
     }
+
     this.state = {
       value: editorState,
       anchorEl: null,
+      isEditorFocused: false,
     }
 
     this.editorCfg = {
@@ -79,30 +82,35 @@ class RichEditor extends React.PureComponent {
   componentDidMount () {}
 
   componentWillReceiveProps (nextProps) {
-    //console.log(nextProps)
     const { field, value } = nextProps
-    let v = this.state.value
+    const { isEditorFocused } = this.state
+    let v = value || ''
     if (field) {
       v = field.value || ''
+      // v = field.value || ''
       // this.setState({
       //   value: field.value,
       // })
-      Modifier.replaceText(
-        this.state.value.getCurrentContent(),
-        this.state.value.getSelection(),
-        v,
-      )
-    } else if (value) {
-      v = value
-
-      this.setState({
-        value: v,
-      })
+    }
+    // console.log(isEditorFocused)
+    if (!isEditorFocused) {
+      if (!v) {
+        this.setState({
+          value: EditorState.createEmpty(),
+        })
+      } else if (!this.state.value.getCurrentContent().getPlainText().length) {
+        const contentBlock = htmlToDraft(v)
+        this.setState({
+          value: EditorState.createWithContent(
+            ContentState.createFromBlockArray(contentBlock.contentBlocks),
+          ),
+        })
+      }
     }
   }
 
   onChange = (editorState) => {
-    //console.log(editorState)
+    // console.log(editorState)
     // const {onChange}=this.props
     this.setState({
       value: editorState,
@@ -125,7 +133,7 @@ class RichEditor extends React.PureComponent {
         // name: props.field.name,
       },
     }
-    //console.log(props.field, props.field.onChange)
+    // console.log(props.field, props.field.onChange)
     if (props.field && props.field.onChange) {
       v.target.name = props.field.name
       props.field.onChange(v)
@@ -133,6 +141,14 @@ class RichEditor extends React.PureComponent {
     if (onChange) {
       onChange(v)
     }
+  }
+
+  _onFocus = () => {
+    this.setState({ isEditorFocused: true })
+  }
+
+  _onBlur = () => {
+    this.setState({ isEditorFocused: false })
   }
 
   tagButtonOnClick = (selectedValue) => {
@@ -163,7 +179,8 @@ class RichEditor extends React.PureComponent {
     const currentEditorSelection = value.getSelection()
     const currentContentState = value.getCurrentContent()
 
-    let newEditorState, newContentState
+    let newEditorState
+    let newContentState
 
     // 判断是否有选中，有则替换，无则插入
     const selectionEnd = currentEditorSelection.getEndOffset()
@@ -212,14 +229,16 @@ class RichEditor extends React.PureComponent {
       onFocus,
       onBlur,
       tagList,
+      disabled,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-    //console.log(this.state.value)
+    // console.log('getComponent', restProps)
 
     return (
       <div style={{ width: '100%', height: 'auto' }} {...props}>
         <Editor
+          readOnly={disabled}
           editorState={this.state.value}
           wrapperClassName={classnames({
             [classes.wrapper]: true,
@@ -231,9 +250,11 @@ class RichEditor extends React.PureComponent {
           })}
           onEditorStateChange={this.onChange}
           mention={{
-            //trigger: '<',
+            // trigger: '<',
             suggestions: tagList,
           }}
+          onFocus={this._onFocus}
+          onBlur={this._onBlur}
           {...this.editorCfg}
           {...this.props}
         />
@@ -309,18 +330,17 @@ class RichEditor extends React.PureComponent {
           {this.getTagButtonComponent()}
         </React.Fragment>
       )
-    } else {
-      return (
-        <CustomInput
-          labelProps={labelProps}
-          inputComponent={this.getComponent}
-          noUnderLine
-          preventDefaultChangeEvent
-          preventDefaultKeyDownEvent
-          {...restProps}
-        />
-      )
     }
+    return (
+      <CustomInput
+        labelProps={labelProps}
+        inputComponent={this.getComponent}
+        noUnderLine
+        preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
+        {...restProps}
+      />
+    )
   }
 }
 

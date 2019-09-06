@@ -42,8 +42,9 @@ class SchemesGrid extends PureComponent {
               row.validTo,
             ]
           },
+          sortingEnabled: false,
           isDisabled: (row) => {
-            return this.isMedisave(row)
+            return this.isMedisaveOrPHPC(row)
           },
           // onChange: (date, moments, org, row) => {
           //   row.validFrom = date[0]
@@ -56,6 +57,7 @@ class SchemesGrid extends PureComponent {
           columnName: 'schemeTypeFK',
           type: 'codeSelect',
           code: 'ctSchemeType',
+          sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
             console.log('schemeTypeFK')
             let rows = this.props.rows
@@ -116,23 +118,25 @@ class SchemesGrid extends PureComponent {
             }
             if (st.code !== 'Corporate' && row.coPaymentSchemeFK) {
               row.coPaymentSchemeFK = undefined
-              this.props.dispatch({
-                // force current edit row components to update
-                type: 'global/updateState',
-                payload: {
-                  commitCount: commitCount++,
-                },
-              })
             }
-            if (this.isMedisave(row)) {
+            if (this.isMedisaveOrPHPC(row)) {
               row.validRange = []
               row.validFrom = undefined
               row.validTo = undefined
             }
+            console.log(row)
+            this.props.dispatch({
+              // force current edit row components to update
+              type: 'global/updateState',
+              payload: {
+                commitCount: commitCount++,
+              },
+            })
           },
         },
         {
           columnName: 'coPaymentSchemeFK',
+          sortingEnabled: false,
           // type: 'codeSelect',
           // code: 'ctSchemeCategory',
           type: 'select', // TODO: get from api
@@ -177,6 +181,7 @@ class SchemesGrid extends PureComponent {
         },
         {
           columnName: 'accountNumber',
+          sortingEnabled: false,
           isDisabled: (row) => {
             return !this.isCorporate(row)
           },
@@ -188,7 +193,7 @@ class SchemesGrid extends PureComponent {
       const { setFieldValue } = this.props
       const newRows = this.getSortedRows(rows)
       newRows.forEach((r, i) => {
-        if (r.validRange && !this.isMedisave(r)) {
+        if (r.validRange && !this.isMedisaveOrPHPC(r)) {
           r.validFrom = r.validRange[0]
           r.validTo = r.validRange[1]
         } else {
@@ -203,22 +208,33 @@ class SchemesGrid extends PureComponent {
     }
   }
 
+  isPHPC = (row) => {
+    const { codetable } = this.props
+    const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
+    const r = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
+    return r && r.code.startsWith('PHPC')
+  }
+
   isCorporate = (row) => {
-    return row.schemeTypeFK === 11
+    const { codetable } = this.props
+    const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
+    const r = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
+    return r && r.code === 'Corporate'
   }
 
   isCHAS = (schemeTypeFK) => {
-    return schemeTypeFK <= 5
+    const { codetable } = this.props
+    const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
+    const r = ctSchemeTypes.find((o) => o.id === schemeTypeFK)
+    return r && r.code.startsWith('CHAS')
   }
 
-  isMedisave = (row) => {
+  isMedisaveOrPHPC = (row) => {
     const { codetable } = this.props
     // const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
 
-    const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()]
-    const r = ctSchemeTypes
-      ? ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
-      : undefined
+    const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
+    const r = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
 
     if (!r) return false
     return (
@@ -226,17 +242,15 @@ class SchemesGrid extends PureComponent {
         'MEDI500VISUT',
         'FLEXIMEDI',
         'OPSCAN',
-      ].indexOf(r.code) >= 0
+      ].indexOf(r.code) >= 0 || r.code.startsWith('PHPC')
     )
   }
 
   medisaveCheck = (row) => {
     const { codetable } = this.props
-    const schemeTypes = codetable[ctSchemeType.toLowerCase()]
+    const schemeTypes = codetable[ctSchemeType.toLowerCase()] || []
 
-    const r = schemeTypes
-      ? schemeTypes.find((o) => o.id === row.schemeTypeFK)
-      : undefined
+    const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
 
     if (!r) return false
     return (
@@ -283,7 +297,7 @@ class SchemesGrid extends PureComponent {
   render () {
     const { editingRowIds, rowChanges } = this.state
     const { type, rows, schema } = this.props
-
+    // console.log('schema', schema)
     const EditingProps = {
       showAddCommand: true,
 

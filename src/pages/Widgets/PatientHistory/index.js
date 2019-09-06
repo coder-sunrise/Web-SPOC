@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
+import moment from 'moment'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import Yup from '@/utils/yup'
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
@@ -27,6 +27,7 @@ import {
   CardContainer,
   confirm,
   Accordion,
+  withFormikExtend,
 } from '@/components'
 import {
   withStyles,
@@ -136,7 +137,7 @@ const data = [
     date: '08 Dec 2018',
   },
 ]
-@withFormik({
+@withFormikExtend({
   // mapPropsToValues: ({ patientHistory }) => {
   //   console.log(patientHistory)
   //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
@@ -261,12 +262,53 @@ class PatientHistory extends Component {
     ]
   }
 
-  getTitle = () => (
+  componentWillReceiveProps (nextProps) {
+    // console.log(this.props, nextProps)
+    if (
+      nextProps.patientHistory.patientID &&
+      this.props.patientHistory.patientID !== nextProps.patientHistory.patientID
+    ) {
+      nextProps
+        .dispatch({
+          type: 'patientHistory/query',
+          payload: {
+            patientProfileFK: nextProps.patientHistory.patientID,
+            sorting: [
+              {
+                columnName: 'VisitDate',
+                direction: 'asc',
+              },
+            ],
+          },
+        })
+        .then((o) => {
+          this.props.resetForm(o)
+        })
+    }
+  }
+
+  // componentDidMount () {
+
+  // }
+
+  getTitle = (row) => (
     <div className={this.props.classes.title}>
       <GridContainer>
         <GridItem sm={7}>
-          <span>Consultation Visit</span>
-          <div className={this.props.classes.note}>V4, Dr Levine</div>
+          <p
+            onClick={() => {
+              console.log(row)
+              this.props.dispatch({
+                type: 'patientHistory/queryOne',
+                payload: row.coHistory[0].id,
+              })
+            }}
+          >
+            <span>Consultation Visit</span>
+            <div className={this.props.classes.note}>
+              V4, {row.doctorTitle} {row.doctorName}
+            </div>
+          </p>
         </GridItem>
         <GridItem sm={5}>
           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
@@ -279,56 +321,46 @@ class PatientHistory extends Component {
     </div>
   )
 
-  getContent = () => (
-    <List
-      component='nav'
-      classes={{
-        root: this.props.classes.listRoot,
-      }}
-      disablePadding
-    >
-      <ListItem
-        alignItems='flex-start'
+  getContent = (row) => {
+    return (
+      <List
+        component='nav'
         classes={{
-          root: this.props.classes.listItemRoot,
+          root: this.props.classes.listRoot,
         }}
-        divider
-        disableGutters
-        button
+        disablePadding
       >
-        <ListItemText
-          primary={
-            <div style={{ width: '100%', paddingRight: 20 }}>
-              <GridContainer>
-                <GridItem sm={7}>V3, Dr Levine</GridItem>
-                <GridItem sm={5}>12 Apr 2019</GridItem>
-              </GridContainer>
-            </div>
-          }
-        />
-      </ListItem>
-      <ListItem
-        alignItems='flex-start'
-        classes={{
-          root: this.props.classes.listItemRoot,
-        }}
-        divider
-        disableGutters
-        button
-      >
-        <ListItemText
-          primary={
-            <div style={{ width: '100%', paddingRight: 20 }}>
-              <GridContainer>
-                <GridItem sm={7}>V2, Dr Levine</GridItem>
-                <GridItem sm={5}>11 Apr 2019</GridItem>
-              </GridContainer>
-            </div>
-          }
-        />
-      </ListItem>
-    </List>
-  )
+        {row.coHistory.map((o) => {
+          return (
+            <ListItem
+              alignItems='flex-start'
+              classes={{
+                root: this.props.classes.listItemRoot,
+              }}
+              divider
+              disableGutters
+              button
+            >
+              <ListItemText
+                primary={
+                  <div style={{ width: '100%', paddingRight: 20 }}>
+                    <GridContainer>
+                      <GridItem sm={7}>
+                        V{o.versionNumber}, {row.doctorTitle} {row.doctorName}
+                      </GridItem>
+                      <GridItem sm={5}>
+                        <DatePicker text defaultValue={moment(row.visitDate)} />
+                      </GridItem>
+                    </GridContainer>
+                  </div>
+                }
+              />
+            </ListItem>
+          )
+        })}
+      </List>
+    )
+  }
 
   onSelectChange = (val) => {
     this.setState({
@@ -337,7 +369,7 @@ class PatientHistory extends Component {
   }
 
   render () {
-    const { theme, style, classes, override = {} } = this.props
+    const { theme, style, classes, override = {}, patientHistory } = this.props
     return (
       <div style={style}>
         <CardContainer
@@ -350,20 +382,10 @@ class PatientHistory extends Component {
         >
           <Accordion
             active={0}
-            collapses={[
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-              {
-                title: this.getTitle(),
-                content: this.getContent(),
-              },
-            ]}
+            collapses={patientHistory.list.map((o) => ({
+              title: this.getTitle(o),
+              content: this.getContent(o),
+            }))}
           />
         </CardContainer>
         <CardContainer
