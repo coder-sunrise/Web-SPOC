@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/stockvaccination'
+const url = '/api/InventoryVaccination'
 
 module.exports = {
   queryList: (params) => service.queryList(url, params),

@@ -14,11 +14,18 @@ import {
   Select,
   DatePicker,
   Switch,
+  DateRangePicker,
+  Button,
+  CodeSelect,
+  Checkbox,
+  Field,
 } from '@/components'
 
 const styles = () => ({})
 
-const Detail = ({ vaccinationDetail, dispatch }) => {
+const Detail = ({ vaccinationDetail, dispatch, values }) => {
+  // console.log('props', vaccinationDetail)
+  // console.log('props', values)
   useEffect(() => {
     if (vaccinationDetail.currentId) {
       dispatch({
@@ -42,7 +49,7 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='Code'
+                name='code'
                 render={(args) => {
                   return (
                     <TextField
@@ -57,7 +64,7 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='Name'
+                name='displayValue'
                 render={(args) => {
                   return (
                     <TextField
@@ -72,7 +79,7 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='Description'
+                name='description'
                 render={(args) => {
                   return (
                     <TextField
@@ -87,7 +94,7 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='Remarks'
+                name='remarks'
                 render={(args) => {
                   return (
                     <TextField
@@ -102,140 +109,140 @@ const Detail = ({ vaccinationDetail, dispatch }) => {
                 }}
               />
             </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='isEnableRetail'
-                render={(args) => {
-                  return (
-                    <Switch
-                      label={formatMessage({
-                        id: 'inventory.master.vaccination.enableRetail',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
+
             <GridItem xs={12} style={{ marginTop: '10px' }} />
-            <GridItem xs={12}>
-              <FastField
-                name='SDDID'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'inventory.master.vaccination.sddID',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='SDDDescription'
-                render={(args) => {
-                  return (
-                    <Select
-                      label={formatMessage({
-                        id: 'inventory.master.vaccination.sddDescription',
-                      })}
-                      options={[]}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
           </GridContainer>
         </GridItem>
-        <GridItem xs={12} md={2} />
-        <GridItem xs={12} md={5}>
+
+        <GridItem xs={1} />
+
+        <GridItem xs={12} md={6}>
           <GridContainer>
-            <GridItem xs={12}>
+            <GridItem xs={2} />
+            <GridItem xs={10}>
               <FastField
-                name='Supplier'
+                name='favouriteSupplierFK'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.vaccination.supplier',
                     })}
-                    options={[]}
+                    code='ctCompany'
                     {...args}
                   />
                 )}
               />
             </GridItem>
-            <GridItem xs={12}>
+            <GridItem xs={2} />
+            <GridItem xs={10}>
               <FastField
-                name='VaccinationGroup'
+                name='revenueCategoryFK'
+                render={(args) => (
+                  <CodeSelect
+                    label={formatMessage({
+                      id: 'inventory.master.medication.revenueCategory',
+                    })}
+                    code='ctRevenueCategory'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={2} />
+            <GridItem xs={10}>
+              <FastField
+                name='effectiveDates'
+                render={(args) => (
+                  <DateRangePicker
+                    label='Effective Start Date'
+                    label2='End Date'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            {/* <GridItem xs={2}>
+              <Field
+                name='enableVaccinationGroup'
+                render={(args) => (
+                  <Checkbox style={{ marginTop: 18, right: -100 }} {...args} />
+                )}
+              />
+            </GridItem>
+
+            <GridItem xs={10}>
+              <Field
+                name='vaccinationGroupFK'
                 render={(args) => (
                   <Select
                     label={formatMessage({
                       id: 'inventory.master.vaccination.vaccinationGroup',
                     })}
-                    options={[]}
+                    options={[
+                      {
+                        name: 'Medisave Vaccination',
+                        value: '1',
+                      },
+                      {
+                        name: 'Medisave Vaccination1',
+                        value: '2',
+                      },
+                    ]}
+                    disabled={!values.enableVaccinationGroup}
                     {...args}
                   />
                 )}
               />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='RevenueCategory'
-                render={(args) => (
-                  <Select
-                    label={formatMessage({
-                      id: 'inventory.master.vaccination.revenueCategory',
-                    })}
-                    options={[]}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='EffectiveStartDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.vaccination.effectiveStartDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='EffectiveEndDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.vaccination.effectiveEndDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='EffectiveEndDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.vaccination.effectiveEndDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
+            </GridItem> */}
           </GridContainer>
+        </GridItem>
+      </GridContainer>
+      <h5 style={{ marginTop: 5, marginLeft: 8 }}>SDD</h5>
+      <Divider style={{ marginLeft: 8 }} />
+      <GridContainer>
+        <GridItem xs={5}>
+          <FastField
+            name='sddfk'
+            render={(args) => {
+              return (
+                <TextField
+                  label={formatMessage({
+                    id: 'inventory.master.medication.sddID',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={5} style={{ marginTop: 10 }}>
+          <Button
+            variant='contained'
+            color='primary'
+            // onClick={() => {
+            //   dispatch({
+            //     type: 'medication/query',
+            //   })
+            // }}
+          >
+            Search
+          </Button>
+        </GridItem>
+        <GridItem xs={5}>
+          <FastField
+            name='sddDescription'
+            render={(args) => {
+              return (
+                <Select
+                  label={formatMessage({
+                    id: 'inventory.master.medication.sddDescription',
+                  })}
+                  options={[]}
+                  {...args}
+                />
+              )
+            }}
+          />
         </GridItem>
       </GridContainer>
       <Divider style={{ margin: '40px 0 20px 0' }} />

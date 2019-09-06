@@ -31,7 +31,7 @@ class Filter extends PureComponent {
             <FastField
               name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code Display Value' {...args} />
+                return <TextField label='Code / Display Value' {...args} />
               }}
             />
           </GridItem>

@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import * as service from './services'
 import htmlToText from 'html-to-text'
-
+import MouseOverPopover from './MouseOverPopover'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -24,7 +24,19 @@ class Grid extends PureComponent {
     })
   }
 
+  getTooltipTitle = () => {
+    const pathname = window.location.pathname.trim().toLowerCase()
+
+    const modalTitle =
+      pathname == '/setting/smstemplate'
+        ? 'SMS Template'
+        : 'Referral Letter Template'
+
+    return `Edit ${modalTitle}`
+  }
+
   render () {
+    const { classes } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -46,7 +58,12 @@ class Grid extends PureComponent {
           {
             columnName: 'templateMessage',
             render: (row) => {
-              return htmlToText.fromString(row.templateMessage)
+              //return htmlToText.fromString(row.templateMessage)
+              const templateMessageProps = {
+                templateMessage: htmlToText.fromString(row.templateMessage),
+              }
+
+              return <MouseOverPopover {...templateMessageProps} />
             },
           },
           {
@@ -65,16 +82,18 @@ class Grid extends PureComponent {
             align: 'center',
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title={this.getTooltipTitle()} placement='top-end'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },

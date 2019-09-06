@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Remove from '@material-ui/icons/Remove'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
@@ -9,6 +9,7 @@ import {
   Button,
   GridContainer,
   GridItem,
+  EditableTableGrid,
 } from '@/components'
 
 const styles = () => ({
@@ -16,15 +17,51 @@ const styles = () => ({
     float: 'right',
     padding: '20px',
   },
+
+  tableHeader: {
+    marginTop: 50,
+  },
 })
 
 const InventoryTypeListing = ({
   dispatch,
-  tableParas,
-  colExtensions,
-  list,
   classes,
+  packDetail,
+  medication,
+  consumable,
+  vaccination,
+  service,
+  setFieldValue,
+  commitChanges,
+  onAddedRowsChange,
+  onRowChangesChange,
+  onDeletedRowIdsChange,
+  setRowChange,
+  rowChange,
+  ...props
 }) => {
+  const { medicationPackageItem, servicePackageItem } = props.values
+  console.log('values', medicationPackageItem)
+  const {
+    medicationTableParas,
+    medicationColExtensions,
+    medicationList,
+  } = medication
+  const {
+    consumableTableParas,
+    consumableColExtensions,
+    consumableList,
+  } = consumable
+  const {
+    vaccinationTableParas,
+    vaccinationColExtensions,
+    vaccinationList,
+  } = vaccination
+  const { serviceTableParas, serviceColExtensions, serviceList } = service
+  // const [
+  //   rows,
+  //   setRows,
+  // ] = useState([])
   const Cell = ({ column, row, ...p }) => {
     if (column.name === 'Action') {
       return (
@@ -48,6 +85,15 @@ const InventoryTypeListing = ({
   }
   const TableCell = (p) => Cell({ ...p, dispatch })
 
+  const clickRow = (row, event) => {
+    // setRows([
+    //   ...rows,
+    //   row,
+    // ])
+  }
+
+  const changeEditingRowIds = (editingRowIds) => setRows({ editingRowIds })
+
   return (
     <CardContainer
       hideHeader
@@ -57,24 +103,84 @@ const InventoryTypeListing = ({
       }}
     >
       <GridContainer>
-        <GridItem xs={12} md={12}>
+        <GridItem xs={12}>
           <div className={classes.displayDiv}>
-            <p>rerewrwe</p>
+            <h4>
+              <b>Package Price: $404.00</b>
+            </h4>
           </div>
         </GridItem>
-        <GridItem xs={10} md={10}>
-          <CommonTableGrid
-            {...tableParas}
-            columnExtensions={colExtensions}
-            rows={list}
+      </GridContainer>
+      <GridContainer>
+        <GridItem xs={12}>
+          <b>Medication</b>
+          <EditableTableGrid
+            {...medicationTableParas}
+            columnExtensions={medicationColExtensions}
+            rows={medicationPackageItem}
             FuncProps={{ pager: false }}
             ActionProps={{ TableCellComponent: TableCell }}
+            EditingProps={{
+              showAddCommand: true,
+              showEditCommand: false,
+              onDeletedRowIdsChange: onDeletedRowIdsChange,
+              onCommitChanges: commitChanges('medicationPackageItem'),
+            }}
           />
         </GridItem>
-        <GridItem xs={10} md={10}>
-          <div className={classes.displayDiv}>
-            <p>rerewrwe</p>
-          </div>
+        <GridItem xs={12} className={classes.tableHeader}>
+          <b>Consumable</b>
+          <EditableTableGrid
+            {...consumableTableParas}
+            columnExtensions={consumableColExtensions}
+            rows={consumableList}
+            FuncProps={{ pager: false }}
+            ActionProps={{ TableCellComponent: TableCell }}
+            EditingProps={{
+              showAddCommand: true,
+              showEditCommand: false,
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} className={classes.tableHeader}>
+          <b>Vaccination</b>
+          <EditableTableGrid
+            {...vaccinationTableParas}
+            columnExtensions={vaccinationColExtensions}
+            rows={vaccinationList}
+            FuncProps={{ pager: false }}
+            ActionProps={{ TableCellComponent: TableCell }}
+            EditingProps={{
+              showAddCommand: true,
+              showEditCommand: false,
+              onCommitChanges: commitChanges,
+              onAddedRowsChange: onAddedRowsChange,
+              // onCommitChanges: this.commitChanges,
+              // onAddedRowsChange: this.onAddedRowsChange,
+            }}
+          />
+        </GridItem>
+        <GridItem xs={12} className={classes.tableHeader}>
+          <b>Service</b>
+          <EditableTableGrid
+            {...serviceTableParas}
+            columnExtensions={serviceColExtensions}
+            rows={servicePackageItem ? servicePackageItem : []}
+            FuncProps={{ pager: false }}
+            onRowClick={clickRow}
+            EditingProps={{
+              showAddCommand: true,
+              showEditCommand: false,
+              rowChanges: rowChange,
+              onAddedRowsChange: onAddedRowsChange,
+              // onEditingRowIdsChange: { changeEditingRowIds },
+              // onRowChangesChange: { onRowChangesChange },
+              // onRowChangesChange: onRowChangesChange,
+              // onDeletedRowIdsChange: onDeletedRowIdsChange,
+              onCommitChanges: commitChanges('servicePackageItem'),
+              // onAddedRowsChange: onAddedRowsChange,
+            }}
+          />
         </GridItem>
       </GridContainer>
     </CardContainer>

@@ -296,13 +296,11 @@ class PatientDetail extends PureComponent {
                         }
                         onClick={(e) => {
                           onMenuClick(e, o)
+                          console.log('here', entity, values)
                           dispatch({
                             type: 'patient/updateState',
                             payload: {
-                              entity:
-                                values.patientAccountNo !== ''
-                                  ? values
-                                  : undefined,
+                              entity: entity || undefined,
                             },
                           })
                           this.props.history.push(
