@@ -350,6 +350,7 @@ const convertToQuery = (
     sorting = [],
   } = query
   let customQuerys = { ...query }
+  delete customQuerys.keepFilter
   delete customQuerys.current
   delete customQuerys.pagesize
   delete customQuerys.sorting

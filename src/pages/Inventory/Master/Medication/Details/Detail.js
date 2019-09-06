@@ -22,7 +22,13 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
+const Detail = ({
+  medicationDetail,
+  dispatch,
+  setFieldValue,
+  sddDetail,
+  ...props
+}) => {
   const field = medicationDetail.entity ? 'entity' : 'default'
 
   useEffect(() => {
@@ -39,6 +45,7 @@ const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
             type: 'sddDetail/query',
             payload: {
               id: sddfk,
+              keepFilter: false,
             },
           }).then((sdd) => {
             const { data } = sdd
@@ -277,7 +284,8 @@ const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ medicationDetail }) => ({
+  connect(({ medicationDetail, sddDetail }) => ({
     medicationDetail,
+    sddDetail,
   })),
 )(Detail)

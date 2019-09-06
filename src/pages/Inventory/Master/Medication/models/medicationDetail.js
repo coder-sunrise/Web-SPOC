@@ -79,7 +79,7 @@ export default createFormViewModel({
 
       getMedicPrecautionList (state, { payload }) {
         const { data } = payload
-        console.log('payload', payload)
+        // console.log('payload', payload)
         return {
           ...state,
           ctmedicationprecaution: data.map((x) => {
