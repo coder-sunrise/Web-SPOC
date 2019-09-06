@@ -88,7 +88,7 @@ export const mapPropsToValues = ({
         recurrenceDto === undefined || recurrenceDto === null
           ? { ...initDailyRecurrence }
           : recurrenceDto,
-      appointment: { ...appointment },
+      currentAppointment: { ...appointment },
       appointments: viewingAppointment.appointments.map((item) => ({
         ...item,
       })),
@@ -100,7 +100,7 @@ export const mapPropsToValues = ({
     overwriteEntireSeries: false,
     bookedByUser: user.userName,
     bookedByUserFK: user.id,
-    appointment: {
+    currentAppointment: {
       appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),
       appointments_Resources: [],
     },

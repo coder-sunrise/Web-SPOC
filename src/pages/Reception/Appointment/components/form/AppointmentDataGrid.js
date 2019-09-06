@@ -44,6 +44,7 @@ const styles = () => ({
 @connect(({ codetable }) => ({
   appointmentTypes: codetable.ctappointmenttype,
   clinicianProfiles: codetable.clinicianprofile,
+  rooms: codetable.ctroom,
 }))
 class AppointmentDataGrid extends React.PureComponent {
   constructor (props) {
@@ -65,6 +66,18 @@ class AppointmentDataGrid extends React.PureComponent {
           currentDate: appointmentDate
             ? moment(appointmentDate, dateFormat)
             : moment(),
+        }
+      }
+
+      if (column.columnName === 'roomFk') {
+        return {
+          ...column,
+          render: (row) => {
+            const { rooms = [] } = this.props
+            const room = rooms.find((item) => item.id === row.roomFk)
+            if (room) return room.name
+            return ''
+          },
         }
       }
 
@@ -120,31 +133,6 @@ class AppointmentDataGrid extends React.PureComponent {
     this.state = {
       columnExtensions,
     }
-
-    // this.getClinicianFK()
-  }
-
-  getClinicianFK = async () => {
-    const url = '/api/ClinicianProfile'
-    const result = await request(url, { pagesize: 9999 })
-    const { status, data } = result
-    if (parseInt(status, 10) === 200) {
-      const { columnExtensions } = this.state
-      this.setState((prevState) => ({
-        ...prevState,
-        columnExtensions: columnExtensions.map(
-          (column) =>
-            column.columnName === 'clinicianFK'
-              ? {
-                  ...column,
-                  options: [
-                    ...data.data,
-                  ],
-                }
-              : { ...column },
-        ),
-      }))
-    }
   }
 
   onRadioChange = (row, e, checked) => {
@@ -181,29 +169,16 @@ class AppointmentDataGrid extends React.PureComponent {
           ]}
           FuncProps={{
             pager: false,
+            sort: true,
+            sortConfig: {
+              defaultSorting: [
+                { columnName: 'startTime', direction: 'asc' },
+              ],
+            },
           }}
           EditingProps={{
             showAddCommand: true,
             onCommitChanges: handleCommitChanges,
-            // onAddedRowsChange: (addedRows) => {
-            //   console.log('added rows', { addedRows })
-            //   return [
-            //     { ...addedRows, endTime: moment() },
-            //   ]
-            // },
-            // addedRows:
-            //   data.length === 0
-            //     ? [
-            //         {
-            //           clinicianFK: undefined,
-            //           appointmentTypeFK: undefined,
-            //           startTime: undefined,
-            //           endTime: undefined,
-            //           roomFk: undefined,
-            //           isPrimaryClinician: undefined,
-            //         },
-            //       ]
-            //     : [],
           }}
           columns={AppointmentDataColumn}
           columnExtensions={this.state.columnExtensions}
