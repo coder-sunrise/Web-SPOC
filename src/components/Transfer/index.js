@@ -35,8 +35,9 @@ const Transfer = ({
   limit,
   setFieldValue,
   fieldName,
+  search,
+  setSearch,
 }) => {
-  //console.log({ fieldName })
   const [
     addedList,
     setAddedList,
@@ -139,8 +140,10 @@ const Transfer = ({
           <GridItem xs={12}>
             <TextField
               label='Search'
-              onChange={(event) => setSearchField(event.target.value)}
-              value={searchField}
+              // onChange={(event) => setSearchField(event.target.value)}
+              // value={searchField}
+              onChange={(event) => setSearch(event.target.value)}
+              value={search}
             />{' '}
           </GridItem>
           <GridItem xs={12}>

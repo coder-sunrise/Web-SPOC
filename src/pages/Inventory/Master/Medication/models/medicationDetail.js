@@ -22,7 +22,7 @@ export default createFormViewModel({
         ],
       },
     },
-    subscriptions: ({ dispatch, history }) => {
+    subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
         const { query = {} } = loct
         if (query.uid) {
@@ -74,13 +74,6 @@ export default createFormViewModel({
               data.effectiveEndDate,
             ],
           },
-        }
-      },
-
-      querySdd (st, { payload }) {
-        console.log('reducers', st)
-        return {
-          ...st,
         }
       },
 

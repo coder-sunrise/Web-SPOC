@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
@@ -34,20 +34,70 @@ const Detail = ({
   handleSubmit,
   ...props
 }) => {
+  const [
+    selectedItem,
+    setSelectedItem,
+  ] = useState({})
+
   const field = packDetail.entity ? 'entity' : 'default'
 
+  const { ctServiceCenter } = packDetail
+  console.log('ctServiceCenter', packDetail)
+
+  const handleItemOnChange = (e) => {
+    const { option, row } = e
+    const { sellingPrice } = option
+    setSelectedItem(option)
+
+    return { ...row, unitPrice: sellingPrice }
+  }
+  const [
+    serviceCenterList,
+    setServiceCenterList,
+  ] = useState([])
+
+  const [
+    list,
+    setList,
+  ] = useState([])
+
+  const filterServiceCenter = (serviceCenter) => {
+    if (serviceCenter) {
+      return ctServiceCenter.filter((o) =>
+        o.name.toLowerCase().includes(serviceCenter.toLowerCase()),
+      )
+    }
+    return ctServiceCenter
+  }
+
+  useEffect(
+    () => {
+      if (serviceCenterList) {
+        setList(serviceCenterList)
+      }
+    },
+    [
+      serviceCenterList,
+    ],
+  )
+
   const handleServiceOnChange = (e) => {
-    console.log('er', e)
-    const { row, option } = e
-    const serviceUnitPrice = option.unitPrice
-    return {
-      ...row,
-      unitPrice: serviceUnitPrice,
+    if (e) {
+      const { option, row } = e
+      const { unitPrice, serviceCenter } = option
+      setServiceCenterList(filterServiceCenter(serviceCenter))
+      setSelectedItem(option)
+      console.log('heckfiler', filterServiceCenter(serviceCenter))
     }
   }
 
   console.log('propsss', props)
-  const { ServiceList } = props
+  const {
+    medicationPackageItem,
+    consumablePackageItem,
+    vaccinationPackageItem,
+    servicePackageItem,
+  } = props.values
   const { currentTab } = pack
   const detailProps = {
     packDetail,
@@ -73,93 +123,17 @@ const Detail = ({
         code: 'inventoryMedication',
         labelField: 'displayValue',
         valueField: 'id',
-      },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'subTotal', type: 'number', currency: true },
-    ],
-    medicationList: [
-      props.values.medicationPackageItem,
-    ],
-  }
-
-  const vaccinationProps = {
-    vaccinationTableParas: {
-      columns: [
-        { name: 'vaccination', title: 'Vaccination' },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
-      ],
-      leftColumns: [],
-    },
-    vaccinationColExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
-    ],
-    vaccinationList: [],
-  }
-
-  const consumableProps = {
-    consumableTableParas: {
-      columns: [
-        { name: 'consumableName', title: 'Consumable Name' },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
-      ],
-      leftColumns: [],
-    },
-    consumableColExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
-    ],
-    consumableList: [
-      {
-        consumableName: 'Colgate Active Fast',
-        quantity: 1,
-        unitPrice: 15,
-        amount: 15,
+        onChange: handleItemOnChange,
       },
       {
-        consumableName: 'Sensidive Whitening',
-        quantity: 1,
-        unitPrice: 15,
-        amount: 15,
-      },
-      {
-        consumableName: 'Fruit Juice (Orange) Sugar Free',
-        quantity: 1,
-        unitPrice: 2,
-        amount: 2,
-      },
-    ],
-  }
-  const serviceProps = {
-    serviceTableParas: {
-      columns: [
-        { name: 'serviceName', title: 'Service' },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'subTotal', title: 'Amount' },
-      ],
-      leftColumns: [],
-    },
-    serviceColExtensions: [
-      {
-        columnName: 'serviceName',
-        type: 'codeSelect',
-        code: 'ctservice',
-        labelField: 'displayValue',
-        valueField: 'serviceId',
-        filter: {},
-        onChange: handleServiceOnChange,
+        columnName: 'quantity',
+        type: 'number',
       },
       {
         columnName: 'unitPrice',
         type: 'number',
         currency: true,
+        disabled: true,
       },
       {
         columnName: 'subTotal',
@@ -168,114 +142,162 @@ const Detail = ({
         disabled: true,
       },
     ],
-    ServiceList: props.values.servicePackageItem,
+    medicationList: medicationPackageItem,
   }
 
-  const commitChanges = (type) => ({ rows, added, changed, deleted }) => {
-    console.log('packDetail', packDetail)
-
-    const newRow = rows[0]
-    console.log('newRow', newRow)
-
-    const calSubtotal = newRow.quantity * newRow.unitPrice
-    newRow.subTotal = calSubtotal
-    // console.log('asdas', getUniqueNumericId())
-    // newRow.id = getUniqueNumericId()
-
-    const {
-      medicationPackageItem,
-      consumablePackageItem,
-      vaccinationPackageItem,
-      servicePackageItem,
-    } = props.values
-
-    switch (type) {
-      case 'medicationPackageItem': {
-        const newPackageItem = medicationPackageItem.concat(newRow)
-        return dispatch({
-          type: 'packDetail/updateState',
-          payload: {
-            [field]: {
-              ...props.values,
-              medicationPackageItem: newPackageItem,
-            },
-          },
-        })
-      }
-      case 'servicePackageItem': {
-        const newPackageItem = servicePackageItem.concat(newRow)
-        return dispatch({
-          type: 'packDetail/updateState',
-          payload: {
-            [field]: {
-              ...props.values,
-              servicePackageItem: newPackageItem,
-            },
-          },
-        })
-      }
-
-      default:
-        return newRow
-    }
-  }
-
-  const onAddedRowsChange = (addedRows) => {
-    console.log('addedRows', addedRows)
-    // return addedRows.map(
-    //   (row) => console.log('row', row),
-    //   //  ({
-    //   //   onsetDate: moment(),
-    //   //   ...row,
-    //   //   confirmedByUserFK: props.user.data.id,
-    //   //   isConfirmed: true,
-    //   //   type,
-    //   // })
-    // )
-    return [
-      { ...addedRows, unitPrice: 123 },
-    ]
-  }
-
-  const onDeletedRowIdsChange = (ids) => {
-    const rows = props.values.servicePackageItem.filter(
-      (service) => ids.indexOf(service.id) < 0,
-    )
-    console.log('deleterow', rows)
-    dispatch({
-      type: 'packDetail/updateState',
-      payload: {
-        default: {
-          ...props.values,
-          medicationPackageItem: rows,
-        },
+  const vaccinationProps = {
+    vaccinationTableParas: {
+      columns: [
+        { name: 'vaccinationName', title: 'Vaccination' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'subTotal', title: 'Amount' },
+      ],
+      leftColumns: [],
+    },
+    vaccinationColExtensions: [
+      {
+        columnName: 'vaccinationName',
+        type: 'codeSelect',
+        code: 'inventoryVaccination',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: handleItemOnChange,
       },
-    })
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+    ],
+    vaccinationList: vaccinationPackageItem,
+  }
 
-    return ids
+  const consumableProps = {
+    consumableTableParas: {
+      columns: [
+        { name: 'consumableName', title: 'Consumable Name' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'subTotal', title: 'Amount' },
+      ],
+      leftColumns: [],
+    },
+    consumableColExtensions: [
+      {
+        columnName: 'consumableName',
+        type: 'codeSelect',
+        code: 'inventoryConsumable',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: handleItemOnChange,
+      },
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+    ],
+    consumableList: consumablePackageItem,
   }
 
   const [
-    rowChange,
-    setRowChange,
+    serviceCenter,
+    setServiceCenter,
   ] = useState([])
 
-  const onRowChangesChange = (rowChanges) => {
-    console.log('rowChanges', rowChanges)
+  const serviceProps = {
+    serviceTableParas: {
+      columns: [
+        { name: 'serviceName', title: 'Service' },
+        { name: 'serviceCenterServiceFK', title: 'Service Center' },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'unitPrice', title: 'Unit Price' },
+        { name: 'subTotal', title: 'Amount' },
+      ],
+      leftColumns: [],
+    },
+    serviceColExtensions: [
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'serviceName',
+        type: 'codeSelect',
+        code: 'ctService',
+        labelField: 'displayValue',
+        valueField: 'serviceId',
+        onChange: handleServiceOnChange,
+      },
+      {
+        columnName: 'serviceCenterServiceFK',
+        type: 'select',
+        options: list,
+      },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+    ],
+    ServiceList: servicePackageItem,
+  }
+  const [
+    total,
+    setTotal,
+  ] = useState(0)
+  const calTotal = () => {
+    setTotal(0)
+    medicationPackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
 
-    setRowChange(rowChanges)
-    console.log('rowChange', rowChange)
+    servicePackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
 
-    return rowChanges
+    consumablePackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
+
+    vaccinationPackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
   }
 
-  const editableGridProps = {
-    commitChanges,
-    onAddedRowsChange,
-    onRowChangesChange,
-    onDeletedRowIdsChange,
-  }
-
+  // if (ctServiceCenter) {
+  //   setServiceCenter(
+  //     ctServiceCenter.for((o) => {
+  //       return {
+  //         value: o.serviceCenterCategoryFK,
+  //         name: o.displayValue,
+  //       }
+  //     }),
+  //   )
+  // }
+  console.log('let', list)
+  console.log('let', serviceCenterList)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -309,31 +331,21 @@ const Detail = ({
             tabButton: 'Order Item',
             tabContent: (
               <InventoryTypeListing
+                calTotal={calTotal}
                 medication={medicationProps}
                 consumable={consumableProps}
                 vaccination={vaccinationProps}
                 service={serviceProps}
                 packDetail={packDetail}
                 setFieldValue={setFieldValue}
-                {...editableGridProps}
                 {...props}
-                rowChange={rowChange}
-                setRowChange={setRowChange}
+                selectedItem={selectedItem}
+                setSelectedItem={setSelectedItem}
+                setServiceCenter={setServiceCenter}
+                serviceCenter={serviceCenter}
               />
             ),
           },
-          // {
-          //   tabButton: 'Vaccination',
-          //   tabContent: <InventoryTypeListing {...vaccinationProps} />,
-          // },
-          // {
-          //   tabButton: 'Consumable',
-          //   tabContent: <InventoryTypeListing {...consumableProps} />,
-          // },
-          // {
-          //   tabButton: 'Service',
-          //   tabContent: <InventoryTypeListing {...serviceProps} />,
-          // },
         ]}
       />
     </React.Fragment>
