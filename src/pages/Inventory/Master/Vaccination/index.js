@@ -9,7 +9,7 @@ import { status } from '@/utils/codes'
 
 const styles = () => ({})
 
-const Vaccination = ({ dispatch, history, vaccination }) => {
+const Vaccination = ({ dispatch, history, vaccination, values }) => {
   const [
     tableParas,
     setTableParas,
@@ -51,6 +51,7 @@ const Vaccination = ({ dispatch, history, vaccination }) => {
   const filterProps = {
     dispatch,
     history,
+    values,
   }
 
   const gridProps = {

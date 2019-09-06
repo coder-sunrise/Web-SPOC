@@ -8,7 +8,7 @@ import Grid from '../Grid'
 import { status } from '@/utils/codes'
 
 const styles = () => ({})
-const Consumable = ({ dispatch, history, consumable }) => {
+const Consumable = ({ dispatch, history, consumable, values }) => {
   const [
     tableParas,
     setTableParas,
@@ -50,6 +50,7 @@ const Consumable = ({ dispatch, history, consumable }) => {
   const filterProps = {
     dispatch,
     history,
+    values,
   }
   const gridProps = {
     ...filterProps,

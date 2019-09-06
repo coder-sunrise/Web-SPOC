@@ -35,6 +35,7 @@ const InventoryTypeListing = ({
   setFieldValue,
   selectedItem,
   setSelectedItem,
+  setServiceCenter,
   ...props
 }) => {
   const {
@@ -120,7 +121,9 @@ const InventoryTypeListing = ({
 
       return addedRows.map((row) => ({
         ...row,
-        unitPrice: selectedItem.sellingPrice,
+        unitPrice: selectedItem.sellingPrice
+          ? selectedItem.sellingPrice
+          : selectedItem.unitPrice,
         subTotal: total(),
       }))
     }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
@@ -41,27 +41,57 @@ const Detail = ({
 
   const field = packDetail.entity ? 'entity' : 'default'
 
-  const handleServiceOnChange = (e) => {
-    console.log('er', e)
-    const { row, option } = e
-    const serviceUnitPrice = option.unitPrice
-    return {
-      ...row,
-      unitPrice: serviceUnitPrice,
-    }
-  }
+  const { ctServiceCenter } = packDetail
+  console.log('ctServiceCenter', packDetail)
 
   const handleItemOnChange = (e) => {
     const { option, row } = e
     const { sellingPrice } = option
     setSelectedItem(option)
-    console.log('er', e)
-    console.log('er', option)
 
     return { ...row, unitPrice: sellingPrice }
   }
+  const [
+    serviceCenterList,
+    setServiceCenterList,
+  ] = useState([])
 
-  // console.log('propsss', props)
+  const [
+    list,
+    setList,
+  ] = useState([])
+
+  const filterServiceCenter = (serviceCenter) => {
+    if (serviceCenter) {
+      return ctServiceCenter.filter((o) =>
+        o.name.toLowerCase().includes(serviceCenter.toLowerCase()),
+      )
+    }
+    return ctServiceCenter
+  }
+
+  useEffect(
+    () => {
+      if (serviceCenterList) {
+        setList(serviceCenterList)
+      }
+    },
+    [
+      serviceCenterList,
+    ],
+  )
+
+  const handleServiceOnChange = (e) => {
+    if (e) {
+      const { option, row } = e
+      const { unitPrice, serviceCenter } = option
+      setServiceCenterList(filterServiceCenter(serviceCenter))
+      setSelectedItem(option)
+      console.log('heckfiler', filterServiceCenter(serviceCenter))
+    }
+  }
+
+  console.log('propsss', props)
   const {
     medicationPackageItem,
     consumablePackageItem,
@@ -186,10 +216,17 @@ const Detail = ({
     ],
     consumableList: consumablePackageItem,
   }
+
+  const [
+    serviceCenter,
+    setServiceCenter,
+  ] = useState([])
+
   const serviceProps = {
     serviceTableParas: {
       columns: [
         { name: 'serviceName', title: 'Service' },
+        { name: 'serviceCenterServiceFK', title: 'Service Center' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -197,14 +234,19 @@ const Detail = ({
       leftColumns: [],
     },
     serviceColExtensions: [
+      { columnName: 'quantity', type: 'number' },
       {
         columnName: 'serviceName',
         type: 'codeSelect',
-        code: 'ctservice',
+        code: 'ctService',
         labelField: 'displayValue',
         valueField: 'serviceId',
-        filter: {},
         onChange: handleServiceOnChange,
+      },
+      {
+        columnName: 'serviceCenterServiceFK',
+        type: 'select',
+        options: list,
       },
       {
         columnName: 'unitPrice',
@@ -244,6 +286,18 @@ const Detail = ({
     })
   }
 
+  // if (ctServiceCenter) {
+  //   setServiceCenter(
+  //     ctServiceCenter.for((o) => {
+  //       return {
+  //         value: o.serviceCenterCategoryFK,
+  //         name: o.displayValue,
+  //       }
+  //     }),
+  //   )
+  // }
+  console.log('let', list)
+  console.log('let', serviceCenterList)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -287,21 +341,11 @@ const Detail = ({
                 {...props}
                 selectedItem={selectedItem}
                 setSelectedItem={setSelectedItem}
+                setServiceCenter={setServiceCenter}
+                serviceCenter={serviceCenter}
               />
             ),
           },
-          // {
-          //   tabButton: 'Vaccination',
-          //   tabContent: <InventoryTypeListing {...vaccinationProps} />,
-          // },
-          // {
-          //   tabButton: 'Consumable',
-          //   tabContent: <InventoryTypeListing {...consumableProps} />,
-          // },
-          // {
-          //   tabButton: 'Service',
-          //   tabContent: <InventoryTypeListing {...serviceProps} />,
-          // },
         ]}
       />
     </React.Fragment>

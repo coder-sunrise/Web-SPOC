@@ -44,6 +44,7 @@ export default createFormViewModel({
         }
       })
     },
+
     effects: {
       *submit ({ payload }, { call }) {
         return yield call(upsert, payload)

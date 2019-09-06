@@ -13,6 +13,7 @@ import {
   Select,
   Button,
   TextField,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -28,13 +29,13 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = ({ classes, dispatch, history }) => {
+const FilterBar = ({ classes, dispatch, history, values }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
         <GridItem xs={6} md={3}>
           <FastField
-            name='Code'
+            name='code'
             render={(args) => {
               return (
                 <TextField
@@ -49,7 +50,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
         </GridItem>
         <GridItem xs={6} md={3}>
           <FastField
-            name='Name'
+            name='displayValue'
             render={(args) => {
               return (
                 <TextField
@@ -64,14 +65,14 @@ const FilterBar = ({ classes, dispatch, history }) => {
         </GridItem>
         <GridItem xs={6} md={3}>
           <FastField
-            name='Supplier'
+            name='supplier'
             render={(args) => {
               return (
-                <Select
+                <CodeSelect
                   label={formatMessage({
                     id: 'inventory.master.consumable.supplier',
                   })}
-                  options={[]}
+                  code='ctCompany'
                   {...args}
                 />
               )
@@ -80,7 +81,7 @@ const FilterBar = ({ classes, dispatch, history }) => {
         </GridItem>
         <GridItem xs={6} md={3}>
           <FastField
-            name='Status'
+            name='isActive'
             render={(args) => {
               return (
                 <Select
@@ -100,8 +101,15 @@ const FilterBar = ({ classes, dispatch, history }) => {
               variant='contained'
               color='primary'
               onClick={() => {
+                const { code, displayValue, supplier, isActive } = values
                 dispatch({
                   type: 'consumable/query',
+                  payload: {
+                    code,
+                    displayValue,
+                    supplier,
+                    isActive,
+                  },
                 })
               }}
             >
