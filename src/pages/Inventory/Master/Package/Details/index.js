@@ -43,62 +43,53 @@ const Detail = ({
   const field = packDetail.entity ? 'entity' : 'default'
 
   const { ctServiceCenter } = packDetail
-  console.log('ctServiceCenter', ctServiceCenter)
+  // console.log('ctServiceCenter', ctServiceCenter)
   const { ctservice } = codetable
 
-  const result = []
-  const map = new Map()
-  if (ctservice) {
-    // for (const item of ctservice) {
-    //   if (!map.has(item.serviceId) && !map.has(item.serviceCenter)) {
-    //     map.set(item.serviceId, true)
-    //     map.set(item.serviceCenter, true)
-    //     result.push({
-    //       serviceId: item.serviceId,
-    //       code: item.code,
-    //       serviceCenter: item.serviceCenter,
-    //     })
-    //   }
-    // }
-    const unique = ctservice.reduce((uniqueList, service) => {
-      const existed = uniqueList.find(
-        (uniqueService) =>
-          uniqueService.serviceId === service.serviceId &&
-          uniqueService.serviceCenter === service.serviceCenter,
-      )
-      if (existed)
-        return [
-          ...uniqueList,
-        ]
-      return [
-        ...uniqueList,
-        service,
-      ]
-    }, [])
-    console.log({ unique })
-  }
+  const [
+    test,
+    setTest,
+  ] = useState([])
 
-  console.log(result)
-  // const result = Array.from(
-  //   new Set(
-  //     ctservice.map((s) => {
-  //       return {
-  //         serviceId: s.serviceId,
-  //         serviceCenter: s.serviceCenter,
-  //       }
-  //     }),
-  //   ),
-  // ).map((serviceCenter) => {
-  //   console.log('serviceCentertest', serviceCenter)
-  //   // return {
-  //   //   serviceId: ctservice.find((s) => s.serviceCenter === serviceCenter)
-  //   //     .serviceId,
-  //   //   code: ctservice.find((s) => s.serviceCenter === serviceCenter).code,
-  //   //   serviceCenter: serviceCenter,
-  //   // }
-  // })
+  useEffect(
+    () => {
+      if (ctservice) {
+        const result = ctservice.reduce((uniqueList, service) => {
+          const existed = uniqueList.find(
+            (uniqueService) =>
+              uniqueService.serviceId === service.serviceId &&
+              uniqueService.serviceCenter === service.serviceCenter,
+          )
+          if (existed)
+            return [
+              ...uniqueList,
+            ]
+          return [
+            ...uniqueList,
+            service,
+          ]
+        }, [])
 
-  console.log('result', result)
+        setTest((prevTest) => [
+          ...prevTest,
+          ...result,
+        ])
+      }
+    },
+    [
+      ctservice,
+    ],
+  )
+
+  useEffect(
+    () => {
+      console.log({ test })
+    },
+    [
+      test,
+    ],
+  )
+
   const handleItemOnChange = (e) => {
     const { option, row } = e
     const { sellingPrice } = option
@@ -146,8 +137,6 @@ const Detail = ({
     }
   }
 
-  console.log('propsss', props)
-  console.log('codetable', codetable)
   const {
     medicationPackageItem,
     consumablePackageItem,
@@ -165,7 +154,7 @@ const Detail = ({
   const medicationProps = {
     medicationTableParas: {
       columns: [
-        { name: 'medicationName', title: 'Medication Name' },
+        { name: 'inventoryMedicationFK', title: 'Medication Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -174,7 +163,7 @@ const Detail = ({
     },
     medicationColExtensions: [
       {
-        columnName: 'medicationName',
+        columnName: 'inventoryMedicationFK',
         type: 'codeSelect',
         code: 'inventoryMedication',
         labelField: 'displayValue',
@@ -204,7 +193,7 @@ const Detail = ({
   const vaccinationProps = {
     vaccinationTableParas: {
       columns: [
-        { name: 'vaccinationName', title: 'Vaccination' },
+        { name: 'inventoryVaccinationFK', title: 'Vaccination' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -213,7 +202,7 @@ const Detail = ({
     },
     vaccinationColExtensions: [
       {
-        columnName: 'vaccinationName',
+        columnName: 'inventoryVaccinationFK',
         type: 'codeSelect',
         code: 'inventoryVaccination',
         labelField: 'displayValue',
@@ -240,7 +229,7 @@ const Detail = ({
   const consumableProps = {
     consumableTableParas: {
       columns: [
-        { name: 'consumableName', title: 'Consumable Name' },
+        { name: 'inventoryConsumableFK', title: 'Consumable Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -249,7 +238,7 @@ const Detail = ({
     },
     consumableColExtensions: [
       {
-        columnName: 'consumableName',
+        columnName: 'inventoryConsumableFK',
         type: 'codeSelect',
         code: 'inventoryConsumable',
         labelField: 'displayValue',
@@ -295,6 +284,8 @@ const Detail = ({
         columnName: 'serviceName',
         type: 'codeSelect',
         code: 'ctService',
+        options: test,
+
         labelField: 'displayValue',
         valueField: 'serviceId',
         onChange: handleServiceOnChange,
@@ -356,8 +347,8 @@ const Detail = ({
   //     }),
   //   )
   // }
-  console.log('let', list)
-  console.log('let', serviceCenterList)
+  // console.log('let', list)
+  // console.log('let', serviceCenterList)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>

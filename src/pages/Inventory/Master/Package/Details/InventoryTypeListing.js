@@ -72,8 +72,16 @@ const InventoryTypeListing = ({
   }
   const TableCell = (p) => Cell({ ...p, dispatch })
 
-  const schema = Yup.object().shape({
-    medicationName: Yup.number().required(),
+  const medicationSchema = Yup.object().shape({
+    inventoryMedicationFK: Yup.number().required(),
+    quantity: Yup.number().required(),
+  })
+  const consumableSchema = Yup.object().shape({
+    inventoryConsumableFK: Yup.number().required(),
+    quantity: Yup.number().required(),
+  })
+  const vaccinationSchema = Yup.object().shape({
+    inventoryVaccinationFK: Yup.number().required(),
     quantity: Yup.number().required(),
   })
 
@@ -175,7 +183,7 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...medicationTableParas}
             columnExtensions={medicationColExtensions}
-            schema={schema}
+            schema={medicationSchema}
             rows={medicationPackageItem}
             FuncProps={{ pager: false }}
             EditingProps={{
@@ -191,6 +199,7 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...consumableTableParas}
             columnExtensions={consumableColExtensions}
+            schema={consumableSchema}
             rows={consumablePackageItem}
             FuncProps={{ pager: false }}
             EditingProps={{
@@ -206,6 +215,7 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...vaccinationTableParas}
             columnExtensions={vaccinationColExtensions}
+            schema={vaccinationSchema}
             rows={vaccinationPackageItem}
             FuncProps={{ pager: false }}
             EditingProps={{

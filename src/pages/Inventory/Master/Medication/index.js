@@ -39,6 +39,10 @@ const Medication = ({ dispatch, history, medication, values }) => {
       type: 'number',
     },
     {
+      columnName: 'stock',
+      type: 'number',
+    },
+    {
       columnName: 'isActive',
       sortingEnabled: false,
       type: 'select',

@@ -84,7 +84,6 @@ export default createFormViewModel({
 
       getServiceCenterList (state, { payload }) {
         const { data } = payload
-        console.log('payload', payload)
         return {
           ...state,
           ctServiceCenter: data.map((x) => {
