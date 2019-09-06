@@ -41,6 +41,7 @@ class SelectEditor extends PureComponent {
     //   window.$tempGridRow,
     //   gridId,
     // )
+    console.log({ cfg, latestRow, columnName, props: this.props })
     this.setState({
       error: updateCellValue(
         this.props,

@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'dva'
-import moment from 'moment'
 import classnames from 'classnames'
 // formik
 import { FastField, withFormik } from 'formik'
@@ -75,10 +74,6 @@ class Form extends React.PureComponent {
     this.props.dispatch({
       type: 'codetable/fetchCodes',
       payload: { code: 'ltappointmentstatus' },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ltcancelreasontype' },
     })
     this.validateDataGrid()
   }
@@ -155,37 +150,32 @@ class Form extends React.PureComponent {
     const { onClose, dispatch } = this.props
     dispatch({
       type: 'calendar/deleteDraft',
-      payload: { id },
+      id,
       callback: onClose,
     })
   }
 
-  onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
-    const { values, onClose, user, dispatch } = this.props
-    const payload = {
-      id: values.currentAppointment.id,
-      concurrencyToken: values.currentAppointment.concurrencyToken,
-      appointmentStatusFK: 3,
-      isCancelled: true,
-      cancellationDateTime: moment().format(),
-      cancellationReasonTypeFK: reasonType,
-      cancellationReason: reason,
-      cancelByUserFk: user.id,
-      cancelSeries: type === '2',
-    }
-
-    dispatch({
-      type: 'calendar/cancelAppointment',
-      payload,
-    }).then((response) => {
-      if (response) {
-        this.setState({
-          showDeleteConfirmationModal: false,
+  onCancelOrDeleteClick = () => {
+    const { values, dispatch } = this.props
+    if (values.appointmentStatusFk !== undefined) {
+      if (values.appointmentStatusFk === '2') {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: `Are you sure want to delete this draft appointment?`,
+            onOpenConfirm: () => this.deleteDraft(values.id),
+          },
         })
-        onClose()
+      } else {
+        this.setState({
+          showDeleteConfirmationModal: true,
+        })
       }
-    })
+    }
+  }
 
+  onConfirmCancelAppointment = ({ deleteType, reasonType, reason }) => {
     // const { handleDeleteEvent, slotInfo } = this.props
     // this.setState(
     //   {
@@ -261,6 +251,10 @@ class Form extends React.PureComponent {
         setSubmitting(false)
         return
       }
+      // const appointmentResources = datagrid.map(
+      //   mapDatagridToAppointmentResources(isRecurrenceChanged),
+      // )
+
       const submitPayload = {
         datagrid,
         formikValues: values,
@@ -268,21 +262,173 @@ class Form extends React.PureComponent {
         newAppointmentStatusFK: appointmentStatusFK,
       }
 
-      setSubmitting(false)
-
       dispatch({
         type: 'calendar/submit',
         payload: submitPayload,
-      }).then((response) => {
-        response && resetForm()
-        onClose && onClose()
       })
+
+      // const {
+      //   currentAppointment,
+      //   appointments,
+      //   recurrenceDto,
+      //   overwriteEntireSeries,
+      //   ...restValues
+      // } = values
+      // const appointmentGroupDto = {
+      //   ...restValues,
+      // }
+      // const { recurrenceDto: originalRecurrenceDto = {} } = viewingAppointment
+
+      // const isEdit = restValues.id !== undefined
+      // const isRecurrenceChanged = values.isEnableRecurrence
+      //   ? compareDto(recurrenceDto, originalRecurrenceDto)
+      //   : false
+
+      // let payload = {}
+      // let actionKey = actionKeys.insert
+
+      // console.log({ appointmentResources, appointments })
+      // const singleAppointment = {
+      //   ...currentAppointment,
+      //   isEditedAsSingleAppointment:
+      //     isEditedAsSingleAppointment ||
+      //     currentAppointment.isEditedAsSingleAppointment,
+      //   appointmentStatusFk: appointmentStatusFK,
+      //   appointments_Resources: [
+      //     ...appointmentResources.map((item, index) => ({
+      //       ...item,
+      //       sortOrder: item.sortOrder !== undefined ? item.sortOrder : index,
+      //     })),
+      //   ],
+      // }
+      // const [
+      //   newRecurringAppointments,
+      //   recurrenceEndDate,
+      // ] =
+      //   !isEdit || isRecurrenceChanged
+      //     ? generateRecurringAppointments(
+      //         recurrenceDto,
+      //         singleAppointment,
+      //         restValues.isEnableRecurrence,
+      //         isRecurrenceChanged,
+      //       )
+      //     : [
+      //         appointments.reduce(
+      //           (updated, appt) =>
+      //             appt.isEditedAsSingleAppointment && !overwriteEntireSeries
+      //               ? [
+      //                   ...updated,
+      //                 ]
+      //               : [
+      //                   ...updated,
+      //                   {
+      //                     ...appt,
+      //                     appointmentStatusFk: appointmentStatusFK,
+      //                     appointmentRemarks:
+      //                       currentAppointment.appointmentRemarks,
+      //                     appointments_Resources: [
+      //                       ...appt.appointments_Resources,
+      //                     ],
+      //                     isEditedAsSingleAppointment:
+      //                       isEditedAsSingleAppointment ||
+      //                       appt.isEditedAsSingleAppointment,
+      //                   },
+      //                 ],
+      //           [],
+      //         ),
+      //         recurrenceDto.recurrenceEndDate,
+      //       ]
+
+      // const newResources = appointmentResources.filter((item) => item.isNew)
+      // const oldResources = appointmentResources.filter((item) => !item.isNew)
+
+      // const finalAppointments = newRecurringAppointments.map((item) => {
+      //   return {
+      //     ...item,
+      //     appointments_Resources: [
+      //       ...item.appointments_Resources.reduce((resources, apptResource) => {
+      //         const old = oldResources.find(
+      //           (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+      //         )
+      //         if (old === undefined)
+      //           return [
+      //             ...resources,
+      //             { ...apptResource, isDeleted: true },
+      //           ]
+
+      //         const {
+      //           clinicianFK,
+      //           appointmentTypeFK,
+      //           startTime,
+      //           endTime,
+      //           roomFk,
+      //           isPrimaryClinician,
+      //         } = old
+      //         return [
+      //           ...resources,
+      //           {
+      //             ...apptResource,
+      //             clinicianFK,
+      //             appointmentTypeFK,
+      //             startTime,
+      //             endTime,
+      //             roomFk,
+      //             isPrimaryClinician,
+      //           },
+      //         ]
+      //       }, []),
+      //       ...newResources,
+      //     ],
+      //   }
+      // })
+      // console.log({ newResources, oldResources, finalAppointments })
+
+      // let recurrence = null
+      // if (restValues.isEnableRecurrence) {
+      //   if (isEdit && isRecurrenceChanged) {
+      //     recurrence = { ...recurrenceDto, recurrenceEndDate }
+      //   } else if (!isEdit) {
+      //     recurrence = { ...recurrenceDto, recurrenceEndDate }
+      //   } else {
+      //     recurrence = { ...recurrenceDto }
+      //   }
+      // }
+      // payload = {
+      //   ...appointmentGroupDto,
+      //   recurrenceDto: recurrence,
+      //   appointments: newRecurringAppointments,
+      // }
+      // if (isEdit) {
+      //   payload = {
+      //     appointmentGroupDto: {
+      //       ...appointmentGroupDto,
+      //       appointments: finalAppointments,
+      //     },
+      //     recurrenceDto: recurrence,
+      //     recurrenceChanged: isRecurrenceChanged,
+      //     overwriteEntireSeries,
+      //     editSingleAppointment: isEditedAsSingleAppointment,
+      //   }
+      //   actionKey =
+      //     appointmentStatusFK === 5 ? actionKeys.reschedule : actionKeys.save
+      // }
+      // console.log({ payload })
+
+      // setSubmitting(false)
+      // dispatch({
+      //   type: actionKey,
+      //   payload,
+      // }).then((response) => {
+      //   console.log({ response })
+      // })
+
+      // if (validate) return
+      // resetForm()
+      // onClose && onClose()
     } catch (error) {
       console.log({ error })
     }
   }
-
-  onDeleteClick = () => {}
 
   onValidateClick = () => {
     const appointmentStatus = this.props.appointmentStatuses.find(
@@ -299,28 +445,6 @@ class Form extends React.PureComponent {
     )
   }
 
-  onCancelOrDeleteClick = () => {
-    const { values, dispatch } = this.props
-    const { currentAppointment } = values
-
-    if (currentAppointment.appointmentStatusFk !== undefined) {
-      if (currentAppointment.appointmentStatusFk === 2) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            openConfirmContent: `Are you sure want to delete this draft appointment?`,
-            onOpenConfirm: () => this.deleteDraft(currentAppointment.id),
-          },
-        })
-      } else {
-        this.setState({
-          showDeleteConfirmationModal: true,
-        })
-      }
-    }
-  }
-
   onSaveDraftClick = () => {
     const {
       appointmentStatuses,
@@ -331,11 +455,6 @@ class Form extends React.PureComponent {
     const appointmentStatusFK = appointmentStatuses.find(
       (item) => item.code === 'DRAFT',
     ).id
-    const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
-      (editedAsSingle, appointment) =>
-        appointment.isEditedAsSingleAppointment || editedAsSingle,
-      false,
-    )
     this.setState(
       {
         tempNewAppointmentStatusFK: appointmentStatusFK,
@@ -343,8 +462,7 @@ class Form extends React.PureComponent {
       () => {
         if (
           values.id !== undefined &&
-          !isEditedAsSingleAppointment &&
-          hasModifiedAsSingle &&
+          isEditedAsSingleAppointment &&
           viewingAppointment.isEnableRecurrence
         )
           this.openSeriesUpdateConfirmation()
@@ -417,14 +535,7 @@ class Form extends React.PureComponent {
   }
 
   render () {
-    const {
-      classes,
-      onClose,
-      loading,
-      values,
-      isSubmitting,
-      isEditedAsSingleAppointment,
-    } = this.props
+    const { classes, onClose, loading, values, isSubmitting } = this.props
 
     const {
       showSearchPatientModal,
@@ -450,8 +561,6 @@ class Form extends React.PureComponent {
                   onCreatePatient={this.toggleNewPatientModal}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
-                  isEdit={values.id}
-                  appointmentStatusFK={currentAppointment.appointmentStatusFk}
                 />
                 <AppointmentDateInput disabled={values.isEnableRecurrence} />
               </GridItem>
@@ -522,14 +631,10 @@ class Form extends React.PureComponent {
               open={showDeleteConfirmationModal}
               title='Alert'
               onClose={this.closeDeleteConfirmation}
+              onConfirm={this.onConfirmCancelAppointment}
               maxWidth='sm'
             >
-              <DeleteConfirmation
-                handleConfirmClick={this.onConfirmCancelAppointment}
-                isSeries={
-                  !isEditedAsSingleAppointment && values.isEnableRecurrence
-                }
-              />
+              <DeleteConfirmation isSeries={values.series} />
             </CommonModal>
             <CommonModal
               open={showSeriesUpdateConfirmation}

@@ -126,13 +126,14 @@ export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
 
 export const compareDto = (value, original) => {
   console.log({ value, original })
+  if (Object.keys(original).length === 0 && Object.keys(value).length > 0)
+    return true
+
   if ((original === null || original === undefined) && value) return true
 
   if (
-    value === undefined ||
-    value === null ||
-    original === null ||
-    original === undefined
+    (value === undefined || value === null) &&
+    (original === undefined || original === null)
   )
     return false
   let isChanged = false
@@ -151,9 +152,7 @@ export const generateRecurringAppointments = (
 ) => {
   if (!shouldGenerate)
     return [
-      [
-        appointment,
-      ],
+      appointment,
     ]
 
   const rrule = computeRRule({
@@ -163,29 +162,30 @@ export const generateRecurringAppointments = (
   if (rrule) {
     const allDates = rrule.all() || []
     const { id, ...restAppointmentValues } = appointment
-    const endDate =
-      allDates.length > 0
-        ? moment(allDates[allDates.length - 1]).format()
-        : undefined
-    return [
-      allDates.map(
-        (date) =>
-          shouldDumpID || id === undefined
-            ? {
-                ...restAppointmentValues,
-                appointmentDate: parseDateToServerDateFormatString(date),
-              }
-            : {
-                ...restAppointmentValues,
-                id,
-                appointmentDate: parseDateToServerDateFormatString(date),
-              },
-      ),
-      endDate,
-    ]
+    return allDates.map(
+      (date) =>
+        shouldDumpID || id === undefined
+          ? {
+              ...restAppointmentValues,
+              appointments_Resources: restAppointmentValues.appointments_Resources.map(
+                ({ appointmentFK, ...restItem }) => ({ ...restItem }),
+              ),
+              appointmentDate: parseDateToServerDateFormatString(date),
+            }
+          : {
+              ...restAppointmentValues,
+              id,
+              appointmentDate: parseDateToServerDateFormatString(date),
+            },
+    )
   }
   return null
 }
+
+export const getRecurrenceLastDate = (recurrences = []) =>
+  recurrences.length > 0
+    ? moment(recurrences[recurrences.length - 1]).format()
+    : undefined
 
 export const filterRecurrenceDto = (recurrenceDto) => {
   const { recurrencePatternFK } = recurrenceDto

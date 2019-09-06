@@ -85,6 +85,7 @@ class AppointmentDataGrid extends React.PureComponent {
         return {
           ...column,
           render: (row) => {
+            console.log({ row })
             const { clinicianFK } = row
 
             const { clinicianProfiles = [] } = this.props
@@ -153,12 +154,13 @@ class AppointmentDataGrid extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
+    console.log({ rows })
     this.props.handleCommitChanges({ rows, deleted })
   }
 
   render () {
     const { data, handleCommitChanges } = this.props
-
+    console.log({ data })
     return (
       <div>
         <EditableTableGrid

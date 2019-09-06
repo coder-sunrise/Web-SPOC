@@ -14,8 +14,12 @@ const PatientInfoInput = ({
   onCreatePatient,
   patientName,
   patientProfileFK,
+  isEdit,
+  appointmentStatusFK,
 }) => {
-  const isRegisteredPatient = patientProfileFK !== undefined
+  const isRegisteredPatient =
+    patientProfileFK !== undefined && patientProfileFK !== null
+
   return (
     <React.Fragment>
       <GridItem xs md={6}>
@@ -29,6 +33,7 @@ const PatientInfoInput = ({
                   autoFocus
                   // onEnterPressed={onSearchPatient}
                   label='Patient Name'
+                  disabled={isEdit}
                 />
               )
             }}
@@ -50,17 +55,23 @@ const PatientInfoInput = ({
                 color='primary'
                 variant='contained'
                 submitKey='patientSearch/query'
+                disabled={isEdit}
                 onClick={onSearchPatient}
                 icon={null}
               >
                 Search
               </ProgressButton>
-              <Button size='sm' color='primary' onClick={onCreatePatient}>
+              <Button
+                size='sm'
+                color='primary'
+                disabled={isEdit}
+                onClick={onCreatePatient}
+              >
                 Create Patient
               </Button>
             </React.Fragment>
           ) : (
-            <Button size='sm' color='primary' disabled>
+            <Button size='sm' color='primary' disabled={isEdit}>
               Register To Visit
             </Button>
           )}
@@ -69,7 +80,13 @@ const PatientInfoInput = ({
       <GridItem xs md={6}>
         <FastField
           name='patientContactNo'
-          render={(args) => <TextField {...args} label='Contact No.' />}
+          render={(args) => (
+            <TextField
+              {...args}
+              disabled={isEdit && appointmentStatusFK !== 2}
+              label='Contact No.'
+            />
+          )}
         />
       </GridItem>
     </React.Fragment>

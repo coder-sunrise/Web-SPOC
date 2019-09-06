@@ -24,6 +24,7 @@ import * as commonService from '@/services/common'
 
 const url = '/api/appointment'
 const rescheduleURL = '/api/appointment/reschedule'
+const cancelURL = '/api/appointment/cancel'
 
 export const upsert = (params) => commonService.upsert(url, params)
 
@@ -34,15 +35,22 @@ export const save = (params) => request(url, { method: 'PUT', body: params })
 export const reschedule = (params) =>
   request(rescheduleURL, { method: 'PUT', body: params })
 
+export const cancel = (params) =>
+  request(cancelURL, { method: 'POST', body: params })
+
 export const query = (payload) => {
   const urlPrefix = payload.isEditedAsSingleAppointment ? '/single' : '/series'
   return request(`${url}${urlPrefix}/${payload.id}`, { method: 'GET' })
 }
 
 export const queryList = (params) =>
-  commonService.queryList(url, { pagesize: 9999, ...params })
+  commonService.queryList(url, {
+    pagesize: 9999,
+    ...params,
+    isCancelled: false,
+  })
 
-export const deleteDraft = (id) => commonService.remove(`${url}/${id}`)
+export const deleteDraft = (payload) => commonService.remove(url, payload)
 
 export const validate = (params) =>
   request(`${url}/validate`, { method: 'POST', body: params })

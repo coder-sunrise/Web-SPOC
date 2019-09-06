@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import classnames from 'classnames'
+import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Warning'
@@ -27,7 +28,13 @@ const styles = (theme) => ({
   },
 })
 
-function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
+const DeleteConfirmation = ({
+  ltCancelReason,
+  isSeries,
+  handleConfirmClick,
+  onClose,
+  classes,
+}) => {
   const [
     error,
     setError,
@@ -48,17 +55,17 @@ function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
     setReason,
   ] = useState('')
   const [
-    seriesType,
-    setSeriesType,
+    type,
+    setType,
   ] = useState('')
 
   const [
     reasonType,
     setReasonType,
-  ] = useState('noshow')
+  ] = useState('1')
 
   const onContinueClick = () => {
-    if (isSeries && seriesType === '') {
+    if (isSeries && type === '') {
       setError('Please choose an option')
     } else {
       setStep(1)
@@ -67,7 +74,7 @@ function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
 
   const onChange = (event) => {
     const { target } = event
-    setSeriesType(target.value)
+    setType(target.value)
     setError('')
   }
 
@@ -82,12 +89,13 @@ function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
   }
 
   const onConfirmClick = () => {
-    onConfirm({
-      deleteType,
+    handleConfirmClick({
+      type,
       reasonType,
       reason,
     })
   }
+
   return step === 0 ? (
     <GridContainer justify='center'>
       <GridItem>
@@ -104,15 +112,15 @@ function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
             label=''
             simple
             vertical
-            defaultValue={seriesType}
+            defaultValue={type}
             onChange={onChange}
             options={[
               {
-                value: 'single',
+                value: '1',
                 label: 'Only appointment that has not been modified',
               },
               {
-                value: 'all',
+                value: '2',
                 label: 'All appointment',
               },
             ]}
@@ -150,16 +158,19 @@ function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
           vertical
           defaultValue={reasonType}
           onChange={onReasonTypeChange}
-          options={[
-            {
-              value: 'noshow',
-              label: 'No Show',
-            },
-            {
-              value: 'other',
-              label: 'Other',
-            },
-          ]}
+          options={ltCancelReason}
+          textField='name'
+          valueField='id'
+          // options={[
+          //   {
+          //     value: 'noshow',
+          //     label: 'No Show',
+          //   },
+          //   {
+          //     value: 'other',
+          //     label: 'Other',
+          //   },
+          // ]}
         />
       </GridItem>
       <GridItem xs md={6} className={classnames(classes.reasonTextBox)}>
@@ -182,4 +193,8 @@ function DeleteConfirmation ({ isSeries, onConfirm, onClose, classes }) {
   )
 }
 
-export default withStyles(styles)(DeleteConfirmation)
+const ConnectDeleteConfirmation = connect(({ codetable }) => ({
+  ltCancelReason: codetable.ltcancelreasontype,
+}))(DeleteConfirmation)
+
+export default withStyles(styles)(ConnectDeleteConfirmation)

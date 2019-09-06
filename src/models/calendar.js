@@ -2,13 +2,27 @@
 import BigCalendar from 'react-big-calendar'
 // moment
 import moment from 'moment'
+// medisys model
+import { createListViewModel } from 'medisys-model'
 // common components
 import { notification, serverDateFormat } from '@/components'
-
-import { createListViewModel } from 'medisys-model'
 import * as service from '../services/calendar'
+// utils
+import {
+  generateRecurringAppointments,
+  getRecurrenceLastDate,
+  mapDatagridToAppointmentResources,
+  compareDto,
+} from '@/pages/Reception/Appointment/components/form/formikUtils'
 
 // import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
+
+const ACTION_KEYS = {
+  insert: 'insertAppointment',
+  save: 'saveAppointment',
+  reschedule: 'rescheduleAppointment',
+  delete: 'deleteDraft',
+}
 
 export default createListViewModel({
   namespace: 'calendar',
@@ -28,6 +42,166 @@ export default createListViewModel({
     },
     subscriptions: {},
     effects: {
+      *submit ({ payload }, { select, call, put }) {
+        const calendarState = yield select((state) => state.calendar)
+        // const { ltsppointmentstatus } = yield select((state) => state.codetable)
+        try {
+          const {
+            formikValues,
+            datagrid = [],
+            newAppointmentStatusFK,
+          } = payload
+          const {
+            currentAppointment: formikCurrentAppointment,
+            appointments: formikAppointments,
+            recurrenceDto,
+            overwriteEntireSeries,
+            ...restFormikValues
+          } = formikValues
+
+          const isEdit = formikValues.id !== undefined
+          const isRecurrenceChanged =
+            formikValues.isEnableRecurrence &&
+            compareDto(
+              recurrenceDto,
+              calendarState.currentViewAppointment.recurrenceDto || {},
+            )
+
+          const appointmentResources = datagrid.map(
+            mapDatagridToAppointmentResources(isRecurrenceChanged),
+          )
+
+          const currentAppointment = {
+            ...formikCurrentAppointment,
+            isEditedAsSingleAppointment:
+              calendarState.isEditedAsSingleAppointment,
+            appointmentStatusFk: newAppointmentStatusFK,
+            appointments_Resources: appointmentResources.map((item, index) => ({
+              ...item,
+              sortOrder: item.sortOrder === undefined ? index : item.sortOrder,
+            })),
+          }
+          const newResources = appointmentResources.filter((item) => item.isNew)
+          const oldResources = appointmentResources.filter(
+            (item) => !item.isNew,
+          )
+
+          const shouldGenerateRecurrence =
+            !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
+          let appointments = []
+          let recurrenceEndDate = ''
+
+          if (shouldGenerateRecurrence) {
+            appointments = generateRecurringAppointments(
+              recurrenceDto,
+              currentAppointment,
+              formikValues.isEnableRecurrence,
+              isRecurrenceChanged,
+            )
+            recurrenceEndDate = getRecurrenceLastDate(appointments)
+          } else if (calendarState.isEditedAsSingleAppointment) {
+            appointments = [
+              currentAppointment,
+            ]
+          } else {
+            appointments = formikValues.appointments.reduce(
+              (updated, appt) =>
+                appt.isEditedAsSingleAppointment && !overwriteEntireSeries
+                  ? [
+                      ...updated,
+                    ]
+                  : [
+                      ...updated,
+                      {
+                        ...appt,
+                        appointmentStatusFk: newAppointmentStatusFK,
+                        appointmentRemarks:
+                          currentAppointment.appointmentRemarks,
+                        appointments_Resources: [
+                          ...newResources,
+                          ...appt.appointments_Resources.reduce(
+                            (currentResources, apptResource) => {
+                              const old = oldResources.find(
+                                (oldItem) =>
+                                  oldItem.sortOrder === apptResource.sortOrder,
+                              )
+                              if (old === undefined)
+                                return [
+                                  ...currentResources,
+                                  { ...apptResource, isDeleted: true },
+                                ]
+                              const {
+                                clinicianFK,
+                                appointmentTypeFK,
+                                startTime,
+                                endTime,
+                                roomFk,
+                                isPrimaryClinician,
+                              } = old
+                              return [
+                                ...currentResources,
+                                {
+                                  ...apptResource,
+                                  clinicianFK,
+                                  appointmentTypeFK,
+                                  startTime,
+                                  endTime,
+                                  roomFk,
+                                  isPrimaryClinician,
+                                },
+                              ]
+                            },
+                            [],
+                          ),
+                        ],
+                      },
+                    ],
+              [],
+            )
+          }
+
+          const recurrence = !isRecurrenceChanged
+            ? recurrenceDto
+            : { ...recurrenceDto, recurrenceEndDate }
+
+          let actionKey = ACTION_KEYS.insert
+          if (isEdit) actionKey = ACTION_KEYS.save
+          if (newAppointmentStatusFK === 5) actionKey = ACTION_KEYS.reschedule
+          console.log({
+            actionKey,
+            isEdit,
+            isRecurrenceChanged,
+            appointmentResources,
+            currentAppointment,
+            appointments,
+            recurrenceEndDate,
+          })
+          let savePayload = {
+            ...restFormikValues,
+            appointments,
+            recurrenceDto: recurrence,
+          }
+          if (isEdit) {
+            savePayload = {
+              recurrenceChanged: isRecurrenceChanged,
+              overwriteEntireSeries,
+              editSingleAppointment: calendarState.isEditedAsSingleAppointment,
+              appointmentGroupDto: {
+                ...restFormikValues,
+                appointments,
+                recurrenceDto: recurrence,
+              },
+            }
+          }
+          return yield put({
+            type: actionKey,
+            payload: savePayload,
+          })
+        } catch (error) {
+          console.log({ error })
+        }
+        return false
+      },
       *validate ({ payload }, { call, put }) {
         const result = yield call(service.validate, payload)
         console.log({ result })
@@ -66,7 +240,9 @@ export default createListViewModel({
         return false
       },
       *getCalendarList ({ payload }, { call, put }) {
-        const result = yield call(service.queryList, payload)
+        const result = yield call(service.queryList, {
+          ...payload,
+        })
         const { status, data } = result
         if (status === '200' && data.data) {
           yield put({
@@ -82,24 +258,41 @@ export default createListViewModel({
         if (result) {
           yield put({ type: 'refresh' })
           notification.success({ message: 'Appointment created' })
+          return true
         }
+        return false
       },
       *saveAppointment ({ payload }, { call, put }) {
         const result = yield call(service.save, payload)
         if (result) {
           yield put({ type: 'refresh' })
           notification.success({ message: 'Appointment(s) updated' })
+          return true
         }
+        return false
       },
       *rescheduleAppointment ({ payload }, { call, put }) {
         const result = yield call(service.reschedule, payload)
-        if (result) yield put({ type: 'refresh' })
+        if (result) {
+          yield put({ type: 'refresh' })
+          notification.success({ message: 'Appointment(s) updated' })
+          return true
+        }
+        return false
       },
-      *deleteDraft ({ id, callback }, { call, put }) {
-        const result = yield call(service.deleteDraft, id)
+      *deleteDraft ({ payload, callback }, { call, put }) {
+        const result = yield call(service.deleteDraft, payload)
         if (result === 204) notification.success({ message: 'Deleted' })
         yield put({ type: 'refresh' })
         callback && callback()
+      },
+      *cancelAppointment ({ payload }, { call, put }) {
+        const result = yield call(service.cancel, payload)
+        if (result && result.status === '200') {
+          put({ type: 'refresh' })
+          return true
+        }
+        return false
       },
       *navigateCalendar ({ date }, { select, call, put }) {
         const calendarState = yield select((state) => state.calendar)
