@@ -18,15 +18,27 @@ class Grid extends PureComponent {
             { name: 'uom', title: 'UOM' },
             { name: 'orderQty', title: 'Order Qty' },
             { name: 'bonusQty', title: 'Bonus Qty' },
+            { name: 'totalQty', title: 'Total Qty' },
             { name: 'totalReceived', title: 'Total Received' },
             { name: 'totalPrice', title: 'Total Price' },
           ]}
           // FuncProps={{ pager: false }}
           columnExtensions={[
             {
+              columnName: 'orderQty',
+              type: 'number',
+            },
+            {
+              columnName: 'bonusQty',
+              type: 'number',
+            },
+            {
+              columnName: 'totalQty',
+              type: 'number',
+            },
+            {
               columnName: 'totalReceived',
               type: 'number',
-              currency: true,
             },
             {
               columnName: 'totalPrice',

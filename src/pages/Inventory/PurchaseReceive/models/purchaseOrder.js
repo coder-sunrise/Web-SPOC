@@ -11,6 +11,12 @@ export default createListViewModel({
     service,
     state: {
       default: {
+        purchaseOrder: {
+          poNo: 'PO/000001',
+          poDate: moment(),
+          status: 'Draft',
+          shippingAddress: '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
+        },
         adjustmentList: [
           {
             id: 1,

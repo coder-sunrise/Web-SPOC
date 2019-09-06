@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
 import { connect } from 'dva'
+import Yup from '@/utils/yup'
 import {
   GridContainer,
   GridItem,
@@ -12,176 +13,203 @@ import {
   CommonTableGrid,
   Button,
   CommonModal,
+  EditableTableGrid,
 } from '@/components'
 import Edit from '@material-ui/icons/Edit'
 import Add from '@material-ui/icons/Add'
 import ReceivingItemDetails from './ReceivingItemDetails'
+import moment from 'moment'
+import { podoOrderType } from '@/utils/codes'
 
-@connect(({ deliveryOrderDetails }) => ({
-  deliveryOrderDetails,
-}))
-@withFormikExtend({ displayName: 'deliveryOrderDetails' })
+@withFormikExtend({
+  mapPropsToValues: ({ deliveryOrder }) =>
+    deliveryOrder.entity || deliveryOrder.default,
+  displayName: 'deliveryOrder',
+  validationSchema: Yup.object().shape({
+    poNo: Yup.string().required(),
+    deliveryOrderDate: Yup.string().required(),
+  }),
+})
 export class DeliveryOrderDetails extends PureComponent {
-  editRow = (row, e) => {}
+  state = { selectedType: 'InventoryConsumable' }
 
-  toggleReceivingItemModal = () => {
-    this.props.dispatch({
-      type: 'deliveryOrderDetails/updateState',
-      payload: {
-        showModal: !this.props.deliveryOrderDetails.showModal,
-      },
+  handleOnTypeChange = (e) => {
+    const { option } = e
+    this.setState({
+      selectedType: option ? option.ctName : undefined,
     })
   }
 
-  render () {
-    const { props } = this
-    const { footer, theme, deliveryOrderDetails } = props
-    const cfg = {
-      toggleReceivingItemModal: this.toggleReceivingItemModal,
+  tableParas = {
+    //schema={schema},
+    columns: [
+      { name: 'type', title: 'Type' },
+      { name: 'code', title: 'Code' },
+      { name: 'name', title: 'Name' },
+      { name: 'uom', title: 'UOM' },
+      { name: 'orderQty', title: 'Order Qty' },
+      { name: 'bonusQty', title: 'Bonus Qty' },
+      { name: 'totalReceived', title: 'Total Received' },
+      { name: 'totalBonusReceived', title: 'Total Bonus Received' },
+      { name: 'currentReceivingQty', title: 'Current Receiving Qty' },
+      {
+        name: 'currentReceivingBonusQty',
+        title: 'Current Receiving Bonus Qty',
+      },
+      { name: 'batchNo', title: 'Batch No.' },
+      { name: 'expiryDate', title: 'Expiry Date' },
+    ],
+    columnExtensions: [
+      {
+        columnName: 'type',
+        type: 'codeSelect',
+        options: podoOrderType,
+        label: 'Type',
+        width: 135,
+        onChange: this.handleOnTypeChange,
+      },
+      {
+        columnName: 'code',
+        type: 'codeSelect',
+        //Consumable = InventoryConsumable | Medication = InventoryMedication | Vacination = InventoryVaccination
+        code: this.state.selectedType,
+      },
+      {
+        columnName: 'expiryDate',
+        type: 'date',
+        format: 'DD MMM YYYY',
+      },
+      {
+        columnName: 'orderQty',
+        type: 'number',
+      },
+      {
+        columnName: 'bonusQty',
+        type: 'number',
+      },
+      {
+        columnName: 'totalReceived',
+        type: 'number',
+      },
+      {
+        columnName: 'totalBonusReceived',
+        type: 'number',
+        width: 180,
+      },
+      {
+        columnName: 'currentReceivingQty',
+        type: 'number',
+        width: 150,
+      },
+      {
+        columnName: 'currentReceivingBonusQty',
+        type: 'number',
+        width: 180,
+      },
+    ],
+  }
+
+  onCommitChanges = ({ rows, deleted }) => {
+    const { setFieldValue } = this.props
+    setFieldValue('deliveryOrder_receivingItemList', rows)
+  }
+
+  onAddedRowsChange = (addedRows) => {
+    if (addedRows.length > 0) {
+      const newRow = addedRows[0]
+
+      const { quantity, unitPrice } = newRow
     }
+    return addedRows
+  }
+
+  render () {
+    const isEditable = true
+    const { props, ...tableParas } = this
+    const { footer, theme, deliveryOrderDetails, values } = props
+    //const {} = values
+
+    //console.log('DOD', this)
 
     return (
       <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer>
-            <GridItem xs={12} md={5}>
-              <GridContainer>
-                <GridItem xs={12}>
-                  <FastField
-                    name='poNo'
-                    render={(args) => {
-                      return (
-                        <TextField
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.deliveryOrderNo',
-                          })}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={12}>
-                  <FastField
-                    name='invoiceDate'
-                    render={(args) => {
-                      return (
-                        <DatePicker
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.deliveryOrderDate',
-                          })}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-            </GridItem>
-
-            <GridItem xs={12} md={1} />
-
-            <GridItem xs={12} md={5}>
-              <GridContainer>
-                <GridItem xs={12}>
-                  <OutlinedTextField
-                    label={formatMessage({
-                      id: 'inventory.pr.detail.dod.remarks',
-                    })}
-                    multiline
-                    rowsMax={2}
-                    rows={2}
-                  />
-                </GridItem>
-              </GridContainer>
-            </GridItem>
-          </GridContainer>
-
-          <GridItem xs={12} md={11}>
-            <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
-              {formatMessage({
-                id: 'inventory.pr.detail.dod.receivingDetails',
-              })}
-            </h4>
+        <GridContainer>
+          <GridItem xs={12} md={5}>
+            <GridContainer>
+              <GridItem xs={12}>
+                <FastField
+                  name='poNo'
+                  render={(args) => {
+                    return (
+                      <TextField
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.dod.deliveryOrderNo',
+                        })}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name='deliveryOrderDate'
+                  render={(args) => {
+                    return (
+                      <DatePicker
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.dod.deliveryOrderDate',
+                        })}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
           </GridItem>
 
-          <CommonTableGrid
-            type='deliveryOrderDetails'
-            onRowDoubleClick={this.editRow}
-            columns={[
-              { name: 'type', title: 'Type' },
-              { name: 'code', title: 'Code' },
-              { name: 'name', title: 'Name' },
-              { name: 'uom', title: 'UOM' },
-              { name: 'orderQty', title: 'Order Qty' },
-              { name: 'bonusQty', title: 'Bonus Qty' },
-              { name: 'totalReceived', title: 'Total Received' },
-              { name: 'totalBonusReceived', title: 'Total Bonus Received' },
-              { name: 'currentReceivingQty', title: 'Current Receiving Qty' },
-              {
-                name: 'currentReceivingBonusQty',
-                title: 'Current Receiving Bonus Qty',
-              },
-              { name: 'batchNo', title: 'Batch No.' },
-              { name: 'expiryDate', title: 'Expiry Date' },
-              {
-                name: 'action',
-                title: 'Action',
-              },
-            ]}
-            columnExtensions={[
-              {
-                columnName: 'expiryDate',
-                type: 'date',
-                format: 'DD MMM YYYY',
-              },
-              {
-                columnName: 'action',
-                sortingEnabled: false,
-                align: 'center',
-                render: (row) => {
-                  return (
-                    <Button
-                      size='sm'
-                      onClick={() => {
-                        this.editRow(row)
-                      }}
-                      justIcon
-                      color='primary'
-                    >
-                      <Edit />
-                    </Button>
-                  )
-                },
-              },
-            ]}
-            FuncProps={{
-              pager: false,
-            }}
-          />
-        </div>
-        <CommonModal
-          open={deliveryOrderDetails.showModal}
-          observe='ReceivingItemDetail'
-          title={'Receiving Item'}
-          maxWidth='md'
-          bodyNoPadding
-          onClose={this.toggleReceivingItemModal}
-          onConfirm={this.toggleReceivingItemModal}
-        >
-          <ReceivingItemDetails {...cfg} {...this.props} />
-        </CommonModal>
-        <Button
-          onClick={this.toggleReceivingItemModal}
-          hideIfNoEditRights
-          color='info'
-          link
-        >
-          <Add />
-          {formatMessage({
-            id: 'inventory.pr.detail.dod.addNewDeliveryOrder',
-          })}
-        </Button>
+          <GridItem xs={12} md={1} />
+
+          <GridItem xs={12} md={5}>
+            <GridContainer>
+              <GridItem xs={12}>
+                <OutlinedTextField
+                  label={formatMessage({
+                    id: 'inventory.pr.detail.dod.remarks',
+                  })}
+                  multiline
+                  rowsMax={2}
+                  rows={2}
+                />
+              </GridItem>
+            </GridContainer>
+          </GridItem>
+        </GridContainer>
+
+        <GridItem xs={12} md={11}>
+          <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
+            {formatMessage({
+              id: 'inventory.pr.detail.dod.receivingDetails',
+            })}
+          </h4>
+        </GridItem>
+
+        <EditableTableGrid
+          rows={values.deliveryOrder_receivingItemList}
+          FuncProps={{
+            edit: isEditable,
+            pager: false,
+          }}
+          EditingProps={{
+            showAddCommand: isEditable,
+            //showEditCommand: isEditable,
+            //showDeleteCommand: isEditable,
+            onCommitChanges: this.onCommitChanges,
+            onAddedRowsChange: this.onAddedRowsChange,
+          }}
+          {...this.tableParas}
+        />
         {footer &&
           footer({
             onConfirm: props.handleSubmit,

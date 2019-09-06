@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { status } from '@/utils/codes'
 import { Tooltip } from '@material-ui/core'
 import {
   withFormikExtend,
@@ -11,19 +10,21 @@ import {
   TextField,
   Checkbox,
   Select,
-  ProgressButton,
   CodeSelect,
+  ProgressButton,
   DatePicker,
 } from '@/components'
 
 @withFormikExtend({
   mapPropsToValues: ({ purchasingReceiving }) =>
-    purchasingReceiving.filter || {},
+    purchasingReceiving.default.filter || {},
   handleSubmit: () => {},
   displayName: 'PurchasingReceivingFilter',
 })
 class Filter extends PureComponent {
   render () {
+    console.log('filter', this.props)
+
     const { classes, navigatePdoDetails } = this.props
     return (
       <div className={classes.filterBar}>
@@ -94,12 +95,12 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='supplier'
+              name='invoiceStatus'
               render={(args) => {
                 return (
                   <Select
                     label={formatMessage({
-                      id: 'inventory.pr.supplier',
+                      id: 'inventory.pr.invoiceStatus',
                     })}
                     {...args}
                   />
@@ -109,14 +110,30 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='status'
+              name='supplier'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label={formatMessage({
+                      id: 'inventory.pr.supplier',
+                    })}
+                    code='ctCompany'
+                    //max={10}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='poStatus'
               render={(args) => {
                 return (
                   <Select
                     label={formatMessage({
-                      id: 'inventory.pr.status',
+                      id: 'inventory.pr.poStatus',
                     })}
-                    options={status}
                     {...args}
                   />
                 )

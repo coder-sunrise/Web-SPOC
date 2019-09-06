@@ -16,6 +16,7 @@ import {
   OutlinedTextField,
   EditableTableGrid,
   Button,
+  CodeSelect,
 } from '@/components'
 
 @connect(({ purchaseOrder }) => ({
@@ -24,7 +25,7 @@ import {
 @withFormikExtend({
   displayName: 'purchaseOrder',
   mapPropsToValues: ({ purchaseOrder }) => {
-    return purchaseOrder.entity || purchaseOrder.default
+    return purchaseOrder.entity || purchaseOrder.default.purchaseOrder
   },
 })
 class index extends PureComponent {
@@ -92,6 +93,7 @@ class index extends PureComponent {
                         label={formatMessage({
                           id: 'inventory.pr.pono',
                         })}
+                        disabled={true}
                         {...args}
                       />
                     )
@@ -107,6 +109,7 @@ class index extends PureComponent {
                         label={formatMessage({
                           id: 'inventory.pr.status',
                         })}
+                        disabled={true}
                         {...args}
                       />
                     )
@@ -166,13 +169,21 @@ class index extends PureComponent {
                 />
               </GridItem>
               <GridItem xs={12}>
-                <OutlinedTextField
-                  label={formatMessage({
-                    id: 'inventory.pr.detail.pod.shippingAdd',
-                  })}
-                  multiline
-                  rowsMax={2}
-                  rows={2}
+                <FastField
+                  name='shippingAddress'
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.pod.shippingAdd',
+                        })}
+                        multiline
+                        rowsMax={2}
+                        rows={2}
+                        {...args}
+                      />
+                    )
+                  }}
                 />
               </GridItem>
               <GridItem xs={12}>
@@ -209,10 +220,12 @@ class index extends PureComponent {
                   name='supplier'
                   render={(args) => {
                     return (
-                      <TextField
+                      <CodeSelect
                         label={formatMessage({
                           id: 'inventory.pr.supplier',
                         })}
+                        code='ctCompany'
+                        //max={10}
                         {...args}
                       />
                     )

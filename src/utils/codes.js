@@ -805,6 +805,12 @@ export const getTenantCodes = async (tenantCode) => {
   return {}
 }
 
+export const podoOrderType = [
+  { id: 1, name: 'Consumable', ctName: 'InventoryConsumable' },
+  { id: 2, name: 'Medication', ctName: 'InventoryMedication' },
+  { id: 3, name: 'Vaccination', ctName: 'InventoryVaccination' },
+]
+
 module.exports = {
   paymentMethods,
   titles,
