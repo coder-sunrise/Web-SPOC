@@ -167,7 +167,7 @@ const routes = [
           },
           {
             path: '/inventory/master/editconsumable',
-            name: 'consumable.editcounsumable',
+            name: 'consumable.editconsumable',
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
           },

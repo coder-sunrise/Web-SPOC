@@ -13,7 +13,13 @@ import {
 
 const styles = () => ({})
 
-const Pricing = ({ values, setFieldValue }) => {
+const Pricing = ({
+  values,
+  setFieldValue,
+  medicationDetail,
+  vaccinationDetail,
+  consumableDetail,
+}) => {
   const [
     acp,
     setAcp,
@@ -29,6 +35,34 @@ const Pricing = ({ values, setFieldValue }) => {
     setFieldValue('suggestSellingPrice', suggestedSellingPrice)
   }
 
+  useEffect(() => {
+    if (medicationDetail) {
+      return setFieldValue('averageCostPrice', 0)
+    }
+    if (vaccinationDetail) {
+      return setFieldValue('averageCostPrice', 0)
+    }
+
+    if (consumableDetail) {
+      return setFieldValue('averageCostPrice', 0)
+    }
+    return undefined
+  }, [])
+
+  const isEditMode = () => {
+    if (medicationDetail && medicationDetail.entity) {
+      return true
+    }
+    if (vaccinationDetail && vaccinationDetail.entity) {
+      return true
+    }
+
+    if (consumableDetail && consumableDetail.entity) {
+      return true
+    }
+
+    return false
+  }
   useEffect(
     () => {
       if (acp && markupMargin) {
@@ -61,6 +95,7 @@ const Pricing = ({ values, setFieldValue }) => {
                       label={formatMessage({
                         id: 'inventory.master.pricing.lastCostPriceBefBonus',
                       })}
+                      disabled={isEditMode()}
                       {...args}
                     />
                   )
@@ -77,6 +112,7 @@ const Pricing = ({ values, setFieldValue }) => {
                       label={formatMessage({
                         id: 'inventory.master.pricing.lastCostPriceAftBonus',
                       })}
+                      disabled={isEditMode()}
                       {...args}
                     />
                   )

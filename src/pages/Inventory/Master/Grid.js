@@ -29,7 +29,11 @@ const Grid = ({
     if (column.name === 'action') {
       return (
         <Table.Cell {...p}>
-          <Tooltip title='Edit Medication' placement='bottom'>
+          <Tooltip
+            title={`Edit ${namespace.charAt(0).toUpperCase() +
+              namespace.slice(1)}`}
+            placement='bottom'
+          >
             <Button
               size='sm'
               onClick={showDetail(row)}
