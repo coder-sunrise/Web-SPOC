@@ -33,11 +33,11 @@ class Service extends PureComponent {
               name='service'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label='Service'
-                    options={[
-                      { value: '1', name: 'Blood Test' },
-                    ]}
+                    code='ctservice'
+                    labelField='displayValue'
+                    valueField='serviceId'
                     {...args}
                   />
                 )

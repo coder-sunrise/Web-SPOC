@@ -705,6 +705,8 @@ const tenantCodes = [
   'ctservice',
   'ctreferrallettertemplate',
   'role',
+  'inventorymedication',
+  'inventoryconsumable',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -734,11 +736,12 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     body,
   })
   const { status: statusCode, data } = response
-  const result = multiplyCodetable(
-    useGeneral ? data[code] : data.data,
-    multiplier,
-  )
+
   if (parseInt(statusCode, 10) === 200) {
+    const result = multiplyCodetable(
+      useGeneral ? data[code] : data.data,
+      multiplier,
+    )
     await db.codetable.put({
       code,
       data: result,

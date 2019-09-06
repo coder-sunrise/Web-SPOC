@@ -156,11 +156,10 @@ class Medication extends React.Component {
                 name='stockDrugFK'
                 render={(args) => {
                   return (
-                    <Select
+                    <CodeSelect
                       label='Name'
-                      options={[
-                        { value: '1', name: 'Biogesic tab 500 mg' },
-                      ]}
+                      code='inventorymedication'
+                      labelField='displayValue'
                       {...args}
                     />
                   )
