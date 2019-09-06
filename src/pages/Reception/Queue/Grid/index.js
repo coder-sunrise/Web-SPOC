@@ -180,12 +180,12 @@ const Grid = ({
         break
       case '5': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons`,
         )
         break
       case '6': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons&action=resume`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume`,
         )
         break
       case '9':
@@ -217,7 +217,7 @@ const Grid = ({
     >
       <CommonTableGrid
         size='sm'
-        height={700}
+        // height={700}
         rows={queueListingData}
         columnExtensions={colExtensions}
         FuncProps={FuncConfig}

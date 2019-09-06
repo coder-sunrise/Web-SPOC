@@ -40,6 +40,10 @@ export default createFormViewModel({
         type: '6',
         certificateDate: moment(),
       },
+      defaultOthers: {
+        type: '5',
+        issueDate: moment(),
+      },
       default: {},
       rows: [],
     },
@@ -81,7 +85,10 @@ export default createFormViewModel({
 
         return {
           ...state,
-          rows: rows.filter((o) => o.uid !== payload.id),
+          rows: rows.map((o) => {
+            if (o.uid === payload.id) o.isDeleted = true
+            return o
+          }),
         }
       },
     },

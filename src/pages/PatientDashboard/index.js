@@ -127,7 +127,7 @@ class PatientDashboard extends PureComponent {
 
     this.props.history.push(
       getAppendUrl({
-        md: 'cons',
+        md2: 'cons',
       }),
     )
   }

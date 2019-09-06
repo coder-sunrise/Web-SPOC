@@ -51,7 +51,7 @@ export default createFormViewModel({
             type: 'initState',
             payload: {
               queueID: Number(query.qid) || 0,
-              showConsultation: Number(query.md === 'cons'),
+              showConsultation: Number(query.md2 === 'cons'),
               version: query.v,
               action: query.action,
             },
@@ -141,7 +141,7 @@ export default createFormViewModel({
           if (
             showConsultation &&
             visitRegistration.visitInfo.visit.clinicalObjectRecordFK &&
-            !consultation.entity
+            (!consultation.entity || version !== patientDashboard.version)
           ) {
             yield put({
               type: 'consultation/query',

@@ -99,7 +99,10 @@ export default createListViewModel({
 
         return {
           ...state,
-          rows: rows.filter((o) => o.uid !== payload.id),
+          rows: rows.map((o) => {
+            if (o.uid === payload.id) o.isDeleted = true
+            return o
+          }),
         }
       },
     },

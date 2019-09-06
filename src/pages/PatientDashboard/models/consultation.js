@@ -90,7 +90,7 @@ export default createFormViewModel({
       *closeConsultationModal ({ payload }, { call, put }) {
         router.push(
           getRemovedUrl([
-            'md',
+            'md2',
             'cmt',
             // 'pid',
             'new',
@@ -137,17 +137,19 @@ export default createFormViewModel({
 
         let oRows = []
         orderTypes.forEach((p) => {
+          const datas =
+            (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
+          console.log('orderTypes', datas)
           oRows = oRows.concat(
-            ((p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || [])
-              .map((o) => {
-                const d = {
-                  uid: getUniqueId(),
-                  type: p.value,
-                  // subject: p.getSubject ? p.getSubject(o) : '',
-                  ...o,
-                }
-                return p.convert ? p.convert(d) : d
-              }),
+            datas.map((o) => {
+              const d = {
+                uid: getUniqueId(),
+                editType: p.value,
+                // subject: p.getSubject ? p.getSubject(o) : '',
+                ...o,
+              }
+              return p.convert ? p.convert(d) : d
+            }),
           )
         })
         console.log(cdRows)

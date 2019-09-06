@@ -1,6 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import moment from 'moment'
+import Yup from '@/utils/yup'
 import {
   Button,
   GridContainer,
@@ -20,12 +21,49 @@ import {
   NumberInput,
   RichEditor,
   TimePicker,
+  ClinicianSelect,
+  withFormikExtend,
+  skeleton,
 } from '@/components'
 
+// @skeleton()
+@withFormikExtend({
+  mapPropsToValues: ({ consultationDocument }) => {
+    return consultationDocument.entity || consultationDocument.defaultOthers
+  },
+  validationSchema: Yup.object().shape({
+    issueDate: Yup.date().required(),
+    issuedByUserFK: Yup.number().required(),
+    title: Yup.string().required(),
+    subject: Yup.string().required(),
+    content: Yup.string().required(),
+  }),
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, consultationDocument, currentType } = props
+    const { rows } = consultationDocument
+
+    dispatch({
+      type: 'consultationDocument/upsertRow',
+      payload: {
+        sequence: rows.length,
+        ...values,
+      },
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'AddConsultationDocument',
+})
 class Others extends PureComponent {
   render () {
-    const { theme, classes, consultationDocument, rowHeight } = this.props
-    console.log('Others')
+    const {
+      footer,
+      handleSubmit,
+      theme,
+      classes,
+      consultationDocument,
+      rowHeight,
+    } = this.props
     return (
       <div>
         <GridContainer>
@@ -41,7 +79,7 @@ class Others extends PureComponent {
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='date'
+              name='issueDate'
               render={(args) => {
                 return <DatePicker label='Date' {...args} />
               }}
@@ -49,9 +87,9 @@ class Others extends PureComponent {
           </GridItem>
           <GridItem xs={6}>
             <FastField
-              name='from'
+              name='issuedByUserFK'
               render={(args) => {
-                return <TextField disabled label='From' {...args} />
+                return <ClinicianSelect disabled label='From' {...args} />
               }}
             />
           </GridItem>
@@ -73,9 +111,19 @@ class Others extends PureComponent {
             <Button link className={classes.editorBtn}>
               Add Diagnosis
             </Button>
-            <RichEditor />
+            <FastField
+              name='content'
+              render={(args) => {
+                return <RichEditor {...args} />
+              }}
+            />
           </GridItem>
         </GridContainer>
+        {footer &&
+          footer({
+            onConfirm: handleSubmit,
+            confirmBtnText: 'Save',
+          })}
       </div>
     )
   }
