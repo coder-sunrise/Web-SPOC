@@ -18,7 +18,7 @@ const Package = ({ dispatch, history, pack }) => {
       { name: 'displayValue', title: 'Name' },
       { name: 'totalPrice', title: 'Selling Price' },
       { name: 'isActive', title: 'Status' },
-      { name: 'Action', title: 'Action' },
+      { name: 'action', title: 'Action' },
     ],
     leftColumns: [],
   })

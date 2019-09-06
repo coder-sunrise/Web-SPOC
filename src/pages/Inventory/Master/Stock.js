@@ -18,7 +18,18 @@ const styles = (theme) => ({
   },
 })
 
-const Stock = ({ classes }) => {
+const Stock = ({
+  classes,
+  vaccinationDetail,
+  medicationDetail,
+  consumableDetail,
+}) => {
+  const objectType = () => {
+    if (vaccinationDetail) return 'vaccinationStock'
+    if (medicationDetail) return 'medicationStock'
+    if (consumableDetail) return 'consumableStock'
+    return ''
+  }
   const [
     tableParas,
     setTableParas,
@@ -50,7 +61,7 @@ const Stock = ({ classes }) => {
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
           <FastField
-            name='currentStock'
+            name={`${objectType()}.length`}
             render={(args) => {
               return (
                 <NumberInput

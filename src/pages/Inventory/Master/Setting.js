@@ -18,7 +18,18 @@ import {
 } from '@/components'
 
 const styles = () => ({})
-const Setting = ({ classes, setFieldValue, showTransfer, ...props }) => {
+const Setting = ({
+  classes,
+  setFieldValue,
+  showTransfer,
+  dispatch,
+  ...props
+}) => {
+  const [
+    search,
+    setSearch,
+  ] = useState('')
+
   const { medicationDetail } = props
   const { ctmedicationprecaution, entity } = medicationDetail
   const entityData = entity || []
@@ -36,10 +47,28 @@ const Setting = ({ classes, setFieldValue, showTransfer, ...props }) => {
     limit: 3,
     setFieldValue,
     fieldName: 'inventoryMedication_MedicationPrecaution',
+    setSearch,
+    search,
   }
 
-  console.log('Setting', props)
+  useEffect(
+    () => {
+      const payload = {
+        displayValue: search,
+        pagesize: 99999,
+      }
 
+      dispatch({
+        type: 'medicPrecautionList',
+        payload,
+      })
+    },
+    [
+      search,
+    ],
+  )
+
+  // console.log('Setting', props)
   return (
     <GridContainer>
       <GridItem xs={6}>
@@ -59,13 +88,7 @@ const Setting = ({ classes, setFieldValue, showTransfer, ...props }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.dosage',
                       })}
-                      code={
-                        showTransfer ? (
-                          'ctMedicationDosage'
-                        ) : (
-                          'ctVaccinationDosage'
-                        )
-                      }
+                      code='ctMedicationDosage'
                       {...args}
                     />
                   )}
@@ -99,13 +122,7 @@ const Setting = ({ classes, setFieldValue, showTransfer, ...props }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.frequency',
                       })}
-                      code={
-                        showTransfer ? (
-                          'ctMedicationFrequency'
-                        ) : (
-                          'ctvaccinationfrequency'
-                        )
-                      }
+                      code='ctMedicationFrequency'
                       {...args}
                     />
                   )}
@@ -182,7 +199,13 @@ const Setting = ({ classes, setFieldValue, showTransfer, ...props }) => {
                       label={formatMessage({
                         id: 'inventory.master.setting.uom',
                       })}
-                      code='ctmedicationunitofmeasurement'
+                      code={
+                        showTransfer ? (
+                          'ctmedicationunitofmeasurement'
+                        ) : (
+                          'ctvaccinationunitofmeasurement'
+                        )
+                      }
                       {...args}
                     />
                   )}

@@ -90,7 +90,7 @@ const Detail = ({
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock />,
+            tabContent: <Stock medicationDetail={medicationDetail} />,
           },
         ]}
       />
@@ -166,10 +166,11 @@ export default compose(
     }),
     handleSubmit: (values, { props, resetForm }) => {
       // console.log('restValues')
-      // console.log('restValues', values)
-
+      console.log('restValues', values)
       const { effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
+      console.log('medicationDetail', medicationDetail)
+
       const payload = {
         ...restValues,
         effectiveStartDate: effectiveDates[0],

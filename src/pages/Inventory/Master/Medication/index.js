@@ -9,7 +9,7 @@ import { status } from '@/utils/codes'
 
 const styles = () => ({})
 
-const Medication = ({ dispatch, history, medication }) => {
+const Medication = ({ dispatch, history, medication, values }) => {
   const [
     tableParas,
     setTableParas,
@@ -51,12 +51,13 @@ const Medication = ({ dispatch, history, medication }) => {
   const filterProps = {
     dispatch,
     history,
+    values,
   }
 
   const gridProps = {
     ...filterProps,
     medication,
-    namespace: medication.namespace,
+    namespace: 'medication',
     list: medication.list || [],
 
     tableParas,

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Remove from '@material-ui/icons/Remove'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import Yup from '@/utils/yup'
 import {
   CardContainer,
   CommonTableGrid,
@@ -32,36 +33,22 @@ const InventoryTypeListing = ({
   vaccination,
   service,
   setFieldValue,
-  commitChanges,
-  onAddedRowsChange,
-  onRowChangesChange,
-  onDeletedRowIdsChange,
-  setRowChange,
-  rowChange,
+  selectedItem,
+  setSelectedItem,
+  setServiceCenter,
   ...props
 }) => {
-  const { medicationPackageItem, servicePackageItem } = props.values
-  console.log('values', medicationPackageItem)
   const {
-    medicationTableParas,
-    medicationColExtensions,
-    medicationList,
-  } = medication
-  const {
-    consumableTableParas,
-    consumableColExtensions,
-    consumableList,
-  } = consumable
-  const {
-    vaccinationTableParas,
-    vaccinationColExtensions,
-    vaccinationList,
-  } = vaccination
+    medicationPackageItem,
+    consumablePackageItem,
+    vaccinationPackageItem,
+    servicePackageItem,
+  } = props.values
+  const { medicationTableParas, medicationColExtensions } = medication
+  const { consumableTableParas, consumableColExtensions } = consumable
+  const { vaccinationTableParas, vaccinationColExtensions } = vaccination
   const { serviceTableParas, serviceColExtensions, serviceList } = service
-  // const [
-  //   rows,
-  //   setRows,
-  // ] = useState([])
+
   const Cell = ({ column, row, ...p }) => {
     if (column.name === 'Action') {
       return (
@@ -85,14 +72,85 @@ const InventoryTypeListing = ({
   }
   const TableCell = (p) => Cell({ ...p, dispatch })
 
-  const clickRow = (row, event) => {
-    // setRows([
-    //   ...rows,
-    //   row,
-    // ])
+  const schema = Yup.object().shape({
+    medicationName: Yup.number().required(),
+    quantity: Yup.number().required(),
+  })
+
+  const onCommitChanges = (type) => ({ rows, deleted }) => {
+    if (deleted) {
+      const deletedSet = new Set(deleted)
+      const changedRows = rows.filter((row) => !deletedSet.has(row.id))
+      setFieldValue(`${type}`, changedRows)
+      return rows
+    }
+    switch (type) {
+      case 'medicationPackageItem': {
+        const vals = medicationPackageItem.concat(rows[0])
+        return setFieldValue(`${type}`, vals)
+      }
+      case 'consumablePackageItem': {
+        const vals = consumablePackageItem.concat(rows[0])
+        return setFieldValue(`${type}`, vals)
+      }
+      case 'vaccinationPackageItem': {
+        const vals = vaccinationPackageItem.concat(rows[0])
+        return setFieldValue(`${type}`, vals)
+      }
+      case 'servicePackageItem': {
+        const vals = servicePackageItem.concat(rows[0])
+        return setFieldValue(`${type}`, vals)
+      }
+      default:
+        return rows
+    }
   }
 
-  const changeEditingRowIds = (editingRowIds) => setRows({ editingRowIds })
+  const onAddedRowsChange = (addedRows) => {
+    if (addedRows.length > 0) {
+      const newRow = addedRows[0]
+
+      const { quantity, unitPrice } = newRow
+
+      const total = () => {
+        if (quantity && unitPrice) {
+          return quantity * unitPrice
+        }
+        return undefined
+      }
+
+      return addedRows.map((row) => ({
+        ...row,
+        unitPrice: selectedItem.sellingPrice
+          ? selectedItem.sellingPrice
+          : selectedItem.unitPrice,
+        subTotal: total(),
+      }))
+    }
+    setSelectedItem({})
+    return addedRows
+  }
+
+  const calTotal = () => {
+    let total = 0
+    medicationPackageItem.forEach((row) => {
+      total += row.subTotal
+    })
+
+    servicePackageItem.forEach((row) => {
+      total += row.subTotal
+    })
+
+    consumablePackageItem.forEach((row) => {
+      total += row.subTotal
+    })
+
+    vaccinationPackageItem.forEach((row) => {
+      total += row.subTotal
+    })
+
+    return total
+  }
 
   return (
     <CardContainer
@@ -106,7 +164,7 @@ const InventoryTypeListing = ({
         <GridItem xs={12}>
           <div className={classes.displayDiv}>
             <h4>
-              <b>Package Price: $404.00</b>
+              <b>Package Price: ${calTotal().toFixed(2)}</b>
             </h4>
           </div>
         </GridItem>
@@ -117,14 +175,14 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...medicationTableParas}
             columnExtensions={medicationColExtensions}
+            schema={schema}
             rows={medicationPackageItem}
             FuncProps={{ pager: false }}
-            ActionProps={{ TableCellComponent: TableCell }}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onDeletedRowIdsChange: onDeletedRowIdsChange,
-              onCommitChanges: commitChanges('medicationPackageItem'),
+              onCommitChanges: onCommitChanges('medicationPackageItem'),
+              onAddedRowsChange: onAddedRowsChange,
             }}
           />
         </GridItem>
@@ -133,12 +191,13 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...consumableTableParas}
             columnExtensions={consumableColExtensions}
-            rows={consumableList}
+            rows={consumablePackageItem}
             FuncProps={{ pager: false }}
-            ActionProps={{ TableCellComponent: TableCell }}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
+              onAddedRowsChange: onAddedRowsChange,
+              onCommitChanges: onCommitChanges('consumablePackageItem'),
             }}
           />
         </GridItem>
@@ -147,16 +206,13 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...vaccinationTableParas}
             columnExtensions={vaccinationColExtensions}
-            rows={vaccinationList}
+            rows={vaccinationPackageItem}
             FuncProps={{ pager: false }}
-            ActionProps={{ TableCellComponent: TableCell }}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onCommitChanges: commitChanges,
+              onCommitChanges: onCommitChanges('vaccinationPackageItem'),
               onAddedRowsChange: onAddedRowsChange,
-              // onCommitChanges: this.commitChanges,
-              // onAddedRowsChange: this.onAddedRowsChange,
             }}
           />
         </GridItem>
@@ -165,19 +221,18 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...serviceTableParas}
             columnExtensions={serviceColExtensions}
-            rows={servicePackageItem ? servicePackageItem : []}
+            rows={servicePackageItem}
             FuncProps={{ pager: false }}
-            onRowClick={clickRow}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              rowChanges: rowChange,
               onAddedRowsChange: onAddedRowsChange,
+              onCommitChanges: onCommitChanges('servicePackageItem'),
+
               // onEditingRowIdsChange: { changeEditingRowIds },
               // onRowChangesChange: { onRowChangesChange },
               // onRowChangesChange: onRowChangesChange,
               // onDeletedRowIdsChange: onDeletedRowIdsChange,
-              onCommitChanges: commitChanges('servicePackageItem'),
               // onAddedRowsChange: onAddedRowsChange,
             }}
           />

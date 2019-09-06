@@ -704,6 +704,9 @@ const tenantCodes = [
   'ctappointmenttype',
   'ctservice',
   'ctreferrallettertemplate',
+  'inventorymedication',
+  'inventoryconsumable',
+  'inventoryvaccination',
   'role',
 ]
 
