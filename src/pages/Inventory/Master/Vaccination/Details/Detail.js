@@ -70,12 +70,13 @@ const Detail = ({
   const handleSelectSdd = (row) => {
     const { setFieldTouched } = props
     const { id, code, name } = row
+    console.log('valueprops', values)
     setToggle(!toggle)
     dispatch({
       type: 'vaccinationDetail/updateState',
       payload: {
         [field]: {
-          ...props.values,
+          ...values,
           sddfk: id,
           sddCode: code,
           sddDescription: name,
@@ -257,6 +258,7 @@ const Detail = ({
                   label={formatMessage({
                     id: 'inventory.master.medication.sddID',
                   })}
+                  disabled
                   {...args}
                 />
               )
@@ -273,11 +275,11 @@ const Detail = ({
             name='sddDescription'
             render={(args) => {
               return (
-                <Select
+                <TextField
                   label={formatMessage({
                     id: 'inventory.master.medication.sddDescription',
                   })}
-                  options={[]}
+                  disabled
                   {...args}
                 />
               )

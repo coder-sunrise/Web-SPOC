@@ -32,6 +32,7 @@ const Detail = ({
   history,
   setFieldValue,
   handleSubmit,
+  codetable,
   ...props
 }) => {
   const [
@@ -42,8 +43,62 @@ const Detail = ({
   const field = packDetail.entity ? 'entity' : 'default'
 
   const { ctServiceCenter } = packDetail
-  console.log('ctServiceCenter', packDetail)
+  console.log('ctServiceCenter', ctServiceCenter)
+  const { ctservice } = codetable
 
+  const result = []
+  const map = new Map()
+  if (ctservice) {
+    // for (const item of ctservice) {
+    //   if (!map.has(item.serviceId) && !map.has(item.serviceCenter)) {
+    //     map.set(item.serviceId, true)
+    //     map.set(item.serviceCenter, true)
+    //     result.push({
+    //       serviceId: item.serviceId,
+    //       code: item.code,
+    //       serviceCenter: item.serviceCenter,
+    //     })
+    //   }
+    // }
+    const unique = ctservice.reduce((uniqueList, service) => {
+      const existed = uniqueList.find(
+        (uniqueService) =>
+          uniqueService.serviceId === service.serviceId &&
+          uniqueService.serviceCenter === service.serviceCenter,
+      )
+      if (existed)
+        return [
+          ...uniqueList,
+        ]
+      return [
+        ...uniqueList,
+        service,
+      ]
+    }, [])
+    console.log({ unique })
+  }
+
+  console.log(result)
+  // const result = Array.from(
+  //   new Set(
+  //     ctservice.map((s) => {
+  //       return {
+  //         serviceId: s.serviceId,
+  //         serviceCenter: s.serviceCenter,
+  //       }
+  //     }),
+  //   ),
+  // ).map((serviceCenter) => {
+  //   console.log('serviceCentertest', serviceCenter)
+  //   // return {
+  //   //   serviceId: ctservice.find((s) => s.serviceCenter === serviceCenter)
+  //   //     .serviceId,
+  //   //   code: ctservice.find((s) => s.serviceCenter === serviceCenter).code,
+  //   //   serviceCenter: serviceCenter,
+  //   // }
+  // })
+
+  console.log('result', result)
   const handleItemOnChange = (e) => {
     const { option, row } = e
     const { sellingPrice } = option
@@ -92,6 +147,7 @@ const Detail = ({
   }
 
   console.log('propsss', props)
+  console.log('codetable', codetable)
   const {
     medicationPackageItem,
     consumablePackageItem,
@@ -247,6 +303,10 @@ const Detail = ({
         columnName: 'serviceCenterServiceFK',
         type: 'select',
         options: list,
+        query: (value) => {
+          console.log({ value })
+          return []
+        },
       },
       {
         columnName: 'unitPrice',
@@ -353,9 +413,10 @@ const Detail = ({
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ pack, packDetail }) => ({
+  connect(({ pack, packDetail, codetable }) => ({
     pack,
     packDetail,
+    codetable,
   })),
   withFormikExtend({
     enableReinitialize: true,

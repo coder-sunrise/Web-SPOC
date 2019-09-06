@@ -30,12 +30,20 @@ const Setting = ({
     setSearch,
   ] = useState('')
 
-  const { medicationDetail } = props
+  const { medicationDetail, vaccinationDetail } = props
+
+  const [
+    list,
+    setList,
+  ] = useState([])
+
   const { ctmedicationprecaution, entity } = medicationDetail
+    ? medicationDetail
+    : vaccinationDetail
   const entityData = entity || []
 
   const settingProps = {
-    items: ctmedicationprecaution,
+    items: ctmedicationprecaution ? list : [],
     addedItems: entityData
       ? entityData.inventoryMedication_MedicationPrecaution
       : [],
@@ -53,22 +61,18 @@ const Setting = ({
 
   useEffect(
     () => {
-      const payload = {
-        displayValue: search,
-        pagesize: 99999,
+      if (ctmedicationprecaution) {
+        const filteredList = ctmedicationprecaution.filter((o) => {
+          return o.value.toLowerCase().indexOf(search) >= 0
+        })
+        setList(filteredList)
       }
-
-      dispatch({
-        type: 'medicPrecautionList',
-        payload,
-      })
     },
     [
       search,
     ],
   )
 
-  // console.log('Setting', props)
   return (
     <GridContainer>
       <GridItem xs={6}>
