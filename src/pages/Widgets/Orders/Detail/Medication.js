@@ -37,24 +37,19 @@ import Yup from '@/utils/yup'
     return v
   },
   validationSchema: Yup.object().shape({
-    // stockDrugFK: Yup.string().required(),
     quantity: Yup.number().required(),
-    // totalAfterItemAdjustment: Yup.number().required(),
-    // totalAfterOverallAdjustment: Yup.number().required(),
-
-    // type: Yup.string().required(),
-    // to: Yup.string().when('type', {
-    //   is: (val) => val !== '2',
-    //   then: Yup.string().required(),
-    // }),
-    // from: Yup.string().required(),
-    // date: Yup.date().required(),
-    // subject: Yup.string().required(),
-    // // 3->MC
-    // days: Yup.number().when('type', {
-    //   is: (val) => val === '3',
-    //   then: Yup.number().required(),
-    // }),
+    dispenseUOMFK: Yup.number().required(),
+    totalPrice: Yup.number().required(),
+    totalAfterAdj: Yup.number().required(),
+    editType: Yup.string(),
+    stockDrugFK: Yup.string().when('editType', {
+      is: true,
+      then: Yup.string().required(),
+    }),
+    drugName: Yup.string().when('editType', {
+      is: (val) => val === '5',
+      then: Yup.string().required(),
+    }),
     corPrescriptionItemPrecaution: Yup.array().of(
       Yup.object().shape({
         prescriptionItemFK: Yup.number().required(),
@@ -94,12 +89,6 @@ class Medication extends React.Component {
     const { entity } = orders
     if (entity && entity.uid !== values.uid) {
       resetForm(entity)
-      // console.log(
-      //   'componentWillReceiveProps',
-      //   orders,
-      //   values,
-      //   this.props.values,
-      // )
     }
   }
 
@@ -149,8 +138,8 @@ class Medication extends React.Component {
       openPrescription,
       footer,
       handleSubmit,
+      setFieldValue,
     } = this.props
-    console.log('Medication', this.props)
     return (
       <div>
         <GridContainer>
@@ -378,6 +367,21 @@ class Medication extends React.Component {
                                       // label='Precaution'
                                       simple
                                       code='ctMedicationPrecaution'
+                                      onChange={(v, option) => {
+                                        // console.log(a, b, c)
+                                        setFieldValue(
+                                          `corPrescriptionItemPrecaution[${i}].precaution`,
+                                          option.name,
+                                        )
+                                        setFieldValue(
+                                          `corPrescriptionItemPrecaution[${i}].precautionCode`,
+                                          option.code,
+                                        )
+                                        setFieldValue(
+                                          `corPrescriptionItemPrecaution[${i}].sequence`,
+                                          i,
+                                        )
+                                      }}
                                       {...args}
                                     />
                                   </div>
@@ -429,7 +433,7 @@ class Medication extends React.Component {
           </GridItem>
           <GridItem xs={2}>
             <FastField
-              name='uom'
+              name='dispenseUOMFK'
               render={(args) => {
                 return (
                   <CodeSelect

@@ -4,9 +4,8 @@ import _ from 'lodash'
 import $ from 'jquery'
 import classnames from 'classnames'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
-import Yup from '@/utils/yup'
 import { widgets } from '@/utils/widgets'
-import { getUniqueId } from '@/utils/utils'
+import { getAppendUrl } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { sendNotification } from '@/utils/realtime'
@@ -62,6 +61,7 @@ import {
   SizeContainer,
   Popconfirm,
   withFormikExtend,
+  skeleton,
 } from '@/components'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 
@@ -89,11 +89,19 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 
 let lasActivedWidget = null
 
+// @skeleton()
 @connect(
-  ({ consultation, global, consultationDocument, patientDashboard }) => ({
+  ({
     consultation,
     global,
     consultationDocument,
+    orders,
+    patientDashboard,
+  }) => ({
+    consultation,
+    global,
+    consultationDocument,
+    orders,
     patientDashboard,
   }),
 )
@@ -782,9 +790,10 @@ class Consultation extends PureComponent {
 
           const { rows: orderRows = [] } = orders
           orderTypes.forEach((p) => {
-            values[p.prop] = orderRows.filter((o) => o.type === p.value)
+            values[p.prop] = (values[p.prop] || [])
+              .concat(orderRows.filter((o) => o.editType === p.value))
           })
-          console.log(values)
+          console.log('saveConsultation', values)
           dispatch({
             type: `consultation/${action}`,
             payload: values,
@@ -835,10 +844,14 @@ class Consultation extends PureComponent {
       payload: consultation.visitID,
     }).then((r) => {
       if (r) {
-        resetForm(r)
         notification.success({
           message: 'Consultation resumed',
         })
+        history.push(
+          getAppendUrl({
+            v: Date.now(),
+          }),
+        )
       }
     })
   }
@@ -879,7 +892,7 @@ class Consultation extends PureComponent {
     } = this.props
     const { currentLayout } = state
     const { entity } = consultation
-    console.log(values)
+    // console.log(values)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)

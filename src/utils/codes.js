@@ -647,7 +647,7 @@ const orderTypes = [
     name: 'Medication',
     value: '1',
     prop: 'corPrescriptionItem',
-    filter: (r) => !r.stockDrugFK,
+    filter: (r) => !!r.stockDrugFK,
   },
   {
     name: 'Vaccination',
@@ -664,7 +664,7 @@ const orderTypes = [
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
-    filter: (r) => !!r.stockDrugFK,
+    filter: (r) => !r.stockDrugFK,
   },
 ]
 // const localCodes = {}

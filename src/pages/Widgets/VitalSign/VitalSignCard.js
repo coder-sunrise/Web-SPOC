@@ -189,7 +189,13 @@ export default ({
           </Popover> */}
           <Popconfirm
             title='Confirm to remove this Vital Sign?'
-            onConfirm={() => arrayHelpers.remove(index)}
+            onConfirm={() => {
+              const { form } = arrayHelpers
+              form.setFieldValue(
+                `corPatientNoteVitalSign[${index}].isDeleted`,
+                true,
+              )
+            }}
           >
             <Button
               style={{ position: 'absolute', bottom: theme.spacing(1) }}

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import Link from 'umi/link'
 import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
@@ -46,15 +47,28 @@ import DraftsIcon from '@material-ui/icons/Drafts'
 import SendIcon from '@material-ui/icons/Send'
 import avatar from '@/assets/img/faces/marc.jpg'
 import { titles, finTypes, gender } from '@/utils/codes'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 // import model from '../models/demographic'
 import Block from './Block'
 
-@connect(({ patientDashboard }) => ({
+@connect(({ patientDashboard, codetable }) => ({
   patientDashboard,
+  codetable,
 }))
 class Banner extends PureComponent {
   state = {}
+
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctdrugallergy',
+      },
+    })
+  }
 
   componentDidMount () {
     const { props, value } = this
@@ -69,6 +83,32 @@ class Banner extends PureComponent {
     //   props.setValues(props.demographic.default)
     // }
     // props.setValues(props.patientDashboard.entity)
+  }
+
+  getAllergyLink () {
+    const { props } = this
+    const { patientDashboard, codetable } = props
+    const { patientInfo } = patientDashboard
+    if (!patientInfo) return null
+    const { patientAllergy = [] } = patientInfo
+    const { ctdrugallergy = [] } = codetable
+    const da = ctdrugallergy.filter((o) =>
+      patientAllergy.find((m) => m.allergyFK === o.id),
+    )
+    // console.log(da, da.length)
+    return (
+      <div>
+        <Link
+          to={getAppendUrl({
+            md: 'pt',
+            cmt: 3,
+            pid: patientInfo.id,
+          })}
+        >
+          {da.length ? da[0].name + `${da.length > 1 ? ' ...' : ''}` : '-'}
+        </Link>
+      </div>
+    )
   }
 
   render () {
@@ -150,7 +190,7 @@ class Banner extends PureComponent {
             />
           </GridItem>
           <GridItem xs={6} md={2}>
-            <Block header='Allergies' body='Penicillin' />
+            <Block header='Allergies' body={this.getAllergyLink()} />
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block header='Medical Problem' body='Asthma' />

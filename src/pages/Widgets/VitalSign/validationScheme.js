@@ -10,7 +10,7 @@ const VitalSignMessage = {
 }
 
 export default Yup.object().shape({
-  patientVitalSign: Yup.array().of(
+  patientVitalSign: Yup.array().compact((v) => v.isDeleted).of(
     Yup.object().shape({
       temperatureC: Yup.number()
         .min(0, VitalSignMessage.temperatureC)
