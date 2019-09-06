@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import Add from '@material-ui/icons/Add'
 import { Divider } from '@material-ui/core'
 import POSummary from './POSummary'
+import Grid from './Grid'
 import {
   CardContainer,
   GridContainer,
@@ -16,37 +18,45 @@ import {
   Button,
 } from '@/components'
 
-@withFormikExtend({ displayName: 'poDetails' })
+@connect(({ purchaseOrder }) => ({
+  purchaseOrder,
+}))
+@withFormikExtend({
+  displayName: 'purchaseOrder',
+  mapPropsToValues: ({ purchaseOrder }) => {
+    return purchaseOrder.entity || purchaseOrder.default
+  },
+})
 class index extends PureComponent {
   constructor (props) {
     super(props)
 
     const { type } = props
 
-    this.tableParas = {
-      columns: [
-        { name: 'type', title: 'Type' },
-        { name: 'code', title: 'Code' },
-        { name: 'name', title: 'Name' },
-        { name: 'uom', title: 'UOM' },
-        { name: 'orderQty', title: 'Order Qty' },
-        { name: 'bonusQty', title: 'Bonus Qty' },
-        { name: 'totalReceived', title: 'Total Received' },
-        { name: 'totalPrice', title: 'Total Price' },
-      ],
-      columnExtensions: [
-        {
-          columnName: 'totalReceived',
-          type: 'number',
-          currency: true,
-        },
-        {
-          columnName: 'totalPrice',
-          type: 'number',
-          currency: true,
-        },
-      ],
-    }
+    // this.tableParas = {
+    //   columns: [
+    //     { name: 'type', title: 'Type' },
+    //     { name: 'code', title: 'Code' },
+    //     { name: 'name', title: 'Name' },
+    //     { name: 'uom', title: 'UOM' },
+    //     { name: 'orderQty', title: 'Order Qty' },
+    //     { name: 'bonusQty', title: 'Bonus Qty' },
+    //     { name: 'totalReceived', title: 'Total Received' },
+    //     { name: 'totalPrice', title: 'Total Price' },
+    //   ],
+    //   columnExtensions: [
+    //     {
+    //       columnName: 'totalReceived',
+    //       type: 'number',
+    //       currency: true,
+    //     },
+    //     {
+    //       columnName: 'totalPrice',
+    //       type: 'number',
+    //       currency: true,
+    //     },
+    //   ],
+    // }
 
     // this.commitChanges = props.setArrayValue
     // this.onAddedRowsChange = (addedRows) => {
@@ -60,9 +70,14 @@ class index extends PureComponent {
     // }
   }
 
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'purchaseOrder/query',
+    })
+  }
+
   render () {
-    const { classes } = this.props
-    const { isEditable } = this.props
+    const { classes, isEditable, purchaseOrder } = this.props
     return (
       <div>
         <GridContainer gutter={0}>
@@ -270,7 +285,7 @@ class index extends PureComponent {
           </GridItem>
         </GridContainer>
 
-        <EditableTableGrid
+        {/* <EditableTableGrid
           //rows={rows}
           //schema={schema}
           FuncProps={{
@@ -297,9 +312,29 @@ class index extends PureComponent {
             //onAddedRowsChange: this.onAddedRowsChange,
           }}
           {...this.tableParas}
-        />
+        /> */}
+
+        <Grid />
+
+        <Button
+          // onClick={this.toggleAddPaymaneModal}
+          hideIfNoEditRights
+          color='info'
+          link
+        >
+          <Add />
+          {formatMessage({
+            id: 'inventory.pr.detail.pod.addItem',
+          })}
+        </Button>
         <POSummary />
-        <GridContainer direction='row' justify='flex-end' alignItems='flex-end'>
+
+        <GridContainer
+          direction='row'
+          justify='flex-end'
+          alignItems='flex-end'
+          style={{ marginTop: 20 }}
+        >
           <Button color='danger'>
             {formatMessage({
               id: 'inventory.pr.detail.pod.cancelpo',

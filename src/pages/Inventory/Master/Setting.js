@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
@@ -14,29 +14,20 @@ import {
   Select,
   TextField,
   Transfer,
+  CodeSelect,
 } from '@/components'
 
 const styles = () => ({})
-const Setting = ({ classes, setFieldValue, showTransfer }) => {
+const Setting = ({ classes, setFieldValue, showTransfer, ...props }) => {
+  const { medicationDetail } = props
+  const { ctmedicationprecaution, entity } = medicationDetail
+  const entityData = entity || []
+
   const settingProps = {
-    items: [
-      {
-        value: 'Anti-Inflmation',
-        id: 1,
-      },
-      {
-        value: 'Anti-Swelling',
-        id: 2,
-      },
-      {
-        value: 'Apply as instructed',
-        id: 3,
-      },
-      {
-        value: 'Apply on the ear only',
-        id: 4,
-      },
-    ],
+    items: ctmedicationprecaution,
+    addedItems: entityData
+      ? entityData.inventoryMedication_MedicationPrecaution
+      : [],
     classes,
     label: 'Precaution',
     limitTitle: formatMessage({
@@ -44,8 +35,11 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
     }),
     limit: 3,
     setFieldValue,
-    fieldName: 'stockDrugDrugPrecaution',
+    fieldName: 'inventoryMedication_MedicationPrecaution',
   }
+
+  console.log('Setting', props)
+
   return (
     <GridContainer>
       <GridItem xs={6}>
@@ -59,13 +53,19 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
             <GridContainer>
               <GridItem xs={6}>
                 <FastField
-                  name='prescribeDrugDosageFk'
+                  name='prescribingDosageFK'
                   render={(args) => (
-                    <Select
+                    <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.setting.dosage',
                       })}
-                      options={[]}
+                      code={
+                        showTransfer ? (
+                          'ctMedicationDosage'
+                        ) : (
+                          'ctVaccinationDosage'
+                        )
+                      }
                       {...args}
                     />
                   )}
@@ -73,13 +73,19 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='prescribeUOMFk'
+                  name='prescribingUOMFK'
                   render={(args) => (
-                    <Select
+                    <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.setting.uom',
                       })}
-                      options={[]}
+                      code={
+                        showTransfer ? (
+                          'ctmedicationunitofmeasurement'
+                        ) : (
+                          'ctvaccinationunitofmeasurement'
+                        )
+                      }
                       {...args}
                     />
                   )}
@@ -87,13 +93,19 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
               </GridItem>
               <GridItem xs={12}>
                 <FastField
-                  name='prescribeDrugFrequencyFk'
+                  name='medicationFrequencyFK'
                   render={(args) => (
-                    <Select
+                    <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.setting.frequency',
                       })}
-                      options={[]}
+                      code={
+                        showTransfer ? (
+                          'ctMedicationFrequency'
+                        ) : (
+                          'ctvaccinationfrequency'
+                        )
+                      }
                       {...args}
                     />
                   )}
@@ -101,7 +113,7 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
               </GridItem>
               <GridItem xs={12}>
                 <FastField
-                  name='prescribeDuration'
+                  name='duration'
                   render={(args) => {
                     return (
                       <TextField
@@ -119,7 +131,7 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
         </Card>
       </GridItem>
       <GridItem xs={6}>
-        <Card>
+        <Card style={{ height: 250 }}>
           <CardHeader color='primary' text>
             <CardText color='primary'>
               <h5 className={classes.cardTitle}>Dispensing</h5>
@@ -129,13 +141,19 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
             <GridContainer>
               <GridItem xs={12}>
                 <FastField
-                  name='dispenseDrugConsumptionMethodFk'
+                  name='medicationUsageFK'
                   render={(args) => (
-                    <Select
+                    <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.setting.usage',
                       })}
-                      options={[]}
+                      code={
+                        showTransfer ? (
+                          'ctMedicationUsage'
+                        ) : (
+                          'ctvaccinationusage'
+                        )
+                      }
                       {...args}
                     />
                   )}
@@ -143,7 +161,7 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='dispenseQuantity'
+                  name='dispensingQuantity'
                   render={(args) => {
                     return (
                       <TextField
@@ -158,13 +176,13 @@ const Setting = ({ classes, setFieldValue, showTransfer }) => {
               </GridItem>
               <GridItem xs={6}>
                 <FastField
-                  name='dispenseUOMFk'
+                  name='dispensingUOMFK'
                   render={(args) => (
-                    <Select
+                    <CodeSelect
                       label={formatMessage({
                         id: 'inventory.master.setting.uom',
                       })}
-                      options={[]}
+                      code='ctmedicationunitofmeasurement'
                       {...args}
                     />
                   )}

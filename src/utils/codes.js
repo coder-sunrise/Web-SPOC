@@ -702,6 +702,7 @@ const tenantCodes = [
   'doctorProfile',
   'clinicianprofile',
   'ctappointmenttype',
+  'ctservice',
   'ctreferrallettertemplate',
   'role',
 ]

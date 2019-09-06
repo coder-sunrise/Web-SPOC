@@ -19,6 +19,23 @@ export async function queryList (url, params, convertExcludeFields) {
   })
 }
 
+export async function queryListTemp (url, params, convertExcludeFields) {
+  // //console.log('querylist')
+  // console.log(params)
+  const parsedParams = convertToQuery(
+    {
+      pagesize: 10,
+      current: 1,
+      ...params,
+    },
+    convertExcludeFields,
+  )
+
+  return request(url, {
+    method: 'GET',
+  })
+}
+
 export async function remove (url, params) {
   if (params.id) {
     return request(`${url}/${params.id}`, {

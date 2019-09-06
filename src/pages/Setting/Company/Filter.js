@@ -19,9 +19,21 @@ import {
   displayName: 'CompanyFilter',
 })
 class Filter extends PureComponent {
+  state = {
+    isCopayer: undefined,
+  }
+
+  checkIsCopayer (name) {
+    this.setState({
+      isCopayer: name === 'copayer',
+    })
+  }
+
   render () {
     const { classes, route } = this.props
     const { name } = route
+    this.checkIsCopayer(name)
+    const { isCopayer } = this.state
 
     return (
       <div className={classes.filterBar}>
@@ -33,11 +45,7 @@ class Filter extends PureComponent {
                 return (
                   <TextField
                     label={
-                      name === 'copayer' ? (
-                        'Co-Payer Code/Name'
-                      ) : (
-                        'Supplier Code/Name'
-                      )
+                      isCopayer ? 'Co-Payer Code/Name' : 'Supplier Code/Name'
                     }
                     {...args}
                   />
@@ -46,8 +54,8 @@ class Filter extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={3}>
-            {name === 'copayer' ? (
+          <GridItem xs={isCopayer ? 6 : 0} md={isCopayer ? 3 : 0}>
+            {isCopayer ? (
               <FastField
                 name='coPayerTypeFK'
                 render={(args) => {

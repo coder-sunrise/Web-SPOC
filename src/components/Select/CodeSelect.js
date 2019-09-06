@@ -48,7 +48,7 @@ class CodeSelect extends React.PureComponent {
 
   render () {
     const { codetable, code } = this.props
-
+    console.log({ props: this.props })
     const options =
       code !== undefined ? codetable[code.toLowerCase()] : this.state.options
     // console.log(options, code)

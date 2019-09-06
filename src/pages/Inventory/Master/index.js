@@ -18,7 +18,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
   }
   return (
     <NavPills
-      color='info'
+      color='primary'
       onChange={(event, active) => {
         history.push(
           getAppendUrl({
@@ -52,7 +52,8 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ inventoryMaster }) => ({
+  connect(({ inventoryMaster, pack }) => ({
     inventoryMaster,
+    pack,
   })),
 )(InventoryMaster)
