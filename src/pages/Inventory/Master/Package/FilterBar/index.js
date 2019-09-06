@@ -33,7 +33,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
       <GridContainer>
         <GridItem xs={6} md={3}>
           <FastField
-            name='codeDisplayValue'
+            name='code'
             render={(args) => {
               return (
                 <TextField
@@ -43,6 +43,14 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   {...args}
                 />
               )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={6} md={3}>
+          <FastField
+            name='displayValue'
+            render={(args) => {
+              return <TextField label='Package Name' {...args} />
             }}
           />
         </GridItem>
@@ -69,19 +77,13 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
               variant='contained'
               color='primary'
               onClick={() => {
-                const { isActive, codeDisplayValue } = values
-                console.log('values', values)
+                const { code, displayValue, isActive } = values
                 dispatch({
                   type: 'pack/query',
                   payload: {
+                    code,
+                    displayValue,
                     isActive,
-                    group: [
-                      {
-                        code: codeDisplayValue,
-                        displayValue: codeDisplayValue,
-                        combineCondition: 'or',
-                      },
-                    ],
                   },
                 })
               }}

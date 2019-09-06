@@ -22,7 +22,7 @@ export default createFormViewModel({
         ],
       },
     },
-    subscriptions: ({ dispatch, history }) => {
+    subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
         const { query = {} } = loct
         if (query.uid) {
@@ -77,16 +77,9 @@ export default createFormViewModel({
         }
       },
 
-      querySdd (st, { payload }) {
-        console.log('reducers', st)
-        return {
-          ...st,
-        }
-      },
-
       getMedicPrecautionList (state, { payload }) {
         const { data } = payload
-        console.log('payload', payload)
+        // console.log('payload', payload)
         return {
           ...state,
           ctmedicationprecaution: data.map((x) => {

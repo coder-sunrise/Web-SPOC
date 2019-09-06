@@ -2,7 +2,7 @@ import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
 import { getUniqueGUID } from '@/utils/cdrss'
-
+import { queryServiceCenter } from '../services'
 const { upsert } = service
 
 export default createFormViewModel({
@@ -47,10 +47,24 @@ export default createFormViewModel({
           })
         }
       })
+      dispatch({
+        type: 'serviceCenterList',
+        payload: {
+          pagesize: 99999,
+        },
+      })
     },
     effects: {
       *submit ({ payload }, { call }) {
         return yield call(upsert, payload)
+      },
+
+      *serviceCenterList ({ payload }, { call, put }) {
+        const response = yield call(queryServiceCenter, payload)
+        yield put({
+          type: 'getServiceCenterList',
+          payload: response.status == '200' ? response.data : {},
+        })
       },
     },
     reducers: {
@@ -65,6 +79,20 @@ export default createFormViewModel({
               data.effectiveEndDate,
             ],
           },
+        }
+      },
+
+      getServiceCenterList (state, { payload }) {
+        const { data } = payload
+        console.log('payload', payload)
+        return {
+          ...state,
+          ctServiceCenter: data.map((x) => {
+            return {
+              value: x.id,
+              name: x.name,
+            }
+          }),
         }
       },
     },

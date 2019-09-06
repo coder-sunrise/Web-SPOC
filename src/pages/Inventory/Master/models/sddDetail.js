@@ -18,7 +18,7 @@ export default createListViewModel({
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload
-
+        console.log('payload', payload)
         return {
           ...st,
           list: data.data.map((o) => {
