@@ -43,7 +43,7 @@ const styles = () => ({
   clinicianProfiles: codetable.clinicianprofile,
   rooms: codetable.ctroom,
 }))
-class AppointmentDataGrid extends React.PureComponent {
+class AppointmentDataGrid extends React.Component {
   constructor (props) {
     super(props)
     const { appointmentDate } = this.props
@@ -82,7 +82,6 @@ class AppointmentDataGrid extends React.PureComponent {
         return {
           ...column,
           render: (row) => {
-            console.log({ row })
             const { clinicianFK } = row
 
             const { clinicianProfiles = [] } = this.props
@@ -128,6 +127,10 @@ class AppointmentDataGrid extends React.PureComponent {
       }
       return { ...column }
     })
+
+    this.columnExtensions = [
+      ...columnExtensions,
+    ]
     this.state = {
       columnExtensions,
     }
@@ -159,10 +162,11 @@ class AppointmentDataGrid extends React.PureComponent {
       <div>
         <EditableTableGrid
           rows={data}
-          schema={validationSchema}
-          leftColumns={[
-            'conflict',
-          ]}
+          // leftColumns={[
+          //   'conflict',
+          // ]}
+          columns={AppointmentDataColumn}
+          columnExtensions={this.columnExtensions}
           FuncProps={{
             pager: false,
             sort: true,
@@ -176,8 +180,7 @@ class AppointmentDataGrid extends React.PureComponent {
             showAddCommand: true,
             onCommitChanges: handleCommitChanges,
           }}
-          columns={AppointmentDataColumn}
-          columnExtensions={this.state.columnExtensions}
+          schema={validationSchema}
         />
       </div>
     )

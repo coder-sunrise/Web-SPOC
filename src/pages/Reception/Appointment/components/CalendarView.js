@@ -74,11 +74,18 @@ class CalendarView extends React.PureComponent {
   }
 
   _eventColors = (event) => {
-    const appointmentTypeFK = getFirstAppointmentType(event)
-    // TODO: get appointment type color here
-    const appointmentType =
-      appointmentTypeFK !== null &&
-      this.props.appointmentTypes.find((item) => item.id === appointmentTypeFK)
+    const { calendarView, appointmentTypes } = this.props
+    let appointmentType
+    if (calendarView !== BigCalendar.Views.MONTH) {
+      appointmentType = appointmentTypes.find(
+        (item) => item.id === event.appointmentTypeFK,
+      )
+    } else {
+      const appointmentTypeFK = getFirstAppointmentType(event)
+      appointmentType =
+        appointmentTypeFK !== null &&
+        appointmentTypes.find((item) => item.id === appointmentTypeFK)
+    }
 
     return {
       style: {
@@ -109,12 +116,22 @@ class CalendarView extends React.PureComponent {
   }
 
   _jumpToDate = (date) => {
-    this.props.dispatch({ type: 'calendar/navigateCalendar', date })
+    this.props.dispatch({
+      type: 'calendar/navigateCalendar',
+      payload: { date },
+    })
     // this.props.dispatch({ type: 'calendar/setCurrentViewDate', date })
   }
 
   _onViewChange = (view) => {
-    this.props.dispatch({ type: 'calendar/setCalendarView', view })
+    this.props.dispatch({
+      type: 'calendar/navigateCalendar',
+      payload: { view },
+    })
+    this.props.dispatch({
+      type: 'calendar/setCalendarView',
+      payload: view,
+    })
   }
 
   _moveEvent = ({ event, start, end, resourceId }) => {
@@ -194,15 +211,31 @@ class CalendarView extends React.PureComponent {
       resources,
       displayDate,
       calendarView,
+      filter,
     } = this.props
-
+    console.log({ filter, resources })
     const flattenedList =
       calendarView === BigCalendar.Views.MONTH
-        ? calendarEvents.map((appointment) => ({
-            ...appointment,
-            start: appointment.appointmentDate,
-            end: appointment.appointmentDate,
-          }))
+        ? calendarEvents.reduce((events, appointment) => {
+            const { patientName } = appointment
+
+            if (
+              filter.search !== '' &&
+              patientName.toLowerCase().indexOf(filter.search.toLowerCase()) < 0
+            )
+              return [
+                ...events,
+              ]
+
+            return [
+              ...events,
+              {
+                ...appointment,
+                start: appointment.appointmentDate,
+                end: appointment.appointmentDate,
+              },
+            ]
+          }, [])
         : calendarEvents.reduce((events, appointment) => {
             const {
               appointmentDate,
@@ -211,7 +244,7 @@ class CalendarView extends React.PureComponent {
               isEnableRecurrence,
               appointment_Resources: apptResources,
             } = appointment
-            // const appointmentDate = moment(appointmentDate).format(serverDateFormat)
+
             const apptEvents = apptResources.map((item) => ({
               ...item,
               resourceId: item.clinicianFK,

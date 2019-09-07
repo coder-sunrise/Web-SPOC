@@ -18,10 +18,14 @@ class SelectEditor extends PureComponent {
   }
 
   constructor (props) {
-    // console.log('constructor', props)
+    console.log('constructor', props)
     super(props)
     this.myRef = React.createRef()
   }
+
+  // componentWillMount () {
+  //   console.log({ 't-1': window.$tempGridRow })
+  // }
 
   componentDidMount () {
     const { columnExtensions, row, column: { name: columnName } } = this.props
@@ -41,7 +45,7 @@ class SelectEditor extends PureComponent {
     //   window.$tempGridRow,
     //   gridId,
     // )
-    console.log({ cfg, latestRow, columnName, props: this.props })
+    // console.log({ cfg, latestRow, columnName, props: this.props })
     this.setState({
       error: updateCellValue(
         this.props,
@@ -49,6 +53,51 @@ class SelectEditor extends PureComponent {
         latestRow[columnName],
       ),
     })
+  }
+
+  // componentWillUnmount () {
+  //   console.log('unmount')
+  // }
+
+  _onChange = (val, option) => {
+    const {
+      columnExtensions,
+      column: { name: columnName },
+      value,
+      onValueChange,
+      row,
+    } = this.props
+    const cfg =
+      columnExtensions.find(
+        ({ columnName: currentColumnName }) => currentColumnName === columnName,
+      ) || {}
+    const {
+      type,
+      code,
+      validationSchema,
+      isDisabled = () => false,
+      onChange,
+      gridId,
+      ...restProps
+    } = cfg
+
+    const error = updateCellValue(this.props, this.myRef.current, val)
+    this.setState({
+      error,
+    })
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][row.id] || {}
+      : row
+    if (!error) {
+      if (onChange)
+        onChange({
+          val,
+          option,
+          row: latestRow,
+          onValueChange,
+          error,
+        })
+    }
   }
 
   render () {
@@ -76,9 +125,8 @@ class SelectEditor extends PureComponent {
       ? window.$tempGridRow[gridId][row.id] || {}
       : row
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
-
     const _onChange = (val, option) => {
-      // console.log(val, option)
+      console.log({ val, option })
       const error = updateCellValue(this.props, this.myRef.current, val)
       this.setState({
         error,
@@ -102,7 +150,7 @@ class SelectEditor extends PureComponent {
       value: latestRow[columnName],
       disabled: isDisabled(latestRow),
       ...restProps,
-      onChange: _onChange,
+      onChange: this._onChange,
     }
     // console.log(columnName)
     if (columnName) {
@@ -167,6 +215,7 @@ class SelectTypeProvider extends React.Component {
   constructor (props) {
     // console.log('SelectTypeProvider constructor')
     super(props)
+
     const { columnExtensions } = this.props
     const colFor = columnExtensions.filter(
       (o) =>
@@ -217,41 +266,11 @@ class SelectTypeProvider extends React.Component {
     // console.log(nextProps, this.props)
     // console.log(nextState, this.state)
 
-    // check if new column extensions has new options
-    const { columnExtensions: nextColExt } = nextProps
-    const { columnExtensions: thisColExt } = this.props
-    const nextColFor = nextColExt.filter(
-      (o) =>
-        [
-          'select',
-          'codeSelect',
-        ].indexOf(o.type) >= 0,
-    )
-    const thisColFor = thisColExt.filter(
-      (o) =>
-        [
-          'select',
-          'codeSelect',
-        ].indexOf(o.type) >= 0,
-    )
-
-    let optionsUpdate = false
-    nextColFor.forEach((column) => {
-      const oldColumn = thisColFor.find(
-        (col) => col.columnName === column.columnName,
-      )
-      if (
-        oldColumn &&
-        Object.keys(column).length !== Object.keys(oldColumn).length
-      )
-        optionsUpdate = true
-    })
-
     return (
-      optionsUpdate ||
+      // optionsUpdate ||
       this.props.editingRowIds !== nextProps.editingRowIds ||
       Object.keys(this.state).length !== Object.keys(nextState).length ||
-      // this.state.codeLoaded !== nextState.codeLoaded ||
+      this.state.codeLoaded !== nextState.codeLoaded ||
       this.props.commitCount !== nextProps.commitCount
     )
   }

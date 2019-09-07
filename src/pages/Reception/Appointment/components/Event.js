@@ -13,6 +13,7 @@ const style = (theme) => ({
     display: 'block',
   },
   baseContainer: {
+    height: '100%',
     minHeight: '1em',
     cursor: 'pointer',
   },
@@ -47,7 +48,7 @@ const style = (theme) => ({
   },
   icons: {
     float: 'right',
-    width: '.8rem',
+    // width: '.8rem',
     height: '.8rem',
   },
 })
@@ -112,11 +113,11 @@ class Event extends PureComponent {
       >
         <div className={classes.title}>
           <span>{title ? title.toUpperCase() : ''}</span>
-          <div className={classes.icons}>
+          {/* <div className={classes.icons}>
             {hasConflict && <ErrorOutline />}
             {isEnableRecurrence && <Cached />}
             {appointmentStatusFk === '2' && <Draft />}
-          </div>
+          </div> */}
         </div>
         <span className={classes.blockDiv}>
           {subtitle ? subtitle.toUpperCase() : ''}

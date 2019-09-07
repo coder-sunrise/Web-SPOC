@@ -103,18 +103,20 @@ export default createListViewModel({
           } = formikValues
 
           const isEdit = formikValues.id !== undefined
-          const isRecurrenceChanged =
+          let isRecurrenceChanged =
             formikValues.isEnableRecurrence &&
             compareDto(
               recurrenceDto,
               calendarState.currentViewAppointment.recurrenceDto || {},
             )
-          // const sortedDataGrid = [
-          //   ...datagrid,
-          // ].sort(sortDataGrid)
-          const appointmentResources = datagrid.map(
-            mapDatagridToAppointmentResources(isRecurrenceChanged),
-          )
+
+          const appointmentResources = datagrid
+            .map(mapDatagridToAppointmentResources(isRecurrenceChanged))
+            .sort(sortDataGrid)
+            .map((item, index) => ({
+              ...item,
+              sortOrder: index,
+            }))
 
           const currentAppointment = {
             ...formikCurrentAppointment,
@@ -122,15 +124,11 @@ export default createListViewModel({
               calendarState.isEditedAsSingleAppointment,
             appointmentStatusFk: newAppointmentStatusFK,
             appointments_Resources: appointmentResources,
-
-            // appointments_Resources: appointmentResources.map((item, index) => ({
-            //   ...item,
-            //   sortOrder: item.sortOrder === undefined ? index : item.sortOrder,
-            // })),
           }
 
           const shouldGenerateRecurrence =
             !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
+
           let appointments = []
 
           if (shouldGenerateRecurrence) {
@@ -189,6 +187,19 @@ export default createListViewModel({
             )
           }
 
+          // const cancelRecurrence =
+          //   formikValues.isEnableRecurrence === false &&
+          //   calendarState.currentViewAppointment.isEnableRecurrence === true
+          // if (cancelRecurrence) {
+          //   isRecurrenceChanged = true
+          //   appointments = appointments.map(
+          //     (appt) =>
+          //       appt.id === currentAppointment.id
+          //         ? { ...appt }
+          //         : { ...appt, isDeleted: true },
+          //   )
+          // }
+
           const recurrence = formikValues.isEnableRecurrence
             ? filterRecurrenceDto(recurrenceDto)
             : null
@@ -212,7 +223,6 @@ export default createListViewModel({
                 recurrenceDto: recurrence,
               },
             }
-            console.log({ savePayload })
           }
 
           return yield put({
@@ -228,22 +238,22 @@ export default createListViewModel({
         const result = yield call(service.validate, payload)
         console.log({ result })
       },
-      *refresh (_, { select, put }) {
-        const calendarState = yield select((state) => state.calendar)
-        const { date, calendarView } = calendarState
-        let start
-        let end
-        if (calendarView === BigCalendar.Views.MONTH) {
-          start = moment(date).startOf('month').format(serverDateFormat)
-          end = moment(date).endOf('month').format(serverDateFormat)
-        }
+      *refresh (_, { put }) {
+        // const calendarState = yield select((state) => state.calendar)
+        // const { date, calendarView } = calendarState
+        // let start
+        // let end
+        // if (calendarView === BigCalendar.Views.MONTH) {
+        //   start = moment(date).startOf('month').format(serverDateFormat)
+        //   end = moment(date).endOf('month').format(serverDateFormat)
+        // }
 
-        const payload = {
-          combineCondition: 'and',
-          lgt_appointmentDate: start,
-          lst_appointmentDate: end,
-        }
-        yield put({ type: 'getCalendarList', payload })
+        // const payload = {
+        //   combineCondition: 'and',
+        //   lgt_appointmentDate: start,
+        //   lst_appointmentDate: end,
+        // }
+        yield put({ type: 'navigateCalendar', payload: {} })
       },
       *getAppointmentDetails ({ payload }, { call, put }) {
         const result = yield call(service.query, payload)
@@ -318,39 +328,60 @@ export default createListViewModel({
         }
         return false
       },
-      *navigateCalendar ({ date }, { select, call, put }) {
+      *navigateCalendar ({ payload }, { select, call, put }) {
         const calendarState = yield select((state) => state.calendar)
+        const { date, view } = payload
+        const targetDate =
+          date !== undefined ? date : calendarState.currentViewDate
+        const targetView =
+          view !== undefined ? view : calendarState.calendarView
         yield put({
           type: 'setCurrentViewDate',
-          date,
+          payload: targetDate,
         })
         let start
         let end
-        if (calendarState.calendarView === BigCalendar.Views.MONTH) {
-          start = moment(date).startOf('month').format(serverDateFormat)
-          end = moment(date).endOf('month').format(serverDateFormat)
+        let isDayView = false
+
+        if (targetView === BigCalendar.Views.MONTH) {
+          start = moment(targetDate).startOf('month').format(serverDateFormat)
+          end = moment(targetDate).endOf('month').format(serverDateFormat)
+        }
+        if (targetView === BigCalendar.Views.WEEK) {
+          start = moment(targetDate).startOf('week').format(serverDateFormat)
+          end = moment(targetDate).endOf('week').format(serverDateFormat)
+        }
+        if (targetView === BigCalendar.Views.DAY) {
+          start = moment(targetDate).startOf('day').format(serverDateFormat)
+          end = moment(targetDate).endOf('day').format(serverDateFormat)
+          isDayView = true
         }
 
-        const payload = {
-          combineCondition: 'and',
-          lgt_appointmentDate: start,
-          lst_appointmentDate: end,
-        }
-        yield put({ type: 'getCalendarList', payload })
+        const getCalendarListPayload = isDayView
+          ? {
+              eql_appointmentDate: start,
+            }
+          : {
+              combineCondition: 'and',
+              lgteql_appointmentDate: start,
+              lsteql_appointmentDate: end,
+            }
+
+        yield put({ type: 'getCalendarList', payload: getCalendarListPayload })
       },
     },
     reducers: {
       setEditType (state, { payload }) {
         return { ...state, isEditedAsSingleAppointment: payload }
       },
-      setCurrentViewDate (state, { date }) {
-        return { ...state, currentViewDate: date }
+      setCurrentViewDate (state, { payload }) {
+        return { ...state, currentViewDate: payload }
       },
       setViewAppointment (state, { data }) {
         return { ...state, currentViewAppointment: { ...data } }
       },
-      setCalendarView (state, { view }) {
-        return { ...state, calendarView: view }
+      setCalendarView (state, { payload }) {
+        return { ...state, calendarView: payload }
       },
       moveEvent (state, { updatedEvent, id, _appointmentID }) {
         const { calendarEvents } = state

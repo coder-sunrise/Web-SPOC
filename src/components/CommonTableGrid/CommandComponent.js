@@ -23,6 +23,7 @@ const EditButton = ({ onExecute, editingRowIds }) => (
           },
         })
       }
+      console.log({ onExecute })
       onExecute(e)
     }}
     justIcon

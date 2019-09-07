@@ -13,6 +13,7 @@ import {
   GridItem,
   SizeContainer,
   OutlinedTextField,
+  withFormikExtend,
 } from '@/components'
 // medisys components
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
@@ -39,7 +40,8 @@ import styles from './style'
   appointmentStatuses: codetable.ltappointmentstatus,
   clinicianProfiles: codetable.clinicianprofile,
 }))
-@withFormik({
+@withFormikExtend({
+  displayName: 'AppointmentForm',
   enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,

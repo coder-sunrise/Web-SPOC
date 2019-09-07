@@ -58,7 +58,8 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
 
 @connect(({ calendar, codetable }) => ({
   calendar,
-  doctorProfiles: codetable.doctorprofile || [],
+  // doctorProfiles: codetable.doctorprofile || [],
+  clinicianProfiles: codetable.clinicianprofile || [],
 }))
 class Appointment extends React.PureComponent {
   state = {
@@ -71,13 +72,9 @@ class Appointment extends React.PureComponent {
     // calendarEvents: dndEvents,
     selectedSlot: {},
     filter: {
-      searchQuery: '',
-      appointmentType: [
-        'all',
-      ],
-      doctors: [
-        'all',
-      ],
+      search: '',
+      filterByApptType: [],
+      filterByDoctor: [],
     },
     isDragging: false,
     selectedAppointmentFK: -1,
@@ -96,7 +93,7 @@ class Appointment extends React.PureComponent {
     })
     this.props.dispatch({
       type: 'calendar/setCurrentViewDate',
-      date: moment().toDate(),
+      payload: moment().toDate(),
     })
   }
 
@@ -158,6 +155,7 @@ class Appointment extends React.PureComponent {
               ? selectedEvent.id
               : selectedEvent.appointmentFK,
             isEditedAsSingleAppointment: false,
+            alwaysSingle: true,
           },
         })
         .then((response) => {
@@ -247,15 +245,15 @@ class Appointment extends React.PureComponent {
 
   onFilterUpdate = (filter) => {
     const { filterByDoctor } = filter
-    const { doctorProfiles } = this.props
-    const newResources = doctorProfiles.reduce(
+    const { clinicianProfiles } = this.props
+    const newResources = clinicianProfiles.reduce(
       (resources, doctor) =>
         filterByDoctor.includes(doctor.id)
           ? [
               ...resources,
               {
                 clinicianFK: doctor.id,
-                doctorName: doctor.clinicianProfile.name,
+                doctorName: doctor.name,
               },
             ]
           : [
@@ -263,7 +261,10 @@ class Appointment extends React.PureComponent {
             ],
       [],
     )
-    this.setState({ resources: newResources.length > 0 ? newResources : null })
+    this.setState((preState) => ({
+      filter: { ...preState.filter, ...filter },
+      resources: newResources.length > 0 ? newResources : null,
+    }))
     // this.setState({
     //   filter: { ...newFilter },
     // })
@@ -418,6 +419,7 @@ class Appointment extends React.PureComponent {
         <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
           <CalendarView
             resources={resources}
+            filter={filter}
             handleSelectSlot={this.onSelectSlot}
             handleSelectEvent={this.onSelectEvent}
             // handleDoubleClick={this.onSelectEvent}
@@ -435,6 +437,7 @@ class Appointment extends React.PureComponent {
           showFooter={false}
           maxWidth='lg'
           overrideLoading
+          observe='AppointmentForm'
         >
           <Form
             resources={resources}

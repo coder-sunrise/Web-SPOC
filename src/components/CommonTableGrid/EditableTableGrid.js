@@ -222,6 +222,7 @@ class EditableTableGrid extends PureComponent {
     //   //   },
     //   // )
     // }
+    console.log({ newRows, t: window.$tempGridRow })
     onCommitChanges({
       rows: newRows,
       added,
@@ -357,6 +358,7 @@ class EditableTableGrid extends PureComponent {
     const editableCfg = {
       extraState: [
         <EditingState
+          key={`editingState-${uniqueGid}`}
           editingRowIds={editingRowIds}
           deletedRowIds={deletedRowIds}
           rowChanges={rowChanges}
@@ -370,10 +372,14 @@ class EditableTableGrid extends PureComponent {
         />,
       ],
       extraRow: [
-        <CustomTableEditRow availableColumns={availableColumns} />,
+        <CustomTableEditRow
+          key={`CustomTableEditRow-${uniqueGid}`}
+          availableColumns={availableColumns}
+        />,
       ],
       extraColumn: [
         <TableEditColumn
+          key={`TableEditColumn-${uniqueGid}`}
           showAddCommand={this.addable}
           showEditCommand={showEditCommand}
           showDeleteCommand={showDeleteCommand}
@@ -403,6 +409,7 @@ class EditableTableGrid extends PureComponent {
       extraGetter: [
         // <EditPlugin />,
         <Getter
+          key={`Getter-${uniqueGid}`}
           name='tableColumns'
           computed={({ tableColumns, isColumnEditingEnabled }) => {
             const cols = [

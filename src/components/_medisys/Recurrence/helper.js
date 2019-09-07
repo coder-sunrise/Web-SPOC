@@ -23,9 +23,12 @@ const getEndType = (range, count, endDate) => {
 }
 
 const getWeekConfig = (weekdays) => ({
-  byweekday: [
-    ...weekdays,
-  ],
+  byweekday:
+    weekdays.length === 1
+      ? weekdays[0]
+      : [
+          ...weekdays,
+        ],
 })
 
 const getMonthConfig = (dayOfMonth) => {
@@ -47,7 +50,9 @@ const joinWeekDays = (selectedDays) => {
     .join(', ')
   const pos = days.lastIndexOf(',')
 
-  const result = `${days.substring(0, pos)} and${days.substring(pos + 1)}`
+  const result = `${days.substring(0, pos)} ${selectedDays.length > 1
+    ? 'and '
+    : ''}${days.substring(pos + 1)}`
   return result
 }
 
@@ -57,7 +62,7 @@ const RRuleFreq = {
   [RECURRENCE_PATTERN.MONTHLY]: RRule.MONTHLY,
 }
 
-export const computeRRule = ({ startDate, recurrenceDto }) => {
+export const computeRRule = ({ date, recurrenceDto }) => {
   let rule = new RRule(defaultRule)
   const {
     recurrencePatternFK,
@@ -68,17 +73,18 @@ export const computeRRule = ({ startDate, recurrenceDto }) => {
     recurrenceDayOfTheMonth,
     recurrenceDaysOfTheWeek,
   } = recurrenceDto
-
   try {
-    const start = moment(startDate).toDate()
-    const dtstart = new Date(
-      start.getUTCFullYear(),
-      start.getUTCMonth(),
-      start.getUTCDate(),
-      start.getUTCHours(),
-      start.getUTCMinutes(),
+    const _tempDate = moment(date).toDate()
+
+    const start = new Date(
+      Date.UTC(
+        _tempDate.getFullYear(),
+        _tempDate.getMonth(),
+        _tempDate.getDate(),
+        _tempDate.getHours(),
+        _tempDate.getMinutes(),
+      ),
     )
-    // console.log({ start, dtstart })
 
     const interval = recurrenceFrequency
     const endType = getEndType(
@@ -94,6 +100,8 @@ export const computeRRule = ({ startDate, recurrenceDto }) => {
       otherConfig = getMonthConfig(recurrenceDayOfTheMonth)
 
     const ruleConfig = {
+      // tzid: 'Asia/Hong_Kong',
+      wkst: RRule.SU,
       freq: RRuleFreq[recurrencePatternFK],
       dtstart: start,
       interval,
@@ -121,6 +129,8 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
     } else {
       stopDate = formatDateToText(rule.options.until)
     }
+
+    console.log({ rule, all: rule.all(), stopDate })
 
     const {
       recurrencePatternFK,

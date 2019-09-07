@@ -56,12 +56,12 @@ const Recurrence = ({
   recurrenceDto = RecurrenceDTO,
   handleRecurrencePatternChange = (f) => f,
 }) => {
-  const { isEnableRecurrence, appointmentDate } = formValues
+  const { isEnableRecurrence, currentAppointment } = formValues
   const { recurrencePatternFK, recurrenceRange } = recurrenceDto
+  const { appointmentDate } = currentAppointment
   const _labelSize = labelSize[size]
   const blockSize = (12 - _labelSize) / 2
   const _inputSize = block ? blockSize : inputSize[size]
-
   return (
     <Fragment>
       <FastField

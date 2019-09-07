@@ -175,7 +175,7 @@ export const generateRecurringAppointments = (
 
   const rrule = computeRRule({
     recurrenceDto,
-    startDate: appointment.appointmentDate,
+    date: appointment.appointmentDate,
   })
   if (rrule) {
     const allDates = rrule.all() || []

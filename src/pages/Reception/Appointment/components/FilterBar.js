@@ -1,12 +1,11 @@
 import React, { memo } from 'react'
 import classnames from 'classnames'
-import debounce from 'lodash/debounce'
 // formik
 import { withFormik, Field, FastField } from 'formik'
 // umi/locale
 import { formatMessage } from 'umi/locale'
 // material ui
-import { CircularProgress, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import Search from '@material-ui/icons/Search'
 // custom component
@@ -15,12 +14,11 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  Select,
   CodeSelect,
   SizeContainer,
 } from '@/components'
 // sub components
-import { AppointmentTypeLabel } from 'medisys-components'
+import { AppointmentTypeLabel } from '@/components/_medisys'
 
 const styles = () => ({
   selectorContainer: {
@@ -41,17 +39,13 @@ const FilterBar = ({
   const onFilterClick = () => handleUpdateFilter(values)
 
   const renderDropdown = (option) => {
-    const title =
-      option.clinicianProfile.title !== null
-        ? option.clinicianProfile.title
+    const { name, doctorProfile } = option
+    const title = option.title !== null ? option.title : ''
+    const mcrNo =
+      doctorProfile !== null && doctorProfile !== undefined
+        ? `(${doctorProfile.doctorMCRNo})`
         : ''
-    return option.isExtra ? (
-      <p>{option.clinicianProfile.name}</p>
-    ) : (
-      <p>
-        {`${title} ${option.clinicianProfile.name} (${option.doctorMCRNo})`}
-      </p>
-    )
+    return <div>{`${title} ${name} ${mcrNo}`}</div>
   }
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
@@ -86,10 +80,11 @@ const FilterBar = ({
                 <CodeSelect
                   {...args}
                   all={-99}
-                  code='doctorprofile'
+                  code='clinicianprofile'
                   label='Filter by Doctor'
                   mode='multiple'
-                  labelField='clinicianProfile.name'
+                  labelField='name'
+                  valueField='id'
                   maxTagCount={maxDoctorTagCount}
                   maxTagPlaceholder={maxDoctorTagPlaceholder}
                   renderDropdown={renderDropdown}
