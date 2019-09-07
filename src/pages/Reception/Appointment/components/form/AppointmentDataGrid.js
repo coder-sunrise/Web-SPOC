@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 import moment from 'moment'
-import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
@@ -13,8 +12,6 @@ import {
   AppointmentDataColExtensions,
   AppointmentDataColumn,
 } from './variables'
-// services
-import request from '@/utils/request'
 
 const validationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
@@ -49,7 +46,7 @@ const styles = () => ({
 class AppointmentDataGrid extends React.PureComponent {
   constructor (props) {
     super(props)
-    const { appointmentDate, classes } = this.props
+    const { appointmentDate } = this.props
     const columnExtensions = AppointmentDataColExtensions.map((column) => {
       if (column.columnName === 'isPrimaryClinician') {
         return {
@@ -148,19 +145,16 @@ class AppointmentDataGrid extends React.PureComponent {
               }
             : { ...eachRow, isPrimaryClinician: checked },
       )
-      console.log({ checked, data, row, newRows })
       handleCommitChanges({ rows: newRows })
     }
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    console.log({ rows })
     this.props.handleCommitChanges({ rows, deleted })
   }
 
   render () {
     const { data, handleCommitChanges } = this.props
-    console.log({ data })
     return (
       <div>
         <EditableTableGrid

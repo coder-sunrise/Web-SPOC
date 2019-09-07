@@ -63,6 +63,9 @@ class Event extends PureComponent {
     handleMouseOver(null, null)
   }
 
+  constructAccountNo = (patientAccountNo) =>
+    patientAccountNo === null ? '' : `(${patientAccountNo})`
+
   render () {
     const { event, classes, calendarView } = this.props
     const {
@@ -73,6 +76,10 @@ class Event extends PureComponent {
     } = event
 
     const title = isDoctorEvent ? event.doctor : event.patientName
+
+    const accountNo = isDoctorEvent
+      ? ''
+      : this.constructAccountNo(event.patientAccountNo)
     const subtitle = isDoctorEvent ? event.eventType : event.patientContactNo
 
     const monthViewClass = classnames({
@@ -91,7 +98,9 @@ class Event extends PureComponent {
         onMouseEnter={this._handleMouseEnter}
         onMouseLeave={this._handleMouseLeave}
       >
-        <span>{title} (S1234567D)</span>
+        <span>
+          {title} {accountNo}
+        </span>
         {hasConflict && <ErrorOutline className={classes.icon} />}
         {isEnableRecurrence && <Cached />}
       </div>

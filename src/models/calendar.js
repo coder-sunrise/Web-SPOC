@@ -10,11 +10,11 @@ import * as service from '../services/calendar'
 // utils
 import {
   generateRecurringAppointments,
-  getRecurrenceLastDate,
+  filterRecurrenceDto,
   mapDatagridToAppointmentResources,
   compareDto,
 } from '@/pages/Reception/Appointment/components/form/formikUtils'
-
+import { getTimeObject, compare } from '@/utils/yup'
 // import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
 
 const ACTION_KEYS = {
@@ -22,6 +22,49 @@ const ACTION_KEYS = {
   save: 'saveAppointment',
   reschedule: 'rescheduleAppointment',
   delete: 'deleteDraft',
+}
+
+const sortDataGrid = (a, b) => {
+  const start = getTimeObject(a.startTime)
+  const end = getTimeObject(b.startTime)
+  const aLessThanB = compare(start, end)
+  if (aLessThanB) return -1
+  if (!aLessThanB) return 1
+  return 0
+}
+
+const updateApptResources = (oldResources) => (
+  currentResources,
+  apptResource,
+) => {
+  const old = oldResources.find(
+    (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+  )
+  if (old === undefined)
+    return [
+      ...currentResources,
+      { ...apptResource, isDeleted: true },
+    ]
+  const {
+    clinicianFK,
+    appointmentTypeFK,
+    startTime,
+    endTime,
+    roomFk,
+    isPrimaryClinician,
+  } = old
+  return [
+    ...currentResources,
+    {
+      ...apptResource,
+      clinicianFK,
+      appointmentTypeFK,
+      startTime,
+      endTime,
+      roomFk,
+      isPrimaryClinician,
+    },
+  ]
 }
 
 export default createListViewModel({
@@ -66,7 +109,9 @@ export default createListViewModel({
               recurrenceDto,
               calendarState.currentViewAppointment.recurrenceDto || {},
             )
-
+          // const sortedDataGrid = [
+          //   ...datagrid,
+          // ].sort(sortDataGrid)
           const appointmentResources = datagrid.map(
             mapDatagridToAppointmentResources(isRecurrenceChanged),
           )
@@ -76,20 +121,17 @@ export default createListViewModel({
             isEditedAsSingleAppointment:
               calendarState.isEditedAsSingleAppointment,
             appointmentStatusFk: newAppointmentStatusFK,
-            appointments_Resources: appointmentResources.map((item, index) => ({
-              ...item,
-              sortOrder: item.sortOrder === undefined ? index : item.sortOrder,
-            })),
+            appointments_Resources: appointmentResources,
+
+            // appointments_Resources: appointmentResources.map((item, index) => ({
+            //   ...item,
+            //   sortOrder: item.sortOrder === undefined ? index : item.sortOrder,
+            // })),
           }
-          const newResources = appointmentResources.filter((item) => item.isNew)
-          const oldResources = appointmentResources.filter(
-            (item) => !item.isNew,
-          )
 
           const shouldGenerateRecurrence =
             !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
           let appointments = []
-          let recurrenceEndDate = ''
 
           if (shouldGenerateRecurrence) {
             appointments = generateRecurringAppointments(
@@ -98,12 +140,24 @@ export default createListViewModel({
               formikValues.isEnableRecurrence,
               isRecurrenceChanged,
             )
-            recurrenceEndDate = getRecurrenceLastDate(appointments)
           } else if (calendarState.isEditedAsSingleAppointment) {
             appointments = [
               currentAppointment,
             ]
           } else {
+            /* 
+              update all other recurrences
+              - appointmentStatusFK
+              - appointmentRemarks
+              - appointmentsResources
+            */
+            const newResources = appointmentResources.filter(
+              (item) => item.isNew,
+            )
+            const oldResources = appointmentResources.filter(
+              (item) => !item.isNew,
+            )
+
             appointments = formikValues.appointments.reduce(
               (updated, appt) =>
                 appt.isEditedAsSingleAppointment && !overwriteEntireSeries
@@ -120,62 +174,28 @@ export default createListViewModel({
                         appointments_Resources: [
                           ...newResources,
                           ...appt.appointments_Resources.reduce(
-                            (currentResources, apptResource) => {
-                              const old = oldResources.find(
-                                (oldItem) =>
-                                  oldItem.sortOrder === apptResource.sortOrder,
-                              )
-                              if (old === undefined)
-                                return [
-                                  ...currentResources,
-                                  { ...apptResource, isDeleted: true },
-                                ]
-                              const {
-                                clinicianFK,
-                                appointmentTypeFK,
-                                startTime,
-                                endTime,
-                                roomFk,
-                                isPrimaryClinician,
-                              } = old
-                              return [
-                                ...currentResources,
-                                {
-                                  ...apptResource,
-                                  clinicianFK,
-                                  appointmentTypeFK,
-                                  startTime,
-                                  endTime,
-                                  roomFk,
-                                  isPrimaryClinician,
-                                },
-                              ]
-                            },
+                            updateApptResources(oldResources),
                             [],
                           ),
-                        ],
+                        ]
+                          .sort(sortDataGrid)
+                          .map((item, index) => ({
+                            ...item,
+                            sortOrder: index,
+                          })),
                       },
                     ],
               [],
             )
           }
 
-          const recurrence = !isRecurrenceChanged
-            ? recurrenceDto
-            : { ...recurrenceDto, recurrenceEndDate }
+          const recurrence = formikValues.isEnableRecurrence
+            ? filterRecurrenceDto(recurrenceDto)
+            : null
 
           let actionKey = ACTION_KEYS.insert
           if (isEdit) actionKey = ACTION_KEYS.save
           if (newAppointmentStatusFK === 5) actionKey = ACTION_KEYS.reschedule
-          console.log({
-            actionKey,
-            isEdit,
-            isRecurrenceChanged,
-            appointmentResources,
-            currentAppointment,
-            appointments,
-            recurrenceEndDate,
-          })
           let savePayload = {
             ...restFormikValues,
             appointments,
@@ -192,7 +212,9 @@ export default createListViewModel({
                 recurrenceDto: recurrence,
               },
             }
+            console.log({ savePayload })
           }
+
           return yield put({
             type: actionKey,
             payload: savePayload,
@@ -255,6 +277,7 @@ export default createListViewModel({
       },
       *insertAppointment ({ payload }, { call, put }) {
         const result = yield call(service.insert, payload)
+        console.log({ result })
         if (result) {
           yield put({ type: 'refresh' })
           notification.success({ message: 'Appointment created' })
@@ -264,6 +287,7 @@ export default createListViewModel({
       },
       *saveAppointment ({ payload }, { call, put }) {
         const result = yield call(service.save, payload)
+        console.log({ result })
         if (result) {
           yield put({ type: 'refresh' })
           notification.success({ message: 'Appointment(s) updated' })

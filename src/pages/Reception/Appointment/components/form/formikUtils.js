@@ -1,13 +1,7 @@
 import moment from 'moment'
 import * as Yup from 'yup'
-import {
-  serverDateFormat,
-  timeFormat,
-  timeFormat24Hour,
-  timeFormatWithoutSecond,
-} from '@/components'
+import { serverDateFormat, timeFormat, timeFormat24Hour } from '@/components'
 import { computeRRule } from '@/components/_medisys'
-import { initialAptInfo } from './variables'
 
 const initDailyRecurrence = {
   recurrencePatternFK: 1,
@@ -67,48 +61,72 @@ export const ValidationSchema = Yup.object().shape({
   }),
 })
 
+const convertReccurenceDaysOfTheWeek = (week) =>
+  week !== null
+    ? week.split(', ').map((eachDay) => parseInt(eachDay, 10))
+    : week
+
 export const mapPropsToValues = ({
   viewingAppointment,
   selectedAppointmentID,
-  isEditedAsSingleAppointment = false,
   selectedSlot,
   user,
+  clinicianProfiles,
 }) => {
-  if (viewingAppointment.id) {
-    const appointment = viewingAppointment.appointments.find(
-      (item) => item.id === selectedAppointmentID,
-    )
-    const { recurrenceDto } = viewingAppointment
+  try {
+    if (viewingAppointment.id) {
+      const clinicianProfile =
+        clinicianProfiles &&
+        clinicianProfiles.find(
+          (item) => viewingAppointment.bookedByUserFk === item.userProfileFK,
+        )
+      const appointment = viewingAppointment.appointments.find(
+        (item) => item.id === selectedAppointmentID,
+      )
+      const { recurrenceDto } = viewingAppointment
 
-    return {
-      ...viewingAppointment,
-      overwriteEntireSeries: false,
-      recurrenceChanged: false,
-      recurrenceDto:
-        recurrenceDto === undefined || recurrenceDto === null
-          ? { ...initDailyRecurrence }
-          : recurrenceDto,
-      currentAppointment: { ...appointment },
-      appointments: viewingAppointment.appointments.map((item) => ({
-        ...item,
-      })),
+      return {
+        ...viewingAppointment,
+        bookedByUser: clinicianProfile ? clinicianProfile.name : '',
+        overwriteEntireSeries: false,
+        recurrenceChanged: false,
+        recurrenceDto:
+          recurrenceDto === undefined || recurrenceDto === null
+            ? { ...initDailyRecurrence }
+            : {
+                ...recurrenceDto,
+                recurrenceDaysOfTheWeek: convertReccurenceDaysOfTheWeek(
+                  recurrenceDto.recurrenceDaysOfTheWeek,
+                ),
+              },
+        currentAppointment: { ...appointment },
+        appointments: viewingAppointment.appointments.map((item) => ({
+          ...item,
+        })),
+      }
     }
+    return {
+      isEnableRecurrence: false,
+      isEditedAsSingleAppointment: false,
+      overwriteEntireSeries: false,
+      bookedByUser: user.userName,
+      bookedByUserFK: user.id,
+      currentAppointment: {
+        appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),
+        appointments_Resources: [],
+      },
+      recurrenceDto: { ...initDailyRecurrence },
+    }
+  } catch (error) {
+    console.log({ error })
   }
-  return {
-    isEnableRecurrence: false,
-    isEditedAsSingleAppointment: false,
-    overwriteEntireSeries: false,
-    bookedByUser: user.userName,
-    bookedByUserFK: user.id,
-    currentAppointment: {
-      appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),
-      appointments_Resources: [],
-    },
-    recurrenceDto: { ...initDailyRecurrence },
-  }
+  return {}
 }
 
-export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
+export const mapDatagridToAppointmentResources = (shouldDumpID) => (
+  event,
+  index,
+) => {
   const { id, startTime: timeFrom, endTime: timeTo, ...restEvent } = event
   const startTime =
     timeFrom.includes('AM') || timeFrom.includes('PM')
@@ -118,6 +136,7 @@ export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
     timeTo.includes('AM') || timeTo.includes('PM')
       ? moment(timeTo, timeFormat).format(timeFormat24Hour)
       : timeTo
+  const sortOrder = index
   if (id < 0 || shouldDumpID) {
     return { ...restEvent, startTime, endTime }
   }
@@ -125,7 +144,6 @@ export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
 }
 
 export const compareDto = (value, original) => {
-  console.log({ value, original })
   if (Object.keys(original).length === 0 && Object.keys(value).length > 0)
     return true
 
@@ -187,54 +205,40 @@ export const getRecurrenceLastDate = (recurrences = []) =>
     ? moment(recurrences[recurrences.length - 1]).format()
     : undefined
 
+export const getFirstAppointmentType = (appointment) => {
+  const { appointment_Resources: resources = [] } = appointment
+
+  if (resources.length > 0) {
+    const first = resources.find((item) => item.sortOrder === 0)
+    return first && first.appointmentTypeFK
+  }
+  return null
+}
+
 export const filterRecurrenceDto = (recurrenceDto) => {
   const { recurrencePatternFK } = recurrenceDto
   // daily
   if (recurrencePatternFK === 1) {
     return {
       ...recurrenceDto,
-      recurrenceDaysOfTheWeek: undefined,
-      recurrenceDayOfTheMonth: undefined,
+      recurrenceDaysOfTheWeek: null,
+      recurrenceDayOfTheMonth: null,
     }
   }
   // weekly
   if (recurrencePatternFK === 2) {
     return {
       ...recurrenceDto,
-      recurrenceDayOfTheMonth: undefined,
+      recurrenceDaysOfTheWeek: recurrenceDto.recurrenceDaysOfTheWeek.join(', '),
+      recurrenceDayOfTheMonth: null,
     }
   }
   // monthly
   if (recurrencePatternFK === 3) {
     return {
       ...recurrenceDto,
-      recurrenceDaysOfTheWeek: undefined,
+      recurrenceDaysOfTheWeek: null,
     }
   }
   return { ...recurrenceDto }
-}
-
-export const constructPayload = (payload, appointmentStatusFK) => {
-  const { overwriteEntireSeries } = payload
-
-  // DRAFT
-  if (appointmentStatusFK === 5) {
-    return {
-      overwriteEntireSeries,
-      appointmentGroupDto: payload,
-    }
-  }
-  return payload
-}
-
-export const getFirstAppointmentType = (appointment) => {
-  if (
-    appointment.appointment_Resources &&
-    appointment.appointment_Resources.length >= 1
-  )
-    return appointment.appointment_Resources[0].appointmentTypeFK
-
-  return appointment.appointmentTypeFK
-    ? appointment.appointmentTypeFK
-    : undefined
 }

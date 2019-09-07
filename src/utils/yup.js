@@ -145,7 +145,7 @@ Yup.addMethod(Yup.array, 'unique', function (
   })
 })
 
-const getTimeObject = (value) => {
+export const getTimeObject = (value) => {
   try {
     if (value === undefined || value === null)
       throw Error('Value is undefined | null')
@@ -179,7 +179,7 @@ const getTimeObject = (value) => {
   return undefined
 }
 
-const compare = (start, end) => {
+export const compare = (start, end) => {
   const { hour: startHour, minute: startMinute } = start
   const { hour: endHour, minute: endMinute } = end
   if (

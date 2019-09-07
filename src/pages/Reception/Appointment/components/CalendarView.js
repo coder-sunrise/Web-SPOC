@@ -47,10 +47,11 @@ const styles = () => ({
 
 const today = new Date()
 
-@connect(({ calendar }) => ({
+@connect(({ calendar, codetable }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list,
+  appointmentTypes: codetable.ctappointmenttype || [],
 }))
 class CalendarView extends React.PureComponent {
   state = {
@@ -75,9 +76,15 @@ class CalendarView extends React.PureComponent {
   _eventColors = (event) => {
     const appointmentTypeFK = getFirstAppointmentType(event)
     // TODO: get appointment type color here
+    const appointmentType =
+      appointmentTypeFK !== null &&
+      this.props.appointmentTypes.find((item) => item.id === appointmentTypeFK)
+
     return {
       style: {
-        backgroundColor: !appointmentTypeFK ? primaryColor : '#26c6da',
+        backgroundColor: !appointmentType
+          ? primaryColor
+          : appointmentType.tagColorHex,
       },
     }
   }

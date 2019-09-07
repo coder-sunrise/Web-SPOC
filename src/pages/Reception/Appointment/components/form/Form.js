@@ -26,23 +26,8 @@ import AppointmentDateInput from './AppointmentDate'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 // utils
-import {
-  ValidationSchema,
-  mapPropsToValues,
-  generateRecurringAppointments,
-  mapDatagridToAppointmentResources,
-  filterRecurrenceDto,
-  compareDto,
-  constructPayload,
-} from './formikUtils'
+import { ValidationSchema, mapPropsToValues } from './formikUtils'
 import styles from './style'
-
-const actionKeys = {
-  insert: 'calendar/insertAppointment',
-  save: 'calendar/saveAppointment',
-  reschedule: 'calendar/rescheduleAppointment',
-  delete: 'calendar/deleteDraft',
-}
 
 @connect(({ loginSEMR, loading, user, calendar, codetable }) => ({
   loginSEMR,
@@ -52,6 +37,7 @@ const actionKeys = {
   viewingAppointment: calendar.currentViewAppointment,
   isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
   appointmentStatuses: codetable.ltappointmentstatus,
+  clinicianProfiles: codetable.clinicianprofile,
 }))
 @withFormik({
   enableReinitialize: true,
@@ -72,6 +58,12 @@ class Form extends React.PureComponent {
   }
 
   componentWillMount () {
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+      },
+    })
     this.props.dispatch({
       type: 'codetable/fetchCodes',
       payload: { code: 'ltappointmentstatus' },
@@ -198,6 +190,10 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
+    const sorted = [
+      ...rows,
+    ].sort()
+
     if (rows) {
       this.setState(
         {
@@ -243,8 +239,6 @@ class Form extends React.PureComponent {
         setSubmitting,
         handleSubmit,
         values,
-        viewingAppointment,
-        isEditedAsSingleAppointment,
         onClose,
         dispatch,
       } = this.props
