@@ -43,7 +43,7 @@ class POSummary extends PureComponent {
 
     return (
       <React.Fragment>
-        <GridContainer>
+        {/* <GridContainer>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
             <NumberInput
@@ -54,7 +54,7 @@ class POSummary extends PureComponent {
               {...amountProps}
             />
           </GridItem>
-        </GridContainer>
+        </GridContainer> */}
 
         <GridContainer>
           <GridItem xs={2} md={9} />

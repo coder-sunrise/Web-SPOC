@@ -85,6 +85,16 @@ export class DeliveryOrderDetails extends PureComponent {
         code: 'ctService',
       },
       {
+        columnName: 'name',
+        type: 'codeSelect',
+        code: 'ctService',
+      },
+      {
+        columnName: 'uom',
+        type: 'codeSelect',
+        code: 'ctMedicationUnitOfMeasurement',
+      },
+      {
         columnName: 'expiryDate',
         type: 'date',
         format: 'DD MMM YYYY',

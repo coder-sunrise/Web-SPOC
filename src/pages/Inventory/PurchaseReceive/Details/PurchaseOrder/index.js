@@ -331,7 +331,7 @@ class index extends PureComponent {
 
         <Grid />
 
-        <Button
+        {/* <Button
           // onClick={this.toggleAddPaymaneModal}
           hideIfNoEditRights
           color='info'
@@ -341,7 +341,7 @@ class index extends PureComponent {
           {formatMessage({
             id: 'inventory.pr.detail.pod.addItem',
           })}
-        </Button>
+        </Button> */}
         <POSummary />
 
         <GridContainer
