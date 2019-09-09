@@ -19,7 +19,7 @@ class ViewDetailsBtn extends PureComponent {
       <Button
         size='sm'
         onClick={this.handleClick}
-        color='rose'
+        color='primary'
         simple
         className='noPadding'
       >

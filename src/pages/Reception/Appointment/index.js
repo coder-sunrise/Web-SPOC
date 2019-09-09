@@ -18,9 +18,7 @@ import {
   CalendarActions,
   DoctorFormValidation,
   InitialPopoverEvent,
-  applyFilter,
 } from './const'
-import { getUniqueGUID } from '@/utils/utils'
 
 const styles = (theme) => ({
   popover: {
@@ -143,17 +141,16 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectEvent = (selectedEvent) => {
-    // console.log({ selectedEvent })
-    const { isEnableRecurrence, id } = selectedEvent
-    // const urlPrefix = isEnableRecurrence ? '/series' : '/single'
+    const { id, appointmentFK } = selectedEvent
+    const selectedAppointmentID =
+      appointmentFK === undefined ? id : appointmentFK
+
     if (!selectedEvent.isEnableRecurrence) {
       this.props
         .dispatch({
           type: 'calendar/getAppointmentDetails',
           payload: {
-            id: selectedEvent.id
-              ? selectedEvent.id
-              : selectedEvent.appointmentFK,
+            id: selectedAppointmentID,
             isEditedAsSingleAppointment: false,
             alwaysSingle: true,
           },
@@ -161,55 +158,16 @@ class Appointment extends React.PureComponent {
         .then((response) => {
           if (response)
             this.setState({
-              selectedAppointmentFK: selectedEvent.id
-                ? selectedEvent.id
-                : selectedEvent.appointmentFK,
+              selectedAppointmentFK: selectedAppointmentID,
               showAppointmentForm: true,
             })
         })
     } else {
       this.setState({
-        selectedAppointmentFK: selectedEvent.id
-          ? selectedEvent.id
-          : selectedEvent.appointmentFK,
+        selectedAppointmentFK: selectedAppointmentID,
         showSeriesConfirmation: true,
-        // showAppointmentForm: !selectedEvent.isEnableRecurrence,
       })
     }
-
-    // this.props
-    //   .dispatch({
-    //     type: 'calendar/getAppointmentDetails',
-    //     appointmentID: selectedEvent.id
-    //       ? selectedEvent.id
-    //       : selectedEvent.appointmentFK,
-    //   })
-    //   .then(() => {
-
-    //   })
-    // start and end are unwated values,
-    // the important values are the ...restEvent
-    // const { start, end, ...restEvent } = selectedEvent
-    // const { isDoctorEvent, series } = restEvent
-
-    // if (series) {
-    //   this.setState({
-    //     showSeriesConfirmation: true,
-    //     selectedSlot: { ...restEvent, type: 'update' },
-    //     // showAppointmentForm: !isDoctorEvent && true,
-    //     // showDoctorEventModal: isDoctorEvent,
-    //   })
-    // } else {
-    //   this.setState({
-    //     showPopup: false,
-    //     isDragging: false,
-    //     popoverEvent: { ...InitialPopoverEvent },
-    //     popupAnchor: null,
-    //     selectedSlot: { ...restEvent, type: 'update' },
-    //     showAppointmentForm: !isDoctorEvent && true,
-    //     showDoctorEventModal: isDoctorEvent,
-    //   })
-    // }
   }
 
   onEventMouseOver = (event, syntheticEvent) => {
@@ -244,7 +202,7 @@ class Appointment extends React.PureComponent {
   }
 
   onFilterUpdate = (filter) => {
-    const { filterByDoctor } = filter
+    const { filterByDoctor = [] } = filter
     const { clinicianProfiles } = this.props
     const newResources = clinicianProfiles.reduce(
       (resources, doctor) =>
@@ -303,7 +261,7 @@ class Appointment extends React.PureComponent {
   }
 
   editSeriesConfirmation = (isEditedAsSingleAppointment = false) => {
-    const { calendar, dispatch } = this.props
+    const { dispatch } = this.props
     const { selectedAppointmentFK } = this.state
     dispatch({
       type: 'calendar/getAppointmentDetails',
@@ -321,32 +279,6 @@ class Appointment extends React.PureComponent {
           showAppointmentForm: true,
         })
     })
-    // dispatch({
-    //   type: 'calendar/setViewAppointment',
-    //   data: {
-    //     ...calendar.currentViewAppointment,
-    //     isEditedAsSingleAppointment,
-    //   },
-    // })
-    // this.setState({
-    //   showPopup: false,
-    //   isDragging: false,
-    //   popupAnchor: null,
-    //   showSeriesConfirmation: false,
-    //   showAppointmentForm: true,
-    // })
-    // const { selectedSlot } = this.state
-    // const { isDoctorEvent } = selectedSlot
-    // this.setState({
-    //   showSeriesConfirmation: false,
-    //   showPopup: false,
-    //   isDragging: false,
-    //   popoverEvent: { ...InitialPopoverEvent },
-    //   popupAnchor: null,
-    //   // selectedSlot: { ...selectedEvent, type: 'update' },
-    //   showAppointmentForm: !isDoctorEvent && true,
-    //   showDoctorEventModal: isDoctorEvent,
-    // })
   }
 
   render () {
@@ -366,18 +298,10 @@ class Appointment extends React.PureComponent {
     } = this.state
 
     const {
-      calendarEvents,
-      list,
       currentViewAppointment,
       isEditedAsSingleAppointment,
       calendarView,
     } = CalendarModel
-    // const flattenedCalendarData = calendarEvents.reduce(
-    //   flattenAppointmentDateToCalendarEvents,
-    //   [],
-    // )
-
-    // console.log({ flattenedList })
 
     const formTitle =
       currentViewAppointment.id === undefined

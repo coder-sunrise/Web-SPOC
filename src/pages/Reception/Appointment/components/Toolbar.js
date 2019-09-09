@@ -105,15 +105,15 @@ class CalendarToolbar extends React.PureComponent {
       <GridContainer className={classnames(classes.container)}>
         <GridItem xs md={2}>
           <div>
-            <IconButton color='info' onClick={this.subtractDate}>
+            <Button justIcon simple color='info' onClick={this.subtractDate}>
               <ChevronLeft />
-            </IconButton>
+            </Button>
             <Button simple color='info' onClick={this.returnToday}>
               Today
             </Button>
-            <IconButton color='info' onClick={this.addDate}>
+            <Button justIcon simple color='info' onClick={this.addDate}>
               <ChevronRight />
-            </IconButton>
+            </Button>
           </div>
         </GridItem>
         <GridItem xs md={8} container justify='center'>

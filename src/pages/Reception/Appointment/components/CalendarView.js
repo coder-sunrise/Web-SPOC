@@ -12,11 +12,7 @@ import { withStyles } from '@material-ui/core'
 // components
 import { serverDateFormat } from '@/components'
 // setting
-import {
-  defaultColorOpts,
-  doctorEventColorOpts,
-  AppointmentTypeAsColor,
-} from '../setting'
+import { doctorEventColorOpts } from '../setting'
 // sub component
 import CalendarToolbar from './Toolbar'
 import Event from './Event'
@@ -46,6 +42,41 @@ const styles = () => ({
 })
 
 const today = new Date()
+
+const applyFilter = (filter, data) => {
+  const { filterByApptType, filterByDoctor, search = '' } = filter
+  let returnData = [
+    ...data,
+  ]
+  try {
+    // filter by patient name
+    if (search !== '') {
+      returnData = returnData.filter(
+        (eachData) =>
+          eachData.patientName.toLowerCase().indexOf(search.toLowerCase()) !==
+          -1,
+      )
+    }
+
+    // filter by doctor
+    if (filterByDoctor.length > 0) {
+      returnData = returnData.filter((eachData) =>
+        filterByDoctor.includes(eachData.clinicianFK),
+      )
+    }
+
+    // filter by appointment type
+    if (filterByApptType.length > 0) {
+      returnData = returnData.filter((eachData) =>
+        filterByApptType.includes(eachData.appointmentTypeFK),
+      )
+    }
+  } catch (error) {
+    console.log({ error })
+  }
+
+  return returnData
+}
 
 @connect(({ calendar, codetable }) => ({
   displayDate: calendar.currentViewDate,
@@ -200,7 +231,6 @@ class CalendarView extends React.PureComponent {
 
   render () {
     const {
-      classes,
       // --- event handlers ---
       handleSelectSlot,
       handleSelectEvent,
@@ -213,19 +243,23 @@ class CalendarView extends React.PureComponent {
       calendarView,
       filter,
     } = this.props
-    console.log({ filter, resources })
+    // console.log({ filter, resources })
     const flattenedList =
       calendarView === BigCalendar.Views.MONTH
         ? calendarEvents.reduce((events, appointment) => {
-            const { patientName } = appointment
+            const { appointment_Resources: apptResources = [] } = appointment
 
-            if (
-              filter.search !== '' &&
-              patientName.toLowerCase().indexOf(filter.search.toLowerCase()) < 0
+            const firstApptRes = apptResources.find(
+              (item) => item.sortOrder === 0,
             )
-              return [
-                ...events,
-              ]
+
+            const firstClinicianFK =
+              firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
+
+            const firstAppointmentTypeFK =
+              firstApptRes !== undefined
+                ? firstApptRes.appointmentTypeFK
+                : undefined
 
             return [
               ...events,
@@ -233,6 +267,8 @@ class CalendarView extends React.PureComponent {
                 ...appointment,
                 start: appointment.appointmentDate,
                 end: appointment.appointmentDate,
+                appointmentTypeFK: firstAppointmentTypeFK,
+                clinicianFK: firstClinicianFK,
               },
             ]
           }, [])
@@ -248,6 +284,7 @@ class CalendarView extends React.PureComponent {
             const apptEvents = apptResources.map((item) => ({
               ...item,
               resourceId: item.clinicianFK,
+              clinicianFK: item.clinicianFK,
               patientName,
               patientContactNo,
               isEnableRecurrence,
@@ -268,6 +305,7 @@ class CalendarView extends React.PureComponent {
           }, [])
 
     const { minTime, maxTime } = this.state
+    const filtered = applyFilter(filter, flattenedList)
 
     return (
       <DragAndDropCalendar
@@ -285,7 +323,7 @@ class CalendarView extends React.PureComponent {
         max={maxTime}
         view={calendarView}
         // --- values props ---
-        events={flattenedList}
+        events={filtered}
         // --- values props ---
         // --- functional props ---
         selectable='ignoreEvents'

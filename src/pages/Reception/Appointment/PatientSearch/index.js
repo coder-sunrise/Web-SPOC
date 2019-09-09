@@ -58,8 +58,8 @@ class PatientSearch extends PureComponent {
     <Button
       className='noPadding'
       size='sm'
-      color='rose'
-      simple
+      color='primary'
+      variant='outlined'
       id={row.id}
       onClick={() => this.props.handleSelectClick(row)}
     >

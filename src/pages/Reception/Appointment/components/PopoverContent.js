@@ -13,6 +13,7 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  CodeSelect,
   Danger,
   timeFormat,
   timeFormat24Hour,
@@ -71,7 +72,7 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
   )
 }
 
-class PopoverContent extends React.PureComponent {
+class PopoverContent extends React.Component {
   getTimeRange = () => {
     const { classes, popoverEvent, calendarView } = this.props
     if (calendarView === BigCalendar.Views.MONTH) return ''
@@ -94,9 +95,8 @@ class PopoverContent extends React.PureComponent {
       isDoctorEvent,
       patientName,
       patientContactNo,
-      doctor,
-      appointmentType,
-      appointmentStatusFk,
+      clinicianFK,
+      appointmentTypeFK,
     } = popoverEvent
 
     return (
@@ -104,11 +104,7 @@ class PopoverContent extends React.PureComponent {
         {isDoctorEvent ? (
           <DoctorEventContent {...this.props} />
         ) : (
-          <GridContainer
-            direction='column'
-            justify='center'
-            alignItems='center'
-          >
+          <GridContainer direction='column'>
             {hasConflict && (
               <GridItem className={classnames(classes.iconRow)}>
                 <ErrorOutline className={classnames(classes.icon)} />
@@ -117,11 +113,6 @@ class PopoverContent extends React.PureComponent {
                 </Danger>
               </GridItem>
             )}
-            <GridItem>
-              {appointmentStatusFk === '2' && (
-                <span style={{ textAlign: 'right' }}>DRAFT</span>
-              )}
-            </GridItem>
             <GridItem className={classnames(classes.iconRow)}>
               {this.getTimeRange()}
             </GridItem>
@@ -136,14 +127,24 @@ class PopoverContent extends React.PureComponent {
                 value={patientContactNo}
               />
             </GridItem>
-            <GridItem>
-              <TextField disabled label='Doctor' value={doctor} />
+            <GridItem md={12}>
+              <CodeSelect
+                disabled
+                code='clinicianprofile'
+                label='Doctor'
+                labelField='name'
+                valueField='id'
+                value={clinicianFK}
+              />
             </GridItem>
             <GridItem>
-              <TextField
+              <CodeSelect
                 disabled
+                code='ctappointmenttype'
                 label='Appointment Type'
-                value={appointmentType}
+                labelField='displayValue'
+                valueField='id'
+                value={appointmentTypeFK}
               />
             </GridItem>
           </GridContainer>
