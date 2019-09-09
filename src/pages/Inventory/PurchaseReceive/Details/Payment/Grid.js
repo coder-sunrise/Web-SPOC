@@ -1,58 +1,76 @@
 import React, { PureComponent } from 'react'
-import { CardContainer, CommonTableGrid, Button } from '@/components'
-import DeleteOutline from '@material-ui/icons/DeleteOutline'
+import {
+  GridContainer,
+  EditableTableGrid,
+  withFormikExtend,
+} from '@/components'
+import moment from 'moment'
 
+@withFormikExtend({
+  mapPropsToValues: ({ purchaseReceivePayment }) =>
+    purchaseReceivePayment.entity || purchaseReceivePayment.default,
+  displayName: 'purchaseReceivePayment',
+})
 class Grid extends PureComponent {
-  deleteRow = (row, e) => {}
+  tableParas = {
+    columns: [
+      { name: 'paymentNo', title: 'Payment No.' },
+      { name: 'paymentDate', title: 'Date' },
+      { name: 'paymentMode', title: 'Payment Mode' },
+      { name: 'reference', title: 'Reference' },
+      { name: 'paymentAmount', title: 'Payment Amount' },
+      { name: 'Remarks', title: 'Remarks' },
+    ],
+    columnExtensions: [
+      {
+        columnName: 'paymentDate',
+        type: 'date',
+        format: 'DD MMM YYYY',
+        value: moment(),
+        disabled: true,
+      },
+      {
+        columnName: 'paymentMode',
+        type: 'codeSelect',
+        code: 'CTCreditCardType',
+      },
+      {
+        columnName: 'paymentAmount',
+        type: 'number',
+        currency: true,
+      },
+    ],
+  }
+
+  onCommitChanges = ({ rows, deleted }) => {
+    const { setFieldValue } = this.props
+    setFieldValue('payment_list', rows)
+  }
+
   render () {
+    const isEditable = true
+    const { values } = this.props
+    //console.log('Payment Grid', this.props)
+
     return (
-      <CardContainer hideHeader>
-        <CommonTableGrid
-          style={{ margin: 0 }}
-          type='purchaseReceivePayment'
-          onRowDoubleClick={this.editRow}
-          columns={[
-            { name: 'paymentNo', title: 'Payment No.' },
-            { name: 'paymentDate', title: 'Date' },
-            { name: 'paymentMode', title: 'Payment Mode' },
-            { name: 'reference', title: 'Reference' },
-            { name: 'paymentAmount', title: 'Payment Amount' },
-            { name: 'remarks', title: 'Remarks' },
-            { name: 'action', title: 'Action' },
-          ]}
-          // FuncProps={{ pager: false }}
-          columnExtensions={[
-            {
-              columnName: 'doDate',
-              type: 'date',
-              format: 'DD MMM YYYY',
-            },
-            { columnName: 'paymentAmount', type: 'number', currency: true },
-            {
-              columnName: 'action',
-              sortingEnabled: false,
-              align: 'center',
-              render: (row) => {
-                return (
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      this.deleteRow(row)
-                    }}
-                    justIcon
-                    color='primary'
-                  >
-                    <DeleteOutline />
-                  </Button>
-                )
-              },
-            },
-          ]}
+      <GridContainer>
+        <EditableTableGrid
+          rows={values.payment_list}
+          //schema={receivingDetailsSchema}
           FuncProps={{
+            edit: isEditable,
             pager: false,
           }}
+          EditingProps={{
+            showAddCommand: isEditable,
+            showEditCommand: false,
+            showDeleteCommand: isEditable,
+            onCommitChanges: this.onCommitChanges,
+            //onAddedRowsChange: this.onAddedRowsChange,
+          }}
+          {...this.tableParas}
         />
-      </CardContainer>
+      </GridContainer>
     )
   }
 }

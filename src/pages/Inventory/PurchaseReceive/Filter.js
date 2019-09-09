@@ -3,6 +3,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Tooltip } from '@material-ui/core'
 import {
   withFormikExtend,
+  Field,
   FastField,
   GridContainer,
   GridItem,
@@ -13,6 +14,7 @@ import {
   CodeSelect,
   ProgressButton,
   DatePicker,
+  DateRangePicker,
 } from '@/components'
 
 @withFormikExtend({
@@ -22,10 +24,23 @@ import {
   displayName: 'PurchasingReceivingFilter',
 })
 class Filter extends PureComponent {
-  render () {
-    console.log('filter', this.props)
+  state = {
+    isAllDateChecked: false,
+  }
 
+  componentDidUpdate () {
+    const { values } = this.props
+
+    this.setState({
+      isAllDateChecked: values.allDate || false,
+    })
+  }
+
+  render () {
     const { classes, navigatePdoDetails } = this.props
+
+    console.log('filter', this.state.isAllDateChecked)
+
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -44,30 +59,23 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='transactionDateFrom'
-              render={(args) => (
-                <DatePicker
-                  label={formatMessage({
-                    id: 'inventory.pr.filter.datefrom',
-                  })}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='transactionDateTo'
-              render={(args) => (
-                <DatePicker
-                  label={formatMessage({
-                    id: 'inventory.pr.filter.dateto',
-                  })}
-                  {...args}
-                />
-              )}
+          <GridItem md={6}>
+            <Field
+              name='transactionDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    disabled={this.state.isAllDateChecked}
+                    label={formatMessage({
+                      id: 'inventory.pr.filter.datefrom',
+                    })}
+                    label2={formatMessage({
+                      id: 'inventory.pr.filter.dateto',
+                    })}
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
           <GridItem xs sm={6} md={3}>

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import Add from '@material-ui/icons/Add'
@@ -125,6 +126,7 @@ class index extends PureComponent {
                         label={formatMessage({
                           id: 'inventory.pr.detail.pod.expectedDeliveryDate',
                         })}
+                        disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
                         {...args}
                       />
                     )

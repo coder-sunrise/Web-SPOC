@@ -3,7 +3,7 @@ import * as service from '../Details/DeliveryOrder/services'
 import moment from 'moment'
 
 export default createListViewModel({
-  namespace: 'deliveryOrder',
+  namespace: 'purchaseReceivePayment',
   config: {
     queryOnLoad: false,
   },
@@ -11,8 +11,11 @@ export default createListViewModel({
     service,
     state: {
       default: {
-        deliveryOrderDate: moment(),
-        deliveryOrder_receivingItemList: [],
+        poNo: 'PO/000001',
+        purchaseOrderDate: moment(),
+        invoiceAmount: 100,
+        outstandingAmount: 50,
+        payment_list: [],
       },
     },
     subscriptions: ({ dispatch, history }) => {

@@ -21,6 +21,17 @@ import ReceivingItemDetails from './ReceivingItemDetails'
 import moment from 'moment'
 import { podoOrderType } from '@/utils/codes'
 
+const receivingDetailsSchema = Yup.object().shape({
+  type: Yup.string().required(),
+  // costPrice: Yup.number().required(),
+  // unitPrice: Yup.number().required(),
+})
+
+const schema = Yup.object().shape({
+  medicationName: Yup.number().required(),
+  quantity: Yup.number().required(),
+})
+
 @withFormikExtend({
   mapPropsToValues: ({ deliveryOrder }) =>
     deliveryOrder.entity || deliveryOrder.default,
@@ -28,6 +39,7 @@ import { podoOrderType } from '@/utils/codes'
   validationSchema: Yup.object().shape({
     poNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
+    //deliveryOrder_receivingItemList: Yup.array().of(receivingDetailsSchema),
   }),
 })
 export class DeliveryOrderDetails extends PureComponent {
@@ -41,7 +53,6 @@ export class DeliveryOrderDetails extends PureComponent {
   }
 
   tableParas = {
-    //schema={schema},
     columns: [
       { name: 'type', title: 'Type' },
       { name: 'code', title: 'Code' },
@@ -71,8 +82,7 @@ export class DeliveryOrderDetails extends PureComponent {
       {
         columnName: 'code',
         type: 'codeSelect',
-        //Consumable = InventoryConsumable | Medication = InventoryMedication | Vacination = InventoryVaccination
-        code: this.state.selectedType,
+        code: 'ctService',
       },
       {
         columnName: 'expiryDate',
@@ -126,10 +136,10 @@ export class DeliveryOrderDetails extends PureComponent {
   render () {
     const isEditable = true
     const { props, ...tableParas } = this
-    const { footer, theme, deliveryOrderDetails, values } = props
+    const { footer, deliveryOrderDetails, values } = props
     //const {} = values
 
-    //console.log('DOD', this)
+    console.log('DOD', this)
 
     return (
       <React.Fragment>
@@ -197,6 +207,7 @@ export class DeliveryOrderDetails extends PureComponent {
 
         <EditableTableGrid
           rows={values.deliveryOrder_receivingItemList}
+          schema={receivingDetailsSchema}
           FuncProps={{
             edit: isEditable,
             pager: false,
@@ -212,6 +223,7 @@ export class DeliveryOrderDetails extends PureComponent {
         />
         {footer &&
           footer({
+            align: 'center',
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {

@@ -12,8 +12,10 @@ export default createListViewModel({
     state: {
       default: {
         filter: {
-          transactionDateFrom: moment().format('YYYY-MM-01'),
-          transactionDateTo: moment(),
+          transactionDates: [
+            moment().format('YYYY-MM-01'),
+            moment(),
+          ],
         },
       },
     },
