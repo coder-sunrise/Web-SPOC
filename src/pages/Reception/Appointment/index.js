@@ -19,6 +19,7 @@ import {
   DoctorFormValidation,
   InitialPopoverEvent,
 } from './const'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const styles = (theme) => ({
   popover: {
@@ -50,7 +51,12 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         ...massaged,
         ...event.appointment_Resources.map((appointment) => {
           const { appointmentResources, ...restEvent } = event
-          return { ...restEvent, ...appointment }
+          return {
+            ...restEvent,
+            ...appointment,
+            visitStatus: VISIT_STATUS.UPCOMING_APPT,
+            id: event.id,
+          }
         }),
       ]
 

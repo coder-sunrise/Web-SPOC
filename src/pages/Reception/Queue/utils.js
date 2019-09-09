@@ -1,5 +1,11 @@
 import moment from 'moment'
+
 import { filterMap } from './variables'
+
+const dateTimeFormat = 'DD MMM YYYY hh:mm A'
+
+export const formatAppointmentTime = (value) =>
+  moment(value, 'HH:mm:ss').format(dateTimeFormat)
 
 export const filterData = (filter, data = []) => {
   let newData = data.filter((eachRow) => {

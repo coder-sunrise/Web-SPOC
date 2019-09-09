@@ -19,7 +19,16 @@ const ActionButton = ({ row, onClick }) => {
         <GridButton
           row={row}
           onClick={onClick}
-          contextMenuOptions={AppointmentContextMenu}
+          contextMenuOptions={AppointmentContextMenu.map((opt) => {
+            switch (opt.id) {
+              case 8:
+                return { ...opt, disabled: row.patientProfileFK !== undefined }
+              case 9:
+                return { ...opt, disabled: row.patientProfileFK === undefined }
+              default:
+                return { ...opt }
+            }
+          })}
         />
       </Tooltip>
     )

@@ -60,7 +60,7 @@ export const AppointmentContextMenu = [
     id: 9,
     label: 'Register Patient',
     Icon: Person,
-    disabled: false,
+    disabled: true,
   },
 ]
 

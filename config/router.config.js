@@ -573,6 +573,11 @@ const routes = [
             name: 'referrallettertemplate',
             component: './Setting/TemplateMessages',
           },
+          {
+            path: '/setting/appointmenttype',
+            name: 'appointmenttype',
+            component: './Setting/AppointmentType',
+          },
         ],
       },
       // Settings
