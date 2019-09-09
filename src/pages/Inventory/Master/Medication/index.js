@@ -1,60 +1,74 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { CardContainer } from '@/components'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
+import { status } from '@/utils/codes'
 
 const styles = () => ({})
 
-const Medication = ({ dispatch, history, medication }) => {
-  const [ tableParas, setTableParas ] = useState({
+const Medication = ({ dispatch, history, medication, values }) => {
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
-      { name: 'refNo', title: 'Code' },
-      { name: 'patientName', title: 'Name' },
+      { name: 'code', title: 'Code' },
+      { name: 'displayValue', title: 'Name' },
       { name: 'supplier', title: 'Supplier' },
-      { name: 'dispUOM', title: 'Disp. UOM' },
+      { name: 'uom', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
-      { name: 'payments', title: 'Avg Cost Price' },
-      { name: 'expenseAmount', title: 'Selling Price' },
-      { name: 'status', title: 'Status' },
-      { name: 'Action', title: 'Action' },
+      { name: 'averageCostPrice', title: 'Avg Cost Price' },
+      { name: 'sellingPrice', title: 'Selling Price' },
+      { name: 'isActive', title: 'Status' },
+      { name: 'action', title: 'Action' },
     ],
     leftColumns: [],
   })
 
-  const [ colExtensions, setColExtensions ] = useState([
-    { columnName: 'Action', width: 110, align: 'center' },
+  const [
+    colExtensions,
+    setColExtensions,
+  ] = useState([
+    { columnName: 'action', width: 110, align: 'center' },
+
     {
-      columnName: 'supplier',
+      columnName: 'uom',
+      type: 'number',
+    },
+    {
+      columnName: 'isActive',
+      sortingEnabled: false,
       type: 'select',
-      options: [],
-      label: 'Supplier',
+      options: status,
     },
-    {
-      columnName: 'dispUOM',
-      align: 'select',
-      options: [],
-      label: 'DispUOM',
-    },
-    { columnName: 'payments', type: 'number', currency: true },
-    { columnName: 'expenseAmount', type: 'number', currency: true },
+    { columnName: 'averageCostPrice', type: 'number', currency: true },
+    { columnName: 'sellingPrice', type: 'number', currency: true },
   ])
 
   const filterProps = {
     dispatch,
     history,
+    values,
   }
 
   const gridProps = {
     ...filterProps,
     medication,
-    namespace: medication.namespace,
+    namespace: 'medication',
     list: medication.list || [],
+
     tableParas,
     colExtensions,
   }
+
+  useEffect(() => {
+    dispatch({
+      type: 'medication/query',
+    })
+  }, [])
 
   return (
     <CardContainer

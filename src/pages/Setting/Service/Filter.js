@@ -113,10 +113,13 @@ class Filter extends PureComponent {
               <Button
                 color='primary'
                 onClick={() => {
-                  this.props.toggleModal()
                   this.props.dispatch({
                     type: 'settingClinicService/updateState',
+                    payload: {
+                      entity: undefined,
+                    },
                   })
+                  this.props.toggleModal()
                 }}
               >
                 Add New

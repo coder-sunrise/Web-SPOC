@@ -1,58 +1,71 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { CardContainer } from '@/components'
 import { compose } from 'redux'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
+import { status } from '@/utils/codes'
 
 const styles = () => ({})
-const Consumable = ({ dispatch, history, consumable }) => {
-  const [ tableParas, setTableParas ] = useState({
+const Consumable = ({ dispatch, history, consumable, values }) => {
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
-      { name: 'refNo', title: 'Code' },
-      { name: 'patientName', title: 'Name' },
+      { name: 'code', title: 'Code' },
+      { name: 'displayValue', title: 'Name' },
       { name: 'supplier', title: 'Supplier' },
-      { name: 'dispUOM', title: 'Disp. UOM' },
+      { name: 'uom', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
-      { name: 'payments', title: 'Avg Cost Price' },
-      { name: 'expenseAmount', title: 'Selling Price' },
-      { name: 'status', title: 'Status' },
-      { name: 'Action', title: 'Action' },
+      { name: 'averageCostPrice', title: 'Avg Cost Price' },
+      { name: 'sellingPrice', title: 'Selling Price' },
+      { name: 'isActive', title: 'Status' },
+      { name: 'action', title: 'Action' },
     ],
     leftColumns: [],
   })
 
-  const [ colExtensions, setColExtensions ] = useState([
-    { columnName: 'Action', width: 110, align: 'center' },
+  const [
+    colExtensions,
+    setColExtensions,
+  ] = useState([
     {
-      columnName: 'supplier',
-      type: 'select',
-      options: [],
-      label: 'Supplier',
+      columnName: 'uom',
+      type: 'number',
     },
+
+    { columnName: 'action', width: 110, align: 'center' },
     {
-      columnName: 'dispUOM',
+      columnName: 'isActive',
+      sortingEnabled: false,
       type: 'select',
-      options: [],
-      label: 'DispUOM',
+      options: status,
     },
-    { columnName: 'payments', type: 'number', currency: true },
-    { columnName: 'expenseAmount', type: 'number', currency: true },
+    { columnName: 'averageCostPrice', type: 'number', currency: true },
+    { columnName: 'sellingPrice', type: 'number', currency: true },
   ])
 
   const filterProps = {
     dispatch,
     history,
+    values,
   }
   const gridProps = {
     ...filterProps,
     consumable,
-    namespace: consumable.namespace,
+    namespace: 'consumable',
     list: consumable.list || [],
     tableParas,
     colExtensions,
   }
+
+  useEffect(() => {
+    dispatch({
+      type: 'consumable/query',
+    })
+  }, [])
 
   return (
     <CardContainer

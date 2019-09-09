@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl } from '@/utils/utils'
-import { withFormik } from 'formik'
+// import { withFormik } from 'formik'
 import DetailPanel from './Detail'
 // import Pricing from '../../DetaPricing'
 // import Stock from '../../Details/Stock'
 import InventoryTypeListing from './InventoryTypeListing'
-import { NavPills, ProgressButton, Button } from '@/components'
+import {
+  NavPills,
+  ProgressButton,
+  Button,
+  withFormikExtend,
+} from '@/components'
 import Yup from '@/utils/yup'
 
 const styles = () => ({
@@ -25,9 +30,130 @@ const Detail = ({
   pack,
   packDetail,
   history,
-  handleSubmit,
   setFieldValue,
+  handleSubmit,
+  codetable,
+  ...props
 }) => {
+  const [
+    selectedItem,
+    setSelectedItem,
+  ] = useState({})
+
+  const field = packDetail.entity ? 'entity' : 'default'
+
+  const { ctServiceCenter } = packDetail
+  console.log('ctServiceCenter', ctServiceCenter)
+  const { ctservice } = codetable
+
+  const result = []
+  const map = new Map()
+  if (ctservice) {
+    // for (const item of ctservice) {
+    //   if (!map.has(item.serviceId) && !map.has(item.serviceCenter)) {
+    //     map.set(item.serviceId, true)
+    //     map.set(item.serviceCenter, true)
+    //     result.push({
+    //       serviceId: item.serviceId,
+    //       code: item.code,
+    //       serviceCenter: item.serviceCenter,
+    //     })
+    //   }
+    // }
+    const unique = ctservice.reduce((uniqueList, service) => {
+      const existed = uniqueList.find(
+        (uniqueService) =>
+          uniqueService.serviceId === service.serviceId &&
+          uniqueService.serviceCenter === service.serviceCenter,
+      )
+      if (existed)
+        return [
+          ...uniqueList,
+        ]
+      return [
+        ...uniqueList,
+        service,
+      ]
+    }, [])
+    console.log({ unique })
+  }
+
+  console.log(result)
+  // const result = Array.from(
+  //   new Set(
+  //     ctservice.map((s) => {
+  //       return {
+  //         serviceId: s.serviceId,
+  //         serviceCenter: s.serviceCenter,
+  //       }
+  //     }),
+  //   ),
+  // ).map((serviceCenter) => {
+  //   console.log('serviceCentertest', serviceCenter)
+  //   // return {
+  //   //   serviceId: ctservice.find((s) => s.serviceCenter === serviceCenter)
+  //   //     .serviceId,
+  //   //   code: ctservice.find((s) => s.serviceCenter === serviceCenter).code,
+  //   //   serviceCenter: serviceCenter,
+  //   // }
+  // })
+
+  console.log('result', result)
+  const handleItemOnChange = (e) => {
+    const { option, row } = e
+    const { sellingPrice } = option
+    setSelectedItem(option)
+
+    return { ...row, unitPrice: sellingPrice }
+  }
+  const [
+    serviceCenterList,
+    setServiceCenterList,
+  ] = useState([])
+
+  const [
+    list,
+    setList,
+  ] = useState([])
+
+  const filterServiceCenter = (serviceCenter) => {
+    if (serviceCenter) {
+      return ctServiceCenter.filter((o) =>
+        o.name.toLowerCase().includes(serviceCenter.toLowerCase()),
+      )
+    }
+    return ctServiceCenter
+  }
+
+  useEffect(
+    () => {
+      if (serviceCenterList) {
+        setList(serviceCenterList)
+      }
+    },
+    [
+      serviceCenterList,
+    ],
+  )
+
+  const handleServiceOnChange = (e) => {
+    if (e) {
+      const { option, row } = e
+      const { unitPrice, serviceCenter } = option
+      setServiceCenterList(filterServiceCenter(serviceCenter))
+      setSelectedItem(option)
+      console.log('heckfiler', filterServiceCenter(serviceCenter))
+    }
+  }
+
+  console.log('propsss', props)
+  console.log('codetable', codetable)
+  const {
+    medicationPackageItem,
+    consumablePackageItem,
+    vaccinationPackageItem,
+    servicePackageItem,
+  } = props.values
   const { currentTab } = pack
   const detailProps = {
     packDetail,
@@ -37,80 +163,201 @@ const Detail = ({
   }
 
   const medicationProps = {
-    tableParas: {
+    medicationTableParas: {
       columns: [
         { name: 'medicationName', title: 'Medication Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
-        { name: 'Action', title: 'Action' },
+        { name: 'subTotal', title: 'Amount' },
       ],
       leftColumns: [],
     },
-    colExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
+    medicationColExtensions: [
+      {
+        columnName: 'medicationName',
+        type: 'codeSelect',
+        code: 'inventoryMedication',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: handleItemOnChange,
+      },
+      {
+        columnName: 'quantity',
+        type: 'number',
+      },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
     ],
-    list: [],
+    medicationList: medicationPackageItem,
   }
 
   const vaccinationProps = {
-    tableParas: {
+    vaccinationTableParas: {
       columns: [
-        { name: 'vaccination', title: 'Vaccination' },
+        { name: 'vaccinationName', title: 'Vaccination' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
-        { name: 'Action', title: 'Action' },
+        { name: 'subTotal', title: 'Amount' },
       ],
       leftColumns: [],
     },
-    colExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
+    vaccinationColExtensions: [
+      {
+        columnName: 'vaccinationName',
+        type: 'codeSelect',
+        code: 'inventoryVaccination',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: handleItemOnChange,
+      },
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
     ],
-    list: [],
+    vaccinationList: vaccinationPackageItem,
   }
 
   const consumableProps = {
-    tableParas: {
+    consumableTableParas: {
       columns: [
         { name: 'consumableName', title: 'Consumable Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
-        { name: 'Action', title: 'Action' },
+        { name: 'subTotal', title: 'Amount' },
       ],
       leftColumns: [],
     },
-    colExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
+    consumableColExtensions: [
+      {
+        columnName: 'consumableName',
+        type: 'codeSelect',
+        code: 'inventoryConsumable',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: handleItemOnChange,
+      },
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
     ],
-    list: [],
+    consumableList: consumablePackageItem,
   }
 
+  const [
+    serviceCenter,
+    setServiceCenter,
+  ] = useState([])
+
   const serviceProps = {
-    tableParas: {
+    serviceTableParas: {
       columns: [
-        { name: 'service', title: 'Service' },
+        { name: 'serviceName', title: 'Service' },
+        { name: 'serviceCenterServiceFK', title: 'Service Center' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'amount', title: 'Amount' },
-        { name: 'Action', title: 'Action' },
+        { name: 'subTotal', title: 'Amount' },
       ],
       leftColumns: [],
     },
-    colExtensions: [
-      { columnName: 'Action', width: 110, align: 'center' },
-      { columnName: 'unitPrice', type: 'number', currency: true },
-      { columnName: 'amount', type: 'number', currency: true },
+    serviceColExtensions: [
+      { columnName: 'quantity', type: 'number' },
+      {
+        columnName: 'serviceName',
+        type: 'codeSelect',
+        code: 'ctService',
+        labelField: 'displayValue',
+        valueField: 'serviceId',
+        onChange: handleServiceOnChange,
+      },
+      {
+        columnName: 'serviceCenterServiceFK',
+        type: 'select',
+        options: list,
+        query: (value) => {
+          console.log({ value })
+          return []
+        },
+      },
+      {
+        columnName: 'unitPrice',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
+      {
+        columnName: 'subTotal',
+        type: 'number',
+        currency: true,
+        disabled: true,
+      },
     ],
-    list: [],
+    ServiceList: servicePackageItem,
   }
+  const [
+    total,
+    setTotal,
+  ] = useState(0)
+  const calTotal = () => {
+    setTotal(0)
+    medicationPackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
+
+    servicePackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
+
+    consumablePackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
+
+    vaccinationPackageItem.map((row) => {
+      return setTotal(total + row.subTotal)
+    })
+  }
+
+  // if (ctServiceCenter) {
+  //   setServiceCenter(
+  //     ctServiceCenter.for((o) => {
+  //       return {
+  //         value: o.serviceCenterCategoryFK,
+  //         name: o.displayValue,
+  //       }
+  //     }),
+  //   )
+  // }
+  console.log('let', list)
+  console.log('let', serviceCenterList)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -125,7 +372,7 @@ const Detail = ({
         </Button>
       </div>
       <NavPills
-        color='info'
+        color='primary'
         onChange={(event, active) => {
           history.push(
             getAppendUrl({
@@ -142,20 +389,23 @@ const Detail = ({
           },
           {
             tabButton: 'Order Item',
-            tabContent: <InventoryTypeListing {...medicationProps} />,
+            tabContent: (
+              <InventoryTypeListing
+                calTotal={calTotal}
+                medication={medicationProps}
+                consumable={consumableProps}
+                vaccination={vaccinationProps}
+                service={serviceProps}
+                packDetail={packDetail}
+                setFieldValue={setFieldValue}
+                {...props}
+                selectedItem={selectedItem}
+                setSelectedItem={setSelectedItem}
+                setServiceCenter={setServiceCenter}
+                serviceCenter={serviceCenter}
+              />
+            ),
           },
-          // {
-          //   tabButton: 'Vaccination',
-          //   tabContent: <InventoryTypeListing {...vaccinationProps} />,
-          // },
-          // {
-          //   tabButton: 'Consumable',
-          //   tabContent: <InventoryTypeListing {...consumableProps} />,
-          // },
-          // {
-          //   tabButton: 'Service',
-          //   tabContent: <InventoryTypeListing {...serviceProps} />,
-          // },
         ]}
       />
     </React.Fragment>
@@ -163,35 +413,35 @@ const Detail = ({
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ pack, packDetail }) => ({
+  connect(({ pack, packDetail, codetable }) => ({
     pack,
     packDetail,
+    codetable,
   })),
-  withFormik({
+  withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ packDetail }) => {
-      return packDetail.entity ? packDetail.entity : {}
+      return packDetail.entity ? packDetail.entity : packDetail.default
     },
     handleSubmit: (values, { props }) => {
-      console.log(props)
-      console.log(values)
-      const { dispatch } = props
-      // dispatch({
-      //   type: `${modelType}/submit`,
-      //   payload: test,
-      // }).then((r) => {
-      //   if (r.message === 'Ok') {
-      //     notification.success({
-      //       message: 'Done',
-      //     })
-      //   }
-      // })
+      const { dispatch, history } = props
+      dispatch({
+        type: 'packDetail/upsert',
+        payload: {
+          ...values,
+          effectiveStartDate: values.effectiveDates[0],
+          effectiveEndDate: values.effectiveDates[1],
+        },
+      }).then((r) => {
+        if (r) {
+          history.push('/inventory/master?t=3')
+        }
+      })
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      effectiveStartDate: Yup.string().required(),
-      effectiveEndDate: Yup.string().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     }),
     displayName: 'InventoryPackageDetail',
   }),

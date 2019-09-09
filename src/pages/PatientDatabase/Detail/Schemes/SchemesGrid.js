@@ -60,6 +60,7 @@ class SchemesGrid extends PureComponent {
           sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
             console.log('schemeTypeFK')
+
             let rows = this.props.rows
             if (!row.id) {
               rows = rows.concat([

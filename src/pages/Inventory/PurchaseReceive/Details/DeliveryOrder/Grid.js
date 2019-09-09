@@ -1,16 +1,15 @@
 import React, { PureComponent } from 'react'
-import { CommonTableGrid, Button } from '@/components'
+import { CardContainer, CommonTableGrid, Button } from '@/components'
 import Edit from '@material-ui/icons/Edit'
-import Add from '@material-ui/icons/Add'
 
-class DOGrid extends PureComponent {
+class Grid extends PureComponent {
   editRow = (row, e) => {}
   render () {
     return (
-      <React.Fragment>
+      <CardContainer hideHeader>
         <CommonTableGrid
           style={{ margin: 0 }}
-          type='deliveryOrderDetail'
+          type='deliveryOrder'
           onRowDoubleClick={this.editRow}
           columns={[
             { name: 'doDate', title: 'Delivery Order Date' },
@@ -54,17 +53,9 @@ class DOGrid extends PureComponent {
             pager: false,
           }}
         />
-        <Button
-          //onClick={this.toggleModal}
-          hideIfNoEditRights
-          color='info'
-          link
-        >
-          <Add />Add Delivery Order
-        </Button>
-      </React.Fragment>
+      </CardContainer>
     )
   }
 }
 
-export default DOGrid
+export default Grid

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
@@ -28,18 +28,74 @@ const styles = () => ({
 
 const Transfer = ({
   items,
+  addedItems,
   classes,
   label,
   limitTitle,
   limit,
   setFieldValue,
   fieldName,
+  search,
+  setSearch,
 }) => {
-  const [ addedList, setAddedList ] = useState(items || [])
-  const [ removedList, setRemovedList ] = useState([])
-  const [ searchField, setSearchField ] = useState('')
+  const [
+    addedList,
+    setAddedList,
+  ] = useState(items || [])
+
+  const [
+    removedList,
+    setRemovedList,
+  ] = useState([])
+
+  const [
+    searchField,
+    setSearchField,
+  ] = useState('')
+
+  useEffect(
+    () => {
+      setAddedList(items || [])
+    },
+    [
+      items,
+    ],
+  )
+
+  useEffect(
+    () => {
+      if (addedItems) {
+        const filter = addedList.filter((x) =>
+          addedItems.find(
+            (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
+          ),
+        )
+        initAddedItems(filter)
+      }
+    },
+    [
+      addedItems,
+    ],
+  )
+
+  const initAddedItems = (items) => {
+    setRemovedList(items)
+
+    const tempList = addedList.filter(
+      (x) =>
+        !items.find(
+          (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
+        ),
+    )
+
+    setAddedList(tempList)
+  }
+
   const addClick = (index) => () => {
-    const tempList = [ ...removedList, ...addedList.slice(index, index + 1) ]
+    const tempList = [
+      ...removedList,
+      ...addedList.slice(index, index + 1),
+    ]
     setRemovedList(tempList)
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, tempList)
@@ -52,7 +108,10 @@ const Transfer = ({
   }
 
   const removeClick = (index) => () => {
-    setAddedList([ ...addedList, ...removedList.slice(index, index + 1) ])
+    setAddedList([
+      ...addedList,
+      ...removedList.slice(index, index + 1),
+    ])
     const tempList = [
       ...removedList.slice(0, index),
       ...removedList.slice(index + 1, removedList.length),
@@ -68,7 +127,10 @@ const Transfer = ({
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, [])
     }
-    setAddedList([ ...addedList, ...removedList ])
+    setAddedList([
+      ...addedList,
+      ...removedList,
+    ])
   }
 
   return (
@@ -78,8 +140,10 @@ const Transfer = ({
           <GridItem xs={12}>
             <TextField
               label='Search'
-              onChange={(event) => setSearchField(event.target.value)}
-              value={searchField}
+              // onChange={(event) => setSearchField(event.target.value)}
+              // value={searchField}
+              onChange={(event) => setSearch(event.target.value)}
+              value={search}
             />{' '}
           </GridItem>
           <GridItem xs={12}>

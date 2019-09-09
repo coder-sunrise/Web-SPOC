@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-
+import Sdd from '../../Sdd'
 import {
   CodeSelect,
   CardContainer,
@@ -15,11 +15,22 @@ import {
   Select,
   DatePicker,
   Switch,
+  DateRangePicker,
+  Button,
+  CommonModal,
 } from '@/components'
 
 const styles = () => ({})
 
-const Detail = ({ medicationDetail, dispatch }) => {
+const Detail = ({
+  medicationDetail,
+  dispatch,
+  setFieldValue,
+  sddDetail,
+  ...props
+}) => {
+  const field = medicationDetail.entity ? 'entity' : 'default'
+
   useEffect(() => {
     if (medicationDetail.currentId) {
       dispatch({
@@ -27,9 +38,51 @@ const Detail = ({ medicationDetail, dispatch }) => {
         payload: {
           id: medicationDetail.currentId,
         },
+      }).then((med) => {
+        const { sddfk } = med
+        if (sddfk) {
+          dispatch({
+            type: 'sddDetail/query',
+            payload: {
+              id: sddfk,
+              keepFilter: false,
+            },
+          }).then((sdd) => {
+            const { data } = sdd
+            const { code, name } = data[0]
+            setFieldValue('sddCode', code)
+            setFieldValue('sddDescription', name)
+          })
+        }
       })
     }
   }, [])
+
+  const [
+    toggle,
+    setToggle,
+  ] = useState(false)
+
+  const toggleModal = () => {
+    setToggle(!toggle)
+  }
+  const handleSelectSdd = (row) => {
+    const { setFieldTouched } = props
+    const { id, code, name } = row
+    setToggle(!toggle)
+    dispatch({
+      type: 'medicationDetail/updateState',
+      payload: {
+        [field]: {
+          ...props.values,
+          sddfk: id,
+          sddCode: code,
+          sddDescription: name,
+        },
+      },
+    })
+  }
+
   return (
     <CardContainer
       hideHeader
@@ -103,53 +156,6 @@ const Detail = ({ medicationDetail, dispatch }) => {
                 }}
               />
             </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='isEnableRetail'
-                render={(args) => {
-                  return (
-                    <Switch
-                      label={formatMessage({
-                        id: 'inventory.master.medication.enableRetail',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12} style={{ marginTop: '10px' }} />
-            <GridItem xs={12}>
-              <FastField
-                name='sddFk'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'inventory.master.medication.sddID',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='sDDDescription'
-                render={(args) => {
-                  return (
-                    <Select
-                      label={formatMessage({
-                        id: 'inventory.master.medication.sddDescription',
-                      })}
-                      options={[]}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
           </GridContainer>
         </GridItem>
         <GridItem xs={12} md={2} />
@@ -157,13 +163,14 @@ const Detail = ({ medicationDetail, dispatch }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='favouriteSupplierFk'
+                name='favouriteSupplierFK'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.medication.supplier',
                     })}
-                    code='ctSupplier'
+                    // code='ctSupplier'
+                    code='ctCompany'
                     max={10}
                     {...args}
                   />
@@ -172,13 +179,13 @@ const Detail = ({ medicationDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='drugGroupFK'
+                name='medicationGroupFK'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.medication.medicationGroup',
                     })}
-                    options={[]}
+                    code='ctMedicationGroup'
                     {...args}
                   />
                 )}
@@ -186,13 +193,13 @@ const Detail = ({ medicationDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='revenueCategoryFk'
+                name='revenueCategoryFK'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.medication.revenueCategory',
                     })}
-                    options={[]}
+                    code='ctRevenueCategory'
                     {...args}
                   />
                 )}
@@ -200,41 +207,85 @@ const Detail = ({ medicationDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='effectiveStartDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.medication.effectiveStartDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='effectiveEndDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.medication.effectiveEndDate',
-                    })}
-                    {...args}
-                  />
-                )}
+                name='effectiveDates'
+                render={(args) => {
+                  return (
+                    <DateRangePicker
+                      label='Effective Start Date'
+                      label2='End Date'
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
           </GridContainer>
         </GridItem>
       </GridContainer>
+
+      <h5 style={{ marginTop: 15, marginLeft: 8 }}>SDD</h5>
+      <Divider style={{ marginLeft: 8 }} />
+      <GridContainer>
+        <GridItem xs={5}>
+          <FastField
+            name='sddCode'
+            render={(args) => {
+              return (
+                <TextField
+                  label={formatMessage({
+                    id: 'inventory.master.medication.sddID',
+                  })}
+                  disabled
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={5} style={{ marginTop: 10 }}>
+          <Button variant='contained' color='primary' onClick={toggleModal}>
+            Search
+          </Button>
+        </GridItem>
+        <GridItem xs={5}>
+          <FastField
+            name='sddDescription'
+            render={(args) => {
+              return (
+                <TextField
+                  label={formatMessage({
+                    id: 'inventory.master.medication.sddDescription',
+                  })}
+                  disabled
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+      </GridContainer>
+
       <Divider style={{ margin: '40px 0 20px 0' }} />
+
+      <CommonModal
+        open={toggle}
+        observe='MedicationDetail'
+        title='Standard Drug Dictionary'
+        maxWidth='md'
+        bodyNoPadding
+        onClose={toggleModal}
+        onConfirm={toggleModal}
+      >
+        <Sdd dispatch={dispatch} handleSelectSdd={handleSelectSdd} {...props} />
+      </CommonModal>
     </CardContainer>
   )
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ medicationDetail }) => ({
+  connect(({ medicationDetail, sddDetail }) => ({
     medicationDetail,
+    sddDetail,
   })),
 )(Detail)

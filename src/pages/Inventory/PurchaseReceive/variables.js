@@ -5,6 +5,7 @@ import Print from '@material-ui/icons/Print'
 import { formatMessage } from 'umi/locale'
 import PurchaseOrder from './Details/PurchaseOrder'
 import DeliveryOrder from './Details/DeliveryOrder'
+import Payment from './Details/Payment'
 
 export const ContextMenuOptions = [
   {
@@ -34,6 +35,8 @@ const addContent = (type) => {
       return <PurchaseOrder />
     case 2:
       return <DeliveryOrder />
+    case 3:
+      return <Payment />
     default:
       return <PurchaseOrder />
   }
@@ -62,3 +65,12 @@ export const PurchaseReceiveDetailOption = [
     content: addContent(3),
   },
 ]
+
+export const amountProps = {
+  style: { margin: 0 },
+  noUnderline: true,
+  currency: true,
+  disabled: true,
+  rightAlign: true,
+  normalText: true,
+}

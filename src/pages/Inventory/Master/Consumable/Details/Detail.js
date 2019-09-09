@@ -15,6 +15,7 @@ import {
   Select,
   DatePicker,
   Switch,
+  DateRangePicker,
 } from '@/components'
 
 const styles = () => ({})
@@ -104,21 +105,6 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 }}
               />
             </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='isEnableRetail'
-                render={(args) => {
-                  return (
-                    <Switch
-                      label={formatMessage({
-                        id: 'inventory.master.consumable.enableRetail',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
           </GridContainer>
         </GridItem>
         <GridItem xs={12} md={2} />
@@ -126,13 +112,13 @@ const Detail = ({ consumableDetail, dispatch }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name='supplier'
+                name='favouriteSupplierFK'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.consumable.supplier',
                     })}
-                    code='ctSupplier'
+                    code='ctCompany'
                     max={10}
                     {...args}
                   />
@@ -141,13 +127,13 @@ const Detail = ({ consumableDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='baseUOM'
+                name='uomfk'
                 render={(args) => (
                   <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.consumable.baseUOM',
                     })}
-                    code='ctBaseUOM'
+                    code='ctConsumableUnitOfMeasurement'
                     max={10}
                     {...args}
                   />
@@ -156,13 +142,13 @@ const Detail = ({ consumableDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='consumableCategory'
+                name='consumableCategoryFK'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
                       id: 'inventory.master.consumable.category',
                     })}
-                    options={[]}
+                    code='ctConsumableCategory'
                     {...args}
                   />
                 )}
@@ -170,13 +156,13 @@ const Detail = ({ consumableDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='revenueCategory'
+                name='revenueCategoryFK'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label={formatMessage({
-                      id: 'inventory.master.consumable.revenueCategory',
+                      id: 'inventory.master.medication.revenueCategory',
                     })}
-                    options={[]}
+                    code='ctRevenueCategory'
                     {...args}
                   />
                 )}
@@ -184,25 +170,11 @@ const Detail = ({ consumableDetail, dispatch }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='effectiveStartDate'
+                name='effectiveDates'
                 render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.consumable.effectiveStartDate',
-                    })}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='effectiveEndDate'
-                render={(args) => (
-                  <DatePicker
-                    label={formatMessage({
-                      id: 'inventory.master.consumable.effectiveEndDate',
-                    })}
+                  <DateRangePicker
+                    label='Effective Start Date'
+                    label2='End Date'
                     {...args}
                   />
                 )}

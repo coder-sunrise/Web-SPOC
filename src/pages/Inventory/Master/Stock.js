@@ -18,25 +18,34 @@ const styles = (theme) => ({
   },
 })
 
-const Stock = ({ classes }) => {
-  const [ tableParas, setTableParas ] = useState({
+const Stock = ({
+  classes,
+  vaccinationDetail,
+  medicationDetail,
+  consumableDetail,
+}) => {
+  const objectType = () => {
+    if (vaccinationDetail) return 'vaccinationStock'
+    if (medicationDetail) return 'medicationStock'
+    if (consumableDetail) return 'consumableStock'
+    return ''
+  }
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
-      { name: 'refNo', title: 'Batch No.' },
-      { name: 'expenseDate', title: 'Receiving Date' },
-      { name: 'invoiceDate', title: 'Expiry Date' },
-      { name: 'quantity', title: 'Quantity' },
+      { name: 'batchNo', title: 'Batch No.' },
+      { name: 'expiryDate', title: 'Expiry Date' },
+      { name: 'stock', title: 'Quantity' },
     ],
     columnExtensions: [
       {
-        columnName: 'quantity',
+        columnName: 'stock',
         type: 'number',
       },
       {
-        columnName: 'invoiceDate',
-        type: 'date',
-      },
-      {
-        columnName: 'expenseDate',
+        columnName: 'expiryDate',
         type: 'date',
       },
     ],
@@ -52,13 +61,14 @@ const Stock = ({ classes }) => {
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
           <FastField
-            name='currentStock'
+            name={`${objectType()}.length`}
             render={(args) => {
               return (
                 <NumberInput
                   label={formatMessage({
                     id: 'inventory.master.stock.currentStock',
                   })}
+                  disabled
                   {...args}
                 />
               )

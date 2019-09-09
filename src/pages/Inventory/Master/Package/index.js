@@ -1,26 +1,39 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { CardContainer } from '@/components'
 import { compose } from 'redux'
+import { CardContainer } from '@/components'
+import { status } from '@/utils/codes'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
 
 const styles = () => ({})
 const Package = ({ dispatch, history, pack }) => {
-  const [ tableParas, setTableParas ] = useState({
+  const [
+    tableParas,
+    setTableParas,
+  ] = useState({
     columns: [
-      { name: 'refNo', title: 'Code' },
-      { name: 'patientName', title: 'Name' },
-      { name: 'expenseAmount', title: 'Selling Price' },
-      { name: 'status', title: 'Status' },
-      { name: 'Action', title: 'Action' },
+      { name: 'code', title: 'Code' },
+      { name: 'displayValue', title: 'Name' },
+      { name: 'totalPrice', title: 'Selling Price' },
+      { name: 'isActive', title: 'Status' },
+      { name: 'action', title: 'Action' },
     ],
     leftColumns: [],
   })
-  const [ colExtensions, setColExtensions ] = useState([
+  const [
+    colExtensions,
+    setColExtensions,
+  ] = useState([
+    {
+      columnName: 'isActive',
+      sortingEnabled: false,
+      type: 'select',
+      options: status,
+    },
     { columnName: 'Action', width: 110, align: 'center' },
-    { columnName: 'expenseAmount', type: 'number', currency: true },
+    { columnName: 'totalPrice', type: 'number', currency: true },
   ])
 
   const filterProps = {
@@ -31,11 +44,17 @@ const Package = ({ dispatch, history, pack }) => {
   const gridProps = {
     ...filterProps,
     pack,
-    namespace: pack.namespace,
+    namespace: 'package',
     list: pack.list || [],
     tableParas,
     colExtensions,
   }
+
+  useEffect(() => {
+    dispatch({
+      type: 'pack/query',
+    })
+  }, [])
 
   return (
     <CardContainer

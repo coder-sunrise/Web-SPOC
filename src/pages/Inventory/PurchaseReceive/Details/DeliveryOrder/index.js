@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
-import { Divider } from '@material-ui/core'
-import { withStyles } from '@material-ui/core'
+import { Divider, withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import { GridContainer, GridItem } from '@/components'
-import DOGrid from './Grid'
+import { GridContainer, GridItem, Button, CommonModal } from '@/components'
+import DeliveryOrderDetails from './Details/DeliveryOrderDetails'
+import Grid from './Grid'
+import Add from '@material-ui/icons/Add'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -15,32 +16,70 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ deliveryOrderDetail }) => ({
-  deliveryOrderDetail,
+@connect(({ deliveryOrder }) => ({
+  deliveryOrder,
 }))
 class index extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
-      type: 'deliveryOrderDetail/query',
+      type: 'deliveryOrder/query',
+    })
+  }
+
+  toggleDeliveryOrderDetailsModal = () => {
+    this.props.dispatch({
+      type: 'deliveryOrder/updateState',
+      payload: {
+        showModal: !this.props.deliveryOrder.showModal,
+      },
     })
   }
 
   render () {
-    console.log(this.props)
-    
     const { props } = this
-    const { classes, deliveryOrderDetail } = props
+    const { classes, deliveryOrder } = props
+    const cfg = {
+      toggleDeliveryOrderDetailsModal: this.toggleDeliveryOrderDetailsModal,
+    }
     return (
       <div>
-        <GridContainer gutter={0}>
+        <GridContainer>
           <GridItem xs={12} md={12}>
-            <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
+            <h4 style={{ fontWeight: 'bold' }}>
               {formatMessage({
                 id: 'inventory.pr.detail.dod.do',
               })}
             </h4>
           </GridItem>
-          <DOGrid {...this.props} />
+          <Grid {...this.props} />
+          <CommonModal
+            open={deliveryOrder.showModal}
+            observe='DeliveryOrderDetail'
+            title={
+              deliveryOrder.entity ? (
+                'Edit Delivery Order'
+              ) : (
+                'Delivery Order Details'
+              )
+            }
+            maxWidth='lg'
+            bodyNoPadding
+            onClose={this.toggleDeliveryOrderDetailsModal}
+            onConfirm={this.toggleDeliveryOrderDetailsModal}
+          >
+            <DeliveryOrderDetails {...cfg} {...this.props} />
+          </CommonModal>
+          <Button
+            onClick={this.toggleDeliveryOrderDetailsModal}
+            hideIfNoEditRights
+            color='info'
+            link
+          >
+            <Add />
+            {formatMessage({
+              id: 'inventory.pr.detail.dod.addDeliveryOrder',
+            })}
+          </Button>
         </GridContainer>
       </div>
     )

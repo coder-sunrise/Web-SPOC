@@ -273,6 +273,7 @@ class AntdSelect extends React.PureComponent {
 
     return source
       .map((s) => {
+        // console.log({ label: Object.byString(s, labelField) })
         return {
           ...s,
           value: s[valueField],

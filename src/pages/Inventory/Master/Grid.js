@@ -12,25 +12,28 @@ const Grid = ({
   colExtensions,
   list,
 }) => {
+  // console.log(namespace, namespace)
   useEffect(() => {
     dispatch({
       type: `${namespace}/query`,
     })
   }, [])
-  const showDetail = (row, vmode) => () => {
-    history.push(`/inventory/master/${namespace}?uid=${row.id}`)
-  }
+
+  const showDetail = (row, vmode) => () =>
+    history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
+
+  const handleDoubleClick = (row) =>
+    history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
 
   const Cell = ({ column, row, classes, ...p }) => {
-    if (column.name === 'Action') {
+    if (column.name === 'action') {
       return (
         <Table.Cell {...p}>
-          <Tooltip title='Detail' placement='bottom'>
+          <Tooltip title='Edit Medication' placement='bottom'>
             <Button
               size='sm'
               onClick={showDetail(row)}
               justIcon
-              round
               color='primary'
               style={{ marginRight: 5 }}
             >
@@ -50,6 +53,7 @@ const Grid = ({
     <React.Fragment>
       <CommonTableGrid
         rows={list}
+        onRowDoubleClick={(row) => handleDoubleClick(row)}
         columnExtensions={colExtensions}
         ActionProps={ActionProps}
         FuncProps={{ pager: true }}

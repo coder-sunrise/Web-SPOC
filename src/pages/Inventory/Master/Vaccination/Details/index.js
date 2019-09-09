@@ -27,6 +27,8 @@ const Detail = ({
   history,
   handleSubmit,
   setFieldValue,
+  values,
+  ...props
 }) => {
   const { currentTab } = vaccination
 
@@ -35,6 +37,8 @@ const Detail = ({
     dispatch,
     setFieldValue,
     showTransfer: false,
+    values,
+    ...props,
   }
   return (
     <React.Fragment>
@@ -53,7 +57,7 @@ const Detail = ({
         </Button>
       </div>
       <NavPills
-        color='info'
+        color='primary'
         onChange={(event, active) => {
           history.push(
             getAppendUrl({
@@ -74,11 +78,11 @@ const Detail = ({
           },
           {
             tabButton: 'Pricing',
-            tabContent: <Pricing />,
+            tabContent: <Pricing {...detailProps} />,
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock />,
+            tabContent: <Stock vaccinationDetail={vaccinationDetail} />,
           },
         ]}
       />
@@ -94,29 +98,46 @@ export default compose(
   withFormik({
     enableReinitialize: true,
     mapPropsToValues: ({ vaccinationDetail }) => {
-      return vaccinationDetail.entity ? vaccinationDetail.entity : {}
+      return vaccinationDetail.entity
+        ? vaccinationDetail.entity
+        : vaccinationDetail.default
     },
     handleSubmit: (values, { props }) => {
-      console.log(props)
-      console.log(values)
-      const { dispatch } = props
-      // dispatch({
-      //   type: `${modelType}/submit`,
-      //   payload: test,
-      // }).then((r) => {
-      //   if (r.message === 'Ok') {
-      //     notification.success({
-      //       message: 'Done',
-      //     })
-      //   }
-      // })
+      console.log('clicked')
+      const { dispatch, history } = props
+      dispatch({
+        type: 'vaccinationDetail/upsert',
+        payload: {
+          ...values,
+          effectiveStartDate: values.effectiveDates[0],
+          effectiveEndDate: values.effectiveDates[1],
+        },
+      }).then((r) => {
+        if (r) {
+          history.push('/inventory/master?t=2')
+        }
+      })
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
-      // revenueCategory: Yup.string().required(),
-      effectiveStartDate: Yup.string().required(),
-      effectiveEndDate: Yup.string().required(),
+      revenueCategoryFK: Yup.number().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      prescribingUOMFK: Yup.number().required(),
+      dispensingUOMFK: Yup.number().required(),
+      averageCostPrice: Yup.number().positive(
+        'Average Cost Price must between 0 to 999,999.99',
+      ),
+      markupMargin: Yup.number().positive(
+        'Markup Margin must between 0 to 999,999.99',
+      ),
+      sellingPriceBefDiscount: Yup.number().positive(
+        'Selling Price must between 0 to 999,999.99',
+      ),
+      maxDiscount: Yup.number().positive(
+        'Max Discount must between 0 to 999,999.99',
+      ),
+
       // SellingPrice: Yup.number().required(),
     }),
     displayName: 'InventoryVaccinationDetail',

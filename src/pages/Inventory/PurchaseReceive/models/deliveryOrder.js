@@ -3,7 +3,7 @@ import * as service from '../Details/DeliveryOrder/services'
 import moment from 'moment'
 
 export default createListViewModel({
-  namespace: 'deliveryOrderDetail',
+  namespace: 'deliveryOrder',
   config: {
     queryOnLoad: false,
   },

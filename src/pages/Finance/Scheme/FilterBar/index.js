@@ -27,13 +27,13 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
+const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
         <GridItem xs={6} md={4}>
           <FastField
-            name='schemeName'
+            name='name'
             render={(args) => {
               return (
                 <TextField
@@ -48,7 +48,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='schemeNameType'
+            name='schemeTypeName'
             render={(args) => {
               return (
                 <CodeSelect
@@ -64,7 +64,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='schemeCategory'
+            name='schemeCategoryName'
             render={(args) => {
               return (
                 <CodeSelect
@@ -80,7 +80,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='Co-Payer Name'
+            name='coPayerName'
             render={(args) => {
               return (
                 <CodeSelect
@@ -96,7 +96,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='Co-Pyaer Type'
+            name='coPayerType'
             render={(args) => {
               return (
                 <CodeSelect
@@ -124,8 +124,24 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail }) => {
               variant='contained'
               color='primary'
               onClick={() => {
+                const {
+                  name,
+                  schemeNameType,
+                  schemeCategory,
+                  coPayerName,
+                  coPayerType,
+                  isActive,
+                } = values
                 dispatch({
                   type: 'copaymentScheme/query',
+                  payload: {
+                    name,
+                    schemeNameType,
+                    schemeCategory,
+                    coPayerName,
+                    coPayerType,
+                    isActive,
+                  },
                 })
               }}
             >

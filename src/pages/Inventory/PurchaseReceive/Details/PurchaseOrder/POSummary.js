@@ -1,7 +1,9 @@
 import React, { PureComponent } from 'react'
-// material ui
+import { connect } from 'dva'
 import { Divider } from '@material-ui/core'
-// common component
+import { formatMessage } from 'umi/locale'
+import { Add } from '@material-ui/icons'
+import { amountProps } from '../../variables'
 import {
   GridContainer,
   GridItem,
@@ -10,91 +12,159 @@ import {
   Switch,
   Tooltip,
   Checkbox,
+  Button,
+  FieldArray,
+  FastField,
+  withFormik,
 } from '@/components'
-// styling
+import Adjustment from './Adjustment'
 
-const amountProps = {
-  style: { margin: 0 },
-  noUnderline: true,
-  currency: true,
-  disabled: true,
-  rightAlign: true,
-  normalText: true,
-}
+@connect(({ purchaseOrder }) => ({
+  purchaseOrder,
+}))
+@withFormik({
+  displayName: 'purchaseOrder',
+  mapPropsToValues: ({ purchaseOrder }) => {
+    return purchaseOrder.entity || purchaseOrder.default
+  },
+})
+class POSummary extends PureComponent {
+  addAdjustment = () => {
+    this.arrayHelpers.push({
+      adjTitle: 'test',
+      adjAmount: 0.5,
+      isDeleted: false,
+    })
+  }
 
-class Summary extends PureComponent {
-  render () {
+  render() {
+    const { props } = this
+    const { values } = props
+
     return (
-      <div>
-        <GridContainer
-          direction='column'
-          justify='center'
-          alignItems='flex-end'
-        >
-          <GridItem xs={6} md={6}>
+      <React.Fragment>
+        <GridContainer>
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3}>
             <NumberInput
-              prefix='Sub Total:'
-              defaultValue={10}
+              prefix={formatMessage({
+                id: 'inventory.pr.detail.pod.summary.subTotal',
+              })}
+              defaultValue={190}
               {...amountProps}
             />
           </GridItem>
+        </GridContainer>
 
-          <GridItem xs={6} md={6}>
-            <NumberInput
-              prefix='Adjustments:'
-              defaultValue={2}
-              {...amountProps}
-            />
+        <GridContainer>
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3} container>
+            <p>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.summary.adjustment',
+              })}
+            </p>
+            &nbsp;&nbsp;&nbsp;
+            <Button
+              color='primary'
+              size='sm'
+              justIcon
+              key='addAdjustment'
+              onClick={this.addAdjustment}
+            >
+              <Add />
+            </Button>
           </GridItem>
+        </GridContainer>
 
-          <GridItem xs={6} md={6}>
+        <FieldArray
+          name='adjustmentList'
+          render={(arrayHelpers) => {
+            this.arrayHelpers = arrayHelpers
+            if (!values.adjustmentList) return null
+            return values.adjustmentList.map((v, i) => {
+              return (
+                <Adjustment
+                  key={v.id}
+                  index={i}
+                  arrayHelpers={arrayHelpers}
+                  // propName='purchaseOrder.adjustmentList'
+                  {...amountProps}
+                  {...props}
+                />
+              )
+            })
+          }}
+        />
+
+        <GridContainer>
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3}>
             <NumberInput
-              prefix='GST (7%):'
-              defaultValue={0.63}
+              prefix={formatMessage({
+                id: 'inventory.pr.detail.pod.summary.gst',
+              })}
+              defaultValue={13.3}
               {...amountProps}
             />
           </GridItem>
-          <GridItem xs={6} md={6}>
+        </GridContainer>
+
+        <GridContainer>
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3}>
             <Field
               name='gstEnabled'
               render={(args) => (
                 <Switch
-                  checkedChildren='Yes'
-                  unCheckedChildren='No'
-                  label=''
                   {...args}
                 />
               )}
-              {...amountProps}
             />
           </GridItem>
-          <GridItem xs={6} md={6}>
-            <Field
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3}>
+            <FastField
               name='gstIncluded'
               render={(args) => {
                 return (
-                  <Tooltip title={'Inclusive GST'} placement='bottom'>
-                    <Checkbox label={'Inclusive GST'} simple {...args} />
+                  <Tooltip
+                    title={formatMessage({
+                      id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                    })}
+                    placement='bottom'
+                  >
+                    <Checkbox
+                      label={formatMessage({
+                        id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                      })}
+                      {...args}
+                    />
                   </Tooltip>
                 )
               }}
             />
           </GridItem>
+        </GridContainer>
 
-          <GridItem md={3}>
+        <GridContainer>
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3}>
             <Divider />
           </GridItem>
-
-          <GridItem xs={6} md={6}>
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3}>
             <NumberInput
-              prefix='Total:'
-              defaultValue={10.63}
+              prefix={formatMessage({
+                id: 'inventory.pr.detail.pod.summary.total',
+              })}
+              defaultValue={203.3}
               {...amountProps}
             />
           </GridItem>
         </GridContainer>
-      </div>
+      </React.Fragment>
     )
   }
 }
-export default Summary
+export default POSummary

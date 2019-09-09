@@ -3,9 +3,19 @@ import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { podoStatus } from '@/utils/codes'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import { ContextMenuOptions } from './variables'
-import { notification } from '@/components'
+import {
+  notification,
+  GridContainer,
+  GridItem,
+  CommonModal,
+} from '@/components'
+import { formatMessage } from 'umi/locale'
 
 class Grid extends PureComponent {
+  state = {
+    selectedRows: [],
+  }
+
   onContextButtonClick = (row, id) => {
     switch (id) {
       case '0':
@@ -15,7 +25,16 @@ class Grid extends PureComponent {
         // })
         break
       case '1':
-        notification.info({ message: 'Duplocate PO' })
+        const { dispatch, purchasingReceiving } = this.props
+        const { list } = purchasingReceiving
+        dispatch({
+          type: 'purchasingReceiving/updateState',
+          payload: {
+            showDuplicatePOModal: true,
+            entity: list.find((o) => o.id === row.id),
+          },
+        })
+        //notification.info({ message: 'Duplocate PO' })
         //router.push(`/reception/queue/dispense/${row.visitRefNo}`)
         break
       case '2':
@@ -27,12 +46,22 @@ class Grid extends PureComponent {
     }
   }
 
+  handleSelectionChange = (selection) => {
+    this.setState({ selectedRows: selection })
+  }
+
   render () {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='purchasingReceiving'
         // onRowDoubleClick={this.editRow}
+        selection={this.state.selectedRows}
+        onSelectionChange={this.handleSelectionChange}
+        FuncProps={{
+          selectable: true,
+          selectConfig: { showSelectAll: true },
+        }}
         columns={[
           { name: 'poNo', title: 'PO No' },
           { name: 'poDate', title: 'PO Date' },
