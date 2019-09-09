@@ -1,14 +1,18 @@
-/*eslint no-unused-vars: 0*/
+
 
 import FabricCanvasTool from './fabrictool'
 
-const fabric = require('fabric').fabric
+const {fabric} = require('fabric')
 
 class Rectangle extends FabricCanvasTool {
   configureCanvas (props) {
     let canvas = this._canvas
-    canvas.isDrawingMode = canvas.selection = false
-    canvas.forEachObject((o) => (o.selectable = o.evented = false))
+    canvas.isDrawingMode = false
+    canvas.selection = false
+    canvas.forEachObject((o) => {
+      o.selectable = true
+      o.evented = true 
+    })
     this._width = props.lineWidth
     this._color = props.lineColor
     this._fill = props.fillColor
@@ -30,7 +34,6 @@ class Rectangle extends FabricCanvasTool {
       stroke: this._color,
       strokeWidth: this._width,
       fill: this._fill,
-      //fill: 'rgba(255,0,0,0.5)',
       transparentCorners: false,
       selectable: false,
       evented: false,
@@ -55,7 +58,7 @@ class Rectangle extends FabricCanvasTool {
     canvas.renderAll()
   }
 
-  doMouseUp (o) {
+  doMouseUp () {
     this.isDown = false
   }
 }

@@ -1,15 +1,16 @@
-/*eslint no-unused-vars: 0*/
 
 import FabricCanvasTool from './fabrictool'
 
-const fabric = require('fabric').fabric
 
 class Pan extends FabricCanvasTool {
-  configureCanvas (props) {
+  configureCanvas () {
     let canvas = this._canvas
-    canvas.isDrawingMode = canvas.selection = false
-    canvas.forEachObject((o) => (o.selectable = o.evented = false))
-    //Change the cursor to the move grabber
+    canvas.isDrawingMode = false
+    canvas.selection = false
+    canvas.forEachObject((o) => {
+      o.selectable = true
+      o.evented = true 
+    })
     canvas.defaultCursor = 'move'
   }
 
@@ -33,7 +34,7 @@ class Pan extends FabricCanvasTool {
     canvas.renderAll()
   }
 
-  doMouseUp (o) {
+  doMouseUp () {
     this.isDown = false
   }
 }

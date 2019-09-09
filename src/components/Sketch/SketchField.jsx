@@ -1,5 +1,4 @@
-/*eslint no-unused-vars: 0*/
-
+/* eslint-disable */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import History from './history'
@@ -12,10 +11,9 @@ import Rectangle from './rectangle'
 import Circle from './circle'
 import Pan from './pan'
 import Eraser from './eraser'
-import ArrowBend from './arrowBend'
 import Tool from './tools'
 
-const fabric = require('fabric').fabric
+const { fabric } = require('fabric')
 
 /**
  *   based on FabricJS for React Applications
@@ -89,7 +87,6 @@ class SketchField extends PureComponent {
     this._tools[Tool.Circle] = new Circle(fabricCanvas)
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
     this._tools[Tool.Eraser] = new Eraser(fabricCanvas)
-    this._tools[Tool.ArrowBend] = new ArrowBend(fabricCanvas)
   }
 
   /**
@@ -151,7 +148,7 @@ class SketchField extends PureComponent {
       return
     }
     // if(e.target.type != "image"){
-    if (e.target.id != 'ARROW') {
+    if (e.target.id !== 'ARROW') {
       let obj = e.target
 
       obj.__version = 1
@@ -172,17 +169,17 @@ class SketchField extends PureComponent {
   /**
    * Action when an object is moving around inside the canvas
    */
-  _onObjectMoving = (e) => {}
+  _onObjectMoving = () => {}
 
   /**
    * Action when an object is scaling inside the canvas
    */
-  _onObjectScaling = (e) => {}
+  _onObjectScaling = () => {}
 
   /**
    * Action when an object is rotating inside the canvas
    */
-  _onObjectRotating = (e) => {}
+  _onObjectRotating = () => {}
 
   _onObjectModified = (e) => {
     let obj = e.target
@@ -206,7 +203,7 @@ class SketchField extends PureComponent {
     let obj = e.target
     let canvas = this._fc
 
-    if (obj.id == 'delete') {
+    if (obj.id === 'delete') {
       let activeObj = obj
       if (activeObj) {
         let selected = []
@@ -263,7 +260,7 @@ class SketchField extends PureComponent {
   /**
    * Action when the mouse cursor is moving out from the canvas
    */
-  _onMouseOut = (e) => {
+  _onMouseOut = () => {
     // this._selectedTool.doMouseOut(e)
     // if (this.props.onChange) {
     //   let onChange = this.props.onChange
@@ -287,7 +284,7 @@ class SketchField extends PureComponent {
       }
     }
     if (this.props.onChange) {
-      let onChange = this.props.onChange
+      let { onChange } = this.props
       setTimeout(() => {
         onChange(e.e)
       }, 10)
@@ -314,8 +311,8 @@ class SketchField extends PureComponent {
     if (canvas.backgroundImage) {
       // Need to scale background images as well
       let bi = canvas.backgroundImage
-      bi.width = bi.width * wfactor
-      bi.height = bi.height * hfactor
+      bi.width *= wfactor
+      bi.height *= hfactor
     }
     let objects = canvas.getObjects()
     for (let i in objects) {
@@ -380,16 +377,14 @@ class SketchField extends PureComponent {
 
   hideDrawing = (hideEnable) => {
     let history = this._history
-    var allList = history.getAllList()
+    let allList = history.getAllList()
 
-    for (var i = 0; i < allList.length; i++) {
+    for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-        prevState,
-        currState,
       ] = allList[i]
 
-      if (obj.type != 'image') {
+      if (obj.type !== 'image') {
         if (hideEnable) {
           obj.set({
             opacity: 0,
@@ -413,10 +408,8 @@ class SketchField extends PureComponent {
     let [
       obj,
       prevState,
-      currState,
     ] = history.getCurrent()
 
-    var test = history.getCurrent();
     history.undo()
     if (obj.__removed) {
       this.setState({ action: false }, () => {
@@ -447,10 +440,9 @@ class SketchField extends PureComponent {
     let history = this._history
     if (history.canRedo()) {
       let canvas = this._fc
-      //noinspection Eslint
+
       let [
         obj,
-        prevState,
         currState,
       ] = history.redo()
       if (obj.__version === 0) {
@@ -586,7 +578,7 @@ class SketchField extends PureComponent {
 
   copy = () => {
     let canvas = this._fc
-    canvas.getActiveObject().clone((cloned) => (this._clipboard = cloned))
+    canvas.getActiveObject().clone((cloned) => {this._clipboard = cloned})
   }
 
   paste = () => {
@@ -620,20 +612,22 @@ class SketchField extends PureComponent {
    * @param dataUrl the dataUrl to be used as a background
    * @param options
    */
-  setBackgroundFromDataUrl = (dataUrl, indexCount /*, options = {}*/) => {
+  setBackgroundFromDataUrl = (dataUrl, indexCount) => {
     let canvas = this._fc
-    const context = canvas.getContext('2d')
+    // const context = canvas.getContext('2d')
     const image = new Image()
     image.src = dataUrl
     image.onload = () => {
-      var imgbase64 = new fabric.Image(image, {})
+      let imgbase64 = new fabric.Image(image, {})
       imgbase64.set({
         zindex: indexCount,
       })
-      //canvas.setBackgroundImage(imgbase64)
+      // canvas.setBackgroundImage(imgbase64)
       canvas.add(imgbase64)
+      imgbase64.selectable = false
+      imgbase64.evented = false
       canvas.moveTo(imgbase64, indexCount)
-      //context.drawImage(imgbase64, 0, 0);
+      // context.drawImage(imgbase64, 0, 0);
     }
 
     // fabric.Image.fromURL(
@@ -657,27 +651,22 @@ class SketchField extends PureComponent {
   }
 
   setTemplate = (dataUrl, indexCount) => {
-    console.log("template")
+    console.log('template')
     let history = this._history
-    var allList = history.getAllList()
-    var prevTemplate = ''
+    let allList = history.getAllList()
+    let prevTemplate = ''
 
-    for (var i = 0; i < allList.length; i++) {
+    for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-        prevState,
-        currState,
       ] = allList[i]
 
-      if (obj.id == 'template') {
+      if (obj.id === 'template') {
         prevTemplate = obj
-        console.log("vghjk")
       }
     }
 
-
-    if (prevTemplate != '') {
-
+    if (prevTemplate !== '') {
       let canvas = this._fc
       let activeObj = prevTemplate
       if (activeObj) {
@@ -698,7 +687,7 @@ class SketchField extends PureComponent {
             state,
           ])
           canvas.remove(obj)
-          console.log("removed")
+          console.log('removed')
         })
         canvas.discardActiveObject()
         canvas.requestRenderAll()
@@ -706,24 +695,25 @@ class SketchField extends PureComponent {
     }
 
     let canvas = this._fc
-    const context = canvas.getContext('2d')
     const image = new Image()
     image.src = dataUrl
     image.onload = () => {
-      var imgbase64 = new fabric.Image(image, {})
+      let imgbase64 = new fabric.Image(image, {})
       imgbase64.set({
         zindex: indexCount,
-        id: "template"
+        id: 'template',
       })
       canvas.add(imgbase64)
-      canvas.moveTo(imgbase64, indexCount)
+      imgbase64.selectable = false
+      imgbase64.evented = false
+      canvas.moveTo(imgbase64, 0)
     }
   }
 
   downloadImage = () => {
     let canvas = this._fc
-    var url = canvas.toDataURL('image/png')
-    var link = document.createElement('a')
+    // let url = canvas.toDataURL('image/png')
+    let link = document.createElement('a')
     link.download = 'drawing.png'
     link.href = canvas.toDataURL()
     link.click()
@@ -752,12 +742,12 @@ class SketchField extends PureComponent {
 
   componentDidMount = () => {
     let { tool, value, undoSteps, defaultValue, backgroundColor } = this.props
-
-    let canvas = (this._fc = new fabric.Canvas(this._canvas, {
+    this._fc = new fabric.Canvas(this._canvas, {
       preserveObjectStacking: true,
-      //renderOnAddRemove: false,
-      //skipTargetFind: true
-    }))
+      // renderOnAddRemove: false,
+      // skipTargetFind: true
+    })
+    let canvas = this._fc
 
     this._initTools(canvas)
 
@@ -816,7 +806,7 @@ class SketchField extends PureComponent {
         this._tools[this.props.tool] || this._tools[Tool.Pencil]
     }
 
-    //Bring the cursor back to default if it is changed by a tool
+    // Bring the cursor back to default if it is changed by a tool
     this._fc.defaultCursor = 'default'
     this._selectedTool.configureCanvas(this.props)
 
@@ -837,18 +827,25 @@ class SketchField extends PureComponent {
 
     let canvasDivStyle = Object.assign(
       {},
-      style ? style : {},
-      width ? { width: width } : {},
-      height ? { height: height } : { height: 512 },
+      style || {},
+      width ? { width } : {},
+      height ? { height } : { height: 512 },
     )
 
     return (
       <div
         className={className}
-        ref={(c) => (this._container = c)}
+        ref={(c) => {
+          this._container = c
+        }}
         style={canvasDivStyle}
       >
-        <canvas id={uuid4()} ref={(c) => (this._canvas = c)}>
+        <canvas
+          id={uuid4()}
+          ref={(c) => {
+            this._canvas = c
+          }}
+        >
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>
       </div>

@@ -66,3 +66,5 @@ export * from './Decorator'
 export * from './formik/index'
 
 export AuthorizedContext from './Context/Authorized'
+
+export {default as Scribble} from './Scribble'

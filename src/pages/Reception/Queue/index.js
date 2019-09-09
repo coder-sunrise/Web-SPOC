@@ -174,6 +174,7 @@ class Queue extends PureComponent {
   }
 
   onEnterPressed = async (searchQuery) => {
+    console.log(searchQuery);
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -294,7 +295,7 @@ class Queue extends PureComponent {
               <React.Fragment>
                 <DetailsActionBar
                   onRegisterVisitEnterPressed={this.onEnterPressed}
-                  togglePatientSearch={this.togglePatientSearch}
+                  togglePatientSearch={this.togglePatientDetailsGridSearch}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid

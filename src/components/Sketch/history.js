@@ -28,9 +28,11 @@ class History {
   getCurrent () {
     return this.current
   }
-/*
+
+  /*
   Get all list
 */
+
   getAllList () {
     return this.allList
   }
@@ -132,11 +134,7 @@ class History {
   print () {
     if (this.debug) {
       /* eslint-disable no-console */
-      console.log(
-        this.undoList,
-        ' -> ' + this.current + ' <- ',
-        this.redoList.slice(0).reverse(),
-      )
+      console.log(this.undoList, this.current, this.redoList.slice(0).reverse())
     }
   }
 }

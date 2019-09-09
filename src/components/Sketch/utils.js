@@ -7,19 +7,19 @@
  */
 export const pointerPosition = (event) => {
   event = event || window.event
-  var target = event.target || event.srcElement,
-    style = target.currentStyle || window.getComputedStyle(target, null),
-    borderLeftWidth = parseInt(style['borderLeftWidth'], 10),
-    borderTopWidth = parseInt(style['borderTopWidth'], 10),
-    rect = target.getBoundingClientRect(),
-    _x = event.clientX - borderLeftWidth - rect.left,
-    _y = event.clientY - borderTopWidth - rect.top,
-    _touchX = event.changedTouches
-      ? event.changedTouches[0].clientX - borderLeftWidth - rect.left
-      : null,
-    _touchY = event.changedTouches
-      ? event.changedTouches[0].clientY - borderTopWidth - rect.top
-      : null
+  let target = event.target || event.srcElement
+  let style = target.currentStyle || window.getComputedStyle(target, null)
+  let borderLeftWidth = parseInt(style.borderLeftWidth, 10)
+  let borderTopWidth = parseInt(style.borderTopWidth, 10)
+  let rect = target.getBoundingClientRect()
+  let _x = event.clientX - borderLeftWidth - rect.left
+  let _y = event.clientY - borderTopWidth - rect.top
+  let _touchX = event.changedTouches
+    ? event.changedTouches[0].clientX - borderLeftWidth - rect.left
+    : null
+  let _touchY = event.changedTouches
+    ? event.changedTouches[0].clientY - borderTopWidth - rect.top
+    : null
   return [
     _x || _touchX,
     _y || _touchY,
@@ -45,8 +45,8 @@ export const linearDistance = (point1, point2) => {
  * @returns {string}
  */
 export const uuid4 = () => {
-  let uuid = '',
-    ii
+  let uuid = ''
+  let ii = ''
   for (ii = 0; ii < 32; ii += 1) {
     switch (ii) {
       case 8:

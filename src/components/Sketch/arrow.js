@@ -1,15 +1,17 @@
-/*eslint no-unused-vars: 0*/
-
 import FabricCanvasTool from './fabrictool'
-import zIndex from '@material-ui/core/styles/zIndex';
 
-const fabric = require('fabric').fabric
+const { fabric } = require('fabric')
 
 class Arrow extends FabricCanvasTool {
   configureCanvas (props) {
     let canvas = this._canvas
-    canvas.isDrawingMode = canvas.selection = false
-    canvas.forEachObject((o) => (o.selectable = o.evented = false))
+
+    canvas.isDrawingMode = false
+    canvas.selection = false
+    canvas.forEachObject((o) => {
+      o.selectable = true
+      o.evented = true
+    })
     this._width = props.lineWidth
     this._color = props.lineColor
   }
@@ -17,8 +19,8 @@ class Arrow extends FabricCanvasTool {
   doMouseDown (o) {
     this.isDown = true
     let canvas = this._canvas
-    var pointer = canvas.getPointer(o.e)
-    var points = [
+    let pointer = canvas.getPointer(o.e)
+    let points = [
       pointer.x,
       pointer.y,
       pointer.x,
@@ -56,23 +58,23 @@ class Arrow extends FabricCanvasTool {
   doMouseMove (o) {
     if (!this.isDown) return
     let canvas = this._canvas
-    var pointer = canvas.getPointer(o.e)
+    let pointer = canvas.getPointer(o.e)
     this.line.set({ x2: pointer.x, y2: pointer.y })
     this.line.setCoords()
 
-    let x_delta = pointer.x - this.line.x1
-    let y_delta = pointer.y - this.line.y1
+    let xDelta = pointer.x - this.line.x1
+    let yDelta = pointer.y - this.line.y1
 
     this.head.set({
       left: pointer.x,
       top: pointer.y,
-      angle: 90 + Math.atan2(y_delta, x_delta) * 180 / Math.PI,
+      angle: 90 + Math.atan2(yDelta, xDelta) * 180 / Math.PI,
     })
 
     canvas.renderAll()
   }
 
-  doMouseUp (o) {
+  doMouseUp () {
     this.isDown = false
     let canvas = this._canvas
 
@@ -84,11 +86,11 @@ class Arrow extends FabricCanvasTool {
     ])
     arrow.selectable = false
     arrow.evented = false
-    arrow.id ="abc"
+    arrow.id = 'abc'
     canvas.add(arrow)
   }
 
-  doMouseOut (o) {
+  doMouseOut () {
     this.isDown = false
   }
 }

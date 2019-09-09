@@ -57,25 +57,25 @@
 import FabricCanvasTool from './fabrictool'
 
 class Eraser extends FabricCanvasTool {
-  configureCanvas (props) {
+  configureCanvas () {
     let canvas = this._canvas
     canvas.isDrawingMode = false
     canvas.selection = true
     canvas.forEachObject((o) => {
-      o.selectable = o.evented = true
+      o.selectable = true
+      o.evented = true 
     })
-    //Change the cursor to the move grabber
     canvas.defaultCursor = 'cell'
   }
 
-  doMouseDown (o) {
+  doMouseDown () {
 
     let canvas = this._canvas
     this.isDown = true
-    var obj = canvas.getActiveObject()
+    let obj = canvas.getActiveObject()
     if(obj){
       obj.set({
-        id: "delete"
+        id: "delete",
       })
       canvas.remove(obj)
     }
@@ -83,13 +83,13 @@ class Eraser extends FabricCanvasTool {
   }
 
 
-  doMouseUp (o) {
+  doMouseUp () {
     let canvas = this._canvas
     this.isDown = false
-    var obj = canvas.getActiveObject()
+    let obj = canvas.getActiveObject()
     if(obj){
       obj.set({
-        id: "delete"
+        id: "delete",
       })
       canvas.remove(obj)
     }
