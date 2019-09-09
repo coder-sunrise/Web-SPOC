@@ -10,6 +10,7 @@ import {
 import { Attachment } from '@/components/_medisys'
 
 import UploadAttachment from './UploadAttachment'
+import ScribbleNote from './ScribbleNote'
 import model from './models'
 
 window.g_app.replaceModel(model)
@@ -59,6 +60,17 @@ class ClinicalNotes extends PureComponent {
       type: 'clinicalnotes/updateState',
       payload: {
         showAttachmentModal: !clinicalnotes.showAttachmentModal,
+      },
+    })
+  }
+
+  toggleScribbleModal = () => {
+    const { clinicalnotes } = this.props
+
+    this.props.dispatch({
+      type: 'clinicalnotes/updateState',
+      payload: {
+        showScribbleModal: !clinicalnotes.showScribbleModal,
       },
     })
   }
@@ -158,6 +170,15 @@ class ClinicalNotes extends PureComponent {
           onClose={() => this.toggleAttachmentModal()}
         >
           <UploadAttachment updateAttachments={this.updateAttachments} />
+        </CommonModal>
+        <CommonModal
+          open={clinicalnotes.showScribbleModal}
+          title='Scribble'
+          fullScreen
+          bodyNoPadding
+          onClose={() => this.toggleScribbleModal()}
+        >
+          <ScribbleNote />
         </CommonModal>
       </div>
     )

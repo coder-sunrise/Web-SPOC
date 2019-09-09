@@ -30,6 +30,8 @@ import Rectangle from '@material-ui/icons/CropLandscape'
 import Circle from '@material-ui/icons/PanoramaFishEye'
 import Move from '@material-ui/icons/OpenWith'
 import Select from '@material-ui/icons/PanTool'
+import Visibility from '@material-ui/icons/Visibility'
+import InVisibility from '@material-ui/icons/VisibilityOff'
 import { Radio } from 'antd'
 import {
   GridContainer,
@@ -95,7 +97,7 @@ class Scribble extends React.Component {
       canRedo: false,
       canClear: false,
       sketchHeight: 750,
-      sketchWidth: 1648,
+      sketchWidth: window.width,
       hideEnable: false,
       disableAddImage: false,
       indexCount: 1,
@@ -111,7 +113,6 @@ class Scribble extends React.Component {
   handleColorVisibleChange = (colorVisible) => {
     this.setState({ colorVisible })
   }
-
 
   handleInsertImageVisibleChange = (imageVisible) => {
     this.setState({ imageVisible })
@@ -192,8 +193,8 @@ class Scribble extends React.Component {
   _selectTool = (event) => {
     this.setState({
       tool: event.target.value,
-     // enableRemoveSelected: event.target.value === Tools.Select,
-     // enableCopyPaste: event.target.value === Tools.Select,
+      // enableRemoveSelected: event.target.value === Tools.Select,
+      // enableCopyPaste: event.target.value === Tools.Select,
     })
   }
 
@@ -235,27 +236,32 @@ class Scribble extends React.Component {
     const { classes } = this.props
 
     return (
-      <div>
+      <div
+        style={{
+          paddingLeft: 10,
+          paddingRight: 10,
+        }}
+      >
         <GridContainer>
-          <div
-            style={{
-              width: 300,
-              left: 5,
-              paddingRight: 10,
-              display: 'flex',
-              float: 'left',
-            }}
-          >
-            <TextField label='Scribble Subject' />
-          </div>
           <GridItem
             xs={12}
             md={12}
             gutter={0}
             style={{
+              paddingTop: 20,
               position: 'relative',
             }}
           >
+            <div
+              style={{
+                width: 250,
+                display: 'flex',
+                float: 'left',
+                paddingRight: 10,
+              }}
+            >
+              <TextField label='Scribble Subject' />
+            </div>
             <ToggleButtonGroup
               // size='small'
               // value={alignment}
@@ -364,7 +370,7 @@ class Scribble extends React.Component {
                     <div>
                       <Typography>Line Weight</Typography>
                       <Slider
-                       // ValueLabelComponent={ValueLabelComponent}
+                        // ValueLabelComponent={ValueLabelComponent}
                         step={1}
                         min={0}
                         max={50}
@@ -433,10 +439,7 @@ class Scribble extends React.Component {
                 onVisibleChange={this.handleColorVisibleChange}
               >
                 <Tooltip title='Colors'>
-                  <ToggleButton
-                    key={3}
-                    className={classes.actionButton}
-                  >
+                  <ToggleButton key={3} className={classes.actionButton}>
                     <ColorLens className={classes.actionIcon} />
                   </ToggleButton>
                 </Tooltip>
@@ -632,6 +635,55 @@ class Scribble extends React.Component {
                   <Save />
                 </ToggleButton>
               </Tooltip>
+              <Tooltip title='Undo'>
+                <ToggleButton
+                  key={7}
+                  color='primary'
+                  disabled={!this.state.canUndo}
+                  onClick={this._undo}
+                >
+                  <UndoIcon
+                    color={this.state.canUndo ? 'primary' : 'disabled'}
+                  />
+                </ToggleButton>
+              </Tooltip>
+              <Tooltip title='Redo'>
+                <ToggleButton
+                  key={8}
+                  color='primary'
+                  disabled={!this.state.canRedo}
+                  onClick={this._redo}
+                >
+                  <RedoIcon
+                    color={this.state.canRedo ? 'primary' : 'disabled'}
+                  />
+                </ToggleButton>
+              </Tooltip>
+              <Tooltip title='Remove All'>
+                <ToggleButton
+                  key={9}
+                  color='primary'
+                  disabled={!this.state.canClear}
+                  onClick={this._clear}
+                >
+                  <DeleteIcon
+                    color={this.state.canClear ? 'primary' : 'disabled'}
+                  />
+                </ToggleButton>
+              </Tooltip>
+              <Tooltip title='Hide'>
+                <ToggleButton
+                  key={10}
+                  checked={this.state.hideEnable}
+                  onClick={this._hideDrawing}
+                >
+                  {this.state.hideEnable ? (
+                    <InVisibility color='disabled' />
+                  ) : (
+                    <Visibility color='primary' />
+                  )}
+                </ToggleButton>
+              </Tooltip>
             </ToggleButtonGroup>
 
             <div
@@ -698,7 +750,9 @@ class Scribble extends React.Component {
             <br />
             <SketchField
               name='sketch'
-              ref={(c) => {this._sketch = c}}
+              ref={(c) => {
+                this._sketch = c
+              }}
               lineWidth={this.state.lineWidth}
               lineColor={this.state.lineColor}
               className={classes.container}
@@ -725,6 +779,4 @@ class Scribble extends React.Component {
   }
 }
 
-
 export default withStyles(styles, { withTheme: true })(Scribble)
-

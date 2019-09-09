@@ -73,12 +73,12 @@ const widgets = [
                       window.g_app._store.dispatch({
                         type: 'clinicalnotes/updateState',
                         payload: {
-                          showAttachmentModal: true,
+                          showScribbleModal: true,
                         },
                       })
                     }}
                   >
-                    > Add Scribble Notes
+                     Add Scribble Notes
                   </Menu.Item>
                 </Menu>
               }
