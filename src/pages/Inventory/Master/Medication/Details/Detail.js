@@ -65,7 +65,7 @@ const Detail = ({
 
   const toggleModal = () => {
     setToggle(!toggle)
-  }
+  } 
   const handleSelectSdd = (row) => {
     const { setFieldTouched } = props
     const { id, code, name } = row

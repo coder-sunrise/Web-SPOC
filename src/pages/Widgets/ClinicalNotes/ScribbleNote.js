@@ -4,9 +4,12 @@ import { Scribble } from '@/components'
 
 class ScribbleNote extends PureComponent {
   render () {
+    const {
+      toggleScribbleModal,
+    } = this.props
     return (
       <div>
-        <Scribble />
+        <Scribble toggleScribbleModal={toggleScribbleModal} />
       </div>
     )
   }

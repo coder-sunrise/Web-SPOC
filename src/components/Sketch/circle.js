@@ -1,9 +1,7 @@
-
 import { linearDistance } from './utils'
 import FabricCanvasTool from './fabrictool'
 
-const {fabric} = require('fabric')
-
+const { fabric } = require('fabric')
 
 class Circle extends FabricCanvasTool {
   configureCanvas (props) {
@@ -11,8 +9,8 @@ class Circle extends FabricCanvasTool {
     canvas.isDrawingMode = false
     canvas.selection = false
     canvas.forEachObject((o) => {
-      o.selectable = true
-      o.evented = true 
+      o.selectable = false
+      o.evented = false
     })
     this._width = props.lineWidth
     this._color = props.lineColor
@@ -59,6 +57,8 @@ class Circle extends FabricCanvasTool {
         Math.atan2(pointer.y - this.startY, pointer.x - this.startX) *
         180 /
         Math.PI,
+      selectable: false,
+      evented: false,
     })
     this.circle.setCoords()
     canvas.renderAll()

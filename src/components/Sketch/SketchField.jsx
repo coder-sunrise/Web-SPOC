@@ -687,7 +687,6 @@ class SketchField extends PureComponent {
             state,
           ])
           canvas.remove(obj)
-          console.log('removed')
         })
         canvas.discardActiveObject()
         canvas.requestRenderAll()

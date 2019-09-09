@@ -315,7 +315,7 @@ class RichEditor extends React.PureComponent {
       shrink: true,
     }
 
-    if (tagList != undefined) {
+    if (tagList !== undefined) {
       return (
         <React.Fragment>
           <CustomInput

@@ -135,7 +135,7 @@ export default compose(
   //   displayName: 'InventoryMedicationDetail',
   // }),
 
-  withFormikExtend({
+ withFormikExtend({
     enableReinitialize: true,
 
     mapPropsToValues: ({ medicationDetail }) => {

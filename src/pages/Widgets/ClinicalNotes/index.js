@@ -64,9 +64,9 @@ class ClinicalNotes extends PureComponent {
     })
   }
 
-  toggleScribbleModal = () => {
+  toggleScribbleModal =  () => {
     const { clinicalnotes } = this.props
-
+    console.log({ clinicalnotes })
     this.props.dispatch({
       type: 'clinicalnotes/updateState',
       payload: {
@@ -176,9 +176,9 @@ class ClinicalNotes extends PureComponent {
           title='Scribble'
           fullScreen
           bodyNoPadding
-          onClose={() => this.toggleScribbleModal()}
+          onClose={this.toggleScribbleModal}
         >
-          <ScribbleNote />
+          <ScribbleNote toggleScribbleModal={this.toggleScribbleModal} />
         </CommonModal>
       </div>
     )

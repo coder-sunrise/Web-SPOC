@@ -9,8 +9,8 @@ class Arrow extends FabricCanvasTool {
     canvas.isDrawingMode = false
     canvas.selection = false
     canvas.forEachObject((o) => {
-      o.selectable = true
-      o.evented = true
+      o.selectable = false
+      o.evented = false
     })
     this._width = props.lineWidth
     this._color = props.lineColor

@@ -1,14 +1,5 @@
 import React from 'react'
-import {
-  Paper,
-  withStyles,
-  IconButton,
-  Typography,
-  Slider,
-  Button,
-  List,
-  Grid,
-} from '@material-ui/core'
+import { Paper, withStyles, Typography, Slider, List } from '@material-ui/core'
 
 import { CompactPicker } from 'react-color'
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -33,6 +24,7 @@ import Select from '@material-ui/icons/PanTool'
 import Visibility from '@material-ui/icons/Visibility'
 import InVisibility from '@material-ui/icons/VisibilityOff'
 import { Radio } from 'antd'
+import Yup from '@/utils/yup'
 import {
   GridContainer,
   GridItem,
@@ -42,28 +34,16 @@ import {
   Tools,
   Tooltip,
   TextField,
+  ProgressButton,
+  Button,
+  withFormikExtend,
+  FastField,
 } from '@/components'
 
 const styles = () => ({
   container: {
     border: '1px solid #0d3349',
     backgroundColor: '#ffffff',
-  },
-  actionButton: {
-    // widht: 30,
-    // margin: '5px 5px',
-  },
-  actionIcon: {
-    // width: 35,
-    // height: 35,
-  },
-  activeStyle: {
-    borderStyle: 'solid',
-    backgroundColor: '#eee',
-  },
-  rejectStyle: {
-    borderStyle: 'solid',
-    backgroundColor: '#ffdddd',
   },
   dropArea: {
     width: '100%',
@@ -76,8 +56,75 @@ const styles = () => ({
     paddingLeft: '10px',
     paddingRight: '10px',
   },
+  actionDiv: {
+    float: 'right',
+    textAlign: 'center',
+    marginTop: '5px',
+  },
+  layout: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 20,
+  },
+  gridItem: {
+    position: 'relative',
+  },
+  scribbleSubject: {
+    width: 250,
+    display: 'flex',
+    float: 'left',
+    paddingRight: 10,
+  },
+  radioButtonPadding: {
+    paddingTop: 5,
+  },
+  templateImage: {
+    maxHeight: 130,
+    overflow: 'auto',
+    alignItems: 'center',
+  },
+  imageOption: {
+    padding: 20,
+  },
+  rightButton: {
+    display: 'flex',
+    float: 'right',
+    padding: 2,
+  },
+  sketchArea: {
+    paddingTop: 30,
+  }
 })
 
+@withFormikExtend({
+  validationSchema: Yup.object().shape({
+    subject: Yup.string().required(),
+  }),
+  handleSubmit: (values, { props, resetForm }) => {
+    // // console.log('restValues')
+    // console.log('restValues', values)
+    // const { effectiveDates, ...restValues } = values
+    // const { dispatch, history, onConfirm, medicationDetail } = props
+    // console.log('medicationDetail', medicationDetail)
+    // const payload = {
+    //   ...restValues,
+    //   effectiveStartDate: effectiveDates[0],
+    //   effectiveEndDate: effectiveDates[1],
+    // }
+    // dispatch({
+    //   type: 'medicationDetail/upsert',
+    //   payload,
+    // }).then((r) => {
+    //   if (r) {
+    //     if (onConfirm) onConfirm()
+    //     dispatch({
+    //       type: 'medicationDetail/query',
+    //     })
+    //     history.push('/inventory/master')
+    //   }
+    // })
+  },
+})
 class Scribble extends React.Component {
   constructor (props) {
     super(props)
@@ -96,7 +143,7 @@ class Scribble extends React.Component {
       canUndo: false,
       canRedo: false,
       canClear: false,
-      sketchHeight: 750,
+      sketchHeight: 770,
       sketchWidth: window.width,
       hideEnable: false,
       disableAddImage: false,
@@ -233,34 +280,18 @@ class Scribble extends React.Component {
   }
 
   render () {
-    const { classes } = this.props
-
+    const { classes, toggleScribbleModal, handleSubmit } = this.props
     return (
-      <div
-        style={{
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
+      <div className={classes.layout}>
         <GridContainer>
-          <GridItem
-            xs={12}
-            md={12}
-            gutter={0}
-            style={{
-              paddingTop: 20,
-              position: 'relative',
-            }}
-          >
-            <div
-              style={{
-                width: 250,
-                display: 'flex',
-                float: 'left',
-                paddingRight: 10,
-              }}
-            >
-              <TextField label='Scribble Subject' />
+          <GridItem xs={12} md={12} gutter={0} className={classes.gridItem}>
+            <div className={classes.scribbleSubject}>
+              <FastField
+                name='subject'
+                render={(args) => {
+                  return <TextField label='Scribble Subject' {...args} />
+                }}
+              />
             </div>
             <ToggleButtonGroup
               // size='small'
@@ -290,12 +321,10 @@ class Scribble extends React.Component {
                       tool: 'select',
                     })
                   }}
-                  className={classes.actionButton}
                 >
                   <Select />
                 </ToggleButton>
               </Tooltip>
-
               <Popover
                 icon={null}
                 content={
@@ -317,7 +346,7 @@ class Scribble extends React.Component {
                           <React.Fragment>
                             <Radio.Button
                               value={Tools.Select}
-                              style={{ paddingTop: 5 }}
+                              className={classes.radioButtonPadding}
                             >
                               <Select />
                             </Radio.Button>
@@ -327,7 +356,7 @@ class Scribble extends React.Component {
                         <Tooltip title='Pencil'>
                           <Radio.Button
                             value={Tools.Pencil}
-                            style={{ paddingTop: 5 }}
+                            className={classes.radioButtonPadding}
                           >
                             <Pen />
                           </Radio.Button>
@@ -335,31 +364,31 @@ class Scribble extends React.Component {
 
                         <Radio.Button
                           value={Tools.Line}
-                          style={{ paddingTop: 5 }}
+                          className={classes.radioButtonPadding}
                         >
                           <Remove />
                         </Radio.Button>
                         <Radio.Button
                           value={Tools.Arrow}
-                          style={{ paddingTop: 5 }}
+                          className={classes.radioButtonPadding}
                         >
                           <Backspace />
                         </Radio.Button>
                         <Radio.Button
                           value={Tools.Rectangle}
-                          style={{ paddingTop: 5 }}
+                          className={classes.radioButtonPadding}
                         >
                           <Rectangle />
                         </Radio.Button>
                         <Radio.Button
                           value={Tools.Circle}
-                          style={{ paddingTop: 5 }}
+                          className={classes.radioButtonPadding}
                         >
                           <Circle />
                         </Radio.Button>
                         <Radio.Button
                           value={Tools.Pan}
-                          style={{ paddingTop: 5 }}
+                          className={classes.radioButtonPadding}
                         >
                           <Move />
                         </Radio.Button>
@@ -388,12 +417,8 @@ class Scribble extends React.Component {
                 onVisibleChange={this.handleToolsVisibleChange}
               >
                 <Tooltip title='Colors'>
-                  <ToggleButton
-                    key={2}
-                    type='primary'
-                    className={classes.actionButton}
-                  >
-                    <MoreVert className={classes.actionIcon} />
+                  <ToggleButton key={2} type='primary'>
+                    <MoreVert />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
@@ -439,8 +464,8 @@ class Scribble extends React.Component {
                 onVisibleChange={this.handleColorVisibleChange}
               >
                 <Tooltip title='Colors'>
-                  <ToggleButton key={3} className={classes.actionButton}>
-                    <ColorLens className={classes.actionIcon} />
+                  <ToggleButton key={3}>
+                    <ColorLens />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
@@ -449,15 +474,9 @@ class Scribble extends React.Component {
                 icon={null}
                 content={
                   <div>
-                    <Paper
-                      style={{
-                        maxHeight: 130,
-                        overflow: 'auto',
-                        alignItems: 'center',
-                      }}
-                    >
+                    <Paper className={classes.templateImage}>
                       <List>
-                        <div style={{ padding: 20 }}>
+                        <div className={classes.imageOption}>
                           <Button
                             color='primary'
                             onClick={this._setTemplate}
@@ -480,7 +499,7 @@ class Scribble extends React.Component {
                             Test Image 3
                           </Button>
                         </div>
-                        <div style={{ padding: 20 }}>
+                        <div className={classes.imageOption}>
                           <Button
                             color='primary'
                             onClick={this._setTemplate}
@@ -503,7 +522,7 @@ class Scribble extends React.Component {
                             Test Image 3
                           </Button>
                         </div>
-                        <div style={{ padding: 20 }}>
+                        <div className={classes.imageOption}>
                           <Button
                             color='primary'
                             onClick={this._setTemplate}
@@ -526,7 +545,7 @@ class Scribble extends React.Component {
                             Test Image 3
                           </Button>
                         </div>
-                        <div style={{ padding: 20 }}>
+                        <div className={classes.imageOption}>
                           <Button
                             color='primary'
                             onClick={this._setTemplate}
@@ -559,27 +578,12 @@ class Scribble extends React.Component {
                         onDrop={this._onBackgroundImageDrop}
                         accept='image/*'
                         multiple={false}
-                        style={styles.dropArea}
-                        activeStyle={styles.activeStyle}
-                        rejectStyle={styles.rejectStyle}
                       >
                         {({ getRootProps, getInputProps }) => (
                           <section>
                             <div {...getRootProps()} style={styles.dropArea}>
                               <input {...getInputProps()} />
-                              <p
-                                style={{
-                                  width: '100%',
-                                  height: '90px',
-                                  border: '2px dashed rgb(102, 102, 102)',
-                                  borderStyle: 'dashed',
-                                  borderRadius: '5px',
-                                  textAlign: 'center',
-                                  paddingTop: '30px',
-                                  paddingLeft: '10px',
-                                  paddingRight: '10px',
-                                }}
-                              >
+                              <p className={classes.dropArea}>
                                 Drag and drop some files here, or click to
                                 select files
                               </p>
@@ -597,8 +601,8 @@ class Scribble extends React.Component {
                 onVisibleChange={this.handleInsertImageVisibleChange}
               >
                 <Tooltip title='Insert Image'>
-                  <ToggleButton key={4} className={classes.actionButton}>
-                    <InsertPhoto className={classes.actionIcon} />
+                  <ToggleButton key={4}>
+                    <InsertPhoto />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
@@ -621,17 +625,12 @@ class Scribble extends React.Component {
                       tool: 'eraser',
                     })
                   }}
-                  className={classes.actionButton}
                 >
                   <Erase />
                 </ToggleButton>
               </Tooltip>
               <Tooltip title='Save'>
-                <ToggleButton
-                  key={6}
-                  onClick={this._download}
-                  // className={classes.actionButton}
-                >
+                <ToggleButton key={6} onClick={this._download}>
                   <Save />
                 </ToggleButton>
               </Tooltip>
@@ -686,92 +685,47 @@ class Scribble extends React.Component {
               </Tooltip>
             </ToggleButtonGroup>
 
-            <div
-              style={{
-                display: 'flex',
-                float: 'right',
-                padding: 2,
-              }}
-            >
-              <div style={{ paddingRight: 10 }}>
-                <Tooltip title='Hide Drawing'>
-                  <Grid
-                    component='label'
-                    container
-                    alignItems='center'
-                    spacing={1}
-                  >
-                    <Grid item style={{ paddingTop: 8 }}>
-                      Hide
-                    </Grid>
-                    <Grid item>
-                      <Switch
-                        checkedChildren='Yes'
-                        unCheckedChildren='No'
-                        checked={this.state.hideEnable}
-                        onChange={this._hideDrawing}
-                      />
-                    </Grid>
-                  </Grid>
-                </Tooltip>
+            <div className={classes.rightButton}>
+              <div className={classes.actionDiv}>
+                <ProgressButton
+                  submitKey='medicationDetail/submit'
+                  onClick={handleSubmit}
+                />
+                <Button color='danger' onClick={toggleScribbleModal}>
+                  Cancel
+                </Button>
               </div>
-
-              <Tooltip title='Undo'>
-                <IconButton
-                  color='primary'
-                  disabled={!this.state.canUndo}
-                  onClick={this._undo}
-                >
-                  <UndoIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title='Redo'>
-                <IconButton
-                  color='primary'
-                  disabled={!this.state.canRedo}
-                  onClick={this._redo}
-                >
-                  <RedoIcon />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title='Remove All'>
-                <IconButton
-                  color='primary'
-                  disabled={!this.state.canClear}
-                  onClick={this._clear}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
             </div>
-            <br />
-            <br />
-            <SketchField
-              name='sketch'
-              ref={(c) => {
-                this._sketch = c
-              }}
-              lineWidth={this.state.lineWidth}
-              lineColor={this.state.lineColor}
-              className={classes.container}
-              tool={this.state.tool}
-              fillColor={
-                this.state.fillWithColor ? this.state.fillColor : 'transparent'
-              }
-              backgroundColor={
-                this.state.fillWithBackgroundColor ? (
-                  this.state.backgroundColor
-                ) : (
-                  'transparent'
-                )
-              }
-              onChange={this._onSketchChange}
-              forceValue
-              height={this.state.sketchHeight}
-              width={this.state.sketchWidth}
-            />
+            <div className={classes.sketchArea}>
+              <SketchField
+                name='sketch'
+                ref={(c) => {
+                  this._sketch = c
+                }}
+                lineWidth={this.state.lineWidth}
+                lineColor={this.state.lineColor}
+                className={classes.container}
+                tool={this.state.tool}
+                fillColor={
+                  this.state.fillWithColor ? (
+                    this.state.fillColor
+                  ) : (
+                    'transparent'
+                  )
+                }
+                backgroundColor={
+                  this.state.fillWithBackgroundColor ? (
+                    this.state.backgroundColor
+                  ) : (
+                    'transparent'
+                  )
+                }
+                onChange={this._onSketchChange}
+                forceValue
+                height={this.state.sketchHeight}
+                width={this.state.sketchWidth}
+              />
+            </div>
           </GridItem>
         </GridContainer>
       </div>
