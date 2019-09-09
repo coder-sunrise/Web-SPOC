@@ -231,6 +231,12 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/PurchaseReceive/Details',
           },
+          {
+            path: '/inventory/inventoryadjustment',
+            name: 'inventoryadjustment',
+            component: './Inventory/InventoryAdjustment',
+            mini: 'IA',
+          },
         ],
       },
       //
@@ -596,6 +602,11 @@ const routes = [
             path: '/setting/referrallettertemplate',
             name: 'referrallettertemplate',
             component: './Setting/TemplateMessages',
+          },
+          {
+            path: '/setting/paymentmode',
+            name: 'paymentmode',
+            component: './Setting/PaymentMode',
           },
         ],
       },

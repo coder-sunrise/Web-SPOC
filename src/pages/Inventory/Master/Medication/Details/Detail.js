@@ -42,10 +42,9 @@ const Detail = ({
         const { sddfk } = med
         if (sddfk) {
           dispatch({
-            type: 'sddDetail/query',
+            type: 'sddDetail/queryOne',
             payload: {
               id: sddfk,
-              keepFilter: false,
             },
           }).then((sdd) => {
             const { data } = sdd

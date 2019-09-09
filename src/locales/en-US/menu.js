@@ -71,6 +71,7 @@ export default {
   'menu.inventory.vaccination.editvaccination': 'Edit Vaccination',
   'menu.inventory.package.package': 'Add Package',
   'menu.inventory.package.editpackage': 'Edit Package',
+  'menu.inventory.inventoryadjustment': 'Inventory Adjustment',
 
   'menu.queuelisting': 'Queue Listing',
   'menu.patientdashboard': 'Patient Dashboard',
@@ -124,6 +125,7 @@ export default {
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
+  'menu.setting.paymentmode': 'Payment Mode',
 
   'menu.report': 'Report',
   'menu.report.queueListingReport': 'Queue Listing Report',

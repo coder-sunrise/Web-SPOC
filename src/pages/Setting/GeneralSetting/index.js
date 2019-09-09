@@ -86,52 +86,8 @@ class GeneralSetting extends PureComponent {
     const { hasActiveSession } = this.state
 
     return (
-      <CardContainer hideHeader>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='systemCurrency'
-              render={(args) => (
-                <Select
-                  label='System Currency'
-                  {...args}
-                  options={currencies}
-                  disabled={!!hasActiveSession}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='currencyRounding'
-              render={(args) => (
-                <Select
-                  label='Currency Rounding'
-                  options={currencyRounding}
-                  {...args}
-                  disabled={!!hasActiveSession}
-                />
-              )}
-            />
-          </GridItem>
-
-          <GridItem md={3}>
-            <Field
-              name='toTheClosest'
-              render={(args) => (
-                <Select
-                  label='To The Closest'
-                  options={currencyRoundingToTheClosest}
-                  {...args}
-                  disabled={!!hasActiveSession}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        {hasActiveSession ? (
+      <React.Fragment>
+        {hasActiveSession && (
           <div style={{ paddingTop: 5 }}>
             <WarningSnackbar
               variant='warning'
@@ -139,13 +95,63 @@ class GeneralSetting extends PureComponent {
               message='Active Session detected!'
             />
           </div>
-        ) : (
-          <div className={classes.actionBtn}>
+        )}
+        <CardContainer hideHeader>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='systemCurrency'
+                render={(args) => (
+                  <Select
+                    label='System Currency'
+                    {...args}
+                    options={currencies}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='currencyRounding'
+                render={(args) => (
+                  <Select
+                    label='Currency Rounding'
+                    options={currencyRounding}
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={3}>
+              <Field
+                name='toTheClosest'
+                render={(args) => (
+                  <Select
+                    label='To The Closest'
+                    options={currencyRoundingToTheClosest}
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+
+          <div
+            className={classes.actionBtn}
+            style={{ display: 'flex', justifyContent: 'center' }}
+          >
             <Button
               color='danger'
               onClick={() => {
                 this.props.history.push('/setting')
               }}
+              disabled={hasActiveSession}
             >
               Cancel
             </Button>
@@ -155,12 +161,13 @@ class GeneralSetting extends PureComponent {
               onClick={() => {
                 this.props.handleSubmit
               }}
+              disabled={hasActiveSession}
             >
               Save
             </Button>
           </div>
-        )}
-      </CardContainer>
+        </CardContainer>
+      </React.Fragment>
     )
   }
 }

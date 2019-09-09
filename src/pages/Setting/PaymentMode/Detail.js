@@ -1,88 +1,56 @@
 import React, { PureComponent } from 'react'
-import { FastField } from 'formik'
 import Yup from '@/utils/yup'
-import { status } from '@/utils/codes'
-import moment from 'moment'
-
-// import Edit from '@material-ui/icons/Edit'
-// import Delete from '@material-ui/icons/Delete'
+import _ from 'lodash'
+import { formatMessage, FormattedMessage } from 'umi/locale'
 import {
+  withFormikExtend,
+  FastField,
   GridContainer,
   GridItem,
   TextField,
   DateRangePicker,
-  Select,
-  notification,
-  withFormikExtend,
+  NumberInput,
 } from '@/components'
 
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingPublicHoliday }) =>
-    settingPublicHoliday.entity || settingPublicHoliday.default,
+  mapPropsToValues: ({ settingPaymentMode }) =>
+    settingPaymentMode.entity || settingPaymentMode.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    dates: Yup.array().of(Yup.date()).min(2).required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    paymentCharges: Yup.number(),
+    description: Yup.string().required(),
   }),
   handleSubmit: (values, { props }) => {
-    const { isActive, dates, effectiveDates, ...restValues } = values
+    const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
-      type: 'settingPublicHoliday/upsert',
+      type: 'settingPaymentMode/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
-
-        effectiveEndDate:
-          isActive || isActive === undefined
-            ? effectiveDates[1]
-            : moment('2010-12-31'),
-        startDate: moment(dates[0])
-          .utc()
-          .set({ hour: 0, minute: 0, second: 0 }),
-        endDate: moment(dates[1])
-          .utc()
-          .set({ hour: 23, minute: 59, second: 59 }),
+        effectiveEndDate: effectiveDates[1],
       },
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingPublicHoliday/query',
+          type: 'settingPaymentMode/query',
         })
       }
     })
   },
-  displayName: 'PublicHolidayDetail',
+  displayName: 'PaymentModeDetail',
 })
 class Detail extends PureComponent {
   state = {}
-  // state = {
-  // editingRowIds: [],
-  //   rowChanges: {},
-  // }
-
-  // changeEditingRowIds = (editingRowIds) => {
-  //   this.setState({ editingRowIds })
-  // }
-
-  // changeRowChanges = (rowChanges) => {
-  //   this.setState({ rowChanges })
-  // }
-
-  // commitChanges = ({ rows, added, changed, deleted }) => {
-  //   const { setFieldValue } = this.props
-  //   setFieldValue('items', rows)
-  // }
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values, settingPublicHoliday } = props
-
-    console.log('detail', props)
+    const { classes, theme, footer, values, setFieldValue } = props
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -93,8 +61,9 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <TextField
                     label='Code'
+                    autoFocused
+                    disabled={!!values.id}
                     {...args}
-                    disabled={settingPublicHoliday.entity ? true : false}
                   />
                 )}
               />
@@ -107,11 +76,11 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={12}>
               <FastField
-                name='dates'
+                name='effectiveDates'
                 render={(args) => {
                   return (
                     <DateRangePicker
-                      label='Start Date'
+                      label='Effective Start Date'
                       label2='End Date'
                       {...args}
                     />
@@ -119,33 +88,6 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
-              <FastField
-                name='effectiveDates'
-                render={(args) => {
-                  return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='Effective End Date'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={12}>
-              {settingPublicHoliday.entity ? (
-                <FastField
-                  name='isActive'
-                  render={(args) => {
-                    return <Select label='Status' {...args} options={status} />
-                  }}
-                />
-              ) : (
-                []
-              )}
-            </GridItem>
-
             <GridItem md={12}>
               <FastField
                 name='description'
@@ -157,6 +99,16 @@ class Detail extends PureComponent {
                       rowsMax={4}
                       {...args}
                     />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='paymentCharges'
+                render={(args) => {
+                  return (
+                    <NumberInput label='Payment Charges' suffix='%' {...args} />
                   )
                 }}
               />

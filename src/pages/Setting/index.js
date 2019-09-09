@@ -172,6 +172,11 @@ const menuData = [
     url: '/setting/medicationconsumptionmethod',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Payment Mode',
+    url: '/setting/paymentmode',
+  },
+  {
     title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',
