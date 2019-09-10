@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import moment from 'moment'
 import classnames from 'classnames'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
@@ -57,6 +57,7 @@ class Form extends React.PureComponent {
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: false,
+    editingRows: [],
   }
 
   componentWillMount () {
@@ -156,6 +157,7 @@ class Form extends React.PureComponent {
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
     const { values, onClose, user, dispatch } = this.props
+    console.log({ type })
     const payload = {
       id: values.currentAppointment.id,
       concurrencyToken: values.currentAppointment.concurrencyToken,
@@ -192,10 +194,6 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    const sorted = [
-      ...rows,
-    ].sort()
-
     if (rows) {
       this.setState(
         {
@@ -216,9 +214,12 @@ class Form extends React.PureComponent {
   }
 
   validateDataGrid = () => {
-    const { datagrid = [] } = this.state
+    const { datagrid = [], editingRows } = this.state
 
     let isDataGridValid = true
+
+    // editing at least 1 row
+    if (editingRows.length > 0) isDataGridValid = false
 
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
@@ -258,6 +259,7 @@ class Form extends React.PureComponent {
         return
       }
       const submitPayload = {
+        validate,
         datagrid,
         formikValues: values,
         appointmentResources: [],
@@ -270,8 +272,10 @@ class Form extends React.PureComponent {
         type: 'calendar/submit',
         payload: submitPayload,
       }).then((response) => {
-        response && resetForm()
-        onClose && onClose()
+        if (response) {
+          resetForm()
+          onClose()
+        }
       })
     } catch (error) {
       console.log({ error })
@@ -412,6 +416,18 @@ class Form extends React.PureComponent {
     this.closeSeriesUpdateConfirmation(this._submit)
   }
 
+  onEditingRowsChange = (rows) => {
+    this.setState(
+      {
+        editingRows: [
+          ...rows,
+        ],
+      },
+      () => this.validateDataGrid(),
+    )
+    return rows
+  }
+
   render () {
     const {
       classes,
@@ -471,6 +487,7 @@ class Form extends React.PureComponent {
                   appointmentDate={currentAppointment.appointmentDate}
                   data={datagrid}
                   handleCommitChanges={this.onCommitChanges}
+                  handleEditingRowsChange={this.onEditingRowsChange}
                 />
               </GridItem>
 

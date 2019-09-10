@@ -131,9 +131,6 @@ class AppointmentDataGrid extends React.Component {
     this.columnExtensions = [
       ...columnExtensions,
     ]
-    this.state = {
-      columnExtensions,
-    }
   }
 
   onRadioChange = (row, e, checked) => {
@@ -157,7 +154,7 @@ class AppointmentDataGrid extends React.Component {
   }
 
   render () {
-    const { data, handleCommitChanges } = this.props
+    const { data, handleCommitChanges, handleEditingRowsChange } = this.props
     return (
       <div>
         <EditableTableGrid
@@ -179,6 +176,7 @@ class AppointmentDataGrid extends React.Component {
           EditingProps={{
             showAddCommand: true,
             onCommitChanges: handleCommitChanges,
+            onEditingRowIdsChange: handleEditingRowsChange,
           }}
           schema={validationSchema}
         />

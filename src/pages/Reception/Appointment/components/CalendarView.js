@@ -11,6 +11,8 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 import { withStyles } from '@material-ui/core'
 // components
 import { serverDateFormat } from '@/components'
+// medisys components
+import { LoadingWrapper } from '@/components/_medisys'
 // setting
 import { doctorEventColorOpts } from '../setting'
 // sub component
@@ -78,11 +80,12 @@ const applyFilter = (filter, data) => {
   return returnData
 }
 
-@connect(({ calendar, codetable }) => ({
+@connect(({ calendar, codetable, loading }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list,
   appointmentTypes: codetable.ctappointmenttype || [],
+  loading: loading.effects['calendar/getCalendarList'],
 }))
 class CalendarView extends React.PureComponent {
   state = {
@@ -242,6 +245,7 @@ class CalendarView extends React.PureComponent {
       displayDate,
       calendarView,
       filter,
+      loading,
     } = this.props
     // console.log({ filter, resources })
     const flattenedList =
@@ -308,49 +312,51 @@ class CalendarView extends React.PureComponent {
     const filtered = applyFilter(filter, flattenedList)
 
     return (
-      <DragAndDropCalendar
-        components={{
-          // https://github.com/intljusticemission/react-big-calendar/blob/master/src/Calendar.js
-          toolbar: this.Toolbar,
-          event: this.Event,
-          month: {
-            dateHeader: this.MonthDateHeader,
-          },
-        }}
-        localizer={localizer}
-        date={displayDate}
-        min={minTime}
-        max={maxTime}
-        view={calendarView}
-        // --- values props ---
-        events={filtered}
-        // --- values props ---
-        // --- functional props ---
-        selectable='ignoreEvents'
-        resizable={false}
-        showMultiDayTimes={false}
-        step={15}
-        timeslots={2}
-        longPressThreshold={500}
-        tooltipAccessor={null}
-        // --- functional props ---
-        // --- resources ---
-        resources={resources}
-        resourceIdAccessor='clinicianFK'
-        resourceTitleAccessor='doctorName'
-        // --- resources ---
-        // --- event handlers ---
-        onNavigate={this._jumpToDate}
-        onEventDrop={this._moveEvent}
-        onView={this._onViewChange}
-        eventPropGetter={this._eventColors}
-        dayPropGetter={this._customDayPropGetter}
-        onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleSelectEvent}
-        onDoubleClickEvent={handleDoubleClick}
-        onDragStart={handleOnDragStart}
-        // --- event handlers ---
-      />
+      <LoadingWrapper loading={loading} text='Loading appointments...'>
+        <DragAndDropCalendar
+          components={{
+            // https://github.com/intljusticemission/react-big-calendar/blob/master/src/Calendar.js
+            toolbar: this.Toolbar,
+            event: this.Event,
+            month: {
+              dateHeader: this.MonthDateHeader,
+            },
+          }}
+          localizer={localizer}
+          date={displayDate}
+          min={minTime}
+          max={maxTime}
+          view={calendarView}
+          // --- values props ---
+          events={filtered}
+          // --- values props ---
+          // --- functional props ---
+          selectable='ignoreEvents'
+          resizable={false}
+          showMultiDayTimes={false}
+          step={15}
+          timeslots={2}
+          longPressThreshold={500}
+          tooltipAccessor={null}
+          // --- functional props ---
+          // --- resources ---
+          resources={resources}
+          resourceIdAccessor='clinicianFK'
+          resourceTitleAccessor='doctorName'
+          // --- resources ---
+          // --- event handlers ---
+          onNavigate={this._jumpToDate}
+          onEventDrop={this._moveEvent}
+          onView={this._onViewChange}
+          eventPropGetter={this._eventColors}
+          dayPropGetter={this._customDayPropGetter}
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
+          onDoubleClickEvent={handleDoubleClick}
+          onDragStart={handleOnDragStart}
+          // --- event handlers ---
+        />
+      </LoadingWrapper>
     )
   }
 }

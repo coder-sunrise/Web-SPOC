@@ -90,6 +90,7 @@ export default createListViewModel({
         // const { ltsppointmentstatus } = yield select((state) => state.codetable)
         try {
           const {
+            validate,
             formikValues,
             datagrid = [],
             newAppointmentStatusFK,
@@ -212,6 +213,13 @@ export default createListViewModel({
             appointments,
             recurrenceDto: recurrence,
           }
+          if (validate) {
+            yield put({
+              type: 'validate',
+              payload: savePayload,
+            })
+            return false
+          }
           if (isEdit) {
             savePayload = {
               recurrenceChanged: isRecurrenceChanged,
@@ -234,25 +242,10 @@ export default createListViewModel({
         }
         return false
       },
-      *validate ({ payload }, { call, put }) {
-        const result = yield call(service.validate, payload)
-        console.log({ result })
+      *validate ({ payload }, { call }) {
+        return yield call(service.validate, payload)
       },
       *refresh (_, { put }) {
-        // const calendarState = yield select((state) => state.calendar)
-        // const { date, calendarView } = calendarState
-        // let start
-        // let end
-        // if (calendarView === BigCalendar.Views.MONTH) {
-        //   start = moment(date).startOf('month').format(serverDateFormat)
-        //   end = moment(date).endOf('month').format(serverDateFormat)
-        // }
-
-        // const payload = {
-        //   combineCondition: 'and',
-        //   lgt_appointmentDate: start,
-        //   lst_appointmentDate: end,
-        // }
         yield put({ type: 'navigateCalendar', payload: {} })
       },
       *getAppointmentDetails ({ payload }, { call, put }) {
@@ -287,7 +280,6 @@ export default createListViewModel({
       },
       *insertAppointment ({ payload }, { call, put }) {
         const result = yield call(service.insert, payload)
-        console.log({ result })
         if (result) {
           yield put({ type: 'refresh' })
           notification.success({ message: 'Appointment created' })
@@ -297,7 +289,6 @@ export default createListViewModel({
       },
       *saveAppointment ({ payload }, { call, put }) {
         const result = yield call(service.save, payload)
-        console.log({ result })
         if (result) {
           yield put({ type: 'refresh' })
           notification.success({ message: 'Appointment(s) updated' })
@@ -323,7 +314,8 @@ export default createListViewModel({
       *cancelAppointment ({ payload }, { call, put }) {
         const result = yield call(service.cancel, payload)
         if (result && result.status === '200') {
-          put({ type: 'refresh' })
+          notification.success({ message: 'Appointment(s) cancelled' })
+          yield put({ type: 'refresh' })
           return true
         }
         return false
