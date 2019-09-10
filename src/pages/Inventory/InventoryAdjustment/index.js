@@ -20,11 +20,11 @@ const styles = (theme) => ({
 class Room extends PureComponent {
   state = {}
 
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'inventoryAdjustment/query',
-    })
-  }
+  // componentDidMount () {
+  //   this.props.dispatch({
+  //     type: 'inventoryAdjustment/query',
+  //   })
+  // }
 
   toggleModal = () => {
     this.props.dispatch({

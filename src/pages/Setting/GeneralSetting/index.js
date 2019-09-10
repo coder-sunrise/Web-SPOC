@@ -40,19 +40,12 @@ const styles = (theme) => ({
   settingGeneral,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ settingGeneral }) => {
-    console.log(settingGeneral)
-    return settingGeneral.entity
-      ? settingGeneral.entity
-      : settingGeneral.default
-  },
-  // validationSchema: Yup.object().shape({
-  //   name: Yup.string().required(),
-  //   address: Yup.object().shape({
-  //     postcode: Yup.number().required(),
-  //     countryFK: Yup.string().required(),
-  //   }),
-  // }),
+  // mapPropsToValues: ({ settingGeneral }) => {
+  //   console.log(settingGeneral)
+  //   return settingGeneral.entity
+  //     ? settingGeneral.entity
+  //     : settingGeneral.default
+  // },
 
   handleSubmit: () => {},
   displayName: 'GeneralSettingInfo',
@@ -62,8 +55,33 @@ class GeneralSetting extends PureComponent {
     hasActiveSession: true,
   }
 
-  componentDidMount () {
+  componentDidMount = () => {
     this.checkHasActiveSession()
+    this.props
+      .dispatch({
+        type: 'settingGeneral/query',
+      })
+      .then((v) => {
+        const { setFieldValue } = this.props
+        if (v) {
+          v.map((o, i) => {
+            switch (i) {
+              case 0: {
+                return setFieldValue('systemCurrency', o.settingValue)
+              }
+              case 1: {
+                return setFieldValue('currencyRounding', o.settingValue)
+              }
+              case 2: {
+                return setFieldValue('roundingToTheClosest', o.settingValue)
+              }
+              default: {
+                return undefined
+              }
+            }
+          })
+        }
+      })
   }
 
   checkHasActiveSession = async () => {
@@ -129,7 +147,7 @@ class GeneralSetting extends PureComponent {
 
             <GridItem md={3}>
               <Field
-                name='toTheClosest'
+                name='roundingToTheClosest'
                 render={(args) => (
                   <Select
                     label='To The Closest'

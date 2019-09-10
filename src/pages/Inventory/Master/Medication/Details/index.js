@@ -139,7 +139,7 @@ export default compose(
     enableReinitialize: true,
 
     mapPropsToValues: ({ medicationDetail }) => {
-      console.log('medicationDetail', medicationDetail)
+      // console.log('medicationDetail', medicationDetail)
       return medicationDetail.entity
         ? medicationDetail.entity
         : medicationDetail.default
@@ -164,12 +164,13 @@ export default compose(
         'Max Discount must between 0 to 999,999.99',
       ),
     }),
+
     handleSubmit: (values, { props, resetForm }) => {
       // console.log('restValues')
-      console.log('restValues', values)
+      // console.log('restValues', values)
       const { effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
-      console.log('medicationDetail', medicationDetail)
+      // console.log('medicationDetail', medicationDetail)
 
       const payload = {
         ...restValues,

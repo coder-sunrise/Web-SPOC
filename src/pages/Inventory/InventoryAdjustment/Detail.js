@@ -9,6 +9,11 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  DatePicker,
+  Select,
+  EditableTableGrid,
+  Button,
+  OutlinedTextField,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -46,6 +51,99 @@ const styles = (theme) => ({})
 class Detail extends PureComponent {
   state = {}
 
+  constructor (props) {
+    super(props)
+    this.tableParas = {
+      rows: [
+        {
+          type: 'medication',
+          code: 'abc',
+          name: 'panadol',
+          uom: 'Tablet',
+          currentStock: 100,
+          adjustmentQty: 200,
+        },
+        {
+          type: 'medication',
+          code: 'cg',
+          name: 'coughSyrup',
+          uom: 'Bottle',
+          currentStock: 100,
+          adjustmentQty: 200,
+        },
+        {
+          type: 'consumable',
+          code: 'ct',
+          name: 'cotton',
+          uom: 'Piece',
+          currentStock: 100,
+          adjustmentQty: 200,
+        },
+      ],
+      columns: [
+        {
+          name: 'type',
+          title: 'Type',
+        },
+        { name: 'code', title: 'Code' },
+        { name: 'name', title: 'Name' },
+        { name: 'uom', title: 'UOM' },
+        { name: 'currentStock', title: 'Current Stock' },
+        { name: 'adjustmentQty', title: 'Adjustment Qty' },
+      ],
+      columnExtensions: [
+        {
+          columnName: 'type',
+          type: 'select',
+          options: [
+            { value: 'medication', name: 'Medication' },
+            { value: 'consumable', name: 'Consumable' },
+          ],
+        },
+        {
+          columnName: 'code',
+          type: 'select',
+          options: [
+            { value: 'abc', name: 'ABC' },
+            { value: 'cg', name: 'CG' },
+            { value: 'ct', name: 'CT' },
+          ],
+        },
+        {
+          columnName: 'name',
+          type: 'select',
+          options: [
+            { value: 'panadol', name: 'Panadol' },
+            { value: 'coughSyrup', name: 'Cough Syrup' },
+            { value: 'cotton', name: 'Cotton' },
+          ],
+        },
+        {
+          columnName: 'uom',
+          disabled: true,
+        },
+        {
+          columnName: 'currentStock',
+          disabled: true,
+        },
+        {
+          columnName: 'adjustmentQty',
+          type: 'number',
+        },
+      ],
+    }
+  }
+
+  onCommitChanges = ({ rows, deleted }) => {
+    if (deleted) {
+      const deletedSet = new Set(deleted)
+      const changedRows = rows.filter((row) => !deletedSet.has(row.id))
+      // setFieldValue(`${type}`, changedRows)
+      return changedRows
+    }
+    return rows
+  }
+
   render () {
     const { props } = this
     const { classes, theme, footer, values } = props
@@ -55,25 +153,63 @@ class Detail extends PureComponent {
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem md={6}>
-              <FastField
-                name='code'
-                render={(args) => (
-                  <TextField
-                    label='Code'
-                    autoFocused
-                    disabled={!!values.id}
-                    {...args}
-                  />
-                )}
-              />
+              <GridItem md={12}>
+                <FastField
+                  name='transNo'
+                  render={(args) => (
+                    <TextField
+                      label='Transaction No'
+                      autoFocused
+                      disabled={!!values.id}
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={12}>
+                <FastField
+                  name='transDate'
+                  render={(args) => (
+                    <DatePicker label='Transaction Date' {...args} />
+                  )}
+                />
+              </GridItem>
+
+              <GridItem md={12}>
+                <FastField
+                  name='status'
+                  render={(args) => {
+                    return (
+                      <Select
+                        label='Status'
+                        options={[
+                          { value: 'Finalize', name: 'Finalize' },
+                          { value: 'Draft', name: 'Draft' },
+                        ]}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                name='remarks'
+                render={(args) => {
+                  return (
+                    <OutlinedTextField
+                      label='Remarks'
+                      multiline
+                      rowsMax={5}
+                      rows={5}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
-            <GridItem md={12}>
+            {/* <GridItem md={12}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -86,25 +222,38 @@ class Detail extends PureComponent {
                   )
                 }}
               />
-            </GridItem>
-            <GridItem md={12}>
-              <FastField
-                name='description'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Description'
-                      multiline
-                      rowsMax={4}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
+            </GridItem> */}
+          </GridContainer>
+
+          <EditableTableGrid
+            style={{ marginTop: 10 }}
+            {...this.tableParas}
+            // {...consumableTableParas}
+            // columnExtensions={consumableColExtensions}
+            // schema={consumableSchema}
+            // rows={consumablePackageItem}
+            FuncProps={{
+              pager: false,
+            }}
+            EditingProps={{
+              showAddCommand: false,
+              showEditCommand: false,
+              // onAddedRowsChange: onAddedRowsChange,
+              onCommitChanges: this.onCommitChanges,
+            }}
+          />
+          <GridContainer
+            direction='row'
+            justify='flex-end'
+            alignItems='flex-end'
+          >
+            <Button color='danger'>Cancel</Button>
+            <Button color='primary'>Save</Button>
+            <Button color='info'>Finalize</Button>
           </GridContainer>
         </div>
-        {footer &&
+
+        {/* {footer &&
           footer({
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
@@ -112,6 +261,7 @@ class Detail extends PureComponent {
               disabled: false,
             },
           })}
+        <Button>Finalize</Button> */}
       </React.Fragment>
     )
   }

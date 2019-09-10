@@ -79,9 +79,18 @@ class Filter extends PureComponent {
 
           <GridItem xs={6} md={3}>
             <FastField
-              name='isActive'
+              name='status'
               render={(args) => {
-                return <Select label='Status' options={status} {...args} />
+                return (
+                  <Select
+                    label='Status'
+                    options={[
+                      { value: 'draft', name: 'Draft' },
+                      { value: 'finalized', name: 'Finalized' },
+                    ]}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

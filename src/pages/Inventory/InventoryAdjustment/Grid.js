@@ -1,49 +1,47 @@
 import React, { PureComponent } from 'react'
 
-import { CommonTableGrid, Button } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
+// import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
-import Edit from '@material-ui/icons/Edit'
+// import Delete from '@material-ui/icons/Delete'
+// import Edit from '@material-ui/icons/Edit'
+import { CommonTableGrid, Button } from '@/components'
 import * as service from './services'
 
 class Grid extends PureComponent {
   configs = {
-    columns: [
-      { name: 'code', title: 'Code' },
-      { name: 'displayValue', title: 'Display Value' },
-      { name: 'description', title: 'Description' },
-      { name: 'isActive', title: 'Status' },
+    rows: [
       {
-        name: 'action',
-        title: 'Action',
+        transNo: 'SA/000001',
+        transDate: '30/2/2018',
+        status: 'Draft',
+        remarks: 'Remarks',
+      },
+      {
+        transNo: 'SA/000002',
+        transDate: '30/3/2018',
+        status: 'Finalized',
+        remarks: 'abc',
+      },
+      {
+        transNo: 'SA/000003',
+        transDate: '30/5/2018',
+        status: 'Finalized',
+        remarks: 'Need another adjustment',
       },
     ],
+    columns: [
+      { name: 'transNo', title: 'Transaction No' },
+      { name: 'transDate', title: 'Transaction Date' },
+      { name: 'status', title: 'Status' },
+      { name: 'remarks', title: 'Remark' },
+    ],
     columnExtensions: [
-      {
-        columnName: 'isActive',
-        sortingEnabled: false,
-        type: 'select',
-        options: status,
-      },
-      {
-        columnName: 'action',
-        align: 'center',
-        render: (row) => {
-          return (
-            <Button
-              size='sm'
-              onClick={() => {
-                this.editRow(row)
-              }}
-              justIcon
-              color='primary'
-            >
-              <Edit />
-            </Button>
-          )
-        },
-      },
+      // {
+      //   columnName: 'isActive',
+      //   sortingEnabled: false,
+      //   type: 'select',
+      //   options: status,
+      // },
     ],
   }
 
@@ -66,7 +64,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='inventoryAdjustment'
+        // type='inventoryAdjustment'
         onRowDoubleClick={this.editRow}
         {...this.configs}
       />
