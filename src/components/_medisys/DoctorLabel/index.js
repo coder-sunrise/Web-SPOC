@@ -3,7 +3,9 @@ import React, { memo } from 'react'
 const DoctorLabel = ({ doctor }) => {
   let label = ''
   try {
-    const { clinicianProfile } = doctor
+    let { clinicianProfile } = doctor
+    if (clinicianProfile === undefined) clinicianProfile = doctor
+
     const designation = !clinicianProfile.title ? '' : clinicianProfile.title
     label = `${designation} ${clinicianProfile.name}`
   } catch (error) {

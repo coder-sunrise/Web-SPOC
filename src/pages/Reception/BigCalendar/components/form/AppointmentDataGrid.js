@@ -44,7 +44,6 @@ const styles = () => ({
 class AppointmentDataGrid extends React.PureComponent {
   state = {
     editingRowIds: [],
-    rowChanges: [],
   }
 
   changeEditingRowIds = (editingRowIds) => {
@@ -52,7 +51,8 @@ class AppointmentDataGrid extends React.PureComponent {
   }
 
   changeRowChanges = (rowChanges) => {
-    this.setState({ rowChanges })
+    console.log({ rowChanges })
+    // this.setState({ rowChanges })
   }
 
   onRadioChange = (row, e, checked) => {
@@ -142,7 +142,7 @@ class AppointmentDataGrid extends React.PureComponent {
             onEditingRowIdsChange: this.changeEditingRowIds,
             onCommitChanges: handleCommitChanges,
             // rowChanges: this.state.rowChanges,
-            // onRowChangesChange: this.changeRowChanges,
+            onRowChangesChange: this.changeRowChanges,
           }}
           columns={AppointmentDataColumn}
           columnExtensions={columnExtensions}

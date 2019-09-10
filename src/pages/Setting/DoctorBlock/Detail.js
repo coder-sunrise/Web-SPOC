@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import DoctorBlock from '../../Reception/BigCalendar/components/form/DoctorBlock'
+import DoctorBlock from '@/pages/Reception/Appointment/components/form/DoctorBlock'
 // import Edit from '@material-ui/icons/Edit'
 // import Delete from '@material-ui/icons/Delete'
 // import {

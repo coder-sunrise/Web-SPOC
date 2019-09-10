@@ -311,6 +311,7 @@ class AntdSelect extends React.PureComponent {
       labelField,
       groupField,
       options,
+      defaultOptions = [],
       classes,
       defaultValue,
       renderDropdown,
@@ -327,7 +328,13 @@ class AntdSelect extends React.PureComponent {
     } = this.props
     const { form, field, value } = restProps
     // console.log(options)
-    const source = autoComplete || query ? this.state.data : options
+    const source =
+      autoComplete || query
+        ? this.state.data
+        : [
+            ...defaultOptions,
+            ...options,
+          ]
 
     const cfg = {
       value: this.state.value,

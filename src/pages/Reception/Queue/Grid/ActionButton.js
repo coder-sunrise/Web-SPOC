@@ -13,13 +13,23 @@ import {
 
 const ActionButton = ({ row, onClick }) => {
   const { visitStatus } = row
+
   if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
     return (
       <Tooltip title='More Actions'>
         <GridButton
           row={row}
           onClick={onClick}
-          contextMenuOptions={AppointmentContextMenu}
+          contextMenuOptions={AppointmentContextMenu.map((opt) => {
+            switch (opt.id) {
+              case 8:
+                return { ...opt, disabled: row.patientProfileFk === null }
+              case 9:
+                return { ...opt, disabled: row.patientProfileFk !== null }
+              default:
+                return { ...opt }
+            }
+          })}
         />
       </Tooltip>
     )
