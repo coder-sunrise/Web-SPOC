@@ -1,42 +1,41 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 // material ui
-import { TextField } from '@material-ui/core'
-import withStyles from '@material-ui/styles/withStyles'
-// custom components
-import { Card, CardBody } from '@/components'
+import { withStyles } from '@material-ui/core'
 // style
 import CardStyle from './style'
 
-// <div>
-// {children}
-// </div>
-class FieldSet extends React.PureComponent {
-  render () {
-    const { classes, title, size, children } = this.props
-    return (
-      <TextField
-        label={title}
-        margin='normal'
-        variant='outlined'
-        fullWidth
-        InputLabelProps={{
-          shrink: true,
-          focused: false,
-        }}
-        InputProps={{
-          inputComponent: ({ inputRef, ...ps }) => {
-            return (
-              <div style={{ width: '100%', height: 'auto' }} {...ps}>
-                {children}
-              </div>
-            )
-          },
-        }}
-      />
-    )
-  }
+const FieldSet = ({ classes, title, size, disabled, children }) => {
+  // TODO: enhance -> padding and margin for size = sm || lg
+  return (
+    <div style={{ width: '100%', height: 'auto' }}>
+      <fieldset className={classes.fieldset} disabled={disabled}>
+        <legend className={classes.legend}>{title}</legend>
+        {children}
+      </fieldset>
+    </div>
+  )
+  // return (
+  //   <TextField
+  //     label={title}
+  //     margin='normal'
+  //     variant='outlined'
+  //     fullWidth
+  //     InputLabelProps={{
+  //       shrink: true,
+  //       focused: false,
+  //     }}
+  //     InputProps={{
+  //       inputComponent: ({ inputRef, ...ps }) => {
+  //         return (
+  //           <div style={{ width: '100%', height: 'auto' }} {...ps}>
+  //             {children}
+  //           </div>
+  //         )
+  //       },
+  //     }}
+  //   />
+  // )
 }
 
 FieldSet.propTypes = {

@@ -180,7 +180,8 @@ class TextField extends React.PureComponent {
       if (!error) {
         cfg.error = shouldShow && !!rawError
       }
-      // console.log(rawError)
+      const touched = Object.byString(form.touched, field.name)
+      // console.log({ error, rawError, shouldShow, touched, showErrorIcon })
       if (cfg.error) {
         focus = focus || this.shouldFocus(error)
         if (focus && this.refEl && !window.alreadyFocused) {
@@ -188,6 +189,7 @@ class TextField extends React.PureComponent {
           this.refEl.focus()
           window.alreadyFocused = true
         }
+
         cfg.help = !showErrorIcon && shouldShow ? rawError : help
       }
       cfg.rawError = error || rawError

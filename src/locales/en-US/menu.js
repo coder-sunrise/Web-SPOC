@@ -120,6 +120,7 @@ export default {
   'menu.setting.generalsetting': 'General Setting',
   'menu.setting.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
+  'menu.setting.appointmenttype': 'Appointment Type',
 
   'menu.report': 'Report',
   'menu.report.queueListingReport': 'Queue Listing Report',

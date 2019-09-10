@@ -181,6 +181,7 @@ class NewVisit extends PureComponent {
       values,
       isSubmitting,
     } = this.props
+    console.log({ props: this.props })
     const existingQNo = list.reduce(
       (queueNumbers, queue) =>
         queue.visitFK === values.id
@@ -193,7 +194,9 @@ class NewVisit extends PureComponent {
             ],
       [],
     )
-    const isReadOnly = values.visitStatus !== VISIT_STATUS.WAITING
+    const isReadOnly =
+      values.visitStatus !== VISIT_STATUS.WAITING ||
+      values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']

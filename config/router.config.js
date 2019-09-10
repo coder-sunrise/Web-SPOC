@@ -65,7 +65,7 @@ const routes = [
             path: '/reception/appointment',
             name: 'appointment',
             mini: 'AP',
-            component: './Reception/BigCalendar',
+            component: './Reception/Appointment',
           },
           {
             hideInMenu: true,
@@ -572,6 +572,11 @@ const routes = [
             path: '/setting/referrallettertemplate',
             name: 'referrallettertemplate',
             component: './Setting/TemplateMessages',
+          },
+          {
+            path: '/setting/appointmenttype',
+            name: 'appointmenttype',
+            component: './Setting/AppointmentType',
           },
         ],
       },

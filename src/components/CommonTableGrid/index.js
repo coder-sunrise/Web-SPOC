@@ -701,6 +701,7 @@ class CommonTableGrid extends React.Component {
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,
     }
+
     // const extraPagerConfig = {
     //   ...pagerConfig,
     // }

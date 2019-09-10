@@ -743,6 +743,7 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     multiplier,
   )
   if (parseInt(statusCode, 10) === 200) {
+    const result = useGeneral ? data[code] : data.data
     await db.codetable.put({
       code,
       data: result,
@@ -775,13 +776,14 @@ export const getCodes = async (payload) => {
     const lastLoginDate = cookies.get('_lastLogin')
     const parsedLastLoginDate = moment(lastLoginDate)
 
-    // not exist in current table, make network call to retrieve data
+    /* not exist in current table, make network call to retrieve data */
     if (ct === undefined) {
       result = _fetchAndSaveCodeTable(ctcode, params, multiply)
     } else {
-      // compare updateDate with lastLoginDate
-      // if updateDate > lastLoginDate, do nothing
-      // else perform network call and update indexedDB
+      /*  compare updateDate with lastLoginDate
+          if updateDate > lastLoginDate, do nothing
+          else perform network call and update indexedDB 
+      */
       const { updateDate, data: existedData } = ct
       const parsedUpdateDate = moment(updateDate)
 

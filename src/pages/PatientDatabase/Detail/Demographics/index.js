@@ -51,6 +51,7 @@ class Demographic extends PureComponent {
 
   selectReferralPerson = (args) => {
     const { values, classes } = this.props
+    console.log({ values })
     return (
       <Select
         remote

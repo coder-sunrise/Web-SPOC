@@ -18,11 +18,13 @@ import { control } from '@/components/Decorator'
 const _dateFormat = 'YYYY-MM-DD'
 
 const _toMoment = (value, format) => {
-  if (!value) return value
+  if (!value) return null
   try {
+    if (moment.isMoment(value)) return value
     if (moment(value, format).isValid()) return moment(value, format)
     return null
   } catch (error) {
+    console.log('error', { error })
     return null
   }
 }
@@ -106,6 +108,7 @@ class AntdTimePicker extends PureComponent {
     this.setState({
       value: time,
     })
+
     const { form, field, format, onChange } = this.props
     if (form && field) {
       form.setFieldValue(
@@ -127,16 +130,14 @@ class AntdTimePicker extends PureComponent {
       onBlur,
       onOpenChange,
       use12Hours = true,
-      minuteStep = 15,
+      minuteStep = 1,
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
-    // console.log(format)
-    // date picker component dont pass formik props into wrapper
-    // date picker component should handle the value change event itself
     return (
       <div style={{ width: '100%' }} {...props}>
         <TimePicker
+          {...restProps}
           className={classnames(classes.timePickerContainer)}
           // dropdownClassName={classnames(classes.dropdownMenu)}
           popupStyle={{ zIndex: 1400 }}
@@ -148,8 +149,7 @@ class AntdTimePicker extends PureComponent {
           defaultOpenValue={moment('00:00', 'HH:mm')}
           onChange={this.handleChange}
           onOpenChange={onOpenChange}
-          value={this.state.value}
-          {...restProps}
+          value={_toMoment(this.state.value)}
         />
       </div>
     )
@@ -162,8 +162,6 @@ class AntdTimePicker extends PureComponent {
     const labelProps = {
       shrink: !!selectValue || this.state.shrink,
     }
-    // date picker component dont pass formik props into wrapper
-    // date picker component should handle the value change event itself
     return (
       <CustomInput
         labelProps={labelProps}

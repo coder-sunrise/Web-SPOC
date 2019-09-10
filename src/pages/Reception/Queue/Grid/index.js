@@ -1,15 +1,15 @@
 import React, { memo, useState, useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
+// medisys component
+import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
 // custom components
 import { CommonTableGrid, DateFormatter } from '@/components'
-// medisys component
-import { LoadingWrapper, DoctorLabel } from 'medisys-components'
 // sub component
 import ActionButton from './ActionButton'
 // utils
-import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
-import { filterData, filterDoctorBlock, todayOnly } from '../utils'
+import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
+import { filterData, formatAppointmentTime } from '../utils'
 import { StatusIndicator } from '../variables'
 
 const compareQueueNo = (a, b) => {
@@ -80,21 +80,33 @@ const columnExtensions = [
   { columnName: 'gst', type: 'number', currency: true },
   { columnName: 'outstandingBalance', type: 'number', currency: true },
   { columnName: 'Action', width: 100, align: 'center' },
-  { columnName: 'timeIn', width: 160, type: 'time' },
-  { columnName: 'timeOut', width: 160, type: 'time' },
+  {
+    columnName: 'timeIn',
+    width: 160,
+    render: (row) =>
+      DateFormatter({
+        value: row.timeIn,
+        full: true,
+      }),
+  },
+  { columnName: 'timeOut', width: 160 },
   {
     columnName: 'gender/age',
-    render: (row) => `${row.gender}/${row.age < 0 ? 0 : row.age}`,
+    render: (row) =>
+      row.gender && row.age ? `${row.gender}/${row.age < 0 ? 0 : row.age}` : '',
     sortBy: 'genderFK',
   },
   {
     columnName: 'appointmentTime',
-    width: 160,
+    width: 180,
     render: (row) => {
       if (row.appointmentTime) {
-        return DateFormatter({ value: row.appointmentTime, full: true })
+        return DateFormatter({
+          value: row.appointmentTime,
+          full: true,
+        })
       }
-      if (row.start) return DateFormatter({ value: row.start, full: true })
+      if (row.startTime) return formatAppointmentTime(row.startTime)
       return '-'
     },
   },
@@ -114,6 +126,7 @@ const Grid = ({
   handleEditVisitClick,
   onRegisterPatientClick,
   onViewPatientProfileClick,
+  handleActualizeAppointment,
   deleteQueue,
 }) => {
   const onRowDoubleClick = (row) =>
@@ -122,23 +135,20 @@ const Grid = ({
     })
 
   const calendarData = useMemo(
-    () =>
-      calendarEvents
-        .reduce(flattenAppointmentDateToCalendarEvents, [])
-        .filter(todayOnly),
+    () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
     [
       calendarEvents,
     ],
   )
 
   const computeQueueListingData = () => {
-    if (filter === StatusIndicator.APPOINTMENT)
-      return filterDoctorBlock(calendarData)
+    if (filter === StatusIndicator.APPOINTMENT) return calendarData
     return filterData(filter, queueList)
   }
 
   const queueListingData = useMemo(computeQueueListingData, [
     filter,
+    calendarEvents,
     queueList,
   ])
 
@@ -182,6 +192,12 @@ const Grid = ({
         router.push(
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
         )
+        break
+      case '8':
+        handleActualizeAppointment({
+          patientID: row.patientProfileFk,
+          appointmentID: row.id,
+        })
         break
       case '9':
         onRegisterPatientClick()
@@ -227,11 +243,12 @@ export default memo(
   connect(({ queueLog, calendar, global, loading }) => ({
     filter: queueLog.currentFilter,
     queueList: queueLog.list,
-    calendarEvents: calendar.calendarEvents,
+    calendarEvents: calendar.list,
     showingVisitRegistration: global.showVisitRegistration,
     queryingData:
       loading.effects['queueLog/refresh'] ||
       loading.effects['queueLog/getSessionInfo'] ||
-      loading.effects['queueLog/query'],
+      loading.effects['queueLog/query'] ||
+      loading.effects['calendar/getCalendarList'],
   }))(Grid),
 )
