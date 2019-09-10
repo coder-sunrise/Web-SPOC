@@ -2,9 +2,9 @@ import React, { memo, useState, useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // custom components
+import { LoadingWrapper, DoctorLabel } from 'medisys-components'
 import { CommonTableGrid, DateFormatter } from '@/components'
 // medisys component
-import { LoadingWrapper, DoctorLabel } from 'medisys-components'
 // sub component
 import ActionButton from './ActionButton'
 // utils
@@ -176,7 +176,9 @@ const Grid = ({
         onViewPatientProfileClick(row.patientProfileFK)
         break
       case '4': // patient dashboard
-        router.push(`/reception/queue/patientdashboard?qid=${row.id}`)
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
+        )
         break
       case '5': // start consultation
         router.push(
@@ -185,7 +187,12 @@ const Grid = ({
         break
       case '6': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}`,
+        )
+        break
+      case '7': // edit consultation
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}`,
         )
         break
       case '9':

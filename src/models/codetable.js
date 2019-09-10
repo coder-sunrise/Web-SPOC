@@ -30,7 +30,10 @@ export default createListViewModel({
                 code: ctcode,
                 data: response,
               })
+              return response
             }
+          } else {
+            return codetableState[ctcode]
           }
         }
       },

@@ -128,6 +128,6 @@ export const ContextMenuOptions = [
     label: 'Edit Consultation',
     Icon: Edit,
     disabled: true,
-    hidden: true,
+    hidden: false,
   },
 ]

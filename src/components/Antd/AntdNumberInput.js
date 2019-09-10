@@ -106,6 +106,8 @@ class AntdNumberInput extends React.PureComponent {
     disabled: false,
     size: 'default',
     allowEmpty: true,
+    max: 999999999999,
+    min: -999999999999,
   }
 
   constructor (props) {
@@ -129,7 +131,7 @@ class AntdNumberInput extends React.PureComponent {
     }
     // console.log(this.state.value)
 
-    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 1000)
+    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 300)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -217,7 +219,10 @@ class AntdNumberInput extends React.PureComponent {
     let newV = v
     if (v === undefined && !this.props.allowEmpty) {
       newV = this.props.min
+    } else if (v > this.props.max) {
+      newV = this.props.max
     }
+    // console.log(v, newV)
     this.setState({
       value: newV,
     })
@@ -256,17 +261,21 @@ class AntdNumberInput extends React.PureComponent {
   // }
 
   getConfig = () => {
-    const { currency, percentage, formatter } = this.props
+    const { currency, percentage, formatter, max, min } = this.props
     const extraCfg = {
-      max: 999999999999,
-      min: -999999999999,
+      formatter,
+      max,
+      min,
     }
 
     if (currency) {
       extraCfg.formatter = (v) => {
         if (v === '') return ''
         if (!this.state.focused) {
-          return currencySymbol + numeral(v).format(`${currencyFormat}`)
+          const nv = numeral(v)
+          if (nv._value < 0)
+            return nv.format(`(${currencySymbol}${currencyFormat})`)
+          return nv.format(`${currencySymbol}${currencyFormat}`)
         }
         return v
       }
@@ -288,7 +297,7 @@ class AntdNumberInput extends React.PureComponent {
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
       }
-      extraCfg.max = 100
+      extraCfg.max = extraCfg.max || 100
       extraCfg.min = -100
     } else if (formatter) {
       extraCfg.formatter = (v) => {
@@ -368,6 +377,7 @@ class AntdNumberInput extends React.PureComponent {
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
+        maxlength='12'
         {...restProps}
       />
     )

@@ -4,7 +4,6 @@ import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
 
 import { Save, Close, Clear, FilterList, Search, Add } from '@material-ui/icons'
 import {
@@ -20,6 +19,9 @@ import {
 } from '@material-ui/core'
 import { Affix } from 'antd'
 import { formatMessage } from 'umi/locale'
+import InboxIcon from '@material-ui/icons/MoveToInbox'
+import DraftsIcon from '@material-ui/icons/Drafts'
+import SendIcon from '@material-ui/icons/Send'
 import {
   Button,
   CommonHeader,
@@ -41,14 +43,13 @@ import {
   CardContainer,
   confirm,
   dateFormatLong,
+  Skeleton,
 } from '@/components'
-import InboxIcon from '@material-ui/icons/MoveToInbox'
-import DraftsIcon from '@material-ui/icons/Drafts'
-import SendIcon from '@material-ui/icons/Send'
 import avatar from '@/assets/img/faces/marc.jpg'
 import { titles, finTypes, gender } from '@/utils/codes'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
+import Yup from '@/utils/yup'
 // import model from '../models/demographic'
 import Block from './Block'
 
@@ -89,7 +90,7 @@ class Banner extends PureComponent {
     const { props } = this
     const { patientDashboard, codetable } = props
     const { patientInfo } = patientDashboard
-    if (!patientInfo) return null
+    if (!patientInfo) return <Skeleton height={101} />
     const { patientAllergy = [] } = patientInfo
     const { ctdrugallergy = [] } = codetable
     const da = ctdrugallergy.filter((o) =>
@@ -105,7 +106,7 @@ class Banner extends PureComponent {
             pid: patientInfo.id,
           })}
         >
-          {da.length ? da[0].name + `${da.length > 1 ? ' ...' : ''}` : '-'}
+          {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
         </Link>
       </div>
     )
@@ -127,9 +128,9 @@ class Banner extends PureComponent {
         paddingRight: 16,
       },
     } = props
-    if (!patientDashboard) return null
+    if (!patientDashboard) return <Skeleton height={100} />
     const { patientInfo } = patientDashboard
-    if (!patientInfo) return null
+    if (!patientInfo) return <Skeleton height={100} />
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>

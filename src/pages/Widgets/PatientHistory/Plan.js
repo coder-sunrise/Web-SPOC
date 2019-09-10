@@ -1,10 +1,8 @@
-import { CommonTableGrid } from '@/components'
-
-export default ({ classes }) => (
+export default ({ classes, current }) => (
   <div>
-    <div className={classes.paragraph}>
-      <p>A *paragraph* of text</p>
-      <p>A _second_ row of text</p>
-    </div>
+    <div
+      className={classes.paragraph}
+      dangerouslySetInnerHTML={{ __html: current.plan }}
+    />
   </div>
 )

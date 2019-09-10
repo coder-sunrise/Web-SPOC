@@ -69,6 +69,11 @@ export default createFormViewModel({
         // }
         return response
       },
+      *edit ({ payload }, { call, put }) {
+        const response = yield call(service.edit, payload)
+
+        return response
+      },
       *sign ({ payload }, { call, put }) {
         const response = yield call(service.sign, payload)
         if (response) {
@@ -110,6 +115,7 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
+        router.push('reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
         console.log('queryDone', payload)

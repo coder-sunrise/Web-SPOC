@@ -1,5 +1,8 @@
 import React, { Component, PureComponent } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import { connect } from 'dva'
+import _ from 'lodash'
+import { getServices } from '@/utils/codes'
+
 import {
   Button,
   GridContainer,
@@ -19,25 +22,109 @@ import {
   NumberInput,
   CustomInputWrapper,
   Popconfirm,
+  FastField,
+  Field,
+  withFormikExtend,
 } from '@/components'
+import Yup from '@/utils/yup'
 
+@connect(({ codetable }) => ({ codetable }))
+@withFormikExtend({
+  mapPropsToValues: ({ orders = {}, editType, ...resetProps }) => {
+    const v = orders.entity || orders.defaultService
+    v.editType = editType
+    return v
+  },
+  validationSchema: Yup.object().shape({}),
+
+  handleSubmit: (values, { props, resetForm }) => {
+    const { dispatch, onConfirm, orders, editType } = props
+    const { rows, entity } = orders
+    const data = {
+      sequence: rows.length,
+      ...values,
+    }
+    dispatch({
+      type: 'orders/upsertRow',
+      payload: data,
+    })
+    resetForm({
+      ...orders.defaultService,
+      editType,
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'OrderPage',
+})
 class Service extends PureComponent {
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservicecenterservice',
+      },
+    }).then((list) => {
+      console.log(list)
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    }).then((list) => {
+      console.log(list)
+      // eslint-disable-next-line compat/compat
+      const { services, serviceCenters } = getServices(list)
+      this.setState({
+        services,
+        serviceCenters,
+      })
+      console.log(services, serviceCenters)
+      // this.setState((ps) => {
+      //   return {
+      //     pagination: {
+      //       ...ps.pagination,
+      //       ...payload,
+      //     },
+      //   }
+      // })
+    })
+    // const v =
+    //   field.value !== undefined && field.value !== ''
+    //     ? field.value
+    //     : props.value || props.defaultValue
+    this.state = {
+      services: [],
+      serviceCenters: [],
+    }
+  }
+
   render () {
-    const { theme, classes, values } = this.props
-    // console.log('Service', this.props)
+    const { theme, classes, values = {} } = this.props
+    const { services, serviceCenters } = this.state
+    const { serviceFK, serviceCenterServiceFK } = values
+    console.log('Service', services, serviceCenters)
+
     return (
       <div>
         <GridContainer>
           <GridItem xs={12}>
-            <FastField
-              name='service'
+            <Field
+              name='serviceFK'
               render={(args) => {
                 return (
-                  <CodeSelect
+                  <Select
                     label='Service'
-                    code='ctservice'
-                    labelField='displayValue'
-                    valueField='serviceId'
+                    options={services.filter(
+                      (o) =>
+                        !serviceCenterServiceFK ||
+                        o.serviceCenters.find(
+                          (m) => m.value === serviceCenterServiceFK,
+                        ),
+                    )}
                     {...args}
                   />
                 )
@@ -45,15 +132,17 @@ class Service extends PureComponent {
             />
           </GridItem>
           <GridItem xs={12}>
-            <FastField
-              name='serviceCentre'
+            <Field
+              name='serviceCenterServiceFK'
               render={(args) => {
                 return (
                   <Select
                     label='Service Centre'
-                    options={[
-                      { value: '1', name: 'Consultation' },
-                    ]}
+                    options={serviceCenters.filter(
+                      (o) =>
+                        !serviceFK ||
+                        o.services.find((m) => m.value === serviceFK),
+                    )}
                     {...args}
                   />
                 )

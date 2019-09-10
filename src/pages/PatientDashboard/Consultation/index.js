@@ -4,13 +4,6 @@ import _ from 'lodash'
 import $ from 'jquery'
 import classnames from 'classnames'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
-import { widgets } from '@/utils/widgets'
-import { getAppendUrl } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
-import { sendNotification } from '@/utils/realtime'
-
-import AuthorizedContext from '@/components/Context/Authorized'
 
 import { Menu, Dropdown } from 'antd'
 import {
@@ -38,6 +31,7 @@ import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 
+import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 import {
   CardContainer,
   TextField,
@@ -62,13 +56,19 @@ import {
   Popconfirm,
   withFormikExtend,
   skeleton,
+  FastField,
+  NumberInput,
 } from '@/components'
-import { standardRowHeight, headerHeight } from 'mui-pro-jss'
+import AuthorizedContext from '@/components/Context/Authorized'
+import { sendNotification } from '@/utils/realtime'
+import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
+import { getAppendUrl } from '@/utils/utils'
+import { widgets } from '@/utils/widgets'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
-import InvoiceAdjustment from './InvoiceAdjustment'
 
 import schema from './schema'
 import styles from './style'
@@ -88,6 +88,56 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 // console.log(basicStyle)
 
 let lasActivedWidget = null
+
+const saveConsultation = ({
+  props,
+  action,
+  confirmMessage,
+  successMessage,
+}) => {
+  const {
+    dispatch,
+    values,
+    history,
+    consultation,
+    patientDashboard,
+    consultationDocument = {},
+    orders = {},
+  } = props
+  dispatch({
+    type: 'global/updateAppState',
+    payload: {
+      openConfirm: true,
+      openConfirmContent: confirmMessage,
+      onOpenConfirm: () => {
+        const { rows = [] } = consultationDocument
+        consultationDocumentTypes.forEach((p) => {
+          values[p.prop] = rows.filter((o) => o.type === p.value)
+        })
+
+        const { rows: orderRows = [] } = orders
+        orderTypes.forEach((p) => {
+          values[p.prop] = (values[p.prop] || [])
+            .concat(orderRows.filter((o) => o.editType === p.value))
+        })
+        dispatch({
+          type: `consultation/${action}`,
+          payload: values,
+        }).then((r) => {
+          if (r) {
+            if (successMessage) {
+              notification.success({
+                message: successMessage,
+              })
+            }
+
+            history.push(`/reception/queue`)
+          }
+        })
+      },
+    },
+  })
+}
 
 // @skeleton()
 @connect(
@@ -112,14 +162,14 @@ let lasActivedWidget = null
   validationSchema: schema,
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, history, consultation } = props
-    dispatch({
-      type: 'consultation/sign',
-      payload: values,
-    }).then(() => {
-      history.push(
-        `/reception/queue/patientdashboard?qid=${consultation.queueID}&v=${Date.now()}`,
-      )
+    saveConsultation({
+      props: {
+        values,
+        ...props,
+      },
+      confirmMessage: 'Confirm sign off current consultation?',
+      successMessage: 'Consultation signed',
+      action: 'sign',
     })
   },
   displayName: 'ConsultationPage',
@@ -761,68 +811,25 @@ class Consultation extends PureComponent {
     )
   }
 
-  toggleInvoiceAdjustment = () => {
-    this.setState((prevState) => ({
-      showInvoiceAdjustment: !prevState.showInvoiceAdjustment,
-    }))
-  }
-
-  saveConsultation = ({ action, confirmMessage, successMessage }) => {
-    const {
-      dispatch,
-      values,
-      history,
-      consultation,
-      patientDashboard,
-      consultationDocument = {},
-      orders = {},
-    } = this.props
-    dispatch({
-      type: 'global/updateAppState',
+  showInvoiceAdjustment = () => {
+    const { theme, ...resetProps } = this.props
+    this.props.dispatch({
+      type: 'global/updateState',
       payload: {
-        openConfirm: true,
-        openConfirmContent: confirmMessage,
-        onOpenConfirm: () => {
-          const { rows = [] } = consultationDocument
-          consultationDocumentTypes.forEach((p) => {
-            values[p.prop] = rows.filter((o) => o.type === p.value)
-          })
-
-          const { rows: orderRows = [] } = orders
-          orderTypes.forEach((p) => {
-            values[p.prop] = (values[p.prop] || [])
-              .concat(orderRows.filter((o) => o.editType === p.value))
-          })
-          console.log('saveConsultation', values)
-          dispatch({
-            type: `consultation/${action}`,
-            payload: values,
-          }).then((r) => {
-            if (r) {
-              if (successMessage) {
-                notification.success({
-                  message: successMessage,
-                })
-              }
-
-              // dispatch({
-              //   type: 'consultation/query',
-              //   payload: values.id,
-              // }).then(() => {
-              //   history.push(
-              //     `/reception/queue/patientdashboard?qid=${consultation.queueID}`,
-              //   )
-              // })
-              history.push(`/reception/queue`)
-            }
-          })
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          showRemark: true,
+          defaultValues: {
+            initialAmout: 150,
+          },
         },
       },
     })
   }
 
   pauseConsultation = () => {
-    this.saveConsultation({
+    saveConsultation({
+      props: this.props,
       confirmMessage: 'Confirm pause current consultation?',
       successMessage: 'Consultation paused',
       action: 'pause',
@@ -907,7 +914,7 @@ class Consultation extends PureComponent {
                 <Dropdown
                   overlay={
                     <Menu>
-                      <Menu.Item onClick={this.toggleInvoiceAdjustment}>
+                      <Menu.Item onClick={this.showInvoiceAdjustment}>
                         Add Invoice Adjustment
                       </Menu.Item>
                       <Menu.Divider />
@@ -1057,16 +1064,6 @@ class Consultation extends PureComponent {
             </Drawer>
           </React.Fragment>
         )}
-        <CommonModal
-          open={this.state.showInvoiceAdjustment}
-          title='Add Invoice Adjustment'
-          maxWidth='sm'
-          bodyNoPadding
-          onClose={() => this.toggleInvoiceAdjustment()}
-          onConfirm={() => this.toggleInvoiceAdjustment()}
-        >
-          <InvoiceAdjustment />
-        </CommonModal>
       </div>
     )
   }

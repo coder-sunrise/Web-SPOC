@@ -4,6 +4,8 @@ import { FastField } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
+import DeleteIcon from '@material-ui/icons/Delete'
+import { withStyles, Divider, Paper } from '@material-ui/core'
 import {
   TextField,
   NumberInput,
@@ -14,8 +16,6 @@ import {
   Button,
   Popconfirm,
 } from '@/components'
-import DeleteIcon from '@material-ui/icons/Delete'
-import { withStyles, Divider, Paper } from '@material-ui/core'
 
 export default ({
   theme,

@@ -1,5 +1,6 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
+import _ from 'lodash'
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
@@ -808,6 +809,42 @@ export const getTenantCodes = async (tenantCode) => {
   return {}
 }
 
+export const getServices = (data) => {
+  // eslint-disable-next-line compat/compat
+  const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
+    return {
+      value: o[0].serviceId,
+      name: o[0].displayValue,
+      serviceCenters: o.map((m) => {
+        return {
+          value: m.serviceCenterId,
+          name: m.serviceCenter,
+        }
+      }),
+    }
+  })
+  // eslint-disable-next-line compat/compat
+  const serviceCenters = Object.values(
+    _.groupBy(data, 'serviceCenterId'),
+  ).map((o) => {
+    return {
+      value: o[0].serviceCenterId,
+      name: o[0].serviceCenter,
+      services: o.map((m) => {
+        return {
+          value: m.serviceId,
+          name: m.displayValue,
+        }
+      }),
+    }
+  })
+
+  return {
+    services,
+    serviceCenters,
+  }
+}
+
 module.exports = {
   paymentMethods,
   titles,
@@ -843,5 +880,6 @@ module.exports = {
   coPayerType,
   country,
   consultationDocumentTypes,
+  getServices,
   ...module.exports,
 }

@@ -30,7 +30,10 @@ const ActionButton = ({ row, onClick }) => {
     row.visitStatus,
   )
   const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
-  const isStatusCompleted = row.visitStatus === VISIT_STATUS.COMPLETED
+  const isStatusCompleted = [
+    VISIT_STATUS.COMPLETED,
+    VISIT_STATUS.DISPENSE,
+  ].includes(row.visitStatus)
 
   const hideResumeButton = ![
     VISIT_STATUS.IN_CONS,

@@ -1,5 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 
+import Add from '@material-ui/icons/Add'
+import Delete from '@material-ui/icons/Delete'
 import {
   Button,
   GridContainer,
@@ -23,9 +25,8 @@ import {
   FastField,
   FieldArray,
   Tooltip,
+  Field,
 } from '@/components'
-import Add from '@material-ui/icons/Add'
-import Delete from '@material-ui/icons/Delete'
 import Yup from '@/utils/yup'
 
 @withFormikExtend({
@@ -33,7 +34,8 @@ import Yup from '@/utils/yup'
     // console.log('resetProps', resetProps)
     const v = orders.entity || orders.defaultMedication
     v.editType = editType
-    console.log(v)
+    v.totalAfterAdj = orders.totalAfterAdj || v.totalAfterAdj
+    console.log('mapPropsToValues', v)
     return v
   },
   validationSchema: Yup.object().shape({
@@ -139,6 +141,7 @@ class Medication extends React.Component {
       footer,
       handleSubmit,
       setFieldValue,
+      orders,
     } = this.props
     return (
       <div>
@@ -449,14 +452,37 @@ class Medication extends React.Component {
             <FastField
               name='totalPrice'
               render={(args) => {
-                return <NumberInput label='Total' currency {...args} />
+                return (
+                  <NumberInput
+                    label='Total'
+                    onChange={(e) => {
+                      this.props.setFieldValue('totalAfterAdj', e.target.value)
+                      this.props.dispatch({
+                        type: 'orders/updateState',
+                        payload: {
+                          totalPrice: e.target.value,
+                          totalAfterAdj: undefined,
+                        },
+                      })
+                    }}
+                    currency
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
           <GridItem xs={3}>
-            <FastField
+            <Field
               name='totalAfterAdj'
               render={(args) => {
+                if (
+                  orders.totalAfterAdj &&
+                  args.field.value !== orders.totalAfterAdj
+                ) {
+                  args.form.setFieldValue('totalAfterAdj', orders.totalAfterAdj)
+                }
+                console.log(args.field)
                 return (
                   <NumberInput
                     label='Total After Adj'
