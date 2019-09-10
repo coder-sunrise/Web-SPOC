@@ -88,7 +88,6 @@ class NumberEditor extends PureComponent {
           })
       }
     }
-    // console.log(window.$tempGridRow)
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
@@ -99,6 +98,7 @@ class NumberEditor extends PureComponent {
       ...restProps,
       onChange: _onChange,
     }
+
     return (
       <NumberInput
         inputProps={{
@@ -128,22 +128,24 @@ const NumberFormatter = (columnExtensions) =>
           ({ columnName: currentColumnName }) =>
             currentColumnName === columnName,
         ) || {}
-      const { type, ...restProps } = cfg
+      const { type, format, ...restProps } = cfg
 
       if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
         color = 'red'
 
       if (cfg && (cfg.currency || type === 'currency')) {
-        if (text) return numeral(value).format(currencyFormat)
+        if (text) return numeral(value).format(format || currencyFormat)
         return (
           <b style={{ color }}>
             {currencySymbol}
-            {numeral(value).format(currencyFormat)}
+            {numeral(value).format(format || currencyFormat)}
           </b>
         )
       }
-      if (text) return numeral(value).format(qtyFormat)
-      return <b style={{ color }}>{numeral(value).format(qtyFormat)}</b>
+      if (text) return numeral(value).format(format || qtyFormat)
+      return (
+        <b style={{ color }}>{numeral(value).format(format || qtyFormat)}</b>
+      )
     },
     (prevProps, nextProps) => {
       // console.log(prevProps === nextProps, prevProps.value === nextProps.value)

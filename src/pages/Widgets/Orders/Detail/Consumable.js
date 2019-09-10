@@ -33,11 +33,10 @@ class Consumable extends PureComponent {
               name='stockConsumableFK'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label='Name'
-                    options={[
-                      { value: '1', name: 'Cotton' },
-                    ]}
+                    code='inventoryconsumable'
+                    labelField='displayValue'
                     {...args}
                   />
                 )

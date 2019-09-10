@@ -1,9 +1,9 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
+import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
 import { orderTypes } from '@/utils/codes'
-import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 import {
   withFormikExtend,
   FastField,
@@ -70,7 +70,7 @@ class Details extends PureComponent {
         <Divider />
 
         <div className={classnames(classes.footer)}>
-          <Button link style={{ float: 'left' }} onClick={this.toggleModal}>
+          <Button link style={{ float: 'left' }} onClick={this.showAdjustment}>
             {currencySymbol} Adjustment
           </Button>
           <Button color='danger'>Cancel</Button>
@@ -79,6 +79,26 @@ class Details extends PureComponent {
         </div>
       </>
     )
+  }
+
+  showAdjustment=()=>{
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackConfig:{
+            model:'orders',
+            reducer:'adjustAmount',
+          },
+          showRemark: true,
+          defaultValues: {
+            ...this.props.orders.adjustment,
+            initialAmout: this.props.orders.totalPrice,
+          },
+        },
+      },
+    })
   }
 
   render () {
@@ -121,20 +141,6 @@ class Details extends PureComponent {
             {editType === '5' && <Medication {...cfg} openPrescription />}
           </div>
 
-          <CommonModal
-            open={state.showModal}
-            title='Adjustment'
-            onClose={this.toggleModal}
-            onConfirm={this.toggleModal}
-            maxWidth='sm'
-            bodyNoPadding
-            // showFooter=
-            // footProps={{
-            //   confirmBtnText: 'Save',
-            // }}
-          >
-            <Adjustment {...this.props} />
-          </CommonModal>
         </div>
       </div>
     )

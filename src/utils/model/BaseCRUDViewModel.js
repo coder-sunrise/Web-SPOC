@@ -128,12 +128,9 @@ export default class BaseCRUDViewModel {
         // console.log(response)
         const { data, status, message } = response
         if (status === '200' || data) {
-          const querySuccessPayload = payload.keepFilter
-            ? { data, filter }
-            : { data }
           yield put({
             type: 'querySuccess',
-            payload: querySuccessPayload,
+            payload: { data, filter },
           })
           yield put({
             type: 'queryDone',

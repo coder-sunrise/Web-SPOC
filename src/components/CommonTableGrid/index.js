@@ -9,8 +9,6 @@ import {
   createMuiTheme,
   withStyles,
 } from '@material-ui/core/styles'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
-import { Button } from '@/components'
 // import Paper from '@material-ui/core/Paper'
 import { LinearProgress, Paper, Tooltip, IconButton } from '@material-ui/core'
 import {
@@ -60,6 +58,8 @@ import {
   VirtualTable,
   TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
+import { Button } from '@/components'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
@@ -498,6 +498,15 @@ class CommonTableGrid extends React.Component {
       dispatch({
         type: `${type}/${queryMethod}`,
         payload: p,
+      }).then(() => {
+        this.setState((ps) => {
+          return {
+            pagination: {
+              ...ps.pagination,
+              ...payload,
+            },
+          }
+        })
       })
     } else {
       const { pagination } = this.state

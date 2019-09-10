@@ -34,6 +34,8 @@ export default createListViewModel({
               })
               return response
             }
+          } else {
+            return codetableState[ctcode]
           }
         }
         return []

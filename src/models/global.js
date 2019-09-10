@@ -40,7 +40,7 @@ export default createFormViewModel({
               showPatientInfoPanel: true,
             },
           })
-        } else if (query.md === 'cons') {
+        } else if (query.md2 === 'cons') {
           dispatch({
             type: 'updateState',
             payload: {

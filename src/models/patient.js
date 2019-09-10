@@ -111,12 +111,12 @@ export default createFormViewModel({
             'new',
           ]),
         )
-        yield put({
-          type: 'updateState',
-          payload: {
-            entity: undefined,
-          },
-        })
+        // yield put({
+        //   type: 'updateState',
+        //   payload: {
+        //     entity: undefined,
+        //   },
+        // })
         yield put({
           type: 'global/updateAppState',
           payload: {

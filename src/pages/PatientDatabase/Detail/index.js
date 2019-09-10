@@ -5,7 +5,19 @@ import moment from 'moment'
 import _ from 'lodash'
 import router from 'umi/router'
 
-import avatar from '@/assets/img/faces/marc.jpg'
+// medisys-components
+import { PatientInfoSideBanner } from 'medisys-components'
+import Loading from '@/components/PageLoading/index'
+import {
+  withStyles,
+  MenuItem,
+  MenuList,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core'
+import Error from '@material-ui/icons/Error'
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
 import {
   withFormikExtend,
   NumberInput,
@@ -22,19 +34,7 @@ import {
   DatePicker,
   Button,
 } from '@/components'
-// medisys-components
-import { PatientInfoSideBanner } from 'medisys-components'
-import Loading from '@/components/PageLoading/index'
-import {
-  withStyles,
-  MenuItem,
-  MenuList,
-  Divider,
-  ListItemIcon,
-  ListItemText,
-} from '@material-ui/core'
-import Error from '@material-ui/icons/Error'
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
+import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import schema from './schema'
@@ -202,20 +202,20 @@ class PatientDetail extends PureComponent {
     ]
   }
 
-  componentDidMount () {
-    if (this.props.patient.currentId) {
-      this.props
-        .dispatch({
-          type: 'patient/query',
-          payload: {
-            id: this.props.patient.currentId,
-          },
-        })
-        .then((o) => {
-          this.props.resetForm(o)
-        })
-    }
-  }
+  // componentDidMount () {
+  //   if (this.props.patient.currentId) {
+  //     this.props
+  //       .dispatch({
+  //         type: 'patient/query',
+  //         payload: {
+  //           id: this.props.patient.currentId,
+  //         },
+  //       })
+  //       .then((o) => {
+  //         this.props.resetForm(o)
+  //       })
+  //   }
+  // }
 
   componentWillReceiveProps (nextProps) {
     const { errors, dispatch, patient } = nextProps
@@ -236,6 +236,23 @@ class PatientDetail extends PureComponent {
           menuErrors,
         },
       })
+    }
+
+    if (
+      nextProps.patient.currentId &&
+      (this.props.patient.version !== nextProps.patient.version ||
+        !this.props.patient.entity)
+    ) {
+      this.props
+        .dispatch({
+          type: 'patient/query',
+          payload: {
+            id: this.props.patient.currentId,
+          },
+        })
+        .then((o) => {
+          this.props.resetForm(o)
+        })
     }
   }
 
