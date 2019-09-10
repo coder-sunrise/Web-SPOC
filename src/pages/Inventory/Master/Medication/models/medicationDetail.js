@@ -62,24 +62,8 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
-        const { data } = payload
-        console.log('data', data)
-        return {
-          ...st,
-          entity: {
-            ...data,
-            effectiveDates: [
-              data.effectiveStartDate,
-              data.effectiveEndDate,
-            ],
-          },
-        }
-      },
-
       getMedicPrecautionList (state, { payload }) {
         const { data } = payload
-        // console.log('payload', payload)
         return {
           ...state,
           ctmedicationprecaution: data.map((x) => {

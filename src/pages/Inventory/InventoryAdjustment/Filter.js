@@ -131,7 +131,6 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={this.handleToggle}
                 buttonRef={(node) => {
-                  console.log('node', node)
                   this.anchorElAccount = node
                 }}
               >

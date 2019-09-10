@@ -26,41 +26,35 @@ const styles = (theme) => ({
   settingGst,
 }))
 @withFormikExtend({
-  // mapPropsToValues: ({ settingGst }) => {
-  //   return settingGst.entity ? settingGst.entity : settingGst.default
-  // },
+  enableReinitialize: true,
+  mapPropsToValues: ({ settingGst }) => settingGst.entity,
 
   handleSubmit: (values, { props }) => {
-    console.log('abc', values, props)
-    const { enableGst, gstRate, gstRegNum } = values
-    const { dispatch, onConfirm } = props
+    const { IsEnableGST } = values[0]
+    const { GSTRegistrationNumber } = values[1]
+    const { GSTPercentage } = values[2]
+
     const payload = [
       {
         settingKey: 'IsEnableGST',
-        settingValue: enableGst,
-      },
-      {
-        settingKey: 'GSTPercentage',
-        settingValue: gstRate,
+        settingValue: IsEnableGST,
       },
       {
         settingKey: 'GSTRegistrationNumber',
-        settingValue: gstRegNum,
+        settingValue: GSTRegistrationNumber,
+      },
+      {
+        settingKey: 'GSTPercentage',
+        settingValue: GSTPercentage,
       },
     ]
+    const { dispatch, onConfirm, history } = props
+
     dispatch({
       type: 'settingGst/upsert',
 
       payload,
-    })
-    //   .then((r) => {
-    //     if (r) {
-    //       if (onConfirm) onConfirm()
-    //       dispatch({
-    //         type: 'settingRoom/query',
-    //       })
-    //     }
-    // })
+    }).then(history.push('/setting'))
   },
   displayName: 'GstSetupInfo',
 })
@@ -71,42 +65,27 @@ class GstSetup extends PureComponent {
     hasActiveSession: true,
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
     this.checkHasActiveSession()
-    this.props
-      .dispatch({
-        type: 'settingGst/query',
-      })
-      .then((v) => {
-        const { setFieldValue } = this.props
-        if (v) {
-          v.map((o, i) => {
-            switch (i) {
-              case 0: {
-                return setFieldValue('enableGst', o.settingValue)
-              }
-              case 1: {
-                return setFieldValue('gstRegNum', o.settingValue)
-              }
-              case 2: {
-                return setFieldValue('gstRate', o.settingValue)
-              }
-              default: {
-                return undefined
-              }
-            }
-          })
-        }
-      })
+    await this.props.dispatch({
+      type: 'settingGst/query',
+    })
+
+    const { IsEnableGST } = this.props.values[0]
+    this.setState({ enableGst: IsEnableGST })
   }
 
   checkHasActiveSession = async () => {
     const result = await getActiveSession()
     const { data } = result.data
-    // data = false
-    this.setState({
-      hasActiveSession: !!data,
-    })
+    // let data = []
+    if (!data || data.length === 0) {
+      this.setState((prevState) => {
+        return {
+          hasActiveSession: !prevState.hasActiveSession,
+        }
+      })
+    }
   }
 
   handleOnChange = () => {
@@ -116,11 +95,11 @@ class GstSetup extends PureComponent {
           enableGst: !prevState.enableGst,
         }
       },
-      (v) => {
-        if (!this.state.enableGst) {
-          this.props.setFieldValue('inclusiveGst', false)
-        }
-      },
+      // (v) => {
+      //   if (!this.state.enableGst) {
+      //     this.props.setFieldValue('inclusiveGst', false)
+      //   }
+      // },
     )
   }
 
@@ -132,6 +111,7 @@ class GstSetup extends PureComponent {
       dispatch,
       theme,
       handleSubmit,
+      values,
       ...restProps
     } = this.props
     const { enableGst, hasActiveSession } = this.state
@@ -152,7 +132,7 @@ class GstSetup extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='enableGst'
+                name='[0]IsEnableGST'
                 render={(args) => (
                   <Checkbox
                     label='Enable GST'
@@ -167,12 +147,12 @@ class GstSetup extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='gstRegNum'
+                name='[1]GSTRegistrationNumber'
                 render={(args) => (
                   <TextField
                     label='GST Registration Number'
                     {...args}
-                    disabled={!enableGst}
+                    disabled={!enableGst || !!hasActiveSession}
                   />
                 )}
               />
@@ -181,19 +161,19 @@ class GstSetup extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='gstRate'
+                name='[2]GSTPercentage'
                 render={(args) => (
                   <TextField
                     label='GST Rate'
                     {...args}
-                    disabled={!enableGst}
+                    disabled={!enableGst || !!hasActiveSession}
                     suffix='%'
                   />
                 )}
               />
             </GridItem>
           </GridContainer>
-          <GridContainer>
+          {/* <GridContainer>
             <GridItem md={3}>
               <Field
                 name='inclusiveGst'
@@ -206,7 +186,7 @@ class GstSetup extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
+          </GridContainer> */}
           <div
             className={classes.actionBtn}
             style={{ display: 'flex', justifyContent: 'center' }}
@@ -224,7 +204,7 @@ class GstSetup extends PureComponent {
             <Button
               color='primary'
               onClick={handleSubmit}
-              // disabled={hasActiveSession}
+              disabled={hasActiveSession}
             >
               Save
             </Button>

@@ -18,6 +18,7 @@ export default createListViewModel({
           moment().utc().set({ hour: 0, minute: 0, second: 0 }),
           moment('2099-12-31').utc().set({ hour: 23, minute: 59, second: 59 }),
         ],
+        adminCharge: 0,
         contact: {
           contactAddress: [
             {
@@ -50,10 +51,6 @@ export default createListViewModel({
         if (pathname.toLowerCase().indexOf('/setting/company/') === 0) {
           getCodes('ctCompanyType').then((codetableData) => {
             companyTypes = codetableData
-            console.log(
-              companyTypes,
-              Number(pathname.toLowerCase().replace('/setting/company/', '')),
-            )
             const companyType = companyTypes.find(
               (o) =>
                 o.id ===
@@ -73,7 +70,6 @@ export default createListViewModel({
             })
           })
         }
-        console.log(loct)
       })
     },
     effects: {},

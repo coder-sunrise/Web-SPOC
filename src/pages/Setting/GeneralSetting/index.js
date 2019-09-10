@@ -12,23 +12,13 @@ import {
 } from '@/utils/codes'
 
 import {
-  Checkbox,
   withFormikExtend,
-  FastField,
   Field,
-  PictureUpload,
   GridContainer,
   GridItem,
   CardContainer,
-  Transition,
-  TextField,
-  AntdInput,
   Select,
-  Accordion,
   Button,
-  CommonTableGrid,
-  DatePicker,
-  NumberInput,
 } from '@/components'
 import WarningSnackbar from './WarningSnackbar'
 
@@ -40,14 +30,39 @@ const styles = (theme) => ({
   settingGeneral,
 }))
 @withFormikExtend({
-  // mapPropsToValues: ({ settingGeneral }) => {
-  //   console.log(settingGeneral)
-  //   return settingGeneral.entity
-  //     ? settingGeneral.entity
-  //     : settingGeneral.default
-  // },
+  enableReinitialize: true,
 
-  handleSubmit: () => {},
+  mapPropsToValues: ({ settingGeneral }) => {
+    return settingGeneral.entity
+  },
+
+  handleSubmit: (values, { props }) => {
+    const { SystemCurrency } = values[0]
+    const { CurrencyRounding } = values[1]
+    const { CurrencyRoundingToTheClosest } = values[2]
+
+    const payload = [
+      {
+        settingKey: 'SystemCurrency',
+        settingValue: SystemCurrency,
+      },
+      {
+        settingKey: 'CurrencyRounding',
+        settingValue: CurrencyRounding,
+      },
+      {
+        settingKey: 'CurrencyRoundingToTheClosest',
+        settingValue: CurrencyRoundingToTheClosest,
+      },
+    ]
+    const { dispatch, onConfirm, history } = props
+
+    dispatch({
+      type: 'settingGeneral/upsert',
+
+      payload,
+    }).then(history.push('/setting'))
+  },
   displayName: 'GeneralSettingInfo',
 })
 class GeneralSetting extends PureComponent {
@@ -57,40 +72,22 @@ class GeneralSetting extends PureComponent {
 
   componentDidMount = () => {
     this.checkHasActiveSession()
-    this.props
-      .dispatch({
-        type: 'settingGeneral/query',
-      })
-      .then((v) => {
-        const { setFieldValue } = this.props
-        if (v) {
-          v.map((o, i) => {
-            switch (i) {
-              case 0: {
-                return setFieldValue('systemCurrency', o.settingValue)
-              }
-              case 1: {
-                return setFieldValue('currencyRounding', o.settingValue)
-              }
-              case 2: {
-                return setFieldValue('roundingToTheClosest', o.settingValue)
-              }
-              default: {
-                return undefined
-              }
-            }
-          })
-        }
-      })
+    this.props.dispatch({
+      type: 'settingGeneral/query',
+    })
   }
 
   checkHasActiveSession = async () => {
     const result = await getActiveSession()
     const { data } = result.data
-    // data = false
-    this.setState({
-      hasActiveSession: !!data,
-    })
+    // let data = []
+    if (!data || data.length === 0) {
+      this.setState((prevState) => {
+        return {
+          hasActiveSession: !prevState.hasActiveSession,
+        }
+      })
+    }
   }
 
   render () {
@@ -99,6 +96,7 @@ class GeneralSetting extends PureComponent {
       generalSettingInfo,
       dispatch,
       theme,
+      handleSubmit,
       ...restProps
     } = this.props
     const { hasActiveSession } = this.state
@@ -118,13 +116,13 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='systemCurrency'
+                name='[0]SystemCurrency'
                 render={(args) => (
                   <Select
                     label='System Currency'
                     {...args}
                     options={currencies}
-                    disabled={!!hasActiveSession}
+                    disabled
                   />
                 )}
               />
@@ -133,7 +131,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='currencyRounding'
+                name='[1]CurrencyRounding'
                 render={(args) => (
                   <Select
                     label='Currency Rounding'
@@ -147,7 +145,7 @@ class GeneralSetting extends PureComponent {
 
             <GridItem md={3}>
               <Field
-                name='roundingToTheClosest'
+                name='[2]CurrencyRoundingToTheClosest'
                 render={(args) => (
                   <Select
                     label='To The Closest'
@@ -176,9 +174,7 @@ class GeneralSetting extends PureComponent {
 
             <Button
               color='primary'
-              onClick={() => {
-                this.props.handleSubmit
-              }}
+              onClick={handleSubmit}
               disabled={hasActiveSession}
             >
               Save

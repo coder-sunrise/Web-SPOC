@@ -117,6 +117,7 @@ const Detail = ({
                       label={formatMessage({
                         id: 'inventory.master.medication.name',
                       })}
+                      disabled={medicationDetail.entity}
                       {...args}
                     />
                   )

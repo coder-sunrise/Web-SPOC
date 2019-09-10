@@ -11,9 +11,9 @@ module.exports = {
   upsert: async (params) => {
     const r = await request(`${url}`, {
       method: 'PUT',
-      body: {
+      body: [
         ...params,
-      },
+      ],
     })
     return r
   },

@@ -20,36 +20,20 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {
-      *addAfter1Second (action, { call, put }) {
-        console.log('effect')
-        yield call(service.query)
-        yield put({ type: 'add' })
-      },
-    },
+    effects: {},
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload
-        console.log('payload', payload)
 
         const settingValue = data.map((o, i) => {
-          switch (i) {
-            case 0: {
-              return { enableGst: o.settingValue }
-            }
-            case 1: {
-              return { gstRegNum: o.settingValue }
-            }
-            case 2: {
-              return { gstRate: o.settingValue }
-            }
-            default: {
-              return { ...st }
-            }
+          return {
+            [o.settingKey]: o.settingValue,
           }
         })
 
-        return settingValue
+        return {
+          entity: settingValue,
+        }
       },
     },
   },

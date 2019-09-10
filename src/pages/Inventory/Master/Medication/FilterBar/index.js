@@ -65,7 +65,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         </GridItem>
         <GridItem xs={6} md={3}>
           <FastField
-            name='supplier'
+            name='favouriteSupplierFK'
             render={(args) => {
               return (
                 <CodeSelect
@@ -101,13 +101,18 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
               variant='contained'
               color='primary'
               onClick={() => {
-                const { code, displayValue, supplier, isActive } = values
+                const {
+                  code,
+                  displayValue,
+                  favouriteSupplierFK,
+                  isActive,
+                } = values
                 dispatch({
                   type: 'medication/query',
                   payload: {
                     code,
                     displayValue,
-                    supplier,
+                    favouriteSupplierFK,
                     isActive,
                   },
                 })

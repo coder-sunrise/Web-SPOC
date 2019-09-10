@@ -48,7 +48,6 @@ class Supplier extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    console.log('comapny', this.props)
     const { name } = route
     const companyType = name === 'copayer' ? 'Co-Payer' : 'Supplier'
     return (
@@ -58,9 +57,7 @@ class Supplier extends PureComponent {
 
         <CommonModal
           open={settingCompany.showModal}
-          observe='SupplierDetail'
-          // { id === 1 ? title = settingCompany.entity ? 'Edit Co-Payer' : 'Add Co-Payer' : title = settingCompany.entity ? 'Edit Supplier' : 'Add Supplier}
-
+          observe='CompanyDetail'
           title={
             settingCompany.entity ? `Edit ${companyType}` : `Add ${companyType}`
           }

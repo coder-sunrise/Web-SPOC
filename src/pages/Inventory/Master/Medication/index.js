@@ -10,6 +10,7 @@ import { status } from '@/utils/codes'
 const styles = () => ({})
 
 const Medication = ({ dispatch, history, medication, values }) => {
+  console.log('values', values, medication)
   const [
     tableParas,
     setTableParas,
@@ -17,8 +18,8 @@ const Medication = ({ dispatch, history, medication, values }) => {
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
-      { name: 'supplier', title: 'Supplier' },
-      { name: 'uom', title: 'Disp. UOM' },
+      { name: 'favouriteSupplier', title: 'Supplier' },
+      { name: 'dispensingUOM', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
       { name: 'sellingPrice', title: 'Selling Price' },
@@ -33,10 +34,15 @@ const Medication = ({ dispatch, history, medication, values }) => {
     setColExtensions,
   ] = useState([
     { columnName: 'action', width: 110, align: 'center' },
-
     {
-      columnName: 'uom',
-      type: 'number',
+      columnName: 'favouriteSupplier',
+      type: 'codeSelect',
+      code: 'ctCompany',
+    },
+    {
+      columnName: 'dispensingUOM',
+      type: 'codeSelect',
+      code: 'ctmedicationunitofmeasurement',
     },
     {
       columnName: 'stock',
@@ -71,6 +77,22 @@ const Medication = ({ dispatch, history, medication, values }) => {
   useEffect(() => {
     dispatch({
       type: 'medication/query',
+    }).then((v) => {
+      const { data } = v
+      dispatch({
+        type: 'medication/updateState',
+        payload: {
+          list: data.map((o) => {
+            return {
+              ...o,
+              favouriteSupplier: o.favouriteSupplier
+                ? o.favouriteSupplier.id
+                : undefined,
+              dispensingUOM: o.dispensingUOM ? o.dispensingUOM.id : undefined,
+            }
+          }),
+        },
+      })
     })
   }, [])
 

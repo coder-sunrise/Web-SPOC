@@ -133,7 +133,7 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug UOM',
+    text: 'Medication UOM',
     url: '/setting/medicationuom',
   },
   {
@@ -143,7 +143,7 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug Category',
+    text: 'Medication Group',
     url: '/setting/medicationgroup',
   },
   {
@@ -153,22 +153,22 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug Dosage',
+    text: 'Medication Dosage',
     url: '/setting/medicationdosage',
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug Precautions',
+    text: 'Medication Precautions',
     url: '/setting/medicationprecautions',
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug Frequency',
+    text: 'Medication Frequency',
     url: '/setting/medicationfrequency',
   },
   {
     title: 'Clinic Setting',
-    text: 'Drug Consumption Method',
+    text: 'Medication Consumption Method',
     url: '/setting/medicationconsumptionmethod',
   },
   {

@@ -33,14 +33,6 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='displayValue'
-              render={(args) => {
-                return <TextField label='Display Value' {...args} />
-              }}
-            />
-          </GridItem>
 
           <GridItem xs={6} md={3}>
             <div className={classes.filterBtn}>

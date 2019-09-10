@@ -35,14 +35,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
           <FastField
             name='code'
             render={(args) => {
-              return (
-                <TextField
-                  label={formatMessage({
-                    id: 'inventory.master.package.code',
-                  })}
-                  {...args}
-                />
-              )
+              return <TextField label='Package Code' {...args} />
             }}
           />
         </GridItem>
