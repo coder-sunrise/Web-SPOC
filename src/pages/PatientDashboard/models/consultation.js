@@ -115,7 +115,7 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
-        router.push('reception/queue')
+        router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
         console.log('queryDone', payload)

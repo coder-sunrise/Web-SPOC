@@ -322,6 +322,17 @@ class CommonTableGrid extends React.Component {
             ...tableRowSharedRootConfig,
           },
         },
+        PageSizeSelector: {
+          label: {
+            fontSize: '0.9rem',
+            marginBottom: 3,
+          },
+        },
+        Pagination: {
+          rowsLabel: {
+            fontSize: '0.9rem',
+          },
+        },
       },
     }
     const size = props.size || theme.props.size

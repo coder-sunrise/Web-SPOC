@@ -482,7 +482,6 @@ class Medication extends React.Component {
                 ) {
                   args.form.setFieldValue('totalAfterAdj', orders.totalAfterAdj)
                 }
-                console.log(args.field)
                 return (
                   <NumberInput
                     label='Total After Adj'

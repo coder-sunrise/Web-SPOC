@@ -841,6 +841,7 @@ export const getServices = (data) => {
   })
 
   return {
+    serviceCenterServices: data,
     services,
     serviceCenters,
   }
