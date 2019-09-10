@@ -200,6 +200,7 @@ class Queue extends PureComponent {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
+        openConfirmTitle: '',
         openConfirmContent: `Are you sure to end current session (${sessionNo})`,
         onOpenConfirm: this.onConfirmEndSession,
       },

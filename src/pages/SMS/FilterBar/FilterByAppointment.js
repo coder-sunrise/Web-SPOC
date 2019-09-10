@@ -5,9 +5,15 @@ import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Checkbox, GridItem, DatePicker, Select } from '@/components'
+import {
+  Checkbox,
+  GridItem,
+  DatePicker,
+  Select,
+  CodeSelect,
+} from '@/components'
 // medisys component
-import { AppointmentTypeSelect } from 'medisys-components'
+import { AppointmentTypeLabel } from '@/components/_medisys'
 
 const styles = (theme) => ({
   checkbox: {
@@ -45,7 +51,29 @@ const FilterByAppointment = ({ classes }) => {
         <FastField
           name='appointmentType'
           render={(args) => {
-            return <AppointmentTypeSelect label='Appointment Type' {...args} />
+            return (
+              <CodeSelect
+                {...args}
+                mode='multiple'
+                all={-99}
+                label='Filter by Appointment Type'
+                code='ctappointmenttype'
+                labelField='displayValue'
+                renderDropdown={(option) => (
+                  <AppointmentTypeLabel
+                    color={option.tagColorHex}
+                    label={option.displayValue}
+                  />
+                )}
+                defaultOptions={[
+                  {
+                    isExtra: true,
+                    id: -99,
+                    displayValue: 'All appointment types',
+                  },
+                ]}
+              />
+            )
           }}
         />
       </GridItem>

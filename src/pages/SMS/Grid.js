@@ -6,7 +6,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common components
 import { CommonTableGrid, Tooltip } from '@/components'
 // medisys components
-import { GridContextMenuButton } from 'medisys-components'
+import { GridContextMenuButton } from '@/components/_medisys'
 
 const generateRowData = () => {
   let data = []
