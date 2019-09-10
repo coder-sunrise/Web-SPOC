@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+// moment
+import moment from 'moment'
 // dva
 import { connect } from 'dva'
 // umi locale
@@ -20,6 +22,7 @@ import {
   PageHeaderWrapper,
   Button,
   ProgressButton,
+  serverDateFormat,
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
@@ -90,12 +93,31 @@ class Queue extends PureComponent {
   componentWillMount = () => {
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
-
+    dispatch({
+      type: 'calendar/updateState',
+      payload: {
+        list: [],
+      },
+    })
     if (sessionInfo.id === '') {
       dispatch({
         type: `${modelKey}getSessionInfo`,
       })
+    } else {
+      const today = moment().format(serverDateFormat)
+      dispatch({
+        type: 'calendar/getCalendarList',
+        payload: {
+          eql_appointmentDate: today,
+        },
+      })
     }
+    // dispatch({
+    //   type: 'calendar/getCalendarList',
+    //   payload: {
+    //     eql_appointmentDate: today,
+    //   },
+    // })
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)
@@ -103,14 +125,25 @@ class Queue extends PureComponent {
 
   componentWillUnmount () {
     clearInterval(this._timer)
+    this.props.dispatch({
+      type: 'calendar/updateState',
+      payload: {
+        list: [],
+      },
+    })
   }
 
-  showVisitRegistration = ({ visitID = undefined, patientID = undefined }) => {
+  showVisitRegistration = ({
+    visitID = undefined,
+    patientID = undefined,
+    isAppointment = false,
+  }) => {
     const parameter = {
       md: 'visreg',
     }
     if (patientID) parameter.pid = patientID
     if (visitID) parameter.vis = visitID
+    if (isAppointment) parameter.type = 'appt'
 
     this.setState(
       {
@@ -118,6 +151,18 @@ class Queue extends PureComponent {
       },
       () => this.props.history.push(getAppendUrl(parameter)),
     )
+  }
+
+  handleActualizeAppointment = ({
+    patientID = undefined,
+    appointmentID = undefined,
+  }) => {
+    this.props.dispatch({
+      type: `${modelKey}actualizeAppointment`,
+      payload: appointmentID,
+    })
+
+    // this.showVisitRegistration({ patientID })
   }
 
   closeVisitRegistration = () => {
@@ -302,6 +347,7 @@ class Queue extends PureComponent {
                   onViewDispenseClick={this.toggleDispense}
                   onRegisterPatientClick={this.toggleRegisterNewPatient}
                   handleEditVisitClick={this.showVisitRegistration}
+                  handleActualizeAppointment={this.handleActualizeAppointment}
                   currentFilter={currentFilter}
                 />
               </React.Fragment>

@@ -55,8 +55,8 @@ import {
       type: 'consultationDocument/upsertRow',
       payload: {
         sequence: rows.length,
+        subject: currentType.getSubject(values),
         ...values,
-        // subject: currentType.getSubject(values),
       },
     })
     if (onConfirm) onConfirm()

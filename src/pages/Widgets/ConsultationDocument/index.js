@@ -1,7 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import {  Tooltip } from '@material-ui/core'
-import { CommonTableGrid, Button, CommonModal,Popconfirm } from '@/components'
+import { CommonTableGrid, Button, CommonModal,Popconfirm ,skeleton} from '@/components'
 import {consultationDocumentTypes} from '@/utils/codes'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
@@ -11,9 +11,12 @@ import model from './models'
 
 
 window.g_app.replaceModel(model)
+
 @connect(({ consultationDocument,codetable,patientDashboard }) => ({
   consultationDocument,codetable,patientDashboard,
 }))
+// @skeleton(['consultationDocument'])
+
 class ConsultationDocument extends PureComponent {
   constructor (props) {
     super(props)

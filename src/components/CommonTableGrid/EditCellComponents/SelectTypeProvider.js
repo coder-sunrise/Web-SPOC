@@ -1,15 +1,10 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import {
-  MUISelect,
-  MUICodeSelect,
-  CodeSelect,
-  Select,
-  TextField,
-} from '@/components'
+import { CodeSelect, Select, TextField } from '@/components'
 import { getCodes } from '@/utils/codes'
 import {
   updateGlobalVariable,
@@ -23,10 +18,14 @@ class SelectEditor extends PureComponent {
   }
 
   constructor (props) {
-    // console.log('constructor', props)
+    console.log('constructor', props)
     super(props)
     this.myRef = React.createRef()
   }
+
+  // componentWillMount () {
+  //   console.log({ 't-1': window.$tempGridRow })
+  // }
 
   componentDidMount () {
     const { columnExtensions, row, column: { name: columnName } } = this.props
@@ -46,6 +45,7 @@ class SelectEditor extends PureComponent {
     //   window.$tempGridRow,
     //   gridId,
     // )
+    // console.log({ cfg, latestRow, columnName, props: this.props })
     this.setState({
       error: updateCellValue(
         this.props,
@@ -53,6 +53,51 @@ class SelectEditor extends PureComponent {
         latestRow[columnName],
       ),
     })
+  }
+
+  // componentWillUnmount () {
+  //   console.log('unmount')
+  // }
+
+  _onChange = (val, option) => {
+    const {
+      columnExtensions,
+      column: { name: columnName },
+      value,
+      onValueChange,
+      row,
+    } = this.props
+    const cfg =
+      columnExtensions.find(
+        ({ columnName: currentColumnName }) => currentColumnName === columnName,
+      ) || {}
+    const {
+      type,
+      code,
+      validationSchema,
+      isDisabled = () => false,
+      onChange,
+      gridId,
+      ...restProps
+    } = cfg
+
+    const error = updateCellValue(this.props, this.myRef.current, val)
+    this.setState({
+      error,
+    })
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][row.id] || {}
+      : row
+    if (!error) {
+      if (onChange)
+        onChange({
+          val,
+          option,
+          row: latestRow,
+          onValueChange,
+          error,
+        })
+    }
   }
 
   render () {
@@ -80,9 +125,8 @@ class SelectEditor extends PureComponent {
       ? window.$tempGridRow[gridId][row.id] || {}
       : row
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
-
     const _onChange = (val, option) => {
-      // console.log(val, option)
+      console.log({ val, option })
       const error = updateCellValue(this.props, this.myRef.current, val)
       this.setState({
         error,
@@ -106,7 +150,7 @@ class SelectEditor extends PureComponent {
       value: latestRow[columnName],
       disabled: isDisabled(latestRow),
       ...restProps,
-      onChange: _onChange,
+      onChange: this._onChange,
     }
     // console.log(columnName)
     if (columnName) {
@@ -133,6 +177,7 @@ class SelectEditor extends PureComponent {
 const SelectDisplay = (columnExtensions, state) => ({
   value,
   column: { name: columnName },
+  row,
   ...restProps
 }) => {
   const cfg =
@@ -144,47 +189,24 @@ const SelectDisplay = (columnExtensions, state) => ({
   const v =
     (cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
-  // console.log(cfg)
-  const { labelField = 'name' } = cfg
-  // console.log(v, labelField)
+
+  const { labelField = 'name', render } = cfg
+  const label = Object.byString(v, labelField)
+
   const vEl = v ? (
-    <Tooltip title={v[labelField]} enterDelay={1500}>
-      <span>{v[labelField]}</span>
+    <Tooltip title={label} enterDelay={1500}>
+      <span>{label}</span>
     </Tooltip>
   ) : (
     ''
   )
-  if (v.colorValue) {
-    return (
-      <div>
-        <span
-          style={{
-            height: '0.8rem',
-            width: '1.5rem',
-            borderRadius: '20%',
-            display: 'inline-block',
-            marginRight: 10,
-            backgroundColor: v.colorValue,
-          }}
-        />
-        {vEl}
-      </div>
-    )
-  }
-  if (v.color) {
-    return (
-      <div
-        style={{
-          color: v.color,
-        }}
-      >
-        {vEl}
-      </div>
-    )
-  }
+
+  if (render) return render(row)
+
   return vEl
 }
 
+@connect(() => ({}))
 class SelectTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
@@ -193,6 +215,7 @@ class SelectTypeProvider extends React.Component {
   constructor (props) {
     // console.log('SelectTypeProvider constructor')
     super(props)
+
     const { columnExtensions } = this.props
     const colFor = columnExtensions.filter(
       (o) =>
@@ -207,15 +230,30 @@ class SelectTypeProvider extends React.Component {
       codeLoaded: 0,
     }
     // console.log(props)
+
     colFor.forEach((f) => {
       if (f.code) {
-        getCodes(f.code).then((o) => {
-          // console.log(o)
-          this.setState((prevState) => ({
-            [`${f.columnName}Option`]: o,
-            codeLoaded: ++prevState.codeLoaded,
-          }))
-        })
+        this.props
+          .dispatch({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: f.code,
+            },
+          })
+          .then((response) => {
+            if (response) {
+              this.setState((prevState) => ({
+                [`${f.columnName}Option`]: response,
+                codeLoaded: ++prevState.codeLoaded,
+              }))
+            }
+          })
+        // getCodes(f.code).then((o) => {
+        //   this.setState((prevState) => ({
+        //     [`${f.columnName}Option`]: o,
+        //     codeLoaded: ++prevState.codeLoaded,
+        //   }))
+        // })
       }
     })
 
@@ -229,8 +267,10 @@ class SelectTypeProvider extends React.Component {
     // console.log(nextState, this.state)
 
     return (
+      // optionsUpdate ||
       this.props.editingRowIds !== nextProps.editingRowIds ||
       Object.keys(this.state).length !== Object.keys(nextState).length ||
+      this.state.codeLoaded !== nextState.codeLoaded ||
       this.props.commitCount !== nextProps.commitCount
     )
   }

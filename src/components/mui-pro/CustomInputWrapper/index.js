@@ -103,7 +103,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
       break
   }
   // console.log(props)
-  // console.log(label)
+
   return noWrapper ? (
     <div style={style}>{newChildren}</div>
   ) : (

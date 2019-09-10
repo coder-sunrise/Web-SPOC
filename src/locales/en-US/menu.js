@@ -126,6 +126,7 @@ export default {
   'menu.setting.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
   'menu.setting.paymentmode': 'Payment Mode',
+  'menu.setting.appointmenttype': 'Appointment Type',
 
   'menu.report': 'Report',
   'menu.report.queueListingReport': 'Queue Listing Report',

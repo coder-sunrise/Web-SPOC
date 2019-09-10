@@ -8,7 +8,7 @@ import { Button } from '@/components'
 // styling
 import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
 // variables
-import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
+import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { StatusIndicator } from '../variables'
 import { getCount, todayOnly } from '../utils'
 
@@ -74,15 +74,12 @@ const StatusFilterButton = ({
 
   useEffect(
     () => {
-      const flattenedCalendarData = appointments
-        .reduce(flattenAppointmentDateToCalendarEvents, [])
-        .filter(todayOnly)
       const count = {
         all: getCount(StatusIndicator.ALL, list),
         waiting: getCount(StatusIndicator.WAITING, list),
         inProgress: getCount(StatusIndicator.IN_PROGRESS, list),
         completed: getCount(StatusIndicator.COMPLETED, list),
-        appointment: flattenedCalendarData.length,
+        appointment: appointments.length,
       }
       setStatusCount(count)
     },
@@ -235,7 +232,7 @@ const StatusFilterButton = ({
 
 const ConnectedStatusFilterButton = connect(({ queueLog, calendar }) => ({
   queueLog,
-  appointments: calendar.calendarEvents,
+  appointments: calendar.list,
 }))(StatusFilterButton)
 
 export default memo(withStyles(styles)(ConnectedStatusFilterButton))

@@ -44,7 +44,11 @@ export default createFormViewModel({
                 type: 'fetchPatientInfoByPatientID',
                 payload: { id: query.pid },
               })
-
+          // if (query.type !== undefined) {
+          //   dispatch({
+          //     type: 'setRegisterType',
+          //   })
+          // }
           dispatch(openModal)
         }
       })
@@ -60,6 +64,7 @@ export default createFormViewModel({
             'acc',
             'refno',
             'new',
+            'type',
           ]),
         )
         yield put({

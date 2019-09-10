@@ -1,7 +1,11 @@
-import { subscribeNotification } from '@/utils/realtime'
 import { createListViewModel } from 'medisys-model'
+// moment
+import moment from 'moment'
+import { subscribeNotification } from '@/utils/realtime'
 import * as service from '../services'
+import { save as updateAppt } from '@/services/calendar'
 import { StatusIndicator } from '../variables'
+import { serverDateFormat } from '@/components'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -89,11 +93,18 @@ export default createListViewModel({
         // data = null when get session failed
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
+          const today = moment().format(serverDateFormat)
           yield put({
             type: 'query',
             payload: {
               pagesize: 999999,
               'VisitFKNavigation.BizSessionFK': sessionData[0].id,
+            },
+          })
+          yield put({
+            type: 'calendar/getCalendarList',
+            payload: {
+              eql_appointmentDate: today,
             },
           })
           yield put({
@@ -115,6 +126,38 @@ export default createListViewModel({
           type: 'getSessionInfo',
         })
         return true
+      },
+      *actualizeAppointment ({ payload }, { select, call, put }) {
+        const calendarState = yield select((state) => state.calendar)
+        const { list } = calendarState
+        // const appointment = list.find((item) => item.id === payload)
+        // console.log({ appointment, list, payload })
+        // if (appointment) {
+        //   const appointmentPayload = {
+        //     recurrenceChanged: false,
+        //     overwriteEntireSeries: false,
+        //     editSingleAppointment: true,
+        //     concurrencyToken: appointment.concurrencyToken,
+        //     appointmentGroupDto: {
+        //       id: parseInt(appointment.appointmentGroupFK, 10),
+        //       concurrencyToken: appointment.concurrencyToken,
+        //       appointments: [
+        //         {
+        //           id: appointment.id,
+        //           concurrencyToken: appointment.concurrencyToken,
+        //           appointmentGroupFk: parseInt(
+        //             appointment.appointmentGroupFK,
+        //             10,
+        //           ),
+        //           appointmentStatusFk: 4,
+        //           isEditedAsSingleAppointment: true,
+        //         },
+        //       ],
+        //     },
+        //   }
+        // console.log({ appointmentPayload })
+        // yield call(updateAppt, appointmentPayload)
+        // }
       },
     },
     reducers: {

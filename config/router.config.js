@@ -65,7 +65,7 @@ const routes = [
             path: '/reception/appointment',
             name: 'appointment',
             mini: 'AP',
-            component: './Reception/BigCalendar',
+            component: './Reception/Appointment',
           },
           {
             hideInMenu: true,
@@ -607,6 +607,11 @@ const routes = [
             path: '/setting/paymentmode',
             name: 'paymentmode',
             component: './Setting/PaymentMode',
+          },
+          {
+            path: '/setting/appointmenttype',
+            name: 'appointmenttype',
+            component: './Setting/AppointmentType',
           },
         ],
       },

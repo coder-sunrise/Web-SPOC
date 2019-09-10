@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
+import Link from 'umi/link'
 import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
 
 import { Save, Close, Clear, FilterList, Search, Add } from '@material-ui/icons'
 import {
@@ -19,6 +19,9 @@ import {
 } from '@material-ui/core'
 import { Affix } from 'antd'
 import { formatMessage } from 'umi/locale'
+import InboxIcon from '@material-ui/icons/MoveToInbox'
+import DraftsIcon from '@material-ui/icons/Drafts'
+import SendIcon from '@material-ui/icons/Send'
 import {
   Button,
   CommonHeader,
@@ -40,21 +43,33 @@ import {
   CardContainer,
   confirm,
   dateFormatLong,
+  Skeleton,
 } from '@/components'
-import InboxIcon from '@material-ui/icons/MoveToInbox'
-import DraftsIcon from '@material-ui/icons/Drafts'
-import SendIcon from '@material-ui/icons/Send'
 import avatar from '@/assets/img/faces/marc.jpg'
 import { titles, finTypes, gender } from '@/utils/codes'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import { standardRowHeight, headerHeight } from 'mui-pro-jss'
+import Yup from '@/utils/yup'
 // import model from '../models/demographic'
 import Block from './Block'
 
-@connect(({ patientDashboard }) => ({
+@connect(({ patientDashboard, codetable }) => ({
   patientDashboard,
+  codetable,
 }))
 class Banner extends PureComponent {
   state = {}
+
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctdrugallergy',
+      },
+    })
+  }
 
   componentDidMount () {
     const { props, value } = this
@@ -69,6 +84,32 @@ class Banner extends PureComponent {
     //   props.setValues(props.demographic.default)
     // }
     // props.setValues(props.patientDashboard.entity)
+  }
+
+  getAllergyLink () {
+    const { props } = this
+    const { patientDashboard, codetable } = props
+    const { patientInfo } = patientDashboard
+    if (!patientInfo) return <Skeleton height={101} />
+    const { patientAllergy = [] } = patientInfo
+    const { ctdrugallergy = [] } = codetable
+    const da = ctdrugallergy.filter((o) =>
+      patientAllergy.find((m) => m.allergyFK === o.id),
+    )
+    // console.log(da, da.length)
+    return (
+      <div>
+        <Link
+          to={getAppendUrl({
+            md: 'pt',
+            cmt: 3,
+            pid: patientInfo.id,
+          })}
+        >
+          {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
+        </Link>
+      </div>
+    )
   }
 
   render () {
@@ -87,9 +128,9 @@ class Banner extends PureComponent {
         paddingRight: 16,
       },
     } = props
-    if (!patientDashboard) return null
+    if (!patientDashboard) return <Skeleton height={100} />
     const { patientInfo } = patientDashboard
-    if (!patientInfo) return null
+    if (!patientInfo) return <Skeleton height={100} />
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -150,7 +191,7 @@ class Banner extends PureComponent {
             />
           </GridItem>
           <GridItem xs={6} md={2}>
-            <Block header='Allergies' body='Penicillin' />
+            <Block header='Allergies' body={this.getAllergyLink()} />
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block header='Medical Problem' body='Asthma' />

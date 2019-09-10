@@ -60,7 +60,7 @@ export const AppointmentContextMenu = [
     id: 9,
     label: 'Register Patient',
     Icon: Person,
-    disabled: false,
+    disabled: true,
   },
 ]
 
@@ -128,6 +128,6 @@ export const ContextMenuOptions = [
     label: 'Edit Consultation',
     Icon: Edit,
     disabled: true,
-    hidden: true,
+    hidden: false,
   },
 ]
