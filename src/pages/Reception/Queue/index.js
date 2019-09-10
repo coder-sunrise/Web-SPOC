@@ -103,8 +103,15 @@ class Queue extends PureComponent {
       dispatch({
         type: `${modelKey}getSessionInfo`,
       })
+    } else {
+      const today = moment().format(serverDateFormat)
+      dispatch({
+        type: 'calendar/getCalendarList',
+        payload: {
+          eql_appointmentDate: today,
+        },
+      })
     }
-    // const today = moment().format(serverDateFormat)
     // dispatch({
     //   type: 'calendar/getCalendarList',
     //   payload: {
