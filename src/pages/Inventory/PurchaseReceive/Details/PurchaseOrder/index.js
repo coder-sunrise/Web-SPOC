@@ -3,9 +3,6 @@ import moment from 'moment'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import Add from '@material-ui/icons/Add'
-import { Divider } from '@material-ui/core'
-import POSummary from './POSummary'
-import Grid from './Grid'
 import {
   CardContainer,
   GridContainer,
@@ -18,7 +15,12 @@ import {
   EditableTableGrid,
   Button,
   CodeSelect,
+  CommonModal,
 } from '@/components'
+import POForm from './POForm'
+import Grid from './Grid'
+import POSummary from './POSummary'
+import InvoiceAdjustment from './InvoiceAdjustment'
 
 @connect(({ purchaseOrder }) => ({
   purchaseOrder,
@@ -26,324 +28,42 @@ import {
 @withFormikExtend({
   displayName: 'purchaseOrder',
   mapPropsToValues: ({ purchaseOrder }) => {
-    return purchaseOrder.entity || purchaseOrder.default.purchaseOrder
+    return purchaseOrder.entity || purchaseOrder.default
   },
 })
 class index extends PureComponent {
-  constructor (props) {
-    super(props)
-
-    const { type } = props
-
-    // this.tableParas = {
-    //   columns: [
-    //     { name: 'type', title: 'Type' },
-    //     { name: 'code', title: 'Code' },
-    //     { name: 'name', title: 'Name' },
-    //     { name: 'uom', title: 'UOM' },
-    //     { name: 'orderQty', title: 'Order Qty' },
-    //     { name: 'bonusQty', title: 'Bonus Qty' },
-    //     { name: 'totalReceived', title: 'Total Received' },
-    //     { name: 'totalPrice', title: 'Total Price' },
-    //   ],
-    //   columnExtensions: [
-    //     {
-    //       columnName: 'totalReceived',
-    //       type: 'number',
-    //       currency: true,
-    //     },
-    //     {
-    //       columnName: 'totalPrice',
-    //       type: 'number',
-    //       currency: true,
-    //     },
-    //   ],
-    // }
-
-    // this.commitChanges = props.setArrayValue
-    // this.onAddedRowsChange = (addedRows) => {
-    //   return addedRows.map((row) => ({
-    //     onsetDate: moment(),
-    //     ...row,
-    //     confirmedByUserFK: props.user.data.id,
-    //     isConfirmed: true,
-    //     type,
-    //   }))
-    // }
+  state = {
+    showInvoiceAdjustment: false,
   }
 
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'purchaseOrder/query',
-    })
+  toggleInvoiceAdjustment = () => {
+    this.setState((prevState) => ({
+      showInvoiceAdjustment: !prevState.showInvoiceAdjustment,
+    }))
   }
+
+  onClickPrint = () => {
+    console.log('onClickPrint', this.props)
+  }
+
+  calculateTotal = () => {}
 
   render () {
-    const { classes, isEditable, purchaseOrder } = this.props
+    const { classes, isEditable, values, setFieldValue } = this.props
+    const { adjustmentList, purchaseOrder, purchaseOrderItems } = values
+    console.log('PO Index', this.props)
     return (
       <div>
-        <GridContainer gutter={0}>
-          <GridItem xs={12} md={5}>
-            <GridContainer>
-              <GridItem xs={12}>
-                <FastField
-                  name='poNo'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.pr.pono',
-                        })}
-                        disabled={true}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='status'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.pr.status',
-                        })}
-                        disabled={true}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='expectedDeliveryDate'
-                  render={(args) => {
-                    return (
-                      <DatePicker
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.expectedDeliveryDate',
-                        })}
-                        disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='invoiceDate'
-                  render={(args) => {
-                    return (
-                      <DatePicker
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.invoiceDate',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-
-          <GridItem xs={12} md={1} />
-
-          <GridItem xs={12} md={5}>
-            <GridContainer>
-              <GridItem xs={12}>
-                <FastField
-                  name='poDate'
-                  render={(args) => {
-                    return (
-                      <DatePicker
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.poDate',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='shippingAddress'
-                  render={(args) => {
-                    return (
-                      <OutlinedTextField
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.shippingAdd',
-                        })}
-                        multiline
-                        rowsMax={2}
-                        rows={2}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='invoiceNo'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.invoiceNo',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-
-          <GridItem xs={12} md={11}>
-            <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.supplierInfo',
-              })}
-            </h4>
-            <Divider />
-          </GridItem>
-
-          <GridItem xs={12} md={5}>
-            <GridContainer>
-              <GridItem xs={12}>
-                <FastField
-                  name='supplier'
-                  render={(args) => {
-                    return (
-                      <CodeSelect
-                        label={formatMessage({
-                          id: 'inventory.pr.supplier',
-                        })}
-                        code='ctCompany'
-                        //max={10}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='contactPerson'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.contactPerson',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <OutlinedTextField
-                  label={formatMessage({
-                    id: 'inventory.pr.detail.pod.supplierAdd',
-                  })}
-                  multiline
-                  rowsMax={2}
-                  rows={2}
-                />
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-
-          <GridItem xs={12} md={1} />
-
-          <GridItem xs={12} md={5}>
-            <GridContainer>
-              <GridItem xs={12}>
-                <FastField
-                  name='contactNo'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.contactNo',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='faxNo'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.pod.faxNo',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-        </GridContainer>
-
-        {/* <EditableTableGrid
-          //rows={rows}
-          //schema={schema}
-          FuncProps={{
-            edit: isEditable,
-            pager: false,
-            pagerConfig: {
-              containerExtraComponent: (
-                <Button
-                  //onClick={this.toggleModal}
-                  hideIfNoEditRights
-                  color='info'
-                  link
-                >
-                  <Add />Add Item
-                </Button>
-              ),
-            },
-          }}
-          EditingProps={{
-            showAddCommand: isEditable,
-            showEditCommand: isEditable,
-            showDeleteCommand: isEditable,
-            //onCommitChanges: this.commitChanges,
-            //onAddedRowsChange: this.onAddedRowsChange,
-          }}
-          {...this.tableParas}
-        /> */}
-
-        <Grid />
-
-        {/* <Button
-          // onClick={this.toggleAddPaymaneModal}
-          hideIfNoEditRights
-          color='info'
-          link
-        >
-          <Add />
-          {formatMessage({
-            id: 'inventory.pr.detail.pod.addItem',
-          })}
-        </Button> */}
-        <POSummary />
-
+        <POForm />
+        <Grid
+          purchaseOrderItems={purchaseOrderItems}
+          setFieldValue={setFieldValue}
+        />
+        <POSummary
+          adjustmentList={adjustmentList}
+          setFieldValue={setFieldValue}
+          toggleInvoiceAdjustment={this.toggleInvoiceAdjustment}
+        />
         <GridContainer
           direction='row'
           justify='flex-end'
@@ -365,12 +85,26 @@ class index extends PureComponent {
               id: 'inventory.pr.detail.pod.finalize',
             })}
           </Button>
-          <Button color='info'>
+          <Button color='info' onClick={this.onClickPrint}>
             {formatMessage({
               id: 'inventory.pr.detail.print',
             })}
           </Button>
         </GridContainer>
+
+        <CommonModal
+          open={this.state.showInvoiceAdjustment}
+          title='Add Invoice Adjustment'
+          maxWidth='sm'
+          bodyNoPadding
+          onClose={() => this.toggleInvoiceAdjustment()}
+          onConfirm={() => this.toggleInvoiceAdjustment()}
+        >
+          <InvoiceAdjustment
+            adjustmentList={adjustmentList}
+            setFieldValue={setFieldValue}
+          />
+        </CommonModal>
       </div>
     )
   }

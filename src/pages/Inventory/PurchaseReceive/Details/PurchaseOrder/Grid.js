@@ -1,10 +1,34 @@
 import React, { PureComponent } from 'react'
-import { EditableTableGrid } from '@/components'
+import { connect } from 'dva'
+import Yup from '@/utils/yup'
+import { EditableTableGrid, withFormikExtend } from '@/components'
 import DeleteOutline from '@material-ui/icons/DeleteOutline'
 import { podoOrderType } from '@/utils/codes'
 
+const receivingDetailsSchema = Yup.object().shape({
+  code: Yup.number().required(),
+  orderQty: Yup.number().required(),
+})
+
 class Grid extends PureComponent {
+  constructor (props) {
+    super(props)
+    this.state = {
+      selectedItem: {},
+    }
+  }
+
   deleteRow = (row, e) => {}
+
+  handleItemOnChange = (e) => {
+    const { option, row } = e
+    const { sellingPrice } = option
+    // setSelectedItem(option)
+    this.setState({ selectedItem: option })
+
+    return { ...row, unitPrice: sellingPrice }
+  }
+
   tableParas = {
     columns: [
       { name: 'type', title: 'Type' },
@@ -27,17 +51,21 @@ class Grid extends PureComponent {
       {
         columnName: 'code',
         type: 'codeSelect',
-        code: 'ctService',
+        code: 'inventoryMedication',
+        labelField: 'displayValue',
+        valueField: 'id',
+        onChange: this.handleItemOnChange,
       },
-      {
-        columnName: 'name',
-        type: 'codeSelect',
-        code: 'ctService',
-      },
+      // {
+      //   columnName: 'name',
+      //   type: 'codeSelect',
+      //   code: 'ctService',
+      // },
       {
         columnName: 'uom',
         type: 'codeSelect',
         code: 'ctMedicationUnitOfMeasurement',
+        disabled: true,
       },
       {
         columnName: 'orderQty',
@@ -50,37 +78,90 @@ class Grid extends PureComponent {
       {
         columnName: 'totalQty',
         type: 'number',
+        disabled: true,
       },
       {
         columnName: 'totalReceived',
         type: 'number',
+        disabled: true,
       },
       {
         columnName: 'unitPrice',
         type: 'number',
         currency: true,
+        disabled: true,
       },
       {
         columnName: 'totalPrice',
         type: 'number',
         currency: true,
+        disabled: true,
+        //value: 0,
       },
     ],
   }
+
+  onAddedRowsChange = (addedRows) => {
+    if (addedRows.length > 0) {
+      const newRow = addedRows[0]
+      const { orderQty, unitPrice } = newRow
+      const { selectedItem } = this.state
+
+      const calcTotalPrice = () => {
+        if (orderQty && unitPrice) {
+          return orderQty * unitPrice
+        }
+        return undefined
+      }
+
+      return addedRows.map((row) => ({
+        ...row,
+        unitPrice: selectedItem.sellingPrice
+          ? selectedItem.sellingPrice
+          : selectedItem.unitPrice,
+        totalPrice: calcTotalPrice(),
+      }))
+    }
+
+    this.setState({ selectedItem: {} })
+    return addedRows
+  }
+
+  onCommitChanges = ({ rows, deleted }) => {
+    const { setFieldValue } = this.props
+    return setFieldValue('purchaseOrderItems', rows)
+    this.calcTotal()
+  }
+
+  calcTotal = () => {
+    const { setFieldValue, values } = this.props
+    const { purchaseOrderItems } = values
+    let total = 0
+
+    purchaseOrderItems.forEach((row) => {
+      total += row.totalPrice
+    })
+
+    setFieldValue('summaryTotal', total)
+    return total
+  }
+
   render () {
     const isEditable = true
+    const { purchaseOrderItems } = this.props
+    console.log('PO Grid', this.props)
     return (
       <React.Fragment>
         <EditableTableGrid
-          //rows={values.deliveryOrder_receivingItemList}
-          //schema={receivingDetailsSchema}
+          rows={purchaseOrderItems}
+          schema={receivingDetailsSchema}
           FuncProps={{
             //edit: isEditable,
             pager: false,
           }}
           EditingProps={{
             showAddCommand: isEditable,
-            //showEditCommand: isEditable,
+            showEditCommand: false,
             //showDeleteCommand: isEditable,
             onCommitChanges: this.onCommitChanges,
             onAddedRowsChange: this.onAddedRowsChange,

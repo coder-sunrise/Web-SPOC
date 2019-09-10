@@ -15,26 +15,22 @@ export default createListViewModel({
           poNo: 'PO/000001',
           poDate: moment(),
           status: 'Draft',
-          shippingAddress: '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
+          shippingAddress:
+            '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
         },
+        purchaseOrderItems: [],
         adjustmentList: [
           {
-            id: 1,
             adjTitle: 'Adj001',
             adjAmount: 10,
-            isDeleted: false,
           },
           {
-            id: 2,
             adjTitle: 'Adj002',
             adjAmount: 5,
-            isDeleted: false,
           },
           {
-            id: 3,
             adjTitle: 'Adj003',
             adjAmount: 2,
-            isDeleted: false,
           },
         ],
       },
