@@ -40,36 +40,31 @@ const styles = (theme) => ({})
         }),
       }),
 
-      contact: Yup.object().when('settingCompany', {
-        is: (val) => settingCompany.companyType.id === 1,
-        then: Yup.object().shape({
-          // mobilContactNumber: Yup.object().shape({
-          //   number: Yup.string().required(),
-          // }),
-          contactEmailAddress: Yup.object().shape({
-            emailAddress: Yup.string().email(),
-          }),
-        }),
-        // otherwise: Yup.object().shape({
-        //   mobilContactNumber: Yup.object().shape({
-        //     number: Yup.number().required(),
+      contact: Yup.object().when(settingCompany, {
+        is: (val) => console.log('val', val),
+        // settingCompany.companyType.id === 1,
+        // then: Yup.object().shape({
+        //   contactEmailAddress: Yup.object().shape({
+        //     emailAddress: Yup.string().email(),
         //   }),
         // }),
       }),
     }),
 
   handleSubmit: (values, { props }) => {
-    const {
-      url,
-      country,
-      postalCode,
-      mobileFaxNum,
-      address,
-      officeNum,
-      email,
-      effectiveDates,
-      ...restValues
-    } = values
+    // const {
+    //   url,
+    //   country,
+    //   postalCode,
+    //   mobileFaxNum,
+    //   address,
+    //   officeNum,
+    //   email,
+    //   effectiveDates,
+    //   ...restValues
+    // } = values
+    const { contact, effectiveDates, ...restValues } = values
+    // console.log('values', values)
 
     const { dispatch, onConfirm, settingCompany } = props
     const { id, name } = settingCompany.companyType
@@ -81,6 +76,14 @@ const styles = (theme) => ({})
         effectiveEndDate: effectiveDates[1],
         companyTypeFK: id,
         companyTypeName: name,
+        // contact: {
+        //   contactEmailAddress: {
+        //     emailAddress:
+        //       contact.contactEmailAddress.emailAddress === null
+        //         ? ''
+        //         : contact.contactEmailAddress.emailAddress,
+        //   },
+        // },
       },
     }).then((r) => {
       if (r) {
@@ -102,6 +105,7 @@ class Detail extends PureComponent {
     const { name } = route
     const type = 'copayer'
     // console.log('detail', settingCompany)
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
