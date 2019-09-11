@@ -1,7 +1,6 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { getServices } from '@/utils/codes'
 
 import {
   Button,
@@ -27,35 +26,36 @@ import {
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { getServices } from '@/utils/codes'
+import { calculateAdjustAmount } from '@/utils/utils'
 
-@connect(({ codetable }) => ({ codetable }))
+@connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, editType, ...resetProps }) => {
-    const v = orders.entity || orders.defaultService
-    v.editType = editType
+  mapPropsToValues: ({ orders = {}, editType }) => {
+    const v = {
+      ...(orders.entity || orders.defaultService),
+      editType,
+    }
     return v
   },
+  enableReinitialize: true,
   validationSchema: Yup.object().shape({
     serviceFK: Yup.number().required(),
     serviceCenterFK: Yup.number().required(),
+    total: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm, orders, editType, currentType } = props
-    const { rows, entity } = orders
-
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, orders, currentType } = props
+    const { rows } = orders
     const data = {
       sequence: rows.length,
-      subject: currentType.getSubject(values),
       ...values,
+      subject: currentType.getSubject(values),
     }
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
-    })
-    resetForm({
-      ...orders.defaultService,
-      editType,
     })
     if (onConfirm) onConfirm()
   },
@@ -102,6 +102,21 @@ class Service extends PureComponent {
     }
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (
+      (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
+      nextProps.orders.shouldPushToState
+    ) {
+      nextProps.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: nextProps.values,
+          shouldPushToState: false,
+        },
+      })
+    }
+  }
+
   getServiceCenterService = () => {
     const { values, setFieldValue, setValues } = this.props
     const { serviceFK, serviceCenterFK } = values
@@ -121,19 +136,24 @@ class Service extends PureComponent {
         total: serviceCenterService.unitPrice,
         quantity: 1,
       })
-      this.updateTotalValue(serviceCenterService.unitPrice)
+      this.updateTotalPrice(serviceCenterService.unitPrice)
     }
   }
 
-  updateTotalValue = (v) => {
-    this.props.setFieldValue('totalAfterOverallAdjustment', v)
-    this.props.dispatch({
-      type: 'orders/updateState',
-      payload: {
-        totalPrice: v,
-        totalAfterAdj: undefined,
-      },
-    })
+  updateTotalPrice = (v) => {
+    if (v !== undefined) {
+      const { adjType, adjValue } = this.props.values
+      const adjustment = calculateAdjustAmount(
+        adjType === 'ExactAmount',
+        v,
+        adjValue,
+      )
+      this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
+      this.props.setFieldValue('adjAmount', adjustment.adjAmount)
+    } else {
+      this.props.setFieldValue('totalAfterItemAdjustment', undefined)
+      this.props.setFieldValue('adjAmount', undefined)
+    }
   }
 
   render () {
@@ -147,8 +167,6 @@ class Service extends PureComponent {
     } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
-    // console.log('Service', services, serviceCenters)
-
     return (
       <div>
         <GridContainer>
@@ -207,9 +225,10 @@ class Service extends PureComponent {
                 return (
                   <NumberInput
                     label='Total'
+                    min={0.01}
                     currency
                     onChange={(e) => {
-                      this.updateTotalValue(e.target.value)
+                      this.updateTotalPrice(e.target.value)
                     }}
                     {...args}
                   />
@@ -219,17 +238,8 @@ class Service extends PureComponent {
           </GridItem>
           <GridItem xs={6}>
             <Field
-              name='totalAfterOverallAdjustment'
+              name='totalAfterItemAdjustment'
               render={(args) => {
-                if (
-                  orders.totalAfterAdj &&
-                  args.field.value !== orders.totalAfterAdj
-                ) {
-                  args.form.setFieldValue(
-                    'totalAfterOverallAdjustment',
-                    orders.totalAfterAdj,
-                  )
-                }
                 return (
                   <NumberInput
                     label='Total After Adj'

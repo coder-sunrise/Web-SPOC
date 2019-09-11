@@ -1,4 +1,5 @@
 import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
 // import * as service from '../services'
 import { getUniqueId } from '@/utils/utils'
 
@@ -15,6 +16,7 @@ const sharedMedicationValue = {
       drugFrequencyFK: 1,
       dispenseUOMFK: 1,
       duration: 1,
+      sequence: 0,
       stepdose: 'AND',
     },
   ],
@@ -27,12 +29,16 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      editType: '1',
+      // editType: '1',
       rows: [],
       defaultMedication: {
         ...sharedMedicationValue,
       },
       defaultService: {},
+      defaultVaccination: {
+        vaccinationGivenDate: moment(),
+        quantity: 1,
+      },
       default: {
         corPrescriptionItemPrecaution: [
           {
@@ -91,7 +97,9 @@ export default createListViewModel({
         return {
           ...state,
           rows,
+          editType: undefined,
           entity: undefined,
+          // totalAfterAdj: undefined,
         }
       },
 
@@ -111,8 +119,11 @@ export default createListViewModel({
         // console.log(payload)
         return {
           ...state,
-          totalAfterAdj: payload.finalAmount,
-          adjustment: payload,
+          entity: {
+            ...state.entity,
+            ...payload,
+            totalAfterItemAdjustment: payload.finalAmount,
+          },
         }
       },
     },

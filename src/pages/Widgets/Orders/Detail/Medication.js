@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react'
-
+import { connect } from 'dva'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import {
@@ -28,21 +28,23 @@ import {
   Field,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { calculateAdjustAmount } from '@/utils/utils'
 
+@connect(({ global }) => ({ global }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, editType, ...resetProps }) => {
-    // console.log('resetProps', resetProps)
-    const v = orders.entity || orders.defaultMedication
-    v.editType = editType
-    v.totalAfterAdj = orders.totalAfterAdj || v.totalAfterAdj
-    console.log('mapPropsToValues', v)
+    const v = {
+      ...(orders.entity || orders.defaultMedication),
+      editType,
+    }
     return v
   },
+  enableReinitialize: true,
+
   validationSchema: Yup.object().shape({
     quantity: Yup.number().required(),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
-    totalAfterAdj: Yup.number().required(),
     editType: Yup.string(),
     stockDrugFK: Yup.string().when('editType', {
       is: true,
@@ -54,43 +56,52 @@ import Yup from '@/utils/yup'
     }),
     corPrescriptionItemPrecaution: Yup.array().of(
       Yup.object().shape({
-        prescriptionItemFK: Yup.number().required(),
+        medicationPrecautionFK: Yup.number().required(),
       }),
     ),
     corPrescriptionItemInstruction: Yup.array().of(
-      Yup.object().shape(
-        {
-          // prescriptionItemFK: Yup.number().required(),
-        },
-      ),
+      Yup.object().shape({
+        usageMethodFK: Yup.number().required(),
+        dosageFK: Yup.number().required(),
+        prescribeUOMFK: Yup.number().required(),
+        drugFrequencyFK: Yup.number().required(),
+        duration: Yup.number().required(),
+        sequence: Yup.number().required(),
+        stepdose: Yup.string().required(),
+      }),
     ),
   }),
 
-  handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm, orders, editType } = props
-    const { rows, entity } = orders
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, orders, currentType } = props
+    const { rows } = orders
+
     const data = {
       sequence: rows.length,
+      subject: currentType.getSubject(values),
       ...values,
     }
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
     })
-    resetForm({
-      ...orders.defaultMedication,
-      editType,
-    })
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
 })
-class Medication extends React.Component {
+class Medication extends PureComponent {
   componentWillReceiveProps (nextProps) {
-    const { values, orders, resetForm } = nextProps
-    const { entity } = orders
-    if (entity && entity.uid !== values.uid) {
-      resetForm(entity)
+    if (
+      (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
+      nextProps.orders.shouldPushToState
+    ) {
+      nextProps.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: nextProps.values,
+          shouldPushToState: false,
+        },
+      })
     }
   }
 
@@ -117,19 +128,98 @@ class Medication extends React.Component {
             </Button>
           </Popconfirm>
         )}
-        <Button
-          justIcon
-          color='info'
-          onClick={() => {
-            arrayHelpers.push(defaultValue)
-          }}
-        >
-          <Tooltip title={tooltip}>
-            <Add />
-          </Tooltip>
-        </Button>
+        {values[prop].length < 3 && (
+          <Button
+            justIcon
+            color='info'
+            onClick={() => {
+              arrayHelpers.push(defaultValue)
+            }}
+          >
+            <Tooltip title={tooltip}>
+              <Add />
+            </Tooltip>
+          </Button>
+        )}
       </GridItem>
     )
+  }
+
+  changeMedication = (v, op) => {
+    console.log(v, op)
+    const { setFieldValue, values } = this.props
+
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].usageMethodFK',
+      op.medicationUsage ? op.medicationUsage.id : undefined,
+    )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].dosageFK',
+      op.prescribingDosage ? op.prescribingDosage.id : undefined,
+    )
+
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].prescribeUOMFK',
+      op.prescribingUOM ? op.prescribingUOM.id : undefined,
+    )
+
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].drugFrequencyFK',
+      op.medicationFrequency ? op.medicationFrequency.id : undefined,
+    )
+
+    if (
+      op.inventoryMedication_MedicationPrecaution &&
+      op.inventoryMedication_MedicationPrecaution.length > 0
+    ) {
+      op.inventoryMedication_MedicationPrecaution.forEach((im, i) => {
+        setFieldValue(
+          `corPrescriptionItemPrecaution[${i}].medicationPrecautionFK`,
+          im.id,
+        )
+        setFieldValue(
+          `corPrescriptionItemPrecaution[${i}].precaution`,
+          im.medicationPrecaution.name,
+        )
+        setFieldValue(
+          `corPrescriptionItemPrecaution[${i}].precautionCode`,
+          im.medicationPrecaution.code,
+        )
+        setFieldValue(`corPrescriptionItemPrecaution[${i}].sequence`, i)
+      })
+    } else {
+      setFieldValue(`corPrescriptionItemPrecaution`, [])
+    }
+
+    setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
+    setFieldValue('drugCode', op.displayValue)
+    setFieldValue('drugName', op.code)
+
+    if (op.sellingPrice) {
+      setFieldValue('unitPrice', op.sellingPrice)
+      setFieldValue('totalPrice', op.sellingPrice * values.quantity)
+      this.updateTotalPrice(op.sellingPrice * values.quantity)
+    } else {
+      setFieldValue('unitPrice', undefined)
+      setFieldValue('totalPrice', undefined)
+      this.updateTotalPrice(undefined)
+    }
+  }
+
+  updateTotalPrice = (v) => {
+    if (v !== undefined) {
+      const { adjType, adjValue } = this.props.values
+      const adjustment = calculateAdjustAmount(
+        adjType === 'ExactAmount',
+        v,
+        adjValue,
+      )
+      this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
+      this.props.setFieldValue('adjAmount', adjustment.adjAmount)
+    } else {
+      this.props.setFieldValue('totalAfterItemAdjustment', undefined)
+      this.props.setFieldValue('adjAmount', undefined)
+    }
   }
 
   render () {
@@ -143,6 +233,7 @@ class Medication extends React.Component {
       setFieldValue,
       orders,
     } = this.props
+    // console.log(this.props)
     return (
       <div>
         <GridContainer>
@@ -163,6 +254,7 @@ class Medication extends React.Component {
                       label='Name'
                       code='inventorymedication'
                       labelField='displayValue'
+                      onChange={this.changeMedication}
                       {...args}
                     />
                   )
@@ -310,13 +402,9 @@ class Medication extends React.Component {
                             'corPrescriptionItemInstruction',
                             'Add step dose',
                             {
-                              action: '1',
-                              count: 1,
-                              unit: '1',
-                              frequency: '1',
-                              day: 1,
-                              precaution: '1',
-                              operator: '1',
+                              drugFrequencyFK: 1,
+                              duration: 1,
+                              stepdose: 'AND',
                             },
                           )}
                         </GridContainer>
@@ -350,7 +438,7 @@ class Medication extends React.Component {
                         <GridContainer>
                           <GridItem xs={10}>
                             <FastField
-                              name={`corPrescriptionItemPrecaution[${i}].prescriptionItemFK`}
+                              name={`corPrescriptionItemPrecaution[${i}].medicationPrecautionFK`}
                               render={(args) => {
                                 return (
                                   <div style={{ position: 'relative' }}>
@@ -370,7 +458,7 @@ class Medication extends React.Component {
                                       simple
                                       code='ctMedicationPrecaution'
                                       onChange={(v, option) => {
-                                        // console.log(a, b, c)
+                                        // console.log(v, option)
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precaution`,
                                           option.name,
@@ -400,10 +488,9 @@ class Medication extends React.Component {
                               action: '1',
                               count: 1,
                               unit: '1',
-                              frequency: '1',
+                              drugFrequencyFK: '1',
                               day: 1,
                               precaution: '1',
-                              operator: '1',
                             },
                           )}
                         </GridContainer>
@@ -418,7 +505,7 @@ class Medication extends React.Component {
 
         <GridContainer>
           <GridItem xs={2}>
-            <FastField
+            <Field
               name='quantity'
               render={(args) => {
                 return (
@@ -427,6 +514,13 @@ class Medication extends React.Component {
                     // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
                     min={1}
+                    onChange={(e) => {
+                      if (values.unitPrice) {
+                        const total = e.target.value * values.unitPrice
+                        setFieldValue('totalPrice', total)
+                        this.updateTotalPrice(total)
+                      }
+                    }}
                     {...args}
                   />
                 )
@@ -449,21 +543,25 @@ class Medication extends React.Component {
             />
           </GridItem>
           <GridItem xs={3}>
-            <FastField
+            <Field
               name='totalPrice'
               render={(args) => {
                 return (
                   <NumberInput
                     label='Total'
                     onChange={(e) => {
-                      this.props.setFieldValue('totalAfterAdj', e.target.value)
-                      this.props.dispatch({
-                        type: 'orders/updateState',
-                        payload: {
-                          totalPrice: e.target.value,
-                          totalAfterAdj: undefined,
-                        },
-                      })
+                      this.props.setFieldValue(
+                        'totalAfterItemAdjustment',
+                        e.target.value,
+                      )
+                      this.updateTotalPrice(e.target.value)
+                      // this.props.dispatch({
+                      //   type: 'orders/updateState',
+                      //   payload: {
+                      //     totalPrice: e.target.value,
+                      //     totalAfterItemAdjustment: undefined,
+                      //   },
+                      // })
                     }}
                     currency
                     {...args}
@@ -474,14 +572,14 @@ class Medication extends React.Component {
           </GridItem>
           <GridItem xs={3}>
             <Field
-              name='totalAfterAdj'
+              name='totalAfterItemAdjustment'
               render={(args) => {
-                if (
-                  orders.totalAfterAdj &&
-                  args.field.value !== orders.totalAfterAdj
-                ) {
-                  args.form.setFieldValue('totalAfterAdj', orders.totalAfterAdj)
-                }
+                // if (
+                //   orders.totalAfterItemAdjustment &&
+                //   args.field.value !== orders.totalAfterItemAdjustment
+                // ) {
+                //   args.form.setFieldValue('totalAfterItemAdjustment', orders.totalAfterItemAdjustment)
+                // }
                 return (
                   <NumberInput
                     label='Total After Adj'
@@ -503,7 +601,10 @@ class Medication extends React.Component {
             <FastField
               name='remarks'
               render={(args) => {
-                return <RichEditor placeholder='Remarks' {...args} />
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
               }}
             />
           </GridItem>
