@@ -309,19 +309,30 @@ const CalendarView = ({
 
   const filtered = useMemo(
     () =>
-      applyFilter(filter, [
-        ...eventList,
-        ...doctorBlocks.map((item) => ({
-          ...item,
-          start: item.startDateTime,
-          end: item.endDateTime,
-        })),
-      ]),
+      applyFilter(
+        filter,
+        calendarView === BigCalendar.Views.MONTH
+          ? [
+              ...eventList,
+              ...doctorBlocks.map((item) => ({
+                ...item,
+                start: item.startDateTime,
+                end: item.endDateTime,
+              })),
+            ]
+          : [
+              ...eventList,
+            ],
+      ),
     [
+      calendarView,
+      filter,
       doctorBlocks,
       eventList,
     ],
   )
+
+  console.log({ filtered })
 
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
