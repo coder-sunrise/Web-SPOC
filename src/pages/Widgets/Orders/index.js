@@ -24,6 +24,7 @@ import {
   ProgressButton,
   CardContainer,
   confirm,
+  skeleton,
 } from '@/components'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 
@@ -35,7 +36,7 @@ import model from './models'
 window.g_app.replaceModel(model)
 
 const styles = (theme) => ({})
-
+// @skeleton()
 @connect(({ orders }) => ({
   orders,
 }))

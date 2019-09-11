@@ -3,8 +3,8 @@ import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-// custom components
 import { CommonTableGrid, DateFormatter } from '@/components'
+// medisys component
 // sub component
 import ActionButton from './ActionButton'
 // utils
@@ -188,16 +188,23 @@ const Grid = ({
         onViewPatientProfileClick(row.patientProfileFK)
         break
       case '4': // patient dashboard
-        router.push(`/reception/queue/patientdashboard?qid=${row.id}`)
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
+        )
         break
       case '5': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
         )
         break
       case '6': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons&action=resume`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
+        )
+        break
+      case '7': // edit consultation
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
         )
         break
       case '8':
@@ -235,7 +242,7 @@ const Grid = ({
     >
       <CommonTableGrid
         size='sm'
-        height={700}
+        // height={700}
         rows={queueListingData}
         columnExtensions={colExtensions}
         FuncProps={FuncConfig}

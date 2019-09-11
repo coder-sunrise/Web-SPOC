@@ -32,6 +32,7 @@ export default createListViewModel({
       defaultMedication: {
         ...sharedMedicationValue,
       },
+      defaultService: {},
       default: {
         corPrescriptionItemPrecaution: [
           {
@@ -99,7 +100,19 @@ export default createListViewModel({
 
         return {
           ...state,
-          rows: rows.filter((o) => o.uid !== payload.id),
+          rows: rows.map((o) => {
+            if (o.uid === payload.id) o.isDeleted = true
+            return o
+          }),
+        }
+      },
+
+      adjustAmount (state, { payload }) {
+        // console.log(payload)
+        return {
+          ...state,
+          totalAfterAdj: payload.finalAmount,
+          adjustment: payload,
         }
       },
     },

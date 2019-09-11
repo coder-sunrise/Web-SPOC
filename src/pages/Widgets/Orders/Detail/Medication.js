@@ -1,5 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 
+import Add from '@material-ui/icons/Add'
+import Delete from '@material-ui/icons/Delete'
 import {
   Button,
   GridContainer,
@@ -23,9 +25,8 @@ import {
   FastField,
   FieldArray,
   Tooltip,
+  Field,
 } from '@/components'
-import Add from '@material-ui/icons/Add'
-import Delete from '@material-ui/icons/Delete'
 import Yup from '@/utils/yup'
 
 @withFormikExtend({
@@ -33,28 +34,24 @@ import Yup from '@/utils/yup'
     // console.log('resetProps', resetProps)
     const v = orders.entity || orders.defaultMedication
     v.editType = editType
-    console.log(v)
+    v.totalAfterAdj = orders.totalAfterAdj || v.totalAfterAdj
+    console.log('mapPropsToValues', v)
     return v
   },
   validationSchema: Yup.object().shape({
-    // stockDrugFK: Yup.string().required(),
     quantity: Yup.number().required(),
-    // totalAfterItemAdjustment: Yup.number().required(),
-    // totalAfterOverallAdjustment: Yup.number().required(),
-
-    // type: Yup.string().required(),
-    // to: Yup.string().when('type', {
-    //   is: (val) => val !== '2',
-    //   then: Yup.string().required(),
-    // }),
-    // from: Yup.string().required(),
-    // date: Yup.date().required(),
-    // subject: Yup.string().required(),
-    // // 3->MC
-    // days: Yup.number().when('type', {
-    //   is: (val) => val === '3',
-    //   then: Yup.number().required(),
-    // }),
+    dispenseUOMFK: Yup.number().required(),
+    totalPrice: Yup.number().required(),
+    totalAfterAdj: Yup.number().required(),
+    editType: Yup.string(),
+    stockDrugFK: Yup.string().when('editType', {
+      is: true,
+      then: Yup.string().required(),
+    }),
+    drugName: Yup.string().when('editType', {
+      is: (val) => val === '5',
+      then: Yup.string().required(),
+    }),
     corPrescriptionItemPrecaution: Yup.array().of(
       Yup.object().shape({
         prescriptionItemFK: Yup.number().required(),
@@ -94,12 +91,6 @@ class Medication extends React.Component {
     const { entity } = orders
     if (entity && entity.uid !== values.uid) {
       resetForm(entity)
-      // console.log(
-      //   'componentWillReceiveProps',
-      //   orders,
-      //   values,
-      //   this.props.values,
-      // )
     }
   }
 
@@ -149,8 +140,9 @@ class Medication extends React.Component {
       openPrescription,
       footer,
       handleSubmit,
+      setFieldValue,
+      orders,
     } = this.props
-    console.log('Medication', this.props)
     return (
       <div>
         <GridContainer>
@@ -167,11 +159,10 @@ class Medication extends React.Component {
                 name='stockDrugFK'
                 render={(args) => {
                   return (
-                    <Select
+                    <CodeSelect
                       label='Name'
-                      options={[
-                        { value: '1', name: 'Biogesic tab 500 mg' },
-                      ]}
+                      code='inventorymedication'
+                      labelField='displayValue'
                       {...args}
                     />
                   )
@@ -378,6 +369,21 @@ class Medication extends React.Component {
                                       // label='Precaution'
                                       simple
                                       code='ctMedicationPrecaution'
+                                      onChange={(v, option) => {
+                                        // console.log(a, b, c)
+                                        setFieldValue(
+                                          `corPrescriptionItemPrecaution[${i}].precaution`,
+                                          option.name,
+                                        )
+                                        setFieldValue(
+                                          `corPrescriptionItemPrecaution[${i}].precautionCode`,
+                                          option.code,
+                                        )
+                                        setFieldValue(
+                                          `corPrescriptionItemPrecaution[${i}].sequence`,
+                                          i,
+                                        )
+                                      }}
                                       {...args}
                                     />
                                   </div>
@@ -429,7 +435,7 @@ class Medication extends React.Component {
           </GridItem>
           <GridItem xs={2}>
             <FastField
-              name='uom'
+              name='dispenseUOMFK'
               render={(args) => {
                 return (
                   <CodeSelect
@@ -446,14 +452,36 @@ class Medication extends React.Component {
             <FastField
               name='totalPrice'
               render={(args) => {
-                return <NumberInput label='Total' currency {...args} />
+                return (
+                  <NumberInput
+                    label='Total'
+                    onChange={(e) => {
+                      this.props.setFieldValue('totalAfterAdj', e.target.value)
+                      this.props.dispatch({
+                        type: 'orders/updateState',
+                        payload: {
+                          totalPrice: e.target.value,
+                          totalAfterAdj: undefined,
+                        },
+                      })
+                    }}
+                    currency
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
           <GridItem xs={3}>
-            <FastField
+            <Field
               name='totalAfterAdj'
               render={(args) => {
+                if (
+                  orders.totalAfterAdj &&
+                  args.field.value !== orders.totalAfterAdj
+                ) {
+                  args.form.setFieldValue('totalAfterAdj', orders.totalAfterAdj)
+                }
                 return (
                   <NumberInput
                     label='Total After Adj'

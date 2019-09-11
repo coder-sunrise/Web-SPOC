@@ -19,7 +19,6 @@ class index extends PureComponent {
       !this.props.patientVitalSign.shouldAddNew &&
       nextProps.patientVitalSign.shouldAddNew
     ) {
-      console.log('shouldAddNew')
       this.addPatientVitalSign()
       this.props.dispatch({
         type: 'patientVitalSign/updateState',
@@ -42,7 +41,7 @@ class index extends PureComponent {
     })
   }
 
-  handleCalculateBMI = (i, form) => {
+  handleCalculateBMI = (i, form) => () => {
     const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
     const { setFieldValue, setFieldTouched } = form
     if (heightCM && weightKG) {
@@ -63,6 +62,7 @@ class index extends PureComponent {
           render={(arrayHelpers) => {
             this.arrayHelpers = arrayHelpers
             return (arrayHelpers.form.values.corPatientNoteVitalSign || [])
+              .filter((o) => !o.isDeleted)
               .map((v, i) => {
                 return (
                   <div key={i}>
@@ -76,9 +76,7 @@ class index extends PureComponent {
                 )
               })
           }}
-        >
-          {/* <VitalSignCard handleCalculateBMI={this.calculateBMI} /> */}
-        </FieldArray>
+        />
       </div>
     )
   }

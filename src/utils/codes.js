@@ -1,5 +1,6 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
+import _ from 'lodash'
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
@@ -647,7 +648,7 @@ const orderTypes = [
     name: 'Medication',
     value: '1',
     prop: 'corPrescriptionItem',
-    filter: (r) => !r.stockDrugFK,
+    filter: (r) => !!r.stockDrugFK,
   },
   {
     name: 'Vaccination',
@@ -664,7 +665,7 @@ const orderTypes = [
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
-    filter: (r) => !!r.stockDrugFK,
+    filter: (r) => !r.stockDrugFK,
   },
 ]
 // const localCodes = {}
@@ -708,6 +709,8 @@ const tenantCodes = [
   'inventoryconsumable',
   'inventoryvaccination',
   'role',
+  'inventorymedication',
+  'inventoryconsumable',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -737,12 +740,12 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     body,
   })
   const { status: statusCode, data } = response
-  const result = multiplyCodetable(
-    useGeneral ? data[code] : data.data,
-    multiplier,
-  )
+
   if (parseInt(statusCode, 10) === 200) {
-    const result = useGeneral ? data[code] : data.data
+    const result = multiplyCodetable(
+      useGeneral ? data[code] : data.data,
+      multiplier,
+    )
     await db.codetable.put({
       code,
       data: result,
@@ -807,6 +810,43 @@ export const getTenantCodes = async (tenantCode) => {
   return {}
 }
 
+export const getServices = (data) => {
+  // eslint-disable-next-line compat/compat
+  const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
+    return {
+      value: o[0].serviceId,
+      name: o[0].displayValue,
+      serviceCenters: o.map((m) => {
+        return {
+          value: m.serviceCenterId,
+          name: m.serviceCenter,
+        }
+      }),
+    }
+  })
+  // eslint-disable-next-line compat/compat
+  const serviceCenters = Object.values(
+    _.groupBy(data, 'serviceCenterId'),
+  ).map((o) => {
+    return {
+      value: o[0].serviceCenterId,
+      name: o[0].serviceCenter,
+      services: o.map((m) => {
+        return {
+          value: m.serviceId,
+          name: m.displayValue,
+        }
+      }),
+    }
+  })
+
+  return {
+    serviceCenterServices: data,
+    services,
+    serviceCenters,
+  }
+}
+
 module.exports = {
   paymentMethods,
   titles,
@@ -842,5 +882,6 @@ module.exports = {
   coPayerType,
   country,
   consultationDocumentTypes,
+  getServices,
   ...module.exports,
 }

@@ -53,7 +53,7 @@ class AntdSwitch extends React.PureComponent {
 
   componentWillReceiveProps (nextProps) {
     const { field, value, checkedValue, unCheckedValue } = nextProps
-    console.log(checkedValue, field.value)
+    // console.log(checkedValue, field.value)
     if (field) {
       this.setState({
         value: field.value === checkedValue,
@@ -67,7 +67,7 @@ class AntdSwitch extends React.PureComponent {
 
   handleValueChange = (checked) => {
     const { form, field, onChange, checkedValue, unCheckedValue } = this.props
-    console.log(checkedValue, field.value)
+    // console.log(checkedValue, field.value)
 
     if (form && field) {
       form.setFieldValue(field.name, checked ? checkedValue : unCheckedValue)

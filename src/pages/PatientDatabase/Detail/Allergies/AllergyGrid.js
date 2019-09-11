@@ -35,7 +35,7 @@ class AllergyGrid extends PureComponent {
         {
           columnName: 'allergyFK',
           type: 'codeSelect',
-          code: 'ctDrugAllergy',
+          code: 'ctdrugallergy',
           label: 'Allergy Name',
           autoComplete: true,
           onChange: ({ val, option, row }) => {
