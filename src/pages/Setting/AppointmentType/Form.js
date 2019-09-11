@@ -80,10 +80,10 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
 
 export default withFormikExtend({
   displayName: 'AppointmentTypeSettingForm',
-  validationScheme: Yup.object().shape({
+  validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveDates: Yup.array().of(Yup.date().required()).min(2).required(),
   }),
   mapPropsToValues: ({ settingAppointmentType }) =>
     settingAppointmentType.entity || settingAppointmentType.default,

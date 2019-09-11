@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
+import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import MessageListing from './Reminder/MessageListing'
-import { CommonModal, CardContainer } from '@/components'
+import { CommonModal, CardContainer, Danger } from '@/components'
 import Grid from './Grid'
 import New from './New'
 import FilterBar from './FilterBar'
@@ -11,10 +12,25 @@ const styles = {
   sendBar: {
     marginTop: '10px',
   },
+  blur: {
+    opacity: 0.4,
+  },
+  warning: {
+    position: 'fixed',
+    top: '50%',
+    left: '45%',
+    zIndex: 9999,
+    '& h4': {
+      fontWeight: 'bold',
+    },
+  },
 }
 
 const SMS = ({ classes }) => {
-  const [ showMessageModal, setShowMessageModal ] = useState(false)
+  const [
+    showMessageModal,
+    setShowMessageModal,
+  ] = useState(false)
   const newMessageProps = {
     onSend: (value) => {
       console.log(value)
@@ -39,6 +55,7 @@ const SMS = ({ classes }) => {
       setShowMessageModal(true)
     },
   }
+
   return (
     <CardContainer hideHeader>
       {/* <Button
@@ -48,10 +65,19 @@ const SMS = ({ classes }) => {
       >
         <Assignment />
       </Button> */}
-      <FilterBar />
-      <Grid {...gridProps} />
-      <div className={classes.sendBar}>
-        <New {...newMessageProps} />
+      <div className={classes.warning}>
+        <CardContainer hideHeader>
+          <Danger>
+            <h4>Please contact administrator to setup SMS feature.</h4>
+          </Danger>
+        </CardContainer>
+      </div>
+      <div className={classes.blur}>
+        <FilterBar />
+        <Grid {...gridProps} />
+        <div className={classes.sendBar}>
+          <New {...newMessageProps} />
+        </div>
       </div>
       <CommonModal
         open={showMessageModal}

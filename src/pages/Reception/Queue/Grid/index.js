@@ -160,6 +160,7 @@ const Grid = ({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
+        openConfirmTitle: '',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
         onOpenConfirm: () => deleteQueue(id),
       },
