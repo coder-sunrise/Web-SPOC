@@ -94,32 +94,6 @@ const Detail = ({
     })
   }, [])
 
-  const getServiceCenterService = () => {
-    if (!serviceCenterFK || !serviceFK) {
-      console.log('missing', serviceCenterFK, serviceFK)
-      setSelectedItem({})
-      return
-    }
-    const serviceCenterService =
-      serviceCenterServicess.find(
-        (o) =>
-          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
-      ) || {}
-    if (serviceCenterService) {
-      // setValues({
-      //   ...values,
-      //   serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
-      //   serviceName: servicess.find((o) => o.value === serviceFK).name,
-      //   unitPrice: serviceCenterService.unitPrice,
-      //   total: serviceCenterService.unitPrice,
-      //   quantity: 1,
-      // })
-      // this.updateTotalValue(serviceCenterService.unitPrice)
-      setPrice(serviceCenterService.unitPrice)
-      setSelectedItem(serviceCenterService)
-    }
-  }
-
   const handleItemOnChange = (e) => {
     const { option, row } = e
     const { sellingPrice } = option
@@ -283,9 +257,9 @@ const Detail = ({
         onChange: (e) => {
           setServiceFK(e.val)
           console.log('service', serviceFK)
-          setTimeout(() => {
-            getServiceCenterService()
-          }, 1)
+          // setTimeout(() => {
+          //   getServiceCenterService()
+          // }, 1)
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -304,10 +278,10 @@ const Detail = ({
         ),
         onChange: (e) => {
           setServiceCenterFK(e.val)
-          console.log('serviceCenterFK', serviceCenterFK)
-          setTimeout(() => {
-            getServiceCenterService()
-          }, 1)
+          // console.log('serviceCenterFK', serviceCenterFK)
+          // setTimeout(() => {
+          //   getServiceCenterService()
+          // }, 1)
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -414,6 +388,9 @@ const Detail = ({
                 setServiceCenter={setServiceCenter}
                 serviceCenter={serviceCenter}
                 price={price}
+                serviceCenterFK={serviceCenterFK}
+                serviceFK={serviceFK}
+                serviceCenterServicess={serviceCenterServicess}
               />
             ),
           },

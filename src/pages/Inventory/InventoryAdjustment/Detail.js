@@ -24,7 +24,7 @@ const styles = (theme) => ({})
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    transDate: Yup.date().required(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -49,10 +49,13 @@ const styles = (theme) => ({})
   displayName: 'InventoryAdjustmentDetail',
 })
 class Detail extends PureComponent {
-  state = {}
+  state = {
+    type: undefined,
+  }
 
   constructor (props) {
     super(props)
+    let commitCount = 1000 // uniqueNumber
     this.tableParas = {
       rows: [
         {
@@ -99,15 +102,25 @@ class Detail extends PureComponent {
             { value: 'medication', name: 'Medication' },
             { value: 'consumable', name: 'Consumable' },
           ],
+          onChange: (e) => {
+            this.setState({ type: e.value })
+            this.props.dispatch({
+              // force current edit row components to update
+              type: 'global/updateState',
+              payload: {
+                commitCount: (commitCount += 1),
+              },
+            })
+          },
         },
         {
           columnName: 'code',
-          type: 'select',
-          options: [
-            { value: 'abc', name: 'ABC' },
-            { value: 'cg', name: 'CG' },
-            { value: 'ct', name: 'CT' },
-          ],
+          type: 'codeSelect',
+          code:
+            this.state.type === 'medication'
+              ? 'ctInventoryMedication'
+              : 'ctInventoryConsumable',
+          disabled: this.state.type,
         },
         {
           columnName: 'name',
@@ -146,7 +159,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values } = props
+    const { classes, theme, footer, values, handleSubmit } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -236,7 +249,7 @@ class Detail extends PureComponent {
               pager: false,
             }}
             EditingProps={{
-              showAddCommand: false,
+              showAddCommand: true,
               showEditCommand: false,
               // onAddedRowsChange: onAddedRowsChange,
               onCommitChanges: this.onCommitChanges,
@@ -248,7 +261,9 @@ class Detail extends PureComponent {
             alignItems='flex-end'
           >
             <Button color='danger'>Cancel</Button>
-            <Button color='primary'>Save</Button>
+            <Button color='primary' onClick={handleSubmit}>
+              Save
+            </Button>
             <Button color='info'>Finalize</Button>
           </GridContainer>
         </div>

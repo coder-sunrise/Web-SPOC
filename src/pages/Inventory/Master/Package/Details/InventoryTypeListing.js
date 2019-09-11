@@ -36,8 +36,10 @@ const InventoryTypeListing = ({
   selectedItem,
   setSelectedItem,
   setServiceCenter,
+  serviceCenterFK,
+  serviceFK,
   values,
-  price,
+  serviceCenterServicess,
 }) => {
   const {
     medicationPackageItem,
@@ -49,7 +51,10 @@ const InventoryTypeListing = ({
   const { consumableTableParas, consumableColExtensions } = consumable
   const { vaccinationTableParas, vaccinationColExtensions } = vaccination
   const { serviceTableParas, serviceColExtensions } = service
-
+  const [
+    price,
+    setPrice,
+  ] = useState()
   const Cell = ({ column, row, ...p }) => {
     if (column.name === 'Action') {
       return (
@@ -115,6 +120,33 @@ const InventoryTypeListing = ({
     }
   }
 
+  const getServiceCenterService = () => {
+    if (!serviceCenterFK || !serviceFK) {
+      console.log('missing', serviceCenterFK, serviceFK)
+      setSelectedItem({})
+      return
+    }
+    const serviceCenterService =
+      serviceCenterServicess.find(
+        (o) =>
+          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+      ) || {}
+    if (serviceCenterService) {
+      // setValues({
+      //   ...values,
+      //   serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+      //   serviceName: servicess.find((o) => o.value === serviceFK).name,
+      //   unitPrice: serviceCenterService.unitPrice,
+      //   total: serviceCenterService.unitPrice,
+      //   quantity: 1,
+      // })
+      // this.updateTotalValue(serviceCenterService.unitPrice)
+      // setPrice(serviceCenterService.unitPrice)
+      setPrice(serviceCenterService.unitPrice)
+      // setSelectedItem(serviceCenterService)
+    }
+  }
+
   const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
@@ -134,6 +166,8 @@ const InventoryTypeListing = ({
       }
       if (type === 'service') {
         if (serviceCenterServiceFK && serviceName) {
+          getServiceCenterService()
+
           return addedRows.map((row) => ({
             ...row,
             unitPrice: price,

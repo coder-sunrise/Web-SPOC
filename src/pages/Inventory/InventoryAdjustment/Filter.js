@@ -19,6 +19,7 @@ import {
   Select,
   ProgressButton,
   DateRangePicker,
+  Field,
 } from '@/components'
 
 @withFormikExtend({
@@ -39,7 +40,7 @@ class Filter extends PureComponent {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, values } = this.props
     const { open } = this.state
     return (
       <div className={classes.filterBar}>
@@ -54,13 +55,14 @@ class Filter extends PureComponent {
           </GridItem>
 
           <GridItem xs={6} md={3}>
-            <FastField
+            <Field
               name='effectiveDates'
               render={(args) => {
                 return (
                   <DateRangePicker
                     label='Transaction From Date'
                     label2='To Date'
+                    disabled={values.allDate}
                     {...args}
                   />
                 )

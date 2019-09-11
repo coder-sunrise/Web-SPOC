@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
-
+import Edit from '@material-ui/icons/Edit'
 // import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
-// import Delete from '@material-ui/icons/Delete'
-// import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button } from '@/components'
-import * as service from './services'
 
 class Grid extends PureComponent {
   configs = {
@@ -34,14 +31,27 @@ class Grid extends PureComponent {
       { name: 'transDate', title: 'Transaction Date' },
       { name: 'status', title: 'Status' },
       { name: 'remarks', title: 'Remark' },
+      { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      // {
-      //   columnName: 'isActive',
-      //   sortingEnabled: false,
-      //   type: 'select',
-      //   options: status,
-      // },
+      {
+        columnName: 'action',
+        align: 'center',
+        render: (row) => {
+          return (
+            <Button
+              size='sm'
+              onClick={() => {
+                this.editRow(row)
+              }}
+              justIcon
+              color='primary'
+            >
+              <Edit />
+            </Button>
+          )
+        },
+      },
     ],
   }
 
