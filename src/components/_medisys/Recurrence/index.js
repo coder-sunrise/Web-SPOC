@@ -56,7 +56,7 @@ const Recurrence = ({
   recurrenceDto = RecurrenceDTO,
   handleRecurrencePatternChange = (f) => f,
 }) => {
-  const { isEnableRecurrence, currentAppointment } = formValues
+  const { isEnableRecurrence, currentAppointment = {} } = formValues
   const { recurrencePatternFK, recurrenceRange } = recurrenceDto
   const { appointmentDate } = currentAppointment
   const _labelSize = labelSize[size]

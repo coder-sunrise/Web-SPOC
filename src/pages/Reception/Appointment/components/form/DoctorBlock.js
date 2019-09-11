@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { compose } from 'redux'
 import moment from 'moment'
 import * as Yup from 'yup'
+import { connect } from 'dva'
 // formik
 import { FastField, Field, withFormik } from 'formik'
 // material ui
@@ -18,11 +20,12 @@ import {
   SizeContainer,
   TextField,
 } from '@/components'
-// sub components
 // import Recurrence from './Recurrence'
-import { Recurrence } from '@/components/_medisys'
-import { getUniqueGUID } from '@/utils/utils'
+import { Recurrence, DoctorLabel, computeRRule } from '@/components/_medisys'
+import { filterRecurrenceDto } from './formikUtils'
+// styles
 import style from './style'
+// assets
 import { tooltip } from '@/assets/jss/index'
 
 const STYLES = (theme) => ({
@@ -55,12 +58,6 @@ const STYLES = (theme) => ({
 const _dateFormat = 'DD MMM YYYY'
 const _timeFormat = 'hh:mm a'
 
-const eventType = [
-  { value: 'family day', name: 'Family Day' },
-  { value: 'vacation', name: 'Vacation' },
-  { value: 'on leave', name: 'On Leave' },
-]
-
 const durationHours = [
   { value: '0', name: 0 },
   { value: '1', name: 1 },
@@ -80,25 +77,12 @@ const durationMinutes = [
   { value: '45', name: 45 },
 ]
 
-const RECURRENCE_RANGE = {
-  AFTER: 'after',
-  BY: 'by',
-}
+const convertReccurenceDaysOfTheWeek = (week = '') =>
+  week !== null
+    ? week.split(', ').map((eachDay) => parseInt(eachDay, 10))
+    : week
 
-const recurrencePattern = [
-  { name: 'Daily', value: 'daily' },
-  { name: 'Weekly', value: 'weekly' },
-  { name: 'Monthly', value: 'wonthly' },
-]
-
-const DoctorEventForm = ({
-  classes,
-  handleSubmit,
-  onClose,
-  values,
-  footer,
-  ...props
-}) => {
+const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
   const { hasConflict } = values
   const [
     anchorEl,
@@ -114,7 +98,7 @@ const DoctorEventForm = ({
   }
 
   const showPopup = Boolean(anchorEl)
-
+  console.log({ values, errors })
   return (
     <React.Fragment>
       <Popover
@@ -150,10 +134,15 @@ const DoctorEventForm = ({
             render={(args) => (
               <CodeSelect
                 {...args}
+                allowClear
                 label='Doctor'
                 code='doctorprofile'
-                labelField='clinicianInfomation.name'
-                allowClear
+                labelField='clinicianProfile.name'
+                valueField='clinicianProfile.userProfileFK'
+                // code='clinicianprofile'
+                // labelField='name'
+                // valueField='id'
+                renderDropdown={(option) => <DoctorLabel doctor={option} />}
               />
             )}
           />
@@ -215,15 +204,6 @@ const DoctorEventForm = ({
             />
           </GridItem>
         </GridContainer>
-
-        <GridItem xs md={12}>
-          <FastField
-            name='eventType'
-            render={(args) => (
-              <Select {...args} label='Event Type' options={eventType} />
-            )}
-          />
-        </GridItem>
         <GridItem xs md={12}>
           <FastField
             name='remarks'
@@ -236,6 +216,7 @@ const DoctorEventForm = ({
         <GridItem md={12}>
           <Recurrence
             block
+            disabled={values.id !== undefined}
             formValues={values}
             recurrenceDto={values.recurrenceDto}
           />
@@ -255,75 +236,172 @@ const DoctorEventForm = ({
   )
 }
 
-export default withFormik({
-  validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
-    validationSchema,
-  handleSubmit: (values, { props, resetForm }) => {
-    const { handleUpdateDoctorEvent, initialProps } = props
+const generateRecurringDoctorBlock = (recurrenceDto, doctorBlock) => {
+  const rrule = computeRRule({ recurrenceDto, date: doctorBlock.eventDate })
+  if (rrule) {
+    const allDates = rrule.all() || []
+    const { id, ...restDoctorBlockValues } = doctorBlock
+    return allDates.map((date) => ({
+      ...restDoctorBlockValues,
+      eventDate: date,
+    }))
+  }
+  return []
+}
 
-    const { type = 'add' } = initialProps
-    const {
-      doctor,
-      durationHour,
-      durationMinute,
-      eventDate,
-      eventTime,
-    } = values
+const initDailyRecurrence = {
+  recurrencePatternFK: 1,
+  recurrenceFrequency: 1,
+  recurrenceRange: 'after',
+  recurrenceCount: 1,
+  recurrenceDaysOfTheWeek: undefined,
+  recurrenceDayOfTheMonth: undefined,
+}
 
-    const date = moment(eventDate).format(_dateFormat)
-    const endDate = moment(
-      `${date} ${eventTime}`,
-      `${_dateFormat} ${_timeFormat}`,
-    )
-    endDate.add(parseInt(durationHour, 10), 'hours')
-    endDate.add(parseInt(durationMinute, 10), 'minutes')
+export default compose(
+  withStyles(STYLES, { name: 'DoctorForm' }),
+  connect(({ doctorBlock }) => ({
+    currentViewDoctorBlock: doctorBlock.currentViewDoctorBlock,
+  })),
+  withFormik({
+    enableReinitialize: true,
+    validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
+      validationSchema,
+    handleSubmit: (values, { props, resetForm }) => {
+      const { dispatch, onClose } = props
 
-    const startDate = moment(
-      `${date} ${eventTime}`,
-      `${_dateFormat} ${_timeFormat}`,
-    )
-    const _appointmentID =
-      values._appointmentID !== undefined
-        ? values._appointmentID
-        : getUniqueGUID()
+      const {
+        restDoctorBlock,
+        doctorBlockUserFk,
+        isEnableRecurrence,
+        durationHour,
+        durationMinute,
+        eventDate,
+        eventTime,
+        remarks,
+        recurrenceDto,
+        ...restValues
+      } = values
 
-    const event = {
-      ...values,
-      _appointmentID,
-      // startTime: startDate.format(_timeFormat),
-      // endTime: endDate.format(_timeFormat),
-      start: startDate.toDate(),
-      end: endDate.toDate(),
-      isDoctorEvent: true,
-      resourceId: doctor,
-    }
+      try {
+        const doctorBlock = {
+          eventDate,
+          eventTime,
+          recordClinicFK: 1,
+          doctorBlockUserFk,
+          remarks,
+          ...restDoctorBlock,
+          // startDateTime: startDate.format(),
+          // endDateTime: endDate.format(),
+        }
+        // generate recurrence
+        let doctorBlocks = [
+          doctorBlock,
+        ]
+        if (isEnableRecurrence && restValues.id === undefined) {
+          doctorBlocks = generateRecurringDoctorBlock(
+            recurrenceDto,
+            doctorBlock,
+          )
+        }
 
-    handleUpdateDoctorEvent({
-      [type]: event,
-    })
-    // todo: update doctor event
-    resetForm()
-  },
-  mapPropsToValues: ({ initialProps }) => ({
-    doctor: undefined,
-    durationHour: '0',
-    durationMinute: '15',
-    eventDate: '',
-    eventTime: '',
-    subject: '',
-    description: '',
-    occurence: 0,
-    enableRecurrence: false,
-    recurrencePattern: 'daily',
-    recurrenceRange: RECURRENCE_RANGE.AFTER,
-    recurrenceDto: {
-      recurrencePatternFK: 1,
-      recurrenceFrequency: 1,
-      recurrenceRange: 'after',
-      recurrenceCount: 1,
-      recurrenceDaysOfTheWeek: [],
-      recurrenceDayOfTheMonth: undefined,
+        // compute startTime and endTime on all recurrence
+        doctorBlocks = doctorBlocks.map((item) => {
+          const { eventDate: date, eventTime: time, ...rest } = item
+          const doctorBlockDate = moment(date).format(_dateFormat)
+
+          const endDate = moment(
+            `${doctorBlockDate} ${time}`,
+            `${_dateFormat} ${_timeFormat}`,
+          )
+          endDate.add(parseInt(durationHour, 10), 'hours')
+          endDate.add(parseInt(durationMinute, 10), 'minutes')
+
+          const startDate = moment(
+            `${doctorBlockDate} ${time}`,
+            `${_dateFormat} ${_timeFormat}`,
+          )
+          return {
+            ...rest,
+            startDateTime: startDate.format(),
+            endDateTime: endDate.format(),
+          }
+        })
+
+        let payload = {
+          doctorBlockUserFk,
+          isEnableRecurrence,
+          doctorBlocks,
+          recordClinicFK: 1,
+          ...restValues,
+        }
+        if (isEnableRecurrence)
+          payload = {
+            ...payload,
+            recurrenceDto: filterRecurrenceDto(recurrenceDto),
+          }
+
+        dispatch({
+          type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
+          payload,
+        }).then((response) => {
+          if (response) {
+            dispatch({
+              type: 'calendar/refresh',
+            })
+            resetForm()
+            onClose()
+          }
+        })
+      } catch (error) {
+        console.log({ error })
+      }
     },
-    ...initialProps,
+    mapPropsToValues: ({ currentViewDoctorBlock }) => {
+      if (Object.keys(currentViewDoctorBlock).length > 0) {
+        const {
+          doctorBlocks,
+          recurrenceDto,
+          ...restValues
+        } = currentViewDoctorBlock
+        const doctorBlock = doctorBlocks[0]
+        const start = moment(doctorBlock.startDateTime)
+        const end = moment(doctorBlock.endDateTime)
+        const durationHour = end.diff(start, 'hour')
+        const durationMinute = end.diff(start, 'minute')
+
+        return {
+          ...restValues,
+          eventDate: start.format(_dateFormat),
+          eventTime: start.format(_timeFormat),
+          durationHour,
+          durationMinute,
+          restDoctorBlock: { ...doctorBlock },
+          remarks: doctorBlock.remarks,
+          recurrenceDto:
+            recurrenceDto !== null && recurrenceDto !== undefined
+              ? {
+                  ...recurrenceDto,
+                  recurrenceDaysOfTheWeek: convertReccurenceDaysOfTheWeek(
+                    recurrenceDto.recurrenceDaysOfTheWeek,
+                  ),
+                }
+              : { ...initDailyRecurrence },
+        }
+      }
+      return {
+        doctorBlockUserFk: undefined,
+        recordClinicFK: 1,
+        durationHour: '0',
+        durationMinute: '15',
+        eventDate: moment(),
+        eventTime: undefined,
+        startDateTime: '',
+        endDateTime: '',
+        remarks: '',
+        isEnableRecurrence: false,
+        recurrenceDto: { ...initDailyRecurrence },
+      }
+    },
   }),
-})(withStyles(STYLES, { name: 'DoctorForm' })(DoctorEventForm))
+)(DoctorEventForm)

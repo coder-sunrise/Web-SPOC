@@ -80,10 +80,12 @@ const applyFilter = (filter, data) => {
   return returnData
 }
 
-@connect(({ calendar, codetable, loading }) => ({
+@connect(({ calendar, codetable, doctorBlock, loading }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list,
+  publicHolidays: calendar.publicHolidayList,
+  doctorBlocks: doctorBlock.list,
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.effects['calendar/getCalendarList'],
 }))
@@ -131,20 +133,20 @@ class CalendarView extends React.PureComponent {
   }
 
   _customDayPropGetter = (date) => {
-    if (
-      this.props.calendarView === BigCalendar.Views.MONTH &&
-      (date.getDate() === 7 ||
-        date.getDate() === 17 ||
-        date.getDate() === 19 ||
-        date.getDate() === 28)
-    )
+    const { publicHolidays } = this.props
+    const momentDate = moment(date)
+    const publicHoliday = publicHolidays.find((item) => {
+      const momentStartDate = moment(item.startDate)
+
+      if (momentStartDate.diff(momentDate, 'day') === 0) {
+        return true
+      }
+      return false
+    })
+
+    if (this.props.calendarView === BigCalendar.Views.MONTH && publicHoliday)
       return {
         className: 'calendar-holiday',
-        style: {
-          '&::before': {
-            content: 'test 123',
-          },
-        },
       }
     return {}
   }
@@ -214,16 +216,19 @@ class CalendarView extends React.PureComponent {
     // drillDownView,
     // isOffRange,
   }) => {
-    const { classes } = this.props
+    const { classes, publicHolidays } = this.props
     let holidayLabel = ''
-    if (
-      date.getDate() === 7 ||
-      date.getDate() === 17 ||
-      date.getDate() === 19 ||
-      date.getDate() === 28
-    ) {
-      holidayLabel = 'Public Holiday'
-    }
+    const momentDate = moment(date)
+    const publicHoliday = publicHolidays.find((item) => {
+      const momentStartDate = moment(item.startDate)
+
+      if (momentStartDate.diff(momentDate, 'day') === 0) {
+        return true
+      }
+      return false
+    })
+
+    if (publicHoliday) holidayLabel = publicHoliday.displayValue
     return (
       <div>
         <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>
@@ -241,6 +246,7 @@ class CalendarView extends React.PureComponent {
       handleOnDragStart,
       // --- variables ---
       calendarEvents,
+      doctorBlocks,
       resources,
       displayDate,
       calendarView,
@@ -309,7 +315,16 @@ class CalendarView extends React.PureComponent {
           }, [])
 
     const { minTime, maxTime } = this.state
-    const filtered = applyFilter(filter, flattenedList)
+    const filtered = applyFilter(filter, [
+      ...flattenedList,
+      // ...doctorBlocks.map((item) => ({
+      //   ...item,
+      //   start: item.startDateTime,
+      //   end: item.endDateTime,
+      // })),
+    ])
+
+    console.log({ filtered })
 
     return (
       <LoadingWrapper loading={loading} text='Loading appointments...'>

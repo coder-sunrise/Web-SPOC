@@ -18,7 +18,7 @@ export const SeriesAlert = {
 }
 
 export const DoctorFormValidation = Yup.object().shape({
-  doctor: Yup.string().required(),
+  doctorBlockUserFk: Yup.string().required(),
   durationHour: Yup.string().required(),
   durationMinute: Yup.string().required(),
   eventDate: Yup.string().required(),
