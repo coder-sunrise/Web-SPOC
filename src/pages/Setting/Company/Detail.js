@@ -17,54 +17,48 @@ import {
 import Contact from './Contact'
 
 const styles = (theme) => ({})
+
 @withFormikExtend({
   mapPropsToValues: ({ settingCompany }) =>
     settingCompany.entity || settingCompany.default,
-
   validationSchema: ({ settingCompany }) =>
     Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       coPayerTypeFK: Yup.number().when('settingCompany', {
-        is: (val) => settingCompany.companyType.id === 1,
+        is: () => settingCompany.companyType.id === 1,
         then: Yup.number().required(),
+        otherwise: Yup.number().nullable(),
       }),
 
       url: Yup.object().when('settingCompany', {
-        is: (val) => settingCompany.companyType.id === 1,
+        is: () => settingCompany.companyType.id === 1,
         then: Yup.object().shape({
           contactWebsite: Yup.object().shape({
             website: Yup.string().url(),
           }),
         }),
       }),
+      // contact.contactAddress[0].postcode
+      contact: Yup.object().when('settingCompany', {
+        is: () => settingCompany.companyType.id === 1,
+        then: Yup.object().shape({
+          contactEmailAddress: Yup.object().shape({
+            emailAddress: Yup.string().email().nullable(),
+          }),
 
-      contact: Yup.object().when(settingCompany, {
-        is: (val) => console.log('val', val),
-        // settingCompany.companyType.id === 1,
-        // then: Yup.object().shape({
-        //   contactEmailAddress: Yup.object().shape({
-        //     emailAddress: Yup.string().email(),
-        //   }),
-        // }),
+          // contactAddress: Yup.array().of(
+          //   Yup.object().shape({
+          //     postcode: Yup.number().lessThan(10),
+          //   }),
+          // ),
+        }),
       }),
     }),
 
   handleSubmit: (values, { props }) => {
-    // const {
-    //   url,
-    //   country,
-    //   postalCode,
-    //   mobileFaxNum,
-    //   address,
-    //   officeNum,
-    //   email,
-    //   effectiveDates,
-    //   ...restValues
-    // } = values
-    const { contact, effectiveDates, ...restValues } = values
-    // console.log('values', values)
+    const { effectiveDates, ...restValues } = values
 
     const { dispatch, onConfirm, settingCompany } = props
     const { id, name } = settingCompany.companyType
@@ -76,14 +70,6 @@ const styles = (theme) => ({})
         effectiveEndDate: effectiveDates[1],
         companyTypeFK: id,
         companyTypeName: name,
-        // contact: {
-        //   contactEmailAddress: {
-        //     emailAddress:
-        //       contact.contactEmailAddress.emailAddress === null
-        //         ? ''
-        //         : contact.contactEmailAddress.emailAddress,
-        //   },
-        // },
       },
     }).then((r) => {
       if (r) {
@@ -105,6 +91,7 @@ class Detail extends PureComponent {
     const { name } = route
     const type = 'copayer'
     // console.log('detail', settingCompany)
+    console.log('props', this.props)
 
     return (
       <React.Fragment>

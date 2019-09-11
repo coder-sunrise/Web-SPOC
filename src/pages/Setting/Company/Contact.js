@@ -8,6 +8,7 @@ import {
   TextField,
   Select,
   CodeSelect,
+  NumberInput,
 } from '@/components'
 
 const Contact = (props) => {
@@ -37,7 +38,7 @@ const Contact = (props) => {
           <GridItem md={6}>
             <FastField
               name='contact.contactAddress[0].postcode'
-              render={(args) => <TextField label='Postal Code' {...args} />}
+              render={(args) => <NumberInput label='Postal Code' {...args} />}
             />
           </GridItem>
           <GridItem md={6}>
