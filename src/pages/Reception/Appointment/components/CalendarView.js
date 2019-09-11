@@ -84,6 +84,7 @@ const applyFilter = (filter, data) => {
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list,
+  publicHolidays: calendar.publicHolidayList,
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.effects['calendar/getCalendarList'],
 }))
@@ -131,20 +132,20 @@ class CalendarView extends React.PureComponent {
   }
 
   _customDayPropGetter = (date) => {
-    if (
-      this.props.calendarView === BigCalendar.Views.MONTH &&
-      (date.getDate() === 7 ||
-        date.getDate() === 17 ||
-        date.getDate() === 19 ||
-        date.getDate() === 28)
-    )
+    const { publicHolidays } = this.props
+    const momentDate = moment(date)
+    const publicHoliday = publicHolidays.find((item) => {
+      const momentStartDate = moment(item.startDate)
+
+      if (momentStartDate.diff(momentDate, 'day') === 0) {
+        return true
+      }
+      return false
+    })
+
+    if (this.props.calendarView === BigCalendar.Views.MONTH && publicHoliday)
       return {
         className: 'calendar-holiday',
-        style: {
-          '&::before': {
-            content: 'test 123',
-          },
-        },
       }
     return {}
   }
@@ -214,16 +215,19 @@ class CalendarView extends React.PureComponent {
     // drillDownView,
     // isOffRange,
   }) => {
-    const { classes } = this.props
+    const { classes, publicHolidays } = this.props
     let holidayLabel = ''
-    if (
-      date.getDate() === 7 ||
-      date.getDate() === 17 ||
-      date.getDate() === 19 ||
-      date.getDate() === 28
-    ) {
-      holidayLabel = 'Public Holiday'
-    }
+    const momentDate = moment(date)
+    const publicHoliday = publicHolidays.find((item) => {
+      const momentStartDate = moment(item.startDate)
+
+      if (momentStartDate.diff(momentDate, 'day') === 0) {
+        return true
+      }
+      return false
+    })
+
+    if (publicHoliday) holidayLabel = publicHoliday.displayValue
     return (
       <div>
         <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>

@@ -40,11 +40,13 @@ const getTimeString = (value) => {
   return 'N/A'
 }
 
+const getDoctorBlockTimeString = (value) => moment(value).format(timeFormat)
+
 const DoctorEventContent = ({ popoverEvent, classes }) => {
-  const startTime = getTimeString(popoverEvent.start)
-  const endTime = getTimeString(popoverEvent.end)
+  const startTime = getDoctorBlockTimeString(popoverEvent.startDateTime)
+  const endTime = getDoctorBlockTimeString(popoverEvent.endDateTime)
   return (
-    <GridContainer direction='column' justify='center' alignItems='center'>
+    <GridContainer direction='column'>
       {popoverEvent.hasConflict && (
         <GridItem className={classnames(classes.iconRow)}>
           <ErrorOutline className={classnames(classes.icon)} />
@@ -60,10 +62,14 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
         </span>
       </GridItem>
       <GridItem>
-        <TextField disabled label='Doctor' value={popoverEvent.doctor} />
-      </GridItem>
-      <GridItem>
-        <TextField disabled label='Event Type' value={popoverEvent.eventType} />
+        <CodeSelect
+          disabled
+          code='doctorProfile'
+          label='Doctor'
+          labelField='clinicianProfile.name'
+          valueField='clinicianProfile.userProfileFK'
+          value={popoverEvent.doctor.clinicianProfile.userProfileFK}
+        />
       </GridItem>
       <GridItem>
         <TextField disabled label='Remarks' value={popoverEvent.remarks} />
@@ -92,7 +98,7 @@ class PopoverContent extends React.Component {
     const { popoverEvent, classes } = this.props
     const {
       hasConflict,
-      isDoctorEvent,
+      doctor,
       patientName,
       patientContactNo,
       clinicianFK,
@@ -101,7 +107,7 @@ class PopoverContent extends React.Component {
 
     return (
       <CardBody>
-        {isDoctorEvent ? (
+        {doctor ? (
           <DoctorEventContent {...this.props} />
         ) : (
           <GridContainer direction='column'>

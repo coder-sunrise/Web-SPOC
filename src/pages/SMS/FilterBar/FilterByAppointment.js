@@ -77,7 +77,7 @@ const FilterByAppointment = ({ classes }) => {
           }}
         />
       </GridItem>
-      <GridItem xs={4} />
+
       <GridItem xs={4}>
         <FastField
           name='Doctor'
@@ -103,7 +103,7 @@ const FilterByAppointment = ({ classes }) => {
           }}
         />
       </GridItem>
-      <GridItem xs={4}>
+      <GridItem xs={2}>
         <FastField
           name='AppointmentStatus'
           render={(args) => {
@@ -128,6 +128,7 @@ const FilterByAppointment = ({ classes }) => {
           }}
         />
       </GridItem>
+
       <GridItem xs={4} className={classes.checkbox}>
         <FastField
           name='ExcludeSent'
@@ -142,7 +143,8 @@ const FilterByAppointment = ({ classes }) => {
           )}
         />
       </GridItem>
-      <GridItem xs={4}>
+      <GridItem md={6} />
+      <GridItem xs={2}>
         <FastField
           name='SMSStatus'
           render={(args) => {
@@ -167,7 +169,8 @@ const FilterByAppointment = ({ classes }) => {
           }}
         />
       </GridItem>
-      <GridItem xs={4}>
+
+      <GridItem xs={2}>
         <FastField
           name='MessageStatus'
           render={(args) => {

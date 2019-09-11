@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
-import { Chip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 // custom component
 import {
   GridContainer,
@@ -10,7 +10,7 @@ import {
   withFormikExtend,
 } from '@/components'
 // medisys-components
-import { ErrorWrapper, LoadingWrapper } from 'medisys-components'
+import { ErrorWrapper, LoadingWrapper } from '@/components/_medisys'
 // Sub-components
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
@@ -99,14 +99,15 @@ class NewVisit extends PureComponent {
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
     const { setFieldValue, setFieldTouched } = this.props
-    console.log({ heightCM, weightKG })
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
       const bmi = weightKG / heightM ** 2
       const bmiInTwoDecimal = Math.round(bmi * 100) / 100
       setFieldValue(FormFieldName['vitalsign.bmi'], bmiInTwoDecimal)
-      setFieldTouched(FormFieldName['vitalsign.bmi'], true)
+    } else {
+      setFieldValue(FormFieldName['vitalsign.bmi'], null)
     }
+    setFieldTouched(FormFieldName['vitalsign.bmi'], true)
   }
 
   updateAttachments = ({ added, deleted }) => {
@@ -175,14 +176,14 @@ class NewVisit extends PureComponent {
     const {
       classes,
       footer,
-      handleSubmit,
+
       queueLog: { list = [] } = { list: [] },
       loading,
       visitRegistration: { visitInfo, errorState },
       values,
       isSubmitting,
     } = this.props
-    console.log({ props: this.props })
+
     const existingQNo = list.reduce(
       (queueNumbers, queue) =>
         queue.visitFK === values.id
@@ -205,7 +206,7 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-    console.log({ values, isReadOnly })
+
     return (
       <React.Fragment>
         <LoadingWrapper

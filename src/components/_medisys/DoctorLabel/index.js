@@ -10,7 +10,7 @@ const DoctorLabel = ({ doctor }) => {
     const mcrNo = doctorMCRNo ? `(${doctorMCRNo})` : ''
     label = `${designation} ${clinicianProfile.name} ${mcrNo}`
   } catch (error) {
-    console.log({ error })
+    // console.log({ error })
   }
   return <div>{label}</div>
 }

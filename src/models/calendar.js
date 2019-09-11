@@ -6,7 +6,9 @@ import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 // common components
 import { notification, serverDateFormat } from '@/components'
-import * as service from '../services/calendar'
+import * as service from '@/services/calendar'
+import * as doctorBlockService from '@/services/doctorBlock'
+import { queryList as queryPublicHolidays } from '@/pages/Setting/PublicHoliday/services'
 // utils
 import {
   generateRecurringAppointments,
@@ -80,7 +82,11 @@ export default createListViewModel({
       currentViewAppointment: {
         appointments: [],
       },
+      currentViewDoctorBlock: {
+        doctorBlocks: [],
+      },
       calendarView: BigCalendar.Views.MONTH,
+      publicHolidayList: [],
       isEditedAsSingleAppointment: false,
     },
     subscriptions: {},
@@ -278,6 +284,18 @@ export default createListViewModel({
           })
         }
       },
+      *getPublicHolidayList ({ payload }, { call, put }) {
+        const result = yield call(queryPublicHolidays, {
+          lgteql_startDate: payload.start,
+          pagesize: 99999,
+        })
+        if (result.status === '200') {
+          yield put({
+            type: 'savePublicHolidays',
+            payload: result.data.data,
+          })
+        }
+      },
       *insertAppointment ({ payload }, { call, put }) {
         const result = yield call(service.insert, payload)
         if (result) {
@@ -296,6 +314,7 @@ export default createListViewModel({
         }
         return false
       },
+
       *rescheduleAppointment ({ payload }, { call, put }) {
         const result = yield call(service.reschedule, payload)
         if (result) {
@@ -360,6 +379,14 @@ export default createListViewModel({
             }
 
         yield put({ type: 'getCalendarList', payload: getCalendarListPayload })
+        yield put({ type: 'getPublicHolidayList', payload: { start } })
+        yield put({
+          type: 'doctorBlock/query',
+          payload: {
+            pagesize: 9999,
+            lgteql_startDateTime: start,
+          },
+        })
       },
     },
     reducers: {
@@ -374,6 +401,14 @@ export default createListViewModel({
       },
       setCalendarView (state, { payload }) {
         return { ...state, calendarView: payload }
+      },
+      savePublicHolidays (state, { payload }) {
+        return {
+          ...state,
+          publicHolidayList: [
+            ...payload,
+          ],
+        }
       },
       moveEvent (state, { updatedEvent, id, _appointmentID }) {
         const { calendarEvents } = state
