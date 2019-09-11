@@ -15,11 +15,18 @@ const styles = {
   blur: {
     opacity: 0.4,
   },
-  warning: {
-    position: 'fixed',
+  warningContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+    zIndex: 9999,
+  },
+  warningContent: {
     top: '50%',
     left: '45%',
-    zIndex: 9999,
+    position: 'fixed',
     '& h4': {
       fontWeight: 'bold',
     },
@@ -56,6 +63,11 @@ const SMS = ({ classes }) => {
     },
   }
 
+  const showWarning = false
+  const contentClass = classnames({
+    [classes.blur]: showWarning,
+  })
+
   return (
     <CardContainer hideHeader>
       {/* <Button
@@ -65,14 +77,18 @@ const SMS = ({ classes }) => {
       >
         <Assignment />
       </Button> */}
-      <div className={classes.warning}>
-        <CardContainer hideHeader>
-          <Danger>
-            <h4>Please contact administrator to setup SMS feature.</h4>
-          </Danger>
-        </CardContainer>
-      </div>
-      <div className={classes.blur}>
+      {showWarning && (
+        <div className={classes.warningContainer}>
+          <div className={classes.warningContent}>
+            <CardContainer hideHeader>
+              <Danger>
+                <h4>Please contact administrator to setup SMS feature.</h4>
+              </Danger>
+            </CardContainer>
+          </div>
+        </div>
+      )}
+      <div className={contentClass}>
         <FilterBar />
         <Grid {...gridProps} />
         <div className={classes.sendBar}>

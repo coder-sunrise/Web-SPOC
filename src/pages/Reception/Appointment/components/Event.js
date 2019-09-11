@@ -71,17 +71,23 @@ class Event extends PureComponent {
     const { event, classes, calendarView } = this.props
     const {
       appointmentStatusFk,
-      isDoctorEvent,
+      doctor,
       hasConflict,
       isEnableRecurrence,
     } = event
 
-    const title = isDoctorEvent ? event.doctor : event.patientName
-
-    const accountNo = isDoctorEvent
-      ? ''
-      : this.constructAccountNo(event.patientAccountNo)
-    const subtitle = isDoctorEvent ? event.eventType : event.patientContactNo
+    let title = event.patientName
+    let accountNo = this.constructAccountNo(event.patientAccountNo)
+    let subtitle = event.patientContactNo
+    if (doctor) {
+      const { clinicianProfile = {} } = doctor
+      const { doctorProfile } = clinicianProfile
+      title = clinicianProfile.name
+      accountNo = doctorProfile
+        ? this.constructAccountNo(doctorProfile.doctorMCRNo)
+        : ''
+      subtitle = ''
+    }
 
     const monthViewClass = classnames({
       [classes.baseContainer]: true,
