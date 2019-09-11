@@ -1,9 +1,11 @@
 import React, { Component, PureComponent, useState } from 'react'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import { connect } from 'dva'
+import { isNumber } from 'util'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import Yup from '@/utils/yup'
+import { calculateAdjustAmount } from '@/utils/utils'
 
 import {
   Button,
@@ -37,12 +39,24 @@ const styles = (theme) => ({})
 }))
 @withFormik({
   mapPropsToValues: ({ global }) => {
-    const { defaultValues } = global.openAdjustmentConfig || {}
+    const { defaultValues = {} } = global.openAdjustmentConfig || {}
+    // const { openAdjustmentValue } = global
+    console.log(defaultValues)
+    if (defaultValues) {
+      defaultValues.isExactAmount = defaultValues.adjType !== 'Percentage'
+      defaultValues.isMinus = !(defaultValues.adjValue > 0)
+      defaultValues.finalAmount = calculateAdjustAmount(
+        defaultValues.isExactAmount,
+        defaultValues.initialAmout,
+        defaultValues.adjValue,
+      ).amount
+      defaultValues.adjustment = defaultValues.adjValue
+    }
+    // console.log(defaultValues)
     return {
       initialAmout: 0,
       isExactAmount: true,
       isMinus: true,
-      finalAmount: defaultValues.initialAmout,
       ...defaultValues,
     }
   },
@@ -58,10 +72,16 @@ const styles = (theme) => ({})
     const { dispatch, global } = props
     const { openAdjustmentConfig = {} } = global
     const { callbackConfig } = openAdjustmentConfig
+    const newVals = {
+      ...values,
+      adjValue: values.adjustment,
+      adjAmount: values.finalAmount - values.initialAmout,
+      adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
+    }
     dispatch({
       type: 'global/updateState',
       payload: {
-        openAdjustmentValue: values,
+        openAdjustmentValue: newVals,
       },
     })
     // console.log(callbackConfig)
@@ -69,7 +89,7 @@ const styles = (theme) => ({})
       const { model, reducer } = callbackConfig
       dispatch({
         type: `${model}/${reducer}`,
-        payload: values,
+        payload: newVals,
       })
     }
     if (props.onConfirm) props.onConfirm()
@@ -81,19 +101,18 @@ class Adjustment extends PureComponent {
     console.log('getFinalAmount')
     const { values, setFieldValue } = this.props
     const { isExactAmount, isMinus, adjustment, initialAmout = 0 } = values
-    let amount = initialAmout
-    if (isExactAmount) {
-      amount += value || adjustment
-    } else {
-      amount += initialAmout * (value || adjustment) * 0.01
-    }
 
-    setFieldValue('finalAmount', amount)
+    setFieldValue(
+      'finalAmount',
+      calculateAdjustAmount(isExactAmount, initialAmout, value || adjustment)
+        .amount,
+    )
   }
 
   onConditionChange = (v) => {
     const { values, setFieldValue } = this.props
     const { isExactAmount, isMinus, adjustment } = values
+    if (!isNumber(adjustment)) return
     let value = adjustment
     if (isMinus) {
       value = -Math.abs(adjustment)

@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import { withStyles, Divider, Paper } from '@material-ui/core'
+import DeleteIcon from '@material-ui/icons/Delete'
 import Yup from '@/utils/yup'
 
 import {
@@ -26,9 +28,7 @@ import {
   confirm,
   skeleton,
 } from '@/components'
-import { withStyles, Divider, Paper } from '@material-ui/core'
 
-import DeleteIcon from '@material-ui/icons/Delete'
 import Grid from './Grid'
 import Detail from './Detail/index'
 import model from './models'
@@ -51,6 +51,8 @@ class Orders extends Component {
         <Divider light />
 
         <Grid {...props} />
+        {/* 
+        <div>7.00% GST</div> */}
       </div>
     )
   }

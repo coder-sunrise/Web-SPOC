@@ -649,19 +649,19 @@ const orderTypes = [
     value: '1',
     prop: 'corPrescriptionItem',
     filter: (r) => !!r.stockDrugFK,
+    getSubject: (r) => r.drugName,
   },
   {
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
+    getSubject: (r) => r.vaccinationName,
   },
   {
     name: 'Service',
     value: '3',
     prop: 'corService',
-    getSubject: (r) => {
-      return r.serviceName
-    },
+    getSubject: (r) => r.serviceName,
   },
   { name: 'Consumable', value: '4', prop: 'corConsumable' },
   {
@@ -669,6 +669,7 @@ const orderTypes = [
     value: '5',
     prop: 'corPrescriptionItem',
     filter: (r) => !r.stockDrugFK,
+    getSubject: (r) => r.drugName,
   },
 ]
 // const localCodes = {}
@@ -712,8 +713,6 @@ const tenantCodes = [
   'inventoryconsumable',
   'inventoryvaccination',
   'role',
-  'inventorymedication',
-  'inventoryconsumable',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {

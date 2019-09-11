@@ -236,6 +236,8 @@ class GlobalModalContainer extends PureComponent {
               type: 'global/updateAppState',
               payload: {
                 openAdjustment: false,
+                openAdjustmentConfig: undefined,
+                openAdjustmentValue: undefined,
               },
             })
           }}
@@ -244,6 +246,7 @@ class GlobalModalContainer extends PureComponent {
               type: 'global/updateAppState',
               payload: {
                 openAdjustment: false,
+                openAdjustmentConfig: undefined,
               },
             })
             if (global.onAdjustmentConfirm) {
