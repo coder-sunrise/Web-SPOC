@@ -34,10 +34,10 @@ const FilterBar = ({ classes, values }) => {
       <GridContainer alignItems='center'>
         <GridItem xs={6}>
           <FastField
-            name='SearchBy'
+            name='searchBy'
             render={(args) => (
               <RadioGroup
-                label='Filter By'
+                label='Search By'
                 simple
                 defaultValue='patient'
                 options={[

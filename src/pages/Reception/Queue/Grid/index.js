@@ -235,21 +235,23 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingData
 
   return (
-    <LoadingWrapper
-      linear
-      loading={isLoading}
-      text='Refreshing queue listing...'
-    >
-      <CommonTableGrid
-        size='sm'
-        // height={700}
-        rows={queueListingData}
-        columnExtensions={colExtensions}
-        FuncProps={FuncConfig}
-        onRowDoubleClick={onRowDoubleClick}
-        {...TableConfig}
-      />
-    </LoadingWrapper>
+    <div style={{ minHeight: '76.5vh', maxHeight: '76.5vh' }}>
+      <LoadingWrapper
+        linear
+        loading={isLoading}
+        text='Refreshing queue listing...'
+      >
+        <CommonTableGrid
+          size='sm'
+          // height={700}
+          rows={queueListingData}
+          columnExtensions={colExtensions}
+          FuncProps={FuncConfig}
+          onRowDoubleClick={onRowDoubleClick}
+          {...TableConfig}
+        />
+      </LoadingWrapper>
+    </div>
   )
 }
 

@@ -276,8 +276,9 @@ class AntdSelect extends React.PureComponent {
         // console.log({ label: Object.byString(s, labelField) })
         return {
           ...s,
-          value: s[valueField],
+          value: Object.byString(s, valueField),
           label: Object.byString(s, labelField),
+          // value: s[valueField],
           // label: s[labelField],
         }
       })

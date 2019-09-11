@@ -74,7 +74,7 @@ class CalendarToolbar extends React.PureComponent {
   changeDate = (action) => {
     const { handleDateChange } = this.props
     let newDate = moment(new Date())
-    const { view: currentView, displayDate: currentDate } = this.props
+    const { view: currentView, date: currentDate } = this.props
 
     if (action === DATE_NAVIGATOR_ACTION.ADD) {
       newDate = moment(currentDate).add(1, type[currentView])

@@ -8,6 +8,7 @@ import { CardContainer, CommonModal, serverDateFormat } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import CalendarView from './components/CalendarView'
+import FuncCalendarView from './components/FuncCalendarView'
 import PopoverContent from './components/PopoverContent'
 import Form from './components/form/Form'
 import DoctorBlockForm from './components/form/DoctorBlock'
@@ -96,17 +97,31 @@ class Appointment extends React.PureComponent {
   }
 
   componentWillMount () {
+    const { dispatch } = this.props
     const startOfMonth = moment().startOf('month').format(serverDateFormat)
     const endOfMonth = moment().endOf('month').format(serverDateFormat)
-    this.props.dispatch({
+    dispatch({
       type: 'calendar/query',
       payload: {
         combineCondition: 'and',
-        lgt_appointmentDate: startOfMonth,
-        lst_appointmentDate: endOfMonth,
+        lgteql_appointmentDate: startOfMonth,
+        lsteql_appointmentDate: endOfMonth,
       },
     })
-    this.props.dispatch({
+
+    dispatch({
+      type: 'calendar/getPublicHolidayList',
+      payload: { start: startOfMonth },
+    })
+    dispatch({
+      type: 'doctorBlock/query',
+      payload: {
+        pagesize: 9999,
+        lgteql_startDateTime: startOfMonth,
+      },
+    })
+
+    dispatch({
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
     })
@@ -144,7 +159,6 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = ({ start }) => {
-    console.log({ start })
     const selectedSlot = {
       allDay: false,
       start,
@@ -158,32 +172,53 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectEvent = (selectedEvent) => {
-    const { id, appointmentFK } = selectedEvent
-    const selectedAppointmentID =
-      appointmentFK === undefined ? id : appointmentFK
+    const { id, appointmentFK, doctor } = selectedEvent
 
-    if (!selectedEvent.isEnableRecurrence) {
+    if (doctor) {
       this.props
         .dispatch({
-          type: 'calendar/getAppointmentDetails',
+          type: 'doctorBlock/queryOne',
           payload: {
-            id: selectedAppointmentID,
-            isEditedAsSingleAppointment: false,
-            alwaysSingle: true,
+            id,
           },
         })
         .then((response) => {
-          if (response)
+          if (response) {
             this.setState({
-              selectedAppointmentFK: selectedAppointmentID,
-              showAppointmentForm: true,
+              showDoctorEventModal: true,
+              isDragging: false,
             })
+          }
         })
     } else {
-      this.setState({
-        selectedAppointmentFK: selectedAppointmentID,
-        showSeriesConfirmation: true,
-      })
+      const selectedAppointmentID =
+        appointmentFK === undefined ? id : appointmentFK
+
+      if (!selectedEvent.isEnableRecurrence) {
+        this.props
+          .dispatch({
+            type: 'calendar/getAppointmentDetails',
+            payload: {
+              id: selectedAppointmentID,
+              isEditedAsSingleAppointment: false,
+              alwaysSingle: true,
+            },
+          })
+          .then((response) => {
+            if (response)
+              this.setState({
+                selectedAppointmentFK: selectedAppointmentID,
+                showAppointmentForm: true,
+                isDragging: false,
+              })
+          })
+      } else {
+        this.setState({
+          selectedAppointmentFK: selectedAppointmentID,
+          showSeriesConfirmation: true,
+          isDragging: false,
+        })
+      }
     }
   }
 
@@ -252,6 +287,22 @@ class Appointment extends React.PureComponent {
   handleDoctorEventClick = () => {
     const { showDoctorEventModal } = this.state
     this.setState({ showDoctorEventModal: !showDoctorEventModal })
+    this.props.dispatch({
+      type: 'doctorBlock/updateState',
+      payload: {
+        currentViewDoctorBlock: {},
+      },
+    })
+  }
+
+  closeDoctorBlockModal = () => {
+    this.setState({ showDoctorEventModal: false })
+    this.props.dispatch({
+      type: 'doctorBlock/updateState',
+      payload: {
+        currentViewDoctorBlock: {},
+      },
+    })
   }
 
   updateDoctorEvent = (doctorEvent) => {
@@ -358,7 +409,7 @@ class Appointment extends React.PureComponent {
           onAddAppointmentClick={this.handleAddAppointmentClick}
         />
         <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
-          <CalendarView
+          <FuncCalendarView
             resources={resources}
             filter={filter}
             handleSelectSlot={this.onSelectSlot}
@@ -390,7 +441,7 @@ class Appointment extends React.PureComponent {
         <CommonModal
           open={showDoctorEventModal}
           title='Doctor Block'
-          onClose={this.handleDoctorEventClick}
+          onClose={this.closeDoctorBlockModal}
           onConfirm={this.handleDoctorEventClick}
           maxWidth='sm'
         >
