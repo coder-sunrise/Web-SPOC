@@ -133,17 +133,12 @@ class Queue extends PureComponent {
     })
   }
 
-  showVisitRegistration = ({
-    visitID = undefined,
-    patientID = undefined,
-    isAppointment = false,
-  }) => {
+  showVisitRegistration = ({ visitID = undefined, patientID = undefined }) => {
     const parameter = {
       md: 'visreg',
     }
     if (patientID) parameter.pid = patientID
     if (visitID) parameter.vis = visitID
-    if (isAppointment) parameter.type = 'appt'
 
     this.setState(
       {

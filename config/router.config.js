@@ -377,6 +377,11 @@ const routes = [
             name: 'queueListingReport',
             component: './Report/QueueListing',
           },
+          {
+            path: '/report/patientlisting',
+            name: 'patientListingReport',
+            component: './Report/PatientListing',
+          },
         ],
       },
       // Report

@@ -101,14 +101,14 @@ class AntdDateRangePicker extends PureComponent {
   }
 
   handleChange = (dateArray, dateString) => {
-    // console.log(dateArray, dateString)
+    console.log({ dateArray, dateString })
     this.setState({
       value: dateArray,
     })
 
     const { form, field, onChange } = this.props
     const v = Array.isArray(dateArray)
-      ? dateArray.map((o) => o.utc().format())
+      ? dateArray.map((o) => (o !== undefined ? o.utc().format() : o))
       : []
     if (form && field) {
       // console.log(date.format())

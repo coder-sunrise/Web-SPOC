@@ -99,6 +99,7 @@ class NewVisit extends PureComponent {
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
     const { setFieldValue, setFieldTouched } = this.props
+    console.log({ heightCM, weightKG })
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
       const bmi = weightKG / heightM ** 2
@@ -195,7 +196,7 @@ class NewVisit extends PureComponent {
       [],
     )
     const isReadOnly =
-      values.visitStatus !== VISIT_STATUS.WAITING ||
+      values.visitStatus !== VISIT_STATUS.WAITING &&
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
@@ -204,7 +205,7 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-
+    console.log({ values, isReadOnly })
     return (
       <React.Fragment>
         <LoadingWrapper
