@@ -151,7 +151,7 @@ export default createFormViewModel({
               const d = {
                 uid: getUniqueId(),
                 editType: p.value,
-                // subject: p.getSubject ? p.getSubject(o) : '',
+                subject: p.getSubject ? p.getSubject(o) : '',
                 ...o,
               }
               return p.convert ? p.convert(d) : d

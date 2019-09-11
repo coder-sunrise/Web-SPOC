@@ -41,11 +41,12 @@ import Yup from '@/utils/yup'
   }),
 
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm, orders, editType } = props
+    const { dispatch, onConfirm, orders, editType, currentType } = props
     const { rows, entity } = orders
 
     const data = {
       sequence: rows.length,
+      subject: currentType.getSubject(values),
       ...values,
     }
     dispatch({
@@ -71,7 +72,7 @@ class Service extends PureComponent {
         code: 'ctservice',
       },
     }).then((list) => {
-      console.log(list)
+      // console.log(list)
       // eslint-disable-next-line compat/compat
       const { services, serviceCenters, serviceCenterServices } = getServices(
         list,
@@ -81,7 +82,7 @@ class Service extends PureComponent {
         serviceCenters,
         serviceCenterServices,
       })
-      console.log(services, serviceCenters, serviceCenterServices)
+      // console.log(services, serviceCenters, serviceCenterServices)
       // this.setState((ps) => {
       //   return {
       //     pagination: {
@@ -114,6 +115,8 @@ class Service extends PureComponent {
       setValues({
         ...values,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+        serviceName: this.state.services.find((o) => o.value === serviceFK)
+          .name,
         unitPrice: serviceCenterService.unitPrice,
         total: serviceCenterService.unitPrice,
         quantity: 1,
@@ -244,7 +247,10 @@ class Service extends PureComponent {
             <FastField
               name='remark'
               render={(args) => {
-                return <RichEditor placeholder='Remarks' {...args} />
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
               }}
             />
           </GridItem>

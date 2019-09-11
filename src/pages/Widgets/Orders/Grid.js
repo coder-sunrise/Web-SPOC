@@ -1,7 +1,7 @@
-import { CommonTableGrid, Button,Popconfirm,Tooltip } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { CommonTableGrid, Button,Popconfirm,Tooltip } from '@/components'
 import { orderTypes } from '@/utils/codes'
 
 export default ({ orders,dispatch }) => {
@@ -28,15 +28,14 @@ export default ({ orders,dispatch }) => {
       columns={[
         { name: 'editType', title: 'Type' },
         { name: 'subject', title: 'Name' },
-        { name: 'remarks', title: 'Description' },
-        { name: 'total', title: 'Total' },
+        { name: 'remark', title: 'Description' },
+        { name: 'totalAfterOverallAdjustment', title: 'Total' },
         { name: 'action', title: 'Action' },
       ]}
       FuncProps={{ pager: false }}
       columnExtensions={[
         { columnName: 'editType', type: 'select', options: orderTypes },
-
-        { columnName: 'total', type: 'number', currency: true },
+        { columnName: 'totalAfterOverallAdjustment', type: 'number', currency: true },
         { columnName: 'action', render:(row)=>{
           return (
             <>
