@@ -10,7 +10,6 @@ import { status } from '@/utils/codes'
 const styles = () => ({})
 
 const Medication = ({ dispatch, history, medication, values }) => {
-  console.log('values', values, medication)
   const [
     tableParas,
     setTableParas,
@@ -73,28 +72,6 @@ const Medication = ({ dispatch, history, medication, values }) => {
     tableParas,
     colExtensions,
   }
-
-  useEffect(() => {
-    dispatch({
-      type: 'medication/query',
-    }).then((v) => {
-      const { data } = v
-      dispatch({
-        type: 'medication/updateState',
-        payload: {
-          list: data.map((o) => {
-            return {
-              ...o,
-              favouriteSupplier: o.favouriteSupplier
-                ? o.favouriteSupplier.id
-                : undefined,
-              dispensingUOM: o.dispensingUOM ? o.dispensingUOM.id : undefined,
-            }
-          }),
-        },
-      })
-    })
-  }, [])
 
   return (
     <CardContainer

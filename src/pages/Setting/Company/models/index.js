@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
+import * as supplierService from '../services/supplierService'
 
 import { getCodes } from '@/utils/codes'
 

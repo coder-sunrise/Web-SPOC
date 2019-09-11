@@ -165,7 +165,8 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
             formatMessage({
               id: 'finance.scheme.setting.vaccines',
             }),
-            values.itemGroupValueDto
+            values.itemGroupValueDto &&
+            values.itemGroupValueDto.vaccinationGroupValue
               ? values.itemGroupValueDto.vaccinationGroupValue.groupValueType
               : 'ExactAmount',
             'sub',

@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/ctcopayer'
+const url = '/api/ctsupplier'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),

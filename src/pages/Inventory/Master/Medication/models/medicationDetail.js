@@ -74,6 +74,23 @@ export default createFormViewModel({
           }),
         }
       },
+
+      queryDone (st, { payload }) {
+        const { data } = payload
+
+        return {
+          ...st,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+              effectiveDates: [
+                o.effectiveStartDate,
+                o.effectiveEndDate,
+              ],
+            }
+          }),
+        }
+      },
     },
   },
 })

@@ -12,8 +12,29 @@ const Grid = ({
   colExtensions,
   list,
 }) => {
-  // console.log(namespace, namespace)
   useEffect(() => {
+    // if (namespace === 'medication') {
+    //   dispatch({
+    //     type: `${namespace}/query`,
+    //   }).then((v) => {
+    //     const { data } = v
+    //     dispatch({
+    //       type: 'medication/updateState',
+    //       payload: {
+    //         list: data.map((o) => {
+    //           return {
+    //             ...o,
+    //             favouriteSupplier: o.favouriteSupplier
+    //               ? o.favouriteSupplier.id
+    //               : undefined,
+    //             dispensingUOM: o.dispensingUOM ? o.dispensingUOM.id : undefined,
+    //           }
+    //         }),
+    //       },
+    //     })
+    //   })
+    // }
+
     dispatch({
       type: `${namespace}/query`,
     })

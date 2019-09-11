@@ -88,7 +88,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
@@ -100,7 +100,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
@@ -112,7 +112,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
@@ -124,7 +124,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
             />
           )}
         />
-        <FastField
+        <Field
           name='itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput

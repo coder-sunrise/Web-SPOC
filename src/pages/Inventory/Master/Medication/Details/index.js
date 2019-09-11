@@ -46,8 +46,6 @@ const Detail = ({
     ...props,
   }
 
-  console.log({ values })
-
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>

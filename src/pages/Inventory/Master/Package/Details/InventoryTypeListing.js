@@ -36,18 +36,18 @@ const InventoryTypeListing = ({
   selectedItem,
   setSelectedItem,
   setServiceCenter,
-  ...props
+  values,
 }) => {
   const {
     medicationPackageItem,
     consumablePackageItem,
     vaccinationPackageItem,
     servicePackageItem,
-  } = props.values
+  } = values
   const { medicationTableParas, medicationColExtensions } = medication
   const { consumableTableParas, consumableColExtensions } = consumable
   const { vaccinationTableParas, vaccinationColExtensions } = vaccination
-  const { serviceTableParas, serviceColExtensions, serviceList } = service
+  const { serviceTableParas, serviceColExtensions } = service
 
   const Cell = ({ column, row, ...p }) => {
     if (column.name === 'Action') {
@@ -190,7 +190,7 @@ const InventoryTypeListing = ({
               showAddCommand: true,
               showEditCommand: false,
               onCommitChanges: onCommitChanges('medicationPackageItem'),
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange,
             }}
           />
         </GridItem>
@@ -205,7 +205,7 @@ const InventoryTypeListing = ({
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange,
               onCommitChanges: onCommitChanges('consumablePackageItem'),
             }}
           />
@@ -222,7 +222,7 @@ const InventoryTypeListing = ({
               showAddCommand: true,
               showEditCommand: false,
               onCommitChanges: onCommitChanges('vaccinationPackageItem'),
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange,
             }}
           />
         </GridItem>
@@ -236,14 +236,8 @@ const InventoryTypeListing = ({
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange,
               onCommitChanges: onCommitChanges('servicePackageItem'),
-
-              // onEditingRowIdsChange: { changeEditingRowIds },
-              // onRowChangesChange: { onRowChangesChange },
-              // onRowChangesChange: onRowChangesChange,
-              // onDeletedRowIdsChange: onDeletedRowIdsChange,
-              // onAddedRowsChange: onAddedRowsChange,
             }}
           />
         </GridItem>
