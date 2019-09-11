@@ -113,7 +113,8 @@ class Detail extends PureComponent {
 								)}
 							/>
 						</GridItem> */}
-            <GridItem md={6}>
+
+            <GridItem md={12}>
               <FastField
                 name='sortOrder'
                 render={(args) => {

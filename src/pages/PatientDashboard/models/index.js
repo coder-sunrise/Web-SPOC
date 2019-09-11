@@ -55,6 +55,7 @@ export default createFormViewModel({
               version: query.v,
               action: query.action,
               visitID: query.visit,
+              status: query.status,
             },
           })
         }
@@ -62,7 +63,14 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { queueID, showConsultation, version, action, visitID } = payload
+        const {
+          queueID,
+          showConsultation,
+          version,
+          action,
+          visitID,
+          status,
+        } = payload
         let {
           patientDashboard,
           visitRegistration,
@@ -76,15 +84,22 @@ export default createFormViewModel({
           ].includes(action) &&
           visitID
         ) {
-          yield put({
-            type: `consultation/${action}`,
-            payload: visitID,
-          })
-          yield take(`consultation/${action}/@@end`)
+          console.log(status)
+          if (
+            (status === 'PAUSED' && action === 'resume') ||
+            action !== 'resume'
+          ) {
+            yield put({
+              type: `consultation/${action}`,
+              payload: visitID,
+            })
+            yield take(`consultation/${action}/@@end`)
+          }
           router.push(
             getRemovedUrl([
               'action',
               'visit',
+              'status',
             ]),
           )
           return

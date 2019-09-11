@@ -31,7 +31,6 @@ const Filterbar = ({ classes, toggleNewPatient, handleSubmit }) => (
           return (
             <TextField
               label='Register visit (Patient Name, Acc No., Phone No.)'
-              // className={classes.textBox}
               {...args}
             />
           )

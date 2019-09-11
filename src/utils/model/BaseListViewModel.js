@@ -110,7 +110,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       ...super.reducers(),
       querySuccess (st, { payload }) {
         // console.log(payload)
-        const { data, filter } = payload
+        const { data, filter = {} } = payload
         // const { entities, filter } = data
         // // //console.log('list query')
         // console.log(filter)

@@ -157,7 +157,7 @@ class Form extends React.PureComponent {
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
     const { values, onClose, user, dispatch } = this.props
-    console.log({ type })
+
     const payload = {
       id: values.currentAppointment.id,
       concurrencyToken: values.currentAppointment.concurrencyToken,

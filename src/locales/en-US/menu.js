@@ -130,4 +130,5 @@ export default {
 
   'menu.report': 'Report',
   'menu.report.queueListingReport': 'Queue Listing Report',
+  'menu.report.patientListingReport': 'Patient Listing Report',
 }

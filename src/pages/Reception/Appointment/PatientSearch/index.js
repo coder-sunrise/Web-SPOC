@@ -1,11 +1,13 @@
 import React, { PureComponent } from 'react'
 import Loadable from 'react-loadable'
 import { connect } from 'dva'
-import Create from '@material-ui/icons/Create'
+// mateerial ui
+import { Tooltip } from '@material-ui/core'
+import Add from '@material-ui/icons/Add'
+// medisys components
+import { LoadingWrapper } from '@/components/_medisys'
 // custom component
 import { Button } from '@/components'
-// medisys components
-import { LoadingWrapper } from 'medisys-components'
 // sub components
 import Loading from '@/components/PageLoading/index'
 
@@ -20,7 +22,9 @@ class PatientSearch extends PureComponent {
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
-      { columnName: 'name', width: 200 },
+      // { columnName: 'name', width: 300 },
+      { columnName: 'patientAccountNo', width: 140 },
+      { columnName: 'mobileNo', width: 140 },
       {
         columnName: 'gender/age',
         width: 95,
@@ -28,6 +32,7 @@ class PatientSearch extends PureComponent {
       },
       {
         columnName: 'action',
+        width: 100,
         align: 'center',
         render: (row) => this.ActionButton(row),
       },
@@ -55,17 +60,22 @@ class PatientSearch extends PureComponent {
   })
 
   ActionButton = (row) => (
-    <Button
-      className='noPadding'
-      size='sm'
-      color='primary'
-      variant='outlined'
-      id={row.id}
-      onClick={() => this.props.handleSelectClick(row)}
-    >
-      <Create />
-      Select
-    </Button>
+    <Tooltip title='Select patient'>
+      <div>
+        <Button
+          // className='noPadding'
+          // variant='outlined'
+          justIcon
+          round
+          size='sm'
+          color='primary'
+          id={row.id}
+          onClick={() => this.props.handleSelectClick(row)}
+        >
+          <Add />
+        </Button>
+      </div>
+    </Tooltip>
   )
 
   render () {

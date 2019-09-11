@@ -35,13 +35,18 @@ import Yup from '@/utils/yup'
     v.editType = editType
     return v
   },
-  validationSchema: Yup.object().shape({}),
+  validationSchema: Yup.object().shape({
+    serviceFK: Yup.number().required(),
+    serviceCenterFK: Yup.number().required(),
+  }),
 
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm, orders, editType } = props
+    const { dispatch, onConfirm, orders, editType, currentType } = props
     const { rows, entity } = orders
+
     const data = {
       sequence: rows.length,
+      subject: currentType.getSubject(values),
       ...values,
     }
     dispatch({
@@ -64,25 +69,20 @@ class Service extends PureComponent {
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'ctservicecenterservice',
-      },
-    }).then((list) => {
-      console.log(list)
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
         code: 'ctservice',
       },
     }).then((list) => {
-      console.log(list)
+      // console.log(list)
       // eslint-disable-next-line compat/compat
-      const { services, serviceCenters } = getServices(list)
+      const { services, serviceCenters, serviceCenterServices } = getServices(
+        list,
+      )
       this.setState({
         services,
         serviceCenters,
+        serviceCenterServices,
       })
-      console.log(services, serviceCenters)
+      // console.log(services, serviceCenters, serviceCenterServices)
       // this.setState((ps) => {
       //   return {
       //     pagination: {
@@ -102,11 +102,52 @@ class Service extends PureComponent {
     }
   }
 
+  getServiceCenterService = () => {
+    const { values, setFieldValue, setValues } = this.props
+    const { serviceFK, serviceCenterFK } = values
+    if (!serviceCenterFK || !serviceFK) return
+    const serviceCenterService =
+      this.state.serviceCenterServices.find(
+        (o) =>
+          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+      ) || {}
+    if (serviceCenterService) {
+      setValues({
+        ...values,
+        serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+        serviceName: this.state.services.find((o) => o.value === serviceFK)
+          .name,
+        unitPrice: serviceCenterService.unitPrice,
+        total: serviceCenterService.unitPrice,
+        quantity: 1,
+      })
+      this.updateTotalValue(serviceCenterService.unitPrice)
+    }
+  }
+
+  updateTotalValue = (v) => {
+    this.props.setFieldValue('totalAfterOverallAdjustment', v)
+    this.props.dispatch({
+      type: 'orders/updateState',
+      payload: {
+        totalPrice: v,
+        totalAfterAdj: undefined,
+      },
+    })
+  }
+
   render () {
-    const { theme, classes, values = {} } = this.props
+    const {
+      theme,
+      orders,
+      classes,
+      values = {},
+      footer,
+      handleSubmit,
+    } = this.props
     const { services, serviceCenters } = this.state
-    const { serviceFK, serviceCenterServiceFK } = values
-    console.log('Service', services, serviceCenters)
+    const { serviceFK, serviceCenterFK } = values
+    // console.log('Service', services, serviceCenters)
 
     return (
       <div>
@@ -120,11 +161,15 @@ class Service extends PureComponent {
                     label='Service'
                     options={services.filter(
                       (o) =>
-                        !serviceCenterServiceFK ||
+                        !serviceCenterFK ||
                         o.serviceCenters.find(
-                          (m) => m.value === serviceCenterServiceFK,
+                          (m) => m.value === serviceCenterFK,
                         ),
                     )}
+                    onChange={() =>
+                      setTimeout(() => {
+                        this.getServiceCenterService()
+                      }, 1)}
                     {...args}
                   />
                 )
@@ -133,7 +178,7 @@ class Service extends PureComponent {
           </GridItem>
           <GridItem xs={12}>
             <Field
-              name='serviceCenterServiceFK'
+              name='serviceCenterFK'
               render={(args) => {
                 return (
                   <Select
@@ -143,6 +188,10 @@ class Service extends PureComponent {
                         !serviceFK ||
                         o.services.find((m) => m.value === serviceFK),
                     )}
+                    onChange={() =>
+                      setTimeout(() => {
+                        this.getServiceCenterService()
+                      }, 1)}
                     {...args}
                   />
                 )
@@ -155,14 +204,32 @@ class Service extends PureComponent {
             <FastField
               name='total'
               render={(args) => {
-                return <NumberInput label='Total' currency {...args} />
+                return (
+                  <NumberInput
+                    label='Total'
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalValue(e.target.value)
+                    }}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
           <GridItem xs={6}>
-            <FastField
-              name='totalAfterAdj'
+            <Field
+              name='totalAfterOverallAdjustment'
               render={(args) => {
+                if (
+                  orders.totalAfterAdj &&
+                  args.field.value !== orders.totalAfterAdj
+                ) {
+                  args.form.setFieldValue(
+                    'totalAfterOverallAdjustment',
+                    orders.totalAfterAdj,
+                  )
+                }
                 return (
                   <NumberInput
                     label='Total After Adj'
@@ -177,9 +244,20 @@ class Service extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={12} className={classes.editor}>
-            <RichEditor placeholder='Remarks' />
+            <FastField
+              name='remark'
+              render={(args) => {
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
+              }}
+            />
           </GridItem>
         </GridContainer>
+        {footer({
+          onSave: handleSubmit,
+        })}
       </div>
     )
   }

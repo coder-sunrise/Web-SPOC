@@ -115,7 +115,7 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
-        router.push('reception/queue')
+        router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
         console.log('queryDone', payload)
@@ -151,7 +151,7 @@ export default createFormViewModel({
               const d = {
                 uid: getUniqueId(),
                 editType: p.value,
-                // subject: p.getSubject ? p.getSubject(o) : '',
+                subject: p.getSubject ? p.getSubject(o) : '',
                 ...o,
               }
               return p.convert ? p.convert(d) : d

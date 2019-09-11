@@ -91,7 +91,7 @@ class Details extends PureComponent {
             model:'orders',
             reducer:'adjustAmount',
           },
-          showRemark: true,
+          // showRemark: true,
           defaultValues: {
             ...this.props.orders.adjustment,
             initialAmout: this.props.orders.totalPrice,

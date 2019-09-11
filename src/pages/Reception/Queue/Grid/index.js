@@ -160,6 +160,7 @@ const Grid = ({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
+        openConfirmTitle: '',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
         onOpenConfirm: () => deleteQueue(id),
       },
@@ -193,17 +194,17 @@ const Grid = ({
         break
       case '5': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
         )
         break
       case '6': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
         )
         break
       case '7': // edit consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
         )
         break
       case '8':

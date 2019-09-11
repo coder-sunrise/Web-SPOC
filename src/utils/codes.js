@@ -659,6 +659,9 @@ const orderTypes = [
     name: 'Service',
     value: '3',
     prop: 'corService',
+    getSubject: (r) => {
+      return r.serviceName
+    },
   },
   { name: 'Consumable', value: '4', prop: 'corConsumable' },
   {
@@ -841,6 +844,7 @@ export const getServices = (data) => {
   })
 
   return {
+    serviceCenterServices: data,
     services,
     serviceCenters,
   }
