@@ -623,6 +623,7 @@ class CommonTableGrid extends React.Component {
       getRowId = (row) => (row.Id ? row.Id : row.id),
       onSelectionChange = (f) => f,
       FuncProps = {},
+      TableProps = {},
       ActionProps = {},
       FilteringProps: {
         defaultFilters = [],
@@ -733,6 +734,7 @@ class CommonTableGrid extends React.Component {
     // console.log(errors, newColumExtensions)
 
     const tableProps = {
+      ...TableProps,
       columnExtensions: newColumExtensions,
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,

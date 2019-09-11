@@ -36,7 +36,7 @@ class PatientSearch extends PureComponent {
       {
         align: 'left',
         columnName: 'name',
-        width: 240,
+        // width: 240,
         render: (row) => (
           <Tooltip title='View patient profile'>
             <Button
@@ -52,12 +52,16 @@ class PatientSearch extends PureComponent {
           </Tooltip>
         ),
       },
+      { columnName: 'patientAccountNo', width: 140 },
+      { columnName: 'mobileNo', width: 140 },
       {
         columnName: 'gender/age',
+        width: 95,
         render: (row) => `${row.gender.substring(0, 1)}/${row.age}`,
       },
       {
         columnName: 'action',
+        width: 95,
         align: 'center',
         render: (row) => this.Cell(row),
       },

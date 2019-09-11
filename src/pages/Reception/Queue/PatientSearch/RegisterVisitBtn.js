@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'umi/locale'
-
-import Create from '@material-ui/icons/Create'
-
+// material ui
+import { Tooltip } from '@material-ui/core'
+import Add from '@material-ui/icons/Add'
 // custom component
 import { Button } from '@/components'
 
@@ -15,16 +15,18 @@ class ViewDetailsBtn extends PureComponent {
 
   render () {
     return (
-      <Button
-        size='sm'
-        onClick={this.handleClick}
-        color='rose'
-        simple
-        className='noPadding'
-      >
-        <Create />
-        <FormattedMessage id='reception.queue.patientSearch.registerVisit' />
-      </Button>
+      <Tooltip title='Register Visit'>
+        <Button
+          size='sm'
+          justIcon
+          round
+          onClick={this.handleClick}
+          color='primary'
+          className='noPadding'
+        >
+          <Add />
+        </Button>
+      </Tooltip>
     )
   }
 }
