@@ -43,28 +43,32 @@ const Detail = ({
   const [
     selectedItem,
     setSelectedItem,
-  ] = useState({})
+  ] = useState(() => {})
 
   const [
     servicess,
     setServicess,
-  ] = useState([])
+  ] = useState(() => [])
   const [
     serviceCenterss,
     setServiceCenterss,
-  ] = useState([])
+  ] = useState(() => [])
   const [
     serviceCenterServicess,
     setServiceCenterServicess,
-  ] = useState([])
+  ] = useState(() => [])
   const [
     serviceFK,
     setServiceFK,
-  ] = useState()
+  ] = useState(() => {})
   const [
     serviceCenterFK,
     setServiceCenterFK,
-  ] = useState()
+  ] = useState(() => {})
+  const [
+    price,
+    setPrice,
+  ] = useState(() => undefined)
 
   useEffect(async () => {
     await dispatch({
@@ -92,6 +96,7 @@ const Detail = ({
 
   const getServiceCenterService = () => {
     if (!serviceCenterFK || !serviceFK) {
+      console.log('missing', serviceCenterFK, serviceFK)
       setSelectedItem({})
       return
     }
@@ -110,6 +115,7 @@ const Detail = ({
       //   quantity: 1,
       // })
       // this.updateTotalValue(serviceCenterService.unitPrice)
+      setPrice(serviceCenterService.unitPrice)
       setSelectedItem(serviceCenterService)
     }
   }
@@ -276,6 +282,7 @@ const Detail = ({
 
         onChange: (e) => {
           setServiceFK(e.val)
+          console.log('service', serviceFK)
           setTimeout(() => {
             getServiceCenterService()
           }, 1)
@@ -297,6 +304,7 @@ const Detail = ({
         ),
         onChange: (e) => {
           setServiceCenterFK(e.val)
+          console.log('serviceCenterFK', serviceCenterFK)
           setTimeout(() => {
             getServiceCenterService()
           }, 1)
@@ -405,6 +413,7 @@ const Detail = ({
                 setSelectedItem={setSelectedItem}
                 setServiceCenter={setServiceCenter}
                 serviceCenter={serviceCenter}
+                price={price}
               />
             ),
           },

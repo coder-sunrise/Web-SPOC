@@ -169,8 +169,7 @@ const Detail = ({
                     label={formatMessage({
                       id: 'inventory.master.medication.supplier',
                     })}
-                    // code='ctSupplier'
-                    code='ctCompany'
+                    code='ctSupplier'
                     max={10}
                     {...args}
                   />

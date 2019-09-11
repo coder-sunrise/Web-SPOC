@@ -37,6 +37,7 @@ const InventoryTypeListing = ({
   setSelectedItem,
   setServiceCenter,
   values,
+  price,
 }) => {
   const {
     medicationPackageItem,
@@ -114,11 +115,16 @@ const InventoryTypeListing = ({
     }
   }
 
-  const onAddedRowsChange = (addedRows) => {
+  const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
 
-      const { quantity, unitPrice } = newRow
+      const {
+        quantity,
+        unitPrice,
+        serviceCenterServiceFK,
+        serviceName,
+      } = newRow
 
       const total = () => {
         if (quantity && unitPrice) {
@@ -126,7 +132,20 @@ const InventoryTypeListing = ({
         }
         return undefined
       }
-
+      if (type === 'service') {
+        if (serviceCenterServiceFK && serviceName) {
+          return addedRows.map((row) => ({
+            ...row,
+            unitPrice: price,
+            subTotal: total(),
+          }))
+        }
+        return addedRows.map((row) => ({
+          ...row,
+          unitPrice: undefined,
+          subTotal: total(),
+        }))
+      }
       return addedRows.map((row) => ({
         ...row,
         unitPrice: selectedItem.sellingPrice
@@ -135,7 +154,7 @@ const InventoryTypeListing = ({
         subTotal: total(),
       }))
     }
-    setSelectedItem({})
+    console.log('addedRows', addedRows)
     return addedRows
   }
 
@@ -190,7 +209,7 @@ const InventoryTypeListing = ({
               showAddCommand: true,
               showEditCommand: false,
               onCommitChanges: onCommitChanges('medicationPackageItem'),
-              onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('medication'),
             }}
           />
         </GridItem>
@@ -205,7 +224,7 @@ const InventoryTypeListing = ({
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('consumable'),
               onCommitChanges: onCommitChanges('consumablePackageItem'),
             }}
           />
@@ -222,7 +241,7 @@ const InventoryTypeListing = ({
               showAddCommand: true,
               showEditCommand: false,
               onCommitChanges: onCommitChanges('vaccinationPackageItem'),
-              onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('vaccination'),
             }}
           />
         </GridItem>
@@ -236,7 +255,7 @@ const InventoryTypeListing = ({
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('service'),
               onCommitChanges: onCommitChanges('servicePackageItem'),
             }}
           />

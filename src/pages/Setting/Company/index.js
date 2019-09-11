@@ -22,9 +22,14 @@ class Supplier extends PureComponent {
   state = {}
 
   componentDidMount () {
-    //   // this.props.dispatch({
-    //   //   type: 'settingCompany/query',
-    //   // })
+    const { route, dispatch } = this.props
+
+    dispatch({
+      type:
+        route.name === 'copayer'
+          ? 'settingCompany/queryCopayer'
+          : 'settingCompany/querySupplier',
+    })
   }
 
   toggleModal = () => {

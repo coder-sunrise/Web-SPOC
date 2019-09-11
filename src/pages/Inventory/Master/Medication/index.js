@@ -36,7 +36,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
     {
       columnName: 'favouriteSupplier',
       type: 'codeSelect',
-      code: 'ctCompany',
+      code: 'ctSupplier',
     },
     {
       columnName: 'dispensingUOM',

@@ -13,31 +13,31 @@ const Grid = ({
   list,
 }) => {
   useEffect(() => {
-    // if (namespace === 'medication') {
-    //   dispatch({
-    //     type: `${namespace}/query`,
-    //   }).then((v) => {
-    //     const { data } = v
-    //     dispatch({
-    //       type: 'medication/updateState',
-    //       payload: {
-    //         list: data.map((o) => {
-    //           return {
-    //             ...o,
-    //             favouriteSupplier: o.favouriteSupplier
-    //               ? o.favouriteSupplier.id
-    //               : undefined,
-    //             dispensingUOM: o.dispensingUOM ? o.dispensingUOM.id : undefined,
-    //           }
-    //         }),
-    //       },
-    //     })
-    //   })
-    // }
+    if (namespace === 'medication') {
+      dispatch({
+        type: `${namespace}/query`,
+      }).then((v) => {
+        const { data } = v
+        dispatch({
+          type: 'medication/updateState',
+          payload: {
+            list: data.map((o) => {
+              return {
+                ...o,
+                favouriteSupplier: o.favouriteSupplier
+                  ? o.favouriteSupplier.id
+                  : undefined,
+                dispensingUOM: o.dispensingUOM ? o.dispensingUOM.id : undefined,
+              }
+            }),
+          },
+        })
+      })
+    }
 
-    dispatch({
-      type: `${namespace}/query`,
-    })
+    // dispatch({
+    //   type: `${namespace}/query`,
+    // })
   }, [])
 
   const showDetail = (row, vmode) => () =>

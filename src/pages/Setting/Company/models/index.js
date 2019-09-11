@@ -1,11 +1,13 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
-import * as supplierService from '../services/supplierService'
-
 import { getCodes } from '@/utils/codes'
+import { notification } from '@/components'
 
-let companyTypes = []
+let companyTypes = [
+  { id: 1, name: 'copayer' },
+  { id: 2, name: 'supplier' },
+]
 
 export default createListViewModel({
   namespace: 'settingCompany',
@@ -50,37 +52,66 @@ export default createListViewModel({
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
         if (pathname.toLowerCase().indexOf('/setting/company/') === 0) {
-          getCodes('ctCompanyType').then((codetableData) => {
-            companyTypes = codetableData
-            const companyType = companyTypes.find(
-              (o) =>
-                o.id ===
-                Number(pathname.toLowerCase().replace('/setting/company/', '')),
-            )
-            dispatch({
-              type: 'updateState',
-              payload: {
-                companyType,
-                filter: {
-                  companyTypeFK: companyType.id,
-                },
+          const companyType = companyTypes.find(
+            (o) =>
+              o.id ===
+              Number(pathname.toLowerCase().replace('/setting/company/', '')),
+          )
+          dispatch({
+            type: 'updateState',
+            payload: {
+              companyType,
+              filter: {
+                companyTypeFK: companyType.id,
               },
-            })
-            dispatch({
-              type: 'query',
-            })
+            },
           })
         }
       })
     },
-    effects: {},
-    reducers: {
-      queryDone (st, { payload }) {
-        const { data } = payload
+    effects: {
+      *queryCopayer ({ payload }, { call, put }) {
+        const result = yield call(service.queryListCop)
+        yield put({ type: 'getCopSupList', payload: result })
+      },
 
+      *querySupplier ({ payload }, { call, put }) {
+        const result = yield call(service.queryListSup)
+        yield put({ type: 'getCopSupList', payload: result })
+      },
+
+      *upsertCopayer ({ payload }, { call, put }) {
+        const r = yield call(service.upsertCop, payload)
+        if (r.id) {
+          notification.success({ message: 'Created' })
+          return true
+        }
+        if (r) {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return r
+      },
+
+      *upsertSupplier ({ payload }, { call, put }) {
+        const r = yield call(service.upsertSup, payload)
+        if (r.id) {
+          notification.success({ message: 'Created' })
+          return true
+        }
+        if (r) {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return r
+      },
+    },
+
+    reducers: {
+      getCopSupList (st, { payload }) {
+        const { data } = payload
         return {
           ...st,
-
           list: data.data.map((o) => {
             return {
               ...o,

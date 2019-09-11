@@ -48,11 +48,24 @@ const styles = (theme) => ({})
             emailAddress: Yup.string().email().nullable(),
           }),
 
-          // contactAddress: Yup.array().of(
-          //   Yup.object().shape({
-          //     postcode: Yup.number().lessThan(10),
-          //   }),
-          // ),
+          contactAddress: Yup.array().of(
+            Yup.object().shape({
+              postcode: Yup.string().max(
+                10,
+                'The postcode should not more than 10 digits',
+              ),
+            }),
+          ),
+        }),
+        otherwise: Yup.object().shape({
+          contactAddress: Yup.array().of(
+            Yup.object().shape({
+              postcode: Yup.string().max(
+                10,
+                'The postcode should not more than 10 digits',
+              ),
+            }),
+          ),
         }),
       }),
     }),
@@ -63,7 +76,10 @@ const styles = (theme) => ({})
     const { dispatch, onConfirm, settingCompany } = props
     const { id, name } = settingCompany.companyType
     dispatch({
-      type: 'settingCompany/upsert',
+      type:
+        id === 1
+          ? 'settingCompany/upsertCopayer'
+          : 'settingCompany/upsertSupplier',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -75,7 +91,10 @@ const styles = (theme) => ({})
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingCompany/query',
+          type:
+            id === 1
+              ? 'settingCompany/queryCopayer'
+              : 'settingCompany/querySupplier',
         })
       }
     })
@@ -86,6 +105,7 @@ class Detail extends PureComponent {
   state = {}
 
   render () {
+    console.log(this.props)
     const { props } = this
     const { classes, theme, footer, values, settingCompany, route } = props
     const { name } = route
