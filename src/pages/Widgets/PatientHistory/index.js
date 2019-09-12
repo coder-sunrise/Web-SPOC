@@ -2,10 +2,22 @@ import React, { Component } from 'react'
 import moment from 'moment'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
-import Yup from '@/utils/yup'
 import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
 import classnames from 'classnames'
+import {
+  withStyles,
+  MenuItem,
+  MenuList,
+  Divider,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Typography,
+} from '@material-ui/core'
+import { standardRowHeight, border } from 'assets/jss'
+import DeleteIcon from '@material-ui/icons/Delete'
 import {
   Button,
   CommonHeader,
@@ -28,21 +40,10 @@ import {
   confirm,
   Accordion,
   withFormikExtend,
+  Skeleton,
 } from '@/components'
-import {
-  withStyles,
-  MenuItem,
-  MenuList,
-  Divider,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Typography,
-} from '@material-ui/core'
-import { standardRowHeight, border } from 'assets/jss'
-import DeleteIcon from '@material-ui/icons/Delete'
+import Loading from '@/components/PageLoading/index'
+import Yup from '@/utils/yup'
 
 import Orders from './Orders'
 import ConsultationDocument from './ConsultationDocument'
@@ -105,38 +106,6 @@ const styles = (theme) => ({
     // },
   },
 })
-const data = [
-  {
-    id: 1,
-    name: 'Consultation Visit',
-    doctor: 'Dr Levine',
-    date: '12 Apr 2019',
-  },
-  {
-    id: 2,
-    name: 'Consultation Visit',
-    doctor: 'Dr Levine',
-    date: '01 Apr 2019',
-  },
-  {
-    id: 3,
-    name: 'Consultation Visit',
-    doctor: 'Dr Levine',
-    date: '01 Jan 2019',
-  },
-  {
-    id: 4,
-    name: 'Consultation Visit',
-    doctor: 'Dr Levine',
-    date: '12 Dec 2018',
-  },
-  {
-    id: 5,
-    name: 'Consultation Visit',
-    doctor: 'Dr Levine',
-    date: '08 Dec 2018',
-  },
-]
 @withFormikExtend({
   // mapPropsToValues: ({ patientHistory }) => {
   //   console.log(patientHistory)
@@ -182,7 +151,7 @@ class PatientHistory extends Component {
           loader: () => import('./ChiefComplaints'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
+            return <Cmpnet {...props} {...p} />
           },
           loading: Loading,
         }),
@@ -194,7 +163,7 @@ class PatientHistory extends Component {
           loader: () => import('./Plan'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
+            return <Cmpnet {...props} {...p} />
           },
           loading: Loading,
         }),
@@ -206,7 +175,7 @@ class PatientHistory extends Component {
           loader: () => import('./Diagnosis'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
+            return <Cmpnet {...props} {...p} />
           },
           loading: Loading,
         }),
@@ -218,7 +187,7 @@ class PatientHistory extends Component {
           loader: () => import('./Orders'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
+            return <Cmpnet {...props} {...p} />
           },
           loading: Loading,
         }),
@@ -227,10 +196,10 @@ class PatientHistory extends Component {
         id: '5',
         name: 'Consultation Document',
         component: Loadable({
-          loader: () => import('./ConsultationDocument'),
+          loader: () => import('../ConsultationDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
+            return <Cmpnet {...props} {...p} />
           },
           loading: Loading,
         }),
@@ -242,7 +211,7 @@ class PatientHistory extends Component {
           loader: () => import('./ResultHistory'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
+            return <Cmpnet {...props} {...p} />
           },
           loading: Loading,
         }),
@@ -254,7 +223,7 @@ class PatientHistory extends Component {
           loader: () => import('./Invoice'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...props} />
+            return <Cmpnet {...props} {...p} />
           },
           loading: Loading,
         }),
@@ -265,8 +234,8 @@ class PatientHistory extends Component {
   componentWillReceiveProps (nextProps) {
     // console.log(this.props, nextProps)
     if (
-      nextProps.patientHistory.patientID &&
-      this.props.patientHistory.patientID !== nextProps.patientHistory.patientID
+      nextProps.patientHistory.version &&
+      this.props.patientHistory.version !== nextProps.patientHistory.version
     ) {
       nextProps
         .dispatch({
@@ -291,35 +260,30 @@ class PatientHistory extends Component {
 
   // }
 
-  getTitle = (row) => (
-    <div className={this.props.classes.title}>
-      <GridContainer>
-        <GridItem sm={7}>
-          <p
-            onClick={() => {
-              console.log(row)
-              this.props.dispatch({
-                type: 'patientHistory/queryOne',
-                payload: row.coHistory[0].id,
-              })
-            }}
-          >
-            <span>Consultation Visit</span>
-            <div className={this.props.classes.note}>
-              V4, {row.doctorTitle} {row.doctorName}
-            </div>
-          </p>
-        </GridItem>
-        <GridItem sm={5}>
-          <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-            {/* <DateRange style={{ position: 'absolute', left: 0 }} /> */}
-            12 Apr 2019
-          </span>
-          <div className={this.props.classes.note}>&nbsp;</div>
-        </GridItem>
-      </GridContainer>
-    </div>
-  )
+  getTitle = (row) => {
+    const { coHistory } = row
+    const latest = coHistory[coHistory.length] || {}
+    return (
+      <div className={this.props.classes.title}>
+        <GridContainer>
+          <GridItem sm={7}>
+            <p>
+              <span>Consultation Visit</span>
+              <div className={this.props.classes.note}>
+                V{latest.versionNumber}, {row.doctorTitle} {row.doctorName}
+              </div>
+            </p>
+          </GridItem>
+          <GridItem sm={5}>
+            <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
+              <DatePicker text defaultValue={moment(row.visitDate)} />
+            </span>
+            <div className={this.props.classes.note}>&nbsp;</div>
+          </GridItem>
+        </GridContainer>
+      </div>
+    )
+  }
 
   getContent = (row) => {
     return (
@@ -340,6 +304,22 @@ class PatientHistory extends Component {
               divider
               disableGutters
               button
+              onClick={() => {
+                this.props
+                  .dispatch({
+                    type: 'patientHistory/queryOne',
+                    payload: o.id,
+                  })
+                  .then((r) => {
+                    if (r)
+                      this.props.dispatch({
+                        type: 'consultationDocument/updateState',
+                        payload: {
+                          rows: r.documents,
+                        },
+                      })
+                  })
+              }}
             >
               <ListItemText
                 primary={
@@ -370,6 +350,7 @@ class PatientHistory extends Component {
 
   render () {
     const { theme, style, classes, override = {}, patientHistory } = this.props
+    const { entity } = patientHistory
     return (
       <div style={style}>
         <CardContainer
@@ -380,13 +361,17 @@ class PatientHistory extends Component {
             [override.leftPanel]: true,
           })}
         >
-          <Accordion
-            active={0}
-            collapses={patientHistory.list.map((o) => ({
-              title: this.getTitle(o),
-              content: this.getContent(o),
-            }))}
-          />
+          {patientHistory.list.length ? (
+            <Accordion
+              defaultActive={0}
+              collapses={patientHistory.list.map((o) => ({
+                title: this.getTitle(o),
+                content: this.getContent(o),
+              }))}
+            />
+          ) : (
+            <Skeleton height={300} />
+          )}
         </CardContainer>
         <CardContainer
           hideHeader
@@ -418,22 +403,23 @@ class PatientHistory extends Component {
             style={{ marginBottom: theme.spacing(1) }}
             onChange={this.onSelectChange}
           />
-          {this.widgets
-            .filter(
-              (o) =>
-                this.state.selectedItems.length === 0 ||
-                this.state.selectedItems.indexOf('0') >= 0 ||
-                this.state.selectedItems.indexOf(o.id) >= 0,
-            )
-            .map((o) => {
-              const Widget = o.component
-              return (
-                <div>
-                  <h5>{o.name}</h5>
-                  <Widget />
-                </div>
+          {entity &&
+            this.widgets
+              .filter(
+                (o) =>
+                  this.state.selectedItems.length === 0 ||
+                  this.state.selectedItems.indexOf('0') >= 0 ||
+                  this.state.selectedItems.indexOf(o.id) >= 0,
               )
-            })}
+              .map((o) => {
+                const Widget = o.component
+                return (
+                  <div>
+                    <h5>{o.name}</h5>
+                    <Widget current={entity || {}} {...this.props} />
+                  </div>
+                )
+              })}
         </CardContainer>
       </div>
     )

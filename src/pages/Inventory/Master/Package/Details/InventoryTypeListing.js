@@ -36,19 +36,25 @@ const InventoryTypeListing = ({
   selectedItem,
   setSelectedItem,
   setServiceCenter,
-  ...props
+  serviceCenterFK,
+  serviceFK,
+  values,
+  serviceCenterServicess,
 }) => {
   const {
     medicationPackageItem,
     consumablePackageItem,
     vaccinationPackageItem,
     servicePackageItem,
-  } = props.values
+  } = values
   const { medicationTableParas, medicationColExtensions } = medication
   const { consumableTableParas, consumableColExtensions } = consumable
   const { vaccinationTableParas, vaccinationColExtensions } = vaccination
-  const { serviceTableParas, serviceColExtensions, serviceList } = service
-
+  const { serviceTableParas, serviceColExtensions } = service
+  const [
+    price,
+    setPrice,
+  ] = useState()
   const Cell = ({ column, row, ...p }) => {
     if (column.name === 'Action') {
       return (
@@ -72,8 +78,16 @@ const InventoryTypeListing = ({
   }
   const TableCell = (p) => Cell({ ...p, dispatch })
 
-  const schema = Yup.object().shape({
-    medicationName: Yup.number().required(),
+  const medicationSchema = Yup.object().shape({
+    inventoryMedicationFK: Yup.number().required(),
+    quantity: Yup.number().required(),
+  })
+  const consumableSchema = Yup.object().shape({
+    inventoryConsumableFK: Yup.number().required(),
+    quantity: Yup.number().required(),
+  })
+  const vaccinationSchema = Yup.object().shape({
+    inventoryVaccinationFK: Yup.number().required(),
     quantity: Yup.number().required(),
   })
 
@@ -106,11 +120,43 @@ const InventoryTypeListing = ({
     }
   }
 
-  const onAddedRowsChange = (addedRows) => {
+  const getServiceCenterService = () => {
+    if (!serviceCenterFK || !serviceFK) {
+      console.log('missing', serviceCenterFK, serviceFK)
+      setSelectedItem({})
+      return
+    }
+    const serviceCenterService =
+      serviceCenterServicess.find(
+        (o) =>
+          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+      ) || {}
+    if (serviceCenterService) {
+      // setValues({
+      //   ...values,
+      //   serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+      //   serviceName: servicess.find((o) => o.value === serviceFK).name,
+      //   unitPrice: serviceCenterService.unitPrice,
+      //   total: serviceCenterService.unitPrice,
+      //   quantity: 1,
+      // })
+      // this.updateTotalValue(serviceCenterService.unitPrice)
+      // setPrice(serviceCenterService.unitPrice)
+      setPrice(serviceCenterService.unitPrice)
+      // setSelectedItem(serviceCenterService)
+    }
+  }
+
+  const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
 
-      const { quantity, unitPrice } = newRow
+      const {
+        quantity,
+        unitPrice,
+        serviceCenterServiceFK,
+        serviceName,
+      } = newRow
 
       const total = () => {
         if (quantity && unitPrice) {
@@ -118,7 +164,22 @@ const InventoryTypeListing = ({
         }
         return undefined
       }
+      if (type === 'service') {
+        if (serviceCenterServiceFK && serviceName) {
+          getServiceCenterService()
 
+          return addedRows.map((row) => ({
+            ...row,
+            unitPrice: price,
+            subTotal: total(),
+          }))
+        }
+        return addedRows.map((row) => ({
+          ...row,
+          unitPrice: undefined,
+          subTotal: total(),
+        }))
+      }
       return addedRows.map((row) => ({
         ...row,
         unitPrice: selectedItem.sellingPrice
@@ -127,7 +188,7 @@ const InventoryTypeListing = ({
         subTotal: total(),
       }))
     }
-    setSelectedItem({})
+    console.log('addedRows', addedRows)
     return addedRows
   }
 
@@ -175,14 +236,14 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...medicationTableParas}
             columnExtensions={medicationColExtensions}
-            schema={schema}
+            schema={medicationSchema}
             rows={medicationPackageItem}
             FuncProps={{ pager: false }}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
               onCommitChanges: onCommitChanges('medicationPackageItem'),
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('medication'),
             }}
           />
         </GridItem>
@@ -191,12 +252,13 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...consumableTableParas}
             columnExtensions={consumableColExtensions}
+            schema={consumableSchema}
             rows={consumablePackageItem}
             FuncProps={{ pager: false }}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('consumable'),
               onCommitChanges: onCommitChanges('consumablePackageItem'),
             }}
           />
@@ -206,13 +268,14 @@ const InventoryTypeListing = ({
           <EditableTableGrid
             {...vaccinationTableParas}
             columnExtensions={vaccinationColExtensions}
+            schema={vaccinationSchema}
             rows={vaccinationPackageItem}
             FuncProps={{ pager: false }}
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
               onCommitChanges: onCommitChanges('vaccinationPackageItem'),
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('vaccination'),
             }}
           />
         </GridItem>
@@ -226,14 +289,8 @@ const InventoryTypeListing = ({
             EditingProps={{
               showAddCommand: true,
               showEditCommand: false,
-              onAddedRowsChange: onAddedRowsChange,
+              onAddedRowsChange: onAddedRowsChange('service'),
               onCommitChanges: onCommitChanges('servicePackageItem'),
-
-              // onEditingRowIdsChange: { changeEditingRowIds },
-              // onRowChangesChange: { onRowChangesChange },
-              // onRowChangesChange: onRowChangesChange,
-              // onDeletedRowIdsChange: onDeletedRowIdsChange,
-              // onAddedRowsChange: onAddedRowsChange,
             }}
           />
         </GridItem>

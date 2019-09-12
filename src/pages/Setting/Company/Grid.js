@@ -120,6 +120,7 @@ class Grid extends PureComponent {
               }
             : {
                 columnName: 'officeNum',
+                sortingEnabled: false,
                 render: (row) => (
                   <span>
                     {row.contact.officeContactNumber.number !== '' ? (
@@ -138,6 +139,7 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'faxNo',
+            sortingEnabled: false,
             render: (row) => (
               <span>
                 {row.contact.faxContactNumber.number !== '' ? (
@@ -151,7 +153,7 @@ class Grid extends PureComponent {
 
           {
             columnName: 'contactNo',
-
+            sortingEnabled: false,
             render: (row) => (
               <span>
                 {row.contact.mobileContactNumber.number !== '' ? (

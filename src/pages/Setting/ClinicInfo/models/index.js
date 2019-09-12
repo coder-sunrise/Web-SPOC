@@ -25,7 +25,26 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *fetchAddress ({ payload }, { call, put }) {
+        const response = yield call(service.query, payload)
+        console.log('response', response)
+        if (response.data.data.length === 0)
+          return {
+            data: [
+              {
+                postalCode: '',
+                blkHseNo: '',
+                street: '',
+                building: '',
+                houseType: '',
+              },
+            ],
+          }
+
+        return response.data
+      },
+    },
     reducers: {},
   },
 })

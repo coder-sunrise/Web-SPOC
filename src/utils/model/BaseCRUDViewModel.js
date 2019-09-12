@@ -130,10 +130,7 @@ export default class BaseCRUDViewModel {
         if (status === '200' || data) {
           yield put({
             type: 'querySuccess',
-            payload: {
-              data,
-              filter,
-            },
+            payload: { data, filter },
           })
           yield put({
             type: 'queryDone',
@@ -147,7 +144,7 @@ export default class BaseCRUDViewModel {
         // }
       },
       *upsert ({ payload, history }, { select, call, put }) {
-        console.log('upsert', payload)
+        // console.log('upsert', payload)
         const { cfg = {} } = payload
         const newPayload = cleanFieldValue(_.cloneDeep(payload))
         const r = yield call(service.upsert, newPayload)
@@ -166,7 +163,7 @@ export default class BaseCRUDViewModel {
       },
       *delete ({ payload }, { call, put }) {
         const response = yield call(service.remove, payload)
-        console.log(response)
+        // console.log(response)
         return response
       },
 

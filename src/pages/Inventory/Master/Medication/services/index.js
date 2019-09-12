@@ -1,7 +1,6 @@
 import * as service from '@/services/common'
 
 const url = '/api/InventoryMedication'
-const sddUrl = 'api/CodeTable?ctnames=ctsdd'
 const medicPrecautionUrl = '/api/CodeTable/Search?ctname=ctmedicationprecaution'
 
 module.exports = {

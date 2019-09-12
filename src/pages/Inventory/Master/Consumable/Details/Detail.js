@@ -118,7 +118,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                     label={formatMessage({
                       id: 'inventory.master.consumable.supplier',
                     })}
-                    code='ctCompany'
+                    code='ctSupplier'
                     max={10}
                     {...args}
                   />

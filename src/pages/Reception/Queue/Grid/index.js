@@ -1,15 +1,15 @@
 import React, { memo, useState, useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
-// custom components
+// medisys component
+import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
 import { CommonTableGrid, DateFormatter } from '@/components'
 // medisys component
-import { LoadingWrapper, DoctorLabel } from 'medisys-components'
 // sub component
 import ActionButton from './ActionButton'
 // utils
-import { flattenAppointmentDateToCalendarEvents } from '../../BigCalendar'
-import { filterData, filterDoctorBlock, todayOnly } from '../utils'
+import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
+import { filterData, formatAppointmentTimes } from '../utils'
 import { StatusIndicator } from '../variables'
 
 const compareQueueNo = (a, b) => {
@@ -80,11 +80,20 @@ const columnExtensions = [
   { columnName: 'gst', type: 'number', currency: true },
   { columnName: 'outstandingBalance', type: 'number', currency: true },
   { columnName: 'Action', width: 100, align: 'center' },
-  { columnName: 'timeIn', width: 160, type: 'time' },
-  { columnName: 'timeOut', width: 160, type: 'time' },
+  {
+    columnName: 'timeIn',
+    width: 160,
+    render: (row) =>
+      DateFormatter({
+        value: row.timeIn,
+        full: true,
+      }),
+  },
+  { columnName: 'timeOut', width: 160 },
   {
     columnName: 'gender/age',
-    render: (row) => `${row.gender}/${row.age < 0 ? 0 : row.age}`,
+    render: (row) =>
+      row.gender && row.age ? `${row.gender}/${row.age < 0 ? 0 : row.age}` : '',
     sortBy: 'genderFK',
   },
   {
@@ -92,9 +101,13 @@ const columnExtensions = [
     width: 160,
     render: (row) => {
       if (row.appointmentTime) {
-        return DateFormatter({ value: row.appointmentTime, full: true })
+        return DateFormatter({
+          value: row.appointmentTime,
+          full: true,
+        })
       }
-      if (row.start) return DateFormatter({ value: row.start, full: true })
+
+      if (row.startTime) return formatAppointmentTimes(row.startTime).join(', ')
       return '-'
     },
   },
@@ -114,6 +127,7 @@ const Grid = ({
   handleEditVisitClick,
   onRegisterPatientClick,
   onViewPatientProfileClick,
+  handleActualizeAppointment,
   deleteQueue,
 }) => {
   const onRowDoubleClick = (row) =>
@@ -122,23 +136,20 @@ const Grid = ({
     })
 
   const calendarData = useMemo(
-    () =>
-      calendarEvents
-        .reduce(flattenAppointmentDateToCalendarEvents, [])
-        .filter(todayOnly),
+    () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
     [
       calendarEvents,
     ],
   )
 
   const computeQueueListingData = () => {
-    if (filter === StatusIndicator.APPOINTMENT)
-      return filterDoctorBlock(calendarData)
+    if (filter === StatusIndicator.APPOINTMENT) return calendarData
     return filterData(filter, queueList)
   }
 
   const queueListingData = useMemo(computeQueueListingData, [
     filter,
+    calendarEvents,
     queueList,
   ])
 
@@ -149,6 +160,7 @@ const Grid = ({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
+        openConfirmTitle: '',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
         onOpenConfirm: () => deleteQueue(id),
       },
@@ -176,17 +188,30 @@ const Grid = ({
         onViewPatientProfileClick(row.patientProfileFK)
         break
       case '4': // patient dashboard
-        router.push(`/reception/queue/patientdashboard?qid=${row.id}`)
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
+        )
         break
       case '5': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
         )
         break
       case '6': // start consultation
         router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md=cons&action=resume`,
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
         )
+        break
+      case '7': // edit consultation
+        router.push(
+          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
+        )
+        break
+      case '8':
+        handleActualizeAppointment({
+          patientID: row.patientProfileFk,
+          appointmentID: row.id,
+        })
         break
       case '9':
         onRegisterPatientClick()
@@ -210,21 +235,23 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingData
 
   return (
-    <LoadingWrapper
-      linear
-      loading={isLoading}
-      text='Refreshing queue listing...'
-    >
-      <CommonTableGrid
-        size='sm'
-        height={700}
-        rows={queueListingData}
-        columnExtensions={colExtensions}
-        FuncProps={FuncConfig}
-        onRowDoubleClick={onRowDoubleClick}
-        {...TableConfig}
-      />
-    </LoadingWrapper>
+    <div style={{ minHeight: '76.5vh', maxHeight: '76.5vh' }}>
+      <LoadingWrapper
+        linear
+        loading={isLoading}
+        text='Refreshing queue listing...'
+      >
+        <CommonTableGrid
+          size='sm'
+          // height={700}
+          rows={queueListingData}
+          columnExtensions={colExtensions}
+          FuncProps={FuncConfig}
+          onRowDoubleClick={onRowDoubleClick}
+          {...TableConfig}
+        />
+      </LoadingWrapper>
+    </div>
   )
 }
 
@@ -232,11 +259,12 @@ export default memo(
   connect(({ queueLog, calendar, global, loading }) => ({
     filter: queueLog.currentFilter,
     queueList: queueLog.list,
-    calendarEvents: calendar.calendarEvents,
+    calendarEvents: calendar.list,
     showingVisitRegistration: global.showVisitRegistration,
     queryingData:
       loading.effects['queueLog/refresh'] ||
       loading.effects['queueLog/getSessionInfo'] ||
-      loading.effects['queueLog/query'],
+      loading.effects['queueLog/query'] ||
+      loading.effects['calendar/getCalendarList'],
   }))(Grid),
 )

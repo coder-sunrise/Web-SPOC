@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 import Yup from '@/utils/yup'
 // import Edit from '@material-ui/icons/Edit'
 // import Delete from '@material-ui/icons/Delete'
@@ -11,45 +11,74 @@ import {
   TimePicker,
   notification,
   Select,
+  withFormikExtend,
 } from '@/components'
 
 const styles = (theme) => ({})
 
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ settingClinicBreakHour }) =>
     settingClinicBreakHour.entity || settingClinicBreakHour.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
-    monFromBreak: Yup.string().required(),
-    monToBreak: Yup.string()
-      .laterThan(Yup.ref('monFromBreak'), 'TO must be later than FROM')
-      .required(),
-    tueFromBreak: Yup.string().required(),
-    tueToBreak: Yup.string()
-      .laterThan(Yup.ref('tueFromBreak'), 'TO must be later than FROM')
-      .required(),
-    wedFromBreak: Yup.string().required(),
-    wedToBreak: Yup.string()
-      .laterThan(Yup.ref('wedFromBreak'), 'TO must be later than FROM')
-      .required(),
-    thursFromBreak: Yup.string().required(),
-    thursToBreak: Yup.string()
-      .laterThan(Yup.ref('thursFromBreak'), 'TO must be later than FROM')
-      .required(),
-    friFromBreak: Yup.string().required(),
-    friToBreak: Yup.string()
-      .laterThan(Yup.ref('friFromBreak'), 'TO must be later than FROM')
-      .required(),
-    satFromBreak: Yup.string().required(),
-    satToBreak: Yup.string()
-      .laterThan(Yup.ref('satFromBreak'), 'TO must be later than FROM')
-      .required(),
-    sunFromBreak: Yup.string().required(),
-    sunToBreak: Yup.string()
-      .laterThan(Yup.ref('sunFromBreak'), 'TO must be later than FROM')
-      .required(),
+    monFromBreak: Yup.string(),
+    monToBreak: Yup.string().when('monFromBreak', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('monFromBreak'),
+        'TO must be later than FROM',
+      ),
+    }),
+    tueFromBreak: Yup.string(),
+    tueToBreak: Yup.string().when('tueFromBreak', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('tueFromBreak'),
+        'TO must be later than FROM',
+      ),
+    }),
+    wedFromBreak: Yup.string(),
+    wedToBreak: Yup.string().when('wedFromBreak', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('wedFromBreak'),
+        'TO must be later than FROM',
+      ),
+    }),
+    thursFromBreak: Yup.string(),
+    thursToBreak: Yup.string().when('thursFromBreak', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('thursFromBreak'),
+        'TO must be later than FROM',
+      ),
+    }),
+    friFromBreak: Yup.string(),
+    friToBreak: Yup.string().when('friFromBreak', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('friFromBreak'),
+        'TO must be later than FROM',
+      ),
+    }),
+    satFromBreak: Yup.string(),
+    satToBreak: Yup.string().when('satFromBreak', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('satFromBreak'),
+        'TO must be later than FROM',
+      ),
+    }),
+    sunFromBreak: Yup.string(),
+    sunToBreak: Yup.string().when('sunFromBreak', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('sunFromBreak'),
+        'TO must be later than FROM',
+      ),
+    }),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -71,7 +100,7 @@ const styles = (theme) => ({})
       }
     })
   },
-  displayName: 'ClinicBreakHourModal',
+  displayName: 'ClinicBreakHourDetail',
 })
 class Detail extends PureComponent {
   state = {}

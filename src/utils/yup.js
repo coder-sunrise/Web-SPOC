@@ -2,6 +2,7 @@ import Moment from 'moment'
 import * as Yup from 'yup'
 import _ from 'lodash'
 import { camelizeKeys, pascalizeKeys } from 'humps'
+import { timeFormat24Hour, timeFormat } from '@/components'
 
 // console.log(Yup)
 // function _printValue (value, quoteStrings) {
@@ -144,22 +145,41 @@ Yup.addMethod(Yup.array, 'unique', function (
   })
 })
 
-const getTimeObject = (value) => {
+export const getTimeObject = (value) => {
   try {
-    if (value === undefined) return undefined
+    if (value === undefined || value === null)
+      throw Error('Value is undefined | null')
+
+    let validTimeFormat = value.length <= 8
+    let format = timeFormat24Hour
+    let timeValue = value
+    if (value.includes('AM') || value.includes('PM')) {
+      format = timeFormat
+      // parse value to 24hour format
+      timeValue = Moment(value, format).format(timeFormat24Hour)
+      validTimeFormat = timeValue.length === 5
+    } else if (value.length === 8) {
+      format = 'HH:mm:ss'
+      timeValue = Moment(value, format).format(timeFormat24Hour)
+      validTimeFormat = timeValue.length === 5
+    }
+
+    if (!validTimeFormat) throw Error('Invalid time format')
+
     const [
       hour,
       minute,
-    ] = value.split(':')
+    ] = timeValue.split(':')
+
     if (hour.length === 2 && minute.length === 2)
       return { hour: parseInt(hour, 10), minute: parseInt(minute, 10) }
   } catch (error) {
-    console.log(error)
+    // console.error(error)
   }
   return undefined
 }
 
-const compare = (start, end) => {
+export const compare = (start, end) => {
   const { hour: startHour, minute: startMinute } = start
   const { hour: endHour, minute: endMinute } = end
   if (

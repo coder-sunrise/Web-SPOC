@@ -8,11 +8,11 @@ import {
   TextField,
   Select,
   CodeSelect,
+  NumberInput,
 } from '@/components'
 
 const Contact = (props) => {
   const { theme, type } = props
-  console.log(props.values)
   return (
     <React.Fragment>
       <div
@@ -22,7 +22,7 @@ const Contact = (props) => {
           marginTop: theme.spacing(3),
         }}
       >
-        <h5>Address</h5>
+        <h5>Contact</h5>
         <Divider />
       </div>
       <div style={{ margin: theme.spacing(1) }}>

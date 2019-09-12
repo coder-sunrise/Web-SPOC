@@ -22,7 +22,13 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
+const Detail = ({
+  medicationDetail,
+  dispatch,
+  setFieldValue,
+  sddDetail,
+  ...props
+}) => {
   const field = medicationDetail.entity ? 'entity' : 'default'
 
   useEffect(() => {
@@ -36,7 +42,7 @@ const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
         const { sddfk } = med
         if (sddfk) {
           dispatch({
-            type: 'sddDetail/query',
+            type: 'sddDetail/queryOne',
             payload: {
               id: sddfk,
             },
@@ -111,6 +117,7 @@ const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
                       label={formatMessage({
                         id: 'inventory.master.medication.name',
                       })}
+                      disabled={medicationDetail.entity}
                       {...args}
                     />
                   )
@@ -162,8 +169,7 @@ const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
                     label={formatMessage({
                       id: 'inventory.master.medication.supplier',
                     })}
-                    // code='ctSupplier'
-                    code='ctCompany'
+                    code='ctSupplier'
                     max={10}
                     {...args}
                   />
@@ -277,7 +283,8 @@ const Detail = ({ medicationDetail, dispatch, setFieldValue, ...props }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ medicationDetail }) => ({
+  connect(({ medicationDetail, sddDetail }) => ({
     medicationDetail,
+    sddDetail,
   })),
 )(Detail)

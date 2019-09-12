@@ -5,21 +5,14 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import * as service from './services'
+import { Tooltip } from '@material-ui/core'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingMedicationGroup } = this.props
 
     const { list } = settingMedicationGroup
-    // For complex object retrieve from server
-    // dispatch({
-    //   type: 'settingMedicationGroup/queryOne',
-    //   payload: {
-    //     id: row.id,
-    //   },
-    // }).then(toggleModal)
-    // console.log(settingMedicationGroup, row.id, e)
+
     dispatch({
       type: 'settingMedicationGroup/updateState',
       payload: {
@@ -45,13 +38,13 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
+          { name: 'sortOrder', title: 'sortOrder' },
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',
             title: 'Action',
           },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'isActive',
@@ -64,16 +57,18 @@ class Grid extends PureComponent {
             align: 'center',
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Edit Medication Group' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },

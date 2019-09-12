@@ -8,8 +8,8 @@ import $ from 'jquery'
 import numeral from 'numeral'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import lodash from 'lodash'
-import { NumberInput, CustomInput } from '@/components'
 import * as cdrssUtil from 'medisys-util'
+import { NumberInput, CustomInput } from '@/components'
 import config from './config'
 
 document.addEventListener('click', () => {
@@ -350,6 +350,7 @@ const convertToQuery = (
     sorting = [],
   } = query
   let customQuerys = { ...query }
+  delete customQuerys.keepFilter
   delete customQuerys.current
   delete customQuerys.pagesize
   delete customQuerys.sorting
@@ -527,7 +528,7 @@ export const updateCellValue = (
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
   const { validationSchema, gridId, ...restConfig } = cfg
-  // console.log(columnName, val)
+  // console.log({ columnName, val })
   if (!window.$tempGridRow[gridId]) {
     window.$tempGridRow[gridId] = {}
   }
@@ -536,10 +537,10 @@ export const updateCellValue = (
     window.$tempGridRow[gridId][row.id] = row
   }
   // console.log(columnName, val)
-
+  // console.log({ row, val })
   window.$tempGridRow[gridId][row.id][columnName] = val
   // console.log(val, columnName)
-
+  // console.log({ t1: window.$tempGridRow })
   if (validationSchema) {
     try {
       if (value !== val) {
@@ -551,6 +552,7 @@ export const updateCellValue = (
           abortEarly: false,
         },
       )
+      // console.log({ t2: window.$tempGridRow })
       // console.log({ r })
       $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
@@ -642,6 +644,25 @@ const navigateDirtyCheck = (itemPath) => (e) => {
   }
 }
 
+const calculateAdjustAmount = (
+  isExactAmount = true,
+  initialAmout = 0,
+  adj = 0,
+) => {
+  let amount = initialAmout
+  let adjAmount
+  if (isExactAmount) {
+    adjAmount = adj
+  } else {
+    adjAmount = initialAmout * adj * 0.01
+  }
+  amount += adjAmount
+  return {
+    amount,
+    adjAmount,
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -658,4 +679,5 @@ module.exports = {
   watchForElementChange,
   confirmBeforeReload,
   navigateDirtyCheck,
+  calculateAdjustAmount,
 }

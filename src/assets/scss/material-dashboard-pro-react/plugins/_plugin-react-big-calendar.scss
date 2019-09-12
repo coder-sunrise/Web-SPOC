@@ -28,7 +28,7 @@ button.rbc-input::-moz-focus-inner {
   -webkit-align-items: stretch;
   -ms-flex-align: stretch;
   align-items: stretch;
-  min-height: 80vh;
+  // min-height: 80vh;
   // max-height: 80vh;
 }
 .rbc-calendar *,
@@ -75,7 +75,7 @@ button.rbc-input::-moz-focus-inner {
   text-align: center;
   vertical-align: middle;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: .85rem;
   min-height: 0;
   border-bottom: 1px solid #ddd;
   color: #9e9e9e;
@@ -99,7 +99,7 @@ button.rbc-input::-moz-focus-inner {
   user-select: none;
   -webkit-user-select: none;
   z-index: 4;
-  min-height: 90px;
+  min-height: 130px;
 }
 .rbc-toolbar {
   display: -webkit-flex;
@@ -253,7 +253,7 @@ button.rbc-input::-moz-focus-inner {
   height: 100%;
   border-left: none;
   border-right: none;
-  // max-height: 75vh;
+  max-height: 75vh;
   // overflow: auto;
 }
 .rbc-month-view {
@@ -471,6 +471,7 @@ button.rbc-input::-moz-focus-inner {
   overflow: hidden;
   position: absolute;
   padding: 0px 5px;
+  border: .5px dashed #777;
 }
 .rbc-day-slot .rbc-event-label {
   -webkit-flex: none;
@@ -484,6 +485,7 @@ button.rbc-input::-moz-focus-inner {
   box-sizing: content-box;
   color: #fff;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .rbc-day-slot .rbc-event-content {
   width: 100%;
@@ -604,20 +606,11 @@ button.rbc-input::-moz-focus-inner {
   -ms-flex-align: start;
   align-items: flex-start;
   width: 100%;
-  border-top: 2px solid #ddd;
+  border-top: 1px solid #ddd;
   overflow-y: auto;
   position: relative;
+  max-height: 70vh;
 }
-
-// .rbc-day-slot.rbc-time-column:nth-child(14n + 2),
-// .rbc-day-slot.rbc-time-column:nth-child(14n + 3),
-// .rbc-day-slot.rbc-time-column:nth-child(14n + 4),
-// .rbc-day-slot.rbc-time-column:nth-child(14n + 5),
-// .rbc-day-slot.rbc-time-column:nth-child(14n + 6),
-// .rbc-day-slot.rbc-time-column:nth-child(14n + 7),
-// .rbc-day-slot.rbc-time-column:nth-child(14n + 8) {
-//   background: $brand-primary-hover;
-// }
 
 .rbc-time-content > .rbc-time-gutter {
   -webkit-flex: none;
@@ -649,10 +642,10 @@ button.rbc-input::-moz-focus-inner {
 }
 .rbc-event {
   width: 100%;
-  height: 100%;
+  // min-height: 20px;
   position: relative; /* for resize handle and other inner positioning */
   display: block; /* make the <a> tag block */
-  font-size: 1rem;
+  font-size: .8rem;
   border-radius: 2px;
   padding: 0;
   background-color: $brand-info; /* default BACKGROUND color */
@@ -697,10 +690,11 @@ button.rbc-input::-moz-focus-inner {
 
   .rbc-event-content {
     position: relative;
-    z-index: 2;
+    // z-index: 2;
     white-space: nowrap;
     overflow: hidden;
     color: #fff;
+    min-height: 1em;
     // padding: 0 5px;
   }
 }

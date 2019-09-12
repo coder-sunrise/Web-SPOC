@@ -26,12 +26,36 @@ const styles = (theme) => ({
   settingGst,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ settingGst }) => {
-    // console.log(settingGst)
-    return settingGst.entity ? settingGst.entity : settingGst.default
-  },
+  enableReinitialize: true,
+  mapPropsToValues: ({ settingGst }) => settingGst.entity,
 
-  handleSubmit: () => {},
+  handleSubmit: (values, { props }) => {
+    const { IsEnableGST } = values[0]
+    const { GSTRegistrationNumber } = values[1]
+    const { GSTPercentage } = values[2]
+
+    const payload = [
+      {
+        settingKey: 'IsEnableGST',
+        settingValue: IsEnableGST,
+      },
+      {
+        settingKey: 'GSTRegistrationNumber',
+        settingValue: GSTRegistrationNumber,
+      },
+      {
+        settingKey: 'GSTPercentage',
+        settingValue: GSTPercentage,
+      },
+    ]
+    const { dispatch, onConfirm, history } = props
+
+    dispatch({
+      type: 'settingGst/upsert',
+
+      payload,
+    }).then(history.push('/setting'))
+  },
   displayName: 'GstSetupInfo',
 })
 class GstSetup extends PureComponent {
@@ -41,17 +65,27 @@ class GstSetup extends PureComponent {
     hasActiveSession: true,
   }
 
-  componentDidMount () {
+  componentDidMount = async () => {
     this.checkHasActiveSession()
+    await this.props.dispatch({
+      type: 'settingGst/query',
+    })
+
+    const { IsEnableGST } = this.props.values[0]
+    this.setState({ enableGst: IsEnableGST })
   }
 
   checkHasActiveSession = async () => {
     const result = await getActiveSession()
     const { data } = result.data
-    // data = false
-    this.setState({
-      hasActiveSession: !!data,
-    })
+    // let data = []
+    if (!data || data.length === 0) {
+      this.setState((prevState) => {
+        return {
+          hasActiveSession: !prevState.hasActiveSession,
+        }
+      })
+    }
   }
 
   handleOnChange = () => {
@@ -61,11 +95,11 @@ class GstSetup extends PureComponent {
           enableGst: !prevState.enableGst,
         }
       },
-      (v) => {
-        if (!this.state.enableGst) {
-          this.props.setFieldValue('inclusiveGst', false)
-        }
-      },
+      // (v) => {
+      //   if (!this.state.enableGst) {
+      //     this.props.setFieldValue('inclusiveGst', false)
+      //   }
+      // },
     )
   }
 
@@ -76,73 +110,16 @@ class GstSetup extends PureComponent {
       gstSetupInfo,
       dispatch,
       theme,
+      handleSubmit,
+      values,
       ...restProps
     } = this.props
     const { enableGst, hasActiveSession } = this.state
 
     // console.log('inclusiveGst', this.props.values)
     return (
-      <CardContainer hideHeader>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='enableGst'
-              render={(args) => (
-                <Checkbox
-                  label='Enable GST'
-                  onChange={this.handleOnChange}
-                  disabled={!!hasActiveSession}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='gstRegNum'
-              render={(args) => (
-                <TextField
-                  label='GST Registration Number'
-                  {...args}
-                  disabled={!enableGst}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='gstRate'
-              render={(args) => (
-                <TextField
-                  label='GST Rate'
-                  {...args}
-                  disabled={!enableGst}
-                  suffix='%'
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='inclusiveGst'
-              render={(args) => (
-                <Checkbox
-                  label='Inclusive GST'
-                  disabled={!enableGst}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-
-        {hasActiveSession ? (
+      <React.Fragment>
+        {hasActiveSession && (
           <div style={{ paddingTop: 5 }}>
             <WarningSnackbar
               variant='warning'
@@ -150,28 +127,90 @@ class GstSetup extends PureComponent {
               message='Active Session detected!'
             />
           </div>
-        ) : (
-          <div className={classes.actionBtn}>
+        )}
+        <CardContainer hideHeader>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='[0]IsEnableGST'
+                render={(args) => (
+                  <Checkbox
+                    label='Enable GST'
+                    onChange={this.handleOnChange}
+                    disabled={!!hasActiveSession}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='[1]GSTRegistrationNumber'
+                render={(args) => (
+                  <TextField
+                    label='GST Registration Number'
+                    {...args}
+                    disabled={!enableGst || !!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='[2]GSTPercentage'
+                render={(args) => (
+                  <TextField
+                    label='GST Rate'
+                    {...args}
+                    disabled={!enableGst || !!hasActiveSession}
+                    suffix='%'
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          {/* <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='inclusiveGst'
+                render={(args) => (
+                  <Checkbox
+                    label='Inclusive GST'
+                    disabled={!enableGst}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer> */}
+          <div
+            className={classes.actionBtn}
+            style={{ display: 'flex', justifyContent: 'center' }}
+          >
             <Button
               color='danger'
               onClick={() => {
                 this.props.history.push('/setting')
               }}
+              disabled={hasActiveSession}
             >
               Cancel
             </Button>
 
             <Button
               color='primary'
-              onClick={() => {
-                this.props.handleSubmit
-              }}
+              onClick={handleSubmit}
+              disabled={hasActiveSession}
             >
               Save
             </Button>
           </div>
-        )}
-      </CardContainer>
+        </CardContainer>
+      </React.Fragment>
     )
   }
 }

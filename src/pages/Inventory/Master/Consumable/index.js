@@ -35,7 +35,10 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
       columnName: 'uom',
       type: 'number',
     },
-
+    {
+      columnName: 'stock',
+      type: 'number',
+    },
     { columnName: 'action', width: 110, align: 'center' },
     {
       columnName: 'isActive',

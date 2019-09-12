@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
-import { CommonTableGrid, Button } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { CommonTableGrid, Button } from '@/components'
 import { queryOne } from './services'
 import request from '@/utils/request'
 import { showErrorNotification } from '@/utils/error'
@@ -20,7 +20,7 @@ class Grid extends PureComponent {
 
     if (serviceList.status != '200') {
       showErrorNotification('', 'Server busy. Please try again later.')
-      return
+      
     } else {
       let serviceInfo = serviceList.data
 

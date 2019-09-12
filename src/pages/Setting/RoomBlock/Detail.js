@@ -18,7 +18,8 @@ import {
   FieldSet,
 } from '@/components'
 
-import Recurrence from '@/pages/Reception/BigCalendar/components/form/Recurrence'
+// import Recurrence from '@/pages/Reception/BigCalendar/components/form/Recurrence'
+import { Recurrence } from '@/components/_medisys'
 
 const styles = (theme) => ({})
 
@@ -110,9 +111,9 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
+            {/*  <GridItem md={12}>
               <Recurrence values={values} labelSize={4} inputSize={4} />
-            </GridItem>
+            </GridItem> */}
           </GridContainer>
         </div>
         {footer &&

@@ -57,6 +57,9 @@ const customInputStyle = {
     display: 'inline-block',
     width: 'auto',
     margin: 0,
+    '& .Mui-disabled': {
+      cursor: 'initial',
+    },
   },
   textInput: {
     color: 'currentColor',

@@ -22,8 +22,14 @@ import { connect } from 'dva'
 
 const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
   useEffect(() => {
+    console.log('sddduseeffect')
     dispatch({
       type: 'sddDetail/query',
+      payload: {
+        keepFilter: false,
+      },
+    }).then((response) => {
+      console.log({ response })
     })
   }, [])
 
@@ -110,7 +116,7 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
                 group: [
                   {
                     code: sddIdName,
-                    // name: sddIdName,
+                    name: sddIdName,
                     combineCondition: 'or',
                   },
                 ],
