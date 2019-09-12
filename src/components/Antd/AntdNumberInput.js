@@ -136,11 +136,21 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { field } = nextProps
+    const { field, value } = nextProps
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
         shrink: field.value !== undefined,
+      })
+    } else if (value) {
+      this.setState({
+        value: value === undefined ? '' : value,
+        shrink: value !== undefined,
+      })
+    } else {
+      this.setState({
+        value: undefined,
+        shrink: false,
       })
     }
     // console.log(field)

@@ -1,5 +1,7 @@
 import React, { Component, PureComponent, useState } from 'react'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import { withStyles, Divider, Paper } from '@material-ui/core'
+import DeleteIcon from '@material-ui/icons/Delete'
 import {
   Button,
   CommonHeader,
@@ -23,8 +25,6 @@ import {
   Checkbox,
   Popover,
 } from '@/components'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import DeleteIcon from '@material-ui/icons/Delete'
 
 export default ({ theme, index, arrayHelpers, ...props }) => {
   const [
@@ -36,12 +36,12 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
         <GridItem xs={12}>
           <FastField
-            name={`diagnosises[${index}].diagnosis`}
+            name={`corDiagnosis[${index}].diagnosisFK`}
             render={(args) => {
               return (
                 <CodeSelect
                   label='Diagnosis'
-                  code='ctPatientAccountNoType'
+                  code='ctOutPatientScanDiagnosis'
                   {...args}
                 />
               )
@@ -50,7 +50,7 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
         </GridItem>
         <GridItem xs={12}>
           <FastField
-            name={`diagnosises[${index}].complication`}
+            name={`corDiagnosis[${index}].complication`}
             render={(args) => {
               return (
                 <CodeSelect
@@ -65,7 +65,7 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
         </GridItem>
         <GridItem xs={6}>
           <FastField
-            name={`diagnosises[${index}].orderDate`}
+            name={`corDiagnosis[${index}].onsetDate`}
             render={(args) => {
               return <DatePicker label='Order Date' {...args} />
             }}
@@ -73,7 +73,7 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
         </GridItem>
         <GridItem xs={6}>
           <FastField
-            name={`diagnosises[${index}].isPersist`}
+            name={`corDiagnosis[${index}].isPersist`}
             render={(args) => {
               return <Checkbox inputLabel='Persist' {...args} />
             }}
@@ -81,7 +81,7 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
         </GridItem>
         <GridItem xs={11}>
           <FastField
-            name={`diagnosises[${index}].remarks`}
+            name={`corDiagnosis[${index}].remarks`}
             render={(args) => {
               return (
                 <TextField label='Remarks' multiline rowsMax={6} {...args} />

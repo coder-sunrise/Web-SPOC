@@ -142,6 +142,11 @@ class AntdSelect extends React.PureComponent {
         value,
         shrink: value !== undefined,
       })
+    } else {
+      this.setState({
+        value: undefined,
+        shrink: false,
+      })
     }
     if (autoComplete && options && this.state.data.length === 0) {
       this.setState({

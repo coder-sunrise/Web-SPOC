@@ -115,7 +115,8 @@ const saveConsultation = ({
           values[p.prop] = rows.filter((o) => o.type === p.value)
         })
 
-        const { rows: orderRows = [] } = orders
+        const { rows: orderRows = [], finalAdjustments = [] } = orders
+        values.corOrderAdjustment = finalAdjustments
         orderTypes.forEach((p) => {
           values[p.prop] = (values[p.prop] || [])
             .concat(orderRows.filter((o) => o.editType === p.value))

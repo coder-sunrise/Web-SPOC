@@ -217,7 +217,7 @@ class Adjustment extends PureComponent {
             {showRemark && (
               <GridItem xs={12}>
                 <FastField
-                  name='remarks'
+                  name='adjRemark'
                   render={(args) => {
                     return (
                       <TextField
