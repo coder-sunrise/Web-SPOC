@@ -122,6 +122,8 @@ const NumberFormatter = (columnExtensions) =>
         classes,
         text = false,
       } = props
+      if (value === undefined) return null
+
       let { color = 'darkblue' } = props
       const cfg =
         columnExtensions.find(
@@ -129,7 +131,6 @@ const NumberFormatter = (columnExtensions) =>
             currentColumnName === columnName,
         ) || {}
       const { type, format, ...restProps } = cfg
-
       if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
         color = 'red'
 
@@ -137,8 +138,17 @@ const NumberFormatter = (columnExtensions) =>
         if (text) return numeral(value).format(format || currencyFormat)
         return (
           <b style={{ color }}>
-            {currencySymbol}
-            {numeral(value).format(format || currencyFormat)}
+            {value >= 0 ? (
+              <React.Fragment>
+                {currencySymbol}
+                {numeral(value).format(format || currencyFormat)}
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                ({currencySymbol}
+                {numeral(Math.abs(value)).format(format || currencyFormat)})
+              </React.Fragment>
+            )}
           </b>
         )
       }

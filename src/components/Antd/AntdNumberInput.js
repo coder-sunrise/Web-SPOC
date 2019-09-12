@@ -10,6 +10,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import { primaryColor } from 'mui-pro-jss'
 // ant
 import { InputNumber } from 'antd'
+import { isNumber } from 'util'
 import { CustomInput } from '@/components'
 import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
@@ -139,6 +140,7 @@ class AntdNumberInput extends React.PureComponent {
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
+        shrink: field.value !== undefined,
       })
     }
     // console.log(field)
@@ -222,7 +224,9 @@ class AntdNumberInput extends React.PureComponent {
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-    // console.log(v, newV)
+    if (!isNumber(newV)) {
+      return
+    }
     this.setState({
       value: newV,
     })

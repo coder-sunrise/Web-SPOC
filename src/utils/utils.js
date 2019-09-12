@@ -8,8 +8,8 @@ import $ from 'jquery'
 import numeral from 'numeral'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import lodash from 'lodash'
-import { NumberInput, CustomInput } from '@/components'
 import * as cdrssUtil from 'medisys-util'
+import { NumberInput, CustomInput } from '@/components'
 import config from './config'
 
 document.addEventListener('click', () => {
@@ -644,6 +644,25 @@ const navigateDirtyCheck = (itemPath) => (e) => {
   }
 }
 
+const calculateAdjustAmount = (
+  isExactAmount = true,
+  initialAmout = 0,
+  adj = 0,
+) => {
+  let amount = initialAmout
+  let adjAmount
+  if (isExactAmount) {
+    adjAmount = adj
+  } else {
+    adjAmount = initialAmout * adj * 0.01
+  }
+  amount += adjAmount
+  return {
+    amount,
+    adjAmount,
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -660,4 +679,5 @@ module.exports = {
   watchForElementChange,
   confirmBeforeReload,
   navigateDirtyCheck,
+  calculateAdjustAmount,
 }

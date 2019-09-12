@@ -80,11 +80,12 @@ const applyFilter = (filter, data) => {
   return returnData
 }
 
-@connect(({ calendar, codetable, loading }) => ({
+@connect(({ calendar, codetable, doctorBlock, loading }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list,
   publicHolidays: calendar.publicHolidayList,
+  doctorBlocks: doctorBlock.list,
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.effects['calendar/getCalendarList'],
 }))
@@ -245,6 +246,7 @@ class CalendarView extends React.PureComponent {
       handleOnDragStart,
       // --- variables ---
       calendarEvents,
+      doctorBlocks,
       resources,
       displayDate,
       calendarView,
@@ -313,7 +315,16 @@ class CalendarView extends React.PureComponent {
           }, [])
 
     const { minTime, maxTime } = this.state
-    const filtered = applyFilter(filter, flattenedList)
+    const filtered = applyFilter(filter, [
+      ...flattenedList,
+      // ...doctorBlocks.map((item) => ({
+      //   ...item,
+      //   start: item.startDateTime,
+      //   end: item.endDateTime,
+      // })),
+    ])
+
+    console.log({ filtered })
 
     return (
       <LoadingWrapper loading={loading} text='Loading appointments...'>

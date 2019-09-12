@@ -133,12 +133,14 @@ class AntdSelect extends React.PureComponent {
       v = field.value
       this.setState({
         value: field.value,
+        shrink: field.value !== undefined,
       })
     } else if (value) {
       v = value
 
       this.setState({
         value,
+        shrink: value !== undefined,
       })
     }
     if (autoComplete && options && this.state.data.length === 0) {
