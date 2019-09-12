@@ -42,10 +42,9 @@ const Detail = ({
         const { sddfk } = med
         if (sddfk) {
           dispatch({
-            type: 'sddDetail/query',
+            type: 'sddDetail/queryOne',
             payload: {
               id: sddfk,
-              keepFilter: false,
             },
           }).then((sdd) => {
             const { data } = sdd
@@ -118,6 +117,7 @@ const Detail = ({
                       label={formatMessage({
                         id: 'inventory.master.medication.name',
                       })}
+                      disabled={medicationDetail.entity}
                       {...args}
                     />
                   )
@@ -169,8 +169,7 @@ const Detail = ({
                     label={formatMessage({
                       id: 'inventory.master.medication.supplier',
                     })}
-                    // code='ctSupplier'
-                    code='ctCompany'
+                    code='ctSupplier'
                     max={10}
                     {...args}
                   />

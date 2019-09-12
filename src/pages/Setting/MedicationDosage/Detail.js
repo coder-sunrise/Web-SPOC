@@ -20,8 +20,16 @@ const styles = (theme) => ({})
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     multiplier: Yup.string().required(),
-    shortcutKey: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    sortOrder: Yup.number()
+      .min(
+        -2147483648,
+        'The number should between -2,147,483,648 and 2,147,483,647',
+      )
+      .max(
+        2147483647,
+        'The number should between -2,147,483,648 and 2,147,483,647',
+      ),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -94,12 +102,18 @@ class Detail extends PureComponent {
                 render={(args) => <TextField label='Multiplier' {...args} />}
               />
             </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='shortcutKey'
-                render={(args) => <TextField label='Shortcut Key' {...args} />}
-              />
-            </GridItem>
+            {/* <GridItem md={6}>
+							<FastField
+								name='shortcutKey'
+								render={(args) => (
+									<TextField
+										label='Shortcut Key'
+										{...args}
+									/>
+								)}
+							/>
+						</GridItem> */}
+
             <GridItem md={12}>
               <FastField
                 name='sortOrder'

@@ -12,7 +12,7 @@ export default createFormViewModel({
       default: {
         systemCurrency: 'SGD',
         currencyRounding: 'Up',
-        toTheClosest: '0.50',
+        roundingToTheClosest: '0.50',
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -21,6 +21,20 @@ export default createFormViewModel({
       })
     },
     effects: {},
-    reducers: {},
+    reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+
+        const settingValue = data.map((o, i) => {
+          return {
+            [o.settingKey]: o.settingValue,
+          }
+        })
+
+        return {
+          entity: settingValue,
+        }
+      },
+    },
   },
 })

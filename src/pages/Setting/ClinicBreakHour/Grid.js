@@ -39,13 +39,13 @@ export default class Grid extends PureComponent {
           { name: 'displayValue', title: 'Display Value' },
           { name: 'code', title: 'Code' },
           { name: 'isActive', title: 'Status' },
-          { name: 'mondayTiming', title: 'Monday' },
-          { name: 'tuesdayTiming', title: 'Tuesday' },
-          { name: 'wednesdayTiming', title: 'Wednesday' },
-          { name: 'thurdayTiming', title: 'Thursday' },
-          { name: 'fridayTiming', title: 'Friday' },
-          { name: 'saturdayTiming', title: 'Saturday' },
-          { name: 'sundayTiming', title: 'Sunday' },
+          { name: 'monFromBreak', title: 'Monday' },
+          { name: 'tueFromBreak', title: 'Tuesday' },
+          { name: 'wedFromBreak', title: 'Wednesday' },
+          { name: 'thursFromBreak', title: 'Thursday' },
+          { name: 'friFromBreak', title: 'Friday' },
+          { name: 'satFromBreak', title: 'Saturday' },
+          { name: 'sunFromBreak', title: 'Sunday' },
           { name: 'action', title: 'Action' },
         ]}
         // FuncProps={{ pager: false }}
@@ -75,7 +75,7 @@ export default class Grid extends PureComponent {
             },
           },
           {
-            columnName: 'mondayTiming',
+            columnName: 'monFromBreak',
 
             align: 'center',
             render: (row) => {
@@ -83,21 +83,21 @@ export default class Grid extends PureComponent {
             },
           },
           {
-            columnName: 'tuesdayTiming',
+            columnName: 'tueFromBreak',
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.tueFromBreak} to={row.tueToBreak} />
             },
           },
           {
-            columnName: 'wednesdayTiming',
+            columnName: 'wedFromBreak',
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.wedFromBreak} to={row.wedToBreak} />
             },
           },
           {
-            columnName: 'thurdayTiming',
+            columnName: 'thursFromBreak',
             align: 'center',
             render: (row) => {
               return (
@@ -106,21 +106,21 @@ export default class Grid extends PureComponent {
             },
           },
           {
-            columnName: 'fridayTiming',
+            columnName: 'friFromBreak',
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.friFromBreak} to={row.friToBreak} />
             },
           },
           {
-            columnName: 'saturdayTiming',
+            columnName: 'satFromBreak',
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.satFromBreak} to={row.satToBreak} />
             },
           },
           {
-            columnName: 'sundayTiming',
+            columnName: 'sunFromBreak',
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.sunFromBreak} to={row.sunToBreak} />

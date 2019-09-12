@@ -12,23 +12,13 @@ import {
 } from '@/utils/codes'
 
 import {
-  Checkbox,
   withFormikExtend,
-  FastField,
   Field,
-  PictureUpload,
   GridContainer,
   GridItem,
   CardContainer,
-  Transition,
-  TextField,
-  AntdInput,
   Select,
-  Accordion,
   Button,
-  CommonTableGrid,
-  DatePicker,
-  NumberInput,
 } from '@/components'
 import WarningSnackbar from './WarningSnackbar'
 
@@ -40,21 +30,39 @@ const styles = (theme) => ({
   settingGeneral,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ settingGeneral }) => {
-    console.log(settingGeneral)
-    return settingGeneral.entity
-      ? settingGeneral.entity
-      : settingGeneral.default
-  },
-  // validationSchema: Yup.object().shape({
-  //   name: Yup.string().required(),
-  //   address: Yup.object().shape({
-  //     postcode: Yup.number().required(),
-  //     countryFK: Yup.string().required(),
-  //   }),
-  // }),
+  enableReinitialize: true,
 
-  handleSubmit: () => {},
+  mapPropsToValues: ({ settingGeneral }) => {
+    return settingGeneral.entity
+  },
+
+  handleSubmit: (values, { props }) => {
+    const { SystemCurrency } = values[0]
+    const { CurrencyRounding } = values[1]
+    const { CurrencyRoundingToTheClosest } = values[2]
+
+    const payload = [
+      {
+        settingKey: 'SystemCurrency',
+        settingValue: SystemCurrency,
+      },
+      {
+        settingKey: 'CurrencyRounding',
+        settingValue: CurrencyRounding,
+      },
+      {
+        settingKey: 'CurrencyRoundingToTheClosest',
+        settingValue: CurrencyRoundingToTheClosest,
+      },
+    ]
+    const { dispatch, onConfirm, history } = props
+
+    dispatch({
+      type: 'settingGeneral/upsert',
+
+      payload,
+    }).then(history.push('/setting'))
+  },
   displayName: 'GeneralSettingInfo',
 })
 class GeneralSetting extends PureComponent {
@@ -62,17 +70,24 @@ class GeneralSetting extends PureComponent {
     hasActiveSession: true,
   }
 
-  componentDidMount () {
+  componentDidMount = () => {
     this.checkHasActiveSession()
+    this.props.dispatch({
+      type: 'settingGeneral/query',
+    })
   }
 
   checkHasActiveSession = async () => {
     const result = await getActiveSession()
     const { data } = result.data
-    // data = false
-    this.setState({
-      hasActiveSession: !!data,
-    })
+    // let data = []
+    if (!data || data.length === 0) {
+      this.setState((prevState) => {
+        return {
+          hasActiveSession: !prevState.hasActiveSession,
+        }
+      })
+    }
   }
 
   render () {
@@ -81,57 +96,14 @@ class GeneralSetting extends PureComponent {
       generalSettingInfo,
       dispatch,
       theme,
+      handleSubmit,
       ...restProps
     } = this.props
     const { hasActiveSession } = this.state
 
     return (
-      <CardContainer hideHeader>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='systemCurrency'
-              render={(args) => (
-                <Select
-                  label='System Currency'
-                  {...args}
-                  options={currencies}
-                  disabled={!!hasActiveSession}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        <GridContainer>
-          <GridItem md={3}>
-            <Field
-              name='currencyRounding'
-              render={(args) => (
-                <Select
-                  label='Currency Rounding'
-                  options={currencyRounding}
-                  {...args}
-                  disabled={!!hasActiveSession}
-                />
-              )}
-            />
-          </GridItem>
-
-          <GridItem md={3}>
-            <Field
-              name='toTheClosest'
-              render={(args) => (
-                <Select
-                  label='To The Closest'
-                  options={currencyRoundingToTheClosest}
-                  {...args}
-                  disabled={!!hasActiveSession}
-                />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
-        {hasActiveSession ? (
+      <React.Fragment>
+        {hasActiveSession && (
           <div style={{ paddingTop: 5 }}>
             <WarningSnackbar
               variant='warning'
@@ -139,28 +111,77 @@ class GeneralSetting extends PureComponent {
               message='Active Session detected!'
             />
           </div>
-        ) : (
-          <div className={classes.actionBtn}>
+        )}
+        <CardContainer hideHeader>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='[0]SystemCurrency'
+                render={(args) => (
+                  <Select
+                    label='System Currency'
+                    {...args}
+                    options={currencies}
+                    disabled
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='[1]CurrencyRounding'
+                render={(args) => (
+                  <Select
+                    label='Currency Rounding'
+                    options={currencyRounding}
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={3}>
+              <Field
+                name='[2]CurrencyRoundingToTheClosest'
+                render={(args) => (
+                  <Select
+                    label='To The Closest'
+                    options={currencyRoundingToTheClosest}
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+
+          <div
+            className={classes.actionBtn}
+            style={{ display: 'flex', justifyContent: 'center' }}
+          >
             <Button
               color='danger'
               onClick={() => {
                 this.props.history.push('/setting')
               }}
+              disabled={hasActiveSession}
             >
               Cancel
             </Button>
 
             <Button
               color='primary'
-              onClick={() => {
-                this.props.handleSubmit
-              }}
+              onClick={handleSubmit}
+              disabled={hasActiveSession}
             >
               Save
             </Button>
           </div>
-        )}
-      </CardContainer>
+        </CardContainer>
+      </React.Fragment>
     )
   }
 }

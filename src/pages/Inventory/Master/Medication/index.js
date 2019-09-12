@@ -17,8 +17,8 @@ const Medication = ({ dispatch, history, medication, values }) => {
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
-      { name: 'supplier', title: 'Supplier' },
-      { name: 'uom', title: 'Disp. UOM' },
+      { name: 'favouriteSupplier', title: 'Supplier' },
+      { name: 'dispensingUOM', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
       { name: 'sellingPrice', title: 'Selling Price' },
@@ -33,9 +33,18 @@ const Medication = ({ dispatch, history, medication, values }) => {
     setColExtensions,
   ] = useState([
     { columnName: 'action', width: 110, align: 'center' },
-
     {
-      columnName: 'uom',
+      columnName: 'favouriteSupplier',
+      type: 'codeSelect',
+      code: 'ctSupplier',
+    },
+    {
+      columnName: 'dispensingUOM',
+      type: 'codeSelect',
+      code: 'ctmedicationunitofmeasurement',
+    },
+    {
+      columnName: 'stock',
       type: 'number',
     },
     {
@@ -63,12 +72,6 @@ const Medication = ({ dispatch, history, medication, values }) => {
     tableParas,
     colExtensions,
   }
-
-  useEffect(() => {
-    dispatch({
-      type: 'medication/query',
-    })
-  }, [])
 
   return (
     <CardContainer

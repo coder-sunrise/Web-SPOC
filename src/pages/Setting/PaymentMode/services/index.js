@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/CodeTable/Search?ctname=ctsdd'
+const url = '/api/ctpaymentmode'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),

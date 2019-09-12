@@ -52,6 +52,12 @@ const styles = (theme) => ({
 class ClinicInfo extends PureComponent {
   state = {}
 
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'settingMasterClinicInfo/fetchAddress',
+    })
+  }
+
   render () {
     const { classes, clinicInfo, dispatch, theme, ...restProps } = this.props
 
@@ -60,13 +66,13 @@ class ClinicInfo extends PureComponent {
         <GridContainer>
           <GridItem md={6}>
             <FastField
-              name='name'
+              name='clinicName'
               render={(args) => <TextField label='Clinic Name' {...args} />}
             />
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name='hciCode'
+              name='clinicId'
               render={(args) => (
                 <TextField label='Clinic ID (HCI Code)' disabled {...args} />
               )}

@@ -11,6 +11,5 @@ module.exports = {
   upsert: (params) => {
     return service.upsert(url, params)
   },
-  queryServiceCenter: (params) =>
-  service.queryList(serviceCenterUrl, params),
+  queryServiceCenter: (params) => service.queryList(serviceCenterUrl, params),
 }

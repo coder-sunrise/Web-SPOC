@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 import Yup from '@/utils/yup'
 // import Edit from '@material-ui/icons/Edit'
 // import Delete from '@material-ui/icons/Delete'
@@ -11,45 +11,80 @@ import {
   TimePicker,
   notification,
   Select,
+  withFormikExtend,
 } from '@/components'
 
 const styles = (theme) => ({})
 
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ settingClinicOperationHour }) =>
     settingClinicOperationHour.entity || settingClinicOperationHour.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
-    monFromOpHour: Yup.string().required(),
-    monToOpHour: Yup.string()
-      .laterThan(Yup.ref('monFromOpHour'), 'TO must be later than FROM')
-      .required(),
-    tueFromOpHour: Yup.string().required(),
-    tueToOpHour: Yup.string()
-      .laterThan(Yup.ref('tueFromOpHour'), 'TO must be later than FROM')
-      .required(),
-    wedFromOpHour: Yup.string().required(),
-    wedToOpHour: Yup.string()
-      .laterThan(Yup.ref('wedFromOpHour'), 'TO must be later than FROM')
-      .required(),
-    thursFromOpHour: Yup.string().required(),
-    thursToOpHour: Yup.string()
-      .laterThan(Yup.ref('thursFromOpHour'), 'TO must be later than FROM')
-      .required(),
-    friFromOpHour: Yup.string().required(),
-    friToOpHour: Yup.string()
-      .laterThan(Yup.ref('friFromOpHour'), 'TO must be later than FROM')
-      .required(),
-    satFromOpHour: Yup.string().required(),
-    satToOpHour: Yup.string()
-      .laterThan(Yup.ref('satFromOpHour'), 'TO must be later than FROM')
-      .required(),
-    sunFromOpHour: Yup.string().required(),
-    sunToOpHour: Yup.string()
-      .laterThan(Yup.ref('sunFromOpHour'), 'TO must be later than FROM')
-      .required(),
+    monFromOpHour: Yup.string(),
+    monToOpHour: Yup.string().when('monFromOpHour', {
+      is: (val) => val !== undefined && val !== '',
+      then: Yup.string().laterThan(
+        Yup.ref('monFromOpHour'),
+        'TO must be later than FROM',
+      ),
+    }),
+
+    tueFromOpHour: Yup.string(),
+    tueToOpHour: Yup.string().when('tueFromOpHour', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('tueFromOpHour'),
+        'TO must be later than FROM',
+      ),
+    }),
+
+    wedFromOpHour: Yup.string(),
+    wedToOpHour: Yup.string().when('wedFromOpHour', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('wedFromOpHour'),
+        'TO must be later than FROM',
+      ),
+    }),
+
+    thursFromOpHour: Yup.string(),
+    thursToOpHour: Yup.string().when('thursFromOpHour', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('thursFromOpHour'),
+        'TO must be later than FROM',
+      ),
+    }),
+
+    friFromOpHour: Yup.string(),
+    friToOpHour: Yup.string().when('friFromOpHour', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('friFromOpHour'),
+        'TO must be later than FROM',
+      ),
+    }),
+
+    satFromOpHour: Yup.string(),
+    satToOpHour: Yup.string().when('satFromOpHour', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('satFromOpHour'),
+        'TO must be later than FROM',
+      ),
+    }),
+
+    sunFromOpHour: Yup.string(),
+    sunToOpHour: Yup.string().when('sunFromOpHour', {
+      is: (val) => val !== undefined,
+      then: Yup.string().laterThan(
+        Yup.ref('sunFromOpHour'),
+        'TO must be later than FROM',
+      ),
+    }),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -71,7 +106,7 @@ const styles = (theme) => ({})
       }
     })
   },
-  displayName: 'ClinicOperationHourModal',
+  displayName: 'ClinicOperationHourDetail',
 })
 class Detail extends PureComponent {
   state = {}

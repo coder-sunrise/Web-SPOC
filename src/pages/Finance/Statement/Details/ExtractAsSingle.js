@@ -44,7 +44,7 @@ class ExtractAsSingle extends PureComponent {
             <GridItem xs={8}>
               <FastField
                 name={`packageValueDto[${row.rowIndex - 1}].itemValue`}
-                render={(args) => <CodeSelect code='ctCompany' {...args} />}
+                render={(args) => <CodeSelect code='ctCopayer' {...args} />}
               />
             </GridItem>
           )
