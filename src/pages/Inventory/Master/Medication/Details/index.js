@@ -88,7 +88,9 @@ const Detail = ({
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock medicationDetail={medicationDetail} />,
+            tabContent: (
+              <Stock medicationDetail={medicationDetail} values={values} />
+            ),
           },
         ]}
       />
@@ -160,6 +162,12 @@ export default compose(
       ),
       maxDiscount: Yup.number().positive(
         'Max Discount must between 0 to 999,999.99',
+      ),
+      reOrderThreshold: Yup.number().positive(
+        'Re-Order Threshold must between 0 to 999,999.99',
+      ),
+      criticalThreshold: Yup.number().positive(
+        'Critical Threshold must between 0 to 999,999.99',
       ),
     }),
 

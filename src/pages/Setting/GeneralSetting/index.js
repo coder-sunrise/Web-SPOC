@@ -26,20 +26,22 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingGeneral }) => ({
-  settingGeneral,
+@connect(({ generalSetting }) => ({
+  generalSetting,
 }))
 @withFormikExtend({
   enableReinitialize: true,
 
-  mapPropsToValues: ({ settingGeneral }) => {
-    return settingGeneral.entity
+  mapPropsToValues: ({ generalSetting }) => {
+    return generalSetting.setting
   },
 
   handleSubmit: (values, { props }) => {
-    const { SystemCurrency } = values[0]
-    const { CurrencyRounding } = values[1]
-    const { CurrencyRoundingToTheClosest } = values[2]
+    const {
+      SystemCurrency,
+      CurrencyRounding,
+      CurrencyRoundingToTheClosest,
+    } = values
 
     const payload = [
       {
@@ -58,8 +60,7 @@ const styles = (theme) => ({
     const { dispatch, onConfirm, history } = props
 
     dispatch({
-      type: 'settingGeneral/upsert',
-
+      type: 'generalSetting/upsert',
       payload,
     }).then(history.push('/setting'))
   },
@@ -73,7 +74,7 @@ class GeneralSetting extends PureComponent {
   componentDidMount = () => {
     this.checkHasActiveSession()
     this.props.dispatch({
-      type: 'settingGeneral/query',
+      type: 'generalSetting/getGeneralSetting',
     })
   }
 
@@ -116,7 +117,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='[0]SystemCurrency'
+                name='SystemCurrency'
                 render={(args) => (
                   <Select
                     label='System Currency'
@@ -131,7 +132,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='[1]CurrencyRounding'
+                name='CurrencyRounding'
                 render={(args) => (
                   <Select
                     label='Currency Rounding'
@@ -145,7 +146,7 @@ class GeneralSetting extends PureComponent {
 
             <GridItem md={3}>
               <Field
-                name='[2]CurrencyRoundingToTheClosest'
+                name='CurrencyRoundingToTheClosest'
                 render={(args) => (
                   <Select
                     label='To The Closest'

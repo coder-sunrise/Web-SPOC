@@ -32,6 +32,7 @@ const Detail = ({
   history,
   handleSubmit,
   setFieldValue,
+  values,
 }) => {
   const { currentTab } = consumable
 
@@ -78,13 +79,16 @@ const Detail = ({
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock consumableDetail={consumableDetail} />,
+            tabContent: (
+              <Stock consumableDetail={consumableDetail} values={values} />
+            ),
           },
         ]}
       />
     </React.Fragment>
   )
 }
+const errMsg = (field) => `${field} must between 0 to 999,999.99`
 export default compose(
   withStyles(styles, { withTheme: true }),
   connect(({ consumable, consumableDetail }) => ({
@@ -116,6 +120,12 @@ export default compose(
       maxDiscount: Yup.number().positive(
         'Max Discount must between 0 to 999,999.99',
       ),
+      reOrderThreshold: Yup.number().positive(
+        'Re-Order Threshold must between 0 to 999,999.99',
+      ),
+      criticalThreshold: Yup.number()
+        .positive(errMsg('Critical Threshold'))
+        .max(999999.99, errMsg('Critical Threshold')),
     }),
 
     handleSubmit: (values, { props }) => {

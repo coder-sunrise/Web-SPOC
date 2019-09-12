@@ -82,7 +82,9 @@ const Detail = ({
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock vaccinationDetail={vaccinationDetail} />,
+            tabContent: (
+              <Stock vaccinationDetail={vaccinationDetail} values={values} />
+            ),
           },
         ]}
       />
@@ -137,8 +139,12 @@ export default compose(
       maxDiscount: Yup.number().positive(
         'Max Discount must between 0 to 999,999.99',
       ),
-
-      // SellingPrice: Yup.number().required(),
+      reOrderThreshold: Yup.number().positive(
+        'Re-Order Threshold must between 0 to 999,999.99',
+      ),
+      criticalThreshold: Yup.number().positive(
+        'Critical Threshold must between 0 to 999,999.99',
+      ),
     }),
     displayName: 'InventoryVaccinationDetail',
   }),

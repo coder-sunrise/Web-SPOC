@@ -1,25 +1,24 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import { connect } from 'dva'
-import { withFormik, FastField } from 'formik'
+import { FastField } from 'formik'
 
 import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-
+import { Add } from '@material-ui/icons'
 import {
-  PictureUpload,
   GridContainer,
   GridItem,
   CardContainer,
-  Transition,
   TextField,
-  AntdInput,
-  Select,
-  Accordion,
   Button,
   CommonTableGrid,
   DatePicker,
   NumberInput,
+  CodeSelect,
+  withFormikExtend,
+  FieldArray,
+  notification,
 } from '@/components'
 
 import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
@@ -28,25 +27,42 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingMasterClinicInfo }) => ({
-  settingMasterClinicInfo,
+@connect(({ clinicInfo }) => ({
+  clinicInfo,
 }))
-@withFormik({
-  mapPropsToValues: ({ settingMasterClinicInfo }) => {
-    console.log(settingMasterClinicInfo)
-    return settingMasterClinicInfo.entity
-      ? settingMasterClinicInfo.entity
-      : settingMasterClinicInfo.default
+@withFormikExtend({
+  enableReinitialize: true,
+  mapPropsToValues: ({ clinicInfo }) => {
+    return clinicInfo
   },
-  validationSchema: Yup.object().shape({
-    name: Yup.string().required(),
-    address: Yup.object().shape({
-      postcode: Yup.number().required(),
-      countryFK: Yup.string().required(),
-    }),
-  }),
+  // validationSchema: Yup.object().shape({
+  //   clinicName: Yup.string().required(),
+  //   contact: Yup.object().shape({
+  //     contactAddress: Yup.array().of(
+  //       Yup.object().shape({
+  //         postcode: Yup.number().required(),
+  //         countryFK: Yup.string().required(),
+  //       }),
+  //     ),
+  //   }),
+  // }),
 
-  handleSubmit: () => {},
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, history } = props
+    console.log('ehllo', props)
+    dispatch({
+      type: 'clinicInfo/upsert',
+      payload: {
+        ...values,
+        contact: undefined,
+      },
+    }).then((r) => {
+      if (r && r.id) {
+        notification.success({ message: 'Saved' })
+        history.push('/setting')
+      }
+    })
+  },
   displayName: 'ClinicInfo',
 })
 class ClinicInfo extends PureComponent {
@@ -54,13 +70,23 @@ class ClinicInfo extends PureComponent {
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingMasterClinicInfo/fetchAddress',
+      type: 'clinicInfo/query',
+      payload: 'Tenant_000',
+      // payload: localStorage.getItem('clinicCode'),
     })
   }
 
   render () {
-    const { classes, clinicInfo, dispatch, theme, ...restProps } = this.props
-
+    const {
+      classes,
+      clinicInfo,
+      dispatch,
+      theme,
+      handleSubmit,
+      values,
+      ...restProps
+    } = this.props
+    console.log('ads', this.props)
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -90,21 +116,15 @@ class ClinicInfo extends PureComponent {
         <GridContainer>
           <GridItem md={6}>
             <FastField
-              name='primaryClinician'
+              name='primaryRegisteredDoctorFK'
               render={(args) => (
-                <Select
-                  label='Primary Clinician'
-                  options={[
-                    { value: 1, name: 'Dr Levine Choong' },
-                  ]}
-                  {...args}
-                />
+                <CodeSelect label='Primary Clinician' code='' {...args} />
               )}
             />
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name='primaryClinicianMCR'
+              name='primaryMCRNO'
               render={(args) => (
                 <TextField label='Primary Clinician MCR Number' {...args} />
               )}
@@ -121,8 +141,52 @@ class ClinicInfo extends PureComponent {
           <h5>Address</h5>
           <Divider />
         </div>
-
-        <Address propName='address' {...this.props} />
+        <GridContainer>
+          <GridItem xs={12}>
+            <FieldArray
+              name='contact.contactAddress'
+              render={(arrayHelpers) => {
+                this.arrayHelpers = arrayHelpers
+                if (!values || !values.contact) return null
+                return (
+                  <div>
+                    {values.contact.contactAddress.map((val, i) => {
+                      return (
+                        <Address
+                          key={val.id}
+                          addressIndex={i}
+                          theme={theme}
+                          arrayHelpers={arrayHelpers}
+                          propName='contact.contactAddress'
+                          style={{
+                            padding: theme.spacing.unit,
+                            marginTop: theme.spacing.unit,
+                            marginBottom: theme.spacing.unit,
+                          }}
+                          {...restProps}
+                        />
+                      )
+                    })}
+                  </div>
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12}>
+            <Button
+              link
+              href=''
+              key='addAddress'
+              aria-label='Reset'
+              color='danger'
+              onClick={this.addAddress}
+            >
+              <Add />
+              Add Address
+            </Button>
+          </GridItem>
+        </GridContainer>
+        {/* <Address propName='address' {...this.props} /> */}
         <div className={classes.actionBtn}>
           <Button
             color='danger'
@@ -133,12 +197,7 @@ class ClinicInfo extends PureComponent {
             Cancel
           </Button>
 
-          <Button
-            color='primary'
-            onClick={() => {
-              this.props.handleSubmit
-            }}
-          >
+          <Button color='danger' onClick={handleSubmit}>
             Save
           </Button>
         </div>
