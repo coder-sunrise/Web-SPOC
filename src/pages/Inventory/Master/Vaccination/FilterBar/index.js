@@ -71,7 +71,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   label={formatMessage({
                     id: 'inventory.master.vaccination.supplier',
                   })}
-                  code='ctCompany'
+                  code='ctSupplier'
                   {...args}
                 />
               )

@@ -2,10 +2,9 @@ import React, { PureComponent } from 'react'
 
 import { CommonTableGrid, Button } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import * as service from './services'
+import { Tooltip } from '@material-ui/core'
+import { status } from '@/utils/codes'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -23,7 +22,12 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingConsumableGroup, toggleModal } = this.props
+    const {
+      dispatch,
+      classes,
+      settingConsumableGroup,
+      toggleModal,
+    } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -49,20 +53,34 @@ class Grid extends PureComponent {
             options: status,
           },
           {
+            columnName: 'description',
+            render: (row) => {
+              return <p>{row.description === null ? '-' : row.description}</p>
+            },
+          },
+          {
+            columnName: 'sortOrder',
+            render: (row) => {
+              return <p>{row.sortOrder === null ? '-' : row.sortOrder}</p>
+            },
+          },
+          {
             columnName: 'action',
             align: 'center',
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Edit Consumable Category' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },

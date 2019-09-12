@@ -11,6 +11,7 @@ import {
   Select,
   ProgressButton,
   CodeSelect,
+  Field,
 } from '@/components'
 
 @withFormikExtend({
@@ -39,7 +40,7 @@ class Filter extends PureComponent {
       <div className={classes.filterBar}>
         <GridContainer>
           <GridItem xs={6} md={3}>
-            <FastField
+            <Field
               name='codeDisplayValue'
               render={(args) => {
                 return (

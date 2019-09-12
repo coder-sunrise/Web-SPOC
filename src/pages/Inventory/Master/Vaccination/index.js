@@ -39,6 +39,10 @@ const Vaccination = ({ dispatch, history, vaccination, values }) => {
       type: 'number',
     },
     {
+      columnName: 'stock',
+      type: 'number',
+    },
+    {
       columnName: 'isActive',
       sortingEnabled: false,
       type: 'select',

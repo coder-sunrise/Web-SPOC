@@ -17,64 +17,69 @@ import {
 import Contact from './Contact'
 
 const styles = (theme) => ({})
+
 @withFormikExtend({
   mapPropsToValues: ({ settingCompany }) =>
     settingCompany.entity || settingCompany.default,
-
   validationSchema: ({ settingCompany }) =>
     Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       coPayerTypeFK: Yup.number().when('settingCompany', {
-        is: (val) => settingCompany.companyType.id === 1,
+        is: () => settingCompany.companyType.id === 1,
         then: Yup.number().required(),
+        otherwise: Yup.number().nullable(),
       }),
 
       url: Yup.object().when('settingCompany', {
-        is: (val) => settingCompany.companyType.id === 1,
+        is: () => settingCompany.companyType.id === 1,
         then: Yup.object().shape({
           contactWebsite: Yup.object().shape({
             website: Yup.string().url(),
           }),
         }),
       }),
-
+      // contact.contactAddress[0].postcode
       contact: Yup.object().when('settingCompany', {
-        is: (val) => settingCompany.companyType.id === 1,
+        is: () => settingCompany.companyType.id === 1,
         then: Yup.object().shape({
-          // mobilContactNumber: Yup.object().shape({
-          //   number: Yup.string().required(),
-          // }),
           contactEmailAddress: Yup.object().shape({
-            emailAddress: Yup.string().email(),
+            emailAddress: Yup.string().email().nullable(),
           }),
+
+          contactAddress: Yup.array().of(
+            Yup.object().shape({
+              postcode: Yup.string().max(
+                10,
+                'The postcode should not more than 10 digits',
+              ),
+            }),
+          ),
         }),
-        // otherwise: Yup.object().shape({
-        //   mobilContactNumber: Yup.object().shape({
-        //     number: Yup.number().required(),
-        //   }),
-        // }),
+        otherwise: Yup.object().shape({
+          contactAddress: Yup.array().of(
+            Yup.object().shape({
+              postcode: Yup.string().max(
+                10,
+                'The postcode should not more than 10 digits',
+              ),
+            }),
+          ),
+        }),
       }),
     }),
 
   handleSubmit: (values, { props }) => {
-    const {
-      url,
-      country,
-      postalCode,
-      mobileFaxNum,
-      address,
-      officeNum,
-      email,
-      effectiveDates,
-      ...restValues
-    } = values
+    const { effectiveDates, ...restValues } = values
 
     const { dispatch, onConfirm, settingCompany } = props
     const { id, name } = settingCompany.companyType
     dispatch({
-      type: 'settingCompany/upsert',
+      type:
+        id === 1
+          ? 'settingCompany/upsertCopayer'
+          : 'settingCompany/upsertSupplier',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -86,7 +91,10 @@ const styles = (theme) => ({})
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingCompany/query',
+          type:
+            id === 1
+              ? 'settingCompany/queryCopayer'
+              : 'settingCompany/querySupplier',
         })
       }
     })
@@ -97,11 +105,14 @@ class Detail extends PureComponent {
   state = {}
 
   render () {
+    console.log(this.props)
     const { props } = this
     const { classes, theme, footer, values, settingCompany, route } = props
     const { name } = route
     const type = 'copayer'
     // console.log('detail', settingCompany)
+    console.log('props', this.props)
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

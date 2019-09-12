@@ -15,6 +15,7 @@ import {
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { getServices } from '@/utils/codes'
 
 const styles = () => ({
   actionDiv: {
@@ -24,6 +25,8 @@ const styles = () => ({
     marginRight: '10px',
   },
 })
+
+let commitCount = 1000 // uniqueNumber
 const Detail = ({
   classes,
   dispatch,
@@ -33,72 +36,64 @@ const Detail = ({
   setFieldValue,
   handleSubmit,
   codetable,
+  setValues,
+  values,
   ...props
 }) => {
   const [
     selectedItem,
     setSelectedItem,
-  ] = useState({})
+  ] = useState(() => {})
 
-  const field = packDetail.entity ? 'entity' : 'default'
+  const [
+    servicess,
+    setServicess,
+  ] = useState(() => [])
+  const [
+    serviceCenterss,
+    setServiceCenterss,
+  ] = useState(() => [])
+  const [
+    serviceCenterServicess,
+    setServiceCenterServicess,
+  ] = useState(() => [])
+  const [
+    serviceFK,
+    setServiceFK,
+  ] = useState(() => {})
+  const [
+    serviceCenterFK,
+    setServiceCenterFK,
+  ] = useState(() => {})
+  const [
+    price,
+    setPrice,
+  ] = useState(() => undefined)
 
-  const { ctServiceCenter } = packDetail
-  console.log('ctServiceCenter', ctServiceCenter)
-  const { ctservice } = codetable
-
-  const result = []
-  const map = new Map()
-  if (ctservice) {
-    // for (const item of ctservice) {
-    //   if (!map.has(item.serviceId) && !map.has(item.serviceCenter)) {
-    //     map.set(item.serviceId, true)
-    //     map.set(item.serviceCenter, true)
-    //     result.push({
-    //       serviceId: item.serviceId,
-    //       code: item.code,
-    //       serviceCenter: item.serviceCenter,
-    //     })
-    //   }
-    // }
-    const unique = ctservice.reduce((uniqueList, service) => {
-      const existed = uniqueList.find(
-        (uniqueService) =>
-          uniqueService.serviceId === service.serviceId &&
-          uniqueService.serviceCenter === service.serviceCenter,
+  useEffect(async () => {
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+      },
+    }).then((list) => {
+      const { services, serviceCenters, serviceCenterServices } = getServices(
+        list,
       )
-      if (existed)
-        return [
-          ...uniqueList,
-        ]
-      return [
-        ...uniqueList,
-        service,
-      ]
-    }, [])
-    console.log({ unique })
-  }
+      setServicess(services)
+      setServiceCenterss(serviceCenters)
+      setServiceCenterServicess(serviceCenterServices)
+    })
 
-  console.log(result)
-  // const result = Array.from(
-  //   new Set(
-  //     ctservice.map((s) => {
-  //       return {
-  //         serviceId: s.serviceId,
-  //         serviceCenter: s.serviceCenter,
-  //       }
-  //     }),
-  //   ),
-  // ).map((serviceCenter) => {
-  //   console.log('serviceCentertest', serviceCenter)
-  //   // return {
-  //   //   serviceId: ctservice.find((s) => s.serviceCenter === serviceCenter)
-  //   //     .serviceId,
-  //   //   code: ctservice.find((s) => s.serviceCenter === serviceCenter).code,
-  //   //   serviceCenter: serviceCenter,
-  //   // }
-  // })
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }, [])
 
-  console.log('result', result)
   const handleItemOnChange = (e) => {
     const { option, row } = e
     const { sellingPrice } = option
@@ -106,54 +101,13 @@ const Detail = ({
 
     return { ...row, unitPrice: sellingPrice }
   }
-  const [
-    serviceCenterList,
-    setServiceCenterList,
-  ] = useState([])
 
-  const [
-    list,
-    setList,
-  ] = useState([])
-
-  const filterServiceCenter = (serviceCenter) => {
-    if (serviceCenter) {
-      return ctServiceCenter.filter((o) =>
-        o.name.toLowerCase().includes(serviceCenter.toLowerCase()),
-      )
-    }
-    return ctServiceCenter
-  }
-
-  useEffect(
-    () => {
-      if (serviceCenterList) {
-        setList(serviceCenterList)
-      }
-    },
-    [
-      serviceCenterList,
-    ],
-  )
-
-  const handleServiceOnChange = (e) => {
-    if (e) {
-      const { option, row } = e
-      const { unitPrice, serviceCenter } = option
-      setServiceCenterList(filterServiceCenter(serviceCenter))
-      setSelectedItem(option)
-      console.log('heckfiler', filterServiceCenter(serviceCenter))
-    }
-  }
-
-  console.log('propsss', props)
-  console.log('codetable', codetable)
   const {
     medicationPackageItem,
     consumablePackageItem,
     vaccinationPackageItem,
     servicePackageItem,
-  } = props.values
+  } = values
   const { currentTab } = pack
   const detailProps = {
     packDetail,
@@ -165,7 +119,7 @@ const Detail = ({
   const medicationProps = {
     medicationTableParas: {
       columns: [
-        { name: 'medicationName', title: 'Medication Name' },
+        { name: 'inventoryMedicationFK', title: 'Medication Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -174,7 +128,7 @@ const Detail = ({
     },
     medicationColExtensions: [
       {
-        columnName: 'medicationName',
+        columnName: 'inventoryMedicationFK',
         type: 'codeSelect',
         code: 'inventoryMedication',
         labelField: 'displayValue',
@@ -204,7 +158,7 @@ const Detail = ({
   const vaccinationProps = {
     vaccinationTableParas: {
       columns: [
-        { name: 'vaccinationName', title: 'Vaccination' },
+        { name: 'inventoryVaccinationFK', title: 'Vaccination' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -213,7 +167,7 @@ const Detail = ({
     },
     vaccinationColExtensions: [
       {
-        columnName: 'vaccinationName',
+        columnName: 'inventoryVaccinationFK',
         type: 'codeSelect',
         code: 'inventoryVaccination',
         labelField: 'displayValue',
@@ -240,7 +194,7 @@ const Detail = ({
   const consumableProps = {
     consumableTableParas: {
       columns: [
-        { name: 'consumableName', title: 'Consumable Name' },
+        { name: 'inventoryConsumableFK', title: 'Consumable Name' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -249,7 +203,7 @@ const Detail = ({
     },
     consumableColExtensions: [
       {
-        columnName: 'consumableName',
+        columnName: 'inventoryConsumableFK',
         type: 'codeSelect',
         code: 'inventoryConsumable',
         labelField: 'displayValue',
@@ -281,8 +235,8 @@ const Detail = ({
   const serviceProps = {
     serviceTableParas: {
       columns: [
-        { name: 'serviceName', title: 'Service' },
-        { name: 'serviceCenterServiceFK', title: 'Service Center' },
+        { name: 'serviceCenterServiceFK', title: 'Service' },
+        { name: 'serviceName', title: 'Service Center' },
         { name: 'quantity', title: 'Quantity' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'subTotal', title: 'Amount' },
@@ -292,20 +246,50 @@ const Detail = ({
     serviceColExtensions: [
       { columnName: 'quantity', type: 'number' },
       {
-        columnName: 'serviceName',
-        type: 'codeSelect',
-        code: 'ctService',
-        labelField: 'displayValue',
-        valueField: 'serviceId',
-        onChange: handleServiceOnChange,
-      },
-      {
         columnName: 'serviceCenterServiceFK',
         type: 'select',
-        options: list,
-        query: (value) => {
-          console.log({ value })
-          return []
+        options: servicess.filter(
+          (o) =>
+            !serviceCenterFK ||
+            o.serviceCenters.find((m) => m.value === serviceCenterFK),
+        ),
+
+        onChange: (e) => {
+          setServiceFK(e.val)
+          console.log('service', serviceFK)
+          // setTimeout(() => {
+          //   getServiceCenterService()
+          // }, 1)
+          dispatch({
+            // force current edit row components to update
+            type: 'global/updateState',
+            payload: {
+              commitCount: (commitCount += 1),
+            },
+          })
+          handleItemOnChange
+        },
+      },
+      {
+        columnName: 'serviceName',
+        type: 'select',
+        options: serviceCenterss.filter(
+          (o) => !serviceFK || o.services.find((m) => m.value === serviceFK),
+        ),
+        onChange: (e) => {
+          setServiceCenterFK(e.val)
+          // console.log('serviceCenterFK', serviceCenterFK)
+          // setTimeout(() => {
+          //   getServiceCenterService()
+          // }, 1)
+          dispatch({
+            // force current edit row components to update
+            type: 'global/updateState',
+            payload: {
+              commitCount: (commitCount += 1),
+            },
+          })
+          handleItemOnChange
         },
       },
       {
@@ -356,8 +340,8 @@ const Detail = ({
   //     }),
   //   )
   // }
-  console.log('let', list)
-  console.log('let', serviceCenterList)
+  // console.log('let', list)
+  // console.log('let', serviceCenterList)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -398,11 +382,15 @@ const Detail = ({
                 service={serviceProps}
                 packDetail={packDetail}
                 setFieldValue={setFieldValue}
-                {...props}
+                values={values}
                 selectedItem={selectedItem}
                 setSelectedItem={setSelectedItem}
                 setServiceCenter={setServiceCenter}
                 serviceCenter={serviceCenter}
+                price={price}
+                serviceCenterFK={serviceCenterFK}
+                serviceFK={serviceFK}
+                serviceCenterServicess={serviceCenterServicess}
               />
             ),
           },

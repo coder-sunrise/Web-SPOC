@@ -87,7 +87,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                   label={formatMessage({
                     id: 'finance.scheme.search.cpname',
                   })}
-                  code='ctCompany'
+                  code='ctCopayer'
                   {...args}
                 />
               )

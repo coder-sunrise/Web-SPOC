@@ -170,7 +170,7 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
                     label={formatMessage({
                       id: 'finance.scheme.detail.coPayer',
                     })}
-                    code='ctCompany'
+                    code='ctCopayer'
                     max={50}
                     {...args}
                   />

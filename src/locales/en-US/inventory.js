@@ -79,7 +79,8 @@ export default {
   //Purchasing & Receiving
   'inventory.pr.reason': 'Reason',
   'inventory.pr.diplicatePO': 'Duplicate Purchase Order',
-  'inventory.pr.duplicatePOConfirmation': 'Duplicate purchase order based on PO No.: ',
+  'inventory.pr.duplicatePOConfirmation':
+    'Duplicate purchase order based on PO No.: ',
   'inventory.pr.addnew': 'Add New',
   'inventory.pr.pono': 'Purchase Order #',
   'inventory.pr.supplier': 'Supplier',
@@ -127,10 +128,14 @@ export default {
   'inventory.pr.detail.dod.receivingItem.bonusQty': 'Bonus Qty.',
   'inventory.pr.detail.dod.receivingItem.totalQty': 'Total Qty.',
   'inventory.pr.detail.dod.receivingItem.orderUOM': 'Order UOM: ',
-  'inventory.pr.detail.dod.receivingItem.qtyAlreadyReceived': 'Qty. Already Received',
-  'inventory.pr.detail.dod.receivingItem.qtyBonusAlreadyReceived': 'Bonus Qty. Already Received',
-  'inventory.pr.detail.dod.receivingItem.receivingOrderQty': 'Receiving Order Qty.',
-  'inventory.pr.detail.dod.receivingItem.receivingBonusQty': 'Receiving Bonus Qty.',
+  'inventory.pr.detail.dod.receivingItem.qtyAlreadyReceived':
+    'Qty. Already Received',
+  'inventory.pr.detail.dod.receivingItem.qtyBonusAlreadyReceived':
+    'Bonus Qty. Already Received',
+  'inventory.pr.detail.dod.receivingItem.receivingOrderQty':
+    'Receiving Order Qty.',
+  'inventory.pr.detail.dod.receivingItem.receivingBonusQty':
+    'Receiving Bonus Qty.',
   'inventory.pr.detail.dod.receivingItem.receivingUOM': 'Receiving UOM: ',
   'inventory.pr.detail.dod.receivingItem.batchNo': 'Batch No.',
   'inventory.pr.detail.dod.receivingItem.expiryDate': 'Expiry Date',

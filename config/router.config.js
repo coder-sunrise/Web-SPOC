@@ -167,7 +167,7 @@ const routes = [
           },
           {
             path: '/inventory/master/editconsumable',
-            name: 'consumable.editcounsumable',
+            name: 'consumable.editconsumable',
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
           },
@@ -230,6 +230,12 @@ const routes = [
             name: 'pd.detail',
             hideInMenu: true,
             component: './Inventory/PurchaseReceive/Details',
+          },
+          {
+            path: '/inventory/inventoryadjustment',
+            name: 'inventoryadjustment',
+            component: './Inventory/InventoryAdjustment',
+            mini: 'IA',
           },
         ],
       },
@@ -601,6 +607,11 @@ const routes = [
             path: '/setting/referrallettertemplate',
             name: 'referrallettertemplate',
             component: './Setting/TemplateMessages',
+          },
+          {
+            path: '/setting/paymentmode',
+            name: 'paymentmode',
+            component: './Setting/PaymentMode',
           },
           {
             path: '/setting/appointmenttype',

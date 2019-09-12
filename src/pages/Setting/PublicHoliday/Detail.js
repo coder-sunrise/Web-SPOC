@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 import Yup from '@/utils/yup'
 import { status } from '@/utils/codes'
 import moment from 'moment'
@@ -13,11 +13,12 @@ import {
   DateRangePicker,
   Select,
   notification,
+  withFormikExtend,
 } from '@/components'
 
 const styles = (theme) => ({})
 
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ settingPublicHoliday }) =>
     settingPublicHoliday.entity || settingPublicHoliday.default,
   validationSchema: Yup.object().shape({
@@ -55,7 +56,7 @@ const styles = (theme) => ({})
       }
     })
   },
-  displayName: 'PublicHolidayModal',
+  displayName: 'PublicHolidayDetail',
 })
 class Detail extends PureComponent {
   state = {}
