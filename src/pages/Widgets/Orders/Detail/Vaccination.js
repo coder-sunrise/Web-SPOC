@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import { connect } from 'dva'
 import {
   Button,
   GridContainer,
@@ -19,25 +19,130 @@ import {
   NumberInput,
   CustomInputWrapper,
   Popconfirm,
+  FastField,
+  withFormikExtend,
 } from '@/components'
+import Yup from '@/utils/yup'
+import { calculateAdjustAmount } from '@/utils/utils'
 
+@connect(({ global }) => ({ global }))
+@withFormikExtend({
+  mapPropsToValues: ({ orders = {}, editType }) => {
+    const v = {
+      ...(orders.entity || orders.defaultVaccination),
+      editType,
+    }
+    return v
+  },
+  enableReinitialize: true,
+  validationSchema: Yup.object().shape({
+    stockVaccinationFK: Yup.number().required(),
+    unitPrice: Yup.number().required(),
+    totalPrice: Yup.number().required(),
+    vaccinationGivenDate: Yup.date().required(),
+    quantity: Yup.number().required(),
+    usageMethodFK: Yup.number().required(),
+    dosageFK: Yup.number().required(),
+    uomfk: Yup.number().required(),
+  }),
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, orders, currentType } = props
+    const { rows } = orders
+    const data = {
+      sequence: rows.length,
+      ...values,
+      subject: currentType.getSubject(values),
+    }
+    dispatch({
+      type: 'orders/upsertRow',
+      payload: data,
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'OrderPage',
+})
 class Vaccination extends PureComponent {
+  componentWillReceiveProps (nextProps) {
+    if (
+      (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
+      nextProps.orders.shouldPushToState
+    ) {
+      nextProps.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: nextProps.values,
+          shouldPushToState: false,
+        },
+      })
+    }
+  }
+
+  changeVaccination = (v, op) => {
+    const { setFieldValue, values } = this.props
+
+    setFieldValue(
+      'dosageFK',
+      op.prescribingDosage ? op.prescribingDosage.id : undefined,
+    )
+    setFieldValue('uomfk', op.prescribingUOM ? op.prescribingUOM.id : undefined)
+    setFieldValue(
+      'usageMethodFK',
+      op.vaccinationUsage ? op.vaccinationUsage.id : undefined,
+    )
+    setFieldValue('vaccinationName', op.displayValue)
+    setFieldValue('vaccinationCode', op.code)
+
+    if (op.sellingPrice) {
+      setFieldValue('unitPrice', op.sellingPrice)
+      setFieldValue('totalPrice', op.sellingPrice * values.quantity)
+      this.updateTotalPrice(op.sellingPrice * values.quantity)
+    } else {
+      setFieldValue('unitPrice', undefined)
+      setFieldValue('totalPrice', undefined)
+      this.updateTotalPrice(undefined)
+    }
+  }
+
+  updateTotalPrice = (v) => {
+    if (v !== undefined) {
+      const { adjType, adjValue } = this.props.values
+      const adjustment = calculateAdjustAmount(
+        adjType === 'ExactAmount',
+        v,
+        adjValue,
+      )
+      this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
+      this.props.setFieldValue('adjAmount', adjustment.adjAmount)
+    } else {
+      this.props.setFieldValue('totalAfterItemAdjustment', undefined)
+      this.props.setFieldValue('adjAmount', undefined)
+    }
+  }
+
   render () {
-    const { theme, classes, values } = this.props
+    const {
+      theme,
+      classes,
+      values,
+      footer,
+      handleSubmit,
+      setFieldValue,
+    } = this.props
     // console.log('Vaccination', this.props)
     return (
       <div>
         <GridContainer>
           <GridItem xs={12}>
             <FastField
-              name='name'
+              name='stockVaccinationFK'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label='Name'
-                    options={[
-                      { value: '1', name: 'Vaccination 2' },
-                    ]}
+                    labelField='displayValue'
+                    code='inventoryvaccination'
+                    onChange={this.changeVaccination}
                     {...args}
                   />
                 )
@@ -48,30 +153,59 @@ class Vaccination extends PureComponent {
         <GridContainer>
           <GridItem xs={6}>
             <FastField
-              name='dateGiven'
+              name='vaccinationGivenDate'
               render={(args) => {
                 return <DatePicker label='Date Given' {...args} />
               }}
             />
           </GridItem>
-          {/* <GridItem xs={6}>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={4}>
             <FastField
-              name='sequence'
+              name='usageMethodFK'
               render={(args) => {
                 return (
-                  <Select
-                    label='Sequence'
-                    options={[
-                      { value: '1', name: 'D1' },
-                    ]}
+                  <CodeSelect
+                    label='Usage'
+                    allowClear={false}
+                    code='ctMedicationUsage'
                     {...args}
                   />
                 )
               }}
             />
-          </GridItem> */}
-        </GridContainer>
-        <GridContainer>
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='dosageFK'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Dosage'
+                    allowClear={false}
+                    code='ctMedicationDosage'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={4}>
+            <FastField
+              name='uomfk'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='UOM'
+                    allowClear={false}
+                    code='ctMedicationUnitOfMeasurement'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
           <GridItem xs={4}>
             <FastField
               name='quantity'
@@ -82,6 +216,13 @@ class Vaccination extends PureComponent {
                     formatter={(v) => `${v} Tab/s`}
                     step={1}
                     min={1}
+                    onChange={(e) => {
+                      if (values.unitPrice) {
+                        const total = e.target.value * values.unitPrice
+                        setFieldValue('totalPrice', total)
+                        this.updateTotalPrice(total)
+                      }
+                    }}
                     {...args}
                   />
                 )
@@ -90,7 +231,7 @@ class Vaccination extends PureComponent {
           </GridItem>
           <GridItem xs={4}>
             <FastField
-              name='total'
+              name='totalPrice'
               render={(args) => {
                 return <NumberInput label='Total' currency {...args} />
               }}
@@ -98,7 +239,7 @@ class Vaccination extends PureComponent {
           </GridItem>
           <GridItem xs={4}>
             <FastField
-              name='totalAfterAdj'
+              name='totalAfterItemAdjustment'
               render={(args) => {
                 return (
                   <NumberInput
@@ -113,10 +254,21 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={12} className={classes.editor}>
-            <RichEditor placeholder='Remarks' />
+          <GridItem xs={12}>
+            <FastField
+              name='remarks'
+              render={(args) => {
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
+              }}
+            />
           </GridItem>
         </GridContainer>
+        {footer({
+          onSave: handleSubmit,
+        })}
       </div>
     )
   }

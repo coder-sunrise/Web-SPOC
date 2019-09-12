@@ -1,5 +1,6 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
+import _ from 'lodash'
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
@@ -647,24 +648,28 @@ const orderTypes = [
     name: 'Medication',
     value: '1',
     prop: 'corPrescriptionItem',
-    filter: (r) => !r.stockDrugFK,
+    filter: (r) => !!r.stockDrugFK,
+    getSubject: (r) => r.drugName,
   },
   {
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
+    getSubject: (r) => r.vaccinationName,
   },
   {
     name: 'Service',
     value: '3',
     prop: 'corService',
+    getSubject: (r) => r.serviceName,
   },
   { name: 'Consumable', value: '4', prop: 'corConsumable' },
   {
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
-    filter: (r) => !!r.stockDrugFK,
+    filter: (r) => !r.stockDrugFK,
+    getSubject: (r) => r.drugName,
   },
 ]
 // const localCodes = {}
@@ -737,11 +742,12 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     body,
   })
   const { status: statusCode, data } = response
-  const result = multiplyCodetable(
-    useGeneral ? data[code] : data.data,
-    multiplier,
-  )
+
   if (parseInt(statusCode, 10) === 200) {
+    const result = multiplyCodetable(
+      useGeneral ? data[code] : data.data,
+      multiplier,
+    )
     await db.codetable.put({
       code,
       data: result,
@@ -774,13 +780,14 @@ export const getCodes = async (payload) => {
     const lastLoginDate = cookies.get('_lastLogin')
     const parsedLastLoginDate = moment(lastLoginDate)
 
-    // not exist in current table, make network call to retrieve data
+    /* not exist in current table, make network call to retrieve data */
     if (ct === undefined) {
       result = _fetchAndSaveCodeTable(ctcode, params, multiply)
     } else {
-      // compare updateDate with lastLoginDate
-      // if updateDate > lastLoginDate, do nothing
-      // else perform network call and update indexedDB
+      /*  compare updateDate with lastLoginDate
+          if updateDate > lastLoginDate, do nothing
+          else perform network call and update indexedDB 
+      */
       const { updateDate, data: existedData } = ct
       const parsedUpdateDate = moment(updateDate)
 
@@ -803,6 +810,43 @@ export const getTenantCodes = async (tenantCode) => {
     return data
   }
   return {}
+}
+
+export const getServices = (data) => {
+  // eslint-disable-next-line compat/compat
+  const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
+    return {
+      value: o[0].serviceId,
+      name: o[0].displayValue,
+      serviceCenters: o.map((m) => {
+        return {
+          value: m.serviceCenterId,
+          name: m.serviceCenter,
+        }
+      }),
+    }
+  })
+  // eslint-disable-next-line compat/compat
+  const serviceCenters = Object.values(
+    _.groupBy(data, 'serviceCenterId'),
+  ).map((o) => {
+    return {
+      value: o[0].serviceCenterId,
+      name: o[0].serviceCenter,
+      services: o.map((m) => {
+        return {
+          value: m.serviceId,
+          name: m.displayValue,
+        }
+      }),
+    }
+  })
+
+  return {
+    serviceCenterServices: data,
+    services,
+    serviceCenters,
+  }
 }
 
 module.exports = {
@@ -840,5 +884,6 @@ module.exports = {
   coPayerType,
   country,
   consultationDocumentTypes,
+  getServices,
   ...module.exports,
 }

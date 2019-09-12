@@ -126,7 +126,6 @@ class ClinicalNotes extends PureComponent {
           { ...item },
         ]
       }, [])
-    console.log(updated)
     form.setFieldValue('corAttachment', updated)
   }
 

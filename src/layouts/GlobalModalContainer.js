@@ -2,12 +2,13 @@ import React, { PureComponent } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
 import qs from 'query-string'
+import { ChangePassword } from 'medisys-components'
 import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
-import { ChangePassword } from 'medisys-components'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 import Consultation from '@/pages/PatientDashboard/Consultation'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
+import Adjustment from '@/pages/Shared/Adjustment'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
 
@@ -223,6 +224,37 @@ class GlobalModalContainer extends PureComponent {
           showFooter
         >
           <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+        </CommonModal>
+
+        <CommonModal
+          open={global.openAdjustment}
+          title={global.openAdjustmentTitle}
+          cancelText='Cancel'
+          maxWidth='sm'
+          onClose={(e) => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openAdjustment: false,
+                openAdjustmentConfig: undefined,
+                openAdjustmentValue: undefined,
+              },
+            })
+          }}
+          onConfirm={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                openAdjustment: false,
+                openAdjustmentConfig: undefined,
+              },
+            })
+            if (global.onAdjustmentConfirm) {
+              global.onAdjustmentConfirm()
+            }
+          }}
+        >
+          <Adjustment />
         </CommonModal>
       </div>
     )

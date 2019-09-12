@@ -9,8 +9,6 @@ import {
   createMuiTheme,
   withStyles,
 } from '@material-ui/core/styles'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
-import { Button } from '@/components'
 // import Paper from '@material-ui/core/Paper'
 import { LinearProgress, Paper, Tooltip, IconButton } from '@material-ui/core'
 import {
@@ -60,6 +58,8 @@ import {
   VirtualTable,
   TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
+import { Button } from '@/components'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
@@ -322,6 +322,17 @@ class CommonTableGrid extends React.Component {
             ...tableRowSharedRootConfig,
           },
         },
+        PageSizeSelector: {
+          label: {
+            fontSize: '0.9rem',
+            marginBottom: 3,
+          },
+        },
+        Pagination: {
+          rowsLabel: {
+            fontSize: '0.9rem',
+          },
+        },
       },
     }
     const size = props.size || theme.props.size
@@ -498,6 +509,15 @@ class CommonTableGrid extends React.Component {
       dispatch({
         type: `${type}/${queryMethod}`,
         payload: p,
+      }).then(() => {
+        this.setState((ps) => {
+          return {
+            pagination: {
+              ...ps.pagination,
+              ...payload,
+            },
+          }
+        })
       })
     } else {
       const { pagination } = this.state
@@ -603,6 +623,7 @@ class CommonTableGrid extends React.Component {
       getRowId = (row) => (row.Id ? row.Id : row.id),
       onSelectionChange = (f) => f,
       FuncProps = {},
+      TableProps = {},
       ActionProps = {},
       FilteringProps: {
         defaultFilters = [],
@@ -713,10 +734,12 @@ class CommonTableGrid extends React.Component {
     // console.log(errors, newColumExtensions)
 
     const tableProps = {
+      ...TableProps,
       columnExtensions: newColumExtensions,
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,
     }
+
     // const extraPagerConfig = {
     //   ...pagerConfig,
     // }

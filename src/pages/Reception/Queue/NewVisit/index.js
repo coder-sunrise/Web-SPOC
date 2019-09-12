@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
-import { Chip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 // custom component
 import {
   GridContainer,
@@ -10,7 +10,7 @@ import {
   withFormikExtend,
 } from '@/components'
 // medisys-components
-import { ErrorWrapper, LoadingWrapper } from 'medisys-components'
+import { ErrorWrapper, LoadingWrapper } from '@/components/_medisys'
 // Sub-components
 import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
@@ -104,8 +104,10 @@ class NewVisit extends PureComponent {
       const bmi = weightKG / heightM ** 2
       const bmiInTwoDecimal = Math.round(bmi * 100) / 100
       setFieldValue(FormFieldName['vitalsign.bmi'], bmiInTwoDecimal)
-      setFieldTouched(FormFieldName['vitalsign.bmi'], true)
+    } else {
+      setFieldValue(FormFieldName['vitalsign.bmi'], null)
     }
+    setFieldTouched(FormFieldName['vitalsign.bmi'], true)
   }
 
   updateAttachments = ({ added, deleted }) => {
@@ -174,13 +176,14 @@ class NewVisit extends PureComponent {
     const {
       classes,
       footer,
-      handleSubmit,
+
       queueLog: { list = [] } = { list: [] },
       loading,
       visitRegistration: { visitInfo, errorState },
       values,
       isSubmitting,
     } = this.props
+
     const existingQNo = list.reduce(
       (queueNumbers, queue) =>
         queue.visitFK === values.id
@@ -193,7 +196,9 @@ class NewVisit extends PureComponent {
             ],
       [],
     )
-    const isReadOnly = values.visitStatus !== VISIT_STATUS.WAITING
+    const isReadOnly =
+      values.visitStatus !== VISIT_STATUS.WAITING &&
+      values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
     const isEdit = Object.keys(visitInfo).length > 0
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']

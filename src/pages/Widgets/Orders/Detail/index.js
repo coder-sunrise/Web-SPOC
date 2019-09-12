@@ -1,9 +1,9 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
+import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
 import { orderTypes } from '@/utils/codes'
-import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
 import {
   withFormikExtend,
   FastField,
@@ -60,34 +60,101 @@ const styles = (theme) => ({
 })
 
 class Details extends PureComponent {
-  state = {
-  }
+  state = {}
 
-  footerBtns = ({onSave}) => {
+  footerBtns = ({ onSave }) => {
     const { classes } = this.props
     return (
-      <>
+      <React.Fragment>
         <Divider />
 
         <div className={classnames(classes.footer)}>
-          <Button link style={{ float: 'left' }} onClick={this.toggleModal}>
+          <Button link style={{ float: 'left' }} onClick={this.showAdjustment}>
             {currencySymbol} Adjustment
           </Button>
-          <Button color='danger'>Cancel</Button>
+          <Button
+            color='danger'
+            onClick={() => {
+              this.props.dispatch({
+                type: 'orders/updateState',
+                payload: {
+                  entity: undefined,
+                  // adjustment: undefined,
+                  // totalAfterAdj: undefined,
+                },
+              })
+            }}
+          >
+            New
+          </Button>
 
-          <Button color='primary' onClick={onSave}>Save</Button>
+          <Button color='primary' onClick={onSave}>
+            Save
+          </Button>
         </div>
-      </>
+      </React.Fragment>
     )
+  }
+
+  _show = () => {
+    if (
+      !this.props.orders.entity ||
+      (this.props.orders.entity.total < 0 &&
+        this.props.orders.entity.totalPrice < 0)
+    ) {
+      notification.warn({
+        message: 'Invalid total price',
+      })
+      return
+    }
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackConfig: {
+            model: 'orders',
+            reducer: 'adjustAmount',
+          },
+          // showRemark: true,
+          defaultValues: {
+            ...this.props.orders.entity,
+            initialAmout:
+              this.props.orders.entity.total ||
+              this.props.orders.entity.totalPrice,
+          },
+        },
+      },
+    })
+  }
+
+  showAdjustment = () => {
+    this.props.dispatch({
+      type: 'orders/updateState',
+      payload: {
+        shouldPushToState: true,
+      },
+    })
+    setTimeout(() => {
+      this._show()
+    }, 1)
   }
 
   render () {
     const { props, state } = this
-    const { theme, classes, orders, values, rowHeight, footer,dispatch } = props
-    const {editType}=orders
-    // console.log(props)
+    const {
+      theme,
+      classes,
+      orders,
+      values,
+      rowHeight,
+      footer,
+      dispatch,
+    } = props
+    const { editType } = orders
+    // console.log(values)
     const cfg = {
-      footer:this.footerBtns,
+      footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === editType),
       editType,
       ...props,
@@ -120,21 +187,6 @@ class Details extends PureComponent {
             {editType === '4' && <Consumable {...cfg} />}
             {editType === '5' && <Medication {...cfg} openPrescription />}
           </div>
-
-          <CommonModal
-            open={state.showModal}
-            title='Adjustment'
-            onClose={this.toggleModal}
-            onConfirm={this.toggleModal}
-            maxWidth='sm'
-            bodyNoPadding
-            // showFooter=
-            // footProps={{
-            //   confirmBtnText: 'Save',
-            // }}
-          >
-            <Adjustment {...this.props} />
-          </CommonModal>
         </div>
       </div>
     )

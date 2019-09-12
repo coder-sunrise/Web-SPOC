@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
+import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import MessageListing from './Reminder/MessageListing'
-import { CommonModal, CardContainer } from '@/components'
+import { CommonModal, CardContainer, Danger } from '@/components'
 import Grid from './Grid'
 import New from './New'
 import FilterBar from './FilterBar'
@@ -11,10 +12,32 @@ const styles = {
   sendBar: {
     marginTop: '10px',
   },
+  blur: {
+    opacity: 0.4,
+  },
+  warningContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+    zIndex: 9999,
+  },
+  warningContent: {
+    top: '50%',
+    left: '45%',
+    position: 'fixed',
+    '& h4': {
+      fontWeight: 'bold',
+    },
+  },
 }
 
 const SMS = ({ classes }) => {
-  const [ showMessageModal, setShowMessageModal ] = useState(false)
+  const [
+    showMessageModal,
+    setShowMessageModal,
+  ] = useState(false)
   const newMessageProps = {
     onSend: (value) => {
       console.log(value)
@@ -39,6 +62,12 @@ const SMS = ({ classes }) => {
       setShowMessageModal(true)
     },
   }
+
+  const showWarning = false
+  const contentClass = classnames({
+    [classes.blur]: showWarning,
+  })
+
   return (
     <CardContainer hideHeader>
       {/* <Button
@@ -48,10 +77,23 @@ const SMS = ({ classes }) => {
       >
         <Assignment />
       </Button> */}
-      <FilterBar />
-      <Grid {...gridProps} />
-      <div className={classes.sendBar}>
-        <New {...newMessageProps} />
+      {showWarning && (
+        <div className={classes.warningContainer}>
+          <div className={classes.warningContent}>
+            <CardContainer hideHeader>
+              <Danger>
+                <h4>Please contact administrator to setup SMS feature.</h4>
+              </Danger>
+            </CardContainer>
+          </div>
+        </div>
+      )}
+      <div className={contentClass}>
+        <FilterBar />
+        <Grid {...gridProps} />
+        <div className={classes.sendBar}>
+          <New {...newMessageProps} />
+        </div>
       </div>
       <CommonModal
         open={showMessageModal}

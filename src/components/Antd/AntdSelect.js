@@ -133,12 +133,14 @@ class AntdSelect extends React.PureComponent {
       v = field.value
       this.setState({
         value: field.value,
+        shrink: field.value !== undefined,
       })
     } else if (value) {
       v = value
 
       this.setState({
         value,
+        shrink: value !== undefined,
       })
     }
     if (autoComplete && options && this.state.data.length === 0) {
@@ -276,8 +278,9 @@ class AntdSelect extends React.PureComponent {
         // console.log({ label: Object.byString(s, labelField) })
         return {
           ...s,
-          value: s[valueField],
+          value: Object.byString(s, valueField),
           label: Object.byString(s, labelField),
+          // value: s[valueField],
           // label: s[labelField],
         }
       })
@@ -311,6 +314,7 @@ class AntdSelect extends React.PureComponent {
       labelField,
       groupField,
       options,
+      defaultOptions = [],
       classes,
       defaultValue,
       renderDropdown,
@@ -327,7 +331,13 @@ class AntdSelect extends React.PureComponent {
     } = this.props
     const { form, field, value } = restProps
     // console.log(options)
-    const source = autoComplete || query ? this.state.data : options
+    const source =
+      autoComplete || query
+        ? this.state.data
+        : [
+            ...defaultOptions,
+            ...options,
+          ]
 
     const cfg = {
       value: this.state.value,

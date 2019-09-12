@@ -110,13 +110,13 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       ...super.reducers(),
       querySuccess (st, { payload }) {
         // console.log(payload)
-        const { data, filter } = payload
+        const { data, filter = {} } = payload
         // const { entities, filter } = data
         // // //console.log('list query')
-        // console.log(data)
+        // console.log(filter)
         const list = data.entities ? data.entities : data.data
         // sortAll(list)
-
+        const { sorting } = filter
         // console.log(list)
         return {
           ...st,
@@ -128,6 +128,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
               current: data.currentPage || 1,
               pagesize: data.pageSize || 10,
               totalRecords: data.totalRecords,
+              sorting,
             },
           },
           // currentItem: entities[0],
@@ -135,7 +136,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       },
 
       querySingleSuccess (st, { payload }) {
-        console.log(payload)
+        // console.log(payload)
         const { data } = payload
         sortAll(data)
         return {
@@ -180,7 +181,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       },
       save (st, { payload }) {
         const { data } = payload
-        const id = data.id
+        const { id } = data
         const { list } = st
         let index = lodash.findIndex(list, { id })
         list.splice(index, 1, data)
@@ -191,7 +192,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       },
       remove (st, { payload }) {
         const { data } = payload
-        const id = data.id
+        const { id } = data
         const { list } = st
 
         lodash.remove(list, { id })

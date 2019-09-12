@@ -1,10 +1,11 @@
 import React from 'react'
+import moment from 'moment'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 // custom type
 import TimeSchemaType from './YupTime'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField, Field, withFormik } from 'formik'
 // common component
 import {
   Button,
@@ -14,6 +15,7 @@ import {
   GridItem,
   TimePicker,
   CommonModal,
+  Select,
 } from '@/components'
 // component
 import { ReportViewer } from '@/components/_medisys'
@@ -93,10 +95,9 @@ class Report extends React.Component {
     //     </CommonModal>
     //   </CardContainer>
     // )
-
     return (
       <CardContainer hideHeader size='sm'>
-        <Button color='primary&#39;' onClick={this.toggleReport}>
+        {/* <Button color='primary&#39;' onClick={this.toggleReport}>
           View Report
         </Button>
         <Button color='primary&#39;' onClick={this.getCodeTable}>
@@ -115,8 +116,8 @@ class Report extends React.Component {
         >
           <ReportViewer />
         </CommonModal>
-        <CodeSelect code='clinicianprofile' />
-        {/* <Button onClick={this.validate} color='primary'>
+        <CodeSelect code='clinicianprofile' /> */}
+        <Button onClick={this.validate} color='primary'>
           Submit
         </Button>
         <GridContainer>
@@ -136,7 +137,7 @@ class Report extends React.Component {
               )}
             />
           </GridItem>
-        </GridContainer> */}
+        </GridContainer>
       </CardContainer>
     )
   }

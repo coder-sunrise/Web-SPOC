@@ -21,21 +21,17 @@ import {
 } from '@/components'
 
 const _toMoment = (value, format) => {
-  // console.log({ value })
-  if (!value) return ''
-  // console.log(value, format)
-  // console.log(moment.zone())
-  // console.log(value)
+  if (!value) return null
   const m = moment.utc(value)
-
   return m.local()
-  if (!value) return value
-  try {
-    if (moment(value, format).isValid()) return moment(value, format)
-    return null
-  } catch (error) {
-    return null
-  }
+
+  // if (!value) return value
+  // try {
+  //   if (moment(value, format).isValid()) return moment(value, format)
+  //   return null
+  // } catch (error) {
+  //   return null
+  // }
 }
 
 const STYLES = (theme) => ({
@@ -208,7 +204,8 @@ class AntdDatePicker extends PureComponent {
         <AutosizeInput
           inputClassName={props.className}
           value={
-            this.state.value !== undefined ? (
+            this.state.value !== undefined &&
+            _toMoment(this.state.value, format) ? (
               _toMoment(this.state.value, format).format(format)
             ) : (
               ''

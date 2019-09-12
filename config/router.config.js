@@ -65,7 +65,7 @@ const routes = [
             path: '/reception/appointment',
             name: 'appointment',
             mini: 'AP',
-            component: './Reception/BigCalendar',
+            component: './Reception/Appointment',
           },
           {
             hideInMenu: true,
@@ -377,6 +377,11 @@ const routes = [
             name: 'queueListingReport',
             component: './Report/QueueListing',
           },
+          {
+            path: '/report/patientlisting',
+            name: 'patientListingReport',
+            component: './Report/PatientListing',
+          },
         ],
       },
       // Report
@@ -596,6 +601,11 @@ const routes = [
             path: '/setting/referrallettertemplate',
             name: 'referrallettertemplate',
             component: './Setting/TemplateMessages',
+          },
+          {
+            path: '/setting/appointmenttype',
+            name: 'appointmenttype',
+            component: './Setting/AppointmentType',
           },
         ],
       },

@@ -18,6 +18,9 @@ import {
 } from '@material-ui/core'
 
 import { unstable_Box as Box } from '@material-ui/core/Box'
+import { Icon, Input, AutoComplete, Form } from 'antd'
+import Loadable from 'react-loadable'
+import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import {
   PictureUpload,
   GridContainer,
@@ -31,14 +34,11 @@ import {
   Button,
   notification,
 } from '@/components'
-import { Icon, Input, AutoComplete, Form } from 'antd'
 
 import avatar from '@/assets/img/faces/marc.jpg'
 import { getAppendUrl } from '@/utils/utils'
 
-import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
-import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 
@@ -127,7 +127,7 @@ class PatientDashboard extends PureComponent {
 
     this.props.history.push(
       getAppendUrl({
-        md: 'cons',
+        md2: 'cons',
       }),
     )
   }

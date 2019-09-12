@@ -30,6 +30,12 @@ module.exports = {
     })
     return r
   },
+  edit: async (id) => {
+    const r = await request(`${url}/edit/${id}`, {
+      method: 'PUT',
+    })
+    return r
+  },
   sign: async (params) => {
     const r = await request(`${url}/sign/${params.id}`, {
       method: 'PUT',
