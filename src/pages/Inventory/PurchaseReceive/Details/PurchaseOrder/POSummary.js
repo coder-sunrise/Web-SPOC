@@ -20,22 +20,10 @@ import {
 import Adjustment from './Adjustment'
 
 class POSummary extends PureComponent {
-  // calcTotal = () => {
-  //   const { setFieldValue, values } = this.props
-  //   const { purchaseOrderItems } = values
-  //   let total = 0
-
-  //   purchaseOrderItems.forEach((row) => {
-  //     total += row.totalPrice
-  //   })
-
-  //   setFieldValue('summaryTotal', total)
-  //   return total
-  // }
-
   render () {
     const { props } = this
     const { adjustmentList, toggleInvoiceAdjustment } = props
+    const poPrefix = 'purchaseOrder'
     console.log('POSummary', this.props)
     return (
       <React.Fragment>
@@ -55,7 +43,7 @@ class POSummary extends PureComponent {
               key='addAdjustment'
               //onClick={this.addAdjustment}
               onClick={toggleInvoiceAdjustment}
-            >
+            > 
               <Add />
             </Button>
           </GridItem>
@@ -72,7 +60,6 @@ class POSummary extends PureComponent {
                   key={v.id}
                   index={i}
                   arrayHelpers={arrayHelpers}
-                  // propName='purchaseOrder.adjustmentList'
                   {...amountProps}
                   {...props}
                 />
@@ -84,12 +71,19 @@ class POSummary extends PureComponent {
         <GridContainer>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
-            <NumberInput
-              prefix={formatMessage({
-                id: 'inventory.pr.detail.pod.summary.gst',
-              })}
-              defaultValue={13.3}
-              {...amountProps}
+            <FastField
+              name={`${poPrefix}.invoiceGST`}
+              render={(args) => {
+                return (
+                  <NumberInput
+                    prefix={formatMessage({
+                      id: 'inventory.pr.detail.pod.summary.gst',
+                    })}
+                    {...amountProps}
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
         </GridContainer>
@@ -97,12 +91,15 @@ class POSummary extends PureComponent {
         <GridContainer>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
-            <Field name='gstEnabled' render={(args) => <Switch {...args} />} />
+            <Field
+              name={`${poPrefix}.gstEnabled`}
+              render={(args) => <Switch {...args} />}
+            />
           </GridItem>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
             <FastField
-              name='gstIncluded'
+              name={`${poPrefix}.gstIncluded`}
               render={(args) => {
                 return (
                   <Tooltip
@@ -132,15 +129,13 @@ class POSummary extends PureComponent {
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
             <FastField
-              name='summaryTotal'
+              name={`${poPrefix}.invoiceTotal`}
               render={(args) => {
                 return (
                   <NumberInput
                     prefix={formatMessage({
                       id: 'inventory.pr.detail.pod.summary.total',
                     })}
-                    //defaultValue={this.calcTotal().toFixed(2)}
-                    defaultValue={109.99}
                     {...amountProps}
                     {...args}
                   />

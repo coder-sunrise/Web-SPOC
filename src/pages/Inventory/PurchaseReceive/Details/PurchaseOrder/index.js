@@ -42,6 +42,75 @@ class index extends PureComponent {
     }))
   }
 
+  calculateInvoice = (rows) => {
+    /*-------------------------------------------*/
+    // Retrieve from /api/GSTSetup
+    const isClinicGSTEnabled = true
+    const gstPercentage = 7.0
+    /*-------------------------------------------*/
+    const { values, setFieldValue } = this.props
+    const { purchaseOrderItems, adjustmentList } = values
+    const items = rows || purchaseOrderItems
+    let tempInvoiceTotal = 0
+    let invoiceTotal = 0
+    let invoiceGST = 0
+
+    // Calculate all unitPrice
+    items.forEach((row) => {
+      if (!row.isDeleted) {
+        tempInvoiceTotal += row.totalPrice
+        row.tempSubTotal = row.totalPrice
+      }
+    })
+
+    // Check is there any adjustment was added
+    if (adjustmentList) {
+      // Calculate adjustment for added items
+      adjustmentList.forEach((adj, adjKey, adjArr) => {
+        // Init adjAmount for percentage
+        if (adj.isPercentage) {
+          adj.adjAmount = 0
+        }
+
+        items.map((item) => {
+          if (!item.isDeleted) {
+            if (adj.isPercentage) {
+              item[adj.adjTitle] = item.tempSubTotal * (adj.adjPercentage / 100)
+              item.tempSubTotal += item[adj.adjTitle]
+              adj.adjAmount += item[adj.adjTitle]
+            } else {
+              item[adj.adjTitle] =
+                item.tempSubTotal / tempInvoiceTotal * adj.adjAmount
+              item.tempSubTotal += item[adj.adjTitle]
+            }
+
+            if (isClinicGSTEnabled) {
+              // If Inclusive GST checked --> item.itemLevelGST = item.tempSubTotal * (gstPercentage / 107)
+              // Else                     --> item.itemLevelGST = item.tempSubTotal * (gstPercentage / 100)
+              item.itemLevelGST = item.tempSubTotal * (gstPercentage / 100)
+            } else {
+              item.itemLevelGST = 0
+            }
+
+            // Sum up all itemLevelGST & invoiceTotal at last iteration
+            if (Object.is(adjArr.length - 1, adjKey)) {
+              invoiceGST += item.itemLevelGST
+              invoiceTotal += item.itemLevelGST + item.tempSubTotal
+            }
+          }
+        })
+      })
+    }
+
+    setTimeout(() => {
+      setFieldValue('purchaseOrder.invoiceGST', invoiceGST)
+    }, 1)
+
+    setTimeout(() => {
+      setFieldValue('purchaseOrder.invoiceTotal', invoiceTotal)
+    }, 1)
+  }
+
   onClickPrint = () => {
     console.log('onClickPrint', this.props)
   }
@@ -52,12 +121,14 @@ class index extends PureComponent {
     const { classes, isEditable, values, setFieldValue } = this.props
     const { adjustmentList, purchaseOrder, purchaseOrderItems } = values
     console.log('PO Index', this.props)
+
     return (
       <div>
         <POForm />
         <Grid
           purchaseOrderItems={purchaseOrderItems}
           setFieldValue={setFieldValue}
+          calculateInvoice={this.calculateInvoice}
         />
         <POSummary
           adjustmentList={adjustmentList}

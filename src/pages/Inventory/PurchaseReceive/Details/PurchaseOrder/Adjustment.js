@@ -5,9 +5,8 @@ import {
   GridItem,
   Button,
   NumberInput,
-  FastField,
-  withFormikExtend,
   Popconfirm,
+  Field,
 } from '@/components'
 import DeleteOutline from '@material-ui/icons/DeleteOutline'
 
@@ -15,8 +14,8 @@ class Adjustment extends PureComponent {
   render () {
     const { index, arrayHelpers, adjustmentList, ...amountProps } = this.props
     const adjTitle = adjustmentList[index].adjTitle
-    const adjAmount = adjustmentList[index].adjAmount
-
+    //const adjAmount = adjustmentList[index].adjAmount
+    console.log('Adjustment', this.props)
     return (
       <GridContainer>
         <GridItem xs={2} md={9} />
@@ -36,7 +35,13 @@ class Adjustment extends PureComponent {
           </GridItem>
         </GridItem>
         <GridItem xs={5} md={1}>
-          <NumberInput defaultValue={adjAmount} {...amountProps} />
+          {/* <NumberInput defaultValue={adjAmount} {...amountProps} /> */}
+          <Field
+            name={`adjustmentList[${index}].adjAmount`}
+            render={(args) => {
+              return <NumberInput {...amountProps} {...args} />
+            }}
+          />
         </GridItem>
       </GridContainer>
     )

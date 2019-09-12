@@ -7,26 +7,27 @@ import { podoOrderType } from '@/utils/codes'
 
 const receivingDetailsSchema = Yup.object().shape({
   code: Yup.number().required(),
+  //name: Yup.number().required(),
   orderQty: Yup.number().required(),
 })
 
 class Grid extends PureComponent {
   constructor (props) {
     super(props)
+    // Initialize invoice calculation
+    this.props.calculateInvoice()
     this.state = {
       selectedItem: {},
     }
   }
 
-  deleteRow = (row, e) => {}
-
   handleItemOnChange = (e) => {
     const { option, row } = e
-    const { sellingPrice } = option
-    // setSelectedItem(option)
+    const { sellingPrice, prescribingUOM } = option
+
     this.setState({ selectedItem: option })
 
-    return { ...row, unitPrice: sellingPrice }
+    return { ...row, unitPrice: sellingPrice, uom: prescribingUOM.name }
   }
 
   tableParas = {
@@ -52,19 +53,20 @@ class Grid extends PureComponent {
         columnName: 'code',
         type: 'codeSelect',
         code: 'inventoryMedication',
-        labelField: 'displayValue',
+        labelField: 'code',
         valueField: 'id',
         onChange: this.handleItemOnChange,
       },
       // {
       //   columnName: 'name',
       //   type: 'codeSelect',
-      //   code: 'ctService',
+      //   code: 'inventoryMedication',
+      //   labelField: 'displayValue',
+      //   valueField: 'id',
+      //   onChange: this.handleItemOnChange,
       // },
       {
         columnName: 'uom',
-        type: 'codeSelect',
-        code: 'ctMedicationUnitOfMeasurement',
         disabled: true,
       },
       {
@@ -116,6 +118,9 @@ class Grid extends PureComponent {
 
       return addedRows.map((row) => ({
         ...row,
+        uom: selectedItem.prescribingUOM
+          ? selectedItem.prescribingUOM.name
+          : undefined,
         unitPrice: selectedItem.sellingPrice
           ? selectedItem.sellingPrice
           : selectedItem.unitPrice,
@@ -129,40 +134,34 @@ class Grid extends PureComponent {
 
   onCommitChanges = ({ rows, deleted }) => {
     const { setFieldValue } = this.props
-    return setFieldValue('purchaseOrderItems', rows)
-    this.calcTotal()
-  }
 
-  calcTotal = () => {
-    const { setFieldValue, values } = this.props
-    const { purchaseOrderItems } = values
-    let total = 0
+    if (deleted) {
+      const deletedSet = new Set(deleted)
+      const changedRows = rows.filter((row) => !deletedSet.has(row.id))
+      setFieldValue('purchaseOrderItems', changedRows)
+    }
 
-    purchaseOrderItems.forEach((row) => {
-      total += row.totalPrice
-    })
-
-    setFieldValue('summaryTotal', total)
-    return total
+    setFieldValue('purchaseOrderItems', rows)
+    this.props.calculateInvoice(rows)
+    return rows
   }
 
   render () {
     const isEditable = true
     const { purchaseOrderItems } = this.props
-    console.log('PO Grid', this.props)
+
     return (
       <React.Fragment>
         <EditableTableGrid
           rows={purchaseOrderItems}
           schema={receivingDetailsSchema}
           FuncProps={{
-            //edit: isEditable,
             pager: false,
           }}
           EditingProps={{
             showAddCommand: isEditable,
             showEditCommand: false,
-            //showDeleteCommand: isEditable,
+            showDeleteCommand: true,
             onCommitChanges: this.onCommitChanges,
             onAddedRowsChange: this.onAddedRowsChange,
           }}
