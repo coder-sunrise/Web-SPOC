@@ -142,7 +142,6 @@ class SketchField extends PureComponent {
    * Action when an object is added to the canvas
    */
   _onObjectAdded = (e) => {
-    console.log(e.target.type)
     if (!this.state.action) {
       this.setState({ action: true })
       return
@@ -164,6 +163,34 @@ class SketchField extends PureComponent {
       ])
     }
     //  }
+  }
+
+  getValue = () => {
+    return this._history.getAllList()
+  }
+
+  test = () => {
+    let history = this._history
+    let canvas = this._fc
+    let allList = history.getAllList()
+    console.log(allList)
+
+    for (let i = 0; i < allList.length; i++) {
+      let [
+        obj
+      ] = allList[i].data
+
+ 
+        this.setState({ action: false }, () => {
+          this._fc.add(obj)
+          if (obj.zindex != null) {
+            canvas.moveTo(obj, obj.zindex)
+          }
+          obj.__version -= 1
+          obj.__removed = false
+        })
+      
+    }
   }
 
   /**
@@ -202,7 +229,6 @@ class SketchField extends PureComponent {
   _onObjectRemoved = (e) => {
     let obj = e.target
     let canvas = this._fc
-
     if (obj.id === 'delete') {
       let activeObj = obj
       if (activeObj) {
@@ -382,7 +408,7 @@ class SketchField extends PureComponent {
     for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-      ] = allList[i]
+      ] = allList[i].data
 
       if (obj.type !== 'image') {
         if (hideEnable) {
@@ -578,7 +604,9 @@ class SketchField extends PureComponent {
 
   copy = () => {
     let canvas = this._fc
-    canvas.getActiveObject().clone((cloned) => {this._clipboard = cloned})
+    canvas.getActiveObject().clone((cloned) => {
+      this._clipboard = cloned
+    })
   }
 
   paste = () => {
@@ -651,7 +679,6 @@ class SketchField extends PureComponent {
   }
 
   setTemplate = (dataUrl, indexCount) => {
-    console.log('template')
     let history = this._history
     let allList = history.getAllList()
     let prevTemplate = ''
@@ -659,7 +686,7 @@ class SketchField extends PureComponent {
     for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-      ] = allList[i]
+      ] = allList[i].data
 
       if (obj.id === 'template') {
         prevTemplate = obj
@@ -715,7 +742,13 @@ class SketchField extends PureComponent {
     let link = document.createElement('a')
     link.download = 'drawing.png'
     link.href = canvas.toDataURL()
-    link.click()
+
+    canvas.toDataURL().set({
+      id: 'template',
+    })
+    console.log(canvas.toDataURL())
+
+    //link.click()
   }
 
   addText = (text, color, options = {}) => {

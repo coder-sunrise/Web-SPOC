@@ -63,33 +63,31 @@ class Eraser extends FabricCanvasTool {
     canvas.selection = true
     canvas.forEachObject((o) => {
       o.selectable = true
-      o.evented = true 
+      o.evented = true
     })
     canvas.defaultCursor = 'cell'
   }
 
   doMouseDown () {
-
     let canvas = this._canvas
     this.isDown = true
     let obj = canvas.getActiveObject()
-    if(obj){
+
+    if (obj) {
       obj.set({
-        id: "delete",
+        id: 'delete',
       })
       canvas.remove(obj)
     }
-   
   }
-
 
   doMouseUp () {
     let canvas = this._canvas
     this.isDown = false
     let obj = canvas.getActiveObject()
-    if(obj){
+    if (obj) {
       obj.set({
-        id: "delete",
+        id: 'delete',
       })
       canvas.remove(obj)
     }

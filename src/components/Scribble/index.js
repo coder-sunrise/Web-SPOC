@@ -93,7 +93,7 @@ const styles = () => ({
   },
   sketchArea: {
     paddingTop: 30,
-  }
+  },
 })
 
 @withFormikExtend({
@@ -101,7 +101,9 @@ const styles = () => ({
     subject: Yup.string().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    // // console.log('restValues')
+    console.log(values)
+
+    // // console.log('restValues') 
     // console.log('restValues', values)
     // const { effectiveDates, ...restValues } = values
     // const { dispatch, history, onConfirm, medicationDetail } = props
@@ -220,6 +222,14 @@ class Scribble extends React.Component {
     })
   }
 
+  _test = () => {
+    this._sketch.test()
+  }
+
+  testPassValue = () => {
+    return this._sketch.getValue()
+  }
+
   _download = () => {
     this._sketch.downloadImage()
   }
@@ -280,7 +290,7 @@ class Scribble extends React.Component {
   }
 
   render () {
-    const { classes, toggleScribbleModal, handleSubmit } = this.props
+    const { classes, toggleScribbleModal, handleSubmit, getScribbleValue } = this.props
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -683,14 +693,20 @@ class Scribble extends React.Component {
                   )}
                 </ToggleButton>
               </Tooltip>
+              <Tooltip title='Test'>
+                <ToggleButton
+                  key={10}
+                  checked={this.state.hideEnable}
+                  onClick={this._test}
+                >
+                  Test
+                </ToggleButton>
+              </Tooltip>
             </ToggleButtonGroup>
 
             <div className={classes.rightButton}>
               <div className={classes.actionDiv}>
-                <ProgressButton
-                  submitKey='medicationDetail/submit'
-                  onClick={handleSubmit}
-                />
+                <ProgressButton onClick={handleSubmit} />
                 <Button color='danger' onClick={toggleScribbleModal}>
                   Cancel
                 </Button>

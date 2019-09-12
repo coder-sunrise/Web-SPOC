@@ -9,6 +9,7 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
+      test: "hello",
       default: {
         clinicalNotes: 'Test notes',
       },
