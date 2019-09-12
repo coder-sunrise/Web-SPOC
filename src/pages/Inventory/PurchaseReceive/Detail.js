@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
+import Yup from '@/utils/yup'
 import {
   TextField,
   GridContainer,
@@ -10,6 +11,9 @@ import {
 
 @withFormikExtend({
   displayName: 'PurchasingReceivingWriteOffDetail',
+  validationSchema: Yup.object().shape({
+    reason: Yup.string().required(),
+  }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
     onConfirm()

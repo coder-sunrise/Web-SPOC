@@ -65,10 +65,12 @@ class Grid extends PureComponent {
         columns={[
           { name: 'poNo', title: 'PO No' },
           { name: 'poDate', title: 'PO Date' },
+          { name: 'supplier', title: 'Supplier' },
           { name: 'expectedDeliveryDate', title: 'Expected Delivery Date' },
-          { name: 'status', title: 'Status' },
-          { name: 'total', title: 'total' },
+          { name: 'poStatus', title: 'PO Status' },
+          { name: 'total', title: 'Total' },
           { name: 'outstanding', title: 'Outstanding' },
+          { name: 'invoiceStatus', title: 'Inv. Status' },
           { name: 'remarks', title: 'Remarks' },
           { name: 'action', title: 'Action' },
         ]}
@@ -99,7 +101,7 @@ class Grid extends PureComponent {
                     <GridButton
                       row={row}
                       onClick={this.onContextButtonClick}
-                      contextMenuOptions={ContextMenuOptions}
+                      contextMenuOptions={ContextMenuOptions(row)}
                     />
                   </div>
                 </Tooltip>

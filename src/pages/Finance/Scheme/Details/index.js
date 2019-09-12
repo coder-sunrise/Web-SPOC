@@ -71,6 +71,7 @@ const Detail = (props) => {
   }
   const { currentTab } = schemeDetail
   // console.log(restProps)
+  console.log('details/index', props)
   return (
     <div>
       <NavPills
@@ -133,8 +134,8 @@ export default compose(
         }),
       ),
 
-      // effectiveStartDate: Yup.string().required(),
-      // effectiveEndDate: Yup.string().required(),
+      //effectiveStartDate: Yup.string().required(),
+      //effectiveEndDate: Yup.string().required(),
     }),
     handleSubmit: (values, { props, resetForm }) => {
       const { effectiveDates, ...restValues } = values

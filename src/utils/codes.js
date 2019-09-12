@@ -712,6 +712,7 @@ const tenantCodes = [
   'inventorymedication',
   'inventoryconsumable',
   'inventoryvaccination',
+  'inventorypackage',
   'role',
 ]
 
@@ -848,6 +849,45 @@ export const getServices = (data) => {
     serviceCenters,
   }
 }
+
+export const podoOrderType = [
+  { id: 1, name: 'Consumable', ctName: 'InventoryConsumable' },
+  { id: 2, name: 'Medication', ctName: 'InventoryMedication' },
+  { id: 3, name: 'Vaccination', ctName: 'InventoryVaccination' },
+]
+
+export const InventoryTypes = [
+  {
+    value: 1,
+    name: 'Comsumables',
+    prop: 'consumableValueDto',
+    itemFKName: 'inventoryConsumableFK',
+  },
+  {
+    value: 2,
+    name: 'Medications',
+    prop: 'medicationValueDto',
+    itemFKName: 'inventoryMedicationFK',
+  },
+  {
+    value: 3,
+    name: 'Vaccines',
+    prop: 'vaccinationValueDto',
+    itemFKName: 'inventoryVaccinationFK',
+  },
+  {
+    value: 4,
+    name: 'Services',
+    prop: 'serviceValueDto',
+    itemFKName: 'serviceCenterServiceFK',
+  },
+  {
+    value: 5,
+    name: 'Packages',
+    prop: 'packageValueDto',
+    itemFKName: 'inventoryPackageFK',
+  },
+]
 
 module.exports = {
   paymentMethods,

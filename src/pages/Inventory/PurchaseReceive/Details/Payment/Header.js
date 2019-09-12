@@ -16,14 +16,11 @@ import {
   withFormik,
 } from '@/components'
 
-@withFormik({
+@withFormikExtend({
   displayName: 'purchaseReceivePayment',
-  mapPropsToValues: () => ({
-    poNo: 'PO/000001',
-    purchaseOrderDate: moment(),
-    invoiceAmount: 100,
-    outstandingAmount: 50,
-  }),
+  mapPropsToValues: ({ purchaseReceivePayment }) => {
+    return purchaseReceivePayment.entity || purchaseReceivePayment.default
+  },
 })
 class Header extends PureComponent {
   render () {

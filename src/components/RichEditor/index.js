@@ -48,7 +48,7 @@ class RichEditor extends React.PureComponent {
     }
 
     this.state = {
-      value: editorState,
+      value: EditorState.moveSelectionToEnd(editorState),
       anchorEl: null,
       isEditorFocused: false,
     }
@@ -100,11 +100,26 @@ class RichEditor extends React.PureComponent {
         })
       } else if (!this.state.value.getCurrentContent().getPlainText().length) {
         const contentBlock = htmlToDraft(v)
+        const newEditorState = EditorState.createWithContent(
+          ContentState.createFromBlockArray(contentBlock.contentBlocks),
+        )
         this.setState({
-          value: EditorState.createWithContent(
-            ContentState.createFromBlockArray(contentBlock.contentBlocks),
-          ),
+          value: EditorState.moveSelectionToEnd(newEditorState),
         })
+      } else {
+        const prevState = draftToHtml(
+          convertToRaw(this.state.value.getCurrentContent()),
+        )
+        if (prevState != v) {
+          const contentBlock = htmlToDraft(v)
+          const newEditorState = EditorState.createWithContent(
+            ContentState.createFromBlockArray(contentBlock.contentBlocks),
+          )
+
+          this.setState({
+            value: EditorState.moveSelectionToEnd(newEditorState),
+          })
+        }
       }
     }
   }
@@ -144,7 +159,10 @@ class RichEditor extends React.PureComponent {
   }
 
   _onFocus = () => {
-    this.setState({ isEditorFocused: true })
+    this.setState((prevState) => ({
+      isEditorFocused: false,
+      value: EditorState.moveFocusToEnd(prevState.value),
+    }))
   }
 
   _onBlur = () => {

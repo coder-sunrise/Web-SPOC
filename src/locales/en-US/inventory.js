@@ -84,7 +84,9 @@ export default {
   'inventory.pr.addnew': 'Add New',
   'inventory.pr.pono': 'Purchase Order #',
   'inventory.pr.supplier': 'Supplier',
+  'inventory.pr.invoiceStatus': 'Inv. Status',
   'inventory.pr.status': 'Status',
+  'inventory.pr.poStatus': 'PO Status',
   'inventory.pr.detail.print': 'Print',
 
   'inventory.pr.filter.datefrom': 'Transaction Date From',
