@@ -27,11 +27,19 @@ import InvoiceAdjustment from './InvoiceAdjustment'
 }))
 @withFormikExtend({
   displayName: 'purchaseOrder',
+  enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrder }) => {
+    console.log('mapPropsToValues', purchaseOrder)
     return purchaseOrder.entity || purchaseOrder.default
   },
 })
 class index extends PureComponent {
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'purchaseOrder/fakeQueryDone',
+    })
+  }
+
   state = {
     showInvoiceAdjustment: false,
   }
@@ -118,20 +126,28 @@ class index extends PureComponent {
   calculateTotal = () => {}
 
   render () {
-    const { classes, isEditable, values, setFieldValue } = this.props
-    const { adjustmentList, purchaseOrder, purchaseOrderItems } = values
+    const { classes, isEditable, values, setFieldValue, dispatch } = this.props
+    const {
+      adjustmentList,
+      purchaseOrderAdjustment,
+      purchaseOrder,
+      //purchaseOrderItems,
+      rows,
+    } = values
     console.log('PO Index', this.props)
 
     return (
       <div>
         <POForm />
         <Grid
-          purchaseOrderItems={purchaseOrderItems}
+          rows={rows}
+          dispatch={dispatch}
           setFieldValue={setFieldValue}
           calculateInvoice={this.calculateInvoice}
         />
         <POSummary
           adjustmentList={adjustmentList}
+          purchaseOrderAdjustment={purchaseOrderAdjustment}
           setFieldValue={setFieldValue}
           toggleInvoiceAdjustment={this.toggleInvoiceAdjustment}
         />

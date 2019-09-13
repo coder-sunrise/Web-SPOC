@@ -163,7 +163,7 @@ export class POForm extends PureComponent {
                         label={formatMessage({
                           id: 'inventory.pr.supplier',
                         })}
-                        code='ctCompany'
+                        //code='ctCompany'
                         //max={10}
                         {...args}
                       />

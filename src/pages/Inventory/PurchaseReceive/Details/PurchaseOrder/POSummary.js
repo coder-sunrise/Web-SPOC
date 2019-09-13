@@ -22,7 +22,11 @@ import Adjustment from './Adjustment'
 class POSummary extends PureComponent {
   render () {
     const { props } = this
-    const { adjustmentList, toggleInvoiceAdjustment } = props
+    const {
+      adjustmentList,
+      purchaseOrderAdjustment,
+      toggleInvoiceAdjustment,
+    } = props
     const poPrefix = 'purchaseOrder'
     console.log('POSummary', this.props)
     return (
@@ -43,23 +47,24 @@ class POSummary extends PureComponent {
               key='addAdjustment'
               //onClick={this.addAdjustment}
               onClick={toggleInvoiceAdjustment}
-            > 
+            >
               <Add />
             </Button>
           </GridItem>
         </GridContainer>
-
+        
         <FieldArray
-          name='adjustmentList'
+          name='purchaseOrderAdjustment'
           render={(arrayHelpers) => {
             this.arrayHelpers = arrayHelpers
-            if (!adjustmentList) return null
-            return adjustmentList.map((v, i) => {
+            if (!purchaseOrderAdjustment) return null
+            return purchaseOrderAdjustment.map((v, i) => {
               return (
                 <Adjustment
                   key={v.id}
                   index={i}
                   arrayHelpers={arrayHelpers}
+                  purchaseOrderAdjustment={purchaseOrderAdjustment}
                   {...amountProps}
                   {...props}
                 />

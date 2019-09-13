@@ -813,6 +813,21 @@ export const getTenantCodes = async (tenantCode) => {
   return {}
 }
 
+export const getInventoryItem = (data) => {
+  const inventoryItemList = data.map((x) => {
+    return {
+      name: x.code,
+      value: x.displayValue,
+      sellingPrice: x.sellingPrice,
+      uom: 'TBD',
+      //uom: x.uom.name,
+    }
+  })
+  return {
+    inventoryItemList,
+  }
+}
+
 export const getServices = (data) => {
   // eslint-disable-next-line compat/compat
   const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
@@ -851,9 +866,27 @@ export const getServices = (data) => {
 }
 
 export const podoOrderType = [
-  { id: 1, name: 'Consumable', ctName: 'InventoryConsumable' },
-  { id: 2, name: 'Medication', ctName: 'InventoryMedication' },
-  { id: 3, name: 'Vaccination', ctName: 'InventoryVaccination' },
+  {
+    value: 1,
+    name: 'Medication',
+    prop: 'purchaseOrderMedicationItem',
+    itemFKName: 'inventoryMedicationFK',
+    ctName: 'InventoryMedication',
+  },
+  {
+    value: 2,
+    name: 'Vaccination',
+    prop: 'purchaseOrderVaccinationItem',
+    itemFKName: 'inventoryVaccinationFK',
+    ctName: 'InventoryVaccination',
+  },
+  {
+    value: 3,
+    name: 'Consumable',
+    prop: 'purchaseOrderConsumableItem',
+    itemFKName: 'inventoryConsumableFK',
+    ctName: 'InventoryConsumable',
+  },
 ]
 
 export const InventoryTypes = [
