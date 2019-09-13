@@ -16,16 +16,10 @@ import {
 import { orderTypes } from '@/utils/codes'
 import { sumReducer } from '@/utils/utils'
 
-export default ({
-  orders,
-  dispatch,
-  classes,
-  summary,
-  theme,
-  handleAddAdjustment,
-}) => {
-  const { rows } = orders
-  const { adjustments, total, gst, totalWithGst } = summary
+export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
+  const { rows, summary, finalAdjustments } = orders
+  const { total, gst, totalWithGST } = summary
+  const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
     dispatch({
       type: 'orders/updateState',
@@ -37,6 +31,26 @@ export default ({
         //   adjAmount: row.adjAmount,
         //   adjType: row.adjType,
         // },
+      },
+    })
+  }
+  const addAdjustment = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackConfig: {
+            model: 'orders',
+            reducer: 'addFinalAdjustment',
+          },
+          showRemark: true,
+          showAmountPreview: false,
+          defaultValues: {
+            // ...this.props.orders.entity,
+            initialAmout: totalWithGST,
+          },
+        },
       },
     })
   }
@@ -115,7 +129,7 @@ export default ({
               if (type === 'total') {
                 return (
                   <span style={{ float: 'right' }}>
-                    <NumberInput value={total} text currency />
+                    <NumberInput value={totalWithGST} text currency />
                   </span>
                 )
               }
@@ -154,10 +168,7 @@ export default ({
                     <span style={{ color: 'initial' }}>
                       Adjustment
                       <Tooltip title='Add Adjustment'>
-                        <IconButton
-                          style={{ top: -1 }}
-                          onClick={handleAddAdjustment}
-                        >
+                        <IconButton style={{ top: -1 }} onClick={addAdjustment}>
                           <Add />
                         </IconButton>
                       </Tooltip>

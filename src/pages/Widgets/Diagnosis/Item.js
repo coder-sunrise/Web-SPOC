@@ -56,7 +56,18 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
                 <CodeSelect
                   label='Complication'
                   mode='multiple'
-                  code='ctPatientAccountNoType'
+                  code='ctComplication'
+                  onChange={(v, opts) => {
+                    const { form } = args
+                    const { setFieldValue } = form
+                    setFieldValue(`corDiagnosis[${index}]corComplication`, [])
+                    opts.forEach((o, i) => {
+                      setFieldValue(
+                        `corDiagnosis[${index}]corComplication[${i}]complicationFK`,
+                        o.id,
+                      )
+                    })
+                  }}
                   {...args}
                 />
               )

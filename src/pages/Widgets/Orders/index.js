@@ -55,34 +55,34 @@ class Orders extends PureComponent {
     adjustments: [],
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
-    const { orders } = nextProps
-    const { rows, finalAdjustments } = orders
-    const total = rows
-      .map((o) => o.totalAfterOverallAdjustment)
-      .reduce(sumReducer, 0)
-    const gst = total * 0.07
-    let totalWithGst = total + gst
-    const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
-    adjustments.forEach((fa) => {
-      totalWithGst += fa.adjAmount
-    })
-    if (preState.totalWithGst !== totalWithGst)
-      return {
-        adjustments,
-        total,
-        gst,
-        totalWithGst,
-      }
+  // static getDerivedStateFromProps (nextProps, preState) {
+  //   const { orders } = nextProps
+  //   const { rows, finalAdjustments } = orders
+  //   const total = rows
+  //     .map((o) => o.totalAfterOverallAdjustment)
+  //     .reduce(sumReducer, 0)
+  //   const gst = total * 0.07
+  //   let totalWithGst = total + gst
+  //   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
+  //   adjustments.forEach((fa) => {
+  //     totalWithGst += fa.adjAmount
+  //   })
+  //   if (preState.totalWithGst !== totalWithGst)
+  //     return {
+  //       adjustments,
+  //       total,
+  //       gst,
+  //       totalWithGst,
+  //     }
 
-    return null
-  }
+  //   return null
+  // }
 
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'orders/calculateAmount',
-    })
-  }
+  // componentDidMount () {
+  //   this.props.dispatch({
+  //     type: 'orders/calculateAmount',
+  //   })
+  // }
 
   // componentWillReceiveProps (nextProps) {
   //   if (
@@ -95,31 +95,31 @@ class Orders extends PureComponent {
   //   }
   // }
 
-  recacluateAmount = () => {
-    const { orders } = this.props
-    const { rows, adjustment } = orders
-    console.log(rows, adjustment)
-  }
+  // recacluateAmount = () => {
+  //   const { orders } = this.props
+  //   const { rows, adjustment } = orders
+  //   console.log(rows, adjustment)
+  // }
 
-  addAdjustment = () => {
-    this.props.dispatch({
-      type: 'global/updateState',
-      payload: {
-        openAdjustment: true,
-        openAdjustmentConfig: {
-          callbackConfig: {
-            model: 'orders',
-            reducer: 'addFinalAdjustment',
-          },
-          showRemark: true,
-          defaultValues: {
-            // ...this.props.orders.entity,
-            initialAmout: this.state.total,
-          },
-        },
-      },
-    })
-  }
+  // addAdjustment = () => {
+  //   this.props.dispatch({
+  //     type: 'global/updateState',
+  //     payload: {
+  //       openAdjustment: true,
+  //       openAdjustmentConfig: {
+  //         callbackConfig: {
+  //           model: 'orders',
+  //           reducer: 'addFinalAdjustment',
+  //         },
+  //         showRemark: true,
+  //         defaultValues: {
+  //           // ...this.props.orders.entity,
+  //           initialAmout: this.state.total,
+  //         },
+  //       },
+  //     },
+  //   })
+  // }
 
   // generateFinalAmount = () => {
   //   const { state, props } = this
@@ -224,7 +224,7 @@ class Orders extends PureComponent {
 
         <Grid
           {...props}
-          summary={this.state}
+          // summary={this.state}
           handleAddAdjustment={this.addAdjustment}
         />
         {/* {this.generateFinalAmount()} */}

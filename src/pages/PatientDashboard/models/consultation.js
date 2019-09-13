@@ -93,7 +93,8 @@ export default createFormViewModel({
         return response
       },
       *discard ({ payload }, { call, put }) {
-        const response = yield call(service.delete, payload)
+        const response = yield call(service.remove, payload)
+
         if (response) {
           sendNotification('QueueListing', {
             message: `Consultation discarded`,
@@ -175,6 +176,9 @@ export default createFormViewModel({
               uid: o.id,
             })),
           },
+        })
+        yield put({
+          type: 'orders/calculateAmount',
         })
 
         yield put({

@@ -91,7 +91,6 @@ class Diagnosis extends PureComponent {
   }
 
   render () {
-    console.log('diagnosis')
     const { theme } = this.props
     return (
       <div>
@@ -100,6 +99,8 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
+            // console.log('diagnosis', values)
+
             this.arrayHelpers = arrayHelpers
             if (!values || !values.corDiagnosis) return null
             return values.corDiagnosis

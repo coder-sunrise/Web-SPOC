@@ -4,8 +4,7 @@ let connection = null
 const connectionObserver = {}
 
 const initStream = () => {
-  const signalREndPoint =
-    'https://ec2-175-41-131-73.ap-southeast-1.compute.amazonaws.com/notificationHub'
+  const signalREndPoint = process.env.signalrUrl
 
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {

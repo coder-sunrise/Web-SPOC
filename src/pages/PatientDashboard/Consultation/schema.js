@@ -46,13 +46,13 @@ const schema = Yup.object().shape({
     }),
   ),
 
-  corDiagnosis: Yup.array().of(
-    Yup.object().shape({
-      diagnosisFK: Yup.number().required(),
-      // complication: Yup.array().of(Yup.string()).required().min(1),
-      onsetDate: Yup.string().required(),
-    }),
-  ),
+  // corDiagnosis: Yup.array().of(
+  //   Yup.object().shape({
+  //     diagnosisFK: Yup.number().required(),
+  //     // complication: Yup.array().of(Yup.string()).required().min(1),
+  //     onsetDate: Yup.string().required(),
+  //   }),
+  // ),
 })
 
 export default schema

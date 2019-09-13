@@ -220,10 +220,17 @@ class AntdSelect extends React.PureComponent {
 
     let proceed = true
     if (onChange) {
-      const option = (autoComplete || query ? this.state.data : options).find(
-        (o) => o[valueField] === newVal,
-      )
-      proceed = onChange(newVal, option) !== false
+      if (!mode || mode === 'default') {
+        const option = (autoComplete || query ? this.state.data : options).find(
+          (o) => o[valueField] === newVal,
+        )
+        proceed = onChange(newVal, option) !== false
+      } else {
+        const opts = (autoComplete || query
+          ? this.state.data
+          : options).filter((o) => newVal.find((m) => m === o[valueField]))
+        proceed = onChange(newVal, opts) !== false
+      }
     }
     if (proceed) {
       if (form && field) {

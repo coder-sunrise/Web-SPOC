@@ -32,6 +32,7 @@ export default createListViewModel({
       // editType: '1',
       rows: [],
       finalAdjustments: [],
+      summary: {},
       defaultMedication: {
         ...sharedMedicationValue,
       },
@@ -74,7 +75,7 @@ export default createListViewModel({
       // })
     },
     effects: {
-      *upsertRow ({ payload }, { select, call, put, delay, ...rest }) {
+      *upsertRow ({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'upsertRowState',
           payload,
@@ -83,9 +84,20 @@ export default createListViewModel({
           type: 'calculateAmount',
         })
       },
-      *addFinalAdjustment ({ payload }, { select, call, put, delay, ...rest }) {
+      *addFinalAdjustment ({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'addFinalAdjustmentState',
+          payload,
+        })
+
+        yield put({
+          type: 'calculateAmount',
+        })
+      },
+
+      *deleteFinalAdjustment ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'deleteFinalAdjustmentState',
           payload,
         })
 
@@ -162,23 +174,24 @@ export default createListViewModel({
         })
         finalAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
           rows.forEach((r) => {
-            console.log(r.weightage * fa.adjAmount, r)
+            // console.log(r.weightage * fa.adjAmount, r)
             r.totalAfterOverallAdjustment += r.weightage * fa.adjAmount
           })
         })
 
-        const gst =
-          rows.map((o) => o.totalAfterOverallAdjustment).reduce(sumReducer, 0) *
-          0.07
-        // console.log(rows, finalAdjustments)
+        const totalAfterAdj = rows
+          .map((o) => o.totalAfterOverallAdjustment)
+          .reduce(sumReducer, 0)
+        const gst = totalAfterAdj * 0.07
+        // console.log(totalAfterAdj, gst)
 
         return {
           ...state,
           rows,
           summary: {
             gst,
-            total,
-            totalWithGST: gst + total,
+            total: totalAfterAdj,
+            totalWithGST: gst + totalAfterAdj,
           },
         }
       },
@@ -211,7 +224,7 @@ export default createListViewModel({
         }
       },
 
-      deleteFinalAdjustment (state, { payload }) {
+      deleteFinalAdjustmentState (state, { payload }) {
         const { finalAdjustments } = state
 
         return {
