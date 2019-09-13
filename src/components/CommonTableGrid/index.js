@@ -798,7 +798,6 @@ class CommonTableGrid extends React.Component {
       ].concat(newLeftCols)
       newColumns.unshift({ name: 'rowIndex', title: 'No.' })
     }
-    // console.log(extraGetter, extraColumn, extraState)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper

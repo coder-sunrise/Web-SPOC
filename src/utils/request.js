@@ -1,10 +1,10 @@
 import fetch from 'dva/fetch'
 import axios from 'axios'
-import { notification } from '@/components'
 import router from 'umi/router'
 import hash from 'hash.js'
 import queryString from 'query-string'
 import $ from 'jquery'
+import { notification } from '@/components'
 import { isAntdPro, updateLoadingState } from './utils'
 
 // export const baseUrl = 'http://localhost:9300'
@@ -32,6 +32,7 @@ let dynamicURL = baseUrl
 // }
 
 const codeMessage = {
+  0: 'Service not available',
   200: 'Success',
   201: 'Created',
   202: 'Request in queue',
@@ -40,11 +41,11 @@ const codeMessage = {
   401: 'User session has expired. Please logout and login to refresh session.',
   403: 'Request received but user is unauthorized for such request',
   404: 'Method not allowed',
-  406: '请求的格式不可得。',
+  406: 'Not Acceptable',
   410: 'Hard delete',
   422: 'Verification error',
   500: 'Server error. Please contact administrator',
-  502: '网关错误。',
+  502: 'Bad Gateway',
   503: 'Server overloadded',
   504: 'Request timeout',
 }
@@ -289,13 +290,7 @@ export default function request (
         return data
       })
       .catch((response, s, xhr) => {
-        console.log(
-          response.getResponseHeader('Date'),
-          response.getResponseHeader('date'),
-          s,
-          xhr,
-          xhr,
-        )
+        console.log(response, s, xhr)
 
         let msg
         let status
@@ -307,7 +302,8 @@ export default function request (
             let returnObj = {
               title: codeMessage[response.status],
             }
-            let errorMsg = 'Unknown System Error'
+            // console.log(codeMessage, response)
+            let errorMsg = codeMessage[response.status]
 
             if (response.status === 401) {
               /* eslint-disable no-underscore-dangle */

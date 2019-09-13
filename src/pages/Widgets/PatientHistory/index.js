@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import moment from 'moment'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
+import router from 'umi/router'
 import Loadable from 'react-loadable'
 import classnames from 'classnames'
 import {
@@ -49,6 +50,8 @@ import Orders from './Orders'
 import ConsultationDocument from './ConsultationDocument'
 import ResultHistory from './ResultHistory'
 import Invoice from './Invoice'
+import AuthorizedContext from '@/components/Context/Authorized'
+
 // import ChiefComplaints from './ChiefComplaints'
 // import ChiefComplaints from './ChiefComplaints'
 
@@ -245,7 +248,7 @@ class PatientHistory extends Component {
             sorting: [
               {
                 columnName: 'VisitDate',
-                direction: 'asc',
+                direction: 'desc',
               },
             ],
           },
@@ -276,7 +279,7 @@ class PatientHistory extends Component {
           </GridItem>
           <GridItem sm={5}>
             <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-              <DatePicker text defaultValue={moment(row.visitDate)} />
+              <DatePicker text value={moment(row.visitDate)} />
             </span>
             <div className={this.props.classes.note}>&nbsp;</div>
           </GridItem>
@@ -311,13 +314,20 @@ class PatientHistory extends Component {
                     payload: o.id,
                   })
                   .then((r) => {
-                    if (r)
+                    if (r) {
+                      this.props.dispatch({
+                        type: 'patientHistory/updateState',
+                        payload: {
+                          selected: row,
+                        },
+                      })
                       this.props.dispatch({
                         type: 'consultationDocument/updateState',
                         payload: {
                           rows: r.documents,
                         },
                       })
+                    }
                   })
               }}
             >
@@ -349,8 +359,15 @@ class PatientHistory extends Component {
   }
 
   render () {
-    const { theme, style, classes, override = {}, patientHistory } = this.props
-    const { entity } = patientHistory
+    const {
+      theme,
+      style,
+      classes,
+      override = {},
+      patientHistory,
+      dispatch,
+    } = this.props
+    const { entity, visitInfo, selected } = patientHistory
     return (
       <div style={style}>
         <CardContainer
@@ -370,57 +387,103 @@ class PatientHistory extends Component {
               }))}
             />
           ) : (
-            <Skeleton height={300} />
+            <React.Fragment>
+              <Skeleton height={30} />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} width='80%' />
+            </React.Fragment>
           )}
         </CardContainer>
-        <CardContainer
-          hideHeader
-          size='sm'
-          className={classnames({
-            [classes.rightPanel]: true,
-            [override.rightPanel]: true,
-          })}
-          // style={{ marginLeft: theme.spacing.unit * 2 }}
-        >
-          <Select
-            noWrapper
-            defautValue={this.state.selectedItems}
-            all='0'
-            prefix='Filter By'
-            mode='multiple'
-            options={[
-              { name: 'All', value: '0' },
-              { name: 'Chief Complaints', value: '1' },
-              { name: 'Plan', value: '2' },
-              { name: 'Diagnosis', value: '3' },
-              { name: 'Consultation Document', value: '4' },
-              { name: 'Orders', value: '5' },
-              { name: 'Result History', value: '6' },
-              { name: 'Invoice', value: '7' },
-            ]}
-            label='Filter By'
-            maxTagCount={3}
-            style={{ marginBottom: theme.spacing(1) }}
-            onChange={this.onSelectChange}
-          />
-          {entity &&
-            this.widgets
-              .filter(
-                (o) =>
-                  this.state.selectedItems.length === 0 ||
-                  this.state.selectedItems.indexOf('0') >= 0 ||
-                  this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
-                const Widget = o.component
-                return (
-                  <div>
-                    <h5>{o.name}</h5>
-                    <Widget current={entity || {}} {...this.props} />
-                  </div>
-                )
-              })}
-        </CardContainer>
+        {selected && (
+          <CardContainer
+            hideHeader
+            size='sm'
+            className={classnames({
+              [classes.rightPanel]: true,
+              [override.rightPanel]: true,
+            })}
+            // style={{ marginLeft: theme.spacing.unit * 2 }}
+          >
+            <GridContainer gutter={0}>
+              <GridItem md={8}>
+                <Select
+                  noWrapper
+                  value={this.state.selectedItems}
+                  all='0'
+                  prefix='Filter By'
+                  mode='multiple'
+                  options={[
+                    { name: 'All', value: '0' },
+                    { name: 'Chief Complaints', value: '1' },
+                    { name: 'Plan', value: '2' },
+                    { name: 'Diagnosis', value: '3' },
+                    { name: 'Consultation Document', value: '4' },
+                    { name: 'Orders', value: '5' },
+                    { name: 'Result History', value: '6' },
+                    { name: 'Invoice', value: '7' },
+                  ]}
+                  label='Filter By'
+                  maxTagCount={3}
+                  style={{ marginBottom: theme.spacing(1) }}
+                  onChange={this.onSelectChange}
+                />
+              </GridItem>
+              <GridItem md={4}>
+                <Button
+                  color='primary'
+                  style={{ marginLeft: theme.spacing(2) }}
+                  onClick={() => {
+                    dispatch({
+                      type: `consultation/edit`,
+                      payload: selected.id,
+                    }).then((o) => {
+                      // console.log(o)
+                      dispatch({
+                        type: `consultation/updateState`,
+                        payload: {
+                          entity: o,
+                        },
+                      })
+                      router.push(
+                        `/reception/queue/patientdashboard?cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                      )
+                    })
+                  }}
+                >
+                  Edit Consultation
+                </Button>
+              </GridItem>
+            </GridContainer>
+
+            <AuthorizedContext.Provider
+              value={{
+                view: 'default',
+                edit: 'none',
+              }}
+            >
+              {entity &&
+                this.widgets
+                  .filter(
+                    (o) =>
+                      this.state.selectedItems.length === 0 ||
+                      this.state.selectedItems.indexOf('0') >= 0 ||
+                      this.state.selectedItems.indexOf(o.id) >= 0,
+                  )
+                  .map((o) => {
+                    const Widget = o.component
+                    return (
+                      <div>
+                        <h5>{o.name}</h5>
+                        <Widget current={entity || {}} {...this.props} />
+                      </div>
+                    )
+                  })}
+            </AuthorizedContext.Provider>
+          </CardContainer>
+        )}
       </div>
     )
   }

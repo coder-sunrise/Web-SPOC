@@ -41,9 +41,11 @@ class index extends PureComponent {
     })
   }
 
-  handleCalculateBMI = (i, form) => () => {
+  handleCalculateBMI = (i) => () => {
+    const { form } = this.arrayHelpers
     const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
     const { setFieldValue, setFieldTouched } = form
+    // console.log(heightCM, weightKG, form.values.corPatientNoteVitalSign[i])
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
       const bmi = weightKG / heightM ** 2

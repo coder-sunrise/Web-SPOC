@@ -1,9 +1,16 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import { Divider, CircularProgress, Paper, withStyles } from '@material-ui/core'
+import {
+  Divider,
+  CircularProgress,
+  Paper,
+  withStyles,
+  IconButton,
+} from '@material-ui/core'
 import Yup from '@/utils/yup'
 import { orderTypes } from '@/utils/codes'
+
 import {
   withFormikExtend,
   FastField,
@@ -63,7 +70,8 @@ class Details extends PureComponent {
   state = {}
 
   footerBtns = ({ onSave }) => {
-    const { classes } = this.props
+    const { classes, orders } = this.props
+    const { entity } = orders
     return (
       <React.Fragment>
         <Divider />
@@ -72,22 +80,38 @@ class Details extends PureComponent {
           <Button link style={{ float: 'left' }} onClick={this.showAdjustment}>
             {currencySymbol} Adjustment
           </Button>
-          <Button
-            color='danger'
-            onClick={() => {
-              this.props.dispatch({
-                type: 'orders/updateState',
-                payload: {
-                  entity: undefined,
-                  // adjustment: undefined,
-                  // totalAfterAdj: undefined,
-                },
-              })
-            }}
-          >
-            New
-          </Button>
-
+          {!!entity && (
+            <Button
+              color='danger'
+              onClick={() => {
+                this.props.dispatch({
+                  type: 'orders/updateState',
+                  payload: {
+                    entity: undefined,
+                    // adjustment: undefined,
+                    // totalAfterAdj: undefined,
+                  },
+                })
+              }}
+            >
+              New
+            </Button>
+          )}
+          {!entity && (
+            <Button
+              color='danger'
+              onClick={() => {
+                this.props.dispatch({
+                  type: 'orders/updateState',
+                  payload: {
+                    editType: undefined,
+                  },
+                })
+              }}
+            >
+              Discard
+            </Button>
+          )}
           <Button color='primary' onClick={onSave}>
             Save
           </Button>
@@ -151,7 +175,7 @@ class Details extends PureComponent {
       footer,
       dispatch,
     } = props
-    const { editType } = orders
+    const { editType, entity } = orders
     // console.log(values)
     const cfg = {
       footer: this.footerBtns,
@@ -169,6 +193,7 @@ class Details extends PureComponent {
                 options={orderTypes}
                 allowClear={false}
                 value={editType}
+                disabled={!!entity}
                 onChange={(v) => {
                   dispatch({
                     type: 'orders/updateState',

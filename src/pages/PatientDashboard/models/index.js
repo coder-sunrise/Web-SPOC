@@ -46,6 +46,8 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history, ...restProps }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
+        // console.log(pathname)
+
         if (pathname.indexOf('/reception/queue/patientdashboard') === 0) {
           dispatch({
             type: 'initState',
@@ -56,6 +58,7 @@ export default createFormViewModel({
               action: query.action,
               visitID: query.visit,
               status: query.status,
+              consultationID: Number(query.cid),
             },
           })
         }
@@ -84,7 +87,6 @@ export default createFormViewModel({
           ].includes(action) &&
           visitID
         ) {
-          console.log(status)
           if (
             (status === 'PAUSED' && action === 'resume') ||
             action !== 'resume'
@@ -95,19 +97,21 @@ export default createFormViewModel({
             })
             yield take(`consultation/${action}/@@end`)
           }
-          router.push(
-            getRemovedUrl([
-              'action',
-              'visit',
-              'status',
-            ]),
-          )
+          setTimeout(() => {
+            router.push(
+              getRemovedUrl([
+                'action',
+                'visit',
+                'status',
+              ]),
+            )
+          }, 1)
           return
         }
-
         if (
-          patientDashboard.queueID !== queueID ||
-          version !== patientDashboard.version
+          queueID &&
+          (patientDashboard.queueID !== queueID ||
+            version !== patientDashboard.version)
         ) {
           yield put({
             type: 'visitRegistration/fetchVisitInfo',
@@ -122,6 +126,7 @@ export default createFormViewModel({
             type: 'patientHistory/updateState',
             payload: {
               patientID: patientInfo.id,
+              visitInfo,
               version,
             },
           })
@@ -142,13 +147,15 @@ export default createFormViewModel({
             },
           })
         }
-        console.log(visitRegistration)
+        let { consultationID } = payload
+        // console.log(visitRegistration)
         if (visitRegistration) {
+          consultationID =
+            visitRegistration.visitInfo.visit.clinicalObjectRecordFK
           yield put({
             type: 'consultation/updateState',
             payload: {
-              consultationID:
-                visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+              consultationID,
               visitID: visitRegistration.visitInfo.visit.id,
               queueID,
               entity: undefined,
@@ -158,10 +165,7 @@ export default createFormViewModel({
           //   showConsultation,
           //   !visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
           // )
-          if (
-            showConsultation &&
-            !visitRegistration.visitInfo.visit.clinicalObjectRecordFK
-          ) {
+          if (showConsultation && !consultationID) {
             yield put({
               type: 'consultation/newConsultation',
               payload: visitRegistration.visitInfo.visit.id,
@@ -175,12 +179,19 @@ export default createFormViewModel({
 
           if (
             showConsultation &&
-            visitRegistration.visitInfo.visit.clinicalObjectRecordFK &&
+            consultationID &&
             (!consultation.entity || version !== patientDashboard.version)
           ) {
+            // console.log(
+            //   showConsultation,
+            //   consultationID,
+            //   consultation.entity,
+            //   version,
+            //   patientDashboard.version,
+            // )
             yield put({
               type: 'consultation/query',
-              payload: visitRegistration.visitInfo.visit.clinicalObjectRecordFK,
+              payload: consultationID,
             })
             yield take('consultation/query/@@end')
           }

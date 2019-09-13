@@ -169,7 +169,7 @@ class Vaccination extends PureComponent {
                   <CodeSelect
                     label='Usage'
                     allowClear={false}
-                    code='ctMedicationUsage'
+                    code='ctVaccinationUsage'
                     {...args}
                   />
                 )
@@ -199,7 +199,7 @@ class Vaccination extends PureComponent {
                   <CodeSelect
                     label='UOM'
                     allowClear={false}
-                    code='ctMedicationUnitOfMeasurement'
+                    code='ctVaccinationUnitOfMeasurement'
                     {...args}
                   />
                 )

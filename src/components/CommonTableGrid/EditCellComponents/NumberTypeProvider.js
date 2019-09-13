@@ -1,6 +1,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import { isNumber } from 'util'
 import numeral from 'numeral'
 import { withStyles } from '@material-ui/core'
 
@@ -123,7 +124,7 @@ const NumberFormatter = (columnExtensions) =>
         text = false,
       } = props
       if (value === undefined) return null
-
+      if (!isNumber(value)) return value
       let { color = 'darkblue' } = props
       const cfg =
         columnExtensions.find(
