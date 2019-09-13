@@ -14,6 +14,7 @@ import Yup from '@/utils/yup'
 import { compose } from 'redux'
 import DetailPanel from './Detail'
 import Setting from './Setting'
+import { InventoryTypes } from '@/utils/codes'
 
 const styles = (theme) => ({
   actionDiv: {
@@ -34,25 +35,25 @@ const Detail = (props) => {
     if (props.schemeDetail.currentId) {
       props
         .dispatch({
-          type: 'schemeDetail/query',
+          type: 'schemeDetail/querySchemeDetails',
           payload: {
             id: props.schemeDetail.currentId,
           },
         })
-        .then((o) => {
-          return {
-            ...o,
-            effectiveDates: [
-              o.effectiveStartDate,
-              o.effectiveEndDate,
-            ],
-            itemGroupMaxCapacityDtoRdoValue: o.itemGroupMaxCapacityDto
-              ? 'sub'
-              : 'all',
-            itemGroupValueDtoRdoValue: o.itemGroupValueDto ? 'sub' : 'all',
-          }
+        .then(() => {
+          // return {
+          //   ...o,
+          //   effectiveDates: [
+          //     o.effectiveStartDate,
+          //     o.effectiveEndDate,
+          //   ],
+          //   itemGroupMaxCapacityDtoRdoValue: o.itemGroupMaxCapacityDto
+          //     ? 'sub'
+          //     : 'all',
+          //   itemGroupValueDtoRdoValue: o.itemGroupValueDto ? 'sub' : 'all',
+          // }
         })
-        .then((o) => props.resetForm(o))
+      //.then((o) => props.resetForm(o))
     }
   }, [])
 
@@ -71,7 +72,6 @@ const Detail = (props) => {
   }
   const { currentTab } = schemeDetail
   // console.log(restProps)
-  console.log('details/index', props)
   return (
     <div>
       <NavPills
@@ -121,7 +121,7 @@ export default compose(
   })),
   withFormikExtend({
     mapPropsToValues: ({ schemeDetail }) => {
-      // console.log(1, 2, schemeDetail)
+      console.log('mapPropsToValues', schemeDetail)
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
@@ -137,10 +137,18 @@ export default compose(
       //effectiveStartDate: Yup.string().required(),
       //effectiveEndDate: Yup.string().required(),
     }),
+    enableReinitialize: true,
     handleSubmit: (values, { props, resetForm }) => {
+      InventoryTypes.forEach((p) => {
+        values[p.prop] = values.rows.filter((o) => o.type === p.value)
+      })
+
       const { effectiveDates, ...restValues } = values
-      console.log('restValues', restValues)
+      //console.log('restValues', restValues)
       const { dispatch, history, onConfirm, schemeDetail } = props
+
+      //console.log('restValues', restValues)
+
       dispatch({
         type: 'schemeDetail/upsert',
         payload: {

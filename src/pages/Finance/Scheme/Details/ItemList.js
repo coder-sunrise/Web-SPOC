@@ -26,63 +26,27 @@ const ItemList = ({
   classes,
   setFieldValue,
   dispatch,
-  ...props
+  values,
+  //...props
 }) => {
-  console.log('ItemList', props)
-  const [
-    values,
-    setValues,
-  ] = useState({})
-
-  const [
-    itemRows,
-    setItemRows,
-  ] = useState([])
-
-  useEffect(
-    () => {
-      setValues(props.values || {})
-      const { entity } = props.schemeDetail
-      if (entity) {
-        setFieldValue('rows', entity.rows)
-      }
-    },
-    [
-      props.values,
-    ],
-  )
-
-  useEffect(
-    () => {
-      const { entity } = props.schemeDetail
-      if (entity) {
-        setItemRows(entity.rows || [])
-      }
-      console.log('useEffect', entity)
-    },
-    [
-      props.schemeDetail.entity,
-    ],
-  )
-
   function callback (key) {
     console.log('key', key)
-  }
-
-  function onClickDelete (row) {
-    console.log('onClickDelete', row)
-    console.log('onClickDelete2', values)
   }
 
   const addItemToRows = (obj) => {
     const newRows = values.rows
     newRows.push(obj)
     setFieldValue('rows', newRows)
+
+    //Reset field
+    setFieldValue('tempSelectedItemFK', '')
+    setFieldValue('tempSelectedItemSellingPrice', '')
+    setFieldValue('tempSelectedItemTotalPrice', '')
   }
 
   const onClickAdd = (type) => {
     switch (type) {
-      case 'InventoryConsumable':
+      case 'inventoryconsumable':
         const inventoryConsumable = {
           uid: getUniqueId(),
           type: 1,
@@ -98,7 +62,7 @@ const ItemList = ({
         addItemToRows(inventoryConsumable)
 
         break
-      case 'InventoryMedication':
+      case 'inventorymedication':
         const inventoryMedication = {
           uid: getUniqueId(),
           type: 2,
@@ -115,7 +79,7 @@ const ItemList = ({
         addItemToRows(inventoryMedication)
 
         break
-      case 'InventoryVaccination':
+      case 'inventoryvaccination':
         const inventoryVaccination = {
           uid: getUniqueId(),
           type: 3,
@@ -132,7 +96,7 @@ const ItemList = ({
         addItemToRows(inventoryVaccination)
 
         break
-      case 'ctService':
+      case 'ctservice':
         const ctService = {
           uid: getUniqueId(),
           type: 4,
@@ -149,7 +113,7 @@ const ItemList = ({
         addItemToRows(ctService)
 
         break
-      case 'InventoryPackage':
+      case 'inventorypackage':
         const inventoryPackage = {
           uid: getUniqueId(),
           type: 5,
@@ -172,7 +136,7 @@ const ItemList = ({
   const onItemSelect = (e, option) => {
     if (e) {
       const { sellingPrice, totalPrice } = option
-      console.log('onItemSelect', e)
+      //console.log('onItemSelect', option)
       setFieldValue('tempSelectedItemSellingPrice', sellingPrice)
       setFieldValue('tempSelectedItemTotalPrice', totalPrice)
     }
@@ -188,8 +152,7 @@ const ItemList = ({
               return (
                 <CodeSelect
                   labelField='displayValue'
-                  onChange={(e, option) =>
-                    onItemSelect(e, option, setFieldValue)}
+                  onChange={(e, option) => onItemSelect(e, option)}
                   code={type}
                   {...args}
                 />
@@ -210,35 +173,35 @@ const ItemList = ({
     {
       id: 1,
       name: 'Consumables',
-      content: addContent('InventoryConsumable'),
+      content: addContent('inventoryconsumable'),
     },
     {
       id: 2,
       name: 'Medications',
-      content: addContent('InventoryMedication'),
+      content: addContent('inventorymedication'),
     },
     {
       id: 3,
       name: 'Vaccines',
-      content: addContent('InventoryVaccination'),
+      content: addContent('inventoryvaccination'),
     },
     {
       id: 4,
       name: 'Services',
-      content: addContent('ctService'),
+      content: addContent('ctservice'),
     },
     {
       id: 5,
       name: 'Packages',
-      content: addContent('InventoryPackage'),
+      content: addContent('inventorypackage'),
     },
   ]
 
   const tableConfigs = {
+    getRowId: (r) => r.uid,
     columns: [
       { name: 'type', title: 'Type' },
       { name: 'itemFK', title: 'Item' },
-      { name: 'inventoryConsumableFK', title: 'dev:ItemFK' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'cpAmount', title: 'Co-Pay Amount' },
       { name: 'action', title: 'Actions' },
@@ -251,13 +214,29 @@ const ItemList = ({
       },
       {
         columnName: 'itemFK',
-        type: 'codeSelect',
-        code: 'InventoryConsumable',
-        labelField: 'displayValue',
-        valueField: 'id',
-      },
-      {
-        columnName: 'inventoryConsumableFK',
+        render: (row) => {
+          const inventory = InventoryTypes.filter(
+            (x) => x.value === row.type,
+          )[0]
+          const { ctName, itemFKName } = inventory
+
+          return (
+            <FastField
+              name={`rows[${row.rowIndex - 1}].${itemFKName}`}
+              render={(args) => {
+                console.log(args)
+                return (
+                  <CodeSelect
+                    text
+                    labelField='displayValue'
+                    code={ctName}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          )
+        },
       },
       {
         columnName: 'unitPrice',
@@ -277,10 +256,8 @@ const ItemList = ({
                   name={`rows[${row.rowIndex - 1}].itemValue`}
                   render={CPNumber(
                     ' ',
-                    Array.isArray(values.consumableValueDto) &&
-                    values.consumableValueDto.length >= 1
-                      ? values.consumableValueDto[row.rowIndex - 1]
-                          .itemValueType
+                    Array.isArray(values.rows) && values.rows.length >= 1
+                      ? values.rows[row.rowIndex - 1].itemValueType
                       : 'ExactAmount',
                   )}
                 />
@@ -294,21 +271,21 @@ const ItemList = ({
             </GridContainer>
           )
         },
-      }, //
+      },
       {
         columnName: 'action',
         align: 'center',
         render: (row) => {
           return (
             <Popconfirm
-              // onConfirm={() =>
-              //   dispatch({
-              //     type: 'schemeDetail/deleteRow',
-              //     payload: {
-              //       id: row.uid,
-              //     },
-              //   })}
-              onConfirm={() => onClickDelete(row)}
+              onConfirm={() =>
+                dispatch({
+                  type: 'schemeDetail/deleteRow',
+                  payload: {
+                    id: row.uid,
+                  },
+                })}
+              //onConfirm={() => onClickDelete(row)}
             >
               <Tooltip title='Delete'>
                 <Button size='sm' color='danger' justIcon>
@@ -316,20 +293,6 @@ const ItemList = ({
                 </Button>
               </Tooltip>
             </Popconfirm>
-
-            // <Button
-            //   //onClick={() => onClickDelete(row)}
-            //   onClick={() => onClickDelete(row)}
-            //   //onClick={(e) => {
-            //   // updateGlobalVariable('gridIgnoreValidation', true)
-            //   // onExecute(e)
-            //   //}}
-            //   justIcon
-            //   color='danger'
-            //   title='Delete'
-            // >
-            //   <Delete />
-            // </Button>
           )
         },
       },
@@ -342,7 +305,6 @@ const ItemList = ({
       // },
     },
   }
-
   return (
     <div>
       <Tabs defaultActiveKey='1' options={options()} onChange={callback} />
