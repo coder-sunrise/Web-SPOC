@@ -862,30 +862,35 @@ export const InventoryTypes = [
     name: 'Comsumables',
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
+    ctName: 'inventoryconsumable',
   },
   {
     value: 2,
     name: 'Medications',
     prop: 'medicationValueDto',
     itemFKName: 'inventoryMedicationFK',
+    ctName: 'inventorymedication',
   },
   {
     value: 3,
     name: 'Vaccines',
     prop: 'vaccinationValueDto',
     itemFKName: 'inventoryVaccinationFK',
+    ctName: 'inventoryvaccination',
   },
   {
     value: 4,
     name: 'Services',
     prop: 'serviceValueDto',
     itemFKName: 'serviceCenterServiceFK',
+    ctName: 'ctservice',
   },
   {
     value: 5,
     name: 'Packages',
     prop: 'packageValueDto',
     itemFKName: 'inventoryPackageFK',
+    ctName: 'inventorypackage',
   },
 ]
 

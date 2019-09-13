@@ -360,7 +360,7 @@ class AntdSelect extends React.PureComponent {
     }
 
     if (this.props.text) {
-      const match = source.find((o) => o[this.props.valueField] === value)
+      const match = source.find((o) => o[this.props.valueField] === this.state.value)
       let text = ''
       if (match) text = match[this.props.labelField]
       return (
