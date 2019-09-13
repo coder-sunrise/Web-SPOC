@@ -119,6 +119,7 @@ const Setting = (props) => {
         </GridContainer>
         <ItemList
           {...props}
+          //values={values}
           CPSwitch={CPSwitch}
           CPNumber={CPNumber}
           setFieldValue={setFieldValue}

@@ -2,6 +2,7 @@ import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
 const { upsert } = service
+const { queryOne } = service
 import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 
@@ -72,7 +73,6 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct) => {
         const { pathname, search, query = {} } = loct
-        // console.log(pathname)
         if (pathname.indexOf('/finance/scheme/') === 0) {
           dispatch({
             type: 'updateState',
@@ -88,10 +88,17 @@ export default createFormViewModel({
       *submit ({ payload }, { call }) {
         return yield call(upsert, payload)
       },
+      *querySchemeDetails ({ payload }, { call, put }) {
+        const response = yield call(queryOne, payload)
+        yield put({
+          type: 'schemeDetailsResult',
+          payload: response.status == '200' ? response.data : {},
+        })
+      },
     },
     reducers: {
-      queryDone (state, { payload }) {
-        const { data } = payload
+      schemeDetailsResult (state, { payload }) {
+        const data = payload
         let itemRows = []
         InventoryTypes.forEach((x) => {
           itemRows = itemRows.concat(
@@ -107,12 +114,20 @@ export default createFormViewModel({
           )
         })
 
-        console.log('queryDone', itemRows)
+        console.log('schemeDetailsResult', { ...data, rows: itemRows })
 
         return {
           ...state,
           entity: {
-            ...state.entity,
+            ...data,
+            effectiveDates: [
+              data.effectiveStartDate,
+              data.effectiveEndDate,
+            ],
+            itemGroupMaxCapacityDtoRdoValue: data.itemGroupMaxCapacityDto
+              ? 'sub'
+              : 'all',
+            itemGroupValueDtoRdoValue: data.itemGroupValueDto ? 'sub' : 'all',
             rows: itemRows,
           },
         }
@@ -120,7 +135,7 @@ export default createFormViewModel({
 
       deleteRow (state, { payload }) {
         const { rows } = state.entity
-        console.log('deleteRow', rows)
+
         return {
           ...state,
           entity: {

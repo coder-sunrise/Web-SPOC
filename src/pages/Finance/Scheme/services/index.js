@@ -10,6 +10,9 @@ module.exports = {
   query: (params) => {
     return service.query(url, params)
   },
+  queryOne: (params) => {
+    return service.query(url, params)
+  },
   upsert: (params) => {
     return service.upsert(url, params)
   },
