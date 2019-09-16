@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import DeleteOutline from '@material-ui/icons/DeleteOutline'
 import Yup from '@/utils/yup'
 import {
   EditableTableGrid,
@@ -9,14 +10,14 @@ import {
   GridContainer,
   GridItem,
 } from '@/components'
-import DeleteOutline from '@material-ui/icons/DeleteOutline'
 import { podoOrderType, getInventoryItem } from '@/utils/codes'
+
 let commitCount = 2200 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
   code: Yup.number().required(),
-  //name: Yup.number().required(),
+  // name: Yup.number().required(),
   orderQty: Yup.number().min(1).required(),
   bonusQty: Yup.number().min(0).required(),
   quantityReceived: Yup.number().min(0).required(),
@@ -89,17 +90,17 @@ class Grid extends PureComponent {
       const calcTotalPrice = () => {
         if (orderQty >= 1 && selectedItem.sellingPrice) {
           return orderQty * selectedItem.sellingPrice
-        } else {
+        } 
           return selectedItem.sellingPrice || defaultAmount
-        }
+        
       }
 
       const calcTotalQty = () => {
         if (orderQty && bonusQty) {
           return orderQty + bonusQty
-        } else {
+        } 
           return defaultQty
-        }
+        
       }
 
       if (onClickColumn === 'Type') {
@@ -131,7 +132,7 @@ class Grid extends PureComponent {
         finalAddedRows = addedRows.map((row) => ({
           ...row,
           itemFK: selectedItem.id,
-          //name: selectedItem.displayValue,
+          // name: selectedItem.displayValue,
           uom: selectedItem.uom,
           unitPrice: selectedItem.sellingPrice
             ? selectedItem.sellingPrice
@@ -140,7 +141,7 @@ class Grid extends PureComponent {
           totalPrice: calcTotalPrice(),
         }))
       } else {
-        //console.log('onAddedRowsChangeElse', calcTotalQty())
+        // console.log('onAddedRowsChangeElse', calcTotalQty())
         finalAddedRows = addedRows.map((row) => ({
           ...row,
           totalQty: calcTotalQty(),
@@ -176,7 +177,7 @@ class Grid extends PureComponent {
   }
 
   render () {
-    //const { purchaseOrderItems } = this.props
+    // const { purchaseOrderItems } = this.props
     const { rows, dispatch, isEditable } = this.props
     console.log('Grid', rows)
 
@@ -193,10 +194,10 @@ class Grid extends PureComponent {
         { name: 'bonusQty', title: 'Bonus Qty' },
         { name: 'totalQty', title: 'Total Qty' }, // Disabled, auto calc
         { name: 'quantityReceived', title: 'Total Received' },
-        //Sync c -s
+        // Sync c -s
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'totalPrice', title: 'Total Price' }, // Disabled, auto calc
-        //Sync c -e
+        // Sync c -e
       ],
       columnExtensions: [
         {
@@ -333,7 +334,7 @@ class Grid extends PureComponent {
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>
           <EditableTableGrid
-            //rows={purchaseOrderItems}
+            // rows={purchaseOrderItems}
             rows={rows}
             schema={receivingDetailsSchema}
             FuncProps={{

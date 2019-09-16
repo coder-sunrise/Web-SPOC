@@ -439,6 +439,13 @@ class Consultation extends PureComponent {
   }
 
   removeWidget = (widgetId) => {
+    const wg = widgets.find((o) => o.id === widgetId)
+    const { model } = wg
+    if (model) {
+      this.props.dispatch({
+        type: `${model}/removeWidget`,
+      })
+    }
     const { currentLayout } = this.state
 
     const layout = {
@@ -767,7 +774,7 @@ class Consultation extends PureComponent {
                             </Tooltip>
 
                             <Popconfirm
-                              title='Do you want to remove this widget?'
+                              title='Removing widget will remove all underlying data. Remove this widget?'
                               onConfirm={() => this.removeWidget(id)}
                             >
                               <Tooltip title='Delete'>
