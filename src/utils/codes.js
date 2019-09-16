@@ -925,7 +925,6 @@ module.exports = {
   // paymentMethods,
   // titles,
   // finTypes,
-  // status,
   // drugs,
   // consumptionMethods,
   // dosage,
@@ -948,6 +947,8 @@ module.exports = {
   // preferredContactMode,
   // countries,
   // schemes,
+  status,
+
   addressTypes,
   orderTypes,
   currencies,
