@@ -38,6 +38,7 @@ const RadioEditorBase = React.memo(
       uncheckedValue = false,
       gridId,
       isDisabled = () => false,
+      getRowId,
       ...restConfig
     } = cfg
     // console.log(cfg)
@@ -61,7 +62,7 @@ const RadioEditorBase = React.memo(
     const commonCfg = {
       disabled: isDisabled(
         window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][row.id] || {}
+          ? window.$tempGridRow[gridId][getRowId(row)] || {}
           : row,
       ),
     }

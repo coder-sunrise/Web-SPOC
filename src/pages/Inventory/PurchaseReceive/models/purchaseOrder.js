@@ -16,8 +16,8 @@ export default createListViewModel({
         purchaseOrder: {
           poNo: 'PO/000001',
           poDate: moment(),
-          status: 'Draft',
-          //status: 'Finalized',
+          //status: 'Draft',
+          status: 'Finalized',
           shippingAddress:
             '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
           gstEnabled: true,
@@ -47,7 +47,7 @@ export default createListViewModel({
         ],
         purchaseOrderVaccinationItem: [
           {
-            id: 2,
+            id: 1,
             inventoryVaccinationFK: 10,
             uom: 10,
             orderQty: 1,
@@ -66,7 +66,7 @@ export default createListViewModel({
         ],
         purchaseOrderConsumableItem: [
           {
-            id: 3,
+            id: 1,
             inventoryConsumableFK: 8,
             uom: 8,
             orderQty: 1,
@@ -83,7 +83,7 @@ export default createListViewModel({
             isDeleted: false,
           },
           {
-            id: 4,
+            id: 1,
             inventoryConsumableFK: 10,
             uom: 10,
             orderQty: 1,

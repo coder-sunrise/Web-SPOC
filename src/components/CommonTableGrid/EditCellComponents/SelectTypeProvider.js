@@ -120,10 +120,11 @@ class SelectEditor extends PureComponent {
       onChange,
       gridId,
       options,
+      getRowId,
       ...restProps
     } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
     const _onChange = (val, option) => {
@@ -154,7 +155,7 @@ class SelectEditor extends PureComponent {
       ...restProps,
       onChange: this._onChange,
     }
-    // console.log(columnName)
+    console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
