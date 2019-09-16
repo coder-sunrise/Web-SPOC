@@ -1,6 +1,7 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Component } from 'react'
 import { connect } from 'dva'
 import DeleteOutline from '@material-ui/icons/DeleteOutline'
+import _ from 'lodash'
 import Yup from '@/utils/yup'
 import {
   EditableTableGrid,
@@ -23,13 +24,15 @@ const receivingDetailsSchema = Yup.object().shape({
   quantityReceived: Yup.number().min(0).required(),
 })
 
-class Grid extends PureComponent {
+class Grid extends Component {
   constructor (props) {
     super(props)
     this.state = {
       onClickColumn: undefined,
       selectedItem: {},
       itemDropdownList: [],
+      selectedName: null,
+      selectedCode: null,
     }
   }
 
@@ -71,7 +74,11 @@ class Grid extends PureComponent {
   handleItemOnChange = (e) => {
     console.log('handleItemOnChange', e)
     const { option, row } = e
-    const { sellingPrice, uom, name, value } = option
+    const { sellingPrice, uom, name, value, displayValue } = option
+
+    row.code = name
+    row.name = displayValue
+
     this.setState({
       selectedItem: option,
       onClickColumn: 'Code',
@@ -80,8 +87,8 @@ class Grid extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
-    const defaultQty = 1
-    const defaultAmount = 0.00001
+    const defaultQty = 0
+    const defaultAmount = 0
     if (addedRows.length > 0) {
       let finalAddedRows
       const { selectedItem, onClickColumn } = this.state
@@ -90,17 +97,15 @@ class Grid extends PureComponent {
       const calcTotalPrice = () => {
         if (orderQty >= 1 && selectedItem.sellingPrice) {
           return orderQty * selectedItem.sellingPrice
-        } 
-          return selectedItem.sellingPrice || defaultAmount
-        
+        }
+        return selectedItem.sellingPrice || defaultAmount
       }
 
       const calcTotalQty = () => {
         if (orderQty && bonusQty) {
           return orderQty + bonusQty
-        } 
-          return defaultQty
-        
+        }
+        return defaultQty
       }
 
       if (onClickColumn === 'Type') {
@@ -126,7 +131,7 @@ class Grid extends PureComponent {
         finalAddedRows = addedRows.map((row) => ({
           ...row,
           itemFK: selectedItem.id,
-          // name: selectedItem.displayValue,
+          name: selectedItem.id,
           uom: selectedItem.uom,
           unitPrice: selectedItem.sellingPrice
             ? selectedItem.sellingPrice
@@ -173,6 +178,7 @@ class Grid extends PureComponent {
   render () {
     // const { purchaseOrderItems } = this.props
     const { rows, dispatch, isEditable } = this.props
+    const { selectedItem, selectedCode, selectedName } = this.state
     console.log('Grid', rows)
 
     const tableParas = {
@@ -201,55 +207,35 @@ class Grid extends PureComponent {
           onChange: (e) => {
             if (e.option) {
               this.handleOnOrderTypeChanged(e)
+
+              dispatch({
+                // force current edit row components to update
+                type: 'global/updateState',
+                payload: {
+                  commitCount: (commitCount += 1),
+                },
+              })
             }
           },
         },
-        // {
-        //   columnName: 'code',
-        //   type: 'select',
-        //   labelField: 'name',
-        //   options: this.state.itemDropdownList,
-        //   onChange: (e) => {
-        //     if (e.option) {
-        //       this.handleItemOnChange(e)
-        //     }
-        //   },
-        // },
-        // {
         {
           columnName: 'code',
           type: 'select',
-          labelField: 'name',
+          // labelField: 'name',
           options: this.state.itemDropdownList,
+
           onChange: (e) => {
             if (e.option) {
               this.handleItemOnChange(e)
             }
-          },
-          render: (row) => {
-            if (row.uid) {
-              const podoType = podoOrderType.filter(
-                (x) => x.value === row.type,
-              )[0]
-              const { ctName, itemFKName } = podoType
 
-              return (
-                <FastField
-                  name={`rows[${row.rowIndex - 1}].${itemFKName}`}
-                  render={(args) => {
-                    console.log(args)
-                    return (
-                      <CodeSelect
-                        text
-                        labelField='code'
-                        code={ctName}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              )
-            }
+            dispatch({
+              // force current edit row components to update
+              type: 'global/updateState',
+              payload: {
+                commitCount: (commitCount += 1),
+              },
+            })
           },
         },
         {
@@ -257,35 +243,19 @@ class Grid extends PureComponent {
           type: 'select',
           labelField: 'displayValue',
           options: this.state.itemDropdownList,
+
           onChange: (e) => {
             if (e.option) {
               this.handleItemOnChange(e)
             }
-          },
-          render: (row) => {
-            if (row.uid) {
-              const podoType = podoOrderType.filter(
-                (x) => x.value === row.type,
-              )[0]
-              const { ctName, itemFKName } = podoType
 
-              return (
-                <FastField
-                  name={`rows[${row.rowIndex - 1}].${itemFKName}`}
-                  render={(args) => {
-                    console.log(args)
-                    return (
-                      <CodeSelect
-                        text
-                        labelField='displayValue'
-                        code={ctName}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              )
-            }
+            dispatch({
+              // force current edit row components to update
+              type: 'global/updateState',
+              payload: {
+                commitCount: (commitCount += 1),
+              },
+            })
           },
         },
         {
