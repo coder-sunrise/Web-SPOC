@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
+import moment from 'moment'
 import Yup from '@/utils/yup'
 import { status } from '@/utils/codes'
-import moment from 'moment'
 
 // import Edit from '@material-ui/icons/Edit'
 // import Delete from '@material-ui/icons/Delete'
@@ -94,7 +94,7 @@ class Detail extends PureComponent {
                   <TextField
                     label='Code'
                     {...args}
-                    disabled={settingPublicHoliday.entity ? true : false}
+                    disabled={!!settingPublicHoliday.entity}
                   />
                 )}
               />
