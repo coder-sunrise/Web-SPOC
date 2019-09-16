@@ -2,7 +2,7 @@
  * Maintains the history of an object
  */
 class History {
-  constructor (undoLimit = 100, debug = false) {
+  constructor (undoLimit = 200, debug = false) {
     this.undoLimit = undoLimit
     this.undoList = []
     this.redoList = []
@@ -38,6 +38,10 @@ class History {
     return this.allList
   }
 
+  getInitializeList (data) {
+    this.allList = data
+  }
+
   /**
    * Keep an object to history
    *
@@ -50,15 +54,17 @@ class History {
       let [
         mainObject,
       ] = obj
-      if (mainObject.id !== 'delete') {
-        this.redoList = []
-        this.allList.push({
-          data: obj,
-          type: mainObject.type,
-          sequence: this.count,
-        })
-        this.count = this.count + 1
-      } else if (mainObject.id === 'delete') {
+      // if (mainObject.id !== 'delete' && mainObject.id !== 'oldTemplate') {
+      //   console.log("not equal")
+      //   this.redoList = []
+      //   this.allList.push({
+      //     data: obj,
+      //     type: mainObject.type,
+      //     sequence: this.count,
+      //   })
+      //   this.count = this.count + 1
+      // } else
+      if (mainObject.id === 'delete' || mainObject.id === 'oldTemplate') {
         for (let i = 0; i < this.allList.length; i++) {
           let [
             arrayobject,
@@ -76,6 +82,14 @@ class History {
             }
           }
         }
+      } else {
+        this.redoList = []
+        this.allList.push({
+          data: obj,
+          type: mainObject.type,
+          sequence: this.count,
+        })
+        this.count = this.count + 1
       }
 
       if (this.current) {
@@ -89,7 +103,6 @@ class History {
       this.print()
     }
   }
-
 
   /**
    * Undo the last object, this operation will set the current object to one step back in time
@@ -135,20 +148,18 @@ class History {
   redo () {
     try {
       if (this.redoList.length > 0) {
-        if (this.current) {
-          this.undoList.push(this.current)
-          let [
-            object,
-          ] = this.current
-          this.allList.push({
-            data: this.current,
-            type: object.type,
-            sequence: this.count,
-          })
-          this.count = this.count + 1
-          this.current = this.redoList.pop()
-          return this.current
-        }
+        if (this.current) this.undoList.push(this.current)
+        this.current = this.redoList.pop()
+        let [
+          object,
+        ] = this.current
+        this.allList.push({
+          data: this.current,
+          type: object.type,
+          sequence: this.count,
+        })
+        this.count = this.count + 1
+        return this.current
       }
       return null
     } finally {
@@ -180,8 +191,9 @@ class History {
   clear () {
     this.undoList = []
     this.redoList = []
-    // this.allList = []
+    this.allList = []
     this.current = null
+    this.count = 1
     this.print()
   }
 

@@ -67,4 +67,6 @@ export * from './formik/index'
 
 export AuthorizedContext from './Context/Authorized'
 
+export * from '@material-ui/lab'
+
 export {default as Scribble} from './Scribble'

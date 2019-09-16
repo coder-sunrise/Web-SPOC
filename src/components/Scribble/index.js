@@ -23,6 +23,7 @@ import Move from '@material-ui/icons/OpenWith'
 import Select from '@material-ui/icons/PanTool'
 import Visibility from '@material-ui/icons/Visibility'
 import InVisibility from '@material-ui/icons/VisibilityOff'
+import { connect } from 'dva'
 import { Radio } from 'antd'
 import Yup from '@/utils/yup'
 import {
@@ -39,6 +40,11 @@ import {
   withFormikExtend,
   FastField,
 } from '@/components'
+
+
+
+
+
 
 const styles = () => ({
   container: {
@@ -96,14 +102,41 @@ const styles = () => ({
   },
 })
 
-@withFormikExtend({
-  validationSchema: Yup.object().shape({
-    subject: Yup.string().required(),
-  }),
-  handleSubmit: (values, { props, resetForm }) => {
-    console.log(values)
 
-    // // console.log('restValues') 
+
+let temp = null
+@withFormikExtend({
+  // displayName: 'purchaseOrder',
+  // mapPropsToValues: ({ purchaseOrder }) => {
+  //   return purchaseOrder.entity || purchaseOrder.default
+  // },
+  mapPropsToValues: ({ scriblenotes }) =>
+ {return scriblenotes.entity === '' ? "" : scriblenotes.entity},
+  validationSchema: Yup.object().shape({
+    subject: Yup.string()
+      .required()
+      .max(20, 'Subject should not exceed 20 characters'),
+  }),
+  handleSubmit: (values, { props }) => {
+    console.log(values)
+    const { dispatch, scriblenotes } = props
+
+    props.addScribble(values.subject, temp)
+    props.toggleScribbleModal()
+    // dispatch({
+    //   type: 'clinicalnotes/updateState',
+    //   payload: {
+    //     ...clinicalnotes,
+    //     notes: {
+    //       notesArray: [
+    //         ...clinicalnotes.notes.notesArray,
+    //         { subject: values.subject, lineData: temp },
+    //       ],
+    //     },
+    //   },
+    // })
+
+    // // console.log('restValues')
     // console.log('restValues', values)
     // const { effectiveDates, ...restValues } = values
     // const { dispatch, history, onConfirm, medicationDetail } = props
@@ -127,6 +160,10 @@ const styles = () => ({
     // })
   },
 })
+
+@connect(({ clinicalnotes }) => ({
+  clinicalnotes,
+}))
 class Scribble extends React.Component {
   constructor (props) {
     super(props)
@@ -227,7 +264,9 @@ class Scribble extends React.Component {
   }
 
   testPassValue = () => {
-    return this._sketch.getValue()
+    let value = this._sketch.getValue()
+    console.log(value)
+    return value
   }
 
   _download = () => {
@@ -272,25 +311,36 @@ class Scribble extends React.Component {
       let reader = new FileReader()
       reader.addEventListener(
         'load',
-        () => sketch.setBackgroundFromDataUrl(reader.result, indexCount),
+        () => sketch.setBackgroundFromDataUrl(reader.result),
         false,
       )
 
-      let newIndexCount = indexCount + 1
+      // let newIndexCount = indexCount + 1
 
-      this.setState({
-        indexCount: newIndexCount,
-      })
+      // this.setState({
+      //   indexCount: newIndexCount,
+      // })
       reader.readAsDataURL(accepted[0])
     }
   }
 
   _setTemplate = () => {
-    this._sketch.setTemplate(this.state.exampleImage, -500)
+    this._sketch.setTemplate(this.state.exampleImage)
+  }
+
+  componentDidMount () {
+    if (this.props.scribbleData !== '') {
+      this._sketch.initializeData(this.props.scribbleData.lineData)
+    }
   }
 
   render () {
-    const { classes, toggleScribbleModal, handleSubmit, getScribbleValue } = this.props
+    const {
+      classes,
+      toggleScribbleModal,
+      handleSubmit,
+      scriblenotes,
+    } = this.props
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -693,20 +743,16 @@ class Scribble extends React.Component {
                   )}
                 </ToggleButton>
               </Tooltip>
-              <Tooltip title='Test'>
-                <ToggleButton
-                  key={10}
-                  checked={this.state.hideEnable}
-                  onClick={this._test}
-                >
-                  Test
-                </ToggleButton>
-              </Tooltip>
             </ToggleButtonGroup>
 
             <div className={classes.rightButton}>
               <div className={classes.actionDiv}>
-                <ProgressButton onClick={handleSubmit} />
+                <ProgressButton
+                  onClick={() => {
+                    temp = this._sketch.getValue()
+                    handleSubmit()
+                  }}
+                />
                 <Button color='danger' onClick={toggleScribbleModal}>
                   Cancel
                 </Button>

@@ -75,6 +75,7 @@ class SketchField extends PureComponent {
   state = {
     parentWidth: 550,
     action: true,
+    indexCount: 1,
   }
 
   _initTools = (fabricCanvas) => {
@@ -149,7 +150,6 @@ class SketchField extends PureComponent {
     // if(e.target.type != "image"){
     if (e.target.id !== 'ARROW') {
       let obj = e.target
-
       obj.__version = 1
       // record current object state as json and save as originalState
       let objState = obj.toJSON()
@@ -169,27 +169,41 @@ class SketchField extends PureComponent {
     return this._history.getAllList()
   }
 
-  test = () => {
+  initializeData = (data) => {
     let history = this._history
     let canvas = this._fc
-    let allList = history.getAllList()
-    console.log(allList)
-
+    let allList = data
+    let { indexCount } = this.state
+    let latestIndex = 0
+    history.getInitializeList(data)
     for (let i = 0; i < allList.length; i++) {
       let [
-        obj
+        obj,
       ] = allList[i].data
 
- 
-        this.setState({ action: false }, () => {
-          this._fc.add(obj)
-          if (obj.zindex != null) {
-            canvas.moveTo(obj, obj.zindex)
+      this.setState({ action: false }, () => {
+        this._fc.add(obj)
+        if (obj.zindex != null) {
+          canvas.moveTo(obj, obj.zindex)
+
+          if (obj.id === 'template') {
+            canvas.moveTo(obj, -100)
+          }else{
+            latestIndex = obj.zindex
           }
-          obj.__version -= 1
-          obj.__removed = false
-        })
-      
+
+          if(i === (allList.length-1)){
+            if (latestIndex !== 0) {
+              latestIndex += 1
+              this.setState({
+                indexCount: latestIndex,
+              })
+            }
+          }
+        }
+        obj.__version -= 1
+        obj.__removed = false
+      })
     }
   }
 
@@ -229,7 +243,7 @@ class SketchField extends PureComponent {
   _onObjectRemoved = (e) => {
     let obj = e.target
     let canvas = this._fc
-    if (obj.id === 'delete') {
+    if (obj.id === 'delete' || obj.id === 'oldTemplate') {
       let activeObj = obj
       if (activeObj) {
         let selected = []
@@ -640,23 +654,34 @@ class SketchField extends PureComponent {
    * @param dataUrl the dataUrl to be used as a background
    * @param options
    */
-  setBackgroundFromDataUrl = (dataUrl, indexCount) => {
+  setBackgroundFromDataUrl = (dataUrl) => {
     let canvas = this._fc
+    let { indexCount } = this.state
+
+    let oldIndexCount = indexCount
+    let newIndexCount = indexCount + 1
+
+    this.setState({
+      indexCount: newIndexCount,
+    })
+
     // const context = canvas.getContext('2d')
     const image = new Image()
     image.src = dataUrl
     image.onload = () => {
       let imgbase64 = new fabric.Image(image, {})
       imgbase64.set({
-        zindex: indexCount,
+        zindex: oldIndexCount,
       })
       // canvas.setBackgroundImage(imgbase64)
       canvas.add(imgbase64)
       imgbase64.selectable = false
       imgbase64.evented = false
-      canvas.moveTo(imgbase64, indexCount)
+      canvas.moveTo(imgbase64, oldIndexCount)
       // context.drawImage(imgbase64, 0, 0);
     }
+
+    
 
     // fabric.Image.fromURL(
     //   dataUrl,
@@ -678,7 +703,7 @@ class SketchField extends PureComponent {
     // img.src = dataUrl
   }
 
-  setTemplate = (dataUrl, indexCount) => {
+  setTemplate = (dataUrl) => {
     let history = this._history
     let allList = history.getAllList()
     let prevTemplate = ''
@@ -689,6 +714,9 @@ class SketchField extends PureComponent {
       ] = allList[i].data
 
       if (obj.id === 'template') {
+        obj.set({
+          id: 'oldTemplate',
+        })
         prevTemplate = obj
       }
     }
@@ -726,13 +754,13 @@ class SketchField extends PureComponent {
     image.onload = () => {
       let imgbase64 = new fabric.Image(image, {})
       imgbase64.set({
-        zindex: indexCount,
+        zindex: -100,
         id: 'template',
       })
       canvas.add(imgbase64)
       imgbase64.selectable = false
       imgbase64.evented = false
-      canvas.moveTo(imgbase64, 0)
+      canvas.moveTo(imgbase64, -100)
     }
   }
 
@@ -743,16 +771,15 @@ class SketchField extends PureComponent {
     link.download = 'drawing.png'
     link.href = canvas.toDataURL()
 
-    canvas.toDataURL().set({
-      id: 'template',
-    })
-    console.log(canvas.toDataURL())
+    // canvas.toDataURL().set({
+    //   id: 'template',
+    // })
+    // console.log(canvas.toDataURL())
 
-    //link.click()
+    link.click()
   }
 
   addText = (text, color, options = {}) => {
-    console.log(color)
     let canvas = this._fc
     let iText = new fabric.IText(text, options)
 
