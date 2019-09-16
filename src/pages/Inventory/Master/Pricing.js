@@ -164,7 +164,9 @@ const Pricing = ({
                     })}
                     onChange={(e) => {
                       setMarkupMargin(e.target.value)
-                      setFieldValue('markupMargin', e.target.value.toFixed(1))
+                      if (e.target.value) {
+                        setFieldValue('markupMargin', e.target.value.toFixed(1))
+                      }
                     }}
                     {...args}
                   />

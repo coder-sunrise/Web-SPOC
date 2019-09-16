@@ -75,11 +75,11 @@ const Medication = ({ dispatch, history, medication, values }) => {
     colExtensions,
   }
 
-  useEffect(() => {
-    dispatch({
-      type: 'medication/query',
-    })
-  }, [])
+  // useEffect(() => {
+  //   dispatch({
+  //     type: 'medication/query',
+  //   })
+  // }, [])
 
   return (
     <CardContainer

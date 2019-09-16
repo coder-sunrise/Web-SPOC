@@ -50,11 +50,11 @@ const Package = ({ dispatch, history, pack }) => {
     colExtensions,
   }
 
-  useEffect(() => {
-    dispatch({
-      type: 'pack/query',
-    })
-  }, [])
+  // useEffect(() => {
+  //   dispatch({
+  //     type: 'pack/query',
+  //   })
+  // }, [])
 
   return (
     <CardContainer

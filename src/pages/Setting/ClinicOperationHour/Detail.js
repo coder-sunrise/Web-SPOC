@@ -25,7 +25,7 @@ const styles = (theme) => ({})
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
     monFromOpHour: Yup.string(),
     monToOpHour: Yup.string().when('monFromOpHour', {
-      is: (val) => val !== undefined && val !== '',
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('monFromOpHour'),
         'TO must be later than FROM',
@@ -34,7 +34,7 @@ const styles = (theme) => ({})
 
     tueFromOpHour: Yup.string(),
     tueToOpHour: Yup.string().when('tueFromOpHour', {
-      is: (val) => val !== undefined,
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('tueFromOpHour'),
         'TO must be later than FROM',
@@ -43,7 +43,7 @@ const styles = (theme) => ({})
 
     wedFromOpHour: Yup.string(),
     wedToOpHour: Yup.string().when('wedFromOpHour', {
-      is: (val) => val !== undefined,
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('wedFromOpHour'),
         'TO must be later than FROM',
@@ -52,7 +52,7 @@ const styles = (theme) => ({})
 
     thursFromOpHour: Yup.string(),
     thursToOpHour: Yup.string().when('thursFromOpHour', {
-      is: (val) => val !== undefined,
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('thursFromOpHour'),
         'TO must be later than FROM',
@@ -61,7 +61,7 @@ const styles = (theme) => ({})
 
     friFromOpHour: Yup.string(),
     friToOpHour: Yup.string().when('friFromOpHour', {
-      is: (val) => val !== undefined,
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('friFromOpHour'),
         'TO must be later than FROM',
@@ -70,7 +70,7 @@ const styles = (theme) => ({})
 
     satFromOpHour: Yup.string(),
     satToOpHour: Yup.string().when('satFromOpHour', {
-      is: (val) => val !== undefined,
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('satFromOpHour'),
         'TO must be later than FROM',
@@ -79,7 +79,7 @@ const styles = (theme) => ({})
 
     sunFromOpHour: Yup.string(),
     sunToOpHour: Yup.string().when('sunFromOpHour', {
-      is: (val) => val !== undefined,
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('sunFromOpHour'),
         'TO must be later than FROM',

@@ -74,11 +74,11 @@ const Vaccination = ({ dispatch, history, vaccination, values }) => {
     colExtensions,
   }
 
-  useEffect(() => {
-    dispatch({
-      type: 'vaccination/query',
-    })
-  }, [])
+  // useEffect(() => {
+  //   dispatch({
+  //     type: 'vaccination/query',
+  //   })
+  // }, [])
 
   return (
     <CardContainer

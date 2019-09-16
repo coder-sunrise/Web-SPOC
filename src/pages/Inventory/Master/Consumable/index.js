@@ -78,11 +78,11 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
     colExtensions,
   }
 
-  useEffect(() => {
-    dispatch({
-      type: 'consumable/query',
-    })
-  }, [])
+  // useEffect(() => {
+  //   dispatch({
+  //     type: 'consumable/query',
+  //   })
+  // }, [])
 
   return (
     <CardContainer
