@@ -107,18 +107,12 @@ class Grid extends PureComponent {
         finalAddedRows = addedRows.map((row) => ({
           itemFK: 0,
           uom: '',
-          orderQty: 1,
-          bonusQty: 1,
-          totalQty: 1,
-          quantityReceived: 1,
-          unitPrice: 1,
-          totalPrice: 1,
-          // orderQty: defaultQty,
-          // bonusQty: defaultQty,
-          // totalQty: defaultQty,
-          // quantityReceived: defaultQty,
-          // unitPrice: defaultAmount,
-          // totalPrice: defaultAmount,
+          orderQty: defaultQty,
+          bonusQty: defaultQty,
+          totalQty: defaultQty,
+          quantityReceived: defaultQty,
+          unitPrice: defaultAmount,
+          totalPrice: defaultAmount,
         }))
       } else if (onClickColumn === 'Code') {
         console.log(
