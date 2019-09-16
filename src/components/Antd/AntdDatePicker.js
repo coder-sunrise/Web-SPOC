@@ -18,12 +18,13 @@ import {
   BaseInput,
   CustomInput,
   dateFormat,
+  dateFormatWithTime,
 } from '@/components'
 
 const _toMoment = (value, format) => {
   if (!value) return null
   const m = moment.utc(value)
-  return m.local()
+  return m // .local()
 
   // if (!value) return value
   // try {
@@ -37,7 +38,7 @@ const _toMoment = (value, format) => {
 const STYLES = (theme) => ({
   ...inputStyle(theme),
   datepickerContainer: {
-    width: '100%',
+    width: '100% !important',
     boxSizing: 'content-box',
     lineHeight: '1em',
     color: 'currentColor',
@@ -112,9 +113,16 @@ class AntdDatePicker extends PureComponent {
     // if (date) {
     //   date.utcOffset()
     // }
-    const { form, field, onChange, dateFormat } = this.props
-    const v = date ? date.utc().format() : ''
-
+    const { form, field, onChange, showTime } = this.props
+    // eslint-disable-next-line no-nested-ternary
+    const v = date
+      ? showTime
+        ? date.utc().format()
+        : date.utc().set({ hour: 0, minute: 0, second: 0 }).format()
+      : ''
+    showTime
+      ? date.utc().format()
+      : date.utc().set({ hour: 0, minute: 0, second: 0 }).format()
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())
@@ -195,7 +203,16 @@ class AntdDatePicker extends PureComponent {
       text,
       ...restProps
     } = this.props
-    const { format = dateFormat } = restProps
+    let { format } = restProps
+    // console.log(format, restProps.showTime, restProps)
+
+    if (!format) {
+      if (restProps.showTime) {
+        format = dateFormatWithTime
+      } else {
+        format = dateFormat
+      }
+    }
     // console.log(this.state.value)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself

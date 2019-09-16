@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { formatMessage, FormattedMessage } from 'umi/locale'
+import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   FastField,
@@ -79,6 +79,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
+                      // showTime
                       label='Effective Start Date'
                       label2='End Date'
                       {...args}
