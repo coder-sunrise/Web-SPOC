@@ -8,9 +8,17 @@ import {
   GridContainer,
   GridItem,
   CommonModal,
+  withFormikExtend
 } from '@/components'
 import { formatMessage } from 'umi/locale'
 
+@withFormikExtend({
+  displayName: 'purchasingReceiving',
+  mapPropsToValues: ({ purchasingReceiving }) => {
+    console.log('mapPropsToValues', purchasingReceiving)
+    return purchasingReceiving.entity || purchasingReceiving.default
+  },
+})
 class Grid extends PureComponent {
   state = {
     selectedRows: [],
@@ -19,10 +27,9 @@ class Grid extends PureComponent {
   onContextButtonClick = (row, id) => {
     switch (id) {
       case '0':
-        notification.info({ message: 'Edit' })
-        // this.props.handleEditVisitClick({
-        //   visitID: row.id,
-        // })
+        const { history } = this.props
+        const { location } = history
+        history.push(`${location.pathname}/pdodetails?id=${row.id}&type=edit`)
         break
       case '1':
         const { dispatch, purchasingReceiving } = this.props
@@ -50,7 +57,7 @@ class Grid extends PureComponent {
     this.setState({ selectedRows: selection })
   }
 
-  render () {
+  render() {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -60,7 +67,9 @@ class Grid extends PureComponent {
         onSelectionChange={this.handleSelectionChange}
         FuncProps={{
           selectable: true,
-          selectConfig: { showSelectAll: true },
+          selectConfig: {
+            // showSelectAll: true
+          },
         }}
         columns={[
           { name: 'poNo', title: 'PO No' },

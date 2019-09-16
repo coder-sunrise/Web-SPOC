@@ -20,6 +20,7 @@ export default createFormViewModel({
           moment(),
           moment('2099-12-31'),
         ],
+        isActive: true,
       },
     },
     subscriptions: ({ dispatch, history, searchField }) => {
@@ -75,22 +76,19 @@ export default createFormViewModel({
         }
       },
 
-      // queryDone (st, { payload }) {
-      //   const { data } = payload
-
-      //   return {
-      //     ...st,
-      //     list: data.data.map((o) => {
-      //       return {
-      //         ...o,
-      //         effectiveDates: [
-      //           o.effectiveStartDate,
-      //           o.effectiveEndDate,
-      //         ],
-      //       }
-      //     }),
-      //   }
-      // },
+      queryDone (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          entity: {
+            ...data,
+            effectiveDates: [
+              data.effectiveStartDate,
+              data.effectiveEndDate,
+            ],
+          },
+        }
+      },
     },
   },
 })

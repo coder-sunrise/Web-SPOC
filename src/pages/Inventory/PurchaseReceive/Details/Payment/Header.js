@@ -17,9 +17,9 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  displayName: 'purchaseReceivePayment',
-  mapPropsToValues: ({ purchaseReceivePayment }) => {
-    return purchaseReceivePayment.entity || purchaseReceivePayment.default
+  displayName: 'purchaseOrderPayment',
+  mapPropsToValues: ({ purchaseOrderPayment }) => {
+    return purchaseOrderPayment.entity || purchaseOrderPayment.default
   },
 })
 class Header extends PureComponent {

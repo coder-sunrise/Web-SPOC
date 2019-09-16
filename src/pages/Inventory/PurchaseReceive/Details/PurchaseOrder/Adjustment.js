@@ -11,9 +11,18 @@ import {
 import DeleteOutline from '@material-ui/icons/DeleteOutline'
 
 class Adjustment extends PureComponent {
-  render () {
-    const { index, arrayHelpers, adjustmentList, ...amountProps } = this.props
-    const adjTitle = adjustmentList[index].adjTitle
+  render() {
+    const {
+      index,
+      arrayHelpers,
+      purchaseOrderAdjustment,
+      setFieldValue,
+      calculateInvoice,
+      dispatch,
+      ...amountProps
+    } = this.props
+    const adjRemark = purchaseOrderAdjustment[index].adjRemark
+    //const adjTitle = adjustmentList[index].adjTitle
     //const adjAmount = adjustmentList[index].adjAmount
     console.log('Adjustment', this.props)
     return (
@@ -24,20 +33,31 @@ class Adjustment extends PureComponent {
             <Popconfirm
               title='Do you want to remove this adjustment?'
               onConfirm={() => {
-                arrayHelpers.remove(index)
+                //arrayHelpers.remove(index)
+
+                purchaseOrderAdjustment[index].isDeleted = true
+
+                dispatch({
+                  type: 'purchaseOrderDetails/deleteAdjustment',
+                  payload: {
+                    purchaseOrderAdjustment
+                  },
+                })
+
+                calculateInvoice()
               }}
             >
               <Button color='danger' size='sm' aria-label='Delete' justIcon>
                 <DeleteOutline />
               </Button>
             </Popconfirm>
-            {adjTitle}
+            {adjRemark}
           </GridItem>
         </GridItem>
         <GridItem xs={5} md={1}>
           {/* <NumberInput defaultValue={adjAmount} {...amountProps} /> */}
           <Field
-            name={`adjustmentList[${index}].adjAmount`}
+            name={`purchaseOrderAdjustment[${index}].adjDisplayAmount`}
             render={(args) => {
               return <NumberInput {...amountProps} {...args} />
             }}

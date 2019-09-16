@@ -1,5 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../Detail/services/streetAddress'
+import * as service from '../services/streetAddress'
 import { notification } from '@/components'
 
 export default createFormViewModel({

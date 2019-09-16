@@ -47,12 +47,12 @@ class ServiceCenter extends PureComponent {
         <Grid {...cfg} {...this.props} />
         <CommonModal
           open={settingMedicationPrecautions.showModal}
-          observe='MedicationPrecautionDetail'
+          observe='MedicationPrecautionsDetail'
           title={
             settingMedicationPrecautions.entity ? (
-              'Edit Medication Precautions'
+              'Edit Medication Precaution'
             ) : (
-              'Add Medication Precautions'
+              'Add Medication Precaution'
             )
           }
           maxWidth='md'

@@ -29,7 +29,8 @@ const styles = (theme) => ({})
       .max(
         2147483647,
         'The number should between -2,147,483,648 and 2,147,483,647',
-      ),
+      )
+      .nullable(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values

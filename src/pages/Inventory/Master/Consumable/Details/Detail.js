@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
@@ -17,10 +17,24 @@ import {
   Switch,
   DateRangePicker,
 } from '@/components'
+import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
-const Detail = ({ consumableDetail, dispatch }) => {
+const Detail = ({ consumableDetail, dispatch, values }) => {
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+  const checkHasActiveSession = async () => {
+    const result = await getActiveSession()
+    const { data } = result.data
+    // let data = []
+    if (!data || data.length === 0) {
+      setHasActiveSession(!hasActiveSession)
+    }
+  }
+
   useEffect(() => {
     if (consumableDetail.currentId) {
       dispatch({
@@ -29,6 +43,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
           id: consumableDetail.currentId,
         },
       })
+      checkHasActiveSession()
     }
   }, [])
 
@@ -52,6 +67,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                       label={formatMessage({
                         id: 'inventory.master.consumable.code',
                       })}
+                      disabled={!values.isActive}
                       {...args}
                     />
                   )
@@ -67,6 +83,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
                       label={formatMessage({
                         id: 'inventory.master.consumable.name',
                       })}
+                      disabled={consumableDetail.entity}
                       {...args}
                     />
                   )
@@ -173,8 +190,10 @@ const Detail = ({ consumableDetail, dispatch }) => {
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
+                    format='DD MMM YYYY'
                     label='Effective Start Date'
                     label2='End Date'
+                    disabled={!!(consumableDetail.entity && hasActiveSession)}
                     {...args}
                   />
                 )}
@@ -190,7 +209,7 @@ const Detail = ({ consumableDetail, dispatch }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ consumableDetail }) => ({
-    consumableDetail,
-  })),
+  // connect(({ consumableDetail }) => ({
+  //   consumableDetail,
+  // })),
 )(Detail)

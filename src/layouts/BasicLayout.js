@@ -198,9 +198,17 @@ class BasicLayout extends React.PureComponent {
     dispatch({
       type: 'user/fetchCurrent',
     })
-    // dispatch({
-    //   type: 'setting/getSetting',
-    // })
+    dispatch({
+      type: 'gstSetup/getGstSetup',
+    })
+    dispatch({
+      type: 'generalSetting/getGeneralSetting',
+    })
+    dispatch({
+      type: 'clinicInfo/query',
+      payload: 'Tenant_000',
+      // payload: localStorage.getItem('clinicCode'),
+    })
     initStream()
   }
 

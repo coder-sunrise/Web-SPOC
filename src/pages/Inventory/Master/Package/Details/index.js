@@ -80,6 +80,7 @@ const Detail = ({
       const { services, serviceCenters, serviceCenterServices } = getServices(
         list,
       )
+
       setServicess(services)
       setServiceCenterss(serviceCenters)
       setServiceCenterServicess(serviceCenterServices)
