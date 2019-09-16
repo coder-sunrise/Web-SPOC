@@ -166,14 +166,18 @@ const InventoryTypeListing = ({
       }
       if (type === 'service') {
         if (serviceCenterServiceFK && serviceName) {
+          console.log('abc', price)
           getServiceCenterService()
-
-          return addedRows.map((row) => ({
+          console.log('addedRows', addedRows)
+          const returnRow = addedRows.map((row) => ({
             ...row,
             unitPrice: price,
             subTotal: total(),
           }))
+          console.log('returnRow', returnRow)
+          return returnRow
         }
+
         return addedRows.map((row) => ({
           ...row,
           unitPrice: undefined,

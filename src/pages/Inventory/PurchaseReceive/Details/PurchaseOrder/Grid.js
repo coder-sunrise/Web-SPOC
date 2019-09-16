@@ -23,7 +23,7 @@ const receivingDetailsSchema = Yup.object().shape({
 })
 
 class Grid extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       onClickColumn: undefined,
@@ -48,7 +48,12 @@ class Grid extends PureComponent {
         code: ctName,
       },
     }).then((list) => {
-      const { inventoryItemList } = getInventoryItem(list, value, itemFKName, rows)
+      const { inventoryItemList } = getInventoryItem(
+        list,
+        value,
+        itemFKName,
+        rows,
+      )
       this.setState({
         itemDropdownList: inventoryItemList,
       })
@@ -102,12 +107,18 @@ class Grid extends PureComponent {
         finalAddedRows = addedRows.map((row) => ({
           itemFK: 0,
           uom: '',
-          orderQty: defaultQty,
-          bonusQty: defaultQty,
-          totalQty: defaultQty,
-          quantityReceived: defaultQty,
-          unitPrice: defaultAmount,
-          totalPrice: defaultAmount,
+          orderQty: 1,
+          bonusQty: 1,
+          totalQty: 1,
+          quantityReceived: 1,
+          unitPrice: 1,
+          totalPrice: 1,
+          // orderQty: defaultQty,
+          // bonusQty: defaultQty,
+          // totalQty: defaultQty,
+          // quantityReceived: defaultQty,
+          // unitPrice: defaultAmount,
+          // totalPrice: defaultAmount,
         }))
       } else if (onClickColumn === 'Code') {
         console.log(
@@ -136,7 +147,7 @@ class Grid extends PureComponent {
           totalPrice: calcTotalPrice(),
         }))
       }
-
+      console.log('finalAddedRows', finalAddedRows)
       this.setState({ onClickColumn: undefined })
       return finalAddedRows
     }
@@ -164,7 +175,7 @@ class Grid extends PureComponent {
     return rows
   }
 
-  render() {
+  render () {
     //const { purchaseOrderItems } = this.props
     const { rows, dispatch, isEditable } = this.props
     console.log('Grid', rows)
@@ -244,7 +255,7 @@ class Grid extends PureComponent {
                 />
               )
             }
-          }
+          },
         },
         {
           columnName: 'name',
@@ -280,7 +291,7 @@ class Grid extends PureComponent {
                 />
               )
             }
-          }
+          },
         },
         {
           columnName: 'uom',
@@ -319,8 +330,8 @@ class Grid extends PureComponent {
     }
 
     return (
-      <GridContainer style={{paddingRight: 20}}>
-        <GridItem xs={4} md={12} >
+      <GridContainer style={{ paddingRight: 20 }}>
+        <GridItem xs={4} md={12}>
           <EditableTableGrid
             //rows={purchaseOrderItems}
             rows={rows}
