@@ -30,7 +30,7 @@ export default createListViewModel({
           {
             id: 1,
             inventoryMedicationFK: 35,
-            uom: '',
+            uom: 35,
             orderQty: 1,
             bonusQty: 0,
             totalQty: 1,
@@ -47,9 +47,9 @@ export default createListViewModel({
         ],
         purchaseOrderVaccinationItem: [
           {
-            id: 1,
+            id: 2,
             inventoryVaccinationFK: 10,
-            uom: '',
+            uom: 10,
             orderQty: 1,
             bonusQty: 0,
             totalQty: 1,
@@ -66,9 +66,9 @@ export default createListViewModel({
         ],
         purchaseOrderConsumableItem: [
           {
-            id: 1,
+            id: 3,
             inventoryConsumableFK: 8,
-            uom: '',
+            uom: 8,
             orderQty: 1,
             bonusQty: 0,
             totalQty: 1,
@@ -83,9 +83,9 @@ export default createListViewModel({
             isDeleted: false,
           },
           {
-            id: 2,
+            id: 4,
             inventoryConsumableFK: 10,
-            uom: '',
+            uom: 10,
             orderQty: 1,
             bonusQty: 0,
             totalQty: 1,
@@ -126,7 +126,8 @@ export default createListViewModel({
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
         if (pathname.indexOf('/inventory/pr/pdodetails') === 0) {
-          if (query.type === 'dup' && query.type === 'edit') {
+          console.log('query', query)
+          if (query.type === 'dup' || query.type === 'edit') {
             dispatch({
               type: 'updateState',
               payload: {
@@ -254,6 +255,7 @@ export default createListViewModel({
             ...payload,
             [itemFK]: payload.itemFK,
             name: payload.itemFK,
+            uom: payload.itemFK,
             uid: getUniqueId(),
             isDeleted: false,
           })

@@ -842,21 +842,24 @@ export const podoOrderType = [
     name: 'Medication',
     prop: 'purchaseOrderMedicationItem',
     itemFKName: 'inventoryMedicationFK',
-    ctName: 'InventoryMedication',
+    ctName: 'inventorymedication',
+    stateName: 'medicationItemList',
   },
   {
     value: 2,
     name: 'Vaccination',
     prop: 'purchaseOrderVaccinationItem',
     itemFKName: 'inventoryVaccinationFK',
-    ctName: 'InventoryVaccination',
+    ctName: 'inventoryvaccination',
+    stateName: 'vaccinationItemList',
   },
   {
     value: 3,
     name: 'Consumable',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
-    ctName: 'InventoryConsumable',
+    ctName: 'inventoryconsumable',
+    stateName: 'consumableItemList',
   },
 ]
 
@@ -916,6 +919,22 @@ export const getInventoryItem = (data, value, itemFKName, rows) => {
 
   inventoryItemList = _.differenceBy(inventoryItemList, newRows, itemFKName)
 
+  return {
+    inventoryItemList,
+  }
+}
+
+export const getInventoryItemList = (list) => {
+  let inventoryItemList = list.map((x) => {
+    return {
+      value: x.id,
+      name: x.displayValue,
+      code: x.code,
+      //uom: prescribingUOM.id,
+      uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
+      sellingPrice: x.sellingPrice,
+    }
+  })
   return {
     inventoryItemList,
   }

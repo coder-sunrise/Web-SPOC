@@ -29,10 +29,10 @@ import { isPOStatusFinalized } from '../../variables'
 }))
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
-  //enableReinitialize: true,
+  enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
     console.log('mapPropsToValues', purchaseOrderDetails)
-    return purchaseOrderDetails.entity
+    return purchaseOrderDetails.entity || purchaseOrderDetails.default
   },
 })
 class index extends PureComponent {

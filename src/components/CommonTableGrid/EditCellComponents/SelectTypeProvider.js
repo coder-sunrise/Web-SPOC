@@ -119,6 +119,7 @@ class SelectEditor extends PureComponent {
       isDisabled = () => false,
       onChange,
       gridId,
+      options,
       ...restProps
     } = cfg
     const latestRow = window.$tempGridRow[gridId]
@@ -149,6 +150,7 @@ class SelectEditor extends PureComponent {
       error: this.state.error,
       value: latestRow[columnName],
       disabled: isDisabled(latestRow),
+      options:typeof options ==='function'?options(latestRow):options,
       ...restProps,
       onChange: this._onChange,
     }
@@ -187,7 +189,7 @@ const SelectDisplay = (columnExtensions, state) => ({
 
   if (value === undefined) return ''
   const v =
-    (cfg.options || state[`${columnName}Option`] || [])
+    (typeof cfg.options ==='function'?cfg.options(row):cfg.options || state[`${columnName}Option`] || [])
       .find((o) => o.value === value || o.id === value) || {}
 
   const { labelField = 'name', render } = cfg

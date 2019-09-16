@@ -14,26 +14,29 @@ import {
   Button,
   CommonModal,
   EditableTableGrid,
-  CodeSelect
+  CodeSelect,
 } from '@/components'
 import Edit from '@material-ui/icons/Edit'
 import Add from '@material-ui/icons/Add'
 import ReceivingItemDetails from './ReceivingItemDetails'
 import moment from 'moment'
-import { podoOrderType, getInventoryItem } from '@/utils/codes'
+import {
+  podoOrderType,
+  getInventoryItem,
+  getInventoryItemList,
+} from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
 
 let commitCount = 2201 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
   type: Yup.string().required(),
-  code: Yup.number().required(),
-  //name: Yup.number().required(),
-  //orderQty: Yup.number().min(1).required(),
-  orderQty: Yup.number().min(0).required(),
-  bonusQty: Yup.number().min(0).required(),
-  quantityReceived: Yup.number().min(0).required(),
-  totalBonusReceived: Yup.number().min(0).required(),
+  code: Yup.string().required(),
+  name: Yup.string().required(),
+  //orderQty: Yup.number().required(),
+  //bonusQty: Yup.number().required(),
+  //quantityReceived: Yup.number().min(0).required(),
+  //totalBonusReceived: Yup.number().min(0).required(),
 
   currentReceivingQty: Yup.number().min(0).required(),
   currentReceivingBonusQty: Yup.number().min(0).required(),
@@ -51,76 +54,94 @@ const receivingDetailsSchema = Yup.object().shape({
     deliveryOrderDate: Yup.string().required(),
     rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
   }),
-
 })
 export class DeliveryOrderDetails extends PureComponent {
   state = {
-    selectedType: 'InventoryConsumable',
+    onClickColumn: undefined,
     selectedItem: {},
-    itemDropdownList: [],
+
+    consumableItemList: [],
+    medicationItemList: [],
+    vaccinationItemList: [],
+
+    filterConsumableItemList: [],
+    filterMedicationItemList: [],
+    filterVaccinationItemList: [],
   }
 
-  // handleOnTypeChange = (e) => {
-  //   const { option } = e
-  //   this.setState({
-  //     selectedType: option ? option.ctName : undefined,
-  //   })
-  // }
+  initializeStateItemList = async () => {
+    const { dispatch } = this.props
+
+    await podoOrderType.forEach((x) => {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: x.ctName,
+        },
+      }).then((list) => {
+        const { inventoryItemList } = getInventoryItemList(list)
+        this.setState({ [x.stateName]: inventoryItemList })
+      })
+    })
+  }
+
+  forceUpdate = () => {
+    const { dispatch } = this.props
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }
+
+  componentDidMount () {
+    this.initializeStateItemList()
+  }
 
   handleOnOrderTypeChanged = async (e) => {
-    const { dispatch, values } = this.props
-    const { option, row } = e
-    const { ctName, value, itemFKName } = option
-    const { rows } = values
+    const { row } = e
+    this.forceUpdate()
 
-    this.setState({
-      onClickColumn: 'Type',
-    })
+    row.code = ''
+    row.name = ''
+    row.uom = ''
+    row.orderQty = 0
+    row.bonusQty = 0
+    row.quantityReceived = 0
+    row.totalBonusReceived = 0
+    row.currentReceivingQty = 0
+    row.currentReceivingBonusQty = 0
 
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: ctName,
-      },
-    }).then((list) => {
-      const { inventoryItemList } = getInventoryItem(list, value, itemFKName, rows)
-      this.setState({
-        itemDropdownList: inventoryItemList,
-      })
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    })
+    this.setState({ onClickColumn: 'type' })
   }
 
-  handleItemOnChange = (e) => {
+  handleItemOnChange = (e, type) => {
+    const { dispatch } = this.props
     const { option, row } = e
     const { sellingPrice, uom, name, value } = option
+
+    if (type === 'code') {
+      row.name = option.name
+    } else {
+      row.code = option.code
+    }
+
+    row.uom = option.uom
+
     this.setState({
       selectedItem: option,
+      onClickColumn: 'item',
     })
+
+    this.forceUpdate()
+
     return { ...row }
   }
 
-  // onCommitChanges = ({ rows, deleted }) => {
-  //   const { setFieldValue } = this.props
-  //   let newRows = rows
-
-  //   if (deleted) {
-  //     newRows = rows.filter((x) => x.uid !== deleted[0])
-  //   } else {
-  //     console.log('onCommitChanges', rows)
-  //   }
-
-  //   setFieldValue('rows', newRows)
-  //   return newRows
-  // }
-
   onCommitChanges = ({ rows, deleted, changed }) => {
+    console.log('onCommitChanges')
     const { dispatch } = this.props
 
     if (deleted) {
@@ -135,36 +156,78 @@ export class DeliveryOrderDetails extends PureComponent {
         type: 'deliveryOrder/upsertRow',
         payload: { uid: existUid, ...changed[existUid] },
       })
-
-    }
-    else {
+    } else {
       dispatch({
         type: 'deliveryOrder/upsertRow',
         payload: rows[0],
       })
     }
 
-
     return rows
   }
 
   onAddedRowsChange = (addedRows) => {
-    //currentReceivingQty
-    //currentReceivingBonusQty
+    console.log('onAddedRowsChange')
     if (addedRows.length > 0) {
-      const { selectedItem } = this.state
-      console.log('onAddedRowsChange', addedRows)
-      return addedRows.map((row) => ({
-        ...row,
-        itemFK: selectedItem.id || undefined,
-        currentReceivingQty: row.orderQty - row.quantityReceived < row.currentReceivingQty ? undefined : row.currentReceivingQty,
-        currentReceivingBonusQty: row.bonusQty - row.totalBonusReceived < row.currentReceivingBonusQty ? undefined : row.currentReceivingBonusQty
-      }))
+      if (!addedRows.isFocused) {
+        const { onClickColumn, selectedItem } = this.state
+        let tempRow = addedRows[0]
+        let tempOrderQty = tempRow.orderQty
+        let tempBonusQty = tempRow.bonusQty
+        let tempQuantityReceived = tempRow.quantityReceived
+        let tempTotalBonusReceived = tempRow.totalBonusReceived
+        let tempCurrentReceivingQty = tempRow.currentReceivingQty
+        let tempCurrentReceivingBonusQty = tempRow.currentReceivingBonusQty
+
+        if (onClickColumn === 'type') {
+        } else if (onClickColumn === 'item') {
+          // Set according outstanding list
+          // orderQty
+          // bonusQty
+          // quantityReceived
+          // totalBonusReceived
+          // currentReceivingQty = Auto fill to maximum
+          // currentReceivingBonusQty = Auto fill to maximum
+        } else {
+          tempCurrentReceivingQty =
+            tempOrderQty - tempQuantityReceived < tempCurrentReceivingQty
+              ? ''
+              : tempCurrentReceivingQty
+          //------------------------------------------------------
+          tempCurrentReceivingBonusQty =
+            tempBonusQty - tempTotalBonusReceived < tempCurrentReceivingBonusQty
+              ? ''
+              : tempCurrentReceivingBonusQty
+          this.forceUpdate()
+        }
+
+        this.setState({ onClickColumn: undefined })
+
+        return addedRows.map((row) => ({
+          ...row,
+          itemFK: selectedItem.value,
+          currentReceivingQty: tempCurrentReceivingQty,
+          currentReceivingBonusQty: tempCurrentReceivingBonusQty,
+        }))
+      } else {
+        // Initialize new generated row
+        this.setState({ onClickColumn: undefined })
+        return addedRows.map((row) => ({
+          ...row,
+          orderQty: 0,
+          bonusQty: 0,
+          quantityReceived: 0,
+          totalBonusReceived: 0,
+          currentReceivingQty: 0,
+          currentReceivingBonusQty: 0,
+          isFocused: true,
+        }))
+      }
     }
     return addedRows
   }
 
-  render() {
+  render () {
     const isEditable = true
     const { props } = this
     const { footer, deliveryOrderDetails, values } = props
@@ -204,95 +267,82 @@ export class DeliveryOrderDetails extends PureComponent {
         {
           columnName: 'code',
           type: 'select',
-          labelField: 'name',
-          options: this.state.itemDropdownList,
-          onChange: (e) => {
-            if (e.option) {
-              this.handleItemOnChange(e)
+          labelField: 'code',
+          options: (row) => {
+            if (row.type === 1) {
+              return this.state.medicationItemList
+            } else if (row.type === 2) {
+              return this.state.vaccinationItemList
+            } else if (row.type === 3) {
+              return this.state.consumableItemList
+            } else {
+              return []
             }
           },
-          render: (row) => {
-            if (row.uid) {
-              const podoType = podoOrderType.filter(
-                (x) => x.value === row.type,
-              )[0]
-              const { ctName, itemFKName } = podoType
-
-              return (
-                <FastField
-                  name={`rows[${row.rowIndex - 1}].${itemFKName}`}
-                  render={(args) => {
-                    console.log(args)
-                    return (
-                      <CodeSelect
-                        text
-                        labelField='code'
-                        code={ctName}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              )
+          onChange: (e) => {
+            if (e.option) {
+              this.handleItemOnChange(e, 'code')
             }
-          }
+          },
         },
         {
           columnName: 'name',
           type: 'select',
-          labelField: 'displayValue',
-          options: this.state.itemDropdownList,
-          onChange: (e) => {
-            if (e.option) {
-              this.handleItemOnChange(e)
+          labelField: 'name',
+          options: (row) => {
+            if (row.type === 1) {
+              return this.state.medicationItemList
+            } else if (row.type === 2) {
+              return this.state.vaccinationItemList
+            } else if (row.type === 3) {
+              return this.state.consumableItemList
+            } else {
+              return []
             }
           },
-          render: (row) => {
-            if (row.uid) {
-              const podoType = podoOrderType.filter(
-                (x) => x.value === row.type,
-              )[0]
-              const { ctName, itemFKName } = podoType
-
-              return (
-                <FastField
-                  name={`rows[${row.rowIndex - 1}].${itemFKName}`}
-                  render={(args) => {
-                    console.log(args)
-                    return (
-                      <CodeSelect
-                        text
-                        labelField='displayValue'
-                        code={ctName}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              )
+          onChange: (e) => {
+            if (e.option) {
+              this.handleItemOnChange(e, 'name')
             }
-          }
+          },
         },
         {
           columnName: 'uom',
+          type: 'select',
+          labelField: 'uom',
           disabled: true,
+          options: (row) => {
+            if (row.type === 1) {
+              return this.state.medicationItemList
+            } else if (row.type === 2) {
+              return this.state.vaccinationItemList
+            } else if (row.type === 3) {
+              return this.state.consumableItemList
+            } else {
+              return []
+            }
+          },
         },
         {
           columnName: 'orderQty',
           type: 'number',
+          disabled: true,
         },
         {
           columnName: 'bonusQty',
           type: 'number',
+          disabled: true,
         },
         {
           columnName: 'quantityReceived',
           type: 'number',
+          disabled: true,
         },
         {
           columnName: 'totalBonusReceived',
           type: 'number',
           width: 180,
+          disabled: true,
         },
         {
           columnName: 'currentReceivingQty',
@@ -381,13 +431,13 @@ export class DeliveryOrderDetails extends PureComponent {
           rows={rows}
           schema={receivingDetailsSchema}
           FuncProps={{
-            edit: isEditable,
+            //edit: isEditable,
             pager: false,
           }}
           EditingProps={{
             showAddCommand: isEditable,
-            //showEditCommand: isEditable,
-            //showDeleteCommand: isEditable,
+            showEditCommand: isEditable,
+            showDeleteCommand: isEditable,
             onCommitChanges: this.onCommitChanges,
             onAddedRowsChange: this.onAddedRowsChange,
           }}
