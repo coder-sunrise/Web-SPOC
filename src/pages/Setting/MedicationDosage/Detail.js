@@ -9,6 +9,7 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  NumberInput,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -29,7 +30,8 @@ const styles = (theme) => ({})
       .max(
         2147483647,
         'The number should between -2,147,483,648 and 2,147,483,647',
-      ),
+      )
+      .nullable(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -99,7 +101,7 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='multiplier'
-                render={(args) => <TextField label='Multiplier' {...args} />}
+                render={(args) => <NumberInput label='Multiplier' {...args} />}
               />
             </GridItem>
             {/* <GridItem md={6}>
@@ -118,7 +120,9 @@ class Detail extends PureComponent {
               <FastField
                 name='sortOrder'
                 render={(args) => {
-                  return <TextField label='Sort Order' rowsMax={4} {...args} />
+                  return (
+                    <NumberInput label='Sort Order' rowsMax={4} {...args} />
+                  )
                 }}
               />
             </GridItem>

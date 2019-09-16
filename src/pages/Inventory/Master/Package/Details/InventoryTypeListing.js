@@ -166,27 +166,34 @@ const InventoryTypeListing = ({
       }
       if (type === 'service') {
         if (serviceCenterServiceFK && serviceName) {
+          console.log('abc', price)
           getServiceCenterService()
-
-          return addedRows.map((row) => ({
+          console.log('addedRows', addedRows)
+          const returnRow = addedRows.map((row) => ({
             ...row,
             unitPrice: price,
             subTotal: total(),
           }))
+          console.log('returnRow', returnRow)
+          return returnRow
         }
+
         return addedRows.map((row) => ({
           ...row,
           unitPrice: undefined,
           subTotal: total(),
         }))
       }
-      return addedRows.map((row) => ({
-        ...row,
-        unitPrice: selectedItem.sellingPrice
-          ? selectedItem.sellingPrice
-          : selectedItem.unitPrice,
-        subTotal: total(),
-      }))
+
+      if (selectedItem) {
+        return addedRows.map((row) => ({
+          ...row,
+          unitPrice: selectedItem.sellingPrice
+            ? selectedItem.sellingPrice
+            : selectedItem.unitPrice,
+          subTotal: total(),
+        }))
+      }
     }
     console.log('addedRows', addedRows)
     return addedRows

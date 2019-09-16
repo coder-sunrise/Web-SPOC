@@ -21,6 +21,7 @@ import {
   Checkbox,
   Field,
 } from '@/components'
+import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
@@ -32,6 +33,19 @@ const Detail = ({
   ...props
 }) => {
   const field = vaccinationDetail.entity ? 'entity' : 'default'
+
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+  const checkHasActiveSession = async () => {
+    const result = await getActiveSession()
+    const { data } = result.data
+    // let data = []
+    if (!data || data.length === 0) {
+      setHasActiveSession(!hasActiveSession)
+    }
+  }
 
   useEffect(() => {
     if (vaccinationDetail.currentId) {
@@ -56,6 +70,7 @@ const Detail = ({
           })
         }
       })
+      checkHasActiveSession()
     }
   }, [])
 
@@ -70,7 +85,6 @@ const Detail = ({
   const handleSelectSdd = (row) => {
     const { setFieldTouched } = props
     const { id, code, name } = row
-    console.log('valueprops', values)
     setToggle(!toggle)
     dispatch({
       type: 'vaccinationDetail/updateState',
@@ -105,6 +119,7 @@ const Detail = ({
                       label={formatMessage({
                         id: 'inventory.master.vaccination.code',
                       })}
+                      disabled={!values.isActive}
                       {...args}
                     />
                   )
@@ -120,6 +135,7 @@ const Detail = ({
                       label={formatMessage({
                         id: 'inventory.master.vaccination.name',
                       })}
+                      disabled={vaccinationDetail.entity}
                       {...args}
                     />
                   )
@@ -203,8 +219,10 @@ const Detail = ({
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
+                    format='DD MMM YYYY'
                     label='Effective Start Date'
                     label2='End Date'
+                    disabled={!!(vaccinationDetail.entity && hasActiveSession)}
                     {...args}
                   />
                 )}
@@ -307,7 +325,7 @@ const Detail = ({
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ vaccinationDetail }) => ({
-    vaccinationDetail,
-  })),
+  // connect(({ vaccinationDetail }) => ({
+  //   vaccinationDetail,
+  // })),
 )(Detail)

@@ -663,6 +663,7 @@ const calculateAdjustAmount = (
   }
 }
 
+const errMsgForOutOfRange = (field) => `${field} must between 0 and 999,999.99`
 const calculateItemLevelAdjustment = (
   adjType = 'ExactAmount',
   adjValue = 0,
@@ -719,5 +720,6 @@ module.exports = {
   confirmBeforeReload,
   navigateDirtyCheck,
   calculateAdjustAmount,
+  errMsgForOutOfRange,
   calculateItemLevelAdjustment,
 }

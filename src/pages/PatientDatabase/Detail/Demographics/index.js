@@ -423,7 +423,7 @@ class Demographic extends PureComponent {
                   name='referredBy'
                   render={(args) => (
                     <RadioGroup
-                      label='Referral Person'
+                      label='Referral'
                       options={[
                         {
                           value: 'Company',

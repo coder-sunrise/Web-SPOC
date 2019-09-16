@@ -16,7 +16,7 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
-      { name: 'supplier', title: 'Supplier' },
+      { name: 'favouriteSupplier', title: 'Supplier' },
       { name: 'uom', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
@@ -32,8 +32,16 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
     setColExtensions,
   ] = useState([
     {
+      columnName: 'favouriteSupplier',
+      type: 'codeSelect',
+      code: 'ctSupplier',
+      sortingEnabled: false,
+    },
+    {
       columnName: 'uom',
-      type: 'number',
+      type: 'codeSelect',
+      code: 'ctConsumableUnitOfMeasurement',
+      sortingEnabled: false,
     },
     {
       columnName: 'stock',
@@ -55,11 +63,17 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
     history,
     values,
   }
+
+  const [
+    consumableList,
+    setConsumableList,
+  ] = useState([])
+
   const gridProps = {
     ...filterProps,
     consumable,
     namespace: 'consumable',
-    list: consumable.list || [],
+    list: consumableList || [],
     tableParas,
     colExtensions,
   }

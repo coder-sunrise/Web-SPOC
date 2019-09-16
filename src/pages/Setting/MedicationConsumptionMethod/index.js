@@ -50,9 +50,9 @@ class ServiceCenter extends PureComponent {
           observe='MedicationConsumptionMethodDetail'
           title={
             settingMedicationConsumptionMethod.entity ? (
-              'Edit Medication Precautions'
+              'Edit Medication Consumption Method'
             ) : (
-              'Add Medication Precautions'
+              'Add Medication Consumption Method'
             )
           }
           maxWidth='md'

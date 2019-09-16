@@ -37,11 +37,13 @@ const Medication = ({ dispatch, history, medication, values }) => {
       columnName: 'favouriteSupplier',
       type: 'codeSelect',
       code: 'ctSupplier',
+      sortingEnabled: false,
     },
     {
       columnName: 'dispensingUOM',
       type: 'codeSelect',
       code: 'ctmedicationunitofmeasurement',
+      sortingEnabled: false,
     },
     {
       columnName: 'stock',
@@ -72,6 +74,12 @@ const Medication = ({ dispatch, history, medication, values }) => {
     tableParas,
     colExtensions,
   }
+
+  useEffect(() => {
+    dispatch({
+      type: 'medication/query',
+    })
+  }, [])
 
   return (
     <CardContainer

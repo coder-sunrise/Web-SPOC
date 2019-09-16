@@ -60,7 +60,7 @@ class Room extends PureComponent {
               'Add Inventory Adjustment'
             )
           }
-          maxWidth='md'
+          maxWidth='lg'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}

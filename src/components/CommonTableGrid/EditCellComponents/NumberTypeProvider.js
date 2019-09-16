@@ -89,11 +89,12 @@ class NumberEditor extends PureComponent {
           })
       }
     }
+    // console.log(columnName, value)
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
       error: this.state.error,
-      defaultValue: value,
+      value,
       disabled: isDisabled(latestRow),
       currency: cfg && (cfg.currency || type === 'currency'),
       ...restProps,
@@ -164,7 +165,7 @@ const NumberFormatter = (columnExtensions) =>
     },
   )
 
-class NumberTypeProvider extends PureComponent {
+class NumberTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
   }
@@ -175,6 +176,10 @@ class NumberTypeProvider extends PureComponent {
       return <NumberEditor columnExtensions={ces} {...editorProps} />
     }
   }
+
+  shouldComponentUpdate = (nextProps, nextState) =>
+    this.props.editingRowIds !== nextProps.editingRowIds ||
+    this.props.commitCount !== nextProps.commitCount
 
   render () {
     const { columnExtensions } = this.props

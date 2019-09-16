@@ -37,6 +37,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
       loading: Loading,
     }),
+    model: 'clinicalnotes',
     disabled: true,
     layoutConfig: {
       minW: 12,
@@ -90,6 +91,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/Diagnosis'),
       loading: Loading,
     }),
+    model: 'diagnosis',
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -129,6 +131,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ConsultationDocument'),
       loading: Loading,
     }),
+    model: 'consultationDocument',
     layoutConfig: {},
     toolbarAddon: (
       <AuthorizedContext>
@@ -164,6 +167,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/PatientHistory'),
       loading: Loading,
     }),
+    model: 'patientHistory',
     layoutConfig: {
       style: {
         padding: 5,
@@ -182,6 +186,7 @@ const widgets = [
       //   return <Component {...props} />
       // },
     }),
+    model: 'orders',
     layoutConfig: {
       style: {
         padding: '0 5px',
@@ -195,6 +200,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ResultHistory'),
       loading: Loading,
     }),
+    model: 'resultHistory',
     layoutConfig: {
       style: {},
     },
@@ -206,6 +212,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/VitalSign'),
       loading: Loading,
     }),
+    model: 'patientVitalSign',
     layoutConfig: {
       minW: 12,
       minH: 10,
