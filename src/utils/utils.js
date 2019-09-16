@@ -518,7 +518,6 @@ export const updateCellValue = (
     classes,
     config = {},
     row,
-    
   },
   element,
   val,
@@ -528,13 +527,13 @@ export const updateCellValue = (
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
-  const { validationSchema, gridId,getRowId, ...restConfig } = cfg
+  const { validationSchema, gridId, getRowId, ...restConfig } = cfg
   // console.log({ columnName, val },getRowId,'dsad')
   if (!window.$tempGridRow[gridId]) {
     window.$tempGridRow[gridId] = {}
   }
   if (!window.$tempGridRow[gridId][getRowId(row)]) {
-    // console.log(row)
+    // console.log('1312323', row, getRowId(row))
     window.$tempGridRow[gridId][getRowId(row)] = row
   }
   // console.log(columnName, val)
@@ -619,7 +618,7 @@ const confirmBeforeReload = (e) => {
 }
 
 const navigateDirtyCheck = (itemPath) => (e) => {
-  console.log({ itemPath, e, handler: window.beforeReloadHandlerAdded })
+  // console.log({ itemPath, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',

@@ -34,16 +34,24 @@ const EditButton = ({ onExecute, editingRowIds }) => (
   </Button>
 )
 
-const CancelButton = ({ onExecute, editingRowIds, row, schema, gridId }) => (
+const CancelButton = ({
+  onExecute,
+  editingRowIds,
+  row,
+  schema,
+  gridId,
+  getRowId,
+}) => (
   <Button
     size='sm'
     onClick={(e) => {
       // delete window.$tempGridRow[gridId][row.id]
       // updateGlobalVariable('gridIgnoreValidation', true)
       // console.log(editingRowIds, Object.keys(window.$tempGridRow[gridId]))
+      const id = getRowId(row)
       if (
-        (!row.id && editingRowIds.length === 0) ||
-        (row.id &&
+        (!id && editingRowIds.length === 0) ||
+        (id &&
           editingRowIds.length === 1 &&
           !window.$tempGridRow[gridId][undefined])
       ) {
@@ -97,10 +105,10 @@ const AddButton = ({ onExecute }) => (
 )
 
 const isDisabled = (props) => {
-  const { onExecute, editingRowIds, row, schema, gridId } = props
+  const { onExecute, editingRowIds, row, schema, gridId, getRowId } = props
   let disabled = false
   const latestRow = window.$tempGridRow[gridId]
-    ? window.$tempGridRow[gridId][row.id] || {}
+    ? window.$tempGridRow[gridId][getRowId(row)] || {}
     : row
   if (schema) {
     try {
@@ -129,7 +137,7 @@ class CommitButton extends React.PureComponent {
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
-    const { row, schema, gridId,getRowId } = nextProps
+    const { row, schema, gridId, getRowId } = nextProps
     const latestRow = window.$tempGridRow[gridId]
       ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
