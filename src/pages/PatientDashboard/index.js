@@ -79,9 +79,8 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
   },
 })
-@connect(({ patientDashboard, visitRegistration, global }) => ({
+@connect(({ patientDashboard, global }) => ({
   patientDashboard,
-  visitRegistration,
   global,
 }))
 class PatientDashboard extends PureComponent {
@@ -122,8 +121,8 @@ class PatientDashboard extends PureComponent {
     //     message: 'Visit info not found, please start over',
     //   })
     // }
-    const { visitRegistration } = this.props
-    const { visitInfo = {} } = visitRegistration
+    // const { visitRegistration = {} } = this.props
+    // const { visitInfo = {} } = visitRegistration
 
     this.props.history.push(
       getAppendUrl({
@@ -142,30 +141,35 @@ class PatientDashboard extends PureComponent {
       ...resetProps
     } = this.props
 
-    const { patientDashboard, visitRegistration, global, history } = resetProps
+    const { patientDashboard, global, history } = resetProps
 
-    const { visitInfo = {} } = visitRegistration
-
+    const { visitInfo = {} } = patientDashboard
+    const { visit = {} } = visitInfo
+    // console.log(visit)
     return (
       <div className={classes.root}>
         <Banner
           extraCmt={
-            <Button
-              color='primary'
-              onClick={this.startConsultation}
-              style={{ marginTop: 25 }}
-            >
-              Start Consultation
-            </Button>
+            visit.visitStatus === 'WAITING' && (
+              <Button
+                color='primary'
+                onClick={this.startConsultation}
+                style={{ marginTop: 25 }}
+              >
+                Start Consultation
+              </Button>
+            )
           }
           {...this.props}
         />
-        <PatientHistory
-          override={{
-            leftPanel: classes.leftPanel,
-            rightPanel: classes.rightPanel,
-          }}
-        />
+        <div style={{ marginTop: theme.spacing(1) }}>
+          <PatientHistory
+            override={{
+              leftPanel: classes.leftPanel,
+              rightPanel: classes.rightPanel,
+            }}
+          />
+        </div>
       </div>
     )
   }

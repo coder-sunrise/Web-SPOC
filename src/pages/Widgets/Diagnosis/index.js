@@ -1,9 +1,13 @@
 import React, { Component, PureComponent } from 'react'
+import moment from 'moment'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
 import { getUniqueGUID } from 'utils'
+import { withStyles, Divider, Paper } from '@material-ui/core'
+import DeleteIcon from '@material-ui/icons/Delete'
+import Add from '@material-ui/icons/Add'
+import { compare } from '@/layouts'
 import {
   Button,
   CommonHeader,
@@ -25,11 +29,9 @@ import {
   CardContainer,
   confirm,
   Checkbox,
+  withFormikExtend,
 } from '@/components'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import { compare } from '@/layouts'
-import DeleteIcon from '@material-ui/icons/Delete'
-import Add from '@material-ui/icons/Add'
+import Yup from '@/utils/yup'
 import Item from './Item'
 import model from './models'
 
@@ -38,27 +40,27 @@ window.g_app.replaceModel(model)
 const styles = (theme) => ({})
 
 // @compare('diagnosis')
+// @withFormikExtend({
+//   mapPropsToValues: ({ diagnosis }) => {
+//     console.log(diagnosis)
+//     return diagnosis.entity ? diagnosis.entity : diagnosis.default
+//   },
+//   validationSchema: Yup.object().shape({
+//     diagnosises: Yup.array().of(
+//       Yup.object().shape({
+//         diagnosisFK: Yup.number().required(),
+//         // complication: Yup.array().of(Yup.string()).required().min(1),
+//         onsetDate: Yup.string().required(),
+//       }),
+//     ),
+//   }),
+
+//   handleSubmit: () => {},
+//   displayName: 'Diagnosis',
+// })
 @connect(({ diagnosis }) => ({
   diagnosis,
 }))
-@withFormik({
-  mapPropsToValues: ({ diagnosis }) => {
-    console.log(diagnosis)
-    return diagnosis.entity ? diagnosis.entity : diagnosis.default
-  },
-  validationSchema: Yup.object().shape({
-    diagnosises: Yup.array().of(
-      Yup.object().shape({
-        diagnosis: Yup.string().required(),
-        complication: Yup.array().of(Yup.string()).required().min(1),
-        orderDate: Yup.string().required(),
-      }),
-    ),
-  }),
-
-  handleSubmit: () => {},
-  displayName: 'Diagnosis',
-})
 class Diagnosis extends PureComponent {
   // constructor (props) {
   //   super(props)
@@ -70,7 +72,7 @@ class Diagnosis extends PureComponent {
       !this.props.diagnosis.shouldAddNew &&
       nextProps.diagnosis.shouldAddNew
     ) {
-      console.log('shouldAddNew')
+      // console.log('shouldAddNew')
       this.addDiagnosis()
       this.props.dispatch({
         type: 'diagnosis/updateState',
@@ -83,32 +85,37 @@ class Diagnosis extends PureComponent {
 
   addDiagnosis = () => {
     this.arrayHelpers.push({
-      diagnosis: '',
-      complication: [],
-      orderDate: '',
-      isPersist: false,
-      remarks: '',
-      // id: getUniqueGUID(),
+      onsetDate: moment(),
+      uid: getUniqueGUID(),
     })
   }
 
   render () {
-    console.log('diagnosis')
-    const { theme, values } = this.props
+    const { theme } = this.props
     return (
       <div>
         <FieldArray
-          name='diagnosises'
+          name='corDiagnosis'
           render={(arrayHelpers) => {
+            const { form } = arrayHelpers
+            const { values } = form
+            // console.log('diagnosis', values)
+
             this.arrayHelpers = arrayHelpers
-            if (!values || !values.diagnosises) return null
-            return values.diagnosises.map((v, i) => {
-              return (
-                <div key={i}>
-                  <Item {...this.props} index={i} arrayHelpers={arrayHelpers} />
-                </div>
-              )
-            })
+            if (!values || !values.corDiagnosis) return null
+            return values.corDiagnosis
+              .filter((o) => !o.isDeleted)
+              .map((v, i) => {
+                return (
+                  <div key={i}>
+                    <Item
+                      {...this.props}
+                      index={i}
+                      arrayHelpers={arrayHelpers}
+                    />
+                  </div>
+                )
+              })
           }}
         />
 

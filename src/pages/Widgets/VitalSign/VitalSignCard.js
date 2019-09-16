@@ -41,6 +41,7 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature',
                 })}
+                max={200}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature.suffix',
                 })}
@@ -55,6 +56,7 @@ export default ({
               <NumberInput
                 {...args}
                 label='Blood Pressure SYS'
+                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}
@@ -69,6 +71,7 @@ export default ({
               <NumberInput
                 {...args}
                 label='Blood Pressure DIA'
+                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}
@@ -85,6 +88,7 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.heartRate',
                 })}
+                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.heartRate.suffix',
                 })}
@@ -101,10 +105,11 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.weight',
                 })}
+                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}
-                onChange={handleCalculateBMI(index, args.form)}
+                onChange={handleCalculateBMI(index)}
               />
             )}
           />
@@ -118,11 +123,12 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.height',
                 })}
+                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.height.suffix',
                 })}
                 // formatter={(value) => Math.floor(value)}
-                onChange={handleCalculateBMI(index, args.form)}
+                onChange={handleCalculateBMI(index)}
               />
             )}
           />
@@ -137,6 +143,7 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.bmi',
                 })}
+                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.bmi.suffix',
                 })}

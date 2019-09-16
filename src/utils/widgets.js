@@ -1,5 +1,4 @@
 import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
 import { Menu, Dropdown } from 'antd'
 
 import {
@@ -26,6 +25,7 @@ import Edit from '@material-ui/icons/Edit'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
+import Loading from '@/components/PageLoading/index'
 
 import { AuthorizedContext } from '@/components'
 

@@ -12,16 +12,14 @@ export default createFormViewModel({
     service: {},
     state: {
       default: {
-        diagnosises: [
-          {
-            id: getUniqueGUID(),
-            diagnosis: 'Asthma',
-            complication: 'Complication',
-            orderDate: moment('2015-01-30'),
-            isPersist: false,
-            remarks: '',
-          },
-        ],
+        // corDiagnosis: [
+        //   {
+        //     uid: getUniqueGUID(),
+        //     onsetDate: moment(),
+        //     isPersist: false,
+        //     remarks: '',
+        //   },
+        // ],
       },
     },
     subscriptions: ({ dispatch, history }) => {

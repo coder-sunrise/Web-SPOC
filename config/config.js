@@ -71,6 +71,8 @@ export default {
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
     'process.env.url': 'https://semr2dev2010.emr.com.sg',
+    'process.env.signalrUrl':
+      'https://ec2-175-41-131-73.ap-southeast-1.compute.amazonaws.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,

@@ -1,7 +1,11 @@
 import React from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { withStyles, Divider, Paper, IconButton } from '@material-ui/core'
+import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import numeral from 'numeral'
 import {
   CommonTableGrid,
   Button,
@@ -10,10 +14,12 @@ import {
   NumberInput,
 } from '@/components'
 import { orderTypes } from '@/utils/codes'
+import { sumReducer } from '@/utils/utils'
 
-export default ({ orders, dispatch }) => {
-  const { rows } = orders
-
+export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
+  const { rows, summary, finalAdjustments } = orders
+  const { total, gst, totalWithGST } = summary
+  const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
     dispatch({
       type: 'orders/updateState',
@@ -28,6 +34,65 @@ export default ({ orders, dispatch }) => {
       },
     })
   }
+  const addAdjustment = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackConfig: {
+            model: 'orders',
+            reducer: 'addFinalAdjustment',
+          },
+          showRemark: true,
+          showAmountPreview: false,
+          defaultValues: {
+            // ...this.props.orders.entity,
+            initialAmout: totalWithGST,
+          },
+        },
+      },
+    })
+  }
+  const totalItems = [
+    ...adjustments.map((o) => ({
+      columnName: 'totalAfterItemAdjustment',
+      type: `${o.uid}`,
+    })),
+    { columnName: 'totalAfterItemAdjustment', type: 'gst' },
+    { columnName: 'totalAfterItemAdjustment', type: 'total' },
+  ]
+  const messages = {
+    gst: '7.00% GST',
+    total: 'Total (GST)',
+  }
+  adjustments.forEach((adj) => {
+    messages[adj.uid] = (
+      <span>
+        {adj.adjRemark}
+
+        <Popconfirm
+          onConfirm={() =>
+            dispatch({
+              type: 'orders/deleteFinalAdjustment',
+              payload: {
+                uid: adj.uid,
+              },
+            })}
+        >
+          <Tooltip title='Delete Adjustment'>
+            <IconButton
+              style={{
+                top: -1,
+              }}
+            >
+              <Delete />
+            </IconButton>
+          </Tooltip>
+        </Popconfirm>
+      </span>
+    )
+  })
   return (
     <CommonTableGrid
       size='sm'
@@ -40,27 +105,107 @@ export default ({ orders, dispatch }) => {
         { name: 'subject', title: 'Name' },
         { name: 'remark', title: 'Description' },
         { name: 'adjAmount', title: 'Adj.' },
-        { name: 'totalAfterOverallAdjustment', title: 'Total' },
+        { name: 'totalAfterItemAdjustment', title: 'Total' },
         { name: 'action', title: 'Action' },
       ]}
-      FuncProps={{ pager: false }}
+      FuncProps={{
+        pager: false,
+        summary: true,
+        summaryConfig: {
+          state: {
+            totalItems,
+          },
+          integrated: {
+            calculator: (type, r, getValue) => {
+              // console.log(type, rows, getValue)
+              if (type === 'gst') {
+                return (
+                  <span style={{ float: 'right' }}>
+                    <NumberInput value={gst} text currency />
+                  </span>
+                )
+              }
+
+              if (type === 'total') {
+                return (
+                  <span style={{ float: 'right' }}>
+                    <NumberInput value={totalWithGST} text currency />
+                  </span>
+                )
+              }
+              const adj = adjustments.find((o) => `${o.uid}` === type)
+              if (adj) {
+                return (
+                  <span style={{ float: 'right' }}>
+                    <NumberInput value={adj.adjAmount} text currency />
+                  </span>
+                )
+              }
+
+              return IntegratedSummary.defaultCalculator(type, r, getValue)
+            },
+          },
+          row: {
+            messages,
+            totalRowComponent: (p) => {
+              const { children, ...restProps } = p
+              const newChildren = [
+                <Table.Cell colSpan={3} key={1} />,
+                React.cloneElement(children[4], {
+                  colSpan: 2,
+                  ...restProps,
+                }),
+                <Table.Cell colSpan={1} key={2} />,
+              ]
+              return <Table.Row>{newChildren}</Table.Row>
+            },
+            totalCellComponent: (p) => {
+              const { children, column } = p
+              if (column.name === 'totalAfterItemAdjustment') {
+                // console.log(p)
+                return (
+                  <Table.Cell colSpan={2}>
+                    <span style={{ color: 'initial' }}>
+                      Adjustment
+                      <Tooltip title='Add Adjustment'>
+                        <IconButton style={{ top: -1 }} onClick={addAdjustment}>
+                          <Add />
+                        </IconButton>
+                      </Tooltip>
+                    </span>
+                    {children}
+                  </Table.Cell>
+                )
+              }
+              return null
+            },
+          },
+        },
+      }}
       columnExtensions={[
         { columnName: 'editType', type: 'select', options: orderTypes },
-        { columnName: 'adjAmount', type: 'currency' },
+        { columnName: 'adjAmount', type: 'currency', width: 100 },
         {
-          columnName: 'totalAfterOverallAdjustment',
-          align: 'right',
-          render: (r) => {
-            if (!r.totalAfterItemAdjustment) return ''
-            return (
-              <NumberInput text currency value={r.totalAfterItemAdjustment} />
-            )
-          },
+          columnName: 'totalAfterItemAdjustment',
+          // align: 'right',
+          type: 'currency',
+          // width: 130,
+          // render: (r) => {
+          //   if (!r.totalAfterItemAdjustment) return ''
+          //   return (
+          //     <NumberInput text currency value={r.totalAfterItemAdjustment} />
+          //   )
+          // },
         },
         {
           columnName: 'remark',
           render: (r) => {
-            return r.remark || r.remarks || ''
+            const rmk = r.remark || r.remarks || ''
+            return (
+              <Tooltip title={rmk} placement='top-end'>
+                <span>{rmk}</span>
+              </Tooltip>
+            )
           },
         },
         {
@@ -68,23 +213,25 @@ export default ({ orders, dispatch }) => {
           render: (row) => {
             return (
               <React.Fragment>
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                  style={{ marginRight: 5 }}
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Add'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 5 }}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
                 <Popconfirm
                   onConfirm={() =>
                     dispatch({
                       type: 'orders/deleteRow',
                       payload: {
-                        id: row.uid,
+                        uid: row.uid,
                       },
                     })}
                 >
