@@ -22,7 +22,8 @@ const styles = (theme) => ({
 class PurchaseReceive extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
-      type: 'purchasingReceiving/query',
+      //type: 'purchasingReceiving/query',
+      type: 'purchasingReceiving/fakeQueryDone',
     })
   }
 
@@ -30,7 +31,7 @@ class PurchaseReceive extends PureComponent {
     const { history } = this.props
     const { location } = history
 
-    history.push(`${location.pathname}/${currentTarget.id}`)
+    history.push(`${location.pathname}/${currentTarget.id}?type=new`)
   }
 
   toggleWriteOffModal = () => {

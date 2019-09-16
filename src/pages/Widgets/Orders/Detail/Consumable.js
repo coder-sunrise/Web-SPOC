@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import { connect } from 'dva'
 import {
   Button,
   GridContainer,
@@ -19,12 +19,104 @@ import {
   NumberInput,
   CustomInputWrapper,
   Popconfirm,
+  FastField,
+  withFormikExtend,
 } from '@/components'
 
+import Yup from '@/utils/yup'
+import { calculateAdjustAmount } from '@/utils/utils'
+
+@connect(({ global }) => ({ global }))
+@withFormikExtend({
+  mapPropsToValues: ({ orders = {}, editType }) => {
+    const v = {
+      ...(orders.entity || orders.defaultVaccination),
+      editType,
+    }
+    return v
+  },
+  enableReinitialize: true,
+  validationSchema: Yup.object().shape({
+    stockConsumableFK: Yup.number().required(),
+    unitPrice: Yup.number().required(),
+    totalPrice: Yup.number().required(),
+    quantity: Yup.number().required(),
+  }),
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, orders, currentType } = props
+    const { rows } = orders
+    const data = {
+      sequence: rows.length,
+      ...values,
+      subject: currentType.getSubject(values),
+    }
+    dispatch({
+      type: 'orders/upsertRow',
+      payload: data,
+    })
+    if (onConfirm) onConfirm()
+  },
+  displayName: 'OrderPage',
+})
 class Consumable extends PureComponent {
+  componentWillReceiveProps (nextProps) {
+    if (
+      (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
+      nextProps.orders.shouldPushToState
+    ) {
+      nextProps.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: nextProps.values,
+          shouldPushToState: false,
+        },
+      })
+    }
+  }
+
+  changeConsumable = (v, op) => {
+    const { setFieldValue, values } = this.props
+    console.log(v, op)
+    setFieldValue('consumableName', op.displayValue)
+
+    if (op.sellingPrice) {
+      setFieldValue('unitPrice', op.sellingPrice)
+      setFieldValue('totalPrice', op.sellingPrice * values.quantity)
+      this.updateTotalPrice(op.sellingPrice * values.quantity)
+    } else {
+      setFieldValue('unitPrice', undefined)
+      setFieldValue('totalPrice', undefined)
+      this.updateTotalPrice(undefined)
+    }
+  }
+
+  updateTotalPrice = (v) => {
+    if (v !== undefined) {
+      const { adjType, adjValue } = this.props.values
+      const adjustment = calculateAdjustAmount(
+        adjType === 'ExactAmount',
+        v,
+        adjValue,
+      )
+      this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
+      this.props.setFieldValue('adjAmount', adjustment.adjAmount)
+    } else {
+      this.props.setFieldValue('totalAfterItemAdjustment', undefined)
+      this.props.setFieldValue('adjAmount', undefined)
+    }
+  }
+
   render () {
-    const { theme, classes, values } = this.props
-    // console.log('Consumable', this.props)
+    const {
+      theme,
+      classes,
+      values,
+      footer,
+      handleSubmit,
+      setFieldValue,
+    } = this.props
+    console.log(values)
     return (
       <div>
         <GridContainer>
@@ -37,6 +129,7 @@ class Consumable extends PureComponent {
                     label='Name'
                     code='inventoryconsumable'
                     labelField='displayValue'
+                    onChange={this.changeConsumable}
                     {...args}
                   />
                 )
@@ -51,7 +144,19 @@ class Consumable extends PureComponent {
               name='quantity'
               render={(args) => {
                 return (
-                  <NumberInput label='Quantity' step={1} min={1} {...args} />
+                  <NumberInput
+                    label='Quantity'
+                    step={1}
+                    min={1}
+                    onChange={(e) => {
+                      if (values.unitPrice) {
+                        const total = e.target.value * values.unitPrice
+                        setFieldValue('totalPrice', total)
+                        this.updateTotalPrice(total)
+                      }
+                    }}
+                    {...args}
+                  />
                 )
               }}
             />
@@ -81,15 +186,21 @@ class Consumable extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={12} className={classes.editor}>
+          <GridItem xs={12}>
             <FastField
-              name='remark'
+              name='remarks'
               render={(args) => {
-                return <RichEditor placeholder='Remarks' {...args} />
+                // return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField multiline rowsMax='5' label='Remarks' {...args} />
+                )
               }}
             />
           </GridItem>
         </GridContainer>
+        {footer({
+          onSave: handleSubmit,
+        })}
       </div>
     )
   }

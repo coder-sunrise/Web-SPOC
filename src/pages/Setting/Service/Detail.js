@@ -297,7 +297,7 @@ class Detail extends PureComponent {
                 />
               </GridItem>
             </GridContainer>
-            <h5 className={classes.detailHeader}>Medisave Settings</h5>
+            {/* <h5 className={classes.detailHeader}>Medisave Settings</h5>
             <Divider />
             <GridContainer>
               <GridItem
@@ -375,7 +375,7 @@ class Detail extends PureComponent {
                   }}
                 />
               </GridItem>
-            </GridContainer>
+            </GridContainer> */}
             <h5 className={classes.detailHeader}>Service Settings</h5>
             <Divider />
             <EditableTableGrid

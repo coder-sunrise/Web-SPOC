@@ -3,7 +3,11 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 // import { withFormik } from 'formik'
 import { compose } from 'redux'
-import { getAppendUrl } from '@/utils/utils'
+import {
+  getAppendUrl,
+  errMsgForOutOfRange as errMsg,
+  navigateDirtyCheck,
+} from '@/utils/utils'
 import {
   NavPills,
   ProgressButton,
@@ -55,9 +59,7 @@ const Detail = ({
         />
         <Button
           color='danger'
-          onClick={() => {
-            history.push('/inventory/master?t=0')
-          }}
+          onClick={navigateDirtyCheck('/inventory/master')}
         >
           Cancel
         </Button>
@@ -88,7 +90,13 @@ const Detail = ({
           },
           {
             tabButton: 'Stock',
-            tabContent: <Stock medicationDetail={medicationDetail} />,
+            tabContent: (
+              <Stock
+                medicationDetail={medicationDetail}
+                values={values}
+                setFieldValue={setFieldValue}
+              />
+            ),
           },
         ]}
       />
@@ -101,43 +109,9 @@ export default compose(
     medication,
     medicationDetail,
   })),
-  // withFormik({
-  //   enableReinitialize: true,
-  //   mapPropsToValues: ({ medicationDetail }) => {
-  //     return medicationDetail.entity ? medicationDetail.entity : {}
-  //   },
-  //   handleSubmit: (values, { props }) => {
-  //     console.log(values)
-  //     const { dispatch } = props
-  //     // dispatch({
-  //     //   type: `${modelType}/submit`,
-  //     //   payload: test,
-  //     // }).then((r) => {
-  //     //   if (r.message === 'Ok') {
-  //     //     notification.success({
-  //     //       message: 'Done',
-  //     //     })
-  //     //   }
-  //     // })
-  //   },
-  //   validationSchema: Yup.object().shape(
-  //     {
-  //       // code: Yup.string().required(),
-  //       // displayValue: Yup.string().required(),
-  //       // // revenueCategory: Yup.string().required(),
-  //       // effectiveStartDate: Yup.string().required(),
-  //       // effectiveEndDate: Yup.string().required(),
-  //       // SellingPrice: Yup.number().required(),
-  //     },
-  //   ),
-  //   displayName: 'InventoryMedicationDetail',
-  // }),
-
- withFormikExtend({
+  withFormikExtend({
     enableReinitialize: true,
-
     mapPropsToValues: ({ medicationDetail }) => {
-      // console.log('medicationDetail', medicationDetail)
       return medicationDetail.entity
         ? medicationDetail.entity
         : medicationDetail.default
@@ -149,18 +123,29 @@ export default compose(
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       prescribingUOMFK: Yup.number().required(),
       dispensingUOMFK: Yup.number().required(),
-      averageCostPrice: Yup.number().positive(
-        'Average Cost Price must between 0 to 999,999.99',
-      ),
-      markupMargin: Yup.number().positive(
-        'Markup Margin must between 0 to 999,999.99',
-      ),
-      sellingPriceBefDiscount: Yup.number().positive(
-        'Selling Price must between 0 to 999,999.99',
-      ),
-      maxDiscount: Yup.number().positive(
-        'Max Discount must between 0 to 999,999.99',
-      ),
+      averageCostPrice: Yup.number()
+        .min(0, 'Average Cost Price must between 0 and 999,999.9999')
+        .max(999999.9999, 'Average Cost Price must between 0 and 999,999.9999'),
+
+      markupMargin: Yup.number()
+        .min(0, 'Markup Margin must between 0 and 999,999.9')
+        .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
+
+      sellingPrice: Yup.number()
+        .min(0, errMsg('Selling Price'))
+        .max(999999.99, errMsg('Selling Price')),
+
+      maxDiscount: Yup.number()
+        .min(0, 'Max Discount must between 0 and 999,999.9')
+        .max(999999.9, 'Max Discount must between 0 and 999,999.9'),
+
+      reOrderThreshold: Yup.number()
+        .min(0, errMsg('Re-Order Threshold'))
+        .max(999999.99, errMsg('Re-Order Threshold')),
+
+      criticalThreshold: Yup.number()
+        .min(0, errMsg('Critical Threshold'))
+        .max(999999.99, errMsg('Critical Threshold')),
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
@@ -180,15 +165,15 @@ export default compose(
         payload,
       }).then((r) => {
         if (r) {
-          if (onConfirm) onConfirm()
-          dispatch({
-            type: 'medicationDetail/query',
-          })
+          // if (onConfirm) onConfirm()
+          // dispatch({
+          //   type: 'medicationDetail/query',
+          // })
           history.push('/inventory/master')
         }
       })
     },
 
-    displayName: 'medicationDetail',
+    displayName: 'InventoryMedicationDetail',
   }),
 )(Detail)

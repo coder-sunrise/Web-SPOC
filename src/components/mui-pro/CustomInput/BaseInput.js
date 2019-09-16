@@ -258,7 +258,16 @@ class BaseInput extends React.PureComponent {
         return <AutosizeInput inputClassName={className} {...inputProps} />
       }
     }
-    // console.log(inputProps)
+    if (
+      !(
+        inputProps.value === undefined ||
+        inputProps.value === null ||
+        inputProps.value === ''
+      )
+    ) {
+      labelProps.shrink = true
+    }
+    // console.log(labelProps, props, inputProps, cfg)
     const element = (
       <CustomInputWrapper
         id={inputIdPrefix + inputIdCounter}

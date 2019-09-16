@@ -1,28 +1,54 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
-import { GridContainer, Button } from '@/components'
+import {
+  GridContainer,
+  Button,
+  EditableTableGrid,
+  withFormikExtend,
+  ProgressButton,
+} from '@/components'
 import Header from './Header'
 import Grid from './Grid'
-import { Add } from '@material-ui/icons'
+import { isPOStatusFinalized } from '../../variables'
 
+@connect(({ purchaseOrderPayment, purchaseOrderDetails }) => ({
+  purchaseOrderPayment, purchaseOrderDetails
+}))
+@withFormikExtend({
+  displayName: 'purchaseOrderPayment',
+  handleSubmit: (values, { props }) => { },
+})
 class index extends PureComponent {
-  render () {
+  componentDidMount() {
+    // this.props.dispatch({
+    //   type: 'purchaseOrderPayment/query',
+    // })
+  }
+
+  render() {
+    console.log('Payment Index', this.props)
+    const { purchaseOrderDetails } = this.props
+    const { status } = purchaseOrderDetails.entity.purchaseOrder
+    const isEditable = isPOStatusFinalized(status)
     return (
-      <GridContainer>
-        <Header />
-        <Grid />
-        <Button
-          // onClick={this.toggleAddPaymaneModal}
-          hideIfNoEditRights
-          color='info'
-          link
-        >
-          <Add />
-          {formatMessage({
-            id: 'inventory.pr.detail.payment.addPayment',
-          })}
-        </Button>
-      </GridContainer>
+      <React.Fragment>
+        <GridContainer>
+          <Header {...this.props} />
+          <Grid isEditable={isEditable} {...this.props} />
+        </GridContainer>
+        <div style={{ textAlign: 'center' }}>
+          <ProgressButton
+            //submitKey='medicationDetail/submit'
+            //onClick={handleSubmit}
+            disabled={!isEditable}
+          />
+          <Button
+            color='danger'
+            disabled={!isEditable}
+          >Cancel</Button>
+        </div>
+      </React.Fragment>
     )
   }
 }

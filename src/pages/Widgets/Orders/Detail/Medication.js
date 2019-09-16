@@ -167,6 +167,7 @@ class Medication extends PureComponent {
       'corPrescriptionItemInstruction[0].drugFrequencyFK',
       op.medicationFrequency ? op.medicationFrequency.id : undefined,
     )
+    setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
 
     if (
       op.inventoryMedication_MedicationPrecaution &&
@@ -297,7 +298,7 @@ class Medication extends PureComponent {
                                       simple
                                       options={[
                                         { value: 'AND', name: 'And' },
-                                        { value: 'OR', name: 'Or' },
+                                        { value: 'THEN', name: 'Then' },
                                       ]}
                                       {...args}
                                     />

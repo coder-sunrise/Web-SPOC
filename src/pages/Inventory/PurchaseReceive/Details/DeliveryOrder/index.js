@@ -3,26 +3,33 @@ import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { Divider, withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import { GridContainer, GridItem, Button, CommonModal } from '@/components'
+import { GridContainer, GridItem, Button, CommonModal, withFormikExtend } from '@/components'
 import DeliveryOrderDetails from './Details/DeliveryOrderDetails'
 import Grid from './Grid'
 import Add from '@material-ui/icons/Add'
+import { showErrorNotification } from '@/utils/error'
+import { isPOStatusFinalized } from '../../variables'
 
-const styles = (theme) => ({
-  ...basicStyle(theme),
-  buttonGroup: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-  },
-})
-
-@connect(({ deliveryOrder }) => ({
+@connect(({ deliveryOrder, purchaseOrderDetails }) => ({
   deliveryOrder,
+  purchaseOrderDetails,
 }))
+// @withFormikExtend({
+//   displayName: 'purchaseOrder',
+//   enableReinitialize: true,
+//   mapPropsToValues: ({ deliveryOrder }) => {
+//     return deliveryOrder.entity || deliveryOrder.default
+//   },
+// })
 class index extends PureComponent {
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'deliveryOrder/query',
+    })
+
+    this.props.dispatch({
+      type: 'deliveryOrder/mapPurchaseOrder',
+      payload: this.props.purchaseOrderDetails
     })
   }
 
@@ -35,12 +42,17 @@ class index extends PureComponent {
     })
   }
 
-  render () {
+  render() {
+    console.log('DO Index', this.props)
     const { props } = this
     const { classes, deliveryOrder } = props
+
+    const { purchaseOrder } = deliveryOrder
+    const { poStatus, purchaseOrderOutstandingItem } = purchaseOrder
     const cfg = {
       toggleDeliveryOrderDetailsModal: this.toggleDeliveryOrderDetailsModal,
     }
+
     return (
       <div>
         <GridContainer>
@@ -59,10 +71,10 @@ class index extends PureComponent {
               deliveryOrder.entity ? (
                 'Edit Delivery Order'
               ) : (
-                'Delivery Order Details'
-              )
+                  'Delivery Order Details'
+                )
             }
-            maxWidth='lg'
+            maxWidth='xl'
             bodyNoPadding
             onClose={this.toggleDeliveryOrderDetailsModal}
             onConfirm={this.toggleDeliveryOrderDetailsModal}
@@ -70,7 +82,20 @@ class index extends PureComponent {
             <DeliveryOrderDetails {...cfg} {...this.props} />
           </CommonModal>
           <Button
-            onClick={this.toggleDeliveryOrderDetailsModal}
+            //onClick={this.toggleDeliveryOrderDetailsModal}
+            disabled={!isPOStatusFinalized(poStatus)}
+            onClick={() => {
+              this.props.dispatch({
+                type: 'deliveryOrder/updateState',
+                payload: {
+                  //entity: undefined,
+                  entity: {
+                    rows: purchaseOrderOutstandingItem
+                  }
+                },
+              })
+              this.toggleDeliveryOrderDetailsModal()
+            }}
             hideIfNoEditRights
             color='info'
             link
@@ -86,4 +111,4 @@ class index extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(index)
+export default index

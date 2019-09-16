@@ -19,43 +19,36 @@ import {
 } from '@/components'
 import Adjustment from './Adjustment'
 
-@connect(({ purchaseOrder }) => ({
-  purchaseOrder,
-}))
-@withFormik({
-  displayName: 'purchaseOrder',
-  mapPropsToValues: ({ purchaseOrder }) => {
-    return purchaseOrder.entity || purchaseOrder.default
-  },
-})
 class POSummary extends PureComponent {
-  addAdjustment = () => {
-    this.arrayHelpers.push({
-      adjTitle: 'test',
-      adjAmount: 0.5,
-      isDeleted: false,
-    })
-  }
-
-  render() {
+  render () {
     const { props } = this
-    const { values } = props
+    const {
+      clinicSetting,
+      calculateInvoice,
+      setFieldValue,
+      adjustmentList,
+      dispatch,
+      purchaseOrder,
+      purchaseOrderAdjustment,
+      toggleInvoiceAdjustment,
+    } = props
+    const poPrefix = 'purchaseOrder'
+    const { gstEnabled, gstIncluded } = purchaseOrder
 
+    const onChangeGstToggle = (isCheckboxClicked = false) => {
+      if (!isCheckboxClicked) {
+        if (!gstEnabled) {
+          setFieldValue(`${poPrefix}.gstIncluded`, false)
+        }
+      }
+      setTimeout(() => {
+        calculateInvoice()
+      }, 1)
+    }
+
+    console.log('POSummary', this.props)
     return (
-      <React.Fragment>
-        <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <NumberInput
-              prefix={formatMessage({
-                id: 'inventory.pr.detail.pod.summary.subTotal',
-              })}
-              defaultValue={190}
-              {...amountProps}
-            />
-          </GridItem>
-        </GridContainer>
-
+      <div style={{ paddingRight: 140, paddingTop: 20 }}>
         <GridContainer>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3} container>
@@ -70,7 +63,8 @@ class POSummary extends PureComponent {
               size='sm'
               justIcon
               key='addAdjustment'
-              onClick={this.addAdjustment}
+              //onClick={this.addAdjustment}
+              onClick={toggleInvoiceAdjustment}
             >
               <Add />
             </Button>
@@ -78,74 +72,94 @@ class POSummary extends PureComponent {
         </GridContainer>
 
         <FieldArray
-          name='adjustmentList'
+          name='purchaseOrderAdjustment'
           render={(arrayHelpers) => {
             this.arrayHelpers = arrayHelpers
-            if (!values.adjustmentList) return null
-            return values.adjustmentList.map((v, i) => {
-              return (
-                <Adjustment
-                  key={v.id}
-                  index={i}
-                  arrayHelpers={arrayHelpers}
-                  // propName='purchaseOrder.adjustmentList'
-                  {...amountProps}
-                  {...props}
-                />
-              )
+            if (!purchaseOrderAdjustment) return null
+            return purchaseOrderAdjustment.map((v, i) => {
+              if (!v.isDeleted) {
+                return (
+                  <Adjustment
+                    key={v.id}
+                    index={i}
+                    dispatch={dispatch}
+                    arrayHelpers={arrayHelpers}
+                    purchaseOrderAdjustment={purchaseOrderAdjustment}
+                    calculateInvoice={calculateInvoice}
+                    setFieldValue={setFieldValue}
+                    {...amountProps}
+                    {...props}
+                  />
+                )
+              }
             })
           }}
         />
 
-        <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <NumberInput
-              prefix={formatMessage({
-                id: 'inventory.pr.detail.pod.summary.gst',
-              })}
-              defaultValue={13.3}
-              {...amountProps}
-            />
-          </GridItem>
-        </GridContainer>
+        {clinicSetting.gstEnabled ? (
+          <GridContainer>
+            <GridItem xs={2} md={9} />
+            <GridItem xs={4} md={2}>
+              <span> {`GST (${clinicSetting.gstRate}%): `}</span>
+              <FastField
+                name={`${poPrefix}.gstEnabled`}
+                render={(args) => (
+                  <Switch
+                    fullWidth={false}
+                    onChange={() => onChangeGstToggle()}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={6} md={1}>
+              <FastField
+                name={`${poPrefix}.invoiceGST`}
+                render={(args) => {
+                  return <NumberInput {...amountProps} {...args} />
+                }}
+              />
+            </GridItem>
 
-        <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <Field
-              name='gstEnabled'
-              render={(args) => (
-                <Switch
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={2} md={9} />
+            {/* <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
             <FastField
-              name='gstIncluded'
-              render={(args) => {
-                return (
-                  <Tooltip
-                    title={formatMessage({
-                      id: 'inventory.pr.detail.pod.summary.inclusiveGST',
-                    })}
-                    placement='bottom'
-                  >
-                    <Checkbox
-                      label={formatMessage({
-                        id: 'inventory.pr.detail.pod.summary.inclusiveGST',
-                      })}
-                      {...args}
-                    />
-                  </Tooltip>
-                )
-              }}
+              name={`${poPrefix}.gstEnabled`}
+              render={(args) => <Switch onChange={() => onChangeGstToggle()} {...args} />}
             />
-          </GridItem>
-        </GridContainer>
+          </GridItem> */}
+            <GridItem xs={2} md={9} />
+            {gstEnabled ? (
+              <GridItem xs={10} md={3}>
+                <FastField
+                  name={`${poPrefix}.gstIncluded`}
+                  render={(args) => {
+                    return (
+                      <Tooltip
+                        title={formatMessage({
+                          id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                        })}
+                        placement='bottom'
+                      >
+                        <Checkbox
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                          })}
+                          onChange={() => onChangeGstToggle(true)}
+                          {...args}
+                        />
+                      </Tooltip>
+                    )
+                  }}
+                />
+              </GridItem>
+            ) : (
+              <GridItem xs={10} md={3} />
+            )}
+          </GridContainer>
+        ) : (
+          []
+        )}
 
         <GridContainer>
           <GridItem xs={2} md={9} />
@@ -154,16 +168,23 @@ class POSummary extends PureComponent {
           </GridItem>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
-            <NumberInput
-              prefix={formatMessage({
-                id: 'inventory.pr.detail.pod.summary.total',
-              })}
-              defaultValue={203.3}
-              {...amountProps}
+            <FastField
+              name={`${poPrefix}.invoiceTotal`}
+              render={(args) => {
+                return (
+                  <NumberInput
+                    prefix={formatMessage({
+                      id: 'inventory.pr.detail.pod.summary.total',
+                    })}
+                    {...amountProps}
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
         </GridContainer>
-      </React.Fragment>
+      </div>
     )
   }
 }

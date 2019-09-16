@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import lodash from 'lodash'
-import { confirmBeforeReload } from '@/utils/utils'
 import { FastField, withFormik } from 'formik'
+import { confirmBeforeReload } from '@/utils/utils'
 
 import Authorized from '@/utils/Authorized'
 
@@ -33,7 +33,7 @@ const control = ({ disabledProps } = {}) => (Component) => {
       return (
         <Authorized.Context.Consumer>
           {({ view, edit }) => {
-            // console.log('Authorized.Context.Consumer')
+            // console.log('Authorized.Context.Consumer', view, edit)
             if (!view) return <Component {...this.props} />
             return (
               <Authorized

@@ -142,6 +142,11 @@ class AntdSelect extends React.PureComponent {
         value,
         shrink: value !== undefined,
       })
+    } else {
+      this.setState({
+        value: undefined,
+        shrink: false,
+      })
     }
     if (autoComplete && options && this.state.data.length === 0) {
       this.setState({
@@ -215,10 +220,17 @@ class AntdSelect extends React.PureComponent {
 
     let proceed = true
     if (onChange) {
-      const option = (autoComplete || query ? this.state.data : options).find(
-        (o) => o[valueField] === newVal,
-      )
-      proceed = onChange(newVal, option) !== false
+      if (!mode || mode === 'default') {
+        const option = (autoComplete || query ? this.state.data : options).find(
+          (o) => o[valueField] === newVal,
+        )
+        proceed = onChange(newVal, option) !== false
+      } else {
+        const opts = (autoComplete || query
+          ? this.state.data
+          : options).filter((o) => newVal.find((m) => m === o[valueField]))
+        proceed = onChange(newVal, opts) !== false
+      }
     }
     if (proceed) {
       if (form && field) {
@@ -323,7 +335,7 @@ class AntdSelect extends React.PureComponent {
       onBlur,
       allowClear = true,
       style,
-      dropdownMatchSelectWidth = false,
+      dropdownMatchSelectWidth = true,
       autoComplete,
       query,
       optionLabelLength,
@@ -360,7 +372,7 @@ class AntdSelect extends React.PureComponent {
     }
 
     if (this.props.text) {
-      const match = source.find((o) => o[this.props.valueField] === value)
+      const match = source.find((o) => o[this.props.valueField] === this.state.value)
       let text = ''
       if (match) text = match[this.props.labelField]
       return (

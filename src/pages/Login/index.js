@@ -17,7 +17,7 @@ import loginBackground from '../../assets/img/login.jpeg'
 const styles = (theme) => ({
   ...authStyle(theme),
 })
-@connect(({ login, loading }) => ({ login, loading }))
+@connect(({ login, loading, global }) => ({ login, loading, global }))
 class LoginPage extends PureComponent {
   getBgImage = () => {
     return loginBackground
@@ -34,7 +34,10 @@ class LoginPage extends PureComponent {
         const { payload } = props
         const validLogin = payload.access_token !== undefined
 
-        validLogin && router.push('/')
+        if (validLogin) {
+          localStorage.setItem('clinicCode', clinicCode)
+          router.push('/')
+        }
       })
       .catch((error) => {
         console.log('error', error)

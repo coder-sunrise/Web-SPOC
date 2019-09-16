@@ -14,6 +14,7 @@ export default createListViewModel({
           moment(),
           moment('2099-12-31'),
         ],
+        status: 'Draft',
       },
     },
     subscriptions: ({ dispatch, history }) => {

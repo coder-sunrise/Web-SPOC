@@ -1,5 +1,4 @@
 import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
 import { Menu, Dropdown } from 'antd'
 
 import {
@@ -26,6 +25,7 @@ import Edit from '@material-ui/icons/Edit'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
+import Loading from '@/components/PageLoading/index'
 
 import { AuthorizedContext } from '@/components'
 
@@ -37,6 +37,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
       loading: Loading,
     }),
+    model: 'clinicalnotes',
     disabled: true,
     layoutConfig: {
       minW: 12,
@@ -102,6 +103,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/Diagnosis'),
       loading: Loading,
     }),
+    model: 'diagnosis',
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -141,6 +143,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ConsultationDocument'),
       loading: Loading,
     }),
+    model: 'consultationDocument',
     layoutConfig: {},
     toolbarAddon: (
       <AuthorizedContext>
@@ -176,6 +179,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/PatientHistory'),
       loading: Loading,
     }),
+    model: 'patientHistory',
     layoutConfig: {
       style: {
         padding: 5,
@@ -194,6 +198,7 @@ const widgets = [
       //   return <Component {...props} />
       // },
     }),
+    model: 'orders',
     layoutConfig: {
       style: {
         padding: '0 5px',
@@ -207,6 +212,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/ResultHistory'),
       loading: Loading,
     }),
+    model: 'resultHistory',
     layoutConfig: {
       style: {},
     },
@@ -218,6 +224,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/VitalSign'),
       loading: Loading,
     }),
+    model: 'patientVitalSign',
     layoutConfig: {
       minW: 12,
       minH: 10,

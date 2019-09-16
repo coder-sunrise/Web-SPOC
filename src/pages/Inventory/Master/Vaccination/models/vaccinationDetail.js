@@ -20,6 +20,7 @@ export default createFormViewModel({
           moment('2099-12-31'),
         ],
         VaccinationGroup: 'MedisaveVaccination',
+        isActive: true,
       },
       // entity: {},
     },
@@ -38,7 +39,7 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               currentId: '',
-              // entity: {},
+              entity: undefined,
             },
           })
         }
@@ -53,7 +54,6 @@ export default createFormViewModel({
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload
-        console.log('data', data)
         return {
           ...st,
           entity: {

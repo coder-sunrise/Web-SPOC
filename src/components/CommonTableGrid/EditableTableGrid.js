@@ -241,7 +241,7 @@ class EditableTableGrid extends PureComponent {
       } = {},
       ...props
     } = this.props
-    const { pagerConfig = {}, pager = true } = FuncProps
+    const { pagerConfig = {}, pager = true, addNewLabelName } = FuncProps
     const { containerExtraComponent } = pagerConfig
     return (
       <React.Fragment>
@@ -265,7 +265,8 @@ class EditableTableGrid extends PureComponent {
             disabled={this.state.addedRows && this.state.addedRows.length > 0}
             {...addCommandProps}
           >
-            <Add />New
+            <Add />
+            {addNewLabelName || 'New'}
           </Button>
         )}
         {containerExtraComponent}

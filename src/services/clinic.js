@@ -1,19 +1,22 @@
 import * as service from '@/services/common'
 import request from '@/utils/request'
 
-const url = '/api/generalsetting'
+const url = '/api/clinic'
 
 module.exports = {
-  remove: (params) => service.remove(url, params),
   query: (params) => {
-    return service.queryList(url, params)
+    return request(`${url}?clinicCode=${params}`, {
+      method: 'GET',
+    })
   },
+
+  // upsert: (params) => service.upsert(url, params),
   upsert: async (params) => {
     const r = await request(`${url}`, {
       method: 'PUT',
-      body: [
+      body: {
         ...params,
-      ],
+      },
     })
     return r
   },

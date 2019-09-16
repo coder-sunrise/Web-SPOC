@@ -60,7 +60,7 @@ export default {
   'inventory.master.pricing.profitMarginPercentage': 'Markup Margin (%)',
   'inventory.master.pricing.suggestedSellingPrice': 'Suggested Selling Price',
   'inventory.master.pricing.sellingPrice': 'Selling Price',
-  'inventory.master.pricing.maxDiscount': 'Max Discount(%)',
+  'inventory.master.pricing.maxDiscount': 'Max Discount (%)',
 
   'inventory.master.setting.dosage': 'Dosage',
   'inventory.master.setting.frequency': 'Frequency',
@@ -84,7 +84,9 @@ export default {
   'inventory.pr.addnew': 'Add New',
   'inventory.pr.pono': 'Purchase Order #',
   'inventory.pr.supplier': 'Supplier',
+  'inventory.pr.invoiceStatus': 'Inv. Status',
   'inventory.pr.status': 'Status',
+  'inventory.pr.poStatus': 'PO Status',
   'inventory.pr.detail.print': 'Print',
 
   'inventory.pr.filter.datefrom': 'Transaction Date From',

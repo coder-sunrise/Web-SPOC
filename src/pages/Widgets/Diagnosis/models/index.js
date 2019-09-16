@@ -12,16 +12,14 @@ export default createFormViewModel({
     service: {},
     state: {
       default: {
-        diagnosises: [
-          {
-            id: getUniqueGUID(),
-            diagnosis: 'Asthma',
-            complication: 'Complication',
-            orderDate: moment('2015-01-30'),
-            isPersist: false,
-            remarks: '',
-          },
-        ],
+        // corDiagnosis: [
+        //   {
+        //     uid: getUniqueGUID(),
+        //     onsetDate: moment(),
+        //     isPersist: false,
+        //     remarks: '',
+        //   },
+        // ],
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -30,14 +28,14 @@ export default createFormViewModel({
       })
     },
     effects: {
-      // *add ({ payload }, { call, put, select }) {
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: {
-      //       addNew: true,
-      //     },
-      //   })
-      // },
+      *removeWidget ({ payload }, { call, put, select }) {
+        // yield put({
+        //   type: 'updateState',
+        //   payload: {
+        //     addNew: true,
+        //   },
+        // })
+      },
     },
     reducers: {},
   },

@@ -17,8 +17,8 @@ const Vaccination = ({ dispatch, history, vaccination, values }) => {
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'displayValue', title: 'Name' },
-      { name: 'supplier', title: 'Supplier' },
-      { name: 'uom', title: 'Disp. UOM' },
+      { name: 'favouriteSupplier', title: 'Supplier' },
+      { name: 'dispensingUOM', title: 'Disp. UOM' },
       { name: 'stock', title: 'Stock' },
       { name: 'averageCostPrice', title: 'Avg Cost Price' },
       { name: 'sellingPrice', title: 'Selling Price' },
@@ -33,10 +33,17 @@ const Vaccination = ({ dispatch, history, vaccination, values }) => {
     setColExtensions,
   ] = useState([
     { columnName: 'action', width: 110, align: 'center' },
-
     {
-      columnName: 'uom',
-      type: 'number',
+      columnName: 'favouriteSupplier',
+      type: 'codeSelect',
+      code: 'ctSupplier',
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'dispensingUOM',
+      type: 'codeSelect',
+      code: 'ctvaccinationunitofmeasurement',
+      sortingEnabled: false,
     },
     {
       columnName: 'stock',

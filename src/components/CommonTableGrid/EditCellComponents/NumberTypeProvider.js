@@ -1,6 +1,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import { isNumber } from 'util'
 import numeral from 'numeral'
 import { withStyles } from '@material-ui/core'
 
@@ -88,11 +89,12 @@ class NumberEditor extends PureComponent {
           })
       }
     }
+    // console.log(columnName, value)
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
       error: this.state.error,
-      defaultValue: value,
+      value,
       disabled: isDisabled(latestRow),
       currency: cfg && (cfg.currency || type === 'currency'),
       ...restProps,
@@ -123,7 +125,7 @@ const NumberFormatter = (columnExtensions) =>
         text = false,
       } = props
       if (value === undefined) return null
-
+      if (!isNumber(value)) return value
       let { color = 'darkblue' } = props
       const cfg =
         columnExtensions.find(
@@ -163,7 +165,7 @@ const NumberFormatter = (columnExtensions) =>
     },
   )
 
-class NumberTypeProvider extends PureComponent {
+class NumberTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
   }
@@ -174,6 +176,10 @@ class NumberTypeProvider extends PureComponent {
       return <NumberEditor columnExtensions={ces} {...editorProps} />
     }
   }
+
+  shouldComponentUpdate = (nextProps, nextState) =>
+    this.props.editingRowIds !== nextProps.editingRowIds ||
+    this.props.commitCount !== nextProps.commitCount
 
   render () {
     const { columnExtensions } = this.props

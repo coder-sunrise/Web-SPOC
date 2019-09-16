@@ -7,27 +7,39 @@ import PurchaseOrder from './Details/PurchaseOrder'
 import DeliveryOrder from './Details/DeliveryOrder'
 import Payment from './Details/Payment'
 
-export const ContextMenuOptions = [
-  {
-    id: 0,
-    label: 'Edit',
-    Icon: Edit,
-    disabled: false,
-  },
-  {
-    id: 1,
-    label: 'Duplicate PO',
-    Icon: Duplicate,
-    disabled: false,
-  },
-  { isDivider: true },
-  {
-    id: 2,
-    label: 'Print',
-    Icon: Print,
-    disabled: false,
-  },
-]
+const isDuplicatePOAllowed = (status) => {
+  const allowedStatus = ['Partially Received', 'Finalized', 'Fulfilled']
+  return !(allowedStatus.indexOf(status) > -1)
+}
+
+export const isPOStatusFinalized = (status) => {
+  const allowedStatus = ['Finalized']
+  return (allowedStatus.indexOf(status) > -1)
+}
+
+export const ContextMenuOptions = (row) => {
+  return [
+    {
+      id: 0,
+      label: 'Edit',
+      Icon: Edit,
+      disabled: false,
+    },
+    {
+      id: 1,
+      label: 'Duplicate PO',
+      Icon: Duplicate,
+      disabled: isDuplicatePOAllowed(row.poStatus),
+    },
+    { isDivider: true },
+    {
+      id: 2,
+      label: 'Print',
+      Icon: Print,
+      disabled: false,
+    },
+  ]
+}
 
 const addContent = (type) => {
   switch (type) {

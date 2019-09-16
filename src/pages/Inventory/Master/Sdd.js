@@ -116,7 +116,7 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
                 group: [
                   {
                     code: sddIdName,
-                    name: sddIdName,
+                    displayValue: sddIdName,
                     combineCondition: 'or',
                   },
                 ],

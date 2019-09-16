@@ -1,5 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import Call from '@material-ui/icons/Call'
+import { Add } from '@material-ui/icons'
+import { withStyles, Paper } from '@material-ui/core'
 import {
   Field,
   FastField,
@@ -15,9 +18,6 @@ import {
   RadioGroup,
   CheckboxGroup,
 } from '@/components'
-import Call from '@material-ui/icons/Call'
-import { Add } from '@material-ui/icons'
-import { withStyles, Paper } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
@@ -200,7 +200,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <DatePicker
                       label='Date of Birth'
-                      timeFormat={false}
+                      // showTime
                       dobRestrict
                       {...args}
                     />
@@ -423,7 +423,7 @@ class Demographic extends PureComponent {
                   name='referredBy'
                   render={(args) => (
                     <RadioGroup
-                      label='Referral Person'
+                      label='Referral'
                       options={[
                         {
                           value: 'Company',

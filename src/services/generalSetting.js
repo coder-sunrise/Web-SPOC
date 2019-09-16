@@ -1,10 +1,9 @@
 import * as service from '@/services/common'
 import request from '@/utils/request'
 
-const url = '/api/gstsetup'
+const url = '/api/generalSetting'
 
 module.exports = {
-  remove: (params) => service.remove(url, params),
   query: (params) => {
     return service.queryList(url, params)
   },

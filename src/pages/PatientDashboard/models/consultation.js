@@ -1,5 +1,6 @@
 import router from 'umi/router'
 import _ from 'lodash'
+import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
 import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
@@ -17,6 +18,14 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
+        corDiagnosis: [
+          {
+            uid: getUniqueId(),
+            onsetDate: moment(),
+            isPersist: false,
+            remarks: '',
+          },
+        ],
       },
       selectedWidgets: [
         '1',
@@ -84,7 +93,8 @@ export default createFormViewModel({
         return response
       },
       *discard ({ payload }, { call, put }) {
-        const response = yield call(service.delete, payload)
+        const response = yield call(service.remove, payload)
+
         if (response) {
           sendNotification('QueueListing', {
             message: `Consultation discarded`,
@@ -145,7 +155,6 @@ export default createFormViewModel({
         orderTypes.forEach((p) => {
           const datas =
             (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
-          console.log('orderTypes', datas)
           oRows = oRows.concat(
             datas.map((o) => {
               const d = {
@@ -158,11 +167,24 @@ export default createFormViewModel({
             }),
           )
         })
-        console.log(cdRows)
         yield put({
           type: 'orders/updateState',
           payload: {
             rows: _.sortBy(oRows, 'sequence'),
+            finalAdjustments: data.corOrderAdjustment.map((o) => ({
+              ...o,
+              uid: o.id,
+            })),
+          },
+        })
+        yield put({
+          type: 'orders/calculateAmount',
+        })
+
+        yield put({
+          type: 'diagnosis/updateState',
+          payload: {
+            rows: _.sortBy(data.corDiagnosis, 'sequence'),
           },
         })
 

@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
+import moment from 'moment'
 import Yup from '@/utils/yup'
 import { status } from '@/utils/codes'
-import moment from 'moment'
 
 // import Edit from '@material-ui/icons/Edit'
 // import Delete from '@material-ui/icons/Delete'
@@ -34,12 +34,20 @@ const styles = (theme) => ({})
       type: 'settingPublicHoliday/upsert',
       payload: {
         ...restValues,
-        effectiveStartDate: effectiveDates[0],
+        effectiveStartDate: effectiveDates[0]
+          .utc()
+          .set({ hour: 0, minute: 0, second: 0 }),
+
+        // effectiveEndDate:
+        //   effectiveDates[1].utc().set({ hour: 23, minute: 59, second: 59 }) < effectiveDates[0].utc().set({ hour: 0, minute: 0, second: 0 })
+        //     ? moment('2010-12-31')
+        //     : effectiveDates[1].utc().set({ hour: 23, minute: 59, second: 59 }),
 
         effectiveEndDate:
-          isActive || isActive === undefined
-            ? effectiveDates[1]
-            : moment('2010-12-31'),
+          effectiveDates[1] < effectiveDates[0]
+            ? moment('2010-12-31')
+            : effectiveDates[1],
+
         startDate: moment(dates[0])
           .utc()
           .set({ hour: 0, minute: 0, second: 0 }),
@@ -94,7 +102,7 @@ class Detail extends PureComponent {
                   <TextField
                     label='Code'
                     {...args}
-                    disabled={settingPublicHoliday.entity ? true : false}
+                    disabled={!!settingPublicHoliday.entity}
                   />
                 )}
               />

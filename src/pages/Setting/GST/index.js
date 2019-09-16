@@ -22,17 +22,15 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingGst }) => ({
-  settingGst,
+@connect(({ gstSetup }) => ({
+  gstSetup,
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ settingGst }) => settingGst.entity,
+  mapPropsToValues: ({ gstSetup }) => gstSetup.gst,
 
   handleSubmit: (values, { props }) => {
-    const { IsEnableGST } = values[0]
-    const { GSTRegistrationNumber } = values[1]
-    const { GSTPercentage } = values[2]
+    const { IsEnableGST, GSTRegistrationNumber, GSTPercentage } = values
 
     const payload = [
       {
@@ -51,7 +49,7 @@ const styles = (theme) => ({
     const { dispatch, onConfirm, history } = props
 
     dispatch({
-      type: 'settingGst/upsert',
+      type: 'gstSetup/upsert',
 
       payload,
     }).then(history.push('/setting'))
@@ -68,10 +66,10 @@ class GstSetup extends PureComponent {
   componentDidMount = async () => {
     this.checkHasActiveSession()
     await this.props.dispatch({
-      type: 'settingGst/query',
+      type: 'gstSetup/query',
     })
 
-    const { IsEnableGST } = this.props.values[0]
+    const { IsEnableGST } = this.props.values
     this.setState({ enableGst: IsEnableGST })
   }
 
@@ -132,7 +130,7 @@ class GstSetup extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='[0]IsEnableGST'
+                name='IsEnableGST'
                 render={(args) => (
                   <Checkbox
                     label='Enable GST'
@@ -147,7 +145,7 @@ class GstSetup extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='[1]GSTRegistrationNumber'
+                name='GSTRegistrationNumber'
                 render={(args) => (
                   <TextField
                     label='GST Registration Number'
@@ -161,7 +159,7 @@ class GstSetup extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='[2]GSTPercentage'
+                name='GSTPercentage'
                 render={(args) => (
                   <TextField
                     label='GST Rate'

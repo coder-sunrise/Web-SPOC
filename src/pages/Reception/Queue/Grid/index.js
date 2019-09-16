@@ -197,7 +197,7 @@ const Grid = ({
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
         )
         break
-      case '6': // start consultation
+      case '6': // resume consultation
         router.push(
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
         )
