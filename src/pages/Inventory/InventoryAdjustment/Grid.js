@@ -9,19 +9,19 @@ class Grid extends PureComponent {
     rows: [
       {
         transNo: 'SA/000001',
-        transDate: '30/2/2018',
+        transDate: '01-02-2018',
         status: 'Draft',
         remarks: 'Remarks',
       },
       {
         transNo: 'SA/000002',
-        transDate: '30/3/2018',
+        transDate: '02-03-2018',
         status: 'Finalized',
         remarks: 'abc',
       },
       {
         transNo: 'SA/000003',
-        transDate: '30/5/2018',
+        transDate: '06-05-2018',
         status: 'Finalized',
         remarks: 'Need another adjustment',
       },
@@ -57,14 +57,14 @@ class Grid extends PureComponent {
 
   editRow = (row, e) => {
     const { dispatch, inventoryAdjustment } = this.props
-
+    console.log('row', row)
     const { list } = inventoryAdjustment
-
     dispatch({
       type: 'inventoryAdjustment/updateState',
       payload: {
         showModal: true,
-        entity: list.find((o) => o.id === row.id),
+        entity: row,
+        // entity: list.filter((o) => o.id === row.id),
       },
     })
   }

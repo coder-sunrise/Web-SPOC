@@ -3,7 +3,7 @@ import * as service from '../Details/DeliveryOrder/services'
 import moment from 'moment'
 
 export default createListViewModel({
-  namespace: 'purchaseReceivePayment',
+  namespace: 'purchaseOrderPayment',
   config: {
     queryOnLoad: false,
   },
@@ -25,7 +25,7 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone (state, { payload }) {
+      queryDone(state, { payload }) {
         const { data } = payload
 
         return {

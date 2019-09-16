@@ -3,7 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { formatMessage } from 'umi/locale'
-
+import { Radio } from 'antd'
 import {
   CardContainer,
   GridContainer,
@@ -23,6 +23,8 @@ const Stock = ({
   vaccinationDetail,
   medicationDetail,
   consumableDetail,
+  values,
+  setFieldValue,
 }) => {
   const objectType = () => {
     if (vaccinationDetail) return 'vaccinationStock'
@@ -38,15 +40,25 @@ const Stock = ({
       { name: 'batchNo', title: 'Batch No.' },
       { name: 'expiryDate', title: 'Expiry Date' },
       { name: 'stock', title: 'Quantity' },
+      { name: 'isDefault', title: 'Default' },
     ],
     columnExtensions: [
       {
         columnName: 'stock',
+        align: 'center',
         type: 'number',
       },
       {
         columnName: 'expiryDate',
+        align: 'center',
         type: 'date',
+      },
+      {
+        columnName: 'isDefault',
+        align: 'center',
+        render: (row) => {
+          return <Radio checked={row.isDefault} />
+        },
       },
     ],
   })
@@ -84,6 +96,11 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.reorderThreshold',
                   })}
+                  onChange={(e) =>
+                    setFieldValue(
+                      'reOrderThreshold',
+                      e.target.value.toFixed(2),
+                    )}
                   {...args}
                 />
               )
@@ -99,6 +116,11 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.criticalThreshold',
                   })}
+                  onChange={(e) =>
+                    setFieldValue(
+                      'criticalThreshold',
+                      e.target.value.toFixed(2),
+                    )}
                   {...args}
                 />
               )
@@ -106,7 +128,7 @@ const Stock = ({
           />
         </GridItem>
       </GridContainer>
-      <CommonTableGrid rows={[]} {...tableParas} />
+      <CommonTableGrid rows={values[objectType()]} {...tableParas} />
       <Divider style={{ margin: '40px 0 20px 0' }} />
     </CardContainer>
   )

@@ -47,7 +47,7 @@ class Address extends Component {
   }
 
   handleGetAddress = () => {
-    const { values, addressIndex, setFieldValue } = this.props
+    const { values, addressIndex, setFieldValue, setValues } = this.props
     const { postcode } = this.state
     postcode === ''
       ? (setFieldValue(`${addressIndex}postcode`, ''),
@@ -64,7 +64,12 @@ class Address extends Component {
           .then((o) => {
             const { data } = o
             const { postalCode, blkHseNo, building, street } = data[0]
-            setFieldValue(`${addressIndex}postcode`, postalCode)
+            setValues({
+              ...values,
+              address: {
+                postcode: postalCode,
+              },
+            })
             setFieldValue(`${addressIndex}blockNo`, blkHseNo)
             setFieldValue(`${addressIndex}buildingName`, building)
             setFieldValue(`${addressIndex}street`, street)

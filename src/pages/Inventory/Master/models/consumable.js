@@ -29,58 +29,53 @@ export default createListViewModel({
       })
     },
     effects: {
-      // *add ({ payload }, { put, select }) {
-      //   let st = yield select((s) => s[namespace])
-      //   if (payload.length) {
-      //     yield put({
-      //       type: 'updateState',
-      //       payload: update(st, {
-      //         entity: {
-      //           items: {
-      //             $unshift: payload.map((o) => {
-      //               return {
-      //                 Id: getUniqueId(),
-      //                 ...o,
-      //               }
-      //             }),
-      //           },
-      //         },
-      //       }),
-      //     })
-      //   }
-      // },
-      // *change ({ payload }, { put, select }) {
-      //   let st = yield select((s) => s[namespace])
-      //   let { items } = st.entity
-      //   const newItems = items.map((row) => {
-      //     const n = payload[row.Id] ? { ...row, ...payload[row.Id] } : row
-      //     return n
-      //   })
+      // *fetchConsumableList (_, { call, put }) {
+      //   const response = yield call(service.queryList)
       //   yield put({
-      //     type: 'updateState',
-      //     payload: update(st, {
-      //       entity: { items: { $set: newItems } },
-      //     }),
+      //     type: 'save',
+      //     payload: response,
       //   })
-      // },
-      // *delete ({ payload }, { put, select }) {
-      //   let st = yield select((s) => s[namespace])
-      //   let { items } = st.entity
-      //   const newItems = items.filter(
-      //     (row) => !payload.find((o) => o === row.Id),
-      //   )
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: update(st, {
-      //       entity: { items: { $set: newItems } },
-      //     }),
-      //   })
-      // },
-      // *submit ({ payload }, { call }) {
-      //   // console.log(payload)
-      //   return yield call(upsert, payload)
       // },
     },
-    reducers: {},
+    reducers: {
+      // save (st, { payload }) {
+      //   const { data } = payload
+      //   return {
+      //     ...st,
+      //     list: data.data.map((o) => {
+      //       return {
+      //         ...o,
+      //         effectiveDates: [
+      //           o.effectiveStartDate,
+      //           o.effectiveEndDate,
+      //         ],
+      //         uom: o.uom ? o.uom.id : null,
+      //         favouriteSupplier: o.favouriteSupplier
+      //           ? o.favouriteSupplier.id
+      //           : null,
+      //       }
+      //     }),
+      //   }
+      // },
+      queryDone (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+              effectiveDates: [
+                o.effectiveStartDate,
+                o.effectiveEndDate,
+              ],
+              uom: o.uom ? o.uom.id : null,
+              favouriteSupplier: o.favouriteSupplier
+                ? o.favouriteSupplier.id
+                : null,
+            }
+          }),
+        }
+      },
+    },
   },
 })

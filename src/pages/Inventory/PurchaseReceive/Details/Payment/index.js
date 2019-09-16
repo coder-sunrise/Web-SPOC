@@ -10,30 +10,43 @@ import {
 } from '@/components'
 import Header from './Header'
 import Grid from './Grid'
+import { isPOStatusFinalized } from '../../variables'
 
-@connect(({ purchaseReceivePayment }) => ({
-  purchaseReceivePayment,
+@connect(({ purchaseOrderPayment, purchaseOrderDetails }) => ({
+  purchaseOrderPayment, purchaseOrderDetails
 }))
 @withFormikExtend({
-  displayName: 'purchaseReceivePayment',
-  handleSubmit: (values, { props }) => {},
+  displayName: 'purchaseOrderPayment',
+  handleSubmit: (values, { props }) => { },
 })
 class index extends PureComponent {
-  render () {
-    const isEditable = true
+  componentDidMount() {
+    // this.props.dispatch({
+    //   type: 'purchaseOrderPayment/query',
+    // })
+  }
+
+  render() {
     console.log('Payment Index', this.props)
+    const { purchaseOrderDetails } = this.props
+    const { status } = purchaseOrderDetails.entity.purchaseOrder
+    const isEditable = isPOStatusFinalized(status)
     return (
       <React.Fragment>
         <GridContainer>
           <Header {...this.props} />
-          <Grid {...this.props} />
+          <Grid isEditable={isEditable} {...this.props} />
         </GridContainer>
         <div style={{ textAlign: 'center' }}>
           <ProgressButton
-          //submitKey='medicationDetail/submit'
-          //onClick={handleSubmit}
+            //submitKey='medicationDetail/submit'
+            //onClick={handleSubmit}
+            disabled={!isEditable}
           />
-          <Button color='danger'>Cancel</Button>
+          <Button
+            color='danger'
+            disabled={!isEditable}
+          >Cancel</Button>
         </div>
       </React.Fragment>
     )

@@ -837,9 +837,27 @@ export const getServices = (data) => {
 }
 
 export const podoOrderType = [
-  { id: 1, name: 'Consumable', ctName: 'InventoryConsumable' },
-  { id: 2, name: 'Medication', ctName: 'InventoryMedication' },
-  { id: 3, name: 'Vaccination', ctName: 'InventoryVaccination' },
+  {
+    value: 1,
+    name: 'Medication',
+    prop: 'purchaseOrderMedicationItem',
+    itemFKName: 'inventoryMedicationFK',
+    ctName: 'InventoryMedication',
+  },
+  {
+    value: 2,
+    name: 'Vaccination',
+    prop: 'purchaseOrderVaccinationItem',
+    itemFKName: 'inventoryVaccinationFK',
+    ctName: 'InventoryVaccination',
+  },
+  {
+    value: 3,
+    name: 'Consumable',
+    prop: 'purchaseOrderConsumableItem',
+    itemFKName: 'inventoryConsumableFK',
+    ctName: 'InventoryConsumable',
+  },
 ]
 
 export const InventoryTypes = [
@@ -879,6 +897,29 @@ export const InventoryTypes = [
     ctName: 'inventorypackage',
   },
 ]
+
+export const getInventoryItem = (data, value, itemFKName, rows) => {
+  let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
+
+  let inventoryItemList = data.map((x) => {
+    return {
+      id: x.id,
+      value: x.id,
+      [itemFKName]: x.id,
+      name: x.code,
+      displayValue: x.displayValue,
+      sellingPrice: x.sellingPrice,
+      //uom: 'TBD',
+      uom: x.uom ? x.uom.name : x.prescribingUOM.name,
+    }
+  })
+
+  inventoryItemList = _.differenceBy(inventoryItemList, newRows, itemFKName)
+
+  return {
+    inventoryItemList,
+  }
+}
 
 module.exports = {
   // paymentMethods,
