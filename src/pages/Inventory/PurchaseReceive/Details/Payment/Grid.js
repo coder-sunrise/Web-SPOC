@@ -4,12 +4,22 @@ import {
   EditableTableGrid,
   withFormikExtend,
 } from '@/components'
+import Yup from '@/utils/yup'
 import moment from 'moment'
 
+const purchaseOrderPaymentSchema = Yup.object().shape({
+  paymentNo: Yup.string().required(),
+  paymentDate: Yup.string().required(),
+  paymentMode: Yup.string().required(),
+  //reference: Yup.string().required(),
+  paymentAmount: Yup.number().min(0).required(),
+  //Remarks: Yup.string().required(),
+})
+
 @withFormikExtend({
-  mapPropsToValues: ({ purchaseReceivePayment }) =>
-    purchaseReceivePayment.entity || purchaseReceivePayment.default,
-  displayName: 'purchaseReceivePayment',
+  mapPropsToValues: ({ purchaseOrderPayment }) =>
+    purchaseOrderPayment.entity || purchaseOrderPayment.default,
+  displayName: 'purchaseOrderPayment',
 })
 class Grid extends PureComponent {
   tableParas = {
@@ -19,7 +29,7 @@ class Grid extends PureComponent {
       { name: 'paymentMode', title: 'Payment Mode' },
       { name: 'reference', title: 'Reference' },
       { name: 'paymentAmount', title: 'Payment Amount' },
-      { name: 'Remarks', title: 'Remarks' },
+      { name: 'remarks', title: 'Remarks' },
     ],
     columnExtensions: [
       {
@@ -47,16 +57,15 @@ class Grid extends PureComponent {
     setFieldValue('payment_list', rows)
   }
 
-  render () {
-    const isEditable = true
-    const { values } = this.props
+  render() {
+    const { values, isEditable } = this.props
     //console.log('Payment Grid', this.props)
 
     return (
       <GridContainer>
         <EditableTableGrid
           rows={values.payment_list}
-          //schema={receivingDetailsSchema}
+          schema={purchaseOrderPaymentSchema}
           FuncProps={{
             edit: isEditable,
             pager: false,
@@ -64,7 +73,7 @@ class Grid extends PureComponent {
           EditingProps={{
             showAddCommand: isEditable,
             showEditCommand: false,
-            showDeleteCommand: isEditable,
+            showDeleteCommand: true,
             onCommitChanges: this.onCommitChanges,
             //onAddedRowsChange: this.onAddedRowsChange,
           }}

@@ -13,7 +13,9 @@ import {
 } from '@/components'
 
 export class POForm extends PureComponent {
-  render () {
+  render() {
+    const { isPOFinalized } = this.props
+    const invoiceDateNoStatus = !isPOFinalized
     const prefix = 'purchaseOrder'
     console.log('POForm', this)
     return (
@@ -79,6 +81,7 @@ export class POForm extends PureComponent {
                         label={formatMessage({
                           id: 'inventory.pr.detail.pod.invoiceDate',
                         })}
+                        disabled={invoiceDateNoStatus}
                         {...args}
                       />
                     )
@@ -134,6 +137,7 @@ export class POForm extends PureComponent {
                         label={formatMessage({
                           id: 'inventory.pr.detail.pod.invoiceNo',
                         })}
+                        disabled={invoiceDateNoStatus}
                         {...args}
                       />
                     )
@@ -163,7 +167,7 @@ export class POForm extends PureComponent {
                         label={formatMessage({
                           id: 'inventory.pr.supplier',
                         })}
-                        //code='ctCompany'
+                        code='ctSupplier'
                         //max={10}
                         {...args}
                       />

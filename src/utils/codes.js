@@ -813,21 +813,6 @@ export const getTenantCodes = async (tenantCode) => {
   return {}
 }
 
-export const getInventoryItem = (data) => {
-  const inventoryItemList = data.map((x) => {
-    return {
-      name: x.code,
-      value: x.displayValue,
-      sellingPrice: x.sellingPrice,
-      uom: 'TBD',
-      //uom: x.uom.name,
-    }
-  })
-  return {
-    inventoryItemList,
-  }
-}
-
 export const getServices = (data) => {
   // eslint-disable-next-line compat/compat
   const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
@@ -926,6 +911,29 @@ export const InventoryTypes = [
     ctName: 'inventorypackage',
   },
 ]
+
+export const getInventoryItem = (data, value, itemFKName, rows) => {
+  let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
+
+  let inventoryItemList = data.map((x) => {
+    return {
+      id: x.id,
+      value: x.id,
+      [itemFKName]: x.id,
+      name: x.code,
+      displayValue: x.displayValue,
+      sellingPrice: x.sellingPrice,
+      //uom: 'TBD',
+      uom: x.uom ? x.uom.name : x.prescribingUOM.name,
+    }
+  })
+
+  inventoryItemList = _.differenceBy(inventoryItemList, newRows, itemFKName)
+
+  return {
+    inventoryItemList,
+  }
+}
 
 module.exports = {
   paymentMethods,

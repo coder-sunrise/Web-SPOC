@@ -125,7 +125,7 @@ class Filter extends PureComponent {
                     label={formatMessage({
                       id: 'inventory.pr.supplier',
                     })}
-                    code='ctCompany'
+                    code='ctSupplier'
                     //max={10}
                     {...args}
                   />

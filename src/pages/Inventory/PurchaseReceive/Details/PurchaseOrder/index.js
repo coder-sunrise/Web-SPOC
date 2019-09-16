@@ -20,93 +20,198 @@ import {
 import POForm from './POForm'
 import Grid from './Grid'
 import POSummary from './POSummary'
-import InvoiceAdjustment from './InvoiceAdjustment'
+import { calculateItemLevelAdjustment } from '@/utils/utils'
+import { isPOStatusFinalized } from '../../variables'
 
-@connect(({ purchaseOrder }) => ({
-  purchaseOrder,
+@connect(({ purchaseOrderDetails, global }) => ({
+  purchaseOrderDetails,
+  global,
 }))
 @withFormikExtend({
-  displayName: 'purchaseOrder',
-  enableReinitialize: true,
-  mapPropsToValues: ({ purchaseOrder }) => {
-    console.log('mapPropsToValues', purchaseOrder)
-    return purchaseOrder.entity || purchaseOrder.default
+  displayName: 'purchaseOrderDetails',
+  //enableReinitialize: true,
+  mapPropsToValues: ({ purchaseOrderDetails }) => {
+    console.log('mapPropsToValues', purchaseOrderDetails)
+    return purchaseOrderDetails.entity
   },
 })
 class index extends PureComponent {
   componentDidMount () {
-    this.props.dispatch({
-      type: 'purchaseOrder/fakeQueryDone',
+    const { purchaseOrderDetails } = this.props
+    const { id, type } = purchaseOrderDetails
+    console.log('componentDidMount', this.props)
+    switch (type) {
+      // Duplicate order
+      case 'dup':
+        this.props.dispatch({
+          type: 'purchaseOrderDetails/fakeQueryDone',
+          id: id,
+        })
+        break
+      // Edit order
+      case 'edit':
+        this.props.dispatch({
+          type: 'purchaseOrderDetails/fakeQueryDone',
+          id: id,
+        })
+        break
+      // Create new order
+      default:
+        break
+    }
+  }
+
+  // componentWillReceiveProps (nextProps) {
+  //   const { global } = nextProps
+  //   if (global !== this.props.global) {
+  //     if (!global.openAdjustment && global.openAdjustmentValue) {
+  //       console.log('componentWillReceiveProps', nextProps)
+
+  //       const { openAdjustmentValue } = global
+
+  //       const payload = {
+  //         adjRemark: openAdjustmentValue.remarks,
+  //         adjType: openAdjustmentValue.adjType,
+  //         adjValue: openAdjustmentValue.adjValue,
+  //         adjDisplayAmount: openAdjustmentValue.adjAmount,
+  //       }
+
+  //       nextProps.dispatch({
+  //         type: 'purchaseOrderDetails/addAdjustment',
+  //         payload: payload,
+  //       })
+
+  //       setTimeout(() => {
+  //         this.calculateInvoice()
+  //       }, 1)
+  //     }
+  //   }
+  // }
+
+  showInvoiceAdjustment = () => {
+    const { theme, values, dispatch, ...resetProps } = this.props
+    const { purchaseOrder } = values
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          showRemark: true,
+          defaultValues: {
+            initialAmout: purchaseOrder.invoiceTotal,
+          },
+          callbackConfig: {
+            model: 'purchaseOrderDetails',
+            reducer: 'addAdjustment',
+          },
+        },
+      },
     })
+
+    setTimeout(() => {
+      this.calculateInvoice()
+    }, 1)
   }
 
-  state = {
-    showInvoiceAdjustment: false,
-  }
-
-  toggleInvoiceAdjustment = () => {
-    this.setState((prevState) => ({
-      showInvoiceAdjustment: !prevState.showInvoiceAdjustment,
-    }))
-  }
-
-  calculateInvoice = (rows) => {
+  calculateInvoice = () => {
+    console.log('calculateInvoice')
+    const { values, setFieldValue, purchaseOrderDetails } = this.props
+    const { clinicSetting } = purchaseOrderDetails
+    const { rows, purchaseOrderAdjustment, purchaseOrder } = values
     /*-------------------------------------------*/
     // Retrieve from /api/GSTSetup
-    const isClinicGSTEnabled = true
-    const gstPercentage = 7.0
+    const isClinicGSTEnabled = clinicSetting.gstEnabled
+    const gstPercentage = clinicSetting.gstRate
     /*-------------------------------------------*/
-    const { values, setFieldValue } = this.props
-    const { purchaseOrderItems, adjustmentList } = values
-    const items = rows || purchaseOrderItems
+    const { gstEnabled, gstIncluded } = purchaseOrder || false
     let tempInvoiceTotal = 0
     let invoiceTotal = 0
     let invoiceGST = 0
+    const filteredPurchaseOrderAdjustment = purchaseOrderAdjustment.filter(
+      (x) => !x.isDeleted,
+    )
+    const filteredPurchaseOrderItem = rows.filter((x) => !x.isDeleted)
 
     // Calculate all unitPrice
-    items.forEach((row) => {
-      if (!row.isDeleted) {
-        tempInvoiceTotal += row.totalPrice
-        row.tempSubTotal = row.totalPrice
-      }
+    filteredPurchaseOrderItem.forEach((row) => {
+      tempInvoiceTotal += row.totalPrice
+      row.tempSubTotal = row.totalPrice
     })
 
     // Check is there any adjustment was added
-    if (adjustmentList) {
+    if (
+      filteredPurchaseOrderAdjustment &&
+      filteredPurchaseOrderAdjustment.length > 0
+    ) {
       // Calculate adjustment for added items
-      adjustmentList.forEach((adj, adjKey, adjArr) => {
-        // Init adjAmount for percentage
-        if (adj.isPercentage) {
-          adj.adjAmount = 0
-        }
+      filteredPurchaseOrderAdjustment.forEach((adj, adjKey, adjArr) => {
+        if (!adj.isDeleted) {
+          // Init adjAmount for percentage
+          if (adj.adjType === 'Percentage') {
+            adj.adjDisplayAmount = 0
+          }
 
-        items.map((item) => {
-          if (!item.isDeleted) {
-            if (adj.isPercentage) {
-              item[adj.adjTitle] = item.tempSubTotal * (adj.adjPercentage / 100)
-              item.tempSubTotal += item[adj.adjTitle]
-              adj.adjAmount += item[adj.adjTitle]
+          filteredPurchaseOrderItem.map((item) => {
+            const itemLevelAmount = calculateItemLevelAdjustment(
+              adj.adjType,
+              adj.adjValue,
+              item.tempSubTotal,
+              tempInvoiceTotal,
+              isClinicGSTEnabled,
+              gstPercentage,
+              gstEnabled,
+              gstIncluded,
+            )
+
+            if (adj.adjType === 'Percentage') {
+              item[adj.id] = itemLevelAmount.itemLevelAdjustmentAmount
+              item.tempSubTotal += itemLevelAmount.itemLevelAdjustmentAmount
+              adj.adjDisplayAmount += itemLevelAmount.itemLevelAdjustmentAmount
             } else {
-              item[adj.adjTitle] =
-                item.tempSubTotal / tempInvoiceTotal * adj.adjAmount
-              item.tempSubTotal += item[adj.adjTitle]
+              item[adj.id] = itemLevelAmount.itemLevelAdjustmentAmount
+              item.tempSubTotal += itemLevelAmount.itemLevelAdjustmentAmount
             }
 
-            if (isClinicGSTEnabled) {
-              // If Inclusive GST checked --> item.itemLevelGST = item.tempSubTotal * (gstPercentage / 107)
-              // Else                     --> item.itemLevelGST = item.tempSubTotal * (gstPercentage / 100)
-              item.itemLevelGST = item.tempSubTotal * (gstPercentage / 100)
-            } else {
-              item.itemLevelGST = 0
-            }
+            item.itemLevelGST = itemLevelAmount.itemLevelGSTAmount
 
             // Sum up all itemLevelGST & invoiceTotal at last iteration
             if (Object.is(adjArr.length - 1, adjKey)) {
+              // Calculate item level totalAfterAdjustments & totalAfterGst
+              if (gstIncluded) {
+                item.totalAfterGst = item.tempSubTotal
+                invoiceTotal += item.tempSubTotal
+              } else {
+                item.totalAfterGst = item.tempSubTotal + item.itemLevelGST
+                invoiceTotal += item.itemLevelGST + item.tempSubTotal
+              }
+
+              item.totalAfterAdjustments = item.tempSubTotal
               invoiceGST += item.itemLevelGST
-              invoiceTotal += item.itemLevelGST + item.tempSubTotal
             }
+          })
+        }
+      })
+    } else {
+      filteredPurchaseOrderItem.map((item) => {
+        if (isClinicGSTEnabled) {
+          if (!gstEnabled) {
+            item.itemLevelGST = 0
+          } else if (gstIncluded) {
+            item.itemLevelGST = item.tempSubTotal * (gstPercentage / 107)
+          } else {
+            item.itemLevelGST = item.tempSubTotal * (gstPercentage / 100)
           }
-        })
+        } else {
+          item.itemLevelGST = 0
+        }
+
+        // Calculate item level totalAfterAdjustments & totalAfterGst
+        item.totalAfterAdjustments = item.tempSubTotal
+        item.totalAfterGst = item.tempSubTotal + item.itemLevelGST
+
+        // Sum up all and display at summary
+        invoiceGST += item.itemLevelGST
+        invoiceTotal += item.itemLevelGST + item.tempSubTotal
       })
     }
 
@@ -119,49 +224,89 @@ class index extends PureComponent {
     }, 1)
   }
 
-  onClickPrint = () => {
-    console.log('onClickPrint', this.props)
+  onClickPrint = () => {}
+
+  isPOFinalized = () => {
+    const { purchaseOrder } = this.props.values
+    return isPOStatusFinalized(purchaseOrder.status)
   }
 
-  calculateTotal = () => {}
-
   render () {
-    const { classes, isEditable, values, setFieldValue, dispatch } = this.props
     const {
-      adjustmentList,
-      purchaseOrderAdjustment,
-      purchaseOrder,
-      //purchaseOrderItems,
-      rows,
-    } = values
+      classes,
+      isEditable,
+      values,
+      setFieldValue,
+      dispatch,
+      purchaseOrderDetails,
+    } = this.props
+    const { clinicSetting } = purchaseOrderDetails
+    const { purchaseOrderAdjustment, purchaseOrder, rows } = values
     console.log('PO Index', this.props)
 
     return (
       <div>
-        <POForm />
+        <POForm isPOFinalized={this.isPOFinalized()} />
         <Grid
           rows={rows}
           dispatch={dispatch}
           setFieldValue={setFieldValue}
           calculateInvoice={this.calculateInvoice}
+          isEditable={!this.isPOFinalized()}
         />
         <POSummary
-          adjustmentList={adjustmentList}
+          dispatch={dispatch}
+          calculateInvoice={this.calculateInvoice}
+          purchaseOrder={purchaseOrder}
           purchaseOrderAdjustment={purchaseOrderAdjustment}
           setFieldValue={setFieldValue}
-          toggleInvoiceAdjustment={this.toggleInvoiceAdjustment}
+          toggleInvoiceAdjustment={this.showInvoiceAdjustment}
+          clinicSetting={clinicSetting}
         />
-        <GridContainer
+
+        <GridContainer direction='row' style={{ marginTop: 20 }}>
+          <GridItem xs={4} md={8} />
+          <GridItem xs={8} md={4}>
+            {!this.isPOFinalized() ? (
+              <Button color='danger'>
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.cancelpo',
+                })}
+              </Button>
+            ) : (
+              ''
+            )}
+            <Button color='primary'>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.save',
+              })}
+            </Button>
+            <Button color='success'>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.finalize',
+              })}
+            </Button>
+            <Button color='info' onClick={this.onClickPrint}>
+              {formatMessage({
+                id: 'inventory.pr.detail.print',
+              })}
+            </Button>
+          </GridItem>
+        </GridContainer>
+
+        {/* <GridContainer
           direction='row'
           justify='flex-end'
           alignItems='flex-end'
-          style={{ marginTop: 20 }}
+          style={{ marginTop: 20, paddingRight: 20 }}
         >
-          <Button color='danger'>
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.cancelpo',
-            })}
-          </Button>
+          {!this.isPOFinalized() ? (
+            <Button color='danger'>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.cancelpo',
+              })}
+            </Button>
+          ) : ''}
           <Button color='primary'>
             {formatMessage({
               id: 'inventory.pr.detail.pod.save',
@@ -177,21 +322,7 @@ class index extends PureComponent {
               id: 'inventory.pr.detail.print',
             })}
           </Button>
-        </GridContainer>
-
-        <CommonModal
-          open={this.state.showInvoiceAdjustment}
-          title='Add Invoice Adjustment'
-          maxWidth='sm'
-          bodyNoPadding
-          onClose={() => this.toggleInvoiceAdjustment()}
-          onConfirm={() => this.toggleInvoiceAdjustment()}
-        >
-          <InvoiceAdjustment
-            adjustmentList={adjustmentList}
-            setFieldValue={setFieldValue}
-          />
-        </CommonModal>
+        </GridContainer> */}
       </div>
     )
   }

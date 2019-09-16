@@ -663,6 +663,45 @@ const calculateAdjustAmount = (
   }
 }
 
+const calculateItemLevelAdjustment = (
+  adjType = 'ExactAmount',
+  adjValue = 0,
+  tempSubTotal = 0,
+  tempInvoiceTotal = 0,
+  isClinicGSTEnabled = false,
+  gstPercentage = 0,
+  gstEnabled = false,
+  gstIncluded = false,
+) => {
+  let itemLevelAdjustmentAmount = 0
+  let itemLevelGSTAmount = 0
+
+  if (adjType === 'Percentage') {
+    itemLevelAdjustmentAmount = tempSubTotal * (adjValue / 100)
+    tempSubTotal += itemLevelAdjustmentAmount
+  } else {
+    itemLevelAdjustmentAmount = tempSubTotal / tempInvoiceTotal * adjValue
+    tempSubTotal += itemLevelAdjustmentAmount
+  }
+
+  if (isClinicGSTEnabled) {
+    if (!gstEnabled) {
+      itemLevelGSTAmount = 0
+    } else if (gstIncluded) {
+      itemLevelGSTAmount = tempSubTotal * (gstPercentage / 107)
+    } else {
+      itemLevelGSTAmount = tempSubTotal * (gstPercentage / 100)
+    }
+  } else {
+    item.itemLevelGST = 0
+  }
+
+  return {
+    itemLevelAdjustmentAmount,
+    itemLevelGSTAmount,
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -680,4 +719,5 @@ module.exports = {
   confirmBeforeReload,
   navigateDirtyCheck,
   calculateAdjustAmount,
+  calculateItemLevelAdjustment,
 }

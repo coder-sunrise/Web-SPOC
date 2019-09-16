@@ -6,22 +6,25 @@ import {
   withFormikExtend,
   FastField,
   CodeSelect,
+  GridContainer,
+  GridItem,
 } from '@/components'
 import DeleteOutline from '@material-ui/icons/DeleteOutline'
 import { podoOrderType, getInventoryItem } from '@/utils/codes'
 let commitCount = 2200 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
+  type: Yup.number().required(),
   code: Yup.number().required(),
   //name: Yup.number().required(),
-  orderQty: Yup.number().required(),
+  orderQty: Yup.number().min(1).required(),
+  bonusQty: Yup.number().min(0).required(),
+  quantityReceived: Yup.number().min(0).required(),
 })
 
 class Grid extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    // Initialize invoice calculation
-    //this.props.calculateInvoice()
     this.state = {
       onClickColumn: undefined,
       selectedItem: {},
@@ -30,9 +33,10 @@ class Grid extends PureComponent {
   }
 
   handleOnOrderTypeChanged = async (e) => {
-    const { dispatch } = this.props
+    const { dispatch, rows } = this.props
     const { option, row } = e
-    const { ctName } = option
+    const { ctName, value, itemFKName } = option
+    console.log('handleOnOrderTypeChanged', this.props)
 
     this.setState({
       onClickColumn: 'Type',
@@ -44,7 +48,7 @@ class Grid extends PureComponent {
         code: ctName,
       },
     }).then((list) => {
-      const { inventoryItemList } = getInventoryItem(list)
+      const { inventoryItemList } = getInventoryItem(list, value, itemFKName, rows)
       this.setState({
         itemDropdownList: inventoryItemList,
       })
@@ -66,11 +70,12 @@ class Grid extends PureComponent {
       selectedItem: option,
       onClickColumn: 'Code',
     })
-    //return { ...row, unitPrice: sellingPrice, uom: prescribingUOM.name }
+    return { ...row }
   }
 
   onAddedRowsChange = (addedRows) => {
-    const defaultAmountQty = 0.00001
+    const defaultQty = 1
+    const defaultAmount = 0.00001
     if (addedRows.length > 0) {
       let finalAddedRows
       const { selectedItem, onClickColumn } = this.state
@@ -80,7 +85,7 @@ class Grid extends PureComponent {
         if (orderQty >= 1 && selectedItem.sellingPrice) {
           return orderQty * selectedItem.sellingPrice
         } else {
-          return selectedItem.sellingPrice || defaultAmountQty
+          return selectedItem.sellingPrice || defaultAmount
         }
       }
 
@@ -88,22 +93,21 @@ class Grid extends PureComponent {
         if (orderQty && bonusQty) {
           return orderQty + bonusQty
         } else {
-          return defaultAmountQty
+          return defaultQty
         }
       }
 
       if (onClickColumn === 'Type') {
         console.log('onAddedRowsChangeType')
         finalAddedRows = addedRows.map((row) => ({
-          itemFK: [],
-          name: [],
+          itemFK: 0,
           uom: '',
-          orderQty: defaultAmountQty,
-          bonusQty: defaultAmountQty,
-          totalQty: defaultAmountQty,
-          quantityReceived: defaultAmountQty,
-          unitPrice: defaultAmountQty,
-          totalPrice: defaultAmountQty,
+          orderQty: defaultQty,
+          bonusQty: defaultQty,
+          totalQty: defaultQty,
+          quantityReceived: defaultQty,
+          unitPrice: defaultAmount,
+          totalPrice: defaultAmount,
         }))
       } else if (onClickColumn === 'Code') {
         console.log(
@@ -115,17 +119,17 @@ class Grid extends PureComponent {
 
         finalAddedRows = addedRows.map((row) => ({
           ...row,
-          uom: selectedItem.prescribingUOM
-            ? selectedItem.prescribingUOM.name
-            : undefined,
+          itemFK: selectedItem.id,
+          //name: selectedItem.displayValue,
+          uom: selectedItem.uom,
           unitPrice: selectedItem.sellingPrice
             ? selectedItem.sellingPrice
-            : defaultAmountQty,
+            : defaultAmount,
           totalQty: calcTotalQty(),
           totalPrice: calcTotalPrice(),
         }))
       } else {
-        console.log('onAddedRowsChangeElse', calcTotalQty())
+        //console.log('onAddedRowsChangeElse', calcTotalQty())
         finalAddedRows = addedRows.map((row) => ({
           ...row,
           totalQty: calcTotalQty(),
@@ -133,30 +137,36 @@ class Grid extends PureComponent {
         }))
       }
 
-      //this.setState({ selectedItem: {}, onClickColumn: undefined })
       this.setState({ onClickColumn: undefined })
       return finalAddedRows
     }
+    return addedRows
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    const { setFieldValue } = this.props
+    const { setFieldValue, dispatch, calculateInvoice } = this.props
 
     if (deleted) {
-      const deletedSet = new Set(deleted)
-      const changedRows = rows.filter((row) => !deletedSet.has(row.id))
-      setFieldValue('purchaseOrderItems', changedRows)
+      dispatch({
+        type: 'purchaseOrderDetails/deleteRow',
+        payload: deleted[0],
+      })
+    } else {
+      dispatch({
+        type: 'purchaseOrderDetails/upsertRow',
+        payload: rows[0],
+      })
     }
 
-    setFieldValue('purchaseOrderItems', rows)
-    this.props.calculateInvoice(rows)
+    setTimeout(() => {
+      calculateInvoice()
+    }, 1)
     return rows
   }
 
-  render () {
-    const isEditable = true
+  render() {
     //const { purchaseOrderItems } = this.props
-    const { rows, dispatch } = this.props
+    const { rows, dispatch, isEditable } = this.props
     console.log('Grid', rows)
 
     const tableParas = {
@@ -164,7 +174,7 @@ class Grid extends PureComponent {
       columns: [
         { name: 'type', title: 'Type' },
         // Sync -s
-        { name: 'itemFK', title: 'Code' },
+        { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
         { name: 'uom', title: 'UOM' },
         // Sync -e
@@ -188,8 +198,20 @@ class Grid extends PureComponent {
             }
           },
         },
+        // {
+        //   columnName: 'code',
+        //   type: 'select',
+        //   labelField: 'name',
+        //   options: this.state.itemDropdownList,
+        //   onChange: (e) => {
+        //     if (e.option) {
+        //       this.handleItemOnChange(e)
+        //     }
+        //   },
+        // },
+        // {
         {
-          columnName: 'itemFK',
+          columnName: 'code',
           type: 'select',
           labelField: 'name',
           options: this.state.itemDropdownList,
@@ -198,17 +220,71 @@ class Grid extends PureComponent {
               this.handleItemOnChange(e)
             }
           },
+          render: (row) => {
+            if (row.uid) {
+              const podoType = podoOrderType.filter(
+                (x) => x.value === row.type,
+              )[0]
+              const { ctName, itemFKName } = podoType
+
+              return (
+                <FastField
+                  name={`rows[${row.rowIndex - 1}].${itemFKName}`}
+                  render={(args) => {
+                    console.log(args)
+                    return (
+                      <CodeSelect
+                        text
+                        labelField='code'
+                        code={ctName}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              )
+            }
+          }
         },
         {
           columnName: 'name',
           type: 'select',
-          labelField: 'value',
+          labelField: 'displayValue',
           options: this.state.itemDropdownList,
           onChange: (e) => {
             if (e.option) {
               this.handleItemOnChange(e)
             }
           },
+          render: (row) => {
+            if (row.uid) {
+              const podoType = podoOrderType.filter(
+                (x) => x.value === row.type,
+              )[0]
+              const { ctName, itemFKName } = podoType
+
+              return (
+                <FastField
+                  name={`rows[${row.rowIndex - 1}].${itemFKName}`}
+                  render={(args) => {
+                    console.log(args)
+                    return (
+                      <CodeSelect
+                        text
+                        labelField='displayValue'
+                        code={ctName}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              )
+            }
+          }
+        },
+        {
+          columnName: 'uom',
+          disabled: true,
         },
         {
           columnName: 'orderQty',
@@ -243,24 +319,27 @@ class Grid extends PureComponent {
     }
 
     return (
-      <React.Fragment>
-        <EditableTableGrid
-          //rows={purchaseOrderItems}
-          rows={rows}
-          //schema={receivingDetailsSchema}
-          FuncProps={{
-            pager: false,
-          }}
-          EditingProps={{
-            showAddCommand: isEditable,
-            showEditCommand: false,
-            showDeleteCommand: isEditable,
-            onCommitChanges: this.onCommitChanges,
-            onAddedRowsChange: this.onAddedRowsChange,
-          }}
-          {...tableParas}
-        />
-      </React.Fragment>
+      <GridContainer style={{paddingRight: 20}}>
+        <GridItem xs={4} md={12} >
+          <EditableTableGrid
+            //rows={purchaseOrderItems}
+            rows={rows}
+            schema={receivingDetailsSchema}
+            FuncProps={{
+              pager: false,
+            }}
+            EditingProps={{
+              showAddCommand: isEditable,
+              showEditCommand: false,
+              showDeleteCommand: isEditable,
+              onCommitChanges: this.onCommitChanges,
+              onAddedRowsChange: this.onAddedRowsChange,
+            }}
+            {...tableParas}
+          />
+        </GridItem>
+        {/* <GridItem xs={8} md={1} /> */}
+      </GridContainer>
     )
   }
 }

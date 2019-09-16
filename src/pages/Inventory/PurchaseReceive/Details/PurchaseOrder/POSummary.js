@@ -23,14 +23,32 @@ class POSummary extends PureComponent {
   render () {
     const { props } = this
     const {
+      clinicSetting,
+      calculateInvoice,
+      setFieldValue,
       adjustmentList,
+      dispatch,
+      purchaseOrder,
       purchaseOrderAdjustment,
       toggleInvoiceAdjustment,
     } = props
     const poPrefix = 'purchaseOrder'
+    const { gstEnabled, gstIncluded } = purchaseOrder
+
+    const onChangeGstToggle = (isCheckboxClicked = false) => {
+      if (!isCheckboxClicked) {
+        if (!gstEnabled) {
+          setFieldValue(`${poPrefix}.gstIncluded`, false)
+        }
+      }
+      setTimeout(() => {
+        calculateInvoice()
+      }, 1)
+    }
+
     console.log('POSummary', this.props)
     return (
-      <React.Fragment>
+      <div style={{ paddingRight: 140, paddingTop: 20 }}>
         <GridContainer>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3} container>
@@ -52,79 +70,96 @@ class POSummary extends PureComponent {
             </Button>
           </GridItem>
         </GridContainer>
-        
+
         <FieldArray
           name='purchaseOrderAdjustment'
           render={(arrayHelpers) => {
             this.arrayHelpers = arrayHelpers
             if (!purchaseOrderAdjustment) return null
             return purchaseOrderAdjustment.map((v, i) => {
-              return (
-                <Adjustment
-                  key={v.id}
-                  index={i}
-                  arrayHelpers={arrayHelpers}
-                  purchaseOrderAdjustment={purchaseOrderAdjustment}
-                  {...amountProps}
-                  {...props}
-                />
-              )
+              if (!v.isDeleted) {
+                return (
+                  <Adjustment
+                    key={v.id}
+                    index={i}
+                    dispatch={dispatch}
+                    arrayHelpers={arrayHelpers}
+                    purchaseOrderAdjustment={purchaseOrderAdjustment}
+                    calculateInvoice={calculateInvoice}
+                    setFieldValue={setFieldValue}
+                    {...amountProps}
+                    {...props}
+                  />
+                )
+              }
             })
           }}
         />
 
-        <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <FastField
-              name={`${poPrefix}.invoiceGST`}
-              render={(args) => {
-                return (
-                  <NumberInput
-                    prefix={formatMessage({
-                      id: 'inventory.pr.detail.pod.summary.gst',
-                    })}
-                    {...amountProps}
+        {clinicSetting.gstEnabled ? (
+          <GridContainer>
+            <GridItem xs={2} md={9} />
+            <GridItem xs={4} md={2}>
+              <span> {`GST (${clinicSetting.gstRate}%): `}</span>
+              <FastField
+                name={`${poPrefix}.gstEnabled`}
+                render={(args) => (
+                  <Switch
+                    fullWidth={false}
+                    onChange={() => onChangeGstToggle()}
                     {...args}
                   />
-                )
-              }}
-            />
-          </GridItem>
-        </GridContainer>
+                )}
+              />
+            </GridItem>
+            <GridItem xs={6} md={1}>
+              <FastField
+                name={`${poPrefix}.invoiceGST`}
+                render={(args) => {
+                  return <NumberInput {...amountProps} {...args} />
+                }}
+              />
+            </GridItem>
 
-        <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <Field
-              name={`${poPrefix}.gstEnabled`}
-              render={(args) => <Switch {...args} />}
-            />
-          </GridItem>
-          <GridItem xs={2} md={9} />
+            {/* <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
             <FastField
-              name={`${poPrefix}.gstIncluded`}
-              render={(args) => {
-                return (
-                  <Tooltip
-                    title={formatMessage({
-                      id: 'inventory.pr.detail.pod.summary.inclusiveGST',
-                    })}
-                    placement='bottom'
-                  >
-                    <Checkbox
-                      label={formatMessage({
-                        id: 'inventory.pr.detail.pod.summary.inclusiveGST',
-                      })}
-                      {...args}
-                    />
-                  </Tooltip>
-                )
-              }}
+              name={`${poPrefix}.gstEnabled`}
+              render={(args) => <Switch onChange={() => onChangeGstToggle()} {...args} />}
             />
-          </GridItem>
-        </GridContainer>
+          </GridItem> */}
+            <GridItem xs={2} md={9} />
+            {gstEnabled ? (
+              <GridItem xs={10} md={3}>
+                <FastField
+                  name={`${poPrefix}.gstIncluded`}
+                  render={(args) => {
+                    return (
+                      <Tooltip
+                        title={formatMessage({
+                          id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                        })}
+                        placement='bottom'
+                      >
+                        <Checkbox
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                          })}
+                          onChange={() => onChangeGstToggle(true)}
+                          {...args}
+                        />
+                      </Tooltip>
+                    )
+                  }}
+                />
+              </GridItem>
+            ) : (
+              <GridItem xs={10} md={3} />
+            )}
+          </GridContainer>
+        ) : (
+          []
+        )}
 
         <GridContainer>
           <GridItem xs={2} md={9} />
@@ -149,7 +184,7 @@ class POSummary extends PureComponent {
             />
           </GridItem>
         </GridContainer>
-      </React.Fragment>
+      </div>
     )
   }
 }
