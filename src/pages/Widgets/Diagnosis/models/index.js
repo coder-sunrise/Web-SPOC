@@ -28,14 +28,14 @@ export default createFormViewModel({
       })
     },
     effects: {
-      // *add ({ payload }, { call, put, select }) {
-      //   yield put({
-      //     type: 'updateState',
-      //     payload: {
-      //       addNew: true,
-      //     },
-      //   })
-      // },
+      *removeWidget ({ payload }, { call, put, select }) {
+        // yield put({
+        //   type: 'updateState',
+        //   payload: {
+        //     addNew: true,
+        //   },
+        // })
+      },
     },
     reducers: {},
   },

@@ -132,7 +132,7 @@ class AntdNumberInput extends React.PureComponent {
     }
     // console.log(this.state.value)
 
-    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 300)
+    this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 100)
   }
 
   componentWillReceiveProps (nextProps) {
