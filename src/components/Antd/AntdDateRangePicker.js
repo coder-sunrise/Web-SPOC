@@ -5,14 +5,15 @@ import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
 // wrapper
+import { DatePicker as DP } from 'antd'
 import { extendFunc } from '@/utils/utils'
 import { control } from '@/components/Decorator'
-import { DatePicker as DP } from 'antd'
 import {
   CustomInputWrapper,
   BaseInput,
   CustomInput,
   dateFormat,
+  dateFormatWithTime,
 } from '@/components'
 
 import DatePicker from './AntdDatePicker'
@@ -22,7 +23,7 @@ const _toMoment = (value, format) => {
   if (!value) return ''
   const m = moment.utc(value)
 
-  return m.local()
+  return m // .local()
 }
 
 const STYLES = (theme) => ({
@@ -30,7 +31,7 @@ const STYLES = (theme) => ({
     zIndex: 1305,
   },
   datepickerContainer: {
-    width: '100%',
+    width: '100% !important',
     boxSizing: 'content-box',
     lineHeight: '1rem',
     color: 'currentColor',
@@ -101,14 +102,40 @@ class AntdDateRangePicker extends PureComponent {
   }
 
   handleChange = (dateArray, dateString) => {
-    console.log({ dateArray, dateString })
     this.setState({
       value: dateArray,
     })
 
-    const { form, field, onChange } = this.props
+    const { form, field, onChange, showTime } = this.props
     const v = Array.isArray(dateArray)
-      ? dateArray.map((o) => (o !== undefined ? o.utc().format() : o))
+      ? dateArray.map((o, i) => {
+          // console.log(
+          //   showTime,
+          //   o,
+          //   i,
+          //   o !== undefined
+          //     ? // eslint-disable-next-line no-nested-ternary
+          //       i === 0
+          //       ? showTime
+          //         ? o.utc().format()
+          //         : o.utc().set({ hour: 0, minute: 0, second: 0 }).format()
+          //       : showTime
+          //         ? o.utc().format()
+          //         : o.utc().set({ hour: 23, minute: 59, second: 59 }).format()
+          //     : o,
+          // )
+          // eslint-disable-next-line no-nested-ternary
+          return o !== undefined
+            ? // eslint-disable-next-line no-nested-ternary
+              i === 0
+              ? showTime
+                ? o.utc().format()
+                : o.utc().set({ hour: 0, minute: 0, second: 0 }).format()
+              : showTime
+                ? o.utc().format()
+                : o.utc().set({ hour: 23, minute: 59, second: 59 }).format()
+            : o
+        })
       : []
     if (form && field) {
       // console.log(date.format())
@@ -172,22 +199,33 @@ class AntdDateRangePicker extends PureComponent {
       text,
       ...restProps
     } = this.props
-    const { format = dateFormat, form, field } = restProps
-    const selectValue = form && field ? field.value : value
-    const cfg = {}
+    // const { form, field } = restProps
+    let { format } = restProps
+    // console.log(format, restProps.showTime, restProps)
+
+    if (!format) {
+      if (restProps.showTime) {
+        format = dateFormatWithTime
+      } else {
+        format = dateFormat
+      }
+    }
+    // const selectValue = form && field ? field.value : value
+    // const cfg = {}
     //     if(nowOnwards){
     // cfg.disabledDate=()=>{
     //   return current && current < moment().endOf('day');
     // }
     //     }
+    // console.log(format)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     if (text) {
       // console.log(this.state.value)
       return (
         <span>
-          <DatePicker text format={dateFormat} value={this.state.value[0]} /> ~
-          <DatePicker text format={dateFormat} value={this.state.value[1]} />
+          <DatePicker text format={format} value={this.state.value[0]} /> ~
+          <DatePicker text format={format} value={this.state.value[1]} />
         </span>
       )
     }

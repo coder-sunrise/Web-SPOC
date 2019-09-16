@@ -335,7 +335,7 @@ class AntdSelect extends React.PureComponent {
       onBlur,
       allowClear = true,
       style,
-      dropdownMatchSelectWidth = false,
+      dropdownMatchSelectWidth = true,
       autoComplete,
       query,
       optionLabelLength,

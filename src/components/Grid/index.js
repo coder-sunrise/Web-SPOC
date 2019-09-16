@@ -100,6 +100,7 @@ export function QtyFormatter ({ value }) {
 // }
 let dateFormatLong = 'DD-MMM-YYYY'
 let dateFormat = 'DD-MM-YYYY'
+let dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
 // const timeFormat = 'HH:mm:ss'
 const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm a'
@@ -173,6 +174,7 @@ module.exports = {
   currencyFormat,
   qtyFormat,
   dateFormat,
+  dateFormatWithTime,
   dateFormatLong,
   fullDateTime,
   serverDateFormat,
