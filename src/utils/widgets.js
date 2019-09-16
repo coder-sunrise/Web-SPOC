@@ -38,6 +38,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'clinicalnotes',
+
     disabled: true,
     layoutConfig: {
       minW: 12,
@@ -92,6 +93,9 @@ const widgets = [
       loading: Loading,
     }),
     model: 'diagnosis',
+    associatedProps: [
+      'corDiagnosis',
+    ],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -168,6 +172,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'patientHistory',
+
     layoutConfig: {
       style: {
         padding: 5,
@@ -187,6 +192,17 @@ const widgets = [
       // },
     }),
     model: 'orders',
+    // associatedProps: [
+    //   'corOrderAdjustment',
+    //   'corService',
+    //   'corPrescriptionItem',
+    //   'corVaccinationItem',
+    // ],
+    onRemove: () => {
+      window.g_app._store.dispatch({
+        type: 'orders/deleteRow',
+      })
+    },
     layoutConfig: {
       style: {
         padding: '0 5px',
@@ -213,6 +229,9 @@ const widgets = [
       loading: Loading,
     }),
     model: 'patientVitalSign',
+    associatedProps: [
+      'corPatientNoteVitalSign',
+    ],
     layoutConfig: {
       minW: 12,
       minH: 10,

@@ -262,7 +262,8 @@ class BaseInput extends React.PureComponent {
       !(
         inputProps.value === undefined ||
         inputProps.value === null ||
-        inputProps.value === ''
+        inputProps.value === '' ||
+        inputProps.value.length === 0
       )
     ) {
       labelProps.shrink = true

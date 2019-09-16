@@ -29,10 +29,17 @@ export default createFormViewModel({
     },
     effects: {
       *removeWidget ({ payload }, { call, put, select }) {
+        console.log(window)
+        yield put({
+          type: 'updateState',
+          payload: {
+            entity: false,
+          },
+        })
         // yield put({
-        //   type: 'updateState',
+        //   type: 'consuupdateState',
         //   payload: {
-        //     addNew: true,
+        //     entity: false,
         //   },
         // })
       },

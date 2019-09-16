@@ -142,7 +142,7 @@ export default createListViewModel({
         return {
           ...state,
           rows: rows.map((o) => {
-            if (o.uid === payload.uid) o.isDeleted = true
+            if (!payload || o.uid === payload.uid) o.isDeleted = true
             return o
           }),
         }

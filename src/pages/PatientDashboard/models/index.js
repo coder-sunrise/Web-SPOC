@@ -108,6 +108,12 @@ export default createFormViewModel({
           }, 1)
           return
         }
+        // console.log(
+        //   queueID,
+        //   patientDashboard.queueID,
+        //   version,
+        //   patientDashboard.version,
+        // )
         if (
           queueID &&
           (patientDashboard.queueID !== queueID ||
@@ -126,6 +132,7 @@ export default createFormViewModel({
             type: 'patientHistory/updateState',
             payload: {
               patientID: patientInfo.id,
+              queueID,
               visitInfo,
               version,
             },
@@ -148,8 +155,12 @@ export default createFormViewModel({
           })
         }
         let { consultationID } = payload
-        // console.log(visitRegistration)
-        if (visitRegistration) {
+        console.log(visitRegistration)
+        if (
+          visitRegistration &&
+          visitRegistration.visitInfo &&
+          visitRegistration.visitInfo.visit
+        ) {
           consultationID =
             visitRegistration.visitInfo.visit.clinicalObjectRecordFK
           yield put({

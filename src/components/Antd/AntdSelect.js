@@ -127,24 +127,28 @@ class AntdSelect extends React.PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { field, value, options, valueField, autoComplete } = nextProps
+    const { field, value, options, valueField, autoComplete, mode } = nextProps
     let v = this.state.value
     if (field) {
       v = field.value
       this.setState({
         value: field.value,
-        shrink: field.value !== undefined,
+        shrink:
+          mode === 'multiple'
+            ? field.value && field.value.length > 0
+            : field.value !== undefined,
       })
     } else if (value) {
       v = value
 
       this.setState({
         value,
-        shrink: value !== undefined,
+        shrink:
+          mode === 'multiple' ? value && value.length > 0 : value !== undefined,
       })
     } else {
       this.setState({
-        value: undefined,
+        value: mode === 'multiple' ? [] : undefined,
         shrink: false,
       })
     }
@@ -238,7 +242,10 @@ class AntdSelect extends React.PureComponent {
         form.setFieldTouched(field.name, true)
       }
       this.setState({
-        shrink: newVal !== undefined,
+        shrink:
+          mode === 'multiple'
+            ? newVal && newVal.length > 0
+            : newVal !== undefined,
         value: newVal,
       })
     }
@@ -372,7 +379,9 @@ class AntdSelect extends React.PureComponent {
     }
 
     if (this.props.text) {
-      const match = source.find((o) => o[this.props.valueField] === this.state.value)
+      const match = source.find(
+        (o) => o[this.props.valueField] === this.state.value,
+      )
       let text = ''
       if (match) text = match[this.props.labelField]
       return (
@@ -432,13 +441,17 @@ class AntdSelect extends React.PureComponent {
       labelProps.shrink =
         (value !== undefined && value !== null) || this.state.shrink
     } else {
-      labelProps.shrink =
-        (value !== undefined &&
-          value !== null &&
-          value !== '' &&
-          value.length > 0) ||
-        this.state.shrink
+      // console.log(
+      //   value,
+      //   this.state.shrink,
+      //   value !== undefined,
+      //   value !== null,
+      //   value !== '',
+      //   value.length > 0,
+      // )
+      labelProps.shrink = (value && value.length > 0) || this.state.shrink
     }
+    // console.log(labelProps)
 
     return (
       <CustomInput
