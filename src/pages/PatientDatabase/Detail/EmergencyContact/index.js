@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Loadable from 'react-loadable'
+import { Tooltip } from '@material-ui/core'
+import Add from '@material-ui/icons/Add'
 import {
   EditableTableGrid,
   Button,
@@ -8,8 +10,6 @@ import {
   notification,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
-import { Tooltip } from '@material-ui/core'
-import Add from '@material-ui/icons/Add'
 import { query } from '@/services/patient'
 import { getUniqueNumericId } from '@/utils/utils'
 
@@ -109,7 +109,7 @@ class EmergencyContact extends PureComponent {
   onRowDoubleClick = (row) => {
     if (!this.state.editingRowIds.find((o) => o === row.id)) {
       this.setState((prevState) => ({
-        editingRowIds: !prevState.editingRowIds.concat([
+        editingRowIds: prevState.editingRowIds.concat([
           row.id,
         ]),
       }))

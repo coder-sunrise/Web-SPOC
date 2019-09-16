@@ -161,7 +161,7 @@ const saveConsultation = ({
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
-
+  // enableReinitialize: true,
   handleSubmit: (values, { props }) => {
     saveConsultation({
       props: {
@@ -439,13 +439,38 @@ class Consultation extends PureComponent {
   }
 
   removeWidget = (widgetId) => {
+    const { setFieldValue, values } = this.props
     const wg = widgets.find((o) => o.id === widgetId)
-    const { model } = wg
-    if (model) {
-      this.props.dispatch({
-        type: `${model}/removeWidget`,
-      })
-    }
+    // console.log(wg)
+    const { associatedProps = [], onRemove, model } = wg
+    associatedProps.forEach((ap) => {
+      const v = values[ap]
+      console.log(ap, v)
+      if (v) {
+        if (Array.isArray(v)) {
+          // eslint-disable-next-line no-return-assign
+          console.log(
+            v.map((o) => ({
+              ...o,
+              isDeleted: true,
+            })),
+          )
+          setFieldValue(
+            ap,
+            v.map((o) => ({
+              ...o,
+              isDeleted: true,
+            })),
+          )
+        }
+      }
+    })
+    if (onRemove) onRemove()
+    // if (model) {
+    //   this.props.dispatch({
+    //     type: `${model}/removeWidget`,
+    //   })
+    // }
     const { currentLayout } = this.state
 
     const layout = {

@@ -184,7 +184,11 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       }}
       columnExtensions={[
         { columnName: 'editType', type: 'select', options: orderTypes },
-        { columnName: 'adjAmount', type: 'currency', width: 100 },
+        {
+          columnName: 'adjAmount',
+          type: 'currency',
+          width: 100,
+        },
         {
           columnName: 'totalAfterItemAdjustment',
           // align: 'right',

@@ -102,11 +102,13 @@ class EditableTableGrid extends PureComponent {
   }
 
   onRowDoubleClick = (row, e) => {
+    const { getRowId = (r) => r.id } = this.props
+    console.log(row)
     if (
       [
         'svg',
       ].indexOf(e.target.nodeName) < 0 &&
-      !this.state.editingRowIds.find((o) => o === row.id)
+      !this.state.editingRowIds.find((o) => o === getRowId(row))
     ) {
       const { onRowDoubleClick } = this.props
       if (onRowDoubleClick) {
@@ -114,7 +116,7 @@ class EditableTableGrid extends PureComponent {
       } else {
         this.setState((prevState) => {
           const ids = prevState.editingRowIds.concat([
-            row.id,
+            getRowId(row),
           ])
           if (prevState.editingRowIds.length === 0) {
             window.g_app._store.dispatch({
@@ -133,7 +135,12 @@ class EditableTableGrid extends PureComponent {
   }
 
   _onCommitChanges = ({ added, changed, deleted }) => {
-    const { EditingProps, rows, schema } = this.props
+    const {
+      EditingProps,
+      rows,
+      schema,
+      getRowId = (row) => row.id,
+    } = this.props
     const { onCommitChanges = (f) => f } = EditingProps
     // console.log(added, changed, deleted)
     // this.setState({
@@ -167,11 +174,11 @@ class EditableTableGrid extends PureComponent {
 
     if (changed) {
       newRows = newRows.map((row) => {
-        const n = changed[row.id]
+        const n = changed[getRowId(row)]
           ? {
               ...row,
-              ...window.$tempGridRow[this.gridId][row.id],
-              ...changed[row.id],
+              ...window.$tempGridRow[this.gridId][getRowId(row)],
+              ...changed[getRowId(row)],
             }
           : row
         return n
@@ -185,10 +192,10 @@ class EditableTableGrid extends PureComponent {
       // }).then(setArrayValue)
       // console.log(deleted)
       if (deleted[0] === undefined) {
-        newRows = newRows.filter((o) => o.id !== undefined)
+        newRows = newRows.filter((o) => getRowId(o) !== undefined)
       }
       const deletedEcs = newRows.filter((row) =>
-        deleted.find((o) => o === row.id),
+        deleted.find((o) => o === getRowId(row)),
       )
       deletedEcs.forEach((o) => {
         o.isDeleted = true
@@ -356,6 +363,7 @@ class EditableTableGrid extends PureComponent {
       ...props,
     }
     // console.log(rowChanges, addedRows)
+    // console.log(editingRowIds)
     const editableCfg = {
       extraState: [
         <EditingState

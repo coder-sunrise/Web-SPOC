@@ -336,10 +336,18 @@ class PatientHistory extends Component {
                   <div style={{ width: '100%', paddingRight: 20 }}>
                     <GridContainer>
                       <GridItem sm={7}>
-                        V{o.versionNumber}, {row.doctorTitle} {row.doctorName}
+                        <TextField
+                          text
+                          defaultValue={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
+                        />
                       </GridItem>
                       <GridItem sm={5}>
-                        <DatePicker text defaultValue={moment(row.visitDate)} />
+                        {o.signOffDate && (
+                          <DatePicker
+                            text
+                            defaultValue={moment(o.signOffDate)}
+                          />
+                        )}
                       </GridItem>
                     </GridContainer>
                   </div>
@@ -432,7 +440,7 @@ class PatientHistory extends Component {
                 />
               </GridItem>
               <GridItem md={4}>
-                <Button
+                <ProgressButton
                   color='primary'
                   style={{ marginLeft: theme.spacing(2) }}
                   onClick={() => {
@@ -448,13 +456,13 @@ class PatientHistory extends Component {
                         },
                       })
                       router.push(
-                        `/reception/queue/patientdashboard?cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                        `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
                       )
                     })
                   }}
                 >
                   Edit Consultation
-                </Button>
+                </ProgressButton>
               </GridItem>
             </GridContainer>
 

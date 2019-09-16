@@ -630,7 +630,9 @@ const orderTypes = [
     value: '1',
     prop: 'corPrescriptionItem',
     filter: (r) => !!r.stockDrugFK,
-    getSubject: (r) => r.drugName,
+    getSubject: (r) => {
+      return r.drugName
+    },
   },
   {
     name: 'Vaccination',
@@ -912,7 +914,7 @@ export const getInventoryItem = (data, value, itemFKName, rows) => {
       name: x.code,
       displayValue: x.displayValue,
       sellingPrice: x.sellingPrice,
-      //uom: 'TBD',
+      // uom: 'TBD',
       uom: x.uom ? x.uom.name : x.prescribingUOM.name,
     }
   })
