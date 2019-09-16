@@ -12,6 +12,11 @@ const isDuplicatePOAllowed = (status) => {
   return !(allowedStatus.indexOf(status) > -1)
 }
 
+export const isPOStatusFinalized = (status) => {
+  const allowedStatus = ['Finalized']
+  return (allowedStatus.indexOf(status) > -1)
+}
+
 export const ContextMenuOptions = (row) => {
   return [
     {

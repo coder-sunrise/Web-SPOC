@@ -13,15 +13,16 @@ import {
   mapPropsToValues: ({ purchasingReceiving }) =>
     purchasingReceiving.entity || purchasingReceiving.default,
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, history } = props
-    onConfirm()
-    console.log('props', props)
+    const { dispatch, onConfirm, history, purchasingReceiving } = props
+    const { id } = purchasingReceiving.entity
     const { location } = history
-    history.push(`${location.pathname}/pdodetails`)
+
+    onConfirm()
+    history.push(`${location.pathname}/pdodetails?id=${id}&type=dup`)
   },
 })
 class DuplicatePO extends PureComponent {
-  render () {
+  render() {
     const { props } = this
     const { theme, footer, purchasingReceiving } = props
     const { entity } = purchasingReceiving
