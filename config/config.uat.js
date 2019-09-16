@@ -34,8 +34,15 @@ const plugins = [
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {
-              include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
-              exclude: ['@babel/runtime'],
+              include: [
+                'dva',
+                'dva/router',
+                'dva/saga',
+                'dva/fetch',
+              ],
+              exclude: [
+                '@babel/runtime',
+              ],
             },
             hardSource: true,
           }
@@ -64,6 +71,8 @@ export default {
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
     'process.env.url': 'https://semr2uat2010.emr.com.sg',
+    'process.env.signalrUrl':
+      'https://ec2-175-41-131-73.ap-southeast-1.compute.amazonaws.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,
@@ -116,8 +125,8 @@ export default {
         const antdProPath = match[1].replace('.less', '').replace('.scss', '')
         const arr = antdProPath
           .split('/')
-          .map(a => a.replace(/([A-Z])/g, '-$1'))
-          .map(a => a.toLowerCase())
+          .map((a) => a.replace(/([A-Z])/g, '-$1'))
+          .map((a) => a.toLowerCase())
         return `antd-pro${arr.join('-')}-${localName}`.replace(/--/g, '-')
       }
       return localName

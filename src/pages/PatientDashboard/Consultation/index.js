@@ -55,9 +55,9 @@ import {
   SizeContainer,
   Popconfirm,
   withFormikExtend,
-  skeleton,
   FastField,
   NumberInput,
+  Skeleton,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { sendNotification } from '@/utils/realtime'
@@ -115,7 +115,8 @@ const saveConsultation = ({
           values[p.prop] = rows.filter((o) => o.type === p.value)
         })
 
-        const { rows: orderRows = [] } = orders
+        const { rows: orderRows = [], finalAdjustments = [] } = orders
+        values.corOrderAdjustment = finalAdjustments
         orderTypes.forEach((p) => {
           values[p.prop] = (values[p.prop] || [])
             .concat(orderRows.filter((o) => o.editType === p.value))
@@ -641,7 +642,7 @@ class Consultation extends PureComponent {
 
   getLayoutWidgets = () => {
     const { state, props } = this
-    const { classes, height } = props
+    const { classes, height, consultation } = props
     // console.log(state.currentLayout)
 
     const layoutCfg = {
@@ -713,8 +714,7 @@ class Consultation extends PureComponent {
             if (!w) return <div />
             const cfgs = state.currentLayout[state.breakpoint]
             const cfg = cfgs.find((o) => o.i === id)
-            // console.log(cfg, id)
-
+            // console.log(cfg, id, this.props)
             if (!cfg) return <div key={id} />
             const LoadableComponent = w.component
             return (
@@ -894,24 +894,31 @@ class Consultation extends PureComponent {
       theme,
       dispatch,
       values,
+      patientDashboard = {},
       consultation = {},
+      orders = {},
       ...resetProps
     } = this.props
     const { currentLayout } = state
     const { entity } = consultation
-    // console.log(values)
+
+    const { visitInfo = {} } = patientDashboard
+    const { visit = {} } = visitInfo
+    const { summary } = orders
+    // const { adjustments, total, gst, totalWithGst } = summary
+    // console.log('values', values, visit)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
-          style={{}}
+          style={{ maxHeight: 100 }}
           extraCmt={
             <div style={{ textAlign: 'center', paddingTop: 16 }}>
-              <p style={{ position: 'relative' }}>
+              <h4 style={{ position: 'relative' }}>
                 Total Invoice
-                <Dropdown
+                {/* <Dropdown
                   overlay={
                     <Menu>
                       <Menu.Item onClick={this.showInvoiceAdjustment}>
@@ -929,44 +936,52 @@ class Consultation extends PureComponent {
                   <IconButton className={classes.iconButton}>
                     <MoreHoriz />
                   </IconButton>
-                </Dropdown>
-              </p>
-              <h5>{NumberFormatter(210)}</h5>
-              <SizeContainer size='sm'>
-                {values.status !== 'Paused' && (
-                  <ProgressButton
-                    color='danger'
-                    onClick={this.discardConsultation}
-                  >
-                    Discard
-                  </ProgressButton>
+                </Dropdown> */}
+                {summary && (
+                  <span>
+                    &nbsp;:&nbsp;
+                    <NumberInput text currency value={summary.totalWithGST} />
+                  </span>
                 )}
-                {values.status !== 'Paused' && (
-                  <ProgressButton
-                    onClick={this.pauseConsultation}
-                    color='info'
-                    icon={null}
-                  >
-                    Pause
-                  </ProgressButton>
-                )}
-                {values.status === 'Paused' && (
-                  <ProgressButton
-                    onClick={this.resumeConsultation}
-                    color='info'
-                    icon={null}
-                  >
-                    Resume
-                  </ProgressButton>
-                )}
+              </h4>
+
+              {values.status !== 'Paused' && (
                 <ProgressButton
-                  color='primary'
-                  onClick={this.props.handleSubmit}
+                  color='danger'
+                  onClick={this.discardConsultation}
+                >
+                  Discard
+                </ProgressButton>
+              )}
+              {values.status !== 'Paused' &&
+              [
+                'IN CONS',
+                'WAITING',
+              ].includes(visit.visitStatus) && (
+                <ProgressButton
+                  onClick={this.pauseConsultation}
+                  color='info'
                   icon={null}
                 >
-                  Sign Off
+                  Pause
                 </ProgressButton>
-              </SizeContainer>
+              )}
+              {values.status === 'Paused' && (
+                <ProgressButton
+                  onClick={this.resumeConsultation}
+                  color='info'
+                  icon={null}
+                >
+                  Resume
+                </ProgressButton>
+              )}
+              <ProgressButton
+                color='primary'
+                onClick={this.props.handleSubmit}
+                icon={null}
+              >
+                Sign Off
+              </ProgressButton>
             </div>
           }
           {...this.props}

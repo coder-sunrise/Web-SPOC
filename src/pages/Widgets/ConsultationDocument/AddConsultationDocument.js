@@ -1,7 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
-import Yup from '@/utils/yup'
 import withStyles from '@material-ui/core/styles/withStyles'
+import Yup from '@/utils/yup'
 
 import {
   withFormikExtend,

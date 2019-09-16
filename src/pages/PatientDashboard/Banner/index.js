@@ -22,6 +22,7 @@ import { formatMessage } from 'umi/locale'
 import InboxIcon from '@material-ui/icons/MoveToInbox'
 import DraftsIcon from '@material-ui/icons/Drafts'
 import SendIcon from '@material-ui/icons/Send'
+import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 import {
   Button,
   CommonHeader,
@@ -48,7 +49,6 @@ import {
 import avatar from '@/assets/img/faces/marc.jpg'
 import { titles, finTypes, gender } from '@/utils/codes'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
-import { standardRowHeight, headerHeight } from 'mui-pro-jss'
 import Yup from '@/utils/yup'
 // import model from '../models/demographic'
 import Block from './Block'
@@ -90,7 +90,7 @@ class Banner extends PureComponent {
     const { props } = this
     const { patientDashboard, codetable } = props
     const { patientInfo } = patientDashboard
-    if (!patientInfo) return <Skeleton height={101} />
+    if (!patientInfo) return <Skeleton variant='rect' height={101} />
     const { patientAllergy = [] } = patientInfo
     const { ctdrugallergy = [] } = codetable
     const da = ctdrugallergy.filter((o) =>
@@ -126,11 +126,13 @@ class Banner extends PureComponent {
         zIndex: 1000,
         paddingLeft: 16,
         paddingRight: 16,
+        maxHeight: 100,
       },
     } = props
-    if (!patientDashboard) return <Skeleton height={100} />
+    if (!patientDashboard) return <Skeleton variant='rect' height={100} />
     const { patientInfo } = patientDashboard
-    if (!patientInfo) return <Skeleton height={100} />
+    if (!patientInfo || Object.keys(patientInfo).length === 0)
+      return <Skeleton variant='rect' height={100} />
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -150,7 +152,7 @@ class Banner extends PureComponent {
                     code='ctSalutation'
                     value={patientInfo.salutationFK}
                   />{' '}
-                  {patientInfo.name}
+                  <span>{patientInfo.name}</span>
                 </div>
               }
               body={

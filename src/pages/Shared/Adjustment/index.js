@@ -140,7 +140,12 @@ class Adjustment extends PureComponent {
     const { theme, footer, values, global, ...props } = this.props
     // console.log(values)
     const { openAdjustmentConfig = {} } = global
-    const { showRemark, orginalAmount, isMinus } = openAdjustmentConfig
+    const {
+      showRemark,
+      orginalAmount,
+      isMinus,
+      showAmountPreview = true,
+    } = openAdjustmentConfig
     // console.log(global, openAdjustmentConfig)
     return (
       <div>
@@ -217,7 +222,7 @@ class Adjustment extends PureComponent {
             {showRemark && (
               <GridItem xs={12}>
                 <FastField
-                  name='remarks'
+                  name='adjRemark'
                   render={(args) => {
                     return (
                       <TextField
@@ -231,22 +236,24 @@ class Adjustment extends PureComponent {
                 />
               </GridItem>
             )}
-            <GridItem xs={12}>
-              <FastField
-                name='finalAmount'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      style={{ marginTop: theme.spacing(2) }}
-                      currency
-                      prefix='Total Amount After Adjustment:'
-                      text
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
+            {showAmountPreview && (
+              <GridItem xs={12}>
+                <FastField
+                  name='finalAmount'
+                  render={(args) => {
+                    return (
+                      <NumberInput
+                        style={{ marginTop: theme.spacing(2) }}
+                        currency
+                        prefix='Total Amount After Adjustment:'
+                        text
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            )}
           </GridContainer>
         </div>
         {footer &&

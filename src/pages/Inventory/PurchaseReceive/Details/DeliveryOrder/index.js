@@ -8,14 +8,6 @@ import DeliveryOrderDetails from './Details/DeliveryOrderDetails'
 import Grid from './Grid'
 import Add from '@material-ui/icons/Add'
 
-const styles = (theme) => ({
-  ...basicStyle(theme),
-  buttonGroup: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-  },
-})
-
 @connect(({ deliveryOrder }) => ({
   deliveryOrder,
 }))
@@ -41,6 +33,7 @@ class index extends PureComponent {
     const cfg = {
       toggleDeliveryOrderDetailsModal: this.toggleDeliveryOrderDetailsModal,
     }
+
     return (
       <div>
         <GridContainer>
@@ -70,7 +63,16 @@ class index extends PureComponent {
             <DeliveryOrderDetails {...cfg} {...this.props} />
           </CommonModal>
           <Button
-            onClick={this.toggleDeliveryOrderDetailsModal}
+            //onClick={this.toggleDeliveryOrderDetailsModal}
+            onClick={() => {
+              this.props.dispatch({
+                type: 'deliveryOrder/updateState',
+                payload: {
+                  entity: undefined,
+                },
+              })
+              this.toggleDeliveryOrderDetailsModal()
+            }}
             hideIfNoEditRights
             color='info'
             link
@@ -86,4 +88,4 @@ class index extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(index)
+export default index

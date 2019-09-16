@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 // import * as service from '../services'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, maxReducer, sumReducer } from '@/utils/utils'
 
 const sharedMedicationValue = {
   quantity: 1,
@@ -31,6 +31,8 @@ export default createListViewModel({
     state: {
       // editType: '1',
       rows: [],
+      finalAdjustments: [],
+      summary: {},
       defaultMedication: {
         ...sharedMedicationValue,
       },
@@ -72,9 +74,40 @@ export default createListViewModel({
       //   const { pathname, search, query = {} } = loct
       // })
     },
-    effects: {},
+    effects: {
+      *upsertRow ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'upsertRowState',
+          payload,
+        })
+        yield put({
+          type: 'calculateAmount',
+        })
+      },
+      *addFinalAdjustment ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'addFinalAdjustmentState',
+          payload,
+        })
+
+        yield put({
+          type: 'calculateAmount',
+        })
+      },
+
+      *deleteFinalAdjustment ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'deleteFinalAdjustmentState',
+          payload,
+        })
+
+        yield put({
+          type: 'calculateAmount',
+        })
+      },
+    },
     reducers: {
-      upsertRow (state, { payload }) {
+      upsertRowState (state, { payload }) {
         let { rows } = state
         if (payload.uid) {
           rows = rows.map((row) => {
@@ -109,12 +142,13 @@ export default createListViewModel({
         return {
           ...state,
           rows: rows.map((o) => {
-            if (o.uid === payload.id) o.isDeleted = true
+            if (o.uid === payload.uid) o.isDeleted = true
             return o
           }),
         }
       },
 
+      // used by each order component
       adjustAmount (state, { payload }) {
         // console.log(payload)
         return {
@@ -124,6 +158,81 @@ export default createListViewModel({
             ...payload,
             totalAfterItemAdjustment: payload.finalAmount,
           },
+        }
+      },
+
+      calculateAmount (state, { payload }) {
+        let { finalAdjustments, rows } = state
+
+        const total = rows
+          .map((o) => o.totalAfterItemAdjustment)
+          .reduce(sumReducer, 0)
+        rows.forEach((r) => {
+          r.weightage = r.totalAfterItemAdjustment / total
+          r.totalAfterOverallAdjustment = r.totalAfterItemAdjustment
+          // console.log(r)
+        })
+        finalAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+          rows.forEach((r) => {
+            // console.log(r.weightage * fa.adjAmount, r)
+            r.totalAfterOverallAdjustment += r.weightage * fa.adjAmount
+          })
+        })
+
+        const totalAfterAdj = rows
+          .map((o) => o.totalAfterOverallAdjustment)
+          .reduce(sumReducer, 0)
+        const gst = totalAfterAdj * 0.07
+        // console.log(totalAfterAdj, gst)
+
+        return {
+          ...state,
+          rows,
+          summary: {
+            gst,
+            total: totalAfterAdj,
+            totalWithGST: gst + totalAfterAdj,
+          },
+        }
+      },
+
+      // used by calc total amount
+      addFinalAdjustmentState (state, { payload }) {
+        let { finalAdjustments, rows } = state
+        if (payload.uid) {
+          finalAdjustments = finalAdjustments.map((row) => {
+            const n =
+              row.uid === payload.uid
+                ? {
+                    ...row,
+                    ...payload,
+                  }
+                : row
+            return n
+          })
+        } else {
+          finalAdjustments.push({
+            ...payload,
+            uid: getUniqueId(),
+            sequence:
+              finalAdjustments.map((o) => o.sequence).reduce(maxReducer, 0) + 1,
+          })
+        }
+        return {
+          ...state,
+          finalAdjustments,
+        }
+      },
+
+      deleteFinalAdjustmentState (state, { payload }) {
+        const { finalAdjustments } = state
+
+        return {
+          ...state,
+          finalAdjustments: finalAdjustments.map((o) => {
+            if (o.uid === payload.uid) o.isDeleted = true
+            return o
+          }),
         }
       },
     },

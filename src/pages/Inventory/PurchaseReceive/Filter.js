@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { status } from '@/utils/codes'
 import { Tooltip } from '@material-ui/core'
 import {
   withFormikExtend,
+  Field,
   FastField,
   GridContainer,
   GridItem,
@@ -11,20 +11,36 @@ import {
   TextField,
   Checkbox,
   Select,
-  ProgressButton,
   CodeSelect,
+  ProgressButton,
   DatePicker,
+  DateRangePicker,
 } from '@/components'
 
 @withFormikExtend({
   mapPropsToValues: ({ purchasingReceiving }) =>
-    purchasingReceiving.filter || {},
+    purchasingReceiving.default.filter || {},
   handleSubmit: () => {},
   displayName: 'PurchasingReceivingFilter',
 })
 class Filter extends PureComponent {
+  state = {
+    isAllDateChecked: false,
+  }
+
+  componentDidUpdate () {
+    const { values } = this.props
+
+    this.setState({
+      isAllDateChecked: values.allDate || false,
+    })
+  }
+
   render () {
     const { classes, navigatePdoDetails } = this.props
+
+    console.log('filter', this.state.isAllDateChecked)
+
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -43,30 +59,23 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='transactionDateFrom'
-              render={(args) => (
-                <DatePicker
-                  label={formatMessage({
-                    id: 'inventory.pr.filter.datefrom',
-                  })}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='transactionDateTo'
-              render={(args) => (
-                <DatePicker
-                  label={formatMessage({
-                    id: 'inventory.pr.filter.dateto',
-                  })}
-                  {...args}
-                />
-              )}
+          <GridItem md={6}>
+            <Field
+              name='transactionDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    disabled={this.state.isAllDateChecked}
+                    label={formatMessage({
+                      id: 'inventory.pr.filter.datefrom',
+                    })}
+                    label2={formatMessage({
+                      id: 'inventory.pr.filter.dateto',
+                    })}
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
           <GridItem xs sm={6} md={3}>
@@ -94,12 +103,12 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='supplier'
+              name='invoiceStatus'
               render={(args) => {
                 return (
                   <Select
                     label={formatMessage({
-                      id: 'inventory.pr.supplier',
+                      id: 'inventory.pr.invoiceStatus',
                     })}
                     {...args}
                   />
@@ -109,14 +118,30 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='status'
+              name='supplier'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label={formatMessage({
+                      id: 'inventory.pr.supplier',
+                    })}
+                    code='ctCompany'
+                    //max={10}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='poStatus'
               render={(args) => {
                 return (
                   <Select
                     label={formatMessage({
-                      id: 'inventory.pr.status',
+                      id: 'inventory.pr.poStatus',
                     })}
-                    options={status}
                     {...args}
                   />
                 )

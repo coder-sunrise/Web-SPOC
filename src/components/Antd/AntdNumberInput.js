@@ -136,11 +136,21 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { field } = nextProps
+    const { field, value } = nextProps
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
         shrink: field.value !== undefined,
+      })
+    } else if (value) {
+      this.setState({
+        value: value === undefined ? '' : value,
+        shrink: value !== undefined,
+      })
+    } else {
+      this.setState({
+        value: undefined,
+        shrink: false,
       })
     }
     // console.log(field)
@@ -219,14 +229,15 @@ class AntdNumberInput extends React.PureComponent {
     // }
     // console.log(this.props.allowEmpty, v)
     let newV = v
+    if (!isNumber(newV)) {
+      newV = undefined
+    }
     if (v === undefined && !this.props.allowEmpty) {
       newV = this.props.min
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-    if (!isNumber(newV)) {
-      return
-    }
+
     this.setState({
       value: newV,
     })
@@ -265,7 +276,7 @@ class AntdNumberInput extends React.PureComponent {
   // }
 
   getConfig = () => {
-    const { currency, percentage, formatter, max, min } = this.props
+    const { currency, percentage, formatter = (v) => v, max, min } = this.props
     const extraCfg = {
       formatter,
       max,
