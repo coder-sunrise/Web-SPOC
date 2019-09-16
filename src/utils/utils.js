@@ -663,6 +663,8 @@ const calculateAdjustAmount = (
   }
 }
 
+const errMsgForOutOfRange = (field) => `${field} must between 0 and 999,999.99`
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -680,4 +682,5 @@ module.exports = {
   confirmBeforeReload,
   navigateDirtyCheck,
   calculateAdjustAmount,
+  errMsgForOutOfRange,
 }

@@ -24,6 +24,7 @@ const Stock = ({
   medicationDetail,
   consumableDetail,
   values,
+  setFieldValue,
 }) => {
   const objectType = () => {
     if (vaccinationDetail) return 'vaccinationStock'
@@ -95,6 +96,11 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.reorderThreshold',
                   })}
+                  onChange={(e) =>
+                    setFieldValue(
+                      'reOrderThreshold',
+                      e.target.value.toFixed(2),
+                    )}
                   {...args}
                 />
               )
@@ -110,6 +116,11 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.criticalThreshold',
                   })}
+                  onChange={(e) =>
+                    setFieldValue(
+                      'criticalThreshold',
+                      e.target.value.toFixed(2),
+                    )}
                   {...args}
                 />
               )

@@ -1,10 +1,18 @@
 import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
-import { NavPills, ProgressButton, Button } from '@/components'
+import {
+  getAppendUrl,
+  errMsgForOutOfRange as errMsg,
+  navigateDirtyCheck,
+} from '@/utils/utils'
+import {
+  NavPills,
+  ProgressButton,
+  Button,
+  withFormikExtend,
+} from '@/components'
 import { compose } from 'redux'
-import { withFormik } from 'formik'
 import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
@@ -49,9 +57,8 @@ const Detail = ({
         />
         <Button
           color='danger'
-          onClick={() => {
-            history.push('/inventory/master?t=2')
-          }}
+          onClick={navigateDirtyCheck('/inventory/master')}
+          // history.push('/inventory/master?t=2')
         >
           Cancel
         </Button>
@@ -83,7 +90,11 @@ const Detail = ({
           {
             tabButton: 'Stock',
             tabContent: (
-              <Stock vaccinationDetail={vaccinationDetail} values={values} />
+              <Stock
+                vaccinationDetail={vaccinationDetail}
+                values={values}
+                setFieldValue={setFieldValue}
+              />
             ),
           },
         ]}
@@ -97,15 +108,46 @@ export default compose(
     vaccination,
     vaccinationDetail,
   })),
-  withFormik({
+  withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ vaccinationDetail }) => {
       return vaccinationDetail.entity
         ? vaccinationDetail.entity
         : vaccinationDetail.default
     },
+
+    validationSchema: Yup.object().shape({
+      code: Yup.string().required(),
+      displayValue: Yup.string().required(),
+      revenueCategoryFK: Yup.number().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+      prescribingUOMFK: Yup.number().required(),
+      dispensingUOMFK: Yup.number().required(),
+      averageCostPrice: Yup.number()
+        .min(0, 'Average Cost Price must between 0 and 999,999.9999')
+        .max(999999.9999, 'Average Cost Price must between 0 and 999,999.9999'),
+
+      markupMargin: Yup.number()
+        .min(0, 'Markup Margin must between 0 and 999,999.9')
+        .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
+
+      sellingPrice: Yup.number()
+        .min(0, errMsg('Selling Price'))
+        .max(999999.99, errMsg('Selling Price')),
+
+      maxDiscount: Yup.number()
+        .min(0, 'Max Discount must between 0 and 999,999.9')
+        .max(999999.9, 'Max Discount must between 0 and 999,999.9'),
+
+      reOrderThreshold: Yup.number()
+        .min(0, errMsg('Re-Order Threshold'))
+        .max(999999.99, errMsg('Re-Order Threshold')),
+
+      criticalThreshold: Yup.number()
+        .min(0, errMsg('Critical Threshold'))
+        .max(999999.99, errMsg('Critical Threshold')),
+    }),
     handleSubmit: (values, { props }) => {
-      console.log('clicked')
       const { dispatch, history } = props
       dispatch({
         type: 'vaccinationDetail/upsert',
@@ -120,32 +162,6 @@ export default compose(
         }
       })
     },
-    validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
-      displayValue: Yup.string().required(),
-      revenueCategoryFK: Yup.number().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-      prescribingUOMFK: Yup.number().required(),
-      dispensingUOMFK: Yup.number().required(),
-      averageCostPrice: Yup.number().positive(
-        'Average Cost Price must between 0 to 999,999.99',
-      ),
-      markupMargin: Yup.number().positive(
-        'Markup Margin must between 0 to 999,999.99',
-      ),
-      sellingPriceBefDiscount: Yup.number().positive(
-        'Selling Price must between 0 to 999,999.99',
-      ),
-      maxDiscount: Yup.number().positive(
-        'Max Discount must between 0 to 999,999.99',
-      ),
-      reOrderThreshold: Yup.number().positive(
-        'Re-Order Threshold must between 0 to 999,999.99',
-      ),
-      criticalThreshold: Yup.number().positive(
-        'Critical Threshold must between 0 to 999,999.99',
-      ),
-    }),
     displayName: 'InventoryVaccinationDetail',
   }),
 )(Detail)

@@ -12,14 +12,7 @@ class Grid extends PureComponent {
     const { dispatch, settingMedicationUOM } = this.props
 
     const { list } = settingMedicationUOM
-    // For complex object retrieve from server
-    // dispatch({
-    //   type: 'settingMedicationUOM/queryOne',
-    //   payload: {
-    //     id: row.id,
-    //   },
-    // }).then(toggleModal)
-    // console.log(settingMedicationUOM, row.id, e)
+
     dispatch({
       type: 'settingMedicationUOM/updateState',
       payload: {
@@ -40,6 +33,7 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'description', title: 'Description' },
+          { name: 'sortOrder', title: 'Sort Order' },
           { name: 'isActive', title: 'Status' },
           {
             name: 'action',

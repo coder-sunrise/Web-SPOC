@@ -18,7 +18,9 @@ import {
   DateRangePicker,
   Button,
   CommonModal,
+  Field,
 } from '@/components'
+import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
@@ -30,6 +32,18 @@ const Detail = ({
   ...props
 }) => {
   const field = medicationDetail.entity ? 'entity' : 'default'
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+  const checkHasActiveSession = async () => {
+    const result = await getActiveSession()
+    const { data } = result.data
+    // let data = []
+    if (!data || data.length === 0) {
+      setHasActiveSession(!hasActiveSession)
+    }
+  }
 
   useEffect(() => {
     if (medicationDetail.currentId) {
@@ -54,6 +68,7 @@ const Detail = ({
           })
         }
       })
+      checkHasActiveSession()
     }
   }, [])
 
@@ -81,7 +96,7 @@ const Detail = ({
       },
     })
   }
-
+  // console.log('checking', props)
   return (
     <CardContainer
       hideHeader
@@ -94,7 +109,7 @@ const Detail = ({
         <GridItem xs={12} md={5}>
           <GridContainer>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name='code'
                 render={(args) => {
                   return (
@@ -103,6 +118,7 @@ const Detail = ({
                         id: 'inventory.master.medication.code',
                       })}
                       {...args}
+                      disabled={!props.values.isActive}
                     />
                   )
                 }}
@@ -205,17 +221,17 @@ const Detail = ({
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name='effectiveDates'
-                render={(args) => {
-                  return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
-                  )
-                }}
+                render={(args) => (
+                  <DateRangePicker
+                    format='DD MMM YYYY'
+                    label='Effective Start Date'
+                    label2='End Date'
+                    disabled={!!(medicationDetail.entity && hasActiveSession)}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
           </GridContainer>
@@ -283,8 +299,7 @@ const Detail = ({
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ medicationDetail, sddDetail }) => ({
-    medicationDetail,
-    sddDetail,
-  })),
+  // connect(({ sddDetail }) => ({
+  //   sddDetail,
+  // })),
 )(Detail)

@@ -86,7 +86,7 @@ class ClinicInfo extends PureComponent {
       values,
       ...restProps
     } = this.props
-    console.log('ads', this.props)
+    // console.log('ads', this.props)
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -102,6 +102,7 @@ class ClinicInfo extends PureComponent {
               render={(args) => (
                 <TextField label='Clinic ID (HCI Code)' disabled {...args} />
               )}
+              disabled
             />
           </GridItem>
           <GridItem md={3}>
@@ -110,6 +111,7 @@ class ClinicInfo extends PureComponent {
               render={(args) => (
                 <TextField label='Hospital Code' disabled {...args} />
               )}
+              disabled
             />
           </GridItem>
         </GridContainer>
@@ -126,7 +128,11 @@ class ClinicInfo extends PureComponent {
             <FastField
               name='primaryMCRNO'
               render={(args) => (
-                <TextField label='Primary Clinician MCR Number' {...args} />
+                <TextField
+                  label='Primary Clinician MCR Number'
+                  disabled
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -138,8 +144,8 @@ class ClinicInfo extends PureComponent {
             marginTop: theme.spacing(3),
           }}
         >
-          <h5>Address</h5>
-          <Divider />
+          {/* <h5>Address</h5>
+          <Divider /> */}
         </div>
         <GridContainer>
           <GridItem xs={12}>
@@ -172,7 +178,7 @@ class ClinicInfo extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={12}>
+          {/* <GridItem xs={12}>
             <Button
               link
               href=''
@@ -184,7 +190,7 @@ class ClinicInfo extends PureComponent {
               <Add />
               Add Address
             </Button>
-          </GridItem>
+          </GridItem> */}
         </GridContainer>
         {/* <Address propName='address' {...this.props} /> */}
         <div className={classes.actionBtn}>
@@ -197,7 +203,7 @@ class ClinicInfo extends PureComponent {
             Cancel
           </Button>
 
-          <Button color='danger' onClick={handleSubmit}>
+          <Button color='primary' onClick={handleSubmit}>
             Save
           </Button>
         </div>

@@ -9,6 +9,7 @@ import {
   GridContainer,
   GridItem,
   NumberInput,
+  Field,
 } from '@/components'
 
 const styles = () => ({})
@@ -19,11 +20,12 @@ const Pricing = ({
   medicationDetail,
   vaccinationDetail,
   consumableDetail,
+  setValues,
 }) => {
   const [
     acp,
     setAcp,
-  ] = useState()
+  ] = useState(0.0)
   const [
     markupMargin,
     setMarkupMargin,
@@ -31,20 +33,20 @@ const Pricing = ({
 
   const calculate = () => {
     const suggestedSellingPrice =
-      parseFloat(acp) + parseFloat(acp) * parseFloat(markupMargin)
+      parseFloat(acp) * (1 + parseFloat(markupMargin) / 100)
     setFieldValue('suggestSellingPrice', suggestedSellingPrice)
   }
 
   useEffect(() => {
     if (medicationDetail) {
-      return setFieldValue('averageCostPrice', 0)
+      return setFieldValue('averageCostPrice', 0.0)
     }
     if (vaccinationDetail) {
-      return setFieldValue('averageCostPrice', 0)
+      return setFieldValue('averageCostPrice', 0.0)
     }
 
     if (consumableDetail) {
-      return setFieldValue('averageCostPrice', 0)
+      return setFieldValue('averageCostPrice', 0.0)
     }
     return undefined
   }, [])
@@ -68,6 +70,13 @@ const Pricing = ({
       if (acp && markupMargin) {
         calculate()
       }
+      // console.log('values', acp, markupMargin)
+      // setValues({
+      //   averageCostPrice: acp,
+      //   markupMargin: markupMargin,
+      // })
+      setFieldValue('averageCostPrice', acp)
+      setFieldValue('markupMargin', markupMargin)
     },
     [
       acp,
@@ -86,7 +95,7 @@ const Pricing = ({
         <GridItem xs={12} md={5}>
           <GridContainer>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name='lastCostPriceBefBonus'
                 render={(args) => {
                   return (
@@ -103,7 +112,7 @@ const Pricing = ({
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name='lastCostPriceAftBonus'
                 render={(args) => {
                   return (
@@ -122,18 +131,22 @@ const Pricing = ({
             <GridItem xs={12}>
               <FastField
                 name='averageCostPrice'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      currency
-                      label={formatMessage({
-                        id: 'inventory.master.pricing.averageCostPrice',
-                      })}
-                      onBlur={(e) => setAcp(e.target.value)}
-                      {...args}
-                    />
-                  )
-                }}
+                render={(args) => (
+                  <NumberInput
+                    prefix='$'
+                    label={formatMessage({
+                      id: 'inventory.master.pricing.averageCostPrice',
+                    })}
+                    onChange={(e) => {
+                      setAcp(e.target.value)
+                      setFieldValue(
+                        'averageCostPrice',
+                        e.target.value.toFixed(4),
+                      )
+                    }}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
           </GridContainer>
@@ -149,7 +162,10 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.profitMarginPercentage',
                     })}
-                    onBlur={(e) => setMarkupMargin(e.target.value)}
+                    onChange={(e) => {
+                      setMarkupMargin(e.target.value)
+                      setFieldValue('markupMargin', e.target.value.toFixed(1))
+                    }}
                     {...args}
                   />
                 )}
@@ -192,6 +208,8 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.maxDiscount',
                     })}
+                    onChange={(e) =>
+                      setFieldValue('maxDiscount', e.target.value.toFixed(1))}
                     {...args}
                   />
                 )}

@@ -6,6 +6,7 @@ import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button } from '@/components'
 import { status } from '@/utils/codes'
 import * as service from './services'
+import { Tooltip } from '@material-ui/core'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -22,27 +23,27 @@ class Grid extends PureComponent {
     })
   }
 
-  getCoPayer = (data) => {
-    return data.filter((eachRow) => eachRow.companyTypeFK === 1)
-  }
+  // getCoPayer = (data) => {
+  //   return data.filter((eachRow) => eachRow.companyTypeFK === 1)
+  // }
 
-  getSupplier = (data) => {
-    return data.filter((eachRow) => eachRow.companyTypeFK === 2)
-  }
+  // getSupplier = (data) => {
+  //   return data.filter((eachRow) => eachRow.companyTypeFK === 2)
+  // }
 
   render () {
     const { dispatch, classes, settingCompany, toggleModal, route } = this.props
     const { name } = route
-    const { list } = settingCompany
-
-    const data =
-      name === 'copayer' ? this.getCoPayer(list) : this.getSupplier(list)
+    const { list, companyType } = settingCompany
+    console.log('props', this.props)
+    // const data =
+    //   name === 'copayer' ? this.getCoPayer(list) : this.getSupplier(list)
 
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingCompany'
-        rows={data}
+        // rows={data}
         onRowDoubleClick={this.editRow}
         columns={
           name === 'copayer' ? (
@@ -175,16 +176,23 @@ class Grid extends PureComponent {
             align: 'center',
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
+                <Tooltip
+                  title={
+                    companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
+                  }
+                  placement='bottom'
                 >
-                  <Edit />
-                </Button>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },

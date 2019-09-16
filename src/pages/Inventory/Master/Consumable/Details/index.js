@@ -1,7 +1,11 @@
 import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
+import {
+  getAppendUrl,
+  errMsgForOutOfRange as errMsg,
+  navigateDirtyCheck,
+} from '@/utils/utils'
 import {
   NavPills,
   ProgressButton,
@@ -32,6 +36,7 @@ const Detail = ({
   history,
   handleSubmit,
   setFieldValue,
+  setValues,
   values,
 }) => {
   const { currentTab } = consumable
@@ -40,6 +45,8 @@ const Detail = ({
     consumableDetail,
     dispatch,
     setFieldValue,
+    setValues,
+    values,
   }
   return (
     <React.Fragment>
@@ -50,9 +57,9 @@ const Detail = ({
         />
         <Button
           color='danger'
-          onClick={() => {
-            history.push('/inventory/master?t=1')
-          }}
+          onClick={navigateDirtyCheck('/inventory/master')
+          // history.push('/inventory/master?t=1')
+          }
         >
           Cancel
         </Button>
@@ -70,7 +77,7 @@ const Detail = ({
         contentStyle={{ margin: '0 -5px' }}
         tabs={[
           {
-            tabButton: 'Detail',
+            tabButton: 'General',
             tabContent: <DetailPanel {...detailProps} />,
           },
           {
@@ -80,7 +87,11 @@ const Detail = ({
           {
             tabButton: 'Stock',
             tabContent: (
-              <Stock consumableDetail={consumableDetail} values={values} />
+              <Stock
+                consumableDetail={consumableDetail}
+                values={values}
+                setFieldValue={setFieldValue}
+              />
             ),
           },
         ]}
@@ -88,7 +99,7 @@ const Detail = ({
     </React.Fragment>
   )
 }
-const errMsg = (field) => `${field} must between 0 to 999,999.99`
+// const errMsg = (field) => `${field} must between 0 to 999,999.99`
 export default compose(
   withStyles(styles, { withTheme: true }),
   connect(({ consumable, consumableDetail }) => ({
@@ -98,6 +109,7 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ consumableDetail }) => {
+      // console.log('consumableDetail', consumableDetail)
       return consumableDetail.entity
         ? consumableDetail.entity
         : consumableDetail.default
@@ -108,28 +120,34 @@ export default compose(
       revenueCategoryFK: Yup.string().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       uomfk: Yup.number().required(),
-      averageCostPrice: Yup.number().positive(
-        'Average Cost Price must between 0 to 999,999.99',
-      ),
-      markupMargin: Yup.number().positive(
-        'Markup Margin must between 0 to 999,999.99',
-      ),
-      sellingPriceBefDiscount: Yup.number().positive(
-        'Selling Price must between 0 to 999,999.99',
-      ),
-      maxDiscount: Yup.number().positive(
-        'Max Discount must between 0 to 999,999.99',
-      ),
-      reOrderThreshold: Yup.number().positive(
-        'Re-Order Threshold must between 0 to 999,999.99',
-      ),
+      averageCostPrice: Yup.number()
+        .min(0, 'Average Cost Price must between 0 and 999,999.9999')
+        .max(999999.9999, 'Average Cost Price must between 0 and 999,999.9999'),
+
+      markupMargin: Yup.number()
+        .min(0, 'Markup Margin must between 0 and 999,999.9')
+        .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
+
+      sellingPrice: Yup.number()
+        .min(0, errMsg('Selling Price'))
+        .max(999999.99, errMsg('Selling Price')),
+
+      maxDiscount: Yup.number()
+        .min(0, 'Max Discount must between 0 and 999,999.9')
+        .max(999999.9, 'Max Discount must between 0 and 999,999.9'),
+
+      reOrderThreshold: Yup.number()
+        .min(0, errMsg('Re-Order Threshold'))
+        .max(999999.99, errMsg('Re-Order Threshold')),
+
       criticalThreshold: Yup.number()
-        .positive(errMsg('Critical Threshold'))
-        .max(999999.99, errMsg('Critical Threshold')),
+        .min(0, 'Critical Threshold must between 0 and 999,999.9')
+        .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
     }),
 
     handleSubmit: (values, { props }) => {
       const { dispatch, history } = props
+      // console.log('props', props)
       dispatch({
         type: 'consumableDetail/upsert',
         payload: {

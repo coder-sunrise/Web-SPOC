@@ -180,13 +180,16 @@ const InventoryTypeListing = ({
           subTotal: total(),
         }))
       }
-      return addedRows.map((row) => ({
-        ...row,
-        unitPrice: selectedItem.sellingPrice
-          ? selectedItem.sellingPrice
-          : selectedItem.unitPrice,
-        subTotal: total(),
-      }))
+
+      if (selectedItem) {
+        return addedRows.map((row) => ({
+          ...row,
+          unitPrice: selectedItem.sellingPrice
+            ? selectedItem.sellingPrice
+            : selectedItem.unitPrice,
+          subTotal: total(),
+        }))
+      }
     }
     console.log('addedRows', addedRows)
     return addedRows

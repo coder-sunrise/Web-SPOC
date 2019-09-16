@@ -144,7 +144,11 @@ class Filter extends PureComponent {
                 transition
                 disablePortal
                 placement='bottom-end'
-                style={{ zIndex: 1 }}
+                style={{
+                  zIndex: 1,
+                  width: 185,
+                  left: -63,
+                }}
               >
                 {({ TransitionProps, placement }) => (
                   <Grow
