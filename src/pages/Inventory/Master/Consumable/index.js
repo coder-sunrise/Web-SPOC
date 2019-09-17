@@ -54,7 +54,12 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
       type: 'select',
       options: status,
     },
-    { columnName: 'averageCostPrice', type: 'number', currency: true },
+    {
+      columnName: 'averageCostPrice',
+      type: 'number',
+      currency: true,
+      format: '0.0000',
+    },
     { columnName: 'sellingPrice', type: 'number', currency: true },
   ])
 

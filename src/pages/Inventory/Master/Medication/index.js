@@ -55,7 +55,12 @@ const Medication = ({ dispatch, history, medication, values }) => {
       type: 'select',
       options: status,
     },
-    { columnName: 'averageCostPrice', type: 'number', currency: true },
+    {
+      columnName: 'averageCostPrice',
+      type: 'number',
+      currency: true,
+      format: '0.0000',
+    },
     { columnName: 'sellingPrice', type: 'number', currency: true },
   ])
 
@@ -70,7 +75,16 @@ const Medication = ({ dispatch, history, medication, values }) => {
     medication,
     namespace: 'medication',
     list: medication.list || [],
-
+    columnWidths: [
+      {
+        columnName: 'dispensingUOM',
+        width: 20,
+      },
+      {
+        columnName: 'stock',
+        width: 'auto',
+      },
+    ],
     tableParas,
     colExtensions,
   }

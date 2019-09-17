@@ -57,8 +57,7 @@ const Detail = ({
         />
         <Button
           color='danger'
-          onClick={navigateDirtyCheck('/inventory/master')}
-          // history.push('/inventory/master?t=2')
+          onClick={navigateDirtyCheck('/inventory/master?t=2')}
         >
           Cancel
         </Button>

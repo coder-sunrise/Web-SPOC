@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
-// import { withFormik } from 'formik'
+import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import DetailPanel from './Detail'
 // import Pricing from '../../DetaPricing'
 // import Stock from '../../Details/Stock'
@@ -70,29 +69,32 @@ const Detail = ({
     setPrice,
   ] = useState(() => undefined)
 
-  useEffect(async () => {
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-      },
-    }).then((list) => {
-      const { services, serviceCenters, serviceCenterServices } = getServices(
-        list,
-      )
+  useEffect(() => {
+    const fetchCodes = async () => {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+        },
+      }).then((list) => {
+        const { services, serviceCenters, serviceCenterServices } = getServices(
+          list,
+        )
 
-      setServicess(services)
-      setServiceCenterss(serviceCenters)
-      setServiceCenterServicess(serviceCenterServices)
-    })
+        setServicess(services)
+        setServiceCenterss(serviceCenters)
+        setServiceCenterServicess(serviceCenterServices)
+      })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+      dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+    }
+    fetchCodes()
   }, [])
 
   const handleItemOnChange = (e) => {
@@ -349,9 +351,7 @@ const Detail = ({
         <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
         <Button
           color='danger'
-          onClick={() => {
-            history.push('/inventory/master?t=3')
-          }}
+          onClick={navigateDirtyCheck('/inventory/master?t=3')}
         >
           Cancel
         </Button>
@@ -412,6 +412,13 @@ export default compose(
     mapPropsToValues: ({ packDetail }) => {
       return packDetail.entity ? packDetail.entity : packDetail.default
     },
+
+    validationSchema: Yup.object().shape({
+      code: Yup.string().required(),
+      displayValue: Yup.string().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    }),
+
     handleSubmit: (values, { props }) => {
       const { dispatch, history } = props
       dispatch({
@@ -427,11 +434,7 @@ export default compose(
         }
       })
     },
-    validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
-      displayValue: Yup.string().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    }),
+
     displayName: 'InventoryPackageDetail',
   }),
 )(Detail)
