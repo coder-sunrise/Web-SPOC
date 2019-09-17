@@ -702,6 +702,7 @@ const tenantCodes = [
   'inventoryvaccination',
   'inventorypackage',
   'role',
+  'ctsupplier'
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {

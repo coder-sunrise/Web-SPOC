@@ -90,9 +90,13 @@ export class DeliveryOrderDetails extends PureComponent {
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list, x.itemFKName, x.stateName)
+        const { inventoryItemList } = getInventoryItemList(
+          list,
+          x.itemFKName,
+          x.stateName,
+        )
         this.setState({
-          [x.stateName]: inventoryItemList
+          [x.stateName]: inventoryItemList,
         })
       })
     })
@@ -106,8 +110,7 @@ export class DeliveryOrderDetails extends PureComponent {
     })
   }
 
-
-  componentDidMount() {
+  componentDidMount () {
     this.initializeStateItemList()
   }
 
@@ -118,10 +121,15 @@ export class DeliveryOrderDetails extends PureComponent {
     const { value, itemFKName, stateName } = option
     const originItemList = this.state[stateName]
 
-    const { inventoryItemList } = getInventoryItem(originItemList, value, itemFKName, rows)
+    const { inventoryItemList } = getInventoryItem(
+      originItemList,
+      value,
+      itemFKName,
+      rows,
+    )
 
     this.setState({
-      [`filter${stateName}`]: inventoryItemList
+      [`filter${stateName}`]: inventoryItemList,
     })
 
     this.forceUpdate()
@@ -251,17 +259,23 @@ export class DeliveryOrderDetails extends PureComponent {
 
   rowOptions = (row) => {
     if (row.type === 1) {
-      return row.uid ? this.state.MedicationItemList : this.state.filterMedicationItemList
+      return row.uid
+        ? this.state.MedicationItemList
+        : this.state.filterMedicationItemList
     } else if (row.type === 2) {
-      return row.uid ? this.state.VaccinationItemList : this.state.filterVaccinationItemList
+      return row.uid
+        ? this.state.VaccinationItemList
+        : this.state.filterVaccinationItemList
     } else if (row.type === 3) {
-      return row.uid ? this.state.ConsumableItemList : this.state.filterConsumableItemList
+      return row.uid
+        ? this.state.ConsumableItemList
+        : this.state.filterConsumableItemList
     } else {
       return []
     }
   }
 
-  render() {
+  render () {
     const isEditable = true
     const { props } = this
     const { footer, deliveryOrderDetails, values } = props
@@ -378,6 +392,7 @@ export class DeliveryOrderDetails extends PureComponent {
           format: 'DD MMM YYYY',
         },
       ],
+      onRowDoubleClick: undefined,
     }
 
     return (

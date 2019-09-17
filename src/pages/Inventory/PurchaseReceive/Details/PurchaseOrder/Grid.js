@@ -30,7 +30,7 @@ const receivingDetailsSchema = Yup.object().shape({
 })
 
 class Grid extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       onClickColumn: undefined,
@@ -56,9 +56,13 @@ class Grid extends Component {
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list, x.itemFKName, x.stateName)
+        const { inventoryItemList } = getInventoryItemList(
+          list,
+          x.itemFKName,
+          x.stateName,
+        )
         this.setState({
-          [x.stateName]: inventoryItemList
+          [x.stateName]: inventoryItemList,
         })
       })
     })
@@ -72,7 +76,7 @@ class Grid extends Component {
     })
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.initializeStateItemList()
   }
 
@@ -82,10 +86,15 @@ class Grid extends Component {
     const { value, itemFKName, stateName } = option
     const originItemList = this.state[stateName]
 
-    const { inventoryItemList } = getInventoryItem(originItemList, value, itemFKName, rows)
+    const { inventoryItemList } = getInventoryItem(
+      originItemList,
+      value,
+      itemFKName,
+      rows,
+    )
 
     this.setState({
-      [`filter${stateName}`]: inventoryItemList
+      [`filter${stateName}`]: inventoryItemList,
     })
 
     dispatch({
@@ -228,17 +237,23 @@ class Grid extends Component {
 
   rowOptions = (row) => {
     if (row.type === 1) {
-      return row.uid ? this.state.MedicationItemList : this.state.filterMedicationItemList
+      return row.uid
+        ? this.state.MedicationItemList
+        : this.state.filterMedicationItemList
     } else if (row.type === 2) {
-      return row.uid ? this.state.VaccinationItemList : this.state.filterVaccinationItemList
+      return row.uid
+        ? this.state.VaccinationItemList
+        : this.state.filterVaccinationItemList
     } else if (row.type === 3) {
-      return row.uid ? this.state.ConsumableItemList : this.state.filterConsumableItemList
+      return row.uid
+        ? this.state.ConsumableItemList
+        : this.state.filterConsumableItemList
     } else {
       return []
     }
   }
 
-  render() {
+  render () {
     // const { purchaseOrderItems } = this.props
     const { rows, dispatch, isEditable } = this.props
     const { selectedItem, selectedCode, selectedName } = this.state
@@ -343,6 +358,7 @@ class Grid extends Component {
           disabled: true,
         },
       ],
+      onRowDoubleClick: undefined,
     }
 
     return (
@@ -353,12 +369,12 @@ class Grid extends Component {
             rows={rows}
             schema={receivingDetailsSchema}
             FuncProps={{
-              //edit: isEditable,
+              edit: isEditable,
               pager: false,
             }}
             EditingProps={{
               showAddCommand: isEditable,
-              showEditCommand: isEditable,
+              showEditCommand: false,
               showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,

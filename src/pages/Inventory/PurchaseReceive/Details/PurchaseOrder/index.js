@@ -246,7 +246,7 @@ class index extends PureComponent {
 
     return (
       <div>
-        <POForm isPOFinalized={this.isPOFinalized()} />
+        <POForm setFieldValue={setFieldValue} isPOFinalized={this.isPOFinalized()} />
         <Grid
           rows={rows}
           dispatch={dispatch}

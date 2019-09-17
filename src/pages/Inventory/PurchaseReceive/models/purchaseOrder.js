@@ -16,8 +16,8 @@ export default createListViewModel({
         purchaseOrder: {
           poNo: 'PO/000001',
           poDate: moment(),
-          status: 'Draft',
-          //status: 'Finalized',
+          //status: 'Draft',
+          status: 'Finalized',
           shippingAddress:
             '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
           gstEnabled: true,
