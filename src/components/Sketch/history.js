@@ -2,12 +2,14 @@
  * Maintains the history of an object
  */
 class History {
-  constructor(undoLimit = 10, debug = false) {
-    this.undoLimit = undoLimit;
-    this.undoList = [];
-    this.redoList = [];
-    this.current = null;
-    this.debug = debug;
+  constructor (undoLimit = 200, debug = false) {
+    this.undoLimit = undoLimit
+    this.undoList = []
+    this.redoList = []
+    this.allList = []
+    this.current = null
+    this.debug = debug
+    this.count = 1
   }
 
   /**
@@ -15,8 +17,8 @@ class History {
    *
    * @returns {number|*} the undo limit, as it is configured when constructing the history instance
    */
-  getUndoLimit() {
-    return this.undoLimit;
+  getUndoLimit () {
+    return this.undoLimit
   }
 
   /**
@@ -24,8 +26,20 @@ class History {
    *
    * @returns {null|*}
    */
-  getCurrent() {
-    return this.current;
+  getCurrent () {
+    return this.current
+  }
+
+  /*
+  Get all list
+*/
+
+  getAllList () {
+    return this.allList
+  }
+
+  getInitializeList (data) {
+    this.allList = data
   }
 
   /**
@@ -35,18 +49,58 @@ class History {
    *
    * @param obj
    */
-  keep(obj) {
+  keep (obj) {
     try {
-      this.redoList = [];
+      let [
+        mainObject,
+      ] = obj
+      // if (mainObject.id !== 'delete' && mainObject.id !== 'oldTemplate') {
+      //   console.log("not equal")
+      //   this.redoList = []
+      //   this.allList.push({
+      //     data: obj,
+      //     type: mainObject.type,
+      //     sequence: this.count,
+      //   })
+      //   this.count = this.count + 1
+      // } else
+      if (mainObject.id === 'delete' || mainObject.id === 'oldTemplate') {
+        for (let i = 0; i < this.allList.length; i++) {
+          let [
+            arrayobject,
+          ] = this.allList[i].data
+          if (arrayobject === mainObject) {
+            let temp = this.allList
+            this.allList = []
+            for (let a = 0; a < temp.length; a++) {
+              let [
+                tempArrayObject,
+              ] = temp[a].data
+              if (tempArrayObject !== mainObject) {
+                this.allList.push(temp[a])
+              }
+            }
+          }
+        }
+      } else {
+        this.redoList = []
+        this.allList.push({
+          data: obj,
+          type: mainObject.type,
+          sequence: this.count,
+        })
+        this.count = this.count + 1
+      }
+
       if (this.current) {
-        this.undoList.push(this.current);
+        this.undoList.push(this.current)
       }
       if (this.undoList.length > this.undoLimit) {
-        this.undoList.shift();
+        this.undoList.shift()
       }
-      this.current = obj;
+      this.current = obj
     } finally {
-      this.print();
+      this.print()
     }
   }
 
@@ -55,22 +109,34 @@ class History {
    *
    * @returns the new current value after the undo operation, else null if no undo operation was possible
    */
-  undo() {
+  undo () {
     try {
       if (this.current) {
-        this.redoList.push(this.current);
-        if (this.redoList.length > this.undoLimit) {
-          this.redoList.shift();
+        this.redoList.push(this.current)
+        for (let i = 0; i < this.allList.length; i++) {
+          if (this.allList[i].data === this.current) {
+            let temp = this.allList
+            this.allList = []
+            for (let a = 0; a < temp.length; a++) {
+              if (temp[a].data !== this.current) {
+                this.allList.push(temp[a])
+              }
+            }
+          }
         }
-        if (this.undoList.length === 0) this.current = null;
+        if (this.redoList.length > this.undoLimit) {
+          this.redoList.shift()
+        }
+        if (this.undoList.length === 0) this.current = null
       }
       if (this.undoList.length > 0) {
-        this.current = this.undoList.pop();
-        return this.current;
+        this.current = this.undoList.pop()
+        return this.current
       }
-      return null;
+
+      return null
     } finally {
-      this.print();
+      this.print()
     }
   }
 
@@ -79,16 +145,25 @@ class History {
    *
    * @returns the new current value after the redo operation, or null if no redo operation was possible
    */
-  redo() {
+  redo () {
     try {
       if (this.redoList.length > 0) {
-        if (this.current) this.undoList.push(this.current);
-        this.current = this.redoList.pop();
-        return this.current;
+        if (this.current) this.undoList.push(this.current)
+        this.current = this.redoList.pop()
+        let [
+          object,
+        ] = this.current
+        this.allList.push({
+          data: this.current,
+          type: object.type,
+          sequence: this.count,
+        })
+        this.count = this.count + 1
+        return this.current
       }
-      return null;
+      return null
     } finally {
-      this.print();
+      this.print()
     }
   }
 
@@ -97,8 +172,8 @@ class History {
    *
    * @returns {boolean}
    */
-  canRedo() {
-    return this.redoList.length > 0;
+  canRedo () {
+    return this.redoList.length > 0
   }
 
   /**
@@ -106,30 +181,28 @@ class History {
    *
    * @returns {boolean}
    */
-  canUndo() {
-    return this.undoList.length > 0 || this.current !== null;
+  canUndo () {
+    return this.undoList.length > 0 || this.current !== null
   }
 
   /**
    * Clears the history maintained, can be undone
    */
-  clear() {
-    this.undoList = [];
-    this.redoList = [];
-    this.current = null;
-    this.print();
+  clear () {
+    this.undoList = []
+    this.redoList = []
+    this.allList = []
+    this.current = null
+    this.count = 1
+    this.print()
   }
 
-  print() {
+  print () {
     if (this.debug) {
       /* eslint-disable no-console */
-      console.log(
-        this.undoList,
-        ' -> ' + this.current + ' <- ',
-        this.redoList.slice(0).reverse(),
-      );
+      console.log(this.undoList, this.current, this.redoList.slice(0).reverse())
     }
   }
 }
 
-export default History;
+export default History

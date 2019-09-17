@@ -12,11 +12,32 @@ import {
   CodeSelect,
 } from '@/components'
 
+const prefix = 'purchaseOrder'
+
 export class POForm extends PureComponent {
-  render() {
+  setSupplierDetails = (opts) => {
+    const { setFieldValue } = this.props
+    let conPerson
+    let faxNo
+    let officeNo
+
+    if (opts) {
+      const { code, contactPerson, contact } = opts
+      const { faxContactNumber, officeContactNumber } = contact
+      conPerson = contactPerson
+      faxNo = faxContactNumber.number
+      officeNo = officeContactNumber.number
+    }
+
+    setFieldValue(`${prefix}.contactPerson`, conPerson)
+    setFieldValue(`${prefix}.faxNo`, faxNo)
+    setFieldValue(`${prefix}.contactNo`, officeNo)
+  }
+
+  render () {
     const { isPOFinalized } = this.props
     const invoiceDateNoStatus = !isPOFinalized
-    const prefix = 'purchaseOrder'
+
     console.log('POForm', this)
     return (
       <div>
@@ -168,6 +189,12 @@ export class POForm extends PureComponent {
                           id: 'inventory.pr.supplier',
                         })}
                         code='ctSupplier'
+                        labelField='displayValue'
+                        onChange={(v, opts) => {
+                          //const { form } = args
+                          //const { setFieldValue } = form
+                          this.setSupplierDetails(opts)
+                        }}
                         //max={10}
                         {...args}
                       />

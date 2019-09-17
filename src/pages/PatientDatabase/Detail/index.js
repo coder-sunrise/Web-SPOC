@@ -7,7 +7,6 @@ import router from 'umi/router'
 
 // medisys-components
 import { PatientInfoSideBanner } from 'medisys-components'
-import Loading from '@/components/PageLoading/index'
 import {
   withStyles,
   MenuItem,
@@ -18,6 +17,7 @@ import {
 } from '@material-ui/core'
 import Error from '@material-ui/icons/Error'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
+import Loading from '@/components/PageLoading/index'
 import {
   withFormikExtend,
   NumberInput,
@@ -237,11 +237,14 @@ class PatientDetail extends PureComponent {
         },
       })
     }
+  }
 
+  componentDidMount () {
     if (
-      nextProps.patient.currentId &&
-      (this.props.patient.version !== nextProps.patient.version ||
-        !this.props.patient.entity)
+      this.props.patient.currentId &&
+      (!this.props.patient.entity ||
+        this.props.patient.entity.id !== this.props.patient.currentId) &&
+      !this.props.patient.version
     ) {
       this.props
         .dispatch({

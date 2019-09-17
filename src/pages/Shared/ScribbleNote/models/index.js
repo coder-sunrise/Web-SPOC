@@ -2,24 +2,26 @@ import { createFormViewModel } from 'medisys-model'
 // import * as service from '../services'
 
 export default createFormViewModel({
-  namespace: 'clinicalnotes',
+  namespace: 'scriblenotes',
   config: {
     queryOnLoad: false,
   },
   param: {
     service: {},
     state: {
-      // notes: {
-      //   notesScribbleArray: [{subject: "abc"}],
-      // },
-      // ChiefComplaints:{
-      //   chiefComplaintsScribbleArray: [],
-      // },
-      // Plan:{
-      //   planScribbleArray: [],
-      // },
+      entity: '',
+      selectedIndex: '',
+      notes: {
+        notesScribbleArray: [],
+      },
+      ChiefComplaints:{
+        chiefComplaintsScribbleArray: [],
+      },
+      Plan:{
+        planScribbleArray: [],
+      },
       default: {
-        clinicalNotes: 'Test notes',
+        scribleNotes: 'Test notes',
       },
     },
     subscriptions: ({ dispatch, history }) => {

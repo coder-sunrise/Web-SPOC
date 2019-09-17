@@ -10,6 +10,7 @@ import {
   CodeSelect,
   GridContainer,
   GridItem,
+  Select,
 } from '@/components'
 import {
   podoOrderType,
@@ -35,9 +36,9 @@ class Grid extends Component {
       onClickColumn: undefined,
       selectedItem: {},
 
-      consumableItemList: [],
-      medicationItemList: [],
-      vaccinationItemList: [],
+      ConsumableItemList: [],
+      MedicationItemList: [],
+      VaccinationItemList: [],
 
       filterConsumableItemList: [],
       filterMedicationItemList: [],
@@ -55,9 +56,23 @@ class Grid extends Component {
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list)
-        this.setState({ [x.stateName]: inventoryItemList })
+        const { inventoryItemList } = getInventoryItemList(
+          list,
+          x.itemFKName,
+          x.stateName,
+        )
+        this.setState({
+          [x.stateName]: inventoryItemList,
+        })
       })
+    })
+
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
     })
   }
 
@@ -66,8 +81,22 @@ class Grid extends Component {
   }
 
   handleOnOrderTypeChanged = async (e) => {
-    const { dispatch } = this.props
-    const { row } = e
+    const { dispatch, rows } = this.props
+    const { row, option } = e
+    const { value, itemFKName, stateName } = option
+    const originItemList = this.state[stateName]
+
+    const { inventoryItemList } = getInventoryItem(
+      originItemList,
+      value,
+      itemFKName,
+      rows,
+    )
+
+    this.setState({
+      [`filter${stateName}`]: inventoryItemList,
+    })
+
     dispatch({
       // force current edit row components to update
       type: 'global/updateState',
@@ -111,13 +140,13 @@ class Grid extends Component {
       onClickColumn: 'item',
     })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
 
     return { ...row }
   }
@@ -206,6 +235,24 @@ class Grid extends Component {
     return rows
   }
 
+  rowOptions = (row) => {
+    if (row.type === 1) {
+      return row.uid
+        ? this.state.MedicationItemList
+        : this.state.filterMedicationItemList
+    } else if (row.type === 2) {
+      return row.uid
+        ? this.state.VaccinationItemList
+        : this.state.filterVaccinationItemList
+    } else if (row.type === 3) {
+      return row.uid
+        ? this.state.ConsumableItemList
+        : this.state.filterConsumableItemList
+    } else {
+      return []
+    }
+  }
+
   render () {
     // const { purchaseOrderItems } = this.props
     const { rows, dispatch, isEditable } = this.props
@@ -242,15 +289,7 @@ class Grid extends Component {
           type: 'select',
           labelField: 'code',
           options: (row) => {
-            if (row.type === 1) {
-              return this.state.medicationItemList
-            } else if (row.type === 2) {
-              return this.state.vaccinationItemList
-            } else if (row.type === 3) {
-              return this.state.consumableItemList
-            } else {
-              return []
-            }
+            return this.rowOptions(row)
           },
           onChange: (e) => {
             if (e.option) {
@@ -263,15 +302,7 @@ class Grid extends Component {
           type: 'select',
           labelField: 'name',
           options: (row) => {
-            if (row.type === 1) {
-              return this.state.medicationItemList
-            } else if (row.type === 2) {
-              return this.state.vaccinationItemList
-            } else if (row.type === 3) {
-              return this.state.consumableItemList
-            } else {
-              return []
-            }
+            return this.rowOptions(row)
           },
           onChange: (e) => {
             if (e.option) {
@@ -286,11 +317,11 @@ class Grid extends Component {
           disabled: true,
           options: (row) => {
             if (row.type === 1) {
-              return this.state.medicationItemList
+              return this.state.MedicationItemList
             } else if (row.type === 2) {
-              return this.state.vaccinationItemList
+              return this.state.VaccinationItemList
             } else if (row.type === 3) {
-              return this.state.consumableItemList
+              return this.state.ConsumableItemList
             } else {
               return []
             }
@@ -327,6 +358,7 @@ class Grid extends Component {
           disabled: true,
         },
       ],
+      onRowDoubleClick: undefined,
     }
 
     return (
@@ -337,12 +369,12 @@ class Grid extends Component {
             rows={rows}
             schema={receivingDetailsSchema}
             FuncProps={{
-              //edit: isEditable,
+              edit: isEditable,
               pager: false,
             }}
             EditingProps={{
               showAddCommand: isEditable,
-              showEditCommand: isEditable,
+              showEditCommand: false,
               showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,
