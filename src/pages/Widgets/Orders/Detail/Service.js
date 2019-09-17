@@ -31,10 +31,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, editType }) => {
+  mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultService),
-      editType,
+      type,
     }
     return v
   },

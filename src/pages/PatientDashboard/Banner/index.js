@@ -126,7 +126,7 @@ class Banner extends PureComponent {
         zIndex: 1000,
         paddingLeft: 16,
         paddingRight: 16,
-        maxHeight: 100,
+        // maxHeight: 100,
       },
     } = props
     if (!patientDashboard) return <Skeleton variant='rect' height={100} />

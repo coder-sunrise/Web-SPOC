@@ -32,10 +32,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, editType, ...resetProps }) => {
+  mapPropsToValues: ({ orders = {}, type, ...resetProps }) => {
     const v = {
       ...(orders.entity || orders.defaultMedication),
-      editType,
+      type,
     }
     return v
   },
@@ -45,12 +45,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
     quantity: Yup.number().required(),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
-    editType: Yup.string(),
-    stockDrugFK: Yup.string().when('editType', {
+    type: Yup.string(),
+    stockDrugFK: Yup.string().when('type', {
       is: true,
       then: Yup.string().required(),
     }),
-    drugName: Yup.string().when('editType', {
+    drugName: Yup.string().when('type', {
       is: (val) => val === '5',
       then: Yup.string().required(),
     }),

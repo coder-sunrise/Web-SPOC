@@ -119,7 +119,7 @@ const saveConsultation = ({
         values.corOrderAdjustment = finalAdjustments
         orderTypes.forEach((p) => {
           values[p.prop] = (values[p.prop] || [])
-            .concat(orderRows.filter((o) => o.editType === p.value))
+            .concat(orderRows.filter((o) => o.type === p.value))
         })
         dispatch({
           type: `consultation/${action}`,
@@ -945,9 +945,15 @@ class Consultation extends PureComponent {
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
-          style={{ maxHeight: 100 }}
+          style={{}}
           extraCmt={
-            <div style={{ textAlign: 'center', paddingTop: 16 }}>
+            <div
+              style={{
+                textAlign: 'center',
+                paddingTop: theme.spacing(1),
+                paddingBottom: theme.spacing(1),
+              }}
+            >
               <h4 style={{ position: 'relative' }}>
                 Total Invoice
                 {/* <Dropdown

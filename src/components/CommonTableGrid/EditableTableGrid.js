@@ -65,7 +65,7 @@ class EditableTableGrid extends PureComponent {
     const { onEditingRowIdsChange } = EditingProps
 
     let newIds = ids
-    console.log(ids)
+    // console.log(ids, window.$tempGridRow)
     if (onEditingRowIdsChange) {
       newIds = onEditingRowIdsChange(ids)
     }
@@ -230,7 +230,7 @@ class EditableTableGrid extends PureComponent {
     //   //   },
     //   // )
     // }
-    console.log({ newRows, t: window.$tempGridRow })
+    // console.log({ newRows, t: window.$tempGridRow })
     onCommitChanges({
       rows: newRows,
       added,

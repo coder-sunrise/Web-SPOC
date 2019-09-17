@@ -1,11 +1,11 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import {  Tooltip } from '@material-ui/core'
-import { CommonTableGrid, Button, CommonModal,Popconfirm ,skeleton} from '@/components'
-import {consultationDocumentTypes} from '@/utils/codes'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import {consultationDocumentTypes} from '@/utils/codes'
+import { CommonTableGrid, Button, CommonModal,Popconfirm ,skeleton} from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 import model from './models'
 
@@ -46,7 +46,7 @@ class ConsultationDocument extends PureComponent {
       type: 'consultationDocument/updateState',
       payload: {
         entity: row,
-        editType:row.type,
+        type:row.type,
       },
     })
     this.toggleModal()
@@ -54,9 +54,10 @@ class ConsultationDocument extends PureComponent {
 
   render () {
     const { consultationDocument,dispatch} = this.props
-
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
+// console.log(consultationDocumentTypes,rows)
+
     return (
       <div>
         <CommonTableGrid

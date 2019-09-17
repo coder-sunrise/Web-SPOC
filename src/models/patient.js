@@ -64,7 +64,7 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               currentComponent: query.cmt,
-              currentId: query.pid,
+              currentId: Number(query.pid) || 0,
             },
           })
           // if (query.pid) {
@@ -109,7 +109,6 @@ export default createFormViewModel({
             'cmt',
             'pid',
             'new',
-            'v',
           ]),
         )
         // yield put({
@@ -163,6 +162,9 @@ export default createFormViewModel({
               ps.validFrom,
               ps.validTo,
             ]
+          if (ps.coPaymentSchemeFK === null) {
+            ps.coPaymentSchemeFK = undefined
+          }
         })
         return {
           ...st,

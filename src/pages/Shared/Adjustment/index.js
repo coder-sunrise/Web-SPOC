@@ -41,7 +41,7 @@ const styles = (theme) => ({})
   mapPropsToValues: ({ global }) => {
     const { defaultValues = {} } = global.openAdjustmentConfig || {}
     // const { openAdjustmentValue } = global
-    console.log(defaultValues)
+    // console.log(defaultValues)
     if (defaultValues) {
       defaultValues.isExactAmount = defaultValues.adjType !== 'Percentage'
       defaultValues.isMinus = !(defaultValues.adjValue > 0)

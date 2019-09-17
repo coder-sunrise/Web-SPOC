@@ -199,7 +199,7 @@ class PatientHistory extends Component {
         id: '5',
         name: 'Consultation Document',
         component: Loadable({
-          loader: () => import('../ConsultationDocument'),
+          loader: () => import('./ConsultationDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...props} {...p} />
@@ -207,18 +207,18 @@ class PatientHistory extends Component {
           loading: Loading,
         }),
       },
-      {
-        id: '6',
-        name: 'Result History',
-        component: Loadable({
-          loader: () => import('./ResultHistory'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
+      // {
+      //   id: '6',
+      //   name: 'Result History',
+      //   component: Loadable({
+      //     loader: () => import('./ResultHistory'),
+      //     render: (loaded, p) => {
+      //       let Cmpnet = loaded.default
+      //       return <Cmpnet {...props} {...p} />
+      //     },
+      //     loading: Loading,
+      //   }),
+      // },
       {
         id: '7',
         name: 'Invoice',
@@ -259,6 +259,12 @@ class PatientHistory extends Component {
     }
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'patientHistory/reset',
+    })
+  }
+
   // componentDidMount () {
 
   // }
@@ -279,7 +285,7 @@ class PatientHistory extends Component {
           </GridItem>
           <GridItem sm={5}>
             <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-              <DatePicker text value={moment(row.visitDate)} />
+              <DatePicker text value={row.visitDate} />
             </span>
             <div className={this.props.classes.note}>&nbsp;</div>
           </GridItem>
@@ -289,6 +295,7 @@ class PatientHistory extends Component {
   }
 
   getContent = (row) => {
+    const { selectedSubRow } = this.props
     return (
       <List
         component='nav'
@@ -304,6 +311,7 @@ class PatientHistory extends Component {
               classes={{
                 root: this.props.classes.listItemRoot,
               }}
+              selected={selectedSubRow && o.id === selectedSubRow.id}
               divider
               disableGutters
               button
@@ -319,14 +327,15 @@ class PatientHistory extends Component {
                         type: 'patientHistory/updateState',
                         payload: {
                           selected: row,
+                          selectedSubRow: o,
                         },
                       })
-                      this.props.dispatch({
-                        type: 'consultationDocument/updateState',
-                        payload: {
-                          rows: r.documents,
-                        },
-                      })
+                      // this.props.dispatch({
+                      //   type: 'consultationDocument/updateState',
+                      //   payload: {
+                      //     rows: r.documents,
+                      //   },
+                      // })
                     }
                   })
               }}
@@ -387,7 +396,7 @@ class PatientHistory extends Component {
             [override.leftPanel]: true,
           })}
         >
-          {patientHistory.list.length ? (
+          {patientHistory.list && patientHistory.list.length ? (
             <Accordion
               defaultActive={0}
               collapses={patientHistory.list.map((o) => ({
@@ -431,7 +440,7 @@ class PatientHistory extends Component {
                     { name: 'Diagnosis', value: '3' },
                     { name: 'Consultation Document', value: '4' },
                     { name: 'Orders', value: '5' },
-                    { name: 'Result History', value: '6' },
+                    // { name: 'Result History', value: '6' },
                     { name: 'Invoice', value: '7' },
                   ]}
                   label='Filter By'
@@ -457,6 +466,7 @@ class PatientHistory extends Component {
                           entity: o,
                         },
                       })
+
                       router.push(
                         `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
                       )

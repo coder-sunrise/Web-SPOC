@@ -13,8 +13,8 @@ import withMobileDialog from '@material-ui/core/withMobileDialog'
 import Close from '@material-ui/icons/Close'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import Slide from '@material-ui/core/Slide'
-import ModalWrapper from '@/components/ModalWrapper'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import ModalWrapper from '@/components/ModalWrapper'
 import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import Loading from '@/components/PageLoading/index'
@@ -163,14 +163,14 @@ class CommonModal extends React.PureComponent {
           // disabled={disabled || loading.global || global.disableSave}
         >
           {confirmBtnText || confirmText}
-                      </ProgressButton>}
+        </ProgressButton>}
       </DialogActions>
     )
   }
 
   onClose = (force) => {
     const obs =Array.isArray(this.props.observe)?this.props.observe:[this.props.observe]
-   console.log(obs)
+  //  console.log(obs)
     for (let i = 0; i < obs.length; i++) {
       const o = obs[i]
       const ob = window.g_app._store.getState().formik[o]

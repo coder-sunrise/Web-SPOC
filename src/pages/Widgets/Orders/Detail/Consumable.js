@@ -28,10 +28,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, editType }) => {
+  mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultVaccination),
-      editType,
+      type,
     }
     return v
   },

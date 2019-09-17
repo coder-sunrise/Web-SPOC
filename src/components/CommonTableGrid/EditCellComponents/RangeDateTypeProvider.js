@@ -37,11 +37,12 @@ class DateEditorBase extends PureComponent {
       getInitialValue,
       onChange,
       gridId,
+      getRowId,
       ...restProps
     } = cfg
 
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
 
     const _onChange = (date, moments, org) => {
@@ -86,6 +87,7 @@ const DateRangeFormatter = (columnExtensions) => (props) => {
   if (render) {
     return render(row)
   }
+  // console.log(row)
   const v = getInitialValue ? getInitialValue(row) : value
   // console.log(cfg, value)
   if (!v || v.length === 0 || !v[0] || !v[1]) return ''
