@@ -95,7 +95,32 @@ const InventoryTypeListing = ({
     if (deleted) {
       const deletedSet = new Set(deleted)
       const changedRows = rows.filter((row) => !deletedSet.has(row.id))
-      setFieldValue(`${type}`, changedRows)
+      const tempArray = [
+        ...values[type],
+      ]
+      const newArray = tempArray.map((o) => {
+        if (o.id === deleted[0]) {
+          return {
+            ...o,
+            isDeleted: true,
+          }
+        }
+        return {
+          ...o,
+        }
+      })
+
+      setFieldValue(`${type}`, newArray)
+      dispatch({
+        type: 'packDetail/updateState',
+        payload: {
+          entity: {
+            ...values,
+            [type]: newArray,
+          },
+        },
+      })
+
       return rows
     }
     switch (type) {
