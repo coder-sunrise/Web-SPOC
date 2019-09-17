@@ -19,11 +19,10 @@ import {
 import DatePicker from './AntdDatePicker'
 
 const { RangePicker } = DP
-const _toMoment = (value, format) => {
-  if (!value) return ''
+const _toMoment = (value, isLocal) => {
+  if (!value) return null
   const m = moment.utc(value)
-
-  return m // .local()
+  return isLocal ? m.local() : m
 }
 
 const STYLES = (theme) => ({
@@ -62,14 +61,26 @@ const STYLES = (theme) => ({
 class AntdDateRangePicker extends PureComponent {
   constructor (props) {
     super(props)
-    const { field = {}, form, inputProps = {}, formatter, parser } = props
+    const {
+      field = {},
+      form,
+      inputProps = {},
+      formatter,
+      parser,
+      local,
+    } = props
     this.state = {
       shrink: field.value !== undefined && field.value.length > 0,
       value:
         field.value !== undefined && field.value.length > 0
-          ? field.value.map((o) => _toMoment(o))
-          : (props.value || props.defaultValue || []).map((o) => _toMoment(o)),
+          ? field.value.map((o) => _toMoment(o, local))
+          : (props.value || props.defaultValue || [])
+              .map((o) => _toMoment(o, local)),
     }
+  }
+
+  static defaultProps = {
+    local: true,
   }
 
   // shouldComponentUpdate = (nextProps) => {
@@ -90,13 +101,15 @@ class AntdDateRangePicker extends PureComponent {
   // }
 
   componentWillReceiveProps (nextProps) {
-    const { field } = nextProps
+    const { field, local } = nextProps
     // console.log(field.value)
 
     if (field) {
       this.setState({
         value:
-          field.value === undefined ? [] : field.value.map((o) => _toMoment(o)),
+          field.value === undefined
+            ? []
+            : field.value.map((o) => _toMoment(o, local)),
       })
     }
   }
@@ -130,10 +143,10 @@ class AntdDateRangePicker extends PureComponent {
               i === 0
               ? showTime
                 ? o.utc().format()
-                : o.utc().set({ hour: 0, minute: 0, second: 0 }).format()
+                : o.set({ hour: 0, minute: 0, second: 0 }).utc().format()
               : showTime
                 ? o.utc().format()
-                : o.utc().set({ hour: 23, minute: 59, second: 59 }).format()
+                : o.set({ hour: 23, minute: 59, second: 59 }).utc().format()
             : o
         })
       : []

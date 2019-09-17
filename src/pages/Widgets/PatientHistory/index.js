@@ -345,7 +345,8 @@ class PatientHistory extends Component {
                         {o.signOffDate && (
                           <DatePicker
                             text
-                            defaultValue={moment(o.signOffDate)}
+                            // showTime
+                            defaultValue={o.signOffDate}
                           />
                         )}
                       </GridItem>
@@ -443,6 +444,7 @@ class PatientHistory extends Component {
                 <ProgressButton
                   color='primary'
                   style={{ marginLeft: theme.spacing(2) }}
+                  size='sm'
                   onClick={() => {
                     dispatch({
                       type: `consultation/edit`,
