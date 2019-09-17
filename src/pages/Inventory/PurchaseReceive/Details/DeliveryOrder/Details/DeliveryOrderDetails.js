@@ -60,13 +60,24 @@ export class DeliveryOrderDetails extends PureComponent {
     onClickColumn: undefined,
     selectedItem: {},
 
-    consumableItemList: [],
-    medicationItemList: [],
-    vaccinationItemList: [],
+    ConsumableItemList: [],
+    MedicationItemList: [],
+    VaccinationItemList: [],
 
     filterConsumableItemList: [],
     filterMedicationItemList: [],
     filterVaccinationItemList: [],
+  }
+
+  forceUpdate = () => {
+    const { dispatch } = this.props
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
   }
 
   initializeStateItemList = async () => {
@@ -79,14 +90,17 @@ export class DeliveryOrderDetails extends PureComponent {
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list)
-        this.setState({ [x.stateName]: inventoryItemList })
+        const { inventoryItemList } = getInventoryItemList(
+          list,
+          x.itemFKName,
+          x.stateName,
+        )
+        this.setState({
+          [x.stateName]: inventoryItemList,
+        })
       })
     })
-  }
 
-  forceUpdate = () => {
-    const { dispatch } = this.props
     dispatch({
       // force current edit row components to update
       type: 'global/updateState',
@@ -101,7 +115,23 @@ export class DeliveryOrderDetails extends PureComponent {
   }
 
   handleOnOrderTypeChanged = async (e) => {
-    const { row } = e
+    const { dispatch, values } = this.props
+    const { rows } = values
+    const { row, option } = e
+    const { value, itemFKName, stateName } = option
+    const originItemList = this.state[stateName]
+
+    const { inventoryItemList } = getInventoryItem(
+      originItemList,
+      value,
+      itemFKName,
+      rows,
+    )
+
+    this.setState({
+      [`filter${stateName}`]: inventoryItemList,
+    })
+
     this.forceUpdate()
 
     row.code = ''
@@ -227,6 +257,24 @@ export class DeliveryOrderDetails extends PureComponent {
     return addedRows
   }
 
+  rowOptions = (row) => {
+    if (row.type === 1) {
+      return row.uid
+        ? this.state.MedicationItemList
+        : this.state.filterMedicationItemList
+    } else if (row.type === 2) {
+      return row.uid
+        ? this.state.VaccinationItemList
+        : this.state.filterVaccinationItemList
+    } else if (row.type === 3) {
+      return row.uid
+        ? this.state.ConsumableItemList
+        : this.state.filterConsumableItemList
+    } else {
+      return []
+    }
+  }
+
   render () {
     const isEditable = true
     const { props } = this
@@ -269,15 +317,7 @@ export class DeliveryOrderDetails extends PureComponent {
           type: 'select',
           labelField: 'code',
           options: (row) => {
-            if (row.type === 1) {
-              return this.state.medicationItemList
-            } else if (row.type === 2) {
-              return this.state.vaccinationItemList
-            } else if (row.type === 3) {
-              return this.state.consumableItemList
-            } else {
-              return []
-            }
+            return this.rowOptions(row)
           },
           onChange: (e) => {
             if (e.option) {
@@ -290,15 +330,7 @@ export class DeliveryOrderDetails extends PureComponent {
           type: 'select',
           labelField: 'name',
           options: (row) => {
-            if (row.type === 1) {
-              return this.state.medicationItemList
-            } else if (row.type === 2) {
-              return this.state.vaccinationItemList
-            } else if (row.type === 3) {
-              return this.state.consumableItemList
-            } else {
-              return []
-            }
+            return this.rowOptions(row)
           },
           onChange: (e) => {
             if (e.option) {
@@ -313,11 +345,11 @@ export class DeliveryOrderDetails extends PureComponent {
           disabled: true,
           options: (row) => {
             if (row.type === 1) {
-              return this.state.medicationItemList
+              return this.state.MedicationItemList
             } else if (row.type === 2) {
-              return this.state.vaccinationItemList
+              return this.state.VaccinationItemList
             } else if (row.type === 3) {
-              return this.state.consumableItemList
+              return this.state.ConsumableItemList
             } else {
               return []
             }
@@ -360,6 +392,7 @@ export class DeliveryOrderDetails extends PureComponent {
           format: 'DD MMM YYYY',
         },
       ],
+      onRowDoubleClick: undefined,
     }
 
     return (

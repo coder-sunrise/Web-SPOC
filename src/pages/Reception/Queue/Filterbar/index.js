@@ -21,7 +21,6 @@ import StatusFilterButton from './StatusFilterButton'
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
 })
-
 const Filterbar = ({ classes, toggleNewPatient, handleSubmit }) => (
   <GridContainer className={classes.actionBar} alignItems='center'>
     <GridItem xs={6} sm={6} md={6} lg={4}>
