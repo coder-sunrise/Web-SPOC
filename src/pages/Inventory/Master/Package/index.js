@@ -31,6 +31,7 @@ const Package = ({ dispatch, history, pack }) => {
       sortingEnabled: false,
       type: 'select',
       options: status,
+      align: 'center',
     },
     { columnName: 'Action', width: 110, align: 'center' },
     { columnName: 'totalPrice', type: 'number', currency: true },

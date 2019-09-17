@@ -75,7 +75,7 @@ const Detail = ({
         contentStyle={{ margin: '0 -5px' }}
         tabs={[
           {
-            tabButton: 'Detail',
+            tabButton: 'General',
             tabContent: <DetailPanel {...detailProps} />,
           },
           {
