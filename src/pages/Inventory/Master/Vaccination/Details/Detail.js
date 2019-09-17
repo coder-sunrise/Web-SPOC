@@ -25,13 +25,7 @@ import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
-const Detail = ({
-  vaccinationDetail,
-  dispatch,
-  setFieldValue,
-  values,
-  ...props
-}) => {
+const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
   const field = vaccinationDetail.entity ? 'entity' : 'default'
 
   const [
@@ -83,7 +77,7 @@ const Detail = ({
     setToggle(!toggle)
   }
   const handleSelectSdd = (row) => {
-    const { setFieldTouched } = props
+    const { setFieldTouched, values } = props
     const { id, code, name } = row
     setToggle(!toggle)
     dispatch({
@@ -99,6 +93,7 @@ const Detail = ({
     })
   }
 
+  console.log({ props })
   return (
     <CardContainer
       hideHeader
@@ -119,7 +114,7 @@ const Detail = ({
                       label={formatMessage({
                         id: 'inventory.master.vaccination.code',
                       })}
-                      disabled={!values.isActive}
+                      disabled={!props.values.isActive}
                       {...args}
                     />
                   )
@@ -264,7 +259,7 @@ const Detail = ({
           </GridContainer>
         </GridItem>
       </GridContainer>
-      <h5 style={{ marginTop: 5, marginLeft: 8 }}>SDD</h5>
+      <h5 style={{ marginTop: 15, marginLeft: 8 }}>SDD</h5>
       <Divider style={{ marginLeft: 8 }} />
       <GridContainer>
         <GridItem xs={5}>

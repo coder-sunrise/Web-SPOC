@@ -21,6 +21,13 @@ export default createFormViewModel({
           moment('2099-12-31'),
         ],
         isActive: true,
+        lastCostPriceBefBonus: 0,
+        lastCostPriceAftBonus: 0,
+        averageCostPrice: 0,
+        markupMargin: 0,
+        suggestSellingPrice: 0,
+        sellingPrice: 0,
+        maxDiscount: 0,
       },
     },
     subscriptions: ({ dispatch, history }) => {

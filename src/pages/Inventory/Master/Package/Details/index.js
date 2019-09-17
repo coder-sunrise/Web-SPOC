@@ -15,6 +15,11 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codes'
+import {
+  podoOrderType,
+  getInventoryItem,
+  getInventoryItemList,
+} from '@/utils/codes'
 
 const styles = () => ({
   actionDiv: {
@@ -69,6 +74,19 @@ const Detail = ({
     setPrice,
   ] = useState(() => undefined)
 
+  const [
+    consumableItemList,
+    setConsumableItemList,
+  ] = useState([])
+  const [
+    medicationItemList,
+    setMedicationItemList,
+  ] = useState([])
+  const [
+    vaccinationItemList,
+    setVaccinationItemList,
+  ] = useState([])
+
   useEffect(() => {
     const fetchCodes = async () => {
       await dispatch({
@@ -84,6 +102,31 @@ const Detail = ({
         setServicess(services)
         setServiceCenterss(serviceCenters)
         setServiceCenterServicess(serviceCenterServices)
+      })
+
+      await podoOrderType.forEach((x) => {
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: x.ctName,
+          },
+        }).then((list) => {
+          const { inventoryItemList } = getInventoryItemList(list)
+          switch (x.stateName) {
+            case 'consumableItemList': {
+              return setConsumableItemList(inventoryItemList)
+            }
+            case 'medicationItemList': {
+              return setMedicationItemList(inventoryItemList)
+            }
+            case 'vaccinationItemList': {
+              return setVaccinationItemList(inventoryItemList)
+            }
+            default: {
+              return null
+            }
+          }
+        })
       })
 
       dispatch({
@@ -130,12 +173,19 @@ const Detail = ({
       leftColumns: [],
     },
     medicationColExtensions: [
+      // {
+      //   columnName: 'inventoryMedicationFK',
+      //   type: 'codeSelect',
+      //   code: 'inventoryMedication',
+      //   labelField: 'displayValue',
+      //   valueField: 'id',
+      //   onChange: handleItemOnChange,
+      // },
       {
         columnName: 'inventoryMedicationFK',
-        type: 'codeSelect',
-        code: 'inventoryMedication',
-        labelField: 'displayValue',
-        valueField: 'id',
+        type: 'select',
+        labelField: 'code',
+        options: medicationItemList,
         onChange: handleItemOnChange,
       },
       {
@@ -169,12 +219,19 @@ const Detail = ({
       leftColumns: [],
     },
     vaccinationColExtensions: [
+      // {
+      //   columnName: 'inventoryVaccinationFK',
+      //   type: 'codeSelect',
+      //   code: 'inventoryVaccination',
+      //   labelField: 'displayValue',
+      //   valueField: 'id',
+      //   onChange: handleItemOnChange,
+      // },
       {
         columnName: 'inventoryVaccinationFK',
-        type: 'codeSelect',
-        code: 'inventoryVaccination',
-        labelField: 'displayValue',
-        valueField: 'id',
+        type: 'select',
+        labelField: 'code',
+        options: vaccinationItemList,
         onChange: handleItemOnChange,
       },
       { columnName: 'quantity', type: 'number' },
@@ -205,12 +262,19 @@ const Detail = ({
       leftColumns: [],
     },
     consumableColExtensions: [
+      // {
+      //   columnName: 'inventoryConsumableFK',
+      //   type: 'codeSelect',
+      //   code: 'inventoryConsumable',
+      //   labelField: 'displayValue',
+      //   valueField: 'id',
+      //   onChange: handleItemOnChange,
+      // },
       {
         columnName: 'inventoryConsumableFK',
-        type: 'codeSelect',
-        code: 'inventoryConsumable',
-        labelField: 'displayValue',
-        valueField: 'id',
+        type: 'select',
+        labelField: 'code',
+        options: consumableItemList,
         onChange: handleItemOnChange,
       },
       { columnName: 'quantity', type: 'number' },
@@ -259,7 +323,7 @@ const Detail = ({
 
         onChange: (e) => {
           setServiceFK(e.val)
-          console.log('service', serviceFK)
+          // console.log('service', serviceFK)
           // setTimeout(() => {
           //   getServiceCenterService()
           // }, 1)
@@ -333,18 +397,6 @@ const Detail = ({
     })
   }
 
-  // if (ctServiceCenter) {
-  //   setServiceCenter(
-  //     ctServiceCenter.for((o) => {
-  //       return {
-  //         value: o.serviceCenterCategoryFK,
-  //         name: o.displayValue,
-  //       }
-  //     }),
-  //   )
-  // }
-  // console.log('let', list)
-  // console.log('let', serviceCenterList)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -376,6 +428,7 @@ const Detail = ({
             tabButton: 'Order Item',
             tabContent: (
               <InventoryTypeListing
+                dispatch={dispatch}
                 calTotal={calTotal}
                 medication={medicationProps}
                 consumable={consumableProps}
