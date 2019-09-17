@@ -9,6 +9,7 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  NumberInput,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -21,7 +22,9 @@ const styles = (theme) => ({})
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     // shortcutKey: Yup.string().required(),
-    multiplier: Yup.string().required(),
+    multiplier: Yup.number()
+      .min(0, 'Multiplier must between 0 and 999,999.9999')
+      .max(999999.9999, 'Multiplier must between 0 and 999,999.9999'),
     sortOrder: Yup.number()
       .min(
         -2147483648,
@@ -88,14 +91,14 @@ class Detail extends PureComponent {
               <FastField
                 name='sortOrder'
                 render={(args) => (
-                  <TextField label='Sort Order' autoFocused {...args} />
+                  <NumberInput label='Sort Order' autoFocused {...args} />
                 )}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
                 name='multiplier'
-                render={(args) => <TextField label='Multiplier' {...args} />}
+                render={(args) => <NumberInput label='Multiplier' {...args} />}
               />
             </GridItem>
             {/* <GridItem md={4}>

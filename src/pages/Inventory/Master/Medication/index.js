@@ -37,26 +37,37 @@ const Medication = ({ dispatch, history, medication, values }) => {
       columnName: 'favouriteSupplier',
       type: 'codeSelect',
       code: 'ctSupplier',
-      sortingEnabled: false,
+      sortBy: 'favouriteSupplierFK',
     },
     {
       columnName: 'dispensingUOM',
       type: 'codeSelect',
       code: 'ctmedicationunitofmeasurement',
-      sortingEnabled: false,
+      sortBy: 'dispensingUOMFK',
+      width: 110,
     },
     {
       columnName: 'stock',
       type: 'number',
+      width: 110,
+      sortingEnabled: false,
     },
     {
       columnName: 'isActive',
       sortingEnabled: false,
       type: 'select',
       options: status,
+      align: 'center',
+      width: 120,
     },
-    { columnName: 'averageCostPrice', type: 'number', currency: true },
-    { columnName: 'sellingPrice', type: 'number', currency: true },
+    {
+      columnName: 'averageCostPrice',
+      type: 'number',
+      currency: true,
+      width: 120,
+      format: '0.0000',
+    },
+    { columnName: 'sellingPrice', type: 'number', currency: true, width: 200 },
   ])
 
   const filterProps = {
@@ -70,16 +81,25 @@ const Medication = ({ dispatch, history, medication, values }) => {
     medication,
     namespace: 'medication',
     list: medication.list || [],
-
+    columnWidths: [
+      {
+        columnName: 'dispensingUOM',
+        width: 20,
+      },
+      {
+        columnName: 'stock',
+        width: 'auto',
+      },
+    ],
     tableParas,
     colExtensions,
   }
 
-  useEffect(() => {
-    dispatch({
-      type: 'medication/query',
-    })
-  }, [])
+  // useEffect(() => {
+  //   dispatch({
+  //     type: 'medication/query',
+  //   })
+  // }, [])
 
   return (
     <CardContainer

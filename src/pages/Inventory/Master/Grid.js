@@ -10,6 +10,7 @@ const Grid = ({
   history,
   tableParas,
   colExtensions,
+  columnWidths,
   list,
 }) => {
   const showDetail = (row, vmode) => () =>
@@ -53,6 +54,7 @@ const Grid = ({
         rows={list}
         onRowDoubleClick={(row) => handleDoubleClick(row)}
         columnExtensions={colExtensions}
+        defaultColumnWidths={columnWidths}
         ActionProps={ActionProps}
         FuncProps={{ pager: true }}
         {...tableParas}
