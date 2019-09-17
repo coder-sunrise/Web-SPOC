@@ -350,7 +350,7 @@ class EditableTableGrid extends PureComponent {
     }
     const { editingRowIds, deletedRowIds, rowChanges, addedRows } = this.state
     // console.log(this.state, this.props)
-    console.log(editingRowIds, this.state.errorRows)
+    // console.log(editingRowIds, this.state.errorRows)
     // console.log('this.containerComponent', this.containerComponent)
     const cfg = {}
     if (this.containerComponent) {
@@ -367,6 +367,7 @@ class EditableTableGrid extends PureComponent {
     // console.log(rowChanges, addedRows)
     // console.log(editingRowIds)
     const editableCfg = {
+      getRowId,
       extraState: [
         <EditingState
           key={`editingState-${uniqueGid}`}
@@ -401,6 +402,7 @@ class EditableTableGrid extends PureComponent {
               <Table.Cell {...p}>
                 {children.map((o) => {
                   if (o) {
+                    // console.log(12311231,o.props)
                     return React.cloneElement(o, {
                       row: p.row,
                       editingRowIds,

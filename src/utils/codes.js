@@ -574,9 +574,9 @@ const consultationDocumentTypes = [
         .utc(r.mcStartDate)
         .local()
         .format(dateFormatLong)} - ${moment
-        .utc(r.mcEndDate)
-        .local()
-        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+          .utc(r.mcEndDate)
+          .local()
+          .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
     convert: (r) => {
       return {
         ...r,
@@ -845,7 +845,7 @@ export const podoOrderType = [
     prop: 'purchaseOrderMedicationItem',
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
-    stateName: 'medicationItemList',
+    stateName: 'MedicationItemList',
   },
   {
     value: 2,
@@ -853,7 +853,7 @@ export const podoOrderType = [
     prop: 'purchaseOrderVaccinationItem',
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
-    stateName: 'vaccinationItemList',
+    stateName: 'VaccinationItemList',
   },
   {
     value: 3,
@@ -861,7 +861,7 @@ export const podoOrderType = [
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
-    stateName: 'consumableItemList',
+    stateName: 'ConsumableItemList',
   },
 ]
 
@@ -903,30 +903,16 @@ export const InventoryTypes = [
   },
 ]
 
-export const getInventoryItem = (data, value, itemFKName, rows) => {
+export const getInventoryItem = (list, value, itemFKName, rows) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
-
-  let inventoryItemList = data.map((x) => {
-    return {
-      id: x.id,
-      value: x.id,
-      [itemFKName]: x.id,
-      name: x.code,
-      displayValue: x.displayValue,
-      sellingPrice: x.sellingPrice,
-      // uom: 'TBD',
-      uom: x.uom ? x.uom.name : x.prescribingUOM.name,
-    }
-  })
-
-  inventoryItemList = _.differenceBy(inventoryItemList, newRows, itemFKName)
+  let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
   return {
     inventoryItemList,
   }
 }
 
-export const getInventoryItemList = (list) => {
+export const getInventoryItemList = (list, itemFKName = undefined, stateName = undefined) => {
   let inventoryItemList = list.map((x) => {
     return {
       value: x.id,
@@ -935,6 +921,8 @@ export const getInventoryItemList = (list) => {
       //uom: prescribingUOM.id,
       uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
+      [itemFKName]: x.id,
+      stateName: stateName,
     }
   })
   return {
