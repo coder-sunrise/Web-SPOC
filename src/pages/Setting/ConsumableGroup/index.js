@@ -41,7 +41,7 @@ class ConsumableGroup extends PureComponent {
 		const cfg = {
 			toggleModal: this.toggleModal
 		}
-
+		
 		return (
 			<CardContainer hideHeader>
 				<Filter {...cfg} {...this.props} />

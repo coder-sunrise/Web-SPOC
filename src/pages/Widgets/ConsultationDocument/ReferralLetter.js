@@ -129,7 +129,7 @@ class ReferralLetter extends PureComponent {
           <GridItem xs={12} className={classes.editor}>
             <Button link className={classes.editorBtn}>
               Add Diagnosis
-            </Button>
+            </Button> 
             <FastField
               name='content'
               render={(args) => {
