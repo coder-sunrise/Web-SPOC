@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
+import { compose } from 'redux'
 import {
   getAppendUrl,
   errMsgForOutOfRange as errMsg,
@@ -12,7 +13,6 @@ import {
   Button,
   withFormikExtend,
 } from '@/components'
-import { compose } from 'redux'
 import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
@@ -35,7 +35,6 @@ const Detail = ({
   history,
   handleSubmit,
   setFieldValue,
-  values,
   ...props
 }) => {
   const { currentTab } = vaccination
@@ -45,7 +44,6 @@ const Detail = ({
     dispatch,
     setFieldValue,
     showTransfer: false,
-    values,
     ...props,
   }
   return (
@@ -91,7 +89,7 @@ const Detail = ({
             tabContent: (
               <Stock
                 vaccinationDetail={vaccinationDetail}
-                values={values}
+                values={props.values}
                 setFieldValue={setFieldValue}
               />
             ),

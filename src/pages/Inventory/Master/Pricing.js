@@ -29,7 +29,7 @@ const Pricing = ({
   const [
     markupMargin,
     setMarkupMargin,
-  ] = useState()
+  ] = useState(0.0)
 
   const calculate = () => {
     const suggestedSellingPrice =
@@ -135,8 +135,7 @@ const Pricing = ({
                 name='averageCostPrice'
                 render={(args) => (
                   <NumberInput
-                    currency
-                    decimalPlaces='4'
+                    prefix='$'
                     label={formatMessage({
                       id: 'inventory.master.pricing.averageCostPrice',
                     })}
