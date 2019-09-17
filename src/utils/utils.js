@@ -527,18 +527,18 @@ export const updateCellValue = (
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
-  const { validationSchema, gridId, ...restConfig } = cfg
-  // console.log({ columnName, val })
+  const { validationSchema, gridId, getRowId, ...restConfig } = cfg
+  // console.log({ columnName, val },getRowId,'dsad')
   if (!window.$tempGridRow[gridId]) {
     window.$tempGridRow[gridId] = {}
   }
-  if (!window.$tempGridRow[gridId][row.id]) {
-    // console.log(row)
-    window.$tempGridRow[gridId][row.id] = row
+  if (!window.$tempGridRow[gridId][getRowId(row)]) {
+    // console.log('1312323', row, getRowId(row))
+    window.$tempGridRow[gridId][getRowId(row)] = row
   }
   // console.log(columnName, val)
   // console.log({ row, val })
-  window.$tempGridRow[gridId][row.id][columnName] = val
+  window.$tempGridRow[gridId][getRowId(row)][columnName] = val
   // console.log(val, columnName)
   // console.log({ t1: window.$tempGridRow })
   if (validationSchema) {
@@ -547,7 +547,7 @@ export const updateCellValue = (
         onValueChange(val)
       }
       const r = validationSchema.validateSync(
-        window.$tempGridRow[gridId][row.id],
+        window.$tempGridRow[gridId][getRowId(row)],
         {
           abortEarly: false,
         },
@@ -618,7 +618,7 @@ const confirmBeforeReload = (e) => {
 }
 
 const navigateDirtyCheck = (itemPath) => (e) => {
-  console.log({ itemPath, e, handler: window.beforeReloadHandlerAdded })
+  // console.log({ itemPath, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',

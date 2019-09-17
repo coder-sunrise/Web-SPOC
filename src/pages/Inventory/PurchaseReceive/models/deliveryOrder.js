@@ -16,7 +16,7 @@ export default createListViewModel({
     state: {
       purchaseOrder: {
         poStatus: '',
-        purchaseOrderOutstandingItem: []
+        purchaseOrderOutstandingItem: [],
       },
       deliveryOrderDate: moment(),
       deliveryOrder_receivingItemList: [],
@@ -29,7 +29,7 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone(state, { payload }) {
+      queryDone (state, { payload }) {
         const { data } = payload
 
         return {
@@ -38,7 +38,7 @@ export default createListViewModel({
         }
       },
 
-      mapPurchaseOrder(state, { payload }) {
+      mapPurchaseOrder (state, { payload }) {
         const { entity } = payload
         const { purchaseOrder, rows } = entity
         const { status } = purchaseOrder
@@ -46,18 +46,23 @@ export default createListViewModel({
 
         // If PO status = Finalized, filter outstanding PO items
         if (isPOStatusFinalized(status)) {
-          const tempList = rows.filter((x) => x.totalQty - x.quantityReceived > 0)
+          const tempList = rows.filter(
+            (x) => x.totalQty - x.quantityReceived > 0,
+          )
           if (!_.isEmpty(tempList)) {
             outstandingItem = tempList.map((x) => {
               return {
                 ...x,
+                // Testing s
+                orderQty: x.inventoryMedicationFK ? 80 : x.orderQty,
+                // Testing e
                 totalBonusReceived: x.bonusQty,
-                currentReceivingQty: 0,
-                currentReceivingBonusQty: 0,
+
+                currentReceivingQty: x.orderQty - x.quantityReceived,
+                currentReceivingBonusQty: x.orderQty - x.bonusQty,
               }
             })
           }
-
         }
 
         return {
@@ -65,31 +70,35 @@ export default createListViewModel({
           list: [],
           purchaseOrder: {
             poStatus: status,
-            purchaseOrderOutstandingItem: outstandingItem
-          }
+            purchaseOrderOutstandingItem: outstandingItem,
+          },
         }
       },
 
-      upsertRow(state, { payload }) {
+      upsertRow (state, { payload }) {
         let { rows } = state.entity
         if (payload.uid) {
           rows = rows.map((row) => {
             const n =
               row.uid === payload.uid
                 ? {
-                  ...row,
-                  ...payload,
-                }
+                    ...row,
+                    ...payload,
+                  }
                 : row
             return n
           })
         } else {
-          const itemFK = podoOrderType.filter((x) => x.value === payload.type)[0].itemFKName
+          const itemFK = podoOrderType.filter(
+            (x) => x.value === payload.type,
+          )[0].itemFKName
           rows.push({
             ...payload,
             [itemFK]: payload.itemFK,
             name: payload.itemFK,
+            uom: payload.itemFK,
             uid: getUniqueId(),
+            isDeleted: false,
           })
         }
 
@@ -102,7 +111,7 @@ export default createListViewModel({
         }
       },
 
-      deleteRow(state, { payload }) {
+      deleteRow (state, { payload }) {
         const { rows } = state.entity
         console.log('deleteRow', rows.filter((x) => x.uid !== payload))
 
@@ -114,8 +123,8 @@ export default createListViewModel({
             //   if (o.uid === payload) o.isDeleted = true
             //   return o
             // }),
-            rows: rows.filter((x) => x.uid !== payload)
-          }
+            rows: rows.filter((x) => x.uid !== payload),
+          },
         }
       },
     },

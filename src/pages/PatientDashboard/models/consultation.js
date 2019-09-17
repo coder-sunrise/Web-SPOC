@@ -18,14 +18,14 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
-        corDiagnosis: [
-          {
-            uid: getUniqueId(),
-            onsetDate: moment(),
-            isPersist: false,
-            remarks: '',
-          },
-        ],
+        // corDiagnosis: [
+        //   {
+        //     uid: getUniqueId(),
+        //     onsetDate: moment(),
+        //     isPersist: false,
+        //     remarks: '',
+        //   },
+        // ],
       },
       selectedWidgets: [
         '1',
@@ -188,6 +188,19 @@ export default createFormViewModel({
           },
         })
 
+        // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
+        //   data.corDiagnosis.forEach((cd) => {
+        //     cd.complication = cd.corComplication.map((o) => o.complicationFK)
+        //   })
+        // }
+        // if (data.corDiagnosis && data.corDiagnosis.length === 0) {
+        //   data.corDiagnosis.push({
+        //     onsetDate: moment(),
+        //     isPersist: false,
+        //     remarks: '',
+        //   })
+        // }
+        // console.log(payload)
         return payload
       },
       // *submit ({ payload }, { call }) {

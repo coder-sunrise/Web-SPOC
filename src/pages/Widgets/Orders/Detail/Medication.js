@@ -78,8 +78,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
     const data = {
       sequence: rows.length,
-      subject: currentType.getSubject(values),
       ...values,
+      subject: currentType.getSubject(values),
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -193,8 +193,8 @@ class Medication extends PureComponent {
     }
 
     setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
-    setFieldValue('drugCode', op.displayValue)
-    setFieldValue('drugName', op.code)
+    setFieldValue('drugCode', op.code)
+    setFieldValue('drugName', op.displayValue)
 
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
@@ -235,6 +235,12 @@ class Medication extends PureComponent {
       orders,
     } = this.props
     // console.log(this.props)
+    const commonSelectProps = {
+      dropdownMatchSelectWidth: false,
+      dropdownStyle: {
+        width: 300,
+      },
+    }
     return (
       <div>
         <GridContainer>
@@ -327,6 +333,7 @@ class Medication extends PureComponent {
                                       allowClear={false}
                                       style={{ paddingLeft: 15 }}
                                       code='ctMedicationUsage'
+                                      {...commonSelectProps}
                                       {...args}
                                     />
                                   </div>
@@ -343,6 +350,7 @@ class Medication extends PureComponent {
                                     simple
                                     allowClear={false}
                                     code='ctMedicationDosage'
+                                    {...commonSelectProps}
                                     {...args}
                                   />
                                 )
@@ -358,6 +366,7 @@ class Medication extends PureComponent {
                                     simple
                                     allowClear={false}
                                     code='ctMedicationUnitOfMeasurement'
+                                    {...commonSelectProps}
                                     {...args}
                                   />
                                 )
@@ -373,6 +382,7 @@ class Medication extends PureComponent {
                                     simple
                                     allowClear={false}
                                     code='ctMedicationFrequency'
+                                    {...commonSelectProps}
                                     {...args}
                                   />
                                 )

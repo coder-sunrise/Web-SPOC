@@ -34,9 +34,9 @@ class SelectEditor extends PureComponent {
       columnExtensions.find(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
-    const { gridId } = cfg
+    const { gridId, getRowId } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     // console.log(
     //   columnName,
@@ -78,6 +78,7 @@ class SelectEditor extends PureComponent {
       isDisabled = () => false,
       onChange,
       gridId,
+      getRowId,
       ...restProps
     } = cfg
 
@@ -86,7 +87,7 @@ class SelectEditor extends PureComponent {
       error,
     })
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     if (!error) {
       if (onChange)
@@ -119,14 +120,16 @@ class SelectEditor extends PureComponent {
       isDisabled = () => false,
       onChange,
       gridId,
+      options,
+      getRowId,
       ...restProps
     } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
     const _onChange = (val, option) => {
-      console.log({ val, option })
+      // console.log({ val, option })
       const error = updateCellValue(this.props, this.myRef.current, val)
       this.setState({
         error,
@@ -149,10 +152,11 @@ class SelectEditor extends PureComponent {
       error: this.state.error,
       value: latestRow[columnName],
       disabled: isDisabled(latestRow),
+      options: typeof options === 'function' ? options(latestRow) : options,
       ...restProps,
       onChange: this._onChange,
     }
-    // console.log(columnName)
+    console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -187,8 +191,11 @@ const SelectDisplay = (columnExtensions, state) => ({
 
   if (value === undefined) return ''
   const v =
-    (cfg.options || state[`${columnName}Option`] || [])
-      .find((o) => o.value === value || o.id === value) || {}
+    (typeof cfg.options === 'function'
+      ? cfg.options(row)
+      : cfg.options || state[`${columnName}Option`] || []).find(
+      (o) => o.value === value || o.id === value,
+    ) || {}
 
   const { labelField = 'name', render } = cfg
   const label = Object.byString(v, labelField)

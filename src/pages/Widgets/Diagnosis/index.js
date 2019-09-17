@@ -84,6 +84,7 @@ class Diagnosis extends PureComponent {
   }
 
   addDiagnosis = () => {
+    // console.log('addDiagnosis')
     this.arrayHelpers.push({
       onsetDate: moment(),
       uid: getUniqueGUID(),
@@ -103,19 +104,18 @@ class Diagnosis extends PureComponent {
 
             this.arrayHelpers = arrayHelpers
             if (!values || !values.corDiagnosis) return null
-            return values.corDiagnosis
-              .filter((o) => !o.isDeleted)
-              .map((v, i) => {
-                return (
-                  <div key={i}>
-                    <Item
-                      {...this.props}
-                      index={i}
-                      arrayHelpers={arrayHelpers}
-                    />
-                  </div>
-                )
-              })
+            const diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            if (diagnosises.length === 0) {
+              this.addDiagnosis()
+              return null
+            }
+            return diagnosises.map((v, i) => {
+              return (
+                <div key={i}>
+                  <Item {...this.props} index={i} arrayHelpers={arrayHelpers} />
+                </div>
+              )
+            })
           }}
         />
 

@@ -630,7 +630,9 @@ const orderTypes = [
     value: '1',
     prop: 'corPrescriptionItem',
     filter: (r) => !!r.stockDrugFK,
-    getSubject: (r) => r.drugName,
+    getSubject: (r) => {
+      return r.drugName
+    },
   },
   {
     name: 'Vaccination',
@@ -842,21 +844,24 @@ export const podoOrderType = [
     name: 'Medication',
     prop: 'purchaseOrderMedicationItem',
     itemFKName: 'inventoryMedicationFK',
-    ctName: 'InventoryMedication',
+    ctName: 'inventorymedication',
+    stateName: 'medicationItemList',
   },
   {
     value: 2,
     name: 'Vaccination',
     prop: 'purchaseOrderVaccinationItem',
     itemFKName: 'inventoryVaccinationFK',
-    ctName: 'InventoryVaccination',
+    ctName: 'inventoryvaccination',
+    stateName: 'vaccinationItemList',
   },
   {
     value: 3,
     name: 'Consumable',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
-    ctName: 'InventoryConsumable',
+    ctName: 'inventoryconsumable',
+    stateName: 'consumableItemList',
   },
 ]
 
@@ -909,13 +914,29 @@ export const getInventoryItem = (data, value, itemFKName, rows) => {
       name: x.code,
       displayValue: x.displayValue,
       sellingPrice: x.sellingPrice,
-      //uom: 'TBD',
+      // uom: 'TBD',
       uom: x.uom ? x.uom.name : x.prescribingUOM.name,
     }
   })
 
   inventoryItemList = _.differenceBy(inventoryItemList, newRows, itemFKName)
 
+  return {
+    inventoryItemList,
+  }
+}
+
+export const getInventoryItemList = (list) => {
+  let inventoryItemList = list.map((x) => {
+    return {
+      value: x.id,
+      name: x.displayValue,
+      code: x.code,
+      //uom: prescribingUOM.id,
+      uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
+      sellingPrice: x.sellingPrice,
+    }
+  })
   return {
     inventoryItemList,
   }

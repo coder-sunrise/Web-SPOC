@@ -751,6 +751,7 @@ class CommonTableGrid extends React.Component {
     newColumExtensions.forEach((c) => {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
+      c.getRowId = getRowId
       if (c.type === 'number' || c.type === 'currency') {
         if (!c.align) {
           c.align = 'right'
@@ -798,6 +799,7 @@ class CommonTableGrid extends React.Component {
       ].concat(newLeftCols)
       newColumns.unshift({ name: 'rowIndex', title: 'No.' })
     }
+    // console.log(window.$tempGridRow)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper

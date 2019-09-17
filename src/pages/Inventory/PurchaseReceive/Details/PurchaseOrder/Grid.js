@@ -11,17 +11,21 @@ import {
   GridContainer,
   GridItem,
 } from '@/components'
-import { podoOrderType, getInventoryItem } from '@/utils/codes'
+import {
+  podoOrderType,
+  getInventoryItem,
+  getInventoryItemList,
+} from '@/utils/codes'
 
 let commitCount = 2200 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
-  type: Yup.number().required(),
-  code: Yup.number().required(),
-  // name: Yup.number().required(),
-  orderQty: Yup.number().min(1).required(),
+  type: Yup.string().required(),
+  code: Yup.string().required(),
+  name: Yup.string().required(),
+  orderQty: Yup.number().min(0).required(),
   bonusQty: Yup.number().min(0).required(),
-  quantityReceived: Yup.number().min(0).required(),
+  //quantityReceived: Yup.number().min(0).required(),
 })
 
 class Grid extends Component {
@@ -30,127 +34,154 @@ class Grid extends Component {
     this.state = {
       onClickColumn: undefined,
       selectedItem: {},
-      itemDropdownList: [],
-      selectedName: null,
-      selectedCode: null,
+
+      consumableItemList: [],
+      medicationItemList: [],
+      vaccinationItemList: [],
+
+      filterConsumableItemList: [],
+      filterMedicationItemList: [],
+      filterVaccinationItemList: [],
     }
   }
 
-  handleOnOrderTypeChanged = async (e) => {
-    const { dispatch, rows } = this.props
-    const { option, row } = e
-    const { ctName, value, itemFKName } = option
-    console.log('handleOnOrderTypeChanged', this.props)
+  initializeStateItemList = async () => {
+    const { dispatch } = this.props
 
-    this.setState({
-      onClickColumn: 'Type',
-    })
-
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: ctName,
-      },
-    }).then((list) => {
-      const { inventoryItemList } = getInventoryItem(
-        list,
-        value,
-        itemFKName,
-        rows,
-      )
-      this.setState({
-        itemDropdownList: inventoryItemList,
-      })
+    await podoOrderType.forEach((x) => {
       dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
+        type: 'codetable/fetchCodes',
         payload: {
-          commitCount: (commitCount += 1),
+          code: x.ctName,
         },
+      }).then((list) => {
+        const { inventoryItemList } = getInventoryItemList(list)
+        this.setState({ [x.stateName]: inventoryItemList })
       })
     })
   }
 
-  handleItemOnChange = (e) => {
-    console.log('handleItemOnChange', e)
-    const { option, row } = e
-    const { sellingPrice, uom, name, value, displayValue } = option
+  componentDidMount () {
+    this.initializeStateItemList()
+  }
 
-    row.code = name
-    row.name = displayValue
+  handleOnOrderTypeChanged = async (e) => {
+    const { dispatch } = this.props
+    const { row } = e
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+
+    row.code = ''
+    row.name = ''
+    row.uom = ''
+    row.orderQty = 0
+    row.bonusQty = 0
+    row.totalQty = 0
+    row.quantityReceived = 0
+    row.unitPrice = 0
+    row.totalPrice = 0
+
+    this.setState({ onClickColumn: 'type' })
+  }
+
+  handleItemOnChange = (e, type) => {
+    const { dispatch } = this.props
+    const { option, row } = e
+    const { sellingPrice, uom, name, value } = option
+
+    if (type === 'code') {
+      row.name = option.name
+    } else {
+      row.code = option.code
+    }
+
+    row.uom = option.uom
+    row.orderQty = 0
+    row.bonusQty = 0
+    row.totalQty = 0
+    row.quantityReceived = 0
 
     this.setState({
       selectedItem: option,
-      onClickColumn: 'Code',
+      onClickColumn: 'item',
     })
+
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+
     return { ...row }
   }
 
   onAddedRowsChange = (addedRows) => {
-    const defaultQty = 0
-    const defaultAmount = 0
     if (addedRows.length > 0) {
-      let finalAddedRows
-      const { selectedItem, onClickColumn } = this.state
-      const newRow = addedRows[0]
-      const { orderQty, unitPrice, bonusQty } = newRow
-      const calcTotalPrice = () => {
-        if (orderQty >= 1 && selectedItem.sellingPrice) {
-          return orderQty * selectedItem.sellingPrice
+      if (!addedRows.isFocused) {
+        const { onClickColumn, selectedItem } = this.state
+        console.log('selectedItem', selectedItem)
+        let tempRow = addedRows[0]
+        let tempOrderQty = tempRow.orderQty
+        let tempBonusQty = tempRow.bonusQty
+        let tempTotalQty = tempRow.totalQty
+        let tempQuantityReceived = tempRow.quantityReceived
+        let tempUnitPrice = tempRow.unitPrice
+        let tempTotalPrice = tempRow.totalPrice
+
+        const calcTotalQty = () => {
+          if (tempOrderQty >= 0 && tempBonusQty >= 0) {
+            console.log('calcTotalQty', tempOrderQty, tempBonusQty)
+            return tempOrderQty + tempBonusQty
+          }
         }
-        return selectedItem.sellingPrice || defaultAmount
-      }
 
-      const calcTotalQty = () => {
-        if (orderQty && bonusQty) {
-          return orderQty + bonusQty
+        const calcTotalPrice = () => {
+          if (tempOrderQty >= 1 && selectedItem.sellingPrice) {
+            return tempOrderQty * selectedItem.sellingPrice
+          }
         }
-        return defaultQty
-      }
 
-      if (onClickColumn === 'Type') {
-        console.log('onAddedRowsChangeType')
-        finalAddedRows = addedRows.map((row) => ({
-          itemFK: 0,
-          uom: '',
-          orderQty: defaultQty,
-          bonusQty: defaultQty,
-          totalQty: defaultQty,
-          quantityReceived: defaultQty,
-          unitPrice: defaultAmount,
-          totalPrice: defaultAmount,
-        }))
-      } else if (onClickColumn === 'Code') {
-        console.log(
-          'onAddedRowsChangeCode',
-          newRow,
-          selectedItem,
-          calcTotalPrice(),
-        )
+        if (onClickColumn === 'type') {
+        } else if (onClickColumn === 'item') {
+          tempUnitPrice = selectedItem.sellingPrice
+          tempTotalPrice = selectedItem.sellingPrice
+        } else {
+          tempTotalQty = calcTotalQty() || 0
+          tempTotalPrice = calcTotalPrice() || tempUnitPrice
+        }
 
-        finalAddedRows = addedRows.map((row) => ({
+        this.setState({ onClickColumn: undefined })
+
+        return addedRows.map((row) => ({
           ...row,
-          itemFK: selectedItem.id,
-          name: selectedItem.id,
-          uom: selectedItem.uom,
-          unitPrice: selectedItem.sellingPrice
-            ? selectedItem.sellingPrice
-            : defaultAmount,
-          totalQty: calcTotalQty(),
-          totalPrice: calcTotalPrice(),
+          itemFK: selectedItem.value,
+          totalQty: tempTotalQty,
+          unitPrice: tempUnitPrice,
+          totalPrice: tempTotalPrice,
         }))
       } else {
-        // console.log('onAddedRowsChangeElse', calcTotalQty())
-        finalAddedRows = addedRows.map((row) => ({
+        // Initialize new generated row
+        this.setState({ onClickColumn: undefined })
+        return addedRows.map((row) => ({
           ...row,
-          totalQty: calcTotalQty(),
-          totalPrice: calcTotalPrice(),
+          orderQty: 0,
+          bonusQty: 0,
+          totalQty: 0,
+          quantityReceived: 0,
+          unitPrice: 0,
+          totalPrice: 0,
+          isFocused: true,
         }))
       }
-      console.log('finalAddedRows', finalAddedRows)
-      this.setState({ onClickColumn: undefined })
-      return finalAddedRows
     }
+
     return addedRows
   }
 
@@ -182,22 +213,18 @@ class Grid extends Component {
     console.log('Grid', rows)
 
     const tableParas = {
-      getRowId: (r) => r.uid,
+      //getRowId: (r) => r.uid,
       columns: [
         { name: 'type', title: 'Type' },
-        // Sync -s
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
         { name: 'uom', title: 'UOM' },
-        // Sync -e
         { name: 'orderQty', title: 'Order Qty' },
         { name: 'bonusQty', title: 'Bonus Qty' },
         { name: 'totalQty', title: 'Total Qty' }, // Disabled, auto calc
         { name: 'quantityReceived', title: 'Total Received' },
-        // Sync c -s
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'totalPrice', title: 'Total Price' }, // Disabled, auto calc
-        // Sync c -e
       ],
       columnExtensions: [
         {
@@ -207,60 +234,67 @@ class Grid extends Component {
           onChange: (e) => {
             if (e.option) {
               this.handleOnOrderTypeChanged(e)
-
-              dispatch({
-                // force current edit row components to update
-                type: 'global/updateState',
-                payload: {
-                  commitCount: (commitCount += 1),
-                },
-              })
             }
           },
         },
         {
           columnName: 'code',
           type: 'select',
-          // labelField: 'name',
-          options: this.state.itemDropdownList,
-
+          labelField: 'code',
+          options: (row) => {
+            if (row.type === 1) {
+              return this.state.medicationItemList
+            } else if (row.type === 2) {
+              return this.state.vaccinationItemList
+            } else if (row.type === 3) {
+              return this.state.consumableItemList
+            } else {
+              return []
+            }
+          },
           onChange: (e) => {
             if (e.option) {
-              this.handleItemOnChange(e)
+              this.handleItemOnChange(e, 'code')
             }
-
-            dispatch({
-              // force current edit row components to update
-              type: 'global/updateState',
-              payload: {
-                commitCount: (commitCount += 1),
-              },
-            })
           },
         },
         {
           columnName: 'name',
           type: 'select',
-          labelField: 'displayValue',
-          options: this.state.itemDropdownList,
-
+          labelField: 'name',
+          options: (row) => {
+            if (row.type === 1) {
+              return this.state.medicationItemList
+            } else if (row.type === 2) {
+              return this.state.vaccinationItemList
+            } else if (row.type === 3) {
+              return this.state.consumableItemList
+            } else {
+              return []
+            }
+          },
           onChange: (e) => {
             if (e.option) {
-              this.handleItemOnChange(e)
+              this.handleItemOnChange(e, 'name')
             }
-
-            dispatch({
-              // force current edit row components to update
-              type: 'global/updateState',
-              payload: {
-                commitCount: (commitCount += 1),
-              },
-            })
           },
         },
         {
           columnName: 'uom',
+          type: 'select',
+          labelField: 'uom',
           disabled: true,
+          options: (row) => {
+            if (row.type === 1) {
+              return this.state.medicationItemList
+            } else if (row.type === 2) {
+              return this.state.vaccinationItemList
+            } else if (row.type === 3) {
+              return this.state.consumableItemList
+            } else {
+              return []
+            }
+          },
         },
         {
           columnName: 'orderQty',
@@ -278,6 +312,7 @@ class Grid extends Component {
         {
           columnName: 'quantityReceived',
           type: 'number',
+          disabled: true,
         },
         {
           columnName: 'unitPrice',
@@ -298,15 +333,16 @@ class Grid extends Component {
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>
           <EditableTableGrid
-            // rows={purchaseOrderItems}
+            getRowId={(r) => r.uid}
             rows={rows}
             schema={receivingDetailsSchema}
             FuncProps={{
+              //edit: isEditable,
               pager: false,
             }}
             EditingProps={{
               showAddCommand: isEditable,
-              showEditCommand: false,
+              showEditCommand: isEditable,
               showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,

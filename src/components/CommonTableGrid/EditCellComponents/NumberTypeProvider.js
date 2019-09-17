@@ -69,10 +69,11 @@ class NumberEditor extends PureComponent {
       isDisabled = () => false,
       onChange,
       gridId,
+      getRowId,
       ...restProps
     } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     const _onChange = (event) => {
       const v = numeral(event.target.value)._value

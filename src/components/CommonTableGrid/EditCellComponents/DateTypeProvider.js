@@ -46,14 +46,14 @@ class DateEditorBase extends PureComponent {
         error: updateCellValue(this.props, this.myRef.current, date || ''),
       })
     }
-    const { type, isDisabled = () => false, gridId, format, ...restProps } = cfg
+    const { type, isDisabled = () => false, gridId, format,getRowId, ...restProps } = cfg
 
     const commonCfg = {
       text,
       onChange,
       disabled: isDisabled(
         window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][row.id] || {}
+          ? window.$tempGridRow[gridId][getRowId(row)] || {}
           : row,
       ),
       defaultValue: value,
