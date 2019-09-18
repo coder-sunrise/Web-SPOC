@@ -102,7 +102,7 @@ class Service extends PureComponent {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
       nextProps.orders.shouldPushToState

@@ -163,8 +163,9 @@ export default createFormViewModel({
           visitRegistration.visitInfo.visit &&
           (!entity || consultationID !== entity.id)
         ) {
-          consultationID =
-            visitRegistration.visitInfo.visit.clinicalObjectRecordFK
+          if (!consultationID)
+            consultationID =
+              visitRegistration.visitInfo.visit.clinicalObjectRecordFK
           yield put({
             type: 'consultation/updateState',
             payload: {

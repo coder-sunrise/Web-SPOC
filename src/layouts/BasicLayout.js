@@ -16,7 +16,6 @@ import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
-import Authorized from '@/utils/Authorized'
 import { initStream } from '@/utils/realtime'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
@@ -39,6 +38,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import appStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx'
 import Header from 'mui-pro-components/Header'
 import Footer from 'mui-pro-components/Footer'
+import Authorized from '@/utils/Authorized'
 
 // import Footer from './Footer'
 // import Header from './Header'
@@ -241,9 +241,9 @@ class BasicLayout extends React.PureComponent {
   }
 
   resizeFunction () {
-    if (window.innerWidth >= 960) {
-      this.setState({ mobileOpen: false })
-    }
+    // if (window.innerWidth >= 960) {
+    //   this.setState({ mobileOpen: false })
+    // }
   }
 
   getContext () {

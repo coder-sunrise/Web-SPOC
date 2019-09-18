@@ -135,7 +135,7 @@ class AntdNumberInput extends React.PureComponent {
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 100)
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value } = nextProps
     if (field) {
       this.setState({
@@ -351,6 +351,7 @@ class AntdNumberInput extends React.PureComponent {
       const cfg = this.getConfig()
       return (
         <AutosizeInput
+          readOnly
           inputClassName={props.className}
           value={cfg.formatter(this.state.value)}
         />
@@ -392,7 +393,7 @@ class AntdNumberInput extends React.PureComponent {
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
         preventDefaultKeyDownEvent
-        maxlength='12'
+        maxLength='12'
         {...restProps}
       />
     )

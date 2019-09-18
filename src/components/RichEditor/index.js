@@ -81,7 +81,7 @@ class RichEditor extends React.PureComponent {
 
   componentDidMount () {}
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value } = nextProps
     const { isEditorFocused } = this.state
     let v = value || ''

@@ -61,11 +61,11 @@ class index extends PureComponent {
     }
   }
 
-  // componentWillReceiveProps (nextProps) {
+  // UNSAFE_componentWillReceiveProps (nextProps) {
   //   const { global } = nextProps
   //   if (global !== this.props.global) {
   //     if (!global.openAdjustment && global.openAdjustmentValue) {
-  //       console.log('componentWillReceiveProps', nextProps)
+  //       console.log('UNSAFE_componentWillReceiveProps', nextProps)
 
   //       const { openAdjustmentValue } = global
 

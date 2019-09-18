@@ -1,6 +1,6 @@
-import { CommonTableGrid } from '@/components'
+import { CommonTableGrid, DatePicker } from '@/components'
 
-export default ({ classes, theme }) => (
+export default ({ current, classes, theme }) => (
   <div>
     <div className={classes.paragraph}>
       <ul
@@ -9,9 +9,14 @@ export default ({ classes, theme }) => (
           paddingLeft: theme.spacing(2),
         }}
       >
-        <li>Asthma (12 Apr 2019)</li>
-        <li>Fever (12 Apr 2019)</li>
-        <li>Cough (12 Apr 2019)</li>
+        {current.diagnosis.map((o, i) => (
+          <li key={i}>
+            {o.diagnosisDescription} (<DatePicker
+              text
+              defaultValue={o.onsetDate}
+            />)
+          </li>
+        ))}
       </ul>
     </div>
   </div>

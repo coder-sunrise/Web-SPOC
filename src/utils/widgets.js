@@ -181,6 +181,10 @@ const widgets = [
     name: 'Patient History',
     component: Loadable({
       loader: () => import('@/pages/Widgets/PatientHistory'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} widget />
+      },
       loading: Loading,
     }),
     model: 'patientHistory',

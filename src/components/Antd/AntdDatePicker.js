@@ -88,7 +88,7 @@ class AntdDatePicker extends PureComponent {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value } = nextProps
     if (field) {
       this.setState({
@@ -231,6 +231,7 @@ class AntdDatePicker extends PureComponent {
     if (text)
       return (
         <AutosizeInput
+          readOnly
           inputClassName={props.className}
           value={
             this.state.value !== undefined &&
