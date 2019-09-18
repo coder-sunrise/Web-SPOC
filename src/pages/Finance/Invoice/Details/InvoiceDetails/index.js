@@ -22,8 +22,6 @@ import {
 
 class InvoiceDetails extends Component {
   render () {
-    console.log('InvoiceDetails', this.props)
-
     const { classes, values } = this.props
     return (
       <div className={classes.cardContainer}>

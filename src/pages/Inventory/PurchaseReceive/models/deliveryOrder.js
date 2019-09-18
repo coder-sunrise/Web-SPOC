@@ -16,6 +16,7 @@ export default createListViewModel({
     state: {
       purchaseOrder: {
         poStatus: '',
+        purchaseOrderItem: [],
         purchaseOrderOutstandingItem: [],
       },
       deliveryOrderDate: moment(),
@@ -53,9 +54,8 @@ export default createListViewModel({
             outstandingItem = tempList.map((x) => {
               return {
                 ...x,
-                // Testing s
                 orderQty: x.inventoryMedicationFK ? 80 : x.orderQty,
-                // Testing e
+                //orderQty: x.orderQty,
                 totalBonusReceived: x.bonusQty,
 
                 currentReceivingQty: x.orderQty - x.quantityReceived,
@@ -70,6 +70,7 @@ export default createListViewModel({
           list: [],
           purchaseOrder: {
             poStatus: status,
+            purchaseOrderItem: rows,
             purchaseOrderOutstandingItem: outstandingItem,
           },
         }

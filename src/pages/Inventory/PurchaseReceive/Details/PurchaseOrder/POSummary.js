@@ -50,7 +50,6 @@ class POSummary extends PureComponent {
   }
 
   render () {
-    console.log('POSummary', this.state)
     const { props } = this
     const {
       //clinicSetting,

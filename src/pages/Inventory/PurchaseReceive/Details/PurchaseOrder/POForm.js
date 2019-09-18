@@ -41,8 +41,6 @@ export class POForm extends PureComponent {
   render () {
     const { isPOFinalized } = this.props
     const invoiceDateNoStatus = !isPOFinalized
-
-    console.log('POForm', this)
     return (
       <div>
         <GridContainer gutter={0}>

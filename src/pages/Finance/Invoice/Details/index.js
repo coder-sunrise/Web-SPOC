@@ -24,9 +24,6 @@ class InvoiceDetails extends Component {
     this.props.dispatch({
       type: 'invoiceDetail/fakeQueryDone',
     })
-    this.props.dispatch({
-      type: 'invoicePayment/fakeQueryDone',
-    })
     // this.props.dispatch({
     //   type: 'invoiceDetail/queryOne',
     //   payload: {

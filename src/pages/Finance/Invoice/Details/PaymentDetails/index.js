@@ -14,16 +14,6 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 import styles from './styles'
 import { PayerType } from './variables'
 
-@connect(({ invoicePayment }) => ({
-  invoicePayment,
-}))
-@withFormik({
-  name: 'invoicePayment',
-  mapPropsToValues: ({ invoicePayment }) => {
-    console.log('mapPropsToValues', invoicePayment)
-    return invoicePayment.entity || invoicePayment.default
-  },
-})
 class PaymentDetails extends Component {
   state = {
     showAddPayment: false,
@@ -60,7 +50,6 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    console.log('PaymentDetails', this.props)
     const { classes, invoiceDetail, values } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -81,7 +70,7 @@ class PaymentDetails extends Component {
       <div className={classes.container}>
         <PaymentCard
           payerType={PayerType.PATIENT}
-          payerName={invoiceDetail.patientName}
+          payerName={'Lee Tian Kang'}
           payments={[
             {
               type: 'Payment',

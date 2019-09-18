@@ -40,10 +40,9 @@ class index extends PureComponent {
   }
 
   static getDerivedStateFromProps (props, state) {
-    const { values } = props
+    const { values, purchaseOrderDetails } = props
     const { purchaseOrder } = values
-
-    console.log('state', props)
+    const { entity } = purchaseOrderDetails
 
     if (purchaseOrder) {
       const { status } = purchaseOrder
@@ -54,7 +53,6 @@ class index extends PureComponent {
         }
       }
     }
-
     return null
   }
 
@@ -74,13 +72,10 @@ class index extends PureComponent {
             model: 'purchaseOrderDetails',
             reducer: 'addAdjustment',
           },
+          callbackMethod: this.calculateInvoice,
         },
       },
     })
-
-    setTimeout(() => {
-      this.calculateInvoice()
-    }, 1)
   }
 
   calculateInvoice = () => {
@@ -181,8 +176,6 @@ class index extends PureComponent {
         invoiceTotal += item.itemLevelGST + item.tempSubTotal
       })
     }
-
-    console.log('calculateInvoiceEnd', invoiceGST, invoiceTotal)
 
     setTimeout(() => {
       setFieldValue('purchaseOrder.invoiceGST', invoiceGST)

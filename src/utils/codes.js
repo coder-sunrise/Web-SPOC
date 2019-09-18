@@ -11,6 +11,12 @@ const status = [
   { value: true, name: 'Active', color: 'green' },
 ]
 
+const osBalanceStatus = [
+  { value: 'all', name: 'All(Yes/No)', color: 'all' },
+  { value: 'yes', name: 'Yes', color: 'yes' },
+  { value: 'no', name: 'No', color: 'no' },
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -574,9 +580,9 @@ const consultationDocumentTypes = [
         .utc(r.mcStartDate)
         .local()
         .format(dateFormatLong)} - ${moment
-          .utc(r.mcEndDate)
-          .local()
-          .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+        .utc(r.mcEndDate)
+        .local()
+        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
     convert: (r) => {
       return {
         ...r,
@@ -702,7 +708,7 @@ const tenantCodes = [
   'inventoryvaccination',
   'inventorypackage',
   'role',
-  'ctsupplier'
+  'ctsupplier',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -904,16 +910,38 @@ export const InventoryTypes = [
   },
 ]
 
-export const getInventoryItem = (list, value, itemFKName, rows) => {
+export const getInventoryItem = (
+  list,
+  value,
+  itemFKName,
+  rows,
+  outstandingItem = undefined,
+) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
+
+  if (outstandingItem) {
+    const filterOutstandingItem = outstandingItem.filter(
+      (x) => x.type === value && !x.isDeleted,
+    )
+
+    inventoryItemList = _.intersectionBy(
+      inventoryItemList,
+      filterOutstandingItem,
+      itemFKName,
+    )
+  }
 
   return {
     inventoryItemList,
   }
 }
 
-export const getInventoryItemList = (list, itemFKName = undefined, stateName = undefined) => {
+export const getInventoryItemList = (
+  list,
+  itemFKName = undefined,
+  stateName = undefined,
+) => {
   let inventoryItemList = list.map((x) => {
     return {
       value: x.id,
@@ -968,5 +996,6 @@ module.exports = {
   // country,
   consultationDocumentTypes,
   getServices,
+  osBalanceStatus,
   ...module.exports,
 }

@@ -49,7 +49,6 @@ export default createListViewModel({
 
     reducers: {
       initState (state, { payload }) {
-        console.log('initState', state)
         const data = state.default
         return {
           ...state,
@@ -61,6 +60,7 @@ export default createListViewModel({
       },
 
       fakeQueryDone (state, { payload }) {
+        const { type } = payload
         const data = fakeQueryDoneData
 
         let itemRows = []
@@ -84,6 +84,10 @@ export default createListViewModel({
           ...state,
           entity: {
             ...data,
+            purchaseOrder: {
+              ...data.purchaseOrder,
+              status: type === 'dup' ? 'Draft' : data.purchaseOrder.status,
+            },
             rows: itemRows,
           },
         }

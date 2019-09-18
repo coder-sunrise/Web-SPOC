@@ -14,9 +14,11 @@ import {
   TextField,
   DatePicker,
   Tooltip,
+  Select,
 } from '@/components'
+import { osBalanceStatus } from '@/utils/codes'
 
-const FilterBar = ({ classes, dispatch }) => {
+const FilterBar = ({ classes, dispatch, values }) => {
   return (
     <SizeContainer>
       <React.Fragment>
@@ -27,7 +29,23 @@ const FilterBar = ({ classes, dispatch }) => {
               render={(args) => <TextField label='Invoice No' {...args} />}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={6}>
+            <FastField
+              name='invoiceDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    label='Invoice Date From'
+                    label2='Invoice Date To'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          {/* <GridItem xs={6} md={3}>
+          
+
             <FastField
               name='invoiceDateFrom'
               render={(args) => (
@@ -42,11 +60,23 @@ const FilterBar = ({ classes, dispatch }) => {
                 <DatePicker label='Invoice Date To' {...args} />
               )}
             />
-          </GridItem>
+          </GridItem> */}
           <GridItem xs={6} md={3}>
-            <FastField
+            {/* <FastField
               name='pataientOutstanding'
               render={(args) => <TextField label='O/S Balance' {...args} />}
+            /> */}
+            <FastField
+              name='favouriteSupplierFK'
+              render={(args) => {
+                return (
+                  <Select
+                    label='O/S Balance'
+                    options={osBalanceStatus}
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
         </GridContainer>
@@ -70,6 +100,13 @@ const FilterBar = ({ classes, dispatch }) => {
           <Button
             color='primary'
             onClick={() => {
+              const {
+                invoiceNo,
+                patientName,
+                patientAccountNo,
+                pataientOutstanding,
+                invoiceDates,
+              } = values
               dispatch({
                 type: 'invoiceList/query',
                 payload: {
@@ -78,6 +115,12 @@ const FilterBar = ({ classes, dispatch }) => {
                   // [`${prefix}patientAccountNo`]: search,
                   // [`${prefix}contactFkNavigation.contactNumber.number`]: search,
                   // combineCondition: 'or',
+                  invoiceNo,
+                  patientName,
+                  patientAccountNo,
+                  pataientOutstanding,
+                  invoiceDateFrom: invoiceDates[0],
+                  invoiceDateTo: invoiceDates[1],
                 },
               })
             }}

@@ -159,7 +159,6 @@ class Grid extends Component {
 
         const calcTotalQty = () => {
           if (tempOrderQty >= 0 && tempBonusQty >= 0) {
-            console.log('calcTotalQty', tempOrderQty, tempBonusQty)
             return tempOrderQty + tempBonusQty
           }
         }

@@ -10,7 +10,6 @@ import { PurchaseReceiveDetailOption, isPOStatusDraft } from '../variables'
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-    console.log('mapPropsToValues', purchaseOrderDetails)
     return purchaseOrderDetails.entity
   },
 })
@@ -22,8 +21,6 @@ class index extends Component {
   static getDerivedStateFromProps (props, state) {
     const { values } = props
     const { purchaseOrder } = values
-
-    console.log('state', props)
 
     if (purchaseOrder) {
       const { status } = purchaseOrder
@@ -37,7 +34,7 @@ class index extends Component {
 
     return null
   }
-
+  
   componentDidMount () {
     const { purchaseOrderDetails } = this.props
     const { id, type } = purchaseOrderDetails
@@ -72,8 +69,6 @@ class index extends Component {
   }
 
   render () {
-    console.log('PR Index', this.props)
-
     const { purchaseOrderStatus } = this.state
     const isDraft = isPOStatusDraft(purchaseOrderStatus)
 
