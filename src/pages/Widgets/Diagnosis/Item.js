@@ -42,6 +42,18 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
                 <CodeSelect
                   label='Diagnosis'
                   code='ctOutPatientScanDiagnosis'
+                  onChange={(v, op) => {
+                    const { form } = args
+                    const { setFieldValue } = form
+                    setFieldValue(
+                      `corDiagnosis[${index}]diagnosisCode`,
+                      op.code,
+                    )
+                    setFieldValue(
+                      `corDiagnosis[${index}]diagnosisDescription`,
+                      op.name,
+                    )
+                  }}
                   {...args}
                 />
               )

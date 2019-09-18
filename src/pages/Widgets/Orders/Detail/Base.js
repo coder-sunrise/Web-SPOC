@@ -31,7 +31,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ global }) => ({ global }))
 class Base extends PureComponent {
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (!this.props.global.openAdjustment && nextProps.global.openAdjustment) {
       nextProps.dispatch({
         type: 'orders/updateState',

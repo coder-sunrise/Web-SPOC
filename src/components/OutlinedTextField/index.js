@@ -44,7 +44,7 @@ class OutlinedTextField extends PureComponent {
     this.debounceOnChange = _.debounce(this.debounceOnChange.bind(this), 300)
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field } = nextProps
     if (field) {
       this.setState({

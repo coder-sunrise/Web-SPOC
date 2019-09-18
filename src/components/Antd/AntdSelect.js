@@ -126,7 +126,7 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value, options, valueField, autoComplete, mode } = nextProps
     let v = this.state.value
     if (field) {
@@ -369,7 +369,7 @@ class AntdSelect extends React.PureComponent {
       const group = Object.values(groups)
       opts = group.map((g) => {
         return (
-          <Select.OptGroup label={g[0].title}>
+          <Select.OptGroup key={g[0].title} label={g[0].title}>
             {this.getSelectOptions(g, renderDropdown)}
           </Select.OptGroup>
         )
@@ -386,6 +386,7 @@ class AntdSelect extends React.PureComponent {
       if (match) text = match[this.props.labelField]
       return (
         <AutosizeInput
+          readOnly
           inputClassName={props.className}
           value={
             optionLabelLength ? text.substring(0, optionLabelLength) : text

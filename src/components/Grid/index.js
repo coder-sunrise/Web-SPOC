@@ -98,9 +98,10 @@ export function QtyFormatter ({ value }) {
 //   console.log(value)
 //   return '123213' // moment.isMoment(value) ? value.format('LLL') : value
 // }
-let dateFormatLong = 'DD-MMM-YYYY'
-let dateFormat = 'DD-MM-YYYY'
-let dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
+const dateFormatLong = 'DD-MMM-YYYY'
+const dateFormat = 'DD-MM-YYYY'
+const dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
+const dateFormatLongWithTime = 'DD-MMM-YYYY HH:mm:ss'
 // const timeFormat = 'HH:mm:ss'
 const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm a'
@@ -126,7 +127,6 @@ const TimeFormatter = ({ value, ...rest }) => {
 const DateFormatter = ({ value, full = false }) => {
   const format = full ? fullDateTime : dateFormatLong
   if (!value) return null
-
   if (moment.isMoment(value)) return value.format(format)
 
   return moment(value).isValid() ? moment(value).format(format) : value
@@ -175,6 +175,7 @@ module.exports = {
   qtyFormat,
   dateFormat,
   dateFormatWithTime,
+  dateFormatLongWithTime,
   dateFormatLong,
   fullDateTime,
   serverDateFormat,

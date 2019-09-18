@@ -128,7 +128,7 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-        console.log('queryDone', payload)
+        // console.log('queryDone', payload)
         const { data } = payload
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
