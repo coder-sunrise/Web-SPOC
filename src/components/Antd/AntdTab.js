@@ -18,6 +18,7 @@ export default ({ options, ...props }) => {
           <TabPane
             tab={o.name}
             key={o.id}
+            disabled={o.disabled}
             style={{
               border: '1px solid #e8e8e8',
               padding: 8,

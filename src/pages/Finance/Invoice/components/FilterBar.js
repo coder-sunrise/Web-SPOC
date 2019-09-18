@@ -45,7 +45,7 @@ const FilterBar = ({ classes, dispatch }) => {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='outstandingBalance'
+              name='pataientOutstanding'
               render={(args) => <TextField label='O/S Balance' {...args} />}
             />
           </GridItem>
@@ -53,7 +53,7 @@ const FilterBar = ({ classes, dispatch }) => {
         <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
-              name='patientID'
+              name='patientAccountNo'
               render={(args) => (
                 <TextField label='Patient Acc. No.' {...args} />
               )}

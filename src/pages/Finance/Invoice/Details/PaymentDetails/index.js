@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
+import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { CommonModal } from '@/components'
+import { CommonModal, withFormik } from '@/components'
 // sub components
 import { AddPayment } from 'medisys-components'
 import AddCrNote from '../../components/modal/AddCrNote'
@@ -13,6 +14,16 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 import styles from './styles'
 import { PayerType } from './variables'
 
+@connect(({ invoicePayment }) => ({
+  invoicePayment,
+}))
+@withFormik({
+  name: 'invoicePayment',
+  mapPropsToValues: ({ invoicePayment }) => {
+    console.log('mapPropsToValues', invoicePayment)
+    return invoicePayment.entity || invoicePayment.default
+  },
+})
 class PaymentDetails extends Component {
   state = {
     showAddPayment: false,
@@ -49,7 +60,8 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    const { classes } = this.props
+    console.log('PaymentDetails', this.props)
+    const { classes, invoiceDetail, values } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -69,7 +81,7 @@ class PaymentDetails extends Component {
       <div className={classes.container}>
         <PaymentCard
           payerType={PayerType.PATIENT}
-          payerName='Lee Tian Kang'
+          payerName={invoiceDetail.patientName}
           payments={[
             {
               type: 'Payment',

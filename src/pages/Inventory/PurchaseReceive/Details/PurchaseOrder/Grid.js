@@ -24,7 +24,7 @@ const receivingDetailsSchema = Yup.object().shape({
   type: Yup.string().required(),
   code: Yup.string().required(),
   name: Yup.string().required(),
-  orderQty: Yup.number().min(0).required(),
+  orderQty: Yup.number().min(1).required(),
   bonusQty: Yup.number().min(0).required(),
   //quantityReceived: Yup.number().min(0).required(),
 })
@@ -97,14 +97,6 @@ class Grid extends Component {
       [`filter${stateName}`]: inventoryItemList,
     })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
-
     row.code = ''
     row.name = ''
     row.uom = ''
@@ -116,6 +108,14 @@ class Grid extends Component {
     row.totalPrice = 0
 
     this.setState({ onClickColumn: 'type' })
+
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
   }
 
   handleItemOnChange = (e, type) => {
@@ -134,19 +134,13 @@ class Grid extends Component {
     row.bonusQty = 0
     row.totalQty = 0
     row.quantityReceived = 0
+    //row.unitPrice = undefined
+    //row.totalPrice = undefined
 
     this.setState({
       selectedItem: option,
       onClickColumn: 'item',
     })
-
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
 
     return { ...row }
   }
@@ -155,7 +149,6 @@ class Grid extends Component {
     if (addedRows.length > 0) {
       if (!addedRows.isFocused) {
         const { onClickColumn, selectedItem } = this.state
-        console.log('selectedItem', selectedItem)
         let tempRow = addedRows[0]
         let tempOrderQty = tempRow.orderQty
         let tempBonusQty = tempRow.bonusQty
@@ -229,9 +222,7 @@ class Grid extends Component {
       })
     }
 
-    setTimeout(() => {
-      calculateInvoice()
-    }, 1)
+    setTimeout(() => calculateInvoice(), 500)
     return rows
   }
 
@@ -257,7 +248,6 @@ class Grid extends Component {
     // const { purchaseOrderItems } = this.props
     const { rows, dispatch, isEditable } = this.props
     const { selectedItem, selectedCode, selectedName } = this.state
-    console.log('Grid', rows)
 
     const tableParas = {
       //getRowId: (r) => r.uid,

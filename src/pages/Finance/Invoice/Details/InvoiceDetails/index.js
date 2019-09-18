@@ -7,6 +7,7 @@ import {
   GridContainer,
   GridItem,
   OutlinedTextField,
+  FastField,
 } from '@/components'
 // sub component
 import Summary from './Summary'
@@ -21,38 +22,15 @@ import {
 
 class InvoiceDetails extends Component {
   render () {
-    const { classes } = this.props
+    console.log('InvoiceDetails', this.props)
+
+    const { classes, values } = this.props
     return (
       <div className={classes.cardContainer}>
         <CommonTableGrid
           size='sm'
           height={300}
-          rows={[
-            {
-              id: 1,
-              type: 'Medication',
-              name: 'Panadol',
-              quantity: 1,
-              adjustment: 0,
-              total: 8,
-            },
-            {
-              id: 2,
-              type: 'Vaccination',
-              name: 'Chicken Pox Vaccine',
-              quantity: 1,
-              adjustment: 0,
-              total: 1,
-            },
-            {
-              id: 3,
-              type: 'Service',
-              name: 'Consulation Service',
-              quantity: 1,
-              adjustment: 0,
-              total: 1,
-            },
-          ]}
+          rows={values.invoiceItem}
           columns={DataGridColumns}
           columnExtensions={DataGridColExtensions}
           {...TableConfig}
@@ -60,11 +38,19 @@ class InvoiceDetails extends Component {
         <Summary />
         <GridContainer className={classes.summaryContainer}>
           <GridItem md={6}>
-            <OutlinedTextField
-              label='Invoice Remarks'
-              multiline
-              rowsMax={3}
-              rows={3}
+            <FastField
+              name='remark'
+              render={(args) => {
+                return (
+                  <OutlinedTextField
+                    label='Invoice Remarks'
+                    multiline
+                    rowsMax={2}
+                    rows={2}
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
         </GridContainer>

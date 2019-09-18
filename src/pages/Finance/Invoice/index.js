@@ -19,12 +19,17 @@ import styles from './styles'
 }))
 class Invoice extends React.Component {
   onRowDoubleClick = (row) => {
-    this.props.history.push(`/finance/invoice/${row.invoiceNo}`)
+    this.props.history.push(`/finance/invoice/details?id=${row.invoiceNo}`)
+  }
+
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'invoiceList/query',
+    })
   }
 
   render () {
     const { classes, invoiceList } = this.props
-    console.log(invoiceList)
     return (
       <CardContainer hideHeader>
         <FilterBar {...this.props} />

@@ -20,18 +20,22 @@ export class POForm extends PureComponent {
     let conPerson
     let faxNo
     let officeNo
+    let address
 
     if (opts) {
       const { code, contactPerson, contact } = opts
-      const { faxContactNumber, officeContactNumber } = contact
+      const { faxContactNumber, officeContactNumber, contactAddress } = contact
+      const { street } = contactAddress[0]
       conPerson = contactPerson
       faxNo = faxContactNumber.number
       officeNo = officeContactNumber.number
+      address = street
     }
 
     setFieldValue(`${prefix}.contactPerson`, conPerson)
     setFieldValue(`${prefix}.faxNo`, faxNo)
     setFieldValue(`${prefix}.contactNo`, officeNo)
+    setFieldValue(`${prefix}.supplierAddress`, address)
   }
 
   render () {

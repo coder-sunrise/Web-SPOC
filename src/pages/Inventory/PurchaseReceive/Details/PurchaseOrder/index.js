@@ -23,70 +23,40 @@ import POSummary from './POSummary'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
 import { isPOStatusFinalized } from '../../variables'
 
-@connect(({ purchaseOrderDetails, global }) => ({
+@connect(({ purchaseOrderDetails, gstSetup }) => ({
   purchaseOrderDetails,
-  global,
+  gstSetup,
 }))
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-    console.log('mapPropsToValues', purchaseOrderDetails)
-    return purchaseOrderDetails.entity || purchaseOrderDetails.default
+    return purchaseOrderDetails.entity
   },
 })
 class index extends PureComponent {
-  componentDidMount () {
-    const { purchaseOrderDetails } = this.props
-    const { id, type } = purchaseOrderDetails
-    console.log('componentDidMount', this.props)
-    switch (type) {
-      // Duplicate order
-      case 'dup':
-        this.props.dispatch({
-          type: 'purchaseOrderDetails/fakeQueryDone',
-          id: id,
-        })
-        break
-      // Edit order
-      case 'edit':
-        this.props.dispatch({
-          type: 'purchaseOrderDetails/fakeQueryDone',
-          id: id,
-        })
-        break
-      // Create new order
-      default:
-        break
-    }
+  state = {
+    purchaseOrderStatus: 'Draft',
   }
 
-  // componentWillReceiveProps (nextProps) {
-  //   const { global } = nextProps
-  //   if (global !== this.props.global) {
-  //     if (!global.openAdjustment && global.openAdjustmentValue) {
-  //       console.log('componentWillReceiveProps', nextProps)
+  static getDerivedStateFromProps (props, state) {
+    const { values } = props
+    const { purchaseOrder } = values
 
-  //       const { openAdjustmentValue } = global
+    console.log('state', props)
 
-  //       const payload = {
-  //         adjRemark: openAdjustmentValue.remarks,
-  //         adjType: openAdjustmentValue.adjType,
-  //         adjValue: openAdjustmentValue.adjValue,
-  //         adjDisplayAmount: openAdjustmentValue.adjAmount,
-  //       }
+    if (purchaseOrder) {
+      const { status } = purchaseOrder
+      if (status !== state.purchaseOrderStatus) {
+        return {
+          ...state,
+          purchaseOrderStatus: status,
+        }
+      }
+    }
 
-  //       nextProps.dispatch({
-  //         type: 'purchaseOrderDetails/addAdjustment',
-  //         payload: payload,
-  //       })
-
-  //       setTimeout(() => {
-  //         this.calculateInvoice()
-  //       }, 1)
-  //     }
-  //   }
-  // }
+    return null
+  }
 
   showInvoiceAdjustment = () => {
     const { theme, values, dispatch, ...resetProps } = this.props
@@ -114,14 +84,12 @@ class index extends PureComponent {
   }
 
   calculateInvoice = () => {
-    console.log('calculateInvoice')
-    const { values, setFieldValue, purchaseOrderDetails } = this.props
-    const { clinicSetting } = purchaseOrderDetails
+    const { values, setFieldValue, purchaseOrderDetails, gstSetup } = this.props
     const { rows, purchaseOrderAdjustment, purchaseOrder } = values
     /*-------------------------------------------*/
     // Retrieve from /api/GSTSetup
-    const isClinicGSTEnabled = clinicSetting.gstEnabled
-    const gstPercentage = clinicSetting.gstRate
+    const IsEnableGST = gstSetup.IsEnableGST === 'true'
+    const GSTPercentage = Number(gstSetup.GSTPercentage)
     /*-------------------------------------------*/
     const { gstEnabled, gstIncluded } = purchaseOrder || false
     let tempInvoiceTotal = 0
@@ -137,7 +105,6 @@ class index extends PureComponent {
       tempInvoiceTotal += row.totalPrice
       row.tempSubTotal = row.totalPrice
     })
-
     // Check is there any adjustment was added
     if (
       filteredPurchaseOrderAdjustment &&
@@ -157,8 +124,8 @@ class index extends PureComponent {
               adj.adjValue,
               item.tempSubTotal,
               tempInvoiceTotal,
-              isClinicGSTEnabled,
-              gstPercentage,
+              IsEnableGST,
+              GSTPercentage,
               gstEnabled,
               gstIncluded,
             )
@@ -193,13 +160,13 @@ class index extends PureComponent {
       })
     } else {
       filteredPurchaseOrderItem.map((item) => {
-        if (isClinicGSTEnabled) {
+        if (IsEnableGST) {
           if (!gstEnabled) {
             item.itemLevelGST = 0
           } else if (gstIncluded) {
-            item.itemLevelGST = item.tempSubTotal * (gstPercentage / 107)
+            item.itemLevelGST = item.tempSubTotal * (GSTPercentage / 107)
           } else {
-            item.itemLevelGST = item.tempSubTotal * (gstPercentage / 100)
+            item.itemLevelGST = item.tempSubTotal * (GSTPercentage / 100)
           }
         } else {
           item.itemLevelGST = 0
@@ -215,6 +182,8 @@ class index extends PureComponent {
       })
     }
 
+    console.log('calculateInvoiceEnd', invoiceGST, invoiceTotal)
+
     setTimeout(() => {
       setFieldValue('purchaseOrder.invoiceGST', invoiceGST)
     }, 1)
@@ -227,8 +196,8 @@ class index extends PureComponent {
   onClickPrint = () => {}
 
   isPOFinalized = () => {
-    const { purchaseOrder } = this.props.values
-    return isPOStatusFinalized(purchaseOrder.status)
+    const { purchaseOrderStatus } = this.state
+    return isPOStatusFinalized(purchaseOrderStatus)
   }
 
   render () {
@@ -242,11 +211,12 @@ class index extends PureComponent {
     } = this.props
     const { clinicSetting } = purchaseOrderDetails
     const { purchaseOrderAdjustment, purchaseOrder, rows } = values
-    console.log('PO Index', this.props)
-
     return (
       <div>
-        <POForm setFieldValue={setFieldValue} isPOFinalized={this.isPOFinalized()} />
+        <POForm
+          setFieldValue={setFieldValue}
+          isPOFinalized={this.isPOFinalized()}
+        />
         <Grid
           rows={rows}
           dispatch={dispatch}
@@ -293,36 +263,6 @@ class index extends PureComponent {
             </Button>
           </GridItem>
         </GridContainer>
-
-        {/* <GridContainer
-          direction='row'
-          justify='flex-end'
-          alignItems='flex-end'
-          style={{ marginTop: 20, paddingRight: 20 }}
-        >
-          {!this.isPOFinalized() ? (
-            <Button color='danger'>
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.cancelpo',
-              })}
-            </Button>
-          ) : ''}
-          <Button color='primary'>
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.save',
-            })}
-          </Button>
-          <Button color='success'>
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.finalize',
-            })}
-          </Button>
-          <Button color='info' onClick={this.onClickPrint}>
-            {formatMessage({
-              id: 'inventory.pr.detail.print',
-            })}
-          </Button>
-        </GridContainer> */}
       </div>
     )
   }
