@@ -155,11 +155,12 @@ export default createFormViewModel({
         orderTypes.forEach((p) => {
           const datas =
             (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
+          // console.log(oRows, data[p.prop])
           oRows = oRows.concat(
             datas.map((o) => {
               const d = {
                 uid: getUniqueId(),
-                editType: p.value,
+                type: p.value,
                 subject: p.getSubject ? p.getSubject(o) : '',
                 ...o,
               }

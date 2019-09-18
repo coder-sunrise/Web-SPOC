@@ -41,6 +41,7 @@ import {
   CustomPaging,
   TreeDataState,
   CustomTreeData,
+  TableColumnResizing,
 } from '@devexpress/dx-react-grid'
 
 import {

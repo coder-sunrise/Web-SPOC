@@ -69,7 +69,19 @@ const widgets = [
                     Upload Attachment
                   </Menu.Item>
                   <Menu.Divider />
-                  <Menu.Item>Add Scribble Notes</Menu.Item>
+                  <Menu.Item
+                    onClick={() => {
+                      console.log(123)
+                      window.g_app._store.dispatch({
+                        type: 'clinicalnotes/updateState',
+                        payload: {
+                          showScribbleModal: true,
+                        },
+                      })
+                    }}
+                  >
+                    Add Scribble Notes
+                  </Menu.Item>
                 </Menu>
               }
               trigger={[
@@ -150,7 +162,7 @@ const widgets = [
                     type: 'consultationDocument/updateState',
                     payload: {
                       showModal: true,
-                      editType: '2',
+                      type: '2',
                       entity: undefined,
                     },
                   })
@@ -209,18 +221,18 @@ const widgets = [
       },
     },
   },
-  {
-    id: '6',
-    name: 'Result History',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ResultHistory'),
-      loading: Loading,
-    }),
-    model: 'resultHistory',
-    layoutConfig: {
-      style: {},
-    },
-  },
+  // {
+  //   id: '6',
+  //   name: 'Result History',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/ResultHistory'),
+  //     loading: Loading,
+  //   }),
+  //   model: 'resultHistory',
+  //   layoutConfig: {
+  //     style: {},
+  //   },
+  // },
   {
     id: '7',
     name: 'Vital Sign',

@@ -21,10 +21,10 @@ import {
   dateFormatWithTime,
 } from '@/components'
 
-const _toMoment = (value, format) => {
+const _toMoment = (value, isLocal) => {
   if (!value) return null
   const m = moment.utc(value)
-  return m // .local()
+  return isLocal ? m.local() : m
 
   // if (!value) return value
   // try {
@@ -64,9 +64,20 @@ class AntdDatePicker extends PureComponent {
   //   size: 'default',
   // }
 
+  static defaultProps = {
+    local: true,
+  }
+
   constructor (props) {
     super(props)
-    const { field = {}, form, inputProps = {}, formatter, parser } = props
+    const {
+      field = {},
+      form,
+      inputProps = {},
+      formatter,
+      parser,
+      local,
+    } = props
     const v =
       field.value !== undefined && field.value !== ''
         ? field.value
@@ -118,11 +129,11 @@ class AntdDatePicker extends PureComponent {
     const v = date
       ? showTime
         ? date.utc().format()
-        : date.utc().set({ hour: 0, minute: 0, second: 0 }).format()
+        : date.set({ hour: 0, minute: 0, second: 0 }).utc().format()
       : ''
-    showTime
-      ? date.utc().format()
-      : date.utc().set({ hour: 0, minute: 0, second: 0 }).format()
+    // showTime
+    //   ? date.utc().format()
+    //   : date.set({ hour: 0, minute: 0, second: 0 }).utc().format()
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())
@@ -201,6 +212,7 @@ class AntdDatePicker extends PureComponent {
       onOpenChange,
       value,
       text,
+      local = true,
       ...restProps
     } = this.props
     let { format } = restProps
@@ -222,8 +234,8 @@ class AntdDatePicker extends PureComponent {
           inputClassName={props.className}
           value={
             this.state.value !== undefined &&
-            _toMoment(this.state.value, format) ? (
-              _toMoment(this.state.value, format).format(format)
+            _toMoment(this.state.value, local) ? (
+              _toMoment(this.state.value, local).format(format)
             ) : (
               ''
             )
@@ -248,7 +260,7 @@ class AntdDatePicker extends PureComponent {
             this.handleDatePickerOpenChange,
           )}
           format={format}
-          value={_toMoment(this.state.value, format)}
+          value={_toMoment(this.state.value, local)}
           {...restProps}
         />
       </div>

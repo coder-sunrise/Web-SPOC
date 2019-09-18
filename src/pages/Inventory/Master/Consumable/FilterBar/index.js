@@ -107,7 +107,9 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                   payload: {
                     code,
                     displayValue,
-                    supplier,
+                    FavouriteSupplierFkNavigation: {
+                      id: supplier,
+                    },
                     isActive,
                   },
                 })

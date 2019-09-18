@@ -634,13 +634,14 @@ const navigateDirtyCheck = (itemPath) => (e) => {
           })
           window.beforeReloadHandlerAdded = false
           window.removeEventListener('beforeunload', confirmBeforeReload)
-          router.push({
-            pathname: itemPath,
-          })
+
+          router.push(itemPath)
         },
       },
     })
     e.preventDefault()
+  } else {
+    router.push(itemPath)
   }
 }
 

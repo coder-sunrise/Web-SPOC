@@ -1,5 +1,4 @@
-/* eslint no-unused-vars: 0 */
-
+/* eslint-disable */
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import History from './history'
@@ -11,12 +10,13 @@ import Arrow from './arrow'
 import Rectangle from './rectangle'
 import Circle from './circle'
 import Pan from './pan'
+import Eraser from './eraser'
 import Tool from './tools'
 
-const fabric = require('fabric').fabric
+const { fabric } = require('fabric')
 
 /**
- * Sketch Tool based on FabricJS for React Applications
+ *   based on FabricJS for React Applications
  */
 class SketchField extends PureComponent {
   static propTypes = {
@@ -75,6 +75,7 @@ class SketchField extends PureComponent {
   state = {
     parentWidth: 550,
     action: true,
+    indexCount: 1,
   }
 
   _initTools = (fabricCanvas) => {
@@ -86,6 +87,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas)
     this._tools[Tool.Circle] = new Circle(fabricCanvas)
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
+    this._tools[Tool.Eraser] = new Eraser(fabricCanvas)
   }
 
   /**
@@ -145,34 +147,80 @@ class SketchField extends PureComponent {
       this.setState({ action: true })
       return
     }
-    let obj = e.target
-    obj.__version = 1
-    // record current object state as json and save as originalState
-    let objState = obj.toJSON()
-    obj.__originalState = objState
-    let state = JSON.stringify(objState)
-    // object, previous state, current state
-    this._history.keep([
-      obj,
-      state,
-      state,
-    ])
+    // if(e.target.type != "image"){
+    if (e.target.id !== 'ARROW') {
+      let obj = e.target
+      obj.__version = 1
+      // record current object state as json and save as originalState
+      let objState = obj.toJSON()
+      obj.__originalState = objState
+      let state = JSON.stringify(objState)
+      // object, previous state, current state
+      this._history.keep([
+        obj,
+        state,
+        state,
+      ])
+    }
+    //  }
+  }
+
+  getValue = () => {
+    return this._history.getAllList()
+  }
+
+  initializeData = (data) => {
+    let history = this._history
+    let canvas = this._fc
+    let allList = data
+    let { indexCount } = this.state
+    let latestIndex = 0
+    history.getInitializeList(data)
+    for (let i = 0; i < allList.length; i++) {
+      let [
+        obj,
+      ] = allList[i].data
+
+      this.setState({ action: false }, () => {
+        this._fc.add(obj)
+        if (obj.zindex != null) {
+          canvas.moveTo(obj, obj.zindex)
+
+          if (obj.id === 'template') {
+            canvas.moveTo(obj, -100)
+          }else{
+            latestIndex = obj.zindex
+          }
+
+          if(i === (allList.length-1)){
+            if (latestIndex !== 0) {
+              latestIndex += 1
+              this.setState({
+                indexCount: latestIndex,
+              })
+            }
+          }
+        }
+        obj.__version -= 1
+        obj.__removed = false
+      })
+    }
   }
 
   /**
    * Action when an object is moving around inside the canvas
    */
-  _onObjectMoving = (e) => {}
+  _onObjectMoving = () => {}
 
   /**
    * Action when an object is scaling inside the canvas
    */
-  _onObjectScaling = (e) => {}
+  _onObjectScaling = () => {}
 
   /**
    * Action when an object is rotating inside the canvas
    */
-  _onObjectRotating = (e) => {}
+  _onObjectRotating = () => {}
 
   _onObjectModified = (e) => {
     let obj = e.target
@@ -194,12 +242,46 @@ class SketchField extends PureComponent {
    */
   _onObjectRemoved = (e) => {
     let obj = e.target
+    let canvas = this._fc
+    if (obj.id === 'delete' || obj.id === 'oldTemplate') {
+      let activeObj = obj
+      if (activeObj) {
+        let selected = []
+        if (activeObj.type === 'activeSelection') {
+          activeObj.forEachObject((obj) => selected.push(obj))
+        } else {
+          selected.push(activeObj)
+        }
+        selected.forEach((obj) => {
+          obj.__removed = true
+          let objState = obj.toJSON()
+          obj.__originalState = objState
+          let state = JSON.stringify(objState)
+          this._history.keep([
+            obj,
+            state,
+            state,
+          ])
+        })
+        canvas.discardActiveObject()
+        canvas.requestRenderAll()
+      }
+    }
+
+    obj.set({
+      id: '',
+    })
+
     if (obj.__removed) {
       obj.__version += 1
       return
     }
     obj.__version = 0
   }
+
+  /**
+   * re-arrange the history list
+   */
 
   /**
    * Action when the mouse button is pressed down
@@ -218,14 +300,14 @@ class SketchField extends PureComponent {
   /**
    * Action when the mouse cursor is moving out from the canvas
    */
-  _onMouseOut = (e) => {
-    this._selectedTool.doMouseOut(e)
-    if (this.props.onChange) {
-      let onChange = this.props.onChange
-      setTimeout(() => {
-        onChange(e.e)
-      }, 10)
-    }
+  _onMouseOut = () => {
+    // this._selectedTool.doMouseOut(e)
+    // if (this.props.onChange) {
+    //   let onChange = this.props.onChange
+    //   setTimeout(() => {
+    //     onChange(e.e)
+    //   }, 10)
+    // }
   }
 
   _onMouseUp = (e) => {
@@ -242,7 +324,7 @@ class SketchField extends PureComponent {
       }
     }
     if (this.props.onChange) {
-      let onChange = this.props.onChange
+      let { onChange } = this.props
       setTimeout(() => {
         onChange(e.e)
       }, 10)
@@ -273,9 +355,7 @@ class SketchField extends PureComponent {
       bi.height *= hfactor
     }
     let objects = canvas.getObjects()
-    // console.log(canvas, objects)
     for (let i in objects) {
-      // console.log(i)
       let obj = objects[i]
       let scaleX = obj.scaleX
       let scaleY = obj.scaleY
@@ -289,7 +369,6 @@ class SketchField extends PureComponent {
       obj.scaleY = tempScaleY
       obj.left = tempLeft
       obj.top = tempTop
-      // console.log(obj)
       obj.setCoords()
     }
     this.setState({
@@ -331,20 +410,53 @@ class SketchField extends PureComponent {
     canvas.calcOffset()
   }
 
+  /*
+    hide drawing
+
+  */
+
+  hideDrawing = (hideEnable) => {
+    let history = this._history
+    let allList = history.getAllList()
+
+    for (let i = 0; i < allList.length; i++) {
+      let [
+        obj,
+      ] = allList[i].data
+
+      if (obj.type !== 'image') {
+        if (hideEnable) {
+          obj.set({
+            opacity: 0,
+          })
+        } else {
+          obj.set({
+            opacity: 1,
+          })
+        }
+      }
+    }
+    this._fc.renderAll()
+  }
+
   /**
    * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
    */
   undo = () => {
     let history = this._history
+    let canvas = this._fc
     let [
       obj,
       prevState,
-      currState,
     ] = history.getCurrent()
+
     history.undo()
     if (obj.__removed) {
       this.setState({ action: false }, () => {
         this._fc.add(obj)
+        if (obj.zindex != null) {
+          canvas.moveTo(obj, obj.zindex)
+        }
         obj.__version -= 1
         obj.__removed = false
       })
@@ -368,15 +480,17 @@ class SketchField extends PureComponent {
     let history = this._history
     if (history.canRedo()) {
       let canvas = this._fc
-      // noinspection Eslint
+
       let [
         obj,
-        prevState,
         currState,
       ] = history.redo()
       if (obj.__version === 0) {
         this.setState({ action: false }, () => {
           canvas.add(obj)
+          if (obj.zindex != null) {
+            canvas.moveTo(obj, obj.zindex)
+          }
           obj.__version = 1
         })
       } else {
@@ -504,7 +618,9 @@ class SketchField extends PureComponent {
 
   copy = () => {
     let canvas = this._fc
-    canvas.getActiveObject().clone((cloned) => (this._clipboard = cloned))
+    canvas.getActiveObject().clone((cloned) => {
+      this._clipboard = cloned
+    })
   }
 
   paste = () => {
@@ -538,41 +654,135 @@ class SketchField extends PureComponent {
    * @param dataUrl the dataUrl to be used as a background
    * @param options
    */
-  setBackgroundFromDataUrl = (dataUrl, options = {}) => {
+  setBackgroundFromDataUrl = (dataUrl) => {
     let canvas = this._fc
-    if (options.stretched) {
-      delete options.stretched
-      Object.assign(options, {
-        width: canvas.width,
-        height: canvas.height,
+    let { indexCount } = this.state
+
+    let oldIndexCount = indexCount
+    let newIndexCount = indexCount + 1
+
+    this.setState({
+      indexCount: newIndexCount,
+    })
+
+    // const context = canvas.getContext('2d')
+    const image = new Image()
+    image.src = dataUrl
+    image.onload = () => {
+      let imgbase64 = new fabric.Image(image, {})
+      imgbase64.set({
+        zindex: oldIndexCount,
       })
+      // canvas.setBackgroundImage(imgbase64)
+      canvas.add(imgbase64)
+      imgbase64.selectable = false
+      imgbase64.evented = false
+      canvas.moveTo(imgbase64, oldIndexCount)
+      // context.drawImage(imgbase64, 0, 0);
     }
-    if (options.stretchedX) {
-      delete options.stretchedX
-      Object.assign(options, {
-        width: canvas.width,
-      })
-    }
-    if (options.stretchedY) {
-      delete options.stretchedY
-      Object.assign(options, {
-        height: canvas.height,
-      })
-    }
-    let img = new Image()
-    img.setAttribute('crossOrigin', 'anonymous')
-    img.onload = () =>
-      canvas.setBackgroundImage(
-        new fabric.Image(img),
-        () => canvas.renderAll(),
-        options,
-      )
-    img.src = dataUrl
+
+    
+
+    // fabric.Image.fromURL(
+    //   dataUrl,
+    //   function (img) {
+    //     img.set({
+    //       width: canvas.width,
+    //       height: canvas.height,
+    //       originX: 'left',
+    //       originY: 'top',
+    //     })
+    //     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+    //   },
+    // )
+
+    // let img = new Image()
+    // img.setAttribute('crossOrigin', 'anonymous')
+    // img.onload = () =>
+    //   canvas.setBackgroundImage(new fabric.Image(img), () => canvas.renderAll())
+    // img.src = dataUrl
   }
 
-  addText = (text, options = {}) => {
+  setTemplate = (dataUrl) => {
+    let history = this._history
+    let allList = history.getAllList()
+    let prevTemplate = ''
+
+    for (let i = 0; i < allList.length; i++) {
+      let [
+        obj,
+      ] = allList[i].data
+
+      if (obj.id === 'template') {
+        obj.set({
+          id: 'oldTemplate',
+        })
+        prevTemplate = obj
+      }
+    }
+
+    if (prevTemplate !== '') {
+      let canvas = this._fc
+      let activeObj = prevTemplate
+      if (activeObj) {
+        let selected = []
+        if (activeObj.type === 'activeSelection') {
+          activeObj.forEachObject((obj) => selected.push(obj))
+        } else {
+          selected.push(activeObj)
+        }
+        selected.forEach((obj) => {
+          obj.__removed = true
+          let objState = obj.toJSON()
+          obj.__originalState = objState
+          let state = JSON.stringify(objState)
+          this._history.keep([
+            obj,
+            state,
+            state,
+          ])
+          canvas.remove(obj)
+        })
+        canvas.discardActiveObject()
+        canvas.requestRenderAll()
+      }
+    }
+
+    let canvas = this._fc
+    const image = new Image()
+    image.src = dataUrl
+    image.onload = () => {
+      let imgbase64 = new fabric.Image(image, {})
+      imgbase64.set({
+        zindex: -100,
+        id: 'template',
+      })
+      canvas.add(imgbase64)
+      imgbase64.selectable = false
+      imgbase64.evented = false
+      canvas.moveTo(imgbase64, -100)
+    }
+  }
+
+  downloadImage = () => {
+    let canvas = this._fc
+    // let url = canvas.toDataURL('image/png')
+    let link = document.createElement('a')
+    link.download = 'drawing.png'
+    link.href = canvas.toDataURL()
+
+    // canvas.toDataURL().set({
+    //   id: 'template',
+    // })
+    // console.log(canvas.toDataURL())
+
+    link.click()
+  }
+
+  addText = (text, color, options = {}) => {
     let canvas = this._fc
     let iText = new fabric.IText(text, options)
+
     let opts = {
       left: (canvas.getWidth() - iText.width) * 0.5,
       top: (canvas.getHeight() - iText.height) * 0.5,
@@ -581,22 +791,22 @@ class SketchField extends PureComponent {
     iText.set({
       left: options.left,
       top: options.top,
+      fill: color,
     })
 
-    canvas.add(iText)
+    canvas.add(iText).setActiveObject(iText)
+    iText.enterEditing()
+    iText.selectAll()
   }
 
   componentDidMount = () => {
     let { tool, value, undoSteps, defaultValue, backgroundColor } = this.props
-
-    let canvas = (this._fc = new fabric.Canvas(
-      this
-        ._canvas /* , {
-         preserveObjectStacking: false,
-         renderOnAddRemove: false,
-         skipTargetFind: true
-         } */,
-    ))
+    this._fc = new fabric.Canvas(this._canvas, {
+      preserveObjectStacking: true,
+      // renderOnAddRemove: false,
+      // skipTargetFind: true
+    })
+    let canvas = this._fc
 
     this._initTools(canvas)
 
@@ -684,10 +894,17 @@ class SketchField extends PureComponent {
     return (
       <div
         className={className}
-        ref={(c) => (this._container = c)}
+        ref={(c) => {
+          this._container = c
+        }}
         style={canvasDivStyle}
       >
-        <canvas id={uuid4()} ref={(c) => (this._canvas = c)}>
+        <canvas
+          id={uuid4()}
+          ref={(c) => {
+            this._canvas = c
+          }}
+        >
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>
       </div>

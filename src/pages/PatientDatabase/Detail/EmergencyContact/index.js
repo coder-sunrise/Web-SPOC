@@ -42,12 +42,14 @@ class EmergencyContact extends PureComponent {
         type: 'codeSelect',
         code: 'ctrelationship',
         sortingEnabled: false,
+        dropdownMatchSelectWidth: false,
       },
       {
         columnName: 'accountNoTypeFK',
         type: 'codeSelect',
         code: 'ctPatientAccountNoType',
         isDisabled: (row) => !!row.nokPatientProfileFK,
+        dropdownMatchSelectWidth: false,
       },
       {
         columnName: 'address',

@@ -15,16 +15,19 @@ const EditButton = ({ onExecute, editingRowIds }) => (
   <Button
     size='sm'
     onClick={(e) => {
-      if (editingRowIds.length === 0) {
-        window.g_app._store.dispatch({
-          type: 'global/updateState',
-          payload: {
-            disableSave: true,
-          },
-        })
-      }
-      console.log({ onExecute })
       onExecute(e)
+      setTimeout(() => {
+        if (editingRowIds.length === 0) {
+          window.g_app._store.dispatch({
+            type: 'global/updateState',
+            payload: {
+              disableSave: true,
+            },
+          })
+        }
+      }, 1)
+
+      // console.log({ onExecute })
     }}
     justIcon
     color='primary'

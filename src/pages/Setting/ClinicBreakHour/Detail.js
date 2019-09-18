@@ -23,57 +23,58 @@ const styles = (theme) => ({})
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
-    monFromBreak: Yup.string(),
-    monToBreak: Yup.string().when('monFromBreak', {
-      is: (val) => val !== undefined,
+    monFromBreak: Yup.string().nullable(),
+    monToBreak: Yup.string().nullable().when('monFromBreak', {
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('monFromBreak'),
         'TO must be later than FROM',
       ),
+      otherwise: Yup.string().nullable(),
     }),
-    tueFromBreak: Yup.string(),
-    tueToBreak: Yup.string().when('tueFromBreak', {
-      is: (val) => val !== undefined,
+    tueFromBreak: Yup.string().nullable(),
+    tueToBreak: Yup.string().nullable().when('tueFromBreak', {
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('tueFromBreak'),
         'TO must be later than FROM',
       ),
     }),
-    wedFromBreak: Yup.string(),
-    wedToBreak: Yup.string().when('wedFromBreak', {
-      is: (val) => val !== undefined,
+    wedFromBreak: Yup.string().nullable(),
+    wedToBreak: Yup.string().nullable().when('wedFromBreak', {
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('wedFromBreak'),
         'TO must be later than FROM',
       ),
     }),
-    thursFromBreak: Yup.string(),
-    thursToBreak: Yup.string().when('thursFromBreak', {
-      is: (val) => val !== undefined,
+    thursFromBreak: Yup.string().nullable(),
+    thursToBreak: Yup.string().nullable().when('thursFromBreak', {
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('thursFromBreak'),
         'TO must be later than FROM',
       ),
     }),
-    friFromBreak: Yup.string(),
-    friToBreak: Yup.string().when('friFromBreak', {
-      is: (val) => val !== undefined,
+    friFromBreak: Yup.string().nullable(),
+    friToBreak: Yup.string().nullable().when('friFromBreak', {
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('friFromBreak'),
         'TO must be later than FROM',
       ),
     }),
-    satFromBreak: Yup.string(),
-    satToBreak: Yup.string().when('satFromBreak', {
-      is: (val) => val !== undefined,
+    satFromBreak: Yup.string().nullable(),
+    satToBreak: Yup.string().nullable().when('satFromBreak', {
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('satFromBreak'),
         'TO must be later than FROM',
       ),
     }),
-    sunFromBreak: Yup.string(),
-    sunToBreak: Yup.string().when('sunFromBreak', {
-      is: (val) => val !== undefined,
+    sunFromBreak: Yup.string().nullable(),
+    sunToBreak: Yup.string().nullable().when('sunFromBreak', {
+      is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('sunFromBreak'),
         'TO must be later than FROM',
@@ -104,7 +105,6 @@ const styles = (theme) => ({})
 })
 class Detail extends PureComponent {
   state = {}
-
   // state = {
   //   editingRowIds: [],
   //   rowChanges: {},
@@ -124,6 +124,8 @@ class Detail extends PureComponent {
   // }
 
   render () {
+    console.log('ad', this.props)
+
     const { props } = this
     const { classes, theme, footer, values, settingClinicBreakHour } = props
     // console.log('detail', props)

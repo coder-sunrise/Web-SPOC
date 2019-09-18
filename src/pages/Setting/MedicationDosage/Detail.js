@@ -20,7 +20,9 @@ const styles = (theme) => ({})
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    multiplier: Yup.string().required(),
+    multiplier: Yup.number()
+      .min(0, 'Multiplier must between 0 and 999,999.9999')
+      .max(999999.9999, 'Multiplier must between 0 and 999,999.9999'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     sortOrder: Yup.number()
       .min(
@@ -116,7 +118,7 @@ class Detail extends PureComponent {
 							/>
 						</GridItem> */}
 
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='sortOrder'
                 render={(args) => {

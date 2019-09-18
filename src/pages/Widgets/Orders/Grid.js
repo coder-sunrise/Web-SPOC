@@ -16,6 +16,7 @@ import {
 import { orderTypes } from '@/utils/codes'
 import { sumReducer } from '@/utils/utils'
 
+// console.log(orderTypes)
 export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
   const { rows, summary, finalAdjustments } = orders
   const { total, gst, totalWithGST } = summary
@@ -25,7 +26,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       type: 'orders/updateState',
       payload: {
         entity: row,
-        editType: row.editType,
+        type: row.type,
         // adjustment: {
         //   adjValue: row.adjValue,
         //   adjAmount: row.adjAmount,
@@ -101,7 +102,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
       columns={[
-        { name: 'editType', title: 'Type' },
+        { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
         { name: 'remark', title: 'Description' },
         { name: 'adjAmount', title: 'Adj.' },
@@ -183,7 +184,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
         },
       }}
       columnExtensions={[
-        { columnName: 'editType', type: 'select', options: orderTypes },
+        { columnName: 'type', type: 'select', options: orderTypes },
         {
           columnName: 'adjAmount',
           type: 'currency',

@@ -29,7 +29,7 @@ const Pricing = ({
   const [
     markupMargin,
     setMarkupMargin,
-  ] = useState()
+  ] = useState(0.0)
 
   const calculate = () => {
     const suggestedSellingPrice =
@@ -91,6 +91,8 @@ const Pricing = ({
         marginRight: 5,
       }}
     >
+      <h3 style={{ marginLeft: 5 }}>Pricing</h3>
+      <hr />
       <GridContainer gutter={0}>
         <GridItem xs={12} md={5}>
           <GridContainer>
@@ -139,10 +141,12 @@ const Pricing = ({
                     })}
                     onChange={(e) => {
                       setAcp(e.target.value)
-                      setFieldValue(
-                        'averageCostPrice',
-                        e.target.value.toFixed(4),
-                      )
+                      if (e.target.value) {
+                        setFieldValue(
+                          'averageCostPrice',
+                          e.target.value.toFixed(4),
+                        )
+                      }
                     }}
                     {...args}
                   />
@@ -164,7 +168,9 @@ const Pricing = ({
                     })}
                     onChange={(e) => {
                       setMarkupMargin(e.target.value)
-                      setFieldValue('markupMargin', e.target.value.toFixed(1))
+                      if (e.target.value) {
+                        setFieldValue('markupMargin', e.target.value.toFixed(1))
+                      }
                     }}
                     {...args}
                   />
@@ -208,8 +214,11 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.maxDiscount',
                     })}
-                    onChange={(e) =>
-                      setFieldValue('maxDiscount', e.target.value.toFixed(1))}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        setFieldValue('maxDiscount', e.target.value.toFixed(1))
+                      }
+                    }}
                     {...args}
                   />
                 )}

@@ -26,6 +26,12 @@ export default createListViewModel({
             },
           })
         }
+
+        if (pathname === '/inventory/master' && search === '?t=2') {
+          dispatch({
+            type: 'vaccination/query',
+          })
+        }
       })
     },
     effects: {},
