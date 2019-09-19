@@ -68,19 +68,7 @@ const widgets = [
                     Upload Attachment
                   </Menu.Item>
                   <Menu.Divider />
-                  <Menu.Item
-                    onClick={() => {
-                      console.log(123)
-                      window.g_app._store.dispatch({
-                        type: 'clinicalnotes/updateState',
-                        payload: {
-                          showScribbleModal: true,
-                        },
-                      })
-                    }}
-                  >
-                     Add Scribble Notes
-                  </Menu.Item>
+                  
                 </Menu>
               }
               trigger={[

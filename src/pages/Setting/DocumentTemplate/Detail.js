@@ -13,8 +13,8 @@ import {
   OutlinedTextField,
   RichEditor,
   Field,
+  Select,
 } from '@/components'
-
 
 const styles = (theme) => ({})
 
@@ -46,8 +46,8 @@ const tagList = [
 ]
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingTemplateMessage }) =>
-  settingTemplateMessage.entity || settingTemplateMessage.default,
+  mapPropsToValues: ({ settingDocumentTemplate }) =>
+  settingDocumentTemplate.entity || settingDocumentTemplate.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -58,9 +58,10 @@ const tagList = [
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     //console.log(restValues)
-    
+
+
     dispatch({
-      type: 'settingTemplateMessage/upsert',
+      type: 'settingDocumentTemplate/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -70,24 +71,42 @@ const tagList = [
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingTemplateMessage/query',
+          type: 'settingDocumentTemplate/query',
         })
       }
     })
   },
-  displayName: 'TemplateMessageDetail',
+  displayName: 'DocumentTemplateDetail',
 })
 class Detail extends PureComponent {
   state = {}
 
   render () {
     const { props } = this
-    const { theme, footer, settingTemplateMessage } = props
+    const { theme, footer, settingDocumentTemplate, setFieldValue } = props
     //console.log('detail', props)
 
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
+          <GridContainer>
+            <GridItem md={6}>
+              <FastField
+                name='documentType'
+                render={() => (
+                  <Select
+                    label='Document Type'
+                    options={[
+                      { name: 'Referral Letter', value: 'referral letter' },
+                      { name: 'Vaccination Cert', value: 'vaccination cert' },
+                      { name: 'Memo', value: 'memo' },
+                      { name: 'Others', value: 'others' },
+                    ]}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
           <GridContainer>
             <GridItem md={6}>
               <FastField
@@ -97,7 +116,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={settingTemplateMessage.entity ? true : false}
+                    disabled={settingDocumentTemplate.entity ? true : false}
                   />
                 )}
               />

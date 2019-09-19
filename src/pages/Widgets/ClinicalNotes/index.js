@@ -44,14 +44,14 @@ const styles = (theme) => ({
   gridList: {
     flexWrap: 'nowrap',
     // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-    transform: 'translateZ(0)',
+    // transform: 'translateZ(0)',
   },
   root: {
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    overflow: 'hidden',
-    width: 450,
+    overflow: 'hidden ',
+    width: 200,
     backgroundColor: theme.palette.background.paper,
   },
 })
@@ -99,17 +99,37 @@ class ClinicalNotes extends Component {
     selectedData: '',
   }
 
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        entity: '',
+        selectedIndex: '',
+        notes: {
+          notesScribbleArray: [],
+        },
+        ChiefComplaints: {
+          chiefComplaintsScribbleArray: [],
+        },
+        Plan: {
+          planScribbleArray: [],
+        },
+      },
+    })
+  }
+
   scribbleNoteDrawing = (values, temp) => {
     const { scriblenotes } = this.props
-    console.log('))))', scriblenotes)
     const { category, arrayName } = this.state
     if (scriblenotes.editEnable) {
       const newArrayItems = [
         ...scriblenotes[category][arrayName],
       ]
       newArrayItems[scriblenotes.selectedIndex] = {
+        scribbleNoteTypeFK: 0,
+        scribbleNoteTypeName: this.state.category,
         subject: values,
-        lineData: temp,
+        scribbleNoteLayers: temp,
       }
 
       this.props.dispatch({
@@ -129,7 +149,12 @@ class ClinicalNotes extends Component {
           [this.state.category]: {
             [this.state.arrayName]: [
               ...scriblenotes[this.state.category][this.state.arrayName],
-              { subject: values, lineData: temp },
+              {
+                scribbleNoteTypeFK: 0,
+                scribbleNoteTypeName: this.state.category,
+                subject: values,
+                scribbleNoteLayers: temp,
+              },
             ],
           },
         },
@@ -150,7 +175,6 @@ class ClinicalNotes extends Component {
 
   toggleScribbleModal = () => {
     const { scriblenotes } = this.props
-    console.log({ scriblenotes })
     this.props.dispatch({
       type: 'scriblenotes/updateState',
       payload: {
@@ -214,25 +238,6 @@ class ClinicalNotes extends Component {
     })
   }
 
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'scriblenotes/updateState',
-      payload: {
-        entity: '',
-        selectedIndex: '',
-        notes: {
-          notesScribbleArray: [],
-        },
-        ChiefComplaints:{
-          chiefComplaintsScribbleArray: [],
-        },
-        Plan:{
-          planScribbleArray: [],
-        },
-      },
-    })
-  }
-
   render () {
     console.log('ClinicalNotes', this.props)
     const {
@@ -273,23 +278,25 @@ class ClinicalNotes extends Component {
                     >
                       <InsertPhoto />
                     </IconButton>
-                    
-                    <div style={{ display: 'inline-block', marginLeft: 150 }}>
+
+                    <div style={{ display: 'inline-block', right: 0 }}>
                       {scriblenotes.notes.notesScribbleArray.length > 0 ? (
                         <GridContainer>
                           <div className={classes.root}>
                             <GridList
                               className={classes.gridList}
-                              cols={1.5}
+                              cols={0}
                               cellHeight={20}
+                              spacing={1}
                             >
                               {scriblenotes.notes.notesScribbleArray.map(
                                 (item, i) => {
                                   return (
-                                    <GridListTile key={i} cols={1}>
-                                      <GridItem md={2}>
+                                    <GridListTile key={i} cols={0}>
+                                      <GridItem md={1}>
                                         <Button
                                           link
+                                          style={{textDecoration: 'underline'}}
                                           // className={classes.linkBtn}
                                           value={item}
                                           onClick={() => {
@@ -361,24 +368,25 @@ class ClinicalNotes extends Component {
                     >
                       <InsertPhoto />
                     </IconButton>
-                    <div style={{ display: 'inline-block', marginLeft: 150 }}>
+                    <div style={{ display: 'inline-block' }}>
                       {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
                         .length > 0 ? (
                         <GridContainer>
                           <div className={classes.root}>
                             <GridList
                               className={classes.gridList}
-                              cols={1.5}
+                              cols={0}
                               cellHeight={20}
                             >
                               {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray.map(
                                 (item, i) => {
                                   return (
-                                    <GridListTile key={i} cols={1}>
+                                    <GridListTile key={i} cols={0}>
                                       <GridItem md={2}>
                                         <Button
                                           link
                                           // className={classes.linkBtn}
+                                          style={{textDecoration: 'underline'}}
                                           value={item}
                                           onClick={() => {
                                             this.setState({
@@ -450,23 +458,24 @@ class ClinicalNotes extends Component {
                     >
                       <InsertPhoto />
                     </IconButton>
-                    <div style={{ display: 'inline-block', marginLeft: 150 }}>
+                    <div style={{ display: 'inline-block' }}>
                       {scriblenotes.Plan.planScribbleArray.length > 0 ? (
                         <GridContainer>
                           <div className={classes.root}>
                             <GridList
                               className={classes.gridList}
-                              cols={1.5}
+                              cols={0}
                               cellHeight={20}
                             >
                               {scriblenotes.Plan.planScribbleArray.map(
                                 (item, i) => {
                                   return (
-                                    <GridListTile key={i} cols={1}>
+                                    <GridListTile key={i} cols={0}>
                                       <GridItem md={2}>
                                         <Button
                                           link
                                           // className={classes.linkBtn}
+                                          style={{textDecoration: 'underline'}}
                                           value={item}
                                           onClick={() => {
                                             this.setState({

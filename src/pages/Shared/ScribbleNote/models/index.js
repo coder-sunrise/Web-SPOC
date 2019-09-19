@@ -24,11 +24,6 @@ export default createFormViewModel({
         scribleNotes: 'Test notes',
       },
     },
-    subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-      })
-    },
     effects: {},
     reducers: {},
   },

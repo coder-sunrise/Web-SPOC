@@ -14,8 +14,8 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingTemplateMessage, global }) => ({
-  settingTemplateMessage,
+@connect(({ settingSmsTemplate, global }) => ({
+  settingSmsTemplate,
   global,
 }))
 class ServiceCenter extends PureComponent {
@@ -23,43 +23,44 @@ class ServiceCenter extends PureComponent {
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingTemplateMessage/query',
+      type: 'settingSmsTemplate/query',
     })
   }
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingTemplateMessage/updateState',
+      type: 'settingSmsTemplate/updateState',
       payload: {
-        showModal: !this.props.settingTemplateMessage.showModal,
+        showModal: !this.props.settingSmsTemplate.showModal,
       },
     })
   }
 
-  getModalTitle = (isEntityEmpty) => {
-    const pathname = window.location.pathname.trim().toLowerCase()
+  // getModalTitle = (isEntityEmpty) => {
+  //   const pathname = window.location.pathname.trim().toLowerCase()
 
-    const modalTitle =
-      pathname == '/setting/smstemplate'
-        ? 'SMS Template'
-        : 'Referral Letter Template'
+  //   const modalTitle =
+  //     pathname == '/setting/smstemplate'
+  //       ? 'SMS Template'
+  //       : 'Document Template'
 
-    return (isEntityEmpty ? 'Edit ' : 'Add ') + modalTitle
-  }
+  //   return (isEntityEmpty ? 'Edit ' : 'Add ') + modalTitle
+  // }
 
   render () {
-    const { settingTemplateMessage } = this.props
+    const { settingSmsTemplate } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
-    }
+    } 
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
         <Grid {...cfg} {...this.props} />
         <CommonModal
-          open={settingTemplateMessage.showModal}
+          open={settingSmsTemplate.showModal}
           observe='TemplateMessageDetail'
-          title={this.getModalTitle(settingTemplateMessage.entity)}
+          // title={this.getModalTitle(settingSmsTemplate.entity)}
+          title={`${settingSmsTemplate.entity ? 'Edit ' : 'Add '  }SMS Template`}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

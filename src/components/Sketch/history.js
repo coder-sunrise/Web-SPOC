@@ -38,8 +38,9 @@ class History {
     return this.allList
   }
 
-  getInitializeList (data) {
+  getInitializeList (data, count) {
     this.allList = data
+    this.count = count + 1
   }
 
   /**
@@ -68,14 +69,14 @@ class History {
         for (let i = 0; i < this.allList.length; i++) {
           let [
             arrayobject,
-          ] = this.allList[i].data
+          ] = this.allList[i].layerContent
           if (arrayobject === mainObject) {
             let temp = this.allList
             this.allList = []
             for (let a = 0; a < temp.length; a++) {
               let [
                 tempArrayObject,
-              ] = temp[a].data
+              ] = temp[a].layerContent
               if (tempArrayObject !== mainObject) {
                 this.allList.push(temp[a])
               }
@@ -85,9 +86,10 @@ class History {
       } else {
         this.redoList = []
         this.allList.push({
-          data: obj,
-          type: mainObject.type,
-          sequence: this.count,
+          layerType: mainObject.type,
+          layerNumber: this.count,
+          layerContent: obj,
+          templateFK: 0,
         })
         this.count = this.count + 1
       }
@@ -114,11 +116,11 @@ class History {
       if (this.current) {
         this.redoList.push(this.current)
         for (let i = 0; i < this.allList.length; i++) {
-          if (this.allList[i].data === this.current) {
+          if (this.allList[i].layerContent === this.current) {
             let temp = this.allList
             this.allList = []
             for (let a = 0; a < temp.length; a++) {
-              if (temp[a].data !== this.current) {
+              if (temp[a].layerContent !== this.current) {
                 this.allList.push(temp[a])
               }
             }
@@ -154,9 +156,10 @@ class History {
           object,
         ] = this.current
         this.allList.push({
-          data: this.current,
-          type: object.type,
-          sequence: this.count,
+          layerType: object.type,
+          layerNumber: this.count,
+          layerContent: this.current,
+          templateFK: 0,
         })
         this.count = this.count + 1
         return this.current

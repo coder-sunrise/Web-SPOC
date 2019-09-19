@@ -285,42 +285,64 @@ class RichEditor extends React.PureComponent {
     const { anchorEl } = this.state
     const ITEM_HEIGHT = 64
 
+    // <Button
+    //       onClick={this.tagButtonHandleClick}
+    //       aria-controls='customized-menu'
+    //       aria-haspopup='true'
+    //       variant='contained'
+    //       color='primary'
+    //     >
+    //       Tag
+    //     </Button>
+
+    // <Menu
+    //       id='long-menu'
+    //       anchorEl={anchorEl}
+    //       keepMounted
+    //       open={Boolean(anchorEl)}
+    //       onClose={this.tagButtonHandleClose}
+    //       PaperProps={{
+    //         style: {
+    //           maxHeight: ITEM_HEIGHT * 4.5,
+    //           width: 250,
+    //         },
+    //       }}
+    //     >
+    //       {tagList.map((tag) => (
+    //         <MenuItem
+    //           key={tag.id}
+    //           onClick={() => {
+    //             this.tagButtonOnClick(tag.text)
+    //             this.tagButtonHandleClose()
+    //           }}
+    //         >
+    //           {tag.text}
+    //         </MenuItem>
+    //       ))}
+    //     </Menu>
+
     return (
       <div>
-        <Button
-          onClick={this.tagButtonHandleClick}
-          aria-controls='customized-menu'
-          aria-haspopup='true'
-          variant='contained'
-          color='primary'
-        >
-          Tag
-        </Button>
-        <Menu
-          id='long-menu'
-          anchorEl={anchorEl}
-          keepMounted
-          open={Boolean(anchorEl)}
-          onClose={this.tagButtonHandleClose}
-          PaperProps={{
-            style: {
-              maxHeight: ITEM_HEIGHT * 4.5,
-              width: 250,
-            },
-          }}
-        >
-          {tagList.map((tag) => (
-            <MenuItem
-              key={tag.id}
-              onClick={() => {
-                this.tagButtonOnClick(tag.text)
-                this.tagButtonHandleClose()
-              }}
-            >
-              {tag.text}
-            </MenuItem>
-          ))}
-        </Menu>
+        {tagList.map((tag) => (
+          <Button
+            key={tag.id}
+            style={{
+              marginRight: 5,
+              marginTop: 5,
+              backgroundColor: '#48C9B0',
+              color: 'white',
+              fontWeight: 'normal',
+              padding: 8,
+              fontSize: 12,
+            }}
+            onClick={() => {
+              this.tagButtonOnClick(tag.text)
+              this.tagButtonHandleClose()
+            }}
+          >
+            {tag.text}
+          </Button>
+        ))}
       </div>
     )
   }

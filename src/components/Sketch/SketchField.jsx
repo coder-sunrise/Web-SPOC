@@ -175,11 +175,12 @@ class SketchField extends PureComponent {
     let allList = data
     let { indexCount } = this.state
     let latestIndex = 0
-    history.getInitializeList(data)
+    let count = allList[allList.length-1].layerNumber
+    history.getInitializeList(data, count)
     for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-      ] = allList[i].data
+      ] = allList[i].layerContent
 
       this.setState({ action: false }, () => {
         this._fc.add(obj)
@@ -416,13 +417,14 @@ class SketchField extends PureComponent {
   */
 
   hideDrawing = (hideEnable) => {
+    console.log("hide")
     let history = this._history
     let allList = history.getAllList()
 
     for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-      ] = allList[i].data
+      ] = allList[i].layerContent
 
       if (obj.type !== 'image') {
         if (hideEnable) {
@@ -711,7 +713,7 @@ class SketchField extends PureComponent {
     for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-      ] = allList[i].data
+      ] = allList[i].layerContent
 
       if (obj.id === 'template') {
         obj.set({

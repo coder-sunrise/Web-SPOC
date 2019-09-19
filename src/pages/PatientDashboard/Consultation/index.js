@@ -157,9 +157,9 @@ const saveConsultation = ({
   }),
 )
 @withFormikExtend({
-  mapPropsToValues: ({ consultation = {} }) => {
-    return consultation.entity || consultation.default
-  },
+  // mapPropsToValues: ({ consultation = {} }) => {
+  //   return consultation.entity || consultation.default
+  // },
   validationSchema: schema,
 
   handleSubmit: (values, { props }) => {

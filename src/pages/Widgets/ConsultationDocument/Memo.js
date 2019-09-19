@@ -35,7 +35,6 @@ import {
   }),
 
   handleSubmit: (values, { props }) => {
-    console.log(values)
     const { dispatch, onConfirm } = props
     dispatch({
       type: 'consultationDocument/upsertRow',
