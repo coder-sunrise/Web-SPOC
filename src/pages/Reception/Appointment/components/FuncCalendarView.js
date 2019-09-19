@@ -309,21 +309,14 @@ const CalendarView = ({
 
   const filtered = useMemo(
     () =>
-      applyFilter(
-        filter,
-        calendarView === BigCalendar.Views.MONTH
-          ? [
-              ...eventList,
-              ...doctorBlocks.map((item) => ({
-                ...item,
-                start: item.startDateTime,
-                end: item.endDateTime,
-              })),
-            ]
-          : [
-              ...eventList,
-            ],
-      ),
+      applyFilter(filter, [
+        ...eventList,
+        ...doctorBlocks.map((item) => ({
+          ...item,
+          start: moment(item.startDateTime).toDate(),
+          end: moment(item.endDateTime).toDate(),
+        })),
+      ]),
     [
       calendarView,
       filter,
@@ -331,9 +324,6 @@ const CalendarView = ({
       eventList,
     ],
   )
-
-  console.log({ filtered })
-
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
       <DragAndDropCalendar
@@ -350,10 +340,11 @@ const CalendarView = ({
         min={minTime}
         max={maxTime}
         view={calendarView}
-        // --- values props ---
+        // #region values props
         events={filtered}
-        // --- values props ---
-        // --- functional props ---
+        // #endregion
+
+        // #region --- functional props ---
         selectable='ignoreEvents'
         resizable={false}
         showMultiDayTimes={false}
@@ -361,13 +352,13 @@ const CalendarView = ({
         timeslots={2}
         longPressThreshold={500}
         tooltipAccessor={null}
-        // --- functional props ---
-        // --- resources ---
+        // #endregion --- functional props ---
+        // #region --- resources ---
         resources={resources}
         resourceIdAccessor='clinicianFK'
         resourceTitleAccessor='doctorName'
-        // --- resources ---
-        // --- event handlers ---
+        // #endregion --- resources ---
+        // #region --- event handlers ---
         onNavigate={_jumpToDate}
         onEventDrop={_moveEvent}
         onView={_onViewChange}
@@ -377,7 +368,7 @@ const CalendarView = ({
         onSelectEvent={handleSelectEvent}
         onDoubleClickEvent={handleDoubleClick}
         onDragStart={handleOnDragStart}
-        // --- event handlers ---
+        // #endregion --- event handlers ---
       />
     </LoadingWrapper>
   )

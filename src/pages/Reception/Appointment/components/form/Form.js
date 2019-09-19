@@ -493,11 +493,7 @@ class Form extends React.PureComponent {
 
               <GridItem xs md={12}>
                 <Recurrence
-                  disabled={
-                    (values.id !== undefined &&
-                      currentAppointment.appointmentStatusFk !== 2) ||
-                    isEditedAsSingleAppointment
-                  }
+                  disabled={values.id !== undefined}
                   formValues={values}
                   recurrenceDto={values.recurrenceDto}
                   handleRecurrencePatternChange={this.onRecurrencePatternChange}
