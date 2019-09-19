@@ -23,8 +23,8 @@ const MapPaymentType = {
 }
 
 class PaymentCard extends Component {
-  MapPaymentTypeToComponent = (payment) => (
-    <GridItem md={12}>
+  MapPaymentTypeToComponent = (payment, index) => (
+    <GridItem md={12} key={`addpayment-paymentCard-${index}`}>
       {MapPaymentType[payment.type]({
         payment,
         handleDeletePayment: this.props.handleDeletePayment,

@@ -9,6 +9,7 @@ import {
   DatePicker,
   GridContainer,
   GridItem,
+  RadioGroup,
   Select,
   TextField,
   NumberInput,
@@ -23,17 +24,69 @@ const FilterBar = ({ handleSubmit }) => {
       <GridContainer>
         <GridContainer alignItems='flex-end'>
           {/* 1st row  */}
-          <GridItem md={4}>
+          <GridItem md={2}>
             <FastField
-              name='patientCriteria'
+              name='listingFrom'
+              render={(args) => <DatePicker {...args} label='From' />}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='listingTo'
+              render={(args) => <DatePicker {...args} label='To' />}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='doctorID'
               render={(args) => (
-                <TextField
+                <CodeSelect
                   {...args}
-                  label='Patient Name, Acc. No., Ref. No., Contact No.'
+                  code='doctorprofile'
+                  label='Doctor'
+                  labelField='clinicianProfile.name'
+                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
                 />
               )}
             />
           </GridItem>
+
+          <GridItem md={12}>
+            <FastField
+              name='payerType'
+              render={(args) => (
+                <RadioGroup
+                  {...args}
+                  label='Payer Type'
+                  options={[
+                    {
+                      value: '1',
+                      label: 'Just this one',
+                    },
+                    {
+                      value: '2',
+                      label: 'The entire series',
+                    },
+                  ]}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={12}>
+            <FastField
+              name='companyIDS'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  code='ctcompany'
+                  label='Doctor'
+                  labelField='clinicianProfile.name'
+                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
+                />
+              )}
+            />
+          </GridItem>
+
           <GridItem md={1} />
           <GridItem md={1}>
             <FastField
