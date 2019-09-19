@@ -172,11 +172,11 @@ const menuData = [
     text: 'Referral Letter Template',
     url: '/setting/referrallettertemplate',
   },
-  {
-    title: 'Contact',
-    text: 'Co-Payer',
-    url: '/setting/company/1',
-  },
+  // {
+  //   title: 'Contact',
+  //   text: 'Co-Payer',
+  //   url: '/setting/company/1',
+  // },
   {
     title: 'Contact',
     text: 'Supplier',

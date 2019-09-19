@@ -12,14 +12,14 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
         const { pathname } = loct
-        if (pathname === '/setting') {
-          dispatch({
-            type: 'getPrintoutSetting',
-            payload: {
-              pagesize: 99999,
-            },
-          })
-        }
+        // if (pathname === '/setting') {
+        //   dispatch({
+        //     type: 'getPrintoutSetting',
+        //     payload: {
+        //       pagesize: 99999,
+        //     },
+        //   })
+        // }
       })
     },
 

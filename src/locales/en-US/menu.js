@@ -123,7 +123,7 @@ export default {
   'menu.setting.clinicoperationhour': 'Clinic Operation Hour',
   'menu.setting.gstsetup': 'GST Setup',
   'menu.setting.generalsetting': 'General Setting',
-  'menu.setting.copayer': 'Co-Payer',
+  'menu.finance.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',

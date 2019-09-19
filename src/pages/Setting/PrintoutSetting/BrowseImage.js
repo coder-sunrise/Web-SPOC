@@ -39,6 +39,7 @@ const container = {
   marginTop: 10,
   borderWidth: 3,
   borderColor: '#EEEEEE',
+  borderRadius: 10,
 }
 
 const description = {
