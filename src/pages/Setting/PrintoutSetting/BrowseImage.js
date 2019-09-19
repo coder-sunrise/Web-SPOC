@@ -58,6 +58,10 @@ const BrowseImage = (props) => {
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
     onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length === 0) {
+        return notification.error({ message: 'Please select a image file' })
+      }
+
       if (acceptedFiles.length > 1) {
         return notification.error({ message: 'Please select 1 image only' })
       }
@@ -101,7 +105,10 @@ const BrowseImage = (props) => {
 
   return (
     <section style={container}>
-      <div {...getRootProps({ className: 'dropzone' })}>
+      <div
+        style={{ cursor: 'pointer' }}
+        {...getRootProps({ className: 'dropzone' })}
+      >
         <input {...getInputProps()} />
         <p style={description}>
           Drag 'n' drop the image here, or click to select image for
