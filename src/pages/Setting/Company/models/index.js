@@ -1,7 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
-import { getCodes } from '@/utils/codes'
 import { notification } from '@/components'
 
 let companyTypes = [

@@ -1,28 +1,20 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
 import { FastField } from 'formik'
 
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import { Add } from '@material-ui/icons'
 import {
   GridContainer,
   GridItem,
   CardContainer,
   TextField,
   Button,
-  CommonTableGrid,
-  DatePicker,
-  NumberInput,
-  CodeSelect,
   withFormikExtend,
   FieldArray,
-  notification,
   Field,
   Select,
 } from '@/components'
-import { DoctorLabel } from '@/components/_medisys'
 import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
 
 const styles = (theme) => ({
@@ -50,11 +42,10 @@ const styles = (theme) => ({
   // }),
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, history } = props
+    const { dispatch, history } = props
     const { contact } = values
-    console.log('values', values)
     dispatch({
-      type: 'clinicInfo/upsert',
+      type: 'clinicInfo/upsertClinicInfo',
       payload: {
         ...values,
         contact: {
@@ -65,9 +56,7 @@ const styles = (theme) => ({
         },
       },
     }).then((r) => {
-      console.log('r', r)
-      if (r && r.id) {
-        notification.success({ message: 'Saved' })
+      if (r) {
         history.push('/setting')
         dispatch({
           type: 'clinicInfo/query',
