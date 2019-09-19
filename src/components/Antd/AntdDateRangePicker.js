@@ -14,6 +14,8 @@ import {
   CustomInput,
   dateFormat,
   dateFormatWithTime,
+  dateFormatLong,
+  dateFormatLongWithTime,
 } from '@/components'
 
 import DatePicker from './AntdDatePicker'
@@ -100,7 +102,7 @@ class AntdDateRangePicker extends PureComponent {
   //   return nextDateValue !== currentDateValue
   // }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, local } = nextProps
     // console.log(field.value)
 
@@ -218,9 +220,9 @@ class AntdDateRangePicker extends PureComponent {
 
     if (!format) {
       if (restProps.showTime) {
-        format = dateFormatWithTime
+        format = text ? dateFormatLongWithTime : dateFormatWithTime
       } else {
-        format = dateFormat
+        format = text ? dateFormatLong : dateFormat
       }
     }
     // const selectValue = form && field ? field.value : value
@@ -237,7 +239,11 @@ class AntdDateRangePicker extends PureComponent {
       // console.log(this.state.value)
       return (
         <span>
-          <DatePicker text format={format} value={this.state.value[0]} /> ~
+          <DatePicker
+            text
+            format={format}
+            value={this.state.value[0]}
+          />&nbsp;~&nbsp;
           <DatePicker text format={format} value={this.state.value[1]} />
         </span>
       )

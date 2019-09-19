@@ -143,7 +143,7 @@ export const TextEditor = withStyles(styles)(TextEditorBase)
 
 class TextTypeProvider extends React.Component {
   static propTypes = {
-    for: PropTypes.array.isRequired,
+    for: PropTypes.array, // .isRequired,
     columnExtensions: PropTypes.array,
   }
 

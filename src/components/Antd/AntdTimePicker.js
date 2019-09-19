@@ -75,7 +75,7 @@ class AntdTimePicker extends PureComponent {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, format } = nextProps
     if (field) {
       this.setState({

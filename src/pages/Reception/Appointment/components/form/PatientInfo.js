@@ -5,7 +5,13 @@ import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
-import { Button, GridItem, TextField, ProgressButton } from '@/components'
+import {
+  Button,
+  CodeSelect,
+  GridItem,
+  TextField,
+  ProgressButton,
+} from '@/components'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -85,6 +91,19 @@ const PatientInfoInput = ({
               {...args}
               disabled={isEdit && appointmentStatusFK !== 2}
               label='Contact No.'
+            />
+          )}
+        />
+      </GridItem>
+      <GridItem xs md={6}>
+        <FastField
+          name='appointmentStatusFk'
+          render={(args) => (
+            <CodeSelect
+              {...args}
+              disabled
+              code='ltappointmentstatus'
+              label='Appointment Status'
             />
           )}
         />

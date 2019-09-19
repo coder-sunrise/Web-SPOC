@@ -186,7 +186,7 @@ class ControlTest extends PureComponent {
     }
   }
 
-  // componentWillReceiveProps (nextProps) {
+  // UNSAFE_componentWillReceiveProps (nextProps) {
   //   console.log(nextProps, this.props)
   // }
 

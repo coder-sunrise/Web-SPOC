@@ -63,7 +63,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   displayName: 'OrderPage',
 })
 class Vaccination extends PureComponent {
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
       nextProps.orders.shouldPushToState

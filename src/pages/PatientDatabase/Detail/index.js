@@ -217,7 +217,7 @@ class PatientDetail extends PureComponent {
   //   }
   // }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { errors, dispatch, patient } = nextProps
 
     const menuErrors = {}

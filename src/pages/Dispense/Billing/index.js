@@ -5,6 +5,7 @@ import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
 import { Accordion, Button, CommonModal, GridContainer } from '@/components'
+import { AddPayment } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '../DispenseDetails'
@@ -13,7 +14,7 @@ import InvoiceSummary from './components/InvoiceSummary'
 // page modal
 import EditClaimSeq from './modal/EditClaimSeq'
 import CoPayment from './modal/CoPayment'
-import AddPayment from './AddPayment'
+// import AddPayment from './AddPayment'
 
 const styles = (theme) => ({
   paperContent: {
@@ -49,6 +50,10 @@ class Billing extends Component {
   toggleAddPaymentModal = () => {
     const { showAddPaymentModal } = this.state
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
+  }
+
+  onSubmit = (values) => {
+    console.log('addpayment', { values })
   }
 
   render () {
@@ -118,10 +123,9 @@ class Billing extends Component {
         <CommonModal
           open={showAddPaymentModal}
           title='Add Payment'
-          onConfirm={this.toggleAddPaymentModal}
           onClose={this.toggleAddPaymentModal}
         >
-          <AddPayment />
+          <AddPayment handleSubmit={this.onSubmit} />
         </CommonModal>
       </div>
     )

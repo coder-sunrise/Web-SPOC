@@ -132,9 +132,15 @@ class BreadcrumbView extends PureComponent {
       // eslint-disable-next-line no-nested-ternary
       return currentBreadcrumb.name &&
       !currentBreadcrumb.hideInBreadcrumb ? location.pathname === targetUrl ? (
-        <Typography color='textPrimary'>{name}</Typography>
+        <Typography key={index} color='textPrimary'>
+          {name}
+        </Typography>
       ) : (
-        <Link to={targetUrl} onClick={navigateDirtyCheck(targetUrl)}>
+        <Link
+          key={index}
+          to={targetUrl}
+          onClick={navigateDirtyCheck(targetUrl)}
+        >
           {name}
         </Link>
       ) : null

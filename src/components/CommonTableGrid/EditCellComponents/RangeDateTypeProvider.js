@@ -25,7 +25,14 @@ class DateEditorBase extends PureComponent {
 
   render () {
     const { props } = this
-    const { column = {}, value, onValueChange, columnExtensions, row } = props
+    const {
+      column = {},
+      value,
+      onValueChange,
+      columnExtensions,
+      row,
+      text,
+    } = props
     const { name: columnName } = column
     const cfg = columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
@@ -60,6 +67,7 @@ class DateEditorBase extends PureComponent {
       disabled: isDisabled(latestRow),
       defaultValue: getInitialValue ? getInitialValue(row) : value,
       value: latestRow[columnName],
+      text,
     }
     // console.log('RangeDateTypeProvider', cfg, value, commonCfg)
     return (
@@ -104,8 +112,10 @@ class RangeDateTypeProvider extends React.Component {
   constructor (props) {
     super(props)
 
-    this.DateEditorBase = (ces) => (editorProps) => {
-      return <DateEditorBase columnExtensions={ces} {...editorProps} />
+    this.DateEditorBase = (ces, text) => (editorProps) => {
+      return (
+        <DateEditorBase columnExtensions={ces} {...editorProps} text={text} />
+      )
     }
   }
 
@@ -125,7 +135,7 @@ class RangeDateTypeProvider extends React.Component {
               ].indexOf(o.type) >= 0,
           )
           .map((o) => o.columnName)}
-        formatterComponent={DateRangeFormatter(columnExtensions)}
+        formatterComponent={this.DateEditorBase(columnExtensions, true)}
         editorComponent={this.DateEditorBase(columnExtensions)}
         {...this.props}
       />

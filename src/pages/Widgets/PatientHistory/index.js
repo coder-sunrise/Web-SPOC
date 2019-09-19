@@ -109,31 +109,31 @@ const styles = (theme) => ({
     // },
   },
 })
-@withFormikExtend({
-  // mapPropsToValues: ({ patientHistory }) => {
-  //   console.log(patientHistory)
-  //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
-  // },
-  // validationSchema: Yup.object().shape({
-  //   name: Yup.string().required(),
-  //   dob: Yup.date().required(),
-  //   patientAccountNo: Yup.string().required(),
-  //   genderFK: Yup.string().required(),
-  //   dialect: Yup.string().required(),
-  //   contact: Yup.object().shape({
-  //     contactAddress: Yup.array().of(
-  //       Yup.object().shape({
-  //         line1: Yup.string().required(),
-  //         postcode: Yup.number().required(),
-  //         countryFK: Yup.string().required(),
-  //       }),
-  //     ),
-  //   }),
-  // }),
+// @withFormikExtend({
+//   // mapPropsToValues: ({ patientHistory }) => {
+//   //   console.log(patientHistory)
+//   //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
+//   // },
+//   // validationSchema: Yup.object().shape({
+//   //   name: Yup.string().required(),
+//   //   dob: Yup.date().required(),
+//   //   patientAccountNo: Yup.string().required(),
+//   //   genderFK: Yup.string().required(),
+//   //   dialect: Yup.string().required(),
+//   //   contact: Yup.object().shape({
+//   //     contactAddress: Yup.array().of(
+//   //       Yup.object().shape({
+//   //         line1: Yup.string().required(),
+//   //         postcode: Yup.number().required(),
+//   //         countryFK: Yup.string().required(),
+//   //       }),
+//   //     ),
+//   //   }),
+//   // }),
 
-  handleSubmit: () => {},
-  displayName: 'PatientHistory',
-})
+//   handleSubmit: () => {},
+//   displayName: 'PatientHistory',
+// })
 @connect(({ patientHistory }) => ({
   patientHistory,
 }))
@@ -234,65 +234,15 @@ class PatientHistory extends Component {
     ]
   }
 
-  componentWillReceiveProps (nextProps) {
-    // console.log(this.props, nextProps)
-    if (
-      nextProps.patientHistory.version &&
-      this.props.patientHistory.version !== nextProps.patientHistory.version
-    ) {
-      nextProps
-        .dispatch({
-          type: 'patientHistory/query',
-          payload: {
-            patientProfileFK: nextProps.patientHistory.patientID,
-            sorting: [
-              {
-                columnName: 'VisitDate',
-                direction: 'desc',
-              },
-            ],
-          },
-        })
-        .then((o) => {
-          this.props.resetForm(o)
-        })
-    }
-  }
-
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'patientHistory/reset',
-    })
-  }
-
   // componentDidMount () {
 
   // }
 
-  getTitle = (row) => {
-    const { coHistory } = row
-    const latest = coHistory[coHistory.length] || {}
-    return (
-      <div className={this.props.classes.title}>
-        <GridContainer>
-          <GridItem sm={7}>
-            <p>
-              <span>Consultation Visit</span>
-              <div className={this.props.classes.note}>
-                V{latest.versionNumber}, {row.doctorTitle} {row.doctorName}
-              </div>
-            </p>
-          </GridItem>
-          <GridItem sm={5}>
-            <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-              <DatePicker text value={row.visitDate} />
-            </span>
-            <div className={this.props.classes.note}>&nbsp;</div>
-          </GridItem>
-        </GridContainer>
-      </div>
-    )
-  }
+  // componentWillUnmount () {
+  //   this.props.dispatch({
+  //     type: 'patientHistory/reset',
+  //   })
+  // }
 
   getContent = (row) => {
     const { selectedSubRow } = this.props
@@ -370,10 +320,88 @@ class PatientHistory extends Component {
     )
   }
 
+  getTitle = (row) => {
+    const { coHistory } = row
+    const latest = coHistory[coHistory.length] || {}
+    return (
+      <div className={this.props.classes.title}>
+        <GridContainer>
+          <GridItem sm={7}>
+            <p>
+              <span>Consultation Visit</span>
+              <div className={this.props.classes.note}>
+                V{latest.versionNumber}, {row.doctorTitle} {row.doctorName}
+              </div>
+            </p>
+          </GridItem>
+          <GridItem sm={5}>
+            <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
+              <DatePicker text value={row.visitDate} />
+            </span>
+            <div className={this.props.classes.note}>&nbsp;</div>
+          </GridItem>
+        </GridContainer>
+      </div>
+    )
+  }
+
+  // componentDidMount () {
+  //   this.props
+  //     .dispatch({
+  //       type: 'patientHistory/query',
+  //       payload: {
+  //         patientProfileFK: this.props.patientHistory.patientID,
+  //         sorting: [
+  //           {
+  //             columnName: 'VisitDate',
+  //             direction: 'desc',
+  //           },
+  //         ],
+  //       },
+  //     })
+  //     .then((o) => {
+  //       this.props.resetForm(o)
+  //     })
+  // }
+
   onSelectChange = (val) => {
     this.setState({
       selectedItems: val,
     })
+  }
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    // console.log(this.props, nextProps, nextProps.patientHistory.version)
+    if (
+      nextProps.patientHistory.version &&
+      this.props.patientHistory.version !== nextProps.patientHistory.version
+    ) {
+      nextProps
+        .dispatch({
+          type: 'patientHistory/query',
+          payload: {
+            patientProfileFK: nextProps.patientHistory.patientID,
+            sorting: [
+              {
+                columnName: 'VisitDate',
+                direction: 'desc',
+              },
+            ],
+          },
+        })
+        .then((o) => {
+          // this.props.resetForm(o)
+          nextProps.dispatch({
+            type: 'patientHistory/updateState',
+            payload: {
+              selected: undefined,
+              selectedSubRow: undefined,
+              entity: undefined,
+            },
+          })
+        })
+    }
   }
 
   render () {
@@ -384,6 +412,7 @@ class PatientHistory extends Component {
       override = {},
       patientHistory,
       dispatch,
+      widget,
     } = this.props
     const { entity, visitInfo, selected } = patientHistory
     return (
@@ -450,31 +479,33 @@ class PatientHistory extends Component {
                 />
               </GridItem>
               <GridItem md={4}>
-                <ProgressButton
-                  color='primary'
-                  style={{ marginLeft: theme.spacing(2) }}
-                  size='sm'
-                  onClick={() => {
-                    dispatch({
-                      type: `consultation/edit`,
-                      payload: selected.id,
-                    }).then((o) => {
-                      // console.log(o)
+                {!widget && (
+                  <ProgressButton
+                    color='primary'
+                    style={{ marginLeft: theme.spacing(2) }}
+                    size='sm'
+                    onClick={() => {
                       dispatch({
-                        type: `consultation/updateState`,
-                        payload: {
-                          entity: o,
-                        },
-                      })
+                        type: `consultation/edit`,
+                        payload: selected.id,
+                      }).then((o) => {
+                        // console.log(o)
+                        dispatch({
+                          type: `consultation/updateState`,
+                          payload: {
+                            entity: o,
+                          },
+                        })
 
-                      router.push(
-                        `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                      )
-                    })
-                  }}
-                >
-                  Edit Consultation
-                </ProgressButton>
+                        router.push(
+                          `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                        )
+                      })
+                    }}
+                  >
+                    Edit Consultation
+                  </ProgressButton>
+                )}
               </GridItem>
             </GridContainer>
 

@@ -51,7 +51,7 @@ class AntdSwitch extends React.PureComponent {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value, checkedValue, unCheckedValue } = nextProps
     // console.log(checkedValue, field.value)
     if (field) {
