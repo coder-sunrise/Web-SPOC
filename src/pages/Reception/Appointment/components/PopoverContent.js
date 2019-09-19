@@ -28,6 +28,14 @@ const styles = () => ({
   iconRow: {
     marginBottom: 10,
   },
+  statusRow: {
+    position: 'absolute',
+    right: 8,
+    top: 8,
+    textAlign: 'right',
+    color: '#999',
+    fontSize: '.75rem',
+  },
 })
 
 const getTimeString = (value) => {
@@ -103,10 +111,18 @@ class PopoverContent extends React.Component {
       patientContactNo,
       clinicianFK,
       appointmentTypeFK,
+      appointmentStatusFk,
     } = popoverEvent
 
     return (
       <CardBody>
+        <div className={classes.statusRow}>
+          <CodeSelect
+            code='ltappointmentstatus'
+            text
+            value={parseInt(appointmentStatusFk, 10)}
+          />
+        </div>
         {doctor ? (
           <DoctorEventContent {...this.props} />
         ) : (

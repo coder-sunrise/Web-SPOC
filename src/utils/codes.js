@@ -705,6 +705,14 @@ const tenantCodes = [
   'ctsupplier',
 ]
 
+const defaultParams = {
+  excludeInactiveCodes: true,
+}
+
+const convertExcludeFields = [
+  'excludeInactiveCodes',
+]
+
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
@@ -723,13 +731,16 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     url = '/api/'
     useGeneral = false
   }
-  // const newParams = {
-  //   ...params,
-
-  // }
+  const newParams = {
+    ...defaultParams,
+    ...params,
+  }
   const body = useGeneral
-    ? convertToQuery({ ...params })
-    : convertToQuery({ ...params, ...criteriaForTenantCodes })
+    ? convertToQuery({ ...newParams }, convertExcludeFields)
+    : convertToQuery(
+        { ...params, ...criteriaForTenantCodes },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',

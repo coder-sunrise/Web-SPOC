@@ -43,7 +43,7 @@ export default createListViewModel({
     },
     reducers: {
       saveCodetable (state, { payload }) {
-        return { ...state, [payload.code]: payload.data }
+        return { ...state, [payload.code.toLowerCase()]: payload.data }
       },
     },
   },
