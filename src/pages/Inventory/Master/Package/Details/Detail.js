@@ -19,7 +19,7 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ packDetail, dispatch }) => {
+const Detail = ({ packDetail, dispatch, values }) => {
   useEffect(() => {
     if (packDetail.currentId) {
       dispatch({
@@ -27,7 +27,7 @@ const Detail = ({ packDetail, dispatch }) => {
         payload: {
           id: packDetail.currentId,
         },
-      })
+      }) //.then((v) => console.log('v', v))
     }
   }, [])
   return (
@@ -50,6 +50,7 @@ const Detail = ({ packDetail, dispatch }) => {
                       label={formatMessage({
                         id: 'inventory.master.package.code',
                       })}
+                      disabled={!values.isActive}
                       {...args}
                     />
                   )
@@ -128,6 +129,7 @@ const Detail = ({ packDetail, dispatch }) => {
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
+                    format='DD MMM YYYY'
                     label='Effective Start Date'
                     label2='End Date'
                     {...args}

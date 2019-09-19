@@ -159,7 +159,8 @@ const menuData = [
   },
   {
     title: 'Print Setup',
-    text: 'TBD',
+    text: 'Printout Setting',
+    url: '/setting/printoutsetting',
   },
   {
     title: 'Templates',
@@ -171,11 +172,11 @@ const menuData = [
     text: 'Referral Letter Template',
     url: '/setting/referrallettertemplate',
   },
-  {
-    title: 'Contact',
-    text: 'Co-Payer',
-    url: '/setting/company/1',
-  },
+  // {
+  //   title: 'Contact',
+  //   text: 'Co-Payer',
+  //   url: '/setting/company/1',
+  // },
   {
     title: 'Contact',
     text: 'Supplier',

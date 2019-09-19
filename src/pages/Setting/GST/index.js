@@ -22,41 +22,55 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ gstSetup }) => ({
-  gstSetup,
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ gstSetup }) => gstSetup.gst,
+  mapPropsToValues: ({ clinicSettings }) => clinicSettings.settings,
 
   handleSubmit: (values, { props }) => {
-    const { IsEnableGST, GSTRegistrationNumber, GSTPercentage } = values
-
+    const {
+      IsEnableGST,
+      GSTRegistrationNumber,
+      GSTPercentage,
+      concurrencyToken,
+    } = values
+    console.log('values', values)
     const payload = [
       {
+        id: 1,
         settingKey: 'IsEnableGST',
         settingValue: IsEnableGST,
+        dataType: 'Boolean',
+        concurrencyToken,
       },
       {
+        id: 2,
         settingKey: 'GSTRegistrationNumber',
         settingValue: GSTRegistrationNumber,
+        dataType: 'String',
+        concurrencyToken,
       },
       {
+        id: 3,
         settingKey: 'GSTPercentage',
         settingValue: GSTPercentage,
+        dataType: 'Decimal',
+        concurrencyToken,
       },
     ]
     const { dispatch, onConfirm, history } = props
 
     dispatch({
-      type: 'gstSetup/upsert',
+      type: 'clinicSettings/upsert',
 
       payload,
     }).then(history.push('/setting'))
   },
-  displayName: 'GstSetupInfo',
+  displayName: 'clinicSettingsInfo',
 })
-class GstSetup extends PureComponent {
+class clinicSettings extends PureComponent {
   state = {
     enableGst: false,
     inclusiveGst: false,
@@ -66,7 +80,7 @@ class GstSetup extends PureComponent {
   componentDidMount = async () => {
     this.checkHasActiveSession()
     await this.props.dispatch({
-      type: 'gstSetup/query',
+      type: 'clinicSettings/query',
     })
 
     const { IsEnableGST } = this.props.values
@@ -105,7 +119,7 @@ class GstSetup extends PureComponent {
     const {
       form,
       classes,
-      gstSetupInfo,
+      clinicSettingsInfo,
       dispatch,
       theme,
       handleSubmit,
@@ -213,4 +227,4 @@ class GstSetup extends PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(GstSetup)
+export default withStyles(styles, { withTheme: true })(clinicSettings)

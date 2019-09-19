@@ -344,6 +344,12 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Scheme/Details',
           },
+          {
+            path: '/finance/copayer',
+            name: 'copayer',
+            mini: 'CP',
+            component: './Setting/Company',
+          },
         ],
       },
       // Forms
@@ -559,10 +565,15 @@ const routes = [
             component: './Setting/GeneralSetting',
           },
           {
-            path: '/setting/company/1',
-            name: 'copayer',
-            component: './Setting/Company',
+            path: '/setting/printoutsetting',
+            name: 'printoutsetting',
+            component: './Setting/PrintoutSetting',
           },
+          // {
+          //   path: '/finance/company/1',
+          //   name: 'copayer',
+          //   component: './Setting/Company',
+          // },
           {
             path: '/setting/company/2',
             name: 'supplier',

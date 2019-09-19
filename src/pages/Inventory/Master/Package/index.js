@@ -32,9 +32,11 @@ const Package = ({ dispatch, history, pack }) => {
       type: 'select',
       options: status,
       align: 'center',
+      width: 120,
     },
     { columnName: 'Action', width: 110, align: 'center' },
-    { columnName: 'totalPrice', type: 'number', currency: true },
+    { columnName: 'code', width: 230 },
+    { columnName: 'totalPrice', type: 'number', currency: true, width: 220 },
   ])
 
   const filterProps = {
@@ -42,10 +44,44 @@ const Package = ({ dispatch, history, pack }) => {
     history,
   }
 
+  const getPackList = (list) => {
+    console.log('list', list)
+    if (list) {
+      list.map((r) => {
+        const {
+          medicationPackageItem,
+          consumablePackageItem,
+          vaccinationPackageItem,
+          servicePackageItem,
+        } = r
+        let sellingPrice = 0
+        medicationPackageItem.forEach((o) => {
+          sellingPrice += o.subTotal
+        })
+        consumablePackageItem.forEach((o) => {
+          sellingPrice += o.subTotal
+        })
+        vaccinationPackageItem.forEach((o) => {
+          sellingPrice += o.subTotal
+        })
+        servicePackageItem.forEach((o) => {
+          sellingPrice += o.subTotal
+        })
+        return {
+          ...r,
+          totalPrice: sellingPrice,
+        }
+      })
+    }
+
+    return []
+  }
+
   const gridProps = {
     ...filterProps,
     pack,
     namespace: 'package',
+    // list: getPackList(pack.list),
     list: pack.list || [],
     tableParas,
     colExtensions,

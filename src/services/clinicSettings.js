@@ -1,7 +1,7 @@
 import * as service from '@/services/common'
 import request from '@/utils/request'
 
-const url = '/api/generalSetting'
+const url = '/api/clinicSettings'
 
 module.exports = {
   query: (params) => {
