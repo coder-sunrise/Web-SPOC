@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import Edit from '@material-ui/icons/Edit'
+import { Edit, Delete } from '@material-ui/icons'
 // import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button } from '@/components'
@@ -39,16 +39,29 @@ class Grid extends PureComponent {
         align: 'center',
         render: (row) => {
           return (
-            <Button
-              size='sm'
-              onClick={() => {
-                this.editRow(row)
-              }}
-              justIcon
-              color='primary'
-            >
-              <Edit />
-            </Button>
+            <React.Fragment>
+              <Button
+                size='sm'
+                onClick={() => {
+                  this.editRow(row)
+                }}
+                justIcon
+                color='primary'
+              >
+                <Edit />
+              </Button>
+              <Button
+                size='sm'
+                // onClick={() => {
+                //   this.editRow(row)
+                // }}
+                justIcon
+                color='danger'
+                disabled={row.status === 'Finalized'}
+              >
+                <Delete />
+              </Button>
+            </React.Fragment>
           )
         },
       },

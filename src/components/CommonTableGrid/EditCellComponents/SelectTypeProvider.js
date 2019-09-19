@@ -156,7 +156,7 @@ class SelectEditor extends PureComponent {
       ...restProps,
       onChange: this._onChange,
     }
-    console.log(commonCfg)
+    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
