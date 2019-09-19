@@ -104,7 +104,7 @@ class Details extends PureComponent {
                 this.props.dispatch({
                   type: 'orders/updateState',
                   payload: {
-                    editType: undefined,
+                    type: undefined,
                   },
                 })
               }}
@@ -175,12 +175,12 @@ class Details extends PureComponent {
       footer,
       dispatch,
     } = props
-    const { editType, entity } = orders
+    const { type, entity } = orders
     // console.log(values)
     const cfg = {
       footer: this.footerBtns,
-      currentType: orderTypes.find((o) => o.value === editType),
-      editType,
+      currentType: orderTypes.find((o) => o.value === type),
+      type,
       ...props,
     }
     return (
@@ -192,13 +192,13 @@ class Details extends PureComponent {
                 label='Type'
                 options={orderTypes}
                 allowClear={false}
-                value={editType}
+                value={type}
                 disabled={!!entity}
                 onChange={(v) => {
                   dispatch({
                     type: 'orders/updateState',
                     payload: {
-                      editType: v,
+                      type: v,
                     },
                   })
                 }}
@@ -206,11 +206,11 @@ class Details extends PureComponent {
             </GridItem>
           </GridContainer>
           <div>
-            {editType === '1' && <Medication {...cfg} />}
-            {editType === '2' && <Vaccination {...cfg} />}
-            {editType === '3' && <Service {...cfg} />}
-            {editType === '4' && <Consumable {...cfg} />}
-            {editType === '5' && <Medication {...cfg} openPrescription />}
+            {type === '1' && <Medication {...cfg} />}
+            {type === '2' && <Vaccination {...cfg} />}
+            {type === '3' && <Service {...cfg} />}
+            {type === '4' && <Consumable {...cfg} />}
+            {type === '5' && <Medication {...cfg} openPrescription />}
           </div>
         </div>
       </div>

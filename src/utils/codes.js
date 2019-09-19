@@ -574,9 +574,9 @@ const consultationDocumentTypes = [
         .utc(r.mcStartDate)
         .local()
         .format(dateFormatLong)} - ${moment
-          .utc(r.mcEndDate)
-          .local()
-          .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+        .utc(r.mcEndDate)
+        .local()
+        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
     convert: (r) => {
       return {
         ...r,
@@ -702,7 +702,15 @@ const tenantCodes = [
   'inventoryvaccination',
   'inventorypackage',
   'role',
-  'ctsupplier'
+  'ctsupplier',
+]
+
+const defaultParams = {
+  excludeInactiveCodes: true,
+}
+
+const convertExcludeFields = [
+  'excludeInactiveCodes',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -723,9 +731,16 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     url = '/api/'
     useGeneral = false
   }
+  const newParams = {
+    ...defaultParams,
+    ...params,
+  }
   const body = useGeneral
-    ? convertToQuery({ ...params })
-    : convertToQuery({ ...params, ...criteriaForTenantCodes })
+    ? convertToQuery({ ...newParams }, convertExcludeFields)
+    : convertToQuery(
+        { ...params, ...criteriaForTenantCodes },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -913,7 +928,11 @@ export const getInventoryItem = (list, value, itemFKName, rows) => {
   }
 }
 
-export const getInventoryItemList = (list, itemFKName = undefined, stateName = undefined) => {
+export const getInventoryItemList = (
+  list,
+  itemFKName = undefined,
+  stateName = undefined,
+) => {
   let inventoryItemList = list.map((x) => {
     return {
       value: x.id,

@@ -217,7 +217,7 @@ class PatientDetail extends PureComponent {
   //   }
   // }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { errors, dispatch, patient } = nextProps
 
     const menuErrors = {}
@@ -240,11 +240,15 @@ class PatientDetail extends PureComponent {
   }
 
   componentDidMount () {
+    // console.log(
+    //   this.props.patient.currentId,
+    //   !this.props.patient.entity ||
+    //     this.props.patient.entity.id !== this.props.patient.currentId,
+    // )
     if (
       this.props.patient.currentId &&
       (!this.props.patient.entity ||
-        this.props.patient.entity.id !== this.props.patient.currentId) &&
-      !this.props.patient.version
+        this.props.patient.entity.id !== this.props.patient.currentId)
     ) {
       this.props
         .dispatch({
@@ -287,6 +291,8 @@ class PatientDetail extends PureComponent {
     const { currentComponent, currentId, menuErrors, entity } = patient
     // console.log('patient', patient)
     // console.log('xx', resetProps)
+    // console.log(this.props)
+
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}
     const CurrentComponent = currentMenu.component
@@ -316,7 +322,7 @@ class PatientDetail extends PureComponent {
                         }
                         onClick={(e) => {
                           onMenuClick(e, o)
-                          console.log('here', entity, values)
+                          // console.log('here', entity, values)
                           dispatch({
                             type: 'patient/updateState',
                             payload: {

@@ -109,31 +109,31 @@ const styles = (theme) => ({
     // },
   },
 })
-@withFormikExtend({
-  // mapPropsToValues: ({ patientHistory }) => {
-  //   console.log(patientHistory)
-  //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
-  // },
-  // validationSchema: Yup.object().shape({
-  //   name: Yup.string().required(),
-  //   dob: Yup.date().required(),
-  //   patientAccountNo: Yup.string().required(),
-  //   genderFK: Yup.string().required(),
-  //   dialect: Yup.string().required(),
-  //   contact: Yup.object().shape({
-  //     contactAddress: Yup.array().of(
-  //       Yup.object().shape({
-  //         line1: Yup.string().required(),
-  //         postcode: Yup.number().required(),
-  //         countryFK: Yup.string().required(),
-  //       }),
-  //     ),
-  //   }),
-  // }),
+// @withFormikExtend({
+//   // mapPropsToValues: ({ patientHistory }) => {
+//   //   console.log(patientHistory)
+//   //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
+//   // },
+//   // validationSchema: Yup.object().shape({
+//   //   name: Yup.string().required(),
+//   //   dob: Yup.date().required(),
+//   //   patientAccountNo: Yup.string().required(),
+//   //   genderFK: Yup.string().required(),
+//   //   dialect: Yup.string().required(),
+//   //   contact: Yup.object().shape({
+//   //     contactAddress: Yup.array().of(
+//   //       Yup.object().shape({
+//   //         line1: Yup.string().required(),
+//   //         postcode: Yup.number().required(),
+//   //         countryFK: Yup.string().required(),
+//   //       }),
+//   //     ),
+//   //   }),
+//   // }),
 
-  handleSubmit: () => {},
-  displayName: 'PatientHistory',
-})
+//   handleSubmit: () => {},
+//   displayName: 'PatientHistory',
+// })
 @connect(({ patientHistory }) => ({
   patientHistory,
 }))
@@ -199,7 +199,7 @@ class PatientHistory extends Component {
         id: '5',
         name: 'Consultation Document',
         component: Loadable({
-          loader: () => import('../ConsultationDocument'),
+          loader: () => import('./ConsultationDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...props} {...p} />
@@ -207,18 +207,18 @@ class PatientHistory extends Component {
           loading: Loading,
         }),
       },
-      {
-        id: '6',
-        name: 'Result History',
-        component: Loadable({
-          loader: () => import('./ResultHistory'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
+      // {
+      //   id: '6',
+      //   name: 'Result History',
+      //   component: Loadable({
+      //     loader: () => import('./ResultHistory'),
+      //     render: (loaded, p) => {
+      //       let Cmpnet = loaded.default
+      //       return <Cmpnet {...props} {...p} />
+      //     },
+      //     loading: Loading,
+      //   }),
+      // },
       {
         id: '7',
         name: 'Invoice',
@@ -234,61 +234,18 @@ class PatientHistory extends Component {
     ]
   }
 
-  componentWillReceiveProps (nextProps) {
-    // console.log(this.props, nextProps)
-    if (
-      nextProps.patientHistory.version &&
-      this.props.patientHistory.version !== nextProps.patientHistory.version
-    ) {
-      nextProps
-        .dispatch({
-          type: 'patientHistory/query',
-          payload: {
-            patientProfileFK: nextProps.patientHistory.patientID,
-            sorting: [
-              {
-                columnName: 'VisitDate',
-                direction: 'desc',
-              },
-            ],
-          },
-        })
-        .then((o) => {
-          this.props.resetForm(o)
-        })
-    }
-  }
-
   // componentDidMount () {
 
   // }
 
-  getTitle = (row) => {
-    const { coHistory } = row
-    const latest = coHistory[coHistory.length] || {}
-    return (
-      <div className={this.props.classes.title}>
-        <GridContainer>
-          <GridItem sm={7}>
-            <p>
-              <span>Consultation Visit</span>
-              <div className={this.props.classes.note}>
-                V{latest.versionNumber}, {row.doctorTitle} {row.doctorName}
-              </div>
-            </p>
-          </GridItem>
-          <GridItem sm={5}>
-            <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-              <DatePicker text value={moment(row.visitDate)} />
-            </span>
-            <div className={this.props.classes.note}>&nbsp;</div>
-          </GridItem>
-        </GridContainer>
-      </div>
-    )
-  }
+  // componentWillUnmount () {
+  //   this.props.dispatch({
+  //     type: 'patientHistory/reset',
+  //   })
+  // }
 
   getContent = (row) => {
+    const { selectedSubRow } = this.props
     return (
       <List
         component='nav'
@@ -304,6 +261,7 @@ class PatientHistory extends Component {
               classes={{
                 root: this.props.classes.listItemRoot,
               }}
+              selected={selectedSubRow && o.id === selectedSubRow.id}
               divider
               disableGutters
               button
@@ -319,14 +277,15 @@ class PatientHistory extends Component {
                         type: 'patientHistory/updateState',
                         payload: {
                           selected: row,
+                          selectedSubRow: o,
                         },
                       })
-                      this.props.dispatch({
-                        type: 'consultationDocument/updateState',
-                        payload: {
-                          rows: r.documents,
-                        },
-                      })
+                      // this.props.dispatch({
+                      //   type: 'consultationDocument/updateState',
+                      //   payload: {
+                      //     rows: r.documents,
+                      //   },
+                      // })
                     }
                   })
               }}
@@ -361,10 +320,88 @@ class PatientHistory extends Component {
     )
   }
 
+  getTitle = (row) => {
+    const { coHistory } = row
+    const latest = coHistory[coHistory.length] || {}
+    return (
+      <div className={this.props.classes.title}>
+        <GridContainer>
+          <GridItem sm={7}>
+            <p>
+              <span>Consultation Visit</span>
+              <div className={this.props.classes.note}>
+                V{latest.versionNumber}, {row.doctorTitle} {row.doctorName}
+              </div>
+            </p>
+          </GridItem>
+          <GridItem sm={5}>
+            <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
+              <DatePicker text value={row.visitDate} />
+            </span>
+            <div className={this.props.classes.note}>&nbsp;</div>
+          </GridItem>
+        </GridContainer>
+      </div>
+    )
+  }
+
+  // componentDidMount () {
+  //   this.props
+  //     .dispatch({
+  //       type: 'patientHistory/query',
+  //       payload: {
+  //         patientProfileFK: this.props.patientHistory.patientID,
+  //         sorting: [
+  //           {
+  //             columnName: 'VisitDate',
+  //             direction: 'desc',
+  //           },
+  //         ],
+  //       },
+  //     })
+  //     .then((o) => {
+  //       this.props.resetForm(o)
+  //     })
+  // }
+
   onSelectChange = (val) => {
     this.setState({
       selectedItems: val,
     })
+  }
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    // console.log(this.props, nextProps, nextProps.patientHistory.version)
+    if (
+      nextProps.patientHistory.version &&
+      this.props.patientHistory.version !== nextProps.patientHistory.version
+    ) {
+      nextProps
+        .dispatch({
+          type: 'patientHistory/query',
+          payload: {
+            patientProfileFK: nextProps.patientHistory.patientID,
+            sorting: [
+              {
+                columnName: 'VisitDate',
+                direction: 'desc',
+              },
+            ],
+          },
+        })
+        .then((o) => {
+          // this.props.resetForm(o)
+          nextProps.dispatch({
+            type: 'patientHistory/updateState',
+            payload: {
+              selected: undefined,
+              selectedSubRow: undefined,
+              entity: undefined,
+            },
+          })
+        })
+    }
   }
 
   render () {
@@ -375,6 +412,7 @@ class PatientHistory extends Component {
       override = {},
       patientHistory,
       dispatch,
+      widget,
     } = this.props
     const { entity, visitInfo, selected } = patientHistory
     return (
@@ -387,7 +425,7 @@ class PatientHistory extends Component {
             [override.leftPanel]: true,
           })}
         >
-          {patientHistory.list.length ? (
+          {patientHistory.list && patientHistory.list.length ? (
             <Accordion
               defaultActive={0}
               collapses={patientHistory.list.map((o) => ({
@@ -431,7 +469,7 @@ class PatientHistory extends Component {
                     { name: 'Diagnosis', value: '3' },
                     { name: 'Consultation Document', value: '4' },
                     { name: 'Orders', value: '5' },
-                    { name: 'Result History', value: '6' },
+                    // { name: 'Result History', value: '6' },
                     { name: 'Invoice', value: '7' },
                   ]}
                   label='Filter By'
@@ -441,30 +479,33 @@ class PatientHistory extends Component {
                 />
               </GridItem>
               <GridItem md={4}>
-                <ProgressButton
-                  color='primary'
-                  style={{ marginLeft: theme.spacing(2) }}
-                  size='sm'
-                  onClick={() => {
-                    dispatch({
-                      type: `consultation/edit`,
-                      payload: selected.id,
-                    }).then((o) => {
-                      // console.log(o)
+                {!widget && (
+                  <ProgressButton
+                    color='primary'
+                    style={{ marginLeft: theme.spacing(2) }}
+                    size='sm'
+                    onClick={() => {
                       dispatch({
-                        type: `consultation/updateState`,
-                        payload: {
-                          entity: o,
-                        },
+                        type: `consultation/edit`,
+                        payload: selected.id,
+                      }).then((o) => {
+                        // console.log(o)
+                        dispatch({
+                          type: `consultation/updateState`,
+                          payload: {
+                            entity: o,
+                          },
+                        })
+
+                        router.push(
+                          `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                        )
                       })
-                      router.push(
-                        `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                      )
-                    })
-                  }}
-                >
-                  Edit Consultation
-                </ProgressButton>
+                    }}
+                  >
+                    Edit Consultation
+                  </ProgressButton>
+                )}
               </GridItem>
             </GridContainer>
 

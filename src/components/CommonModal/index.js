@@ -13,16 +13,16 @@ import withMobileDialog from '@material-ui/core/withMobileDialog'
 import Close from '@material-ui/icons/Close'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import Slide from '@material-ui/core/Slide'
-import ModalWrapper from '@/components/ModalWrapper'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
+import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
+import ModalWrapper from '@/components/ModalWrapper'
 import Loading from '@/components/PageLoading/index'
 import { confirmBeforeReload } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 
 import { SizeContainer, ProgressButton } from '@/components'
-import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
 
 // const styles = theme => ({
 //     ...notificationsStyle(theme),
@@ -47,15 +47,19 @@ function getContainerHeight (props) {
 @connect(({ loading, global }) => ({ loading, global }))
 class CommonModal extends React.PureComponent {
   state = {
-    open: false,
+    // open: false,
     openConfirm: false,
     height: 0,
   }
 
+  static defaultProps = {
+    open: false,
+  }
+
   static propTypes = {
-    open: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
-    onConfirm: PropTypes.func.isRequired,
+    // open: PropTypes.bool.isRequired,
+    // onClose: PropTypes.func.isRequired,
+    // onConfirm: PropTypes.func.isRequired,
 
     title: PropTypes.string,
     maxWidth: PropTypes.oneOf([
@@ -80,8 +84,8 @@ class CommonModal extends React.PureComponent {
   }
 
   componentDidMount () {
-    this.resize()
-    window.addEventListener('resize', this.resize.bind(this))
+    // this.resize()
+    // window.addEventListener('resize', this.resize.bind(this))
   }
 
   componentWillUnmount () {
@@ -154,23 +158,29 @@ class CommonModal extends React.PureComponent {
           {cancelText || 'Close'}
         </Button>
         {extraButtons}
-        {onConfirm && <ProgressButton
-          color='primary'
-          hideIfNoEditRights
-          onClick={onConfirm}
-          icon={null}
-          {...confirmProps}
-          // disabled={disabled || loading.global || global.disableSave}
-        >
-          {confirmBtnText || confirmText}
-                      </ProgressButton>}
+        {onConfirm && (
+          <ProgressButton
+            color='primary'
+            hideIfNoEditRights
+            onClick={onConfirm}
+            icon={null}
+            {...confirmProps}
+            // disabled={disabled || loading.global || global.disableSave}
+          >
+            {confirmBtnText || confirmText}
+          </ProgressButton>
+        )}
       </DialogActions>
     )
   }
 
   onClose = (force) => {
-    const obs =Array.isArray(this.props.observe)?this.props.observe:[this.props.observe]
-   console.log(obs)
+    const obs = Array.isArray(this.props.observe)
+      ? this.props.observe
+      : [
+          this.props.observe,
+        ]
+    //  console.log(obs)
     for (let i = 0; i < obs.length; i++) {
       const o = obs[i]
       const ob = window.g_app._store.getState().formik[o]
@@ -192,16 +202,14 @@ class CommonModal extends React.PureComponent {
         window.removeEventListener('beforeunload', confirmBeforeReload)
       }
     }
-    
+
     if (this.props.onClose) {
       this.props.onClose()
     }
     // return true
   }
 
-  onMinimize=()=>{
-
-  }
+  onMinimize = () => {}
 
   onConfirm = (cb) => {
     // console.log('onConfirm')
@@ -369,34 +377,34 @@ class CommonModal extends React.PureComponent {
           </DialogContent>
           <DialogActions className={classes.modalFooter}>
             <SizeContainer size='md'>
-              <>
+              <React.Fragment>
                 <Button
                   onClick={() => {
-                  this.setState({
-                    openConfirm: false,
-                  })
-                }}
+                    this.setState({
+                      openConfirm: false,
+                    })
+                  }}
                   color='danger'
                 >
-                Cancel
+                  Cancel
                 </Button>
                 <Button
                   color='primary'
                   onClick={() => {
-                  this.setState({
-                    openConfirm: false,
-                  })
-                  window.beforeReloadHandlerAdded = false
-                  window.removeEventListener(
-                    'beforeunload',
-                    confirmBeforeReload,
-                  )
-                  this.onClose(true)
-                }}
+                    this.setState({
+                      openConfirm: false,
+                    })
+                    window.beforeReloadHandlerAdded = false
+                    window.removeEventListener(
+                      'beforeunload',
+                      confirmBeforeReload,
+                    )
+                    this.onClose(true)
+                  }}
                 >
-                Confirm
+                  Confirm
                 </Button>
-              </>
+              </React.Fragment>
             </SizeContainer>
           </DialogActions>
         </Dialog>

@@ -80,7 +80,7 @@ const widgets = [
                       })
                     }}
                   >
-                     Add Scribble Notes
+                    Add Scribble Notes
                   </Menu.Item>
                 </Menu>
               }
@@ -162,7 +162,7 @@ const widgets = [
                     type: 'consultationDocument/updateState',
                     payload: {
                       showModal: true,
-                      editType: '2',
+                      type: '2',
                       entity: undefined,
                     },
                   })
@@ -181,6 +181,10 @@ const widgets = [
     name: 'Patient History',
     component: Loadable({
       loader: () => import('@/pages/Widgets/PatientHistory'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} widget />
+      },
       loading: Loading,
     }),
     model: 'patientHistory',
@@ -221,18 +225,18 @@ const widgets = [
       },
     },
   },
-  {
-    id: '6',
-    name: 'Result History',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ResultHistory'),
-      loading: Loading,
-    }),
-    model: 'resultHistory',
-    layoutConfig: {
-      style: {},
-    },
-  },
+  // {
+  //   id: '6',
+  //   name: 'Result History',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/ResultHistory'),
+  //     loading: Loading,
+  //   }),
+  //   model: 'resultHistory',
+  //   layoutConfig: {
+  //     style: {},
+  //   },
+  // },
   {
     id: '7',
     name: 'Vital Sign',

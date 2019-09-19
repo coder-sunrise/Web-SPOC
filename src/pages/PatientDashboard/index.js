@@ -140,7 +140,6 @@ class PatientDashboard extends PureComponent {
       onMenuClick = (p) => p,
       ...resetProps
     } = this.props
-
     const { patientDashboard, global, history } = resetProps
 
     const { visitInfo = {} } = patientDashboard

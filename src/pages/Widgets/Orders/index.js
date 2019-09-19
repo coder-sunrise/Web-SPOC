@@ -84,14 +84,14 @@ class Orders extends PureComponent {
   //   })
   // }
 
-  // componentWillReceiveProps (nextProps) {
+  // UNSAFE_componentWillReceiveProps (nextProps) {
   //   if (
   //     _.isEqual(
   //       nextProps.orders.finalAdjustments,
   //       this.props.orders.finalAdjustments,
   //     )
   //   ) {
-  //     console.log('componentWillReceiveProps', nextProps, this.props)
+  //     console.log('UNSAFE_componentWillReceiveProps', nextProps, this.props)
   //   }
   // }
 

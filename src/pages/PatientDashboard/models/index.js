@@ -138,10 +138,10 @@ export default createFormViewModel({
             },
           })
           yield put({
-            type: 'patient/updateState',
+            type: 'patient/queryDone',
             payload: {
-              entity: patientInfo,
-              version,
+              data: patientInfo,
+              // version,
             },
           })
           yield put({
@@ -155,14 +155,17 @@ export default createFormViewModel({
           })
         }
         let { consultationID } = payload
-        console.log(visitRegistration)
+        // console.log(visitRegistration)
+        const { entity } = consultation
         if (
           visitRegistration &&
           visitRegistration.visitInfo &&
-          visitRegistration.visitInfo.visit
+          visitRegistration.visitInfo.visit &&
+          (!entity || consultationID !== entity.id)
         ) {
-          consultationID =
-            visitRegistration.visitInfo.visit.clinicalObjectRecordFK
+          if (!consultationID)
+            consultationID =
+              visitRegistration.visitInfo.visit.clinicalObjectRecordFK
           yield put({
             type: 'consultation/updateState',
             payload: {
@@ -206,6 +209,13 @@ export default createFormViewModel({
             })
             yield take('consultation/query/@@end')
           }
+        } else {
+          yield put({
+            type: 'consultation/queryDone',
+            payload: {
+              data: entity,
+            },
+          })
         }
       },
       // *queryOne ({ payload }, { call, put }) {

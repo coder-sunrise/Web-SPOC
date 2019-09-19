@@ -295,7 +295,7 @@ export default class BaseCRUDViewModel {
     // })
     const { namespace, param, setting = {}, config = {} } = this.options
     const { state } = param
-
+    // console.log(this.options)
     return {
       // Used for simple state update
       updateState (st, { payload }) {
@@ -356,10 +356,7 @@ export default class BaseCRUDViewModel {
       },
 
       reset (st, { payload }) {
-        return {
-          ...st,
-          entity: undefined,
-        }
+        return state.default || {}
       },
 
       showModal (st, { payload }) {

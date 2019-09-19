@@ -52,7 +52,7 @@ class TextField extends React.PureComponent {
   //   return null
   // }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const { field } = nextProps
     if (field) {
       this.setState({
@@ -157,7 +157,7 @@ class TextField extends React.PureComponent {
       uppercase,
       lowercase,
     } = props
-    const { field, form, maxlength, ...resetProps } = props
+    const { field, form, maxLength, ...resetProps } = props
     // console.log(this.state, this.state.value)
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
@@ -201,9 +201,9 @@ class TextField extends React.PureComponent {
     }
     // cfg.onFocus = extendFunc(onFocus, this.handleFocus)
     // cfg.onBlur = extendFunc(onBlur, this.handleBlur)
-    // console.log(maxlength, 'maxlength')
-    if (!maxlength) {
-      cfg.maxlength = 200
+    // console.log(maxLength, 'maxLength')
+    if (!maxLength) {
+      cfg.maxLength = 200
     }
     cfg.negative = state.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)

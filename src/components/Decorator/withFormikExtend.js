@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import lodash from 'lodash'
-import { confirmBeforeReload } from '@/utils/utils'
 import { FastField, withFormik } from 'formik'
+import { confirmBeforeReload } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 
 window.beforeReloadHandlerAdded = false

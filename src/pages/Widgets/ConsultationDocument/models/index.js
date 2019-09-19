@@ -11,7 +11,7 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
-      editType: '2',
+      type: '2',
       defaultMedicalCertificate: {
         type: '3',
         mcDays: 1,

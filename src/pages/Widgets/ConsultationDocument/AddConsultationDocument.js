@@ -108,10 +108,10 @@ class AddConsultationDocument extends PureComponent {
       types,
     } = props
     // console.log(props)
-    const { entity = {}, editType } = consultationDocument
+    const { entity = {}, type } = consultationDocument
     const cfg = {
       ...props,
-      currentType: types.find((o) => o.value === editType),
+      currentType: types.find((o) => o.value === type),
     }
     return (
       <div>
@@ -122,25 +122,25 @@ class AddConsultationDocument extends PureComponent {
                 label='Type'
                 options={types}
                 allowClear={false}
-                value={editType}
+                value={type}
                 disabled={entity.id || entity.uid}
                 onChange={(v) => {
                   dispatch({
                     type: 'consultationDocument/updateState',
                     payload: {
-                      editType: v,
+                      type: v,
                     },
                   })
                 }}
               />
             </GridItem>
           </GridContainer>
-          {editType === '1' && <ReferralLetter {...cfg} />}
-          {editType === '2' && <Memo {...cfg} />}
-          {editType === '3' && <MedicalCertificate {...cfg} />}
-          {editType === '4' && <CertificateAttendance {...cfg} />}
-          {editType === '5' && <Others {...cfg} />}
-          {editType === '6' && <VaccinationCertificate {...cfg} />}
+          {type === '1' && <ReferralLetter {...cfg} />}
+          {type === '2' && <Memo {...cfg} />}
+          {type === '3' && <MedicalCertificate {...cfg} />}
+          {type === '4' && <CertificateAttendance {...cfg} />}
+          {type === '5' && <Others {...cfg} />}
+          {type === '6' && <VaccinationCertificate {...cfg} />}
         </div>
       </div>
     )

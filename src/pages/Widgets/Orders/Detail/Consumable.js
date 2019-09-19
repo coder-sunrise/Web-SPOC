@@ -28,10 +28,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, editType }) => {
+  mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultVaccination),
-      editType,
+      type,
     }
     return v
   },
@@ -60,7 +60,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   displayName: 'OrderPage',
 })
 class Consumable extends PureComponent {
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
       nextProps.orders.shouldPushToState
