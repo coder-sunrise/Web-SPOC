@@ -959,6 +959,26 @@ export const getInventoryItemList = (
   }
 }
 
+export const InvoicePayerType = [
+  {
+    invoicePayerFK: 1,
+    name: 'PATIENT',
+    listName: 'patientPaymentTxn',
+  },
+  {
+    invoicePayerFK: 2,
+    name: 'COPAYER',
+    listName: 'coPayerPaymentTxn',
+  },
+  {
+    invoicePayerFK: 3,
+    name: 'GOVT_COPAYER',
+    listName: 'govCoPayerPaymentTxn',
+  },
+]
+
+
+
 module.exports = {
   // paymentMethods,
   // titles,

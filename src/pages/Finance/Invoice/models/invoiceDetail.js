@@ -1,4 +1,4 @@
-import { createListViewModel } from 'medisys-model'
+import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
 
@@ -71,7 +71,7 @@ const dummyData = {
   //concurrencyToken: 0,
 }
 
-export default createListViewModel({
+export default createFormViewModel({
   namespace: 'invoiceDetail',
   config: {},
   param: {
@@ -94,6 +94,13 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
+      // queryDone (state, { payload }) {
+      //   // TBD
+      //   console.log('queryDone', payload)
+      //   return {
+      //     ...state,
+      //   }
+      // },
       fakeQueryDone (state, { payload }) {
         console.log('fakeQueryDone', dummyData)
         return {

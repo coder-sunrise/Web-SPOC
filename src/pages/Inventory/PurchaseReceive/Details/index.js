@@ -71,6 +71,7 @@ class index extends Component {
   render () {
     const { purchaseOrderStatus } = this.state
     const isDraft = isPOStatusDraft(purchaseOrderStatus)
+    console.log('PRIndex', this.props)
 
     return (
       <CardContainer hideHeader>

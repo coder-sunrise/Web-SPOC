@@ -14,6 +14,16 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 import styles from './styles'
 import { PayerType } from './variables'
 
+@connect(({ invoiceDetail, invoicePayer }) => ({
+  invoiceDetail,
+  invoicePayer,
+}))
+@withFormik({
+  name: 'invoicePayer',
+  mapPropsToValues: ({ invoicePayer }) => {
+    return invoicePayer.entity || invoicePayer.default
+  },
+})
 class PaymentDetails extends Component {
   state = {
     showAddPayment: false,
@@ -33,7 +43,9 @@ class PaymentDetails extends Component {
 
   closeAddCrNoteModal = () => this.setState({ showAddCrNote: false })
 
-  closeWriteOffModal = () => this.setState({ showWriteOff: false })
+  closeWriteOffModal = () => {
+    this.setState({ showWriteOff: false })
+  }
 
   closeDeleteConfirmationModal = () =>
     this.setState({ showDeleteConfirmation: false })
@@ -50,7 +62,9 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    const { classes, invoiceDetail, values } = this.props
+    const { classes, dispatch, invoiceDetail, values } = this.props
+    const { entity } = invoiceDetail
+    const { paymentTxnList } = values
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -70,48 +84,21 @@ class PaymentDetails extends Component {
       <div className={classes.container}>
         <PaymentCard
           payerType={PayerType.PATIENT}
-          payerName={'Lee Tian Kang'}
-          payments={[
-            {
-              type: 'Payment',
-              itemID: 'RE/000001',
-              date: '07 May 2019',
-              amount: 100,
-            },
-            {
-              type: 'Write Off',
-              itemID: 'RE/000001',
-              date: '07 May 2019',
-              amount: 100,
-            },
-          ]}
+          payerName={entity ? entity.patientName : 'N/A'}
+          payments={paymentTxnList.patientPaymentTxn}
           actions={paymentActionsProps}
         />
         <PaymentCard
           actions={paymentActionsProps}
           payerType={PayerType.GOVT_COPAYER}
           payerName='CHAS'
-          payments={[
-            {
-              type: 'Payment',
-              itemID: 'RE/000001',
-              date: '07 May 2019',
-              amount: 100,
-            },
-          ]}
+          payments={paymentTxnList.coPayerPaymentTxn}
         />
         <PaymentCard
           actions={paymentActionsProps}
           payerType={PayerType.COPAYER}
           payerName='medisys'
-          payments={[
-            {
-              type: 'Payment',
-              itemID: 'RE/000001',
-              date: '07 May 2019',
-              amount: 100,
-            },
-          ]}
+          payments={paymentTxnList.govCoPayerPaymentTxn}
         />
         <CommonModal
           open={showAddPayment}
@@ -137,7 +124,7 @@ class PaymentDetails extends Component {
           onClose={this.closeWriteOffModal}
           maxWidth='sm'
         >
-          <WriteOff />
+          <WriteOff dispatch={dispatch} />
         </CommonModal>
 
         <CommonModal
@@ -147,7 +134,7 @@ class PaymentDetails extends Component {
           onClose={this.closeDeleteConfirmationModal}
           maxWidth='sm'
         >
-          <DeleteConfirmation {...onVoid} />
+          <DeleteConfirmation dispatch={dispatch} {...onVoid} />
         </CommonModal>
       </div>
     )

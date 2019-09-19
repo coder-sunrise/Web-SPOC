@@ -11,11 +11,30 @@ const styles = (theme) => ({
   },
 })
 
-const DeleteConfirmation = ({ classes, type, itemID, onConfirm, onClose }) => {
+const DeleteConfirmation = ({
+  classes,
+  dispatch,
+  type,
+  itemID,
+  onConfirm,
+  onClose,
+}) => {
   const [
     reason,
     setReason,
   ] = useState('')
+
+  const submitVoidPayment = () => {
+    dispatch({
+      type: 'invoicePayer/submitVoidPayment',
+      payload: {
+        // TBD
+        writeOffReason: reason,
+      },
+    })
+
+    onConfirm()
+  }
 
   return (
     <GridContainer justify='center' alignItems='center'>
@@ -25,13 +44,21 @@ const DeleteConfirmation = ({ classes, type, itemID, onConfirm, onClose }) => {
         </h4>
       </GridItem>
       <GridItem md={10} className={classes.spacing}>
-        <TextField label='Reason' onChange={setReason} defaultValue={reason} />
+        <TextField
+          label='Reason'
+          onChange={(e) => setReason(e.target.value)}
+          defaultValue=''
+        />
       </GridItem>
       <GridItem>
         <Button color='danger' onClick={onClose}>
           Cancel
         </Button>
-        <Button color='primary' onClick={onConfirm} disabled={reason === ''}>
+        <Button
+          color='primary'
+          onClick={() => submitVoidPayment()}
+          disabled={reason === ''}
+        >
           Confirm
         </Button>
       </GridItem>

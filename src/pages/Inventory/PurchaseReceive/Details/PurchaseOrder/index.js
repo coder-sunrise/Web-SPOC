@@ -186,7 +186,17 @@ class index extends PureComponent {
     }, 1)
   }
 
-  onClickPrint = () => {}
+  onClickPrint = () => {
+    const { purchaseOrderDetails } = this.props
+    const { id, type } = purchaseOrderDetails
+    this.props.dispatch({
+      type: 'purchaseOrderDetails/fakeQueryDone',
+      payload: {
+        id: id,
+        type: type,
+      },
+    })
+  }
 
   isPOFinalized = () => {
     const { purchaseOrderStatus } = this.state

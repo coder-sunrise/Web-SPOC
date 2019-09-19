@@ -7,9 +7,8 @@ import { CardContainer } from '@/components'
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
 
-@connect(({ invoiceDetail, invoicePayment }) => ({
+@connect(({ invoiceDetail }) => ({
   invoiceDetail,
-  invoicePayment,
 }))
 @withFormik({
   name: 'invoiceDetail',
@@ -20,20 +19,25 @@ import InvoiceContent from './Content'
 })
 class InvoiceDetails extends Component {
   componentDidMount () {
-    const { invoiceDetail, dispatch } = this.props
+    const { dispatch, invoiceDetail } = this.props
     this.props.dispatch({
+      //type: 'invoiceDetail/query',
       type: 'invoiceDetail/fakeQueryDone',
+      payload: {
+        id: invoiceDetail.currentId,
+      },
     })
-    // this.props.dispatch({
-    //   type: 'invoiceDetail/queryOne',
-    //   payload: {
-    //     id: invoiceDetail.currentId,
-    //   },
-    // })
+    this.props.dispatch({
+      //type: 'invoicePayer/query',
+      type: 'invoicePayer/fakeQueryDone',
+      payload: {
+        id: invoiceDetail.currentId,
+      },
+    })
   }
 
   render () {
-    const {  ...restProps } = this.props
+    const { ...restProps } = this.props
     return (
       <CardContainer hideHeader>
         <InvoiceBanner {...restProps} />
