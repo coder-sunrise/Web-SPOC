@@ -97,7 +97,7 @@ export default {
   'menu.setting.doctorblock': 'Doctor Block',
   'menu.setting.clinicSetting': 'Clinic Setting',
   'menu.setting.systemSetting': 'System Setting',
-  'menu.setting.printSetting': 'Print Setting',
+  'menu.setting.printoutsetting': 'Printout Setting',
   'menu.setting.userprofile': 'User Profile',
   'menu.setting.newuserprofile': 'Add User Profile',
   'menu.setting.edituserprofile': 'Edit User Profile',

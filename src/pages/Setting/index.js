@@ -193,7 +193,8 @@ const menuData = [
   },
   {
     title: 'Print Setup',
-    text: 'TBD',
+    text: 'Printout Setting',
+    url: '/setting/printoutsetting',
   },
   {
     title: 'User Preference',

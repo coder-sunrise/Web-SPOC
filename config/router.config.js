@@ -559,6 +559,11 @@ const routes = [
             component: './Setting/GeneralSetting',
           },
           {
+            path: '/setting/printoutsetting',
+            name: 'printoutsetting',
+            component: './Setting/PrintoutSetting',
+          },
+          {
             path: '/setting/company/1',
             name: 'copayer',
             component: './Setting/Company',
