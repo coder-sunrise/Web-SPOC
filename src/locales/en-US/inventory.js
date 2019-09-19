@@ -7,7 +7,7 @@ export default {
   'inventory.master.consumable.remarks': 'Remarks',
   'inventory.master.consumable.enableRetail': 'Enable Retail',
   'inventory.master.consumable.supplier': 'Supplier',
-  'inventory.master.consumable.baseUOM': 'Base UOM',
+  'inventory.master.consumable.baseUOM': 'UOM',
   'inventory.master.consumable.category': 'Consumable Category',
   'inventory.master.consumable.revenueCategory': 'Revenue Category',
   'inventory.master.consumable.effectiveStartDate': 'Effective Start Date',

@@ -18,14 +18,14 @@ export default createFormViewModel({
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
-        corDiagnosis: [
-          {
-            uid: getUniqueId(),
-            onsetDate: moment(),
-            isPersist: false,
-            remarks: '',
-          },
-        ],
+        // corDiagnosis: [
+        //   {
+        //     uid: getUniqueId(),
+        //     onsetDate: moment(),
+        //     isPersist: false,
+        //     remarks: '',
+        //   },
+        // ],
       },
       selectedWidgets: [
         '1',
@@ -128,7 +128,7 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-        console.log('queryDone', payload)
+        // console.log('queryDone', payload)
         const { data } = payload
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
@@ -155,11 +155,12 @@ export default createFormViewModel({
         orderTypes.forEach((p) => {
           const datas =
             (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
+          // console.log(oRows, data[p.prop])
           oRows = oRows.concat(
             datas.map((o) => {
               const d = {
                 uid: getUniqueId(),
-                editType: p.value,
+                type: p.value,
                 subject: p.getSubject ? p.getSubject(o) : '',
                 ...o,
               }
@@ -188,6 +189,19 @@ export default createFormViewModel({
           },
         })
 
+        // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
+        //   data.corDiagnosis.forEach((cd) => {
+        //     cd.complication = cd.corComplication.map((o) => o.complicationFK)
+        //   })
+        // }
+        // if (data.corDiagnosis && data.corDiagnosis.length === 0) {
+        //   data.corDiagnosis.push({
+        //     onsetDate: moment(),
+        //     isPersist: false,
+        //     remarks: '',
+        //   })
+        // }
+        // console.log(payload)
         return payload
       },
       // *submit ({ payload }, { call }) {

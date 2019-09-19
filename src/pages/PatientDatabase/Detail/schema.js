@@ -1,5 +1,5 @@
-import Yup from '@/utils/yup'
 import moment from 'moment'
+import Yup from '@/utils/yup'
 import { notification } from '@/components'
 
 import { getCodes } from '@/utils/codes'
@@ -179,7 +179,7 @@ const schemaAllergies = {
       allergyName: Yup.string().required(),
       allergyReaction: Yup.string().required(),
       patientAllergyStatusFK: Yup.number().required(),
-      adverseReaction: Yup.string(),
+      // adverseReaction: Yup.string(),
       onsetDate: Yup.date(),
     }),
   ),
@@ -197,8 +197,11 @@ const schemaSchemes = {
       Yup.object().shape({
         schemeTypeFK: Yup.number().required(),
         coPaymentSchemeFK: Yup.number().when('schemeTypeFK', {
-          is: (val) =>
-            val === schemeTypes.find((o) => o.code === 'Corporate').id,
+          is: (val) => {
+            // return false
+            return val === schemeTypes.find((o) => o.code === 'Corporate').id
+          },
+
           then: Yup.number().required(),
         }),
         validRange: Yup.array().when('schemeTypeFK', {

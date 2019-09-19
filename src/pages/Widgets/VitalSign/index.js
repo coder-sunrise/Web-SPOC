@@ -14,7 +14,7 @@ const styles = (theme) => ({})
   patientVitalSign,
 }))
 class index extends PureComponent {
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       !this.props.patientVitalSign.shouldAddNew &&
       nextProps.patientVitalSign.shouldAddNew

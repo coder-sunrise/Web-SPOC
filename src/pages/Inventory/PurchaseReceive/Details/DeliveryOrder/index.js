@@ -3,17 +3,19 @@ import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { Divider, withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import { GridContainer, GridItem, Button, CommonModal, withFormikExtend } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  Button,
+  CommonModal,
+  withFormikExtend,
+} from '@/components'
 import DeliveryOrderDetails from './Details/DeliveryOrderDetails'
 import Grid from './Grid'
 import Add from '@material-ui/icons/Add'
 import { showErrorNotification } from '@/utils/error'
 import { isPOStatusFinalized } from '../../variables'
 
-@connect(({ deliveryOrder, purchaseOrderDetails }) => ({
-  deliveryOrder,
-  purchaseOrderDetails,
-}))
 // @withFormikExtend({
 //   displayName: 'purchaseOrder',
 //   enableReinitialize: true,
@@ -21,15 +23,19 @@ import { isPOStatusFinalized } from '../../variables'
 //     return deliveryOrder.entity || deliveryOrder.default
 //   },
 // })
+@connect(({ deliveryOrder, purchaseOrderDetails }) => ({
+  deliveryOrder,
+  purchaseOrderDetails,
+}))
 class index extends PureComponent {
-  componentDidMount() {
+  componentDidMount () {
     this.props.dispatch({
       type: 'deliveryOrder/query',
     })
 
     this.props.dispatch({
       type: 'deliveryOrder/mapPurchaseOrder',
-      payload: this.props.purchaseOrderDetails
+      payload: this.props.purchaseOrderDetails,
     })
   }
 
@@ -42,7 +48,7 @@ class index extends PureComponent {
     })
   }
 
-  render() {
+  render () {
     console.log('DO Index', this.props)
     const { props } = this
     const { classes, deliveryOrder } = props
@@ -68,11 +74,12 @@ class index extends PureComponent {
             open={deliveryOrder.showModal}
             observe='DeliveryOrderDetail'
             title={
-              deliveryOrder.entity ? (
-                'Edit Delivery Order'
-              ) : (
-                  'Delivery Order Details'
-                )
+              'Delivery Order Details'
+              // deliveryOrder.entity ? (
+              //   'Edit Delivery Order'
+              // ) : (
+              //     'Delivery Order Details'
+              //   )
             }
             maxWidth='xl'
             bodyNoPadding
@@ -90,8 +97,8 @@ class index extends PureComponent {
                 payload: {
                   //entity: undefined,
                   entity: {
-                    rows: purchaseOrderOutstandingItem
-                  }
+                    rows: purchaseOrderOutstandingItem,
+                  },
                 },
               })
               this.toggleDeliveryOrderDetailsModal()

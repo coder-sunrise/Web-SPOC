@@ -29,10 +29,10 @@ import { isPOStatusFinalized } from '../../variables'
 }))
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
-  //enableReinitialize: true,
+  enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
     console.log('mapPropsToValues', purchaseOrderDetails)
-    return purchaseOrderDetails.entity
+    return purchaseOrderDetails.entity || purchaseOrderDetails.default
   },
 })
 class index extends PureComponent {
@@ -61,11 +61,11 @@ class index extends PureComponent {
     }
   }
 
-  // componentWillReceiveProps (nextProps) {
+  // UNSAFE_componentWillReceiveProps (nextProps) {
   //   const { global } = nextProps
   //   if (global !== this.props.global) {
   //     if (!global.openAdjustment && global.openAdjustmentValue) {
-  //       console.log('componentWillReceiveProps', nextProps)
+  //       console.log('UNSAFE_componentWillReceiveProps', nextProps)
 
   //       const { openAdjustmentValue } = global
 
@@ -246,7 +246,7 @@ class index extends PureComponent {
 
     return (
       <div>
-        <POForm isPOFinalized={this.isPOFinalized()} />
+        <POForm setFieldValue={setFieldValue} isPOFinalized={this.isPOFinalized()} />
         <Grid
           rows={rows}
           dispatch={dispatch}

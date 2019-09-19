@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
-// import { withFormik } from 'formik'
+import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import DetailPanel from './Detail'
 // import Pricing from '../../DetaPricing'
 // import Stock from '../../Details/Stock'
@@ -16,6 +15,11 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getServices } from '@/utils/codes'
+import {
+  podoOrderType,
+  getInventoryItem,
+  getInventoryItemList,
+} from '@/utils/codes'
 
 const styles = () => ({
   actionDiv: {
@@ -70,29 +74,70 @@ const Detail = ({
     setPrice,
   ] = useState(() => undefined)
 
-  useEffect(async () => {
-    await dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-      },
-    }).then((list) => {
-      const { services, serviceCenters, serviceCenterServices } = getServices(
-        list,
-      )
+  const [
+    consumableItemList,
+    setConsumableItemList,
+  ] = useState([])
+  const [
+    medicationItemList,
+    setMedicationItemList,
+  ] = useState([])
+  const [
+    vaccinationItemList,
+    setVaccinationItemList,
+  ] = useState([])
 
-      setServicess(services)
-      setServiceCenterss(serviceCenters)
-      setServiceCenterServicess(serviceCenterServices)
-    })
+  useEffect(() => {
+    const fetchCodes = async () => {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+        },
+      }).then((list) => {
+        const { services, serviceCenters, serviceCenterServices } = getServices(
+          list,
+        )
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+        setServicess(services)
+        setServiceCenterss(serviceCenters)
+        setServiceCenterServicess(serviceCenterServices)
+      })
+
+      await podoOrderType.forEach((x) => {
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: x.ctName,
+          },
+        }).then((list) => {
+          const { inventoryItemList } = getInventoryItemList(list)
+          switch (x.stateName) {
+            case 'consumableItemList': {
+              return setConsumableItemList(inventoryItemList)
+            }
+            case 'medicationItemList': {
+              return setMedicationItemList(inventoryItemList)
+            }
+            case 'vaccinationItemList': {
+              return setVaccinationItemList(inventoryItemList)
+            }
+            default: {
+              return null
+            }
+          }
+        })
+      })
+
+      dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+    }
+    fetchCodes()
   }, [])
 
   const handleItemOnChange = (e) => {
@@ -128,12 +173,19 @@ const Detail = ({
       leftColumns: [],
     },
     medicationColExtensions: [
+      // {
+      //   columnName: 'inventoryMedicationFK',
+      //   type: 'codeSelect',
+      //   code: 'inventoryMedication',
+      //   labelField: 'displayValue',
+      //   valueField: 'id',
+      //   onChange: handleItemOnChange,
+      // },
       {
         columnName: 'inventoryMedicationFK',
-        type: 'codeSelect',
-        code: 'inventoryMedication',
-        labelField: 'displayValue',
-        valueField: 'id',
+        type: 'select',
+        labelField: 'code',
+        options: medicationItemList,
         onChange: handleItemOnChange,
       },
       {
@@ -167,12 +219,19 @@ const Detail = ({
       leftColumns: [],
     },
     vaccinationColExtensions: [
+      // {
+      //   columnName: 'inventoryVaccinationFK',
+      //   type: 'codeSelect',
+      //   code: 'inventoryVaccination',
+      //   labelField: 'displayValue',
+      //   valueField: 'id',
+      //   onChange: handleItemOnChange,
+      // },
       {
         columnName: 'inventoryVaccinationFK',
-        type: 'codeSelect',
-        code: 'inventoryVaccination',
-        labelField: 'displayValue',
-        valueField: 'id',
+        type: 'select',
+        labelField: 'code',
+        options: vaccinationItemList,
         onChange: handleItemOnChange,
       },
       { columnName: 'quantity', type: 'number' },
@@ -203,12 +262,19 @@ const Detail = ({
       leftColumns: [],
     },
     consumableColExtensions: [
+      // {
+      //   columnName: 'inventoryConsumableFK',
+      //   type: 'codeSelect',
+      //   code: 'inventoryConsumable',
+      //   labelField: 'displayValue',
+      //   valueField: 'id',
+      //   onChange: handleItemOnChange,
+      // },
       {
         columnName: 'inventoryConsumableFK',
-        type: 'codeSelect',
-        code: 'inventoryConsumable',
-        labelField: 'displayValue',
-        valueField: 'id',
+        type: 'select',
+        labelField: 'code',
+        options: consumableItemList,
         onChange: handleItemOnChange,
       },
       { columnName: 'quantity', type: 'number' },
@@ -257,7 +323,7 @@ const Detail = ({
 
         onChange: (e) => {
           setServiceFK(e.val)
-          console.log('service', serviceFK)
+          // console.log('service', serviceFK)
           // setTimeout(() => {
           //   getServiceCenterService()
           // }, 1)
@@ -331,27 +397,13 @@ const Detail = ({
     })
   }
 
-  // if (ctServiceCenter) {
-  //   setServiceCenter(
-  //     ctServiceCenter.for((o) => {
-  //       return {
-  //         value: o.serviceCenterCategoryFK,
-  //         name: o.displayValue,
-  //       }
-  //     }),
-  //   )
-  // }
-  // console.log('let', list)
-  // console.log('let', serviceCenterList)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
         <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
         <Button
           color='danger'
-          onClick={() => {
-            history.push('/inventory/master?t=3')
-          }}
+          onClick={navigateDirtyCheck('/inventory/master?t=3')}
         >
           Cancel
         </Button>
@@ -376,6 +428,7 @@ const Detail = ({
             tabButton: 'Order Item',
             tabContent: (
               <InventoryTypeListing
+                dispatch={dispatch}
                 calTotal={calTotal}
                 medication={medicationProps}
                 consumable={consumableProps}
@@ -412,6 +465,13 @@ export default compose(
     mapPropsToValues: ({ packDetail }) => {
       return packDetail.entity ? packDetail.entity : packDetail.default
     },
+
+    validationSchema: Yup.object().shape({
+      code: Yup.string().required(),
+      displayValue: Yup.string().required(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    }),
+
     handleSubmit: (values, { props }) => {
       const { dispatch, history } = props
       dispatch({
@@ -427,11 +487,7 @@ export default compose(
         }
       })
     },
-    validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
-      displayValue: Yup.string().required(),
-      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    }),
+
     displayName: 'InventoryPackageDetail',
   }),
 )(Detail)

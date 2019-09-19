@@ -189,11 +189,11 @@ class SketchField extends PureComponent {
 
           if (obj.id === 'template') {
             canvas.moveTo(obj, -100)
-          }else{
+          } else {
             latestIndex = obj.zindex
           }
 
-          if(i === (allList.length-1)){
+          if (i === allList.length - 1) {
             if (latestIndex !== 0) {
               latestIndex += 1
               this.setState({
@@ -682,8 +682,6 @@ class SketchField extends PureComponent {
       canvas.moveTo(imgbase64, oldIndexCount)
       // context.drawImage(imgbase64, 0, 0);
     }
-
-    
 
     // fabric.Image.fromURL(
     //   dataUrl,

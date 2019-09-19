@@ -75,43 +75,43 @@ class ExcelGrid extends PureComponent {
     ],
   }
 
-  componentDidMount () {
-    const { consumable: { list }, dispatch, height } = this.props
+  // componentDidMount () {
+  //   const { consumable: { list }, dispatch, height } = this.props
 
-    dispatch({
-      type: 'consumable/query',
-    }).then((r) => {
-      console.log(r, this.tableParas.columns)
-      if (r) {
-        this.setState({
-          data: [
-            this.tableParas.columns.map((col) => ({
-              value: col.title,
-              readOnly: true,
-            })),
-          ].concat(
-            r.data.map((o) => {
-              return this.tableParas.columns.map((g) => {
-                const columnName = g.name
-                const cfg = this.tableParas.columnExtensions.find(
-                  (y) => y.columnName === columnName,
-                )
-                const obj = {
-                  value: o[columnName],
-                  column: columnName,
-                  cfg,
-                }
-                return {
-                  ...obj,
-                  component: this.getComponent(obj),
-                }
-              })
-            }),
-          ),
-        })
-      }
-    })
-  }
+  //   dispatch({
+  //     type: 'consumable/query',
+  //   }).then((r) => {
+  //     console.log(r, this.tableParas.columns)
+  //     if (r) {
+  //       this.setState({
+  //         data: [
+  //           this.tableParas.columns.map((col) => ({
+  //             value: col.title,
+  //             readOnly: true,
+  //           })),
+  //         ].concat(
+  //           r.data.map((o) => {
+  //             return this.tableParas.columns.map((g) => {
+  //               const columnName = g.name
+  //               const cfg = this.tableParas.columnExtensions.find(
+  //                 (y) => y.columnName === columnName,
+  //               )
+  //               const obj = {
+  //                 value: o[columnName],
+  //                 column: columnName,
+  //                 cfg,
+  //               }
+  //               return {
+  //                 ...obj,
+  //                 component: this.getComponent(obj),
+  //               }
+  //             })
+  //           }),
+  //         ),
+  //       })
+  //     }
+  //   })
+  // }
 
   getComponent = (cell) => {
     // console.log(cell)

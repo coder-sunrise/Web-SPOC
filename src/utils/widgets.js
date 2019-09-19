@@ -38,6 +38,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'clinicalnotes',
+
     disabled: true,
     layoutConfig: {
       minW: 12,
@@ -92,6 +93,9 @@ const widgets = [
       loading: Loading,
     }),
     model: 'diagnosis',
+    associatedProps: [
+      'corDiagnosis',
+    ],
     layoutConfig: {
       minW: 12,
       minH: 10,
@@ -146,7 +150,7 @@ const widgets = [
                     type: 'consultationDocument/updateState',
                     payload: {
                       showModal: true,
-                      editType: '2',
+                      type: '2',
                       entity: undefined,
                     },
                   })
@@ -165,9 +169,14 @@ const widgets = [
     name: 'Patient History',
     component: Loadable({
       loader: () => import('@/pages/Widgets/PatientHistory'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} widget />
+      },
       loading: Loading,
     }),
     model: 'patientHistory',
+
     layoutConfig: {
       style: {
         padding: 5,
@@ -187,24 +196,35 @@ const widgets = [
       // },
     }),
     model: 'orders',
+    // associatedProps: [
+    //   'corOrderAdjustment',
+    //   'corService',
+    //   'corPrescriptionItem',
+    //   'corVaccinationItem',
+    // ],
+    onRemove: () => {
+      window.g_app._store.dispatch({
+        type: 'orders/deleteRow',
+      })
+    },
     layoutConfig: {
       style: {
         padding: '0 5px',
       },
     },
   },
-  {
-    id: '6',
-    name: 'Result History',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/ResultHistory'),
-      loading: Loading,
-    }),
-    model: 'resultHistory',
-    layoutConfig: {
-      style: {},
-    },
-  },
+  // {
+  //   id: '6',
+  //   name: 'Result History',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/ResultHistory'),
+  //     loading: Loading,
+  //   }),
+  //   model: 'resultHistory',
+  //   layoutConfig: {
+  //     style: {},
+  //   },
+  // },
   {
     id: '7',
     name: 'Vital Sign',
@@ -213,6 +233,9 @@ const widgets = [
       loading: Loading,
     }),
     model: 'patientVitalSign',
+    associatedProps: [
+      'corPatientNoteVitalSign',
+    ],
     layoutConfig: {
       minW: 12,
       minH: 10,

@@ -18,7 +18,7 @@ class SelectEditor extends PureComponent {
   }
 
   constructor (props) {
-    console.log('constructor', props)
+    // console.log('constructor', props)
     super(props)
     this.myRef = React.createRef()
   }
@@ -34,9 +34,9 @@ class SelectEditor extends PureComponent {
       columnExtensions.find(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
-    const { gridId } = cfg
+    const { gridId, getRowId } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     // console.log(
     //   columnName,
@@ -78,6 +78,7 @@ class SelectEditor extends PureComponent {
       isDisabled = () => false,
       onChange,
       gridId,
+      getRowId,
       ...restProps
     } = cfg
 
@@ -86,7 +87,7 @@ class SelectEditor extends PureComponent {
       error,
     })
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     if (!error) {
       if (onChange)
@@ -107,6 +108,7 @@ class SelectEditor extends PureComponent {
       value,
       onValueChange,
       row,
+      codes,
     } = this.props
     const cfg =
       columnExtensions.find(
@@ -119,40 +121,47 @@ class SelectEditor extends PureComponent {
       isDisabled = () => false,
       onChange,
       gridId,
+      options,
+      getRowId,
       ...restProps
     } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
-    const _onChange = (val, option) => {
-      console.log({ val, option })
-      const error = updateCellValue(this.props, this.myRef.current, val)
-      this.setState({
-        error,
-      })
-      if (!error) {
-        if (onChange)
-          onChange({
-            val,
-            option,
-            row: latestRow,
-            onValueChange,
-            error,
-          })
-      }
-    }
+    // const _onChange = (val, option) => {
+    //   // console.log({ val, option })
+    //   const error = updateCellValue(this.props, this.myRef.current, val)
+    //   this.setState({
+    //     error,
+    //   })
+    //   if (!error) {
+    //     if (onChange)
+    //       onChange({
+    //         val,
+    //         option,
+    //         row: latestRow,
+    //         onValueChange,
+    //         error,
+    //       })
+    //   }
+    // }
     // console.log(window.$tempGridRow, row, latestRow[columnName])
+    // console.log(options, this.state, codes, columnName)
     const commonCfg = {
       noWrapper: true,
       showErrorIcon: true,
       error: this.state.error,
       value: latestRow[columnName],
       disabled: isDisabled(latestRow),
+      options:
+        typeof options === 'function'
+          ? options(latestRow)
+          : options || codes[`${columnName}Option`] || [],
       ...restProps,
       onChange: this._onChange,
     }
-    // console.log(columnName)
+    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -187,8 +196,11 @@ const SelectDisplay = (columnExtensions, state) => ({
 
   if (value === undefined) return ''
   const v =
-    (cfg.options || state[`${columnName}Option`] || [])
-      .find((o) => o.value === value || o.id === value) || {}
+    (typeof cfg.options === 'function'
+      ? cfg.options(row)
+      : cfg.options || state[`${columnName}Option`] || []).find(
+      (o) => o.value === value || o.id === value,
+    ) || {}
 
   const { labelField = 'name', render } = cfg
   const label = Object.byString(v, labelField)
@@ -241,10 +253,13 @@ class SelectTypeProvider extends React.Component {
           })
           .then((response) => {
             if (response) {
-              this.setState((prevState) => ({
-                [`${f.columnName}Option`]: response,
-                codeLoaded: ++prevState.codeLoaded,
-              }))
+              this.setState((prevState) => {
+                // console.log(f.columnName, response)
+                return {
+                  [`${f.columnName}Option`]: response,
+                  codeLoaded: ++prevState.codeLoaded,
+                }
+              })
             }
           })
         // getCodes(f.code).then((o) => {
@@ -257,7 +272,14 @@ class SelectTypeProvider extends React.Component {
     })
 
     this.SelectEditor = (ces) => (editorProps) => {
-      return <SelectEditor columnExtensions={ces} {...editorProps} />
+      // console.log(ces, editorProps)
+      return (
+        <SelectEditor
+          columnExtensions={ces}
+          {...editorProps}
+          codes={this.state}
+        />
+      )
     }
   }
 

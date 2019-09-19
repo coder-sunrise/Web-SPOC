@@ -92,7 +92,8 @@ const FilterBar = ({
                     {
                       isExtra: true,
                       id: -99,
-                      clinicianProfile: { name: 'All Doctors' },
+                      name: 'All Doctors',
+                      title: '',
                     },
                   ]}
                 />
@@ -158,8 +159,9 @@ export default memo(
   withFormik({
     enableReinitialize: true,
     mapPropsToValues: () => ({
-      // appointmentType: [],
-      // doctorProfile: undefined,
+      filterByDoctor: [
+        -99,
+      ],
     }),
   })(StyledFilterBar),
 )

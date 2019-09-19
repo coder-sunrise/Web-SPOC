@@ -70,6 +70,8 @@ const Stock = ({
         marginRight: 5,
       }}
     >
+      <h3 style={{ marginLeft: 5 }}>Stock</h3>
+      <hr />
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
           <FastField

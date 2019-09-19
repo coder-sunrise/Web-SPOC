@@ -239,14 +239,14 @@ class ClinicalNotes extends Component {
   }
 
   render () {
-    console.log('ClinicalNotes', this.props)
+    // console.log('ClinicalNotes', this.props)
     const {
       prefix = 'corDoctorNote[0].',
       clinicalnotes,
       classes,
       scriblenotes,
     } = this.props
-    console.log(this.state)
+    // console.log(this.state)
     return (
       <div>
         <div className={classes.editor}>
@@ -279,7 +279,11 @@ class ClinicalNotes extends Component {
                       <InsertPhoto />
                     </IconButton>
 
+<<<<<<< HEAD
                     <div style={{ display: 'inline-block', right: 0 }}>
+=======
+                    <div style={{ display: 'inline-block', marginLeft: 150 }}>
+>>>>>>> dev
                       {scriblenotes.notes.notesScribbleArray.length > 0 ? (
                         <GridContainer>
                           <div className={classes.root}>
@@ -371,7 +375,7 @@ class ClinicalNotes extends Component {
                     <div style={{ display: 'inline-block' }}>
                       {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
                         .length > 0 ? (
-                        <GridContainer>
+                          <GridContainer>
                           <div className={classes.root}>
                             <GridList
                               className={classes.gridList}

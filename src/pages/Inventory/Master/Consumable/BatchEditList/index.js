@@ -74,11 +74,11 @@ class BatchEditList extends PureComponent {
     ],
   }
 
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'consumable/query',
-    })
-  }
+  // componentDidMount () {
+  //   this.props.dispatch({
+  //     type: 'consumable/query',
+  //   })
+  // }
 
   changeEditingRowIds = (editingRowIds) => this.setState({ editingRowIds })
 

@@ -38,7 +38,7 @@ const _config = {
       'type',
       'disabled',
       'inputComponent',
-      'maxlength',
+      'maxLength',
     ],
   },
 }
@@ -255,14 +255,17 @@ class BaseInput extends React.PureComponent {
     }
     if (text) {
       cfg.inputComponent = ({ className }) => {
-        return <AutosizeInput inputClassName={className} {...inputProps} />
+        return (
+          <AutosizeInput readOnly inputClassName={className} {...inputProps} />
+        )
       }
     }
     if (
       !(
         inputProps.value === undefined ||
         inputProps.value === null ||
-        inputProps.value === ''
+        inputProps.value === '' ||
+        inputProps.value.length === 0
       )
     ) {
       labelProps.shrink = true

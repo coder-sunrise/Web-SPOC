@@ -17,7 +17,7 @@ const control = ({ disabledProps } = {}) => (Component) => {
 
     // componentDidMount () {}
 
-    // componentWillReceiveProps (nextProps) {}
+    // UNSAFE_componentWillReceiveProps (nextProps) {}
 
     render () {
       if (this.props.authority === 'none') {

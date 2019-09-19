@@ -7,7 +7,7 @@ const url = '/api/consultation'
 module.exports = {
   remove: (params) => service.remove(url, params),
   query: (params) => {
-    console.log(url, params)
+    // console.log(url, params)
     return service.query(url, params)
   },
   create: async (visitFK) => {
@@ -17,7 +17,7 @@ module.exports = {
     return r
   },
   pause: async (params) => {
-    console.log(params)
+    // console.log(params)
     const r = await request(`${url}/${params.id}`, {
       method: 'PUT',
       body: params,

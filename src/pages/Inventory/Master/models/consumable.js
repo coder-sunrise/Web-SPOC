@@ -26,6 +26,12 @@ export default createListViewModel({
             },
           })
         }
+
+        if (pathname === '/inventory/master' && search === '?t=1') {
+          dispatch({
+            type: 'consumable/query',
+          })
+        }
       })
     },
     effects: {

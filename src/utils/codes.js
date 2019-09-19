@@ -630,7 +630,9 @@ const orderTypes = [
     value: '1',
     prop: 'corPrescriptionItem',
     filter: (r) => !!r.stockDrugFK,
-    getSubject: (r) => r.drugName,
+    getSubject: (r) => {
+      return r.drugName
+    },
   },
   {
     name: 'Vaccination',
@@ -700,6 +702,7 @@ const tenantCodes = [
   'inventoryvaccination',
   'inventorypackage',
   'role',
+  'ctsupplier',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -720,6 +723,10 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     url = '/api/'
     useGeneral = false
   }
+  // const newParams = {
+  //   ...params,
+
+  // }
   const body = useGeneral
     ? convertToQuery({ ...params })
     : convertToQuery({ ...params, ...criteriaForTenantCodes })
@@ -842,21 +849,24 @@ export const podoOrderType = [
     name: 'Medication',
     prop: 'purchaseOrderMedicationItem',
     itemFKName: 'inventoryMedicationFK',
-    ctName: 'InventoryMedication',
+    ctName: 'inventorymedication',
+    stateName: 'MedicationItemList',
   },
   {
     value: 2,
     name: 'Vaccination',
     prop: 'purchaseOrderVaccinationItem',
     itemFKName: 'inventoryVaccinationFK',
-    ctName: 'InventoryVaccination',
+    ctName: 'inventoryvaccination',
+    stateName: 'VaccinationItemList',
   },
   {
     value: 3,
     name: 'Consumable',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
-    ctName: 'InventoryConsumable',
+    ctName: 'inventoryconsumable',
+    stateName: 'ConsumableItemList',
   },
 ]
 
@@ -898,24 +908,32 @@ export const InventoryTypes = [
   },
 ]
 
-export const getInventoryItem = (data, value, itemFKName, rows) => {
+export const getInventoryItem = (list, value, itemFKName, rows) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
+  let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
-  let inventoryItemList = data.map((x) => {
+  return {
+    inventoryItemList,
+  }
+}
+
+export const getInventoryItemList = (
+  list,
+  itemFKName = undefined,
+  stateName = undefined,
+) => {
+  let inventoryItemList = list.map((x) => {
     return {
-      id: x.id,
       value: x.id,
-      [itemFKName]: x.id,
-      name: x.code,
-      displayValue: x.displayValue,
+      name: x.displayValue,
+      code: x.code,
+      //uom: prescribingUOM.id,
+      uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
-      //uom: 'TBD',
-      uom: x.uom ? x.uom.name : x.prescribingUOM.name,
+      [itemFKName]: x.id,
+      stateName: stateName,
     }
   })
-
-  inventoryItemList = _.differenceBy(inventoryItemList, newRows, itemFKName)
-
   return {
     inventoryItemList,
   }

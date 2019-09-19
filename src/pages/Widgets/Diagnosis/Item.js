@@ -42,6 +42,18 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
                 <CodeSelect
                   label='Diagnosis'
                   code='ctOutPatientScanDiagnosis'
+                  onChange={(v, op) => {
+                    const { form } = args
+                    const { setFieldValue } = form
+                    setFieldValue(
+                      `corDiagnosis[${index}]diagnosisCode`,
+                      op.code,
+                    )
+                    setFieldValue(
+                      `corDiagnosis[${index}]diagnosisDescription`,
+                      op.name,
+                    )
+                  }}
                   {...args}
                 />
               )
@@ -52,6 +64,24 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
           <FastField
             name={`corDiagnosis[${index}].complication`}
             render={(args) => {
+              const { form: fm, field: fd } = args
+              // console.log(fd, fm)
+              if (
+                !fd.value &&
+                fm.values.corDiagnosis &&
+                fm.values.corDiagnosis[index] &&
+                fm.values.corDiagnosis[index].corComplication
+              ) {
+                // console.log(
+                //   fm.values,
+                //   fm.values.corDiagnosis,
+                //   fm.values.corDiagnosis[index],
+                // )
+                fd.value = fm.values.corDiagnosis[index].corComplication.map(
+                  (o) => o.complicationFK,
+                )
+              }
+              // console.log(fd.value)
               return (
                 <CodeSelect
                   label='Complication'
