@@ -4,9 +4,13 @@ import request from '@/utils/request'
 const urlCoyer = '/api/ctcopayer'
 const urlSupplier = '/api/ctsupplier'
 module.exports = {
-  queryListCop: (params) => service.queryList(urlCoyer, params),
   upsertCop: (params) => service.upsert(urlCoyer, params),
-
-  queryListSup: (params) => service.queryList(urlSupplier, params),
+  queryList: (params) => {
+    const { companyTypeFK, ...restParams } = params
+    if (companyTypeFK === 1) {
+      return service.queryList(urlCoyer, restParams)
+    }
+    return service.queryList(urlSupplier, restParams)
+  },
   upsertSup: (params) => service.upsert(urlSupplier, params),
 }

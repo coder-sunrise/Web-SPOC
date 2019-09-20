@@ -82,16 +82,6 @@ export default createListViewModel({
       })
     },
     effects: {
-      *queryCopayer ({ payload }, { call, put }) {
-        const result = yield call(service.queryListCop)
-        yield put({ type: 'getCopSupList', payload: result })
-      },
-
-      *querySupplier ({ payload }, { call, put }) {
-        const result = yield call(service.queryListSup)
-        yield put({ type: 'getCopSupList', payload: result })
-      },
-
       *upsertCopayer ({ payload }, { call, put }) {
         const r = yield call(service.upsertCop, payload)
         if (r.id) {
@@ -119,22 +109,6 @@ export default createListViewModel({
       },
     },
 
-    reducers: {
-      getCopSupList (st, { payload }) {
-        const { data } = payload
-        return {
-          ...st,
-          list: data.data.map((o) => {
-            return {
-              ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
-            }
-          }),
-        }
-      },
-    },
+    reducers: {},
   },
 })

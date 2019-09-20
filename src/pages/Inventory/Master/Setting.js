@@ -122,7 +122,9 @@ const Setting = ({
       <GridContainer>
         <GridItem xs={3}>
           <FastField
-            name='medicationFrequencyFK'
+            name={
+              showTransfer ? 'medicationFrequencyFK' : 'vaccinationFrequencyFK'
+            }
             render={(args) => (
               <CodeSelect
                 label={formatMessage({
@@ -156,7 +158,7 @@ const Setting = ({
       <GridContainer>
         <GridItem xs={6}>
           <FastField
-            name='medicationUsageFK'
+            name={showTransfer ? 'medicationUsageFK' : 'vaccinationUsageFK'}
             render={(args) => (
               <CodeSelect
                 label={formatMessage({

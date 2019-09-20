@@ -29,7 +29,6 @@ export default createFormViewModel({
     },
     reducers: {
       queryDone (st, { payload }) {
-        console.log('clinic ino reducer')
         const { data } = payload
         const contact = {
           contactAddress: [
