@@ -713,7 +713,12 @@ const convertExcludeFields = [
   'excludeInactiveCodes',
 ]
 
-const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
+const _fetchAndSaveCodeTable = async (
+  code,
+  params,
+  multiplier = 1,
+  refresh = false,
+) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
@@ -778,7 +783,8 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
       code,
       data: result,
       createDate: new Date(),
-      updateDate: new Date(),
+      updateDate: refresh ? null : new Date(),
+      // shouldRefresh: refresh,
     })
     return result
   }
@@ -790,6 +796,7 @@ export const getCodes = async (payload) => {
   let ctcode
   let params
   let multiply = 1
+  const { refresh = false } = payload
   if (typeof payload === 'string') ctcode = payload.toLowerCase()
   if (typeof payload === 'object') {
     ctcode = payload.code
@@ -807,15 +814,17 @@ export const getCodes = async (payload) => {
     const parsedLastLoginDate = moment(lastLoginDate)
 
     /* not exist in current table, make network call to retrieve data */
-    if (ct === undefined) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply)
+    if (ct === undefined || refresh) {
+      result = _fetchAndSaveCodeTable(ctcode, params, multiply, true)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
+          if updateDate is null, always perform network call to get latest copy
           else perform network call and update indexedDB 
       */
       const { updateDate, data: existedData } = ct
-      const parsedUpdateDate = moment(updateDate)
+      const parsedUpdateDate =
+        updateDate === null ? moment('2001-01-01') : moment(updateDate)
 
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
         ? _fetchAndSaveCodeTable(ctcode, params, multiply)
@@ -824,8 +833,45 @@ export const getCodes = async (payload) => {
   } catch (error) {
     console.log({ error })
   }
-
   return result
+}
+
+export const checkShouldRefresh = async (code) => {
+  try {
+    await db.open()
+    const ct = await db.codetable.get(code.toLowerCase())
+
+    if (ct === undefined) return true
+    const { updateDate } = ct
+    return updateDate === null
+  } catch (error) {
+    console.log({ error })
+  }
+  return false
+}
+
+export const refreshCodetable = async (url) => {
+  try {
+    const paths = url.split('/')
+    const code = paths[2]
+    window.g_app._store.dispatch({
+      type: 'codetable/refreshCodes',
+      payload: { code },
+    })
+  } catch (error) {
+    console.log({ error })
+  }
+}
+
+export const checkIsCodetableAPI = (url) => {
+  try {
+    const isTenantCodes = tenantCodes.indexOf(url) > 0
+    const isCodetable = url.toLowerCase().indexOf('ct') > 0
+    return isTenantCodes || isCodetable
+  } catch (error) {
+    console.log({ error })
+  }
+  return false
 }
 
 export const getTenantCodes = async (tenantCode) => {

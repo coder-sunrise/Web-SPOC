@@ -6,6 +6,7 @@ import queryString from 'query-string'
 import $ from 'jquery'
 import { notification } from '@/components'
 import { isAntdPro, updateLoadingState } from './utils'
+import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
@@ -267,7 +268,13 @@ export default function request (
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)
         const { statusText, status } = xhr
+
         if (status >= 200 && status < 300) {
+          // if api is a codetable, need to refresh store
+          if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
+            const isCodetableAPI = checkIsCodetableAPI(url)
+            if (isCodetableAPI) refreshCodetable(url)
+          }
           return response || status
         }
         let data = {}
@@ -412,7 +419,7 @@ export default function request (
     //     }
     //   }
     // })
-
+    // console.log({ r })
     return r
   } catch (error) {
     console.log(error)

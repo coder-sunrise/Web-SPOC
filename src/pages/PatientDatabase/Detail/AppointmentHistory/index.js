@@ -15,8 +15,6 @@ import {
 } from '@/components'
 // services
 import { queryList as queryAppointments } from '@/services/calendar'
-// utils
-import { formatAppointmentTimes } from '@/pages/Reception/Queue/utils'
 
 const styles = (theme) => ({
   gridRow: {
@@ -179,9 +177,8 @@ class AppointmentHistory extends PureComponent {
   }
 
   render () {
-    const { classes, schemes, payers, dispatch } = this.props
-    const { height, previousAppt, futureAppt } = this.state
-    let list = []
+    const { classes } = this.props
+    const { previousAppt, futureAppt } = this.state
 
     return (
       <GridContainer>

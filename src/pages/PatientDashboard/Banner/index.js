@@ -2,54 +2,17 @@ import React, { PureComponent } from 'react'
 import Link from 'umi/link'
 import { connect } from 'dva'
 import moment from 'moment'
-import PerfectScrollbar from 'perfect-scrollbar'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-
-import { Save, Close, Clear, FilterList, Search, Add } from '@material-ui/icons'
+import { Paper } from '@material-ui/core'
+import { headerHeight } from 'mui-pro-jss'
 import {
-  withStyles,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  MenuList,
-  Divider,
-  Paper,
-} from '@material-ui/core'
-import { Affix } from 'antd'
-import { formatMessage } from 'umi/locale'
-import InboxIcon from '@material-ui/icons/MoveToInbox'
-import DraftsIcon from '@material-ui/icons/Drafts'
-import SendIcon from '@material-ui/icons/Send'
-import { standardRowHeight, headerHeight } from 'mui-pro-jss'
-import {
-  Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
   GridContainer,
   GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
-  TextField,
-  notification,
-  Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
   dateFormatLong,
   Skeleton,
 } from '@/components'
-import avatar from '@/assets/img/faces/marc.jpg'
-import { titles, finTypes, gender } from '@/utils/codes'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
-import Yup from '@/utils/yup'
+import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
 import Block from './Block'
 
@@ -72,8 +35,7 @@ class Banner extends PureComponent {
   }
 
   componentDidMount () {
-    const { props, value } = this
-
+    // const { props, value } = this
     // if (props.patientDashboard.currentId) {
     //   setCurrentPatient(props, props.setValues, () => {
     //     if (value && value.contact.contactAddress.length === 0) {
@@ -88,10 +50,18 @@ class Banner extends PureComponent {
 
   getAllergyLink () {
     const { props } = this
-    const { patientDashboard, codetable } = props
-    const { patientInfo } = patientDashboard
-    if (!patientInfo) return <Skeleton variant='rect' height={101} />
-    const { patientAllergy = [] } = patientInfo
+    const { patientDashboard = {}, patientInfo = {}, codetable } = props
+    const { patientInfo: dashboardPatientInfo } = patientDashboard
+    const info =
+      Object.keys(patientInfo).length === 0 ? dashboardPatientInfo : patientInfo
+
+    if (!Object.keys(info).length === 0)
+      return (
+        <Paper>
+          <Skeleton variant='rect' width='100%' height={101} />
+        </Paper>
+      )
+    const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
     const da = ctdrugallergy.filter((o) =>
       patientAllergy.find((m) => m.allergyFK === o.id),
@@ -103,7 +73,7 @@ class Banner extends PureComponent {
           to={getAppendUrl({
             md: 'pt',
             cmt: 3,
-            pid: patientInfo.id,
+            pid: info.id,
           })}
         >
           {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
@@ -113,12 +83,10 @@ class Banner extends PureComponent {
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
     const {
-      theme,
-      classes,
-      setValues,
-      patientDashboard,
+      patientDashboard = {},
+      patientInfo = {},
       extraCmt,
       style = {
         position: 'sticky',
@@ -129,10 +97,27 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
-    if (!patientDashboard) return <Skeleton variant='rect' height={100} />
-    const { patientInfo } = patientDashboard
-    if (!patientInfo || Object.keys(patientInfo).length === 0)
-      return <Skeleton variant='rect' height={100} />
+
+    // if (!patientDashboard && !patientInfo)
+    //   return (
+    //     <Paper>
+    //       <Skeleton variant='rect' width='100%' height={100} />
+    //     </Paper>
+    //   )
+    const { patientInfo: dashboardPatientInfo } = patientDashboard
+    if (
+      (!patientInfo || Object.keys(patientInfo).length === 0) &&
+      (!dashboardPatientInfo || Object.keys(dashboardPatientInfo).length === 0)
+    )
+      return (
+        <Paper>
+          <Skeleton variant='rect' width='100%' height={100} />
+        </Paper>
+      )
+
+    const info =
+      Object.keys(patientInfo).length === 0 ? dashboardPatientInfo : patientInfo
+
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -150,18 +135,18 @@ class Banner extends PureComponent {
                     // authority='none'
                     text
                     code='ctSalutation'
-                    value={patientInfo.salutationFK}
+                    value={info.salutationFK}
                   />{' '}
-                  <span>{patientInfo.name}</span>
+                  <span>{info.name}</span>
                 </div>
               }
               body={
                 <div>
-                  {patientInfo.patientAccountNo}{' '}
+                  {info.patientAccountNo}{' '}
                   <CodeSelect
                     text
                     code='ctNationality'
-                    value={patientInfo.nationalityFK}
+                    value={info.nationalityFK}
                   />
                 </div>
               }
@@ -172,20 +157,16 @@ class Banner extends PureComponent {
               header='Info'
               body={
                 <div>
-                  <DatePicker
-                    text
-                    format={dateFormatLong}
-                    value={patientInfo.dob}
-                  />
+                  <DatePicker text format={dateFormatLong} value={info.dob} />
                   ({Math.floor(
-                    moment.duration(moment().diff(patientInfo.dob)).asYears(),
+                    moment.duration(moment().diff(info.dob)).asYears(),
                   )},&nbsp;
                   {
                     <CodeSelect
                       code='ctGender'
                       // optionLabelLength={1}
                       text
-                      value={patientInfo.genderFK}
+                      value={info.genderFK}
                     />
                   })
                 </div>

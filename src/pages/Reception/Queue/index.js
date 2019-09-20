@@ -1,6 +1,4 @@
 import React, { PureComponent } from 'react'
-// moment
-import moment from 'moment'
 // dva
 import { connect } from 'dva'
 // umi locale
@@ -12,7 +10,6 @@ import classNames from 'classnames'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 import { Refresh, Stop } from '@material-ui/icons'
-import { getAppendUrl } from '@/utils/utils'
 // custom components
 import {
   Card,
@@ -32,6 +29,7 @@ import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'
 import { StatusIndicator, modelKey } from './variables'
 // utils
+import { getAppendUrl, convertToQuery } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 
 const drawerWidth = 400
@@ -103,19 +101,32 @@ class Queue extends PureComponent {
       dispatch({
         type: `${modelKey}getSessionInfo`,
       })
-    } else {
-      const today = moment().format(serverDateFormat)
-      dispatch({
-        type: 'calendar/getCalendarList',
-        payload: {
-          eql_appointmentDate: today,
-        },
-      })
     }
     // dispatch({
     //   type: 'calendar/getCalendarList',
     //   payload: {
+    //     combineCondition: 'and',
     //     eql_appointmentDate: today,
+    //     eql_appointmentStatusFk: '1',
+    //     // eql_appointmentStatusFk: [
+    //     //   {
+    //     //     appointmentStatusFk: [
+    //     //       '1',
+    //     //       '5',
+    //     //     ],
+    //     //     combineCondition: 'or',
+    //     //   },
+    //     // ],
+    //     // group: [
+    //     //   {
+    //     //     eql_appointmentStatusFk: '1',
+    //     //     combineCondition: 'or',
+    //     //   },
+    //     //   {
+    //     //     eql_appointmentStatusFk: '5',
+    //     //     combineCondition: 'or',
+    //     //   },
+    //     // ],
     //   },
     // })
     this._timer = setInterval(() => {
@@ -133,12 +144,17 @@ class Queue extends PureComponent {
     })
   }
 
-  showVisitRegistration = ({ visitID = undefined, patientID = undefined }) => {
+  showVisitRegistration = ({
+    visitID = undefined,
+    patientID = undefined,
+    appointmentID = undefined,
+  }) => {
     const parameter = {
       md: 'visreg',
     }
     if (patientID) parameter.pid = patientID
     if (visitID) parameter.vis = visitID
+    if (appointmentID) parameter.apptid = appointmentID
 
     this.setState(
       {
@@ -152,12 +168,7 @@ class Queue extends PureComponent {
     patientID = undefined,
     appointmentID = undefined,
   }) => {
-    this.props.dispatch({
-      type: `${modelKey}actualizeAppointment`,
-      payload: appointmentID,
-    })
-
-    // this.showVisitRegistration({ patientID })
+    this.showVisitRegistration({ patientID, appointmentID })
   }
 
   closeVisitRegistration = () => {
@@ -215,7 +226,6 @@ class Queue extends PureComponent {
   }
 
   onEnterPressed = async (searchQuery) => {
-    console.log(searchQuery);
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -273,7 +283,7 @@ class Queue extends PureComponent {
   }
 
   render () {
-    const { classes, queueLog, loading } = this.props
+    const { classes, queueLog, loading, history } = this.props
     const {
       showEndSessionSummary,
       showPatientSearch,
@@ -346,6 +356,7 @@ class Queue extends PureComponent {
                   handleEditVisitClick={this.showVisitRegistration}
                   handleActualizeAppointment={this.handleActualizeAppointment}
                   currentFilter={currentFilter}
+                  history={history}
                 />
               </React.Fragment>
             )}
