@@ -15,6 +15,7 @@ import {
   TextField,
   Transfer,
   CodeSelect,
+  CardContainer,
 } from '@/components'
 
 const styles = () => ({})
@@ -37,9 +38,8 @@ const Setting = ({
     setList,
   ] = useState([])
 
-  const { ctmedicationprecaution, entity } = medicationDetail
-    ? medicationDetail
-    : vaccinationDetail
+  const { ctmedicationprecaution, entity } =
+    medicationDetail || vaccinationDetail
   const entityData = entity || []
 
   const settingProps = {
@@ -74,172 +74,192 @@ const Setting = ({
   )
 
   return (
-    <GridContainer>
-      <GridItem xs={6}>
-        <Card>
-          <CardHeader color='primary' text>
-            <CardText color='primary'>
-              <h5 className={classes.cardTitle}>Prescribing</h5>
-            </CardText>
-          </CardHeader>
-          <CardBody>
-            <GridContainer>
-              <GridItem xs={6}>
-                <FastField
-                  name='prescribingDosageFK'
-                  render={(args) => (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.master.setting.dosage',
-                      })}
-                      code='ctMedicationDosage'
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={6}>
-                <FastField
-                  name='prescribingUOMFK'
-                  render={(args) => (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.master.setting.uom',
-                      })}
-                      code={
-                        showTransfer ? (
-                          'ctmedicationunitofmeasurement'
-                        ) : (
-                          'ctvaccinationunitofmeasurement'
-                        )
-                      }
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='medicationFrequencyFK'
-                  render={(args) => (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.master.setting.frequency',
-                      })}
-                      code='ctMedicationFrequency'
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='duration'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.master.setting.duration',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
-          </CardBody>
-        </Card>
-      </GridItem>
-      <GridItem xs={6}>
-        <Card style={{ height: 250 }}>
-          <CardHeader color='primary' text>
-            <CardText color='primary'>
-              <h5 className={classes.cardTitle}>Dispensing</h5>
-            </CardText>
-          </CardHeader>
-          <CardBody>
-            <GridContainer>
-              <GridItem xs={12}>
-                <FastField
-                  name='medicationUsageFK'
-                  render={(args) => (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.master.setting.usage',
-                      })}
-                      code={
-                        showTransfer ? (
-                          'ctMedicationUsage'
-                        ) : (
-                          'ctvaccinationusage'
-                        )
-                      }
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={6}>
-                <FastField
-                  name='dispensingQuantity'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.master.setting.quantity',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={6}>
-                <FastField
-                  name='dispensingUOMFK'
-                  render={(args) => (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.master.setting.uom',
-                      })}
-                      code={
-                        showTransfer ? (
-                          'ctmedicationunitofmeasurement'
-                        ) : (
-                          'ctvaccinationunitofmeasurement'
-                        )
-                      }
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={6} />
-            </GridContainer>
-          </CardBody>
-        </Card>
-      </GridItem>
-      <GridItem xs={12}>
-        <p style={{ textAlign: 'Center' }}>
-          1 Dispense UOM = <u>1.00</u> Prescribing UOM
-        </p>
-      </GridItem>
-      {showTransfer && (
-        <GridItem xs={12}>
-          <Card>
-            <CardHeader color='primary' text>
-              <CardText color='primary'>
-                <h5 className={classes.cardTitle}>Medication Precaution</h5>
-              </CardText>
-            </CardHeader>
-            <CardBody>
-              <Transfer {...settingProps} />
-            </CardBody>
-          </Card>
+    <CardContainer
+      hideHeader
+      style={{
+        marginLeft: 5,
+        marginRight: 5,
+      }}
+    >
+      <h3>Prescribing</h3>
+      <hr />
+      <GridContainer>
+        <GridItem xs={3}>
+          <FastField
+            name='prescribingDosageFK'
+            render={(args) => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.setting.dosage',
+                })}
+                code='ctMedicationDosage'
+                {...args}
+              />
+            )}
+          />
         </GridItem>
+        <GridItem xs={3}>
+          <FastField
+            name='prescribingUOMFK'
+            render={(args) => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.setting.uom',
+                })}
+                code={
+                  showTransfer ? (
+                    'ctmedicationunitofmeasurement'
+                  ) : (
+                    'ctvaccinationunitofmeasurement'
+                  )
+                }
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+      </GridContainer>
+      <GridContainer>
+        <GridItem xs={3}>
+          <FastField
+            name='medicationFrequencyFK'
+            render={(args) => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.setting.frequency',
+                })}
+                code='ctMedicationFrequency'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={3}>
+          <FastField
+            name='duration'
+            render={(args) => {
+              return (
+                <TextField
+                  label={formatMessage({
+                    id: 'inventory.master.setting.duration',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+      </GridContainer>
+
+      <h3>Dispensing</h3>
+      <hr />
+      <GridContainer>
+        <GridItem xs={6}>
+          <FastField
+            name='medicationUsageFK'
+            render={(args) => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.setting.usage',
+                })}
+                code={showTransfer ? 'ctMedicationUsage' : 'ctvaccinationusage'}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+      </GridContainer>
+      <GridContainer>
+        <GridItem xs={3}>
+          <FastField
+            name='dispensingQuantity'
+            render={(args) => {
+              return (
+                <TextField
+                  label={formatMessage({
+                    id: 'inventory.master.setting.quantity',
+                  })}
+                  {...args}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={3}>
+          <FastField
+            name='dispensingUOMFK'
+            render={(args) => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.setting.uom',
+                })}
+                code={
+                  showTransfer ? (
+                    'ctmedicationunitofmeasurement'
+                  ) : (
+                    'ctvaccinationunitofmeasurement'
+                  )
+                }
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+      </GridContainer>
+      {showTransfer && (
+        <React.Fragment>
+          <h3>Medication Precaution</h3>
+          <hr />
+
+          <Transfer {...settingProps} style={{ paddingLeft: 0 }} />
+        </React.Fragment>
       )}
-    </GridContainer>
+    </CardContainer>
+    // <GridContainer>
+    //   <GridItem xs={6}>
+    //     <Card>
+    //       <CardHeader color='primary' text>
+    //         <CardText color='primary'>
+    //           <h5 className={classes.cardTitle}>Prescribing</h5>
+    //         </CardText>
+    //       </CardHeader>
+    //       <CardBody>
+    //
+    //       </CardBody>
+    //     </Card>
+    //   </GridItem>
+    //   <GridItem xs={6}>
+    //     <Card style={{ height: 250 }}>
+    //       <CardHeader color='primary' text>
+    //         <CardText color='primary'>
+    //           <h5 className={classes.cardTitle}>Dispensing</h5>
+    //         </CardText>
+    //       </CardHeader>
+    //       <CardBody>
+    //
+    //       </CardBody>
+    //     </Card>
+    //   </GridItem>
+    //   <GridItem xs={12}>
+    //     <p style={{ textAlign: 'Center' }}>
+    //       1 Dispense UOM = <u>1.00</u> Prescribing UOM
+    //     </p>
+    //   </GridItem>
+    //   {showTransfer && (
+    //     <GridItem xs={12}>
+    //       <Card>
+    //         <CardHeader color='primary' text>
+    //           <CardText color='primary'>
+    //             <h5 className={classes.cardTitle}>Medication Precaution</h5>
+    //           </CardText>
+    //         </CardHeader>
+    //         <CardBody>
+    //           <Transfer {...settingProps} />
+    //         </CardBody>
+    //       </Card>
+    //     </GridItem>
+    //   )}
+    // </GridContainer>
   )
 }
 export default compose(withStyles(styles, { withTheme: true }), React.memo)(
