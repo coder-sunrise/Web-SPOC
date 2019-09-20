@@ -1,17 +1,27 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
+// dva
 import { connect } from 'dva'
-
+// material ui
 import { withStyles } from '@material-ui/core'
-
+// common components
 import {
-  CardContainer,
-  CommonHeader,
+  CodeSelect,
   GridContainer,
   GridItem,
   CommonTableGrid,
+  serverDateFormat,
+  dateFormatLong,
 } from '@/components'
+// services
+import { queryList as queryAppointments } from '@/services/calendar'
+// utils
+import { formatAppointmentTimes } from '@/pages/Reception/Queue/utils'
 
-const styles = () => ({
+const styles = (theme) => ({
+  gridRow: {
+    marginTop: theme.spacing(1),
+  },
   container: {
     display: 'flex',
     flexDirection: 'column',
@@ -20,35 +30,143 @@ const styles = () => ({
   },
 })
 
-@connect(({ schemes, payers }) => {
-  return {
-    schemes,
-    payers,
-  }
-})
+const commonExt = [
+  {
+    columnName: 'appointmentStatusFk',
+    render: (rows) => (
+      <CodeSelect
+        code='ltappointmentstatus'
+        text
+        value={parseInt(rows.appointmentStatusFk, 10)}
+      />
+    ),
+  },
+  {
+    columnName: 'appointmentDate',
+    render: (rows) => moment(rows.appointmentDate).format(dateFormatLong),
+  },
+  {
+    columnName: 'startTime',
+    render: (rows) => {
+      const firstAppointment = rows.appointment_Resources.find(
+        (item) => item.sortOrder === 0,
+      )
+      if (firstAppointment) {
+        return moment(firstAppointment.startTime, 'HH:mm:ss').format('hh:mm A')
+      }
+      return ''
+    },
+  },
+  {
+    columnName: 'doctor',
+    render: (rows) => {
+      const firstAppointment = rows.appointment_Resources.find(
+        (item) => item.sortOrder === 0,
+      )
+      if (firstAppointment) {
+        return (
+          <CodeSelect
+            text
+            code='clinicianprofile'
+            value={firstAppointment.clinicianFK}
+            labelField='name'
+            valueField='id'
+          />
+        )
+      }
+      return ''
+    },
+  },
+]
+
+@connect(({ patient }) => ({
+  patient: patient.entity || {},
+}))
 class AppointmentHistory extends PureComponent {
   state = {
     height: 100,
+    previousAppt: [],
+    futureAppt: [],
   }
 
-  tableParas = {
+  previousApptTableParams = {
     columns: [
-      { name: 'Date', title: 'Date' },
-      { name: 'Time', title: 'Time' },
-      { name: 'Doctor', title: 'Doctor' },
-      { name: 'Status', title: 'Status' },
-      { name: 'Reason', title: 'Reason' },
-      { name: 'Remarks', title: 'Remarks' },
+      { name: 'appointmentDate', title: 'Date' },
+      { name: 'startTime', title: 'Time' },
+      { name: 'doctor', title: 'Doctor' },
+      { name: 'appointmentStatusFk', title: 'Status' },
+      { name: 'cancellationReason', title: 'Reason' },
+      { name: 'appointmentRemarks', title: 'Remarks' },
+    ],
+    columnExtensions: [
+      ...commonExt,
+    ],
+  }
+
+  futureApptTableParams = {
+    columns: [
+      { name: 'appointmentDate', title: 'Date' },
+      { name: 'startTime', title: 'Time' },
+      { name: 'doctor', title: 'Doctor' },
+      { name: 'appointmentStatusFk', title: 'Status' },
+      { name: 'appointmentRemarks', title: 'Remarks' },
+    ],
+    columnExtensions: [
+      ...commonExt,
     ],
   }
 
   componentDidMount () {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
+    if (this.props.patient.id) {
+      this.getAppts()
+    }
   }
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.resize.bind(this))
+  }
+
+  async getAppts () {
+    const today = moment().format(serverDateFormat)
+    const commonParams = {
+      combineCondition: 'and',
+      isCancelled: false,
+      neql_appointmentStatusFk: '2',
+      sorting: [
+        { columnName: 'appointmentDate', direction: 'asc' },
+      ],
+      'AppointmentGroupFKNavigation.patientProfileFK': this.props.patient.id,
+    }
+    const [
+      previous,
+      future,
+    ] = await Promise.all([
+      queryAppointments({
+        lst_appointmentDate: today,
+        ...commonParams,
+      }),
+      queryAppointments({
+        lgteql_appointmentDate: today,
+        ...commonParams,
+      }),
+    ])
+    if (previous) {
+      const { status, data } = previous
+      if (status === '200')
+        this.setState({
+          previousAppt: data.data,
+        })
+    }
+
+    if (future) {
+      const { status, data } = future
+      if (status === '200')
+        this.setState({
+          futureAppt: data.data,
+        })
+    }
   }
 
   resize () {
@@ -62,14 +180,32 @@ class AppointmentHistory extends PureComponent {
 
   render () {
     const { classes, schemes, payers, dispatch } = this.props
-    const { height } = this.state
+    const { height, previousAppt, futureAppt } = this.state
     let list = []
+
     return (
-      <CardContainer title={this.titleComponent} hideHeader>
-        TBD
-      </CardContainer>
+      <GridContainer>
+        <GridItem md={12}>
+          <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
+        </GridItem>
+        <GridItem md={12} className={classes.gridRow}>
+          <CommonTableGrid
+            rows={previousAppt}
+            {...this.previousApptTableParams}
+          />
+        </GridItem>
+        <GridItem md={12}>
+          <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>
+        </GridItem>
+        <GridItem md={12} className={classes.gridRow}>
+          <CommonTableGrid rows={futureAppt} {...this.futureApptTableParams} />
+        </GridItem>
+      </GridContainer>
     )
   }
 }
 
-export default withStyles(styles, { withTheme: true })(AppointmentHistory)
+export default withStyles(styles, {
+  withTheme: true,
+  name: 'AppointmentHistory',
+})(AppointmentHistory)
