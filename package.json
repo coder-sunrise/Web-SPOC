@@ -55,6 +55,7 @@
     "devextreme-react": "^18.2.3",
     "dexie": "^2.0.4",
     "draft-js": "^0.10.5",
+    "draft-js-import-html": "^1.4.1",
     "draftjs-to-html": "^0.8.4",
     "dva": "^2.4.0",
     "enquire-js": "^0.2.1",

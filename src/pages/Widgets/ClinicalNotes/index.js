@@ -291,6 +291,7 @@ class ClinicalNotes extends Component {
                                         <Button
                                           link
                                           // className={classes.linkBtn}
+                                          tabindex='-1'
                                           value={item}
                                           onClick={() => {
                                             this.setState({
@@ -379,6 +380,7 @@ class ClinicalNotes extends Component {
                                         <Button
                                           link
                                           // className={classes.linkBtn}
+                                          tabindex='-1'
                                           value={item}
                                           onClick={() => {
                                             this.setState({
@@ -467,6 +469,7 @@ class ClinicalNotes extends Component {
                                         <Button
                                           link
                                           // className={classes.linkBtn}
+                                          tabindex='-1'
                                           value={item}
                                           onClick={() => {
                                             this.setState({

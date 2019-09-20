@@ -34,6 +34,38 @@ import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
 import VaccinationCertificate from './VaccinationCertificate'
 
+const loadFromCodes = [
+  {
+    value: 'corDoctorNote[0].clinicianNote',
+    name: 'Clinical Notes',
+  },
+  {
+    value: 'corDoctorNote.chiefComplaints',
+    name: 'Chief Complaints',
+  },
+  { value: 'corDoctorNote.plan', name: 'Plan' },
+  {
+    value: 'corDiagnosis',
+    name: 'Diagnosis',
+    getProps: (v) => {
+      return 'test'
+    },
+  },
+  {
+    value: 'medication',
+    name: 'Medication',
+    getProps: (v) => {
+      return 'test 123'
+    },
+  },
+  {
+    value: 'vaccination',
+    name: 'Vaccination',
+    getProps: (v) => {
+      return 'test dsfsd 123'
+    },
+  },
+]
 const styles = (theme) => ({
   editor: {
     marginTop: theme.spacing(1),
@@ -44,6 +76,7 @@ const styles = (theme) => ({
     zIndex: 1,
     right: 0,
     top: 12,
+    width: 200,
   },
 })
 
@@ -101,7 +134,7 @@ class AddConsultationDocument extends PureComponent {
       theme,
       classes,
       consultationDocument,
-      values,
+      parentProps,
       rowHeight,
       footer,
       dispatch,
@@ -109,8 +142,10 @@ class AddConsultationDocument extends PureComponent {
     } = props
     // console.log(props)
     const { entity = {}, type } = consultationDocument
+    console.log('form', this.form, parentProps)
     const cfg = {
       ...props,
+      loadFromCodes,
       currentType: types.find((o) => o.value === type),
     }
     return (
@@ -118,6 +153,13 @@ class AddConsultationDocument extends PureComponent {
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem xs={6}>
+              <FastField
+                name='fake'
+                render={({ form }) => {
+                  this.form = form
+                  return null
+                }}
+              />
               <Select
                 label='Type'
                 options={types}

@@ -564,8 +564,10 @@ class Layout extends PureComponent {
   render () {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, theme, height, consultation } = props
-
+    const { classes, theme, height } = props
+    const widgetProps = {
+      parentProps: props,
+    }
     // console.log(state.currentLayout)
 
     const layoutCfg = {
@@ -722,7 +724,7 @@ class Layout extends PureComponent {
                     )}
                     <div className='non-dragable' style={w.layoutConfig.style}>
                       <SizeContainer size='sm'>
-                        <LoadableComponent />
+                        <LoadableComponent {...widgetProps} />
                       </SizeContainer>
                     </div>
                   </Paper>

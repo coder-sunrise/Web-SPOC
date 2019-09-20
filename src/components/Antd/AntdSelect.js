@@ -346,6 +346,7 @@ class AntdSelect extends React.PureComponent {
       autoComplete,
       query,
       optionLabelLength,
+      className,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
@@ -394,11 +395,14 @@ class AntdSelect extends React.PureComponent {
         />
       )
     }
-
+    // console.log(classes.selectContainer, classes.className)
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
-          className={classnames(classes.selectContainer)}
+          className={classnames([
+            classes.selectContainer,
+            className,
+          ])}
           dropdownClassName={classnames(classes.dropdownMenu)}
           showSearch
           // defaultOpen

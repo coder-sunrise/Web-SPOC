@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { FormattedMessage } from 'umi/locale'
+import Yup from '@/utils/yup'
+import { tagList } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -15,39 +16,11 @@ import {
   Field,
 } from '@/components'
 
-
 const styles = (theme) => ({})
-
-const tagList = [
-  {
-    id: 1,
-    text: '<#PatientName#>',
-  },
-  {
-    id: 2,
-    text: '<#AppointmentDateTime#>',
-  },
-  {
-    id: 3,
-    text: '<#Doctor#>',
-  },
-  {
-    id: 4,
-    text: '<#NewLine#>',
-  },
-  {
-    id: 5,
-    text: '<#PatientCallingName#>',
-  },
-  {
-    id: 6,
-    text: '<#LastVisitDate#>',
-  },
-]
 
 @withFormikExtend({
   mapPropsToValues: ({ settingTemplateMessage }) =>
-  settingTemplateMessage.entity || settingTemplateMessage.default,
+    settingTemplateMessage.entity || settingTemplateMessage.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -57,8 +30,8 @@ const tagList = [
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-    //console.log(restValues)
-    
+    // console.log(restValues)
+
     dispatch({
       type: 'settingTemplateMessage/upsert',
       payload: {
@@ -83,7 +56,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingTemplateMessage } = props
-    //console.log('detail', props)
+    // console.log('detail', props)
 
     return (
       <React.Fragment>
@@ -97,7 +70,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={settingTemplateMessage.entity ? true : false}
+                    disabled={!!settingTemplateMessage.entity}
                   />
                 )}
               />

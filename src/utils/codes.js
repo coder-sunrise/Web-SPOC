@@ -574,9 +574,9 @@ const consultationDocumentTypes = [
         .utc(r.mcStartDate)
         .local()
         .format(dateFormatLong)} - ${moment
-          .utc(r.mcEndDate)
-          .local()
-          .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+        .utc(r.mcEndDate)
+        .local()
+        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
     convert: (r) => {
       return {
         ...r,
@@ -702,7 +702,7 @@ const tenantCodes = [
   'inventoryvaccination',
   'inventorypackage',
   'role',
-  'ctsupplier'
+  'ctsupplier',
 ]
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
@@ -904,6 +904,64 @@ export const InventoryTypes = [
   },
 ]
 
+const tagList = [
+  {
+    value: 'PatientName',
+    text: 'PatientName',
+    url: '',
+    getter: () => {
+      const { patient, patientDashboard } = window.g_app._store.getState()
+      if (patient && patient.entity) {
+        return patient.entity.name
+      }
+      return ''
+    },
+  },
+  {
+    value: 'AppointmentDateTime',
+    text: 'AppointmentDateTime',
+    url: '',
+  },
+  {
+    value: 'Doctor',
+    text: 'Doctor',
+    url: '',
+    getter: () => {
+      const { user } = window.g_app._store.getState()
+      if (user && user.data && user.data.clinicianProfile) {
+        return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
+          .name}`
+      }
+      return ''
+    },
+  },
+  {
+    value: 'NewLine',
+    text: 'NewLine',
+    url: '',
+    getter: () => {
+      return '<br/>'
+    },
+  },
+  {
+    value: 'PatientCallingName',
+    text: 'PatientCallingName',
+    url: '',
+    getter: () => {
+      const { patient, patientDashboard } = window.g_app._store.getState()
+      if (patient && patient.entity) {
+        return patient.entity.callingName
+      }
+      return ''
+    },
+  },
+  {
+    value: 'LastVisitDate',
+    text: 'LastVisitDate',
+    url: '',
+  },
+]
+
 export const getInventoryItem = (list, value, itemFKName, rows) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
@@ -913,17 +971,21 @@ export const getInventoryItem = (list, value, itemFKName, rows) => {
   }
 }
 
-export const getInventoryItemList = (list, itemFKName = undefined, stateName = undefined) => {
+export const getInventoryItemList = (
+  list,
+  itemFKName = undefined,
+  stateName = undefined,
+) => {
   let inventoryItemList = list.map((x) => {
     return {
       value: x.id,
       name: x.displayValue,
       code: x.code,
-      //uom: prescribingUOM.id,
+      // uom: prescribingUOM.id,
       uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,
-      stateName: stateName,
+      stateName,
     }
   })
   return {
@@ -968,5 +1030,6 @@ module.exports = {
   // country,
   consultationDocumentTypes,
   getServices,
+  tagList,
   ...module.exports,
 }
