@@ -1,19 +1,6 @@
 import React, { Component, PureComponent } from 'react'
-import {
-  EditorState,
-  ContentState,
-  convertToRaw,
-  convertFromHTML,
-  Modifier,
-  Entity,
-  ContentBlock,
-  List,
-} from 'draft-js'
-import { stateFromHTML } from 'draft-js-import-html'
 
 import Yup from '@/utils/yup'
-import { tagList } from '@/utils/codes'
-import { getUniqueId } from '@/utils/utils'
 import {
   Button,
   GridContainer,
@@ -37,7 +24,6 @@ import {
   ClinicianSelect,
 } from '@/components'
 
-const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument }) => {
     return consultationDocument.entity || consultationDocument.defaultMemo
@@ -60,21 +46,8 @@ const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
   displayName: 'AddConsultationDocument',
 })
 class Memo extends PureComponent {
-  constructor (props) {
-    super(props)
-    const { dispatch } = props
-
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctReferralLetterTemplate',
-      },
-    })
-  }
-
   setEditorReference = (ref) => {
     this.editorReferece = ref
-    // ref.focus()
   }
 
   render () {
@@ -87,8 +60,8 @@ class Memo extends PureComponent {
       setFieldValue,
       loadFromCodes,
       parentProps,
+      templateLoader,
     } = this.props
-    const { ctReferralLetterTemplate } = codetable
 
     return (
       <div>
@@ -122,7 +95,7 @@ class Memo extends PureComponent {
             />
           </GridItem> */}
           <GridItem xs={6} />
-          <GridItem xs={6}>
+          <GridItem xs={12}>
             <FastField
               name='subject'
               render={(args) => {
@@ -130,80 +103,14 @@ class Memo extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem
-            xs={6}
-            style={{ lineHeight: rowHeight, textAlign: 'right' }}
-          >
-            <ButtonSelect
-              options={ctReferralLetterTemplate}
-              textField='displayValue'
-              onClick={(option) => {
-                let msg = option.templateMessage
-                const match = option.templateMessage.match(templateReg)
-                match.forEach((s) => {
-                  const text = s.match(/data-value="(.*?)"/)[1]
-                  const m = tagList.find((o) => o.text === text)
-                  if (m && m.getter) msg = msg.replace(s, m.getter())
-                })
-
-                setFieldValue('content', msg)
-              }}
-            >
-              Load Template
-            </ButtonSelect>
-            <ButtonSelect
-              options={loadFromCodes}
-              onClick={(option) => {
-                console.log(this.editorReferece, parentProps)
-                const { values } = parentProps
-                console.log(
-                  values[option.value],
-                  Object.byString(values, option.value),
-                  values,
-                  option.value,
-                )
-                const v = Object.byString(values, option.value) || '-'
-                const blocksFromHTML = convertFromHTML(v)
-                console.log(blocksFromHTML)
-                // const state = ContentState.createFromBlockArray(
-                //   blocksFromHTML.contentBlocks,
-                //   blocksFromHTML.entityMap
-                // );
-                // this.state = {
-                //   editorState: EditorState.createWithContent(state),
-                // };
-                const { editorState } = this.editorReferece.props
-
-                this.editorReferece.update(
-                  RichEditor.insertBlock(
-                    editorState,
-                    blocksFromHTML.contentBlocks,
-                  ),
-                )
-                // setFieldValue('content', option.templateMessage)
-              }}
-            >
-              Load From
-            </ButtonSelect>
-          </GridItem>
 
           <GridItem xs={12} className={classes.editor}>
-            {/* <Select className={classes.editorBtn} /> */}
-            {/* <Button link className={classes.editorBtn}>
-              Add Diagnosis
-            </Button> */}
+            {templateLoader(this.editorReferece, setFieldValue)}
             <FastField
               name='content'
               render={(args) => {
                 return (
-                  <RichEditor
-                    // tagList={loadFromCodes.map((o) => ({
-                    //   id: o.value,
-                    //   text: o.name,
-                    // }))}
-                    editorRef={this.setEditorReference}
-                    {...args}
-                  />
+                  <RichEditor editorRef={this.setEditorReference} {...args} />
                 )
               }}
             />

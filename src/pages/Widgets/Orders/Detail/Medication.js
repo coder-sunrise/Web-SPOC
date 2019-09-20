@@ -561,10 +561,10 @@ class Medication extends PureComponent {
                   <NumberInput
                     label='Total'
                     onChange={(e) => {
-                      this.props.setFieldValue(
-                        'totalAfterItemAdjustment',
-                        e.target.value,
-                      )
+                      // this.props.setFieldValue(
+                      //   'totalAfterItemAdjustment',
+                      //   e.target.value,
+                      // )
                       this.updateTotalPrice(e.target.value)
                       // this.props.dispatch({
                       //   type: 'orders/updateState',

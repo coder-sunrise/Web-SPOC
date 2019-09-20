@@ -47,7 +47,7 @@ const styles = (theme) => ({})
       }
     })
   },
-  displayName: 'InventoryAdjustmentDetail',
+  displayName: 'InventoryAdjustment',
 })
 class Detail extends PureComponent {
   state = {
@@ -125,8 +125,8 @@ class Detail extends PureComponent {
           type: 'codeSelect',
           code:
             this.state.type === 'medication'
-              ? 'ctInventoryMedication'
-              : 'ctInventoryConsumable',
+              ? 'InventoryMedication'
+              : 'InventoryConsumable',
           disabled: this.state.type,
         },
         {
@@ -177,6 +177,15 @@ class Detail extends PureComponent {
     console.log('row', rows)
     this.setState({ rows })
     return rows
+  }
+
+  handleCancel = () => {
+    this.props.dispatch({
+      type: 'inventoryAdjustment/updateState',
+      payload: {
+        showModal: false,
+      },
+    })
   }
 
   render () {
@@ -275,7 +284,9 @@ class Detail extends PureComponent {
             justify='flex-end'
             alignItems='flex-end'
           >
-            <Button color='danger'>Cancel</Button>
+            <Button color='danger' onClick={() => this.handleCancel()}>
+              Cancel
+            </Button>
             <Button color='primary' onClick={handleSubmit}>
               Save
             </Button>

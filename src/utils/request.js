@@ -290,7 +290,7 @@ export default function request (
         return data
       })
       .catch((response, s, xhr) => {
-        console.log(response, s, xhr)
+        // console.log(response, s, xhr)
 
         let msg
         let status

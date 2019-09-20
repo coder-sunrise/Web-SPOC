@@ -83,9 +83,9 @@ class Layout extends PureComponent {
     this.layoutContainer = React.createRef()
     // console.log(this.container)
     // console.log(window.innerHeight)
-    // this.delayedResize = _.debounce(this.resize, 1000)
-    // window.addEventListener('resize', this.delayedResize)
-    this.delayedChangeLayout = _.debounce(this.changeLayout, 1000)
+    this.delayedResize = _.debounce(this.resize, 300)
+    window.addEventListener('resize', this.delayedResize)
+    this.delayedChangeLayout = _.debounce(this.changeLayout, 300)
     this.delayedShowBottomPadding = _.debounce((e) => {
       if (
         Math.abs(

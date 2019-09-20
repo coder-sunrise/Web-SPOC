@@ -1,50 +1,20 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
-import moment from 'moment'
 import _ from 'lodash'
-import PerfectScrollbar from 'perfect-scrollbar'
-import Link from 'umi/link'
 import ListAlt from '@material-ui/icons/ListAlt'
 import Search from '@material-ui/icons/Search'
 import Business from '@material-ui/icons/Business'
 import FolderOpen from '@material-ui/icons/FolderOpen'
+import { withStyles } from '@material-ui/core'
 import {
-  withStyles,
-  MenuItem,
-  MenuList,
-  Divider,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Typography,
-} from '@material-ui/core'
-import MuiButton from '@material-ui/core/Button'
-
-import { unstable_Box as Box } from '@material-ui/core/Box'
-import {
-  PictureUpload,
   GridContainer,
   GridItem,
   CardContainer,
-  Transition,
   TextField,
-  AntdInput,
-  Select,
   Accordion,
   Button,
-  Card,
-  CardBody,
 } from '@/components'
-import { Icon, Input, AutoComplete, Form } from 'antd'
-
-import avatar from '@/assets/img/faces/marc.jpg'
-import { getAppendUrl } from '@/utils/utils'
-
-import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
 // import Banner from './Banner'
 // import Orders from './Orders'
 // import ConsultationDocument from './ConsultationDocument'
@@ -75,25 +45,25 @@ const menuData = [
   {
     title: 'Clinic Setting',
     text: 'Service Center',
-    icon: <Business />,
+    // icon: <Business />,
     url: '/setting/servicecenter',
   },
   {
     title: 'Clinic Setting',
     text: 'Service Center Category',
-    icon: <FolderOpen />,
+    // icon: <FolderOpen />,
     url: '/setting/servicecentercategory',
   },
   {
     title: 'Clinic Setting',
     text: 'Service Category',
-    icon: <FolderOpen />,
+    // icon: <FolderOpen />,
     url: '/setting/servicecategory',
   },
   {
     title: 'Clinic Setting',
     text: 'Revenue Category',
-    icon: <FolderOpen />,
+    // icon: <FolderOpen />,
     url: '/setting/revenuecategory',
   },
   {
@@ -169,6 +139,7 @@ const menuData = [
   {
     title: 'Clinic Setting',
     text: 'Medication Consumption Method',
+    longText: true,
     url: '/setting/medicationconsumptionmethod',
   },
   {
@@ -187,17 +158,9 @@ const menuData = [
     url: '/setting/userprofile',
   },
   {
-    title: 'System User',
-    text: 'Role',
-    url: '/setting/userrole',
-  },
-  {
     title: 'Print Setup',
-    text: 'TBD',
-  },
-  {
-    title: 'User Preference',
-    text: 'TBD',
+    text: 'Printout Setting',
+    url: '/setting/printoutsetting',
   },
   {
     title: 'Templates',
@@ -209,11 +172,11 @@ const menuData = [
     text: 'Referral Letter Template',
     url: '/setting/referrallettertemplate',
   },
-  {
-    title: 'Contact',
-    text: 'Co-Payer',
-    url: '/setting/company/1',
-  },
+  // {
+  //   title: 'Contact',
+  //   text: 'Co-Payer',
+  //   url: '/setting/company/1',
+  // },
   {
     title: 'Contact',
     text: 'Supplier',
@@ -221,6 +184,20 @@ const menuData = [
   },
 ]
 const styles = (theme) => ({
+  baseBtn: {
+    minHeight: 56,
+    '& svg': {
+      width: 24,
+      height: 24,
+    },
+    '& > span': {
+      display: 'flex',
+      justifyContent: 'space-between',
+    },
+    '& > span > span': {
+      width: '100%',
+    },
+  },
   bigviewBtn: {
     // width: 180,
     marginRight: 0,
@@ -286,10 +263,11 @@ class SystemSetting extends PureComponent {
                   >
                     <Button
                       fullWidth
-                      bigview
+                      // bigview
                       color='primary'
                       className={classnames({
-                        [classes.bigviewBtn]: true,
+                        [classes.baseBtn]: true,
+                        // [classes.bigviewBtn]: false,
                         // [classes.longTextBtn]: item.longText,
                       })}
                       variant='outlined'
@@ -297,8 +275,8 @@ class SystemSetting extends PureComponent {
                         this.props.history.push(item.url)
                       }}
                     >
-                      {item.icon || <ListAlt />}
-                      {item.text}
+                      <ListAlt />
+                      <span>{item.text}</span>
                     </Button>
                   </GridItem>
                 )

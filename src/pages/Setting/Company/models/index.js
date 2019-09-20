@@ -67,6 +67,19 @@ export default createListViewModel({
             },
           })
         }
+
+        if (pathname === '/finance/copayer') {
+          const companyType = companyTypes.find((o) => o.id === 1)
+          dispatch({
+            type: 'updateState',
+            payload: {
+              companyType,
+              filter: {
+                companyTypeFK: companyType.id,
+              },
+            },
+          })
+        }
       })
     },
     effects: {

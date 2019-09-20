@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer } from 'react'
 import * as Yup from 'yup'
+import moment from 'moment'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -13,24 +14,31 @@ import { ReportDataGrid, AccordionTitle } from '@/components/_medisys'
 // services
 import { getRawData } from '@/services/report'
 
-const PatientListingColumns = [
-  { name: 'patientReferenceNo', title: 'Reference No.' },
-  { name: 'patientAccountNo', title: 'Acc. No.' },
-  { name: 'patientName', title: 'Patient Name' },
-  { name: 'lastVisitDate', title: 'Last Visit Date' },
-  { name: 'vC_Gender', title: 'Gender' },
-  { name: 'vC_AgeInYear', title: 'Age' },
-  { name: 'vC_Nationality', title: 'Nationality' },
-  { name: 'vC_MobileNo', title: 'Mobile No.' },
-  { name: 'vC_EmailAddress', title: 'Email Address' },
-  { name: 'startDateTime', title: 'Next Appt.' },
+// "salesSummaryDetails": "",
+//             "doctorName": null,
+//             "salesDate": null,
+//             "category": "ADJ",
+//             "sortOrder": 999,
+//             "amount": 0.0,
+//             "visitNum": 0
+
+const PaymentCollectionColumns = [
+  { name: 'salesSummaryDetails', title: 'Date' },
+  { name: 'patientAccountNo', title: 'Receipt No.' },
+  { name: 'patientName', title: 'Ref. No.' },
+  { name: 'lastVisitDate', title: 'Payer Name' },
+  { name: 'vC_Gender', title: 'Invoice No.' },
+  { name: 'vC_AgeInYear', title: 'Inv. Date' },
+  { name: 'vC_Nationality', title: 'Amount' },
+  { name: 'vC_MobileNo', title: 'Write Off' },
+  { name: 'vC_EmailAddress', title: 'Net Amount' },
 ]
 
 const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
-  patientListingData: [],
+  paymentCollectionData: [],
 }
 const reducer = (state, action) => {
   switch (action.type) {
@@ -50,8 +58,8 @@ const reducer = (state, action) => {
   }
 }
 
-const reportID = 2
-const fileName = 'Patient Listing Report'
+const reportID = 3
+const fileName = 'Sales Summary'
 
 const PatientListing = ({ values, validateForm }) => {
   const [
@@ -77,9 +85,9 @@ const PatientListing = ({ values, validateForm }) => {
           activePanel: 0,
           loaded: true,
           isLoading: false,
-          patientListingData: result.PatientListSummary.map((item, index) => ({
+          paymentCollectionData: result.CategoryDetails.map((item, index) => ({
             ...item,
-            id: `patientListSummary-${index}-${item.patientReferenceNo}`,
+            id: `salesSummary-${index}`,
           })),
         },
       })
@@ -132,8 +140,8 @@ const PatientListing = ({ values, validateForm }) => {
                   content: (
                     <ReportDataGrid
                       height={500}
-                      data={state.patientListingData}
-                      columns={PatientListingColumns}
+                      data={state.paymentCollectionData}
+                      columns={PaymentCollectionColumns}
                     />
                   ),
                 },
@@ -153,7 +161,7 @@ const PatientListingWithFormik = withFormik({
     },
   ),
   mapPropsToValues: () => ({
-    patientCriteria: '',
+    dateFrom: moment.utc().startOf('month').toDate(),
   }),
 })(PatientListing)
 

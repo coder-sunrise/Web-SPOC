@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import Authorized from '@/utils/Authorized'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Search, PermIdentity } from '@material-ui/icons'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
+import Authorized from '@/utils/Authorized'
 import { getAppendUrl } from '@/utils/utils'
 
 import {
@@ -95,7 +95,7 @@ class FilterBar extends PureComponent {
                     : 'like_'
                   this.props.dispatch({
                     type: 'patientSearch/query',
-                    payload: {                     
+                    payload: {
                       [`${prefix}patientReferenceNo`]: search,
                       [`${prefix}name`]: search,
                       [`${prefix}patientAccountNo`]: search,
@@ -113,6 +113,12 @@ class FilterBar extends PureComponent {
                     variant='contained'
                     color='primary'
                     onClick={() => {
+                      dispatch({
+                        type: 'patient/updateState',
+                        payload: {
+                          entity: undefined,
+                        },
+                      })
                       dispatch({
                         type: 'patient/openPatientModal',
                       })

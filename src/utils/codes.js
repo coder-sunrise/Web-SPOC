@@ -705,8 +705,17 @@ const tenantCodes = [
   'ctsupplier',
 ]
 
+const defaultParams = {
+  excludeInactiveCodes: true,
+}
+
+const convertExcludeFields = [
+  'excludeInactiveCodes',
+]
+
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
+  const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?ctnames=`
   const searchURL = `${baseURL}/search?ctname=`
@@ -723,21 +732,48 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     url = '/api/'
     useGeneral = false
   }
+  const newParams = {
+    ...defaultParams,
+    ...params,
+  }
   const body = useGeneral
-    ? convertToQuery({ ...params })
-    : convertToQuery({ ...params, ...criteriaForTenantCodes })
+    ? convertToQuery({ ...newParams }, convertExcludeFields)
+    : convertToQuery(
+        { ...params, ...criteriaForTenantCodes },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
     body,
   })
-  const { status: statusCode, data } = response
+
+  let { status: statusCode, data } = response
+  let newData
+
+  if (code.split(',').length > 1) {
+    const codes = code.split(',')
+    newData = [
+      ...codes.reduce(
+        (merged, c) => [
+          ...merged,
+          ...data[c],
+        ],
+        [],
+      ),
+    ]
+  } else {
+    newData = useGeneral
+      ? [
+          ...data[code],
+        ]
+      : [
+          ...data.data,
+        ]
+  }
 
   if (parseInt(statusCode, 10) === 200) {
-    const result = multiplyCodetable(
-      useGeneral ? data[code] : data.data,
-      multiplier,
-    )
+    const result = multiplyCodetable(newData, multiplier)
     await db.codetable.put({
       code,
       data: result,

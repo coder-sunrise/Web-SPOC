@@ -100,6 +100,7 @@ export const mapPropsToValues = ({
                 ),
               },
         currentAppointment: { ...appointment },
+        appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({
           ...item,
         })),
@@ -115,6 +116,7 @@ export const mapPropsToValues = ({
         appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),
         appointments_Resources: [],
       },
+      appointmentStatusFk: 2,
       recurrenceDto: { ...initDailyRecurrence },
     }
   } catch (error) {

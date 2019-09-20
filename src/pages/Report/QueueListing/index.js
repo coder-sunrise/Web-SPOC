@@ -1,44 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useReducer } from 'react'
+import * as Yup from 'yup'
+import moment from 'moment'
 // formik
 import { withFormik } from 'formik'
-// ant design
-import { Dropdown, Menu } from 'antd'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
-import Print from '@material-ui/icons/Print'
 // common components
-import {
-  Accordion,
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-} from '@/components'
+import { Accordion, CardContainer, GridContainer, GridItem } from '@/components'
 // sub components
 import FilterBar from './FilterBar'
-import {
-  // ReportViewer,
-  ReportDataGrid,
-  AccordionTitle,
-} from '@/components/_medisys'
+import ReportLayoutWrapper from '../ReportLayout'
+import { ReportDataGrid, AccordionTitle } from '@/components/_medisys'
 // services
-import { getQueueListingData } from '@/services/report'
-
-/* PDF viewer sample */
-// const QueueListing = ({ handleSubmit, values }) => {
-//   return (
-//     <CardContainer hideHeader>
-//       <GridContainer>
-//         <GridItem md={12}>
-//           <FilterBar handleSubmit={handleSubmit} />
-//         </GridItem>
-//         <GridItem md={12}>
-//           <ReportViewer />
-//         </GridItem>
-//       </GridContainer>
-//     </CardContainer>
-//   )
-// }
+import { getRawData } from '@/services/report'
 
 const VisitListingColumns = [
   { name: 'invoiceID', title: 'Invoice ID' },
@@ -69,45 +43,91 @@ const InvoicePayerColumns = [
   { name: 'coPayerPayable', title: 'Copayer Payable' },
 ]
 
-const QueueListing = ({ values }) => {
-  const [
-    activePanel,
-    setActivePanel,
-  ] = useState(-1)
+const fileName = 'Queue Listing Report'
 
-  const handleActivePanelChange = (event, panel) => {
-    if (activePanel === panel.key) setActivePanel(-1)
-    else setActivePanel(panel.key)
-  }
+const initialState = {
+  loaded: false,
+  isLoading: false,
+  activePanel: -1,
+  visitListingData: [],
+  invoicePayerData: [],
+}
 
-  const [
-    visitListingData,
-    setVisitListingData,
-  ] = useState([])
-
-  const [
-    invoicePayerData,
-    setInvoicePayerData,
-  ] = useState([])
-
-  const asyncGetData = async () => {
-    const queueListingResult = await getQueueListingData(values)
-    if (queueListingResult) {
-      setVisitListingData(queueListingResult.VisitListingDetails)
-      setInvoicePayerData(queueListingResult.InvoicePayerDetails)
-      setActivePanel(0)
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'toggleLoading':
+      return { ...state, isLoading: !state.isLoading }
+    case 'setActivePanel':
+      return { ...state, activePanel: action.payload }
+    case 'setLoaded':
+      return { ...state, loaded: action.payload }
+    case 'updateState': {
+      return { ...state, ...action.payload }
     }
+    case 'reset':
+      return { ...initialState }
+    default:
+      throw new Error()
   }
+}
 
-  const onSubmitClick = () => asyncGetData()
+const QueueListing = ({ values, validateForm }) => {
+  const [
+    state,
+    dispatch,
+  ] = useReducer(reducer, initialState)
 
   useEffect(() => {
     /* 
     clean up function
-    set visit listing data to empty array when leaving the page 
+    set data to empty array when leaving the page 
     */
-    return () => setVisitListingData([])
+    return () =>
+      dispatch({
+        type: 'reset',
+      })
   }, [])
+
+  const handleActivePanelChange = (event, panel) =>
+    dispatch({
+      type: 'setActivePanel',
+      payload: state.activePanel === panel.key ? -1 : panel.key,
+    })
+
+  const asyncGetData = async () => {
+    dispatch({
+      type: 'toggleLoading',
+    })
+    const queueListingResult = await getRawData(1, values)
+
+    if (queueListingResult) {
+      const visitListingData = queueListingResult.VisitListingDetails.map(
+        (item, index) => ({
+          ...item,
+          id: `qListing-${index}-${item.visitReferenceNo}`,
+        }),
+      )
+      dispatch({
+        type: 'updateState',
+        payload: {
+          activePanel: 0,
+          loaded: true,
+          isLoading: false,
+          visitListingData,
+        },
+      })
+    }
+  }
+
+  const onSubmitClick = async () => {
+    dispatch({
+      type: 'setLoaded',
+      payload: false,
+    })
+    const errors = await validateForm()
+    if (Object.keys(errors).length > 0) return
+    asyncGetData()
+  }
 
   return (
     <CardContainer hideHeader>
@@ -116,34 +136,15 @@ const QueueListing = ({ values }) => {
           <FilterBar handleSubmit={onSubmitClick} />
         </GridItem>
         <GridItem md={12}>
-          <CardContainer hideHeader size='sm'>
-            <div style={{ textAlign: 'right' }}>
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item key='export-pdf' id='pdf'>
-                      <span>PDF</span>
-                    </Menu.Item>
-                    <Menu.Item key='export-excel' id='excel'>
-                      <span>Excel</span>
-                    </Menu.Item>
-                  </Menu>
-                }
-                trigger={[
-                  'click',
-                ]}
-              >
-                <Button color='info' size='sm'>
-                  <SolidExpandMore />
-                  Export As
-                </Button>
-              </Dropdown>
-              <Button color='info' size='sm' justIcon>
-                <Print />
-              </Button>
-            </div>
+          <ReportLayoutWrapper
+            loading={state.isLoading}
+            reportID={1}
+            reportParameters={values}
+            loaded={state.loaded}
+            fileName={fileName}
+          >
             <Accordion
-              active={activePanel}
+              active={state.activePanel}
               onChange={handleActivePanelChange}
               leftIcon
               expandIcon={<SolidExpandMore fontSize='large' />}
@@ -153,7 +154,7 @@ const QueueListing = ({ values }) => {
                   content: (
                     <ReportDataGrid
                       height={500}
-                      data={visitListingData}
+                      data={state.visitListingData}
                       columns={VisitListingColumns}
                     />
                   ),
@@ -162,14 +163,14 @@ const QueueListing = ({ values }) => {
                   title: <AccordionTitle title='Invoice Payer' />,
                   content: (
                     <ReportDataGrid
-                      data={invoicePayerData}
+                      data={state.invoicePayerData}
                       columns={InvoicePayerColumns}
                     />
                   ),
                 },
               ]}
             />
-          </CardContainer>
+          </ReportLayoutWrapper>
         </GridItem>
       </GridContainer>
     </CardContainer>
@@ -177,7 +178,13 @@ const QueueListing = ({ values }) => {
 }
 
 const QueueListingWithFormik = withFormik({
-  mapPropsToValues: () => ({ listingFrom: undefined, listingTo: undefined }),
+  validationSchema: Yup.object().shape({
+    listingFrom: Yup.date().required(),
+  }),
+  mapPropsToValues: () => ({
+    listingFrom: moment.utc('2019-08-01').startOf('month').toDate(),
+    listingTo: undefined,
+  }),
 })(QueueListing)
 
 export default QueueListingWithFormik

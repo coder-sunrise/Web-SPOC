@@ -115,11 +115,11 @@ class RichEditor extends React.PureComponent {
       !isEditorFocused &&
       draftToHtml(convertToRaw(this.state.value.getCurrentContent())) !== v
     ) {
-      console.log(
-        'update rich text',
-        draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
-        v,
-      )
+      // console.log(
+      //   'update rich text',
+      //   draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
+      //   v,
+      // )
       if (!v) {
         this.setState({
           value: EditorState.createEmpty(),
@@ -415,7 +415,7 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
     .rest()
   let newBlocks = isBefore
     ? [
-        blocks.map((o) => [
+        ...blocks.map((o) => [
           o.getKey(),
           o,
         ]),
@@ -429,7 +429,7 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
           currentBlock.getKey(),
           currentBlock,
         ],
-        blocks.map((o) => [
+        ...blocks.map((o) => [
           o.getKey(),
           o,
         ]),

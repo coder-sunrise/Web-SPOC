@@ -1,8 +1,8 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
+import { convertFromHTML } from 'draft-js'
 import Yup from '@/utils/yup'
-
 import {
   withFormikExtend,
   FastField,
@@ -25,7 +25,9 @@ import {
   Checkbox,
   SizeContainer,
   RichEditor,
+  ButtonSelect,
 } from '@/components'
+import { tagList } from '@/utils/codes'
 
 import ReferralLetter from './ReferralLetter'
 import Memo from './Memo'
@@ -40,45 +42,47 @@ const loadFromCodes = [
     name: 'Clinical Notes',
   },
   {
-    value: 'corDoctorNote.chiefComplaints',
+    value: 'corDoctorNote[0].chiefComplaints',
     name: 'Chief Complaints',
   },
-  { value: 'corDoctorNote.plan', name: 'Plan' },
+  { value: 'corDoctorNote[0].plan', name: 'Plan' },
   {
     value: 'corDiagnosis',
     name: 'Diagnosis',
-    getProps: (v) => {
-      return 'test'
+    getter: (v) => {
+      const { corDiagnosis = [] } = v
+      return corDiagnosis
+        .map((o) => `<p>- ${o.diagnosisDescription}</p>`)
+        .join('')
     },
   },
   {
-    value: 'medication',
-    name: 'Medication',
-    getProps: (v) => {
-      return 'test 123'
-    },
-  },
-  {
-    value: 'vaccination',
-    name: 'Vaccination',
-    getProps: (v) => {
-      return 'test dsfsd 123'
+    value: 'order',
+    name: 'Orders',
+    getter: (v) => {
+      const { orders } = window.g_app._store.getState()
+      if (!orders) return '-'
+      const { rows = [] } = orders
+      return rows
+        .filter((o) => !o.isDeleted)
+        .map((o) => `<p>- ${o.subject}</p>`)
+        .join('')
     },
   },
 ]
 const styles = (theme) => ({
   editor: {
-    marginTop: theme.spacing(1),
+    // marginTop: theme.spacing(1),
     position: 'relative',
   },
   editorBtn: {
     position: 'absolute',
     zIndex: 1,
-    right: 0,
-    top: 12,
-    width: 200,
+    right: 3,
+    top: 8,
   },
 })
+const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
 
 // @withFormikExtend({
 //   mapPropsToValues: ({ consultationDocument }) => {
@@ -116,6 +120,18 @@ const styles = (theme) => ({
   codetable,
 }))
 class AddConsultationDocument extends PureComponent {
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctreferrallettertemplate',
+      },
+    })
+  }
+
   toggleModal = () => {
     const { consultationDocument } = this.props
     const { showModal } = consultationDocument
@@ -126,6 +142,53 @@ class AddConsultationDocument extends PureComponent {
         showModal: !showModal,
       },
     })
+  }
+
+  getLoader = (editor, setFieldValue) => {
+    const { classes, parentProps, codetable } = this.props
+    const { ctreferrallettertemplate } = codetable
+    return (
+      <div className={classes.editorBtn}>
+        <ButtonSelect
+          options={ctreferrallettertemplate}
+          textField='displayValue'
+          onClick={(option) => {
+            let msg = option.templateMessage
+            const match = option.templateMessage.match(templateReg)
+            match.forEach((s) => {
+              const text = s.match(/data-value="(.*?)"/)[1]
+              const m = tagList.find((o) => o.text === text)
+              if (m && m.getter) msg = msg.replace(s, m.getter())
+            })
+            setFieldValue('content', msg)
+            setTimeout(() => {
+              editor.focus()
+            }, 1)
+          }}
+        >
+          Load Template
+        </ButtonSelect>
+        <ButtonSelect
+          options={loadFromCodes}
+          onClick={(option) => {
+            const { values } = parentProps
+            const v = option.getter
+              ? option.getter(values)
+              : Object.byString(values, option.value) || '-'
+            const blocksFromHTML = convertFromHTML(v)
+            const { editorState } = editor.props
+            editor.update(
+              RichEditor.insertBlock(editorState, blocksFromHTML.contentBlocks),
+            )
+            setTimeout(() => {
+              editor.focus()
+            }, 1)
+          }}
+        >
+          Load From
+        </ButtonSelect>
+      </div>
+    )
   }
 
   render () {
@@ -139,27 +202,22 @@ class AddConsultationDocument extends PureComponent {
       footer,
       dispatch,
       types,
+      codetable,
     } = props
     // console.log(props)
     const { entity = {}, type } = consultationDocument
-    console.log('form', this.form, parentProps)
+    console.log('form', parentProps)
     const cfg = {
       ...props,
       loadFromCodes,
       currentType: types.find((o) => o.value === type),
+      templateLoader: this.getLoader,
     }
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem xs={6}>
-              <FastField
-                name='fake'
-                render={({ form }) => {
-                  this.form = form
-                  return null
-                }}
-              />
               <Select
                 label='Type'
                 options={types}
@@ -189,7 +247,7 @@ class AddConsultationDocument extends PureComponent {
   }
 }
 export default withStyles(styles, { withTheme: true })((props) => (
-  <SizeContainer size='md'>
+  <SizeContainer size='sm'>
     {(extraProps) => {
       return <AddConsultationDocument {...props} {...extraProps} />
     }}

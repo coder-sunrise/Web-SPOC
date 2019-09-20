@@ -15,30 +15,10 @@ export default createFormViewModel({
       })
     },
 
-    effects: {
-      // *getClinicInfo ({ payload }, { call, put }) {
-      //   console.log('ant', payload)
-      //   const response = yield call(service.query, payload)
-      //   yield put({
-      //     type: 'save',
-      //     payload: response,
-      //   })
-      // },
-    },
+    effects: {},
     reducers: {
-      // save (state, { payload }) {
-      //   const { data } = payload
-      //   console.log('data', data)
-      //   // const gst = {}
-      //   // data.forEach((p) => {
-      //   //   gst[p.settingKey] = p.settingValue
-      //   // })
-      //   return {
-      //     // gst,
-      //   }
-      // },
-
       queryDone (st, { payload }) {
+        console.log('clinic ino reducer')
         const { data } = payload
         const contact = {
           contactAddress: [

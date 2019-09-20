@@ -55,6 +55,10 @@ import {
   displayName: 'AddConsultationDocument',
 })
 class Others extends PureComponent {
+  setEditorReference = (ref) => {
+    this.editorReferece = ref
+  }
+
   render () {
     const {
       footer,
@@ -62,7 +66,9 @@ class Others extends PureComponent {
       theme,
       classes,
       consultationDocument,
+      templateLoader,
       rowHeight,
+      setFieldValue,
     } = this.props
     return (
       <div>
@@ -93,7 +99,7 @@ class Others extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={9}>
+          <GridItem xs={12}>
             <FastField
               name='subject'
               render={(args) => {
@@ -101,20 +107,15 @@ class Others extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem
-            xs={3}
-            style={{ lineHeight: rowHeight, textAlign: 'right' }}
-          >
-            <Button color='info'>Load Template</Button>
-          </GridItem>
           <GridItem xs={12} className={classes.editor}>
-            <Button link className={classes.editorBtn}>
-              Add Diagnosis
-            </Button>
+            {templateLoader(this.editorReferece, setFieldValue)}
+
             <FastField
               name='content'
               render={(args) => {
-                return <RichEditor {...args} />
+                return (
+                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                )
               }}
             />
           </GridItem>
