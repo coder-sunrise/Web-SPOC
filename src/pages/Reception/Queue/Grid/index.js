@@ -8,6 +8,7 @@ import { CommonTableGrid, DateFormatter } from '@/components'
 // sub component
 import ActionButton from './ActionButton'
 // utils
+import { getAppendUrl } from '@/utils/utils'
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { filterData, formatAppointmentTimes } from '../utils'
 import { StatusIndicator } from '../variables'
@@ -118,6 +119,7 @@ const columnExtensions = [
 ]
 
 const Grid = ({
+  history,
   dispatch,
   calendarEvents = [],
   filter = StatusIndicator.ALL,
@@ -175,9 +177,16 @@ const Grid = ({
           visitID: row.id,
         })
         break
-      case '1': // dispense
-        router.push(`/reception/queue/dispense/${row.visitReferenceNo}`)
+      case '1': {
+        // dispense
+        const parameters = {
+          vis: row.id,
+          pid: row.patientProfileFK,
+        }
+        history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
+        // router.push(`/reception/queue/dispense${getAppendUrl(parameters)}`)
         break
+      }
       case '1.1': // billing
         router.push(`/reception/queue/dispense/${row.visitReferenceNo}/billing`)
         break
@@ -233,17 +242,12 @@ const Grid = ({
   ])
 
   const isLoading = showingVisitRegistration ? false : queryingData
-
   return (
-    <div style={{ minHeight: '76.5vh', maxHeight: '76.5vh' }}>
-      <LoadingWrapper
-        linear
-        loading={isLoading}
-        text='Refreshing queue listing...'
-      >
+    <div style={{ minHeight: '76vh' }}>
+      <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
         <CommonTableGrid
+          style={{ maxHeight: '76.5vh', overflow: 'auto' }}
           size='sm'
-          // height={700}
           rows={queueListingData}
           columnExtensions={colExtensions}
           FuncProps={FuncConfig}

@@ -380,7 +380,6 @@ const convertToQuery = (
         if (typeof val === 'string') {
           val = val.trim()
           const match = refilter.exec(p)
-          console.log({ match })
           if (!!match && match.length > 1) {
             let s = ''
             match[2].split('$').forEach((item) => {
@@ -407,6 +406,7 @@ const convertToQuery = (
         } else if (Array.isArray(val)) {
           for (let i = 0; i < val.length; i++) {
             const obj = convertToQuery(val[i])
+
             // console.log(val[i], obj, JSON.stringify(obj))
             // newQuery.conditionGroups.push(obj)
             if (obj.criteria && obj.criteria.length > 0) {
@@ -467,7 +467,6 @@ const convertToQuery = (
     includeParentDeleted,
     // queryExcludeFields,
   }
-  console.log({ returnVal })
   convertExcludeFields.forEach((p) => {
     if (customQuerys[p] !== undefined) returnVal[p] = customQuerys[p]
   })

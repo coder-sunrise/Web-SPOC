@@ -44,11 +44,12 @@ export default createFormViewModel({
                 type: 'fetchPatientInfoByPatientID',
                 payload: { id: query.pid },
               })
-          // if (query.type !== undefined) {
-          //   dispatch({
-          //     type: 'setRegisterType',
-          //   })
-          // }
+          if (query.apptid) {
+            dispatch({
+              type: 'updateState',
+              payload: { appointmentFK: query.apptid },
+            })
+          }
           dispatch(openModal)
         }
       })

@@ -34,12 +34,7 @@ const styles = (theme) => ({
 const menuData = [
   {
     title: 'Admin',
-    text: 'Admin Report',
-    url: '',
-  },
-  {
-    title: 'Admin',
-    text: 'Admin Report',
+    text: 'Session Summary Report',
     url: '',
   },
   {
@@ -75,12 +70,12 @@ const menuData = [
 
   {
     title: 'Inventory',
-    text: 'Payment Collection Report',
+    text: 'Drug Movement Report',
     url: '',
   },
   {
     title: 'Other',
-    text: 'Payment Collection Report',
+    text: 'Diagnosis Trending Report',
     url: '',
   },
 ]
