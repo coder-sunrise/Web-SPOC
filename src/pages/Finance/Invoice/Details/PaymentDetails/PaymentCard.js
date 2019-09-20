@@ -17,6 +17,7 @@ const DefaultPaymentInfo = {
   itemID: 'N/A',
   date: 'N/A',
   amount: 'N/A',
+  reason: 'N/A',
 }
 
 const payerTypeToString = {
@@ -42,13 +43,13 @@ const PaymentCard = ({
         {`${payerTypeToString[payerType]} (${payerName})`}
       </p>
       <CardContainer hideHeader size='sm'>
-        <IconButton
+        {/* <IconButton
           id={payerID}
           className={classes.printButton}
           onClick={handlePrinterClick}
         >
           <Printer />
-        </IconButton>
+        </IconButton> */}
         {payments.map((payment) => (
           <PaymentRow {...payment} handleVoidClick={handleVoidClick} />
         ))}

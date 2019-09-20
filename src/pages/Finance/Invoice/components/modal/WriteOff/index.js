@@ -6,23 +6,11 @@ import { Button, GridContainer, GridItem, TextField } from '@/components'
 // styles
 import styles from './styles'
 
-const WriteOff = ({ classes, dispatch, onClose, onConfirm }) => {
+const WriteOff = ({ classes, handleSubmit, onClose }) => {
   const [
     reason,
     setReason,
   ] = useState('')
-
-  const onSubmitWriteOff = () => {
-    dispatch({
-      type: 'invoicePayer/submitWriteOff',
-      payload: {
-        // TBD
-        writeOffReason: reason,
-      },
-    })
-
-    onConfirm()
-  }
 
   return (
     <div>
@@ -43,7 +31,7 @@ const WriteOff = ({ classes, dispatch, onClose, onConfirm }) => {
         <GridItem>
           <Button
             color='primary'
-            onClick={() => onSubmitWriteOff()}
+            onClick={() => handleSubmit(reason)}
             disabled={reason === ''}
           >
             Confirm

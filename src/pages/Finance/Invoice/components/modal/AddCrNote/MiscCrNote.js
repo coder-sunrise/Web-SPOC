@@ -26,7 +26,7 @@ const MiscCrNote = ({ classes }) => (
             <GridItem md={8}>
               <GridContainer direction='column'>
                 <GridItem md={10}>
-                  <TextField label='Type' defaultValue='MISC' disabled />
+                  <TextField label='Type' value='MISC' disabled />
                 </GridItem>
                 <GridItem md={10}>
                   <FastField

@@ -28,8 +28,8 @@ class InvoiceDetails extends Component {
       },
     })
     this.props.dispatch({
-      //type: 'invoicePayer/query',
-      type: 'invoicePayer/fakeQueryDone',
+      //type: 'invoicePayment/query',
+      type: 'invoicePayment/fakeQueryDone',
       payload: {
         id: invoiceDetail.currentId,
       },

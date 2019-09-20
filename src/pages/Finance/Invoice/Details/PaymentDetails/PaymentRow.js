@@ -1,6 +1,8 @@
 import React from 'react'
 // material ui
 import { IconButton, withStyles } from '@material-ui/core'
+import Printer from '@material-ui/icons/Print'
+import Info from '@material-ui/icons/Info'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
 import { GridContainer, GridItem, Tooltip } from '@/components'
@@ -11,8 +13,10 @@ const PaymentRow = ({
   itemID,
   date,
   amount,
+  reason,
   classes,
   handleVoidClick,
+  handlePrinterClick,
 }) => {
   const onVoidClick = () => handleVoidClick({ type, itemID })
 
@@ -23,6 +27,21 @@ const PaymentRow = ({
       className={classes.rowContainer}
     >
       <GridItem md={2}>
+        {type === 'Payment' ? (
+          <IconButton
+            id={itemID}
+            className={classes.printButton}
+            onClick={handlePrinterClick}
+          >
+            <Printer />
+          </IconButton>
+        ) : (
+          <Tooltip title={reason}>
+            <IconButton className={classes.infoButton}>
+              <Info />
+            </IconButton>
+          </Tooltip>
+        )}
         <span>{type}</span>
       </GridItem>
       <GridItem md={2}>

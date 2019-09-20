@@ -13,28 +13,15 @@ const styles = (theme) => ({
 
 const DeleteConfirmation = ({
   classes,
-  dispatch,
+  handleSubmit,
   type,
   itemID,
-  onConfirm,
   onClose,
 }) => {
   const [
     reason,
     setReason,
   ] = useState('')
-
-  const submitVoidPayment = () => {
-    dispatch({
-      type: 'invoicePayer/submitVoidPayment',
-      payload: {
-        // TBD
-        writeOffReason: reason,
-      },
-    })
-
-    onConfirm()
-  }
 
   return (
     <GridContainer justify='center' alignItems='center'>
@@ -56,7 +43,7 @@ const DeleteConfirmation = ({
         </Button>
         <Button
           color='primary'
-          onClick={() => submitVoidPayment()}
+          onClick={() => handleSubmit(reason)}
           disabled={reason === ''}
         >
           Confirm

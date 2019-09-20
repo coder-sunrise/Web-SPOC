@@ -3,8 +3,8 @@ import moment from 'moment'
 import * as service from '../services'
 
 const dummyData = {
-  patientName: 'Lee Tian Kaang',
-  patientAccountNo: 'A0123456789',
+  patientName: 'Lee Tian Kang',
+  patientAccountNo: 'A4696976F',
   invoiceNo: 'IV-A0001',
   invoiceDate: '2019-09-17T07:47:18.511Z',
   invoiceTotal: 5000,

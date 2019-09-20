@@ -14,14 +14,14 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 import styles from './styles'
 import { PayerType } from './variables'
 
-@connect(({ invoiceDetail, invoicePayer }) => ({
+@connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
-  invoicePayer,
+  invoicePayment,
 }))
 @withFormik({
-  name: 'invoicePayer',
-  mapPropsToValues: ({ invoicePayer }) => {
-    return invoicePayer.entity || invoicePayer.default
+  name: 'invoicePayment',
+  mapPropsToValues: ({ invoicePayment }) => {
+    return invoicePayment.entity || invoicePayment.default
   },
 })
 class PaymentDetails extends Component {
@@ -34,8 +34,6 @@ class PaymentDetails extends Component {
   }
 
   onAddPaymentClick = () => this.setState({ showAddPayment: true })
-
-  onAddCrNoteClick = () => this.setState({ showAddCrNote: true })
 
   onWriteOffClick = () => this.setState({ showWriteOff: true })
 
@@ -57,8 +55,61 @@ class PaymentDetails extends Component {
     })
   }
 
+  onAddCrNoteClick = (payerType) => {
+    const { dispatch, values } = this.props
+    dispatch({
+      type: 'invoiceCreditNote/mapCreditNote',
+      payload: {
+        creditNote: values.creditNote || [],
+        invoicePayerFK: payerType,
+      },
+    })
+
+    this.setState({ showAddCrNote: true })
+  }
+
   onPrinterClick = ({ currentTarget }) => {
     console.log({ printer: currentTarget })
+  }
+
+  onSubmit = (paymentData) => {
+    const { dispatch, values } = this.props
+
+    dispatch({
+      type: 'invoicePayment/submitAddPayment',
+      payload: {
+        // TBD
+        paymentData: Object.values(paymentData),
+        values,
+      },
+    })
+  }
+
+  onSubmitWriteOff = (writeOffData) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'invoicePayment/submitWriteOff',
+      payload: {
+        // TBD
+        //invoicePayerFK
+        writeOffReason: writeOffData,
+      },
+    })
+
+    this.closeWriteOffModal()
+  }
+
+  onSubmitVoidPayment = (voidPaymentData) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'invoicePayment/submitVoidPayment',
+      payload: {
+        // TBD
+        writeOffReason: voidPaymentData,
+      },
+    })
+
+    this.closeDeleteConfirmationModal()
   }
 
   render () {
@@ -106,7 +157,7 @@ class PaymentDetails extends Component {
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
         >
-          <AddPayment />
+          <AddPayment handleSubmit={this.onSubmit} />
         </CommonModal>
         <CommonModal
           open={showAddCrNote}
@@ -124,7 +175,7 @@ class PaymentDetails extends Component {
           onClose={this.closeWriteOffModal}
           maxWidth='sm'
         >
-          <WriteOff dispatch={dispatch} />
+          <WriteOff handleSubmit={this.onSubmitWriteOff} />
         </CommonModal>
 
         <CommonModal
@@ -134,7 +185,10 @@ class PaymentDetails extends Component {
           onClose={this.closeDeleteConfirmationModal}
           maxWidth='sm'
         >
-          <DeleteConfirmation dispatch={dispatch} {...onVoid} />
+          <DeleteConfirmation
+            handleSubmit={this.onSubmitVoidPayment}
+            {...onVoid}
+          />
         </CommonModal>
       </div>
     )
