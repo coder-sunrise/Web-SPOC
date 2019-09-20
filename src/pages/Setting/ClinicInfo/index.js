@@ -245,7 +245,10 @@ class ClinicInfo extends PureComponent {
           </GridItem> */}
         </GridContainer>
         {/* <Address propName='address' {...this.props} /> */}
-        <div className={classes.actionBtn}>
+        <div
+          className={classes.actionBtn}
+          style={{ display: 'flex', justifyContent: 'center' }}
+        >
           <Button
             color='danger'
             onClick={() => {
