@@ -2,7 +2,6 @@ import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/invoicePayment'
 import moment from 'moment'
 import { InvoicePayerType } from '@/utils/codes'
-import { CompareSharp } from '@material-ui/icons'
 
 const paymentMode = [
   { type: 'Cash', objName: 'depositPayment', paymentModeFK: 1 },
@@ -480,7 +479,7 @@ export default createFormViewModel({
           },
         })
       },
-      *submitAddPayment ({ payload }, { call }) {
+      *submitAddPayment ({ payload }, { call, put }) {
         const { paymentData, values } = payload
         let addPaymentPayload = {}
         let invoicePaymentMode = []
@@ -547,8 +546,6 @@ export default createFormViewModel({
       },
 
       fakeQueryDone (state, { payload }) {
-        //console.log('InvoicePayfakeQueryDone', dummyData)
-
         const { invoicePayment, invoicePayerWriteOff } = dummyData
         let paymentTxnList = []
 

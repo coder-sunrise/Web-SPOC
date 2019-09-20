@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
+import React, { useState } from 'react'
 import { Tooltip } from '@material-ui/core'
-import { Edit, Search } from '@material-ui/icons'
-import { suppliers, dispUOMs, status } from '@/utils/codes'
+import { Edit } from '@material-ui/icons'
+import { status } from '@/utils/codes'
 
 import { Button, CommonTableGrid } from '@/components'
 
-const Grid = ({ history, dispatch, copaymentScheme }) => {
+const Grid = ({ history }) => {
   const [
     tableParas,
   ] = useState({

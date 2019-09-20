@@ -8,12 +8,10 @@ export default (theme) => ({
   },
   printButton: {
     position: 'absolute',
-    //top: theme.spacing(1),
     left: theme.spacing(2),
   },
   infoButton: {
     position: 'absolute',
-    //top: theme.spacing(4),
     left: theme.spacing(2),
   },
   currency: {
