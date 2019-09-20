@@ -34,18 +34,13 @@ const styles = (theme) => ({
 const menuData = [
   {
     title: 'Admin',
-    text: 'Admin Report',
-    url: '',
-  },
-  {
-    title: 'Admin',
-    text: 'Admin Report',
+    text: 'Session Summary Report',
     url: '',
   },
   {
     title: 'Finance',
     text: 'Payment Collection Report',
-    url: '',
+    url: '/report/paymentcollection',
   },
   {
     title: 'Finance',
@@ -65,7 +60,7 @@ const menuData = [
   {
     title: 'Finance',
     text: 'Sale Summary Report',
-    url: '',
+    url: '/report/salesummary',
   },
   {
     title: 'Finance',
@@ -75,12 +70,12 @@ const menuData = [
 
   {
     title: 'Inventory',
-    text: 'Payment Collection Report',
+    text: 'Drug Movement Report',
     url: '',
   },
   {
     title: 'Other',
-    text: 'Payment Collection Report',
+    text: 'Diagnosis Trending Report',
     url: '',
   },
 ]

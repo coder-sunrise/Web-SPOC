@@ -1,6 +1,6 @@
 import React, { Component, PureComponent } from 'react'
-import Yup from '@/utils/yup'
 
+import Yup from '@/utils/yup'
 import {
   Button,
   GridContainer,
@@ -35,7 +35,7 @@ import {
   }),
 
   handleSubmit: (values, { props }) => {
-    console.log(values)
+    // console.log(values)
     const { dispatch, onConfirm } = props
     dispatch({
       type: 'consultationDocument/upsertRow',
@@ -46,16 +46,8 @@ import {
   displayName: 'AddConsultationDocument',
 })
 class Memo extends PureComponent {
-  constructor (props) {
-    super(props)
-    const { dispatch } = props
-
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctReferralLetterTemplate',
-      },
-    })
+  setEditorReference = (ref) => {
+    this.editorReferece = ref
   }
 
   render () {
@@ -66,8 +58,10 @@ class Memo extends PureComponent {
       codetable,
       rowHeight,
       setFieldValue,
+      loadFromCodes,
+      parentProps,
+      templateLoader,
     } = this.props
-    const { ctReferralLetterTemplate } = codetable
 
     return (
       <div>
@@ -100,7 +94,8 @@ class Memo extends PureComponent {
               }}
             />
           </GridItem> */}
-          <GridItem xs={9}>
+          <GridItem xs={6} />
+          <GridItem xs={12}>
             <FastField
               name='subject'
               render={(args) => {
@@ -108,28 +103,15 @@ class Memo extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem
-            xs={3}
-            style={{ lineHeight: rowHeight, textAlign: 'right' }}
-          >
-            <ButtonSelect
-              options={ctReferralLetterTemplate}
-              textField='displayValue'
-              onClick={(option) => {
-                setFieldValue('content', option.templateMessage)
-              }}
-            >
-              Load Template
-            </ButtonSelect>
-          </GridItem>
+
           <GridItem xs={12} className={classes.editor}>
-            <Button link className={classes.editorBtn}>
-              Add Diagnosis
-            </Button>
+            {templateLoader(this.editorReferece, setFieldValue)}
             <FastField
               name='content'
               render={(args) => {
-                return <RichEditor {...args} />
+                return (
+                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                )
               }}
             />
           </GridItem>

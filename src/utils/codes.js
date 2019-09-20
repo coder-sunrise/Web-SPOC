@@ -713,8 +713,14 @@ const convertExcludeFields = [
   'excludeInactiveCodes',
 ]
 
-const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
+const _fetchAndSaveCodeTable = async (
+  code,
+  params,
+  multiplier = 1,
+  refresh = false,
+) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
+  const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?ctnames=`
   const searchURL = `${baseURL}/search?ctname=`
@@ -746,18 +752,39 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     method: 'GET',
     body,
   })
-  const { status: statusCode, data } = response
+
+  let { status: statusCode, data } = response
+  let newData
+
+  if (code.split(',').length > 1) {
+    const codes = code.split(',')
+    newData = [
+      ...codes.reduce(
+        (merged, c) => [
+          ...merged,
+          ...data[c],
+        ],
+        [],
+      ),
+    ]
+  } else {
+    newData = useGeneral
+      ? [
+          ...data[code],
+        ]
+      : [
+          ...data.data,
+        ]
+  }
 
   if (parseInt(statusCode, 10) === 200) {
-    const result = multiplyCodetable(
-      useGeneral ? data[code] : data.data,
-      multiplier,
-    )
+    const result = multiplyCodetable(newData, multiplier)
     await db.codetable.put({
       code,
       data: result,
       createDate: new Date(),
-      updateDate: new Date(),
+      updateDate: refresh ? null : new Date(),
+      // shouldRefresh: refresh,
     })
     return result
   }
@@ -769,6 +796,7 @@ export const getCodes = async (payload) => {
   let ctcode
   let params
   let multiply = 1
+  const { refresh = false } = payload
   if (typeof payload === 'string') ctcode = payload.toLowerCase()
   if (typeof payload === 'object') {
     ctcode = payload.code
@@ -786,15 +814,17 @@ export const getCodes = async (payload) => {
     const parsedLastLoginDate = moment(lastLoginDate)
 
     /* not exist in current table, make network call to retrieve data */
-    if (ct === undefined) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply)
+    if (ct === undefined || refresh) {
+      result = _fetchAndSaveCodeTable(ctcode, params, multiply, true)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
+          if updateDate is null, always perform network call to get latest copy
           else perform network call and update indexedDB 
       */
       const { updateDate, data: existedData } = ct
-      const parsedUpdateDate = moment(updateDate)
+      const parsedUpdateDate =
+        updateDate === null ? moment('2001-01-01') : moment(updateDate)
 
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
         ? _fetchAndSaveCodeTable(ctcode, params, multiply)
@@ -803,8 +833,45 @@ export const getCodes = async (payload) => {
   } catch (error) {
     console.log({ error })
   }
-
   return result
+}
+
+export const checkShouldRefresh = async (code) => {
+  try {
+    await db.open()
+    const ct = await db.codetable.get(code.toLowerCase())
+
+    if (ct === undefined) return true
+    const { updateDate } = ct
+    return updateDate === null
+  } catch (error) {
+    console.log({ error })
+  }
+  return false
+}
+
+export const refreshCodetable = async (url) => {
+  try {
+    const paths = url.split('/')
+    const code = paths[2]
+    window.g_app._store.dispatch({
+      type: 'codetable/refreshCodes',
+      payload: { code },
+    })
+  } catch (error) {
+    console.log({ error })
+  }
+}
+
+export const checkIsCodetableAPI = (url) => {
+  try {
+    const isTenantCodes = tenantCodes.indexOf(url) > 0
+    const isCodetable = url.toLowerCase().indexOf('ct') > 0
+    return isTenantCodes || isCodetable
+  } catch (error) {
+    console.log({ error })
+  }
+  return false
 }
 
 export const getTenantCodes = async (tenantCode) => {
@@ -919,6 +986,64 @@ export const InventoryTypes = [
   },
 ]
 
+const tagList = [
+  {
+    value: 'PatientName',
+    text: 'PatientName',
+    url: '',
+    getter: () => {
+      const { patient, patientDashboard } = window.g_app._store.getState()
+      if (patient && patient.entity) {
+        return patient.entity.name
+      }
+      return ''
+    },
+  },
+  {
+    value: 'AppointmentDateTime',
+    text: 'AppointmentDateTime',
+    url: '',
+  },
+  {
+    value: 'Doctor',
+    text: 'Doctor',
+    url: '',
+    getter: () => {
+      const { user } = window.g_app._store.getState()
+      if (user && user.data && user.data.clinicianProfile) {
+        return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
+          .name}`
+      }
+      return ''
+    },
+  },
+  {
+    value: 'NewLine',
+    text: 'NewLine',
+    url: '',
+    getter: () => {
+      return '<br/>'
+    },
+  },
+  {
+    value: 'PatientCallingName',
+    text: 'PatientCallingName',
+    url: '',
+    getter: () => {
+      const { patient, patientDashboard } = window.g_app._store.getState()
+      if (patient && patient.entity) {
+        return patient.entity.callingName
+      }
+      return ''
+    },
+  },
+  {
+    value: 'LastVisitDate',
+    text: 'LastVisitDate',
+    url: '',
+  },
+]
+
 export const getInventoryItem = (list, value, itemFKName, rows) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
@@ -938,11 +1063,11 @@ export const getInventoryItemList = (
       value: x.id,
       name: x.displayValue,
       code: x.code,
-      //uom: prescribingUOM.id,
+      // uom: prescribingUOM.id,
       uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,
-      stateName: stateName,
+      stateName,
     }
   })
   return {
@@ -987,5 +1112,6 @@ module.exports = {
   // country,
   consultationDocumentTypes,
   getServices,
+  tagList,
   ...module.exports,
 }

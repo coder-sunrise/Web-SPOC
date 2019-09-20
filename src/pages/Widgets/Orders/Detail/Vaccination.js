@@ -233,7 +233,16 @@ class Vaccination extends PureComponent {
             <FastField
               name='totalPrice'
               render={(args) => {
-                return <NumberInput label='Total' currency {...args} />
+                return (
+                  <NumberInput
+                    label='Total'
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalPrice(e.target.value)
+                    }}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

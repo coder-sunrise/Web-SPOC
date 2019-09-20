@@ -22,7 +22,7 @@ const FilterBar = ({ handleSubmit }) => {
   return (
     <SizeContainer size='sm'>
       <GridContainer>
-        <GridContainer alignItems='flex-end'>
+        <GridContainer alignItems='center'>
           {/* 1st row  */}
           <GridItem md={2}>
             <FastField
@@ -50,8 +50,34 @@ const FilterBar = ({ handleSubmit }) => {
               )}
             />
           </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='companyIDS'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  // code='ctcopayer,ctsupplier'
+                  code='ctcopayer'
+                  label='Company'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='paymentMode'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  code='ctpaymentmode'
+                  label='Payment Mode'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={2} />
 
-          <GridItem md={12}>
+          <GridItem md={2}>
             <FastField
               name='payerType'
               render={(args) => (
@@ -61,46 +87,44 @@ const FilterBar = ({ handleSubmit }) => {
                   options={[
                     {
                       value: '1',
-                      label: 'Just this one',
+                      label: 'All',
                     },
                     {
                       value: '2',
-                      label: 'The entire series',
+                      label: 'Company',
+                    },
+                    {
+                      value: '3',
+                      label: 'Patient',
                     },
                   ]}
                 />
               )}
             />
           </GridItem>
-          <GridItem md={12}>
-            <FastField
-              name='companyIDS'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  code='ctcompany'
-                  label='Doctor'
-                  labelField='clinicianProfile.name'
-                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
-                />
-              )}
-            />
-          </GridItem>
 
-          <GridItem md={1} />
-          <GridItem md={1}>
+          <GridItem>
             <FastField
-              name='ageFrom'
+              name='groupBy'
               render={(args) => (
-                <NumberInput {...args} label='Age' prefix='From' />
-              )}
-            />
-          </GridItem>
-          <GridItem md={1}>
-            <FastField
-              name='ageTo'
-              render={(args) => (
-                <NumberInput {...args} label='Age' prefix='To' />
+                <RadioGroup
+                  {...args}
+                  label='Group By'
+                  options={[
+                    {
+                      value: '1',
+                      label: 'Payment Mode',
+                    },
+                    {
+                      value: '2',
+                      label: 'Doctor',
+                    },
+                    {
+                      value: '3',
+                      label: 'None',
+                    },
+                  ]}
+                />
               )}
             />
           </GridItem>
@@ -108,68 +132,6 @@ const FilterBar = ({ handleSubmit }) => {
             <Button color='primary' onClick={handleSubmit}>
               Generate Report
             </Button>
-          </GridItem>
-          <GridItem md={3} />
-          {/* 2nd row  */}
-          <GridItem md={2}>
-            <FastField
-              name='dateFrom'
-              render={(args) => (
-                <DatePicker {...args} label='Visit Date' prefix='From' />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='dateTo'
-              render={(args) => (
-                <DatePicker {...args} label='Visit Date' prefix='To' />
-              )}
-            />
-          </GridItem>
-          <GridItem md={1}>
-            <FastField
-              name='isAllDate'
-              render={(args) => <Checkbox {...args} label='All Date' />}
-            />
-          </GridItem>
-
-          <GridItem md={2}>
-            <FastField
-              name='noVisitDateFrom'
-              render={(args) => <DatePicker {...args} label='No Visit Since' />}
-            />
-          </GridItem>
-          <GridItem md={4} />
-          {/* 3rd row  */}
-          <GridItem md={2}>
-            <FastField
-              name='patientTag'
-              render={(args) => (
-                <Select {...args} label='Patient Tag' options={[]} />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='DoctorIDs'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  mode='multiple'
-                  code='doctorprofile'
-                  label='Doctor'
-                  labelField='clinicianProfile.name'
-                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem>
-            <FastField
-              name='isGroupByDoctor'
-              render={(args) => <Checkbox {...args} label='Group By Doctor' />}
-            />
           </GridItem>
         </GridContainer>
       </GridContainer>

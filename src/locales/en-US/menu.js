@@ -131,4 +131,6 @@ export default {
   'menu.report': 'Report',
   'menu.report.queueListingReport': 'Queue Listing Report',
   'menu.report.patientListingReport': 'Patient Listing Report',
+  'menu.report.paymentCollection': 'Payment Collection Report',
+  'menu.report.salessummary': 'Sales Summary Report',
 }

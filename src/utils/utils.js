@@ -406,6 +406,7 @@ const convertToQuery = (
         } else if (Array.isArray(val)) {
           for (let i = 0; i < val.length; i++) {
             const obj = convertToQuery(val[i])
+
             // console.log(val[i], obj, JSON.stringify(obj))
             // newQuery.conditionGroups.push(obj)
             if (obj.criteria && obj.criteria.length > 0) {

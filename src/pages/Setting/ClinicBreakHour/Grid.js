@@ -43,11 +43,11 @@ export default class Grid extends PureComponent {
         columnExtensions={[
           {
             columnName: 'isActive',
-            sortingEnabled: false,
             type: 'select',
             options: status,
             width: 70,
             align: 'center',
+            sortingEnabled: false,
           },
           {
             columnName: 'displayValue',
@@ -77,7 +77,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'monFromBreak',
-
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.monFromBreak} to={row.monToBreak} />
@@ -85,6 +85,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'tueFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.tueFromBreak} to={row.tueToBreak} />
@@ -92,6 +93,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'wedFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.wedFromBreak} to={row.wedToBreak} />
@@ -99,6 +101,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'thursFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
@@ -108,6 +111,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'friFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.friFromBreak} to={row.friToBreak} />
@@ -115,6 +119,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'satFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.satFromBreak} to={row.satToBreak} />
@@ -122,6 +127,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'sunFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.sunFromBreak} to={row.sunToBreak} />

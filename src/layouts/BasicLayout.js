@@ -238,9 +238,9 @@ class BasicLayout extends React.PureComponent {
   }
 
   resizeFunction () {
-    // if (window.innerWidth >= 960) {
-    //   this.setState({ mobileOpen: false })
-    // }
+    if (window.innerWidth >= 960) {
+      this.setState({ mobileOpen: false })
+    }
   }
 
   getContext () {
