@@ -111,8 +111,13 @@ class Diagnosis extends PureComponent {
             }
             return diagnosises.map((v, i) => {
               return (
-                <div key={i}>
-                  <Item {...this.props} index={i} arrayHelpers={arrayHelpers} />
+                <div key={v.uid}>
+                  <Item
+                    {...this.props}
+                    index={i}
+                    arrayHelpers={arrayHelpers}
+                    diagnosises={diagnosises}
+                  />
                 </div>
               )
             })

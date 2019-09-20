@@ -522,13 +522,19 @@ class CommonTableGrid extends React.Component {
       })
     } else {
       const { pagination } = this.state
-      payload.current &&
-        this.setState({
-          pagination: {
-            ...pagination,
-            ...payload,
-          },
-        })
+      // console.log(payload.sorting[0].direction)
+      // if (payload.sorting) {
+      //   payload.sorting[0].columnName
+      //   // payload.sorting[0].direction =
+      //   //   payload.sorting[0].direction === 'asc' ? 'desc' : 'asc'
+      // }
+      // payload.current &&
+      this.setState({
+        pagination: {
+          ...pagination,
+          ...payload,
+        },
+      })
     }
   }
 
@@ -753,6 +759,7 @@ class CommonTableGrid extends React.Component {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
       c.getRowId = getRowId
+
       if (c.type === 'number' || c.type === 'currency') {
         if (!c.align) {
           c.align = 'right'
@@ -801,6 +808,7 @@ class CommonTableGrid extends React.Component {
       newColumns.unshift({ name: 'rowIndex', title: 'No.' })
     }
     // console.log(window.$tempGridRow)
+    // console.log(this.state)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -843,6 +851,7 @@ class CommonTableGrid extends React.Component {
                 sorting={this.state.pagination.sorting}
                 defaultSorting={defaultSorting}
                 onSortingChange={(sorting) => {
+                  console.log(sorting, this.state)
                   sorting.forEach((o) => {
                     const c = newColumExtensions.find(
                       (m) => m.columnName === o.columnName,

@@ -1,5 +1,5 @@
 import { Switch } from 'antd'
-
+import { primaryColor } from 'mui-pro-jss'
 import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
@@ -21,6 +21,9 @@ const STYLES = () => {
       color: 'currentColor',
       borderRadius: 3,
     },
+    switchUnchecked: {
+      backgroundColor: `${primaryColor} !important`,
+    },
   }
 }
 @control()
@@ -29,6 +32,7 @@ class AntdSwitch extends React.PureComponent {
     label: PropTypes.string,
     onChange: PropTypes.func,
     disabled: PropTypes.bool,
+    onOffMode: PropTypes.bool,
     checkedValue: PropTypes.any,
     unCheckedValue: PropTypes.any,
   }
@@ -38,6 +42,7 @@ class AntdSwitch extends React.PureComponent {
     disabled: false,
     checkedValue: true,
     unCheckedValue: false,
+    onOffMode: true,
   }
 
   constructor (props) {
@@ -89,6 +94,8 @@ class AntdSwitch extends React.PureComponent {
       style,
       form,
       field,
+      onOffMode,
+      unCheckedValue,
       ...restProps
     } = this.props
 
@@ -99,7 +106,10 @@ class AntdSwitch extends React.PureComponent {
     return (
       <div style={{ width: '100%' }} {...props}>
         <Switch
-          className={classnames(classes.switchContainer)}
+          className={classnames(
+            classes.switchContainer,
+            onOffMode && unCheckedValue !== '$' ? '' : classes.switchUnchecked,
+          )}
           onChange={this.handleValueChange}
           defaultValue={defaultValue}
           checkedChildren='Yes'

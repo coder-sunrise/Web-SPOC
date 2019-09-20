@@ -434,7 +434,7 @@ class EditableTableGrid extends PureComponent {
                 key: 'editCommand',
                 type: TableEditColumn.COLUMN_TYPE,
                 fixed: 'right',
-                width: 110,
+                width: 75,
               },
             ]
             // console.log(cols)
