@@ -91,11 +91,11 @@ const menuData = [
     text: 'Doctor Block',
     url: '/setting/doctorblock',
   },
-  {
-    title: 'Clinic Setting',
-    text: 'Participant Role',
-    url: '/setting/participantrole',
-  },
+  // {
+  //   title: 'Clinic Setting',
+  //   text: 'Participant Role',
+  //   url: '/setting/participantrole',
+  // },
   {
     title: 'Clinic Setting',
     text: 'Room Block',
