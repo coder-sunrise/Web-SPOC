@@ -364,7 +364,7 @@ const formatDatetimeInTimeZone = (text /* , record --remove */) => {
   return moment.utc(text).tz('Asia/Singapore').format(format.datetime)
 }
 
-const confirm = Modal.confirm
+const { confirm } = Modal
 const confirmAction = ({
   onOk = () => {},
   onCancel = () => {},

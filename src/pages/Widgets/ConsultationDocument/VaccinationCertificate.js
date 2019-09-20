@@ -1,7 +1,7 @@
 import React, { Component, PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import moment from 'moment'
 import { connect } from 'dva'
+import Yup from '@/utils/yup'
 
 import {
   Button,
@@ -69,12 +69,18 @@ class VaccinationCertificate extends PureComponent {
     })
   }
 
+  setEditorReference = (ref) => {
+    this.editorReferece = ref
+  }
+
   render () {
     const {
       footer,
       handleSubmit,
       classes,
       patientDashboard,
+      templateLoader,
+      setFieldValue,
       codetable,
     } = this.props
 
@@ -123,13 +129,14 @@ class VaccinationCertificate extends PureComponent {
             />
           </GridItem>
           <GridItem xs={12} className={classes.editor}>
-            <Button link className={classes.editorBtn}>
-              Add Vaccine
-            </Button>
+            {templateLoader(this.editorReferece, setFieldValue)}
+
             <FastField
               name='content'
               render={(args) => {
-                return <RichEditor {...args} />
+                return (
+                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                )
               }}
             />
           </GridItem>

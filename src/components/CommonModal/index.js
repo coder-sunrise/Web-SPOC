@@ -84,8 +84,8 @@ class CommonModal extends React.PureComponent {
   }
 
   componentDidMount () {
-    // this.resize()
-    // window.addEventListener('resize', this.resize.bind(this))
+    this.resize()
+    window.addEventListener('resize', this.resize.bind(this))
   }
 
   componentWillUnmount () {

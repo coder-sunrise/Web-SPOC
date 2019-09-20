@@ -45,7 +45,7 @@ const menuData = [
   {
     title: 'Finance',
     text: 'Payment Collection Report',
-    url: '',
+    url: '/report/paymentcollection',
   },
   {
     title: 'Finance',
@@ -65,7 +65,7 @@ const menuData = [
   {
     title: 'Finance',
     text: 'Sale Summary Report',
-    url: '',
+    url: '/report/salesummary',
   },
   {
     title: 'Finance',

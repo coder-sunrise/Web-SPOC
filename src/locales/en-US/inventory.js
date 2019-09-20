@@ -42,7 +42,7 @@ export default {
   'inventory.master.vaccination.effectiveEndDate': 'Effective End Date',
   'inventory.master.vaccination.status': 'Status',
 
-  'inventory.master.package.code': 'Package Code/Name',
+  'inventory.master.package.code': 'Package Code',
   'inventory.master.package.name': 'Package Name',
   'inventory.master.package.description': 'Description',
   'inventory.master.package.remarks': 'Remarks',

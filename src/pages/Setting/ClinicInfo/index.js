@@ -19,8 +19,10 @@ import {
   withFormikExtend,
   FieldArray,
   notification,
+  Field,
+  Select,
 } from '@/components'
-
+import { DoctorLabel } from '@/components/_medisys'
 import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
 
 const styles = (theme) => ({
@@ -49,24 +51,39 @@ const styles = (theme) => ({
 
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history } = props
-    console.log('ehllo', props)
+    const { contact } = values
+    console.log('values', values)
     dispatch({
       type: 'clinicInfo/upsert',
       payload: {
         ...values,
-        contact: undefined,
+        contact: {
+          ...contact,
+          contactAddress: [
+            contact.contactAddress[0],
+          ],
+        },
       },
     }).then((r) => {
+      console.log('r', r)
       if (r && r.id) {
         notification.success({ message: 'Saved' })
         history.push('/setting')
+        dispatch({
+          type: 'clinicInfo/query',
+          payload: 'Tenant_000',
+          // payload: localStorage.getItem('clinicCode'),
+        })
       }
     })
   },
   displayName: 'ClinicInfo',
 })
 class ClinicInfo extends PureComponent {
-  state = {}
+  state = {
+    doctorProfile: [],
+    primaryClinician: [],
+  }
 
   componentDidMount () {
     this.props.dispatch({
@@ -74,6 +91,22 @@ class ClinicInfo extends PureComponent {
       payload: 'Tenant_000',
       // payload: localStorage.getItem('clinicCode'),
     })
+
+    this.props
+      .dispatch({
+        type: 'codetable/fetchCodes',
+        payload: 'doctorProfile',
+      })
+      .then((v) => {
+        this.setState({ doctorProfile: v })
+        const clinicianOptions = v.map((o) => {
+          return {
+            value: o.id,
+            name: o.clinicianProfile.name,
+          }
+        })
+        this.setState({ primaryClinician: clinicianOptions })
+      })
   }
 
   render () {
@@ -84,9 +117,11 @@ class ClinicInfo extends PureComponent {
       theme,
       handleSubmit,
       values,
+      setFieldValue,
       ...restProps
     } = this.props
-    // console.log('ads', this.props)
+    const { primaryClinician, doctorProfile } = this.state
+    console.log(values)
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -117,15 +152,39 @@ class ClinicInfo extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem md={6}>
-            <FastField
+            <Field
               name='primaryRegisteredDoctorFK'
               render={(args) => (
-                <CodeSelect label='Primary Clinician' code='' {...args} />
+                <Select
+                  {...args}
+                  label='Primary Clinician'
+                  options={primaryClinician}
+                  onChange={(option) =>
+                    setFieldValue(
+                      'primaryMCRNO',
+                      doctorProfile.find((o) => o.id === option).doctorMCRNo,
+                    )}
+                />
               )}
             />
+            {/* <Field
+              name='primaryRegisteredDoctorFK'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  allowClear
+                  label='Primary Clinician'
+                  code='doctorprofile'
+                  labelField='clinicianProfile.name'
+                  valueField='clinicianProfile.userProfileFK'
+                  onChange={(e) => console.log('e', e)}
+                  // renderDropdown={(option) => <DoctorLabel doctor={option} />}
+                />
+              )}
+            /> */}
           </GridItem>
           <GridItem md={3}>
-            <FastField
+            <Field
               name='primaryMCRNO'
               render={(args) => (
                 <TextField
@@ -152,27 +211,31 @@ class ClinicInfo extends PureComponent {
             <FieldArray
               name='contact.contactAddress'
               render={(arrayHelpers) => {
-                this.arrayHelpers = arrayHelpers
-                if (!values || !values.contact) return null
+                // this.arrayHelpers = arrayHelpers
+                // if (!values || !values.contact) return null
                 return (
                   <div>
-                    {values.contact.contactAddress.map((val, i) => {
-                      return (
-                        <Address
-                          key={val.id}
-                          addressIndex={i}
-                          theme={theme}
-                          arrayHelpers={arrayHelpers}
-                          propName='contact.contactAddress'
-                          style={{
-                            padding: theme.spacing.unit,
-                            marginTop: theme.spacing.unit,
-                            marginBottom: theme.spacing.unit,
-                          }}
-                          {...restProps}
-                        />
-                      )
-                    })}
+                    {/* {values.contact.contactAddress.map((val, i) => {
+                      return ( */}
+                    <Address
+                      // key={val.id}
+                      addressIndex={0}
+                      theme={theme}
+                      arrayHelpers={arrayHelpers}
+                      propName='contact.contactAddress'
+                      style={{
+                        padding: theme.spacing.unit,
+                        marginTop: theme.spacing.unit,
+                        marginBottom: theme.spacing.unit,
+                      }}
+                      classes={classes}
+                      values={values}
+                      handleSubmit={handleSubmit}
+                      setFieldValue={setFieldValue}
+                      {...restProps}
+                    />
+                    {/* ) */}
+                    {/* })} */}
                   </div>
                 )
               }}

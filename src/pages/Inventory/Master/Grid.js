@@ -50,7 +50,7 @@ const Grid = ({
   return (
     <React.Fragment>
       <CommonTableGrid
-        type={`${namespace}`}
+        type={`${namespace}` === 'package' ? 'pack' : `${namespace}`}
         rows={list}
         onRowDoubleClick={(row) => handleDoubleClick(row)}
         columnExtensions={colExtensions}

@@ -504,6 +504,7 @@ class Demographic extends PureComponent {
                               marginTop: theme.spacing.unit,
                               marginBottom: theme.spacing.unit,
                             }}
+                            values={values}
                             {...props}
                           />
                         )

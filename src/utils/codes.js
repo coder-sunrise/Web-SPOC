@@ -721,6 +721,7 @@ const convertExcludeFields = [
 
 const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
+  const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?ctnames=`
   const searchURL = `${baseURL}/search?ctname=`
@@ -752,13 +753,33 @@ const _fetchAndSaveCodeTable = async (code, params, multiplier = 1) => {
     method: 'GET',
     body,
   })
-  const { status: statusCode, data } = response
+
+  let { status: statusCode, data } = response
+  let newData
+
+  if (code.split(',').length > 1) {
+    const codes = code.split(',')
+    newData = [
+      ...codes.reduce(
+        (merged, c) => [
+          ...merged,
+          ...data[c],
+        ],
+        [],
+      ),
+    ]
+  } else {
+    newData = useGeneral
+      ? [
+          ...data[code],
+        ]
+      : [
+          ...data.data,
+        ]
+  }
 
   if (parseInt(statusCode, 10) === 200) {
-    const result = multiplyCodetable(
-      useGeneral ? data[code] : data.data,
-      multiplier,
-    )
+    const result = multiplyCodetable(newData, multiplier)
     await db.codetable.put({
       code,
       data: result,
@@ -925,6 +946,64 @@ export const InventoryTypes = [
   },
 ]
 
+const tagList = [
+  {
+    value: 'PatientName',
+    text: 'PatientName',
+    url: '',
+    getter: () => {
+      const { patient, patientDashboard } = window.g_app._store.getState()
+      if (patient && patient.entity) {
+        return patient.entity.name
+      }
+      return ''
+    },
+  },
+  {
+    value: 'AppointmentDateTime',
+    text: 'AppointmentDateTime',
+    url: '',
+  },
+  {
+    value: 'Doctor',
+    text: 'Doctor',
+    url: '',
+    getter: () => {
+      const { user } = window.g_app._store.getState()
+      if (user && user.data && user.data.clinicianProfile) {
+        return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
+          .name}`
+      }
+      return ''
+    },
+  },
+  {
+    value: 'NewLine',
+    text: 'NewLine',
+    url: '',
+    getter: () => {
+      return '<br/>'
+    },
+  },
+  {
+    value: 'PatientCallingName',
+    text: 'PatientCallingName',
+    url: '',
+    getter: () => {
+      const { patient, patientDashboard } = window.g_app._store.getState()
+      if (patient && patient.entity) {
+        return patient.entity.callingName
+      }
+      return ''
+    },
+  },
+  {
+    value: 'LastVisitDate',
+    text: 'LastVisitDate',
+    url: '',
+  },
+]
+
 export const getInventoryItem = (
   list,
   value,
@@ -962,11 +1041,11 @@ export const getInventoryItemList = (
       value: x.id,
       name: x.displayValue,
       code: x.code,
-      //uom: prescribingUOM.id,
+      // uom: prescribingUOM.id,
       uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,
-      stateName: stateName,
+      stateName,
     }
   })
   return {
@@ -991,8 +1070,6 @@ export const InvoicePayerType = [
     listName: 'govCoPayerPaymentTxn',
   },
 ]
-
-
 
 module.exports = {
   // paymentMethods,
@@ -1031,6 +1108,7 @@ module.exports = {
   // country,
   consultationDocumentTypes,
   getServices,
+  tagList,
   osBalanceStatus,
   ...module.exports,
 }

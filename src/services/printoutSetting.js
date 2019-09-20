@@ -1,14 +1,14 @@
 import * as service from '@/services/common'
 import request from '@/utils/request'
 
-const gstUrl = '/api/gstsetup'
+const url = '/api/printoutSetting'
 
 module.exports = {
   query: (params) => {
-    return service.queryList(gstUrl, params)
+    return service.queryList(url, params)
   },
   upsert: async (params) => {
-    const r = await request(`${gstUrl}`, {
+    const r = await request(`${url}`, {
       method: 'PUT',
       body: [
         ...params,

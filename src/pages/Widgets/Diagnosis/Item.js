@@ -41,7 +41,8 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
               return (
                 <CodeSelect
                   label='Diagnosis'
-                  code='ctOutPatientScanDiagnosis'
+                  code='ctsnomeddiagnosis'
+                  autoComplete
                   onChange={(v, op) => {
                     const { form } = args
                     const { setFieldValue } = form

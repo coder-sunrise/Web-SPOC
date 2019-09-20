@@ -94,7 +94,7 @@ const columnExtensions = [
     columnName: 'gender/age',
     render: (row) =>
       row.gender && row.age ? `${row.gender}/${row.age < 0 ? 0 : row.age}` : '',
-    sortBy: 'genderFK',
+    sortingEnabled: false,
   },
   {
     columnName: 'appointmentTime',

@@ -55,16 +55,18 @@ import {
   displayName: 'AddConsultationDocument',
 })
 class ReferralLetter extends PureComponent {
+  setEditorReference = (ref) => {
+    this.editorReferece = ref
+  }
+
   render () {
     const {
       footer,
       handleSubmit,
       classes,
-      codetable,
-      rowHeight,
       setFieldValue,
+      templateLoader,
     } = this.props
-    const { ctReferralLetterTemplate } = codetable
     return (
       <div>
         <GridContainer>
@@ -104,7 +106,7 @@ class ReferralLetter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={9}>
+          <GridItem xs={12}>
             <FastField
               name='subject'
               render={(args) => {
@@ -112,28 +114,16 @@ class ReferralLetter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem
-            xs={3}
-            style={{ lineHeight: rowHeight, textAlign: 'right' }}
-          >
-            <ButtonSelect
-              options={ctReferralLetterTemplate}
-              textField='displayValue'
-              onClick={(option) => {
-                setFieldValue('content', option.templateMessage)
-              }}
-            >
-              Load Template
-            </ButtonSelect>
-          </GridItem>
+
           <GridItem xs={12} className={classes.editor}>
-            <Button link className={classes.editorBtn}>
-              Add Diagnosis
-            </Button> 
+            {templateLoader(this.editorReferece, setFieldValue)}
+
             <FastField
               name='content'
               render={(args) => {
-                return <RichEditor {...args} />
+                return (
+                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                )
               }}
             />
           </GridItem>
