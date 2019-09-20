@@ -388,6 +388,16 @@ const routes = [
             name: 'patientListingReport',
             component: './Report/PatientListing',
           },
+          {
+            path: '/report/paymentcollection',
+            name: 'paymentCollection',
+            component: './Report/PaymentCollection',
+          },
+          {
+            path: '/report/salesummary',
+            name: 'salessummary',
+            component: './Report/SalesSummary',
+          },
         ],
       },
       // Report

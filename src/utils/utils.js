@@ -380,6 +380,7 @@ const convertToQuery = (
         if (typeof val === 'string') {
           val = val.trim()
           const match = refilter.exec(p)
+          console.log({ match })
           if (!!match && match.length > 1) {
             let s = ''
             match[2].split('$').forEach((item) => {
@@ -466,6 +467,7 @@ const convertToQuery = (
     includeParentDeleted,
     // queryExcludeFields,
   }
+  console.log({ returnVal })
   convertExcludeFields.forEach((p) => {
     if (customQuerys[p] !== undefined) returnVal[p] = customQuerys[p]
   })
