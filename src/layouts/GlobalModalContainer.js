@@ -222,7 +222,9 @@ class GlobalModalContainer extends PureComponent {
           }}
           showFooter
         >
-          <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+          <div style={{ textAlign: 'center' }}>
+            <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+          </div>
         </CommonModal>
 
         <CommonModal

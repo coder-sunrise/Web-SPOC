@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
@@ -11,6 +12,7 @@ import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
 import style from './style'
 
+@connect(({ dispense }) => ({ dispense }))
 class Dispense extends Component {
   makePayment = () => {
     const { location } = this.props
@@ -18,10 +20,11 @@ class Dispense extends Component {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, dispense } = this.props
+
     return (
       <div>
-        <PatientBanner />
+        <PatientBanner patientInfo={dispense.patientInfo} />
         <GridContainer direction='column' className={classes.content}>
           <GridItem justify='flex-end' container>
             <Button color='info' size='sm' disabled>

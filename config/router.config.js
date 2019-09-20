@@ -48,7 +48,7 @@ const routes = [
             exact: true,
           },
           {
-            path: '/reception/queue/dispense/:visitRefNo',
+            path: '/reception/queue/dispense',
             name: 'dispense',
             hideInMenu: true,
             exact: true,
