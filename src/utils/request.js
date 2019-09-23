@@ -148,6 +148,7 @@ export default function request (
   url,
   option,
   { contentType } = { contentType: undefined },
+  showNotification = true,
 ) {
   const options = {
     expirys: true,
@@ -285,11 +286,12 @@ export default function request (
               : response.data
           if (data.message) {
             if (data.messageType === 4 && opts.error !== '') {
-              notification.error(opts.error || data.message)
+              showNotification && notification.error(opts.error || data.message)
             } else if (data.messageType === 3 && opts.warn !== '') {
-              notification.info(opts.warn || data.message)
+              showNotification && notification.info(opts.warn || data.message)
             } else if (opts.success !== '') {
-              notification.success(opts.success || data.message)
+              showNotification &&
+                notification.success(opts.success || data.message)
             }
           }
           notification.destroy()
@@ -340,23 +342,28 @@ export default function request (
 
             notification.destroy()
             if (response.responseJSON) {
-              notification.error({
-                // message: response.responseJSON.status,
-                description:
-                  response.responseJSON.message || response.responseJSON.title,
-                duration: 5000,
-              })
+              showNotification &&
+                notification.error({
+                  // message: response.responseJSON.status,
+                  description:
+                    response.responseJSON.message ||
+                    response.responseJSON.title,
+                  duration: 5000,
+                })
             } else {
-              notification.error({
-                message: (
-                  <div>
-                    <h4>{errortext}</h4>
+              showNotification &&
+                notification.error({
+                  message: (
+                    <div>
+                      <h4>{errortext}</h4>
 
-                    {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
-                  </div>
-                ),
-                duration: 5000,
-              })
+                      {JSON.stringify(
+                        returnObj.errors || returnObj.responseJSON,
+                      )}
+                    </div>
+                  ),
+                  duration: 5000,
+                })
             }
 
             // const error = new Error(errortext)
