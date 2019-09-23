@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-import { CommonTableGrid, DateFormatter } from '@/components'
+import { CommonTableGrid, DateFormatter, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
@@ -121,6 +121,7 @@ const columnExtensions = [
 const Grid = ({
   history,
   dispatch,
+  user,
   calendarEvents = [],
   filter = StatusIndicator.ALL,
   queueList = [],
@@ -169,6 +170,28 @@ const Grid = ({
     })
   }
 
+  const isAssignedDoctor = (row) => {
+    const {
+      doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
+    } = row
+    const { clinicianProfile: { doctorProfile } } = user
+    if (!doctorProfile) {
+      notification.error({
+        message: 'Unauthorized Access',
+      })
+      return false
+    }
+
+    if (assignedDoctorProfile.id !== doctorProfile.id) {
+      notification.error({
+        message: `You cannot start other doctor's consultation`,
+      })
+      return false
+    }
+
+    return true
+  }
+
   const onClick = (row, id) => {
     switch (id) {
       case '0': // edit visit
@@ -201,21 +224,33 @@ const Grid = ({
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
         )
         break
-      case '5': // start consultation
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
-        )
+      case '5': {
+        // start consultation
+        const valid = isAssignedDoctor(row)
+        valid &&
+          router.push(
+            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
+          )
         break
-      case '6': // resume consultation
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
-        )
+      }
+      case '6': {
+        // resume consultation
+        const valid = isAssignedDoctor(row)
+        valid &&
+          router.push(
+            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
+          )
         break
-      case '7': // edit consultation
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
-        )
+      }
+      case '7': {
+        // edit consultation
+        const valid = isAssignedDoctor(row)
+        valid &&
+          router.push(
+            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
+          )
         break
+      }
       case '8':
         handleActualizeAppointment({
           patientID: row.patientProfileFk,
@@ -260,7 +295,8 @@ const Grid = ({
 }
 
 export default memo(
-  connect(({ queueLog, calendar, global, loading }) => ({
+  connect(({ queueLog, calendar, global, loading, user }) => ({
+    user: user.data,
     filter: queueLog.currentFilter,
     queueList: queueLog.list,
     calendarEvents: calendar.list,

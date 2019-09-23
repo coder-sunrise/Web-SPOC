@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { formatMessage } from 'umi/locale'
+import Delete from '@material-ui/icons/Delete'
+import { Tooltip } from '@material-ui/core'
 import {
   Field,
   FastField,
@@ -15,8 +17,6 @@ import {
   CommonTableGrid,
   Popconfirm,
 } from '@/components'
-import Delete from '@material-ui/icons/Delete'
-import { Tooltip } from '@material-ui/core'
 import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 
@@ -27,7 +27,7 @@ const ItemList = ({
   setFieldValue,
   dispatch,
   values,
-  //...props
+  // ...props
 }) => {
   function callback (key) {
     console.log('key', key)
@@ -38,7 +38,7 @@ const ItemList = ({
     newRows.push(obj)
     setFieldValue('rows', newRows)
 
-    //Reset field
+    // Reset field
     setFieldValue('tempSelectedItemFK', '')
     setFieldValue('tempSelectedItemSellingPrice', '')
     setFieldValue('tempSelectedItemTotalPrice', '')
@@ -56,8 +56,8 @@ const ItemList = ({
           itemValueType: 'ExactAmount',
           itemValue: 0,
         }
-        //const newConsumableValueDto = values.consumableValueDto
-        //newConsumableValueDto.push(inventoryConsumable)
+        // const newConsumableValueDto = values.consumableValueDto
+        // newConsumableValueDto.push(inventoryConsumable)
 
         addItemToRows(inventoryConsumable)
 
@@ -73,8 +73,8 @@ const ItemList = ({
           itemValue: 0,
         }
 
-        //const newMedicationValueDto = values.medicationValueDto
-        //newMedicationValueDto.push(inventoryMedication)
+        // const newMedicationValueDto = values.medicationValueDto
+        // newMedicationValueDto.push(inventoryMedication)
 
         addItemToRows(inventoryMedication)
 
@@ -90,8 +90,8 @@ const ItemList = ({
           itemValue: 0,
         }
 
-        //const newVaccinationValueDto = values.vaccinationValueDto
-        //newVaccinationValueDto.push(inventoryVaccination)
+        // const newVaccinationValueDto = values.vaccinationValueDto
+        // newVaccinationValueDto.push(inventoryVaccination)
 
         addItemToRows(inventoryVaccination)
 
@@ -107,8 +107,8 @@ const ItemList = ({
           itemValue: 0,
         }
 
-        //const newServiceValueDto = values.serviceValueDto
-        //newServiceValueDto.push(ctService)
+        // const newServiceValueDto = values.serviceValueDto
+        // newServiceValueDto.push(ctService)
 
         addItemToRows(ctService)
 
@@ -123,8 +123,8 @@ const ItemList = ({
           itemValueType: 'ExactAmount',
           itemValue: 0,
         }
-        //const newPackageValueDto = values.packageValueDto
-        //newPackageValueDto.push(inventoryPackage)
+        // const newPackageValueDto = values.packageValueDto
+        // newPackageValueDto.push(inventoryPackage)
 
         addItemToRows(inventoryPackage)
 
@@ -136,7 +136,7 @@ const ItemList = ({
   const onItemSelect = (e, option) => {
     if (e) {
       const { sellingPrice, totalPrice } = option
-      //console.log('onItemSelect', option)
+      // console.log('onItemSelect', option)
       setFieldValue('tempSelectedItemSellingPrice', sellingPrice)
       setFieldValue('tempSelectedItemTotalPrice', totalPrice)
     }
@@ -255,7 +255,7 @@ const ItemList = ({
                 <Field
                   name={`rows[${row.rowIndex - 1}].itemValue`}
                   render={CPNumber(
-                    ' ',
+                    undefined,
                     Array.isArray(values.rows) && values.rows.length >= 1
                       ? values.rows[row.rowIndex - 1].itemValueType
                       : 'ExactAmount',
@@ -265,7 +265,7 @@ const ItemList = ({
               <GridItem xs={4}>
                 <Field
                   name={`rows[${row.rowIndex - 1}].itemValueType`}
-                  render={CPSwitch}
+                  render={CPSwitch(undefined)}
                 />
               </GridItem>
             </GridContainer>
@@ -285,7 +285,7 @@ const ItemList = ({
                     id: row.uid,
                   },
                 })}
-              //onConfirm={() => onClickDelete(row)}
+              // onConfirm={() => onClickDelete(row)}
             >
               <Tooltip title='Delete'>
                 <Button size='sm' color='danger' justIcon>

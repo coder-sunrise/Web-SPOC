@@ -22,7 +22,7 @@ import {
   Switch,
 } from '@/components'
 
-const CPSwitch = (args) => {
+const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
   }
@@ -32,7 +32,7 @@ const CPSwitch = (args) => {
       checkedValue='ExactAmount'
       unCheckedChildren='%'
       unCheckedValue='Percentage'
-      label=' '
+      label={label}
       {...args}
     />
   )
@@ -93,7 +93,10 @@ const Setting = (props) => {
             />
           </GridItem>
           <GridItem xs={4} md={1}>
-            <Field name='patientMinCoPaymentAmountType' render={CPSwitch} />
+            <Field
+              name='patientMinCoPaymentAmountType'
+              render={CPSwitch(' ')}
+            />
           </GridItem>
         </GridContainer>
         <GridContainer>
@@ -119,7 +122,7 @@ const Setting = (props) => {
         </GridContainer>
         <ItemList
           {...props}
-          //values={values}
+          // values={values}
           CPSwitch={CPSwitch}
           CPNumber={CPNumber}
           setFieldValue={setFieldValue}

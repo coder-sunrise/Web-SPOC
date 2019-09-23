@@ -611,11 +611,31 @@ const consultationDocumentTypes = [
     value: '2',
     name: 'Memo',
     prop: 'corMemo',
+    downloadConfig: {
+      id: 11,
+      key: 'memoid',
+      draft: (row) => {
+        return {
+          MemoDetails: [
+            {
+              memoDate: '17 Sep 2019',
+              subject: 'memo',
+              content:
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+              doctorName: 'Medisys Innovation',
+              doctorMCRNo: 'G 637',
+            },
+          ],
+        }
+      },
+    },
   },
   {
     value: '6',
     name: 'Vaccination Certificate',
     prop: 'corVaccinationCert',
+    downloadKey: 'vaccinationcertificateid',
+    downloadId: 10,
   },
   {
     value: '5',
@@ -866,7 +886,9 @@ export const refreshCodetable = async (url) => {
 export const checkIsCodetableAPI = (url) => {
   try {
     const isTenantCodes = tenantCodes.indexOf(url) > 0
-    const isCodetable = url.toLowerCase().indexOf('ct') > 0
+    const paths = url.split('/')
+    const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
+
     return isTenantCodes || isCodetable
   } catch (error) {
     console.log({ error })
