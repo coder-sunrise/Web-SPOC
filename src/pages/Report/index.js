@@ -35,7 +35,7 @@ const menuData = [
   {
     title: 'Admin',
     text: 'Session Summary Report',
-    url: '',
+    url: '/report/sessionsummary',
   },
   {
     title: 'Finance',
@@ -76,7 +76,7 @@ const menuData = [
   {
     title: 'Other',
     text: 'Diagnosis Trending Report',
-    url: '',
+    url: '/report/diagnosistrending',
   },
 ]
 
@@ -98,7 +98,8 @@ class Report extends React.Component {
 
   onButtonClick = (event) => {
     const { currentTarget } = event
-    this.props.history.push(currentTarget.id)
+
+    currentTarget.id !== '' && this.props.history.push(currentTarget.id)
   }
 
   menus = () => {

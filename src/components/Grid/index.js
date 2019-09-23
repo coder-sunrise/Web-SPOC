@@ -100,8 +100,8 @@ export function QtyFormatter ({ value }) {
 // }
 const dateFormatLong = 'DD-MMM-YYYY'
 const dateFormat = 'DD-MM-YYYY'
-const dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
-const dateFormatLongWithTime = 'DD-MMM-YYYY HH:mm:ss'
+const dateFormatWithTime = 'DD-MM-YYYY hh:mm:ss A'
+const dateFormatLongWithTime = 'DD-MMM-YYYY hh:mm:ss A'
 // const timeFormat = 'HH:mm:ss'
 const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm a'

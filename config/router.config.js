@@ -404,6 +404,21 @@ const routes = [
             name: 'salessummary',
             component: './Report/SalesSummary',
           },
+          {
+            path: '/report/diagnosistrending',
+            name: 'diagnosistrending',
+            component: './Report/DiagnosisTrending',
+          },
+          {
+            path: '/report/sessionsummary',
+            name: 'sessionsummary',
+            component: './Report/SessionSummary',
+          },
+          {
+            path: '/report/sessionsummary/:id',
+            name: 'viewreport',
+            component: './Report/SessionSummary/Details',
+          },
         ],
       },
       // Report

@@ -87,7 +87,7 @@ export default createListViewModel({
         const payload = {
           IsClinicSessionClosed: false,
         }
-        const response = yield call(service.getActiveSession, payload)
+        const response = yield call(service.getBizSession, payload)
 
         const { data } = response
         // data = null when get session failed

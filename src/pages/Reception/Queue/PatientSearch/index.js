@@ -6,7 +6,7 @@ import { withStyles } from '@material-ui/core'
 // common components
 import { Button, Tooltip } from '@/components'
 // medisys components
-import { LoadingWrapper } from 'medisys-components'
+import { LoadingWrapper } from '@/components/_medisys'
 // sub components
 import Loading from '@/components/PageLoading/index'
 import RegisterVisitBtn from './RegisterVisitBtn'
