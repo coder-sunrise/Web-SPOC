@@ -161,6 +161,7 @@ class Filter extends PureComponent {
                         <MenuList role='menu'>
                           <MenuItem>Medication</MenuItem>
                           <MenuItem>Consumable</MenuItem>
+                          <MenuItem>Vaccination</MenuItem>
                         </MenuList>
                       </ClickAwayListener>
                     </Paper>

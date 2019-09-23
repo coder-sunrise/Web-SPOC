@@ -183,6 +183,7 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
                       id: 'inventory.master.vaccination.supplier',
                     })}
                     code='ctSupplier'
+                    labelField='displayValue'
                     {...args}
                   />
                 )}

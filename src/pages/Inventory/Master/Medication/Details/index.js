@@ -111,9 +111,30 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ medicationDetail }) => {
-      return medicationDetail.entity
+      const returnValue = medicationDetail.entity
         ? medicationDetail.entity
         : medicationDetail.default
+
+      const { sddfk } = returnValue
+      // if (sddfk) {
+      //   console.log('sddfk', sddfk)
+      //   // console.log('sddfk', this.props)
+      //   this.props
+      //     .dispatch({
+      //       type: 'sddDetail/queryOne',
+      //       payload: {
+      //         id: sddfk,
+      //       },
+      //     })
+      //     .then((sdd) => {
+      //       const { data } = sdd
+      //       const { code, name } = data[0]
+      //       console.log('data', data)
+      //     })
+      // }
+
+      console.log('codetable', returnValue)
+      return returnValue
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),

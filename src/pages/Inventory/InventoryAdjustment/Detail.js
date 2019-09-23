@@ -108,9 +108,10 @@ class Detail extends PureComponent {
           options: [
             { value: 'medication', name: 'Medication' },
             { value: 'consumable', name: 'Consumable' },
+            { value: 'vaccination', name: 'Vaccination' },
           ],
           onChange: (e) => {
-            this.setState({ type: e.value })
+            this.setState({ type: `inventory${e.value}` })
             this.props.dispatch({
               // force current edit row components to update
               type: 'global/updateState',
@@ -123,6 +124,7 @@ class Detail extends PureComponent {
         {
           columnName: 'code',
           type: 'codeSelect',
+          labelField: 'displayValue',
           code:
             this.state.type === 'medication'
               ? 'InventoryMedication'

@@ -136,6 +136,7 @@ const Detail = ({ consumableDetail, dispatch, values }) => {
                       id: 'inventory.master.consumable.supplier',
                     })}
                     code='ctSupplier'
+                    labelField='displayValue'
                     max={10}
                     {...args}
                   />

@@ -38,6 +38,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       type: 'codeSelect',
       code: 'ctSupplier',
       sortBy: 'favouriteSupplierFK',
+      labelField: 'displayValue',
     },
     {
       columnName: 'dispensingUOM',

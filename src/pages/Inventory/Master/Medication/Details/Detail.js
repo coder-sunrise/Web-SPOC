@@ -79,7 +79,7 @@ const Detail = ({
 
   const toggleModal = () => {
     setToggle(!toggle)
-  } 
+  }
   const handleSelectSdd = (row) => {
     const { setFieldTouched } = props
     const { id, code, name } = row
@@ -186,6 +186,7 @@ const Detail = ({
                       id: 'inventory.master.medication.supplier',
                     })}
                     code='ctSupplier'
+                    labelField='displayValue'
                     max={10}
                     {...args}
                   />
