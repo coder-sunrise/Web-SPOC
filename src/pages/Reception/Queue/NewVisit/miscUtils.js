@@ -71,11 +71,13 @@ export const formikHandleSubmit = (
 ) => {
   const { queueNo, visitAttachment, ...restValues } = values
   const { dispatch, queueLog, visitRegistration, onConfirm } = props
+  console.log({ props })
 
   const { sessionInfo } = queueLog
   const {
     visitInfo: { id = undefined, visit, ...restVisitInfo },
     patientInfo,
+    appointmentFK,
   } = visitRegistration
   const bizSessionFK = sessionInfo.id
 
@@ -102,6 +104,7 @@ export const formikHandleSubmit = (
       patientProfileFK,
       bizSessionFK,
       visitReferenceNo,
+      appointmentFK,
       visitStatus: VISIT_STATUS.WAITING,
       visitRemarks: null,
       temperatureC: null,

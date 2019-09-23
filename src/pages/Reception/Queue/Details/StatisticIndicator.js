@@ -55,7 +55,6 @@ const StatisticIndicator = ({
     const flattenedCalendarData = appointments
       // .reduce(flattenAppointmentDateToCalendarEvents, [])
       .filter(todayOnly)
-    console.log({ flattenedCalendarData })
     setNumOfcalendarData(flattenedCalendarData.length)
   }, [])
 

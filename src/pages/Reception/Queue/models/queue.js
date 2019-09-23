@@ -105,6 +105,7 @@ export default createListViewModel({
             type: 'calendar/getCalendarList',
             payload: {
               eql_appointmentDate: today,
+              eql_appointmentStatusFk: '1',
             },
           })
           yield put({
@@ -126,38 +127,6 @@ export default createListViewModel({
           type: 'getSessionInfo',
         })
         return true
-      },
-      *actualizeAppointment ({ payload }, { select, call, put }) {
-        const calendarState = yield select((state) => state.calendar)
-        const { list } = calendarState
-        // const appointment = list.find((item) => item.id === payload)
-        // console.log({ appointment, list, payload })
-        // if (appointment) {
-        //   const appointmentPayload = {
-        //     recurrenceChanged: false,
-        //     overwriteEntireSeries: false,
-        //     editSingleAppointment: true,
-        //     concurrencyToken: appointment.concurrencyToken,
-        //     appointmentGroupDto: {
-        //       id: parseInt(appointment.appointmentGroupFK, 10),
-        //       concurrencyToken: appointment.concurrencyToken,
-        //       appointments: [
-        //         {
-        //           id: appointment.id,
-        //           concurrencyToken: appointment.concurrencyToken,
-        //           appointmentGroupFk: parseInt(
-        //             appointment.appointmentGroupFK,
-        //             10,
-        //           ),
-        //           appointmentStatusFk: 4,
-        //           isEditedAsSingleAppointment: true,
-        //         },
-        //       ],
-        //     },
-        //   }
-        // console.log({ appointmentPayload })
-        // yield call(updateAppt, appointmentPayload)
-        // }
       },
     },
     reducers: {

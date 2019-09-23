@@ -1,5 +1,5 @@
-import request, { axiosRequest } from '@/utils/request'
 import { stringify } from 'qs'
+import request from '@/utils/request'
 
 const FORM_DATA = {
   grant_type: 'password',
@@ -15,11 +15,6 @@ export async function login (credential) {
     ...FORM_DATA,
     ...credential,
   }
-  // const response = await axiosRequest(getTokenURL, {
-  //   method: 'POST',
-  //   data: stringify(requestBody),
-  //   contentType: 'application/x-www-form-urlencoded',
-  // })
 
   const response = await request(
     getTokenURL,
@@ -28,6 +23,7 @@ export async function login (credential) {
       data: stringify(requestBody),
     },
     { contentType: 'application/x-www-form-urlencoded' },
+    false,
   )
   return response
 }

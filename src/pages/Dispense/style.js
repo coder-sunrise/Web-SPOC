@@ -1,6 +1,6 @@
 const DispenseIndexStyle = (theme) => ({
   content: {
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing(1),
   },
   footerRow: {
     marginTop: theme.spacing.unit * 2,

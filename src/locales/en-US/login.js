@@ -7,7 +7,7 @@ export default {
   'app.login.loginBtn.enter': `Enter`,
   'app.login.message-invalid-credentials': 'Invalid username or password',
   'app.login.message-invalid-credentials-info':
-    "The user account entered doesn't match any account",
+    'The user account entered does not match any account in the given clinic code',
   // 'app.login.message-invalid-credentials':
   //   'Invalid username or password（admin/ant.design）',
   'app.login.message-invalid-verification-code': 'Invalid verification code',
