@@ -11,6 +11,12 @@ const status = [
   { value: true, name: 'Active', color: 'green' },
 ]
 
+const osBalanceStatus = [
+  { value: 'all', name: 'All(Yes/No)', color: 'all' },
+  { value: 'yes', name: 'Yes', color: 'yes' },
+  { value: 'no', name: 'No', color: 'no' },
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -1066,9 +1072,27 @@ const tagList = [
   },
 ]
 
-export const getInventoryItem = (list, value, itemFKName, rows) => {
+export const getInventoryItem = (
+  list,
+  value,
+  itemFKName,
+  rows = [],
+  outstandingItem = undefined,
+) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
+
+  if (outstandingItem) {
+    const filterOutstandingItem = outstandingItem.filter(
+      (x) => x.type === value && !x.isDeleted,
+    )
+
+    inventoryItemList = _.intersectionBy(
+      inventoryItemList,
+      filterOutstandingItem,
+      itemFKName,
+    )
+  }
 
   return {
     inventoryItemList,
@@ -1096,6 +1120,24 @@ export const getInventoryItemList = (
     inventoryItemList,
   }
 }
+
+export const InvoicePayerType = [
+  {
+    invoicePayerFK: 1,
+    name: 'PATIENT',
+    listName: 'patientPaymentTxn',
+  },
+  // {
+  //   invoicePayerFK: 2,
+  //   name: 'COPAYER',
+  //   listName: 'coPayerPaymentTxn',
+  // },
+  // {
+  //   invoicePayerFK: 3,
+  //   name: 'GOVT_COPAYER',
+  //   listName: 'govCoPayerPaymentTxn',
+  // },
+]
 
 module.exports = {
   // paymentMethods,
@@ -1135,5 +1177,6 @@ module.exports = {
   consultationDocumentTypes,
   getServices,
   tagList,
+  osBalanceStatus,
   ...module.exports,
 }

@@ -1,23 +1,27 @@
 import React, { Component } from 'react'
+import { connect } from 'dva'
 import { CardContainer, Tabs } from '@/components'
-import { formatMessage } from 'umi/locale'
 import { PurchaseReceiveDetailOption } from '../variables'
 
-function callback (key) {
-  //console.log(key)
-}
-
+@connect(({ purchaseOrderDetails, clinicSettings, clinicInfo }) => ({
+  purchaseOrderDetails,
+  clinicSettings,
+  clinicInfo,
+}))
 class index extends Component {
   render () {
+    const { purchaseOrderDetails } = this.props
+    const { purchaseOrder } = purchaseOrderDetails
+    const poStatus = (purchaseOrder) ? purchaseOrder.status : ''
     return (
       <CardContainer hideHeader>
         <Tabs
           defaultActiveKey='0'
-          onChange={callback}
-          options={PurchaseReceiveDetailOption}
+          options={PurchaseReceiveDetailOption(poStatus, this.props)}
         />
       </CardContainer>
     )
   }
 }
+
 export default index

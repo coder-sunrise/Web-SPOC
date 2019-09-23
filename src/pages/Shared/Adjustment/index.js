@@ -71,7 +71,7 @@ const styles = (theme) => ({})
   handleSubmit: (values, { props }) => {
     const { dispatch, global } = props
     const { openAdjustmentConfig = {} } = global
-    const { callbackConfig } = openAdjustmentConfig
+    const { callbackConfig, callbackMethod } = openAdjustmentConfig
     const newVals = {
       ...values,
       adjValue: values.adjustment,
@@ -91,6 +91,9 @@ const styles = (theme) => ({})
         type: `${model}/${reducer}`,
         payload: newVals,
       })
+    }
+    if (callbackMethod) {
+      setTimeout(() => callbackMethod(), 500)
     }
     if (props.onConfirm) props.onConfirm()
   },

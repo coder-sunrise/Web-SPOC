@@ -1,97 +1,123 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'dva'
-import { CardContainer, GridItem, Button, CommonModal } from '@/components'
-import Grid from './Grid'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import Filter from './Filter'
-import Detail from './Detail'
-import DuplicatePO from './DuplicatePO'
+import { CardContainer, withFormikExtend, CommonModal, GridItem, Button } from '@/components'
+import FilterBar from './components/FilterBar'
+import PurchaseReceiveDataGrid from './components/PurchaseReceiveDataGrid'
+import WriteOff from './components/Modal/WriteOff'
+import DuplicatePO from './components/Modal/DuplicatePO'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
   buttonGroup: {
     marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
+    marginBottom: theme.spacing(2),
   },
 })
 
-@connect(({ purchasingReceiving }) => ({
-  purchasingReceiving,
+@connect(({ purchaseReceiveList }) => ({
+  purchaseReceiveList,
 }))
-class PurchaseReceive extends PureComponent {
+@withFormikExtend({
+  name: 'purchaseReceiveList',
+  mapPropsToValues: ({ purchaseReceiveList }) => {
+    return purchaseReceiveList
+  },
+})
+class PurchaseReceive extends Component {
+  state = {
+    showWriteOff: false,
+    showDuplicatePO: false,
+  }
+
   componentDidMount () {
     this.props.dispatch({
-      //type: 'purchasingReceiving/query',
-      type: 'purchasingReceiving/fakeQueryDone',
+      type: 'purchaseReceiveList/fakeQueryDone',
     })
   }
 
-  navigatePdoDetails = ({ currentTarget }) => {
+  onWriteOffClick = () => this.setState({ showWriteOff: true })
+
+  onDuplicatePOClick = (rowId) => {
+    const { dispatch, purchaseReceiveList } = this.props
+    const { list } = purchaseReceiveList
+    dispatch({
+      type: 'purchaseReceiveList/updateState',
+      payload: {
+        entity: list.find((o) => o.id === rowId),
+      },
+    })
+    this.setState({ showDuplicatePO: true })
+  }
+
+  closeWriteOffModal = () => this.setState({ showWriteOff: false })
+
+  closeDuplicatePOModal = () => this.setState({ showDuplicatePO: false })
+
+  onSubmitWriteOff = (writeOffReason) => { this.closeWriteOffModal() }
+
+  onNavigate = (type, rowId) => {
     const { history } = this.props
     const { location } = history
-
-    history.push(`${location.pathname}/${currentTarget.id}?type=new`)
-  }
-
-  toggleWriteOffModal = () => {
-    this.props.dispatch({
-      type: 'purchasingReceiving/updateState',
-      payload: {
-        showWriteOffModal: !this.props.purchasingReceiving.showWriteOffModal,
-      },
-    })
-  }
-
-  toggleDuplicatePOModal = () => {
-    this.props.dispatch({
-      type: 'purchasingReceiving/updateState',
-      payload: {
-        showDuplicatePOModal: !this.props.purchasingReceiving
-          .showDuplicatePOModal,
-      },
-    })
+    switch (type) {
+      case 'new':
+        history.push(`${location.pathname}/pdodetails?type=${type}`)
+        break
+      case 'dup':
+        history.push(`${location.pathname}/pdodetails?id=${rowId}&type=${type}`)
+        break
+      case 'edit':
+        history.push(`${location.pathname}/pdodetails?id=${rowId}&type=${type}`)
+        break
+      default:
+        break
+    }
   }
 
   render () {
-    console.log(this.props)
-
-    const { props } = this
-    const { classes, purchasingReceiving, dispatch } = props
-    const cfg = {
-      navigatePdoDetails: this.navigatePdoDetails,
+    const { classes } = this.props
+    const actionProps = {
+      handleWriteOff: this.onWriteOffClick,
+      handleDuplicatePO: this.onDuplicatePOClick,
+      handleNavigate: this.onNavigate,
     }
+
+    const {
+      showWriteOff,
+      showDuplicatePO,
+    } = this.state
 
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...this.props} />
+        <FilterBar actions={actionProps} {...this.props} />
+        <PurchaseReceiveDataGrid actions={actionProps} {...this.props} />
         <CommonModal
-          open={purchasingReceiving.showWriteOffModal}
-          observe='PurchaseReceivingWriteOffDetail'
-          title={'Write-Off'}
+          open={showWriteOff}
+          title='Write-Off'
           maxWidth='xs'
-          onClose={this.toggleWriteOffModal}
-          onConfirm={this.toggleWriteOffModal}
+          onConfirm={this.closeWriteOffModal}
+          onClose={this.closeWriteOffModal}
         >
-          <Detail {...this.props} />
+          <WriteOff handleSubmit={this.onSubmitWriteOff} />
         </CommonModal>
+
         <CommonModal
-          open={purchasingReceiving.showDuplicatePOModal}
-          observe='PurchaseOrderConfirmationDetail'
-          title={'Duplicate Purchase Order'}
+          open={showDuplicatePO}
+          title='Duplicate Purchase Order'
           maxWidth='xs'
-          onClose={this.toggleDuplicatePOModal}
-          onConfirm={this.toggleDuplicatePOModal}
+          onConfirm={this.closeDuplicatePOModal}
+          onClose={this.closeDuplicatePOModal}
         >
-          <DuplicatePO {...this.props} />
+          <DuplicatePO
+            actions={actionProps}
+            {...this.props}
+          />
         </CommonModal>
         <GridItem md={4} className={classes.buttonGroup}>
           <Button
             color='primary'
-            onClick={() => {
-              this.toggleWriteOffModal()
-            }}
+            onClick={this.onWriteOffClick}
           >
             Write-Off
           </Button>
@@ -100,5 +126,5 @@ class PurchaseReceive extends PureComponent {
     )
   }
 }
-
 export default withStyles(styles, { withTheme: true })(PurchaseReceive)
+

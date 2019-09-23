@@ -11,7 +11,14 @@ const styles = (theme) => ({
   },
 })
 
-const DeleteConfirmation = ({ classes, type, itemID, onConfirm, onClose }) => {
+const DeleteConfirmation = ({
+  classes,
+  handleSubmit,
+  id,
+  type,
+  itemID,
+  onClose,
+}) => {
   const [
     reason,
     setReason,
@@ -25,13 +32,21 @@ const DeleteConfirmation = ({ classes, type, itemID, onConfirm, onClose }) => {
         </h4>
       </GridItem>
       <GridItem md={10} className={classes.spacing}>
-        <TextField label='Reason' onChange={setReason} defaultValue={reason} />
+        <TextField
+          label='Reason'
+          onChange={(e) => setReason(e.target.value)}
+          defaultValue=''
+        />
       </GridItem>
       <GridItem>
         <Button color='danger' onClick={onClose}>
           Cancel
         </Button>
-        <Button color='primary' onClick={onConfirm} disabled={reason === ''}>
+        <Button
+          color='primary'
+          onClick={() => handleSubmit(id, reason)}
+          disabled={reason === ''}
+        >
           Confirm
         </Button>
       </GridItem>

@@ -1,27 +1,15 @@
 import React, { PureComponent } from 'react'
-import moment from 'moment'
 import { formatMessage } from 'umi/locale'
 import {
-  CardContainer,
   GridContainer,
   GridItem,
   FastField,
   TextField,
-  withFormikExtend,
   DatePicker,
-  OutlinedTextField,
-  EditableTableGrid,
-  Button,
   NumberInput,
-  withFormik,
 } from '@/components'
+const poPrefix = 'purchaseOrderDetails'
 
-@withFormikExtend({
-  displayName: 'purchaseOrderPayment',
-  mapPropsToValues: ({ purchaseOrderPayment }) => {
-    return purchaseOrderPayment.entity || purchaseOrderPayment.default
-  },
-})
 class Header extends PureComponent {
   render () {
     return (
@@ -29,7 +17,7 @@ class Header extends PureComponent {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name='poNo'
+              name={`${poPrefix}.poNo`}
               render={(args) => (
                 <TextField
                   disabled
@@ -43,7 +31,7 @@ class Header extends PureComponent {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='purchaseOrderDate'
+              name={`${poPrefix}.poDate`}
               render={(args) => (
                 <DatePicker
                   disabled
@@ -59,7 +47,7 @@ class Header extends PureComponent {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name='invoiceAmount'
+              name={`${poPrefix}.invoiceTotal`}
               render={(args) => (
                 <NumberInput
                   disabled
@@ -74,7 +62,7 @@ class Header extends PureComponent {
           </GridItem>
           <GridItem xs>
             <FastField
-              name='outstandingAmount'
+              name={`${poPrefix}.outstandingAmount`}
               render={(args) => (
                 <NumberInput
                   disabled
