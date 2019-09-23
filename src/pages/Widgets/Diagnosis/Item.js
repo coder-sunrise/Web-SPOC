@@ -24,6 +24,7 @@ import {
   confirm,
   Checkbox,
   Popover,
+  Tooltip,
 } from '@/components'
 
 export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
@@ -172,14 +173,16 @@ export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
             }}
           >
             {diagnosises.length > 1 && (
-              <Button
-                style={{ position: 'absolute', bottom: theme.spacing(1) }}
-                justIcon
-                color='danger'
-                size='sm'
-              >
-                <DeleteIcon />
-              </Button>
+              <Tooltip title='Delete'>
+                <Button
+                  style={{ position: 'absolute', bottom: theme.spacing(1) }}
+                  justIcon
+                  color='danger'
+                  size='sm'
+                >
+                  <DeleteIcon />
+                </Button>
+              </Tooltip>
             )}
           </Popover>
         </GridItem>

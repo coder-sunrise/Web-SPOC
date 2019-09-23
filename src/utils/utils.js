@@ -454,10 +454,11 @@ const convertToQuery = (
       }
     }
   }
+  console.log(sorting)
   const returnVal = {
     ...newQuery,
     sort: sorting.map((o) => ({
-      sortby: o.columnName,
+      sortby: o.sortBy || o.columnName,
       order: o.direction,
     })),
     current,

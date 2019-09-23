@@ -11,6 +11,7 @@ import {
   DatePicker,
   dateFormatLong,
   Skeleton,
+  Tooltip,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
@@ -30,6 +31,12 @@ class Banner extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctdrugallergy',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctsalutation',
       },
     })
   }
@@ -88,6 +95,7 @@ class Banner extends PureComponent {
       patientDashboard = {},
       patientInfo = {},
       extraCmt,
+      codetable,
       style = {
         position: 'sticky',
         top: headerHeight,
@@ -114,10 +122,12 @@ class Banner extends PureComponent {
           <Skeleton variant='rect' width='100%' height={100} />
         </Paper>
       )
-
+    const { ctsalutation = [] } = codetable
     const info =
       Object.keys(patientInfo).length === 0 ? dashboardPatientInfo : patientInfo
-
+    const salt =
+      ctsalutation.find((o) => o.id === patientInfo.salutationFK) || {}
+    const name = `${salt.name || ''} ${patientInfo.name}`
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -130,15 +140,9 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               h3={
-                <div>
-                  <CodeSelect
-                    // authority='none'
-                    text
-                    code='ctSalutation'
-                    value={info.salutationFK}
-                  />{' '}
-                  <span>{info.name}</span>
-                </div>
+                <Tooltip title={name}>
+                  <span style={{ whiteSpace: 'nowrap' }}>{name}</span>
+                </Tooltip>
               }
               body={
                 <div>
