@@ -21,8 +21,8 @@ export async function login (credential) {
     {
       method: 'POST',
       data: stringify(requestBody),
+      contentType: 'application/x-www-form-urlencoded',
     },
-    { contentType: 'application/x-www-form-urlencoded' },
     false,
   )
   return response

@@ -144,12 +144,7 @@ export const axiosRequest = async (
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-const request = (
-  url,
-  option,
-  { contentType } = { contentType: undefined },
-  showNotification = true,
-) => {
+const request = (url, option, showNotification = true) => {
   const options = {
     expirys: true,
     ...option,
@@ -245,7 +240,7 @@ const request = (
           xhr.setRequestHeader('Accept', 'application/json')
           xhr.setRequestHeader(
             'Content-Type',
-            contentType !== undefined ? contentType : defaultContentType,
+            options.contentType || defaultContentType,
           )
         },
       }),
@@ -435,11 +430,13 @@ const request = (
 export const download = async (
   requestUrl,
   { subject = 'file', type = 'pdf' },
+  options,
 ) => {
   const data = await request(requestUrl, {
     xhrFields: {
       responseType: 'blob',
     },
+    ...options,
   })
   let a = document.createElement('a')
   let url = window.URL.createObjectURL(data)

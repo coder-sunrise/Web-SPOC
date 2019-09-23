@@ -45,6 +45,14 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.replace(new RegExp(search, 'g'), replacement)
 }
 
+moment.prototype.toLocal = function () {
+  return this.add(8, 'hours')
+}
+
+moment.prototype.toUTC = function () {
+  return this.add(-8, 'hours')
+}
+
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
 }
@@ -454,7 +462,6 @@ const convertToQuery = (
       }
     }
   }
-  console.log(sorting)
   const returnVal = {
     ...newQuery,
     sort: sorting.map((o) => ({

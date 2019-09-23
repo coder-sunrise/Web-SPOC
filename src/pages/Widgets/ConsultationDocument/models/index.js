@@ -3,6 +3,7 @@ import moment from 'moment'
 // import * as service from '../services'
 import { getUniqueId } from '@/utils/utils'
 
+let commitCount = 1300
 export default createFormViewModel({
   namespace: 'consultationDocument',
   config: {
@@ -52,9 +53,23 @@ export default createFormViewModel({
     //     const { pathname, search, query = {} } = loct
     //   })
     // },
-    effects: {},
+    effects: {
+      *upsertRow ({ payload }, { call, put }) {
+        yield put({
+          type: 'upsertRowState',
+          payload,
+        })
+
+        yield put({
+          type: 'global/updateState',
+          payload: {
+            commitCount: commitCount++,
+          },
+        })
+      },
+    },
     reducers: {
-      upsertRow (state, { payload }) {
+      upsertRowState (state, { payload }) {
         let { rows } = state
         if (payload.uid) {
           rows = rows.map((row) => {

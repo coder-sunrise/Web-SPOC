@@ -130,6 +130,7 @@ export default createFormViewModel({
       *queryDone ({ payload }, { call, put, select }) {
         // console.log('queryDone', payload)
         const { data } = payload
+        if (!data) return
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
           cdRows = cdRows.concat(

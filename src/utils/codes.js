@@ -571,11 +571,11 @@ const consultationDocumentTypes = [
     prop: 'corMedicalCertificate',
     getSubject: (r) =>
       `${moment
-        .utc(r.mcStartDate)
-        .local()
+        .toUTC(r.mcStartDate)
+        .toLocal()
         .format(dateFormatLong)} - ${moment
-        .utc(r.mcEndDate)
-        .local()
+        .toUTC(r.mcEndDate)
+        .toLocal()
         .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
     convert: (r) => {
       return {
@@ -615,15 +615,16 @@ const consultationDocumentTypes = [
       id: 11,
       key: 'memoid',
       draft: (row) => {
+        // console.log(
+        //   row.memoDate,
+        //   moment(row.memoDate).toLocal(),
+        //   moment(row.memoDate).local(),
+        // )
         return {
           MemoDetails: [
             {
-              memoDate: '17 Sep 2019',
-              subject: 'memo',
-              content:
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-              doctorName: 'Medisys Innovation',
-              doctorMCRNo: 'G 637',
+              ...row,
+              memoDate: moment(row.memoDate).toLocal().format(dateFormatLong),
             },
           ],
         }

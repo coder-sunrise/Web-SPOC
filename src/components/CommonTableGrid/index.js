@@ -148,7 +148,7 @@ let uniqueGid = 0
 @connect(({ loading, global }) => {
   return { loading, global }
 })
-class CommonTableGrid extends React.Component {
+class CommonTableGrid extends PureComponent {
   state = {
     pagination: {
       current: 1,

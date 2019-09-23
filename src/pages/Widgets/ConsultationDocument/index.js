@@ -69,6 +69,7 @@ class ConsultationDocument extends PureComponent {
       notification.error({ message: 'No configuration found' })
       return
     }
+    // return
     if (row.id) {
       download(
         `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id}}`,
@@ -78,16 +79,28 @@ class ConsultationDocument extends PureComponent {
         },
       )
     } else {
+      const { codetable } = this.props
+      const { clinicianprofile = [] } = codetable
+      const obj =
+        clinicianprofile.find(
+          (o) =>
+            o.id ===
+            (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
+        ) || {}
+
+      row.doctorName = obj.name
+      row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
       download(
-        `/api/Reports/${type.downloadId}?ReportFormat=pdf`,
+        `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
         {
           subject: row.subject,
           type: 'pdf',
         },
         {
           method: 'POST',
+          contentType: 'application/x-www-form-urlencoded',
           data: {
-            reportContent: downloadConfig.draft(row),
+            reportContent: JSON.stringify(downloadConfig.draft(row)),
           },
         },
       )
@@ -98,7 +111,7 @@ class ConsultationDocument extends PureComponent {
     const { consultationDocument, dispatch } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-    // console.log(consultationDocumentTypes,rows)
+    // console.log(consultationDocumentTypes, rows)
 
     return (
       <div>

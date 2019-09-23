@@ -395,6 +395,7 @@ class RichEditor extends React.PureComponent {
 }
 
 RichEditor.insertBlock = (editorState, blocks, isBefore) => {
+  if (!blocks) return editorState
   const currentEditorSelection = editorState.getSelection()
   const contentState = editorState.getCurrentContent()
 

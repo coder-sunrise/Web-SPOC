@@ -131,46 +131,48 @@ class CommonModal extends React.PureComponent {
     const { disabled = false } = confirmProps
 
     return (
-      <DialogActions
-        className={classes.modalFooter}
-        style={{ justifyContent: align }}
-      >
-        {onReset && (
-          <Button
-            key='reset'
-            hideIfNoEditRights
-            aria-label='Reset'
-            color='danger'
-            onClick={onReset}
-            style={{ left: 0, position: 'absolute' }}
-          >
-            Reset
-          </Button>
-        )}
-
-        <Button
-          onClick={this.onClose}
-          color='danger'
-          authority='none'
-          // disabled={loading.global}
-          {...cancelProps}
+      <SizeContainer size='md'>
+        <DialogActions
+          className={classes.modalFooter}
+          style={{ justifyContent: align }}
         >
-          {cancelText || 'Close'}
-        </Button>
-        {extraButtons}
-        {onConfirm && (
-          <ProgressButton
-            color='primary'
-            hideIfNoEditRights
-            onClick={onConfirm}
-            icon={null}
-            {...confirmProps}
-            // disabled={disabled || loading.global || global.disableSave}
+          {onReset && (
+            <Button
+              key='reset'
+              hideIfNoEditRights
+              aria-label='Reset'
+              color='danger'
+              onClick={onReset}
+              style={{ left: 0, position: 'absolute' }}
+            >
+              Reset
+            </Button>
+          )}
+
+          <Button
+            onClick={this.onClose}
+            color='danger'
+            authority='none'
+            // disabled={loading.global}
+            {...cancelProps}
           >
-            {confirmBtnText || confirmText}
-          </ProgressButton>
-        )}
-      </DialogActions>
+            {cancelText || 'Close'}
+          </Button>
+          {extraButtons}
+          {onConfirm && (
+            <ProgressButton
+              color='primary'
+              hideIfNoEditRights
+              onClick={onConfirm}
+              icon={null}
+              {...confirmProps}
+              // disabled={disabled || loading.global || global.disableSave}
+            >
+              {confirmBtnText || confirmText}
+            </ProgressButton>
+          )}
+        </DialogActions>
+      </SizeContainer>
     )
   }
 

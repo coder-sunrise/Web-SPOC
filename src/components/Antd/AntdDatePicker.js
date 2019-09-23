@@ -24,7 +24,7 @@ import {
 const _toMoment = (value, isLocal) => {
   if (!value) return null
   const m = moment.utc(value)
-  return isLocal ? m.local() : m
+  return isLocal ? m.toLocal() : m
 
   // if (!value) return value
   // try {
@@ -128,17 +128,17 @@ class AntdDatePicker extends PureComponent {
     // eslint-disable-next-line no-nested-ternary
     const v = date
       ? showTime
-        ? date.utc().format()
-        : date.set({ hour: 0, minute: 0, second: 0 }).utc().format()
+        ? date.toUTC().format()
+        : date.set({ hour: 0, minute: 0, second: 0 }).toUTC().format()
       : ''
     // showTime
-    //   ? date.utc().format()
-    //   : date.set({ hour: 0, minute: 0, second: 0 }).utc().format()
+    //   ? date.toUTC().format()
+    //   : date.set({ hour: 0, minute: 0, second: 0 }).toUTC().format()
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())
 
-      // console.log(date.utc().format())
+      // console.log(date.toUTC().format())
 
       form.setFieldValue(field.name, v)
     }
