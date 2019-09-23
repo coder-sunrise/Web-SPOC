@@ -144,12 +144,12 @@ export const axiosRequest = async (
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request (
+const request = (
   url,
   option,
   { contentType } = { contentType: undefined },
   showNotification = true,
-) {
+) => {
   const options = {
     expirys: true,
     ...option,
