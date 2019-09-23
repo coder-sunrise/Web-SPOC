@@ -10,9 +10,13 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      default: {
-        list: [],
-      },
+      invoicePayerFK: 0,
+      generatedDate: moment(),
+      invoiceTotal: 0,
+      isStockIn: false,
+      creditNoteItem: [],
+      totalAftGST: 0,
+      creditNoteBalance: 0,
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -30,17 +34,20 @@ export default createFormViewModel({
     effects: {},
     reducers: {
       mapCreditNote (state, { payload }) {
-        console.log('mapCreditNote', payload)
-        const { creditNote, invoicePayerFK } = payload
-        let newCreditNote = creditNote.filter(
-          (x) => x.invoicePayerFK === invoicePayerFK,
-        )[0]
+        const { invoicePayerFK, invoiceDetail, creditNote } = payload
+        let filterCreditNote = creditNote.filter(
+          (x) =>
+            x.invoicePayerFK === invoicePayerFK &&
+            !x.isDeleted &&
+            !x.isCancelled,
+        )
+        console.log('mapCreditNote', filterCreditNote)
+
 
         return {
           ...state,
-          entity: {
-            ...newCreditNote,
-          },
+          invoiceTotal: invoiceDetail.invoiceTotalAftGST,
+          creditNoteItem: filterCreditNote.creditNoteItem,
         }
       },
     },

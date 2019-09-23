@@ -2,25 +2,19 @@ import React, { PureComponent } from 'react'
 import {
   GridContainer,
   EditableTableGrid,
-  withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
 import moment from 'moment'
 
 const purchaseOrderPaymentSchema = Yup.object().shape({
   paymentNo: Yup.string().required(),
-  paymentDate: Yup.string().required(),
+  // paymentDate: Yup.string().required(),
   paymentMode: Yup.string().required(),
-  //reference: Yup.string().required(),
+  // reference: Yup.string().required(),
   paymentAmount: Yup.number().min(0).required(),
-  //Remarks: Yup.string().required(),
+  // Remarks: Yup.string().required(),
 })
 
-@withFormikExtend({
-  mapPropsToValues: ({ purchaseOrderPayment }) =>
-    purchaseOrderPayment.entity || purchaseOrderPayment.default,
-  displayName: 'purchaseOrderPayment',
-})
 class Grid extends PureComponent {
   tableParas = {
     columns: [
@@ -52,19 +46,18 @@ class Grid extends PureComponent {
     ],
   }
 
-  onCommitChanges = ({ rows, deleted }) => {
+  onCommitChanges = ({ rows }) => {
     const { setFieldValue } = this.props
-    setFieldValue('payment_list', rows)
+    setFieldValue('paymentList', rows)
   }
 
-  render() {
+  render () {
     const { values, isEditable } = this.props
-    //console.log('Payment Grid', this.props)
 
     return (
       <GridContainer>
         <EditableTableGrid
-          rows={values.payment_list}
+          rows={values.paymentList}
           schema={purchaseOrderPaymentSchema}
           FuncProps={{
             edit: isEditable,
@@ -75,7 +68,7 @@ class Grid extends PureComponent {
             showEditCommand: false,
             showDeleteCommand: true,
             onCommitChanges: this.onCommitChanges,
-            //onAddedRowsChange: this.onAddedRowsChange,
+            // onAddedRowsChange: this.onAddedRowsChange,
           }}
           {...this.tableParas}
         />

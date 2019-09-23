@@ -57,7 +57,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name='invoiceTotal'
+              name='invoiceTotalAftGST'
               render={(args) => <NumberInput {...amountProps} {...args} />}
             />
           </GridItem>

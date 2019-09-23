@@ -1056,7 +1056,7 @@ export const getInventoryItem = (
   list,
   value,
   itemFKName,
-  rows,
+  rows = [],
   outstandingItem = undefined,
 ) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
@@ -1107,16 +1107,16 @@ export const InvoicePayerType = [
     name: 'PATIENT',
     listName: 'patientPaymentTxn',
   },
-  {
-    invoicePayerFK: 2,
-    name: 'COPAYER',
-    listName: 'coPayerPaymentTxn',
-  },
-  {
-    invoicePayerFK: 3,
-    name: 'GOVT_COPAYER',
-    listName: 'govCoPayerPaymentTxn',
-  },
+  // {
+  //   invoicePayerFK: 2,
+  //   name: 'COPAYER',
+  //   listName: 'coPayerPaymentTxn',
+  // },
+  // {
+  //   invoicePayerFK: 3,
+  //   name: 'GOVT_COPAYER',
+  //   listName: 'govCoPayerPaymentTxn',
+  // },
 ]
 
 module.exports = {

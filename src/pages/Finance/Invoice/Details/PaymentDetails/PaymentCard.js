@@ -13,11 +13,13 @@ import styles from './styles'
 import { PayerType } from './variables'
 
 const DefaultPaymentInfo = {
+  id: 0,
   type: 'Payment',
   itemID: 'N/A',
   date: 'N/A',
   amount: 'N/A',
   reason: 'N/A',
+  isCancelled: false,
 }
 
 const payerTypeToString = {

@@ -14,6 +14,7 @@ const styles = (theme) => ({
 const DeleteConfirmation = ({
   classes,
   handleSubmit,
+  id,
   type,
   itemID,
   onClose,
@@ -43,7 +44,7 @@ const DeleteConfirmation = ({
         </Button>
         <Button
           color='primary'
-          onClick={() => handleSubmit(reason)}
+          onClick={() => handleSubmit(id, reason)}
           disabled={reason === ''}
         >
           Confirm

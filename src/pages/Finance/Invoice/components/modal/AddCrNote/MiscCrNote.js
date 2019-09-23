@@ -37,10 +37,10 @@ const MiscCrNote = ({ classes }) => (
                   />
                 </GridItem>
                 <GridItem className={classes.miscActions}>
-                  <Button size='sm' color='primary' disabled>
+                  <Button size='sm' color='primary'>
                     Add
                   </Button>
-                  <Button size='sm' color='danger' disabled>
+                  <Button size='sm' color='danger'>
                     Reset
                   </Button>
                 </GridItem>
@@ -48,7 +48,7 @@ const MiscCrNote = ({ classes }) => (
             </GridItem>
             <GridItem md={4}>
               <GridContainer direction='column'>
-                <GridItem>
+                {/* <GridItem>
                   <FastField
                     name='unitPrice'
                     render={(args) => (
@@ -63,8 +63,7 @@ const MiscCrNote = ({ classes }) => (
                       <NumberInput {...args} label='Quantity:' />
                     )}
                   />
-                </GridItem>
-
+                </GridItem> */}
                 <GridItem>
                   <FastField
                     name='total'

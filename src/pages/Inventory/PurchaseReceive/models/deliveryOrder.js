@@ -1,47 +1,66 @@
-import { createListViewModel } from 'medisys-model'
-import * as service from '../Details/DeliveryOrder/services'
+import { createFormViewModel } from 'medisys-model'
+import * as service from '../services'
 import moment from 'moment'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
-import { isPOStatusFinalized } from '../variables'
+import { fakeDOQueryDoneData, isPOStatusFinalized } from '../variables'
 import _ from 'lodash'
 
-export default createListViewModel({
-  namespace: 'deliveryOrder',
+const InitialPurchaseOrder = {
+  purchaseOrder: {
+    poNo: 'PO/000001',
+    poDate: moment(),
+    status: 'Draft',
+  },
+  purchaseOrderItem: [],
+  purchaseOrderOutstandingItem: [],
+}
+
+export default createFormViewModel({
+  namespace: 'deliveryOrderDetails',
   config: {
     queryOnLoad: false,
   },
   param: {
     service,
     state: {
-      purchaseOrder: {
-        poStatus: '',
-        purchaseOrderItem: [],
-        purchaseOrderOutstandingItem: [],
+      purchaseOrderDetails: { ...InitialPurchaseOrder },
+      list: [],
+      default: {
+        doNo: '',
+        deliveryOrderDate: moment(),
+        remarks: '',
+        rows: [],
       },
-      deliveryOrderDate: moment(),
-      deliveryOrder_receivingItemList: [],
-      default: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
+        if (pathname.indexOf('/inventory/pr/pdodetails') === 0) {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              type: query.type,
+              id: Number(query.id),
+            },
+          })
+        }
       })
     },
-    effects: {},
-    reducers: {
-      queryDone (state, { payload }) {
-        const { data } = payload
 
-        return {
-          ...state,
-          list: [],
-        }
+    effects: {
+      *queryDeliveryOrder ({ payload }, { call, put }) {
+        // Call API to query delivery order listing
+        let data = fakeDOQueryDoneData
+
+        return yield put({
+          type: 'setDeliveryOrder',
+          payload: { data },
+        })
       },
 
-      mapPurchaseOrder (state, { payload }) {
-        const { entity } = payload
-        const { purchaseOrder, rows } = entity
+      *getOutstandingPOItem ({ payload }, { call, put }) {
+        const { rows, purchaseOrder } = payload
         const { status } = purchaseOrder
         let outstandingItem = []
 
@@ -55,9 +74,8 @@ export default createListViewModel({
               return {
                 ...x,
                 orderQty: x.inventoryMedicationFK ? 80 : x.orderQty,
-                //orderQty: x.orderQty,
+                // orderQty: x.orderQty,
                 totalBonusReceived: x.bonusQty,
-
                 currentReceivingQty: x.orderQty - x.quantityReceived,
                 currentReceivingBonusQty: x.orderQty - x.bonusQty,
               }
@@ -65,11 +83,53 @@ export default createListViewModel({
           }
         }
 
+        return yield put({
+          type: 'setOutstandingPOItem',
+          payload: { outstandingItem, rows, purchaseOrder },
+        })
+      },
+
+      *addNewDeliveryOrder ({ payload }, { call, put }) {
+        // Call API to query DeliveryOrder#
+
+        return yield put({
+          type: 'setAddNewDeliveryOrder',
+          payload: {
+            doNo: 'DO/000999',
+          },
+        })
+      },
+    },
+
+    reducers: {
+      setAddNewDeliveryOrder (state, { payload }) {
+        const { doNo } = payload
+        const { purchaseOrderOutstandingItem } = state.purchaseOrderDetails
         return {
           ...state,
-          list: [],
-          purchaseOrder: {
-            poStatus: status,
+          entity: {
+            doNo,
+            deliveryOrderDate: moment(),
+            remarks: '',
+            rows: purchaseOrderOutstandingItem,
+          },
+        }
+      },
+
+      setDeliveryOrder (state, { payload }) {
+        const { data } = payload
+        return {
+          ...state,
+          list: data,
+        }
+      },
+
+      setOutstandingPOItem (state, { payload }) {
+        const { outstandingItem, rows, purchaseOrder } = payload
+        return {
+          ...state,
+          purchaseOrderDetails: {
+            purchaseOrder: { ...purchaseOrder },
             purchaseOrderItem: rows,
             purchaseOrderOutstandingItem: outstandingItem,
           },
@@ -83,9 +143,9 @@ export default createListViewModel({
             const n =
               row.uid === payload.uid
                 ? {
-                    ...row,
-                    ...payload,
-                  }
+                  ...row,
+                  ...payload,
+                }
                 : row
             return n
           })
@@ -107,15 +167,14 @@ export default createListViewModel({
           ...state,
           entity: {
             ...state.entity,
-            rows: rows,
+            rows,
           },
         }
       },
 
       deleteRow (state, { payload }) {
         const { rows } = state.entity
-        console.log('deleteRow', rows.filter((x) => x.uid !== payload))
-
+        console.log('deleteRow')
         return {
           ...state,
           entity: {

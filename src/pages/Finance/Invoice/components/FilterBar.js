@@ -1,9 +1,6 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
-// material ui
-import { withStyles } from '@material-ui/core'
-import Info from '@material-ui/icons/InfoOutlined'
 // common components
 import {
   Button,
@@ -12,8 +9,6 @@ import {
   GridItem,
   SizeContainer,
   TextField,
-  DatePicker,
-  Tooltip,
   Select,
 } from '@/components'
 import { osBalanceStatus } from '@/utils/codes'

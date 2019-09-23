@@ -16,13 +16,8 @@ const Summary = ({ classes }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
-        <GridContainer
-          className={classes.summary}
-          direction='column'
-          justify='center'
-          alignItems='flex-end'
-        >
-          <GridItem md={4}>
+        <GridContainer className={classes.summary} alignItems='flex-end'>
+          {/* <GridItem md={4}>
             <FastField
               name='gst'
               render={(args) => (
@@ -38,8 +33,9 @@ const Summary = ({ classes }) => {
                 />
               )}
             />
-          </GridItem>
-          <GridItem md={4}>
+          </GridItem> */}
+          <GridItem md={8} />
+          <GridItem md={3}>
             <FastField
               name='finalCredit'
               render={(args) => (
@@ -51,10 +47,11 @@ const Summary = ({ classes }) => {
                   rightAlign
                   normalText
                   defaultValue={128.4}
-                  prefix='Final Credit'
+                  prefix='Final Credit: '
                 />
               )}
             />
+            <GridItem md={1} />
           </GridItem>
         </GridContainer>
       </React.Fragment>

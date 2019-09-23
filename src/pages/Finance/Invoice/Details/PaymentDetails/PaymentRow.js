@@ -9,26 +9,29 @@ import { GridContainer, GridItem, Tooltip } from '@/components'
 import styles from './styles'
 
 const PaymentRow = ({
+  id,
   type,
   itemID,
   date,
   amount,
   reason,
+  isCancelled,
   classes,
   handleVoidClick,
   handlePrinterClick,
 }) => {
-  const onVoidClick = () => handleVoidClick({ type, itemID })
-
+  const onVoidClick = () => handleVoidClick({ id, type, itemID })
   return (
     <GridContainer
       justify='center'
       alignItems='center'
       className={classes.rowContainer}
+      style={isCancelled ? { textDecorationLine: 'line-through' } : {}}
     >
       <GridItem md={2}>
         {type === 'Payment' ? (
           <IconButton
+            // payerID='N/A'
             id={itemID}
             className={classes.printButton}
             onClick={handlePrinterClick}
@@ -56,7 +59,11 @@ const PaymentRow = ({
         </GridItem>
         <GridItem>
           <Tooltip title='Void'>
-            <IconButton id={itemID} onClick={onVoidClick}>
+            <IconButton
+              id={itemID}
+              onClick={onVoidClick}
+              disabled={isCancelled}
+            >
               <Cross />
             </IconButton>
           </Tooltip>

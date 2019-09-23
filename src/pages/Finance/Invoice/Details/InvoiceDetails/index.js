@@ -42,7 +42,7 @@ class InvoiceDetails extends Component {
                 return (
                   <OutlinedTextField
                     label='Invoice Remarks'
-                    disabled={true}
+                    disabled
                     multiline
                     rowsMax={2}
                     rows={2}

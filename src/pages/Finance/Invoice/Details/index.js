@@ -20,15 +20,15 @@ import InvoiceContent from './Content'
 class InvoiceDetails extends Component {
   componentDidMount () {
     const { dispatch, invoiceDetail } = this.props
-    this.props.dispatch({
-      //type: 'invoiceDetail/query',
+    dispatch({
+      // type: 'invoiceDetail/query',
       type: 'invoiceDetail/fakeQueryDone',
       payload: {
         id: invoiceDetail.currentId,
       },
     })
-    this.props.dispatch({
-      //type: 'invoicePayment/query',
+    dispatch({
+      // type: 'invoicePayment/query',
       type: 'invoicePayment/fakeQueryDone',
       payload: {
         id: invoiceDetail.currentId,

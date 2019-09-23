@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -48,20 +49,21 @@ class PaymentDetails extends Component {
   closeDeleteConfirmationModal = () =>
     this.setState({ showDeleteConfirmation: false })
 
-  onVoidClick = ({ type, itemID }) => {
+  onVoidClick = ({ id, type, itemID }) => {
     this.setState({
       showDeleteConfirmation: true,
-      onVoid: { type, itemID },
+      onVoid: { id, type, itemID },
     })
   }
 
   onAddCrNoteClick = (payerType) => {
-    const { dispatch, values } = this.props
+    const { dispatch, invoiceDetail, values } = this.props
     dispatch({
       type: 'invoiceCreditNote/mapCreditNote',
       payload: {
-        creditNote: values.creditNote || [],
         invoicePayerFK: payerType,
+        invoiceDetail: invoiceDetail.entity,
+        creditNote: values.creditNote || [],
       },
     })
 
@@ -73,25 +75,21 @@ class PaymentDetails extends Component {
   }
 
   onSubmit = (paymentData) => {
-    const { dispatch, values } = this.props
-
-    dispatch({
+    this.props.dispatch({
       type: 'invoicePayment/submitAddPayment',
       payload: {
         // TBD
-        paymentData: Object.values(paymentData),
-        values,
+        paymentData: _.toArray(paymentData),
       },
     })
   }
 
   onSubmitWriteOff = (writeOffData) => {
-    const { dispatch } = this.props
-    dispatch({
+    this.props.dispatch({
       type: 'invoicePayment/submitWriteOff',
       payload: {
         // TBD
-        //invoicePayerFK
+        // invoicePayerFK
         writeOffReason: writeOffData,
       },
     })
@@ -99,13 +97,12 @@ class PaymentDetails extends Component {
     this.closeWriteOffModal()
   }
 
-  onSubmitVoidPayment = (voidPaymentData) => {
-    const { dispatch } = this.props
-    dispatch({
+  onSubmitVoidPayment = (id, reason) => {
+    this.props.dispatch({
       type: 'invoicePayment/submitVoidPayment',
       payload: {
-        // TBD
-        writeOffReason: voidPaymentData,
+        id,
+        cancelReason: reason,
       },
     })
 
@@ -113,7 +110,8 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    const { classes, dispatch, invoiceDetail, values } = this.props
+    console.log('PaymentIndex', this.props)
+    const { classes, invoiceDetail, values } = this.props
     const { entity } = invoiceDetail
     const { paymentTxnList } = values
     const paymentActionsProps = {
@@ -139,7 +137,7 @@ class PaymentDetails extends Component {
           payments={paymentTxnList.patientPaymentTxn}
           actions={paymentActionsProps}
         />
-        <PaymentCard
+        {/* <PaymentCard
           actions={paymentActionsProps}
           payerType={PayerType.GOVT_COPAYER}
           payerName='CHAS'
@@ -150,7 +148,7 @@ class PaymentDetails extends Component {
           payerType={PayerType.COPAYER}
           payerName='medisys'
           payments={paymentTxnList.govCoPayerPaymentTxn}
-        />
+        /> */}
         <CommonModal
           open={showAddPayment}
           title='Add Payment'

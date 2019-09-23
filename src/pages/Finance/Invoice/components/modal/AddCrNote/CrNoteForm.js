@@ -27,15 +27,20 @@ const CrNoteForm = ({ classes }) => {
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='total'
+              name='invoiceTotal'
               render={(args) => (
-                <NumberInput {...args} currency label='Invoice Amount' />
+                <NumberInput
+                  {...args}
+                  currency
+                  label='Invoice Amount'
+                  disabled
+                />
               )}
             />
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='updateInventory'
+              name='isStockIn'
               render={(args) => {
                 return <Switch prefix='Update Inventory' {...args} />
               }}

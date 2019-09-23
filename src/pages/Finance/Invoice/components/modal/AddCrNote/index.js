@@ -1,7 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 // common components
-import { CommonTableGrid, withFormik } from '@/components'
+import {
+  CommonTableGrid,
+  withFormik,
+  GridContainer,
+  GridItem,
+  Button,
+} from '@/components'
 // sub components
 import CrNoteForm from './CrNoteForm'
 import Summary from './Summary'
@@ -19,34 +25,47 @@ import {
 @withFormik({
   name: 'invoiceCreditNote',
   mapPropsToValues: ({ invoiceCreditNote }) => {
-    return invoiceCreditNote.entity || invoiceCreditNote.default
+    return invoiceCreditNote
   },
 })
 class AddCrNote extends Component {
   render () {
     console.log('AddCrNoteIndex', this.props)
-    const { footer, onConfirm, values } = this.props
+    const { onConfirm, values } = this.props
     const { creditNoteItem } = values
     return (
       <div>
         <CrNoteForm />
         <CommonTableGrid
           {...TableConfig}
-          height={300}
+          // height={300}
           rows={creditNoteItem}
           columns={CrNoteColumns}
           columnExtensions={CrNoteColExtensions}
         />
         <Summary />
         <MiscCrNote />
-        {footer &&
+
+        <GridContainer>
+          <GridItem md={9}>
+            <p>Note: Total Price($) are after GST.</p>
+          </GridItem>
+          <GridItem md={3}>
+            <Button color='primary'>Save</Button>
+            <Button color='danger' onClick={onConfirm}>
+              Cancel
+            </Button>
+          </GridItem>
+        </GridContainer>
+
+        {/* {footer &&
           footer({
             onConfirm,
             confirmBtnText: 'Confirm',
             confirmProps: {
               disabled: false,
             },
-          })}
+          })} */}
       </div>
     )
   }
