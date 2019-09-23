@@ -1,29 +1,38 @@
 import React from 'react'
+import Delete from '@material-ui/icons/Delete'
+import { Tooltip } from '@material-ui/core'
 import {
   Field,
   FastField,
-  RadioGroup,
   GridContainer,
   GridItem,
   CodeSelect,
-  TextField,
-  NumberInput,
   Button,
   Tabs,
-  Switch,
   CommonTableGrid,
   Popconfirm,
 } from '@/components'
-import Delete from '@material-ui/icons/Delete'
-import { Tooltip } from '@material-ui/core'
 import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 
-const ItemList = ({ CPSwitch, CPNumber, setFieldValue, dispatch, values }) => {
+const ItemList = ({
+  CPSwitch,
+  CPNumber,
+  setFieldValue,
+  dispatch,
+  values,
+  // ...props
+}) => {
+  function callback (key) {
+    console.log('key', key)
+  }
+
   const addItemToRows = (obj) => {
     const newRows = values.rows
     newRows.push(obj)
     setFieldValue('rows', newRows)
+
+    // Reset field
     setFieldValue('tempSelectedItemFK', '')
     setFieldValue('tempSelectedItemSellingPrice', '')
     setFieldValue('tempSelectedItemTotalPrice', '')
@@ -46,6 +55,7 @@ const ItemList = ({ CPSwitch, CPNumber, setFieldValue, dispatch, values }) => {
   const onItemSelect = (e, option) => {
     if (e) {
       const { sellingPrice, totalPrice } = option
+      // console.log('onItemSelect', option)
       setFieldValue('tempSelectedItemSellingPrice', sellingPrice)
       setFieldValue('tempSelectedItemTotalPrice', totalPrice)
     }
@@ -157,10 +167,14 @@ const ItemList = ({ CPSwitch, CPNumber, setFieldValue, dispatch, values }) => {
           return (
             <GridContainer>
               <GridItem xs={8}>
+                {/* <Field
+                name={`packageValueDto[${row.rowIndex - 1}].itemValue`}
+                render={(args) => <NumberInput {...args} />}
+              /> */}
                 <Field
                   name={`rows[${row.rowIndex - 1}].itemValue`}
                   render={CPNumber(
-                    ' ',
+                    undefined,
                     Array.isArray(values.rows) && values.rows.length >= 1
                       ? values.rows[row.rowIndex - 1].itemValueType
                       : 'ExactAmount',
@@ -170,7 +184,7 @@ const ItemList = ({ CPSwitch, CPNumber, setFieldValue, dispatch, values }) => {
               <GridItem xs={4}>
                 <Field
                   name={`rows[${row.rowIndex - 1}].itemValueType`}
-                  render={CPSwitch}
+                  render={CPSwitch(undefined)}
                 />
               </GridItem>
             </GridContainer>
@@ -190,6 +204,7 @@ const ItemList = ({ CPSwitch, CPNumber, setFieldValue, dispatch, values }) => {
                     id: row.uid,
                   },
                 })}
+              // onConfirm={() => onClickDelete(row)}
             >
               <Tooltip title='Delete'>
                 <Button size='sm' color='danger' justIcon>
@@ -203,11 +218,16 @@ const ItemList = ({ CPSwitch, CPNumber, setFieldValue, dispatch, values }) => {
     ],
     FuncProps: {
       pager: false,
+      // tree: true,
+      // treeColumnConfig: {
+      //   for: 'cpAmount',
+      // },
     },
   }
   return (
     <div>
-      <Tabs defaultActiveKey='1' options={options()} />
+      <Tabs defaultActiveKey='1' options={options()} onChange={callback} />
+
       <CommonTableGrid rows={values.rows} {...tableConfigs} />
     </div>
   )
