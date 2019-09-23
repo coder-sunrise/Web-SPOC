@@ -38,6 +38,7 @@ class NavBar extends PureComponent {
     const appBarClasses = cx({
       [` ${classes[color]}`]: color,
     })
+
     const list = (
       <List className={classes.list}>
         {/*
@@ -52,22 +53,6 @@ class NavBar extends PureComponent {
             </NavLink>
           </ListItem>
         */}
-
-        <ListItem className={classes.listItem}>
-          <NavLink
-            to='/register-page'
-            className={cx(classes.navLink, {
-              [classes.navLinkActive]: this.activeRoute('/register-page'),
-            })}
-          >
-            <PersonAdd className={classes.listItemIcon} />
-            <ListItemText
-              primary={formatMessage({ id: 'app.login.signup' })}
-              disableTypography
-              className={classes.listItemText}
-            />
-          </NavLink>
-        </ListItem>
         <ListItem className={classes.listItem}>
           <NavLink
             to='/login'
@@ -78,23 +63,6 @@ class NavBar extends PureComponent {
             <Fingerprint className={classes.listItemIcon} />
             <ListItemText
               primary={formatMessage({ id: 'app.login.login' })}
-              disableTypography
-              className={classes.listItemText}
-            />
-          </NavLink>
-        </ListItem>
-        <ListItem className={classes.listItem}>
-          <NavLink
-            to='/auth/lock-screen-page'
-            className={cx(classes.navLink, {
-              [classes.navLinkActive]: this.activeRoute(
-                '/auth/lock-screen-page',
-              ),
-            })}
-          >
-            <LockOpen className={classes.listItemIcon} />
-            <ListItemText
-              primary={formatMessage({ id: 'app.login.lock' })}
               disableTypography
               className={classes.listItemText}
             />

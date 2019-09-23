@@ -617,11 +617,31 @@ const consultationDocumentTypes = [
     value: '2',
     name: 'Memo',
     prop: 'corMemo',
+    downloadConfig: {
+      id: 11,
+      key: 'memoid',
+      draft: (row) => {
+        return {
+          MemoDetails: [
+            {
+              memoDate: '17 Sep 2019',
+              subject: 'memo',
+              content:
+                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+              doctorName: 'Medisys Innovation',
+              doctorMCRNo: 'G 637',
+            },
+          ],
+        }
+      },
+    },
   },
   {
     value: '6',
     name: 'Vaccination Certificate',
     prop: 'corVaccinationCert',
+    downloadKey: 'vaccinationcertificateid',
+    downloadId: 10,
   },
   {
     value: '5',

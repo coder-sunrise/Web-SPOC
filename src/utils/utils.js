@@ -314,7 +314,7 @@ const getRemovedUrl = (ary = [], targetUrl) => {
 
   const p = getPageQuery(targetUrl)
   // let existP = {}
-  console.debug(p)
+  // console.debug(p)
   if (Array.isArray(ary)) {
     ary.forEach((a) => {
       delete p[a]
@@ -328,7 +328,7 @@ const getRemovedUrl = (ary = [], targetUrl) => {
     //   }
     // })
   }
-  console.debug(p)
+  // console.debug(p)
 
   return getQueryPath(window.location.pathname, p)
 }
@@ -454,10 +454,11 @@ const convertToQuery = (
       }
     }
   }
+  console.log(sorting)
   const returnVal = {
     ...newQuery,
     sort: sorting.map((o) => ({
-      sortby: o.columnName,
+      sortby: o.sortBy || o.columnName,
       order: o.direction,
     })),
     current,
