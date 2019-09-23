@@ -704,7 +704,7 @@ const calculateItemLevelAdjustment = (
       itemLevelGSTAmount = tempSubTotal * (gstPercentage / 100)
     }
   } else {
-    item.itemLevelGST = 0
+    itemLevelGSTAmount = 0
   }
 
   return {

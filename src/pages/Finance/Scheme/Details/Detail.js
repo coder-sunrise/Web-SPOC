@@ -1,37 +1,21 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
-import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-import { connect } from 'dva'
 
 import {
-  withFormikExtend,
   CodeSelect,
   CardContainer,
   TextField,
   GridContainer,
   GridItem,
-  Select,
-  DatePicker,
   DateRangePicker,
-  Switch,
 } from '@/components'
 
 const styles = () => ({})
 
-const Detail = ({ schemeDetail, dispatch, height }) => {
-  // useEffect(() => {
-  //   if (schemeDetail.currentId) {
-  //     dispatch({
-  //       type: 'schemeDetail/query',
-  //       payload: {
-  //         id: schemeDetail.currentId,
-  //       },
-  //     })
-  //   }
-  // }, [])
+const Detail = ({ height }) => {
   return (
     <CardContainer
       hideHeader
@@ -144,10 +128,6 @@ const Detail = ({ schemeDetail, dispatch, height }) => {
                 }}
               />
             </GridItem>
-            {/* </GridContainer>
-        </GridItem>
-        <GridItem xs={12} md={5}>
-          <GridContainer> */}
             <GridItem xs={6}>
               <FastField
                 name='companyCoPaymentSchemeDto[0].coPaymentSchemeFk'

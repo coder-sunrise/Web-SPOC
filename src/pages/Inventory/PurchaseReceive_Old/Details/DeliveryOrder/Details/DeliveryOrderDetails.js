@@ -115,7 +115,9 @@ export class DeliveryOrderDetails extends PureComponent {
   }
 
   handleOnOrderTypeChanged = async (e) => {
-    const { dispatch, values } = this.props
+    const { dispatch, values, deliveryOrder } = this.props
+    const { purchaseOrder } = deliveryOrder
+    const { purchaseOrderOutstandingItem } = purchaseOrder
     const { rows } = values
     const { row, option } = e
     const { value, itemFKName, stateName } = option
@@ -126,6 +128,7 @@ export class DeliveryOrderDetails extends PureComponent {
       value,
       itemFKName,
       rows,
+      purchaseOrderOutstandingItem,
     )
 
     this.setState({
@@ -211,19 +214,28 @@ export class DeliveryOrderDetails extends PureComponent {
 
         if (onClickColumn === 'type') {
         } else if (onClickColumn === 'item') {
-          // Set according outstanding list
-          // orderQty
-          // bonusQty
-          // quantityReceived
-          // totalBonusReceived
-          // currentReceivingQty = Auto fill to maximum
-          // currentReceivingBonusQty = Auto fill to maximum
+          const { deliveryOrder } = this.props
+          const { purchaseOrder } = deliveryOrder
+          const { purchaseOrderOutstandingItem } = purchaseOrder
+          let osItem = purchaseOrderOutstandingItem.filter(
+            (x) => x.code === selectedItem.value,
+          )[0]
+
+          return addedRows.map((row) => ({
+            ...row,
+            itemFK: selectedItem.value,
+            orderQty: osItem.orderQty,
+            bonusQty: osItem.bonusQty,
+            quantityReceived: osItem.quantityReceived,
+            totalBonusReceived: osItem.quantityReceived,
+            currentReceivingQty: osItem.orderQty - osItem.quantityReceived,
+            currentReceivingBonusQty: osItem.orderQty - osItem.bonusQty,
+          }))
         } else {
           tempCurrentReceivingQty =
             tempOrderQty - tempQuantityReceived < tempCurrentReceivingQty
               ? ''
               : tempCurrentReceivingQty
-          //------------------------------------------------------
           tempCurrentReceivingBonusQty =
             tempBonusQty - tempTotalBonusReceived < tempCurrentReceivingBonusQty
               ? ''
@@ -235,6 +247,10 @@ export class DeliveryOrderDetails extends PureComponent {
 
         return addedRows.map((row) => ({
           ...row,
+          orderQty: tempOrderQty,
+          bonusQty: tempBonusQty,
+          quantityReceived: tempQuantityReceived,
+          totalBonusReceived: tempTotalBonusReceived,
           itemFK: selectedItem.value,
           currentReceivingQty: tempCurrentReceivingQty,
           currentReceivingBonusQty: tempCurrentReceivingBonusQty,

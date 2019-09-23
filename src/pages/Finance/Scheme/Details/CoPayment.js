@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { formatMessage } from 'umi/locale'
 import {
   Field,
@@ -6,14 +6,12 @@ import {
   RadioGroup,
   GridContainer,
   GridItem,
-  TextField,
   NumberInput,
   Switch,
 } from '@/components'
 
 const CoPayment = ({ values, classes, setFieldValue }) => {
   const CPNumber = (label, type, radType) => (args) => {
-    // if (!type) type = 'ExactAmount'
     return (
       <NumberInput
         label={label}

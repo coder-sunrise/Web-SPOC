@@ -1,16 +1,9 @@
-import React, { PureComponent, Component } from 'react'
-import { connect } from 'dva'
-import DeleteOutline from '@material-ui/icons/DeleteOutline'
-import _ from 'lodash'
+import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import {
   EditableTableGrid,
-  withFormikExtend,
-  FastField,
-  CodeSelect,
   GridContainer,
   GridItem,
-  Select,
 } from '@/components'
 import {
   podoOrderType,
@@ -24,12 +17,11 @@ const receivingDetailsSchema = Yup.object().shape({
   type: Yup.string().required(),
   code: Yup.string().required(),
   name: Yup.string().required(),
-  orderQty: Yup.number().min(0).required(),
+  orderQty: Yup.number().min(1).required(),
   bonusQty: Yup.number().min(0).required(),
-  //quantityReceived: Yup.number().min(0).required(),
 })
 
-class Grid extends Component {
+class Grid extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -46,10 +38,14 @@ class Grid extends Component {
     }
   }
 
+  componentDidMount () {
+    this.initializeStateItemList()
+  }
+
   initializeStateItemList = async () => {
     const { dispatch } = this.props
 
-    await podoOrderType.forEach((x) => {
+    await podoOrderType.map((x) => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
@@ -65,6 +61,7 @@ class Grid extends Component {
           [x.stateName]: inventoryItemList,
         })
       })
+      return null
     })
 
     dispatch({
@@ -74,10 +71,6 @@ class Grid extends Component {
         commitCount: (commitCount += 1),
       },
     })
-  }
-
-  componentDidMount () {
-    this.initializeStateItemList()
   }
 
   handleOnOrderTypeChanged = async (e) => {
@@ -97,14 +90,6 @@ class Grid extends Component {
       [`filter${stateName}`]: inventoryItemList,
     })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
-
     row.code = ''
     row.name = ''
     row.uom = ''
@@ -116,12 +101,18 @@ class Grid extends Component {
     row.totalPrice = 0
 
     this.setState({ onClickColumn: 'type' })
+
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
   }
 
   handleItemOnChange = (e, type) => {
-    const { dispatch } = this.props
     const { option, row } = e
-    const { sellingPrice, uom, name, value } = option
 
     if (type === 'code') {
       row.name = option.name
@@ -140,22 +131,14 @@ class Grid extends Component {
       onClickColumn: 'item',
     })
 
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
-
     return { ...row }
   }
 
   onAddedRowsChange = (addedRows) => {
+    let newAddedRows = addedRows
     if (addedRows.length > 0) {
       if (!addedRows.isFocused) {
         const { onClickColumn, selectedItem } = this.state
-        console.log('selectedItem', selectedItem)
         let tempRow = addedRows[0]
         let tempOrderQty = tempRow.orderQty
         let tempBonusQty = tempRow.bonusQty
@@ -166,18 +149,20 @@ class Grid extends Component {
 
         const calcTotalQty = () => {
           if (tempOrderQty >= 0 && tempBonusQty >= 0) {
-            console.log('calcTotalQty', tempOrderQty, tempBonusQty)
             return tempOrderQty + tempBonusQty
           }
+          return undefined
         }
 
         const calcTotalPrice = () => {
           if (tempOrderQty >= 1 && selectedItem.sellingPrice) {
             return tempOrderQty * selectedItem.sellingPrice
           }
+          return undefined
         }
 
         if (onClickColumn === 'type') {
+          // type logic here
         } else if (onClickColumn === 'item') {
           tempUnitPrice = selectedItem.sellingPrice
           tempTotalPrice = selectedItem.sellingPrice
@@ -188,7 +173,7 @@ class Grid extends Component {
 
         this.setState({ onClickColumn: undefined })
 
-        return addedRows.map((row) => ({
+        newAddedRows = addedRows.map((row) => ({
           ...row,
           itemFK: selectedItem.value,
           totalQty: tempTotalQty,
@@ -198,7 +183,7 @@ class Grid extends Component {
       } else {
         // Initialize new generated row
         this.setState({ onClickColumn: undefined })
-        return addedRows.map((row) => ({
+        newAddedRows = addedRows.map((row) => ({
           ...row,
           orderQty: 0,
           bonusQty: 0,
@@ -211,11 +196,11 @@ class Grid extends Component {
       }
     }
 
-    return addedRows
+    return newAddedRows
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    const { setFieldValue, dispatch, calculateInvoice } = this.props
+    const { dispatch, calcPurchaseOrderSummary } = this.props
 
     if (deleted) {
       dispatch({
@@ -229,9 +214,7 @@ class Grid extends Component {
       })
     }
 
-    setTimeout(() => {
-      calculateInvoice()
-    }, 1)
+    setTimeout(() => calcPurchaseOrderSummary(), 500)
     return rows
   }
 
@@ -240,27 +223,26 @@ class Grid extends Component {
       return row.uid
         ? this.state.MedicationItemList
         : this.state.filterMedicationItemList
-    } else if (row.type === 2) {
+    }
+    if (row.type === 2) {
       return row.uid
         ? this.state.VaccinationItemList
         : this.state.filterVaccinationItemList
-    } else if (row.type === 3) {
+    }
+    if (row.type === 3) {
       return row.uid
         ? this.state.ConsumableItemList
         : this.state.filterConsumableItemList
-    } else {
-      return []
     }
+    return []
   }
 
   render () {
     // const { purchaseOrderItems } = this.props
-    const { rows, dispatch, isEditable } = this.props
-    const { selectedItem, selectedCode, selectedName } = this.state
-    console.log('Grid', rows)
+    const { values, isEditable } = this.props
+    const { rows } = values
 
     const tableParas = {
-      //getRowId: (r) => r.uid,
       columns: [
         { name: 'type', title: 'Type' },
         { name: 'code', title: 'Code' },
@@ -318,13 +300,14 @@ class Grid extends Component {
           options: (row) => {
             if (row.type === 1) {
               return this.state.MedicationItemList
-            } else if (row.type === 2) {
-              return this.state.VaccinationItemList
-            } else if (row.type === 3) {
-              return this.state.ConsumableItemList
-            } else {
-              return []
             }
+            if (row.type === 2) {
+              return this.state.VaccinationItemList
+            }
+            if (row.type === 3) {
+              return this.state.ConsumableItemList
+            }
+            return []
           },
         },
         {

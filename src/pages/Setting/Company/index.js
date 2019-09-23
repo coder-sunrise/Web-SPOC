@@ -25,10 +25,10 @@ class Supplier extends PureComponent {
     const { route, dispatch } = this.props
 
     dispatch({
-      type:
-        route.name === 'copayer'
-          ? 'settingCompany/queryCopayer'
-          : 'settingCompany/querySupplier',
+      type: 'settingCompany/query',
+      payload: {
+        companyTypeFK: route.name === 'copayer' ? 1 : 2,
+      },
     })
   }
 
