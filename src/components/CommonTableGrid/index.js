@@ -856,7 +856,7 @@ class CommonTableGrid extends React.Component {
                     const c = newColumExtensions.find(
                       (m) => m.columnName === o.columnName,
                     )
-                    o.columnName = c.sortBy || c.columnName
+                    o.sortBy = c.sortBy
                   })
                   this.search({
                     sorting,

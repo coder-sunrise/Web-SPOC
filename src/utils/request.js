@@ -143,11 +143,7 @@ export const axiosRequest = async (
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request (
-  url,
-  option,
-  { contentType } = { contentType: undefined },
-) {
+const request = (url, option, { contentType } = { contentType: undefined }) => {
   const options = {
     expirys: true,
     ...option,
@@ -261,7 +257,7 @@ export default function request (
       //   return response.json()
       // })
       .then((response, s, xhr) => {
-        // console.log(response, s, xhr, xhr.getAllResponseHeaders())
+        // console.log(response, s, xhr)
 
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
@@ -418,3 +414,22 @@ export default function request (
     console.log(error)
   }
 }
+export const download = async (
+  requestUrl,
+  { subject = 'file', type = 'pdf' },
+) => {
+  const data = await request(requestUrl, {
+    xhrFields: {
+      responseType: 'blob',
+    },
+  })
+  let a = document.createElement('a')
+  let url = window.URL.createObjectURL(data)
+  a.href = url
+  a.download = `${subject}.${type}`
+  document.body.append(a)
+  a.click()
+  a.remove()
+  window.URL.revokeObjectURL(url)
+}
+export default request
