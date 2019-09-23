@@ -69,7 +69,6 @@ const Detail = ({
             }),
           )
         }}
-        index={currentTab}
         contentStyle={{ margin: '0 -5px' }}
         tabs={[
           {
@@ -152,6 +151,7 @@ export default compose(
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
+          markupMargin: parseFloat(values.markupMargin),
         },
       }).then((r) => {
         if (r) {

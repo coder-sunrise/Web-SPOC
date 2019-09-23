@@ -49,7 +49,6 @@ class Grid extends PureComponent {
 
   editRow = (row, e) => {
     const { dispatch, settingRoom } = this.props
-
     const { list } = settingRoom
     // For complex object retrieve from server
     // dispatch({
@@ -70,6 +69,7 @@ class Grid extends PureComponent {
 
   render () {
     const { dispatch, classes, settingRoom, toggleModal } = this.props
+
     return (
       <CommonTableGrid
         style={{ margin: 0 }}

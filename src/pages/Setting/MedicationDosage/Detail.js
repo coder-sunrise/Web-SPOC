@@ -22,7 +22,8 @@ const styles = (theme) => ({})
     displayValue: Yup.string().required(),
     multiplier: Yup.number()
       .min(0, 'Multiplier must between 0 and 999,999.9999')
-      .max(999999.9999, 'Multiplier must between 0 and 999,999.9999'),
+      .max(999999.9999, 'Multiplier must between 0 and 999,999.9999')
+      .required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     sortOrder: Yup.number()
       .min(
@@ -92,6 +93,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
+                      format='DD MMM YYYY'
                       label='Effective Start Date'
                       label2='End Date'
                       {...args}

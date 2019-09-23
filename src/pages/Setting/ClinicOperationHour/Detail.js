@@ -23,8 +23,8 @@ const styles = (theme) => ({})
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).required().min(2),
-    monFromOpHour: Yup.string(),
-    monToOpHour: Yup.string().when('monFromOpHour', {
+    monFromOpHour: Yup.string().nullable(),
+    monToOpHour: Yup.string().nullable().when('monFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('monFromOpHour'),
@@ -32,8 +32,8 @@ const styles = (theme) => ({})
       ),
     }),
 
-    tueFromOpHour: Yup.string(),
-    tueToOpHour: Yup.string().when('tueFromOpHour', {
+    tueFromOpHour: Yup.string().nullable(),
+    tueToOpHour: Yup.string().nullable().when('tueFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('tueFromOpHour'),
@@ -41,8 +41,8 @@ const styles = (theme) => ({})
       ),
     }),
 
-    wedFromOpHour: Yup.string(),
-    wedToOpHour: Yup.string().when('wedFromOpHour', {
+    wedFromOpHour: Yup.string().nullable(),
+    wedToOpHour: Yup.string().nullable().when('wedFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('wedFromOpHour'),
@@ -50,8 +50,8 @@ const styles = (theme) => ({})
       ),
     }),
 
-    thursFromOpHour: Yup.string(),
-    thursToOpHour: Yup.string().when('thursFromOpHour', {
+    thursFromOpHour: Yup.string().nullable(),
+    thursToOpHour: Yup.string().nullable().when('thursFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('thursFromOpHour'),
@@ -59,8 +59,8 @@ const styles = (theme) => ({})
       ),
     }),
 
-    friFromOpHour: Yup.string(),
-    friToOpHour: Yup.string().when('friFromOpHour', {
+    friFromOpHour: Yup.string().nullable(),
+    friToOpHour: Yup.string().nullable().when('friFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('friFromOpHour'),
@@ -68,8 +68,8 @@ const styles = (theme) => ({})
       ),
     }),
 
-    satFromOpHour: Yup.string(),
-    satToOpHour: Yup.string().when('satFromOpHour', {
+    satFromOpHour: Yup.string().nullable(),
+    satToOpHour: Yup.string().nullable().when('satFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('satFromOpHour'),
@@ -77,8 +77,8 @@ const styles = (theme) => ({})
       ),
     }),
 
-    sunFromOpHour: Yup.string(),
-    sunToOpHour: Yup.string().when('sunFromOpHour', {
+    sunFromOpHour: Yup.string().nullable(),
+    sunToOpHour: Yup.string().nullable().when('sunFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
       then: Yup.string().laterThan(
         Yup.ref('sunFromOpHour'),
@@ -161,6 +161,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
+                      format='DD MMM YYYY'
                       label='Effective Start Date'
                       label2='Effective End Date'
                       {...args}

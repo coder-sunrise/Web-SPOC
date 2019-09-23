@@ -1,23 +1,22 @@
 import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import {
-  getAppendUrl,
-  errMsgForOutOfRange as errMsg,
-  navigateDirtyCheck,
-} from '@/utils/utils'
+import { compose } from 'redux'
+import Yup from '@/utils/yup'
+import DetailPanel from './Detail'
+import Pricing from '../../Pricing'
+import Stock from '../../Stock'
 import {
   NavPills,
   ProgressButton,
   Button,
   withFormikExtend,
 } from '@/components'
-import { withFormik } from 'formik'
-import Yup from '@/utils/yup'
-import { compose } from 'redux'
-import DetailPanel from './Detail'
-import Pricing from '../../Pricing'
-import Stock from '../../Stock'
+import {
+  getAppendUrl,
+  errMsgForOutOfRange as errMsg,
+  navigateDirtyCheck,
+} from '@/utils/utils'
 
 const styles = () => ({
   actionDiv: {
@@ -39,8 +38,6 @@ const Detail = ({
   setValues,
   values,
 }) => {
-  const { currentTab } = consumable
-
   const detailProps = {
     consumableDetail,
     dispatch,
@@ -71,7 +68,6 @@ const Detail = ({
             }),
           )
         }}
-        index={currentTab}
         contentStyle={{ margin: '0 -5px' }}
         tabs={[
           {
@@ -139,8 +135,8 @@ export default compose(
         .max(999999.99, errMsg('Re-Order Threshold')),
 
       criticalThreshold: Yup.number()
-        .min(0, 'Critical Threshold must between 0 and 999,999.9')
-        .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
+        .min(0, errMsg('Critical Threshold'))
+        .max(999999.99, errMsg('Critical Threshold')),
     }),
 
     handleSubmit: (values, { props }) => {

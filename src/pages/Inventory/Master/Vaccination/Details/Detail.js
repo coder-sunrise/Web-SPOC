@@ -12,13 +12,9 @@ import {
   TextField,
   GridContainer,
   GridItem,
-  Select,
-  DatePicker,
-  Switch,
   DateRangePicker,
   Button,
   CodeSelect,
-  Checkbox,
   Field,
 } from '@/components'
 import { getActiveSession } from '@/pages/Reception/Queue/services'
@@ -77,7 +73,7 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
     setToggle(!toggle)
   }
   const handleSelectSdd = (row) => {
-    const { setFieldTouched, values } = props
+    const { values } = props
     const { id, code, name } = row
     setToggle(!toggle)
     dispatch({
@@ -93,7 +89,6 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
     })
   }
 
-  console.log({ props })
   return (
     <CardContainer
       hideHeader

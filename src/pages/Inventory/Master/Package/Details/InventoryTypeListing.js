@@ -5,19 +5,13 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Yup from '@/utils/yup'
 import {
   CardContainer,
-  CommonTableGrid,
   Tooltip,
   Button,
   GridContainer,
   GridItem,
   EditableTableGrid,
 } from '@/components'
-import {
-  podoOrderType,
-  getInventoryItem,
-  getInventoryItemList,
-  getServices,
-} from '@/utils/codes'
+import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
 
 const styles = () => ({
   displayDiv: {
@@ -35,31 +29,19 @@ const InventoryTypeListing = ({
   dispatch,
   classes,
   packDetail,
-  // medication,
-  // consumable,
-  // vaccination,
-  // service,
   setFieldValue,
   setValues,
-  // selectedItem,
-  // setSelectedItem,
-  // setServiceCenter,
-  // serviceCenterFK,
-  // serviceFK,
   values,
-  // serviceCenterServicess,
+  setTotalPrice,
+  totalPrice,
 }) => {
-  // console.log({ values })
   const {
     medicationPackageItem,
     consumablePackageItem,
     vaccinationPackageItem,
     servicePackageItem,
   } = values
-  // const { medicationTableParas, medicationColExtensions } = medication
-  // const { consumableTableParas, consumableColExtensions } = consumable
-  // const { vaccinationTableParas, vaccinationColExtensions } = vaccination
-  // const { serviceTableParas, serviceColExtensions } = service
+
   const [
     price,
     setPrice,
@@ -90,26 +72,21 @@ const InventoryTypeListing = ({
 
   const medicationSchema = Yup.object().shape({
     inventoryMedicationFK: Yup.number().required(),
-    quantity: Yup.number().required(),
+    quantity: Yup.number().required().min(1),
   })
   const consumableSchema = Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),
-    quantity: Yup.number().required(),
+    quantity: Yup.number().required().min(1),
   })
   const vaccinationSchema = Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
-    quantity: Yup.number().required(),
+    quantity: Yup.number().required().min(1),
   })
   const serviceSchema = Yup.object().shape({
     serviceCenterServiceFK: Yup.number().required(),
     serviceName: Yup.number().required(),
-    quantity: Yup.number().required(),
+    quantity: Yup.number().required().min(1),
   })
-
-  const [
-    totalPrice,
-    setTotalPrice,
-  ] = useState(0)
 
   const [
     medicationRows,
@@ -168,11 +145,14 @@ const InventoryTypeListing = ({
     serviceCenterFK,
     setServiceCenterFK,
   ] = useState(() => {})
-
   const [
-    serviceCenter,
-    setServiceCenter,
+    editingRowIds,
+    setEditingRowIds,
   ] = useState([])
+  const [
+    rowChanges,
+    setRowChanges,
+  ] = useState({})
 
   const getServiceId = (serviceCenterServiceFK) => {
     return serviceCenterServicess.find(
@@ -221,29 +201,6 @@ const InventoryTypeListing = ({
         }
       })
     })
-    // console.log('apple', getService(41).serviceId)
-    // const formattedServicePackageItem = serviceRows.map(
-    //   (o) => console.log('o', o),
-    // {
-    //   return {
-    //     ...o,
-    // serviceCenterServiceFK: getService(o.serviceCenterServiceFK).serviceId,
-    // serviceName: getService(o.serviceCenterServiceFK).serviceCenterId,
-    // }
-    // }
-    // )
-
-    // if (packDetail.entity) {
-    //   dispatch({
-    //     type: 'packDetail/updateState',
-    //     payload: {
-    //       entity: {
-    //         ...values,
-    //         servicePackageItem: formattedServicePackageItem,
-    //       },
-    //     },
-    //   })
-    // }
 
     dispatch({
       // force current edit row components to update
@@ -253,6 +210,23 @@ const InventoryTypeListing = ({
       },
     })
   }
+
+  useEffect(
+    () => {
+      dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+    },
+    [
+      medicationList,
+      consumableList,
+      vaccinationList,
+    ],
+  )
 
   useEffect(
     () => {
@@ -427,8 +401,6 @@ const InventoryTypeListing = ({
           return rows
         }
       }
-
-      // return rows
     }
     switch (type) {
       case 'medicationPackageItem': {
@@ -453,8 +425,6 @@ const InventoryTypeListing = ({
         return setFieldValue(`${type}`, vaccinationRows)
       }
       case 'servicePackageItem': {
-        // let tempRow = rows[0]
-
         const { serviceCenterServiceFK, serviceName } = rows[0]
         const serviceCenterService =
           serviceCenterServicess.find(
@@ -482,7 +452,11 @@ const InventoryTypeListing = ({
         return rows
     }
   }
-  // console.log('values', values)
+
+  const onEditingRowIdsChange = (type) => ({ rows, deleted }) => {
+    console.log('elphant', rows)
+  }
+
   const getServiceCenterService = () => {
     if (!serviceCenterFK || !serviceFK) {
       setSelectedItem({})
@@ -512,6 +486,11 @@ const InventoryTypeListing = ({
     const { value, row } = e
     row.subTotal = value * row.unitPrice
   }
+
+  const onRowChangesChange = (rows) => {
+    console.log('test', rows)
+  }
+
   const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
@@ -590,17 +569,19 @@ const InventoryTypeListing = ({
       },
       {
         columnName: 'quantity',
+        width: 150,
         type: 'number',
         onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'unitPrice',
+        width: 150,
         type: 'number',
         currency: true,
-        disabled: true,
       },
       {
         columnName: 'subTotal',
+        width: 150,
         type: 'number',
         currency: true,
         disabled: true,
@@ -623,15 +604,16 @@ const InventoryTypeListing = ({
         options: vaccinationList,
         onChange: handleItemOnChange,
       },
-      { columnName: 'quantity', type: 'number' },
+      { columnName: 'quantity', width: 150, type: 'number' },
       {
         columnName: 'unitPrice',
+        width: 150,
         type: 'number',
         currency: true,
-        disabled: true,
       },
       {
         columnName: 'subTotal',
+        width: 150,
         type: 'number',
         currency: true,
         disabled: true,
@@ -655,15 +637,16 @@ const InventoryTypeListing = ({
         options: consumableList,
         onChange: handleItemOnChange,
       },
-      { columnName: 'quantity', type: 'number' },
+      { columnName: 'quantity', width: 150, type: 'number' },
       {
         columnName: 'unitPrice',
+        width: 150,
         type: 'number',
         currency: true,
-        disabled: true,
       },
       {
         columnName: 'subTotal',
+        width: 150,
         type: 'number',
         currency: true,
         disabled: true,
@@ -681,7 +664,7 @@ const InventoryTypeListing = ({
     ],
 
     columnExtensions: [
-      { columnName: 'quantity', type: 'number' },
+      { columnName: 'quantity', width: 150, type: 'number' },
       {
         columnName: 'serviceCenterServiceFK',
         type: 'select',
@@ -723,12 +706,13 @@ const InventoryTypeListing = ({
       },
       {
         columnName: 'unitPrice',
+        width: 150,
         type: 'number',
         currency: true,
-        disabled: true,
       },
       {
         columnName: 'subTotal',
+        width: 150,
         type: 'number',
         currency: true,
         disabled: true,
@@ -758,8 +742,10 @@ const InventoryTypeListing = ({
           <b>Medication</b>
           <EditableTableGrid
             {...medicationProps}
-            // {...medicationTableParas}
-            // columnExtensions={medicationColExtensions}
+            editingRowIds={editingRowIds}
+            onEditingRowIdsChange={onEditingRowIdsChange()}
+            rowChanges={rowChanges}
+            onRowChangesChange={onRowChangesChange()}
             schema={medicationSchema}
             rows={medicationRows}
             FuncProps={{ pager: false }}
@@ -775,8 +761,6 @@ const InventoryTypeListing = ({
           <b>Consumable</b>
           <EditableTableGrid
             {...consumableProps}
-            // {...consumableTableParas}
-            // columnExtensions={consumableColExtensions}
             schema={consumableSchema}
             rows={consumableRows}
             FuncProps={{ pager: false }}
@@ -792,8 +776,6 @@ const InventoryTypeListing = ({
           <b>Vaccination</b>
           <EditableTableGrid
             {...vaccinationProps}
-            // {...vaccinationTableParas}
-            // columnExtensions={vaccinationColExtensions}
             schema={vaccinationSchema}
             rows={vaccinationRows}
             FuncProps={{ pager: false }}
@@ -809,8 +791,6 @@ const InventoryTypeListing = ({
           <b>Service</b>
           <EditableTableGrid
             {...serviceProps}
-            // {...serviceTableParas}
-            // columnExtensions={serviceColExtensions}
             schema={serviceSchema}
             rows={serviceRows}
             FuncProps={{ pager: false }}

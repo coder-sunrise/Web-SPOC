@@ -1,12 +1,8 @@
 import React, { PureComponent } from 'react'
-
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { Tooltip } from '@material-ui/core'
 import { CommonTableGrid, Button } from '@/components'
 import { status } from '@/utils/codes'
-import * as service from './services'
-import { Tooltip } from '@material-ui/core'
 
 class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -23,27 +19,14 @@ class Grid extends PureComponent {
     })
   }
 
-  // getCoPayer = (data) => {
-  //   return data.filter((eachRow) => eachRow.companyTypeFK === 1)
-  // }
-
-  // getSupplier = (data) => {
-  //   return data.filter((eachRow) => eachRow.companyTypeFK === 2)
-  // }
-
   render () {
-    const { dispatch, classes, settingCompany, toggleModal, route } = this.props
+    const { settingCompany, route } = this.props
     const { name } = route
-    const { list, companyType } = settingCompany
-    console.log('props', this.props)
-    // const data =
-    //   name === 'copayer' ? this.getCoPayer(list) : this.getSupplier(list)
-
+    const { companyType } = settingCompany
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
         type='settingCompany'
-        // rows={data}
         onRowDoubleClick={this.editRow}
         columns={
           name === 'copayer' ? (
@@ -122,6 +105,7 @@ class Grid extends PureComponent {
             : {
                 columnName: 'officeNum',
                 sortingEnabled: false,
+                width: 120,
                 render: (row) => (
                   <span>
                     {row.contact.officeContactNumber.number !== '' ? (
@@ -139,8 +123,13 @@ class Grid extends PureComponent {
             ),
           },
           {
+            columnName: 'displayValue',
+            width: 500,
+          },
+          {
             columnName: 'faxNo',
             sortingEnabled: false,
+            width: 120,
             render: (row) => (
               <span>
                 {row.contact.faxContactNumber.number !== '' ? (
@@ -155,6 +144,7 @@ class Grid extends PureComponent {
           {
             columnName: 'contactNo',
             sortingEnabled: false,
+            width: 120,
             render: (row) => (
               <span>
                 {row.contact.mobileContactNumber.number !== '' ? (
@@ -170,10 +160,13 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             type: 'select',
             options: status,
+            align: 'center',
+            width: 120,
           },
           {
             columnName: 'action',
             align: 'center',
+            width: 100,
             render: (row) => {
               return (
                 <Tooltip
@@ -189,6 +182,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
+                    style={{ marginRight: 0 }}
                   >
                     <Edit />
                   </Button>

@@ -73,7 +73,6 @@ const Detail = ({
             }),
           )
         }}
-        index={currentTab}
         contentStyle={{ margin: '0 -5px' }}
         tabs={[
           {
