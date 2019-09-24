@@ -11,10 +11,12 @@ class Circle extends FabricCanvasTool {
     canvas.forEachObject((o) => {
       o.selectable = false
       o.evented = false
+      
     })
     this._width = props.lineWidth
     this._color = props.lineColor
     this._fill = props.fillColor
+    
   }
 
   doMouseDown (o) {

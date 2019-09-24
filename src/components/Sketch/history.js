@@ -1,15 +1,18 @@
 /**
  * Maintains the history of an object
  */
+import { stringify } from 'qs'
+
 class History {
   constructor (undoLimit = 200, debug = false) {
     this.undoLimit = undoLimit
+    this.originalList = []
     this.undoList = []
     this.redoList = []
     this.allList = []
     this.current = null
     this.debug = debug
-    this.count = 1
+    this.count = 0
   }
 
   /**
@@ -34,13 +37,21 @@ class History {
   Get all list
 */
 
+  getOriginalList () {
+    return this.originalList
+  }
+
   getAllList () {
     return this.allList
   }
 
   getInitializeList (data, count) {
     this.allList = data
-    this.count = count + 1
+    // this.count = count + 1
+  }
+
+  updateCount (count) {
+    this.count = count
   }
 
   /**
@@ -67,17 +78,19 @@ class History {
       // } else
       if (mainObject.id === 'delete' || mainObject.id === 'oldTemplate') {
         for (let i = 0; i < this.allList.length; i++) {
-          let [
-            arrayobject,
-          ] = this.allList[i].layerContent
-          if (arrayobject === mainObject) {
+          // let [
+          //   arrayobject,
+          // ] = this.allList[i].layerContent
+          let arrayobject = this.allList[i].layerContent
+          if (arrayobject === JSON.stringify(mainObject)) {
             let temp = this.allList
             this.allList = []
             for (let a = 0; a < temp.length; a++) {
-              let [
-                tempArrayObject,
-              ] = temp[a].layerContent
-              if (tempArrayObject !== mainObject) {
+              // let [
+              //   tempArrayObject,
+              // ] = temp[a].layerContent
+              let tempArrayObject = temp[a].layerContent
+              if (tempArrayObject !== JSON.stringify(mainObject)) {
                 this.allList.push(temp[a])
               }
             }
@@ -85,13 +98,28 @@ class History {
         }
       } else {
         this.redoList = []
+        this.originalList.push(obj)
         this.allList.push({
           layerType: mainObject.type,
           layerNumber: this.count,
-          layerContent: obj,
-          templateFK: 0,
+          layerContent: JSON.stringify(mainObject),
+          templateFK: null,
         })
-        this.count = this.count + 1
+
+        // console.log('********mainObject**************')
+        // console.dir(mainObject)
+        // console.log({ obj, mainObject })
+        // const shallow = { ...mainObject }
+        // console.log({ shallow })
+        // // console.log('qs', {qs: stringify(mainObject)})
+        // window.mainObject = mainObject
+        // window.temp = this.allList
+
+        // console.log('**********this.allList************')
+        // console.dir(this.allList[0])
+
+        // this.count = this.count + 1
+        this.count = 0
       }
 
       if (this.current) {
@@ -113,15 +141,20 @@ class History {
    */
   undo () {
     try {
+      let [
+        mainObject,
+      ] = this.current
       if (this.current) {
         this.redoList.push(this.current)
         for (let i = 0; i < this.allList.length; i++) {
-          if (this.allList[i].layerContent === this.current) {
+          if (this.allList[i].layerContent === JSON.stringify(mainObject)) {
             let temp = this.allList
             this.allList = []
             for (let a = 0; a < temp.length; a++) {
-              if (temp[a].layerContent !== this.current) {
+              if (temp[a].layerContent !== JSON.stringify(mainObject)) {
                 this.allList.push(temp[a])
+              }else{
+                console.log("skip")
               }
             }
           }
@@ -153,15 +186,15 @@ class History {
         if (this.current) this.undoList.push(this.current)
         this.current = this.redoList.pop()
         let [
-          object,
+          mainObject,
         ] = this.current
         this.allList.push({
-          layerType: object.type,
+          layerType: mainObject.type,
           layerNumber: this.count,
-          layerContent: this.current,
-          templateFK: 0,
+          layerContent: JSON.stringify(mainObject),
+          templateFK: null,
         })
-        this.count = this.count + 1
+        this.count = 0  
         return this.current
       }
       return null
@@ -193,10 +226,11 @@ class History {
    */
   clear () {
     this.undoList = []
+    this.originalList = []
     this.redoList = []
     this.allList = []
     this.current = null
-    this.count = 1
+    this.count = 0
     this.print()
   }
 

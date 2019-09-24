@@ -1,5 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-// import * as service from '../services'
+import * as service from '../services'
 
 export default createFormViewModel({
   namespace: 'scriblenotes',
@@ -7,17 +7,17 @@ export default createFormViewModel({
     queryOnLoad: false,
   },
   param: {
-    service: {},
+    service,
     state: {
       entity: '',
       selectedIndex: '',
-      notes: {
+      ClinicianNote: {
         notesScribbleArray: [],
       },
-      ChiefComplaints:{
+      ChiefComplaints: {
         chiefComplaintsScribbleArray: [],
       },
-      Plan:{
+      Plan: {
         planScribbleArray: [],
       },
       default: {
@@ -25,6 +25,22 @@ export default createFormViewModel({
       },
     },
     effects: {},
-    reducers: {},
+    reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+              effectiveDates: [
+                o.effectiveStartDate,
+                o.effectiveEndDate,
+              ],
+            }
+          }),
+        }
+      },
+    },
   },
 })

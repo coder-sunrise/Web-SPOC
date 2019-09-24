@@ -247,7 +247,7 @@ class Scribble extends React.Component {
 
   _clear = () => {
     this._sketch.clear()
-    this._sketch.setBackgroundFromDataUrl('')
+   // this._sketch.setBackgroundFromDataUrl('')
     this.setState({
       backgroundColor: 'transparent',
       fillWithBackgroundColor: false,
@@ -279,7 +279,7 @@ class Scribble extends React.Component {
         canUndo: now,
         canClear: true,
         hideEnable: false,
-      })
+      }) 
       this._sketch.hideDrawing(false)
     }
   }
