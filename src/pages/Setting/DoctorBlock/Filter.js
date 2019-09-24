@@ -3,6 +3,7 @@ import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { standardRowHeight } from 'mui-pro-jss'
 import {
+  CodeSelect,
   GridContainer,
   GridItem,
   Button,
@@ -10,6 +11,8 @@ import {
   ProgressButton,
   DateRangePicker,
 } from '@/components'
+// medisys components
+import { DoctorProfileSelect } from '@/components/_medisys'
 
 const styles = (theme) => ({
   filterBar: {
@@ -32,7 +35,6 @@ const styles = (theme) => ({
 
 @withFormik({
   handleSubmit: () => {},
-  displayName: 'DoctorBlockFilter',
 })
 class Filter extends PureComponent {
   render () {
@@ -44,23 +46,21 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={4}>
             <FastField
               name='doctorName'
-              render={(args) => {
-                return <Select label='Doctor Name' {...args} />
-              }}
+              render={(args) => <DoctorProfileSelect {...args} />}
             />
           </GridItem>
           <GridItem xs={6} md={4}>
             <FastField
-            name='dates'
-            render={(args) => {
+              name='dates'
+              render={(args) => {
                 return (
-                <DateRangePicker
+                  <DateRangePicker
                     label='Start Date'
                     label2='End Date'
                     {...args}
-                />
+                  />
                 )
-            }}
+              }}
             />
           </GridItem>
           <GridItem xs={6} md={4}>

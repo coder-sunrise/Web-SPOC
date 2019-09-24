@@ -121,6 +121,7 @@ const CalendarView = ({
   handleDoubleClick,
   handleOnDragStart,
   handleEventMouseOver,
+  handleMoveEvent,
   // --- variables ---
   calendarEvents,
   publicHolidays,
@@ -132,6 +133,11 @@ const CalendarView = ({
   loading,
   appointmentTypes,
 }) => {
+  const _draggableAccessor = (event) => {
+    if (event.isEnableRecurrence) return false
+    if (event.doctor) return false
+    return true
+  }
   const _eventColors = (event) => {
     const { doctor } = event
 
@@ -202,8 +208,9 @@ const CalendarView = ({
     })
   }
 
-  const _moveEvent = ({ event, start, end, resourceId }) => {
-    console.log({ event, start, end, resourceId })
+  const _moveEvent = (props) => {
+    handleMoveEvent({ props })
+
     // const { handleMoveEvent } = this.props
     // const { id, _appointmentID } = event
 
@@ -214,7 +221,6 @@ const CalendarView = ({
     //   end,
     //   resourceId: resourceID,
     // }
-    // handleMoveEvent({ updatedEvent, id, _appointmentID })
   }
 
   const Toolbar = (toolbarProps) => {
@@ -262,8 +268,8 @@ const CalendarView = ({
             ...events,
             {
               ...appointment,
-              start: appointment.appointmentDate,
-              end: appointment.appointmentDate,
+              start: moment(appointment.appointmentDate).toDate(),
+              end: moment(appointment.appointmentDate).toDate(),
               appointmentTypeFK: firstAppointmentTypeFK,
               clinicianFK: firstClinicianFK,
             },
@@ -359,6 +365,7 @@ const CalendarView = ({
         resourceTitleAccessor='doctorName'
         // #endregion --- resources ---
         // #region --- event handlers ---
+        draggableAccessor={_draggableAccessor}
         onNavigate={_jumpToDate}
         onEventDrop={_moveEvent}
         onView={_onViewChange}

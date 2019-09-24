@@ -14,14 +14,17 @@ import {
   GridContainer,
   GridItem,
   Select,
-  CodeSelect,
   DatePicker,
   TimePicker,
   SizeContainer,
   TextField,
 } from '@/components'
 // import Recurrence from './Recurrence'
-import { Recurrence, DoctorLabel, computeRRule } from '@/components/_medisys'
+import {
+  Recurrence,
+  DoctorProfileSelect,
+  computeRRule,
+} from '@/components/_medisys'
 import { filterRecurrenceDto } from './formikUtils'
 // styles
 import style from './style'
@@ -98,9 +101,9 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
   }
 
   const showPopup = Boolean(anchorEl)
-  console.log({ values, errors })
+
   return (
-    <React.Fragment>
+    <div style={{ padding: 8 }}>
       <Popover
         id='event-popup'
         className={classes.popover}
@@ -132,17 +135,9 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
           <Field
             name='doctorBlockUserFk'
             render={(args) => (
-              <CodeSelect
+              <DoctorProfileSelect
                 {...args}
-                allowClear
-                label='Doctor'
-                code='doctorprofile'
-                labelField='clinicianProfile.name'
                 valueField='clinicianProfile.userProfileFK'
-                // code='clinicianprofile'
-                // labelField='name'
-                // valueField='id'
-                renderDropdown={(option) => <DoctorLabel doctor={option} />}
               />
             )}
           />
@@ -232,7 +227,7 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
             </Button>
           ),
         })}
-    </React.Fragment>
+    </div>
   )
 }
 
