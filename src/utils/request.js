@@ -5,7 +5,12 @@ import hash from 'hash.js'
 import queryString from 'query-string'
 import $ from 'jquery'
 import { notification } from '@/components'
-import { isAntdPro, updateLoadingState } from './utils'
+import {
+  isAntdPro,
+  updateLoadingState,
+  commonDataWriterTransform,
+  commonDataReaderTransform,
+} from './utils'
 import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 
 // export const baseUrl = 'http://localhost:9300'
@@ -177,7 +182,12 @@ const request = (url, option, showNotification = true) => {
       //     'Content-Type': 'application/json; charset=utf-8',
       //     ...newOptions.headers,
       //   }
-      newOptions.body = JSON.stringify(newOptions.body)
+      newOptions.body = JSON.stringify(
+        commonDataWriterTransform(newOptions.body),
+      )
+      if (newOptions.data) {
+        newOptions.data = commonDataWriterTransform(newOptions.data)
+      }
       // } else {
       //   // newOptions.body is FormData
       //   newOptions.headers = {
@@ -259,7 +269,9 @@ const request = (url, option, showNotification = true) => {
       // })
       .then((response, s, xhr) => {
         // console.log(response, s, xhr)
-
+        if (typeof response === 'object') {
+          commonDataReaderTransform(response)
+        }
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)

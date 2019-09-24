@@ -20,6 +20,58 @@ import model from './models'
 
 window.g_app.replaceModel(model)
 
+export const printRow = async (row, props) => {
+  const type = consultationDocumentTypes.find(
+    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+  )
+  const { downloadConfig } = type
+  if (!downloadConfig) {
+    notification.error({ message: 'No configuration found' })
+    return
+  }
+  // return
+  if (row.id) {
+    download(
+      `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id}}`,
+      {
+        subject: row.subject,
+        type: 'pdf',
+      },
+    )
+  } else {
+    const { codetable, patientDashboard } = props
+    const { clinicianprofile = [] } = codetable
+    const { patientInfo } = patientDashboard
+    const obj =
+      clinicianprofile.find(
+        (o) =>
+          o.id ===
+          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
+      ) || {}
+
+    row.doctorName = obj.name
+    row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
+
+    row.patientName = patientInfo.name
+    row.patientAccountNo = patientInfo.patientAccountNo
+
+    download(
+      `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
+      {
+        subject: row.subject,
+        type: 'pdf',
+      },
+      {
+        method: 'POST',
+        contentType: 'application/x-www-form-urlencoded',
+        data: {
+          reportContent: JSON.stringify(downloadConfig.draft(row)),
+        },
+      },
+    )
+  }
+}
+
 // @skeleton(['consultationDocument'])
 
 @connect(({ consultationDocument, codetable, patientDashboard }) => ({
@@ -60,51 +112,6 @@ class ConsultationDocument extends PureComponent {
       },
     })
     this.toggleModal()
-  }
-
-  printRow = async (row) => {
-    const type = consultationDocumentTypes.find((o) => o.value === row.type)
-    const { downloadConfig } = type
-    if (!downloadConfig) {
-      notification.error({ message: 'No configuration found' })
-      return
-    }
-    // return
-    if (row.id) {
-      download(
-        `/api/Reports/${downloadConfig.id}?ReportFormat=pdf&ReportParameters={${downloadConfig.key}:${row.id}}`,
-        {
-          subject: row.subject,
-          type: 'pdf',
-        },
-      )
-    } else {
-      const { codetable } = this.props
-      const { clinicianprofile = [] } = codetable
-      const obj =
-        clinicianprofile.find(
-          (o) =>
-            o.id ===
-            (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-        ) || {}
-
-      row.doctorName = obj.name
-      row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
-      download(
-        `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
-        {
-          subject: row.subject,
-          type: 'pdf',
-        },
-        {
-          method: 'POST',
-          contentType: 'application/x-www-form-urlencoded',
-          data: {
-            reportContent: JSON.stringify(downloadConfig.draft(row)),
-          },
-        },
-      )
-    }
   }
 
   render () {
@@ -152,7 +159,9 @@ class ConsultationDocument extends PureComponent {
             },
             {
               columnName: 'subject',
-              onClick: this.printRow,
+              onClick: (row) => {
+                printRow(row, this.props)
+              },
               type: 'link',
               linkField: 'href',
             },

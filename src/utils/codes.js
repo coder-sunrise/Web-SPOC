@@ -569,14 +569,14 @@ const consultationDocumentTypes = [
     value: '3',
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
-    getSubject: (r) =>
-      `${moment
-        .toUTC(r.mcStartDate)
+    getSubject: (r) => {
+      console.log(r)
+      return `${moment(r.mcStartDate).toLocal().format()} - ${moment(
+        r.mcEndDate,
+      )
         .toLocal()
-        .format(dateFormatLong)} - ${moment
-        .toUTC(r.mcEndDate)
-        .toLocal()
-        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+        .format()} - ${r.mcDays} Day(s)`
+    },
     convert: (r) => {
       return {
         ...r,
@@ -585,6 +585,28 @@ const consultationDocumentTypes = [
           moment(r.mcEndDate),
         ],
       }
+    },
+    downloadConfig: {
+      id: 7,
+      key: 'MedicalCertificateId',
+      draft: (row) => {
+        return {
+          MedicalCertificateDetails: [
+            {
+              ...row,
+              mcIssueDate: moment(row.mcIssueDate)
+                .toLocal()
+                .format(dateFormatLong),
+              mcStartDate: moment(row.mcIssueDate)
+                .toLocal()
+                .format(dateFormatLong),
+              mcEndDate: moment(row.mcIssueDate)
+                .toLocal()
+                .format(dateFormatLong),
+            },
+          ],
+        }
+      },
     },
   },
   {
@@ -601,6 +623,20 @@ const consultationDocumentTypes = [
         attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
     },
+    downloadConfig: {
+      id: 8,
+      key: 'CertificateOfAttendanceId',
+      draft: (row) => {
+        return {
+          CertificateOfAttendanceDetails: [
+            {
+              ...row,
+              issueDate: moment(row.issueDate).toLocal().format(dateFormatLong),
+            },
+          ],
+        }
+      },
+    },
   },
   {
     value: '1',
@@ -615,11 +651,6 @@ const consultationDocumentTypes = [
       id: 11,
       key: 'memoid',
       draft: (row) => {
-        // console.log(
-        //   row.memoDate,
-        //   moment(row.memoDate).toLocal(),
-        //   moment(row.memoDate).local(),
-        // )
         return {
           MemoDetails: [
             {
@@ -634,9 +665,25 @@ const consultationDocumentTypes = [
   {
     value: '6',
     name: 'Vaccination Certificate',
+    code: 'Vaccination Cert',
     prop: 'corVaccinationCert',
     downloadKey: 'vaccinationcertificateid',
-    downloadId: 10,
+    downloadConfig: {
+      id: 10,
+      key: 'vaccinationcertificateid',
+      draft: (row) => {
+        return {
+          VaccinationCertificateDetails: [
+            {
+              ...row,
+              certificateDate: moment(row.certificateDate)
+                .toLocal()
+                .format(dateFormatLong),
+            },
+          ],
+        }
+      },
+    },
   },
   {
     value: '5',
