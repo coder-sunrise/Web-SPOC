@@ -61,7 +61,6 @@ export default createFormViewModel({
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
         const { queueID, version } = payload
-        console.log(queueID)
         yield put({
           type: 'visitRegistration/query',
           payload: { id: queueID, version },
