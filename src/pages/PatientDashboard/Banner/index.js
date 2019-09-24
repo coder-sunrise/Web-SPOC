@@ -125,9 +125,8 @@ class Banner extends PureComponent {
     const { ctsalutation = [] } = codetable
     const info =
       Object.keys(patientInfo).length === 0 ? dashboardPatientInfo : patientInfo
-    const salt =
-      ctsalutation.find((o) => o.id === patientInfo.salutationFK) || {}
-    const name = `${salt.name || ''} ${patientInfo.name}`
+    const salt = ctsalutation.find((o) => o.id === info.salutationFK) || {}
+    const name = `${salt.name || ''} ${info.name}`
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>

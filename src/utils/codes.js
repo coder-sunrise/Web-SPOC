@@ -575,14 +575,11 @@ const consultationDocumentTypes = [
     value: '3',
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
-    getSubject: (r) =>
-      `${moment
-        .utc(r.mcStartDate)
-        .local()
-        .format(dateFormatLong)} - ${moment
-        .utc(r.mcEndDate)
-        .local()
-        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+    getSubject: (r) => {
+      return `${moment(r.mcStartDate).format(dateFormatLong)} - ${moment(
+        r.mcEndDate,
+      ).format(dateFormatLong)} - ${r.mcDays} Day(s)`
+    },
     convert: (r) => {
       return {
         ...r,
@@ -591,6 +588,22 @@ const consultationDocumentTypes = [
           moment(r.mcEndDate),
         ],
       }
+    },
+    downloadConfig: {
+      id: 7,
+      key: 'MedicalCertificateId',
+      draft: (row) => {
+        return {
+          MedicalCertificateDetails: [
+            {
+              ...row,
+              mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcStartDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcEndDate: moment(row.mcIssueDate).format(dateFormatLong),
+            },
+          ],
+        }
+      },
     },
   },
   {
@@ -606,6 +619,20 @@ const consultationDocumentTypes = [
         attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
         attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
+    },
+    downloadConfig: {
+      id: 8,
+      key: 'CertificateOfAttendanceId',
+      draft: (row) => {
+        return {
+          CertificateOfAttendanceDetails: [
+            {
+              ...row,
+              issueDate: moment(row.issueDate).format(dateFormatLong),
+            },
+          ],
+        }
+      },
     },
   },
   {
@@ -624,12 +651,8 @@ const consultationDocumentTypes = [
         return {
           MemoDetails: [
             {
-              memoDate: '17 Sep 2019',
-              subject: 'memo',
-              content:
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-              doctorName: 'Medisys Innovation',
-              doctorMCRNo: 'G 637',
+              ...row,
+              memoDate: moment(row.memoDate).format(dateFormatLong),
             },
           ],
         }
@@ -639,9 +662,25 @@ const consultationDocumentTypes = [
   {
     value: '6',
     name: 'Vaccination Certificate',
+    code: 'Vaccination Cert',
     prop: 'corVaccinationCert',
     downloadKey: 'vaccinationcertificateid',
-    downloadId: 10,
+    downloadConfig: {
+      id: 10,
+      key: 'vaccinationcertificateid',
+      draft: (row) => {
+        return {
+          VaccinationCertificateDetails: [
+            {
+              ...row,
+              certificateDate: moment(row.certificateDate).format(
+                dateFormatLong,
+              ),
+            },
+          ],
+        }
+      },
+    },
   },
   {
     value: '5',

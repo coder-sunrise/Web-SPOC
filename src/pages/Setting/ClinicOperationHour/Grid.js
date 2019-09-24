@@ -1,11 +1,9 @@
 import React, { PureComponent } from 'react'
-import { CommonTableGrid, Button } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import moment from 'moment'
-import * as service from './services'
+import { Tooltip } from '@material-ui/core'
+import { status } from '@/utils/codes'
+import { CommonTableGrid, Button } from '@/components'
+import FromToTime from '../ClinicBreakHour/FromToTime'
 
 export default class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -23,13 +21,6 @@ export default class Grid extends PureComponent {
   }
 
   render () {
-    const {
-      dispatch,
-      classes,
-      settingClinicOperationHour,
-      toggleModal,
-    } = this.props
-
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -48,121 +39,108 @@ export default class Grid extends PureComponent {
           { name: 'sunFromOpHour', title: 'Sunday' },
           { name: 'action', title: 'Action' },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'isActive',
             sortingEnabled: false,
             type: 'select',
             options: status,
+            width: 70,
+            align: 'center',
+          },
+          {
+            columnName: 'displayValue',
+            width: 300,
           },
           {
             columnName: 'action',
             align: 'center',
+            width: 60,
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Edit Clinic Operation Hour' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 0 }}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },
           {
             columnName: 'monFromOpHour',
-
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
-                <p>
-                  {moment(row.monFromOpHour, 'HH:mm:ss').format('HH:mm')}
-                  {' - '}
-                  {moment(row.monToOpHour, 'HH:mm:ss').format('HH:mm')}
-                </p>
+                <FromToTime from={row.monFromOpHour} to={row.monToOpHour} />
               )
             },
           },
           {
             columnName: 'tueFromOpHour',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
-                <p>
-                  {moment(row.tueFromOpHour, 'HH:mm:ss').format('HH:mm')}
-                  {' - '}
-                  {moment(row.tueToOpHour, 'HH:mm:ss').format('HH:mm')}
-                </p>
+                <FromToTime from={row.tueFromOpHour} to={row.tueToOpHour} />
               )
             },
           },
           {
             columnName: 'wedFromOpHour',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
-                <p>
-                  {moment(row.wedFromOpHour, 'HH:mm:ss').format('HH:mm')}
-                  {' - '}
-                  {moment(row.wedToOpHour, 'HH:mm:ss').format('HH:mm')}
-                </p>
+                <FromToTime from={row.wedFromOpHour} to={row.wedToOpHour} />
               )
             },
           },
           {
             columnName: 'thursFromOpHour',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
-                <p>
-                  {moment(row.thursFromOpHour, 'HH:mm:ss').format('HH:mm')}
-                  {' - '}
-                  {moment(row.thursToOpHour, 'HH:mm:ss').format('HH:mm')}
-                </p>
+                <FromToTime from={row.thursFromOpHour} to={row.thursToOpHour} />
               )
             },
           },
           {
             columnName: 'friFromOpHour',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
-                <p>
-                  {moment(row.friFromOpHour, 'HH:mm:ss').format('HH:mm')}
-                  {' - '}
-                  {moment(row.friToOpHour, 'HH:mm:ss').format('HH:mm')}
-                </p>
+                <FromToTime from={row.friFromOpHour} to={row.friToOpHour} />
               )
             },
           },
           {
             columnName: 'satFromOpHour',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
-                <p>
-                  {moment(row.satFromOpHour, 'HH:mm:ss').format('HH:mm')}
-                  {' - '}
-                  {moment(row.satToOpHour, 'HH:mm:ss').format('HH:mm')}
-                </p>
+                <FromToTime from={row.satFromOpHour} to={row.satToOpHour} />
               )
             },
           },
           {
             columnName: 'sunFromOpHour',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
-                <p>
-                  {moment(row.sunFromOpHour, 'HH:mm:ss').format('HH:mm')}
-                  {' - '}
-                  {moment(row.sunToOpHour, 'HH:mm:ss').format('HH:mm')}
-                </p>
+                <FromToTime from={row.sunFromOpHour} to={row.sunToOpHour} />
               )
             },
           },

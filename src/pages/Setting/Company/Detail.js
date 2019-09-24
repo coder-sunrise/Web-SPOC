@@ -1,6 +1,4 @@
 import React, { PureComponent } from 'react'
-import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -25,6 +23,10 @@ const styles = (theme) => ({})
     Yup.object().shape({
       code: Yup.string().required(),
       displayValue: Yup.string().required(),
+      contactPerson: Yup.string().max(
+        100,
+        'Contact Person must be at most 100 characters',
+      ),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       coPayerTypeFK: Yup.number().when('settingCompany', {
         is: () => settingCompany.companyType.id === 1,
@@ -91,10 +93,10 @@ const styles = (theme) => ({})
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type:
-            id === 1
-              ? 'settingCompany/queryCopayer'
-              : 'settingCompany/querySupplier',
+          type: 'settingCompany/query',
+          payload: {
+            companyTypeFK: id,
+          },
         })
       }
     })
@@ -105,13 +107,10 @@ class Detail extends PureComponent {
   state = {}
 
   render () {
-    console.log(this.props)
     const { props } = this
     const { classes, theme, footer, values, settingCompany, route } = props
     const { name } = route
     const type = 'copayer'
-    // console.log('detail', settingCompany)
-    console.log('props', this.props)
 
     return (
       <React.Fragment>
@@ -147,6 +146,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
+                      format='DD MMM YYYY'
                       label='Effective Start Date'
                       label2='End Date'
                       {...args}
@@ -179,7 +179,7 @@ class Detail extends PureComponent {
               <Field
                 name='adminCharge'
                 render={(args) => {
-                  if (values.adminChargeType) {
+                  if (values.adminChargeType === 'ExactAmount') {
                     return <NumberInput currency label='Admin Fee' {...args} />
                   }
                   return <NumberInput percentage label='Admin Fee' {...args} />
@@ -187,7 +187,7 @@ class Detail extends PureComponent {
               />
             </GridItem>
             <GridItem md={6}>
-              <FastField
+              <Field
                 name='adminChargeType'
                 render={(args) => (
                   <Switch

@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react'
-// material ui
+import { Tooltip } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
-// common components
-import { CommonTableGrid, Button } from '@/components'
-// sub components
-import FromToTime from './FromToTime'
-// utils
 import { status } from '@/utils/codes'
+import { CommonTableGrid, Button } from '@/components'
+import FromToTime from './FromToTime'
 
 export default class Grid extends PureComponent {
   editRow = (row, e) => {
@@ -24,12 +21,6 @@ export default class Grid extends PureComponent {
   }
 
   render () {
-    const {
-      dispatch,
-      classes,
-      settingClinicBreakHour,
-      toggleModal,
-    } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -54,23 +45,33 @@ export default class Grid extends PureComponent {
             columnName: 'isActive',
             type: 'select',
             options: status,
+            width: 70,
+            align: 'center',
             sortingEnabled: false,
           },
           {
+            columnName: 'displayValue',
+            width: 300,
+          },
+          {
             columnName: 'action',
+            width: 60,
             align: 'center',
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Edit Clinic Break Hour' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 0 }}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },

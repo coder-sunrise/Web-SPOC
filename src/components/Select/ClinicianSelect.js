@@ -15,14 +15,7 @@ class ClinicianSelect extends React.PureComponent {
     ) {
       form.setFieldValue(field.name, user.data.clinicianProfile.id)
     }
-    return (
-      <CodeSelect
-        code='clinicianprofile'
-        label={label}
-        field={field}
-        form={form}
-      />
-    )
+    return <CodeSelect code='clinicianprofile' {...this.props} />
   }
 }
 

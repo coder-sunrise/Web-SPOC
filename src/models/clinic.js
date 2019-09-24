@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/clinic'
+import { notification } from '@/components'
 
 export default createFormViewModel({
   namespace: 'clinicInfo',
@@ -15,10 +16,19 @@ export default createFormViewModel({
       })
     },
 
-    effects: {},
+    effects: {
+      *upsertClinicInfo ({ payload }, { call, put }) {
+        const r = yield call(service.upsert, payload)
+
+        if (r) {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return r
+      },
+    },
     reducers: {
       queryDone (st, { payload }) {
-        console.log('clinic ino reducer')
         const { data } = payload
         const contact = {
           contactAddress: [

@@ -1,5 +1,10 @@
 ﻿import _ from 'lodash'
-import { formatUrlPath, sortAll, decrypt, cleanFieldValue } from 'medisys-util'
+import {
+  formatUrlPath,
+  commonDataReaderTransform,
+  decrypt,
+  cleanFieldValue,
+} from 'medisys-util'
 import BaseCRUDViewModel from './BaseCRUDViewModel'
 
 export default class BaseFormViewModel extends BaseCRUDViewModel {
@@ -162,7 +167,9 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
           // console.log(payload)
           // const { response } = payload
           const { data } = payload
-          sortAll(data)
+          // console.log('commonDataReaderTransform', 1)
+
+          // commonDataReaderTransform(data)
           // console.log(data)
           return {
             ...st,

@@ -297,7 +297,7 @@ class PatientHistory extends Component {
                       <GridItem sm={7}>
                         <TextField
                           text
-                          defaultValue={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
+                          value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
                         />
                       </GridItem>
                       <GridItem sm={5}>
@@ -305,7 +305,7 @@ class PatientHistory extends Component {
                           <DatePicker
                             text
                             // showTime
-                            defaultValue={o.signOffDate}
+                            value={o.signOffDate}
                           />
                         )}
                       </GridItem>

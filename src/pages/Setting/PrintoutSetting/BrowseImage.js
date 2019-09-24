@@ -14,9 +14,8 @@ const thumb = {
   borderRadius: 2,
   border: '1px solid #eaeaea',
   marginBottom: 8,
-  marginRight: 8,
-  width: 100,
-  height: 100,
+  width: '100%',
+  height: 150,
   padding: 4,
   boxSizing: 'border-box',
 }
@@ -28,9 +27,18 @@ const thumbInner = {
 }
 
 const img = {
-  display: 'block',
-  width: 'auto',
-  height: '100%',
+  // display: 'block',
+  // width: 'auto',
+  // height: '100%',
+  // borderRadius: 4 /* Rounded border */,
+  // padding: 5 /* Some padding */,
+  // width: 150 /* Set a small width */,
+
+  width: '100%',
+  height: 150,
+  backgroundSize: 'cover',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: '50% 50%',
 }
 
 const container = {
@@ -118,7 +126,7 @@ const BrowseImage = (props) => {
       </div>
       <aside style={thumbsContainer}>{thumbs}</aside>
       {files.length > 0 && (
-        <Button color='danger' onClick={removeAll}>
+        <Button color='danger' style={{ width: '100%' }} onClick={removeAll}>
           Remove
         </Button>
       )}

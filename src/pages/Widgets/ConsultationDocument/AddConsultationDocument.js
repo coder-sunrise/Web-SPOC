@@ -52,6 +52,7 @@ const loadFromCodes = [
     getter: (v) => {
       const { corDiagnosis = [] } = v
       return corDiagnosis
+        .filter((o) => !o.diagnosisDescription)
         .map((o) => `<p>- ${o.diagnosisDescription}</p>`)
         .join('')
     },
@@ -206,7 +207,6 @@ class AddConsultationDocument extends PureComponent {
     } = props
     // console.log(props)
     const { entity = {}, type } = consultationDocument
-    console.log('form', parentProps)
     const cfg = {
       ...props,
       loadFromCodes,

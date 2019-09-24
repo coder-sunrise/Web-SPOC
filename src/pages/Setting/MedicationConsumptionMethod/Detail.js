@@ -99,6 +99,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
+                      format='DD MMM YYYY'
                       label='Effective Start Date'
                       label2='End Date'
                       {...args}

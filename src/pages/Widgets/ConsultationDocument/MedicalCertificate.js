@@ -51,6 +51,7 @@ import {
       mcStartDate: mcStartEndDate[0],
       mcEndDate: mcStartEndDate[1],
     }
+    console.log(mcStartEndDate)
     data.subject = currentType.getSubject(data)
     dispatch({
       type: 'consultationDocument/upsertRow',
@@ -67,13 +68,14 @@ class MedicalCertificate extends PureComponent {
       const startDate = moment(values.mcStartEndDate[0])
       setFieldValue('mcStartEndDate', [
         startDate,
-        startDate.clone().add(e.target.value, 'days'),
+        startDate,
       ])
     }
   }
 
   render () {
     const { footer, handleSubmit, classes, values } = this.props
+    console.log(values)
     return (
       <div>
         {values.mcReferenceNo && (

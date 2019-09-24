@@ -135,7 +135,7 @@ const Transfer = ({
 
   return (
     <GridContainer>
-      <GridItem xs={6}>
+      <GridItem xs={6} style={{ paddingLeft: 0 }}>
         <GridContainer>
           <GridItem xs={12}>
             <TextField

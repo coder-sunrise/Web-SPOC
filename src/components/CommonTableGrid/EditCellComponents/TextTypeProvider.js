@@ -107,7 +107,8 @@ const TextFormatter = (columnExtensions) =>
         return (
           <Tooltip title={value} enterDelay={1500}>
             <a
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault()
                 if (onClick) onClick(row)
               }}
               href={cfg.link || '#'}
