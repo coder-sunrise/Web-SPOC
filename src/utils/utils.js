@@ -45,6 +45,14 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.replace(new RegExp(search, 'g'), replacement)
 }
 
+moment.prototype.toLocal = function () {
+  return this.add(8, 'hours')
+}
+
+moment.prototype.toUTC = function () {
+  return this.add(-8, 'hours')
+}
+
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
 }
@@ -314,7 +322,7 @@ const getRemovedUrl = (ary = [], targetUrl) => {
 
   const p = getPageQuery(targetUrl)
   // let existP = {}
-  console.debug(p)
+  // console.debug(p)
   if (Array.isArray(ary)) {
     ary.forEach((a) => {
       delete p[a]
@@ -328,7 +336,7 @@ const getRemovedUrl = (ary = [], targetUrl) => {
     //   }
     // })
   }
-  console.debug(p)
+  // console.debug(p)
 
   return getQueryPath(window.location.pathname, p)
 }
@@ -406,6 +414,7 @@ const convertToQuery = (
         } else if (Array.isArray(val)) {
           for (let i = 0; i < val.length; i++) {
             const obj = convertToQuery(val[i])
+
             // console.log(val[i], obj, JSON.stringify(obj))
             // newQuery.conditionGroups.push(obj)
             if (obj.criteria && obj.criteria.length > 0) {
@@ -456,7 +465,7 @@ const convertToQuery = (
   const returnVal = {
     ...newQuery,
     sort: sorting.map((o) => ({
-      sortby: o.columnName,
+      sortby: o.sortBy || o.columnName,
       order: o.direction,
     })),
     current,
@@ -695,7 +704,7 @@ const calculateItemLevelAdjustment = (
       itemLevelGSTAmount = tempSubTotal * (gstPercentage / 100)
     }
   } else {
-    item.itemLevelGST = 0
+    itemLevelGSTAmount = 0
   }
 
   return {

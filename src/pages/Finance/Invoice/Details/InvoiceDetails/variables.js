@@ -1,15 +1,15 @@
 export const DataGridColumns = [
-  { name: 'type', title: 'Type' },
-  { name: 'name', title: 'Name' },
+  { name: 'itemType', title: 'Type' },
+  { name: 'itemName', title: 'Name' },
   { name: 'quantity', title: 'Quantity' },
-  { name: 'adjustment', title: 'Adjustment' },
-  { name: 'total', title: 'Total ($)' },
+  { name: 'adjAmt', title: 'Adjustment' },
+  { name: 'totalAfterItemAdjustment', title: 'Total ($)' },
 ]
 
 export const DataGridColExtensions = [
   { columnName: 'quantity', type: 'number', currency: false },
-  { columnName: 'adjustment', type: 'currency', currency: true },
-  { columnName: 'total', type: 'currency', currency: true },
+  { columnName: 'adjAmt', type: 'currency', currency: true },
+  { columnName: 'totalAfterItemAdjustment', type: 'currency', currency: true },
 ]
 
 export const TableConfig = {

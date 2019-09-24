@@ -1,85 +1,110 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useReducer } from 'react'
+import * as Yup from 'yup'
 // formik
 import { withFormik } from 'formik'
-// ant design
-import { Dropdown, Menu } from 'antd'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
-import Print from '@material-ui/icons/Print'
 // common components
-import {
-  Accordion,
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-} from '@/components'
+import { Accordion, CardContainer, GridContainer, GridItem } from '@/components'
 // sub components
 import FilterBar from './FilterBar'
-import {
-  // ReportViewer,
-  ReportDataGrid,
-  AccordionTitle,
-} from '@/components/_medisys'
+import ReportLayoutWrapper from '../ReportLayout'
+import { ReportDataGrid, AccordionTitle } from '@/components/_medisys'
 // services
-import { getPatientListingReport } from '@/services/report'
+import { getRawData } from '@/services/report'
 
 const PatientListingColumns = [
-  { name: 'invoiceID', title: 'Invoice ID' },
-  { name: 'sessionNo', title: 'Session No.' },
-  { name: 'queueNo', title: 'Queue No.' },
-  { name: 'visitReferenceNo', title: 'Visit Reference No.' },
-  { name: 'invoiceNo', title: 'Invoice No' },
+  { name: 'patientReferenceNo', title: 'Reference No.' },
+  { name: 'patientAccountNo', title: 'Acc. No.' },
   { name: 'patientName', title: 'Patient Name' },
-  { name: 'visitDate', title: 'Visit Date' },
-  { name: 'timeIn', title: 'Time In' },
-  { name: 'timeout', title: 'Time Out' },
-  { name: 'doctorCode', title: 'Doctor MCR No.' },
-  { name: 'invoiceAmt', title: 'Invoice Amt.' },
-  { name: 'gstAmt', title: 'GST Amt.' },
-  { name: 'patientPayable', title: 'Patient Payable' },
-  { name: 'totalPatientPaid', title: 'Total Patient Paid' },
-  { name: 'patientPaid', title: 'Patient Paid' },
-  { name: 'coPayerPayable', title: 'Copayer Payable' },
-  { name: 'totalBalanceTrasfer', title: 'Total Balance Transfer' },
-  { name: 'paymentMode', title: 'Payment Mode' },
-  { name: 'countNumber', title: 'Count Number' },
-  { name: 'coPayerName', title: 'Copayer Name' },
+  { name: 'lastVisitDate', title: 'Last Visit Date' },
+  { name: 'vC_Gender', title: 'Gender' },
+  { name: 'vC_AgeInYear', title: 'Age' },
+  { name: 'vC_Nationality', title: 'Nationality' },
+  { name: 'vC_MobileNo', title: 'Mobile No.' },
+  { name: 'vC_EmailAddress', title: 'Email Address' },
+  { name: 'startDateTime', title: 'Next Appt.' },
 ]
 
-const PatientListing = ({ values }) => {
-  const [
-    activePanel,
-    setActivePanel,
-  ] = useState(-1)
-
-  const handleActivePanelChange = (event, panel) => {
-    if (activePanel === panel.key) setActivePanel(-1)
-    else setActivePanel(panel.key)
+const initialState = {
+  loaded: false,
+  isLoading: false,
+  activePanel: -1,
+  patientListingData: [],
+}
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'toggleLoading':
+      return { ...state, isLoading: !state.isLoading }
+    case 'setActivePanel':
+      return { ...state, activePanel: action.payload }
+    case 'setLoaded':
+      return { ...state, loaded: action.payload }
+    case 'updateState': {
+      return { ...state, ...action.payload }
+    }
+    case 'reset':
+      return { ...initialState }
+    default:
+      throw new Error()
   }
+}
 
+const reportID = 2
+const fileName = 'Patient Listing Report'
+
+const PatientListing = ({ values, validateForm }) => {
   const [
-    patientListingData,
-    setPatientListingData,
-  ] = useState([])
+    state,
+    dispatch,
+  ] = useReducer(reducer, initialState)
 
+  const handleActivePanelChange = (event, panel) =>
+    dispatch({
+      type: 'setActivePanel',
+      payload: state.activePanel === panel.key ? -1 : panel.key,
+    })
   const asyncGetData = async () => {
-    const result = await getPatientListingReport(values)
+    dispatch({
+      type: 'toggleLoading',
+    })
+    const result = await getRawData(reportID, values)
+
     if (result) {
-      setPatientListingData(result.patientListingDetails)
-      // setInvoicePayerData(queueListingResult.InvoicePayerDetails)
-      setActivePanel(0)
+      dispatch({
+        type: 'updateState',
+        payload: {
+          activePanel: 0,
+          loaded: true,
+          isLoading: false,
+          patientListingData: result.PatientListSummary.map((item, index) => ({
+            ...item,
+            id: `patientListSummary-${index}-${item.patientReferenceNo}`,
+          })),
+        },
+      })
     }
   }
 
-  const onSubmitClick = () => asyncGetData()
+  const onSubmitClick = async () => {
+    dispatch({
+      type: 'setLoaded',
+      payload: false,
+    })
+    const errors = await validateForm()
+    if (Object.keys(errors).length > 0) return
+    asyncGetData()
+  }
 
   useEffect(() => {
     /* 
     clean up function
-    set visit listing data to empty array when leaving the page 
+    set data to empty array when leaving the page 
     */
-    return () => setPatientListingData([])
+    return () =>
+      dispatch({
+        type: 'reset',
+      })
   }, [])
 
   return (
@@ -89,51 +114,32 @@ const PatientListing = ({ values }) => {
           <FilterBar handleSubmit={onSubmitClick} />
         </GridItem>
         <GridItem md={12}>
-          <CardContainer hideHeader size='sm'>
-            <div style={{ textAlign: 'right' }}>
-              <Dropdown
-                overlay={
-                  <Menu>
-                    <Menu.Item key='export-pdf' id='pdf'>
-                      <span>PDF</span>
-                    </Menu.Item>
-                    <Menu.Item key='export-excel' id='excel'>
-                      <span>Excel</span>
-                    </Menu.Item>
-                  </Menu>
-                }
-                trigger={[
-                  'click',
-                ]}
-              >
-                <Button color='info' size='sm'>
-                  <SolidExpandMore />
-                  Export As
-                </Button>
-              </Dropdown>
-              <Button color='info' size='sm' justIcon>
-                <Print />
-              </Button>
-            </div>
+          <ReportLayoutWrapper
+            loading={state.isLoading}
+            reportID={reportID}
+            reportParameters={values}
+            loaded={state.loaded}
+            fileName={fileName}
+          >
             <Accordion
-              active={activePanel}
+              active={state.activePanel}
               onChange={handleActivePanelChange}
               leftIcon
               expandIcon={<SolidExpandMore fontSize='large' />}
               collapses={[
                 {
-                  title: <AccordionTitle title='Visit Listing' />,
+                  title: <AccordionTitle title='Patient Listing Summary' />,
                   content: (
                     <ReportDataGrid
                       height={500}
-                      data={patientListingData}
+                      data={state.patientListingData}
                       columns={PatientListingColumns}
                     />
                   ),
                 },
               ]}
             />
-          </CardContainer>
+          </ReportLayoutWrapper>
         </GridItem>
       </GridContainer>
     </CardContainer>
@@ -141,7 +147,14 @@ const PatientListing = ({ values }) => {
 }
 
 const PatientListingWithFormik = withFormik({
-  mapPropsToValues: () => ({ listingFrom: undefined, listingTo: undefined }),
+  validationSchema: Yup.object().shape(
+    {
+      // patientCriteria: Yup.string().required(),
+    },
+  ),
+  mapPropsToValues: () => ({
+    patientCriteria: '',
+  }),
 })(PatientListing)
 
 export default PatientListingWithFormik

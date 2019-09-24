@@ -1,27 +1,35 @@
 import React, { PureComponent } from 'react'
-import lodash from 'lodash'
+import _ from 'lodash'
 import { FastField, withFormik } from 'formik'
-import { confirmBeforeReload } from '@/utils/utils'
+import { confirmBeforeReload, sortAll } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 
 window.beforeReloadHandlerAdded = false
+let lastFormikUpdate = {}
 const withFormikExtend = (props) => (Component) => {
   const { displayName, authority } = props
   const updateDirtyState = (ps) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
-    const { errors, dirty } = ps
+    const { errors, dirty, values } = ps
     // console.log(Object.values(errors).length > 0, dirty)
+    const _lastFormikUpdate = {
+      [displayName]: {
+        displayName,
+        errors,
+        hasError: Object.values(errors).length > 0,
+        dirty,
+      },
+    }
+    if (!_.isEqual(_lastFormikUpdate, lastFormikUpdate)) {
+      // console.log(lastFormikUpdate, _lastFormikUpdate)
 
+      lastFormikUpdate = _lastFormikUpdate
+    } else {
+      return
+    }
     window.g_app._store.dispatch({
       type: 'formik/updateState',
-      payload: {
-        [displayName]: {
-          displayName,
-          errors,
-          hasError: Object.values(errors).length > 0,
-          dirty,
-        },
-      },
+      payload: _lastFormikUpdate,
     })
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
@@ -33,6 +41,15 @@ const withFormikExtend = (props) => (Component) => {
   }
   @withFormik({
     ...props,
+    mapPropsToValues: (p) => {
+      // console.log(2, p, props)
+
+      const { mapPropsToValues } = props
+      if (!mapPropsToValues) {
+        return null
+      }
+      return sortAll(mapPropsToValues(p))
+    },
     // handleSubmit: (values, ps, a, b) => {
     //   const { handleSubmit: orghandleSubmit } = props
     //   orghandleSubmit.call(this, values, ps)

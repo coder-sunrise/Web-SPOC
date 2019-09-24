@@ -73,23 +73,6 @@ class GlobalModalContainer extends PureComponent {
             this.props.handleSubmit()
           }}
         /> */}
-        <CommonModal
-          open={global.showPatientInfoPanel}
-          title='Patient Profile'
-          observe='PatientDetail'
-          authority='patient'
-          onClose={(e) => {
-            dispatch({
-              type: 'patient/closePatientModal',
-            })
-          }}
-          // onConfirm={this.toggleModal}
-          fullScreen
-          showFooter={false}
-        >
-          {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
-          {/* {global.currentPatientId} */}
-        </CommonModal>
 
         <CommonModal
           open={global.showConsultationPanel}
@@ -110,7 +93,23 @@ class GlobalModalContainer extends PureComponent {
         >
           {global.showConsultationPanel && <Consultation {...this.props} />}
         </CommonModal>
-
+        <CommonModal
+          open={global.showPatientInfoPanel}
+          title='Patient Profile'
+          observe='PatientDetail'
+          authority='patient'
+          onClose={(e) => {
+            dispatch({
+              type: 'patient/closePatientModal',
+            })
+          }}
+          // onConfirm={this.toggleModal}
+          fullScreen
+          showFooter={false}
+        >
+          {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
+          {/* {global.currentPatientId} */}
+        </CommonModal>
         <CommonModal
           title='Change Password'
           open={global.showChangePasswordModal}
@@ -223,7 +222,9 @@ class GlobalModalContainer extends PureComponent {
           }}
           showFooter
         >
-          <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+          <div style={{ textAlign: 'center' }}>
+            <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+          </div>
         </CommonModal>
 
         <CommonModal

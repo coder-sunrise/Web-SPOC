@@ -67,7 +67,7 @@ class Diagnosis extends PureComponent {
   //   // console.log(this.state, props)
   // }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  componentWillReceiveProps (nextProps) {
     if (
       !this.props.diagnosis.shouldAddNew &&
       nextProps.diagnosis.shouldAddNew
@@ -111,8 +111,13 @@ class Diagnosis extends PureComponent {
             }
             return diagnosises.map((v, i) => {
               return (
-                <div key={`test${i}`}>
-                  <Item {...this.props} index={i} arrayHelpers={arrayHelpers} />
+                <div key={v.uid}>
+                  <Item
+                    {...this.props}
+                    index={i}
+                    arrayHelpers={arrayHelpers}
+                    diagnosises={diagnosises}
+                  />
                 </div>
               )
             })

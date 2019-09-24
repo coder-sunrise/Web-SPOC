@@ -24,13 +24,15 @@ import {
   confirm,
   Checkbox,
   Popover,
+  Tooltip,
 } from '@/components'
 
-export default ({ theme, index, arrayHelpers, ...props }) => {
+export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
   const [
     show,
     setShow,
   ] = useState(false)
+  const { form } = arrayHelpers
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
@@ -41,9 +43,9 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
               return (
                 <CodeSelect
                   label='Diagnosis'
-                  code='ctOutPatientScanDiagnosis'
+                  code='ctsnomeddiagnosis'
+                  autoComplete
                   onChange={(v, op) => {
-                    const { form } = args
                     const { setFieldValue } = form
                     setFieldValue(
                       `corDiagnosis[${index}]diagnosisCode`,
@@ -88,7 +90,6 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
                   mode='multiple'
                   code='ctComplication'
                   onChange={(v, opts) => {
-                    const { form } = args
                     const { setFieldValue } = form
                     setFieldValue(`corDiagnosis[${index}]corComplication`, [])
                     opts.forEach((o, i) => {
@@ -137,19 +138,14 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
                   Confirm to remove a persist diagnosis?
                 </p>
-                <Button
-                  onClick={() => {
-                    setShow(false)
-                  }}
-                  variant='outlined'
-                >
+                <Button onClick={() => {}} variant='outlined'>
                   Cancel
                 </Button>
                 <Button
                   color='primary'
                   onClick={() => {
-                    arrayHelpers.remove(index)
-                    setShow(false)
+                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
+                    // arrayHelpers.remove(index)
                   }}
                 >
                   Remove Current Visit
@@ -157,7 +153,12 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
                 <Button
                   color='primary'
                   onClick={() => {
-                    arrayHelpers.remove(index)
+                    // arrayHelpers.remove(index)
+                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
+                    form.setFieldValue(
+                      `corDiagnosis[${index}].isPermanentDelete`,
+                      true,
+                    )
                   }}
                 >
                   Remove Permanently
@@ -171,15 +172,17 @@ export default ({ theme, index, arrayHelpers, ...props }) => {
               setShow(!show)
             }}
           >
-            {index > 0 && (
-              <Button
-                style={{ position: 'absolute', bottom: theme.spacing(1) }}
-                justIcon
-                color='danger'
-                size='sm'
-              >
-                <DeleteIcon />
-              </Button>
+            {diagnosises.length > 1 && (
+              <Tooltip title='Delete'>
+                <Button
+                  style={{ position: 'absolute', bottom: theme.spacing(1) }}
+                  justIcon
+                  color='danger'
+                  size='sm'
+                >
+                  <DeleteIcon />
+                </Button>
+              </Tooltip>
             )}
           </Popover>
         </GridItem>

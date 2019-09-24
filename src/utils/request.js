@@ -6,6 +6,7 @@ import queryString from 'query-string'
 import $ from 'jquery'
 import { notification } from '@/components'
 import { isAntdPro, updateLoadingState } from './utils'
+import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
@@ -143,11 +144,7 @@ export const axiosRequest = async (
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request (
-  url,
-  option,
-  { contentType } = { contentType: undefined },
-) {
+const request = (url, option, showNotification = true) => {
   const options = {
     expirys: true,
     ...option,
@@ -243,7 +240,7 @@ export default function request (
           xhr.setRequestHeader('Accept', 'application/json')
           xhr.setRequestHeader(
             'Content-Type',
-            contentType !== undefined ? contentType : defaultContentType,
+            options.contentType || defaultContentType,
           )
         },
       }),
@@ -261,13 +258,19 @@ export default function request (
       //   return response.json()
       // })
       .then((response, s, xhr) => {
-        // console.log(response, s, xhr, xhr.getAllResponseHeaders())
+        // console.log(response, s, xhr)
 
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)
         const { statusText, status } = xhr
+
         if (status >= 200 && status < 300) {
+          // if api is a codetable, need to refresh store
+          if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
+            const isCodetableAPI = checkIsCodetableAPI(url)
+            if (isCodetableAPI) refreshCodetable(url)
+          }
           return response || status
         }
         let data = {}
@@ -278,11 +281,12 @@ export default function request (
               : response.data
           if (data.message) {
             if (data.messageType === 4 && opts.error !== '') {
-              notification.error(opts.error || data.message)
+              showNotification && notification.error(opts.error || data.message)
             } else if (data.messageType === 3 && opts.warn !== '') {
-              notification.info(opts.warn || data.message)
+              showNotification && notification.info(opts.warn || data.message)
             } else if (opts.success !== '') {
-              notification.success(opts.success || data.message)
+              showNotification &&
+                notification.success(opts.success || data.message)
             }
           }
           notification.destroy()
@@ -290,7 +294,7 @@ export default function request (
         return data
       })
       .catch((response, s, xhr) => {
-        console.log(response, s, xhr)
+        // console.log(response, s, xhr)
 
         let msg
         let status
@@ -333,23 +337,28 @@ export default function request (
 
             notification.destroy()
             if (response.responseJSON) {
-              notification.error({
-                // message: response.responseJSON.status,
-                description:
-                  response.responseJSON.message || response.responseJSON.title,
-                duration: 5000,
-              })
+              showNotification &&
+                notification.error({
+                  // message: response.responseJSON.status,
+                  description:
+                    response.responseJSON.message ||
+                    response.responseJSON.title,
+                  duration: 5000,
+                })
             } else {
-              notification.error({
-                message: (
-                  <div>
-                    <h4>{errortext}</h4>
+              showNotification &&
+                notification.error({
+                  message: (
+                    <div>
+                      <h4>{errortext}</h4>
 
-                    {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
-                  </div>
-                ),
-                duration: 5000,
-              })
+                      {JSON.stringify(
+                        returnObj.errors || returnObj.responseJSON,
+                      )}
+                    </div>
+                  ),
+                  duration: 5000,
+                })
             }
 
             // const error = new Error(errortext)
@@ -412,9 +421,31 @@ export default function request (
     //     }
     //   }
     // })
-
+    // console.log({ r })
     return r
   } catch (error) {
     console.log(error)
   }
 }
+export const download = async (
+  requestUrl,
+  { subject = 'file', type = 'pdf' },
+  options,
+) => {
+  const data = await request(requestUrl, {
+    xhrFields: {
+      responseType: 'blob',
+    },
+    ...options,
+  })
+  let a = document.createElement('a')
+  let url = window.URL.createObjectURL(data)
+  a.href = url
+  a.download = `${subject}.${type}`
+  document.body.append(a)
+  a.click()
+  a.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+export default request

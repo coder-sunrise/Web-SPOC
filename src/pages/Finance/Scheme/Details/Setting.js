@@ -1,28 +1,20 @@
-import React, { useEffect } from 'react'
-import { formatMessage } from 'umi/locale'
-import { Divider } from '@material-ui/core'
+import React from 'react'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
 import ItemList from './ItemList'
 
 import {
   Field,
-  FastField,
   GridContainer,
   GridItem,
-  ButtonGroup,
   NumberInput,
-  Card,
-  CardHeader,
-  CardText,
-  CardBody,
   SizeContainer,
   CardContainer,
   FieldSet,
   Switch,
 } from '@/components'
 
-const CPSwitch = (args) => {
+const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
   }
@@ -32,7 +24,7 @@ const CPSwitch = (args) => {
       checkedValue='ExactAmount'
       unCheckedChildren='%'
       unCheckedValue='Percentage'
-      label=' '
+      label={label}
       {...args}
     />
   )
@@ -48,36 +40,12 @@ const CPNumber = (label, type) => (args) => {
   )
 }
 const Setting = (props) => {
-  const {
-    schemeDetail,
-    dispatch,
-    height,
-    classes,
-    values,
-    setFieldValue,
-  } = props
-  const changeFieldValue = (value, type, args) => {
-    if (value !== type) {
-      return null
-    }
-    return args.field.value
-  }
-  // const options = [
-  //   {
-  //     label: '$',
-  //     value: 'ExactAmount',
-  //   },
-  //   {
-  //     label: '%',
-  //     value: 'Percentage',
-  //   },
-  // ]
+  const { schemeDetail, height, classes, values, setFieldValue } = props
   return (
     <CardContainer
       hideHeader
       style={{
         height,
-
         overflow: 'auto',
       }}
     >
@@ -93,7 +61,10 @@ const Setting = (props) => {
             />
           </GridItem>
           <GridItem xs={4} md={1}>
-            <Field name='patientMinCoPaymentAmountType' render={CPSwitch} />
+            <Field
+              name='patientMinCoPaymentAmountType'
+              render={CPSwitch(' ')}
+            />
           </GridItem>
         </GridContainer>
         <GridContainer>
@@ -119,7 +90,7 @@ const Setting = (props) => {
         </GridContainer>
         <ItemList
           {...props}
-          //values={values}
+          // values={values}
           CPSwitch={CPSwitch}
           CPNumber={CPNumber}
           setFieldValue={setFieldValue}

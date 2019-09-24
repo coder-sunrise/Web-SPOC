@@ -199,10 +199,7 @@ class BasicLayout extends React.PureComponent {
       type: 'user/fetchCurrent',
     })
     dispatch({
-      type: 'gstSetup/getGstSetup',
-    })
-    dispatch({
-      type: 'generalSetting/getGeneralSetting',
+      type: 'clinicSettings/getClinicSettings',
     })
     dispatch({
       type: 'clinicInfo/query',
@@ -241,9 +238,9 @@ class BasicLayout extends React.PureComponent {
   }
 
   resizeFunction () {
-    // if (window.innerWidth >= 960) {
-    //   this.setState({ mobileOpen: false })
-    // }
+    if (window.innerWidth >= 960) {
+      this.setState({ mobileOpen: false })
+    }
   }
 
   getContext () {

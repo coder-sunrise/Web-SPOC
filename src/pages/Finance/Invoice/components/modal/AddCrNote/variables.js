@@ -1,14 +1,14 @@
 export const CrNoteColumns = [
-  { name: 'type', title: 'Type' },
-  { name: 'name', title: 'Name' },
+  { name: 'itemTypeFK', title: 'Type' },
+  { name: 'invoiceItemFK', title: 'Name' },
   { name: 'quantity', title: 'Quantity' },
-  { name: 'total', title: 'Total ($)' },
-  { name: 'action', title: '' },
+  { name: 'subTotal', title: 'Total ($)' },
+  { name: 'action', title: 'Action' },
 ]
 
 export const CrNoteColExtensions = [
   { columnName: 'quantity', type: 'number' },
-  { columnName: 'total', type: 'currency', currency: true },
+  { columnName: 'subTotal', type: 'currency', currency: true },
 ]
 
 export const TableConfig = {

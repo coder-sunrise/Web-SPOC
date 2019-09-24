@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
-import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
 import {
   withFormikExtend,
   FastField,
@@ -58,7 +56,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values, settingMedicationGroup } = props
+    const { theme, footer, settingMedicationGroup } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -72,7 +70,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={settingMedicationGroup.entity ? true : false}
+                    disabled={!!settingMedicationGroup.entity}
                   />
                 )}
               />
@@ -89,6 +87,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
+                      format='DD MMM YYYY'
                       label='Effective Start Date'
                       label2='End Date'
                       {...args}

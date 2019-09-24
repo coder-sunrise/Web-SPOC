@@ -1,8 +1,7 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
-import { Divider, withStyles } from '@material-ui/core'
-import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import Add from '@material-ui/icons/Add'
 import {
   GridContainer,
   GridItem,
@@ -10,54 +9,54 @@ import {
   CommonModal,
   withFormikExtend,
 } from '@/components'
-import DeliveryOrderDetails from './Details/DeliveryOrderDetails'
-import Grid from './Grid'
-import Add from '@material-ui/icons/Add'
-import { showErrorNotification } from '@/utils/error'
 import { isPOStatusFinalized } from '../../variables'
+import DOGrid from './DOGrid'
+import DODetails from './DODetails'
 
+@connect(({ purchaseOrderDetails, deliveryOrderDetails }) => ({
+  purchaseOrderDetails,
+  deliveryOrderDetails,
+}))
 // @withFormikExtend({
-//   displayName: 'purchaseOrder',
+//   displayName: 'deliveryOrderDetails',
 //   enableReinitialize: true,
-//   mapPropsToValues: ({ deliveryOrder }) => {
-//     return deliveryOrder.entity || deliveryOrder.default
+//   mapPropsToValues: ({ deliveryOrderDetails }) => {
+//     return deliveryOrderDetails
 //   },
 // })
-@connect(({ deliveryOrder, purchaseOrderDetails }) => ({
-  deliveryOrder,
-  purchaseOrderDetails,
-}))
-class index extends PureComponent {
+class index extends Component {
+  state = {
+    showDeliveryOrderDetails: false,
+  }
+
   componentDidMount () {
     this.props.dispatch({
-      type: 'deliveryOrder/query',
+      type: 'deliveryOrderDetails/queryDeliveryOrder',
     })
 
     this.props.dispatch({
-      type: 'deliveryOrder/mapPurchaseOrder',
+      type: 'deliveryOrderDetails/getOutstandingPOItem',
       payload: this.props.purchaseOrderDetails,
     })
   }
 
-  toggleDeliveryOrderDetailsModal = () => {
-    this.props.dispatch({
-      type: 'deliveryOrder/updateState',
-      payload: {
-        showModal: !this.props.deliveryOrder.showModal,
-      },
+  onAddDeliveryOrderClicked = () => {
+    const { dispatch } = this.props
+    this.setState({ showDeliveryOrderDetails: true })
+    dispatch({
+      type: 'deliveryOrderDetails/addNewDeliveryOrder',
     })
   }
 
-  render () {
-    console.log('DO Index', this.props)
-    const { props } = this
-    const { classes, deliveryOrder } = props
+  onEditdDeliveryOrderClicked = () => this.setState({ showDeliveryOrderDetails: true })
 
-    const { purchaseOrder } = deliveryOrder
-    const { poStatus, purchaseOrderOutstandingItem } = purchaseOrder
-    const cfg = {
-      toggleDeliveryOrderDetailsModal: this.toggleDeliveryOrderDetailsModal,
-    }
+  closeDODetailsModal = () => this.setState({ showDeliveryOrderDetails: false })
+
+  render () {
+    const { purchaseOrderDetails } = this.props
+    const { purchaseOrder } = purchaseOrderDetails
+    const poStatus = (purchaseOrder) ? purchaseOrder.status : ''
+    const { showDeliveryOrderDetails } = this.state
 
     return (
       <div>
@@ -69,40 +68,20 @@ class index extends PureComponent {
               })}
             </h4>
           </GridItem>
-          <Grid {...this.props} />
+          <DOGrid {...this.props} />
           <CommonModal
-            open={deliveryOrder.showModal}
-            observe='DeliveryOrderDetail'
-            title={
-              'Delivery Order Details'
-              // deliveryOrder.entity ? (
-              //   'Edit Delivery Order'
-              // ) : (
-              //     'Delivery Order Details'
-              //   )
-            }
+            open={showDeliveryOrderDetails}
+            title='Delivery Order Details'
             maxWidth='xl'
             bodyNoPadding
-            onClose={this.toggleDeliveryOrderDetailsModal}
-            onConfirm={this.toggleDeliveryOrderDetailsModal}
+            onConfirm={this.closeDODetailsModal}
+            onClose={this.closeDODetailsModal}
           >
-            <DeliveryOrderDetails {...cfg} {...this.props} />
+            <DODetails {...this.props} />
           </CommonModal>
           <Button
-            //onClick={this.toggleDeliveryOrderDetailsModal}
             disabled={!isPOStatusFinalized(poStatus)}
-            onClick={() => {
-              this.props.dispatch({
-                type: 'deliveryOrder/updateState',
-                payload: {
-                  //entity: undefined,
-                  entity: {
-                    rows: purchaseOrderOutstandingItem,
-                  },
-                },
-              })
-              this.toggleDeliveryOrderDetailsModal()
-            }}
+            onClick={this.onAddDeliveryOrderClicked}
             hideIfNoEditRights
             color='info'
             link

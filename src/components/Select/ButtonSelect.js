@@ -24,7 +24,7 @@ export default ({
   }
 
   return (
-    <div>
+    <React.Fragment>
       <Button
         onClick={tagButtonHandleClick}
         aria-controls='customized-menu'
@@ -57,6 +57,6 @@ export default ({
           </MenuItem>
         ))}
       </Menu>
-    </div>
+    </React.Fragment>
   )
 }

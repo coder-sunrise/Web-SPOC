@@ -29,7 +29,8 @@ const pagesStyle = (theme) => ({
       border: 'none !important',
     },
     '&:before': {
-      backgroundColor: 'rgba(' + hexToRgb(blackColor) + ', 0.65)',
+      // backgroundColor: 'rgba(' + hexToRgb(blackColor) + ', 0.65)',
+      backgroundColor: `rgba(${hexToRgb(blackColor)}, 0.7)`,
     },
     '&:before,&:after': {
       display: 'block',

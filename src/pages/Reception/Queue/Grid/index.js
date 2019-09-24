@@ -3,11 +3,12 @@ import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-import { CommonTableGrid, DateFormatter } from '@/components'
+import { CommonTableGrid, DateFormatter, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
 // utils
+import { getAppendUrl } from '@/utils/utils'
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { filterData, formatAppointmentTimes } from '../utils'
 import { StatusIndicator } from '../variables'
@@ -94,7 +95,7 @@ const columnExtensions = [
     columnName: 'gender/age',
     render: (row) =>
       row.gender && row.age ? `${row.gender}/${row.age < 0 ? 0 : row.age}` : '',
-    sortBy: 'genderFK',
+    sortingEnabled: false,
   },
   {
     columnName: 'appointmentTime',
@@ -118,7 +119,9 @@ const columnExtensions = [
 ]
 
 const Grid = ({
+  history,
   dispatch,
+  user,
   calendarEvents = [],
   filter = StatusIndicator.ALL,
   queueList = [],
@@ -167,6 +170,28 @@ const Grid = ({
     })
   }
 
+  const isAssignedDoctor = (row) => {
+    const {
+      doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
+    } = row
+    const { clinicianProfile: { doctorProfile } } = user
+    if (!doctorProfile) {
+      notification.error({
+        message: 'Unauthorized Access',
+      })
+      return false
+    }
+
+    if (assignedDoctorProfile.id !== doctorProfile.id) {
+      notification.error({
+        message: `You cannot start other doctor's consultation`,
+      })
+      return false
+    }
+
+    return true
+  }
+
   const onClick = (row, id) => {
     switch (id) {
       case '0': // edit visit
@@ -175,9 +200,16 @@ const Grid = ({
           visitID: row.id,
         })
         break
-      case '1': // dispense
-        router.push(`/reception/queue/dispense/${row.visitReferenceNo}`)
+      case '1': {
+        // dispense
+        const parameters = {
+          vis: row.id,
+          pid: row.patientProfileFK,
+        }
+        history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
+        // router.push(`/reception/queue/dispense${getAppendUrl(parameters)}`)
         break
+      }
       case '1.1': // billing
         router.push(`/reception/queue/dispense/${row.visitReferenceNo}/billing`)
         break
@@ -192,21 +224,33 @@ const Grid = ({
           `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}`,
         )
         break
-      case '5': // start consultation
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
-        )
+      case '5': {
+        // start consultation
+        const valid = isAssignedDoctor(row)
+        valid &&
+          router.push(
+            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
+          )
         break
-      case '6': // resume consultation
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
-        )
+      }
+      case '6': {
+        // resume consultation
+        const valid = isAssignedDoctor(row)
+        valid &&
+          router.push(
+            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
+          )
         break
-      case '7': // edit consultation
-        router.push(
-          `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
-        )
+      }
+      case '7': {
+        // edit consultation
+        const valid = isAssignedDoctor(row)
+        valid &&
+          router.push(
+            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
+          )
         break
+      }
       case '8':
         handleActualizeAppointment({
           patientID: row.patientProfileFk,
@@ -233,17 +277,12 @@ const Grid = ({
   ])
 
   const isLoading = showingVisitRegistration ? false : queryingData
-
   return (
-    <div style={{ minHeight: '76.5vh', maxHeight: '76.5vh' }}>
-      <LoadingWrapper
-        linear
-        loading={isLoading}
-        text='Refreshing queue listing...'
-      >
+    <div style={{ minHeight: '76vh' }}>
+      <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
         <CommonTableGrid
+          style={{ maxHeight: '76.5vh', overflow: 'auto' }}
           size='sm'
-          // height={700}
           rows={queueListingData}
           columnExtensions={colExtensions}
           FuncProps={FuncConfig}
@@ -256,7 +295,8 @@ const Grid = ({
 }
 
 export default memo(
-  connect(({ queueLog, calendar, global, loading }) => ({
+  connect(({ queueLog, calendar, global, loading, user }) => ({
+    user: user.data,
     filter: queueLog.currentFilter,
     queueList: queueLog.list,
     calendarEvents: calendar.list,

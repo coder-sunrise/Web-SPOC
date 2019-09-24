@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { FormattedMessage } from 'umi/locale'
+import Yup from '@/utils/yup'
+import { tagList } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -18,36 +19,14 @@ import {
 
 const styles = (theme) => ({})
 
-const tagList = [
-  {
-    id: 1,
-    text: '<#PatientName#>',
-  },
-  {
-    id: 2,
-    text: '<#AppointmentDateTime#>',
-  },
-  {
-    id: 3,
-    text: '<#Doctor#>',
-  },
-  {
-    id: 4,
-    text: '<#NewLine#>',
-  },
-  {
-    id: 5,
-    text: '<#PatientCallingName#>',
-  },
-  {
-    id: 6,
-    text: '<#LastVisitDate#>',
-  },
-]
-
 @withFormikExtend({
+<<<<<<< HEAD:src/pages/Setting/SmsTemplate/Detail.js
   mapPropsToValues: ({ settingSmsTemplate }) =>
   settingSmsTemplate.entity || settingSmsTemplate.default,
+=======
+  mapPropsToValues: ({ settingTemplateMessage }) =>
+    settingTemplateMessage.entity || settingTemplateMessage.default,
+>>>>>>> dev:src/pages/Setting/TemplateMessages/Detail.js
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -57,8 +36,12 @@ const tagList = [
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+<<<<<<< HEAD:src/pages/Setting/SmsTemplate/Detail.js
     //console.log(restValues)
 
+=======
+    // console.log(restValues)
+>>>>>>> dev:src/pages/Setting/TemplateMessages/Detail.js
 
     dispatch({
       type: 'settingSmsTemplate/upsert',
@@ -83,8 +66,8 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingSmsTemplate, setFieldValue } = props
-    //console.log('detail', props)
+    const { theme, footer, settingTemplateMessage } = props
+    // console.log('detail', props)
 
     return (
       <React.Fragment>
@@ -98,7 +81,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={settingSmsTemplate.entity ? true : false}
+                    disabled={!!settingTemplateMessage.entity}
                   />
                 )}
               />

@@ -13,10 +13,13 @@ import styles from './styles'
 import { PayerType } from './variables'
 
 const DefaultPaymentInfo = {
+  id: 0,
   type: 'Payment',
   itemID: 'N/A',
   date: 'N/A',
   amount: 'N/A',
+  reason: 'N/A',
+  isCancelled: false,
 }
 
 const payerTypeToString = {
@@ -42,13 +45,13 @@ const PaymentCard = ({
         {`${payerTypeToString[payerType]} (${payerName})`}
       </p>
       <CardContainer hideHeader size='sm'>
-        <IconButton
+        {/* <IconButton
           id={payerID}
           className={classes.printButton}
           onClick={handlePrinterClick}
         >
           <Printer />
-        </IconButton>
+        </IconButton> */}
         {payments.map((payment) => (
           <PaymentRow {...payment} handleVoidClick={handleVoidClick} />
         ))}

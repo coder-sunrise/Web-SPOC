@@ -1,33 +1,27 @@
-import React, { useEffect, useState } from 'react'
-import { formatMessage } from 'umi/locale'
+import React from 'react'
+import Delete from '@material-ui/icons/Delete'
+import { Tooltip } from '@material-ui/core'
 import {
   Field,
   FastField,
-  RadioGroup,
   GridContainer,
   GridItem,
   CodeSelect,
-  TextField,
-  NumberInput,
   Button,
   Tabs,
-  Switch,
   CommonTableGrid,
   Popconfirm,
 } from '@/components'
-import Delete from '@material-ui/icons/Delete'
-import { Tooltip } from '@material-ui/core'
 import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 
 const ItemList = ({
   CPSwitch,
   CPNumber,
-  classes,
   setFieldValue,
   dispatch,
   values,
-  //...props
+  // ...props
 }) => {
   function callback (key) {
     console.log('key', key)
@@ -38,105 +32,30 @@ const ItemList = ({
     newRows.push(obj)
     setFieldValue('rows', newRows)
 
-    //Reset field
+    // Reset field
     setFieldValue('tempSelectedItemFK', '')
     setFieldValue('tempSelectedItemSellingPrice', '')
     setFieldValue('tempSelectedItemTotalPrice', '')
   }
 
   const onClickAdd = (type) => {
-    switch (type) {
-      case 'inventoryconsumable':
-        const inventoryConsumable = {
-          uid: getUniqueId(),
-          type: 1,
-          itemFK: values.tempSelectedItemFK,
-          inventoryConsumableFK: values.tempSelectedItemFK,
-          unitPrice: values.tempSelectedItemSellingPrice,
-          itemValueType: 'ExactAmount',
-          itemValue: 0,
-        }
-        //const newConsumableValueDto = values.consumableValueDto
-        //newConsumableValueDto.push(inventoryConsumable)
-
-        addItemToRows(inventoryConsumable)
-
-        break
-      case 'inventorymedication':
-        const inventoryMedication = {
-          uid: getUniqueId(),
-          type: 2,
-          itemFK: values.tempSelectedItemFK,
-          inventoryMedicationFK: values.tempSelectedItemFK,
-          unitPrice: values.tempSelectedItemSellingPrice,
-          itemValueType: 'ExactAmount',
-          itemValue: 0,
-        }
-
-        //const newMedicationValueDto = values.medicationValueDto
-        //newMedicationValueDto.push(inventoryMedication)
-
-        addItemToRows(inventoryMedication)
-
-        break
-      case 'inventoryvaccination':
-        const inventoryVaccination = {
-          uid: getUniqueId(),
-          type: 3,
-          itemFK: values.tempSelectedItemFK,
-          inventoryVaccinationFK: values.tempSelectedItemFK,
-          unitPrice: values.tempSelectedItemSellingPrice,
-          itemValueType: 'ExactAmount',
-          itemValue: 0,
-        }
-
-        //const newVaccinationValueDto = values.vaccinationValueDto
-        //newVaccinationValueDto.push(inventoryVaccination)
-
-        addItemToRows(inventoryVaccination)
-
-        break
-      case 'ctservice':
-        const ctService = {
-          uid: getUniqueId(),
-          type: 4,
-          itemFK: values.tempSelectedItemFK,
-          serviceCenterServiceFK: values.tempSelectedItemFK,
-          unitPrice: values.tempSelectedItemSellingPrice,
-          itemValueType: 'ExactAmount',
-          itemValue: 0,
-        }
-
-        //const newServiceValueDto = values.serviceValueDto
-        //newServiceValueDto.push(ctService)
-
-        addItemToRows(ctService)
-
-        break
-      case 'inventorypackage':
-        const inventoryPackage = {
-          uid: getUniqueId(),
-          type: 5,
-          itemFK: values.tempSelectedItemFK,
-          inventoryPackageFK: values.tempSelectedItemFK,
-          unitPrice: values.tempSelectedItemTotalPrice,
-          itemValueType: 'ExactAmount',
-          itemValue: 0,
-        }
-        //const newPackageValueDto = values.packageValueDto
-        //newPackageValueDto.push(inventoryPackage)
-
-        addItemToRows(inventoryPackage)
-
-        break
-      default:
+    const itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
+    let newItemRow = {
+      uid: getUniqueId(),
+      type: itemFieldName.value,
+      [itemFieldName.itemFKName]: values.tempSelectedItemFK,
+      itemFK: values.tempSelectedItemFK,
+      unitPrice: values.tempSelectedItemSellingPrice,
+      itemValueType: 'ExactAmount',
+      itemValue: 0,
     }
+    addItemToRows(newItemRow)
   }
 
   const onItemSelect = (e, option) => {
     if (e) {
       const { sellingPrice, totalPrice } = option
-      //console.log('onItemSelect', option)
+      // console.log('onItemSelect', option)
       setFieldValue('tempSelectedItemSellingPrice', sellingPrice)
       setFieldValue('tempSelectedItemTotalPrice', totalPrice)
     }
@@ -255,7 +174,7 @@ const ItemList = ({
                 <Field
                   name={`rows[${row.rowIndex - 1}].itemValue`}
                   render={CPNumber(
-                    ' ',
+                    undefined,
                     Array.isArray(values.rows) && values.rows.length >= 1
                       ? values.rows[row.rowIndex - 1].itemValueType
                       : 'ExactAmount',
@@ -265,7 +184,7 @@ const ItemList = ({
               <GridItem xs={4}>
                 <Field
                   name={`rows[${row.rowIndex - 1}].itemValueType`}
-                  render={CPSwitch}
+                  render={CPSwitch(undefined)}
                 />
               </GridItem>
             </GridContainer>
@@ -285,7 +204,7 @@ const ItemList = ({
                     id: row.uid,
                   },
                 })}
-              //onConfirm={() => onClickDelete(row)}
+              // onConfirm={() => onClickDelete(row)}
             >
               <Tooltip title='Delete'>
                 <Button size='sm' color='danger' justIcon>

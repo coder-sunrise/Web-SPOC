@@ -1,8 +1,8 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/gst'
+import * as service from '../services/printoutSetting'
 
 export default createFormViewModel({
-  namespace: 'gstSetup',
+  namespace: 'printoutSetting',
   config: {
     queryOnLoad: false,
   },
@@ -12,19 +12,19 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
         const { pathname } = loct
-        if (pathname === '/setting') {
-          dispatch({
-            type: 'getGstSetup',
-            payload: {
-              pagesize: 99999,
-            },
-          })
-        }
+        // if (pathname === '/setting') {
+        //   dispatch({
+        //     type: 'getPrintoutSetting',
+        //     payload: {
+        //       pagesize: 99999,
+        //     },
+        //   })
+        // }
       })
     },
 
     effects: {
-      *getGstSetup (_, { call, put }) {
+      *getPrintoutSetting (_, { call, put }) {
         const response = yield call(service.query)
 
         yield put({

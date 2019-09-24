@@ -19,7 +19,7 @@ class Grid extends PureComponent {
         { name: 'patientReferenceNo', title: 'Ref. No.' },
         { name: 'patientAccountNo', title: 'Acc. No.' },
         { name: 'name', title: 'Patient Name' },
-        { name: 'lastPayment', title: 'Last Visit Date' },
+        { name: 'lastVisitDate', title: 'Last Visit Date' },
         { name: 'status', title: 'Status' },
         { name: 'gender/age', title: 'Gender / Age' },
         { name: 'dob', title: 'DOB' },
@@ -31,22 +31,21 @@ class Grid extends PureComponent {
         { name: 'action', title: 'Action' },
       ],
       columnExtensions: [
-        // {
-        //   columnName: 'status',
-        //   type: 'select',
-        //   options: status,
-        //   label: 'Status',
-        // },
+        {
+          columnName: 'lastVisitDate',
+          type: 'date',
+          sortingEnabled: false,
+        },
         {
           columnName: 'gender/age',
           render: (row) => {
             // console.log(row)
             return `${row.gender.substring(0, 1)}/${row.age}`
           },
-          sortBy: 'genderFK',
+          sortBy: 'genderFkNavigation.displayValue',
         },
         { columnName: 'dob', type: 'date' },
-        { columnName: 'race', sortBy: 'raceFK' },
+        { columnName: 'race', sortBy: 'raceFkNavigation.displayValue' },
         { columnName: 'lastPayment', type: 'date' },
         {
           columnName: 'action',
@@ -58,10 +57,13 @@ class Grid extends PureComponent {
           },
         },
         { columnName: 'status', sortBy: 'isActive' },
-        { columnName: 'nationality', sortBy: 'nationalityFK' },  
-        { columnName: 'mobileNo', sortingEnabled: false },       
+        {
+          columnName: 'nationality',
+          sortBy: 'nationalityFkNavigation.displayValue',
+        },
+        { columnName: 'mobileNo', sortingEnabled: false },
         { columnName: 'homeNo', sortingEnabled: false },
-        { columnName: 'officeNo', sortingEnabled: false },      
+        { columnName: 'officeNo', sortingEnabled: false },
       ],
       FuncProps: {
         pager: true,

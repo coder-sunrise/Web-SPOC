@@ -122,7 +122,7 @@ class LoginCard extends PureComponent {
             <Card login className={classes[cardAnimation]}>
               <CardHeader
                 className={`${classes.cardHeader} ${classes.textCenter}`}
-                color='rose'
+                color='primary'
               >
                 <h3 className={classes.cardTitle}>Login</h3>
                 <h3>
@@ -181,7 +181,7 @@ class LoginCard extends PureComponent {
                   simple
                   icon={<LockOpen />}
                   block
-                  color='rose'
+                  color='primary'
                   onClick={this.onEnterPressed}
                 />
               </CardFooter>

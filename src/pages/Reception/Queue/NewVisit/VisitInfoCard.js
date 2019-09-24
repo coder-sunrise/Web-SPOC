@@ -79,12 +79,7 @@ const VisitInfoCard = ({
                 })}
                 code='doctorprofile'
                 labelField='clinicianProfile.name'
-                renderDropdown={(option) => (
-                  <React.Fragment>
-                    <p>MCR: {option.doctorMCRNo}</p>
-                    <DoctorLabel doctor={option} />
-                  </React.Fragment>
-                )}
+                renderDropdown={(option) => <DoctorLabel doctor={option} />}
                 {...args}
               />
             )}

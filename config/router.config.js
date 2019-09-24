@@ -48,7 +48,7 @@ const routes = [
             exact: true,
           },
           {
-            path: '/reception/queue/dispense/:visitRefNo',
+            path: '/reception/queue/dispense',
             name: 'dispense',
             hideInMenu: true,
             exact: true,
@@ -257,7 +257,7 @@ const routes = [
             exact: true,
           },
           {
-            path: '/finance/invoice/:invoiceNo',
+            path: '/finance/invoice/details',
             name: 'invoice/detail',
             hideInMenu: true,
             component: './Finance/Invoice/Details',
@@ -344,6 +344,12 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Scheme/Details',
           },
+          {
+            path: '/finance/copayer',
+            name: 'copayer',
+            mini: 'CP',
+            component: './Setting/Company',
+          },
         ],
       },
       // Forms
@@ -387,6 +393,16 @@ const routes = [
             path: '/report/patientlisting',
             name: 'patientListingReport',
             component: './Report/PatientListing',
+          },
+          {
+            path: '/report/paymentcollection',
+            name: 'paymentCollection',
+            component: './Report/PaymentCollection',
+          },
+          {
+            path: '/report/salesummary',
+            name: 'salessummary',
+            component: './Report/SalesSummary',
           },
         ],
       },
@@ -559,10 +575,15 @@ const routes = [
             component: './Setting/GeneralSetting',
           },
           {
-            path: '/setting/company/1',
-            name: 'copayer',
-            component: './Setting/Company',
+            path: '/setting/printoutsetting',
+            name: 'printoutsetting',
+            component: './Setting/PrintoutSetting',
           },
+          // {
+          //   path: '/finance/company/1',
+          //   name: 'copayer',
+          //   component: './Setting/Company',
+          // },
           {
             path: '/setting/company/2',
             name: 'supplier',

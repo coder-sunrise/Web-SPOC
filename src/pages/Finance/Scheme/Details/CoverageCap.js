@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo } from 'react'
 import { formatMessage } from 'umi/locale'
 import {
   Field,
@@ -6,7 +6,6 @@ import {
   RadioGroup,
   GridContainer,
   GridItem,
-  TextField,
   NumberInput,
 } from '@/components'
 

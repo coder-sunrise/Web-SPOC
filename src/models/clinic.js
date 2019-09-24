@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/clinic'
+import { notification } from '@/components'
 
 export default createFormViewModel({
   namespace: 'clinicInfo',
@@ -16,28 +17,17 @@ export default createFormViewModel({
     },
 
     effects: {
-      // *getClinicInfo ({ payload }, { call, put }) {
-      //   console.log('ant', payload)
-      //   const response = yield call(service.query, payload)
-      //   yield put({
-      //     type: 'save',
-      //     payload: response,
-      //   })
-      // },
+      *upsertClinicInfo ({ payload }, { call, put }) {
+        const r = yield call(service.upsert, payload)
+
+        if (r) {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return r
+      },
     },
     reducers: {
-      // save (state, { payload }) {
-      //   const { data } = payload
-      //   console.log('data', data)
-      //   // const gst = {}
-      //   // data.forEach((p) => {
-      //   //   gst[p.settingKey] = p.settingValue
-      //   // })
-      //   return {
-      //     // gst,
-      //   }
-      // },
-
       queryDone (st, { payload }) {
         const { data } = payload
         const contact = {

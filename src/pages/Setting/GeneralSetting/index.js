@@ -26,14 +26,14 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ generalSetting }) => ({
-  generalSetting,
+@connect(({ clinicSettings }) => ({
+  clinicSettings,
 }))
 @withFormikExtend({
   enableReinitialize: true,
 
-  mapPropsToValues: ({ generalSetting }) => {
-    return generalSetting.setting
+  mapPropsToValues: ({ clinicSettings }) => {
+    return clinicSettings.settings
   },
 
   handleSubmit: (values, { props }) => {
@@ -60,11 +60,11 @@ const styles = (theme) => ({
     const { dispatch, onConfirm, history } = props
 
     dispatch({
-      type: 'generalSetting/upsert',
+      type: 'clinicSettings/upsert',
       payload,
     }).then(history.push('/setting'))
   },
-  displayName: 'GeneralSettingInfo',
+  displayName: 'clinicSettings',
 })
 class GeneralSetting extends PureComponent {
   state = {
@@ -74,7 +74,7 @@ class GeneralSetting extends PureComponent {
   componentDidMount = () => {
     this.checkHasActiveSession()
     this.props.dispatch({
-      type: 'generalSetting/getGeneralSetting',
+      type: 'clinicSettings/getClinicSettings',
     })
   }
 
@@ -94,7 +94,7 @@ class GeneralSetting extends PureComponent {
   render () {
     const {
       classes,
-      generalSettingInfo,
+      clinicSettings,
       dispatch,
       theme,
       handleSubmit,

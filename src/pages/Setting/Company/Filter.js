@@ -31,8 +31,9 @@ class Filter extends PureComponent {
   }
 
   render () {
-    const { classes, route } = this.props
+    const { classes, route, settingCompany } = this.props
     const { name } = route
+    const { companyType } = settingCompany
     this.checkIsCopayer(name)
     const { isCopayer } = this.state
 
@@ -81,9 +82,11 @@ class Filter extends PureComponent {
                 icon={null}
                 onClick={() => {
                   const { codeDisplayValue, coPayerTypeFK } = this.props.values
+                  console.log(123)
                   this.props.dispatch({
                     type: 'settingCompany/query',
                     payload: {
+                      companyType,
                       coPayerTypeFK,
                       group: [
                         {

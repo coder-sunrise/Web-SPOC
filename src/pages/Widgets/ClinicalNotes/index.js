@@ -454,6 +454,7 @@ class ClinicalNotes extends Component {
                                             textDecoration: 'underline',
                                           }}
                                           // className={classes.linkBtn}
+                                          tabindex='-1'
                                           value={item}
                                           onClick={() => {
                                             if (item.scribbleNoteLayers) {

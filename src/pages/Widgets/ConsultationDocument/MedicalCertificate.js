@@ -147,7 +147,9 @@ class MedicalCertificate extends PureComponent {
             <FastField
               name='remarks'
               render={(args) => {
-                return <RichEditor placeholder='Remarks' {...args} />
+                return (
+                  <TextField label='Remarks' multiline rowsMax='4' {...args} />
+                )
               }}
             />
           </GridItem>

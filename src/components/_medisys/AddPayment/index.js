@@ -62,7 +62,8 @@ class AddPayment extends Component {
   }
 
   onConfirmClick = (values, formikBag) => {
-    this.props.onConfirm()
+    this.props.handleSubmit(values)
+    this.props.onClose && this.props.onClose()
   }
 
   render () {
@@ -72,7 +73,6 @@ class AddPayment extends Component {
     const validationSchema = Yup.object().shape({
       ...paymentList.reduce(mapPaymentListToValidationScheme, {}),
     })
-
     return (
       <div>
         <PayerHeader />
@@ -81,7 +81,7 @@ class AddPayment extends Component {
           initialValues={paymentList.reduce(mapPaymentListToValues, {})}
           validationSchema={validationSchema}
           onSubmit={this.onConfirmClick}
-          render={({ values, handleSubmit }) => {
+          render={({ values, handleSubmit, ...restProps }) => {
             return (
               <React.Fragment>
                 <PaymentType

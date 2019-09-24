@@ -59,10 +59,7 @@ class SchemesGrid extends PureComponent {
           code: 'ctSchemeType',
           sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
-            return
-            console.log('schemeTypeFK')
-
-            let rows = this.props.rows
+            let { rows } = this.props
             if (!row.id) {
               rows = rows.concat([
                 row,
@@ -85,7 +82,6 @@ class SchemesGrid extends PureComponent {
               notification.error({
                 message: 'The Schemes record already exists in the system',
               })
-              
             }
             if (
               this.isCHAS(val) &&
@@ -151,10 +147,7 @@ class SchemesGrid extends PureComponent {
             return !this.isCorporate(row)
           },
           onChange: ({ val, option, row, onValueChange }) => {
-            // console.log(row)
-            console.log('coPaymentSchemeFK')
-            return
-            let {rows} = this.props
+            let { rows } = this.props
             if (!row.id) {
               rows = rows.concat([
                 row,

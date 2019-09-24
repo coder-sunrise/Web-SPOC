@@ -99,10 +99,11 @@ const FilterBar = ({ handleSubmit }) => {
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name='doctorID'
+              name='DoctorIDs'
               render={(args) => (
                 <CodeSelect
                   {...args}
+                  mode='multiple'
                   code='doctorprofile'
                   label='Doctor'
                   labelField='clinicianProfile.name'

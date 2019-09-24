@@ -4,8 +4,6 @@ import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import DetailPanel from './Detail'
-// import Pricing from '../../DetaPricing'
-// import Stock from '../../Details/Stock'
 import InventoryTypeListing from './InventoryTypeListing'
 import {
   NavPills,
@@ -14,12 +12,6 @@ import {
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getServices } from '@/utils/codes'
-import {
-  podoOrderType,
-  getInventoryItem,
-  getInventoryItemList,
-} from '@/utils/codes'
 
 const styles = () => ({
   actionDiv: {
@@ -30,7 +22,6 @@ const styles = () => ({
   },
 })
 
-let commitCount = 1000 // uniqueNumber
 const Detail = ({
   classes,
   dispatch,
@@ -40,7 +31,6 @@ const Detail = ({
   setFieldValue,
   handleSubmit,
   codetable,
-  setValues,
   values,
   ...props
 }) => {
@@ -50,21 +40,9 @@ const Detail = ({
   ] = useState(() => {})
 
   const [
-    servicess,
-    setServicess,
-  ] = useState(() => [])
-  const [
-    serviceCenterss,
-    setServiceCenterss,
-  ] = useState(() => [])
-  const [
     serviceCenterServicess,
     setServiceCenterServicess,
   ] = useState(() => [])
-  const [
-    serviceFK,
-    setServiceFK,
-  ] = useState(() => {})
   const [
     serviceCenterFK,
     setServiceCenterFK,
@@ -74,329 +52,107 @@ const Detail = ({
     setPrice,
   ] = useState(() => undefined)
 
-  const [
-    consumableItemList,
-    setConsumableItemList,
-  ] = useState([])
-  const [
-    medicationItemList,
-    setMedicationItemList,
-  ] = useState([])
-  const [
-    vaccinationItemList,
-    setVaccinationItemList,
-  ] = useState([])
+  // useEffect(() => {
+  //   const fetchCodes = async () => {
+  //     await podoOrderType.forEach((x) => {
+  //       dispatch({
+  //         type: 'codetable/fetchCodes',
+  //         payload: {
+  //           code: x.ctName,
+  //         },
+  //       }).then((list) => {
+  //         const { inventoryItemList } = getInventoryItemList(list)
+  //         console.log(x.stateName)
+  //         switch (x.stateName) {
+  //           case 'ConsumableItemList': {
+  //             return setConsumableItemList(inventoryItemList)
+  //           }
+  //           case 'MedicationItemList': {
+  //             return setMedicationItemList(inventoryItemList)
+  //           }
+  //           case 'VaccinationItemList': {
+  //             return setVaccinationItemList(inventoryItemList)
+  //           }
+  //           default: {
+  //             return null
+  //           }
+  //         }
+  //       })
 
-  useEffect(() => {
-    const fetchCodes = async () => {
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctservice',
-        },
-      }).then((list) => {
-        const { services, serviceCenters, serviceCenterServices } = getServices(
-          list,
-        )
+  //       dispatch({
+  //         type: 'codetable/fetchCodes',
+  //         payload: {
+  //           code: 'ctservice',
+  //         },
+  //       }).then((list) => {
+  //         const {
+  //           services,
+  //           serviceCenters,
+  //           serviceCenterServices,
+  //         } = getServices(list)
 
-        setServicess(services)
-        setServiceCenterss(serviceCenters)
-        setServiceCenterServicess(serviceCenterServices)
-      })
+  //         setServicess(services)
+  //         setServiceCenterss(serviceCenters)
+  //         setServiceCenterServicess(serviceCenterServices)
+  //       })
+  //     })
 
-      await podoOrderType.forEach((x) => {
-        dispatch({
-          type: 'codetable/fetchCodes',
-          payload: {
-            code: x.ctName,
-          },
-        }).then((list) => {
-          const { inventoryItemList } = getInventoryItemList(list)
-          switch (x.stateName) {
-            case 'consumableItemList': {
-              return setConsumableItemList(inventoryItemList)
-            }
-            case 'medicationItemList': {
-              return setMedicationItemList(inventoryItemList)
-            }
-            case 'vaccinationItemList': {
-              return setVaccinationItemList(inventoryItemList)
-            }
-            default: {
-              return null
-            }
-          }
-        })
-      })
+  //     dispatch({
+  //       // force current edit row components to update
+  //       type: 'global/updateState',
+  //       payload: {
+  //         commitCount: (commitCount += 1),
+  //       },
+  //     })
+  //   }
+  //   fetchCodes()
+  // }, [])
 
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    }
-    fetchCodes()
-  }, [])
+  // const handleItemOnChange = (e) => {
+  //   const { option, row } = e
+  //   const { sellingPrice } = option
+  //   setSelectedItem(option)
 
-  const handleItemOnChange = (e) => {
-    const { option, row } = e
-    const { sellingPrice } = option
-    setSelectedItem(option)
+  //   return { ...row, unitPrice: sellingPrice }
+  // }
 
-    return { ...row, unitPrice: sellingPrice }
-  }
-
-  const {
-    medicationPackageItem,
-    consumablePackageItem,
-    vaccinationPackageItem,
-    servicePackageItem,
-  } = values
   const { currentTab } = pack
   const detailProps = {
+    values,
     packDetail,
     dispatch,
     setFieldValue,
     showTransfer: false,
   }
 
-  const medicationProps = {
-    medicationTableParas: {
-      columns: [
-        { name: 'inventoryMedicationFK', title: 'Medication Name' },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'subTotal', title: 'Amount' },
-      ],
-      leftColumns: [],
-    },
-    medicationColExtensions: [
-      // {
-      //   columnName: 'inventoryMedicationFK',
-      //   type: 'codeSelect',
-      //   code: 'inventoryMedication',
-      //   labelField: 'displayValue',
-      //   valueField: 'id',
-      //   onChange: handleItemOnChange,
-      // },
-      {
-        columnName: 'inventoryMedicationFK',
-        type: 'select',
-        labelField: 'code',
-        options: medicationItemList,
-        onChange: handleItemOnChange,
-      },
-      {
-        columnName: 'quantity',
-        type: 'number',
-      },
-      {
-        columnName: 'unitPrice',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-      {
-        columnName: 'subTotal',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-    ],
-    medicationList: medicationPackageItem,
-  }
-
-  const vaccinationProps = {
-    vaccinationTableParas: {
-      columns: [
-        { name: 'inventoryVaccinationFK', title: 'Vaccination' },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'subTotal', title: 'Amount' },
-      ],
-      leftColumns: [],
-    },
-    vaccinationColExtensions: [
-      // {
-      //   columnName: 'inventoryVaccinationFK',
-      //   type: 'codeSelect',
-      //   code: 'inventoryVaccination',
-      //   labelField: 'displayValue',
-      //   valueField: 'id',
-      //   onChange: handleItemOnChange,
-      // },
-      {
-        columnName: 'inventoryVaccinationFK',
-        type: 'select',
-        labelField: 'code',
-        options: vaccinationItemList,
-        onChange: handleItemOnChange,
-      },
-      { columnName: 'quantity', type: 'number' },
-      {
-        columnName: 'unitPrice',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-      {
-        columnName: 'subTotal',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-    ],
-    vaccinationList: vaccinationPackageItem,
-  }
-
-  const consumableProps = {
-    consumableTableParas: {
-      columns: [
-        { name: 'inventoryConsumableFK', title: 'Consumable Name' },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'subTotal', title: 'Amount' },
-      ],
-      leftColumns: [],
-    },
-    consumableColExtensions: [
-      // {
-      //   columnName: 'inventoryConsumableFK',
-      //   type: 'codeSelect',
-      //   code: 'inventoryConsumable',
-      //   labelField: 'displayValue',
-      //   valueField: 'id',
-      //   onChange: handleItemOnChange,
-      // },
-      {
-        columnName: 'inventoryConsumableFK',
-        type: 'select',
-        labelField: 'code',
-        options: consumableItemList,
-        onChange: handleItemOnChange,
-      },
-      { columnName: 'quantity', type: 'number' },
-      {
-        columnName: 'unitPrice',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-      {
-        columnName: 'subTotal',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-    ],
-    consumableList: consumablePackageItem,
-  }
-
   const [
-    serviceCenter,
-    setServiceCenter,
-  ] = useState([])
-
-  const serviceProps = {
-    serviceTableParas: {
-      columns: [
-        { name: 'serviceCenterServiceFK', title: 'Service' },
-        { name: 'serviceName', title: 'Service Center' },
-        { name: 'quantity', title: 'Quantity' },
-        { name: 'unitPrice', title: 'Unit Price' },
-        { name: 'subTotal', title: 'Amount' },
-      ],
-      leftColumns: [],
-    },
-    serviceColExtensions: [
-      { columnName: 'quantity', type: 'number' },
-      {
-        columnName: 'serviceCenterServiceFK',
-        type: 'select',
-        options: servicess.filter(
-          (o) =>
-            !serviceCenterFK ||
-            o.serviceCenters.find((m) => m.value === serviceCenterFK),
-        ),
-
-        onChange: (e) => {
-          setServiceFK(e.val)
-          // console.log('service', serviceFK)
-          // setTimeout(() => {
-          //   getServiceCenterService()
-          // }, 1)
-          dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
-          handleItemOnChange
-        },
-      },
-      {
-        columnName: 'serviceName',
-        type: 'select',
-        options: serviceCenterss.filter(
-          (o) => !serviceFK || o.services.find((m) => m.value === serviceFK),
-        ),
-        onChange: (e) => {
-          setServiceCenterFK(e.val)
-          // console.log('serviceCenterFK', serviceCenterFK)
-          // setTimeout(() => {
-          //   getServiceCenterService()
-          // }, 1)
-          dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
-          handleItemOnChange
-        },
-      },
-      {
-        columnName: 'unitPrice',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-      {
-        columnName: 'subTotal',
-        type: 'number',
-        currency: true,
-        disabled: true,
-      },
-    ],
-    ServiceList: servicePackageItem,
-  }
-  const [
-    total,
-    setTotal,
+    totalPrice,
+    setTotalPrice,
   ] = useState(0)
-  const calTotal = () => {
-    setTotal(0)
-    medicationPackageItem.map((row) => {
-      return setTotal(total + row.subTotal)
-    })
 
-    servicePackageItem.map((row) => {
-      return setTotal(total + row.subTotal)
-    })
+  // const [
+  //   total,
+  //   setTotal,
+  // ] = useState(0)
+  // const calTotal = () => {
+  //   setTotal(0)
+  //   medicationPackageItem.map((row) => {
+  //     return setTotal(total + row.subTotal)
+  //   })
 
-    consumablePackageItem.map((row) => {
-      return setTotal(total + row.subTotal)
-    })
+  //   servicePackageItem.map((row) => {
+  //     return setTotal(total + row.subTotal)
+  //   })
 
-    vaccinationPackageItem.map((row) => {
-      return setTotal(total + row.subTotal)
-    })
-  }
+  //   consumablePackageItem.map((row) => {
+  //     return setTotal(total + row.subTotal)
+  //   })
 
+  //   vaccinationPackageItem.map((row) => {
+  //     return setTotal(total + row.subTotal)
+  //   })
+  // }
+  // console.log('packDetail', packDetail)
   return (
     <React.Fragment>
       <div className={classes.actionDiv}>
@@ -421,7 +177,7 @@ const Detail = ({
         contentStyle={{ margin: '0 -5px' }}
         tabs={[
           {
-            tabButton: 'Detail',
+            tabButton: 'Details',
             tabContent: <DetailPanel {...detailProps} />,
           },
           {
@@ -429,22 +185,17 @@ const Detail = ({
             tabContent: (
               <InventoryTypeListing
                 dispatch={dispatch}
-                calTotal={calTotal}
-                medication={medicationProps}
-                consumable={consumableProps}
-                vaccination={vaccinationProps}
-                service={serviceProps}
                 packDetail={packDetail}
                 setFieldValue={setFieldValue}
                 values={values}
                 selectedItem={selectedItem}
                 setSelectedItem={setSelectedItem}
-                setServiceCenter={setServiceCenter}
-                serviceCenter={serviceCenter}
                 price={price}
                 serviceCenterFK={serviceCenterFK}
-                serviceFK={serviceFK}
                 serviceCenterServicess={serviceCenterServicess}
+                totalPrice={totalPrice}
+                setTotalPrice={setTotalPrice}
+                {...props}
               />
             ),
           },
@@ -473,13 +224,26 @@ export default compose(
     }),
 
     handleSubmit: (values, { props }) => {
-      const { dispatch, history } = props
+      const { dispatch, history, codetable } = props
+      const { servicePackageItem } = values
+      console.log('submit', values)
+
+      const newServicePackageArray = servicePackageItem.map((o) => {
+        return {
+          ...o,
+          serviceCenterServiceFK: o.tempServiceCenterServiceFK,
+          // serviceName: o.tempServiceName,
+        }
+      })
+
       dispatch({
         type: 'packDetail/upsert',
         payload: {
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
+          servicePackageItem: newServicePackageArray,
+          totalPrice: totalPrice,
         },
       }).then((r) => {
         if (r) {

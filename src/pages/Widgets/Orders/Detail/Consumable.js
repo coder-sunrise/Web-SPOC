@@ -38,7 +38,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     stockConsumableFK: Yup.number().required(),
-    unitPrice: Yup.number().required(),
+    // unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     quantity: Yup.number().required(),
   }),
@@ -165,7 +165,16 @@ class Consumable extends PureComponent {
             <FastField
               name='totalPrice'
               render={(args) => {
-                return <NumberInput label='Total' currency {...args} />
+                return (
+                  <NumberInput
+                    label='Total'
+                    currency
+                    onChange={(e) => {
+                      this.updateTotalPrice(e.target.value)
+                    }}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

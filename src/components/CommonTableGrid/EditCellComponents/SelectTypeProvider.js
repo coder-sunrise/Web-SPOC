@@ -235,9 +235,33 @@ class SelectTypeProvider extends React.Component {
           'codeSelect',
         ].indexOf(o.type) >= 0,
     )
+    colFor.forEach((o) => {
+      let { columnName, type, valueField, labelField } = o
+      if (!valueField) {
+        if (type === 'codeSelect') {
+          valueField = 'id'
+        } else {
+          valueField = 'value'
+        }
+      }
+      if (!labelField) {
+        labelField = 'name'
+      }
 
+      o.compare = (a, b) => {
+        const codes = this.state[`${columnName}Option`]
+        const aa = codes.find((m) => m[valueField] === a)
+        const bb = codes.find((m) => m[valueField] === b)
+        // console.log(aa, bb)
+        // console.log(aa ? aa[labelField] : a, bb ? bb[labelField] : b)
+        // eslint-disable-next-line no-nested-ternary
+        return (aa ? aa[labelField] : a || '') > (bb ? bb[labelField] : b || '')
+          ? 1
+          : -1
+      }
+    })
     this.state = {
-      for: colFor || [],
+      for: colFor,
       codeLoaded: 0,
     }
     // console.log(props)

@@ -24,7 +24,7 @@ const { RangePicker } = DP
 const _toMoment = (value, isLocal) => {
   if (!value) return null
   const m = moment.utc(value)
-  return isLocal ? m.local() : m
+  return isLocal ? m.toLocal() : m
 }
 
 const STYLES = (theme) => ({
@@ -132,11 +132,11 @@ class AntdDateRangePicker extends PureComponent {
           //     ? // eslint-disable-next-line no-nested-ternary
           //       i === 0
           //       ? showTime
-          //         ? o.utc().format()
-          //         : o.utc().set({ hour: 0, minute: 0, second: 0 }).format()
+          //         ? o.toUTC().format()
+          //         : o.toUTC().set({ hour: 0, minute: 0, second: 0 }).format()
           //       : showTime
-          //         ? o.utc().format()
-          //         : o.utc().set({ hour: 23, minute: 59, second: 59 }).format()
+          //         ? o.toUTC().format()
+          //         : o.toUTC().set({ hour: 23, minute: 59, second: 59 }).format()
           //     : o,
           // )
           // eslint-disable-next-line no-nested-ternary
@@ -144,11 +144,11 @@ class AntdDateRangePicker extends PureComponent {
             ? // eslint-disable-next-line no-nested-ternary
               i === 0
               ? showTime
-                ? o.utc().format()
-                : o.set({ hour: 0, minute: 0, second: 0 }).utc().format()
+                ? o.toUTC().format()
+                : o.set({ hour: 0, minute: 0, second: 0 }).toUTC().format()
               : showTime
-                ? o.utc().format()
-                : o.set({ hour: 23, minute: 59, second: 59 }).utc().format()
+                ? o.toUTC().format()
+                : o.set({ hour: 23, minute: 59, second: 59 }).toUTC().format()
             : o
         })
       : []
@@ -156,7 +156,7 @@ class AntdDateRangePicker extends PureComponent {
       // console.log(date.format())
       // console.log(date.utcOffset())
 
-      // console.log(date.utc().format())
+      // console.log(date.toUTC().format())
 
       form.setFieldValue(field.name, v)
     }

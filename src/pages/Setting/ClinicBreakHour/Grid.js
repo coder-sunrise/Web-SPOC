@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
-import { CommonTableGrid, Button } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
+import { Tooltip } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
-import moment from 'moment'
-import * as service from './services'
+import { status } from '@/utils/codes'
+import { CommonTableGrid, Button } from '@/components'
 import FromToTime from './FromToTime'
 
 export default class Grid extends PureComponent {
@@ -24,12 +21,6 @@ export default class Grid extends PureComponent {
   }
 
   render () {
-    const {
-      dispatch,
-      classes,
-      settingClinicBreakHour,
-      toggleModal,
-    } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -52,31 +43,41 @@ export default class Grid extends PureComponent {
         columnExtensions={[
           {
             columnName: 'isActive',
-            sortingEnabled: false,
             type: 'select',
             options: status,
+            width: 70,
+            align: 'center',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'displayValue',
+            width: 300,
           },
           {
             columnName: 'action',
+            width: 60,
             align: 'center',
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Edit Clinic Break Hour' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 0 }}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },
           {
             columnName: 'monFromBreak',
-
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.monFromBreak} to={row.monToBreak} />
@@ -84,6 +85,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'tueFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.tueFromBreak} to={row.tueToBreak} />
@@ -91,6 +93,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'wedFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.wedFromBreak} to={row.wedToBreak} />
@@ -98,6 +101,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'thursFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return (
@@ -107,6 +111,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'friFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.friFromBreak} to={row.friToBreak} />
@@ -114,6 +119,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'satFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.satFromBreak} to={row.satToBreak} />
@@ -121,6 +127,7 @@ export default class Grid extends PureComponent {
           },
           {
             columnName: 'sunFromBreak',
+            sortingEnabled: false,
             align: 'center',
             render: (row) => {
               return <FromToTime from={row.sunFromBreak} to={row.sunToBreak} />
