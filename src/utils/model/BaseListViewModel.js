@@ -1,6 +1,11 @@
 ﻿import lodash from 'lodash'
 import cryptoJS from 'crypto-js'
-import { getUniqueId, sortAll, decrypt, decryptToString } from 'medisys-util'
+import {
+  getUniqueId,
+  commonDataReaderTransform,
+  decrypt,
+  decryptToString,
+} from 'medisys-util'
 import BaseCRUDViewModel from './BaseCRUDViewModel'
 
 export default class BaseListViewModel extends BaseCRUDViewModel {
@@ -115,7 +120,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         // // //console.log('list query')
         // console.log(filter)
         const list = data.entities ? data.entities : data.data
-        // sortAll(list)
+        // commonDataReaderTransform(list)
         const { sorting } = filter
         // console.log(list)
         return {
@@ -138,7 +143,9 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       querySingleSuccess (st, { payload }) {
         // console.log(payload)
         const { data } = payload
-        sortAll(data)
+        // console.log('commonDataReaderTransform', 2)
+
+        // commonDataReaderTransform(data)
         return {
           ...st,
           entity: data,

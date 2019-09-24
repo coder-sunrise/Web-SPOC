@@ -18,7 +18,7 @@ export default createFormViewModel({
         mcDays: 1,
         mcStartEndDate: [
           moment(),
-          moment().add(1, 'days'),
+          moment(),
         ],
         mcIssueDate: moment(),
         unfitTypeFK: 1,
@@ -30,6 +30,7 @@ export default createFormViewModel({
       defaultCertOfAttendance: {
         type: '4',
         issueDate: moment(),
+        referenceNo: '-',
         attendanceStartTime: moment().format('HH:mm'),
         attendanceEndTime: moment().add(30, 'minutes').format('HH:mm'),
       },

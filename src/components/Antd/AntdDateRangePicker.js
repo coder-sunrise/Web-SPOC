@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 // wrapper
 import { DatePicker as DP } from 'antd'
-import { extendFunc } from '@/utils/utils'
+import { extendFunc, toUTC, toLocal } from '@/utils/utils'
 import { control } from '@/components/Decorator'
 import {
   CustomInputWrapper,
@@ -21,10 +21,18 @@ import {
 import DatePicker from './AntdDatePicker'
 
 const { RangePicker } = DP
-const _toMoment = (value, isLocal) => {
+const _toMoment = (value, isLocal, i, showTime) => {
   if (!value) return null
-  const m = moment.utc(value)
-  return isLocal ? m.toLocal() : m
+  let m = moment(value)
+  if (!showTime) {
+    if (i === 0) {
+      m = m.set({ hour: 0, minute: 0, second: 0 })
+    } else if (i === 1) {
+      m = m.set({ hour: 23, minute: 59, second: 59 })
+    }
+  }
+
+  return m
 }
 
 const STYLES = (theme) => ({
@@ -61,6 +69,10 @@ const STYLES = (theme) => ({
 
 @control()
 class AntdDateRangePicker extends PureComponent {
+  static defaultProps = {
+    local: true,
+  }
+
   constructor (props) {
     super(props)
     const {
@@ -70,19 +82,35 @@ class AntdDateRangePicker extends PureComponent {
       formatter,
       parser,
       local,
+      showTime,
     } = props
     this.state = {
       shrink: field.value !== undefined && field.value.length > 0,
       value:
         field.value !== undefined && field.value.length > 0
-          ? field.value.map((o) => _toMoment(o, local))
-          : (props.value || props.defaultValue || [])
-              .map((o) => _toMoment(o, local)),
+          ? field.value
+          : props.value || props.defaultValue || [],
     }
-  }
-
-  static defaultProps = {
-    local: true,
+    if (field && this.state.value.length > 0) {
+      setTimeout(() => {
+        form.setFieldValue(
+          field.name,
+          this.state.value.map((o, i) => {
+            // eslint-disable-next-line no-nested-ternary
+            return o !== undefined
+              ? // eslint-disable-next-line no-nested-ternary
+                i === 0
+                ? showTime
+                  ? moment(o).format()
+                  : moment(o).set({ hour: 0, minute: 0, second: 0 }).format()
+                : showTime
+                  ? moment(o).format()
+                  : moment(o).set({ hour: 23, minute: 59, second: 59 }).format()
+              : o
+          }),
+        )
+      }, 1)
+    }
   }
 
   // shouldComponentUpdate = (nextProps) => {
@@ -103,66 +131,47 @@ class AntdDateRangePicker extends PureComponent {
   // }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, local } = nextProps
+    const { field, local, showTime } = nextProps
     // console.log(field.value)
 
     if (field) {
       this.setState({
-        value:
-          field.value === undefined
-            ? []
-            : field.value.map((o) => _toMoment(o, local)),
+        value: field.value === undefined ? [] : field.value,
       })
     }
   }
 
   handleChange = (dateArray, dateString) => {
-    this.setState({
-      value: dateArray,
-    })
-
     const { form, field, onChange, showTime } = this.props
     const v = Array.isArray(dateArray)
       ? dateArray.map((o, i) => {
-          // console.log(
-          //   showTime,
-          //   o,
-          //   i,
-          //   o !== undefined
-          //     ? // eslint-disable-next-line no-nested-ternary
-          //       i === 0
-          //       ? showTime
-          //         ? o.toUTC().format()
-          //         : o.toUTC().set({ hour: 0, minute: 0, second: 0 }).format()
-          //       : showTime
-          //         ? o.toUTC().format()
-          //         : o.toUTC().set({ hour: 23, minute: 59, second: 59 }).format()
-          //     : o,
-          // )
           // eslint-disable-next-line no-nested-ternary
           return o !== undefined
             ? // eslint-disable-next-line no-nested-ternary
               i === 0
               ? showTime
-                ? o.toUTC().format()
-                : o.set({ hour: 0, minute: 0, second: 0 }).toUTC().format()
+                ? o.format()
+                : o.set({ hour: 0, minute: 0, second: 0 }).format()
               : showTime
-                ? o.toUTC().format()
-                : o.set({ hour: 23, minute: 59, second: 59 }).toUTC().format()
+                ? o.format()
+                : o.set({ hour: 23, minute: 59, second: 59 }).format()
             : o
         })
       : []
+
+    this.setState({
+      value: v,
+    })
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())
 
       // console.log(date.toUTC().format())
-
       form.setFieldValue(field.name, v)
     }
 
     if (onChange) {
-      onChange(v, dateArray, dateString)
+      onChange(dateString, dateArray, v)
     }
   }
 
@@ -212,6 +221,7 @@ class AntdDateRangePicker extends PureComponent {
       nowOnwards,
       value,
       text,
+      local = true,
       ...restProps
     } = this.props
     // const { form, field } = restProps
@@ -248,6 +258,8 @@ class AntdDateRangePicker extends PureComponent {
         </span>
       )
     }
+    // console.log(this.state.value.map((o) => o.add(8, 'days')))
+
     return (
       <div style={{ width: '100%' }} {...props}>
         <RangePicker
@@ -263,7 +275,12 @@ class AntdDateRangePicker extends PureComponent {
             this.handleDatePickerOpenChange,
           )}
           format={format}
-          value={this.state.value}
+          value={this.state.value.map(
+            (o, i) =>
+              moment.isMoment(o)
+                ? o
+                : _toMoment(o, local, i, restProps.showTime),
+          )}
           {...restProps}
         />
       </div>
