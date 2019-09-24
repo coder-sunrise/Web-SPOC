@@ -8,7 +8,7 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // material ui
 import { withStyles } from '@material-ui/core'
 // components
-import { serverDateFormat } from '@/components'
+import { serverDateFormat, Tooltip } from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // setting
@@ -21,11 +21,21 @@ import { getFirstAppointmentType } from './form/formikUtils'
 import { primaryColor } from '@/assets/jss'
 
 const styles = () => ({
+  customMaxWidth: {
+    maxWidth: 500,
+  },
+  calendarHoliday: {
+    '& span': {
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
+  },
   calendarHolidayLabel: {
     paddingLeft: 4,
     float: 'left',
     textAlign: 'left',
-    maxWidth: '75%',
+    maxWidth: '90%',
     fontSize: '0.9rem',
     fontWeight: '450',
     color: '#6f6f6f',
@@ -58,24 +68,26 @@ const applyFilter = (filter, data) => {
     ...data,
   ]
   try {
-    // filter by patient name
+    // filter by patient name and ignore doctorblock
     if (search !== '') {
       returnData = returnData.filter(
         (eachData) =>
-          eachData.patientName.toLowerCase().indexOf(search.toLowerCase()) !==
-          -1,
+          eachData.doctor ||
+          (!eachData.doctor &&
+            eachData.patientName.toLowerCase().indexOf(search.toLowerCase()) !==
+              -1),
       )
     }
 
     // filter by doctor
-    if (filterByDoctor.length > 0) {
+    if (filterByDoctor.length > 0 && filterByDoctor.indexOf(-99) !== 0) {
       returnData = returnData.filter((eachData) =>
         filterByDoctor.includes(eachData.clinicianFK),
       )
     }
 
     // filter by appointment type
-    if (filterByApptType.length > 0) {
+    if (filterByApptType.length > 0 && filterByApptType.indexOf(-99) !== 0) {
       returnData = returnData.filter((eachData) =>
         filterByApptType.includes(eachData.appointmentTypeFK),
       )
@@ -93,22 +105,34 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
   }))(({ classes, date, onDrillDown, label, publicHolidayList }) => {
     let holidayLabel = ''
     const momentDate = moment(date)
-    const publicHoliday = publicHolidayList.find((item) => {
+    const publicHoliday = publicHolidayList.filter((item) => {
       const momentStartDate = moment(item.startDate)
+      const momentEndDate = moment(item.endDate)
 
-      if (momentStartDate.diff(momentDate, 'day') === 0) {
+      if (momentDate.isBetween(momentStartDate, momentEndDate, 'days', '[]'))
         return true
-      }
       return false
+
+      // if (momentStartDate.diff(momentDate, 'day') === 0) {
+      //   return true
+      // }
+      // return false
     })
 
-    if (publicHoliday) holidayLabel = publicHoliday.displayValue
+    if (publicHoliday.length > 0)
+      holidayLabel = publicHoliday.map((item) => item.displayValue).join(', ')
 
     return (
-      <div>
-        <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>
-        <a onClick={onDrillDown}>{label}</a>
-      </div>
+      <Tooltip
+        title={<span style={{ wordWrap: 'break-word' }}>{holidayLabel}</span>}
+        placement='top'
+        classes={{ tooltip: classes.customMaxWidth }}
+      >
+        <div className={classes.calendarHoliday}>
+          <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>
+          <a onClick={onDrillDown}>{label}</a>
+        </div>
+      </Tooltip>
     )
   }),
 )
@@ -175,10 +199,13 @@ const CalendarView = ({
     const momentDate = moment(date)
     const publicHoliday = publicHolidays.find((item) => {
       const momentStartDate = moment(item.startDate)
+      const momentEndDate = moment(item.endDate)
 
-      if (momentStartDate.diff(momentDate, 'day') === 0) {
+      // if (momentStartDate.diff(momentDate, 'day') === 0) {
+      //   return true
+      // }
+      if (momentDate.isBetween(momentStartDate, momentEndDate, 'days', '[]'))
         return true
-      }
       return false
     })
 

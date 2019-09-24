@@ -50,11 +50,11 @@ const FilterBar = ({
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxDoctorTagPlaceholder = filterByDoctor
-    ? `${filterByDoctor.length} doctors selected...`
+    ? `${filterByDoctor.length} doctors selected`
     : ''
 
   const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
-  const maxAppointmentTagPlaceholder = `${filterByApptType.length} appointment types selected...`
+  const maxAppointmentTagPlaceholder = `${filterByApptType.length} appointment types selected`
 
   return (
     <SizeContainer>
@@ -80,6 +80,7 @@ const FilterBar = ({
                 <CodeSelect
                   {...args}
                   all={-99}
+                  allowClear={false}
                   code='clinicianprofile'
                   label='Filter by Doctor'
                   mode='multiple'
@@ -107,6 +108,7 @@ const FilterBar = ({
                 <CodeSelect
                   {...args}
                   mode='multiple'
+                  allowClear={false}
                   all={-99}
                   label='Filter by Appointment Type'
                   code='ctappointmenttype'
@@ -160,6 +162,9 @@ export default memo(
     enableReinitialize: true,
     mapPropsToValues: () => ({
       filterByDoctor: [
+        -99,
+      ],
+      filterByApptType: [
         -99,
       ],
     }),

@@ -214,13 +214,17 @@ class AntdSelect extends React.PureComponent {
         newVal = [
           all,
         ]
-      } else if (val.indexOf(all) === 0) {
+      } else if (val.includes(all) && val.length > 1) {
         newVal = _.reject(newVal, (v) => v === all)
       }
+      // else if (val.indexOf(all) === 0) {
+      //   newVal = _.reject(newVal, (v) => v === all)
+      // }
     }
+
     // console.log(val)
     // console.log(returnValue)
-    // console.log({ val, newVal })
+    // console.log({ val, index: val.indexOf(all), newVal })
 
     let proceed = true
     if (onChange) {
