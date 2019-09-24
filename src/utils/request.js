@@ -450,14 +450,16 @@ export const download = async (
     },
     ...options,
   })
-  let a = document.createElement('a')
-  let url = window.URL.createObjectURL(data)
-  a.href = url
-  a.download = `${subject}.${type}`
-  document.body.append(a)
-  a.click()
-  a.remove()
-  window.URL.revokeObjectURL(url)
+  if (data) {
+    let a = document.createElement('a')
+    let url = window.URL.createObjectURL(data)
+    a.href = url
+    a.download = `${subject}.${type}`
+    document.body.append(a)
+    a.click()
+    a.remove()
+    window.URL.revokeObjectURL(url)
+  }
 }
 
 export default request
