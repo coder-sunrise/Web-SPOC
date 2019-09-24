@@ -47,20 +47,20 @@ const routes = [
             mini: 'QE',
             exact: true,
           },
-          {
-            path: '/reception/queue/dispense',
-            name: 'dispense',
-            hideInMenu: true,
-            exact: true,
-            component: './Dispense',
-          },
-          {
-            path: '/reception/queue/dispense/:visitRefNo/billing',
-            name: 'billing',
-            hideInMenu: true,
-            exact: true,
-            component: './Dispense/Billing',
-          },
+          // {
+          //   path: '/reception/queue/dispense',
+          //   name: 'dispense',
+          //   hideInMenu: true,
+          //   exact: true,
+          //   component: './Dispense',
+          // },
+          // {
+          //   path: '/reception/queue/dispense/billing',
+          //   name: 'billing',
+          //   hideInMenu: true,
+          //   exact: true,
+          //   component: './Dispense/Billing',
+          // },
           {
             path: '/reception/appointment',
             name: 'appointment',
@@ -73,12 +73,12 @@ const routes = [
             name: 'patientdashboard',
             component: './PatientDashboard',
           },
-          {
-            path: '/reception/queue/patientdashboard/consultation/:id?',
-            name: 'consultation',
-            hideInMenu: true,
-            component: './PatientDashboard/Consultation',
-          },
+          // {
+          //   path: '/reception/queue/patientdashboard/consultation/:id?',
+          //   name: 'consultation',
+          //   hideInMenu: true,
+          //   component: './PatientDashboard/Consultation',
+          // },
         ],
       },
       //
