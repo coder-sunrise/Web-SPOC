@@ -78,7 +78,8 @@ const FilterBar = ({
                     id: 'form.date.placeholder.allDate',
                   })}
                   inputLabel=' '
-                  onChange={setIsAllDateChecked(values.filter.allDate)}
+                  onChange={() =>
+                    setIsAllDateChecked(values ? values.filter.allDate : false)}
                   {...args}
                 />
               </Tooltip>
@@ -139,7 +140,13 @@ const FilterBar = ({
             color='primary'
             icon={null}
             onClick={() => {
-              const { poNo, invoiceStatus, transactionDates, supplier, poStatus } = values.filter
+              const {
+                poNo,
+                invoiceStatus,
+                transactionDates,
+                supplier,
+                poStatus,
+              } = values.filter
               dispatch({
                 type: 'purchaseReceiveList/query',
                 // payload: {}
@@ -149,10 +156,8 @@ const FilterBar = ({
             <FormattedMessage id='form.search' />
           </ProgressButton>
 
-          <Button
-            onClick={() => handleNavigate('new')}
-            color='primary'
-          >Add New
+          <Button onClick={() => handleNavigate('new')} color='primary'>
+            Add New
           </Button>
         </div>
       </GridItem>

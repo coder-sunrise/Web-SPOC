@@ -42,7 +42,7 @@ const PurchaseReceiveDataGrid = ({
       columns={PurchaseReceiveGridCol}
       columnExtensions={[
         {
-          columnName: 'poDate',
+          columnName: 'purchaseOrderDate',
           type: 'date',
           format: 'DD MMM YYYY',
         },

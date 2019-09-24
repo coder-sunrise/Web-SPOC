@@ -33,12 +33,12 @@ export const isPOStatusFinalized = (status) => {
 }
 
 export const PurchaseReceiveGridCol = [
-  { name: 'poNo', title: 'PO No' },
-  { name: 'poDate', title: 'PO Date' },
+  { name: 'purchaseOrderNo', title: 'PO No' },
+  { name: 'purchaseOrderDate', title: 'PO Date' },
   { name: 'supplier', title: 'Supplier' },
   { name: 'expectedDeliveryDate', title: 'Expected Delivery Date' },
-  { name: 'poStatus', title: 'PO Status' },
-  { name: 'total', title: 'Total' },
+  { name: 'purchaseOrderStatus', title: 'PO Status' },
+  { name: 'totalAmount', title: 'Total' },
   { name: 'outstanding', title: 'Outstanding' },
   { name: 'invoiceStatus', title: 'Inv. Status' },
   { name: 'remarks', title: 'Remarks' },
