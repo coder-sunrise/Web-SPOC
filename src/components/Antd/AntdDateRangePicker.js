@@ -91,7 +91,7 @@ class AntdDateRangePicker extends PureComponent {
           ? field.value
           : props.value || props.defaultValue || [],
     }
-    if (field && this.state.value.length > 0) {
+    if (form && field && this.state.value.length > 0) {
       setTimeout(() => {
         form.setFieldValue(
           field.name,
