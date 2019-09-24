@@ -11,7 +11,7 @@ import PaymentDetails from './PaymentDetails'
 // styling
 import styles from './styles'
 
-const Content = ({ classes }) => {
+const Content = ({ classes, ...restProps }) => {
   const [
     active,
     setActive,
@@ -36,8 +36,14 @@ const Content = ({ classes }) => {
         active={active}
         onChange={onTabChange}
         tabs={[
-          { tabButton: 'Invoice', tabContent: <InvoiceDetails /> },
-          { tabButton: 'Payment', tabContent: <PaymentDetails /> },
+          {
+            tabButton: 'Invoice',
+            tabContent: <InvoiceDetails {...restProps} />,
+          },
+          {
+            tabButton: 'Payment',
+            tabContent: <PaymentDetails invoiceDetail={restProps.values} />,
+          },
         ]}
       />
     </React.Fragment>

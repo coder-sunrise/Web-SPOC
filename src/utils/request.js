@@ -5,7 +5,12 @@ import hash from 'hash.js'
 import queryString from 'query-string'
 import $ from 'jquery'
 import { notification } from '@/components'
-import { isAntdPro, updateLoadingState } from './utils'
+import {
+  isAntdPro,
+  updateLoadingState,
+  commonDataWriterTransform,
+  commonDataReaderTransform,
+} from './utils'
 import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 
 // export const baseUrl = 'http://localhost:9300'
@@ -144,12 +149,7 @@ export const axiosRequest = async (
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request (
-  url,
-  option,
-  { contentType } = { contentType: undefined },
-  showNotification = true,
-) {
+const request = (url, option, showNotification = true) => {
   const options = {
     expirys: true,
     ...option,
@@ -182,7 +182,12 @@ export default function request (
       //     'Content-Type': 'application/json; charset=utf-8',
       //     ...newOptions.headers,
       //   }
-      newOptions.body = JSON.stringify(newOptions.body)
+      newOptions.body = JSON.stringify(
+        commonDataWriterTransform(newOptions.body),
+      )
+      if (newOptions.data) {
+        newOptions.data = commonDataWriterTransform(newOptions.data)
+      }
       // } else {
       //   // newOptions.body is FormData
       //   newOptions.headers = {
@@ -245,7 +250,7 @@ export default function request (
           xhr.setRequestHeader('Accept', 'application/json')
           xhr.setRequestHeader(
             'Content-Type',
-            contentType !== undefined ? contentType : defaultContentType,
+            options.contentType || defaultContentType,
           )
         },
       }),
@@ -263,8 +268,10 @@ export default function request (
       //   return response.json()
       // })
       .then((response, s, xhr) => {
-        // console.log(response, s, xhr, xhr.getAllResponseHeaders())
-
+        // console.log(response, s, xhr)
+        if (typeof response === 'object') {
+          commonDataReaderTransform(response)
+        }
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
         // console.log(response, status, xhr)
@@ -432,3 +439,27 @@ export default function request (
     console.log(error)
   }
 }
+export const download = async (
+  requestUrl,
+  { subject = 'file', type = 'pdf' },
+  options,
+) => {
+  const data = await request(requestUrl, {
+    xhrFields: {
+      responseType: 'blob',
+    },
+    ...options,
+  })
+  if (data) {
+    let a = document.createElement('a')
+    let url = window.URL.createObjectURL(data)
+    a.href = url
+    a.download = `${subject}.${type}`
+    document.body.append(a)
+    a.click()
+    a.remove()
+    window.URL.revokeObjectURL(url)
+  }
+}
+
+export default request

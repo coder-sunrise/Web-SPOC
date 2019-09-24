@@ -5,6 +5,7 @@ export default ({ options, ...props }) => {
   return (
     <Tabs
       type='card'
+      // animated={false}
       tabBarStyle={{
         paddingLeft: 8,
         top: 1,
@@ -18,8 +19,9 @@ export default ({ options, ...props }) => {
           <TabPane
             tab={o.name}
             key={o.id}
+            disabled={o.disabled}
             style={{
-              border: '1px solid #e8e8e8',
+              // border: '1px solid #e8e8e8',
               padding: 8,
             }}
           >

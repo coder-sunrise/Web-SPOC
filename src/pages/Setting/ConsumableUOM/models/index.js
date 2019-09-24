@@ -11,9 +11,9 @@ export default createListViewModel({
 			default: {
 				isUserMaintainable: true,
 				effectiveDates: [
-					moment().utc().set({ hour: 0, minute: 0, second: 0 }),
+					moment().toUTC().set({ hour: 0, minute: 0, second: 0 }),
 					moment('2099-12-31')
-						.utc()
+						.toUTC()
 						.set({ hour: 23, minute: 59, second: 59 })
 				]
 			}

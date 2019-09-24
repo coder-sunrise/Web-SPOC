@@ -11,13 +11,15 @@ import {
   DatePicker,
   dateFormatLong,
   Skeleton,
+  Tooltip,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
 import Block from './Block'
 
-@connect(({ patientDashboard, codetable }) => ({
+@connect(({ patientDashboard, patient, codetable }) => ({
   patientDashboard,
+  patient,
   codetable,
 }))
 class Banner extends PureComponent {
@@ -30,6 +32,12 @@ class Banner extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctdrugallergy',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctsalutation',
       },
     })
   }
@@ -50,17 +58,9 @@ class Banner extends PureComponent {
 
   getAllergyLink () {
     const { props } = this
-    const { patientDashboard = {}, patientInfo = {}, codetable } = props
-    const { patientInfo: dashboardPatientInfo } = patientDashboard
-    const info =
-      Object.keys(patientInfo).length === 0 ? dashboardPatientInfo : patientInfo
-
-    if (!Object.keys(info).length === 0)
-      return (
-        <Paper>
-          <Skeleton variant='rect' width='100%' height={101} />
-        </Paper>
-      )
+    const { patient, codetable } = props
+    const { entity } = patient
+    const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
     const da = ctdrugallergy.filter((o) =>
@@ -88,6 +88,8 @@ class Banner extends PureComponent {
       patientDashboard = {},
       patientInfo = {},
       extraCmt,
+      patient,
+      codetable,
       style = {
         position: 'sticky',
         top: headerHeight,
@@ -97,27 +99,17 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
-
-    // if (!patientDashboard && !patientInfo)
-    //   return (
-    //     <Paper>
-    //       <Skeleton variant='rect' width='100%' height={100} />
-    //     </Paper>
-    //   )
-    const { patientInfo: dashboardPatientInfo } = patientDashboard
-    if (
-      (!patientInfo || Object.keys(patientInfo).length === 0) &&
-      (!dashboardPatientInfo || Object.keys(dashboardPatientInfo).length === 0)
-    )
+    const { entity } = patient
+    if (!entity)
       return (
         <Paper>
           <Skeleton variant='rect' width='100%' height={100} />
         </Paper>
       )
-
-    const info =
-      Object.keys(patientInfo).length === 0 ? dashboardPatientInfo : patientInfo
-
+    const { ctsalutation = [] } = codetable
+    const info = entity
+    const salt = ctsalutation.find((o) => o.id === info.salutationFK) || {}
+    const name = `${salt.name || ''} ${info.name}`
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -130,15 +122,9 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               h3={
-                <div>
-                  <CodeSelect
-                    // authority='none'
-                    text
-                    code='ctSalutation'
-                    value={info.salutationFK}
-                  />{' '}
-                  <span>{info.name}</span>
-                </div>
+                <Tooltip title={name}>
+                  <span style={{ whiteSpace: 'nowrap' }}>{name}</span>
+                </Tooltip>
               }
               body={
                 <div>

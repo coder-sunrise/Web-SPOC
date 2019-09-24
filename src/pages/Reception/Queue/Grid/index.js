@@ -235,28 +235,70 @@ const Grid = ({
       case '5': {
         // start consultation
         const valid = isAssignedDoctor(row)
-        valid &&
-          router.push(
-            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&status=${row.visitStatus}`,
-          )
+        if (valid) {
+          const version = Date.now()
+          dispatch({
+            type: `consultation/newConsultation`,
+            payload: {
+              id: row.visitFK,
+              version,
+            },
+          }).then((o) => {
+            if (o)
+              router.push(
+                `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+              )
+          })
+        }
         break
       }
       case '6': {
         // resume consultation
         const valid = isAssignedDoctor(row)
-        valid &&
-          router.push(
-            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=resume&visit=${row.visitFK}&status=${row.visitStatus}`,
-          )
+        if (valid) {
+          const version = Date.now()
+
+          if (row.visitStatus === 'PAUSED') {
+            dispatch({
+              type: `consultation/resume`,
+              payload: {
+                id: row.visitFK,
+                version,
+              },
+            }).then((o) => {
+              if (o)
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                )
+            })
+          } else {
+            router.push(
+              `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+            )
+          }
+        }
+
         break
       }
       case '7': {
         // edit consultation
         const valid = isAssignedDoctor(row)
-        valid &&
-          router.push(
-            `/reception/queue/patientdashboard?qid=${row.id}&v=${Date.now()}&md2=cons&action=edit&visit=${row.visitFK}&status=${row.visitStatus}`,
-          )
+        if (valid) {
+          const version = Date.now()
+
+          dispatch({
+            type: `consultation/edit`,
+            payload: {
+              id: row.visitFK,
+              version,
+            },
+          }).then((o) => {
+            if (o)
+              router.push(
+                `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+              )
+          })
+        }
         break
       }
       case '8':

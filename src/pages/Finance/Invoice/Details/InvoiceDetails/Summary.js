@@ -2,7 +2,7 @@ import React from 'react'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // common component
-import { GridContainer, GridItem, NumberInput } from '@/components'
+import { GridContainer, GridItem, NumberInput, FastField } from '@/components'
 // styling
 import styles from './styles'
 
@@ -24,22 +24,46 @@ const Summary = ({ classes }) => {
       className={classes.summaryContent}
     >
       <GridItem xs={6} md={6}>
-        <NumberInput prefix='Sub Total:' defaultValue={10} {...amountProps} />
+        <FastField
+          name='invoiceTotal'
+          render={(args) => {
+            return (
+              <NumberInput prefix='Sub Total:' {...amountProps} {...args} />
+            )
+          }}
+        />
       </GridItem>
 
       <GridItem xs={6} md={6}>
-        <NumberInput prefix='Adjustments:' defaultValue={2} {...amountProps} />
+        <FastField
+          name='totalAdjustment'
+          render={(args) => {
+            return (
+              <NumberInput prefix='Adjustments:' {...amountProps} {...args} />
+            )
+          }}
+        />
       </GridItem>
 
       <GridItem xs={6} md={6}>
-        <NumberInput prefix='GST (7%):' defaultValue={0.63} {...amountProps} />
+        <FastField
+          name='invoiceGSTAmt'
+          render={(args) => {
+            return <NumberInput prefix='GST (7%):' {...amountProps} {...args} />
+          }}
+        />
       </GridItem>
       <GridItem md={3} className={classes.divider}>
         <Divider />
       </GridItem>
 
       <GridItem xs={6} md={6}>
-        <NumberInput prefix='Total:' defaultValue={10.63} {...amountProps} />
+        <FastField
+          name='invoiceTotalAftGST'
+          render={(args) => {
+            return <NumberInput prefix='Total:' {...amountProps} {...args} />
+          }}
+        />
       </GridItem>
     </GridContainer>
   )

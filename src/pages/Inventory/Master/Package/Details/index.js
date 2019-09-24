@@ -12,12 +12,6 @@ import {
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getServices } from '@/utils/codes'
-import {
-  podoOrderType,
-  getInventoryItem,
-  getInventoryItemList,
-} from '@/utils/codes'
 
 const styles = () => ({
   actionDiv: {
@@ -28,7 +22,6 @@ const styles = () => ({
   },
 })
 
-let commitCount = 1000 // uniqueNumber
 const Detail = ({
   classes,
   dispatch,
@@ -47,21 +40,9 @@ const Detail = ({
   ] = useState(() => {})
 
   const [
-    servicess,
-    setServicess,
-  ] = useState(() => [])
-  const [
-    serviceCenterss,
-    setServiceCenterss,
-  ] = useState(() => [])
-  const [
     serviceCenterServicess,
     setServiceCenterServicess,
   ] = useState(() => [])
-  const [
-    serviceFK,
-    setServiceFK,
-  ] = useState(() => {})
   const [
     serviceCenterFK,
     setServiceCenterFK,
@@ -70,19 +51,6 @@ const Detail = ({
     price,
     setPrice,
   ] = useState(() => undefined)
-
-  const [
-    consumableItemList,
-    setConsumableItemList,
-  ] = useState([])
-  const [
-    medicationItemList,
-    setMedicationItemList,
-  ] = useState([])
-  const [
-    vaccinationItemList,
-    setVaccinationItemList,
-  ] = useState([])
 
   // useEffect(() => {
   //   const fetchCodes = async () => {
@@ -148,12 +116,6 @@ const Detail = ({
   //   return { ...row, unitPrice: sellingPrice }
   // }
 
-  const {
-    medicationPackageItem,
-    consumablePackageItem,
-    vaccinationPackageItem,
-    servicePackageItem,
-  } = values
   const { currentTab } = pack
   const detailProps = {
     values,
@@ -162,6 +124,11 @@ const Detail = ({
     setFieldValue,
     showTransfer: false,
   }
+
+  const [
+    totalPrice,
+    setTotalPrice,
+  ] = useState(0)
 
   // const [
   //   total,
@@ -218,22 +185,16 @@ const Detail = ({
             tabContent: (
               <InventoryTypeListing
                 dispatch={dispatch}
-                // calTotal={calTotal}
-                // medication={medicationProps}
-                // consumable={consumableProps}
-                // vaccination={vaccinationProps}
-                // service={serviceProps}
                 packDetail={packDetail}
                 setFieldValue={setFieldValue}
                 values={values}
                 selectedItem={selectedItem}
                 setSelectedItem={setSelectedItem}
-                // setServiceCenter={setServiceCenter}
-                // serviceCenter={serviceCenter}
                 price={price}
                 serviceCenterFK={serviceCenterFK}
-                // serviceFK={serviceFK}
                 serviceCenterServicess={serviceCenterServicess}
+                totalPrice={totalPrice}
+                setTotalPrice={setTotalPrice}
                 {...props}
               />
             ),
@@ -264,7 +225,6 @@ export default compose(
 
     handleSubmit: (values, { props }) => {
       const { dispatch, history, codetable } = props
-      const { ctservice } = codetable
       const { servicePackageItem } = values
       console.log('submit', values)
 
@@ -283,6 +243,7 @@ export default compose(
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           servicePackageItem: newServicePackageArray,
+          totalPrice: totalPrice,
         },
       }).then((r) => {
         if (r) {

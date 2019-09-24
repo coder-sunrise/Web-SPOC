@@ -1,5 +1,5 @@
 export const PayerType = {
-  PATIENT: 0,
-  COPAYER: 1,
-  GOVT_COPAYER: 2,
+  PATIENT: 1,
+  COPAYER: 2,
+  GOVT_COPAYER: 3,
 }
