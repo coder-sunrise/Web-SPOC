@@ -376,6 +376,7 @@ const convertToQuery = (
   // delete customQuerys.queryExcludeFields
   delete customQuerys.totalRecords
   delete customQuerys.combineCondition
+  delete customQuerys.version
 
   // console.log(query)
   let newQuery = {}
