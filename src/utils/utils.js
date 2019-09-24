@@ -45,22 +45,22 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.replace(new RegExp(search, 'g'), replacement)
 }
 
-function toLocal (m) {
-  // console.log(m, m.format(), moment(m.format()).add(8, 'hours'))
-  return m.add(8, 'hours')
-}
+// function toLocal (m) {
+//   // console.log(m, m.format(), moment(m.format()).add(8, 'hours'))
+//   return m.add(8, 'hours')
+// }
 
-function toUTC (m) {
-  return moment(m.format()).add(-8, 'hours')
-}
+// function toUTC (m) {
+//   return moment(m.format()).add(-8, 'hours')
+// }
 
-moment.prototype.toLocal = function () {
-  return this.clone().add(8, 'hours')
-}
+// moment.prototype.toLocal = function () {
+//   return this.clone().add(8, 'hours')
+// }
 
-moment.prototype.toUTC = function () {
-  return this.clone().add(-8, 'hours')
-}
+// moment.prototype.toUTC = function () {
+//   return this.clone().add(-8, 'hours')
+// }
 
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
@@ -741,6 +741,6 @@ module.exports = {
   calculateAdjustAmount,
   errMsgForOutOfRange,
   calculateItemLevelAdjustment,
-  toUTC,
-  toLocal,
+  // toUTC,
+  // toLocal,
 }

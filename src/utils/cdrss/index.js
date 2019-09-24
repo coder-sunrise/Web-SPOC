@@ -705,7 +705,7 @@ const defaultFormBehavior = (
   return returnVal
 }
 
-const regDate = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
+const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
 const commonDataReaderTransform = (data, fieldName = 'id') => {
   // console.log(data, fieldName)
   if (typeof data === 'object') {

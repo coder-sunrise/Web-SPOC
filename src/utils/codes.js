@@ -576,12 +576,9 @@ const consultationDocumentTypes = [
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
     getSubject: (r) => {
-      console.log(r)
-      return `${moment(r.mcStartDate).toLocal().format()} - ${moment(
+      return `${moment(r.mcStartDate).format(dateFormatLong)} - ${moment(
         r.mcEndDate,
-      )
-        .toLocal()
-        .format()} - ${r.mcDays} Day(s)`
+      ).format(dateFormatLong)} - ${r.mcDays} Day(s)`
     },
     convert: (r) => {
       return {
@@ -600,15 +597,9 @@ const consultationDocumentTypes = [
           MedicalCertificateDetails: [
             {
               ...row,
-              mcIssueDate: moment(row.mcIssueDate)
-                .toLocal()
-                .format(dateFormatLong),
-              mcStartDate: moment(row.mcIssueDate)
-                .toLocal()
-                .format(dateFormatLong),
-              mcEndDate: moment(row.mcIssueDate)
-                .toLocal()
-                .format(dateFormatLong),
+              mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcStartDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcEndDate: moment(row.mcIssueDate).format(dateFormatLong),
             },
           ],
         }
@@ -637,7 +628,7 @@ const consultationDocumentTypes = [
           CertificateOfAttendanceDetails: [
             {
               ...row,
-              issueDate: moment(row.issueDate).toLocal().format(dateFormatLong),
+              issueDate: moment(row.issueDate).format(dateFormatLong),
             },
           ],
         }
@@ -661,7 +652,7 @@ const consultationDocumentTypes = [
           MemoDetails: [
             {
               ...row,
-              memoDate: moment(row.memoDate).toLocal().format(dateFormatLong),
+              memoDate: moment(row.memoDate).format(dateFormatLong),
             },
           ],
         }
@@ -682,9 +673,9 @@ const consultationDocumentTypes = [
           VaccinationCertificateDetails: [
             {
               ...row,
-              certificateDate: moment(row.certificateDate)
-                .toLocal()
-                .format(dateFormatLong),
+              certificateDate: moment(row.certificateDate).format(
+                dateFormatLong,
+              ),
             },
           ],
         }

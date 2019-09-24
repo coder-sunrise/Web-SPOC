@@ -7,6 +7,7 @@ import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
+import { commonDataReaderTransform } from '@/utils/utils'
 import {
   CommonTableGrid,
   Button,
@@ -65,7 +66,9 @@ export const printRow = async (row, props) => {
         method: 'POST',
         contentType: 'application/x-www-form-urlencoded',
         data: {
-          reportContent: JSON.stringify(downloadConfig.draft(row)),
+          reportContent: JSON.stringify(
+            commonDataReaderTransform(downloadConfig.draft(row)),
+          ),
         },
       },
     )
