@@ -371,38 +371,39 @@ class PatientHistory extends Component {
   }
 
   // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    // console.log(this.props, nextProps, nextProps.patientHistory.version)
-    if (
-      nextProps.patientHistory.version &&
-      this.props.patientHistory.version !== nextProps.patientHistory.version
-    ) {
-      nextProps
-        .dispatch({
-          type: 'patientHistory/query',
-          payload: {
-            patientProfileFK: nextProps.patientHistory.patientID,
-            sorting: [
-              {
-                columnName: 'VisitDate',
-                direction: 'desc',
-              },
-            ],
-          },
-        })
-        .then((o) => {
-          // this.props.resetForm(o)
-          nextProps.dispatch({
-            type: 'patientHistory/updateState',
-            payload: {
-              selected: undefined,
-              selectedSubRow: undefined,
-              entity: undefined,
-            },
-          })
-        })
-    }
-  }
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   // console.log(this.props, nextProps, nextProps.patientHistory.version)
+  //   if (
+  //     nextProps.patientHistory.version &&
+  //     this.props.patientHistory.version !== nextProps.patientHistory.version
+  //   ) {
+  //     nextProps
+  //       .dispatch({
+  //         type: 'patientHistory/query',
+  //         payload: {
+  //           patientProfileFK: nextProps.patientHistory.patientID,
+  //           sorting: [
+  //             {
+  //               columnName: 'VisitDate',
+  //               direction: 'desc',
+  //             },
+  //           ],
+  //           version:
+  //         },
+  //       })
+  //       .then((o) => {
+  //         // this.props.resetForm(o)
+  //         nextProps.dispatch({
+  //           type: 'patientHistory/updateState',
+  //           payload: {
+  //             selected: undefined,
+  //             selectedSubRow: undefined,
+  //             entity: undefined,
+  //           },
+  //         })
+  //       })
+  //   }
+  // }
 
   render () {
     const {
@@ -487,19 +488,15 @@ class PatientHistory extends Component {
                     onClick={() => {
                       dispatch({
                         type: `consultation/edit`,
-                        payload: selected.id,
+                        payload: {
+                          id: selected.id,
+                          version: patientHistory.version,
+                        },
                       }).then((o) => {
-                        // console.log(o)
-                        dispatch({
-                          type: `consultation/updateState`,
-                          payload: {
-                            entity: o,
-                          },
-                        })
-
-                        router.push(
-                          `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                        )
+                        if (o)
+                          router.push(
+                            `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                          )
                       })
                     }}
                   >

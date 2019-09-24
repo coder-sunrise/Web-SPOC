@@ -572,7 +572,7 @@ const consultationDocumentTypes = [
     getSubject: (r) => {
       return `${moment(r.mcStartDate).format(dateFormatLong)} - ${moment(
         r.mcEndDate,
-      ).format(dateFormatLong)} - ${r.mcDays} Day(s)`
+      ).format(dateFormatLong)} - ${r.mcDays} Day${r.mcDays > 1 ? 's' : ''}`
     },
     convert: (r) => {
       return {
@@ -762,6 +762,7 @@ const tenantCodes = [
   'inventorypackage',
   'role',
   'ctsupplier',
+  'ctsnomeddiagnosis',
 ]
 
 const defaultParams = {

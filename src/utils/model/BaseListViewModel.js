@@ -113,9 +113,9 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
     const { reducers } = param
     return {
       ...super.reducers(),
-      querySuccess (st, { payload }) {
+      querySuccess (st, { payload = {} }) {
         // console.log(payload)
-        const { data, filter = {} } = payload
+        const { data, filter = {}, version } = payload
         // const { entities, filter } = data
         // // //console.log('list query')
         // console.log(filter)
@@ -123,6 +123,10 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         // commonDataReaderTransform(list)
         const { sorting } = filter
         // console.log(list)
+        const cfg = {}
+        if (version) {
+          cfg.version = Number(version)
+        }
         return {
           ...st,
           list,
@@ -136,6 +140,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
               sorting,
             },
           },
+          ...cfg,
           // currentItem: entities[0],
         }
       },
