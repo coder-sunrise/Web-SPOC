@@ -14,7 +14,7 @@ const DuplicatePO = ({ classes, onClose, purchaseReceiveList, actions: { handleN
             {formatMessage({
               id: 'inventory.pr.duplicatePOConfirmation',
             })}
-            <b>{entity.poNo}</b>
+            <b>{entity.purchaseOrderNo}</b>
             {'?'}
           </h3>
         </GridItem>

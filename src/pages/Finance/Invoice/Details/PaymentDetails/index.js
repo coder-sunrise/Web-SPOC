@@ -136,7 +136,7 @@ class PaymentDetails extends Component {
           payments={paymentTxnList.patientPaymentTxn}
           actions={paymentActionsProps}
         />
-        <PaymentCard
+        {/* <PaymentCard
           actions={paymentActionsProps}
           payerType={PayerType.GOVT_COPAYER}
           payerName='CHAS'
@@ -147,7 +147,7 @@ class PaymentDetails extends Component {
           payerType={PayerType.COPAYER}
           payerName='medisys'
           payments={paymentTxnList.govCoPayerPaymentTxn}
-        />
+        /> */}
         <CommonModal
           open={showAddPayment}
           title='Add Payment'

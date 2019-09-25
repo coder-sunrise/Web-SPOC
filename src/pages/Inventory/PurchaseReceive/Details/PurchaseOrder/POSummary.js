@@ -56,7 +56,7 @@ class POSummary extends PureComponent {
     const { values, dispatch, calcPurchaseOrderSummary, toggleInvoiceAdjustment } = this.props
     const { purchaseOrderAdjustment } = values
     return (
-      <div style={{ paddingRight: 140, paddingTop: 20 }}>
+      <div style={{ paddingRight: 98, paddingTop: 20 }}>
         <GridContainer>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3} container>
@@ -119,7 +119,7 @@ class POSummary extends PureComponent {
             </GridItem>
             <GridItem xs={6} md={1}>
               <FastField
-                name={`${poPrefix}.invoiceGST`}
+                name={`${poPrefix}.gstAmount`}
                 render={(args) => {
                   return <NumberInput {...amountProps} {...args} />
                 }}
@@ -164,7 +164,7 @@ class POSummary extends PureComponent {
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3}>
             <FastField
-              name={`${poPrefix}.invoiceTotal`}
+              name={`${poPrefix}.totalAmount`}
               render={(args) => {
                 return (
                   <NumberInput

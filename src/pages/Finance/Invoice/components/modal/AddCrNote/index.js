@@ -39,13 +39,22 @@ import MiscCrNote from './MiscCrNote'
   },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
-    const { creditNoteItem, invoicePayerFK, isStockIn, remark } = values
+    console.log({ values })
+    const {
+      creditNoteItem,
+      invoicePayerFK,
+      isStockIn,
+      remark,
+      finalCredit,
+    } = values
     dispatch({
       type: 'invoiceCreditNote/upsert',
       payload: {
         invoicePayerFK,
         isStockIn,
         remark,
+        total: finalCredit,
+        totalAftGST: finalCredit,
         creditNoteItem: creditNoteItem.filter((x) => x.isSelected),
       },
     }).then((r) => {
@@ -139,11 +148,11 @@ class AddCrNote extends Component {
           columns={CrNoteColumns}
           columnExtensions={[
             { columnName: 'quantity', type: 'number' },
-            {
-              columnName: 'unitPrice',
-              type: 'currency',
-              currency: true,
-            },
+            // {
+            //   columnName: 'unitPrice',
+            //   type: 'currency',
+            //   currency: true,
+            // },
 
             {
               columnName: 'totalAfterItemAdjustment',
@@ -254,14 +263,9 @@ class AddCrNote extends Component {
               },
             },
           ]}
-          FuncProps={{
-            select: true,
-            edit: true,
-            pager: false,
-          }}
           EditingProps={{
             showAddCommand: false,
-            showEditCommand: false,
+            showEditCommand: true,
             showDeleteCommand: true,
             // onCommitChanges: this.onCommitChanges,
             // onAddedRowsChange: this.onAddedRowsChange,

@@ -1,12 +1,20 @@
 import React, { Component } from 'react'
 // import { connect } from 'dva'
+import Yup from '@/utils/yup'
 import { formatMessage } from 'umi/locale'
-import { notification, withFormikExtend, GridContainer, GridItem, Button } from '@/components'
+import {
+  notification,
+  withFormikExtend,
+  GridContainer,
+  GridItem,
+  Button,
+} from '@/components'
 import POForm from './POForm'
 import POGrid from './POGrid'
 import POSummary from './POSummary'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
 import { isPOStatusFinalized } from '../../variables'
+import { podoOrderType } from '@/utils/codes'
 
 // @connect(({ purchaseOrderDetails, clinicSettings, clinicInfo }) => ({
 //   purchaseOrderDetails,
@@ -31,8 +39,10 @@ class index extends Component {
     const { settings } = clinicSettings
 
     if (settings) {
-      if (settings.IsEnableGST !== state.settingGSTEnable &&
-        settings.GSTPercentageInt !== state.settingGSTPercentage)
+      if (
+        settings.IsEnableGST !== state.settingGSTEnable &&
+        settings.GSTPercentageInt !== state.settingGSTPercentage
+      )
         return {
           ...state,
           settingGSTEnable: !settings.IsEnableGST,
@@ -69,6 +79,96 @@ class index extends Component {
     }
   }
 
+  onSavePOClicked = () => {
+    const { dispatch, purchaseOrderDetails, values, history } = this.props
+    const { id, type } = purchaseOrderDetails
+    const {
+      purchaseOrder,
+      purchaseOrderAdjustment: poAdjustment,
+      rows,
+    } = values
+
+    const processPayload = () => {
+      let purchaseOrderItem = []
+      if (type === 'new' || type === 'dup') {
+        purchaseOrderItem = rows.map((x) => {
+          const itemType = podoOrderType.find((y) => y.value === x.type)
+          return {
+            inventoryItemTypeFK: itemType.value,
+            orderQuantity: x.orderQuantity,
+            bonusQuantity: x.bonusQuantity,
+            totalQuantity: x.totalQuantity,
+            totalPrice: x.totalPrice,
+            totalAfterAdjustments: x.totalAfterAdjustments,
+            totalAfterGst: x.totalAfterGst,
+            sortOrder: x.sortOrder,
+            IsACPUpdated: false,
+            [itemType.prop]: {
+              [itemType.itemFKName]: x[itemType.itemFKName],
+              [itemType.itemCode]: '',
+              [itemType.itemName]: '',
+            },
+          }
+        })
+      } else {
+        purchaseOrderItem = rows.map((x) => {
+          const itemType = podoOrderType.find((y) => y.value === x.type)
+          let result = {}
+          // delete x.id
+          // x.outId ? (x.id = x.poItemId) : undefined
+          if (x.isNew) {
+            result = {
+              inventoryItemTypeFK: itemType.value,
+              orderQuantity: x.orderQuantity,
+              bonusQuantity: x.bonusQuantity,
+              totalQuantity: x.totalQuantity,
+              totalPrice: x.totalPrice,
+              totalAfterAdjustments: x.totalAfterAdjustments,
+              totalAfterGst: x.totalAfterGst,
+              sortOrder: x.sortOrder,
+              IsACPUpdated: false,
+              [itemType.prop]: {
+                [itemType.itemFKName]: x[itemType.itemFKName],
+                [itemType.itemCode]: '',
+                [itemType.itemName]: '',
+              },
+            }
+          } else {
+            result = {
+              ...x,
+            }
+          }
+          console.log(result)
+          return result
+        })
+      }
+
+      return {
+        ...purchaseOrder,
+        purchaseOrderStatusFK: 1,
+        invoiceStatusFK: 3, // Soe will double confirm whether this will be done at server side
+        purchaseOrderItem,
+        purchaseOrderAdjustment: [
+          ...poAdjustment.map((adj) => {
+            if (adj.isNew) {
+              delete adj.id
+            }
+            return adj
+          }),
+        ],
+      }
+    }
+
+    dispatch({
+      type: 'purchaseOrderDetails/upsert',
+      payload: processPayload(),
+    }).then((r) => {
+      if (r) {
+        history.push('/inventory/pr')
+      }
+    })
+  }
+
   dummyOnSubmitPO = () => {
     const { dispatch, purchaseOrderDetails, values } = this.props
     const { id, type } = purchaseOrderDetails
@@ -81,15 +181,15 @@ class index extends Component {
   }
 
   updateURL = () => {
-    // Redirect to parent page 
+    // Redirect to parent page
     // (Only need to POST + wait for 200 --> then push to parent)
-    // If: Save Purchase Order Click 
+    // If: Save Purchase Order Click
     // If: Cancel Purchase Order Click
 
-    // Redirect to same page 
+    // Redirect to same page
     // (POST + wait for 200 --> then call model/refresh + remain in same tab)
     // If: Finalize Purchase Order (W/ Finalized notify)
-    // If: Save Delivery Order (From popup) 
+    // If: Save Delivery Order (From popup)
     // If: Save Payment Clicked
 
     const { dispatch, history, values } = this.props
@@ -108,7 +208,7 @@ class index extends Component {
     // })
   }
 
-  onPrintClick = () => { }
+  onPrintClick = () => {}
 
   showInvoiceAdjustment = () => {
     const { values, dispatch } = this.props
@@ -120,7 +220,7 @@ class index extends Component {
         openAdjustmentConfig: {
           showRemark: true,
           defaultValues: {
-            initialAmout: purchaseOrder.invoiceTotal,
+            initialAmout: purchaseOrder.totalAmount,
           },
           callbackConfig: {
             model: 'purchaseOrderDetails',
@@ -138,8 +238,8 @@ class index extends Component {
     const { rows, purchaseOrderAdjustment, purchaseOrder } = values
     const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
     let tempInvoiceTotal = 0
-    let invoiceTotal = 0
-    let invoiceGST = 0
+    let totalAmount = 0
+    let gstAmount = 0
 
     const filteredPurchaseOrderAdjustment = purchaseOrderAdjustment.filter(
       (x) => !x.isDeleted,
@@ -194,14 +294,14 @@ class index extends Component {
               // Calculate item level totalAfterAdjustments & totalAfterGst
               if (IsGSTInclusive) {
                 item.totalAfterGst = item.tempSubTotal
-                invoiceTotal += item.tempSubTotal
+                totalAmount += item.tempSubTotal
               } else {
                 item.totalAfterGst = item.tempSubTotal + item.itemLevelGST
-                invoiceTotal += item.itemLevelGST + item.tempSubTotal
+                totalAmount += item.itemLevelGST + item.tempSubTotal
               }
 
               item.totalAfterAdjustments = item.tempSubTotal
-              invoiceGST += item.itemLevelGST
+              gstAmount += item.itemLevelGST
             }
             return null
           })
@@ -227,28 +327,32 @@ class index extends Component {
         item.totalAfterGst = item.tempSubTotal + item.itemLevelGST
 
         // Sum up all and display at summary
-        invoiceGST += item.itemLevelGST
-        invoiceTotal += item.itemLevelGST + item.tempSubTotal
+        gstAmount += item.itemLevelGST
+        totalAmount += item.itemLevelGST + item.tempSubTotal
         return null
       })
     }
 
     setTimeout(() => {
-      setFieldValue('purchaseOrder.invoiceGST', invoiceGST)
+      setFieldValue('purchaseOrder.gstAmount', gstAmount)
     }, 1)
 
     setTimeout(() => {
-      setFieldValue('purchaseOrder.invoiceTotal', invoiceTotal)
+      setFieldValue('purchaseOrder.totalAmount', totalAmount)
     }, 1)
   }
 
   render () {
+    console.log('Index', this.props)
     const { purchaseOrderDetails } = this.props
     const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = (purchaseOrder) ? purchaseOrder.status : ''
+    const poStatus = purchaseOrder ? purchaseOrder.status : ''
     return (
       <div>
-        <POForm isPOFinalized={!isPOStatusFinalized(poStatus)} {...this.props} />
+        <POForm
+          isPOFinalized={!isPOStatusFinalized(poStatus)}
+          {...this.props}
+        />
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           isEditable={!isPOStatusFinalized(poStatus)}
@@ -269,9 +373,9 @@ class index extends Component {
                 })}
               </Button>
             ) : (
-                ''
-              )}
-            <Button color='primary' onClick={this.dummyOnSubmitPO}>
+              ''
+            )}
+            <Button color='primary' onClick={this.onSavePOClicked}>
               {formatMessage({
                 id: 'inventory.pr.detail.pod.save',
               })}

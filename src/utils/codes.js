@@ -996,6 +996,8 @@ export const podoOrderType = [
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
     stateName: 'MedicationItemList',
+    itemCode: 'inventoryMedicationCode',
+    itemName: 'inventoryMedicationName',
   },
   {
     value: 2,
@@ -1004,6 +1006,8 @@ export const podoOrderType = [
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
     stateName: 'VaccinationItemList',
+    itemCode: 'inventoryVaccinationCode',
+    itemName: 'inventoryVaccinationName',
   },
   {
     value: 3,
@@ -1012,6 +1016,8 @@ export const podoOrderType = [
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
     stateName: 'ConsumableItemList',
+    itemCode: 'inventoryConsumableCode',
+    itemName: 'inventoryConsumableName',
   },
 ]
 

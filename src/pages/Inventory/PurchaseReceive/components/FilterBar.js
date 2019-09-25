@@ -14,7 +14,6 @@ import {
   ProgressButton,
   DateRangePicker,
 } from '@/components'
-const filterPrefix = 'filter'
 
 const FilterBar = ({
   classes,
@@ -30,7 +29,7 @@ const FilterBar = ({
     <GridContainer>
       <GridItem xs={6} md={3}>
         <FastField
-          name={`${filterPrefix}.poNo`}
+          name='purchaseOrderNo'
           render={(args) => {
             return (
               <TextField
@@ -45,7 +44,7 @@ const FilterBar = ({
       </GridItem>
       <GridItem md={6}>
         <Field
-          name={`${filterPrefix}.transactionDates`}
+          name='transactionDates'
           render={(args) => {
             return (
               <DateRangePicker
@@ -64,7 +63,7 @@ const FilterBar = ({
       </GridItem>
       <GridItem xs sm={6} md={3}>
         <FastField
-          name={`${filterPrefix}.allDate`}
+          name='allDate'
           render={(args) => {
             return (
               <Tooltip
@@ -79,7 +78,7 @@ const FilterBar = ({
                   })}
                   inputLabel=' '
                   onChange={() =>
-                    setIsAllDateChecked(values ? values.filter.allDate : false)}
+                    setIsAllDateChecked(values ? values.allDate : false)}
                   {...args}
                 />
               </Tooltip>
@@ -89,7 +88,7 @@ const FilterBar = ({
       </GridItem>
       <GridItem xs={6} md={3}>
         <FastField
-          name={`${filterPrefix}.invoiceStatus`}
+          name='invoiceStatus'
           render={(args) => {
             return (
               <Select
@@ -104,7 +103,7 @@ const FilterBar = ({
       </GridItem>
       <GridItem xs={6} md={3}>
         <FastField
-          name={`${filterPrefix}.supplier`}
+          name='supplier'
           render={(args) => {
             return (
               <CodeSelect
@@ -121,7 +120,7 @@ const FilterBar = ({
       </GridItem>
       <GridItem xs={6} md={3}>
         <FastField
-          name={`${filterPrefix}.poStatus`}
+          name='poStatus'
           render={(args) => {
             return (
               <Select
@@ -140,13 +139,13 @@ const FilterBar = ({
             color='primary'
             icon={null}
             onClick={() => {
-              const {
-                poNo,
-                invoiceStatus,
-                transactionDates,
-                supplier,
-                poStatus,
-              } = values.filter
+              // const {
+              //   purchaseOrderNo,
+              //   invoiceStatus,
+              //   transactionDates,
+              //   supplier,
+              //   poStatus,
+              // } = values
               dispatch({
                 type: 'purchaseReceiveList/query',
                 // payload: {}

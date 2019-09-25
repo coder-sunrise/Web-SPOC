@@ -12,7 +12,7 @@ class index extends Component {
   render () {
     const { purchaseOrderDetails } = this.props
     const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = (purchaseOrder) ? purchaseOrder.status : ''
+    const poStatus = (purchaseOrder) ? purchaseOrder.purchaseOrderStatusFK : 1
     return (
       <CardContainer hideHeader>
         <Tabs

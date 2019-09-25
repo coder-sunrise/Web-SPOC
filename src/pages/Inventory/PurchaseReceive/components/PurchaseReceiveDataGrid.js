@@ -47,11 +47,11 @@ const PurchaseReceiveDataGrid = ({
           format: 'DD MMM YYYY',
         },
         {
-          columnName: 'expectedDeliveryDate',
+          columnName: 'exceptedDeliveryDate',
           type: 'date',
           format: 'DD MMM YYYY',
         },
-        { columnName: 'total', type: 'number', currency: true },
+        { columnName: 'totalAmount', type: 'number', currency: true },
         { columnName: 'outstanding', type: 'number', currency: true },
         {
           columnName: 'status',

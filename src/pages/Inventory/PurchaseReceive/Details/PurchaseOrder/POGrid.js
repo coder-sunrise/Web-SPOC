@@ -1,10 +1,6 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
-import {
-  EditableTableGrid,
-  GridContainer,
-  GridItem,
-} from '@/components'
+import { EditableTableGrid, GridContainer, GridItem } from '@/components'
 import {
   podoOrderType,
   getInventoryItem,
@@ -16,9 +12,9 @@ let commitCount = 2200 // uniqueNumber
 const receivingDetailsSchema = Yup.object().shape({
   type: Yup.string().required(),
   code: Yup.string().required(),
-  name: Yup.string().required(),
-  orderQty: Yup.number().min(1).required(),
-  bonusQty: Yup.number().min(0).required(),
+  // name: Yup.string().required(),
+  orderQuantity: Yup.number().min(1).required(),
+  bonusQuantity: Yup.number().min(0).required(),
 })
 
 class Grid extends PureComponent {
@@ -93,9 +89,9 @@ class Grid extends PureComponent {
     row.code = ''
     row.name = ''
     row.uom = ''
-    row.orderQty = 0
-    row.bonusQty = 0
-    row.totalQty = 0
+    row.orderQuantity = 0
+    row.bonusQuantity = 0
+    row.totalQuantity = 0
     row.quantityReceived = 0
     row.unitPrice = 0
     row.totalPrice = 0
@@ -121,9 +117,9 @@ class Grid extends PureComponent {
     }
 
     row.uom = option.uom
-    row.orderQty = 0
-    row.bonusQty = 0
-    row.totalQty = 0
+    row.orderQuantity = 0
+    row.bonusQuantity = 0
+    row.totalQuantity = 0
     row.quantityReceived = 0
 
     this.setState({
@@ -140,9 +136,9 @@ class Grid extends PureComponent {
       if (!addedRows.isFocused) {
         const { onClickColumn, selectedItem } = this.state
         let tempRow = addedRows[0]
-        let tempOrderQty = tempRow.orderQty
-        let tempBonusQty = tempRow.bonusQty
-        let tempTotalQty = tempRow.totalQty
+        let tempOrderQty = tempRow.orderQuantity
+        let tempBonusQty = tempRow.bonusQuantity
+        let tempTotalQty = tempRow.totalQuantity
         let tempQuantityReceived = tempRow.quantityReceived
         let tempUnitPrice = tempRow.unitPrice
         let tempTotalPrice = tempRow.totalPrice
@@ -176,7 +172,7 @@ class Grid extends PureComponent {
         newAddedRows = addedRows.map((row) => ({
           ...row,
           itemFK: selectedItem.value,
-          totalQty: tempTotalQty,
+          totalQuantity: tempTotalQty,
           unitPrice: tempUnitPrice,
           totalPrice: tempTotalPrice,
         }))
@@ -185,9 +181,9 @@ class Grid extends PureComponent {
         this.setState({ onClickColumn: undefined })
         newAddedRows = addedRows.map((row) => ({
           ...row,
-          orderQty: 0,
-          bonusQty: 0,
-          totalQty: 0,
+          orderQuantity: 0,
+          bonusQuantity: 0,
+          totalQuantity: 0,
           quantityReceived: 0,
           unitPrice: 0,
           totalPrice: 0,
@@ -248,9 +244,9 @@ class Grid extends PureComponent {
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
         { name: 'uom', title: 'UOM' },
-        { name: 'orderQty', title: 'Order Qty' },
-        { name: 'bonusQty', title: 'Bonus Qty' },
-        { name: 'totalQty', title: 'Total Qty' }, // Disabled, auto calc
+        { name: 'orderQuantity', title: 'Order Qty' },
+        { name: 'bonusQuantity', title: 'Bonus Qty' },
+        { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc
         { name: 'quantityReceived', title: 'Total Received' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'totalPrice', title: 'Total Price' }, // Disabled, auto calc
@@ -311,15 +307,15 @@ class Grid extends PureComponent {
           },
         },
         {
-          columnName: 'orderQty',
+          columnName: 'orderQuantity',
           type: 'number',
         },
         {
-          columnName: 'bonusQty',
+          columnName: 'bonusQuantity',
           type: 'number',
         },
         {
-          columnName: 'totalQty',
+          columnName: 'totalQuantity',
           type: 'number',
           disabled: true,
         },

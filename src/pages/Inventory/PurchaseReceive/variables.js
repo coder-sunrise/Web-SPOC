@@ -8,26 +8,65 @@ import DeliveryOrder from './Details/DeliveryOrder'
 import Payment from './Details/Payment'
 import moment from 'moment'
 
+const LTPurchaseOrderStatus = [
+  {
+    code: 'DRAFT',
+    name: 'Draft',
+    id: 1,
+  },
+  {
+    code: 'FINALIZED',
+    name: 'Finalized',
+    id: 2,
+  },
+  {
+    code: 'PARTIALREVD',
+    name: 'Partially Received',
+    id: 3,
+  },
+  {
+    code: 'CANCELLED',
+    name: 'Cancelled',
+    id: 4,
+  },
+  {
+    code: 'FULFILLED',
+    name: 'Fulfilled',
+    id: 5,
+  },
+  {
+    code: 'COMPLETED',
+    name: 'Completed',
+    id: 6,
+  },
+]
+
 const isDuplicatePOAllowed = (status) => {
   const allowedStatus = [
     'Partially Received',
     'Finalized',
     'Fulfilled',
+    // 2,
+    // 3,
+    // 5,
   ]
   return !(allowedStatus.indexOf(status) > -1)
 }
 
 export const isPOStatusDraft = (status) => {
   const allowedStatus = [
-    'Draft',
-    'Cancelled',
+    // 'Draft',
+    // 'Cancelled',
+    1,
+    4,
   ]
   return allowedStatus.indexOf(status) > -1
 }
 
 export const isPOStatusFinalized = (status) => {
   const allowedStatus = [
-    'Finalized',
+    // 'Finalized',
+    2,
   ]
   return allowedStatus.indexOf(status) > -1
 }
@@ -36,7 +75,7 @@ export const PurchaseReceiveGridCol = [
   { name: 'purchaseOrderNo', title: 'PO No' },
   { name: 'purchaseOrderDate', title: 'PO Date' },
   { name: 'supplier', title: 'Supplier' },
-  { name: 'expectedDeliveryDate', title: 'Expected Delivery Date' },
+  { name: 'exceptedDeliveryDate', title: 'Expected Delivery Date' },
   { name: 'purchaseOrderStatus', title: 'PO Status' },
   { name: 'totalAmount', title: 'Total' },
   { name: 'outstanding', title: 'Outstanding' },
@@ -51,7 +90,7 @@ export const PurchaseReceiveGridTableConfig = {
     selectConfig: {
       // showSelectAll: true
     },
-  }
+  },
 }
 
 export const ContextMenuOptions = (row) => {
@@ -66,7 +105,7 @@ export const ContextMenuOptions = (row) => {
       id: 1,
       label: 'Duplicate PO',
       Icon: Duplicate,
-      disabled: isDuplicatePOAllowed(row.poStatus),
+      disabled: isDuplicatePOAllowed(row.purchaseOrderStatus),
     },
     { isDivider: true },
     {
