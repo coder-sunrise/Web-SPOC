@@ -75,8 +75,9 @@ class SketchField extends PureComponent {
   state = {
     parentWidth: 550,
     action: true,
-    indexCount: 0.5,
+    indexCount: 1,
     initialData: [],
+    templateSet: false,
   }
 
   _initTools = (fabricCanvas) => {
@@ -149,7 +150,8 @@ class SketchField extends PureComponent {
       return
     }
     // if(e.target.type != "image"){
-    if (e.target.id !== 'ARROW') {
+      console.log(e.target.id)
+    if (e.target.id !== 'SKIP' ) {
       let obj = e.target
       obj.__version = 1
       // record current object state as json and save as originalState
@@ -475,7 +477,11 @@ class SketchField extends PureComponent {
       this.setState({ action: false }, () => {
         this._fc.add(obj)
         if (obj.zindex != null) {
-          canvas.moveTo(obj, obj.zindex)
+          if(obj.zindex === -100){
+            canvas.sendToBack(obj)
+          }else{
+            canvas.moveTo(obj, obj.zindex)
+          }
         }
         obj.__version -= 1
         obj.__removed = false
@@ -509,7 +515,11 @@ class SketchField extends PureComponent {
         this.setState({ action: false }, () => {
           canvas.add(obj)
           if (obj.zindex != null) {
-            canvas.moveTo(obj, obj.zindex)
+            if(obj.zindex === -100){
+              canvas.sendToBack(obj)
+            }else{
+              canvas.moveTo(obj, obj.zindex)
+            }
           }
           obj.__version = 1
         })
@@ -602,32 +612,40 @@ class SketchField extends PureComponent {
 
     setTimeout(() => {
       let originalList = history.getOriginalList()
-
+      console.log(originalList)
       for (let i = 0; i < this.initialData.length; i++) {
         let [
           mainObject,
         ] = originalList[i]
         if (this.initialData[i].layerNumber != 0) {
-          console.log("count ")
-          console.log(this.initialData[i].layerNumber)
-          if(this.initialData[i].layerNumber == -100){
+          if (this.initialData[i].layerNumber == -100) {
             mainObject.set({
               zindex: this.initialData[i].layerNumber,
               id: 'template',
             })
-          }else{
+            canvas.sendToBack(mainObject)
+          } else {
+            mainObject.set({
+              zindex: this.initialData[i].layerNumber,
+            })
             this.setState({
-              indexCount: this.initialData[i].layerNumber
+              indexCount: this.initialData[i].layerNumber + 1,
             })
             mainObject.set({
               zindex: this.initialData[i].layerNumber,
             })
+            canvas.moveTo(mainObject, this.initialData[i].layerNumber)
           }
-          canvas.moveTo(mainObject, this.initialData[i].layerNumber)
+        }
+      }
 
-          // if (mainObject.id === 'template') {
-          //   canvas.moveTo(mainObject, -100)
-          // }
+      for (let i = 0; i < this.initialData.length; i++) {
+        let [
+          mainObject,
+        ] = originalList[i]
+        if (this.initialData[i].layerType !== 'image') {
+          console.log("front")
+          canvas.bringToFront(mainObject)
         }
       }
     }, 400)
@@ -642,13 +660,12 @@ class SketchField extends PureComponent {
    */
   clear = (propertiesToInclude) => {
     this.setState({
-      indexCount: 0.5,
+      indexCount: 1,
     })
     let discarded = this.toJSON(propertiesToInclude)
     this._fc.clear()
     this._history.clear()
     return discarded
-    
   }
 
   /**
@@ -721,13 +738,13 @@ class SketchField extends PureComponent {
    */
   setBackgroundFromDataUrl = (dataUrl) => {
     let canvas = this._fc
-    let { indexCount } = this.state
+    let { indexCount , templateSet} = this.state
     let history = this._history
     let oldIndexCount = indexCount
-    let newIndexCount = indexCount + 0.5
+    let newIndexCount = indexCount + 1
 
     history.updateCount(oldIndexCount)
-    console.log("image index ", indexCount)
+    console.log('image index ', indexCount)
 
     this.setState({
       indexCount: newIndexCount,
@@ -741,11 +758,23 @@ class SketchField extends PureComponent {
       imgbase64.set({
         zindex: oldIndexCount,
       })
-      // canvas.setBackgroundImage(imgbase64)
+      // canvas.bringForward(imgbase64)
       canvas.add(imgbase64)
       imgbase64.selectable = false
       imgbase64.evented = false
-       canvas.moveTo(imgbase64, oldIndexCount)
+      
+
+      if(!templateSet){
+        this.setState({
+          templateSet: true,
+        })
+        canvas.sendToBack(imgbase64)
+      }else{
+        canvas.moveTo(imgbase64, oldIndexCount)
+      }
+      console.log(imgbase64)
+      console.log(canvas.getObjects().indexOf(imgbase64))
+
       // context.drawImage(imgbase64, 0, 0);
     }
 
@@ -770,10 +799,16 @@ class SketchField extends PureComponent {
   }
 
   setTemplate = (dataUrl) => {
+    let { templateSet } = this.state
     let history = this._history
     let allList = history.getOriginalList()
     let prevTemplate = ''
 
+    if(!templateSet){
+      this.setState({
+        templateSet: true,
+      })
+    }
 
     for (let i = 0; i < allList.length; i++) {
       let [
@@ -815,20 +850,33 @@ class SketchField extends PureComponent {
     history.updateCount(-100)
     let canvas = this._fc
     const image = new Image()
-    image.src = dataUrl
+
     image.onload = () => {
       let imgbase64 = new fabric.Image(image, {})
+
       imgbase64.set({
-       // zindex: -500,
+        zindex: -100,
         id: 'template',
       })
+
       canvas.add(imgbase64)
       imgbase64.selectable = false
       imgbase64.evented = false
       canvas.sendToBack(imgbase64)
-     // canvas.moveTo(imgbase64, -500)
-      
+      console.log(imgbase64)
+      console.log(canvas.getObjects().indexOf(imgbase64))
+      // canvas.moveTo(imgbase64, -500)
     }
+    image.src = dataUrl
+    //   var img = new Image();
+    //   img.src = dataUrl
+    //   img.onload = function() {
+    //     var f_img = new fabric.Image(img);
+
+    //     canvas.setBackgroundImage(f_img);
+
+    //     canvas.renderAll();
+    // };
   }
 
   downloadImage = () => {
@@ -860,10 +908,10 @@ class SketchField extends PureComponent {
       top: options.top,
       fill: color,
     })
-
+    iText.editable = false
     canvas.add(iText).setActiveObject(iText)
-    iText.enterEditing()
-    iText.selectAll()
+    //iText.enterEditing()
+    //iText.selectAll()
   }
 
   componentDidMount = () => {

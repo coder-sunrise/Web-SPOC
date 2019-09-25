@@ -1,6 +1,4 @@
-
 import FabricCanvasTool from './fabrictool'
-
 
 class Pan extends FabricCanvasTool {
   configureCanvas () {
@@ -9,7 +7,7 @@ class Pan extends FabricCanvasTool {
     canvas.selection = false
     canvas.forEachObject((o) => {
       o.selectable = true
-      o.evented = true 
+      o.evented = true
     })
     canvas.defaultCursor = 'move'
   }
@@ -20,6 +18,13 @@ class Pan extends FabricCanvasTool {
     let pointer = canvas.getPointer(o.e)
     this.startX = pointer.x
     this.startY = pointer.y
+
+    let obj = canvas.getActiveObject()
+    if (obj) {
+      obj.set({
+        id: 'pan',
+      })
+    }
   }
 
   doMouseMove (o) {
@@ -35,6 +40,13 @@ class Pan extends FabricCanvasTool {
   }
 
   doMouseUp () {
+    let canvas = this._canvas
+    let obj = canvas.getActiveObject()
+    if (obj) {
+      obj.set({
+        id: 'pan',
+      })
+    }
     this.isDown = false
   }
 }

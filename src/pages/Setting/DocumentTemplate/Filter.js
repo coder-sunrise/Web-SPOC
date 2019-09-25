@@ -16,7 +16,7 @@ import {
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
-  settingDocumentTemplate.filter || {},
+    settingDocumentTemplate.filter || {},
   handleSubmit: () => {},
   displayName: 'DocumentTemplateFilter',
 })
@@ -37,32 +37,24 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name='documentType'
-              render={() => (
-                <Select
-                  label='Document Type'
-                  options={[
-                    { name: 'Referral Letter', value: 'referral letter' },
-                    { name: 'Vaccination Cert', value: 'vaccination cert' },
-                    { name: 'Memo', value: 'memo' },
-                    { name: 'Others', value: 'others' },
-                  ]}
-                />
-              )}
+              name='documentTemplateTypeFK'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    code='LTDocumentTemplateType'
+                    label='Document Type'
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name='status'
-              render={() => (
-                <Select
-                  label='Status'
-                  options={[
-                    { name: 'Active', value: 'active' },
-                    { name: 'Inactive', value: 'inactive' },
-                  ]}
-                />
-              )}
+              name='isActive'
+              render={(args) => {
+                return <Select label='Status' options={status} {...args} />
+              }}
             />
           </GridItem>
         </GridContainer>
@@ -74,14 +66,16 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue } = this.props.values
+                  const { codeDisplayValue,isActive, documentTemplateTypeFK } = this.props.values
                   this.props.dispatch({
                     type: 'settingDocumentTemplate/query',
                     payload: {
+                      isActive,
                       group: [
                         {
                           code: codeDisplayValue,
                           displayValue: codeDisplayValue,
+                          documentTemplateTypeFK: documentTemplateTypeFK,
                           combineCondition: 'or',
                         },
                       ],

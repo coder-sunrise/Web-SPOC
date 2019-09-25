@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function ({ templateMessage }) {
+export default function ({ templateContent }) {
   const classes = useStyles()
   const [
     anchorEl,
@@ -38,7 +38,7 @@ export default function ({ templateMessage }) {
         onMouseLeave={handlePopoverClose}
         noWrap={true}
       >
-        {templateMessage}
+        {templateContent}
       </Typography>
       <Popover
         id='mouse-over-popover'
@@ -60,7 +60,7 @@ export default function ({ templateMessage }) {
         onClose={handlePopoverClose}
         disableRestoreFocus
       >
-        <Typography>{templateMessage}</Typography>
+        <Typography>{templateContent}</Typography>
       </Popover>
     </React.Fragment>
   )

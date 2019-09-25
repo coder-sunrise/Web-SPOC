@@ -23,6 +23,7 @@ import Move from '@material-ui/icons/OpenWith'
 import Select from '@material-ui/icons/PanTool'
 import Visibility from '@material-ui/icons/Visibility'
 import InVisibility from '@material-ui/icons/VisibilityOff'
+import MaterialTextField from '@material-ui/core/TextField'
 import { Radio } from 'antd'
 import Yup from '@/utils/yup'
 import {
@@ -39,11 +40,6 @@ import {
   withFormikExtend,
   FastField,
 } from '@/components'
-
-
-
-
-
 
 const styles = () => ({
   container: {
@@ -101,18 +97,18 @@ const styles = () => ({
   },
 })
 
-
-
 let temp = null
 @withFormikExtend({
-  mapPropsToValues: ({ scriblenotes }) =>
- {return scriblenotes.entity === '' ? "" : scriblenotes.entity},
+  mapPropsToValues: ({ scriblenotes }) => {
+    return scriblenotes.entity === '' ? '' : scriblenotes.entity
+  },
   validationSchema: Yup.object().shape({
     subject: Yup.string()
       .required()
       .max(20, 'Subject should not exceed 20 characters'),
   }),
   handleSubmit: (values, { props }) => {
+    console.log(temp)
     props.addScribble(values.subject, temp)
     props.toggleScribbleModal()
     // dispatch({
@@ -152,8 +148,6 @@ let temp = null
     // })
   },
 })
-
-
 class Scribble extends React.Component {
   constructor (props) {
     super(props)
@@ -165,7 +159,7 @@ class Scribble extends React.Component {
       toolsVisible: false,
       colorVisible: false,
       imageVisible: false,
-      text: 'a text, cool!',
+      text: '',
       fillColor: '#68CCCA',
       fillWithColor: false,
       fillWithBackgroundColor: false,
@@ -184,7 +178,7 @@ class Scribble extends React.Component {
 
   componentDidMount () {
     if (this.props.scribbleData !== '') {
-      if(this.props.scribbleData.scribbleNoteLayers.length > 0){
+      if (this.props.scribbleData.scribbleNoteLayers.length > 0) {
         this._sketch.initializeData(this.props.scribbleData.scribbleNoteLayers)
       }
     }
@@ -247,7 +241,7 @@ class Scribble extends React.Component {
 
   _clear = () => {
     this._sketch.clear()
-   // this._sketch.setBackgroundFromDataUrl('')
+    // this._sketch.setBackgroundFromDataUrl('')
     this.setState({
       backgroundColor: 'transparent',
       fillWithBackgroundColor: false,
@@ -279,7 +273,7 @@ class Scribble extends React.Component {
         canUndo: now,
         canClear: true,
         hideEnable: false,
-      }) 
+      })
       this._sketch.hideDrawing(false)
     }
   }
@@ -326,14 +320,8 @@ class Scribble extends React.Component {
     this._sketch.setTemplate(this.state.exampleImage)
   }
 
-  
-
   render () {
-    const {
-      classes,
-      toggleScribbleModal,
-      handleSubmit,
-    } = this.props
+    const { classes, toggleScribbleModal, handleSubmit } = this.props
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -660,14 +648,44 @@ class Scribble extends React.Component {
                 </Tooltip>
               </Popover>
               <Tooltip title='Add Text'>
-                <ToggleButton
-                  key={5}
-                  id='select'
-                  type='primary'
-                  onClick={this._performSetTextAndReset}
+                <Popover
+                  icon={null}
+                  content={
+                    // <ToggleButton
+                    //   key={5}
+                    //   id='select'
+                    //   type='primary'
+                    //   onClick={this._performSetTextAndReset}
+                    // >
+                    //   <Title />
+                    // </ToggleButton>
+
+                    <div>
+                      <MaterialTextField
+                        label='Text'
+                        helperText='Add text to Sketch'
+                        onChange={(e) =>
+                          this.setState({ text: e.target.value })}
+                        value={this.state.text}
+                      />
+                      <br />
+                      <Button color='primary' onClick={this._addText}>
+                        Add Text
+                      </Button>
+                    </div>
+                  }
+                  title='Text'
+                  trigger='click'
+                  placement='bottomLeft'
+                  // visible={this.state.colorVisible}
+                  // onVisibleChange={this.handleColorVisibleChange}
                 >
-                  <Title />
-                </ToggleButton>
+                  <Tooltip title='Colors'>
+                    <ToggleButton key={3}>
+                      <Title />
+                    </ToggleButton>
+                  </Tooltip>
+                </Popover>
               </Tooltip>
               <Tooltip title='Erase'>
                 <ToggleButton

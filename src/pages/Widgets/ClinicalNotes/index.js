@@ -22,6 +22,8 @@ import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
 
+let size = 0
+
 const styles = (theme) => ({
   editor: {
     marginTop: theme.spacing(1),
@@ -32,7 +34,7 @@ const styles = (theme) => ({
     zIndex: 1,
     left: 305,
     right: 0,
-    top: 27,
+    top: 25,
   },
   linkBtn: {
     position: 'absolute',
@@ -50,8 +52,8 @@ const styles = (theme) => ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    overflow: 'hidden ',
-    width: 200,
+    overflow: 'visible',
+    
     backgroundColor: theme.palette.background.paper,
   },
 })
@@ -99,6 +101,7 @@ class ClinicalNotes extends Component {
     arrayName: '',
     selectedData: '',
     runOnce: false,
+    width: 0,
   }
 
   componentDidMount () {
@@ -118,91 +121,93 @@ class ClinicalNotes extends Component {
         },
       },
     })
+
+    this.resize()
+    window.addEventListener('resize', this.resize.bind(this))
+  }
+
+  resize = () => {
+    this.setState({
+      width: window.innerWidth / 9.5,
+    })
+
+
+    console.log(this.state.width)
   }
 
   scribbleNoteDrawing = (values, temp, scribbleId) => {
     const { scriblenotes } = this.props
-    const { category, arrayName } = this.state
+    const { category, arrayName, categoryIndex } = this.state
     let previousData = this.form.values.corScribbleNotes
+    let clinicianArray = scriblenotes.ClinicianNote.notesScribbleArray
+    let chiefComplaintsArray =
+      scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
+    let planArray = scriblenotes.Plan.planScribbleArray
+
+    console.log(clinicianArray)
 
     if (scriblenotes.editEnable) {
       const newArrayItems = [
         ...scriblenotes[category][arrayName],
       ]
-      newArrayItems[scriblenotes.selectedIndex] = {
-        scribbleNoteTypeFK: this.state.categoryIndex,
-        scribbleNoteTypeName: this.state.category,
-        subject: values,
-        scribbleNoteLayers: temp,
-      }
+      // newArrayItems[scriblenotes.selectedIndex] = {
+      //   scribbleNoteTypeFK: categoryIndex,
+      //   scribbleNoteTypeName: category,
+      //   subject: values,
+      //   scribbleNoteLayers: temp,
+      // }
+
+      newArrayItems[scriblenotes.selectedIndex].subject = values
+      newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
 
       this.props.dispatch({
         type: 'scriblenotes/updateState',
         payload: {
           ...scriblenotes,
-          [this.state.category]: {
-            [this.state.arrayName]: newArrayItems,
+          [category]: {
+            [arrayName]: newArrayItems,
           },
         },
       })
 
-      // previousData.push({
-      //   scribbleNoteTypeFK: this.state.categoryIndex,
-      //   scribbleNoteTypeName: this.state.category,
-      //   subject: values,
-      //   scribbleNoteLayers: temp,
-      // })
+      if (category === 'ClinicianNote') {
+        clinicianArray = newArrayItems
+      } else if (category === 'ChiefComplaints') {
+        chiefComplaintsArray = newArrayItems
+      } else if (category === 'Plan') {
+        planArray = newArrayItems
+      }
 
-      // for (let i = 0; i < previousData.length; i++) {
-      //   if (
-      //     (previousData[i].scribbleNoteTypeFK === this.state.categoryIndex) &
-      //     (i === scriblenotes.selectedIndex)
-      //   ) {
-      //     previousData[i].subject = values
-      //     previousData[i].scribbleNoteLayers = temp
-      //   }
-      // }
+      console.log('********')
+      console.log(clinicianArray)
+      console.log(chiefComplaintsArray)
+      console.log(planArray)
 
-      // for (let i = 0; i < previousData.length; i++) {
-      //   if (previousData[i].id) {
-      //     console.log('yes ', i)
-      //     if (previousData[i].id === scribbleId) {
-      //       previousDataIdFound = true
-      //       previousData[i].subject = values
-      //       previousData[i].scribbleNoteLayers = temp
-      //     }
-      //   }
-      // }
+      previousData = []
 
-      // if (previousDataIdFound === false) {
-      //   this.props.dispatch({
-      //     type: 'scriblenotes/updateState',
-      //     payload: {
-      //       ...scriblenotes,
-      //       [this.state.category]: {
-      //         [this.state.arrayName]: newArrayItems,
-      //       },
-      //     },
-      //   })
+      for (let i = 0; i < clinicianArray.length; i++) {
+        previousData.push(clinicianArray[i])
+      }
 
-      //   previousData.push({
-      //     scribbleNoteTypeFK: this.state.categoryIndex,
-      //     scribbleNoteTypeName: this.state.category,
-      //     subject: values,
-      //     scribbleNoteLayers: temp,
-      //   })
-      // }
+      for (let i = 0; i < chiefComplaintsArray.length; i++) {
+        previousData.push(chiefComplaintsArray[i])
+      }
+
+      for (let i = 0; i < planArray.length; i++) {
+        previousData.push(planArray[i])
+      }
+      console.log('updated ', previousData)
     } else {
       this.props.dispatch({
         type: 'scriblenotes/updateState',
         payload: {
           ...scriblenotes,
-          [this.state.category]: {
-            [this.state.arrayName]: [
-              ...scriblenotes[this.state.category][this.state.arrayName],
+          [category]: {
+            [arrayName]: [
+              ...scriblenotes[category][arrayName],
               {
-                scribbleNoteTypeFK: this.state.categoryIndex,
-                scribbleNoteTypeName: this.state.category,
+                scribbleNoteTypeFK: categoryIndex,
+                scribbleNoteTypeName: category,
                 subject: values,
                 scribbleNoteLayers: temp,
               },
@@ -211,15 +216,13 @@ class ClinicalNotes extends Component {
         },
       })
       previousData.push({
-        scribbleNoteTypeFK: this.state.categoryIndex,
-        scribbleNoteTypeName: this.state.category,
+        scribbleNoteTypeFK: categoryIndex,
+        scribbleNoteTypeName: category,
         subject: values,
         scribbleNoteLayers: temp,
       })
     }
 
-    console.log('** ', previousData)
-    console.log('sss ', scriblenotes[this.state.category][this.state.arrayName])
     this.form.setFieldValue('corScribbleNotes', previousData)
   }
 
@@ -315,14 +318,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  // <Button
-  //   style={{
-  //     backgroundColor: '#48C9B0',
-  //     color: 'white',
-  //     fontWeight: 'normal',
-  //     padding: 0,
-  //     fontSize: 5,
-  //   }}
+  //   <IconButton
   //   onClick={() => {
   //     this.setState({
   //       category: 'ClinicianNote',
@@ -341,8 +337,8 @@ class ClinicalNotes extends Component {
   //     })
   //   }}
   // >
-  //   Scribble Note
-  // </Button>
+  //   <InsertPhoto />
+  // </IconButton>
 
   render () {
     // console.log('ClinicalNotes', this.props)
@@ -376,14 +372,17 @@ class ClinicalNotes extends Component {
               let plan = values.corScribbleNotes.filter(
                 (o) => o.scribbleNoteTypeFK === 3,
               )
-              if (!this.state.runOnce) {
-                scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
-                scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
-                scriblenotes.Plan.planScribbleArray = plan
-                this.setState({
-                  runOnce: true,
-                })
-              }
+              // if (!this.state.runOnce) {
+              //   scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
+              //   scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
+              //   scriblenotes.Plan.planScribbleArray = plan
+              //   this.setState({
+              //     runOnce: true,
+              //   })
+              // }
+              scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
+              scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
+              scriblenotes.Plan.planScribbleArray = plan
 
               return null
               // if (diagnosises.length === 0) {
@@ -410,7 +409,13 @@ class ClinicalNotes extends Component {
               return (
                 <div>
                   <div className={classes.editorBtn}>
-                    <IconButton
+                    <Button
+                      style={{
+                        backgroundColor: '#48C9B0',
+                        color: 'white',
+                        fontWeight: 'normal',
+                        fontSize: 5,
+                      }}
                       onClick={() => {
                         this.setState({
                           category: 'ClinicianNote',
@@ -429,14 +434,14 @@ class ClinicalNotes extends Component {
                         })
                       }}
                     >
-                      <InsertPhoto />
-                    </IconButton>
+                      Scribble Note
+                    </Button>
 
                     <div style={{ display: 'inline-block' }}>
                       {scriblenotes.ClinicianNote.notesScribbleArray.length >
                       0 ? (
                         <GridContainer>
-                          <div className={classes.root}>
+                          <div className={classes.root} style={{ width: this.state.width}}>
                             <GridList
                               className={classes.gridList}
                               cols={0}
@@ -483,6 +488,14 @@ class ClinicalNotes extends Component {
                                                   },
                                                 })
                                                 .then((v) => {
+                                                  this.setState({
+                                                    category: 'ClinicianNote',
+                                                    arrayName:
+                                                      'notesScribbleArray',
+                                                    categoryIndex: 2,
+                                                    selectedData: v,
+                                                  })
+
                                                   const newArrayItems = [
                                                     ...scriblenotes
                                                       .ClinicianNote
@@ -505,13 +518,6 @@ class ClinicalNotes extends Component {
                                                     },
                                                   })
 
-                                                  this.setState({
-                                                    category: 'ClinicianNote',
-                                                    arrayName:
-                                                      'notesScribbleArray',
-                                                    categoryIndex: 2,
-                                                    selectedData: v,
-                                                  })
                                                   window.g_app._store.dispatch({
                                                     type:
                                                       'scriblenotes/updateState',
@@ -556,7 +562,13 @@ class ClinicalNotes extends Component {
               return (
                 <div>
                   <div className={classes.editorBtn}>
-                    <IconButton
+                    <Button
+                      style={{
+                        backgroundColor: '#48C9B0',
+                        color: 'white',
+                        fontWeight: 'normal',
+                        fontSize: 5,
+                      }}
                       onClick={() => {
                         this.setState({
                           category: 'ChiefComplaints',
@@ -575,13 +587,12 @@ class ClinicalNotes extends Component {
                         })
                       }}
                     >
-                      <InsertPhoto />
-                    </IconButton>
+                      Scribble Note
+                    </Button>
                     <div style={{ display: 'inline-block' }}>
-                      {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
-                        .length > 0 ? (
+                      {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray.length > 0 ? (
                         <GridContainer>
-                          <div className={classes.root}>
+                          <div className={classes.root} style={{ width: this.state.width}}>
                             <GridList
                               className={classes.gridList}
                               cols={0}
@@ -627,6 +638,14 @@ class ClinicalNotes extends Component {
                                                   },
                                                 })
                                                 .then((v) => {
+                                                  this.setState({
+                                                    category: 'ChiefComplaints',
+                                                    arrayName:
+                                                      'chiefComplaintsScribbleArray',
+                                                    categoryIndex: 1,
+                                                    selectedData: v,
+                                                  })
+
                                                   const newArrayItems = [
                                                     ...scriblenotes
                                                       .ChiefComplaints
@@ -649,13 +668,6 @@ class ClinicalNotes extends Component {
                                                     },
                                                   })
 
-                                                  this.setState({
-                                                    category: 'ChiefComplaints',
-                                                    arrayName:
-                                                      'chiefComplaintsScribbleArray',
-                                                    categoryIndex: 1,
-                                                    selectedData: v,
-                                                  })
                                                   window.g_app._store.dispatch({
                                                     type:
                                                       'scriblenotes/updateState',
@@ -725,7 +737,13 @@ class ClinicalNotes extends Component {
               return (
                 <div>
                   <div className={classes.editorBtn}>
-                    <IconButton
+                    <Button
+                      style={{
+                        backgroundColor: '#48C9B0',
+                        color: 'white',
+                        fontWeight: 'normal',
+                        fontSize: 5,
+                      }}
                       onClick={() => {
                         this.setState({
                           category: 'Plan',
@@ -744,12 +762,13 @@ class ClinicalNotes extends Component {
                         })
                       }}
                     >
-                      <InsertPhoto />
-                    </IconButton>
-                    <div style={{ display: 'inline-block' }}>
+                      Scribble Note
+                    </Button>
+
+                    <div style={{ display: 'inline-block'}}>
                       {scriblenotes.Plan.planScribbleArray.length > 0 ? (
                         <GridContainer>
-                          <div className={classes.root}>
+                          <div className={classes.root} style={{ width: this.state.width}}>
                             <GridList
                               className={classes.gridList}
                               cols={0}
@@ -794,6 +813,14 @@ class ClinicalNotes extends Component {
                                                   },
                                                 })
                                                 .then((v) => {
+                                                  this.setState({
+                                                    category: 'Plan',
+                                                    arrayName:
+                                                      'planScribbleArray',
+                                                    categoryIndex: 3,
+                                                    selectedData: v,
+                                                  })
+
                                                   const newArrayItems = [
                                                     ...scriblenotes.Plan
                                                       .planScribbleArray,
@@ -815,13 +842,6 @@ class ClinicalNotes extends Component {
                                                     },
                                                   })
 
-                                                  this.setState({
-                                                    category: 'Plan',
-                                                    arrayName:
-                                                      'planScribbleArray',
-                                                    categoryIndex: 3,
-                                                    selectedData: v,
-                                                  })
                                                   window.g_app._store.dispatch({
                                                     type:
                                                       'scriblenotes/updateState',

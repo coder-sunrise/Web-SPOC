@@ -14,6 +14,7 @@ import {
   RichEditor,
   Field,
   Select,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -47,18 +48,17 @@ const tagList = [
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
-  settingDocumentTemplate.entity || settingDocumentTemplate.default,
+    settingDocumentTemplate.entity || settingDocumentTemplate.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateMessage: Yup.string().required(),
+    templateContent: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     //console.log(restValues)
-
 
     dispatch({
       type: 'settingDocumentTemplate/upsert',
@@ -92,18 +92,16 @@ class Detail extends PureComponent {
           <GridContainer>
             <GridItem md={6}>
               <FastField
-                name='documentType'
-                render={() => (
-                  <Select
-                    label='Document Type'
-                    options={[
-                      { name: 'Referral Letter', value: 'referral letter' },
-                      { name: 'Vaccination Cert', value: 'vaccination cert' },
-                      { name: 'Memo', value: 'memo' },
-                      { name: 'Others', value: 'others' },
-                    ]}
-                  />
-                )}
+                name='documentTemplateTypeFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      code='LTDocumentTemplateType'
+                      label='Document Type'
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
           </GridContainer>
@@ -143,7 +141,7 @@ class Detail extends PureComponent {
             </GridItem>
             <GridItem md={12}>
               <Field
-                name='templateMessage'
+                name='templateContent'
                 render={(args) => {
                   return (
                     <RichEditor

@@ -1,7 +1,6 @@
 /**
  * Maintains the history of an object
  */
-import { stringify } from 'qs'
 
 class History {
   constructor (undoLimit = 200, debug = false) {
@@ -13,6 +12,7 @@ class History {
     this.current = null
     this.debug = debug
     this.count = 0
+    this.itemCount = 1
   }
 
   /**
@@ -36,6 +36,7 @@ class History {
   /*
   Get all list
 */
+
 
   getOriginalList () {
     return this.originalList
@@ -76,6 +77,7 @@ class History {
       //   })
       //   this.count = this.count + 1
       // } else
+
       if (mainObject.id === 'delete' || mainObject.id === 'oldTemplate') {
         for (let i = 0; i < this.allList.length; i++) {
           // let [
@@ -96,30 +98,49 @@ class History {
             }
           }
         }
-      } else {
-        this.redoList = []
-        this.originalList.push(obj)
-        this.allList.push({
-          layerType: mainObject.type,
-          layerNumber: this.count,
-          layerContent: JSON.stringify(mainObject),
-          templateFK: null,
-        })
+      }else if(mainObject.id === 'move'){
+        console.log("move")
+        let movingObject = JSON.stringify(mainObject.__originalState)
+        let movingJsonObject = JSON.parse(movingObject)
+        delete movingJsonObject.left
+        delete movingJsonObject.top
+        delete movingJsonObject.scaleX
+        delete movingJsonObject.scaleY
 
-        // console.log('********mainObject**************')
-        // console.dir(mainObject)
-        // console.log({ obj, mainObject })
-        // const shallow = { ...mainObject }
-        // console.log({ shallow })
-        // // console.log('qs', {qs: stringify(mainObject)})
-        // window.mainObject = mainObject
-        // window.temp = this.allList
+        console.log(movingJsonObject)
 
-        // console.log('**********this.allList************')
-        // console.dir(this.allList[0])
+        for(let i = 0; i < this.allList.length; i++){
+          let layerContent = JSON.parse(this.allList[i].layerContent)
+          delete layerContent.left
+          delete layerContent.top
+          delete layerContent.scaleX
+          delete layerContent.scaleY
+          console.log(layerContent)
 
-        // this.count = this.count + 1
-        this.count = 0
+          if(JSON.stringify(movingJsonObject) === JSON.stringify(layerContent)){
+            console.log("same data")
+            console.log(layerContent)
+            this.allList[i].layerContent = movingObject
+            console.log("after")
+            console.log(this.allList[i].layerContent)
+          }
+
+        }
+
+      } else if (mainObject.id !== 'pan' || mainObject.id === null){
+          this.redoList = []
+          this.originalList.push(obj)
+          this.allList.push({
+            layerType: mainObject.type,
+            layerNumber: this.count,
+            layerContent: JSON.stringify(mainObject),
+            templateFK: null,
+          })
+          console.log('move ', mainObject.id)
+   
+          this.count = 0
+          this.itemCount = this.itemCount + 1
+        
       }
 
       if (this.current) {
@@ -153,8 +174,8 @@ class History {
             for (let a = 0; a < temp.length; a++) {
               if (temp[a].layerContent !== JSON.stringify(mainObject)) {
                 this.allList.push(temp[a])
-              }else{
-                console.log("skip")
+              } else {
+                console.log('skip')
               }
             }
           }
@@ -194,7 +215,7 @@ class History {
           layerContent: JSON.stringify(mainObject),
           templateFK: null,
         })
-        this.count = 0  
+        this.count = 0
         return this.current
       }
       return null

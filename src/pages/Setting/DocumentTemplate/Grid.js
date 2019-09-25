@@ -43,12 +43,14 @@ class Grid extends PureComponent {
         type='settingDocumentTemplate'
         onRowDoubleClick={this.editRow}
         columns={[
-          { name: 'documentType', title: 'Document Type'},
+          { name: 'documentTemplateTypeFK', title: 'Document Type'},
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
-          { name: 'templateMessage', title: 'Template Message' },
-          { name: 'effectiveStartDate', title: 'Effective Start Date' },
-          { name: 'effectiveEndDate', title: 'Effective End Date' },
+          { name: 'templateContent', title: 'Template Message' },
+          { name: 'isActive', title: 'Status' },
+          // { name: 'effectiveStartDate', title: 'Effective Start Date' },
+          // { name: 'effectiveEndDate', title: 'Effective End Date' },
+          
           {
             name: 'action',
             title: 'Action',
@@ -57,11 +59,23 @@ class Grid extends PureComponent {
         // FuncProps={{ pager: false }}
         columnExtensions={[
           {
-            columnName: 'templateMessage',
+            columnName: 'documentTemplateTypeFK',
+            sortingEnabled: false,
+            type: 'codeSelect',
+            code: 'LTDocumentTemplateType',
+          },
+          {
+            columnName: 'isActive',
+            sortingEnabled: false,
+            type: 'select',
+            options: status,
+          },
+          {
+            columnName: 'templateContent',
             render: (row) => {
               //return htmlToText.fromString(row.templateMessage)
               const templateMessageProps = {
-                templateMessage: htmlToText.fromString(row.templateMessage),
+                templateContent: htmlToText.fromString(row.templateContent),
               }
 
               return <MouseOverPopover {...templateMessageProps} />

@@ -20,13 +20,8 @@ import {
 const styles = (theme) => ({})
 
 @withFormikExtend({
-<<<<<<< HEAD:src/pages/Setting/SmsTemplate/Detail.js
-  mapPropsToValues: ({ settingSmsTemplate }) =>
-  settingSmsTemplate.entity || settingSmsTemplate.default,
-=======
   mapPropsToValues: ({ settingTemplateMessage }) =>
     settingTemplateMessage.entity || settingTemplateMessage.default,
->>>>>>> dev:src/pages/Setting/TemplateMessages/Detail.js
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -36,12 +31,7 @@ const styles = (theme) => ({})
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-<<<<<<< HEAD:src/pages/Setting/SmsTemplate/Detail.js
-    //console.log(restValues)
-
-=======
     // console.log(restValues)
->>>>>>> dev:src/pages/Setting/TemplateMessages/Detail.js
 
     dispatch({
       type: 'settingSmsTemplate/upsert',

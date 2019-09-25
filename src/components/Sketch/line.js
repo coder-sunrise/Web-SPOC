@@ -29,6 +29,7 @@ class Line extends FabricCanvasTool {
       strokeWidth: this._width,
       fill: this._color,
       stroke: this._color,
+      id: 'SKIP',
       originX: 'center',
       originY: 'center',
       selectable: false,
@@ -47,7 +48,14 @@ class Line extends FabricCanvasTool {
   }
 
   doMouseUp () {
+    let canvas = this._canvas
     this.isDown = false
+
+    canvas.remove(this.line)
+    let line = new fabric.Group([
+      this.line,
+    ])
+    canvas.add(line)
   }
 
   doMouseOut () {

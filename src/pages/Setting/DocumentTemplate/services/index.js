@@ -8,7 +8,7 @@ const getUrl = () => {
   //     ? '/api/smstemplate'
   //     : '/api/CTReferralLetterTemplate'
 
- const url = '/api/CTReferralLetterTemplate'
+ const url = '/api/DocumentTemplate'
 
 
   return url

@@ -136,6 +136,7 @@ const saveConsultation = ({
   // },
   validationSchema: schema,
   // enableReinitialize: true,
+ 
   handleSubmit: (values, { props }) => {
     saveConsultation({
       props: {
