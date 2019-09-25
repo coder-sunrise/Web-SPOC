@@ -16,7 +16,7 @@ import {
 const validationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
   endTime: Yup.string()
-    .laterThan(Yup.ref('startTime'), 'Time From must be later than Time To')
+    .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
     .required(),
   clinicianFK: Yup.string().required(),
 })
@@ -90,8 +90,7 @@ class AppointmentDataGrid extends React.Component {
             )
 
             if (!clinicianProfile) return null
-            const title =
-              clinicianProfile.title !== null ? clinicianProfile.title : ''
+            const title = clinicianProfile.title || ''
             return <p>{`${title} ${clinicianProfile.name}`}</p>
           },
         }
@@ -134,8 +133,10 @@ class AppointmentDataGrid extends React.Component {
   }
 
   onRadioChange = (row, e, checked) => {
+    console.log({ row, e, checked })
     if (checked) {
       const { data, handleCommitChanges } = this.props
+      console.log({ data })
       const newRows = data.map(
         (eachRow) =>
           eachRow.id !== row.id
@@ -145,12 +146,9 @@ class AppointmentDataGrid extends React.Component {
               }
             : { ...eachRow, isPrimaryClinician: checked },
       )
+      console.log({ newRows })
       handleCommitChanges({ rows: newRows })
     }
-  }
-
-  onCommitChanges = ({ rows, deleted }) => {
-    this.props.handleCommitChanges({ rows, deleted })
   }
 
   render () {

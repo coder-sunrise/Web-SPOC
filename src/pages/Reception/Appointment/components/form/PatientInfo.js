@@ -16,8 +16,9 @@ import style from './style'
 
 const PatientInfoInput = ({
   classes,
-  onSearchPatient,
-  onCreatePatient,
+  onSearchPatientClick,
+  onCreatePatientClick,
+  onRegisterToVisitClick,
   patientName,
   patientProfileFK,
   isEdit,
@@ -38,7 +39,7 @@ const PatientInfoInput = ({
                   {...args}
                   autoFocus
                   // onEnterPressed={onSearchPatient}
-                  label='Patient Name'
+                  label='Patient Name / Acc. No.'
                   disabled={isEdit}
                 />
               )
@@ -62,7 +63,7 @@ const PatientInfoInput = ({
                 variant='contained'
                 submitKey='patientSearch/query'
                 disabled={isEdit}
-                onClick={onSearchPatient}
+                onClick={onSearchPatientClick}
                 icon={null}
               >
                 Search
@@ -70,14 +71,19 @@ const PatientInfoInput = ({
               <Button
                 size='sm'
                 color='primary'
-                disabled={isEdit}
-                onClick={onCreatePatient}
+                // disabled={isEdit}
+                onClick={onCreatePatientClick}
               >
                 Create Patient
               </Button>
             </React.Fragment>
           ) : (
-            <Button size='sm' color='primary' disabled={isEdit}>
+            <Button
+              size='sm'
+              color='primary'
+              disabled={appointmentStatusFK === 2}
+              onClick={onRegisterToVisitClick}
+            >
               Register To Visit
             </Button>
           )}

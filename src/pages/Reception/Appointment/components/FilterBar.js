@@ -18,7 +18,7 @@ import {
   SizeContainer,
 } from '@/components'
 // sub components
-import { AppointmentTypeLabel } from '@/components/_medisys'
+import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 
 const styles = () => ({
   selectorContainer: {
@@ -39,13 +39,14 @@ const FilterBar = ({
   const onFilterClick = () => handleUpdateFilter(values)
 
   const renderDropdown = (option) => {
-    const { name, doctorProfile } = option
-    const title = option.title || ''
-    const mcrNo =
-      doctorProfile !== null && doctorProfile !== undefined
-        ? `(${doctorProfile.doctorMCRNo})`
-        : ''
-    return <div>{`${title} ${name} ${mcrNo}`}</div>
+    return <DoctorLabel doctor={option} />
+    // const { name, doctorProfile } = option
+    // const title = option.title || ''
+    // const mcrNo =
+    //   doctorProfile !== null && doctorProfile !== undefined
+    //     ? `(${doctorProfile.doctorMCRNo})`
+    //     : ''
+    // return <div>{`${title} ${name} ${mcrNo}`}</div>
   }
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
@@ -81,19 +82,22 @@ const FilterBar = ({
                   {...args}
                   all={-99}
                   allowClear={false}
-                  code='clinicianprofile'
                   label='Filter by Doctor'
                   mode='multiple'
-                  labelField='name'
-                  valueField='id'
+                  // code='clinicianprofile'
+                  // labelField='name'
+                  // valueField='id'
+                  code='doctorprofile'
+                  labelField='clinicianProfile.name'
+                  valueField='clinicianProfile.id'
                   maxTagCount={maxDoctorTagCount}
                   maxTagPlaceholder={maxDoctorTagPlaceholder}
                   renderDropdown={renderDropdown}
                   defaultOptions={[
                     {
                       isExtra: true,
-                      id: -99,
-                      name: 'All Doctors',
+                      // id: -99,
+                      clinicianProfile: { id: -99, name: 'All Doctors' },
                       title: '',
                     },
                   ]}

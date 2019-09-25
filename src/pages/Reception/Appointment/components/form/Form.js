@@ -18,6 +18,7 @@ import {
 // medisys components
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
+import PatientProfile from '@/pages/PatientDatabase/Detail'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
@@ -28,26 +29,31 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 // utils
 import { ValidationSchema, mapPropsToValues } from './formikUtils'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import styles from './style'
 
-@connect(({ loginSEMR, loading, user, calendar, codetable }) => ({
+@connect(({ loginSEMR, loading, user, calendar, codetable, patient }) => ({
   loginSEMR,
   loading,
+  patientProfile: patient.entity,
+  patientProfileDefaultValue: patient.default,
   user: user.data,
   events: calendar.list,
   viewingAppointment: calendar.currentViewAppointment,
   isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
+  cachedPayload: calendar.cachedPayload,
   appointmentStatuses: codetable.ltappointmentstatus,
   clinicianProfiles: codetable.clinicianprofile,
 }))
 @withFormikExtend({
   displayName: 'AppointmentForm',
-  enableReinitialize: true,
+  // enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
 class Form extends React.PureComponent {
   state = {
+    showPatientProfile: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
     datagrid:
@@ -60,7 +66,7 @@ class Form extends React.PureComponent {
     editingRows: [],
   }
 
-  componentWillMount () {
+  componentDidMount () {
     this.props.dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -102,42 +108,87 @@ class Form extends React.PureComponent {
     }
   }
 
-  toggleNewPatientModal = () => {
-    this.props.dispatch({
-      type: 'patient/openPatientModal',
-    })
-  }
-
   toggleSearchPatientModal = () => {
     const { showSearchPatientModal } = this.state
     this.setState({ showSearchPatientModal: !showSearchPatientModal })
   }
 
+  togglePatientProfileModal = () => {
+    const { patientProfileDefaultValue, dispatch, values } = this.props
+    const entity = {
+      ...patientProfileDefaultValue,
+      name: values.patientName,
+      contact: {
+        ...patientProfileDefaultValue.contact,
+        mobileContactNumber: {
+          number: values.patientContactNo,
+        },
+      },
+    }
+    this.setState(
+      (preState) => ({
+        ...preState,
+        showPatientProfile: !preState.showPatientProfile,
+      }),
+      () => {
+        dispatch({
+          type: 'patient/updateState',
+          payload: {
+            entity,
+            currentId: undefined,
+          },
+        })
+      },
+    )
+  }
+
+  checkShouldPopulate = (patientSearchResult) => {
+    const { totalRecords } = patientSearchResult
+    return totalRecords === 1
+  }
+
   onSearchPatient = async () => {
     const { dispatch, values } = this.props
-    // this.searchPatient(values.patientName)
     const prefix = 'like_'
     const result = await dispatch({
       type: 'patientSearch/query',
       payload: {
         [`${prefix}name`]: values.patientName,
+        [`${prefix}patientAccountNo`]: values.patientName,
+        [`${prefix}contactFkNavigation.contactNumber.number`]: values.patientContactNo,
+        combineCondition: 'or',
       },
     })
-    result && this.toggleSearchPatientModal()
+    if (result) {
+      const shouldPopulate = this.checkShouldPopulate(result)
+      if (shouldPopulate) {
+        this.onSelectPatientClick(result.data[0], true)
+      } else this.toggleSearchPatientModal()
+    }
   }
 
-  onSelectPatientClick = (patientProfile) => {
+  onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
     const { id, patientAccountNo, name, mobileNo } = patientProfile
-    const { setFieldValue, setFieldTouched } = this.props
-    setFieldValue('patientProfileFK', id)
-    setFieldValue('patientAccountNo', patientAccountNo)
-    setFieldValue('patientName', name)
-    setFieldValue('patientContactNo', mobileNo)
+    const { setFieldValue, values, setValues, setFieldTouched } = this.props
+    await setValues({
+      ...values,
+      patientAccountNo,
+      patientProfileFK: id,
+      patientName: name,
+      patientContactNo: mobileNo,
+    })
+    // await setFieldValue('patientProfileFK', id)
+    // await setFieldValue('patientAccountNo', patientAccountNo)
+    // await setFieldValue('patientName', name)
+    // await setFieldValue('patientContactNo', mobileNo)
 
-    setFieldTouched('patientName', true)
-    setFieldTouched('contactNo', true)
+    // setFieldTouched('patientName', true)
+    // setFieldTouched('contactNo', true)
 
-    this.toggleSearchPatientModal()
+    // when not auto populate, close searchPatientModal
+    if (!autoPopulate) this.toggleSearchPatientModal()
+
+    return true
   }
 
   closeDeleteConfirmation = () => {
@@ -153,6 +204,26 @@ class Form extends React.PureComponent {
       payload: { id },
       callback: onClose,
     })
+  }
+
+  onConfirmCreatePatient = async () => {
+    const { patientProfile, history, dispatch } = this.props
+    const { id, name, contact, patientAccountNo } = patientProfile
+    const payload = {
+      id,
+      name,
+      patientAccountNo,
+      mobileNo: contact.mobileContactNumber.number,
+    }
+    dispatch({
+      type: 'patient/closePatientModal',
+    })
+    this.togglePatientProfileModal()
+    const doneUpdateFields = await this.onSelectPatientClick(payload, true)
+    console.log({ doneUpdateFields })
+    if (doneUpdateFields) {
+      this._submit(false, true)
+    }
   }
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
@@ -225,18 +296,35 @@ class Form extends React.PureComponent {
     if (datagrid.length === 0) isDataGridValid = false
 
     // has 1 primary doctor
-    const hasPrimaryDoctor = datagrid.reduce(
-      (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
-      false,
-    )
-    if (!hasPrimaryDoctor) isDataGridValid = false
-
-    this.setState({ isDataGridValid })
+    // const hasPrimaryDoctor = datagrid.reduce(
+    //   (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
+    //   false,
+    // )
+    // if (!hasPrimaryDoctor) isDataGridValid = false
+    // this.setState({ isDataGridValid })
+    const newDataGrid =
+      datagrid.length === 1
+        ? [
+            {
+              ...datagrid[0],
+              isPrimaryClinician:
+                datagrid[0].isPrimaryClinician === undefined ||
+                !datagrid[0].isPrimaryClinician
+                  ? true
+                  : datagrid[0].isPrimaryClinician,
+            },
+          ]
+        : [
+            ...datagrid,
+          ]
+    console.log({ datagrid, newDataGrid })
+    this.setState({ isDataGridValid, datagrid: newDataGrid })
   }
 
-  _submit = async (validate = false) => {
+  _submit = async (validate = false, preSubmit = false) => {
     try {
       const {
+        cachedPayload,
         validateForm,
         resetForm,
         setSubmitting,
@@ -263,7 +351,9 @@ class Form extends React.PureComponent {
         datagrid,
         formikValues: values,
         appointmentResources: [],
-        newAppointmentStatusFK: appointmentStatusFK,
+        newAppointmentStatusFK: preSubmit
+          ? values.appointmentStatusFk
+          : appointmentStatusFK,
       }
 
       setSubmitting(false)
@@ -273,8 +363,17 @@ class Form extends React.PureComponent {
         payload: submitPayload,
       }).then((response) => {
         if (response) {
-          resetForm()
-          onClose()
+          if (preSubmit) {
+            dispatch({
+              type: 'calendar/getAppointmentDetails',
+              payload: {
+                ...cachedPayload,
+              },
+            })
+          } else {
+            resetForm()
+            onClose()
+          }
         }
       })
     } catch (error) {
@@ -428,10 +527,27 @@ class Form extends React.PureComponent {
     return rows
   }
 
+  onCloseClick = () => {
+    this.props.resetForm()
+    this.props.onClose()
+  }
+
+  actualizeAppointment = () => {
+    const { values, history, onClose } = this.props
+    const parameters = {
+      md: 'visreg',
+      pid: values.patientProfileFK,
+      apptid: values.currentAppointment.id,
+    }
+
+    onClose()
+    history.push(getAppendUrl(parameters))
+  }
+
   render () {
     const {
       classes,
-      onClose,
+
       loading,
       values,
       isSubmitting,
@@ -439,6 +555,7 @@ class Form extends React.PureComponent {
     } = this.props
 
     const {
+      showPatientProfile,
       showSearchPatientModal,
       showDeleteConfirmationModal,
       showSeriesUpdateConfirmation,
@@ -449,7 +566,11 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
 
     // console.log({ datagrid })
-    // console.log({ values: this.props.values })
+    // console.log({
+    //   initialValues: this.props.initialValues,
+    //   values: this.props.values,
+    //   dirty: this.props.dirty,
+    // })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
@@ -459,14 +580,15 @@ class Form extends React.PureComponent {
             <GridContainer className={classnames(classes.formContent)}>
               <GridItem container xs md={6}>
                 <PatientInfoInput
-                  onSearchPatient={this.onSearchPatient}
-                  onCreatePatient={this.toggleNewPatientModal}
+                  onSearchPatientClick={this.onSearchPatient}
+                  onCreatePatientClick={this.togglePatientProfileModal}
+                  onRegisterToVisitClick={this.actualizeAppointment}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
                   isEdit={values.id}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
                 />
-                <AppointmentDateInput disabled={values.isEnableRecurrence} />
+                <AppointmentDateInput />
               </GridItem>
               <GridItem xs md={6} className={classnames(classes.remarksField)}>
                 <FastField
@@ -505,7 +627,7 @@ class Form extends React.PureComponent {
             <FormFooter
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={onClose}
+              onClose={this.onCloseClick}
               disabled={
                 !isDataGridValid ||
                 !values.patientName ||
@@ -528,6 +650,19 @@ class Form extends React.PureComponent {
               <PatientSearchModal
                 handleSelectClick={this.onSelectPatientClick}
               />
+            </CommonModal>
+            <CommonModal
+              open={showPatientProfile}
+              onClose={this.togglePatientProfileModal}
+              onConfirm={this.onConfirmCreatePatient}
+              title='Create Patient Profile'
+              observe='PatientDetail'
+              authority='patient'
+              fullScreen
+              overrideLoading
+              showFooter={false}
+            >
+              <PatientProfile history={this.props.history} />
             </CommonModal>
             <CommonModal
               open={showDeleteConfirmationModal}

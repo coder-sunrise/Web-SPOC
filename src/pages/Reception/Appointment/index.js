@@ -16,6 +16,8 @@ import SeriesConfirmation from './SeriesConfirmation'
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
 import { DoctorFormValidation, InitialPopoverEvent } from './const'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+// utils
+import { getRemovedUrl } from '@/utils/utils'
 
 const styles = (theme) => ({
   popover: {
@@ -124,11 +126,17 @@ class Appointment extends React.PureComponent {
 
   closeAppointmentForm = () => {
     this.setState({ selectedAppointmentFK: -1, showAppointmentForm: false })
-
     this.props.dispatch({
       type: 'calendar/setViewAppointment',
       data: { appointments: [] },
     })
+    this.props.history.push(
+      getRemovedUrl([
+        'md',
+        'pid',
+        'apptid',
+      ]),
+    )
   }
 
   moveEvent = (props) => {
@@ -399,6 +407,7 @@ class Appointment extends React.PureComponent {
           observe='AppointmentForm'
         >
           <Form
+            history={this.props.history}
             resources={resources}
             selectedAppointmentID={selectedAppointmentFK}
             selectedSlot={selectedSlot}
