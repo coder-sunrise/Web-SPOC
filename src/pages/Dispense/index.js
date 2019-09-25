@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import router from 'umi/router'
 import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
@@ -11,20 +12,35 @@ import { Button, GridContainer, GridItem } from '@/components'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
 import style from './style'
+// utils
+import { getAppendUrl } from '@/utils/utils'
+// model
+import model from './models/dispense'
+
+window.g_app.replaceModel(model)
 
 @connect(({ dispense }) => ({ dispense }))
 class Dispense extends Component {
   makePayment = () => {
-    const { location } = this.props
-    this.props.history.push(`${location.pathname}/billing`)
+    const { dispatch, dispense } = this.props
+    const { patientInfo } = dispense
+    dispatch({
+      type: 'dispense/closeDispenseModal',
+    })
+    const parameters = {
+      pid: patientInfo.id,
+      md2: 'bill',
+    }
+    router.push(getAppendUrl(parameters, '/reception/queue'))
+    // this.props.history.push(`${location.pathname}/billing`)
   }
 
   render () {
     const { classes, dispense } = this.props
 
     return (
-      <div>
-        <PatientBanner patientInfo={dispense.patientInfo} />
+      <div className={classes.root}>
+        <PatientBanner style={{}} patientInfo={dispense.patientInfo} />
         <GridContainer direction='column' className={classes.content}>
           <GridItem justify='flex-end' container>
             <Button color='info' size='sm' disabled>

@@ -371,38 +371,39 @@ class PatientHistory extends Component {
   }
 
   // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    // console.log(this.props, nextProps, nextProps.patientHistory.version)
-    if (
-      nextProps.patientHistory.version &&
-      this.props.patientHistory.version !== nextProps.patientHistory.version
-    ) {
-      nextProps
-        .dispatch({
-          type: 'patientHistory/query',
-          payload: {
-            patientProfileFK: nextProps.patientHistory.patientID,
-            sorting: [
-              {
-                columnName: 'VisitDate',
-                direction: 'desc',
-              },
-            ],
-          },
-        })
-        .then((o) => {
-          // this.props.resetForm(o)
-          nextProps.dispatch({
-            type: 'patientHistory/updateState',
-            payload: {
-              selected: undefined,
-              selectedSubRow: undefined,
-              entity: undefined,
-            },
-          })
-        })
-    }
-  }
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   // console.log(this.props, nextProps, nextProps.patientHistory.version)
+  //   if (
+  //     nextProps.patientHistory.version &&
+  //     this.props.patientHistory.version !== nextProps.patientHistory.version
+  //   ) {
+  //     nextProps
+  //       .dispatch({
+  //         type: 'patientHistory/query',
+  //         payload: {
+  //           patientProfileFK: nextProps.patientHistory.patientID,
+  //           sorting: [
+  //             {
+  //               columnName: 'VisitDate',
+  //               direction: 'desc',
+  //             },
+  //           ],
+  //           version:
+  //         },
+  //       })
+  //       .then((o) => {
+  //         // this.props.resetForm(o)
+  //         nextProps.dispatch({
+  //           type: 'patientHistory/updateState',
+  //           payload: {
+  //             selected: undefined,
+  //             selectedSubRow: undefined,
+  //             entity: undefined,
+  //           },
+  //         })
+  //       })
+  //   }
+  // }
 
   render () {
     const {
@@ -459,11 +460,10 @@ class PatientHistory extends Component {
                 <Select
                   noWrapper
                   value={this.state.selectedItems}
-                  all='0'
+                  allValue='0'
                   prefix='Filter By'
                   mode='multiple'
                   options={[
-                    { name: 'All', value: '0' },
                     { name: 'Chief Complaints', value: '1' },
                     { name: 'Plan', value: '2' },
                     { name: 'Diagnosis', value: '3' },
@@ -473,7 +473,6 @@ class PatientHistory extends Component {
                     { name: 'Invoice', value: '7' },
                   ]}
                   label='Filter By'
-                  maxTagCount={3}
                   style={{ marginBottom: theme.spacing(1) }}
                   onChange={this.onSelectChange}
                 />
@@ -487,19 +486,15 @@ class PatientHistory extends Component {
                     onClick={() => {
                       dispatch({
                         type: `consultation/edit`,
-                        payload: selected.id,
+                        payload: {
+                          id: selected.id,
+                          version: patientHistory.version,
+                        },
                       }).then((o) => {
-                        // console.log(o)
-                        dispatch({
-                          type: `consultation/updateState`,
-                          payload: {
-                            entity: o,
-                          },
-                        })
-
-                        router.push(
-                          `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                        )
+                        if (o)
+                          router.push(
+                            `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                          )
                       })
                     }}
                   >
@@ -519,7 +514,6 @@ class PatientHistory extends Component {
                 this.widgets
                   .filter(
                     (o) =>
-                      this.state.selectedItems.length === 0 ||
                       this.state.selectedItems.indexOf('0') >= 0 ||
                       this.state.selectedItems.indexOf(o.id) >= 0,
                   )

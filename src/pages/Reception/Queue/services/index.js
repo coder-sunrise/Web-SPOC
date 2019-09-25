@@ -16,7 +16,7 @@ export const endSession = async (sessionID) => {
   return response
 }
 
-export const getActiveSession = (params) =>
+export const getBizSession = (params) =>
   commonServices.queryList(bizSessionAPIURL, params)
 
 export const query = (params) => commonServices.query(bizSessionAPIURL, params)

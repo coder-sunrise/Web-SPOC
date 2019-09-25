@@ -14,7 +14,19 @@ export default createListViewModel({
     state: {
       currentViewDoctorBlock: {},
     },
-    subscriptions: {},
+    subscriptions: ({ dispatch, history }) => {
+      history.listen(async (location) => {
+        const { pathname } = location
+        if (pathname === '/setting/doctorblock') {
+          dispatch({
+            type: 'query',
+            payload: {
+              pagesize: 99999,
+            },
+          })
+        }
+      })
+    },
     effects: {
       // *upsertDoctorBlock ({ payload }, { call, put }) {
       //   const result = yield call(service.upsert, payload)

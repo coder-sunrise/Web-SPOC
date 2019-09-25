@@ -45,13 +45,22 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.replace(new RegExp(search, 'g'), replacement)
 }
 
-moment.prototype.toLocal = function () {
-  return this.add(8, 'hours')
-}
+// function toLocal (m) {
+//   // console.log(m, m.format(), moment(m.format()).add(8, 'hours'))
+//   return m.add(8, 'hours')
+// }
 
-moment.prototype.toUTC = function () {
-  return this.add(-8, 'hours')
-}
+// function toUTC (m) {
+//   return moment(m.format()).add(-8, 'hours')
+// }
+
+// moment.prototype.toLocal = function () {
+//   return this.clone().add(8, 'hours')
+// }
+
+// moment.prototype.toUTC = function () {
+//   return this.clone().add(-8, 'hours')
+// }
 
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
@@ -367,6 +376,7 @@ const convertToQuery = (
   // delete customQuerys.queryExcludeFields
   delete customQuerys.totalRecords
   delete customQuerys.combineCondition
+  delete customQuerys.version
 
   // console.log(query)
   let newQuery = {}
@@ -414,7 +424,6 @@ const convertToQuery = (
         } else if (Array.isArray(val)) {
           for (let i = 0; i < val.length; i++) {
             const obj = convertToQuery(val[i])
-
             // console.log(val[i], obj, JSON.stringify(obj))
             // newQuery.conditionGroups.push(obj)
             if (obj.criteria && obj.criteria.length > 0) {
@@ -427,6 +436,7 @@ const convertToQuery = (
                 obj.combineCondition
             }
           }
+          // console.log({ newQuery })
         } else if (typeof val === 'object' && Object.keys(val).length === 1) {
           const v = val[Object.keys(val)[0]]
           if (v !== undefined) {
@@ -732,4 +742,6 @@ module.exports = {
   calculateAdjustAmount,
   errMsgForOutOfRange,
   calculateItemLevelAdjustment,
+  // toUTC,
+  // toLocal,
 }

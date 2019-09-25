@@ -1,4 +1,5 @@
 import { CommonTableGrid } from '@/components'
+import { printRow } from '../ConsultationDocument'
 
 export default ({ current }) => {
   return (
@@ -12,7 +13,12 @@ export default ({ current }) => {
       ]}
       FuncProps={{ pager: false }}
       columnExtensions={[
-        { columnName: 'subject', type: 'link', linkField: 'href' },
+        {
+          columnName: 'subject',
+          type: 'link',
+          linkField: 'href',
+          onClick: printRow,
+        },
         {
           columnName: 'from',
           render: (r) => {

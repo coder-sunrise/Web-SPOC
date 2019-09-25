@@ -38,7 +38,7 @@ const VisitListingColumns = [
 ]
 
 const InvoicePayerColumns = [
-  { name: 'invoicePayerDetail', title: 'Invoice Payer Detail' },
+  // { name: 'invoicePayerDetail', title: 'Invoice Payer Detail' },
   { name: 'coPayer', title: 'Copayer' },
   { name: 'coPayerPayable', title: 'Copayer Payable' },
 ]
@@ -114,6 +114,14 @@ const QueueListing = ({ values, validateForm }) => {
           loaded: true,
           isLoading: false,
           visitListingData,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'updateState',
+        payload: {
+          loaded: false,
+          isLoading: false,
         },
       })
     }

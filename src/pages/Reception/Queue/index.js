@@ -101,34 +101,11 @@ class Queue extends PureComponent {
       dispatch({
         type: `${modelKey}getSessionInfo`,
       })
+    } else {
+      dispatch({
+        type: `${modelKey}refresh`,
+      })
     }
-    // dispatch({
-    //   type: 'calendar/getCalendarList',
-    //   payload: {
-    //     combineCondition: 'and',
-    //     eql_appointmentDate: today,
-    //     eql_appointmentStatusFk: '1',
-    //     // eql_appointmentStatusFk: [
-    //     //   {
-    //     //     appointmentStatusFk: [
-    //     //       '1',
-    //     //       '5',
-    //     //     ],
-    //     //     combineCondition: 'or',
-    //     //   },
-    //     // ],
-    //     // group: [
-    //     //   {
-    //     //     eql_appointmentStatusFk: '1',
-    //     //     combineCondition: 'or',
-    //     //   },
-    //     //   {
-    //     //     eql_appointmentStatusFk: '5',
-    //     //     combineCondition: 'or',
-    //     //   },
-    //     // ],
-    //   },
-    // })
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)

@@ -344,7 +344,7 @@ const sidebarStyle = (theme) => ({
     display: 'block',
     transition: 'transform 300ms ease 0s, opacity 300ms ease 0s',
     fontSize: '14px',
-    paddingLeft: '64px',
+    paddingLeft: 56,
   },
   collapseItemTextRTL: {
     textAlign: 'right',

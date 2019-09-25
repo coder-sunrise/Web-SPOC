@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import { FastField, withFormik } from 'formik'
-import { confirmBeforeReload, sortAll } from '@/utils/utils'
+import { confirmBeforeReload, commonDataReaderTransform } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 
 window.beforeReloadHandlerAdded = false
@@ -41,15 +41,17 @@ const withFormikExtend = (props) => (Component) => {
   }
   @withFormik({
     ...props,
-    mapPropsToValues: (p) => {
-      // console.log(2, p, props)
+    // mapPropsToValues: (p) => {
+    //   // console.log(2, p, props)
 
-      const { mapPropsToValues } = props
-      if (!mapPropsToValues) {
-        return null
-      }
-      return sortAll(mapPropsToValues(p))
-    },
+    //   const { mapPropsToValues } = props
+    //   if (!mapPropsToValues) {
+    //     return null
+    //   }
+    //   // console.log('commonDataReaderTransform', 3)
+
+    //   return mapPropsToValues(p)
+    // },
     // handleSubmit: (values, ps, a, b) => {
     //   const { handleSubmit: orghandleSubmit } = props
     //   orghandleSubmit.call(this, values, ps)

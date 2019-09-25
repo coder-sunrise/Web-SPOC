@@ -21,6 +21,7 @@ class CommonTooltip extends PureComponent {
       enterDelay = 500,
       ...restProps
     } = this.props
+
     return (
       <Tooltip
         title={title}

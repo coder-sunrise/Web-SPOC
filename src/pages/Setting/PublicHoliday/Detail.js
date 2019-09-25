@@ -34,26 +34,15 @@ const styles = (theme) => ({})
       type: 'settingPublicHoliday/upsert',
       payload: {
         ...restValues,
-        effectiveStartDate: effectiveDates[0]
-          .toUTC()
-          .set({ hour: 0, minute: 0, second: 0 }),
-
-        // effectiveEndDate:
-        //   effectiveDates[1].toUTC().set({ hour: 23, minute: 59, second: 59 }) < effectiveDates[0].toUTC().set({ hour: 0, minute: 0, second: 0 })
-        //     ? moment('2010-12-31')
-        //     : effectiveDates[1].toUTC().set({ hour: 23, minute: 59, second: 59 }),
+        effectiveStartDate: effectiveDates[0],
 
         effectiveEndDate:
           effectiveDates[1] < effectiveDates[0]
             ? moment('2010-12-31')
             : effectiveDates[1],
 
-        startDate: moment(dates[0])
-          .toUTC()
-          .set({ hour: 0, minute: 0, second: 0 }),
-        endDate: moment(dates[1])
-          .toUTC()
-          .set({ hour: 23, minute: 59, second: 59 }),
+        startDate: moment(dates[0]),
+        endDate: moment(dates[1]),
       },
     }).then((r) => {
       if (r) {
