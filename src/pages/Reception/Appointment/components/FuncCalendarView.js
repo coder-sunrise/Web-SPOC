@@ -260,14 +260,11 @@ const CalendarView = ({
       />
     )
   }
-
   const EventComponent = (eventProps) => {
-    // const { handleEventMouseOver, calendarView } = this.props
-
     return (
       <Event
         {...eventProps}
-        calendarView={calendarView}
+        // calendarView={calendarView}
         handleMouseOver={handleEventMouseOver}
       />
     )

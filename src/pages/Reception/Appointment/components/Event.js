@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
@@ -51,7 +52,8 @@ const style = (theme) => ({
   },
 })
 
-class Event extends PureComponent {
+@connect(({ calendar }) => ({ calendarView: calendar.calendarView }))
+class Event extends React.PureComponent {
   _handleMouseEnter = (syntheticEvent) => {
     const { event, handleMouseOver } = this.props
     handleMouseOver(event, syntheticEvent)
@@ -91,6 +93,8 @@ class Event extends PureComponent {
       [classes.baseContainer]: true,
       [classes.otherViewEvent]: true,
     })
+
+    // console.log({ calendarView })
 
     return calendarView === BigCalendar.Views.MONTH ? (
       <div

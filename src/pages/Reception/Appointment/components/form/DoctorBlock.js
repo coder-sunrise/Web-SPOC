@@ -272,12 +272,12 @@ export default compose(
 
       try {
         const doctorBlock = {
+          ...restDoctorBlock,
           eventDate,
           eventTime,
           recordClinicFK: 1,
           doctorBlockUserFk,
           remarks,
-          ...restDoctorBlock,
           // startDateTime: startDate.format(),
           // endDateTime: endDate.format(),
         }
@@ -327,6 +327,7 @@ export default compose(
             ...payload,
             recurrenceDto: filterRecurrenceDto(recurrenceDto),
           }
+        console.log({ payload })
 
         dispatch({
           type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
@@ -356,7 +357,7 @@ export default compose(
         const end = moment(doctorBlock.endDateTime)
         const durationHour = end.diff(start, 'hour')
         const durationMinute = end.diff(start, 'minute')
-
+        console.log({ doctorBlock })
         return {
           ...restValues,
           eventDate: start.format(_dateFormat),
