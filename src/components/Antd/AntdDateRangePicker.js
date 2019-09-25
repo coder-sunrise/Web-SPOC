@@ -230,9 +230,9 @@ class AntdDateRangePicker extends PureComponent {
 
     if (!format) {
       if (restProps.showTime) {
-        format = text ? dateFormatLongWithTime : dateFormatWithTime
+        format = text ? dateFormatLongWithTime : dateFormatLongWithTime
       } else {
-        format = text ? dateFormatLong : dateFormat
+        format = text ? dateFormatLong : dateFormatLong
       }
     }
     // const selectValue = form && field ? field.value : value

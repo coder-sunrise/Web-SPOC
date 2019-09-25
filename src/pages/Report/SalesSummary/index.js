@@ -161,7 +161,7 @@ const PatientListingWithFormik = withFormik({
     },
   ),
   mapPropsToValues: () => ({
-    dateFrom: moment.toUTC().startOf('month').toDate(),
+    dateFrom: moment.startOf('month').toDate(),
   }),
 })(PatientListing)
 

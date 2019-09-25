@@ -79,6 +79,9 @@ class AntdSelect extends React.PureComponent {
     size: PropTypes.string,
     renderDropdown: PropTypes.func,
     max: PropTypes.number,
+    allValue: PropTypes.number,
+    allLabel: PropTypes.string,
+    maxTagCount: PropTypes.number,
   }
 
   static defaultProps = {
@@ -89,6 +92,9 @@ class AntdSelect extends React.PureComponent {
     disabled: false,
     size: 'default',
     max: 50,
+    allValue: -99,
+    allLabel: 'All',
+    maxTagCount: 0,
   }
 
   constructor (props) {
@@ -101,10 +107,42 @@ class AntdSelect extends React.PureComponent {
       autoComplete,
       valueField,
       max,
+      allValue,
+      value,
     } = props
-    const v = form && field ? field.value : props.value || props.defaultValue
+    let v = form && field ? field.value : props.value || props.defaultValue
+
+    if (field) {
+      v = mode === 'multiple' ? field.value || [] : field.value
+      if (mode === 'multiple') {
+        if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
+          v = [
+            allValue,
+            ...options.map((o) => o[valueField]),
+          ]
+          form.setFieldValue(field.name, v)
+        }
+      }
+    } else if (value) {
+      v = mode === 'multiple' ? value || [] : value
+      if (mode === 'multiple') {
+        console.log(
+          allValue,
+          v.indexOf(allValue) >= 0,
+          options.length > 1,
+          v.length === 1,
+        )
+        if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
+          v = [
+            allValue,
+            ...options.map((o) => o[valueField]),
+          ]
+        }
+      }
+    }
+    const shrink = mode === 'multiple' ? v && v.length > 0 : v !== undefined
     this.state = {
-      shrink: !!v,
+      shrink,
       value: v,
       data:
         autoComplete && options && options.length > max
@@ -126,25 +164,50 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
+  // eslint-disable-next-line camelcase
+  // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value, options, valueField, autoComplete, mode } = nextProps
+    const {
+      field,
+      form,
+      value,
+      options,
+      valueField,
+      autoComplete,
+      mode,
+      allValue,
+    } = nextProps
     let v = this.state.value
+
     if (field) {
-      v = field.value
+      v = mode === 'multiple' ? field.value || [] : field.value
+      if (mode === 'multiple') {
+        if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
+          v = [
+            allValue,
+            ...options.map((o) => o[valueField]),
+          ]
+          form.setFieldValue(field.name, v)
+        }
+      }
       this.setState({
-        value: field.value,
-        shrink:
-          mode === 'multiple'
-            ? field.value && field.value.length > 0
-            : field.value !== undefined,
+        value: v,
+        shrink: mode === 'multiple' ? v && v.length > 0 : v !== undefined,
       })
     } else if (value) {
-      v = value
+      v = mode === 'multiple' ? value || [] : value
+      if (mode === 'multiple') {
+        if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
+          v = [
+            allValue,
+            ...options.map((o) => o[valueField]),
+          ]
+        }
+      }
 
       this.setState({
-        value,
-        shrink:
-          mode === 'multiple' ? value && value.length > 0 : value !== undefined,
+        value: v,
+        shrink: mode === 'multiple' ? v && v.length > 0 : v !== undefined,
       })
     } else {
       this.setState({
@@ -196,11 +259,11 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  handleValueChange = (val) => {
+  handleValueChange = (val, a, b, c) => {
     const {
       form,
       field,
-      all,
+      allValue,
       mode,
       onChange,
       options,
@@ -210,17 +273,19 @@ class AntdSelect extends React.PureComponent {
     } = this.props
     let newVal = val
     if (mode === 'multiple') {
-      if (val.indexOf(all) > 0) {
-        newVal = [
-          all,
-        ]
-      } else if (val.indexOf(all) === 0) {
-        newVal = _.reject(newVal, (v) => v === all)
+      if (val.indexOf(allValue) >= 0) {
+        if (this.state.value.indexOf(allValue) >= 0) {
+          newVal = _.reject(newVal, (v) => v === allValue)
+        } else {
+          newVal = [
+            allValue,
+            ...options.map((o) => o[valueField]),
+          ]
+        }
+      } else if (this.state.value.indexOf(allValue) >= 0) {
+        newVal = []
       }
     }
-    // console.log(val)
-    // console.log(returnValue)
-    // console.log({ val, newVal })
 
     let proceed = true
     if (onChange) {
@@ -333,7 +398,9 @@ class AntdSelect extends React.PureComponent {
       labelField,
       groupField,
       options,
-      defaultOptions = [],
+      allValue,
+      allLabel,
+      disableAll,
       classes,
       defaultValue,
       renderDropdown,
@@ -347,23 +414,32 @@ class AntdSelect extends React.PureComponent {
       query,
       optionLabelLength,
       className,
+      maxTagPlaceholder,
+      value,
       ...restProps
     } = this.props
-    const { form, field, value } = restProps
     // console.log(options)
+
     const source =
       autoComplete || query
         ? this.state.data
         : [
-            ...defaultOptions,
+            ...(restProps.mode === 'multiple' && !disableAll
+              ? [
+                  {
+                    [valueField]: allValue,
+                    [labelField]: allLabel,
+                  },
+                ]
+              : []),
             ...options,
           ]
 
     const cfg = {
       value: this.state.value,
     }
-    // console.log(newOptions)
-    // console.log(newOptions, this.state.value, cfg)
+    console.log(this.state.value)
+
     let opts = []
     if (source[0] && source[0][groupField]) {
       const groups = _.groupBy(source, groupField)
@@ -414,6 +490,9 @@ class AntdSelect extends React.PureComponent {
           filterOption={this.handleFilter}
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
+          maxTagPlaceholder={(vv) => {
+            return `${vv.filter((o) => o !== allValue).length} options selected`
+          }}
           optionLabelProp='label'
           notFoundContent={
             this.state.fetching ? (

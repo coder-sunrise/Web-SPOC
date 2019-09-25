@@ -50,12 +50,11 @@ const FilterBar = ({
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxDoctorTagPlaceholder = filterByDoctor
-    ? `${filterByDoctor.length} doctors selected...`
+    ? `${filterByDoctor.filter((o) => o !== -99).length} doctors selected...`
     : ''
 
   const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxAppointmentTagPlaceholder = `${filterByApptType.length} appointment types selected...`
-
   return (
     <SizeContainer>
       <React.Fragment>
@@ -79,7 +78,8 @@ const FilterBar = ({
               render={(args) => (
                 <CodeSelect
                   {...args}
-                  all={-99}
+                  allValue={-99}
+                  allLabel='All Doctors'
                   code='clinicianprofile'
                   label='Filter by Doctor'
                   mode='multiple'
@@ -88,14 +88,6 @@ const FilterBar = ({
                   maxTagCount={maxDoctorTagCount}
                   maxTagPlaceholder={maxDoctorTagPlaceholder}
                   renderDropdown={renderDropdown}
-                  defaultOptions={[
-                    {
-                      isExtra: true,
-                      id: -99,
-                      name: 'All Doctors',
-                      title: '',
-                    },
-                  ]}
                 />
               )}
             />
