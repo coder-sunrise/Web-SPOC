@@ -40,7 +40,7 @@ const FilterBar = ({
 
   const renderDropdown = (option) => {
     const { name, doctorProfile } = option
-    const title = option.title !== null ? option.title : ''
+    const title = option.title || ''
     const mcrNo =
       doctorProfile !== null && doctorProfile !== undefined
         ? `(${doctorProfile.doctorMCRNo})`

@@ -792,7 +792,7 @@ const _fetchAndSaveCodeTable = async (
   const searchURL = `${baseURL}/search?ctname=`
 
   let url = useGeneral ? generalCodetableURL : searchURL
-  let criteriaForTenantCodes = { pagesize: 99999 }
+  let criteriaForTenantCodes = { pagesize: 99999, isActive: true }
   if (
     tenantCodes.reduce(
       (codes, tenantCode) =>

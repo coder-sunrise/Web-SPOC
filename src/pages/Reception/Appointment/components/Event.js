@@ -63,7 +63,7 @@ class Event extends PureComponent {
   }
 
   constructAccountNo = (patientAccountNo) =>
-    patientAccountNo === null ? '' : `(${patientAccountNo})`
+    !patientAccountNo ? '' : `(${patientAccountNo})`
 
   render () {
     const { event, classes, calendarView } = this.props
@@ -71,7 +71,7 @@ class Event extends PureComponent {
 
     let title = event.patientName
     let accountNo = this.constructAccountNo(event.patientAccountNo)
-    let subtitle = event.patientContactNo
+    let subtitle = event.patientContactNo || ''
     if (doctor) {
       const { clinicianProfile = {} } = doctor
       const { doctorProfile } = clinicianProfile

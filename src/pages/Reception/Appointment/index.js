@@ -410,7 +410,6 @@ class Appointment extends React.PureComponent {
           title='Doctor Block'
           onClose={this.closeDoctorBlockModal}
           onConfirm={this.handleDoctorEventClick}
-          maxWidth='sm'
         >
           <DoctorBlockForm
             initialProps={selectedSlot}

@@ -52,10 +52,6 @@ const STYLES = (theme) => ({
     marginTop: 'auto',
     marginBottom: theme.spacing(0.5),
   },
-  checkAvailabilityBtn: {
-    position: 'absolute',
-    left: theme.spacing(2),
-  },
 })
 
 const _dateFormat = 'DD MMM YYYY'
@@ -221,11 +217,7 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
         footer({
           confirmText: 'Confirm',
           onConfirm: handleSubmit,
-          extraButtons: (
-            <Button className={classes.checkAvailabilityBtn} color='success'>
-              Check Availability
-            </Button>
-          ),
+          extraButtons: <Button color='success'>Check Availability</Button>,
         })}
     </div>
   )

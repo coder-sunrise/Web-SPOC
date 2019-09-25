@@ -352,21 +352,20 @@ export default createListViewModel({
         let start
         let end
         let isDayView = false
-
+        const format = ''
         if (targetView === BigCalendar.Views.MONTH) {
-          start = moment(targetDate).startOf('month').format(serverDateFormat)
-          end = moment(targetDate).endOf('month').format(serverDateFormat)
+          start = moment(targetDate).startOf('month').format()
+          end = moment(targetDate).endOf('month').format()
         }
         if (targetView === BigCalendar.Views.WEEK) {
-          start = moment(targetDate).startOf('week').format(serverDateFormat)
-          end = moment(targetDate).endOf('week').format(serverDateFormat)
+          start = moment(targetDate).startOf('week').format()
+          end = moment(targetDate).endOf('week').format()
         }
         if (targetView === BigCalendar.Views.DAY) {
-          start = moment(targetDate).startOf('day').format(serverDateFormat)
-          end = moment(targetDate).endOf('day').format(serverDateFormat)
+          start = moment(targetDate).startOf('day').format()
+          end = moment(targetDate).endOf('day').format()
           isDayView = true
         }
-
         const getCalendarListPayload = isDayView
           ? {
               eql_appointmentDate: start,
