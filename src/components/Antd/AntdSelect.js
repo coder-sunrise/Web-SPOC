@@ -126,12 +126,6 @@ class AntdSelect extends React.PureComponent {
     } else if (value) {
       v = mode === 'multiple' ? value || [] : value
       if (mode === 'multiple') {
-        console.log(
-          allValue,
-          v.indexOf(allValue) >= 0,
-          options.length > 1,
-          v.length === 1,
-        )
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
             allValue,
