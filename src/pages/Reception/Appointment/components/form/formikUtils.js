@@ -61,10 +61,8 @@ export const ValidationSchema = Yup.object().shape({
   }),
 })
 
-const convertReccurenceDaysOfTheWeek = (week) =>
-  week !== null
-    ? week.split(', ').map((eachDay) => parseInt(eachDay, 10))
-    : week
+const convertReccurenceDaysOfTheWeek = (week = '') =>
+  week.split(', ').map((eachDay) => parseInt(eachDay, 10))
 
 export const mapPropsToValues = ({
   viewingAppointment,
@@ -110,7 +108,7 @@ export const mapPropsToValues = ({
       isEnableRecurrence: false,
       isEditedAsSingleAppointment: false,
       overwriteEntireSeries: false,
-      bookedByUser: user.userName,
+      bookedByUser: user.clinicianProfile.name,
       bookedByUserFK: user.id,
       currentAppointment: {
         appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),

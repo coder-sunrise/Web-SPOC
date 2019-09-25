@@ -6,7 +6,7 @@ const DoctorLabel = ({ doctor }) => {
     let { clinicianProfile, doctorMCRNo } = doctor
     if (clinicianProfile === undefined) clinicianProfile = doctor
 
-    const designation = !clinicianProfile.title ? '' : clinicianProfile.title
+    const designation = clinicianProfile.title || ''
     const mcrNo = doctorMCRNo ? `(${doctorMCRNo})` : ''
     label = `${designation} ${clinicianProfile.name} ${mcrNo}`
   } catch (error) {

@@ -40,7 +40,7 @@ const FilterBar = ({
 
   const renderDropdown = (option) => {
     const { name, doctorProfile } = option
-    const title = option.title !== null ? option.title : ''
+    const title = option.title || ''
     const mcrNo =
       doctorProfile !== null && doctorProfile !== undefined
         ? `(${doctorProfile.doctorMCRNo})`
@@ -80,6 +80,7 @@ const FilterBar = ({
                   {...args}
                   allValue={-99}
                   allLabel='All Doctors'
+                  allowClear={false}
                   code='clinicianprofile'
                   label='Filter by Doctor'
                   mode='multiple'
@@ -99,6 +100,7 @@ const FilterBar = ({
                 <CodeSelect
                   {...args}
                   mode='multiple'
+                  allowClear={false}
                   all={-99}
                   label='Filter by Appointment Type'
                   code='ctappointmenttype'
@@ -152,6 +154,9 @@ export default memo(
     enableReinitialize: true,
     mapPropsToValues: () => ({
       filterByDoctor: [
+        -99,
+      ],
+      filterByApptType: [
         -99,
       ],
     }),

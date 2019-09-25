@@ -48,6 +48,22 @@ export default createFormViewModel({
               showConsultationPanel: true,
             },
           })
+        } else if (query.md2 === 'disp') {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              fullscreen: true,
+              showDispensePanel: true,
+            },
+          })
+        } else if (query.md2 === 'bill') {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              fullscreen: true,
+              showBillingPanel: true,
+            },
+          })
         } else {
           dispatch({
             type: 'updateState',

@@ -4,19 +4,15 @@ import { FastField } from 'formik'
 // common components
 import {
   Button,
-  Checkbox,
   CodeSelect,
   DatePicker,
   GridContainer,
   GridItem,
   RadioGroup,
-  Select,
-  TextField,
-  NumberInput,
   SizeContainer,
 } from '@/components'
 // medisys components
-import { DoctorLabel } from '@/components/_medisys'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
 const FilterBar = ({ handleSubmit }) => {
   return (
@@ -39,15 +35,7 @@ const FilterBar = ({ handleSubmit }) => {
           <GridItem md={2}>
             <FastField
               name='doctorID'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  code='doctorprofile'
-                  label='Doctor'
-                  labelField='clinicianProfile.name'
-                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
-                />
-              )}
+              render={(args) => <DoctorProfileSelect {...args} />}
             />
           </GridItem>
           <GridItem md={2}>

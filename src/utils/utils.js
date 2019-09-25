@@ -424,7 +424,6 @@ const convertToQuery = (
         } else if (Array.isArray(val)) {
           for (let i = 0; i < val.length; i++) {
             const obj = convertToQuery(val[i])
-
             // console.log(val[i], obj, JSON.stringify(obj))
             // newQuery.conditionGroups.push(obj)
             if (obj.criteria && obj.criteria.length > 0) {
@@ -437,6 +436,7 @@ const convertToQuery = (
                 obj.combineCondition
             }
           }
+          // console.log({ newQuery })
         } else if (typeof val === 'object' && Object.keys(val).length === 1) {
           const v = val[Object.keys(val)[0]]
           if (v !== undefined) {

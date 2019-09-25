@@ -1,6 +1,7 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import { withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
@@ -10,10 +11,14 @@ import {
   GridItem,
   SizeContainer,
 } from '@/components'
-// medisys components
-import { DoctorProfileSelect } from '@/components/_medisys'
 
-const FilterBar = ({ handleSubmit }) => {
+const styles = (theme) => ({
+  generateBtn: {
+    marginBottom: theme.spacing(1),
+  },
+})
+
+const FilterBar = ({ classes, handleSubmit }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -26,35 +31,15 @@ const FilterBar = ({ handleSubmit }) => {
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name='listingTo'
+              name='listingTO'
               render={(args) => <DatePicker {...args} label='To' />}
             />
           </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='isSeperatePaymentMode'
-              render={(args) => (
-                <Checkbox {...args} label='Separate Payment Mode' />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
+
+          <GridItem md={2} className={classes.generateBtn}>
             <Button color='primary' onClick={handleSubmit}>
               Generate Report
             </Button>
-          </GridItem>
-          <GridItem md={3} />
-          <GridItem md={4}>
-            <FastField
-              name='doctorID'
-              render={(args) => <DoctorProfileSelect {...args} />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='asAt'
-              render={(args) => <Checkbox {...args} label='As At' />}
-            />
           </GridItem>
         </GridContainer>
       </React.Fragment>
@@ -62,4 +47,4 @@ const FilterBar = ({ handleSubmit }) => {
   )
 }
 
-export default FilterBar
+export default withStyles(styles, { name: 'SalesSummaryFilterBar' })(FilterBar)

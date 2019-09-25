@@ -273,19 +273,21 @@ class AntdSelect extends React.PureComponent {
     } = this.props
     let newVal = val
     if (mode === 'multiple') {
-      if (val.indexOf(allValue) >= 0) {
-        if (this.state.value.indexOf(allValue) >= 0) {
-          newVal = _.reject(newVal, (v) => v === allValue)
-        } else {
-          newVal = [
-            allValue,
-            ...options.map((o) => o[valueField]),
-          ]
-        }
-      } else if (this.state.value.indexOf(allValue) >= 0) {
-        newVal = []
+      if (val.indexOf(all) > 0) {
+        newVal = [
+          all,
+        ]
+      } else if (val.includes(all) && val.length > 1) {
+        newVal = _.reject(newVal, (v) => v === all)
       }
+      // else if (val.indexOf(all) === 0) {
+      //   newVal = _.reject(newVal, (v) => v === all)
+      // }
     }
+
+    // console.log(val)
+    // console.log(returnValue)
+    // console.log({ val, index: val.indexOf(all), newVal })
 
     let proceed = true
     if (onChange) {

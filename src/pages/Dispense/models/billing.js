@@ -6,77 +6,20 @@ import * as service from '../services'
 import { query as queryPatient } from '@/services/patient'
 
 export default createListViewModel({
-  namespace: 'dispense',
+  namespace: 'billing',
   config: {
     queryOnLoad: false,
   },
   param: {
     service,
-    state: {
-      patientInfo: {},
-      invoiceItems: [
-        {
-          PRN: false,
-          amount: 9,
-          batchNo: '',
-          category: 'Drug',
-          consumptionMethod: '',
-          discount: 0,
-          discountType: '',
-          dosage: '',
-          dosageUnit: '',
-          expireDate: '',
-          frequency: '',
-          instruction: '',
-          itemCode: 'drug01',
-          period: '',
-          periodAmount: undefined,
-          precautionOne: '',
-          precautionThree: '',
-          precautionTwo: '',
-          quantity: 3,
-          remark: '',
-          scheme: 0,
-          stock: '44',
-          subTotal: 9,
-          unitPrice: 3,
-        },
-        {
-          PRN: false,
-          amount: 6,
-          batchNo: '',
-          category: 'Drug',
-          consumptionMethod: '',
-          discount: 0,
-          discountType: '',
-          dosage: '',
-          dosageUnit: '',
-          expireDate: '',
-          frequency: '',
-          instruction: '',
-          itemCode: 'drug02',
-          period: '',
-          periodAmount: undefined,
-          precautionOne: '',
-          precautionThree: '',
-          precautionTwo: '',
-          quantity: 4,
-          remark: '',
-          scheme: 0,
-          stock: '44',
-          subTotal: 8,
-          unitPrice: 2,
-        },
-      ],
-    },
+    state: {},
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
         const { query, pathname } = location
-        console.log({ pathname })
         if (pathname === '/reception/queue') {
           const { pid, vis, md2 } = query
-          console.log({ query })
-          if (md2 === 'disp') {
+
+          if (md2 === 'bill') {
             dispatch({
               type: 'fetchPatientInfo',
               payload: { id: pid },
@@ -86,7 +29,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *closeDispenseModal (_, { put }) {
+      *closeBillingModal (_, { put }) {
         router.push(
           getRemovedUrl([
             'md2',
@@ -105,7 +48,7 @@ export default createListViewModel({
           type: 'global/updateAppState',
           payload: {
             disableSave: false,
-            showDispensePanel: false,
+            showBillingPanel: false,
             fullscreen: false,
           },
         })

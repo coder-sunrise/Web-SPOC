@@ -446,7 +446,8 @@ class Form extends React.PureComponent {
       isDataGridValid,
     } = this.state
 
-    const { currentAppointment } = values
+    const { currentAppointment = {} } = values
+
     // console.log({ datagrid })
     // console.log({ values: this.props.values })
 
