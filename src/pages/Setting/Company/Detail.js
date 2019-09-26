@@ -11,6 +11,7 @@ import {
   Switch,
   Field,
   NumberInput,
+  dateFormatLong,
 } from '@/components'
 import Contact from './Contact'
 
@@ -146,7 +147,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
-                      format='DD MMM YYYY'
+                      format={dateFormatLong}
                       label='Effective Start Date'
                       label2='End Date'
                       {...args}

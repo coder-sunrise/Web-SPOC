@@ -472,6 +472,7 @@ const convertToQuery = (
       }
     }
   }
+
   const returnVal = {
     ...newQuery,
     sort: sorting.map((o) => ({

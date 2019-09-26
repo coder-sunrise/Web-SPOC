@@ -21,7 +21,7 @@ import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
-    float: 'right',
+    float: 'center',
     textAlign: 'center',
     marginTop: '22px',
     marginRight: '10px',
@@ -48,18 +48,6 @@ const Detail = ({
   }
   return (
     <React.Fragment>
-      <div className={classes.actionDiv}>
-        <ProgressButton
-          submitKey='vaccinationDetail/submit'
-          onClick={handleSubmit}
-        />
-        <Button
-          color='danger'
-          onClick={navigateDirtyCheck('/inventory/master?t=2')}
-        >
-          Cancel
-        </Button>
-      </div>
       <NavPills
         color='primary'
         onChange={(event, active) => {
@@ -95,6 +83,18 @@ const Detail = ({
           },
         ]}
       />
+      <div className={classes.actionDiv}>
+        <ProgressButton
+          submitKey='vaccinationDetail/submit'
+          onClick={handleSubmit}
+        />
+        <Button
+          color='danger'
+          onClick={navigateDirtyCheck('/inventory/master?t=2')}
+        >
+          Cancel
+        </Button>
+      </div>
     </React.Fragment>
   )
 }
@@ -145,13 +145,27 @@ export default compose(
     }),
     handleSubmit: (values, { props }) => {
       const { dispatch, history } = props
+      const { id, vaccinationStock, effectiveDates, ...restValues } = values
+      let defaultVaccinationStock = vaccinationStock
+      if (vaccinationStock.length === 0) {
+        defaultVaccinationStock = [
+          {
+            inventoryVaccinationFK: id,
+            batchNo: 'Not Applicable',
+            stock: 0,
+            isDefault: true,
+          },
+        ]
+      }
       dispatch({
         type: 'vaccinationDetail/upsert',
         payload: {
-          ...values,
+          ...restValues,
+          id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           markupMargin: parseFloat(values.markupMargin),
+          vaccinationStock: defaultVaccinationStock,
         },
       }).then((r) => {
         if (r) {

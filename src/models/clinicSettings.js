@@ -12,35 +12,22 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
         const { pathname } = loct
-        if (pathname === '/setting') {
-          dispatch({
-            type: 'clinicSettings',
-            payload: {
-              pagesize: 99999,
-            },
-          })
-        }
       })
     },
 
-    effects: {
-      *getClinicSettings (_, { call, put }) {
-        const response = yield call(service.query)
-
-        yield put({
-          type: 'save',
-          payload: response,
-        })
-      },
-    },
+    effects: {},
     reducers: {
-      save (state, { payload }) {
+      queryDone (state, { payload }) {
         const { data } = payload
         const settings = {}
+        let entity = {}
         data.forEach((p) => {
+          entity[p.settingKey] = {
+            ...p,
+          }
           switch (p.dataType) {
             case 'Boolean': {
-              const value = p.settingValue === 'Boolean'
+              const value = p.settingValue === 'true'
               settings[p.settingKey] = value
               break
             }
@@ -61,6 +48,7 @@ export default createFormViewModel({
         })
         return {
           settings,
+          entity,
         }
       },
     },

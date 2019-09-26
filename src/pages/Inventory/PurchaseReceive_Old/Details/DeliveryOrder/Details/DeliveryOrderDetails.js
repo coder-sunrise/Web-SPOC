@@ -15,6 +15,7 @@ import {
   CommonModal,
   EditableTableGrid,
   CodeSelect,
+  dateFormatLong,
 } from '@/components'
 import Edit from '@material-ui/icons/Edit'
 import Add from '@material-ui/icons/Add'
@@ -405,7 +406,7 @@ export class DeliveryOrderDetails extends PureComponent {
         {
           columnName: 'expiryDate',
           type: 'date',
-          format: 'DD MMM YYYY',
+          format: { dateFormatLong },
         },
       ],
       onRowDoubleClick: undefined,

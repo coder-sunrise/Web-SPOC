@@ -12,6 +12,7 @@ import {
   notification,
   Select,
   withFormikExtend,
+  dateFormatLong,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -161,7 +162,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
-                      format='DD MMM YYYY'
+                      format={dateFormatLong}
                       label='Effective Start Date'
                       label2='Effective End Date'
                       {...args}

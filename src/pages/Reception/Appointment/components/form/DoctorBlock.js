@@ -18,6 +18,7 @@ import {
   TimePicker,
   SizeContainer,
   TextField,
+  dateFormatLong,
 } from '@/components'
 // import Recurrence from './Recurrence'
 import {
@@ -54,7 +55,7 @@ const STYLES = (theme) => ({
   },
 })
 
-const _dateFormat = 'DD MMM YYYY'
+// const dateFormatLong = { dateFormatLong }
 const _timeFormat = 'hh:mm a'
 
 const durationHours = [
@@ -147,7 +148,7 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
                   {...args}
                   label='Date'
                   allowClear={false}
-                  format={_dateFormat}
+                  format={dateFormatLong}
                 />
               )}
             />
@@ -295,18 +296,18 @@ export default compose(
         // compute startTime and endTime on all recurrence
         doctorBlocks = doctorBlocks.map((item) => {
           const { eventDate: date, eventTime: time, ...rest } = item
-          const doctorBlockDate = moment(date).format(_dateFormat)
+          const doctorBlockDate = moment(date).format(dateFormatLong)
 
           const endDate = moment(
             `${doctorBlockDate} ${time}`,
-            `${_dateFormat} ${_timeFormat}`,
+            `${dateFormatLong} ${_timeFormat}`,
           )
           endDate.add(parseInt(durationHour, 10), 'hours')
           endDate.add(parseInt(durationMinute, 10), 'minutes')
 
           const startDate = moment(
             `${doctorBlockDate} ${time}`,
-            `${_dateFormat} ${_timeFormat}`,
+            `${dateFormatLong} ${_timeFormat}`,
           )
           return {
             ...rest,
@@ -360,7 +361,7 @@ export default compose(
         console.log({ doctorBlock })
         return {
           ...restValues,
-          eventDate: start.format(_dateFormat),
+          eventDate: start.format(dateFormatLong),
           eventTime: start.format(_timeFormat),
           durationHour,
           durationMinute,

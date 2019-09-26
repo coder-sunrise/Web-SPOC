@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import {
   GridContainer,
   EditableTableGrid,
+  withFormikExtend,
+  dateFormatLong,
 } from '@/components'
 import Yup from '@/utils/yup'
 import moment from 'moment'
@@ -29,7 +31,7 @@ class Grid extends PureComponent {
       {
         columnName: 'paymentDate',
         type: 'date',
-        format: 'DD MMM YYYY',
+        format: { dateFormatLong },
         value: moment(),
         disabled: true,
       },

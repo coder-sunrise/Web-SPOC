@@ -33,7 +33,7 @@ export default createFormViewModel({
         const contact = {
           contactAddress: [
             {
-              countryFK: 107,
+              // countryFK: 107,
               isPrimary: true,
               isMailing: true,
             },

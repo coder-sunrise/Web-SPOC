@@ -12,6 +12,7 @@ import {
   Select,
   TextField,
   Button,
+  dateFormatLong,
 } from '@/components'
 
 const styles = () => ({
@@ -68,7 +69,7 @@ class CollectPaymentConfirm extends PureComponent {
         type: 'number',
         currency: true,
       },
-      { columnName: 'invoiceDate', type: 'date', format: 'DD MMM YYYY' },
+      { columnName: 'invoiceDate', type: 'date', format: { dateFormatLong } },
       {
         columnName: 'payment',
         // type: 'number',
