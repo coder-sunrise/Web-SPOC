@@ -3,7 +3,8 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { getActiveSession } from '@/pages/Reception/Queue/services'
+import { getBizSession } from '@/services/queue'
+
 import Yup from '@/utils/yup'
 import {
   currencies,
@@ -21,6 +22,7 @@ import {
   Button,
 } from '@/components'
 import WarningSnackbar from './WarningSnackbar'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -33,7 +35,7 @@ const styles = (theme) => ({
   enableReinitialize: true,
 
   mapPropsToValues: ({ clinicSettings }) => {
-    return clinicSettings.settings
+    return clinicSettings.entity
   },
 
   handleSubmit: (values, { props }) => {
@@ -45,16 +47,13 @@ const styles = (theme) => ({
 
     const payload = [
       {
-        settingKey: 'SystemCurrency',
-        settingValue: SystemCurrency,
+        ...SystemCurrency,
       },
       {
-        settingKey: 'CurrencyRounding',
-        settingValue: CurrencyRounding,
+        ...CurrencyRounding,
       },
       {
-        settingKey: 'CurrencyRoundingToTheClosest',
-        settingValue: CurrencyRoundingToTheClosest,
+        ...CurrencyRoundingToTheClosest,
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -62,7 +61,14 @@ const styles = (theme) => ({
     dispatch({
       type: 'clinicSettings/upsert',
       payload,
-    }).then(history.push('/setting'))
+    }).then((r) => {
+      if (r) {
+        history.push('/setting')
+        dispatch({
+          type: 'clinicSettings/query',
+        })
+      }
+    })
   },
   displayName: 'clinicSettings',
 })
@@ -74,12 +80,12 @@ class GeneralSetting extends PureComponent {
   componentDidMount = () => {
     this.checkHasActiveSession()
     this.props.dispatch({
-      type: 'clinicSettings/getClinicSettings',
+      type: 'clinicSettings/query',
     })
   }
 
   checkHasActiveSession = async () => {
-    const result = await getActiveSession()
+    const result = await getBizSession()
     const { data } = result.data
     // let data = []
     if (!data || data.length === 0) {
@@ -101,7 +107,6 @@ class GeneralSetting extends PureComponent {
       ...restProps
     } = this.props
     const { hasActiveSession } = this.state
-
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -117,7 +122,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='SystemCurrency'
+                name='SystemCurrency.settingValue'
                 render={(args) => (
                   <Select
                     label='System Currency'
@@ -132,7 +137,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='CurrencyRounding'
+                name='CurrencyRounding.settingValue'
                 render={(args) => (
                   <Select
                     label='Currency Rounding'
@@ -146,7 +151,7 @@ class GeneralSetting extends PureComponent {
 
             <GridItem md={3}>
               <Field
-                name='CurrencyRoundingToTheClosest'
+                name='CurrencyRoundingToTheClosest.settingValue'
                 render={(args) => (
                   <Select
                     label='To The Closest'
@@ -165,9 +170,7 @@ class GeneralSetting extends PureComponent {
           >
             <Button
               color='danger'
-              onClick={() => {
-                this.props.history.push('/setting')
-              }}
+              onClick={navigateDirtyCheck('/setting')}
               disabled={hasActiveSession}
             >
               Cancel

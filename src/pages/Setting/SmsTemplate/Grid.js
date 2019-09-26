@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 
-import { CommonTableGrid, Button, Tooltip } from '@/components'
+import { CommonTableGrid, Button, Tooltip, dateFormatLong } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
@@ -69,12 +69,12 @@ class Grid extends PureComponent {
           {
             columnName: 'effectiveStartDate',
             type: 'date',
-            format: 'DD MMM YYYY',
+            format: { dateFormatLong },
           },
           {
             columnName: 'effectiveEndDate',
             type: 'date',
-            format: 'DD MMM YYYY',
+            format: { dateFormatLong },
           },
           {
             columnName: 'action',

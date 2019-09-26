@@ -65,7 +65,7 @@ const styles = () => ({
   },
   // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
-    console.log({ patient })
+    // console.log({ patient })
     return patient.entity || patient.default
   },
   validationSchema: schema,
@@ -86,19 +86,20 @@ const styles = () => ({
               ],
               getAppendUrl({
                 pid: r.id,
+                v: Date.now(),
               }),
             ),
           )
         }
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: r.id || patient.entity.id,
-          },
-        }).then((value) => {
-          resetForm(value)
-          if (onConfirm) onConfirm()
-        })
+        // dispatch({
+        //   type: 'patient/query',
+        //   payload: {
+        //     id: r.id || patient.entity.id,
+        //   },
+        // }).then((value) => {
+        //   resetForm(value)
+        // })
+        if (onConfirm) onConfirm()
       }
     })
   },
@@ -241,29 +242,29 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  componentDidMount () {
-    // console.log(
-    //   this.props.patient.currentId,
-    //   !this.props.patient.entity ||
-    //     this.props.patient.entity.id !== this.props.patient.currentId,
-    // )
-    if (
-      this.props.patient.currentId &&
-      (!this.props.patient.entity ||
-        this.props.patient.entity.id !== this.props.patient.currentId)
-    ) {
-      this.props
-        .dispatch({
-          type: 'patient/query',
-          payload: {
-            id: this.props.patient.currentId,
-          },
-        })
-        .then((o) => {
-          this.props.resetForm(o)
-        })
-    }
-  }
+  // componentDidMount () {
+  //   // console.log(
+  //   //   this.props.patient.currentId,
+  //   //   !this.props.patient.entity ||
+  //   //     this.props.patient.entity.id !== this.props.patient.currentId,
+  //   // )
+  //   if (
+  //     this.props.patient.currentId &&
+  //     (!this.props.patient.entity ||
+  //       this.props.patient.entity.id !== this.props.patient.currentId)
+  //   ) {
+  //     this.props
+  //       .dispatch({
+  //         type: 'patient/query',
+  //         payload: {
+  //           id: this.props.patient.currentId,
+  //         },
+  //       })
+  //       .then((o) => {
+  //         this.props.resetForm(o)
+  //       })
+  //   }
+  // }
 
   registerVisit = () => {
     router.push(
@@ -291,11 +292,11 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
-    console.log("************** patient profile ***********")
-    console.log(this.props)
-    // console.log('patient', patient)
-    // console.log('xx', resetProps)
+    // console.log('************** patient profile ***********')
     // console.log(this.props)
+    // // console.log('patient', patient)
+    // // console.log('xx', resetProps)
+    // console.log(this.props.values)
 
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}

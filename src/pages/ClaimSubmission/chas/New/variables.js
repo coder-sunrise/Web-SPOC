@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { dateFormatLong } from '@/components'
 
 export const NewCHASColumns = [
   {
@@ -67,7 +68,7 @@ const generateNewCHASData = () => {
   for (let i = 0; i < 15; i++) {
     data.push({
       id: i,
-      visitDate: moment().format('DD MMM YYYY'),
+      visitDate: moment().format({ dateFormatLong }),
       accountNo: 'S1234567D',
       patientName: 'Tan Kok Wei',
       doctor: 'Dr Levine',

@@ -70,8 +70,7 @@ export const formikHandleSubmit = (
   { props, resetForm, setSubmitting },
 ) => {
   const { queueNo, visitAttachment, ...restValues } = values
-  const { dispatch, queueLog, visitRegistration, onConfirm } = props
-  console.log({ props })
+  const { history, dispatch, queueLog, visitRegistration, onConfirm } = props
 
   const { sessionInfo } = queueLog
   const {
@@ -130,9 +129,15 @@ export const formikHandleSubmit = (
   }).then((response) => {
     if (response) {
       resetForm({})
-      dispatch({
-        type: 'queueLog/refresh',
-      })
+      const { location } = history
+      if (location.pathname === '/reception/appointment')
+        dispatch({
+          type: 'calendar/refresh',
+        })
+      else
+        dispatch({
+          type: 'queueLog/refresh',
+        })
       onConfirm()
     } else {
       setSubmitting(false)

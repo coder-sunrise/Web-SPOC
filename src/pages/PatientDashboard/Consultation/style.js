@@ -92,6 +92,11 @@ const styles = (theme) => ({
     top: -3,
     marginLeft: 10,
   },
+  actionPanel: {
+    direction: 'column',
+    justify: 'center',
+    alignItems: 'center',
+  },
 })
 
 export default styles

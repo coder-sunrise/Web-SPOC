@@ -78,18 +78,13 @@ export const mapPropsToValues = ({
     bookedByUser: user.clinicianProfile.name,
     bookedByUserFK: user.id,
     currentAppointment: {
-      appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),
+      appointmentDate: moment(selectedSlot.start).formatUTC(),
       appointments_Resources: [],
     },
     appointmentStatusFk: 2,
     recurrenceDto: { ...initDailyRecurrence },
   }
-  window.g_app._store.dispatch({
-    type: 'formik/updateState',
-    payload: {
-      AppointmentForm: undefined,
-    },
-  })
+
   try {
     if (viewingAppointment.id) {
       const clinicianProfile =
@@ -100,9 +95,7 @@ export const mapPropsToValues = ({
       const appointment = viewingAppointment.appointments.find(
         (item) => item.id === selectedAppointmentID,
       )
-
       const { recurrenceDto } = viewingAppointment
-
       values = {
         ...viewingAppointment,
         bookedByUser: clinicianProfile ? clinicianProfile.name : '',
@@ -117,7 +110,8 @@ export const mapPropsToValues = ({
                   recurrenceDto.recurrenceDaysOfTheWeek,
                 ),
               },
-        currentAppointment: { ...appointment },
+
+        currentAppointment: appointment,
         appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({
           ...item,
@@ -129,7 +123,6 @@ export const mapPropsToValues = ({
   }
 
   return values
-  // return {}
 }
 
 export const mapDatagridToAppointmentResources = (shouldDumpID) => (
@@ -211,7 +204,7 @@ export const generateRecurringAppointments = (
 
 export const getRecurrenceLastDate = (recurrences = []) =>
   recurrences.length > 0
-    ? moment(recurrences[recurrences.length - 1]).format()
+    ? moment(recurrences[recurrences.length - 1]).formatUTC()
     : undefined
 
 export const getFirstAppointmentType = (appointment) => {

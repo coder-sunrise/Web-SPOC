@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-
+import { getBizSession } from '@/services/queue'
 import {
   CodeSelect,
   CardContainer,
@@ -16,18 +16,19 @@ import {
   DatePicker,
   Switch,
   DateRangePicker,
+  dateFormatLong,
+  CheckboxGroup,
 } from '@/components'
-import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
-const Detail = ({ consumableDetail, dispatch, values }) => {
+const Detail = ({ consumableDetail, dispatch, values, theme }) => {
   const [
     hasActiveSession,
     setHasActiveSession,
   ] = useState(true)
   const checkHasActiveSession = async () => {
-    const result = await getActiveSession()
+    const result = await getBizSession()
     const { data } = result.data
     // let data = []
     if (!data || data.length === 0) {
@@ -46,13 +47,11 @@ const Detail = ({ consumableDetail, dispatch, values }) => {
       checkHasActiveSession()
     }
   }, [])
-
   return (
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
       <GridContainer gutter={0}>
@@ -122,6 +121,39 @@ const Detail = ({ consumableDetail, dispatch, values }) => {
                 }}
               />
             </GridItem>
+            <GridItem>
+              <FastField
+                name='chas'
+                render={(args) => (
+                  <CheckboxGroup
+                    vertical
+                    simple
+                    valueField='id'
+                    textField='name'
+                    options={[
+                      {
+                        id: 'acute',
+                        name: 'CHAS Acute Claimable',
+
+                        layoutConfig: {
+                          style: {},
+                        },
+                      },
+                      {
+                        id: 'chronic',
+                        name: 'CHAS Chronic Claimable',
+
+                        layoutConfig: {
+                          style: {},
+                        },
+                      },
+                    ]}
+                    onChange={(e, s) => {}}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
           </GridContainer>
         </GridItem>
         <GridItem xs={12} md={2} />
@@ -136,6 +168,7 @@ const Detail = ({ consumableDetail, dispatch, values }) => {
                       id: 'inventory.master.consumable.supplier',
                     })}
                     code='ctSupplier'
+                    labelField='displayValue'
                     max={10}
                     {...args}
                   />
@@ -190,7 +223,7 @@ const Detail = ({ consumableDetail, dispatch, values }) => {
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
-                    format='DD MMM YYYY'
+                    format={dateFormatLong}
                     label='Effective Start Date'
                     label2='End Date'
                     disabled={!!(consumableDetail.entity && hasActiveSession)}
@@ -202,7 +235,7 @@ const Detail = ({ consumableDetail, dispatch, values }) => {
           </GridContainer>
         </GridItem>
       </GridContainer>
-      <Divider style={{ margin: '40px 0 20px 0' }} />
+      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
     </CardContainer>
   )
 }

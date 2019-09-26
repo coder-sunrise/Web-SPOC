@@ -25,6 +25,7 @@ const Stock = ({
   consumableDetail,
   values,
   setFieldValue,
+  theme,
 }) => {
   const objectType = () => {
     if (vaccinationDetail) return 'vaccinationStock'
@@ -66,12 +67,12 @@ const Stock = ({
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
-      <h3 style={{ marginLeft: 5 }}>Stock</h3>
-      <hr />
+      <h4 style={{ fontWeight: 400 }}>
+        <b>Stock</b>
+      </h4>
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
           <FastField
@@ -137,7 +138,7 @@ const Stock = ({
         </GridItem>
       </GridContainer>
       <CommonTableGrid rows={values[objectType()]} {...tableParas} />
-      <Divider style={{ margin: '40px 0 20px 0' }} />
+      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
     </CardContainer>
   )
 }

@@ -15,9 +15,10 @@ import Yup from '@/utils/yup'
 
 const styles = () => ({
   actionDiv: {
-    float: 'right',
+    float: 'center',
     textAlign: 'center',
     marginTop: '22px',
+    marginBottom: '15px',
     marginRight: '10px',
   },
 })
@@ -155,15 +156,6 @@ const Detail = ({
   // console.log('packDetail', packDetail)
   return (
     <React.Fragment>
-      <div className={classes.actionDiv}>
-        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
-        <Button
-          color='danger'
-          onClick={navigateDirtyCheck('/inventory/master?t=3')}
-        >
-          Cancel
-        </Button>
-      </div>
       <NavPills
         color='primary'
         onChange={(event, active) => {
@@ -201,6 +193,15 @@ const Detail = ({
           },
         ]}
       />
+      <div className={classes.actionDiv}>
+        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
+        <Button
+          color='danger'
+          onClick={navigateDirtyCheck('/inventory/master?t=3')}
+        >
+          Cancel
+        </Button>
+      </div>
     </React.Fragment>
   )
 }
@@ -243,7 +244,6 @@ export default compose(
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           servicePackageItem: newServicePackageArray,
-          totalPrice: totalPrice,
         },
       }).then((r) => {
         if (r) {

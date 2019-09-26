@@ -179,9 +179,9 @@ class DatePicker extends PureComponent {
     const value = getValue(m)
     let utcValue = ''
     if (moment.isMoment(m)) {
-      utcValue = m.format()
+      utcValue = m.formatUTC()
     } else if (moment(m, _dateFormat).isValid()) {
-      utcValue = moment(m, _dateFormat).format()
+      utcValue = moment(m, _dateFormat).formatUTC()
     }
 
     this.setState(

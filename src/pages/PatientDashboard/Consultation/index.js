@@ -25,6 +25,8 @@ import {
 } from '@material-ui/core'
 import PlayArrow from '@material-ui/icons/PlayArrow'
 import Pause from '@material-ui/icons/Pause'
+import TimerIcon from '@material-ui/icons/Timer'
+
 import {
   CardContainer,
   TextField,
@@ -66,6 +68,7 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 
+let _getTime = null
 const saveConsultation = ({
   props,
   action,
@@ -98,6 +101,7 @@ const saveConsultation = ({
           values[p.prop] = (values[p.prop] || [])
             .concat(orderRows.filter((o) => o.type === p.value))
         })
+        if (_getTime) values.duration = Math.floor(Number(_getTime()) || 0)
         dispatch({
           type: `consultation/${action}`,
           payload: values,
@@ -155,13 +159,13 @@ const getRights = (values) => {
     view: 'consultation.view',
     edit: 'consultation.edit',
   },
-  mapPropsToValues: ({ consultation = {}, disabled, ...reset }) => {
+  mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
   // enableReinitialize: true,
- 
+
   handleSubmit: (values, { props }) => {
     saveConsultation({
       props: {
@@ -272,42 +276,14 @@ class Consultation extends PureComponent {
     }
   }
 
-  // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
-    // console.log(
-    //   nextProps.consultation,
-    //   nextProps.consultation.consultationID,
-    //   this.props.consultation.consultationID !==
-    //     nextProps.consultation.consultationID,
-    // )
-    if (
-      nextProps.consultation &&
-      nextProps.consultation.entity &&
-      nextProps.consultation.entity.concurrencyToken !==
-        nextProps.values.concurrencyToken
-    ) {
-      nextProps.resetForm(nextProps.consultation.entity)
-    }
-  }
-
-  render () {
-    const { props, state } = this
+  getExtraComponent = () => {
     const {
-      history,
-      classes,
       theme,
-      dispatch,
+      classes,
       values,
-      visitRegistration,
-      patientDashboard = {},
-      consultation = {},
       orders = {},
-      formik,
-      ...resetProps
+      visitRegistration,
     } = this.props
-  
-    const { entity } = consultation
     const { entity: vistEntity } = visitRegistration
     if (!vistEntity) return null
     const { visit = {} } = vistEntity
@@ -319,96 +295,101 @@ class Consultation extends PureComponent {
 
     // console.log(state.currentLayout)
     return (
-      <div className={classes.root} ref={this.container}>
-        <Banner
-          style={{}}
-          extraCmt={
-            <div
-              style={{
-                textAlign: 'center',
-                paddingTop: theme.spacing(1),
-                paddingBottom: theme.spacing(1),
-              }}
-            >
-              <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                <Timer
-                  initialTime={0}
-                  direction='forward'
-                  startImmediately={this.state.recording}
-                >
-                  {({
-                    start,
-                    resume,
-                    pause,
-                    stop,
-                    reset,
-                    getTimerState,
-                    getTime,
-                  }) => (
-                    <React.Fragment>
-                      <Timer.Hours
-                        formatValue={(value) =>
-                          `${numeral(value).format('00')} : `}
-                      />
-                      <Timer.Minutes
-                        formatValue={(value) =>
-                          `${numeral(value).format('00')} : `}
-                      />
-                      <Timer.Seconds
-                        formatValue={(value) =>
-                          `${numeral(value).format('00')}`}
-                      />
-                      {!this.state.recording && (
-                        <IconButton
-                          style={{ padding: 0, top: -1, right: -6 }}
-                          onClick={() => {
-                            resume()
-                            this.setState({
-                              recording: true,
-                            })
-                          }}
-                        >
-                          <PlayArrow />
-                        </IconButton>
-                      )}
-                      {this.state.recording && (
-                        <IconButton
-                          style={{ padding: 0, top: -1, right: -6 }}
-                          onClick={() => {
-                            pause()
-                            this.setState({
-                              recording: false,
-                            })
-                          }}
-                        >
-                          <Pause />
-                        </IconButton>
-                      )}
-                    </React.Fragment>
+      <SizeContainer size='sm'>
+        <div
+          style={{
+            textAlign: 'center',
+            paddingTop: theme.spacing(1),
+            paddingBottom: theme.spacing(1),
+            height: '100%',
+          }}
+        >
+          <GridContainer
+            // className={classes.actionPanel}
+            direction='column'
+            justify='space-evenly'
+            alignItems='center'
+          >
+            {[
+              'IN CONS',
+              'WAITING',
+            ].includes(visit.visitStatus) && (
+              <GridItem>
+                <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                  <Timer
+                    initialTime={values.duration || 0}
+                    direction='forward'
+                    startImmediately={this.state.recording}
+                  >
+                    {({
+                      start,
+                      resume,
+                      pause,
+                      stop,
+                      reset,
+                      getTimerState,
+                      getTime,
+                    }) => {
+                      _getTime = getTime
+                      return (
+                        <React.Fragment>
+                          <TimerIcon
+                            style={{
+                              height: 17,
+                              top: 2,
+                              left: -5,
+                              position: 'relative',
+                            }}
+                          />
+                          <Timer.Hours
+                            formatValue={(value) =>
+                              `${numeral(value).format('00')} : `}
+                          />
+                          <Timer.Minutes
+                            formatValue={(value) =>
+                              `${numeral(value).format('00')} : `}
+                          />
+                          <Timer.Seconds
+                            formatValue={(value) =>
+                              `${numeral(value).format('00')}`}
+                          />
+
+                          {/* {!this.state.recording && (
+                    <IconButton
+                      style={{ padding: 0, top: -1, right: -6 }}
+                      onClick={() => {
+                        resume()
+                        this.setState({
+                          recording: true,
+                        })
+                      }}
+                    >
+                      <PlayArrow />
+                    </IconButton>
                   )}
-                </Timer>
-              </h5>
+                  {this.state.recording && (
+                    <IconButton
+                      style={{ padding: 0, top: -1, right: -6 }}
+                      onClick={() => {
+                        pause()
+                        this.setState({
+                          recording: false,
+                        })
+                      }}
+                    >
+                      <Pause />
+                    </IconButton>
+                  )} */}
+                        </React.Fragment>
+                      )
+                    }}
+                  </Timer>
+                </h5>
+              </GridItem>
+            )}
+            <GridItem>
               <h4 style={{ position: 'relative', marginTop: 0 }}>
                 Total Invoice
-                {/* <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item onClick={this.showInvoiceAdjustment}>
-                        Add Invoice Adjustment
-                      </Menu.Item>
-                      <Menu.Divider />
-
-                      <Menu.Item>Absorb GST</Menu.Item>
-                    </Menu>
-                  }
-                  trigger={[
-                    'click',
-                  ]}
-                >
-                  <IconButton className={classes.iconButton}>
-                    <MoreHoriz />
-                  </IconButton>
-                </Dropdown> */}
                 {summary && (
                   <span>
                     &nbsp;:&nbsp;
@@ -416,7 +397,8 @@ class Consultation extends PureComponent {
                   </span>
                 )}
               </h4>
-
+            </GridItem>
+            <GridItem>
               {values.status !== 'Paused' && (
                 <ProgressButton
                   color='danger'
@@ -454,8 +436,63 @@ class Consultation extends PureComponent {
               >
                 Sign Off
               </ProgressButton>
-            </div>
-          }
+            </GridItem>
+          </GridContainer>
+        </div>
+      </SizeContainer>
+    )
+  }
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
+    // console.log(
+    //   nextProps.consultation,
+    //   nextProps.consultation.consultationID,
+    //   this.props.consultation.consultationID !==
+    //     nextProps.consultation.consultationID,
+    // )
+    if (
+      nextProps.consultation &&
+      nextProps.consultation.entity &&
+      nextProps.consultation.entity.concurrencyToken !==
+        nextProps.values.concurrencyToken
+    ) {
+      nextProps.resetForm(nextProps.consultation.entity)
+    }
+  }
+
+  render () {
+    const { props, state } = this
+    const {
+      history,
+      classes,
+      theme,
+      dispatch,
+      values,
+      visitRegistration,
+      patientDashboard = {},
+      consultation = {},
+      orders = {},
+      formik,
+      ...resetProps
+    } = this.props
+
+    const { entity } = consultation
+    const { entity: vistEntity } = visitRegistration
+    if (!vistEntity) return null
+    const { visit = {} } = vistEntity
+    const { summary } = orders
+    // const { adjustments, total, gst, totalWithGst } = summary
+    // console.log('values', values, this.props)
+    // console.log(currentLayout)
+
+    // console.log(state.currentLayout)
+    return (
+      <div className={classes.root} ref={this.container}>
+        <Banner
+          style={{}}
+          extraCmt={this.getExtraComponent()}
           {...this.props}
         />
         <Layout {...this.props} />

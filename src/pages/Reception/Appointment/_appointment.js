@@ -223,7 +223,7 @@ const generateAppointmentData = () => {
 }
 
 const generateDoctorBlock = () => {
-  const _dateFormat = 'DD MMM YYYY'
+  const _dateFormat = { dateFormatLong }
   const _timeFormat = 'hh:mm a'
   const _fullFormat = `${_dateFormat} ${_timeFormat}`
   let data = []

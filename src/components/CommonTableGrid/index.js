@@ -506,7 +506,7 @@ class CommonTableGrid extends PureComponent {
         ...this.state.entity.filter,
         ...payload,
       }
-      // console.log(p)
+      console.log(p)
       dispatch({
         type: `${type}/${queryMethod}`,
         payload: p,

@@ -62,6 +62,7 @@ class Memo extends PureComponent {
       parentProps,
       templateLoader,
     } = this.props
+    // console.log(this.props.values, this.props.dirty, this.props)
 
     return (
       <div>

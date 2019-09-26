@@ -71,7 +71,7 @@ class Checkbox extends React.Component {
           })
         }
         if (onChange) {
-          onChange(field.name, checked)
+          onChange({ target: { value: checked } })
         }
       },
       disabled,

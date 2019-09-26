@@ -47,11 +47,21 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             type: 'select',
             options: status,
+            width: 120,
+            align: 'center',
+          },
+          {
+            columnName: 'sortOrder',
+            width: 120,
+            render: (row) => {
+              return <p>{row.sortOrder === null ? '-' : row.sortOrder}</p>
+            },
           },
           {
             columnName: 'action',
             sortingEnabled: false,
             align: 'center',
+            width: 100,
             render: (row) => {
               return (
                 <Tooltip title='Edit Medication Precaution' placement='bottom'>
@@ -62,6 +72,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
+                    style={{ marginRight: 0 }}
                   >
                     <Edit />
                   </Button>

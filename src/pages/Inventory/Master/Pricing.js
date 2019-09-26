@@ -21,6 +21,7 @@ const Pricing = ({
   vaccinationDetail,
   consumableDetail,
   setValues,
+  theme,
 }) => {
   const [
     acp,
@@ -87,12 +88,12 @@ const Pricing = ({
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
-      <h3 style={{ marginLeft: 5 }}>Pricing</h3>
-      <hr />
+      <h4 style={{ fontWeight: 400 }}>
+        <b>Pricing</b>
+      </h4>
       <GridContainer gutter={0}>
         <GridItem xs={12} md={5}>
           <GridContainer>
@@ -227,7 +228,7 @@ const Pricing = ({
           </GridContainer>
         </GridItem>
       </GridContainer>
-      <Divider style={{ margin: '40px 0 20px 0' }} />
+      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
     </CardContainer>
   )
 }

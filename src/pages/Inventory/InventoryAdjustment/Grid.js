@@ -1,34 +1,12 @@
 import React, { PureComponent } from 'react'
 import { Edit, Delete } from '@material-ui/icons'
-// import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
 import { CommonTableGrid, Button } from '@/components'
 
 class Grid extends PureComponent {
   configs = {
-    rows: [
-      {
-        transNo: 'SA/000001',
-        transDate: '01-02-2018',
-        status: 'Draft',
-        remarks: 'Remarks',
-      },
-      {
-        transNo: 'SA/000002',
-        transDate: '02-03-2018',
-        status: 'Finalized',
-        remarks: 'abc',
-      },
-      {
-        transNo: 'SA/000003',
-        transDate: '06-05-2018',
-        status: 'Finalized',
-        remarks: 'Need another adjustment',
-      },
-    ],
     columns: [
-      { name: 'transNo', title: 'Transaction No' },
-      { name: 'transDate', title: 'Transaction Date' },
+      { name: 'transactionNo', title: 'Transaction No' },
+      { name: 'transactionDate', title: 'Transaction Date' },
       { name: 'status', title: 'Status' },
       { name: 'remarks', title: 'Remark' },
       { name: 'action', title: 'Action' },
@@ -52,12 +30,12 @@ class Grid extends PureComponent {
               </Button>
               <Button
                 size='sm'
-                // onClick={() => {
-                //   this.editRow(row)
-                // }}
+                onClick={() => {
+                  this.cancelRow(row)
+                }}
                 justIcon
                 color='danger'
-                disabled={row.status === 'Finalized'}
+                disabled={row.status !== 'Draft'}
               >
                 <Delete />
               </Button>
@@ -65,21 +43,50 @@ class Grid extends PureComponent {
           )
         },
       },
+      {
+        columnName: 'transactionDate',
+        type: 'date',
+        format: 'd/M/YYYY',
+      },
     ],
   }
 
-  editRow = (row, e) => {
+  editRow = async (row) => {
     const { dispatch, inventoryAdjustment } = this.props
     console.log('row', row)
     const { list } = inventoryAdjustment
+    console.log('list', list)
+
+    await this.props.dispatch({
+      type: 'inventoryAdjustment/queryOne',
+      payload: {
+        id: row.id,
+      },
+    })
+
     dispatch({
       type: 'inventoryAdjustment/updateState',
       payload: {
         showModal: true,
-        entity: row,
-        // entity: list.filter((o) => o.id === row.id),
       },
     })
+  }
+
+  cancelRow = (row) => {
+    const { dispatch, inventoryAdjustment } = this.props
+
+    this.props
+      .dispatch({
+        type: 'inventoryAdjustment/removeRow',
+        payload: {
+          id: row.id,
+        },
+      })
+      .then(() => {
+        this.props.dispatch({
+          type: 'inventoryAdjustment/query',
+        })
+      })
   }
 
   render () {
@@ -87,7 +94,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        // type='inventoryAdjustment'
+        type='inventoryAdjustment'
         onRowDoubleClick={this.editRow}
         {...this.configs}
       />
