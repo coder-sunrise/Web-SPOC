@@ -151,7 +151,6 @@ class AntdDatePicker extends PureComponent {
         : date.set({ hour: 0, minute: 0, second: 0 }).formatUTC()
       : ''
     if (form && field) {
-      console.log(v)
       form.setFieldValue(field.name, v)
     }
     if (onChange) {

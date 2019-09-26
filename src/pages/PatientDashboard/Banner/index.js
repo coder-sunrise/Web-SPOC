@@ -99,8 +99,8 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
-    console.log("************** banner ***********")
-    console.log(this.props)
+    // console.log("************** banner ***********")
+    // console.log(this.props)
     const { entity } = patient
     if (!entity)
       return (
@@ -137,7 +137,6 @@ class Banner extends PureComponent {
                     code='ctNationality'
                     value={info.nationalityFK}
                   />
-                  
                 </div>
               }
             />

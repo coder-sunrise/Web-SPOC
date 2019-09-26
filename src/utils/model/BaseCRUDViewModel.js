@@ -157,7 +157,7 @@ export default class BaseCRUDViewModel {
           return data
           // }
         },
-        { type: 'throttle', ms: 500 },
+        { type: 'throttle', ms: 2000 },
       ],
 
       *upsert ({ payload, history }, { select, call, put }) {

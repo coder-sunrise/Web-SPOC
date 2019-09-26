@@ -98,7 +98,6 @@ const withFormikExtend = (props) => (Component) => {
     componentDidMount () {
       if (!this.props.values.id) {
         this.props.validateForm()
-        lastVersion = findGetParameter('v')
       }
     }
 
@@ -108,6 +107,8 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     render () {
+      lastVersion = findGetParameter('v')
+
       const rights = {}
       if (authority) {
         if (authority.view) {

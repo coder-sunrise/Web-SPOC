@@ -86,8 +86,8 @@ const styles = (theme) => ({
 }))
 class PatientDashboard extends PureComponent {
   componentDidMount () {
-    console.log("=====")
-    console.log(this.props )
+    console.log('=====')
+    console.log(this.props)
     if (this.props.patientDashboard.currentId) {
       this.props.dispatch({
         type: 'patientDashboard/query',
@@ -148,7 +148,7 @@ class PatientDashboard extends PureComponent {
     if (!entity) return null
     const { visit = {} } = entity
     // console.log(visit)
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div className={classes.root}>
         <Banner
