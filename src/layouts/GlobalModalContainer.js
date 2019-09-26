@@ -227,7 +227,7 @@ class GlobalModalContainer extends PureComponent {
           maxWidth='lg'
           observe='VisitRegistration'
         >
-          <VisitRegistration />
+          <VisitRegistration history={this.props.history} />
         </CommonModal>
 
         <CommonModal

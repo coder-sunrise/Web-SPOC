@@ -2,9 +2,9 @@ import { createListViewModel } from 'medisys-model'
 // moment
 import moment from 'moment'
 import { subscribeNotification } from '@/utils/realtime'
-import * as service from '../services'
+import * as service from '../services/queue'
 import { save as updateAppt } from '@/services/calendar'
-import { StatusIndicator } from '../variables'
+import { StatusIndicator } from '@/pages/Reception/Queue/variables'
 import { serverDateFormat } from '@/components'
 
 const InitialSessionInfo = {
@@ -33,7 +33,22 @@ export default createListViewModel({
         message: '',
       },
     },
-    subscriptions: ({ dispatch }) => {
+    subscriptions: ({ dispatch, history }) => {
+      history.listen((location) => {
+        const { pathname } = location
+        const allowedPaths = [
+          '/reception/queue',
+          '/reception/appointment',
+        ]
+        if (allowedPaths.includes(pathname)) {
+          dispatch({
+            type: 'getSessionInfo',
+            payload: {
+              shouldGetTodayAppointments: pathname === allowedPaths[0],
+            },
+          })
+        }
+      })
       subscribeNotification('QueueListing', {
         callback: () => {
           dispatch({ type: 'refresh' })
@@ -83,11 +98,12 @@ export default createListViewModel({
 
         return status >= 204
       },
-      *getSessionInfo (_, { call, put }) {
-        const payload = {
+      *getSessionInfo ({ payload }, { call, put }) {
+        const { shouldGetTodayAppointments = true } = payload
+        const bizSessionPayload = {
           IsClinicSessionClosed: false,
         }
-        const response = yield call(service.getBizSession, payload)
+        const response = yield call(service.getBizSession, bizSessionPayload)
 
         const { data } = response
         // data = null when get session failed
@@ -101,10 +117,10 @@ export default createListViewModel({
               'VisitFKNavigation.BizSessionFK': sessionData[0].id,
             },
           })
-
-          yield put({
-            type: 'getTodayAppointments',
-          })
+          if (shouldGetTodayAppointments)
+            yield put({
+              type: 'getTodayAppointments',
+            })
 
           yield put({
             type: 'updateSessionInfo',
@@ -139,9 +155,10 @@ export default createListViewModel({
           type: 'refresh',
         })
       },
-      *refresh (_, { put }) {
+      *refresh ({ payload }, { put }) {
         yield put({
           type: 'getSessionInfo',
+          payload,
         })
         return true
       },

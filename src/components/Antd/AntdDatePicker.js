@@ -20,6 +20,7 @@ import {
   dateFormatLong,
   dateFormatWithTime,
   dateFormatLongWithTime,
+  serverDateTimeFormatFull,
 } from '@/components'
 
 const _toMoment = (value, isLocal, showTime) => {
@@ -92,6 +93,7 @@ class AntdDatePicker extends PureComponent {
       shrink: v !== undefined && v !== '',
       value: v,
     }
+    // console.log('antddatepicker', { state: this.state, v })
 
     if (form && field && this.state.value && dateOnly) {
       setTimeout(() => {
@@ -101,7 +103,7 @@ class AntdDatePicker extends PureComponent {
             ? moment(this.state.value).format()
             : moment(this.state.value)
                 .set({ hour: 0, minute: 0, second: 0 })
-                .format(),
+                .format(serverDateTimeFormatFull),
         )
       }, 1)
     }

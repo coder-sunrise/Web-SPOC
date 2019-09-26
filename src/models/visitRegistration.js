@@ -66,6 +66,7 @@ export default createFormViewModel({
             'refno',
             'new',
             'type',
+            'apptid',
           ]),
         )
         yield put({
