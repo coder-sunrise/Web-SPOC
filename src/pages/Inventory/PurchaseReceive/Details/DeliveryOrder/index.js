@@ -13,10 +13,6 @@ import { isPOStatusFinalized } from '../../variables'
 import DOGrid from './DOGrid'
 import DODetails from './DODetails'
 
-@connect(({ purchaseOrderDetails, deliveryOrderDetails }) => ({
-  purchaseOrderDetails,
-  deliveryOrderDetails,
-}))
 // @withFormikExtend({
 //   displayName: 'deliveryOrderDetails',
 //   enableReinitialize: true,
@@ -24,15 +20,19 @@ import DODetails from './DODetails'
 //     return deliveryOrderDetails
 //   },
 // })
+@connect(({ purchaseOrderDetails, deliveryOrderDetails }) => ({
+  purchaseOrderDetails,
+  deliveryOrderDetails,
+}))
 class index extends Component {
   state = {
     showDeliveryOrderDetails: false,
   }
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'deliveryOrderDetails/queryDeliveryOrder',
-    })
+    // this.props.dispatch({
+    //   type: 'deliveryOrderDetails/queryDeliveryOrder',
+    // })
 
     this.props.dispatch({
       type: 'deliveryOrderDetails/getOutstandingPOItem',
@@ -48,14 +48,15 @@ class index extends Component {
     })
   }
 
-  onEditdDeliveryOrderClicked = () => this.setState({ showDeliveryOrderDetails: true })
+  onEditDeliveryOrderClicked = () =>
+    this.setState({ showDeliveryOrderDetails: true })
 
   closeDODetailsModal = () => this.setState({ showDeliveryOrderDetails: false })
 
   render () {
     const { purchaseOrderDetails } = this.props
     const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = (purchaseOrder) ? purchaseOrder.status : ''
+    const poStatus = (purchaseOrder) ? purchaseOrder.purchaseOrderStatusFK : 1
     const { showDeliveryOrderDetails } = this.state
 
     return (

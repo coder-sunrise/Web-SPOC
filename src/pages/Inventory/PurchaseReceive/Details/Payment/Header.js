@@ -47,7 +47,7 @@ class Header extends PureComponent {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name={`${poPrefix}.invoiceTotal`}
+              name={`${poPrefix}.totalAmount`}
               render={(args) => (
                 <NumberInput
                   disabled

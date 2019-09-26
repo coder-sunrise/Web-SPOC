@@ -39,10 +39,52 @@ const receivingDetailsSchema = Yup.object().shape({
   enableReinitialize: true,
   displayName: 'deliveryOrderDetails',
   validationSchema: Yup.object().shape({
-    poNo: Yup.string().required(),
+    deliveryOrderNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
     rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
   }),
+  handleSubmit: (values, { props }) => {
+    const { rows, ...restValues } = values
+    // console.log('handleSubmit1', values)
+    // console.log('handleSubmit2', restValues)
+    const { dispatch, onConfirm } = props
+
+    let deliveryOrderItem = rows.map((x, index) => {
+      const itemType = podoOrderType.find((y) => y.value === x.type)
+      return {
+        purchaseOrderItemFK: x.id,
+        recevingQuantity: x.currentReceivingQty,
+        bonusQuantity: x.currentReceivingBonusQty,
+        // batchNo: x.batchNo,
+        // expiryDate: x.expiryDate,
+        sortOrder: index + 1,
+        inventoryTransactionItemDto: {
+          inventoryTypeFK: itemType.value,
+        },
+      }
+    })
+
+    console.log({
+      ...restValues,
+      sequence: 1,
+      deliveryOrderItem,
+    })
+
+    dispatch({
+      type: 'deliveryOrderDetails/upsert',
+      payload: {
+        ...restValues,
+        sequence: 1,
+        deliveryOrderItem,
+      },
+    }).then((r) => {
+      if (r) {
+        console.log('Upsert success')
+        // if (onConfirm) onConfirm()
+        // dispatch({})
+      }
+    })
+  },
 })
 class DODetails extends PureComponent {
   state = {
@@ -163,7 +205,6 @@ class DODetails extends PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted, changed }) => {
-    console.log('onCommitChanges')
     const { dispatch } = this.props
 
     if (deleted) {
@@ -268,11 +309,13 @@ class DODetails extends PureComponent {
       return row.uid
         ? this.state.MedicationItemList
         : this.state.filterMedicationItemList
-    } if (row.type === 2) {
+    }
+    if (row.type === 2) {
       return row.uid
         ? this.state.VaccinationItemList
         : this.state.filterVaccinationItemList
-    } if (row.type === 3) {
+    }
+    if (row.type === 3) {
       return row.uid
         ? this.state.ConsumableItemList
         : this.state.filterConsumableItemList
@@ -281,7 +324,7 @@ class DODetails extends PureComponent {
   }
 
   render () {
-    console.log(this.props)
+    // console.log('DODetails', this.props)
     const isEditable = true
     const { props } = this
     const { footer, values } = props
@@ -293,8 +336,8 @@ class DODetails extends PureComponent {
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
         { name: 'uom', title: 'UOM' },
-        { name: 'orderQty', title: 'Order Qty' },
-        { name: 'bonusQty', title: 'Bonus Qty' },
+        { name: 'orderQuantity', title: 'Order Qty' },
+        { name: 'bonusQuantity', title: 'Bonus Qty' },
         { name: 'quantityReceived', title: 'Total Received' },
         { name: 'totalBonusReceived', title: 'Total Bonus Received' },
         { name: 'currentReceivingQty', title: 'Current Receiving Qty' },
@@ -350,21 +393,23 @@ class DODetails extends PureComponent {
           options: (row) => {
             if (row.type === 1) {
               return this.state.MedicationItemList
-            } if (row.type === 2) {
+            }
+            if (row.type === 2) {
               return this.state.VaccinationItemList
-            } if (row.type === 3) {
+            }
+            if (row.type === 3) {
               return this.state.ConsumableItemList
             }
             return []
           },
         },
         {
-          columnName: 'orderQty',
+          columnName: 'orderQuantity',
           type: 'number',
           disabled: true,
         },
         {
-          columnName: 'bonusQty',
+          columnName: 'bonusQuantity',
           type: 'number',
           disabled: true,
         },
@@ -405,7 +450,7 @@ class DODetails extends PureComponent {
             <GridContainer>
               <GridItem xs={12}>
                 <FastField
-                  name='doNo'
+                  name='deliveryOrderNo'
                   render={(args) => {
                     return (
                       <TextField
@@ -441,13 +486,21 @@ class DODetails extends PureComponent {
           <GridItem xs={12} md={5}>
             <GridContainer>
               <GridItem xs={12}>
-                <OutlinedTextField
-                  label={formatMessage({
-                    id: 'inventory.pr.detail.dod.remarks',
-                  })}
-                  multiline
-                  rowsMax={2}
-                  rows={2}
+                <FastField
+                  name='remark'
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.dod.remarks',
+                        })}
+                        multiline
+                        rowsMax={2}
+                        rows={2}
+                        {...args}
+                      />
+                    )
+                  }}
                 />
               </GridItem>
             </GridContainer>

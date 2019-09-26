@@ -54,7 +54,7 @@ class Filter extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='isActive'
               render={(args) => {

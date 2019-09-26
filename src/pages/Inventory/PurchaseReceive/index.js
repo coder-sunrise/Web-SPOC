@@ -4,7 +4,7 @@ import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import {
   CardContainer,
-  withFormikExtend,
+  withFormik,
   CommonModal,
   GridItem,
   Button,
@@ -25,7 +25,7 @@ const styles = (theme) => ({
 @connect(({ purchaseReceiveList }) => ({
   purchaseReceiveList,
 }))
-@withFormikExtend({
+@withFormik({
   name: 'purchaseReceiveList',
   mapPropsToValues: ({ purchaseReceiveList }) => {
     return purchaseReceiveList
