@@ -91,7 +91,7 @@ const FilterBar = ({
                   // labelField='clinicianProfile.name'
                   // valueField='clinicianProfile.id'
                   maxTagCount={maxDoctorTagCount}
-                  maxTagPlaceholder={maxDoctorTagPlaceholder}
+                  maxTagPlaceholder='doctors'
                   renderDropdown={renderDropdown}
                 />
               )}
@@ -123,7 +123,7 @@ const FilterBar = ({
                     },
                   ]}
                   maxTagCount={maxAppointmentTagCount}
-                  maxTagPlaceholder={maxAppointmentTagPlaceholder}
+                  maxTagPlaceholder='appointment types'
                 />
               )}
             />
