@@ -29,8 +29,10 @@ class POSummary extends PureComponent {
     const { settings } = clinicSettings
 
     if (settings) {
-      if (settings.IsEnableGST !== state.settingGSTEnable &&
-        settings.GSTPercentageInt !== state.settingGSTPercentage)
+      if (
+        settings.IsEnableGST !== state.settingGSTEnable &&
+        settings.GSTPercentageInt !== state.settingGSTPercentage
+      )
         return {
           ...state,
           settingGSTEnable: !settings.IsEnableGST,
@@ -45,7 +47,7 @@ class POSummary extends PureComponent {
     const { setFieldValue, calcPurchaseOrderSummary } = this.props
     if (!isCheckboxClicked) {
       if (!settingGSTEnable) {
-        setFieldValue(`${poPrefix}.gstIncluded`, false)
+        setFieldValue(`${poPrefix}.IsGSTInclusive`, false)
       }
     }
     setTimeout(() => calcPurchaseOrderSummary(), 1)
@@ -53,11 +55,17 @@ class POSummary extends PureComponent {
 
   render () {
     const { settingGSTEnable, settingGSTPercentage } = this.state
-    const { values, dispatch, calcPurchaseOrderSummary, toggleInvoiceAdjustment } = this.props
-    const { purchaseOrderAdjustment } = values
+    const {
+      values,
+      dispatch,
+      calcPurchaseOrderSummary,
+      toggleInvoiceAdjustment,
+    } = this.props
+    const { purchaseOrderAdjustment, purchaseOrder } = values
+    const { IsGSTEnabled } = purchaseOrder || false
     return (
       <div style={{ paddingRight: 98, paddingTop: 20 }}>
-        <GridContainer>
+        <GridContainer style={{ paddingBottom: 8 }}>
           <GridItem xs={2} md={9} />
           <GridItem xs={10} md={3} container>
             <p>
@@ -110,6 +118,7 @@ class POSummary extends PureComponent {
                 name={`${poPrefix}.IsGSTEnabled`}
                 render={(args) => (
                   <Switch
+                    label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
                     {...args}
@@ -126,8 +135,8 @@ class POSummary extends PureComponent {
               />
             </GridItem>
             <GridItem xs={2} md={9} />
-            {settingGSTEnable ? (
-              <GridItem xs={10} md={3}>
+            {IsGSTEnabled ? (
+              <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
                   name={`${poPrefix}.IsGSTInclusive`}
                   render={(args) => {
@@ -150,11 +159,13 @@ class POSummary extends PureComponent {
                   }}
                 />
               </GridItem>
-            ) : (<GridItem xs={10} md={3} />)}
+            ) : (
+              <GridItem xs={10} md={3} />
+            )}
           </GridContainer>
         ) : (
-            []
-          )}
+          []
+        )}
 
         <GridContainer>
           <GridItem xs={2} md={9} />

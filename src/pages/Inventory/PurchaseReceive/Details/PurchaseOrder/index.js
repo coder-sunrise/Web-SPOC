@@ -2,18 +2,17 @@ import React, { Component } from 'react'
 // import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { formatMessage } from 'umi/locale'
-import {
-  notification,
-  withFormikExtend,
-  GridContainer,
-  GridItem,
-  Button,
-} from '@/components'
+import { withFormikExtend, GridContainer, GridItem, Button } from '@/components'
 import POForm from './POForm'
 import POGrid from './POGrid'
 import POSummary from './POSummary'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
-import { isPOStatusFinalized } from '../../variables'
+import {
+  isPOStatusDraft,
+  isPOStatusFinalized,
+  poSubmitAction,
+  getPurchaseOrderStatusFK,
+} from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 
 // @connect(({ purchaseOrderDetails, clinicSettings, clinicInfo }) => ({
@@ -79,137 +78,6 @@ class index extends Component {
     }
   }
 
-  onSavePOClicked = () => {
-    const { dispatch, purchaseOrderDetails, values, history } = this.props
-    const { id, type } = purchaseOrderDetails
-    const {
-      purchaseOrder,
-      purchaseOrderAdjustment: poAdjustment,
-      rows,
-    } = values
-
-    const processPayload = () => {
-      let purchaseOrderItem = []
-      if (type === 'new' || type === 'dup') {
-        purchaseOrderItem = rows.map((x) => {
-          const itemType = podoOrderType.find((y) => y.value === x.type)
-          return {
-            inventoryItemTypeFK: itemType.value,
-            orderQuantity: x.orderQuantity,
-            bonusQuantity: x.bonusQuantity,
-            totalQuantity: x.totalQuantity,
-            totalPrice: x.totalPrice,
-            totalAfterAdjustments: x.totalAfterAdjustments,
-            totalAfterGst: x.totalAfterGst,
-            sortOrder: x.sortOrder,
-            IsACPUpdated: false,
-            [itemType.prop]: {
-              [itemType.itemFKName]: x[itemType.itemFKName],
-              [itemType.itemCode]: '',
-              [itemType.itemName]: '',
-            },
-          }
-        })
-      } else {
-        purchaseOrderItem = rows.map((x) => {
-          const itemType = podoOrderType.find((y) => y.value === x.type)
-          let result = {}
-          // delete x.id
-          // x.outId ? (x.id = x.poItemId) : undefined
-          if (x.isNew) {
-            result = {
-              inventoryItemTypeFK: itemType.value,
-              orderQuantity: x.orderQuantity,
-              bonusQuantity: x.bonusQuantity,
-              totalQuantity: x.totalQuantity,
-              totalPrice: x.totalPrice,
-              totalAfterAdjustments: x.totalAfterAdjustments,
-              totalAfterGst: x.totalAfterGst,
-              sortOrder: x.sortOrder,
-              IsACPUpdated: false,
-              [itemType.prop]: {
-                [itemType.itemFKName]: x[itemType.itemFKName],
-                [itemType.itemCode]: '',
-                [itemType.itemName]: '',
-              },
-            }
-          } else {
-            result = {
-              ...x,
-            }
-          }
-          console.log(result)
-          return result
-        })
-      }
-
-      return {
-        ...purchaseOrder,
-        purchaseOrderStatusFK: 1,
-        invoiceStatusFK: 3, // Soe will double confirm whether this will be done at server side
-        purchaseOrderItem,
-        purchaseOrderAdjustment: [
-          ...poAdjustment.map((adj) => {
-            if (adj.isNew) {
-              delete adj.id
-            }
-            return adj
-          }),
-        ],
-      }
-    }
-
-    dispatch({
-      type: 'purchaseOrderDetails/upsert',
-      payload: processPayload(),
-    }).then((r) => {
-      if (r) {
-        history.push('/inventory/pr')
-      }
-    })
-  }
-
-  dummyOnSubmitPO = () => {
-    const { dispatch, purchaseOrderDetails, values } = this.props
-    const { id, type } = purchaseOrderDetails
-    dispatch({
-      type: 'purchaseOrderDetails/submitPurchaseOrder',
-      payload: values,
-    })
-
-    setTimeout(() => this.updateURL(), 1000)
-  }
-
-  updateURL = () => {
-    // Redirect to parent page
-    // (Only need to POST + wait for 200 --> then push to parent)
-    // If: Save Purchase Order Click
-    // If: Cancel Purchase Order Click
-
-    // Redirect to same page
-    // (POST + wait for 200 --> then call model/refresh + remain in same tab)
-    // If: Finalize Purchase Order (W/ Finalized notify)
-    // If: Save Delivery Order (From popup)
-    // If: Save Payment Clicked
-
-    const { dispatch, history, values } = this.props
-    const { location } = history
-    const { id, type } = values
-
-    // history.push(`${location.pathname}?id=${id}&type=${type}`)
-
-    history.push('/inventory/pr')
-
-    notification.success({ message: 'Dev: Saved!' })
-
-    // dispatch({
-    //   type: 'purchaseOrderDetails/refresh',
-    //   payload: { id, type },
-    // })
-  }
-
-  onPrintClick = () => {}
-
   showInvoiceAdjustment = () => {
     const { values, dispatch } = this.props
     const { purchaseOrder } = values
@@ -230,6 +98,152 @@ class index extends Component {
         },
       },
     })
+  }
+
+  onSubmitButtonClicked = (action) => {
+    const { dispatch, history } = this.props
+    let dispatchType = 'purchaseOrderDetails/upsert'
+    let processedPayload = {}
+
+    switch (action) {
+      case poSubmitAction.SAVE:
+        processedPayload = this.processSubmitPayload(1)
+        break
+      case poSubmitAction.CANCEL:
+        dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+        processedPayload = this.processSubmitPayload(4)
+        break
+      case poSubmitAction.FINALIZE:
+        dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+        processedPayload = this.processSubmitPayload(2)
+        break
+      case poSubmitAction.COMPLETE:
+        //
+        break
+      case poSubmitAction.PRINT:
+        //
+        break
+      default:
+      // case block
+    }
+
+    dispatch({
+      type: dispatchType,
+      payload: {
+        ...processedPayload,
+      },
+    }).then((r) => {
+      if (r) {
+        history.push('/inventory/pr')
+      }
+    })
+  }
+
+  processSubmitPayload = (purchaseOrderStatusFK) => {
+    const { purchaseOrderDetails, values } = this.props
+    const { type } = purchaseOrderDetails
+    const {
+      purchaseOrder,
+      purchaseOrderAdjustment: poAdjustment,
+      rows,
+    } = values
+    let purchaseOrderItem = []
+    let newPoAdjustment
+    if (type === 'new') {
+      purchaseOrderItem = rows.map((x) => {
+        const itemType = podoOrderType.find((y) => y.value === x.type)
+        return {
+          inventoryItemTypeFK: itemType.value,
+          orderQuantity: x.orderQuantity,
+          bonusQuantity: x.bonusQuantity,
+          totalQuantity: x.totalQuantity,
+          totalPrice: x.totalPrice,
+          totalAfterAdjustments: x.totalAfterAdjustments,
+          totalAfterGst: x.totalAfterGst,
+          sortOrder: x.sortOrder,
+          IsACPUpdated: false,
+          [itemType.prop]: {
+            [itemType.itemFKName]: x[itemType.itemFKName],
+            [itemType.itemCode]: '',
+            [itemType.itemName]: '',
+          },
+        }
+      })
+    } else if (type === 'dup') {
+      delete purchaseOrder.id
+      delete purchaseOrder.concurrencyToken
+      newPoAdjustment = poAdjustment.map((adj) => {
+        delete adj.id
+        delete adj.concurrencyToken
+        delete adj.purchaseOrderFK
+        return adj
+      })
+
+      purchaseOrderItem = rows.map((x) => {
+        const itemType = podoOrderType.find((y) => y.value === x.type)
+        return {
+          inventoryItemTypeFK: itemType.value,
+          orderQuantity: x.orderQuantity,
+          bonusQuantity: x.bonusQuantity,
+          totalQuantity: x.totalQuantity,
+          totalPrice: x.totalPrice,
+          totalAfterAdjustments: x.totalAfterAdjustments,
+          totalAfterGst: x.totalAfterGst,
+          sortOrder: x.sortOrder,
+          IsACPUpdated: false,
+          [itemType.prop]: {
+            [itemType.itemFKName]: x[itemType.itemFKName],
+            [itemType.itemCode]: '',
+            [itemType.itemName]: '',
+          },
+        }
+      })
+    } else {
+      purchaseOrderItem = rows.map((x) => {
+        const itemType = podoOrderType.find((y) => y.value === x.type)
+        let result = {}
+        if (x.isNew) {
+          result = {
+            inventoryItemTypeFK: itemType.value,
+            orderQuantity: x.orderQuantity,
+            bonusQuantity: x.bonusQuantity,
+            totalQuantity: x.totalQuantity,
+            totalPrice: x.totalPrice,
+            totalAfterAdjustments: x.totalAfterAdjustments,
+            totalAfterGst: x.totalAfterGst,
+            sortOrder: x.sortOrder,
+            IsACPUpdated: false,
+            [itemType.prop]: {
+              [itemType.itemFKName]: x[itemType.itemFKName],
+              [itemType.itemCode]: '',
+              [itemType.itemName]: '',
+            },
+          }
+        } else {
+          result = {
+            ...x,
+          }
+        }
+        return result
+      })
+    }
+
+    return {
+      ...purchaseOrder,
+      purchaseOrderStatusFK,
+      purchaseOrderStatusCode: getPurchaseOrderStatusFK(purchaseOrderStatusFK)
+        .code,
+      invoiceStatusFK: 3, // Soe will double confirm whether this will be done at server side
+      purchaseOrderItem,
+      purchaseOrderAdjustment: newPoAdjustment || [
+        ...poAdjustment.map((adj) => {
+          if (adj.isNew) {
+            delete adj.id
+          }
+          return adj
+        }),
+      ],
+    }
   }
 
   calcPurchaseOrderSummary = () => {
@@ -343,10 +357,9 @@ class index extends Component {
   }
 
   render () {
-    console.log('Index', this.props)
     const { purchaseOrderDetails } = this.props
     const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = purchaseOrder ? purchaseOrder.status : ''
+    const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 0
     return (
       <div>
         <POForm
@@ -366,8 +379,12 @@ class index extends Component {
         <GridContainer direction='row' style={{ marginTop: 20 }}>
           <GridItem xs={4} md={8} />
           <GridItem xs={8} md={4}>
-            {!isPOStatusFinalized(poStatus) ? (
-              <Button color='danger' onClick={this.dummyOnSubmitPO}>
+            {isPOStatusDraft(poStatus) ? (
+              <Button
+                color='danger'
+                onClick={() =>
+                  this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+              >
                 {formatMessage({
                   id: 'inventory.pr.detail.pod.cancelpo',
                 })}
@@ -375,17 +392,27 @@ class index extends Component {
             ) : (
               ''
             )}
-            <Button color='primary' onClick={this.onSavePOClicked}>
+            <Button
+              color='primary'
+              onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+            >
               {formatMessage({
                 id: 'inventory.pr.detail.pod.save',
               })}
             </Button>
-            <Button color='success' onClick={this.dummyOnSubmitPO}>
+            <Button
+              color='success'
+              onClick={() =>
+                this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+            >
               {formatMessage({
                 id: 'inventory.pr.detail.pod.finalize',
               })}
             </Button>
-            <Button color='info' onClick={this.dummyOnSubmitPO}>
+            <Button
+              color='info'
+              onClick={() => this.onSubmitButtonClicked(poSubmitAction.PRINT)}
+            >
               {formatMessage({
                 id: 'inventory.pr.detail.print',
               })}

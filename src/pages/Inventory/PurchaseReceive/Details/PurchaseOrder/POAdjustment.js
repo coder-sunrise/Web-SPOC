@@ -9,7 +9,6 @@ import {
 } from '@/components'
 import DeleteOutline from '@material-ui/icons/DeleteOutline'
 
-
 const POAdjustment = ({
   index,
   purchaseOrderAdjustment,
@@ -19,7 +18,7 @@ const POAdjustment = ({
 }) => {
   const { adjRemark } = purchaseOrderAdjustment[index]
   return (
-    <GridContainer>
+    <GridContainer style={{ paddingLeft: 30 }}>
       <GridItem xs={2} md={9} />
       <GridItem xs={5} md={2}>
         <GridItem>
@@ -43,7 +42,8 @@ const POAdjustment = ({
       </GridItem>
       <GridItem xs={5} md={1}>
         <Field
-          name={`purchaseOrderAdjustment[${index}].adjDisplayAmount`}
+          // name={`purchaseOrderAdjustment[${index}].adjDisplayAmount`}
+          name={`purchaseOrderAdjustment[${index}].adjValue`}
           render={(args) => {
             return <NumberInput {...amountProps} {...args} />
           }}
@@ -53,4 +53,4 @@ const POAdjustment = ({
   )
 }
 
-export default (POAdjustment)
+export default POAdjustment

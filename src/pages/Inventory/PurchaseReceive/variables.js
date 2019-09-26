@@ -8,6 +8,14 @@ import DeliveryOrder from './Details/DeliveryOrder'
 import Payment from './Details/Payment'
 import moment from 'moment'
 
+export const poSubmitAction = {
+  SAVE: 1,
+  CANCEL: 2,
+  FINALIZE: 3,
+  COMPLETE: 4,
+  PRINT: 5,
+}
+
 const LTPurchaseOrderStatus = [
   {
     code: 'DRAFT',
@@ -41,6 +49,29 @@ const LTPurchaseOrderStatus = [
   },
 ]
 
+const LTInvoiceStatus = [
+  {
+    code: 'PAID',
+    name: 'Paid',
+    id: 1,
+  },
+  {
+    code: 'OVERPAID',
+    name: 'Overpaid',
+    id: 2,
+  },
+  {
+    code: 'OUTSTANDING',
+    name: 'Outstanding',
+    id: 3,
+  },
+  {
+    code: 'WRITEOFF',
+    name: 'Write-Off',
+    id: 4,
+  },
+]
+
 const isDuplicatePOAllowed = (status) => {
   const allowedStatus = [
     'Partially Received',
@@ -56,9 +87,7 @@ const isDuplicatePOAllowed = (status) => {
 export const isPOStatusDraft = (status) => {
   const allowedStatus = [
     // 'Draft',
-    // 'Cancelled',
     1,
-    4,
   ]
   return allowedStatus.indexOf(status) > -1
 }
@@ -69,6 +98,26 @@ export const isPOStatusFinalized = (status) => {
     2,
   ]
   return allowedStatus.indexOf(status) > -1
+}
+
+export const getPurchaseOrderStatusFK = (status) => {
+  let purchaseOrderStatusFK = {}
+  if (typeof status === 'number') {
+    purchaseOrderStatusFK = LTPurchaseOrderStatus.find((x) => x.id === status)
+  } else {
+    purchaseOrderStatusFK = LTPurchaseOrderStatus.find(
+      (x) => x.name.toLowerCase() === status.toLowerCase(),
+    )
+  }
+
+  return purchaseOrderStatusFK
+}
+
+export const getInvoiceStatusFK = (status) => {
+  const invoiceStatusFK = LTInvoiceStatus.find(
+    (x) => x.name.toLowerCase() === status.toLowerCase(),
+  )
+  return invoiceStatusFK
 }
 
 export const PurchaseReceiveGridCol = [

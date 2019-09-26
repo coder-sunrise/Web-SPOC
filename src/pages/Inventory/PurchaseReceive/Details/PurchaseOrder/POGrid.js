@@ -70,7 +70,8 @@ class Grid extends PureComponent {
   }
 
   handleOnOrderTypeChanged = async (e) => {
-    const { dispatch, rows } = this.props
+    const { dispatch, values } = this.props
+    const { rows } = values
     const { row, option } = e
     const { value, itemFKName, stateName } = option
     const originItemList = this.state[stateName]

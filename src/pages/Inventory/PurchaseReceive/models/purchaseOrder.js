@@ -1,9 +1,14 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services'
 import moment from 'moment'
+import { notification } from '@/components'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
-import { fakeQueryDoneData } from '../variables'
+import {
+  fakeQueryDoneData,
+  getPurchaseOrderStatusFK,
+  getInvoiceStatusFK,
+} from '../variables'
 
 export default createFormViewModel({
   namespace: 'purchaseOrderDetails',
@@ -18,12 +23,13 @@ export default createFormViewModel({
           // poNo: 'PO/000001',
           // poDate: moment(),
           // status: 'Draft',
+          // IsEnabledGST: false,
           // --------------------
           purchaseOrderNo: 'PO/000001',
           purchaseOrderDate: moment(),
           purchaseOrderStatusFK: 1,
           shippingAddress: '',
-          IsEnabledGST: false,
+          IsGSTEnabled: false,
           IsGSTInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
@@ -94,24 +100,24 @@ export default createFormViewModel({
       },
       *duplicatePurchaseOrder ({ payload }, { call, put }) {
         // Call API to query selected Purchase Order
+        const response = yield call(service.queryById, payload.id)
         // Call API to get new PurchaseOrder#
 
-        let data = fakeQueryDoneData
-
-        const purchaseOrder = {
-          ...data.purchaseOrder,
-          purchaseOrderNo: 'PO/000876', // Mock PurchaseOrder#
-          purchaseOrderDate: moment(),
-          purchaseOrderStatusFK: 1,
-          IsEnabledGST: false,
-          IsGSTInclusive: false,
-          gstAmount: 0,
-          totalAmount: 0,
-        }
+        const { data } = response
 
         return yield put({
-          type: 'setDuplicatePurchaseOrder',
-          payload: { ...data, purchaseOrder },
+          type: 'setPurchaseOrder',
+          payload: {
+            ...data,
+            purchaseOrderNo: 'PO/000876', // Mock PurchaseOrder#
+            purchaseOrderDate: moment(),
+            purchaseOrderStatusFK: 1,
+            purchaseOrderStatus: getPurchaseOrderStatusFK(1).name,
+            IsEnabledGST: false,
+            IsGSTInclusive: data.isGstInclusive,
+            gstAmount: data.gstAmount,
+            totalAmount: data.totalAmount,
+          },
         })
       },
       *queryPurchaseOrder ({ payload }, { call, put }) {
@@ -132,25 +138,22 @@ export default createFormViewModel({
           },
         )
       },
-      *submitPurchaseOrder ({ payload }, { call, put }) {
-        // Call API to submit Purchase Order
-        // Get return response
-
-        return yield put({
-          type: 'submitPurchaseOrderResult',
-          payload: {
-            id: 789,
-            type: 'edit',
-          },
-        })
+      *upsertWithStatusCode ({ payload }, { call }) {
+        const r = yield call(service.upsertWithStatusCode, payload)
+        let message = r ? 'Saved' : 'Server busy. Please try again later.'
+        if (r) {
+          notification.success({
+            message,
+          })
+        } else {
+          notification.error({
+            message,
+          })
+        }
+        return r
       },
     },
-
     reducers: {
-      submitPurchaseOrderResult (state, { payload }) {
-        return { ...state, ...payload }
-      },
-
       setNewPurchaseOrder (state, { payload }) {
         return {
           ...state,
@@ -164,52 +167,8 @@ export default createFormViewModel({
         }
       },
 
-      setDuplicatePurchaseOrder (state, { payload }) {
-        let itemRows = []
-        podoOrderType.map((x) => {
-          itemRows = itemRows.concat(
-            (payload[x.prop] || []).map((y) => {
-              const d = {
-                uid: getUniqueId(),
-                type: x.value,
-                code: y[x.itemFKName],
-                name: y[x.itemFKName],
-                isDeleted: false,
-                ...y,
-              }
-              return x.convert ? x.convert(d) : d
-            }),
-          )
-          return null
-        })
-
-        return {
-          ...state,
-          ...payload,
-          rows: itemRows,
-        }
-      },
-
       setPurchaseOrder (state, { payload }) {
         const { purchaseOrderAdjustment, purchaseOrderItem } = payload
-
-        // let itemRows = []
-        // podoOrderType.map((x) => {
-        //   itemRows = itemRows.concat(
-        //     (fakeQueryDoneData[x.prop] || []).map((y) => {
-        //       const d = {
-        //         uid: getUniqueId(),
-        //         type: x.value,
-        //         code: y[x.itemFKName],
-        //         name: y[x.itemFKName],
-        //         isDeleted: false,
-        //         ...y,
-        //       }
-        //       return x.convert ? x.convert(d) : d
-        //     }),
-        //   )
-        //   return null
-        // })
 
         const itemRows = purchaseOrderItem.map((x) => {
           const itemType = podoOrderType.find(
@@ -217,11 +176,10 @@ export default createFormViewModel({
           )
 
           return {
-            // poItemId: x.id,
             ...x,
-            // ...x[itemType.prop],
             uid: getUniqueId(),
             type: x.inventoryItemTypeFK,
+            [itemType.itemFKName]: x[itemType.prop][itemType.itemFKName],
             code: x[itemType.prop][itemType.itemFKName],
             name: x[itemType.prop][itemType.itemFKName],
             uom: x[itemType.prop][itemType.itemFKName],
@@ -230,7 +188,13 @@ export default createFormViewModel({
 
         return {
           ...state,
-          purchaseOrder: payload,
+          purchaseOrder: {
+            ...payload,
+            invoiceStatusFK: getInvoiceStatusFK(payload.invoiceStatus).id,
+            purchaseOrderStatusFK: getPurchaseOrderStatusFK(
+              payload.purchaseOrderStatus,
+            ).id,
+          },
           purchaseOrderAdjustment: purchaseOrderAdjustment || [],
           rows: itemRows || [],
         }
@@ -269,7 +233,8 @@ export default createFormViewModel({
 
       deleteRow (state, { payload }) {
         const { rows } = state
-        return { ...state, rows: rows.filter((x) => x.uid !== payload) }
+        rows.find((v) => v.uid === payload).isDeleted = true
+        return { ...state, rows }
       },
 
       addAdjustment (state, { payload }) {
