@@ -140,3 +140,7 @@ export async function unlock (url, params, options) {
     options,
   })
 }
+
+export async function runningNumber (code) {
+  return request(`/api/RunningNumber/${code}`)
+}

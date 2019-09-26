@@ -7,7 +7,6 @@ import { Popover, withStyles } from '@material-ui/core'
 import { CardContainer, CommonModal, serverDateFormat } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
-import CalendarView from './components/CalendarView'
 import FuncCalendarView from './components/FuncCalendarView'
 import PopoverContent from './components/PopoverContent'
 import Form from './components/form/Form'
@@ -15,12 +14,10 @@ import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
 // settings
 import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
-import {
-  CalendarActions,
-  DoctorFormValidation,
-  InitialPopoverEvent,
-} from './const'
+import { DoctorFormValidation, InitialPopoverEvent } from './const'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+// utils
+import { getRemovedUrl } from '@/utils/utils'
 
 const styles = (theme) => ({
   popover: {
@@ -127,35 +124,28 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  _dispatchAction = ({ action, ...args }, callback) => {
-    const { dispatch } = this.props
-    dispatch({ type: action, ...args })
-    callback && callback()
-  }
-
   closeAppointmentForm = () => {
     this.setState({ selectedAppointmentFK: -1, showAppointmentForm: false })
-
     this.props.dispatch({
       type: 'calendar/setViewAppointment',
       data: { appointments: [] },
     })
+    this.props.history.push(
+      getRemovedUrl([
+        'md',
+        'pid',
+        'apptid',
+      ]),
+    )
   }
 
-  moveEvent = ({ updatedEvent, id, _appointmentID }) => {
+  moveEvent = (props) => {
     console.log({
-      updatedEvent,
-      id,
+      props,
     })
-    // this.setState({
-    //   isDragging: false,
-    // })
-    // this._dispatchAction({
-    //   action: CalendarActions.MoveEvent,
-    //   updatedEvent,
-    //   id,
-    //   _appointmentID,
-    // })
+    this.setState({
+      isDragging: false,
+    })
   }
 
   onSelectSlot = ({ start }) => {
@@ -305,21 +295,6 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  updateDoctorEvent = (doctorEvent) => {
-    this._dispatchAction(
-      {
-        action: CalendarActions.UpdateDoctorEvent,
-        ...doctorEvent,
-      },
-      () => {
-        this.setState({
-          selectedSlot: {},
-          showDoctorEventModal: false,
-        })
-      },
-    )
-  }
-
   closeSeriesConfirmation = () => {
     this.props.dispatch({
       type: 'calendar/setViewAppointment',
@@ -432,6 +407,7 @@ class Appointment extends React.PureComponent {
           observe='AppointmentForm'
         >
           <Form
+            history={this.props.history}
             resources={resources}
             selectedAppointmentID={selectedAppointmentFK}
             selectedSlot={selectedSlot}
@@ -443,11 +419,9 @@ class Appointment extends React.PureComponent {
           title='Doctor Block'
           onClose={this.closeDoctorBlockModal}
           onConfirm={this.handleDoctorEventClick}
-          maxWidth='sm'
         >
           <DoctorBlockForm
             initialProps={selectedSlot}
-            handleUpdateDoctorEvent={this.updateDoctorEvent}
             validationSchema={DoctorFormValidation}
           />
         </CommonModal>

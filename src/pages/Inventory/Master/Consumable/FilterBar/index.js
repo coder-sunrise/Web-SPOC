@@ -73,6 +73,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                     id: 'inventory.master.consumable.supplier',
                   })}
                   code='ctSupplier'
+                  labelField='displayValue'
                   {...args}
                 />
               )

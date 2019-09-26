@@ -10,7 +10,7 @@ import {
   TextField,
 } from '@/components'
 
-const AppointmentDate = ({ disabled }) => (
+const AppointmentDate = () => (
   <GridContainer item xs md={12}>
     <GridItem xs md={6}>
       <FastField
@@ -18,11 +18,10 @@ const AppointmentDate = ({ disabled }) => (
         // validate={this.startDateValidation}
         render={(args) => (
           <DatePicker
-            disabled={disabled}
-            format={dateFormat}
+            {...args}
+            disabled
             allowClear={false}
             label='Appointment Date'
-            {...args}
           />
         )}
       />

@@ -17,6 +17,7 @@ import {
   Button,
 } from '@/components'
 import WarningSnackbar from '../GeneralSetting/WarningSnackbar'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -27,64 +28,56 @@ const styles = (theme) => ({
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ clinicSettings }) => clinicSettings.settings,
+  mapPropsToValues: ({ clinicSettings }) => clinicSettings.entity,
 
   handleSubmit: (values, { props }) => {
-    const {
-      IsEnableGST,
-      GSTRegistrationNumber,
-      GSTPercentage,
-      concurrencyToken,
-    } = values
-    console.log('values', values)
+    const { IsEnableGST, GSTRegistrationNumber, GSTPercentage } = values
+
     const payload = [
       {
-        id: 1,
-        settingKey: 'IsEnableGST',
-        settingValue: IsEnableGST,
-        dataType: 'Boolean',
-        concurrencyToken,
+        ...IsEnableGST,
+        settingValue: IsEnableGST.settingValue.toString(),
       },
       {
-        id: 2,
-        settingKey: 'GSTRegistrationNumber',
-        settingValue: GSTRegistrationNumber,
-        dataType: 'String',
-        concurrencyToken,
+        ...GSTRegistrationNumber,
       },
       {
-        id: 3,
-        settingKey: 'GSTPercentage',
-        settingValue: GSTPercentage,
-        dataType: 'Decimal',
-        concurrencyToken,
+        ...GSTPercentage,
       },
     ]
     const { dispatch, onConfirm, history } = props
 
     dispatch({
       type: 'clinicSettings/upsert',
-
       payload,
-    }).then(history.push('/setting'))
+    }).then((r) => {
+      if (r) {
+        history.push('/setting')
+        dispatch({
+          type: 'clinicSettings/query',
+        })
+      }
+    })
   },
   displayName: 'clinicSettingsInfo',
 })
 class clinicSettings extends PureComponent {
   state = {
-    enableGst: false,
+    enableGst: true,
     inclusiveGst: false,
     hasActiveSession: true,
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     this.checkHasActiveSession()
-    await this.props.dispatch({
+    this.props.dispatch({
       type: 'clinicSettings/query',
     })
+    this.setInitialValue(this.props.values)
+  }
 
-    const { IsEnableGST } = this.props.values
-    this.setState({ enableGst: IsEnableGST })
+  componentDidUpdate = (prevProps) => {
+    this.setInitialValue(this.props.values)
   }
 
   checkHasActiveSession = async () => {
@@ -100,35 +93,103 @@ class clinicSettings extends PureComponent {
     }
   }
 
-  handleOnChange = () => {
-    this.setState(
-      (prevState) => {
-        return {
-          enableGst: !prevState.enableGst,
-        }
-      },
-      // (v) => {
-      //   if (!this.state.enableGst) {
-      //     this.props.setFieldValue('inclusiveGst', false)
-      //   }
-      // },
+  setInitialValue = (param) => {
+    this.setState({
+      enableGst: param.IsEnableGST
+        ? param.IsEnableGST.settingValue.toString() === 'true'
+        : false,
+    })
+    this.props.setFieldValue(
+      'IsEnableGST.settingValue',
+      param.IsEnableGST
+        ? param.IsEnableGST.settingValue.toString() === 'true'
+        : false,
     )
+    // this.props.setValues({
+    //   ...this.props.values,
+    //   IsEnableGST: {
+    //     ...this.props.values.IsEnableGST,
+    //     settingValue: this.props.values.IsEnableGST
+    //       ? this.props.values.IsEnableGST.settingValue.toString() === 'true'
+    //       : false,
+    //   },
+    // })
+  }
+
+  handleOnChange = (event) => {
+    // console.log({ event })
+    // const { values } = this.props
+    // console.log('hello')
+    // this.setState(
+    //   (prevState) => {
+    //     return {
+    //       enableGst: !prevState.enableGst,
+    //     }
+    //   },
+
+    // (v) => {
+    //   if (!this.state.enableGst) {
+    //     this.props.setFieldValue('inclusiveGst', false)
+    //   }
+    // },
+    // )
+    this.setState({ enableGst: event.target.value })
+    // this.props.setFieldValue('IsEnableGST.settingvalue', event.target.value)
+    // this.props.setValues({
+    //   ...this.props.values,
+    //   IsEnableGST: {
+    //     ...this.props.values.IsEnableGST,
+    //     settingValue: event.target.value,
+    //   },
+    // })
+  }
+
+  handleOnSubmit = () => {
+    const {
+      IsEnableGST,
+      GSTRegistrationNumber,
+      GSTPercentage,
+    } = this.props.values
+    console.log(this.props.values)
+    const payload = [
+      {
+        ...IsEnableGST,
+        settingValue: IsEnableGST.settingValue.toString(),
+      },
+      {
+        ...GSTRegistrationNumber,
+      },
+      {
+        ...GSTPercentage,
+      },
+    ]
+    const { dispatch, onConfirm, history } = this.props
+
+    dispatch({
+      type: 'clinicSettings/upsert',
+      payload,
+    }).then((r) => {
+      if (r) {
+        history.push('/setting')
+        dispatch({
+          type: 'clinicSettings/query',
+        })
+      }
+    })
   }
 
   render () {
     const {
       form,
       classes,
-      clinicSettingsInfo,
       dispatch,
       theme,
       handleSubmit,
+      clinicSettingsInfo,
       values,
       ...restProps
     } = this.props
     const { enableGst, hasActiveSession } = this.state
-
-    // console.log('inclusiveGst', this.props.values)
     return (
       <React.Fragment>
         {hasActiveSession && (
@@ -144,7 +205,7 @@ class clinicSettings extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='IsEnableGST'
+                name='IsEnableGST.settingValue'
                 render={(args) => (
                   <Checkbox
                     label='Enable GST'
@@ -159,7 +220,7 @@ class clinicSettings extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='GSTRegistrationNumber'
+                name='GSTRegistrationNumber.settingValue'
                 render={(args) => (
                   <TextField
                     label='GST Registration Number'
@@ -173,7 +234,7 @@ class clinicSettings extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='GSTPercentage'
+                name='GSTPercentage.settingValue'
                 render={(args) => (
                   <TextField
                     label='GST Rate'
@@ -205,9 +266,7 @@ class clinicSettings extends PureComponent {
           >
             <Button
               color='danger'
-              onClick={() => {
-                this.props.history.push('/setting')
-              }}
+              onClick={navigateDirtyCheck('/setting')}
               disabled={hasActiveSession}
             >
               Cancel
@@ -215,7 +274,7 @@ class clinicSettings extends PureComponent {
 
             <Button
               color='primary'
-              onClick={handleSubmit}
+              onClick={this.handleOnSubmit}
               disabled={hasActiveSession}
             >
               Save

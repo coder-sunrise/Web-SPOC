@@ -22,6 +22,11 @@ const styles = () => ({
   tableHeader: {
     marginTop: 50,
   },
+
+  tableSectionHeader: {
+    fontWeight: 400,
+    marginLeft: -15,
+  },
 })
 
 let commitCount = 1000 // uniqueNumber
@@ -34,6 +39,7 @@ const InventoryTypeListing = ({
   values,
   setTotalPrice,
   totalPrice,
+  theme,
 }) => {
   const {
     medicationPackageItem,
@@ -297,6 +303,7 @@ const InventoryTypeListing = ({
         consumablePackageItem: consumableRows,
         vaccinationPackageItem: vaccinationRows,
         servicePackageItem: serviceRows,
+        totalPrice: total,
       })
 
       dispatch({
@@ -724,8 +731,7 @@ const InventoryTypeListing = ({
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
       <GridContainer>
@@ -739,7 +745,9 @@ const InventoryTypeListing = ({
       </GridContainer>
       <GridContainer>
         <GridItem xs={12}>
-          <b>Medication</b>
+          <h4 className={classes.tableSectionHeader}>
+            <b>Medication</b>
+          </h4>
           <EditableTableGrid
             {...medicationProps}
             editingRowIds={editingRowIds}
@@ -758,7 +766,9 @@ const InventoryTypeListing = ({
           />
         </GridItem>
         <GridItem xs={12} className={classes.tableHeader}>
-          <b>Consumable</b>
+          <h4 className={classes.tableSectionHeader}>
+            <b>Consumable</b>
+          </h4>
           <EditableTableGrid
             {...consumableProps}
             schema={consumableSchema}
@@ -773,7 +783,9 @@ const InventoryTypeListing = ({
           />
         </GridItem>
         <GridItem xs={12} className={classes.tableHeader}>
-          <b>Vaccination</b>
+          <h4 className={classes.tableSectionHeader}>
+            <b>Vaccination</b>
+          </h4>
           <EditableTableGrid
             {...vaccinationProps}
             schema={vaccinationSchema}
@@ -788,7 +800,9 @@ const InventoryTypeListing = ({
           />
         </GridItem>
         <GridItem xs={12} className={classes.tableHeader}>
-          <b>Service</b>
+          <h4 className={classes.tableSectionHeader}>
+            <b>Service</b>
+          </h4>
           <EditableTableGrid
             {...serviceProps}
             schema={serviceSchema}

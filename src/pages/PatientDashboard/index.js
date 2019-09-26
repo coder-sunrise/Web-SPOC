@@ -79,12 +79,15 @@ const styles = (theme) => ({
     marginTop: theme.spacing(1),
   },
 })
-@connect(({ patientDashboard, global }) => ({
+@connect(({ patientDashboard, global, visitRegistration }) => ({
+  visitRegistration,
   patientDashboard,
   global,
 }))
 class PatientDashboard extends PureComponent {
   componentDidMount () {
+    console.log("=====")
+    console.log(this.props )
     if (this.props.patientDashboard.currentId) {
       this.props.dispatch({
         type: 'patientDashboard/query',
@@ -140,11 +143,12 @@ class PatientDashboard extends PureComponent {
       onMenuClick = (p) => p,
       ...resetProps
     } = this.props
-    const { patientDashboard, global, history } = resetProps
-
-    const { visitInfo = {} } = patientDashboard
-    const { visit = {} } = visitInfo
+    const { patientDashboard, global, history, visitRegistration } = resetProps
+    const { entity } = visitRegistration
+    if (!entity) return null
+    const { visit = {} } = entity
     // console.log(visit)
+    console.log(this.props)
     return (
       <div className={classes.root}>
         <Banner

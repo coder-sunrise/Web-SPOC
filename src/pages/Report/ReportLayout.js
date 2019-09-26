@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 // printjs
 import printJS from 'print-js'
 // ant design
@@ -14,41 +14,60 @@ import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { getPDF, getExcel } from '@/services/report'
 import { downloadFile } from '@/services/file'
 
+const BodyWrapper = ({ children, simple }) =>
+  simple ? (
+    <React.Fragment>{children}</React.Fragment>
+  ) : (
+    <CardContainer hideHeader>{children}</CardContainer>
+  )
+
 const ReportLayoutWrapper = ({
   children,
+  simple = false,
   loading = false,
   reportID = -1,
   loaded = false,
   fileName = 'Report',
   reportParameters = {},
 }) => {
+  const [
+    isExporting,
+    setIsExporting,
+  ] = useState(false)
+
   const onExportPDFClick = async () => {
+    setIsExporting(true)
     const result = await getPDF(reportID, reportParameters)
     if (result) {
       const fileExtensions = '.pdf'
       downloadFile(result, `${fileName}${fileExtensions}`)
     }
+    setIsExporting(false)
   }
 
   const onExportExcelClick = async () => {
+    setIsExporting(true)
     const result = await getExcel(reportID, reportParameters)
     if (result) {
       const fileExtensions = '.xls'
       downloadFile(result, `${fileName}${fileExtensions}`)
     }
+    setIsExporting(false)
   }
 
   const onPrintClick = async () => {
+    setIsExporting(true)
     const result = await getPDF(reportID, reportParameters)
     if (result) {
       const base64Result = arrayBufferToBase64(result)
       printJS({ printable: base64Result, type: 'pdf', base64: true })
     }
+    setIsExporting(false)
   }
 
   return (
     <LoadingWrapper loading={loading} text={`Generating ${fileName}...`}>
-      <CardContainer hideHeader>
+      <BodyWrapper simple={simple}>
         <div style={{ textAlign: 'right' }}>
           <Dropdown
             disabled={!loaded}
@@ -92,7 +111,7 @@ const ReportLayoutWrapper = ({
           </Button>
         </div>
         {children}
-      </CardContainer>
+      </BodyWrapper>
     </LoadingWrapper>
   )
 }

@@ -4,7 +4,7 @@ import * as service from '../services'
 
 const pathname = window.location.pathname.trim().toLowerCase()
 export default createListViewModel({
-  namespace: 'settingTemplateMessage',
+  namespace: 'settingDocumentTemplate',
   config: {},
   param: {
     service,

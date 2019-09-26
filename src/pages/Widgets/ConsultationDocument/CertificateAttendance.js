@@ -26,6 +26,7 @@ import {
   Field,
   ClinicianSelect,
 } from '@/components'
+import * as service from '@/services/common'
 
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument }) => {
@@ -64,6 +65,19 @@ import {
   displayName: 'AddConsultationDocument',
 })
 class CertificateAttendance extends PureComponent {
+  componentDidMount () {
+    const { setFieldValue } = this.props
+    service.runningNumber('coa').then((o) => {
+      if (o && o.data) {
+        setFieldValue('referenceNo', o.data)
+      } else {
+        notification.error({
+          message: 'Generate Reference Number fail',
+        })
+      }
+    })
+  }
+
   render () {
     const { footer, handleSubmit, classes, values } = this.props
     return (

@@ -17,10 +17,8 @@ export default createListViewModel({
       default: {
         isUserMaintainable: true,
         effectiveDates: [
-          moment().toUTC().set({ hour: 0, minute: 0, second: 0 }),
-          moment('2099-12-31')
-            .toUTC()
-            .set({ hour: 23, minute: 59, second: 59 }),
+          moment(),
+          moment('2099-12-31'),
         ],
         adminCharge: 0,
         contact: {
@@ -111,6 +109,23 @@ export default createListViewModel({
       },
     },
 
-    reducers: {},
+    reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+
+        return {
+          ...st,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+              effectiveDates: [
+                o.effectiveStartDate,
+                o.effectiveEndDate,
+              ],
+            }
+          }),
+        }
+      },
+    },
   },
 })

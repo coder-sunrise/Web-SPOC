@@ -506,7 +506,7 @@ class CommonTableGrid extends PureComponent {
         ...this.state.entity.filter,
         ...payload,
       }
-      // console.log(p)
+      console.log(p)
       dispatch({
         type: `${type}/${queryMethod}`,
         payload: p,
@@ -851,7 +851,6 @@ class CommonTableGrid extends PureComponent {
                 sorting={this.state.pagination.sorting}
                 defaultSorting={defaultSorting}
                 onSortingChange={(sorting) => {
-                  console.log(sorting, this.state)
                   sorting.forEach((o) => {
                     const c = newColumExtensions.find(
                       (m) => m.columnName === o.columnName,

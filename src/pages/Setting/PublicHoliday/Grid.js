@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
-import { CommonTableGrid, Button, dateFormatLong } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import moment from 'moment'
+import { CommonTableGrid, Button, dateFormatLong, Tooltip } from '@/components'
 import { status } from '@/utils/codes'
 
 export default class Grid extends PureComponent {
@@ -20,10 +20,10 @@ export default class Grid extends PureComponent {
       },
     })
   }
+
   render () {
     const { dispatch, classes, settingPublicHoliday, toggleModal } = this.props
 
-    const dateFormat = 'DD MMM YYYY'
     return (
       <CommonTableGrid
         onRowDoubleClick={this.editRow}
@@ -51,28 +51,32 @@ export default class Grid extends PureComponent {
             align: 'center',
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Edit Public Holiday'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },
           {
             columnName: 'startDate',
             type: 'date',
-            format: dateFormat,
+            sortingEnabled: false,
+            format: { dateFormatLong },
           },
           {
             columnName: 'endDate',
             type: 'date',
-            format: dateFormat,
+            sortingEnabled: false,
+            format: { dateFormatLong },
           },
         ]}
       />

@@ -90,45 +90,22 @@ class Queue extends PureComponent {
 
   componentWillMount = () => {
     const { dispatch, queueLog } = this.props
-    const { sessionInfo } = queueLog
-    dispatch({
-      type: 'calendar/updateState',
-      payload: {
-        list: [],
-      },
-    })
-    if (sessionInfo.id === '') {
-      dispatch({
-        type: `${modelKey}getSessionInfo`,
-      })
-    }
+    // const { sessionInfo } = queueLog
     // dispatch({
-    //   type: 'calendar/getCalendarList',
+    //   type: 'calendar/updateState',
     //   payload: {
-    //     combineCondition: 'and',
-    //     eql_appointmentDate: today,
-    //     eql_appointmentStatusFk: '1',
-    //     // eql_appointmentStatusFk: [
-    //     //   {
-    //     //     appointmentStatusFk: [
-    //     //       '1',
-    //     //       '5',
-    //     //     ],
-    //     //     combineCondition: 'or',
-    //     //   },
-    //     // ],
-    //     // group: [
-    //     //   {
-    //     //     eql_appointmentStatusFk: '1',
-    //     //     combineCondition: 'or',
-    //     //   },
-    //     //   {
-    //     //     eql_appointmentStatusFk: '5',
-    //     //     combineCondition: 'or',
-    //     //   },
-    //     // ],
+    //     list: [],
     //   },
     // })
+    // if (sessionInfo.id === '') {
+    //   dispatch({
+    //     type: `${modelKey}getSessionInfo`,
+    //   })
+    // } else {
+    //   dispatch({
+    //     type: `${modelKey}refresh`,
+    //   })
+    // }
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)
@@ -346,7 +323,6 @@ class Queue extends PureComponent {
               <React.Fragment>
                 <DetailsActionBar
                   onRegisterVisitEnterPressed={this.onEnterPressed}
-                  togglePatientSearch={this.togglePatientDetailsGridSearch}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid

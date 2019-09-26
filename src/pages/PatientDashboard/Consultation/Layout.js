@@ -13,12 +13,10 @@ import {
   Input,
   Paper,
   withStyles,
-  IconButton,
   Popper,
   Fade,
   ClickAwayListener,
   Divider,
-  Fab,
   Slide,
   Tooltip,
   Drawer,
@@ -59,6 +57,8 @@ import {
   FastField,
   NumberInput,
   Skeleton,
+  IconButton,
+  Fab,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { sendNotification } from '@/utils/realtime'
@@ -564,7 +564,7 @@ class Layout extends PureComponent {
   render () {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, theme, height } = props
+    const { classes, theme, height, values } = props
     const widgetProps = {
       parentProps: props,
     }
@@ -656,68 +656,74 @@ class Layout extends PureComponent {
                   <Paper {...this.generateConfig(id)}>
                     {this.state.mode === 'edit' && (
                       <div className={`${classes.blockHeader} dragable`}>
-                        <div>
+                        <div style={{ height: 25 }}>
                           <span className={classes.blockName}>{w.name}</span>
-                          {w.toolbarAddon}
-                          {!state.fullScreenWidget && (
-                            <React.Fragment>
-                              <Tooltip title='Full-screen'>
-                                <IconButton
-                                  aria-label='Full-screen'
-                                  size='small'
-                                  onClick={this.onFullScreenClick(id)}
-                                >
-                                  <Fullscreen />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title='Replace'>
-                                <Dropdown
-                                  overlay={this.widgetMenu}
-                                  trigger={[
-                                    'click',
-                                  ]}
-                                  currentWidgetId={id}
-                                  disabled={cfg.static}
-                                  onVisibleChange={(visible) => {
-                                    if (visible)
-                                      this.setState({
-                                        replaceWidget: id,
-                                      })
-                                  }}
-                                >
-                                  <IconButton aria-label='Replace' size='small'>
-                                    <CompareArrows />
-                                  </IconButton>
-                                </Dropdown>
-                              </Tooltip>
 
-                              <Popconfirm
-                                title='Removing widget will remove all underlying data. Remove this widget?'
-                                onConfirm={() => this.removeWidget(id)}
-                              >
-                                <Tooltip title='Delete'>
+                          <React.Fragment>
+                            {w.toolbarAddon}
+                            {!state.fullScreenWidget && (
+                              <React.Fragment>
+                                <Tooltip title='Full-screen'>
                                   <IconButton
-                                    aria-label='Delete'
+                                    aria-label='Full-screen'
                                     size='small'
-                                    disabled={cfg.static}
+                                    onClick={this.onFullScreenClick(id)}
                                   >
-                                    <Clear />
+                                    <Fullscreen />
                                   </IconButton>
                                 </Tooltip>
-                              </Popconfirm>
-                            </React.Fragment>
-                          )}
-                          {state.fullScreenWidget === id && (
-                            <Tooltip title='Exit full-screen'>
-                              <IconButton
-                                aria-label='Exit full-screen'
-                                size='small'
-                                onClick={this.onExitFullScreenClick}
-                              >
-                                <FullscreenExit />
-                              </IconButton>
-                            </Tooltip>
-                          )}
+                                <Tooltip title='Replace'>
+                                  <Dropdown
+                                    overlay={this.widgetMenu}
+                                    trigger={[
+                                      'click',
+                                    ]}
+                                    currentWidgetId={id}
+                                    disabled={cfg.static}
+                                    onVisibleChange={(visible) => {
+                                      if (visible)
+                                        this.setState({
+                                          replaceWidget: id,
+                                        })
+                                    }}
+                                  >
+                                    <IconButton
+                                      aria-label='Replace'
+                                      size='small'
+                                    >
+                                      <CompareArrows />
+                                    </IconButton>
+                                  </Dropdown>
+                                </Tooltip>
+
+                                <Popconfirm
+                                  title='Removing widget will remove all underlying data. Remove this widget?'
+                                  onConfirm={() => this.removeWidget(id)}
+                                >
+                                  <Tooltip title='Delete'>
+                                    <IconButton
+                                      aria-label='Delete'
+                                      size='small'
+                                      disabled={cfg.static}
+                                    >
+                                      <Clear />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Popconfirm>
+                              </React.Fragment>
+                            )}
+                            {state.fullScreenWidget === id && (
+                              <Tooltip title='Exit full-screen'>
+                                <IconButton
+                                  aria-label='Exit full-screen'
+                                  size='small'
+                                  onClick={this.onExitFullScreenClick}
+                                >
+                                  <FullscreenExit />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </React.Fragment>
                         </div>
                         <Divider light />
                       </div>

@@ -9,15 +9,6 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
-      // notes: {
-      //   notesScribbleArray: [{subject: "abc"}],
-      // },
-      // ChiefComplaints:{
-      //   chiefComplaintsScribbleArray: [],
-      // },
-      // Plan:{
-      //   planScribbleArray: [],
-      // },
       default: {
         clinicalNotes: 'Test notes',
       },

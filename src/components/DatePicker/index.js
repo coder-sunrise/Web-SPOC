@@ -166,7 +166,8 @@ class DatePicker extends PureComponent {
           ? preState.displayValue
           : getValue(field.value),
       }
-    } else return null
+    }
+    return null
   }
 
   handleClickAway = () => {
@@ -175,13 +176,12 @@ class DatePicker extends PureComponent {
 
   onChange = (m) => {
     const { form, field, onChange = () => {} } = this.props
-    // console.log(m.toUTC().format())
     const value = getValue(m)
     let utcValue = ''
     if (moment.isMoment(m)) {
-      utcValue = m.toUTC().format()
+      utcValue = m.formatUTC()
     } else if (moment(m, _dateFormat).isValid()) {
-      utcValue = moment(m, _dateFormat).toUTC().format()
+      utcValue = moment(m, _dateFormat).formatUTC()
     }
 
     this.setState(

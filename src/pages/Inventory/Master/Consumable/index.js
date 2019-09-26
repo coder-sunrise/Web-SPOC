@@ -35,6 +35,7 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
       columnName: 'favouriteSupplier',
       type: 'codeSelect',
       code: 'ctSupplier',
+      labelField: 'displayValue',
       sortBy: 'favouriteSupplierFK',
     },
     {

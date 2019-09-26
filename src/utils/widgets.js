@@ -7,7 +7,6 @@ import {
   Input,
   Paper,
   withStyles,
-  IconButton,
   MenuItem,
   Popper,
   Fade,
@@ -27,7 +26,7 @@ import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Loading from '@/components/PageLoading/index'
 
-import { AuthorizedContext } from '@/components'
+import { AuthorizedContext, IconButton } from '@/components'
 
 const widgets = [
   {
@@ -69,19 +68,7 @@ const widgets = [
                     Upload Attachment
                   </Menu.Item>
                   <Menu.Divider />
-                  <Menu.Item
-                    onClick={() => {
-                      console.log(123)
-                      window.g_app._store.dispatch({
-                        type: 'clinicalnotes/updateState',
-                        payload: {
-                          showScribbleModal: true,
-                        },
-                      })
-                    }}
-                  >
-                    Add Scribble Notes
-                  </Menu.Item>
+                  
                 </Menu>
               }
               trigger={[

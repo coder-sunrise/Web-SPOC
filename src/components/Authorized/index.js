@@ -5,6 +5,7 @@ import Secured from './Secured'
 import check from './CheckPermissions'
 import renderAuthorize from './renderAuthorize'
 import AuthorizedContext from '@/components/Context/Authorized'
+import { buttonTypes } from '@/utils/codes'
 
 Authorized.Secured = Secured
 Authorized.AuthorizedRoute = AuthorizedRoute
@@ -29,18 +30,19 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
   ) {
     return component
   }
-  // console.log(component.displayName, props)
   if (!props.hideIfNoEditRights) {
-    if (component.type.displayName === 'RegularButton') {
+    if (buttonTypes.indexOf(component.type.displayName) >= 0) {
       return null
     }
-
-    return (
-      disabledComponent ||
-      React.cloneElement(component, {
-        disabled: true,
-      })
-    )
+    if (disabledComponent) {
+      if (typeof disabledComponent === 'function') {
+        return disabledComponent()
+      }
+      return disabledComponent
+    }
+    return React.cloneElement(component, {
+      disabled: true,
+    })
   }
   if (
     rights.find(
@@ -55,12 +57,16 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
     return null
   }
 
-  return (
-    disabledComponent ||
-    React.cloneElement(component, {
-      disabled: true,
-    })
-  )
+  if (disabledComponent) {
+    if (typeof disabledComponent === 'function') {
+      return disabledComponent()
+    }
+    return disabledComponent
+  }
+
+  return React.cloneElement(component, {
+    disabled: true,
+  })
 }
 // console.log(Authorized)
 export default renderAuthorize(Authorized)

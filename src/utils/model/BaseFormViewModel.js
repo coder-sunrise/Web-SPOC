@@ -163,14 +163,18 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
 
       reducers: {
         ...super.reducers(),
-        querySuccess (st, { payload }) {
+        querySuccess (st, { payload = {} }) {
           // console.log(payload)
           // const { response } = payload
-          const { data } = payload
+          const { data, version } = payload
           // console.log('commonDataReaderTransform', 1)
 
           // commonDataReaderTransform(data)
           // console.log(data)
+          const cfg = {}
+          if (version) {
+            cfg.version = Number(version)
+          }
           return {
             ...st,
             entity: data,
@@ -179,6 +183,7 @@ export default class BaseFormViewModel extends BaseCRUDViewModel {
             //     ? 'update'
             //     : 'create',
             queryCount: (st.queryCount || 0) + 1,
+            ...cfg,
           }
         },
         ...reducers,

@@ -6,7 +6,12 @@ import { Tooltip, withStyles } from '@material-ui/core'
 import { PanTool, Payment } from '@material-ui/icons'
 import Modal from './Modal'
 
-import { Button, CommonModal, CommonTableGrid } from '@/components'
+import {
+  Button,
+  CommonModal,
+  CommonTableGrid,
+  dateFormatLong,
+} from '@/components'
 
 class Grid extends PureComponent {
   state = {
@@ -47,7 +52,7 @@ class Grid extends PureComponent {
       {
         columnName: 'lastTxnDate',
         type: 'date',
-        format: 'DD MMM YYYY',
+        format: { dateFormatLong },
       },
       {
         columnName: 'Action',

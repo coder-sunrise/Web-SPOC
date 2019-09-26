@@ -121,8 +121,7 @@ class ConsultationDocument extends PureComponent {
     const { consultationDocument, dispatch } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-    // console.log(consultationDocumentTypes, rows)
-
+// console.log(consultationDocumentTypes,rows)
     return (
       <div>
         <CommonTableGrid

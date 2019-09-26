@@ -32,33 +32,58 @@ export default createFormViewModel({
       ],
     },
     subscriptions: ({ dispatch, history }) => {
-      // history.listen(async (loct, method) => {
-      //   const { pathname, search, query = {} } = loct
-      //   if (query.md === 'cons') {
-      //     dispatch({
-      //       type: 'updateState',
-      //       payload: {
-      //         queueID: Number(query.qid),
-      //       },
-      //     })
-      //   }
-      // })
+      history.listen(async (loct, method) => {
+        const { pathname, search, query = {} } = loct
+
+        if (
+          pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
+          Number(query.cid)
+        ) {
+          dispatch({
+            type: 'initState',
+            payload: {
+              version: Number(query.v) || undefined,
+              consultationID: Number(query.cid),
+            },
+          })
+        }
+      })
     },
     effects: {
+      *initState ({ payload }, { call, put, select, take }) {
+        const { version, consultationID } = payload
+        yield put({
+          type: 'consultation/query',
+          payload: {
+            id: consultationID,
+            version,
+          },
+        })
+        yield take('consultation/query/@@end')
+      },
+
       *newConsultation ({ payload }, { call, put }) {
-        // console.log(22, payload)
-        const response = yield call(service.create, payload)
-        // console.log(11, response)
+        const response = yield call(service.create, payload.id)
         const { id } = response
         if (id) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: response,
+              version: payload.version,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data: response,
+            },
+          })
           sendNotification('QueueListing', {
             message: `Consultation started`,
           })
-          yield put({
-            type: 'query',
-            payload: id,
-          })
         }
+        return response
       },
       *pause ({ payload }, { call, put }) {
         const response = yield call(service.pause, payload)
@@ -70,17 +95,44 @@ export default createFormViewModel({
         return response
       },
       *resume ({ payload }, { call, put }) {
-        const response = yield call(service.resume, payload)
-        // if (response) {
-        //   sendNotification('QueueListing', {
-        //     message: `Consultation resumed`,
-        //   })
-        // }
+        const response = yield call(service.resume, payload.id || payload)
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: response,
+              version: payload.version,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data: response,
+            },
+          })
+          sendNotification('QueueListing', {
+            message: `Consultation resumed`,
+          })
+        }
         return response
       },
       *edit ({ payload }, { call, put }) {
-        const response = yield call(service.edit, payload)
-
+        const response = yield call(service.edit, payload.id)
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: response,
+              version: payload.version,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data: response,
+            },
+          })
+        }
         return response
       },
       *sign ({ payload }, { call, put }) {

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { connect } from 'dva'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
@@ -15,6 +16,10 @@ import InvoiceSummary from './components/InvoiceSummary'
 import EditClaimSeq from './modal/EditClaimSeq'
 import CoPayment from './modal/CoPayment'
 // import AddPayment from './AddPayment'
+// model
+import model from '../models/billing'
+
+window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
   paperContent: {
@@ -26,6 +31,7 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ billing }) => ({ billing }))
 class Billing extends Component {
   state = {
     showClaimSeqModal: false,
@@ -34,7 +40,8 @@ class Billing extends Component {
   }
 
   backToDispense = () => {
-    this.props.history.goBack()
+    const { history } = this.props
+    console.log({ history })
   }
 
   toggleClaimSequenceModal = () => {
@@ -62,10 +69,10 @@ class Billing extends Component {
       showCoPaymentModal,
       showAddPaymentModal,
     } = this.state
-    const { classes } = this.props
+    const { classes, billing } = this.props
     return (
       <div>
-        <PatientBanner />
+        <PatientBanner style={{}} patientInfo={billing.patientInfo} />
         <div style={{ padding: 8 }}>
           <Accordion
             leftIcon

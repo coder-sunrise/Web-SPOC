@@ -14,7 +14,11 @@ import {
   CodeSelect,
 } from '@/components'
 // medisys components
-import { DoctorLabel, Attachment } from '@/components/_medisys'
+import {
+  DoctorLabel,
+  DoctorProfileSelect,
+  Attachment,
+} from '@/components/_medisys'
 import FormField from './formField'
 
 const styles = (theme) => ({
@@ -72,14 +76,11 @@ const VisitInfoCard = ({
           <Field
             name={FormField['visit.doctorProfileFk']}
             render={(args) => (
-              <CodeSelect
+              <DoctorProfileSelect
                 disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.doctor',
                 })}
-                code='doctorprofile'
-                labelField='clinicianProfile.name'
-                renderDropdown={(option) => <DoctorLabel doctor={option} />}
                 {...args}
               />
             )}

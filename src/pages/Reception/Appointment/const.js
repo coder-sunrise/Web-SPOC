@@ -2,16 +2,6 @@ import * as Yup from 'yup'
 
 export const timeFormat = 'hh:mm a'
 
-const _modelKey = 'calendar/'
-
-export const CalendarActions = {
-  MoveEvent: `${_modelKey}moveEvent`,
-  AddEventSeries: `${_modelKey}addEventSeries`,
-  UpdateEventByEventID: `${_modelKey}updateEventSeriesByEventID`,
-  DeleteEventByEventID: `${_modelKey}deleteEventSeriesByEventID`,
-  UpdateDoctorEvent: `${_modelKey}updateDoctorEvent`,
-}
-
 export const SeriesAlert = {
   0: 'single',
   1: 'series',

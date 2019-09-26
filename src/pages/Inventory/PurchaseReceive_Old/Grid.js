@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { CommonTableGrid, Button, Tooltip } from '@/components'
+import { CommonTableGrid, Button, Tooltip, dateFormatLong } from '@/components'
 import { podoStatus } from '@/utils/codes'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import { ContextMenuOptions } from './variables'
@@ -8,7 +8,7 @@ import {
   GridContainer,
   GridItem,
   CommonModal,
-  withFormikExtend
+  withFormikExtend,
 } from '@/components'
 import { formatMessage } from 'umi/locale'
 
@@ -57,7 +57,7 @@ class Grid extends PureComponent {
     this.setState({ selectedRows: selection })
   }
 
-  render() {
+  render () {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -87,12 +87,12 @@ class Grid extends PureComponent {
           {
             columnName: 'poDate',
             type: 'date',
-            format: 'DD MMM YYYY',
+            format: { dateFormatLong },
           },
           {
             columnName: 'expectedDeliveryDate',
             type: 'date',
-            format: 'DD MMM YYYY',
+            format: { dateFormatLong },
           },
           { columnName: 'total', type: 'number', currency: true },
           { columnName: 'outstanding', type: 'number', currency: true },

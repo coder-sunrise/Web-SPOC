@@ -578,7 +578,7 @@ const consultationDocumentTypes = [
     getSubject: (r) => {
       return `${moment(r.mcStartDate).format(dateFormatLong)} - ${moment(
         r.mcEndDate,
-      ).format(dateFormatLong)} - ${r.mcDays} Day(s)`
+      ).format(dateFormatLong)} - ${r.mcDays} Day${r.mcDays > 1 ? 's' : ''}`
     },
     convert: (r) => {
       return {
@@ -725,6 +725,12 @@ const orderTypes = [
     getSubject: (r) => r.drugName,
   },
 ]
+const buttonTypes = [
+  'RegularButton',
+  'IconButton',
+  'Fab',
+]
+
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -768,6 +774,11 @@ const tenantCodes = [
   'inventorypackage',
   'role',
   'ctsupplier',
+  'ctsnomeddiagnosis',
+]
+
+const noIsActiveProp = [
+  'doctorProfile',
 ]
 
 const defaultParams = {
@@ -791,7 +802,13 @@ const _fetchAndSaveCodeTable = async (
   const searchURL = `${baseURL}/search?ctname=`
 
   let url = useGeneral ? generalCodetableURL : searchURL
-  let criteriaForTenantCodes = { pagesize: 99999 }
+  let criteriaForTenantCodes = noIsActiveProp.reduce(
+    (codes, tenantCode) =>
+      tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
+    false,
+  )
+    ? { pagesize: 99999 }
+    : { pagesize: 99999, isActive: true }
   if (
     tenantCodes.reduce(
       (codes, tenantCode) =>
@@ -1223,5 +1240,6 @@ module.exports = {
   getServices,
   tagList,
   osBalanceStatus,
+  buttonTypes,
   ...module.exports,
 }

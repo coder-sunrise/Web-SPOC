@@ -20,6 +20,7 @@ import {
   DateRangePicker,
   Field,
   CommonTableGrid,
+  dateFormatLong,
 } from '@/components'
 
 const styles = () => ({
@@ -62,7 +63,7 @@ class AddNewStatement extends PureComponent {
       {
         columnName: 'invoiceDate',
         type: 'date',
-        format: 'DD MMM YYYY',
+        format: { dateFormatLong },
       },
     ],
     // currencyColumns: [

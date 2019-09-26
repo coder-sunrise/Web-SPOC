@@ -28,6 +28,11 @@ export default createFormViewModel({
         suggestSellingPrice: 0,
         sellingPrice: 0,
         maxDiscount: 0,
+        medicationStock: [],
+        chas: [
+          'acute',
+          'chronic',
+        ],
       },
     },
     subscriptions: ({ dispatch, history, searchField }) => {

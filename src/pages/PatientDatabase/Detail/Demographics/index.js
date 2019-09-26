@@ -51,7 +51,6 @@ class Demographic extends PureComponent {
 
   selectReferralPerson = (args) => {
     const { values, classes } = this.props
-    console.log({ values })
     return (
       <Select
         remote
@@ -116,7 +115,6 @@ class Demographic extends PureComponent {
   render () {
     const { props } = this
     const { values, theme, setFieldValue } = props
-
     return (
       <React.Fragment>
         <GridContainer gutter={0}>
@@ -200,7 +198,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <DatePicker
                       label='Date of Birth'
-                      showTime
+                      // showTime
                       dobRestrict
                       {...args}
                     />

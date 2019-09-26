@@ -84,6 +84,14 @@ const PatientListing = ({ values, validateForm }) => {
           ),
         },
       })
+    } else {
+      dispatch({
+        type: 'updateState',
+        payload: {
+          loaded: false,
+          isLoading: false,
+        },
+      })
     }
   }
 

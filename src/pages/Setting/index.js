@@ -169,8 +169,8 @@ const menuData = [
   },
   {
     title: 'Templates',
-    text: 'Referral Letter Template',
-    url: '/setting/referrallettertemplate',
+    text: 'Document Template',
+    url: '/setting/documenttemplate',
   },
   // {
   //   title: 'Contact',

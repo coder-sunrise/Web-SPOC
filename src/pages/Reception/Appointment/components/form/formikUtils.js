@@ -34,7 +34,7 @@ export const ValidationSchema = Yup.object().shape({
   // 'appointment.appointmentDate': Yup.string().required(
   //   'Appointment Date is required',
   // ),
-  isEnableRecurrence: Yup.boolean().required(),
+  isEnableRecurrence: Yup.boolean(),
   recurrenceDto: Yup.object().when('isEnableRecurrence', {
     is: true,
     then: Yup.object().shape({
@@ -61,10 +61,8 @@ export const ValidationSchema = Yup.object().shape({
   }),
 })
 
-const convertReccurenceDaysOfTheWeek = (week) =>
-  week !== null
-    ? week.split(', ').map((eachDay) => parseInt(eachDay, 10))
-    : week
+const convertReccurenceDaysOfTheWeek = (week = '') =>
+  week.split(', ').map((eachDay) => parseInt(eachDay, 10))
 
 export const mapPropsToValues = ({
   viewingAppointment,
@@ -73,6 +71,20 @@ export const mapPropsToValues = ({
   user,
   clinicianProfiles,
 }) => {
+  let values = {
+    isEnableRecurrence: false,
+    isEditedAsSingleAppointment: false,
+    overwriteEntireSeries: false,
+    bookedByUser: user.clinicianProfile.name,
+    bookedByUserFK: user.id,
+    currentAppointment: {
+      appointmentDate: moment(selectedSlot.start).formatUTC(),
+      appointments_Resources: [],
+    },
+    appointmentStatusFk: 2,
+    recurrenceDto: { ...initDailyRecurrence },
+  }
+
   try {
     if (viewingAppointment.id) {
       const clinicianProfile =
@@ -84,8 +96,8 @@ export const mapPropsToValues = ({
         (item) => item.id === selectedAppointmentID,
       )
       const { recurrenceDto } = viewingAppointment
-
-      return {
+      const { appointmentDate, ...restAppointment } = appointment
+      values = {
         ...viewingAppointment,
         bookedByUser: clinicianProfile ? clinicianProfile.name : '',
         overwriteEntireSeries: false,
@@ -99,30 +111,22 @@ export const mapPropsToValues = ({
                   recurrenceDto.recurrenceDaysOfTheWeek,
                 ),
               },
-        currentAppointment: { ...appointment },
+        // currentAppointment: {
+        //   ...restAppointment,
+        //   appointmentDate: moment(appointmentDate).formatUTC(),
+        // },
+        currentAppointment: appointment,
         appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({
           ...item,
         })),
       }
     }
-    return {
-      isEnableRecurrence: false,
-      isEditedAsSingleAppointment: false,
-      overwriteEntireSeries: false,
-      bookedByUser: user.userName,
-      bookedByUserFK: user.id,
-      currentAppointment: {
-        appointmentDate: parseDateToServerDateFormatString(selectedSlot.start),
-        appointments_Resources: [],
-      },
-      appointmentStatusFk: 2,
-      recurrenceDto: { ...initDailyRecurrence },
-    }
   } catch (error) {
     console.log({ error })
   }
-  return {}
+
+  return values
 }
 
 export const mapDatagridToAppointmentResources = (shouldDumpID) => (
@@ -204,7 +208,7 @@ export const generateRecurringAppointments = (
 
 export const getRecurrenceLastDate = (recurrences = []) =>
   recurrences.length > 0
-    ? moment(recurrences[recurrences.length - 1]).format()
+    ? moment(recurrences[recurrences.length - 1]).formatUTC()
     : undefined
 
 export const getFirstAppointmentType = (appointment) => {

@@ -25,6 +25,7 @@ import {
   Tooltip,
   GridItem,
   EditableTableGrid,
+  dateFormatLong,
 } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
@@ -183,9 +184,9 @@ class Statement extends PureComponent {
             {
               columnName: 'statementDate',
               type: 'date',
-              format: 'DD MMM YYYY',
+              format: { dateFormatLong },
             },
-            { columnName: 'dueDate', type: 'date', format: 'DD MMM YYYY' },
+            { columnName: 'dueDate', type: 'date', format: { dateFormatLong } },
             {
               columnName: 'action',
               align: 'center',
