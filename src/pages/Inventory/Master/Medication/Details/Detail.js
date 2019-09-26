@@ -19,6 +19,7 @@ import {
   Button,
   CommonModal,
   Field,
+  dateFormatLong,
 } from '@/components'
 import { getActiveSession } from '@/pages/Reception/Queue/services'
 
@@ -226,7 +227,7 @@ const Detail = ({
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
-                    format='DD MMM YYYY'
+                    format={dateFormatLong}
                     label='Effective Start Date'
                     label2='End Date'
                     disabled={!!(medicationDetail.entity && hasActiveSession)}

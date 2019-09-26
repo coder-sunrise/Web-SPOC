@@ -1,8 +1,8 @@
 import moment from 'moment'
-
+import { dateFormatLong, timeFormat } from '@/components'
 import { filterMap } from './variables'
 
-const dateTimeFormat = 'DD MMM YYYY hh:mm A'
+const dateTimeFormat = `${dateFormatLong} ${timeFormat}`
 
 export const formatAppointmentTimes = (values = []) =>
   values.map((value) => moment(value, 'HH:mm:ss').format('hh:mm A'))

@@ -19,6 +19,7 @@ import {
   TimePicker,
   SizeContainer,
   TextField,
+  dateFormatLong,
 } from '@/components'
 // import Recurrence from './Recurrence'
 import { Recurrence, DoctorLabel, computeRRule } from '@/components/_medisys'
@@ -55,7 +56,7 @@ const STYLES = (theme) => ({
   },
 })
 
-const _dateFormat = 'DD MMM YYYY'
+const _dateFormat = { dateFormatLong }
 const _timeFormat = 'hh:mm a'
 
 const durationHours = [

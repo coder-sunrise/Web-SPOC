@@ -15,6 +15,7 @@ import {
   DatePicker,
   Switch,
   DateRangePicker,
+  dateFormatLong,
 } from '@/components'
 
 const styles = () => ({})
@@ -129,7 +130,7 @@ const Detail = ({ packDetail, dispatch, values }) => {
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
-                    format='DD MMM YYYY'
+                    format={dateFormatLong}
                     label='Effective Start Date'
                     label2='End Date'
                     {...args}

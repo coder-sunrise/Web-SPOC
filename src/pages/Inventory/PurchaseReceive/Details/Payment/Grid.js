@@ -3,6 +3,7 @@ import {
   GridContainer,
   EditableTableGrid,
   withFormikExtend,
+  dateFormatLong,
 } from '@/components'
 import Yup from '@/utils/yup'
 import moment from 'moment'
@@ -35,7 +36,7 @@ class Grid extends PureComponent {
       {
         columnName: 'paymentDate',
         type: 'date',
-        format: 'DD MMM YYYY',
+        format: { dateFormatLong },
         value: moment(),
         disabled: true,
       },
@@ -57,7 +58,7 @@ class Grid extends PureComponent {
     setFieldValue('payment_list', rows)
   }
 
-  render() {
+  render () {
     const { values, isEditable } = this.props
     //console.log('Payment Grid', this.props)
 

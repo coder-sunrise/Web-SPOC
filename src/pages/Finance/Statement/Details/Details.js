@@ -15,6 +15,8 @@ import {
   CommonTableGrid,
   CommonModal,
   NavPills,
+  dateFormatLong,
+  timeFormatWithoutSecond,
 } from '@/components'
 import CollectPayment from './CollectPayment'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
@@ -40,7 +42,9 @@ class Details extends PureComponent {
   state = {
     showModal: false,
     selectedRows: [],
-    lastRefresh: moment().add(-1, 'months').format('DD MMM YYYY HH:mm'),
+    lastRefresh: moment()
+      .add(-1, 'months')
+      .format(`${dateFormatLong} ${timeFormatWithoutSecond}`),
     columns: [
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
@@ -71,7 +75,7 @@ class Details extends PureComponent {
       {
         columnName: 'invoiceDate',
         type: 'date',
-        format: 'DD MMM YYYY',
+        format: { dateFormatLong },
       },
       {
         columnName: 'action',
@@ -257,7 +261,9 @@ class Details extends PureComponent {
 
   handleRefresh = () => {
     this.setState({
-      lastRefresh: moment().format('DD MMM YYYY HH:mm'),
+      lastRefresh: moment().format(
+        `${dateFormatLong} ${timeFormatWithoutSecond}`,
+      ),
     })
   }
 

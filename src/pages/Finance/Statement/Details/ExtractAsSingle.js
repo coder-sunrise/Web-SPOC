@@ -13,6 +13,7 @@ import {
   DateRangePicker,
   CommonTableGrid,
   CodeSelect,
+  dateFormatLong,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -30,7 +31,7 @@ class ExtractAsSingle extends PureComponent {
       {
         columnName: 'invoiceDate',
         type: 'date',
-        format: 'DD MMM YYYY',
+        format: { dateFormatLong },
       },
       {
         columnName: 'invoiceAmount',

@@ -16,6 +16,7 @@ import {
   TextField,
   NumberInput,
   RadioGroup,
+  dateFormatLong,
 } from '@/components'
 // medisys components
 import { Recurrence } from '@/components/_medisys'
@@ -30,7 +31,7 @@ const STYLES = (theme) => ({
   },
 })
 
-const _dateFormat = 'DD MMM YYYY'
+const _dateFormat = { dateFormatLong }
 const _timeFormat = 'hh:mm a'
 const doctors = [
   { value: 'medisys', name: 'Medisys' },

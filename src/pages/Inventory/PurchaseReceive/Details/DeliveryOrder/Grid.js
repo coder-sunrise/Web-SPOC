@@ -1,6 +1,11 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
-import { CardContainer, CommonTableGrid, Button } from '@/components'
+import {
+  CardContainer,
+  CommonTableGrid,
+  Button,
+  dateFormatLong,
+} from '@/components'
 import Edit from '@material-ui/icons/Edit'
 
 class Grid extends PureComponent {
@@ -70,7 +75,7 @@ class Grid extends PureComponent {
             {
               columnName: 'doDate',
               type: 'date',
-              format: 'DD MMM YYYY',
+              format: { dateFormatLong },
             },
             {
               columnName: 'total',

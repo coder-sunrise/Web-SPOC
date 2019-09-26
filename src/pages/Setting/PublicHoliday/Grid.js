@@ -23,7 +23,8 @@ export default class Grid extends PureComponent {
   render () {
     const { dispatch, classes, settingPublicHoliday, toggleModal } = this.props
 
-    const dateFormat = 'DD MMM YYYY'
+    const dateFormat = { dateFormatLong }
+
     return (
       <CommonTableGrid
         onRowDoubleClick={this.editRow}
