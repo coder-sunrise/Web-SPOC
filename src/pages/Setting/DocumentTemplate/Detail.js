@@ -49,7 +49,8 @@ const tagList = [
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
     settingDocumentTemplate.entity || settingDocumentTemplate.default,
-  validationSchema: Yup.object().shape({
+    documentTemplateTypeFK: Yup.string().required(),
+    validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     templateContent: Yup.string().required(),
