@@ -434,7 +434,6 @@ class AntdSelect extends React.PureComponent {
     const cfg = {
       value: this.state.value,
     }
-    console.log(this.state.value)
 
     let opts = []
     if (source[0] && source[0][groupField]) {

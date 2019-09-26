@@ -70,3 +70,6 @@ export AuthorizedContext from './Context/Authorized'
 export * from '@material-ui/lab'
 
 export { default as Scribble } from './Scribble'
+
+export IconButton from './Button/IconButton'
+export Fab from './Button/Fab'

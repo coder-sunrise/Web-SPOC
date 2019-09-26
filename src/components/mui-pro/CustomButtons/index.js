@@ -3,13 +3,13 @@ import React from 'react'
 import classNames from 'classnames'
 // nodejs library to set properties for components
 import PropTypes from 'prop-types'
-import { control } from '@/components/Decorator'
 
 // material-ui components
 import withStyles from '@material-ui/core/styles/withStyles'
 import Button from '@material-ui/core/Button'
 
 import buttonStyle from 'mui-pro-jss/material-dashboard-pro-react/components/buttonStyle.jsx'
+import { control } from '@/components/Decorator'
 
 @control(
   {
@@ -43,7 +43,6 @@ class RegularButton extends React.PureComponent {
       hidden,
       ...rest
     } = props
-    // console.log(simple)
     const btnClasses = classNames({
       [classes.button]: true,
       [classes[size]]: size,
@@ -62,6 +61,7 @@ class RegularButton extends React.PureComponent {
       [classes.pureIcon]: pureIcon,
       [className]: className,
     })
+
     if (hidden) return null
     return (
       <Button
