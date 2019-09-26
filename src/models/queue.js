@@ -34,21 +34,21 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen((location) => {
-        const { pathname } = location
-        const allowedPaths = [
-          '/reception/queue',
-          '/reception/appointment',
-        ]
-        if (allowedPaths.includes(pathname)) {
-          dispatch({
-            type: 'getSessionInfo',
-            payload: {
-              shouldGetTodayAppointments: pathname === allowedPaths[0],
-            },
-          })
-        }
-      })
+      // history.listen((location) => {
+      //   const { pathname } = location
+      //   const allowedPaths = [
+      //     '/reception/queue',
+      //     '/reception/appointment',
+      //   ]
+      //   if (allowedPaths.includes(pathname)) {
+      //     dispatch({
+      //       type: 'getSessionInfo',
+      //       payload: {
+      //         shouldGetTodayAppointments: pathname === allowedPaths[0],
+      //       },
+      //     })
+      //   }
+      // })
       subscribeNotification('QueueListing', {
         callback: () => {
           dispatch({ type: 'refresh' })

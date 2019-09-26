@@ -19,7 +19,6 @@ import {
   PageHeaderWrapper,
   Button,
   ProgressButton,
-  serverDateFormat,
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
@@ -29,7 +28,7 @@ import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'
 import { StatusIndicator, modelKey } from './variables'
 // utils
-import { getAppendUrl, convertToQuery } from '@/utils/utils'
+import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
 
 const drawerWidth = 400
@@ -90,22 +89,22 @@ class Queue extends PureComponent {
 
   componentWillMount = () => {
     const { dispatch, queueLog } = this.props
-    // const { sessionInfo } = queueLog
-    // dispatch({
-    //   type: 'calendar/updateState',
-    //   payload: {
-    //     list: [],
-    //   },
-    // })
-    // if (sessionInfo.id === '') {
-    //   dispatch({
-    //     type: `${modelKey}getSessionInfo`,
-    //   })
-    // } else {
-    //   dispatch({
-    //     type: `${modelKey}refresh`,
-    //   })
-    // }
+    const { sessionInfo } = queueLog
+    dispatch({
+      type: 'calendar/updateState',
+      payload: {
+        list: [],
+      },
+    })
+    if (sessionInfo.id === '') {
+      dispatch({
+        type: `${modelKey}getSessionInfo`,
+      })
+    } else {
+      dispatch({
+        type: `${modelKey}refresh`,
+      })
+    }
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)
@@ -133,12 +132,8 @@ class Queue extends PureComponent {
     if (visitID) parameter.vis = visitID
     if (appointmentID) parameter.apptid = appointmentID
 
-    this.setState(
-      {
-        showPatientSearch: false,
-      },
-      () => this.props.history.push(getAppendUrl(parameter)),
-    )
+    this.togglePatientSearch(false)
+    this.props.history.push(getAppendUrl(parameter))
   }
 
   handleActualizeAppointment = ({
@@ -163,9 +158,16 @@ class Queue extends PureComponent {
     })
   }
 
-  togglePatientSearch = () => {
+  togglePatientSearch = (override) => {
     const { showPatientSearch } = this.state
-    this.setState({ showPatientSearch: !showPatientSearch })
+    this.setState({
+      showPatientSearch: override === undefined ? !showPatientSearch : override,
+    })
+    this.props.history.push(
+      getRemovedUrl([
+        'v',
+      ]),
+    )
   }
 
   onStartSession = () => {
@@ -223,7 +225,14 @@ class Queue extends PureComponent {
 
     if (list.length === 1)
       return this.showVisitRegistration({ patientID: list[0].id })
-    if (list.length > 1) return this.setState({ showPatientSearch: true })
+    if (list.length > 1) {
+      this.props.history.push(
+        getAppendUrl({
+          v: Date.now(),
+        }),
+      )
+      return this.setState({ showPatientSearch: true })
+    }
 
     return this.toggleRegisterNewPatient()
   }
