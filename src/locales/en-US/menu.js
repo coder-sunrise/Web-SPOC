@@ -107,7 +107,7 @@ export default {
   'menu.setting.servicecentercategory': 'Service Center Category',
   'menu.setting.servicecategory': 'Service Category',
   'menu.setting.medicationfrequency': 'Medication Frequency',
-  'menu.setting.medicationprecautions': 'Medication Precautions',
+  'menu.setting.medicationprecautions': 'Medication Precaution',
   'menu.setting.medicationconsumptionmethod': 'Medication Consumption Method',
   'menu.setting.smstemplate': 'SMS Template',
   'menu.setting.referrallettertemplate': 'Document Template',
