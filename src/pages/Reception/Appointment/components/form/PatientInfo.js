@@ -26,7 +26,10 @@ const PatientInfoInput = ({
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
-
+  const allowedToActualize = [
+    1,
+    5,
+  ].includes(appointmentStatusFK)
   return (
     <React.Fragment>
       <GridItem xs md={6}>
@@ -81,7 +84,7 @@ const PatientInfoInput = ({
             <Button
               size='sm'
               color='primary'
-              disabled={appointmentStatusFK === 2}
+              disabled={!isEdit || !allowedToActualize}
               onClick={onRegisterToVisitClick}
             >
               Register To Visit
