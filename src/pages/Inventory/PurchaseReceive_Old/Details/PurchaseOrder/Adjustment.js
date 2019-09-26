@@ -24,7 +24,6 @@ class Adjustment extends PureComponent {
     const adjRemark = purchaseOrderAdjustment[index].adjRemark
     //const adjTitle = adjustmentList[index].adjTitle
     //const adjAmount = adjustmentList[index].adjAmount
-    console.log('Adjustment', this.props)
     return (
       <GridContainer>
         <GridItem xs={2} md={9} />

@@ -101,6 +101,9 @@ class AntdNumberInput extends React.PureComponent {
     disabled: PropTypes.bool,
     size: PropTypes.string,
     renderDropdown: PropTypes.func,
+    allowEmpty: PropTypes.bool,
+    max: PropTypes.number,
+    min: PropTypes.number,
   }
 
   static defaultProps = {
@@ -133,27 +136,6 @@ class AntdNumberInput extends React.PureComponent {
     // console.log(this.state.value)
 
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 100)
-  }
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
-    if (field) {
-      this.setState({
-        value: field.value === undefined ? '' : field.value,
-        shrink: field.value !== undefined,
-      })
-    } else if (value) {
-      this.setState({
-        value: value === undefined ? '' : value,
-        shrink: value !== undefined,
-      })
-    } else {
-      this.setState({
-        value: undefined,
-        shrink: false,
-      })
-    }
-    // console.log(field)
   }
 
   handleFocus = () => {
@@ -241,6 +223,7 @@ class AntdNumberInput extends React.PureComponent {
     let newV = v
     if (!isNumber(newV)) {
       newV = undefined
+      return false
     }
     if (v === undefined && !this.props.allowEmpty) {
       newV = this.props.min
@@ -253,6 +236,7 @@ class AntdNumberInput extends React.PureComponent {
     })
 
     this.debouncedOnChange(newV)
+    return true
   }
 
   // debouncedParser = (value) => {
@@ -383,6 +367,28 @@ class AntdNumberInput extends React.PureComponent {
         />
       </div>
     )
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { field, value } = nextProps
+
+    if (field) {
+      this.setState({
+        value: field.value === undefined ? '' : field.value,
+        shrink: field.value !== undefined,
+      })
+    } else if (value) {
+      this.setState({
+        value: value === undefined ? '' : value,
+        shrink: value !== undefined,
+      })
+    } else {
+      this.setState({
+        value: undefined,
+        shrink: false,
+      })
+    }
+    // console.log(field)
   }
 
   render () {

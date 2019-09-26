@@ -11,6 +11,12 @@ const status = [
   { value: true, name: 'Active', color: 'green' },
 ]
 
+const osBalanceStatus = [
+  { value: 'all', name: 'All(Yes/No)', color: 'all' },
+  { value: 'yes', name: 'Yes', color: 'yes' },
+  { value: 'no', name: 'No', color: 'no' },
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -569,14 +575,11 @@ const consultationDocumentTypes = [
     value: '3',
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
-    getSubject: (r) =>
-      `${moment
-        .utc(r.mcStartDate)
-        .local()
-        .format(dateFormatLong)} - ${moment
-        .utc(r.mcEndDate)
-        .local()
-        .format(dateFormatLong)} - ${r.mcDays} Day(s)`,
+    getSubject: (r) => {
+      return `${moment(r.mcStartDate).format(dateFormatLong)} - ${moment(
+        r.mcEndDate,
+      ).format(dateFormatLong)} - ${r.mcDays} Day${r.mcDays > 1 ? 's' : ''}`
+    },
     convert: (r) => {
       return {
         ...r,
@@ -585,6 +588,22 @@ const consultationDocumentTypes = [
           moment(r.mcEndDate),
         ],
       }
+    },
+    downloadConfig: {
+      id: 7,
+      key: 'MedicalCertificateId',
+      draft: (row) => {
+        return {
+          MedicalCertificateDetails: [
+            {
+              ...row,
+              mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcStartDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcEndDate: moment(row.mcIssueDate).format(dateFormatLong),
+            },
+          ],
+        }
+      },
     },
   },
   {
@@ -600,6 +619,20 @@ const consultationDocumentTypes = [
         attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
         attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
+    },
+    downloadConfig: {
+      id: 8,
+      key: 'CertificateOfAttendanceId',
+      draft: (row) => {
+        return {
+          CertificateOfAttendanceDetails: [
+            {
+              ...row,
+              issueDate: moment(row.issueDate).format(dateFormatLong),
+            },
+          ],
+        }
+      },
     },
   },
   {
@@ -618,12 +651,8 @@ const consultationDocumentTypes = [
         return {
           MemoDetails: [
             {
-              memoDate: '17 Sep 2019',
-              subject: 'memo',
-              content:
-                'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-              doctorName: 'Medisys Innovation',
-              doctorMCRNo: 'G 637',
+              ...row,
+              memoDate: moment(row.memoDate).format(dateFormatLong),
             },
           ],
         }
@@ -633,9 +662,25 @@ const consultationDocumentTypes = [
   {
     value: '6',
     name: 'Vaccination Certificate',
+    code: 'Vaccination Cert',
     prop: 'corVaccinationCert',
     downloadKey: 'vaccinationcertificateid',
-    downloadId: 10,
+    downloadConfig: {
+      id: 10,
+      key: 'vaccinationcertificateid',
+      draft: (row) => {
+        return {
+          VaccinationCertificateDetails: [
+            {
+              ...row,
+              certificateDate: moment(row.certificateDate).format(
+                dateFormatLong,
+              ),
+            },
+          ],
+        }
+      },
+    },
   },
   {
     value: '5',
@@ -680,6 +725,12 @@ const orderTypes = [
     getSubject: (r) => r.drugName,
   },
 ]
+const buttonTypes = [
+  'RegularButton',
+  'IconButton',
+  'Fab',
+]
+
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -723,6 +774,11 @@ const tenantCodes = [
   'inventorypackage',
   'role',
   'ctsupplier',
+  'ctsnomeddiagnosis',
+]
+
+const noIsActiveProp = [
+  'doctorProfile',
 ]
 
 const defaultParams = {
@@ -746,7 +802,13 @@ const _fetchAndSaveCodeTable = async (
   const searchURL = `${baseURL}/search?ctname=`
 
   let url = useGeneral ? generalCodetableURL : searchURL
-  let criteriaForTenantCodes = { pagesize: 99999 }
+  let criteriaForTenantCodes = noIsActiveProp.reduce(
+    (codes, tenantCode) =>
+      tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
+    false,
+  )
+    ? { pagesize: 99999 }
+    : { pagesize: 99999, isActive: true }
   if (
     tenantCodes.reduce(
       (codes, tenantCode) =>
@@ -1066,9 +1128,27 @@ const tagList = [
   },
 ]
 
-export const getInventoryItem = (list, value, itemFKName, rows) => {
+export const getInventoryItem = (
+  list,
+  value,
+  itemFKName,
+  rows = [],
+  outstandingItem = undefined,
+) => {
   let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
+
+  if (outstandingItem) {
+    const filterOutstandingItem = outstandingItem.filter(
+      (x) => x.type === value && !x.isDeleted,
+    )
+
+    inventoryItemList = _.intersectionBy(
+      inventoryItemList,
+      filterOutstandingItem,
+      itemFKName,
+    )
+  }
 
   return {
     inventoryItemList,
@@ -1096,6 +1176,24 @@ export const getInventoryItemList = (
     inventoryItemList,
   }
 }
+
+export const InvoicePayerType = [
+  {
+    invoicePayerFK: 1,
+    name: 'PATIENT',
+    listName: 'patientPaymentTxn',
+  },
+  // {
+  //   invoicePayerFK: 2,
+  //   name: 'COPAYER',
+  //   listName: 'coPayerPaymentTxn',
+  // },
+  // {
+  //   invoicePayerFK: 3,
+  //   name: 'GOVT_COPAYER',
+  //   listName: 'govCoPayerPaymentTxn',
+  // },
+]
 
 module.exports = {
   // paymentMethods,
@@ -1135,5 +1233,7 @@ module.exports = {
   consultationDocumentTypes,
   getServices,
   tagList,
+  osBalanceStatus,
+  buttonTypes,
   ...module.exports,
 }

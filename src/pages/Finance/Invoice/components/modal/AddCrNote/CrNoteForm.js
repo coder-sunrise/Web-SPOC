@@ -21,21 +21,26 @@ const CrNoteForm = ({ classes }) => {
         <GridContainer>
           <GridItem md={12}>
             <FastField
-              name='date'
+              name='generatedDate'
               render={(args) => <DatePicker {...args} label='Date' />}
             />
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='invoiceAmount'
+              name='invoiceTotal'
               render={(args) => (
-                <NumberInput {...args} currency label='Invoice Amount' />
+                <NumberInput
+                  {...args}
+                  currency
+                  label='Invoice Amount'
+                  disabled
+                />
               )}
             />
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='updateInventory'
+              name='isStockIn'
               render={(args) => {
                 return <Switch prefix='Update Inventory' {...args} />
               }}
@@ -46,7 +51,7 @@ const CrNoteForm = ({ classes }) => {
       <GridItem md={6}>
         <GridItem md={12}>
           <FastField
-            name='remarks'
+            name='remark'
             render={(args) => (
               <OutlinedTextField
                 {...args}

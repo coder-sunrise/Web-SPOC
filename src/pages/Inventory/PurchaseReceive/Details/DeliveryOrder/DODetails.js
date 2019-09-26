@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
-import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import {
   GridContainer,
@@ -10,23 +9,13 @@ import {
   withFormikExtend,
   DatePicker,
   OutlinedTextField,
-  CommonTableGrid,
-  Button,
-  CommonModal,
   EditableTableGrid,
-  CodeSelect,
-  dateFormatLong,
 } from '@/components'
-import Edit from '@material-ui/icons/Edit'
-import Add from '@material-ui/icons/Add'
-import ReceivingItemDetails from './ReceivingItemDetails'
-import moment from 'moment'
 import {
   podoOrderType,
   getInventoryItem,
   getInventoryItemList,
 } from '@/utils/codes'
-import { getUniqueId } from '@/utils/utils'
 
 let commitCount = 2201 // uniqueNumber
 
@@ -34,29 +23,28 @@ const receivingDetailsSchema = Yup.object().shape({
   type: Yup.string().required(),
   code: Yup.string().required(),
   name: Yup.string().required(),
-  //orderQty: Yup.number().required(),
-  //bonusQty: Yup.number().required(),
-  //quantityReceived: Yup.number().min(0).required(),
-  //totalBonusReceived: Yup.number().min(0).required(),
+  // orderQty: Yup.number().required(),
+  // bonusQty: Yup.number().required(),
+  // quantityReceived: Yup.number().min(0).required(),
+  // totalBonusReceived: Yup.number().min(0).required(),
 
   currentReceivingQty: Yup.number().min(0).required(),
   currentReceivingBonusQty: Yup.number().min(0).required(),
 })
 
 @withFormikExtend({
-  mapPropsToValues: ({ deliveryOrder }) => {
-    console.log('mapPropsToValues', deliveryOrder)
-    return deliveryOrder.entity || deliveryOrder.default
+  mapPropsToValues: ({ deliveryOrderDetails }) => {
+    return deliveryOrderDetails.entity || deliveryOrderDetails.default
   },
   enableReinitialize: true,
-  displayName: 'deliveryOrder',
+  displayName: 'deliveryOrderDetails',
   validationSchema: Yup.object().shape({
     poNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
     rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
   }),
 })
-export class DeliveryOrderDetails extends PureComponent {
+class DODetails extends PureComponent {
   state = {
     onClickColumn: undefined,
     selectedItem: {},
@@ -68,6 +56,10 @@ export class DeliveryOrderDetails extends PureComponent {
     filterConsumableItemList: [],
     filterMedicationItemList: [],
     filterVaccinationItemList: [],
+  }
+
+  componentDidMount () {
+    this.initializeStateItemList()
   }
 
   forceUpdate = () => {
@@ -111,12 +103,10 @@ export class DeliveryOrderDetails extends PureComponent {
     })
   }
 
-  componentDidMount () {
-    this.initializeStateItemList()
-  }
-
   handleOnOrderTypeChanged = async (e) => {
-    const { dispatch, values } = this.props
+    const { values, deliveryOrderDetails } = this.props
+    const { purchaseOrderDetails } = deliveryOrderDetails
+    const { purchaseOrderOutstandingItem } = purchaseOrderDetails
     const { rows } = values
     const { row, option } = e
     const { value, itemFKName, stateName } = option
@@ -127,6 +117,7 @@ export class DeliveryOrderDetails extends PureComponent {
       value,
       itemFKName,
       rows,
+      purchaseOrderOutstandingItem,
     )
 
     this.setState({
@@ -177,19 +168,19 @@ export class DeliveryOrderDetails extends PureComponent {
 
     if (deleted) {
       dispatch({
-        type: 'deliveryOrder/deleteRow',
+        type: 'deliveryOrderDetails/deleteRow',
         payload: deleted[0],
       })
     } else if (changed) {
       const existUid = Object.keys(changed)[0]
 
       dispatch({
-        type: 'deliveryOrder/upsertRow',
+        type: 'deliveryOrderDetails/upsertRow',
         payload: { uid: existUid, ...changed[existUid] },
       })
     } else {
       dispatch({
-        type: 'deliveryOrder/upsertRow',
+        type: 'deliveryOrderDetails/upsertRow',
         payload: rows[0],
       })
     }
@@ -198,7 +189,7 @@ export class DeliveryOrderDetails extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
-    console.log('onAddedRowsChange')
+    let newAddedRows = addedRows
     if (addedRows.length > 0) {
       if (!addedRows.isFocused) {
         const { onClickColumn, selectedItem } = this.state
@@ -211,20 +202,30 @@ export class DeliveryOrderDetails extends PureComponent {
         let tempCurrentReceivingBonusQty = tempRow.currentReceivingBonusQty
 
         if (onClickColumn === 'type') {
+          // Handle type changed
         } else if (onClickColumn === 'item') {
-          // Set according outstanding list
-          // orderQty
-          // bonusQty
-          // quantityReceived
-          // totalBonusReceived
-          // currentReceivingQty = Auto fill to maximum
-          // currentReceivingBonusQty = Auto fill to maximum
+          const { deliveryOrderDetails } = this.props
+          const { purchaseOrderDetails } = deliveryOrderDetails
+          const { purchaseOrderOutstandingItem } = purchaseOrderDetails
+          let osItem = purchaseOrderOutstandingItem.filter(
+            (x) => x.code === selectedItem.value,
+          )[0]
+
+          return addedRows.map((row) => ({
+            ...row,
+            itemFK: selectedItem.value,
+            orderQty: osItem.orderQty,
+            bonusQty: osItem.bonusQty,
+            quantityReceived: osItem.quantityReceived,
+            totalBonusReceived: osItem.quantityReceived,
+            currentReceivingQty: osItem.orderQty - osItem.quantityReceived,
+            currentReceivingBonusQty: osItem.orderQty - osItem.bonusQty,
+          }))
         } else {
           tempCurrentReceivingQty =
             tempOrderQty - tempQuantityReceived < tempCurrentReceivingQty
               ? ''
               : tempCurrentReceivingQty
-          //------------------------------------------------------
           tempCurrentReceivingBonusQty =
             tempBonusQty - tempTotalBonusReceived < tempCurrentReceivingBonusQty
               ? ''
@@ -234,8 +235,12 @@ export class DeliveryOrderDetails extends PureComponent {
 
         this.setState({ onClickColumn: undefined })
 
-        return addedRows.map((row) => ({
+        newAddedRows = addedRows.map((row) => ({
           ...row,
+          orderQty: tempOrderQty,
+          bonusQty: tempBonusQty,
+          quantityReceived: tempQuantityReceived,
+          totalBonusReceived: tempTotalBonusReceived,
           itemFK: selectedItem.value,
           currentReceivingQty: tempCurrentReceivingQty,
           currentReceivingBonusQty: tempCurrentReceivingBonusQty,
@@ -243,7 +248,7 @@ export class DeliveryOrderDetails extends PureComponent {
       } else {
         // Initialize new generated row
         this.setState({ onClickColumn: undefined })
-        return addedRows.map((row) => ({
+        newAddedRows = addedRows.map((row) => ({
           ...row,
           orderQty: 0,
           bonusQty: 0,
@@ -255,7 +260,7 @@ export class DeliveryOrderDetails extends PureComponent {
         }))
       }
     }
-    return addedRows
+    return newAddedRows
   }
 
   rowOptions = (row) => {
@@ -263,26 +268,24 @@ export class DeliveryOrderDetails extends PureComponent {
       return row.uid
         ? this.state.MedicationItemList
         : this.state.filterMedicationItemList
-    } else if (row.type === 2) {
+    } if (row.type === 2) {
       return row.uid
         ? this.state.VaccinationItemList
         : this.state.filterVaccinationItemList
-    } else if (row.type === 3) {
+    } if (row.type === 3) {
       return row.uid
         ? this.state.ConsumableItemList
         : this.state.filterConsumableItemList
-    } else {
-      return []
     }
+    return []
   }
 
   render () {
+    console.log(this.props)
     const isEditable = true
     const { props } = this
-    const { footer, deliveryOrderDetails, values } = props
+    const { footer, values } = props
     const { rows } = values
-
-    console.log('DO Details', this.props)
 
     const tableParas = {
       columns: [
@@ -347,13 +350,12 @@ export class DeliveryOrderDetails extends PureComponent {
           options: (row) => {
             if (row.type === 1) {
               return this.state.MedicationItemList
-            } else if (row.type === 2) {
+            } if (row.type === 2) {
               return this.state.VaccinationItemList
-            } else if (row.type === 3) {
+            } if (row.type === 3) {
               return this.state.ConsumableItemList
-            } else {
-              return []
             }
+            return []
           },
         },
         {
@@ -390,7 +392,7 @@ export class DeliveryOrderDetails extends PureComponent {
         {
           columnName: 'expiryDate',
           type: 'date',
-          format: { dateFormatLong },
+          format: 'DD MMM YYYY',
         },
       ],
       onRowDoubleClick: undefined,
@@ -403,7 +405,7 @@ export class DeliveryOrderDetails extends PureComponent {
             <GridContainer>
               <GridItem xs={12}>
                 <FastField
-                  name='poNo'
+                  name='doNo'
                   render={(args) => {
                     return (
                       <TextField
@@ -465,7 +467,7 @@ export class DeliveryOrderDetails extends PureComponent {
           rows={rows}
           schema={receivingDetailsSchema}
           FuncProps={{
-            //edit: isEditable,
+            // edit: isEditable,
             pager: false,
           }}
           EditingProps={{
@@ -491,4 +493,4 @@ export class DeliveryOrderDetails extends PureComponent {
   }
 }
 
-export default DeliveryOrderDetails
+export default DODetails

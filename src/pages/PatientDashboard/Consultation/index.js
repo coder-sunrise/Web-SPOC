@@ -3,6 +3,8 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import $ from 'jquery'
 import classnames from 'classnames'
+import numeral from 'numeral'
+import Timer from 'react-compound-timer'
 
 import { Menu, Dropdown } from 'antd'
 import {
@@ -21,7 +23,8 @@ import {
   Tooltip,
   Drawer,
 } from '@material-ui/core'
-
+import PlayArrow from '@material-ui/icons/PlayArrow'
+import Pause from '@material-ui/icons/Pause'
 import {
   CardContainer,
   TextField,
@@ -114,6 +117,19 @@ const saveConsultation = ({
   })
 }
 
+const getRights = (values) => {
+  return {
+    view: {
+      name: 'consultation.view',
+      rights: values.status === 'Paused' ? 'disable' : 'enable',
+    },
+    edit: {
+      name: 'consultation.edit',
+      rights: values.status === 'Paused' ? 'disable' : 'enable',
+    },
+  }
+}
+
 // @skeleton()
 @connect(
   ({
@@ -122,16 +138,25 @@ const saveConsultation = ({
     consultationDocument,
     orders,
     patientDashboard,
+    visitRegistration,
+    formik,
   }) => ({
     consultation,
     global,
     consultationDocument,
     orders,
     patientDashboard,
+    visitRegistration,
+    formik,
   }),
 )
 @withFormikExtend({
-  mapPropsToValues: ({ consultation = {} }) => {
+  authority: {
+    view: 'consultation.view',
+    edit: 'consultation.edit',
+  },
+  mapPropsToValues: ({ consultation = {}, disabled, ...reset }) => {
+    // console.log('mapPropsToValues', consultation.entity, disabled, reset)
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
@@ -166,6 +191,10 @@ class Consultation extends PureComponent {
 
   //   return null
   // }
+
+  state = {
+    recording: true,
+  }
 
   showInvoiceAdjustment = () => {
     const { theme, ...resetProps } = this.props
@@ -269,19 +298,21 @@ class Consultation extends PureComponent {
       theme,
       dispatch,
       values,
+      visitRegistration,
       patientDashboard = {},
       consultation = {},
       orders = {},
+      formik,
       ...resetProps
     } = this.props
 
     const { entity } = consultation
-
-    const { visitInfo = {} } = patientDashboard
-    const { visit = {} } = visitInfo
+    const { entity: vistEntity } = visitRegistration
+    if (!vistEntity) return null
+    const { visit = {} } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
-    // console.log('values', values, visit)
+    console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
@@ -297,7 +328,65 @@ class Consultation extends PureComponent {
                 paddingBottom: theme.spacing(1),
               }}
             >
-              <h4 style={{ position: 'relative' }}>
+              <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                <Timer
+                  initialTime={0}
+                  direction='forward'
+                  startImmediately={this.state.recording}
+                >
+                  {({
+                    start,
+                    resume,
+                    pause,
+                    stop,
+                    reset,
+                    getTimerState,
+                    getTime,
+                  }) => (
+                    <React.Fragment>
+                      <Timer.Hours
+                        formatValue={(value) =>
+                          `${numeral(value).format('00')} : `}
+                      />
+                      <Timer.Minutes
+                        formatValue={(value) =>
+                          `${numeral(value).format('00')} : `}
+                      />
+                      <Timer.Seconds
+                        formatValue={(value) =>
+                          `${numeral(value).format('00')}`}
+                      />
+                      {!this.state.recording && (
+                        <IconButton
+                          style={{ padding: 0, top: -1, right: -6 }}
+                          onClick={() => {
+                            resume()
+                            this.setState({
+                              recording: true,
+                            })
+                          }}
+                        >
+                          <PlayArrow />
+                        </IconButton>
+                      )}
+                      {this.state.recording && (
+                        <IconButton
+                          style={{ padding: 0, top: -1, right: -6 }}
+                          onClick={() => {
+                            pause()
+                            this.setState({
+                              recording: false,
+                            })
+                          }}
+                        >
+                          <Pause />
+                        </IconButton>
+                      )}
+                    </React.Fragment>
+                  )}
+                </Timer>
+              </h5>
+              <h4 style={{ position: 'relative', marginTop: 0 }}>
                 Total Invoice
                 {/* <Dropdown
                   overlay={
@@ -367,20 +456,7 @@ class Consultation extends PureComponent {
           }
           {...this.props}
         />
-        <AuthorizedContext.Provider
-          value={{
-            view: {
-              name: 'consultation.view',
-              rights: values.status === 'Paused' ? 'disable' : 'enable',
-            },
-            edit: {
-              name: 'consultation.edit',
-              rights: values.status === 'Paused' ? 'disable' : 'enable',
-            },
-          }}
-        >
-          <Layout {...this.props} />
-        </AuthorizedContext.Provider>
+        <Layout {...this.props} />
       </div>
     )
   }

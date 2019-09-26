@@ -87,13 +87,13 @@ export default createListViewModel({
         const payload = {
           IsClinicSessionClosed: false,
         }
-        const response = yield call(service.getActiveSession, payload)
+        const response = yield call(service.getBizSession, payload)
 
         const { data } = response
         // data = null when get session failed
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
-          const today = moment().format(serverDateFormat)
+
           yield put({
             type: 'query',
             payload: {
@@ -101,13 +101,11 @@ export default createListViewModel({
               'VisitFKNavigation.BizSessionFK': sessionData[0].id,
             },
           })
+
           yield put({
-            type: 'calendar/getCalendarList',
-            payload: {
-              eql_appointmentDate: today,
-              eql_appointmentStatusFk: '1',
-            },
+            type: 'getTodayAppointments',
           })
+
           yield put({
             type: 'updateSessionInfo',
             payload: { ...sessionData[0] },
@@ -115,6 +113,25 @@ export default createListViewModel({
           return true
         }
         return false
+      },
+      *getTodayAppointments (_, { put }) {
+        const today = moment().format(serverDateFormat)
+        yield put({
+          type: 'calendar/getCalendarList',
+          payload: {
+            combineCondition: 'and',
+            group: [
+              {
+                appointmentStatusFk: 5,
+                eql_appointmentStatusFk: '1',
+                combineCondition: 'or',
+              },
+              {
+                eql_appointmentDate: today,
+              },
+            ],
+          },
+        })
       },
       *deleteQueueByQueueID ({ payload }, { call, put }) {
         yield call(service.deleteQueue, payload)

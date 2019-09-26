@@ -1,21 +1,13 @@
-import React, { useEffect } from 'react'
-import { formatMessage } from 'umi/locale'
-import { Divider } from '@material-ui/core'
+import React from 'react'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
 import ItemList from './ItemList'
 
 import {
   Field,
-  FastField,
   GridContainer,
   GridItem,
-  ButtonGroup,
   NumberInput,
-  Card,
-  CardHeader,
-  CardText,
-  CardBody,
   SizeContainer,
   CardContainer,
   FieldSet,
@@ -48,36 +40,12 @@ const CPNumber = (label, type) => (args) => {
   )
 }
 const Setting = (props) => {
-  const {
-    schemeDetail,
-    dispatch,
-    height,
-    classes,
-    values,
-    setFieldValue,
-  } = props
-  const changeFieldValue = (value, type, args) => {
-    if (value !== type) {
-      return null
-    }
-    return args.field.value
-  }
-  // const options = [
-  //   {
-  //     label: '$',
-  //     value: 'ExactAmount',
-  //   },
-  //   {
-  //     label: '%',
-  //     value: 'Percentage',
-  //   },
-  // ]
+  const { schemeDetail, height, classes, values, setFieldValue } = props
   return (
     <CardContainer
       hideHeader
       style={{
         height,
-
         overflow: 'auto',
       }}
     >

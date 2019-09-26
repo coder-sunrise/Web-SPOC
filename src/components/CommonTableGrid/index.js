@@ -148,7 +148,7 @@ let uniqueGid = 0
 @connect(({ loading, global }) => {
   return { loading, global }
 })
-class CommonTableGrid extends React.Component {
+class CommonTableGrid extends PureComponent {
   state = {
     pagination: {
       current: 1,
@@ -851,7 +851,6 @@ class CommonTableGrid extends React.Component {
                 sorting={this.state.pagination.sorting}
                 defaultSorting={defaultSorting}
                 onSortingChange={(sorting) => {
-                  console.log(sorting, this.state)
                   sorting.forEach((o) => {
                     const c = newColumExtensions.find(
                       (m) => m.columnName === o.columnName,

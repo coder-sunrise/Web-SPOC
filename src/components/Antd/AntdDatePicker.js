@@ -11,20 +11,23 @@ import en_US from 'antd/es/locale-provider/en_US'
 // assets
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 // wrapper
-import { extendFunc } from '@/utils/utils'
+import { extendFunc, toLocal, toUTC } from '@/utils/utils'
 import { control } from '@/components/Decorator'
 import {
   CustomInputWrapper,
   BaseInput,
   CustomInput,
-  dateFormat,
+  dateFormatLong,
   dateFormatWithTime,
+  dateFormatLongWithTime,
 } from '@/components'
 
-const _toMoment = (value, isLocal) => {
+const _toMoment = (value, isLocal, showTime) => {
   if (!value) return null
-  const m = moment.utc(value)
-  return isLocal ? m.local() : m
+  const m = showTime
+    ? moment(value)
+    : moment(value).set({ hour: 0, minute: 0, second: 0 })
+  return m
 
   // if (!value) return value
   // try {
@@ -66,6 +69,7 @@ class AntdDatePicker extends PureComponent {
 
   static defaultProps = {
     local: true,
+    dateOnly: true,
   }
 
   constructor (props) {
@@ -77,6 +81,8 @@ class AntdDatePicker extends PureComponent {
       formatter,
       parser,
       local,
+      showTime,
+      dateOnly,
     } = props
     const v =
       field.value !== undefined && field.value !== ''
@@ -85,6 +91,19 @@ class AntdDatePicker extends PureComponent {
     this.state = {
       shrink: v !== undefined && v !== '',
       value: v,
+    }
+
+    if (form && field && this.state.value && dateOnly) {
+      setTimeout(() => {
+        form.setFieldValue(
+          field.name,
+          showTime
+            ? moment(this.state.value).format()
+            : moment(this.state.value)
+                .set({ hour: 0, minute: 0, second: 0 })
+                .format(),
+        )
+      }, 1)
     }
   }
 
@@ -128,17 +147,17 @@ class AntdDatePicker extends PureComponent {
     // eslint-disable-next-line no-nested-ternary
     const v = date
       ? showTime
-        ? date.utc().format()
-        : date.set({ hour: 0, minute: 0, second: 0 }).utc().format()
+        ? date.format()
+        : date.set({ hour: 0, minute: 0, second: 0 }).format()
       : ''
     // showTime
-    //   ? date.utc().format()
-    //   : date.set({ hour: 0, minute: 0, second: 0 }).utc().format()
+    //   ? date.toUTC().format()
+    //   : date.set({ hour: 0, minute: 0, second: 0 }).toUTC().format()
     if (form && field) {
       // console.log(date.format())
       // console.log(date.utcOffset())
 
-      // console.log(date.utc().format())
+      // console.log(date.toUTC().format())
 
       form.setFieldValue(field.name, v)
     }
@@ -216,16 +235,14 @@ class AntdDatePicker extends PureComponent {
       ...restProps
     } = this.props
     let { format } = restProps
-    // console.log(format, restProps.showTime, restProps)
 
     if (!format) {
       if (restProps.showTime) {
-        format = dateFormatWithTime
+        format = dateFormatLongWithTime
       } else {
-        format = dateFormat
+        format = dateFormatLong
       }
     }
-    // console.log(this.state.value)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     if (text)
@@ -235,8 +252,10 @@ class AntdDatePicker extends PureComponent {
           inputClassName={props.className}
           value={
             this.state.value !== undefined &&
-            _toMoment(this.state.value, local) ? (
-              _toMoment(this.state.value, local).format(format)
+            _toMoment(this.state.value, local, restProps.showTime) ? (
+              _toMoment(this.state.value, local, restProps.showTime).format(
+                format,
+              )
             ) : (
               ''
             )
@@ -261,7 +280,7 @@ class AntdDatePicker extends PureComponent {
             this.handleDatePickerOpenChange,
           )}
           format={format}
-          value={_toMoment(this.state.value, local)}
+          value={_toMoment(this.state.value, local, restProps.showTime)}
           {...restProps}
         />
       </div>

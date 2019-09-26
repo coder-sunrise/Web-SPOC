@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { getAppendUrl } from '@/utils/utils'
 import {
   NavPills,
   ProgressButton,
@@ -27,51 +27,28 @@ const styles = (theme) => ({
   },
   rdoInput: {
     marginBottom: 30,
+    marginLeft: 30,
   },
 })
 
 const Detail = (props) => {
   useEffect(() => {
     if (props.schemeDetail.currentId) {
-      props
-        .dispatch({
-          type: 'schemeDetail/querySchemeDetails',
-          payload: {
-            id: props.schemeDetail.currentId,
-          },
-        })
-        .then(() => {
-          // return {
-          //   ...o,
-          //   effectiveDates: [
-          //     o.effectiveStartDate,
-          //     o.effectiveEndDate,
-          //   ],
-          //   itemGroupMaxCapacityDtoRdoValue: o.itemGroupMaxCapacityDto
-          //     ? 'sub'
-          //     : 'all',
-          //   itemGroupValueDtoRdoValue: o.itemGroupValueDto ? 'sub' : 'all',
-          // }
-        })
-      //.then((o) => props.resetForm(o))
+      props.dispatch({
+        type: 'schemeDetail/querySchemeDetails',
+        payload: {
+          id: props.schemeDetail.currentId,
+        },
+      })
     }
   }, [])
 
-  const {
-    classes,
-    dispatch,
-    schemeDetail,
-    history,
-    height,
-    handleSubmit,
-    ...restProps
-  } = props
+  const { classes, schemeDetail, history, handleSubmit } = props
   const detailProps = {
     height: 'calc(100vh - 183px)',
     ...props,
   }
   const { currentTab } = schemeDetail
-  // console.log(restProps)
   return (
     <div>
       <NavPills
@@ -121,7 +98,6 @@ export default compose(
   })),
   withFormikExtend({
     mapPropsToValues: ({ schemeDetail }) => {
-      console.log('mapPropsToValues', schemeDetail)
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
@@ -133,21 +109,15 @@ export default compose(
           companyFk: Yup.number().required(),
         }),
       ),
-
-      //effectiveStartDate: Yup.string().required(),
-      //effectiveEndDate: Yup.string().required(),
     }),
     enableReinitialize: true,
-    handleSubmit: (values, { props, resetForm }) => {
+    handleSubmit: (values, { props }) => {
       InventoryTypes.forEach((p) => {
         values[p.prop] = values.rows.filter((o) => o.type === p.value)
       })
 
       const { effectiveDates, ...restValues } = values
-      //console.log('restValues', restValues)
-      const { dispatch, history, onConfirm, schemeDetail } = props
-
-      //console.log('restValues', restValues)
+      const { dispatch, history, onConfirm } = props
 
       dispatch({
         type: 'schemeDetail/upsert',
@@ -157,40 +127,6 @@ export default compose(
           effectiveEndDate: effectiveDates[1],
         },
       }).then((r) => {
-        // if (r) {
-        //   if (onConfirm) onConfirm()
-        //   dispatch({
-        //     type: 'schemeDetail/query',
-        //     payload: {
-        //       id: r.id,
-        //     },
-        //   })
-        // }
-        // if (r) {
-        //   if (r.id) {
-        //     history.push(
-        //       getRemovedUrl(
-        //         [
-        //           'new',
-        //         ],
-        //         getAppendUrl({
-        //           id: r.id,
-        //         }),
-        //       ),
-        //     )
-        //   }
-        //   dispatch({
-        //     type: 'schemeDetail/query',
-        //     payload: {
-        //       id: r.id || restValues.id,
-        //       effectiveDates: [
-        //         r.effectiveStartDate,
-        //         r.effectiveEndDate,
-        //       ],
-        //     },
-        //   }).then((value) => {
-        //     resetForm(value)
-        //   })
         if (r) {
           if (onConfirm) onConfirm()
           dispatch({

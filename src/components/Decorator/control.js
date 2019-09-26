@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import lodash from 'lodash'
 import { FastField, withFormik } from 'formik'
 import { confirmBeforeReload } from '@/utils/utils'
-
+import { buttonTypes } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
 const control = ({ disabledProps } = {}) => (Component) => {
@@ -32,8 +32,14 @@ const control = ({ disabledProps } = {}) => (Component) => {
       // console.log(props, this.props, Component)
       return (
         <Authorized.Context.Consumer>
-          {({ view, edit }) => {
-            // console.log('Authorized.Context.Consumer', view, edit)
+          {({ view, edit, disabled, matches }) => {
+            if (matches) {
+              return Authorized.generalCheck(
+                matches,
+                this.props,
+                <Component {...this.props} {...extraCfg} />,
+              )
+            }
             if (!view) return <Component {...this.props} />
             return (
               <Authorized
@@ -43,7 +49,7 @@ const control = ({ disabledProps } = {}) => (Component) => {
                 ]}
                 noMatch={() => {
                   if (!this.props.hideIfNoEditRights) {
-                    if (Component.displayName === 'RegularButton') {
+                    if (buttonTypes.indexOf(Component.displayName) >= 0) {
                       return null
                     }
                     return <Component {...this.props} disabled {...extraCfg} />
@@ -51,9 +57,9 @@ const control = ({ disabledProps } = {}) => (Component) => {
                   return null
                 }}
               >
-                {(matches) => {
+                {(m) => {
                   return Authorized.generalCheck(
-                    matches,
+                    m,
                     this.props,
                     <Component {...this.props} {...extraCfg} />,
                   )

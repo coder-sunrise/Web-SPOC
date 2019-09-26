@@ -93,7 +93,7 @@ const modalStyle = (theme) => {
       borderTop: `1px solid ${theme.palette.divider}`,
 
       padding: theme.spacing(1),
-      // textAlign: "right",
+      textAlign: 'center',
       // paddingTop: "0",
       margin: '0',
       '& > button:last-child': {
