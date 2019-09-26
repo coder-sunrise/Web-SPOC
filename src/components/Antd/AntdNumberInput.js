@@ -162,6 +162,7 @@ class AntdNumberInput extends React.PureComponent {
       shrink: true,
       focused: true,
     })
+
     // const { parser } = this.props
     // if (parser) {
     //   this.setState({
@@ -186,6 +187,7 @@ class AntdNumberInput extends React.PureComponent {
     const { form, field } = this.props
     if (form && field) {
       // form.setFieldTouched(field.name, true)
+
       field.onChange(this.state.value)
     }
     // console.log('handleBlur')
@@ -209,6 +211,10 @@ class AntdNumberInput extends React.PureComponent {
     //     displayValue: formatter(value),
     //   })
     // }
+    // const re = /^[0-9\b]+$/
+    // if (!re.test(value)) {
+    //   return
+    // }
     const v = {
       target: {
         value,
@@ -228,6 +234,10 @@ class AntdNumberInput extends React.PureComponent {
     //   return false
     // }
     // console.log(this.props.allowEmpty, v)
+    // const re = /^[0-9\b]+$/
+    // if (!re.test(v)) {
+    //   return
+    // }
     let newV = v
     if (!isNumber(newV)) {
       newV = undefined

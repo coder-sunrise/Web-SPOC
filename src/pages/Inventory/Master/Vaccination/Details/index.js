@@ -145,13 +145,27 @@ export default compose(
     }),
     handleSubmit: (values, { props }) => {
       const { dispatch, history } = props
+      const { id, vaccinationStock, effectiveDates, ...restValues } = values
+      let defaultVaccinationStock = vaccinationStock
+      if (vaccinationStock.length === 0) {
+        defaultVaccinationStock = [
+          {
+            inventoryVaccinationFK: id,
+            batchNo: 'Not Applicable',
+            stock: 0,
+            isDefault: true,
+          },
+        ]
+      }
       dispatch({
         type: 'vaccinationDetail/upsert',
         payload: {
-          ...values,
+          ...restValues,
+          id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           markupMargin: parseFloat(values.markupMargin),
+          vaccinationStock: defaultVaccinationStock,
         },
       }).then((r) => {
         if (r) {

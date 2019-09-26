@@ -454,7 +454,7 @@ const convertToQuery = (
       }
     }
   }
-  console.log(sorting)
+  // console.log(sorting)
   const returnVal = {
     ...newQuery,
     sort: sorting.map((o) => ({

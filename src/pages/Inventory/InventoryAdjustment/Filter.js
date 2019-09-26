@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { status } from '@/utils/codes'
 import { withStyles } from '@material-ui/core/styles'
 import MenuItem from '@material-ui/core/MenuItem'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
@@ -39,6 +38,29 @@ class Filter extends PureComponent {
     })
   }
 
+  handleMassAdjustment = async (e) => {
+    this.handleToggle()
+    const { inventoryAdjustment } = this.props
+    const result = await this.props.dispatch({
+      type: 'inventoryAdjustment/getStockDetails',
+      payload: {
+        id: e,
+      },
+    })
+
+    this.props.dispatch({
+      type: 'inventoryAdjustment/updateState',
+      payload: {
+        entity: undefined,
+        showModal: !inventoryAdjustment.showModal,
+        default: {
+          ...inventoryAdjustment.default,
+          stockList: result.data,
+        },
+      },
+    })
+  }
+
   render () {
     const { classes, values } = this.props
     const { open } = this.state
@@ -47,7 +69,7 @@ class Filter extends PureComponent {
         <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
-              name='code'
+              name='transactionNo'
               render={(args) => {
                 return <TextField label='Transaction No' {...args} />
               }}
@@ -56,7 +78,7 @@ class Filter extends PureComponent {
 
           <GridItem xs={6} md={3}>
             <Field
-              name='effectiveDates'
+              name='transDates'
               render={(args) => {
                 return (
                   <DateRangePicker
@@ -71,7 +93,7 @@ class Filter extends PureComponent {
           </GridItem>
 
           <GridItem xs={6} md={1}>
-            <FastField
+            <Field
               name='allDate'
               render={(args) => {
                 return <Checkbox inputLabel='' {...args} />
@@ -87,8 +109,8 @@ class Filter extends PureComponent {
                   <Select
                     label='Status'
                     options={[
-                      { value: 'draft', name: 'Draft' },
-                      { value: 'finalized', name: 'Finalized' },
+                      { value: 1, name: 'Draft' },
+                      { value: 2, name: 'Finalized' },
                     ]}
                     {...args}
                   />
@@ -102,12 +124,28 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { code, isActive } = this.props.values
+                  const { transactionNo, status, transDates, allDate } = values
+                  console.log('values', values)
+                  const [
+                    from,
+                    to,
+                  ] = transDates
+                  let fromDate
+                  let toDate
+                  if (!allDate) {
+                    if (transDates) {
+                      fromDate = from
+                      toDate = to
+                    }
+                  }
+
                   this.props.dispatch({
                     type: 'inventoryAdjustment/query',
                     payload: {
-                      code,
-                      isActive,
+                      adjustmentTransactionNo: transactionNo,
+                      inventoryAdjustmentStatusFK: status,
+                      lgteql_adjustmentTransactionDate: fromDate,
+                      lsteql_adjustmentTransactionDate: toDate,
                     },
                   })
                 }}
@@ -118,10 +156,15 @@ class Filter extends PureComponent {
               <Button
                 color='primary'
                 onClick={() => {
+                  const { inventoryAdjustment } = this.props
                   this.props.dispatch({
                     type: 'inventoryAdjustment/updateState',
                     payload: {
                       entity: undefined,
+                      default: {
+                        ...inventoryAdjustment.default,
+                        stockList: undefined,
+                      },
                     },
                   })
                   this.props.toggleModal()
@@ -159,9 +202,21 @@ class Filter extends PureComponent {
                     <Paper className={classes.dropdown}>
                       <ClickAwayListener onClickAway={this.handleToggle}>
                         <MenuList role='menu'>
-                          <MenuItem>Medication</MenuItem>
-                          <MenuItem>Consumable</MenuItem>
-                          <MenuItem>Vaccination</MenuItem>
+                          <MenuItem
+                            onClick={() => this.handleMassAdjustment(1)}
+                          >
+                            Medication
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => this.handleMassAdjustment(3)}
+                          >
+                            Consumable
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => this.handleMassAdjustment(2)}
+                          >
+                            Vaccination
+                          </MenuItem>
                         </MenuList>
                       </ClickAwayListener>
                     </Paper>

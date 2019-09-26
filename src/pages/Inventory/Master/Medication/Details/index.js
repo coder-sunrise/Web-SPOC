@@ -22,7 +22,7 @@ import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
-    float: 'right',
+    float: 'center',
     textAlign: 'center',
     marginTop: '22px',
     marginRight: '10px',
@@ -52,18 +52,6 @@ const Detail = ({
 
   return (
     <React.Fragment>
-      <div className={classes.actionDiv}>
-        <ProgressButton
-          submitKey='medicationDetail/submit'
-          onClick={handleSubmit}
-        />
-        <Button
-          color='danger'
-          onClick={navigateDirtyCheck('/inventory/master?t=0')}
-        >
-          Cancel
-        </Button>
-      </div>
       <NavPills
         color='primary'
         onChange={(event, active) => {
@@ -99,6 +87,18 @@ const Detail = ({
           },
         ]}
       />
+      <div className={classes.actionDiv}>
+        <ProgressButton
+          submitKey='medicationDetail/submit'
+          onClick={handleSubmit}
+        />
+        <Button
+          color='danger'
+          onClick={navigateDirtyCheck('/inventory/master?t=0')}
+        >
+          Cancel
+        </Button>
+      </div>
     </React.Fragment>
   )
 }
@@ -171,14 +171,27 @@ export default compose(
     handleSubmit: (values, { props, resetForm }) => {
       // console.log('restValues')
       // console.log('restValues', values)
-      const { effectiveDates, ...restValues } = values
+      const { id, medicationStock, effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
       // console.log('medicationDetail', medicationDetail)
+      let defaultMedicationStock = medicationStock
+      if (medicationStock.length === 0) {
+        defaultMedicationStock = [
+          {
+            inventoryMedicationFK: id,
+            batchNo: 'Not Applicable',
+            stock: 0,
+            isDefault: true,
+          },
+        ]
+      }
 
       const payload = {
         ...restValues,
+        id,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        medicationStock: defaultMedicationStock,
       }
       dispatch({
         type: 'medicationDetail/upsert',

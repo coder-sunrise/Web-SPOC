@@ -17,14 +17,24 @@ const styles = (theme) => ({
 @connect(({ inventoryAdjustment }) => ({
   inventoryAdjustment,
 }))
-class Room extends PureComponent {
-  state = {}
+class InventoryAdjustment extends PureComponent {
+  state = {
+    runningNo: '',
+  }
 
-  // componentDidMount () {
-  //   this.props.dispatch({
-  //     type: 'inventoryAdjustment/query',
-  //   })
-  // }
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'inventoryAdjustment/query',
+    })
+    this.props
+      .dispatch({
+        type: 'inventoryAdjustment/generateRunningNo',
+      })
+      .then((v) => {
+        const { data } = v
+        this.setState({ runningNo: data })
+      })
+  }
 
   toggleModal = () => {
     this.props.dispatch({
@@ -65,11 +75,11 @@ class Room extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail {...cfg} {...this.props} />
+          <Detail {...cfg} {...this.props} runningNo={this.state.runningNo} />
         </CommonModal>
       </CardContainer>
     )
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Room)
+export default withStyles(styles, { withTheme: true })(InventoryAdjustment)

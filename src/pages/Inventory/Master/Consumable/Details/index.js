@@ -141,13 +141,26 @@ export default compose(
 
     handleSubmit: (values, { props }) => {
       const { dispatch, history } = props
-      // console.log('props', props)
+      const { id, consumableStock, effectiveDates, ...restValues } = values
+      let defaultConsumableStock = consumableStock
+      if (consumableStock.length === 0) {
+        defaultConsumableStock = [
+          {
+            inventoryVaccinationFK: id,
+            batchNo: 'Not Applicable',
+            stock: 0,
+            isDefault: true,
+          },
+        ]
+      }
       dispatch({
         type: 'consumableDetail/upsert',
         payload: {
-          ...values,
+          ...restValues,
+          id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
+          consumableStock: defaultConsumableStock,
         },
       }).then((r) => {
         if (r) {
