@@ -6,7 +6,7 @@ import { FastField } from 'formik'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import Sdd from '../../Sdd'
-import { getBizSession } from '@/services/query'
+import { getBizSession } from '@/services/queue'
 import {
   CommonModal,
   CardContainer,

@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { getBizSession } from '@/services/query'
+import { getBizSession } from '@/services/queue'
 
 import Yup from '@/utils/yup'
 import {

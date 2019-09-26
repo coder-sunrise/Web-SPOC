@@ -6,7 +6,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles, Tooltip, Divider } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
-import { getBizSession } from '@/services/query'
+import { getBizSession } from '@/services/queue'
 import {
   GridContainer,
   GridItem,

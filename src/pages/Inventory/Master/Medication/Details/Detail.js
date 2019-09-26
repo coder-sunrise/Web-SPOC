@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-import { getBizSession } from '@/services/query'
+import { getBizSession } from '@/services/queue'
 import Sdd from '../../Sdd'
 import {
   CodeSelect,

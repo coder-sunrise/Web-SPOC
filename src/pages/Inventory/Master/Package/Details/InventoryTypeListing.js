@@ -167,23 +167,21 @@ const InventoryTypeListing = ({
   }
 
   const fetchCodes = async () => {
-    const res = await dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctservice',
       },
+    }).then((list) => {
+      console.log({ list })
+      const { services, serviceCenters, serviceCenterServices } = getServices(
+        list,
+      )
+      console.log({ services, serviceCenters, serviceCenterServices })
+      setServicess(services)
+      setServiceCenterss(serviceCenters)
+      setServiceCenterServicess(serviceCenterServices)
     })
-    console.log({ res })
-    // .then((list) => {
-    //   console.log({ list })
-    //   const { services, serviceCenters, serviceCenterServices } = getServices(
-    //     list,
-    //   )
-    //   console.log({ services, serviceCenters, serviceCenterServices })
-    //   setServicess(services)
-    //   setServiceCenterss(serviceCenters)
-    //   setServiceCenterServicess(serviceCenterServices)
-    // })
 
     podoOrderType.forEach((x) => {
       dispatch({
@@ -256,7 +254,7 @@ const InventoryTypeListing = ({
     ],
   )
 
-  useEffect( () => {
+  useEffect(() => {
     fetchCodes()
   }, [])
 

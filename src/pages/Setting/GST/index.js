@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withStyles, Divider, Tooltip } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Yup from '@/utils/yup'
-import { getBizSession } from '@/services/query'
+import { getBizSession } from '@/services/queue'
 
 import {
   Checkbox,
