@@ -150,9 +150,9 @@ const checkPermissions = (
 
 export { checkPermissions }
 
-const check = (authority, target, Exception, type) => {
+const CheckPermissions = (authority, target, Exception, type) => {
   // console.log(authority, CURRENT, target, Exception)
   return checkPermissions(authority, CURRENT, target, Exception, type)
 }
 
-export default check
+export default CheckPermissions
