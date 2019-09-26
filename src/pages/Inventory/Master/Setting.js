@@ -31,7 +31,7 @@ const Setting = ({
     setSearch,
   ] = useState('')
 
-  const { medicationDetail, vaccinationDetail } = props
+  const { medicationDetail, vaccinationDetail, theme } = props
 
   const [
     list,
@@ -77,12 +77,13 @@ const Setting = ({
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
-      <h3>Prescribing</h3>
-      <hr />
+      <h4 style={{ fontWeight: 400 }}>
+        <b>Prescribing</b>
+      </h4>
+
       <GridContainer>
         <GridItem xs={3}>
           <FastField
@@ -153,8 +154,9 @@ const Setting = ({
         </GridItem>
       </GridContainer>
 
-      <h3>Dispensing</h3>
-      <hr />
+      <h4 style={{ fontWeight: 400, marginTop: 25 }}>
+        <b>Dispensing</b>
+      </h4>
       <GridContainer>
         <GridItem xs={6}>
           <FastField
@@ -210,8 +212,9 @@ const Setting = ({
       </GridContainer>
       {showTransfer && (
         <React.Fragment>
-          <h3>Medication Precaution</h3>
-          <hr />
+          <h4 style={{ fontWeight: 400, marginTop: 25 }}>
+            <b>Medication Precaution</b>
+          </h4>
 
           <Transfer {...settingProps} style={{ paddingLeft: 0 }} />
         </React.Fragment>

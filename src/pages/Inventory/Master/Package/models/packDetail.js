@@ -23,6 +23,7 @@ export default createFormViewModel({
         consumablePackageItem: [],
         medicationPackageItem: [],
         vaccinationPackageItem: [],
+        isActive: true,
       },
       // entity: {},
     },

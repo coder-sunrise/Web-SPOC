@@ -20,7 +20,7 @@ import {
 
 const styles = () => ({
   actionDiv: {
-    float: 'right',
+    float: 'center',
     textAlign: 'center',
     marginTop: '22px',
     marginRight: '10px',
@@ -47,18 +47,6 @@ const Detail = ({
   }
   return (
     <React.Fragment>
-      <div className={classes.actionDiv}>
-        <ProgressButton
-          submitKey='consumableDetail/submit'
-          onClick={handleSubmit}
-        />
-        <Button
-          color='danger'
-          onClick={navigateDirtyCheck('/inventory/master?t=1')}
-        >
-          Cancel
-        </Button>
-      </div>
       <NavPills
         color='primary'
         onChange={(event, active) => {
@@ -90,6 +78,18 @@ const Detail = ({
           },
         ]}
       />
+      <div className={classes.actionDiv}>
+        <ProgressButton
+          submitKey='consumableDetail/submit'
+          onClick={handleSubmit}
+        />
+        <Button
+          color='danger'
+          onClick={navigateDirtyCheck('/inventory/master?t=1')}
+        >
+          Cancel
+        </Button>
+      </div>
     </React.Fragment>
   )
 }

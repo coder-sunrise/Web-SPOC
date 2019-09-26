@@ -77,7 +77,7 @@ let commitCount = 1000 // uniqueNumber
 
       if (list === inventoryAdjustmentItems) {
         const { restValues, ...val } = o
-        const { batchNo, code, displayValue, adjustmentQty, ...value } = val
+        const { batchNo, code, displayValue, ...value } = val
         return {
           ...value,
           // id: undefined,
@@ -232,6 +232,7 @@ class Detail extends PureComponent {
       {
         columnName: 'adjustmentQty',
         type: 'number',
+        format: '0.0',
       },
     ],
     columnEditingEnabled: false,
@@ -454,6 +455,7 @@ class Detail extends PureComponent {
   handleSelectedBatch = (e) => {
     const { option, row } = e
     if (option) {
+      console.log({ option })
       const { expiryDate, stock, value, batchNo } = option
       row.batchNo = value
       row.expiryDate = expiryDate
@@ -566,6 +568,20 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, values, handleSubmit } = props
+    const cfg = {}
+    if (values.inventoryAdjustmentStatusFK !== 1) {
+      cfg.onRowDoubleClick = undefined
+    }
+    const inventoryAdjustmentSchema = Yup.object().shape({
+      inventoryTypeFK: Yup.number().required(),
+      code: Yup.number().required(),
+      displayValue: Yup.number().required(),
+      batchNo: Yup.number().required(),
+      adjustmentQty: Yup.number()
+        .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
+        .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
+    })
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -638,6 +654,7 @@ class Detail extends PureComponent {
               pager: false,
               addNewLabelName: 'New Inventory Adjustment',
             }}
+            schema={inventoryAdjustmentSchema}
             EditingProps={{
               showAddCommand: values.inventoryAdjustmentStatusFK === 1,
               showEditCommand: values.inventoryAdjustmentStatusFK === 1,
@@ -647,6 +664,7 @@ class Detail extends PureComponent {
               // columnEditingEnabled: false,
               // editingEnabled: false,
             }}
+            {...cfg}
             rows={
               this.state.inventoryAdjustmentItems.length === 0 ? (
                 this.state.stockList
