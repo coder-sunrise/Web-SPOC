@@ -129,8 +129,8 @@ class UserProfile extends React.Component {
 
   render () {
     const { classes, settingUserProfile } = this.props
-    const { list } = settingUserProfile
-
+    const { list = [] } = settingUserProfile
+    // console.log({ settingUserProfile, list })
     return (
       <CardContainer hideHeader>
         <GridContainer>

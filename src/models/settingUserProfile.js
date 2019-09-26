@@ -9,10 +9,11 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      list: [],
       currentSelectedUser: {},
       showUserProfileModal: false,
     },
-    subscriptions: ({ dispatch, history }) => {},
+    subscriptions: {},
     effects: {
       *fetchUserProfileByID ({ payload }, { call, put }) {
         const response = yield call(service.query, payload)
