@@ -90,22 +90,22 @@ class Queue extends PureComponent {
 
   componentWillMount = () => {
     const { dispatch, queueLog } = this.props
-    const { sessionInfo } = queueLog
-    dispatch({
-      type: 'calendar/updateState',
-      payload: {
-        list: [],
-      },
-    })
-    if (sessionInfo.id === '') {
-      dispatch({
-        type: `${modelKey}getSessionInfo`,
-      })
-    } else {
-      dispatch({
-        type: `${modelKey}refresh`,
-      })
-    }
+    // const { sessionInfo } = queueLog
+    // dispatch({
+    //   type: 'calendar/updateState',
+    //   payload: {
+    //     list: [],
+    //   },
+    // })
+    // if (sessionInfo.id === '') {
+    //   dispatch({
+    //     type: `${modelKey}getSessionInfo`,
+    //   })
+    // } else {
+    //   dispatch({
+    //     type: `${modelKey}refresh`,
+    //   })
+    // }
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)

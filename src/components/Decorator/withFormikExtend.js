@@ -26,10 +26,12 @@ const withFormikExtend = (props) => (Component) => {
         errors,
         hasError: Object.values(errors).length > 0,
         dirty,
+        values,
+        str: JSON.stringify(values),
       },
     }
     if (!_.isEqual(_lastFormikUpdate, _localFormik[displayName])) {
-      // console.log(_localFormik[displayName], _lastFormikUpdate)
+      console.log(_localFormik[displayName], _lastFormikUpdate)
       _localFormik[displayName] = _lastFormikUpdate
     } else {
       return
@@ -110,7 +112,7 @@ const withFormikExtend = (props) => (Component) => {
           rights.edit = { name: authority.edit, rights: 'enable' }
         }
       }
-      console.log(authority, this.state.authority)
+      // console.log(authority, this.state.authority)
       return authority ? (
         <Authorized
           authority={[

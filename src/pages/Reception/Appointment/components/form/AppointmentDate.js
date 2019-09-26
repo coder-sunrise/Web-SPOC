@@ -18,11 +18,10 @@ const AppointmentDate = () => (
         // validate={this.startDateValidation}
         render={(args) => (
           <DatePicker
+            {...args}
             disabled
-            format={dateFormat}
             allowClear={false}
             label='Appointment Date'
-            {...args}
           />
         )}
       />

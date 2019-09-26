@@ -47,7 +47,7 @@ import styles from './style'
 }))
 @withFormikExtend({
   displayName: 'AppointmentForm',
-  // enableReinitialize: true,
+  enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
@@ -317,7 +317,6 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
-    console.log({ datagrid, newDataGrid })
     this.setState({ isDataGridValid, datagrid: newDataGrid })
   }
 
@@ -527,11 +526,6 @@ class Form extends React.PureComponent {
     return rows
   }
 
-  onCloseClick = () => {
-    this.props.resetForm()
-    this.props.onClose()
-  }
-
   actualizeAppointment = () => {
     const { values, history, onClose } = this.props
     const parameters = {
@@ -547,7 +541,7 @@ class Form extends React.PureComponent {
   render () {
     const {
       classes,
-
+      onClose,
       loading,
       values,
       isSubmitting,
@@ -627,7 +621,7 @@ class Form extends React.PureComponent {
             <FormFooter
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={this.onCloseClick}
+              onClose={onClose}
               disabled={
                 !isDataGridValid ||
                 !values.patientName ||
