@@ -92,7 +92,7 @@ class AntdDatePicker extends PureComponent {
       shrink: v !== undefined && v !== '',
       value: v,
     }
-
+    console.log(this.state.value)
     if (form && field && this.state.value && dateOnly) {
       setTimeout(() => {
         form.setFieldValue(

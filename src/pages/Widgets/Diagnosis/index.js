@@ -58,8 +58,9 @@ const styles = (theme) => ({})
 //   handleSubmit: () => {},
 //   displayName: 'Diagnosis',
 // })
-@connect(({ diagnosis }) => ({
+@connect(({ diagnosis, components }) => ({
   diagnosis,
+  components,
 }))
 class Diagnosis extends PureComponent {
   // constructor (props) {
@@ -72,7 +73,6 @@ class Diagnosis extends PureComponent {
       !this.props.diagnosis.shouldAddNew &&
       nextProps.diagnosis.shouldAddNew
     ) {
-      console.log(nextProps)
       // console.log('shouldAddNew')
       this.addDiagnosis()
       this.props.dispatch({
@@ -86,7 +86,6 @@ class Diagnosis extends PureComponent {
 
   addDiagnosis = () => {
     // console.log('addDiagnosis')
-    console.log(this.props)
     this.arrayHelpers.push({
       onsetDate: moment(),
       uid: getUniqueGUID(),
@@ -94,7 +93,7 @@ class Diagnosis extends PureComponent {
   }
 
   render () {
-    const { theme } = this.props
+    const { theme, components } = this.props
     return (
       <div>
         <FieldArray
@@ -102,15 +101,16 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
-            console.log('diagnosis', values)
 
             this.arrayHelpers = arrayHelpers
             if (!values || !values.corDiagnosis) return null
             const diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             if (diagnosises.length === 0) {
               // if(!values.disabled)
-              this.addDiagnosis()
-              return null
+              if (components.ConsultationPage.edit) {
+                this.addDiagnosis()
+                return null
+              }
             }
             return diagnosises.map((v, i) => {
               return (

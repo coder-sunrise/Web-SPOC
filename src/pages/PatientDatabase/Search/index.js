@@ -31,6 +31,7 @@ class PatientSearch extends PureComponent {
           md: 'pt',
           cmt: '1',
           pid: row.id,
+          v: Date.now(),
         }),
       )
     }

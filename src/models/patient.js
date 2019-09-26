@@ -61,12 +61,20 @@ export default createFormViewModel({
         // console.log(query)
         if (query.md === 'pt' && query.cmt) {
           dispatch({
-            type: 'updateState',
+            type: 'initState',
             payload: {
+              version: Number(query.v) || undefined,
               currentComponent: query.cmt,
               currentId: Number(query.pid) || 0,
             },
           })
+          // dispatch({
+          //   type: 'updateState',
+          //   payload: {
+          //     currentComponent: query.cmt,
+          //     currentId: Number(query.pid) || 0,
+          //   },
+          // })
           // if (query.pid) {
           //   dispatch({
           //     type: 'query',
@@ -92,16 +100,37 @@ export default createFormViewModel({
       })
     },
     effects: {
-      *fetchList ({ payload }, { call, put }) {
-        const response = yield call(service.queryList)
-        console.log(response)
+      *initState ({ payload }, { call, put, select, take }) {
+        let { currentId, version, currentComponent } = payload
         yield put({
           type: 'updateState',
           payload: {
-            list: Array.isArray(response) ? response : [],
+            currentComponent,
           },
         })
+        const patient = yield select((state) => state.patient)
+        if (
+          patient.version !== version ||
+          (patient.entity && patient.entity.id !== currentId)
+        )
+          yield put({
+            type: 'query',
+            payload: {
+              id: currentId,
+              version,
+            },
+          })
       },
+      // *fetchList ({ payload }, { call, put }) {
+      //   const response = yield call(service.queryList)
+      //   console.log(response)
+      //   yield put({
+      //     type: 'updateState',
+      //     payload: {
+      //       list: Array.isArray(response) ? response : [],
+      //     },
+      //   })
+      // },
       *closePatientModal ({ payload }, { call, put }) {
         router.push(
           getRemovedUrl([

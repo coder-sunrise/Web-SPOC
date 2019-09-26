@@ -350,6 +350,17 @@ const getRemovedUrl = (ary = [], targetUrl) => {
   return getQueryPath(window.location.pathname, p)
 }
 
+const findGetParameter = (parameterName) => {
+  let result = null
+  let tmp = []
+  // eslint-disable-next-line no-restricted-globals
+  location.search.substr(1).split('&').forEach((item) => {
+    tmp = item.split('=')
+    if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1])
+  })
+  return result
+}
+
 const convertToQuery = (
   query = {},
   convertExcludeFields = [
@@ -742,6 +753,7 @@ module.exports = {
   calculateAdjustAmount,
   errMsgForOutOfRange,
   calculateItemLevelAdjustment,
+  findGetParameter,
   // toUTC,
   // toLocal,
 }
