@@ -20,8 +20,8 @@ import {
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingTemplateMessage }) =>
-    settingTemplateMessage.entity || settingTemplateMessage.default,
+  mapPropsToValues: ({ settingSmsTemplate }) =>
+  settingSmsTemplate.entity || settingSmsTemplate.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -56,7 +56,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingTemplateMessage } = props
+    const { theme, footer, settingSmsTemplate } = props
     // console.log('detail', props)
 
     return (
@@ -71,7 +71,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={!!settingTemplateMessage.entity}
+                    disabled={!!settingSmsTemplate.entity}
                   />
                 )}
               />

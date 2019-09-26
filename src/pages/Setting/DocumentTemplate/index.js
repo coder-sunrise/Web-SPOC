@@ -46,8 +46,9 @@ class ServiceCenter extends PureComponent {
 
   //   return `${isEntityEmpty ? 'Edit ' : 'Add '  }Document Template`
   // }
-
+  
   render () {
+    console.log("ggggggggg")
     const { settingDocumentTemplate } = this.props
     const cfg = {
       toggleModal: this.toggleModal,

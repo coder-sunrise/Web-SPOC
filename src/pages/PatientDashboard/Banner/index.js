@@ -99,6 +99,8 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
+    console.log("************** banner ***********")
+    console.log(this.props)
     const { entity } = patient
     if (!entity)
       return (
@@ -110,6 +112,7 @@ class Banner extends PureComponent {
     const info = entity
     const salt = ctsalutation.find((o) => o.id === info.salutationFK) || {}
     const name = `${salt.name || ''} ${info.name}`
+
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -134,6 +137,7 @@ class Banner extends PureComponent {
                     code='ctNationality'
                     value={info.nationalityFK}
                   />
+                  
                 </div>
               }
             />

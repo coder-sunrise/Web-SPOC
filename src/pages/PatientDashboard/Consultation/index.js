@@ -285,7 +285,7 @@ class Consultation extends PureComponent {
       orders = {},
       ...resetProps
     } = this.props
-
+  
     const { entity } = consultation
     const { entity: vistEntity } = visitRegistration
     if (!vistEntity) return null
