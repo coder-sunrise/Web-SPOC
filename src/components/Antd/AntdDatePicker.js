@@ -17,8 +17,9 @@ import {
   CustomInputWrapper,
   BaseInput,
   CustomInput,
-  dateFormat,
+  dateFormatLong,
   dateFormatWithTime,
+  dateFormatLongWithTime,
 } from '@/components'
 
 const _toMoment = (value, isLocal, showTime) => {
@@ -234,16 +235,14 @@ class AntdDatePicker extends PureComponent {
       ...restProps
     } = this.props
     let { format } = restProps
-    // console.log(format, restProps.showTime, restProps)
 
     if (!format) {
       if (restProps.showTime) {
-        format = dateFormatWithTime
+        format = dateFormatLongWithTime
       } else {
-        format = dateFormat
+        format = dateFormatLong
       }
     }
-    // console.log(this.state.value)
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     if (text)

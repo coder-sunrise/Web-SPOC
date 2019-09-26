@@ -460,11 +460,10 @@ class PatientHistory extends Component {
                 <Select
                   noWrapper
                   value={this.state.selectedItems}
-                  all='0'
+                  allValue='0'
                   prefix='Filter By'
                   mode='multiple'
                   options={[
-                    { name: 'All', value: '0' },
                     { name: 'Chief Complaints', value: '1' },
                     { name: 'Plan', value: '2' },
                     { name: 'Diagnosis', value: '3' },
@@ -474,7 +473,6 @@ class PatientHistory extends Component {
                     { name: 'Invoice', value: '7' },
                   ]}
                   label='Filter By'
-                  maxTagCount={3}
                   style={{ marginBottom: theme.spacing(1) }}
                   onChange={this.onSelectChange}
                 />
@@ -516,7 +514,6 @@ class PatientHistory extends Component {
                 this.widgets
                   .filter(
                     (o) =>
-                      this.state.selectedItems.length === 0 ||
                       this.state.selectedItems.indexOf('0') >= 0 ||
                       this.state.selectedItems.indexOf(o.id) >= 0,
                   )

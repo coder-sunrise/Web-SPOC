@@ -72,6 +72,7 @@ class Diagnosis extends PureComponent {
       !this.props.diagnosis.shouldAddNew &&
       nextProps.diagnosis.shouldAddNew
     ) {
+      console.log(nextProps)
       // console.log('shouldAddNew')
       this.addDiagnosis()
       this.props.dispatch({
@@ -85,6 +86,7 @@ class Diagnosis extends PureComponent {
 
   addDiagnosis = () => {
     // console.log('addDiagnosis')
+    console.log(this.props)
     this.arrayHelpers.push({
       onsetDate: moment(),
       uid: getUniqueGUID(),
@@ -100,12 +102,13 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
-            // console.log('diagnosis', values)
+            console.log('diagnosis', values)
 
             this.arrayHelpers = arrayHelpers
             if (!values || !values.corDiagnosis) return null
             const diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             if (diagnosises.length === 0) {
+              // if(!values.disabled)
               this.addDiagnosis()
               return null
             }

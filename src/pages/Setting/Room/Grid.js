@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 
-import { CommonTableGrid, Button } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { status } from '@/utils/codes'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 import * as service from './services'
 
 class Grid extends PureComponent {
@@ -20,27 +20,32 @@ class Grid extends PureComponent {
       },
     ],
     columnExtensions: [
+      { columnName: 'code', width: 200 },
       {
         columnName: 'isActive',
         sortingEnabled: false,
         type: 'select',
         options: status,
+        align: 'center',
+        width: 100,
       },
       {
         columnName: 'action',
         align: 'center',
         render: (row) => {
           return (
-            <Button
-              size='sm'
-              onClick={() => {
-                this.editRow(row)
-              }}
-              justIcon
-              color='primary'
-            >
-              <Edit />
-            </Button>
+            <Tooltip title='Edit Room'>
+              <Button
+                size='sm'
+                onClick={() => {
+                  this.editRow(row)
+                }}
+                justIcon
+                color='primary'
+              >
+                <Edit />
+              </Button>
+            </Tooltip>
           )
         },
       },
