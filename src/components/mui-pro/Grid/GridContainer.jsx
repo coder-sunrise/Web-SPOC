@@ -15,12 +15,16 @@ const style = {
     // '&:after':{
     //   clear: 'both',
     // }
+
     '& > div:first-child': {
       paddingLeft: 0,
     },
     '& > div:last-child': {
       paddingRight: 0,
     },
+  },
+  grid: {
+    height: '100%',
   },
 }
 
