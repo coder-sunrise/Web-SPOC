@@ -465,6 +465,7 @@ class AntdSelect extends React.PureComponent {
       )
     }
     // console.log(classes.selectContainer, classes.className)
+    const customTagPlaceholder = maxTagPlaceholder || 'options'
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -484,7 +485,8 @@ class AntdSelect extends React.PureComponent {
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           maxTagPlaceholder={(vv) => {
-            return `${vv.filter((o) => o !== allValue).length} options selected`
+            return `${vv.filter((o) => o !== allValue)
+              .length} ${customTagPlaceholder} selected`
           }}
           optionLabelProp='label'
           notFoundContent={

@@ -14,13 +14,14 @@ import {
   OutlinedTextField,
   RichEditor,
   Field,
+  Select,
 } from '@/components'
 
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingTemplateMessage }) =>
-    settingTemplateMessage.entity || settingTemplateMessage.default,
+  mapPropsToValues: ({ settingSmsTemplate }) =>
+  settingSmsTemplate.entity || settingSmsTemplate.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -33,7 +34,7 @@ const styles = (theme) => ({})
     // console.log(restValues)
 
     dispatch({
-      type: 'settingTemplateMessage/upsert',
+      type: 'settingSmsTemplate/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -43,7 +44,7 @@ const styles = (theme) => ({})
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingTemplateMessage/query',
+          type: 'settingSmsTemplate/query',
         })
       }
     })
@@ -55,7 +56,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingTemplateMessage } = props
+    const { theme, footer, settingSmsTemplate } = props
     // console.log('detail', props)
 
     return (
@@ -70,7 +71,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={!!settingTemplateMessage.entity}
+                    disabled={!!settingSmsTemplate.entity}
                   />
                 )}
               />

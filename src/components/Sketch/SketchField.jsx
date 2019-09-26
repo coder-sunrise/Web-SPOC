@@ -76,6 +76,8 @@ class SketchField extends PureComponent {
     parentWidth: 550,
     action: true,
     indexCount: 1,
+    initialData: [],
+    templateSet: false,
   }
 
   _initTools = (fabricCanvas) => {
@@ -148,7 +150,8 @@ class SketchField extends PureComponent {
       return
     }
     // if(e.target.type != "image"){
-    if (e.target.id !== 'ARROW') {
+      console.log(e.target.id)
+    if (e.target.id !== 'SKIP' ) {
       let obj = e.target
       obj.__version = 1
       // record current object state as json and save as originalState
@@ -175,36 +178,54 @@ class SketchField extends PureComponent {
     let allList = data
     let { indexCount } = this.state
     let latestIndex = 0
-    history.getInitializeList(data)
+    let count = allList[allList.length - 1].layerNumber
+    let testData = { objects: [] }
+    this.initialData = data
+    console.log('@@@@@@@@@@')
+    console.log(this.initialData)
+    //history.getInitializeList(data, count)
     for (let i = 0; i < allList.length; i++) {
-      let [
-        obj,
-      ] = allList[i].data
+      // let decodeObject = JSON.parse(allList[i].layerContent)
+      // console.log("--- ", decodeObject)
+      console.log('************')
+      let obj = JSON.parse(allList[i].layerContent)
+      console.log(obj)
 
-      this.setState({ action: false }, () => {
-        this._fc.add(obj)
-        if (obj.zindex != null) {
-          canvas.moveTo(obj, obj.zindex)
+      // console.log(allList[i].layerContent)
+      // let obj = JSON.parse(allList[i].layerContent)
+      // console.log(JSON.parse(allList[i].layerContent))
+      //   console.log(object)
 
-          if (obj.id === 'template') {
-            canvas.moveTo(obj, -100)
-          } else {
-            latestIndex = obj.zindex
-          }
+      // let testData = {objects: []}
 
-          if (i === allList.length - 1) {
-            if (latestIndex !== 0) {
-              latestIndex += 1
-              this.setState({
-                indexCount: latestIndex,
-              })
-            }
-          }
-        }
-        obj.__version -= 1
-        obj.__removed = false
-      })
+      testData.objects.push(obj)
+
+      // this.setState({ action: false }, () => {
+      //   this._fc.add(obj)
+      //   if (obj.zindex != null) {
+      //     canvas.moveTo(obj, obj.zindex)
+
+      //     if (obj.id === 'template') {
+      //       canvas.moveTo(obj, -100)
+      //     } else {
+      //       latestIndex = obj.zindex
+      //     }
+
+      //     if (i === allList.length - 1) {
+      //       if (latestIndex !== 0) {
+      //         latestIndex += 1
+      //         this.setState({
+      //           indexCount: latestIndex,
+      //         })
+      //       }
+      //     }
+      //   }
+      //   obj.__version -= 1
+      //   obj.__removed = false
+      // })
     }
+
+    this.fromJSON(testData)
   }
 
   /**
@@ -417,12 +438,13 @@ class SketchField extends PureComponent {
 
   hideDrawing = (hideEnable) => {
     let history = this._history
-    let allList = history.getAllList()
+    let allList = []
+    allList = history.getOriginalList()
 
     for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-      ] = allList[i].data
+      ] = allList[i]
 
       if (obj.type !== 'image') {
         if (hideEnable) {
@@ -455,7 +477,11 @@ class SketchField extends PureComponent {
       this.setState({ action: false }, () => {
         this._fc.add(obj)
         if (obj.zindex != null) {
-          canvas.moveTo(obj, obj.zindex)
+          if(obj.zindex === -100){
+            canvas.sendToBack(obj)
+          }else{
+            canvas.moveTo(obj, obj.zindex)
+          }
         }
         obj.__version -= 1
         obj.__removed = false
@@ -489,7 +515,11 @@ class SketchField extends PureComponent {
         this.setState({ action: false }, () => {
           canvas.add(obj)
           if (obj.zindex != null) {
-            canvas.moveTo(obj, obj.zindex)
+            if(obj.zindex === -100){
+              canvas.sendToBack(obj)
+            }else{
+              canvas.moveTo(obj, obj.zindex)
+            }
           }
           obj.__version = 1
         })
@@ -560,16 +590,65 @@ class SketchField extends PureComponent {
    * @param json JSON string or object
    */
   fromJSON = (json) => {
+    let history = this._history
+
     if (!json) return
     let canvas = this._fc
+    // setTimeout(() => {
+    //   canvas.loadFromJSON(json, () => {
+    //     canvas.renderAll()
+    //     // if (this.props.onChange) {
+    //     //   this.props.onChange()
+    //     // }
+    //   })
+    // }, 10000)
+
+    canvas.loadFromJSON(json, () => {
+      canvas.renderAll()
+      // if (this.props.onChange) {
+      //   this.props.onChange()
+      // }
+    })
+
     setTimeout(() => {
-      canvas.loadFromJSON(json, () => {
-        canvas.renderAll()
-        if (this.props.onChange) {
-          this.props.onChange()
+      let originalList = history.getOriginalList()
+      console.log(originalList)
+      for (let i = 0; i < this.initialData.length; i++) {
+        let [
+          mainObject,
+        ] = originalList[i]
+        if (this.initialData[i].layerNumber != 0) {
+          if (this.initialData[i].layerNumber == -100) {
+            mainObject.set({
+              zindex: this.initialData[i].layerNumber,
+              id: 'template',
+            })
+            canvas.sendToBack(mainObject)
+          } else {
+            mainObject.set({
+              zindex: this.initialData[i].layerNumber,
+            })
+            this.setState({
+              indexCount: this.initialData[i].layerNumber + 1,
+            })
+            mainObject.set({
+              zindex: this.initialData[i].layerNumber,
+            })
+            canvas.moveTo(mainObject, this.initialData[i].layerNumber)
+          }
         }
-      })
-    }, 100)
+      }
+
+      for (let i = 0; i < this.initialData.length; i++) {
+        let [
+          mainObject,
+        ] = originalList[i]
+        if (this.initialData[i].layerType !== 'image') {
+          console.log("front")
+          canvas.bringToFront(mainObject)
+        }
+      }
+    }, 400)
   }
 
   /**
@@ -580,6 +659,9 @@ class SketchField extends PureComponent {
    * @returns {string} JSON string of the canvas just cleared
    */
   clear = (propertiesToInclude) => {
+    this.setState({
+      indexCount: 1,
+    })
     let discarded = this.toJSON(propertiesToInclude)
     this._fc.clear()
     this._history.clear()
@@ -656,10 +738,13 @@ class SketchField extends PureComponent {
    */
   setBackgroundFromDataUrl = (dataUrl) => {
     let canvas = this._fc
-    let { indexCount } = this.state
-
+    let { indexCount , templateSet} = this.state
+    let history = this._history
     let oldIndexCount = indexCount
     let newIndexCount = indexCount + 1
+
+    history.updateCount(oldIndexCount)
+    console.log('image index ', indexCount)
 
     this.setState({
       indexCount: newIndexCount,
@@ -673,11 +758,23 @@ class SketchField extends PureComponent {
       imgbase64.set({
         zindex: oldIndexCount,
       })
-      // canvas.setBackgroundImage(imgbase64)
+      // canvas.bringForward(imgbase64)
       canvas.add(imgbase64)
       imgbase64.selectable = false
       imgbase64.evented = false
-      canvas.moveTo(imgbase64, oldIndexCount)
+      
+
+      if(!templateSet){
+        this.setState({
+          templateSet: true,
+        })
+        canvas.sendToBack(imgbase64)
+      }else{
+        canvas.moveTo(imgbase64, oldIndexCount)
+      }
+      console.log(imgbase64)
+      console.log(canvas.getObjects().indexOf(imgbase64))
+
       // context.drawImage(imgbase64, 0, 0);
     }
 
@@ -702,15 +799,21 @@ class SketchField extends PureComponent {
   }
 
   setTemplate = (dataUrl) => {
+    let { templateSet } = this.state
     let history = this._history
-    let allList = history.getAllList()
+    let allList = history.getOriginalList()
     let prevTemplate = ''
+
+    if(!templateSet){
+      this.setState({
+        templateSet: true,
+      })
+    }
 
     for (let i = 0; i < allList.length; i++) {
       let [
         obj,
-      ] = allList[i].data
-
+      ] = allList[i]
       if (obj.id === 'template') {
         obj.set({
           id: 'oldTemplate',
@@ -718,7 +821,6 @@ class SketchField extends PureComponent {
         prevTemplate = obj
       }
     }
-
     if (prevTemplate !== '') {
       let canvas = this._fc
       let activeObj = prevTemplate
@@ -745,21 +847,36 @@ class SketchField extends PureComponent {
         canvas.requestRenderAll()
       }
     }
-
+    history.updateCount(-100)
     let canvas = this._fc
     const image = new Image()
-    image.src = dataUrl
+
     image.onload = () => {
       let imgbase64 = new fabric.Image(image, {})
+
       imgbase64.set({
         zindex: -100,
         id: 'template',
       })
+
       canvas.add(imgbase64)
       imgbase64.selectable = false
       imgbase64.evented = false
-      canvas.moveTo(imgbase64, -100)
+      canvas.sendToBack(imgbase64)
+      console.log(imgbase64)
+      console.log(canvas.getObjects().indexOf(imgbase64))
+      // canvas.moveTo(imgbase64, -500)
     }
+    image.src = dataUrl
+    //   var img = new Image();
+    //   img.src = dataUrl
+    //   img.onload = function() {
+    //     var f_img = new fabric.Image(img);
+
+    //     canvas.setBackgroundImage(f_img);
+
+    //     canvas.renderAll();
+    // };
   }
 
   downloadImage = () => {
@@ -791,10 +908,10 @@ class SketchField extends PureComponent {
       top: options.top,
       fill: color,
     })
-
+    iText.editable = false
     canvas.add(iText).setActiveObject(iText)
-    iText.enterEditing()
-    iText.selectAll()
+    //iText.enterEditing()
+    //iText.selectAll()
   }
 
   componentDidMount = () => {

@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { dateFormatLong } from '@/components'
 
 export const DraftMedisaveColumns = [
   {
@@ -63,7 +64,7 @@ const generateDraftMedisaveData = () => {
   for (let i = 0; i < 15; i++) {
     data.push({
       id: i,
-      vistDate: moment().format('DD MMM YYYY'),
+      vistDate: moment().format({ dateFormatLong }),
       accountNo: 'S1234567D',
       patientName: 'Tan Kok Wei',
       doctor: 'Dr Levine',
@@ -159,7 +160,7 @@ const generateNewMedisaveData = () => {
   for (let i = 0; i < 15; i++) {
     data.push({
       id: i,
-      vistDate: moment().format('DD MMM YYYY'),
+      vistDate: moment().format({ dateFormatLong }),
       accountNo: 'S1234567D',
       patientName: 'Tan Kok Wei',
       payerName: 'Ali',

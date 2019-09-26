@@ -130,8 +130,6 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
       stopDate = formatDateToText(rule.options.until)
     }
 
-    console.log({ rule, all: rule.all(), stopDate })
-
     const {
       recurrencePatternFK,
       recurrenceFrequency,

@@ -37,6 +37,7 @@ const Vaccination = ({ dispatch, history, vaccination, values }) => {
       columnName: 'favouriteSupplier',
       type: 'codeSelect',
       code: 'ctSupplier',
+      labelField: 'displayValue',
       sortBy: 'favouriteSupplierFK',
     },
     {

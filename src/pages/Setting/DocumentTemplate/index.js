@@ -14,8 +14,8 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingTemplateMessage, global }) => ({
-  settingTemplateMessage,
+@connect(({ settingDocumentTemplate, global }) => ({
+  settingDocumentTemplate,
   global,
 }))
 class ServiceCenter extends PureComponent {
@@ -23,43 +23,45 @@ class ServiceCenter extends PureComponent {
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingTemplateMessage/query',
+      type: 'settingDocumentTemplate/query',
     })
   }
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingTemplateMessage/updateState',
+      type: 'settingDocumentTemplate/updateState',
       payload: {
-        showModal: !this.props.settingTemplateMessage.showModal,
+        showModal: !this.props.settingDocumentTemplate.showModal,
       },
     })
   }
 
-  getModalTitle = (isEntityEmpty) => {
-    const pathname = window.location.pathname.trim().toLowerCase()
+  // getModalTitle = (isEntityEmpty) => {
+  //   const pathname = window.location.pathname.trim().toLowerCase()
 
-    const modalTitle =
-      pathname == '/setting/smstemplate'
-        ? 'SMS Template'
-        : 'Referral Letter Template'
+  //   const modalTitle =
+  //     pathname == '/setting/smstemplate'
+  //       ? 'SMS Template'
+  //       : 'Document Template'
 
-    return (isEntityEmpty ? 'Edit ' : 'Add ') + modalTitle
-  }
-
+  //   return `${isEntityEmpty ? 'Edit ' : 'Add '  }Document Template`
+  // }
+  
   render () {
-    const { settingTemplateMessage } = this.props
+    console.log("ggggggggg")
+    const { settingDocumentTemplate } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
-    }
+    } 
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
         <Grid {...cfg} {...this.props} />
         <CommonModal
-          open={settingTemplateMessage.showModal}
+          open={settingDocumentTemplate.showModal}
           observe='TemplateMessageDetail'
-          title={this.getModalTitle(settingTemplateMessage.entity)}
+          // title={this.getModalTitle(settingDocumentTemplate.entity)}
+          title={`${settingDocumentTemplate.entity ? 'Edit ' : 'Add '  }Document Template`}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

@@ -205,14 +205,22 @@ const Grid = ({
         const parameters = {
           vis: row.id,
           pid: row.patientProfileFK,
+          md2: 'disp',
         }
-        history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
-        // router.push(`/reception/queue/dispense${getAppendUrl(parameters)}`)
+        // history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
+        router.push(getAppendUrl(parameters, '/reception/queue'))
         break
       }
-      case '1.1': // billing
-        router.push(`/reception/queue/dispense/${row.visitReferenceNo}/billing`)
+      case '1.1': {
+        // billing
+        const parameters = {
+          vis: row.id,
+          pid: row.patientProfileFK,
+          md2: 'bill',
+        }
+        router.push(getAppendUrl(parameters, '/reception/queue'))
         break
+      }
       case '2': // delete visit
         deleteQueueConfirmation(row)
         break

@@ -15,7 +15,7 @@ import {
   SizeContainer,
 } from '@/components'
 // medisys components
-import { DoctorLabel } from '@/components/_medisys'
+import { DoctorLabel, DoctorProfileSelect } from '@/components/_medisys'
 
 const FilterBar = ({ handleSubmit }) => {
   return (
@@ -101,14 +101,7 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='DoctorIDs'
               render={(args) => (
-                <CodeSelect
-                  {...args}
-                  mode='multiple'
-                  code='doctorprofile'
-                  label='Doctor'
-                  labelField='clinicianProfile.name'
-                  renderDropdown={(option) => <DoctorLabel doctor={option} />}
-                />
+                <DoctorProfileSelect {...args} mode='multiple' label='Doctor' />
               )}
             />
           </GridItem>

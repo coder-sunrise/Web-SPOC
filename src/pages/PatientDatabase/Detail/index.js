@@ -63,14 +63,16 @@ const styles = () => ({
     view: 'patient.view',
     edit: 'patient.edit',
   },
+  // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
+    console.log({ patient })
     return patient.entity || patient.default
   },
   validationSchema: schema,
 
   handleSubmit: (values, component) => {
-    const { props, resetForm, onConfirm } = component
-    const { dispatch, history, patient } = props
+    const { props, resetForm } = component
+    const { dispatch, history, patient, onConfirm } = props
     dispatch({
       type: 'patient/upsert',
       payload: values,
@@ -290,9 +292,11 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
-    // console.log('patient', patient)
-    // console.log('xx', resetProps)
-    console.log(this.props.values)
+    // console.log('************** patient profile ***********')
+    // console.log(this.props)
+    // // console.log('patient', patient)
+    // // console.log('xx', resetProps)
+    // console.log(this.props.values)
 
     const currentMenu =
       this.widgets.find((o) => o.id === currentComponent) || {}

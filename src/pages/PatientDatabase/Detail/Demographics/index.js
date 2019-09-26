@@ -116,7 +116,7 @@ class Demographic extends PureComponent {
   render () {
     const { props } = this
     const { values, theme, setFieldValue } = props
-
+    console.log({ values })
     return (
       <React.Fragment>
         <GridContainer gutter={0}>

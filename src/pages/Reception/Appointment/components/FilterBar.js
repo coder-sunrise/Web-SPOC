@@ -18,7 +18,7 @@ import {
   SizeContainer,
 } from '@/components'
 // sub components
-import { AppointmentTypeLabel } from '@/components/_medisys'
+import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 
 const styles = () => ({
   selectorContainer: {
@@ -39,13 +39,14 @@ const FilterBar = ({
   const onFilterClick = () => handleUpdateFilter(values)
 
   const renderDropdown = (option) => {
-    const { name, doctorProfile } = option
-    const title = option.title !== null ? option.title : ''
-    const mcrNo =
-      doctorProfile !== null && doctorProfile !== undefined
-        ? `(${doctorProfile.doctorMCRNo})`
-        : ''
-    return <div>{`${title} ${name} ${mcrNo}`}</div>
+    return <DoctorLabel doctor={option} />
+    // const { name, doctorProfile } = option
+    // const title = option.title || ''
+    // const mcrNo =
+    //   doctorProfile !== null && doctorProfile !== undefined
+    //     ? `(${doctorProfile.doctorMCRNo})`
+    //     : ''
+    // return <div>{`${title} ${name} ${mcrNo}`}</div>
   }
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
@@ -80,13 +81,17 @@ const FilterBar = ({
                   {...args}
                   allValue={-99}
                   allLabel='All Doctors'
-                  code='clinicianprofile'
+                  allowClear={false}
                   label='Filter by Doctor'
                   mode='multiple'
+                  code='clinicianprofile'
                   labelField='name'
                   valueField='id'
+                  // code='doctorprofile'
+                  // labelField='clinicianProfile.name'
+                  // valueField='clinicianProfile.id'
                   maxTagCount={maxDoctorTagCount}
-                  maxTagPlaceholder={maxDoctorTagPlaceholder}
+                  maxTagPlaceholder='doctors'
                   renderDropdown={renderDropdown}
                 />
               )}
@@ -99,6 +104,7 @@ const FilterBar = ({
                 <CodeSelect
                   {...args}
                   mode='multiple'
+                  allowClear={false}
                   all={-99}
                   label='Filter by Appointment Type'
                   code='ctappointmenttype'
@@ -117,7 +123,7 @@ const FilterBar = ({
                     },
                   ]}
                   maxTagCount={maxAppointmentTagCount}
-                  maxTagPlaceholder={maxAppointmentTagPlaceholder}
+                  maxTagPlaceholder='appointment types'
                 />
               )}
             />
@@ -152,6 +158,9 @@ export default memo(
     enableReinitialize: true,
     mapPropsToValues: () => ({
       filterByDoctor: [
+        -99,
+      ],
+      filterByApptType: [
         -99,
       ],
     }),

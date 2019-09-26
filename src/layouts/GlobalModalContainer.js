@@ -7,6 +7,8 @@ import { CommonModal, SimpleModal } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 import Consultation from '@/pages/PatientDashboard/Consultation'
+import Dispense from '@/pages/Dispense'
+import Billing from '@/pages/Dispense/Billing'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
 
@@ -61,6 +63,7 @@ class GlobalModalContainer extends PureComponent {
 
   render () {
     const { global, dispatch, loggedInUserID, history } = this.props
+
     return (
       <div>
         {/* <SimpleModal
@@ -92,6 +95,38 @@ class GlobalModalContainer extends PureComponent {
           showFooter={false}
         >
           {global.showConsultationPanel && <Consultation {...this.props} />}
+        </CommonModal>
+        <CommonModal
+          open={global.showDispensePanel}
+          title='Dispensing'
+          observe='Dispense'
+          authority='dispense'
+          bodyNoPadding
+          onClose={(e) => {
+            dispatch({
+              type: 'dispense/closeDispenseModal',
+            })
+          }}
+          fullScreen
+          showFooter={false}
+        >
+          {global.showDispensePanel && <Dispense />}
+        </CommonModal>
+        <CommonModal
+          open={global.showBillingPanel}
+          title='Billing'
+          observe='Billing'
+          authority='billing'
+          bodyNoPadding
+          onClose={(e) => {
+            dispatch({
+              type: 'billing/closeBillingModal',
+            })
+          }}
+          fullScreen
+          showFooter={false}
+        >
+          {global.showBillingPanel && <Billing />}
         </CommonModal>
         <CommonModal
           open={global.showPatientInfoPanel}
@@ -192,7 +227,7 @@ class GlobalModalContainer extends PureComponent {
           maxWidth='lg'
           observe='VisitRegistration'
         >
-          <VisitRegistration />
+          <VisitRegistration history={this.props.history} />
         </CommonModal>
 
         <CommonModal

@@ -15,8 +15,8 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingTemplateMessage }) =>
-    settingTemplateMessage.filter || {},
+  mapPropsToValues: ({ settingSmsTemplate }) =>
+  settingSmsTemplate.filter || {},
   handleSubmit: () => {},
   displayName: 'TemplateMessageFilter',
 })
@@ -35,6 +35,9 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
+        </GridContainer>
+
+        <GridContainer>
           <GridItem xs={6} md={3}>
             <div className={classes.filterBtn}>
               <ProgressButton
@@ -43,7 +46,7 @@ class Filter extends PureComponent {
                 onClick={() => {
                   const { codeDisplayValue } = this.props.values
                   this.props.dispatch({
-                    type: 'settingTemplateMessage/query',
+                    type: 'settingSmsTemplate/query',
                     payload: {
                       group: [
                         {
@@ -63,7 +66,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingTemplateMessage/updateState',
+                    type: 'settingSmsTemplate/updateState',
                     payload: {
                       entity: undefined,
                     },

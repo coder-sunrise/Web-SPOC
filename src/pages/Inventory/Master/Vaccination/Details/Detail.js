@@ -16,12 +16,20 @@ import {
   Button,
   CodeSelect,
   Field,
+  dateFormatLong,
+  CheckboxGroup,
 } from '@/components'
 import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
-const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
+const Detail = ({
+  vaccinationDetail,
+  dispatch,
+  theme,
+  setFieldValue,
+  ...props
+}) => {
   const field = vaccinationDetail.entity ? 'entity' : 'default'
 
   const [
@@ -93,8 +101,7 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
       <GridContainer gutter={0}>
@@ -183,6 +190,7 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
                       id: 'inventory.master.vaccination.supplier',
                     })}
                     code='ctSupplier'
+                    labelField='displayValue'
                     {...args}
                   />
                 )}
@@ -209,7 +217,7 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
-                    format='DD MMM YYYY'
+                    format={dateFormatLong}
                     label='Effective Start Date'
                     label2='End Date'
                     disabled={!!(vaccinationDetail.entity && hasActiveSession)}
@@ -253,9 +261,46 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
             </GridItem> */}
           </GridContainer>
         </GridItem>
+        <GridItem>
+          <FastField
+            name='chas'
+            render={(args) => (
+              <CheckboxGroup
+                style={{
+                  margin: theme.spacing(1),
+                }}
+                vertical
+                simple
+                valueField='id'
+                textField='name'
+                options={[
+                  {
+                    id: 'acute',
+                    name: 'CHAS Acute Claimable',
+
+                    layoutConfig: {
+                      style: {},
+                    },
+                  },
+                  {
+                    id: 'chronic',
+                    name: 'CHAS Chronic Claimable',
+
+                    layoutConfig: {
+                      style: {},
+                    },
+                  },
+                ]}
+                onChange={(e, s) => {}}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
       </GridContainer>
-      <h5 style={{ marginTop: 15, marginLeft: 8 }}>SDD</h5>
-      <Divider style={{ marginLeft: 8 }} />
+      <h4 style={{ marginTop: 15, fontWeight: 400 }}>
+        <b>SDD</b>
+      </h4>
       <GridContainer>
         <GridItem xs={5}>
           <FastField
@@ -295,7 +340,7 @@ const Detail = ({ vaccinationDetail, dispatch, setFieldValue, ...props }) => {
           />
         </GridItem>
       </GridContainer>
-      <Divider style={{ margin: '40px 0 20px 0' }} />
+      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
 
       <CommonModal
         open={toggle}

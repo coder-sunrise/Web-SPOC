@@ -19,7 +19,7 @@ const styles = () => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 9999,
+    zIndex: 1200,
     '& h4': {
       fontWeight: 500,
     },

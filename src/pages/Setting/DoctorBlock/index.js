@@ -2,41 +2,52 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import {
-  CardContainer,
-  CommonModal,
-} from '@/components'
+import { CardContainer, CommonModal } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
+import DoctorBlockForm from '@/pages/Reception/Appointment/components/form/DoctorBlock'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingDoctorBlock }) => ({
-    settingDoctorBlock,
+@connect(({ doctorBlock }) => ({
+  doctorBlock,
 }))
 class DoctorBlock extends PureComponent {
-  state = {}
+  state = {
+    showModal: false,
+  }
 
   toggleModal = () => {
-    this.props.dispatch({
-      type: 'settingDoctorBlock/updateState',
-      payload: {
-        showModal: !this.props.settingDoctorBlock.showModal,
-      },
+    const { showModal } = this.state
+    this.setState({
+      showModal: !showModal,
     })
+    showModal &&
+      this.props.dispatch({
+        type: 'doctorBlock/updateState',
+        payload: {
+          currentViewDoctorBlock: {},
+        },
+      })
+  }
+
+  handleEdit = (id) => {
+    this.props
+      .dispatch({
+        type: 'doctorBlock/queryOne',
+        payload: { id },
+      })
+      .then(() => {
+        this.toggleModal()
+      })
   }
 
   render () {
-    const {
-      classes,
-      settingDoctorBlock,
-      dispatch,
-      theme,
-      ...restProps
-    } = this.props
+    const { showModal } = this.state
+    const { classes, doctorBlock, dispatch, theme, ...restProps } = this.props
 
     const cfg = {
       toggleModal: this.toggleModal,
@@ -45,16 +56,16 @@ class DoctorBlock extends PureComponent {
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <Grid onEditClick={this.handleEdit} dataSource={doctorBlock.list} />
         <CommonModal
-          open={settingDoctorBlock.showModal}
+          open={showModal}
           title='Add Doctor Block'
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail {...cfg} {...this.props} />
+          <DoctorBlockForm />
         </CommonModal>
       </CardContainer>
     )

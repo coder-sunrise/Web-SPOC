@@ -777,6 +777,10 @@ const tenantCodes = [
   'ctsnomeddiagnosis',
 ]
 
+const noIsActiveProp = [
+  'doctorProfile',
+]
+
 const defaultParams = {
   excludeInactiveCodes: true,
 }
@@ -798,7 +802,13 @@ const _fetchAndSaveCodeTable = async (
   const searchURL = `${baseURL}/search?ctname=`
 
   let url = useGeneral ? generalCodetableURL : searchURL
-  let criteriaForTenantCodes = { pagesize: 99999 }
+  let criteriaForTenantCodes = noIsActiveProp.reduce(
+    (codes, tenantCode) =>
+      tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
+    false,
+  )
+    ? { pagesize: 99999 }
+    : { pagesize: 99999, isActive: true }
   if (
     tenantCodes.reduce(
       (codes, tenantCode) =>

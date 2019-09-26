@@ -5,7 +5,7 @@ import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
-import { EditableTableGrid } from '@/components'
+import { EditableTableGrid, dateFormatLong } from '@/components'
 import {
   AppointmentTypeOptions,
   getColorClassByAppointmentType,
@@ -88,7 +88,7 @@ class AppointmentDataGrid extends React.PureComponent {
         return {
           ...column,
           currentDate: appointmentDate
-            ? moment(appointmentDate, 'DD MMM YYYY')
+            ? moment(appointmentDate, { dateFormatLong })
             : moment(),
         }
       }

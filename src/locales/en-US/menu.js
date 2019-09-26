@@ -110,7 +110,7 @@ export default {
   'menu.setting.medicationprecautions': 'Medication Precautions',
   'menu.setting.medicationconsumptionmethod': 'Medication Consumption Method',
   'menu.setting.smstemplate': 'SMS Template',
-  'menu.setting.referrallettertemplate': 'Referral Letter Template',
+  'menu.setting.referrallettertemplate': 'Document Template',
   'menu.claimSubmission': 'Claim Submission',
   'menu.claimSubmission.chas': 'CHAS',
   'menu.claimSubmission.medisave': 'Medisave',
@@ -133,4 +133,7 @@ export default {
   'menu.report.patientListingReport': 'Patient Listing Report',
   'menu.report.paymentCollection': 'Payment Collection Report',
   'menu.report.salessummary': 'Sales Summary Report',
+  'menu.report.diagnosistrending': 'Diagnosis Trending Report',
+  'menu.report.sessionsummary': 'Session Summary Report',
+  'menu.report.viewreport': 'View Report',
 }

@@ -42,6 +42,7 @@ const styles = (theme) => ({})
             : effectiveDates[1],
 
         startDate: moment(dates[0]),
+
         endDate: moment(dates[1]),
       },
     }).then((r) => {

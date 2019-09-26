@@ -101,6 +101,9 @@ class AntdNumberInput extends React.PureComponent {
     disabled: PropTypes.bool,
     size: PropTypes.string,
     renderDropdown: PropTypes.func,
+    allowEmpty: PropTypes.bool,
+    max: PropTypes.number,
+    min: PropTypes.number,
   }
 
   static defaultProps = {
@@ -135,33 +138,13 @@ class AntdNumberInput extends React.PureComponent {
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 100)
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
-    if (field) {
-      this.setState({
-        value: field.value === undefined ? '' : field.value,
-        shrink: field.value !== undefined,
-      })
-    } else if (value) {
-      this.setState({
-        value: value === undefined ? '' : value,
-        shrink: value !== undefined,
-      })
-    } else {
-      this.setState({
-        value: undefined,
-        shrink: false,
-      })
-    }
-    // console.log(field)
-  }
-
   handleFocus = () => {
     window.$_inputFocused = true
     this.setState({
       shrink: true,
       focused: true,
     })
+
     // const { parser } = this.props
     // if (parser) {
     //   this.setState({
@@ -186,6 +169,7 @@ class AntdNumberInput extends React.PureComponent {
     const { form, field } = this.props
     if (form && field) {
       // form.setFieldTouched(field.name, true)
+
       field.onChange(this.state.value)
     }
     // console.log('handleBlur')
@@ -209,6 +193,10 @@ class AntdNumberInput extends React.PureComponent {
     //     displayValue: formatter(value),
     //   })
     // }
+    // const re = /^[0-9\b]+$/
+    // if (!re.test(value)) {
+    //   return
+    // }
     const v = {
       target: {
         value,
@@ -228,9 +216,14 @@ class AntdNumberInput extends React.PureComponent {
     //   return false
     // }
     // console.log(this.props.allowEmpty, v)
+    // const re = /^[0-9\b]+$/
+    // if (!re.test(v)) {
+    //   return
+    // }
     let newV = v
     if (!isNumber(newV)) {
       newV = undefined
+      return false
     }
     if (v === undefined && !this.props.allowEmpty) {
       newV = this.props.min
@@ -243,6 +236,7 @@ class AntdNumberInput extends React.PureComponent {
     })
 
     this.debouncedOnChange(newV)
+    return true
   }
 
   // debouncedParser = (value) => {
@@ -373,6 +367,28 @@ class AntdNumberInput extends React.PureComponent {
         />
       </div>
     )
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { field, value } = nextProps
+
+    if (field) {
+      this.setState({
+        value: field.value === undefined ? '' : field.value,
+        shrink: field.value !== undefined,
+      })
+    } else if (value) {
+      this.setState({
+        value: value === undefined ? '' : value,
+        shrink: value !== undefined,
+      })
+    } else {
+      this.setState({
+        value: undefined,
+        shrink: false,
+      })
+    }
+    // console.log(field)
   }
 
   render () {

@@ -19,6 +19,8 @@ import {
   Button,
   CommonModal,
   Field,
+  dateFormatLong,
+  CheckboxGroup,
 } from '@/components'
 import { getActiveSession } from '@/pages/Reception/Queue/services'
 
@@ -29,6 +31,7 @@ const Detail = ({
   dispatch,
   setFieldValue,
   sddDetail,
+  theme,
   ...props
 }) => {
   const field = medicationDetail.entity ? 'entity' : 'default'
@@ -79,7 +82,7 @@ const Detail = ({
 
   const toggleModal = () => {
     setToggle(!toggle)
-  } 
+  }
   const handleSelectSdd = (row) => {
     const { setFieldTouched } = props
     const { id, code, name } = row
@@ -101,8 +104,7 @@ const Detail = ({
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
       <GridContainer gutter={0}>
@@ -186,6 +188,7 @@ const Detail = ({
                       id: 'inventory.master.medication.supplier',
                     })}
                     code='ctSupplier'
+                    labelField='displayValue'
                     max={10}
                     {...args}
                   />
@@ -225,7 +228,7 @@ const Detail = ({
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
-                    format='DD MMM YYYY'
+                    format={dateFormatLong}
                     label='Effective Start Date'
                     label2='End Date'
                     disabled={!!(medicationDetail.entity && hasActiveSession)}
@@ -236,10 +239,47 @@ const Detail = ({
             </GridItem>
           </GridContainer>
         </GridItem>
+        <GridItem>
+          <FastField
+            name='chas'
+            render={(args) => (
+              <CheckboxGroup
+                style={{
+                  margin: theme.spacing(1),
+                }}
+                vertical
+                simple
+                valueField='id'
+                textField='name'
+                options={[
+                  {
+                    id: 'acute',
+                    name: 'CHAS Acute Claimable',
+
+                    layoutConfig: {
+                      style: {},
+                    },
+                  },
+                  {
+                    id: 'chronic',
+                    name: 'CHAS Chronic Claimable',
+
+                    layoutConfig: {
+                      style: {},
+                    },
+                  },
+                ]}
+                onChange={(e, s) => {}}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
       </GridContainer>
 
-      <h5 style={{ marginTop: 15, marginLeft: 8 }}>SDD</h5>
-      <Divider style={{ marginLeft: 8 }} />
+      <h4 style={{ marginTop: 15, fontWeight: 400 }}>
+        <b>SDD</b>
+      </h4>
       <GridContainer>
         <GridItem xs={5}>
           <FastField
@@ -280,7 +320,7 @@ const Detail = ({
         </GridItem>
       </GridContainer>
 
-      <Divider style={{ margin: '40px 0 20px 0' }} />
+      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
 
       <CommonModal
         open={toggle}

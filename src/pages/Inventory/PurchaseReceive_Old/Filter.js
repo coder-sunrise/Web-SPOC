@@ -126,7 +126,7 @@ class Filter extends PureComponent {
                       id: 'inventory.pr.supplier',
                     })}
                     code='ctSupplier'
-                    //max={10}
+                    labelField='displayValue'
                     {...args}
                   />
                 )

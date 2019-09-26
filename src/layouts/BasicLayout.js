@@ -199,7 +199,7 @@ class BasicLayout extends React.PureComponent {
       type: 'user/fetchCurrent',
     })
     dispatch({
-      type: 'clinicSettings/getClinicSettings',
+      type: 'clinicSettings/query',
     })
     dispatch({
       type: 'clinicInfo/query',

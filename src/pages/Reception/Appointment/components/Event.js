@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 import ErrorOutline from '@material-ui/icons/ErrorOutline'
 import Cached from '@material-ui/icons/Cached'
-import Draft from '@material-ui/icons/Edit'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 
@@ -29,7 +29,7 @@ const style = (theme) => ({
     fontSize: '.85rem',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingLeft: theme.spacing(0.5),
     '& svg': {
       width: '.85rem',
@@ -48,12 +48,12 @@ const style = (theme) => ({
   },
   icons: {
     float: 'right',
-    // width: '.8rem',
     height: '.8rem',
   },
 })
 
-class Event extends PureComponent {
+@connect(({ calendar }) => ({ calendarView: calendar.calendarView }))
+class Event extends React.PureComponent {
   _handleMouseEnter = (syntheticEvent) => {
     const { event, handleMouseOver } = this.props
     handleMouseOver(event, syntheticEvent)
@@ -65,20 +65,15 @@ class Event extends PureComponent {
   }
 
   constructAccountNo = (patientAccountNo) =>
-    patientAccountNo === null ? '' : `(${patientAccountNo})`
+    !patientAccountNo ? '' : `(${patientAccountNo})`
 
   render () {
     const { event, classes, calendarView } = this.props
-    const {
-      appointmentStatusFk,
-      doctor,
-      hasConflict,
-      isEnableRecurrence,
-    } = event
+    const { doctor, hasConflict, isEnableRecurrence } = event
 
     let title = event.patientName
     let accountNo = this.constructAccountNo(event.patientAccountNo)
-    let subtitle = event.patientContactNo
+    let subtitle = event.patientContactNo || ''
     if (doctor) {
       const { clinicianProfile = {} } = doctor
       const { doctorProfile } = clinicianProfile
@@ -98,6 +93,8 @@ class Event extends PureComponent {
       [classes.baseContainer]: true,
       [classes.otherViewEvent]: true,
     })
+
+    // console.log({ calendarView })
 
     return calendarView === BigCalendar.Views.MONTH ? (
       <div

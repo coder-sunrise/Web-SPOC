@@ -1,8 +1,8 @@
 import moment from 'moment'
-
+import { dateFormatLong, timeFormat } from '@/components'
 import { filterMap } from './variables'
 
-const dateTimeFormat = 'DD MMM YYYY hh:mm A'
+const dateTimeFormat = `${dateFormatLong} ${timeFormat}`
 
 export const formatAppointmentTimes = (values = []) =>
   values.map((value) => moment(value, 'HH:mm:ss').format('hh:mm A'))
@@ -34,8 +34,8 @@ export const todayOnly = (event) => {
   const today = moment()
   console.log({
     diff: today.diff(eventDate, 'days'),
-    target: eventDate.format(),
-    today: today.format(),
+    target: eventDate.formatUTC(),
+    today: today.formatUTC(),
   })
   return today.diff(eventDate, 'days') === 0
 }

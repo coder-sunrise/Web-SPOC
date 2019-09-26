@@ -1,12 +1,9 @@
 import * as service from '@/services/common'
 
 const getUrl = () => {
-  const pathname = window.location.pathname.trim().toLowerCase()
 
-  const url =
-    pathname == '/setting/smstemplate'
-      ? '/api/smstemplate'
-      : '/api/CTReferralLetterTemplate'
+  const url = '/api/smstemplate'
+   
 
   return url
 }

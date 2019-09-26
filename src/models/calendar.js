@@ -7,7 +7,6 @@ import { createListViewModel } from 'medisys-model'
 // common components
 import { notification, serverDateFormat } from '@/components'
 import * as service from '@/services/calendar'
-import * as doctorBlockService from '@/services/doctorBlock'
 import { queryList as queryPublicHolidays } from '@/pages/Setting/PublicHoliday/services'
 // utils
 import {
@@ -17,7 +16,6 @@ import {
   compareDto,
 } from '@/pages/Reception/Appointment/components/form/formikUtils'
 import { getTimeObject, compare } from '@/utils/yup'
-// import { events as newEvents } from '../pages/Reception/BigCalendar/_appointment'
 
 const ACTION_KEYS = {
   insert: 'insertAppointment',
@@ -91,7 +89,7 @@ export default createListViewModel({
     },
     subscriptions: {},
     effects: {
-      *submit ({ payload }, { select, call, put }) {
+      *submit ({ payload }, { select, put }) {
         const calendarState = yield select((state) => state.calendar)
         // const { ltsppointmentstatus } = yield select((state) => state.codetable)
         try {
@@ -266,6 +264,10 @@ export default createListViewModel({
             type: 'setEditType',
             payload: payload.isEditedAsSingleAppointment,
           })
+          yield put({
+            type: 'cachePayload',
+            payload,
+          })
           return true
         }
         return false
@@ -339,7 +341,7 @@ export default createListViewModel({
         }
         return false
       },
-      *navigateCalendar ({ payload }, { select, call, put }) {
+      *navigateCalendar ({ payload }, { select, put }) {
         const calendarState = yield select((state) => state.calendar)
         const { date, view } = payload
         const targetDate =
@@ -390,6 +392,9 @@ export default createListViewModel({
       },
     },
     reducers: {
+      cachePayload (state, { payload }) {
+        return { ...state, cachedPayload: payload }
+      },
       setEditType (state, { payload }) {
         return { ...state, isEditedAsSingleAppointment: payload }
       },
@@ -409,120 +414,6 @@ export default createListViewModel({
             ...payload,
           ],
         }
-      },
-      moveEvent (state, { updatedEvent, id, _appointmentID }) {
-        const { calendarEvents } = state
-        const appointment = calendarEvents.find(
-          (e) => e._appointmentID === _appointmentID,
-        )
-        if (!appointment) return { ...state }
-
-        const updateAppointmentResource = (Rs, resource) =>
-          resource.id !== id
-            ? [
-                ...Rs,
-                { ...resource },
-              ]
-            : [
-                ...Rs,
-                { ...resource, ...updatedEvent },
-              ]
-        const updatedResources = appointment.appointmentResources.reduce(
-          updateAppointmentResource,
-          [],
-        )
-
-        const removed = calendarEvents.filter(
-          (event) => event._appointmentID !== _appointmentID,
-        )
-
-        const newCalendarEvents = [
-          ...removed,
-          {
-            ...appointment,
-            appointmentResources: updatedResources,
-          },
-        ]
-
-        return { ...state, calendarEvents: newCalendarEvents }
-      },
-      addEventSeries (state, { series }) {
-        return {
-          ...state,
-          calendarEvents: [
-            ...state.calendarEvents,
-            series,
-          ],
-        }
-      },
-      updateEventSeriesByEventID (state, { series, _appointmentID }) {
-        const { calendarEvents: originalEvents } = state
-        const removed = originalEvents.filter(
-          (event) => event._appointmentID !== _appointmentID,
-        )
-
-        const newCalendarEvents = [
-          ...removed,
-          series,
-        ]
-
-        return { ...state, calendarEvents: newCalendarEvents }
-      },
-      deleteEventSeriesByEventID (state, { eventID, appointmentID }) {
-        const { calendarEvents } = state
-
-        const newCalendarEvents = calendarEvents.filter(
-          (event) => event._appointmentID !== appointmentID,
-        )
-
-        return {
-          ...state,
-          calendarEvents: newCalendarEvents,
-        }
-      },
-      updateDoctorEvent (state, { add, update, deleted }) {
-        let newCalendarEvents = [
-          ...state.calendarEvents,
-        ]
-
-        if (add) {
-          newCalendarEvents = [
-            ...state.calendarEvents,
-            add,
-          ]
-        }
-
-        if (update) {
-          newCalendarEvents = newCalendarEvents.reduce(
-            (events, e) =>
-              e._appointmentID === update._appointmentID
-                ? [
-                    ...events,
-                    update,
-                  ]
-                : [
-                    ...events,
-                    e,
-                  ],
-            [],
-          )
-        }
-
-        if (deleted) {
-          newCalendarEvents = newCalendarEvents.reduce(
-            (events, e) =>
-              e._appointmentID === deleted
-                ? [
-                    ...events,
-                  ]
-                : [
-                    ...events,
-                    e,
-                  ],
-            [],
-          )
-        }
-        return { ...state, calendarEvents: newCalendarEvents }
       },
     },
   },

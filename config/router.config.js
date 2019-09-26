@@ -47,20 +47,20 @@ const routes = [
             mini: 'QE',
             exact: true,
           },
-          {
-            path: '/reception/queue/dispense',
-            name: 'dispense',
-            hideInMenu: true,
-            exact: true,
-            component: './Dispense',
-          },
-          {
-            path: '/reception/queue/dispense/:visitRefNo/billing',
-            name: 'billing',
-            hideInMenu: true,
-            exact: true,
-            component: './Dispense/Billing',
-          },
+          // {
+          //   path: '/reception/queue/dispense',
+          //   name: 'dispense',
+          //   hideInMenu: true,
+          //   exact: true,
+          //   component: './Dispense',
+          // },
+          // {
+          //   path: '/reception/queue/dispense/billing',
+          //   name: 'billing',
+          //   hideInMenu: true,
+          //   exact: true,
+          //   component: './Dispense/Billing',
+          // },
           {
             path: '/reception/appointment',
             name: 'appointment',
@@ -73,12 +73,12 @@ const routes = [
             name: 'patientdashboard',
             component: './PatientDashboard',
           },
-          {
-            path: '/reception/queue/patientdashboard/consultation/:id?',
-            name: 'consultation',
-            hideInMenu: true,
-            component: './PatientDashboard/Consultation',
-          },
+          // {
+          //   path: '/reception/queue/patientdashboard/consultation/:id?',
+          //   name: 'consultation',
+          //   hideInMenu: true,
+          //   component: './PatientDashboard/Consultation',
+          // },
         ],
       },
       //
@@ -404,6 +404,21 @@ const routes = [
             name: 'salessummary',
             component: './Report/SalesSummary',
           },
+          {
+            path: '/report/diagnosistrending',
+            name: 'diagnosistrending',
+            component: './Report/DiagnosisTrending',
+          },
+          {
+            path: '/report/sessionsummary',
+            name: 'sessionsummary',
+            component: './Report/SessionSummary',
+          },
+          {
+            path: '/report/sessionsummary/:id',
+            name: 'viewreport',
+            component: './Report/SessionSummary/Details',
+          },
         ],
       },
       // Report
@@ -622,12 +637,12 @@ const routes = [
           {
             path: '/setting/smstemplate',
             name: 'smstemplate',
-            component: './Setting/TemplateMessages',
+            component: './Setting/SMSTemplate',
           },
           {
-            path: '/setting/referrallettertemplate',
-            name: 'referrallettertemplate',
-            component: './Setting/TemplateMessages',
+            path: '/setting/documenttemplate',
+            name: 'documenttertemplate',
+            component: './Setting/DocumentTemplate',
           },
           {
             path: '/setting/paymentmode',

@@ -15,11 +15,12 @@ import {
   DatePicker,
   Switch,
   DateRangePicker,
+  dateFormatLong,
 } from '@/components'
 
 const styles = () => ({})
 
-const Detail = ({ packDetail, dispatch, values }) => {
+const Detail = ({ packDetail, dispatch, values, theme }) => {
   useEffect(() => {
     if (packDetail.currentId) {
       dispatch({
@@ -34,8 +35,7 @@ const Detail = ({ packDetail, dispatch, values }) => {
     <CardContainer
       hideHeader
       style={{
-        marginLeft: 5,
-        marginRight: 5,
+        margin: theme.spacing(2),
       }}
     >
       <GridContainer gutter={0}>
@@ -129,7 +129,7 @@ const Detail = ({ packDetail, dispatch, values }) => {
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker
-                    format='DD MMM YYYY'
+                    format={dateFormatLong}
                     label='Effective Start Date'
                     label2='End Date'
                     {...args}
@@ -140,7 +140,7 @@ const Detail = ({ packDetail, dispatch, values }) => {
           </GridContainer>
         </GridItem>
       </GridContainer>
-      <Divider style={{ margin: '40px 0 20px 0' }} />
+      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
     </CardContainer>
   )
 }
