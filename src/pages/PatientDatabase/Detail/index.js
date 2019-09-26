@@ -197,7 +197,7 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
+            return <Cmpnet {...p} widget />
           },
           loading: Loading,
         }),
