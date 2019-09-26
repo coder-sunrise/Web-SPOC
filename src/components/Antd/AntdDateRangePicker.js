@@ -16,6 +16,7 @@ import {
   dateFormatWithTime,
   dateFormatLong,
   dateFormatLongWithTime,
+  serverDateTimeFormatFull,
 } from '@/components'
 
 import DatePicker from './AntdDatePicker'
@@ -101,11 +102,15 @@ class AntdDateRangePicker extends PureComponent {
               ? // eslint-disable-next-line no-nested-ternary
                 i === 0
                 ? showTime
-                  ? moment(o).format()
-                  : moment(o).set({ hour: 0, minute: 0, second: 0 }).format()
+                  ? moment(o).format(serverDateTimeFormatFull)
+                  : moment(o)
+                      .set({ hour: 0, minute: 0, second: 0 })
+                      .format(serverDateTimeFormatFull)
                 : showTime
-                  ? moment(o).format()
-                  : moment(o).set({ hour: 23, minute: 59, second: 59 }).format()
+                  ? moment(o).format(serverDateTimeFormatFull)
+                  : moment(o)
+                      .set({ hour: 23, minute: 59, second: 59 })
+                      .format(serverDateTimeFormatFull)
               : o
           }),
         )

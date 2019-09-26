@@ -559,11 +559,11 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
 
     // console.log({ datagrid })
-    // console.log({
-    //   initialValues: this.props.initialValues,
-    //   values: this.props.values,
-    //   dirty: this.props.dirty,
-    // })
+    console.log({
+      initialValues: this.props.initialValues,
+      values: this.props.values,
+      dirty: this.props.dirty,
+    })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (

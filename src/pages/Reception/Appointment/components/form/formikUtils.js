@@ -111,10 +111,11 @@ export const mapPropsToValues = ({
                   recurrenceDto.recurrenceDaysOfTheWeek,
                 ),
               },
-        currentAppointment: {
-          ...restAppointment,
-          appointmentDate: moment(appointmentDate).format(),
-        },
+        // currentAppointment: {
+        //   ...restAppointment,
+        //   appointmentDate: moment(appointmentDate).format(),
+        // },
+        currentAppointment: appointment,
         appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({
           ...item,
