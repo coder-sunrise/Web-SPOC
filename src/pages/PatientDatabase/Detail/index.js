@@ -291,6 +291,8 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
+    console.log("************** patient profile ***********")
+    console.log(this.props)
     // console.log('patient', patient)
     // console.log('xx', resetProps)
     // console.log(this.props)

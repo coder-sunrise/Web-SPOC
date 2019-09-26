@@ -33,6 +33,7 @@ class Circle extends FabricCanvasTool {
       top: this.startY,
       originX: 'left',
       originY: 'center',
+      id: 'SKIP',
       strokeWidth: this._width,
       stroke: this._color,
       fill: this._fill,
@@ -65,7 +66,14 @@ class Circle extends FabricCanvasTool {
   }
 
   doMouseUp () {
+    let canvas = this._canvas
     this.isDown = false
+
+    canvas.remove(this.circle)
+    let circle = new fabric.Group([
+      this.circle,
+    ])
+    canvas.add(circle)
   }
 }
 

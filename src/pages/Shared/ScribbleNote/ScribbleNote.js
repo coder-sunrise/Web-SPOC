@@ -12,12 +12,9 @@ window.g_app.replaceModel(model)
 class ScribbleNote extends PureComponent {
   
   render () {
-    
-    const { toggleScribbleModal, addScribble, scriblenotes } = this.props
-    console.log(this.props)
     return (
       <div>
-        <Scribble {...this.props} toggleScribbleModal={toggleScribbleModal} addScribble={addScribble} />
+        <Scribble {...this.props} />
       </div>
     )
   }

@@ -27,6 +27,7 @@ class Rectangle extends FabricCanvasTool {
       top: this.startY,
       originX: 'left',
       originY: 'top',
+      id: 'SKIP',
       width: pointer.x - this.startX,
       height: pointer.y - this.startY,
       stroke: this._color,
@@ -57,7 +58,14 @@ class Rectangle extends FabricCanvasTool {
   }
 
   doMouseUp () {
+    let canvas = this._canvas
     this.isDown = false
+
+    canvas.remove(this.rect)
+    let rect = new fabric.Group([
+      this.rect,
+    ])
+    canvas.add(rect)
   }
 }
 

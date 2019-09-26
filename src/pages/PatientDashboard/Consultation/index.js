@@ -161,6 +161,7 @@ const getRights = (values) => {
   },
   validationSchema: schema,
   // enableReinitialize: true,
+ 
   handleSubmit: (values, { props }) => {
     saveConsultation({
       props: {
@@ -305,7 +306,7 @@ class Consultation extends PureComponent {
       formik,
       ...resetProps
     } = this.props
-
+  
     const { entity } = consultation
     const { entity: vistEntity } = visitRegistration
     if (!vistEntity) return null

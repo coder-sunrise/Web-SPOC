@@ -63,6 +63,7 @@ class GlobalModalContainer extends PureComponent {
 
   render () {
     const { global, dispatch, loggedInUserID, history } = this.props
+
     return (
       <div>
         {/* <SimpleModal
