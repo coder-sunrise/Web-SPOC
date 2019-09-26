@@ -44,11 +44,14 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             type: 'select',
             options: status,
+            width: 120,
+            align: 'center',
           },
           {
             columnName: 'action',
             sortingEnabled: false,
             align: 'center',
+            width: 100,
             render: (row) => {
               return (
                 <Tooltip title='Edit service center' placement='top-end'>
@@ -59,6 +62,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
+                    style={{ marginRight: 0 }}
                   >
                     <Edit />
                   </Button>

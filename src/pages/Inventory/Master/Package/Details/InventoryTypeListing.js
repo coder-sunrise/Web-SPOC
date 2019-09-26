@@ -167,22 +167,25 @@ const InventoryTypeListing = ({
   }
 
   const fetchCodes = async () => {
-    await dispatch({
+    const res = await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctservice',
       },
-    }).then((list) => {
-      const { services, serviceCenters, serviceCenterServices } = getServices(
-        list,
-      )
-
-      setServicess(services)
-      setServiceCenterss(serviceCenters)
-      setServiceCenterServicess(serviceCenterServices)
     })
+    console.log({ res })
+    // .then((list) => {
+    //   console.log({ list })
+    //   const { services, serviceCenters, serviceCenterServices } = getServices(
+    //     list,
+    //   )
+    //   console.log({ services, serviceCenters, serviceCenterServices })
+    //   setServicess(services)
+    //   setServiceCenterss(serviceCenters)
+    //   setServiceCenterServicess(serviceCenterServices)
+    // })
 
-    await podoOrderType.forEach((x) => {
+    podoOrderType.forEach((x) => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
@@ -253,7 +256,7 @@ const InventoryTypeListing = ({
     ],
   )
 
-  useEffect(() => {
+  useEffect( () => {
     fetchCodes()
   }, [])
 
@@ -675,11 +678,12 @@ const InventoryTypeListing = ({
       {
         columnName: 'serviceCenterServiceFK',
         type: 'select',
-        options: servicess.filter(
-          (o) =>
-            !serviceCenterFK ||
-            o.serviceCenters.find((m) => m.value === serviceCenterFK),
-        ),
+        options: () =>
+          servicess.filter(
+            (o) =>
+              !serviceCenterFK ||
+              o.serviceCenters.find((m) => m.value === serviceCenterFK),
+          ),
 
         onChange: (e) => {
           setServiceFK(e.val)

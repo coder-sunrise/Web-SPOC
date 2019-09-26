@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withStyles, Divider, Tooltip } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Yup from '@/utils/yup'
-import { getActiveSession } from '@/pages/Reception/Queue/services'
+import { getBizSession } from '@/services/query'
 
 import {
   Checkbox,
@@ -81,7 +81,7 @@ class clinicSettings extends PureComponent {
   }
 
   checkHasActiveSession = async () => {
-    const result = await getActiveSession()
+    const result = await getBizSession()
     const { data } = result.data
     // let data = []
     if (!data || data.length === 0) {

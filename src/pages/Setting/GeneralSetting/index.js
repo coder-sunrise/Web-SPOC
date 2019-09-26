@@ -3,7 +3,8 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { getActiveSession } from '@/pages/Reception/Queue/services'
+import { getBizSession } from '@/services/query'
+
 import Yup from '@/utils/yup'
 import {
   currencies,
@@ -84,7 +85,7 @@ class GeneralSetting extends PureComponent {
   }
 
   checkHasActiveSession = async () => {
-    const result = await getActiveSession()
+    const result = await getBizSession()
     const { data } = result.data
     // let data = []
     if (!data || data.length === 0) {

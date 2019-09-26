@@ -6,6 +6,7 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles, Tooltip, Divider } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
+import { getBizSession } from '@/services/query'
 import {
   GridContainer,
   GridItem,
@@ -22,7 +23,6 @@ import {
   SizeContainer,
   CodeSelect,
 } from '@/components'
-import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = (theme) => ({})
 
@@ -87,7 +87,7 @@ class Detail extends PureComponent {
   }
 
   checkHasActiveSession = async () => {
-    const result = await getActiveSession()
+    const result = await getBizSession()
     const { data } = result.data
 
     this.setState({
