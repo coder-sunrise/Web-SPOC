@@ -68,7 +68,6 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 
-let _getTime = null
 const saveConsultation = ({
   props,
   action,
@@ -101,7 +100,9 @@ const saveConsultation = ({
           values[p.prop] = (values[p.prop] || [])
             .concat(orderRows.filter((o) => o.type === p.value))
         })
-        if (_getTime) values.duration = Math.floor(Number(_getTime()) || 0)
+        values.duration = Math.floor(
+          Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
+        )
         dispatch({
           type: `consultation/${action}`,
           payload: values,
@@ -112,7 +113,7 @@ const saveConsultation = ({
                 message: successMessage,
               })
             }
-
+            sessionStorage.removeItem(`${values.id}_consultationTimer`)
             history.push(`/reception/queue`)
           }
         })
@@ -311,7 +312,15 @@ class Consultation extends PureComponent {
               <GridItem>
                 <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
                   <Timer
-                    initialTime={values.duration || 0}
+                    initialTime={
+                      Number(
+                        sessionStorage.getItem(
+                          `${values.id}_consultationTimer`,
+                        ),
+                      ) ||
+                      values.duration ||
+                      0
+                    }
                     direction='forward'
                     startImmediately={this.state.recording}
                   >
@@ -324,7 +333,10 @@ class Consultation extends PureComponent {
                       getTimerState,
                       getTime,
                     }) => {
-                      _getTime = getTime
+                      sessionStorage.setItem(
+                        `${values.id}_consultationTimer`,
+                        getTime(),
+                      )
                       return (
                         <React.Fragment>
                           <TimerIcon
