@@ -34,8 +34,8 @@ export const todayOnly = (event) => {
   const today = moment()
   console.log({
     diff: today.diff(eventDate, 'days'),
-    target: eventDate.format(),
-    today: today.format(),
+    target: eventDate.formatUTC(),
+    today: today.formatUTC(),
   })
   return today.diff(eventDate, 'days') === 0
 }

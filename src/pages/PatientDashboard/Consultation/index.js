@@ -155,12 +155,13 @@ const getRights = (values) => {
     view: 'consultation.view',
     edit: 'consultation.edit',
   },
-  mapPropsToValues: ({ consultation = {}, disabled, ...reset }) => {
+  mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
   // enableReinitialize: true,
+ 
   handleSubmit: (values, { props }) => {
     saveConsultation({
       props: {
@@ -271,6 +272,120 @@ class Consultation extends PureComponent {
     }
   }
 
+  getExtraComponent = () => {
+    const { theme, values, orders } = this.props
+    const { summary } = orders
+    return (
+      <div
+        style={{
+          textAlign: 'center',
+          paddingTop: theme.spacing(1),
+          paddingBottom: theme.spacing(1),
+        }}
+      >
+        <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+          <Timer
+            initialTime={0}
+            direction='forward'
+            startImmediately={this.state.recording}
+          >
+            {({
+              start,
+              resume,
+              pause,
+              stop,
+              reset,
+              getTimerState,
+              getTime,
+            }) => (
+              <React.Fragment>
+                <Timer.Hours
+                  formatValue={(value) => `${numeral(value).format('00')} : `}
+                />
+                <Timer.Minutes
+                  formatValue={(value) => `${numeral(value).format('00')} : `}
+                />
+                <Timer.Seconds
+                  formatValue={(value) => `${numeral(value).format('00')}`}
+                />
+                {!this.state.recording && (
+                  <IconButton
+                    style={{ padding: 0, top: -1, right: -6 }}
+                    onClick={() => {
+                      resume()
+                      this.setState({
+                        recording: true,
+                      })
+                    }}
+                  >
+                    <PlayArrow />
+                  </IconButton>
+                )}
+                {this.state.recording && (
+                  <IconButton
+                    style={{ padding: 0, top: -1, right: -6 }}
+                    onClick={() => {
+                      pause()
+                      this.setState({
+                        recording: false,
+                      })
+                    }}
+                  >
+                    <Pause />
+                  </IconButton>
+                )}
+              </React.Fragment>
+            )}
+          </Timer>
+        </h5>
+        <h4 style={{ position: 'relative', marginTop: 0 }}>
+          Total Invoice
+          {summary && (
+            <span>
+              &nbsp;:&nbsp;
+              <NumberInput text currency value={summary.totalWithGST} />
+            </span>
+          )}
+        </h4>
+
+        {values.status !== 'Paused' && (
+          <ProgressButton color='danger' onClick={this.discardConsultation}>
+            Discard
+          </ProgressButton>
+        )}
+        {values.status !== 'Paused' &&
+        [
+          'IN CONS',
+          'WAITING',
+        ].includes(visit.visitStatus) && (
+          <ProgressButton
+            onClick={this.pauseConsultation}
+            color='info'
+            icon={null}
+          >
+            Pause
+          </ProgressButton>
+        )}
+        {values.status === 'Paused' && (
+          <ProgressButton
+            onClick={this.resumeConsultation}
+            color='info'
+            icon={null}
+          >
+            Resume
+          </ProgressButton>
+        )}
+        <ProgressButton
+          color='primary'
+          onClick={this.props.handleSubmit}
+          icon={null}
+        >
+          Sign Off
+        </ProgressButton>
+      </div>
+    )
+  }
+
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps (nextProps) {
     // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
@@ -305,7 +420,7 @@ class Consultation extends PureComponent {
       formik,
       ...resetProps
     } = this.props
-
+  
     const { entity } = consultation
     const { entity: vistEntity } = visitRegistration
     if (!vistEntity) return null
@@ -318,144 +433,7 @@ class Consultation extends PureComponent {
     // console.log(state.currentLayout)
     return (
       <div className={classes.root} ref={this.container}>
-        <Banner
-          style={{}}
-          extraCmt={
-            <div
-              style={{
-                textAlign: 'center',
-                paddingTop: theme.spacing(1),
-                paddingBottom: theme.spacing(1),
-              }}
-            >
-              <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                <Timer
-                  initialTime={0}
-                  direction='forward'
-                  startImmediately={this.state.recording}
-                >
-                  {({
-                    start,
-                    resume,
-                    pause,
-                    stop,
-                    reset,
-                    getTimerState,
-                    getTime,
-                  }) => (
-                    <React.Fragment>
-                      <Timer.Hours
-                        formatValue={(value) =>
-                          `${numeral(value).format('00')} : `}
-                      />
-                      <Timer.Minutes
-                        formatValue={(value) =>
-                          `${numeral(value).format('00')} : `}
-                      />
-                      <Timer.Seconds
-                        formatValue={(value) =>
-                          `${numeral(value).format('00')}`}
-                      />
-                      {!this.state.recording && (
-                        <IconButton
-                          style={{ padding: 0, top: -1, right: -6 }}
-                          onClick={() => {
-                            resume()
-                            this.setState({
-                              recording: true,
-                            })
-                          }}
-                        >
-                          <PlayArrow />
-                        </IconButton>
-                      )}
-                      {this.state.recording && (
-                        <IconButton
-                          style={{ padding: 0, top: -1, right: -6 }}
-                          onClick={() => {
-                            pause()
-                            this.setState({
-                              recording: false,
-                            })
-                          }}
-                        >
-                          <Pause />
-                        </IconButton>
-                      )}
-                    </React.Fragment>
-                  )}
-                </Timer>
-              </h5>
-              <h4 style={{ position: 'relative', marginTop: 0 }}>
-                Total Invoice
-                {/* <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item onClick={this.showInvoiceAdjustment}>
-                        Add Invoice Adjustment
-                      </Menu.Item>
-                      <Menu.Divider />
-
-                      <Menu.Item>Absorb GST</Menu.Item>
-                    </Menu>
-                  }
-                  trigger={[
-                    'click',
-                  ]}
-                >
-                  <IconButton className={classes.iconButton}>
-                    <MoreHoriz />
-                  </IconButton>
-                </Dropdown> */}
-                {summary && (
-                  <span>
-                    &nbsp;:&nbsp;
-                    <NumberInput text currency value={summary.totalWithGST} />
-                  </span>
-                )}
-              </h4>
-
-              {values.status !== 'Paused' && (
-                <ProgressButton
-                  color='danger'
-                  onClick={this.discardConsultation}
-                >
-                  Discard
-                </ProgressButton>
-              )}
-              {values.status !== 'Paused' &&
-              [
-                'IN CONS',
-                'WAITING',
-              ].includes(visit.visitStatus) && (
-                <ProgressButton
-                  onClick={this.pauseConsultation}
-                  color='info'
-                  icon={null}
-                >
-                  Pause
-                </ProgressButton>
-              )}
-              {values.status === 'Paused' && (
-                <ProgressButton
-                  onClick={this.resumeConsultation}
-                  color='info'
-                  icon={null}
-                >
-                  Resume
-                </ProgressButton>
-              )}
-              <ProgressButton
-                color='primary'
-                onClick={this.props.handleSubmit}
-                icon={null}
-              >
-                Sign Off
-              </ProgressButton>
-            </div>
-          }
-          {...this.props}
-        />
+        <Banner style={{}} extraCmt={this.getExtraComponent} {...this.props} />
         <Layout {...this.props} />
       </div>
     )

@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
 import moment from 'moment'
 import { Editor } from 'react-draft-wysiwyg'
@@ -426,7 +427,7 @@ class PatientHistory extends Component {
             [override.leftPanel]: true,
           })}
         >
-          {patientHistory.list && patientHistory.list.length ? (
+          {patientHistory.list ? patientHistory.list.length > 0 ? (
             <Accordion
               defaultActive={0}
               collapses={patientHistory.list.map((o) => ({
@@ -434,6 +435,8 @@ class PatientHistory extends Component {
                 content: this.getContent(o),
               }))}
             />
+          ) : (
+            <p>No visit record</p>
           ) : (
             <React.Fragment>
               <Skeleton height={30} />

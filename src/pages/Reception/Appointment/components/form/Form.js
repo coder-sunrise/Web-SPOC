@@ -29,7 +29,7 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 // utils
 import { ValidationSchema, mapPropsToValues } from './formikUtils'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { getAppendUrl } from '@/utils/utils'
 import styles from './style'
 
 @connect(({ loginSEMR, loading, user, calendar, codetable, patient }) => ({
@@ -47,7 +47,7 @@ import styles from './style'
 }))
 @withFormikExtend({
   displayName: 'AppointmentForm',
-  // enableReinitialize: true,
+  enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
@@ -169,7 +169,7 @@ class Form extends React.PureComponent {
 
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
     const { id, patientAccountNo, name, mobileNo } = patientProfile
-    const { setFieldValue, values, setValues, setFieldTouched } = this.props
+    const { values, setValues } = this.props
     await setValues({
       ...values,
       patientAccountNo,
@@ -207,7 +207,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmCreatePatient = async () => {
-    const { patientProfile, history, dispatch } = this.props
+    const { patientProfile, dispatch } = this.props
     const { id, name, contact, patientAccountNo } = patientProfile
     const payload = {
       id,
@@ -220,7 +220,6 @@ class Form extends React.PureComponent {
     })
     this.togglePatientProfileModal()
     const doneUpdateFields = await this.onSelectPatientClick(payload, true)
-    console.log({ doneUpdateFields })
     if (doneUpdateFields) {
       this._submit(false, true)
     }
@@ -234,7 +233,7 @@ class Form extends React.PureComponent {
       concurrencyToken: values.currentAppointment.concurrencyToken,
       appointmentStatusFK: 3,
       isCancelled: true,
-      cancellationDateTime: moment().format(),
+      cancellationDateTime: moment().formatUTC(),
       cancellationReasonTypeFK: reasonType,
       cancellationReason: reason,
       cancelByUserFk: user.id,
@@ -317,7 +316,6 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
-    console.log({ datagrid, newDataGrid })
     this.setState({ isDataGridValid, datagrid: newDataGrid })
   }
 
@@ -527,11 +525,6 @@ class Form extends React.PureComponent {
     return rows
   }
 
-  onCloseClick = () => {
-    this.props.resetForm()
-    this.props.onClose()
-  }
-
   actualizeAppointment = () => {
     const { values, history, onClose } = this.props
     const parameters = {
@@ -547,7 +540,7 @@ class Form extends React.PureComponent {
   render () {
     const {
       classes,
-
+      onClose,
       loading,
       values,
       isSubmitting,
@@ -566,11 +559,11 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
 
     // console.log({ datagrid })
-    // console.log({
-    //   initialValues: this.props.initialValues,
-    //   values: this.props.values,
-    //   dirty: this.props.dirty,
-    // })
+    console.log({
+      initialValues: this.props.initialValues,
+      values: this.props.values,
+      dirty: this.props.dirty,
+    })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
@@ -627,7 +620,7 @@ class Form extends React.PureComponent {
             <FormFooter
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={this.onCloseClick}
+              onClose={onClose}
               disabled={
                 !isDataGridValid ||
                 !values.patientName ||

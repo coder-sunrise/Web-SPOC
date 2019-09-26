@@ -63,7 +63,7 @@ const generatePrescriptionData = () => {
       name: 'Anarex',
       desription: '',
       batchNo: '324792',
-      expiryDate: moment().format(),
+      expiryDate: moment().formatUTC(),
       qtyOrdered: 10,
       qtyDispensed: 10,
       unitPrice: 50,

@@ -1,19 +1,22 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import { FastField, withFormik } from 'formik'
-import { confirmBeforeReload, commonDataReaderTransform } from '@/utils/utils'
+import {
+  confirmBeforeReload,
+  commonDataReaderTransform,
+  findGetParameter,
+} from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
 
 window.beforeReloadHandlerAdded = false
 const _localFormik = {}
 const _localAuthority = {}
+let lastVersion = null
 const withFormikExtend = (props) => (Component) => {
   const { displayName, authority } = props
   if (displayName) {
-    _localAuthority[displayName] = {
-      authority,
-    }
+    _localAuthority[displayName] = {}
   }
   const updateDirtyState = (ps) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
@@ -26,6 +29,8 @@ const withFormikExtend = (props) => (Component) => {
         errors,
         hasError: Object.values(errors).length > 0,
         dirty,
+        // values,
+        // str: JSON.stringify(values),
       },
     }
     if (!_.isEqual(_lastFormikUpdate, _localFormik[displayName])) {
@@ -47,22 +52,25 @@ const withFormikExtend = (props) => (Component) => {
       window.removeEventListener('beforeunload', confirmBeforeReload)
     }
   }
+  // const { mapPropsToValues } = props
+  // // console.log(props, lastVersion)
   @withFormik({
+    enableReinitialize: lastVersion !== findGetParameter('v'),
     ...props,
-    mapPropsToValues: (p) => {
-      // console.log(2, p, props)
+    // mapPropsToValues: (p) => {
+    //   // console.log(2, p, props)
 
-      const { mapPropsToValues } = props
-      if (!mapPropsToValues) {
-        return null
-      }
-      // console.log('commonDataReaderTransform', p, _localAuthority[displayName].disabled)
+    //   const { mapPropsToValues } = props
+    //   if (!mapPropsToValues) {
+    //     return null
+    //   }
+    //   // console.log('commonDataReaderTransform', p, _localAuthority[displayName].disabled)
 
-      return mapPropsToValues({
-        ...p,
-        disabled: _localAuthority[displayName].disabled,
-      })
-    },
+    //   return mapPropsToValues({
+    //     ...p,
+    //     disabled: _localAuthority[displayName].disabled,
+    //   })
+    // },
     // handleSubmit: (values, ps, a, b) => {
     //   const { handleSubmit: orghandleSubmit } = props
     //   orghandleSubmit.call(this, values, ps)
@@ -90,6 +98,7 @@ const withFormikExtend = (props) => (Component) => {
     componentDidMount () {
       if (!this.props.values.id) {
         this.props.validateForm()
+        lastVersion = findGetParameter('v')
       }
     }
 
@@ -99,8 +108,6 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     render () {
-      if (_localAuthority[displayName].component)
-        return _localAuthority[displayName].component
       const rights = {}
       if (authority) {
         if (authority.view) {
@@ -110,7 +117,15 @@ const withFormikExtend = (props) => (Component) => {
           rights.edit = { name: authority.edit, rights: 'enable' }
         }
       }
-      console.log(authority, this.state.authority)
+      if (_localAuthority[displayName].matches)
+        return (
+          <AuthorizedContext.Provider
+            value={{ ...rights, matches: _localAuthority[displayName].matches }}
+          >
+            <Component {...this.props} />
+          </AuthorizedContext.Provider>
+        )
+
       return authority ? (
         <Authorized
           authority={[
@@ -124,28 +139,24 @@ const withFormikExtend = (props) => (Component) => {
           }}
         >
           {(matches) => {
-            console.log('matches', matches)
+            window.g_app._store.dispatch({
+              type: 'components/updateState',
+              payload: {
+                [displayName]: {
+                  matches,
+                  view: !!matches.find((o) => o.name.indexOf('.view') >= 0),
+                  edit: !!matches.find((o) => o.name.indexOf('.edit') >= 0),
+                },
+              },
+            })
             _localAuthority[displayName].matches = matches
-            _localAuthority[
-              displayName
-            ].component = Authorized.generalCheck(
+            return Authorized.generalCheck(
               matches,
               this.props,
               <AuthorizedContext.Provider value={{ ...rights, matches }}>
                 <Component {...this.props} />
               </AuthorizedContext.Provider>,
-              () => {
-                // _localAuthority[displayName].disabled = true
-                return (
-                  <AuthorizedContext.Provider
-                    value={{ ...rights, disabled: true, matches }}
-                  >
-                    <Component {...this.props} disabled />
-                  </AuthorizedContext.Provider>
-                )
-              },
             )
-            return _localAuthority[displayName].component
           }}
         </Authorized>
       ) : (

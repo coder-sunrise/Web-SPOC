@@ -63,6 +63,7 @@ class GlobalModalContainer extends PureComponent {
 
   render () {
     const { global, dispatch, loggedInUserID, history } = this.props
+
     return (
       <div>
         {/* <SimpleModal
@@ -226,7 +227,7 @@ class GlobalModalContainer extends PureComponent {
           maxWidth='lg'
           observe='VisitRegistration'
         >
-          <VisitRegistration />
+          <VisitRegistration history={this.props.history} />
         </CommonModal>
 
         <CommonModal

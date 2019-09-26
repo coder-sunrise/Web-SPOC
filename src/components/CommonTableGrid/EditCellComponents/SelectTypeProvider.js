@@ -5,7 +5,8 @@ import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { CodeSelect, Select, TextField } from '@/components'
-import { getCodes } from '@/utils/codes'
+import { checkShouldRefresh } from '@/utils/codes'
+
 import {
   updateGlobalVariable,
   updateCellValue,
@@ -217,7 +218,7 @@ const SelectDisplay = (columnExtensions, state) => ({
   return vEl
 }
 
-@connect(() => ({}))
+@connect(({ codetable }) => ({ codetable }))
 class SelectTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
@@ -227,7 +228,7 @@ class SelectTypeProvider extends React.Component {
     // console.log('SelectTypeProvider constructor')
     super(props)
 
-    const { columnExtensions } = this.props
+    const { columnExtensions, codetable, dispatch } = this.props
     const colFor = columnExtensions.filter(
       (o) =>
         [
@@ -260,25 +261,27 @@ class SelectTypeProvider extends React.Component {
           : -1
       }
     })
-    this.state = {
-      for: colFor,
+
+    const payload = {
       codeLoaded: 0,
     }
-    // console.log(props)
-
-    colFor.forEach((f) => {
+    for (let i = 0; i < colFor.length; i++) {
+      const f = colFor[i]
       if (f.code) {
-        this.props
-          .dispatch({
+        const isExisted = codetable[f.code.toLowerCase()]
+
+        if (isExisted) {
+          payload[`${f.columnName}Option`] = codetable[f.code.toLowerCase()]
+          payload.codeLoaded += 1
+        } else {
+          dispatch({
             type: 'codetable/fetchCodes',
             payload: {
-              code: f.code,
+              code: f.code.toLowerCase(),
             },
-          })
-          .then((response) => {
+          }).then((response) => {
             if (response) {
               this.setState((prevState) => {
-                // console.log(f.columnName, response)
                 return {
                   [`${f.columnName}Option`]: response,
                   codeLoaded: ++prevState.codeLoaded,
@@ -286,15 +289,13 @@ class SelectTypeProvider extends React.Component {
               })
             }
           })
-        // getCodes(f.code).then((o) => {
-        //   this.setState((prevState) => ({
-        //     [`${f.columnName}Option`]: o,
-        //     codeLoaded: ++prevState.codeLoaded,
-        //   }))
-        // })
+        }
       }
-    })
-
+    }
+    this.state = {
+      for: colFor,
+      ...payload,
+    }
     this.SelectEditor = (ces) => (editorProps) => {
       // console.log(ces, editorProps)
       return (
@@ -306,6 +307,10 @@ class SelectTypeProvider extends React.Component {
       )
     }
   }
+
+  // componentDidMount () {
+
+  // }
 
   shouldComponentUpdate = (nextProps, nextState) => {
     // console.log(nextProps, this.props)
