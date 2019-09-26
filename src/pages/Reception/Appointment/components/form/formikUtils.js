@@ -78,7 +78,7 @@ export const mapPropsToValues = ({
     bookedByUser: user.clinicianProfile.name,
     bookedByUserFK: user.id,
     currentAppointment: {
-      appointmentDate: moment(selectedSlot.start).format(),
+      appointmentDate: moment(selectedSlot.start).formatUTC(),
       appointments_Resources: [],
     },
     appointmentStatusFk: 2,
@@ -113,7 +113,7 @@ export const mapPropsToValues = ({
               },
         // currentAppointment: {
         //   ...restAppointment,
-        //   appointmentDate: moment(appointmentDate).format(),
+        //   appointmentDate: moment(appointmentDate).formatUTC(),
         // },
         currentAppointment: appointment,
         appointmentStatusFk: appointment.appointmentStatusFk,
@@ -208,7 +208,7 @@ export const generateRecurringAppointments = (
 
 export const getRecurrenceLastDate = (recurrences = []) =>
   recurrences.length > 0
-    ? moment(recurrences[recurrences.length - 1]).format()
+    ? moment(recurrences[recurrences.length - 1]).formatUTC()
     : undefined
 
 export const getFirstAppointmentType = (appointment) => {

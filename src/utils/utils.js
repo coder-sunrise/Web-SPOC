@@ -9,7 +9,11 @@ import numeral from 'numeral'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import lodash from 'lodash'
 import * as cdrssUtil from 'medisys-util'
-import { NumberInput, CustomInput } from '@/components'
+import {
+  NumberInput,
+  CustomInput,
+  serverDateTimeFormatFull,
+} from '@/components'
 import config from './config'
 
 document.addEventListener('click', () => {
@@ -46,17 +50,17 @@ String.prototype.replaceAll = function (search, replacement) {
 }
 
 // function toLocal (m) {
-//   // console.log(m, m.format(), moment(m.format()).add(8, 'hours'))
+//   // console.log(m, m.formatUTC(), moment(m.formatUTC()).add(8, 'hours'))
 //   return m.add(8, 'hours')
 // }
 
 // function toUTC (m) {
-//   return moment(m.format()).add(-8, 'hours')
+//   return moment(m.formatUTC()).add(-8, 'hours')
 // }
 
-// moment.prototype.toLocal = function () {
-//   return this.clone().add(8, 'hours')
-// }
+moment.prototype.formatUTC = function () {
+  return this.format(serverDateTimeFormatFull)
+}
 
 // moment.prototype.toUTC = function () {
 //   return this.clone().add(-8, 'hours')
@@ -348,6 +352,17 @@ const getRemovedUrl = (ary = [], targetUrl) => {
   // console.debug(p)
 
   return getQueryPath(window.location.pathname, p)
+}
+
+const findGetParameter = (parameterName) => {
+  let result = null
+  let tmp = []
+  // eslint-disable-next-line no-restricted-globals
+  location.search.substr(1).split('&').forEach((item) => {
+    tmp = item.split('=')
+    if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1])
+  })
+  return result
 }
 
 const convertToQuery = (
@@ -743,6 +758,7 @@ module.exports = {
   calculateAdjustAmount,
   errMsgForOutOfRange,
   calculateItemLevelAdjustment,
+  findGetParameter,
   // toUTC,
   // toLocal,
 }

@@ -102,15 +102,13 @@ class AntdDateRangePicker extends PureComponent {
               ? // eslint-disable-next-line no-nested-ternary
                 i === 0
                 ? showTime
-                  ? moment(o).format(serverDateTimeFormatFull)
-                  : moment(o)
-                      .set({ hour: 0, minute: 0, second: 0 })
-                      .format(serverDateTimeFormatFull)
+                  ? moment(o).formatUTC()
+                  : moment(o).set({ hour: 0, minute: 0, second: 0 }).formatUTC()
                 : showTime
-                  ? moment(o).format(serverDateTimeFormatFull)
+                  ? moment(o).formatUTC()
                   : moment(o)
                       .set({ hour: 23, minute: 59, second: 59 })
-                      .format(serverDateTimeFormatFull)
+                      .formatUTC()
               : o
           }),
         )
@@ -155,11 +153,11 @@ class AntdDateRangePicker extends PureComponent {
             ? // eslint-disable-next-line no-nested-ternary
               i === 0
               ? showTime
-                ? o.format()
-                : o.set({ hour: 0, minute: 0, second: 0 }).format()
+                ? o.formatUTC()
+                : o.set({ hour: 0, minute: 0, second: 0 }).formatUTC()
               : showTime
-                ? o.format()
-                : o.set({ hour: 23, minute: 59, second: 59 }).format()
+                ? o.formatUTC()
+                : o.set({ hour: 23, minute: 59, second: 59 }).formatUTC()
             : o
         })
       : []
@@ -168,10 +166,10 @@ class AntdDateRangePicker extends PureComponent {
       value: v,
     })
     if (form && field) {
-      // console.log(date.format())
+      // console.log(date.formatUTC())
       // console.log(date.utcOffset())
 
-      // console.log(date.toUTC().format())
+      // console.log(date.toUTC().formatUTC())
       form.setFieldValue(field.name, v)
     }
 

@@ -279,8 +279,8 @@ export default compose(
           recordClinicFK: 1,
           doctorBlockUserFk,
           remarks,
-          // startDateTime: startDate.format(),
-          // endDateTime: endDate.format(),
+          // startDateTime: startDate.formatUTC(),
+          // endDateTime: endDate.formatUTC(),
         }
         // generate recurrence
         let doctorBlocks = [
@@ -311,8 +311,8 @@ export default compose(
           )
           return {
             ...rest,
-            startDateTime: startDate.format(),
-            endDateTime: endDate.format(),
+            startDateTime: startDate.formatUTC(),
+            endDateTime: endDate.formatUTC(),
           }
         })
 

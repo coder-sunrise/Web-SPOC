@@ -90,7 +90,6 @@ export default withFormikExtend({
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-    console.log({ values })
     dispatch({
       type: 'settingAppointmentType/upsert',
       payload: {

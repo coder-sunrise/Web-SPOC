@@ -93,17 +93,15 @@ class AntdDatePicker extends PureComponent {
       shrink: v !== undefined && v !== '',
       value: v,
     }
-    // console.log('antddatepicker', { state: this.state, v })
-
     if (form && field && this.state.value && dateOnly) {
       setTimeout(() => {
         form.setFieldValue(
           field.name,
           showTime
-            ? moment(this.state.value).format()
+            ? moment(this.state.value).formatUTC()
             : moment(this.state.value)
                 .set({ hour: 0, minute: 0, second: 0 })
-                .format(serverDateTimeFormatFull),
+                .formatUTC(),
         )
       }, 1)
     }
@@ -149,18 +147,11 @@ class AntdDatePicker extends PureComponent {
     // eslint-disable-next-line no-nested-ternary
     const v = date
       ? showTime
-        ? date.format()
-        : date.set({ hour: 0, minute: 0, second: 0 }).format()
+        ? date.formatUTC()
+        : date.set({ hour: 0, minute: 0, second: 0 }).formatUTC()
       : ''
-    // showTime
-    //   ? date.toUTC().format()
-    //   : date.set({ hour: 0, minute: 0, second: 0 }).toUTC().format()
     if (form && field) {
-      // console.log(date.format())
-      // console.log(date.utcOffset())
-
-      // console.log(date.toUTC().format())
-
+      console.log(v)
       form.setFieldValue(field.name, v)
     }
     if (onChange) {

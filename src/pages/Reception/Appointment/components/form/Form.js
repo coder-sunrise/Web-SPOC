@@ -233,7 +233,7 @@ class Form extends React.PureComponent {
       concurrencyToken: values.currentAppointment.concurrencyToken,
       appointmentStatusFK: 3,
       isCancelled: true,
-      cancellationDateTime: moment().format(),
+      cancellationDateTime: moment().formatUTC(),
       cancellationReasonTypeFK: reasonType,
       cancellationReason: reason,
       cancelByUserFk: user.id,
