@@ -25,6 +25,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      list: [],
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
       currentFilter: StatusIndicator.ALL,
@@ -134,20 +135,21 @@ export default createListViewModel({
         return false
       },
       *getTodayAppointments (_, { put }) {
-        const today = moment().format(serverDateFormat)
+        const today = moment().format('YYYY-MM-DD')
         yield put({
           type: 'calendar/getCalendarList',
           payload: {
             combineCondition: 'and',
+            eql_appointmentDate: today,
             group: [
               {
                 appointmentStatusFk: 5,
                 eql_appointmentStatusFk: '1',
                 combineCondition: 'or',
               },
-              {
-                eql_appointmentDate: today,
-              },
+              // {
+              //   eql_appointmentDate: today,
+              // },
             ],
           },
         })

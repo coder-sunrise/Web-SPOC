@@ -75,6 +75,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      list: [],
       calendarEvents: [],
       currentViewDate: new Date(),
       currentViewAppointment: {

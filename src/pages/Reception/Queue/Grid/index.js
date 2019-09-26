@@ -348,8 +348,8 @@ export default memo(
   connect(({ queueLog, calendar, global, loading, user }) => ({
     user: user.data,
     filter: queueLog.currentFilter,
-    queueList: queueLog.list,
-    calendarEvents: calendar.list,
+    queueList: queueLog.list || [],
+    calendarEvents: calendar.list || [],
     showingVisitRegistration: global.showVisitRegistration,
     queryingData:
       loading.effects['queueLog/refresh'] ||
