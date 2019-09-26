@@ -357,16 +357,16 @@ export default createListViewModel({
         let isDayView = false
 
         if (targetView === BigCalendar.Views.MONTH) {
-          start = moment(targetDate).startOf('month').format(serverDateFormat)
-          end = moment(targetDate).endOf('month').format(serverDateFormat)
+          start = moment(targetDate).startOf('month').formatUTC()
+          end = moment(targetDate).endOf('month').formatUTC()
         }
         if (targetView === BigCalendar.Views.WEEK) {
-          start = moment(targetDate).startOf('week').format(serverDateFormat)
-          end = moment(targetDate).endOf('week').format(serverDateFormat)
+          start = moment(targetDate).startOf('week').formatUTC()
+          end = moment(targetDate).endOf('week').formatUTC()
         }
         if (targetView === BigCalendar.Views.DAY) {
-          start = moment(targetDate).startOf('day').format(serverDateFormat)
-          end = moment(targetDate).endOf('day').format(serverDateFormat)
+          start = moment(targetDate).startOf('day').formatUTC()
+          end = moment(targetDate).endOf('day').formatUTC()
           isDayView = true
         }
 

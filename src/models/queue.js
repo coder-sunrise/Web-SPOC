@@ -98,7 +98,10 @@ export default createListViewModel({
 
         return status >= 204
       },
-      *getSessionInfo ({ payload }, { call, put }) {
+      *getSessionInfo (
+        { payload = { shouldGetTodayAppointments: true } },
+        { call, put },
+      ) {
         const { shouldGetTodayAppointments = true } = payload
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
