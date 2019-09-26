@@ -7,7 +7,6 @@ import {
   Input,
   Paper,
   withStyles,
-  IconButton,
   MenuItem,
   Popper,
   Fade,
@@ -27,7 +26,7 @@ import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Loading from '@/components/PageLoading/index'
 
-import { AuthorizedContext } from '@/components'
+import { AuthorizedContext, IconButton } from '@/components'
 
 const widgets = [
   {

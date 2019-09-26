@@ -12,7 +12,7 @@ const DoctorLabel = ({ doctor }) => {
   } catch (error) {
     // console.log({ error })
   }
-  return <div>{label}</div>
+  return <React.Fragment>{label}</React.Fragment>
 }
 
 export default memo(DoctorLabel)

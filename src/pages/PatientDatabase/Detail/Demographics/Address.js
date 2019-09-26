@@ -140,7 +140,7 @@ class Address extends Component {
         Get Address
       </ProgressButton>
     )
-    console.log({ values, props: this.props, addressIndex })
+    // console.log({ values, props: this.props, addressIndex })
     return (
       <div style={style}>
         {isArray && (

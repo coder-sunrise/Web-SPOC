@@ -265,6 +265,10 @@ export default createListViewModel({
             type: 'setEditType',
             payload: payload.isEditedAsSingleAppointment,
           })
+          yield put({
+            type: 'cachePayload',
+            payload,
+          })
           return true
         }
         return false
@@ -388,6 +392,9 @@ export default createListViewModel({
       },
     },
     reducers: {
+      cachePayload (state, { payload }) {
+        return { ...state, cachedPayload: payload }
+      },
       setEditType (state, { payload }) {
         return { ...state, isEditedAsSingleAppointment: payload }
       },

@@ -267,21 +267,19 @@ class AntdSelect extends React.PureComponent {
     } = this.props
     let newVal = val
     if (mode === 'multiple') {
-      if (val.indexOf(all) > 0) {
-        newVal = [
-          all,
-        ]
-      } else if (val.includes(all) && val.length > 1) {
-        newVal = _.reject(newVal, (v) => v === all)
+      if (val.indexOf(allValue) >= 0) {
+        if (this.state.value.indexOf(allValue) >= 0) {
+          newVal = _.reject(newVal, (v) => v === allValue)
+        } else {
+          newVal = [
+            allValue,
+            ...options.map((o) => o[valueField]),
+          ]
+        }
+      } else if (this.state.value.indexOf(allValue) >= 0) {
+        newVal = []
       }
-      // else if (val.indexOf(all) === 0) {
-      //   newVal = _.reject(newVal, (v) => v === all)
-      // }
     }
-
-    // console.log(val)
-    // console.log(returnValue)
-    // console.log({ val, index: val.indexOf(all), newVal })
 
     let proceed = true
     if (onChange) {
@@ -434,7 +432,6 @@ class AntdSelect extends React.PureComponent {
     const cfg = {
       value: this.state.value,
     }
-    console.log(this.state.value)
 
     let opts = []
     if (source[0] && source[0][groupField]) {
@@ -468,6 +465,7 @@ class AntdSelect extends React.PureComponent {
       )
     }
     // console.log(classes.selectContainer, classes.className)
+    const customTagPlaceholder = maxTagPlaceholder || 'options'
     return (
       <div style={{ width: '100%' }} {...props}>
         <Select
@@ -487,7 +485,8 @@ class AntdSelect extends React.PureComponent {
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           maxTagPlaceholder={(vv) => {
-            return `${vv.filter((o) => o !== allValue).length} options selected`
+            return `${vv.filter((o) => o !== allValue)
+              .length} ${customTagPlaceholder} selected`
           }}
           optionLabelProp='label'
           notFoundContent={

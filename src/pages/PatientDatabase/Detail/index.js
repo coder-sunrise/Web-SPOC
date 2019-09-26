@@ -63,14 +63,16 @@ const styles = () => ({
     view: 'patient.view',
     edit: 'patient.edit',
   },
+  // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
+    console.log({ patient })
     return patient.entity || patient.default
   },
   validationSchema: schema,
 
   handleSubmit: (values, component) => {
-    const { props, resetForm, onConfirm } = component
-    const { dispatch, history, patient } = props
+    const { props, resetForm } = component
+    const { dispatch, history, patient, onConfirm } = props
     dispatch({
       type: 'patient/upsert',
       payload: values,
@@ -95,8 +97,8 @@ const styles = () => ({
           },
         }).then((value) => {
           resetForm(value)
+          if (onConfirm) onConfirm()
         })
-        if (onConfirm) onConfirm()
       }
     })
   },

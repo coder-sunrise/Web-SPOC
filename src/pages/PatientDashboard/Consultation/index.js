@@ -117,6 +117,19 @@ const saveConsultation = ({
   })
 }
 
+const getRights = (values) => {
+  return {
+    view: {
+      name: 'consultation.view',
+      rights: values.status === 'Paused' ? 'disable' : 'enable',
+    },
+    edit: {
+      name: 'consultation.edit',
+      rights: values.status === 'Paused' ? 'disable' : 'enable',
+    },
+  }
+}
+
 // @skeleton()
 @connect(
   ({
@@ -126,6 +139,7 @@ const saveConsultation = ({
     orders,
     patientDashboard,
     visitRegistration,
+    formik,
   }) => ({
     consultation,
     global,
@@ -133,12 +147,18 @@ const saveConsultation = ({
     orders,
     patientDashboard,
     visitRegistration,
+    formik,
   }),
 )
 @withFormikExtend({
-  // mapPropsToValues: ({ consultation = {} }) => {
-  //   return consultation.entity || consultation.default
-  // },
+  authority: {
+    view: 'consultation.view',
+    edit: 'consultation.edit',
+  },
+  mapPropsToValues: ({ consultation = {}, disabled, ...reset }) => {
+    // console.log('mapPropsToValues', consultation.entity, disabled, reset)
+    return consultation.entity || consultation.default
+  },
   validationSchema: schema,
   // enableReinitialize: true,
  
@@ -283,6 +303,7 @@ class Consultation extends PureComponent {
       patientDashboard = {},
       consultation = {},
       orders = {},
+      formik,
       ...resetProps
     } = this.props
   
@@ -292,7 +313,7 @@ class Consultation extends PureComponent {
     const { visit = {} } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
-    // console.log('values', values, visit)
+    console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
@@ -436,20 +457,7 @@ class Consultation extends PureComponent {
           }
           {...this.props}
         />
-        <AuthorizedContext.Provider
-          value={{
-            view: {
-              name: 'consultation.view',
-              rights: values.status === 'Paused' ? 'disable' : 'enable',
-            },
-            edit: {
-              name: 'consultation.edit',
-              rights: values.status === 'Paused' ? 'disable' : 'enable',
-            },
-          }}
-        >
-          <Layout {...this.props} />
-        </AuthorizedContext.Provider>
+        <Layout {...this.props} />
       </div>
     )
   }

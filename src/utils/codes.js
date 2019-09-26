@@ -725,6 +725,12 @@ const orderTypes = [
     getSubject: (r) => r.drugName,
   },
 ]
+const buttonTypes = [
+  'RegularButton',
+  'IconButton',
+  'Fab',
+]
+
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -1228,5 +1234,6 @@ module.exports = {
   getServices,
   tagList,
   osBalanceStatus,
+  buttonTypes,
   ...module.exports,
 }

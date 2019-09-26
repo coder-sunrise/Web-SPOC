@@ -323,7 +323,6 @@ class Queue extends PureComponent {
               <React.Fragment>
                 <DetailsActionBar
                   onRegisterVisitEnterPressed={this.onEnterPressed}
-                  togglePatientSearch={this.togglePatientDetailsGridSearch}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
                 <DetailsGrid
