@@ -21,7 +21,7 @@ const styles = (theme) => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingSmsTemplate }) =>
-  settingSmsTemplate.entity || settingSmsTemplate.default,
+    settingSmsTemplate.entity || settingSmsTemplate.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -102,6 +102,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <RichEditor
+                      handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
                       {...args}

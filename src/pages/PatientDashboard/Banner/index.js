@@ -8,6 +8,7 @@ import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
 import More from '@material-ui/icons/MoreHoriz'
+import Button from '@material-ui/core/Button'
 import {
   GridContainer,
   GridItem,
@@ -269,9 +270,17 @@ class Banner extends PureComponent {
                                 trigger='click'
                                 placement='bottomLeft'
                               >
-                                <IconButton>
-                                  <More />
-                                </IconButton>
+                                <Button
+                                  size='sm'
+                                  color='primary'
+                                  style={{
+                                    backgroundColor: '#48C9B0',
+                                    color: 'white',
+                                    fontWeight: 'normal',
+                                  }}
+                                >
+                                  More
+                                </Button>
                               </Popover>
                             </div>
                           )}

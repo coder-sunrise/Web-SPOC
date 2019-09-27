@@ -110,7 +110,7 @@ export default {
   'menu.setting.medicationprecautions': 'Medication Precaution',
   'menu.setting.medicationconsumptionmethod': 'Medication Consumption Method',
   'menu.setting.smstemplate': 'SMS Template',
-  'menu.setting.referrallettertemplate': 'Document Template',
+  'menu.setting.documenttemplate': 'Document Template',
   'menu.claimSubmission': 'Claim Submission',
   'menu.claimSubmission.chas': 'CHAS',
   'menu.claimSubmission.medisave': 'Medisave',

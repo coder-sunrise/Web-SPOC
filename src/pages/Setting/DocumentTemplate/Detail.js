@@ -13,7 +13,7 @@ import {
   OutlinedTextField,
   RichEditor,
   Field,
-  Select,
+  Select,   
   CodeSelect,
 } from '@/components'
 
@@ -49,8 +49,8 @@ const tagList = [
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
     settingDocumentTemplate.entity || settingDocumentTemplate.default,
+  validationSchema: Yup.object().shape({
     documentTemplateTypeFK: Yup.string().required(),
-    validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     templateContent: Yup.string().required(),
@@ -85,7 +85,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingDocumentTemplate, setFieldValue } = props
-    //console.log('detail', props)
+    console.log('detail', props)
 
     return (
       <React.Fragment>
@@ -145,16 +145,21 @@ class Detail extends PureComponent {
                 name='templateContent'
                 render={(args) => {
                   return (
-                    <RichEditor
+                    <OutlinedTextField
                       label='Template Message'
-                      tagList={tagList}
+                      multiline
+                      rowsMax={2}
+                      rows={2}
                       {...args}
+                      tagList={tagList}
                     />
                   )
                 }}
               />
             </GridItem>
           </GridContainer>
+
+         
         </div>
         {footer &&
           footer({
@@ -168,5 +173,19 @@ class Detail extends PureComponent {
     )
   }
 }
+
+// <Field
+//                 name='templateContent'
+//                 render={(args) => {
+//                   return (
+//                     <RichEditor
+//                       handlePastedText={() => false}
+//                       label='Template Message'
+//                       tagList={tagList}
+//                       {...args}
+//                     />
+//                   )
+//                 }}
+//               />
 
 export default Detail
