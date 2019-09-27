@@ -96,7 +96,7 @@ class Filter extends PureComponent {
             <Field
               name='allDate'
               render={(args) => {
-                return <Checkbox inputLabel='' {...args} />
+                return <Checkbox inputLabel='' label='All Date' {...args} />
               }}
             />
           </GridItem>
@@ -125,15 +125,16 @@ class Filter extends PureComponent {
                 icon={null}
                 onClick={() => {
                   const { transactionNo, status, transDates, allDate } = values
-                  console.log('values', values)
-                  const [
-                    from,
-                    to,
-                  ] = transDates
+                  
                   let fromDate
                   let toDate
+
                   if (!allDate) {
                     if (transDates) {
+                      const [
+                        from,
+                        to,
+                      ] = transDates
                       fromDate = from
                       toDate = to
                     }
