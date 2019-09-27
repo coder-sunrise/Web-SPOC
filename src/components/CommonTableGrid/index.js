@@ -503,7 +503,6 @@ class CommonTableGrid extends PureComponent {
     } else if (this.state.entity) {
       const p = {
         ...this.state.entity.pagination,
-        ...this.state.entity.filter,
         ...payload,
       }
       console.log(p)

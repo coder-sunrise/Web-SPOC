@@ -46,6 +46,7 @@ import {
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import Yup from '@/utils/yup'
+import { findGetParameter } from '@/utils/utils'
 
 import Orders from './Orders'
 import ConsultationDocument from './ConsultationDocument'
@@ -346,24 +347,17 @@ class PatientHistory extends Component {
     )
   }
 
-  // componentDidMount () {
-  //   this.props
-  //     .dispatch({
-  //       type: 'patientHistory/query',
-  //       payload: {
-  //         patientProfileFK: this.props.patientHistory.patientID,
-  //         sorting: [
-  //           {
-  //             columnName: 'VisitDate',
-  //             direction: 'desc',
-  //           },
-  //         ],
-  //       },
-  //     })
-  //     .then((o) => {
-  //       this.props.resetForm(o)
-  //     })
-  // }
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'patientHistory/initState',
+      payload: {
+        queueID: Number(findGetParameter('qid')) || 0,
+        version: Number(findGetParameter('v')) || undefined,
+        visitID: findGetParameter('visit'),
+        patientID: Number(findGetParameter('pid')) || 0,
+      },
+    })
+  }
 
   onSelectChange = (val) => {
     this.setState({

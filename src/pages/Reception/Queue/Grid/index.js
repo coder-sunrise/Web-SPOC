@@ -202,13 +202,28 @@ const Grid = ({
         break
       case '1': {
         // dispense
-        const parameters = {
-          vis: row.id,
-          pid: row.patientProfileFK,
-          md2: 'disp',
-        }
-        // history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
-        router.push(getAppendUrl(parameters, '/reception/queue'))
+        // const parameters = {
+        //   vis: row.id,
+        //   pid: row.patientProfileFK,
+        //   md2: 'disp',
+        // }
+        // // history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
+        // router.push(getAppendUrl(parameters, '/reception/queue'))
+        const version = Date.now()
+        dispatch({
+          type: `dispense/startDispense`,
+          payload: {
+            id: row.visitFK,
+            version,
+          },
+        }).then((o) => {
+          console.log(o)
+          // if (o)
+          // router.push(
+          //   `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+          // )
+        })
+
         break
       }
       case '1.1': {

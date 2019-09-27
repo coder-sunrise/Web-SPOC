@@ -13,21 +13,21 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-        if (
-          pathname.indexOf('/reception/queue/patientdashboard') === 0 ||
-          (query.md === 'pt' && query.cmt === '6')
-        ) {
-          dispatch({
-            type: 'initState',
-            payload: {
-              queueID: Number(query.qid) || 0,
-              version: Number(query.v) || undefined,
-              visitID: query.visit,
-              patientID: Number(query.pid) || 0,
-            },
-          })
-        }
+        // const { pathname, search, query = {} } = loct
+        // if (
+        //   pathname.indexOf('/reception/queue/patientdashboard') === 0 ||
+        //   query.md === 'pt'
+        // ) {
+        //   dispatch({
+        //     type: 'initState',
+        //     payload: {
+        //       queueID: Number(query.qid) || 0,
+        //       version: Number(query.v) || undefined,
+        //       visitID: query.visit,
+        //       patientID: Number(query.pid) || 0,
+        //     },
+        //   })
+        // }
       })
     },
     effects: {

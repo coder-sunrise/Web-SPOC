@@ -66,6 +66,7 @@ const styles = () => ({
   // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
     // console.log({ patient })
+    console.log(patient.entity, patient.default)
     return patient.entity || patient.default
   },
   validationSchema: schema,
@@ -242,29 +243,13 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  // componentDidMount () {
-  //   // console.log(
-  //   //   this.props.patient.currentId,
-  //   //   !this.props.patient.entity ||
-  //   //     this.props.patient.entity.id !== this.props.patient.currentId,
-  //   // )
-  //   if (
-  //     this.props.patient.currentId &&
-  //     (!this.props.patient.entity ||
-  //       this.props.patient.entity.id !== this.props.patient.currentId)
-  //   ) {
-  //     this.props
-  //       .dispatch({
-  //         type: 'patient/query',
-  //         payload: {
-  //           id: this.props.patient.currentId,
-  //         },
-  //       })
-  //       .then((o) => {
-  //         this.props.resetForm(o)
-  //       })
-  //   }
-  // }
+  componentDidMount () {
+    setTimeout(() => {
+      if (this.props.patient.entity) {
+        this.props.resetForm(this.props.patient.entity)
+      }
+    }, 2000)
+  }
 
   registerVisit = () => {
     router.push(
@@ -299,7 +284,9 @@ class PatientDetail extends PureComponent {
     // console.log(this.props.values)
 
     const currentMenu =
-      this.widgets.find((o) => o.id === currentComponent) || {}
+      this.widgets.find(
+        (o) => o.id === (this.state.selectedMenu || currentComponent),
+      ) || {}
     const CurrentComponent = currentMenu.component
     // console.log(resetProps)
 
@@ -334,12 +321,15 @@ class PatientDetail extends PureComponent {
                               entity: entity || undefined,
                             },
                           })
-                          this.props.history.push(
-                            getAppendUrl({
-                              md: 'pt',
-                              cmt: o.id,
-                            }),
-                          )
+                          this.setState({
+                            selectedMenu: o.id,
+                          })
+                          // this.props.history.push(
+                          //   getAppendUrl({
+                          //     md: 'pt',
+                          //     cmt: o.id,
+                          //   }),
+                          // )
                         }}
                       >
                         <ListItemIcon style={{ minWidth: 25 }}>

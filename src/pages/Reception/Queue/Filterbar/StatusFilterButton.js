@@ -4,9 +4,9 @@ import classnames from 'classnames'
 // material ui
 import { Divider, Paper, withStyles } from '@material-ui/core'
 // common component
+import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
 import { Button } from '@/components'
 // styling
-import { primaryColor, dangerColor, grayColor } from 'mui-pro-jss'
 // variables
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { StatusIndicator } from '../variables'
@@ -232,7 +232,7 @@ const StatusFilterButton = ({
 
 const ConnectedStatusFilterButton = connect(({ queueLog, calendar }) => ({
   queueLog,
-  appointments: calendar.list,
+  appointments: calendar.list || [],
 }))(StatusFilterButton)
 
 export default memo(withStyles(styles)(ConnectedStatusFilterButton))
