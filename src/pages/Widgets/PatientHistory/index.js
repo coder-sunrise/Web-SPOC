@@ -331,7 +331,7 @@ class PatientHistory extends Component {
                   </div>
                 }
               />
-              <div>{this.getDetailPanel()}</div>
+              {/* <div>{this.getDetailPanel()}</div> */}
             </ListItem>
           )
         })}
@@ -504,7 +504,7 @@ class PatientHistory extends Component {
       patientHistory,
       dispatch,
       widget,
-      mode = 'integrated',
+      mode = 'split',
     } = this.props
     const { entity, visitInfo, selected } = patientHistory
     const cfg = {}
