@@ -47,6 +47,15 @@ class Grid extends PureComponent {
         columnName: 'transactionDate',
         type: 'date',
         format: 'd/M/YYYY',
+        sortBy: 'adjustmentTransactionDate',
+      },
+      {
+        columnName: 'transactionNo',
+        sortBy: 'adjustmentTransactionNo',
+      },
+      {
+        columnName: 'status',
+        sortBy: 'inventoryAdjustmentStatusFK',
       },
     ],
   }
