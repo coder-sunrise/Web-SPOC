@@ -408,9 +408,9 @@ const CalendarView = ({
 export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
-  calendarEvents: calendar.list,
-  publicHolidays: calendar.publicHolidayList,
-  doctorBlocks: doctorBlock.list,
+  calendarEvents: calendar.list || [],
+  publicHolidays: calendar.publicHolidayList || [],
+  doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.effects['calendar/getCalendarList'],
 }))(CalendarView)

@@ -75,6 +75,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      list: [],
       calendarEvents: [],
       currentViewDate: new Date(),
       currentViewAppointment: {
@@ -87,8 +88,32 @@ export default createListViewModel({
       publicHolidayList: [],
       isEditedAsSingleAppointment: false,
     },
-    subscriptions: {},
+    subscriptions: ({ dispatch, history }) => {
+      history.listen((location) => {
+        const { pathname } = location
+        const allowedPaths = [
+          '/reception/queue',
+        ]
+
+        if (allowedPaths.includes(pathname)) {
+          dispatch({
+            type: 'getActiveBizSessionQueue',
+          })
+        }
+      })
+    },
     effects: {
+      *getActiveBizSessionQueue (_, { call, put, select }) {
+        const queueLog = yield select((state) => state.queueLog)
+        const { sessionInfo } = queueLog
+        if (sessionInfo.id === '') {
+          // initialize biz session
+          yield put({
+            type: 'queueLog/getSessionInfo',
+            payload: { shouldGetTodayAppointments: false },
+          })
+        }
+      },
       *submit ({ payload }, { select, put }) {
         const calendarState = yield select((state) => state.calendar)
         // const { ltsppointmentstatus } = yield select((state) => state.codetable)
@@ -357,16 +382,16 @@ export default createListViewModel({
         let isDayView = false
 
         if (targetView === BigCalendar.Views.MONTH) {
-          start = moment(targetDate).startOf('month').format(serverDateFormat)
-          end = moment(targetDate).endOf('month').format(serverDateFormat)
+          start = moment(targetDate).startOf('month').formatUTC()
+          end = moment(targetDate).endOf('month').formatUTC()
         }
         if (targetView === BigCalendar.Views.WEEK) {
-          start = moment(targetDate).startOf('week').format(serverDateFormat)
-          end = moment(targetDate).endOf('week').format(serverDateFormat)
+          start = moment(targetDate).startOf('week').formatUTC()
+          end = moment(targetDate).endOf('week').formatUTC()
         }
         if (targetView === BigCalendar.Views.DAY) {
-          start = moment(targetDate).startOf('day').format(serverDateFormat)
-          end = moment(targetDate).endOf('day').format(serverDateFormat)
+          start = moment(targetDate).startOf('day').formatUTC()
+          end = moment(targetDate).endOf('day').formatUTC()
           isDayView = true
         }
 

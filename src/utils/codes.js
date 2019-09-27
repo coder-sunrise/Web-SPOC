@@ -779,6 +779,7 @@ const tenantCodes = [
 
 const noIsActiveProp = [
   'doctorProfile',
+  'role',
 ]
 
 const defaultParams = {

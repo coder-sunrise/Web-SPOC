@@ -226,10 +226,10 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
     const superSubscription = super.subscriptions
     const combinedState = {
       ...super.state(),
-      currentItem: {},
-      modalVisible: false,
-      selectedRowKeys: [],
-      list: [],
+      // currentItem: {},
+      // modalVisible: false,
+      // selectedRowKeys: [],
+      // list: null,
       pagination: {
         // showSizeChanger: true,
         // showQuickJumper: true,

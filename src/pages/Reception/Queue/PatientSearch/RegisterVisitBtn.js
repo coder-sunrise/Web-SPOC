@@ -14,19 +14,30 @@ class ViewDetailsBtn extends PureComponent {
   }
 
   render () {
+    // return (
+    //   <Tooltip title='Register Visit'>
+    //     <Button
+    //       size='sm'
+    //       justIcon
+    //       round
+    //       onClick={this.handleClick}
+    //       color='primary'
+    //       className='noPadding'
+    //     >
+    //       <Add />
+    //     </Button>
+    //   </Tooltip>
+    // )
     return (
-      <Tooltip title='Register Visit'>
-        <Button
-          size='sm'
-          justIcon
-          round
-          onClick={this.handleClick}
-          color='primary'
-          className='noPadding'
-        >
-          <Add />
-        </Button>
-      </Tooltip>
+      <Button
+        style={{ marginRight: 0 }}
+        size='sm'
+        color='primary'
+        onClick={this.handleClick}
+      >
+        <Add />
+        Register Visit
+      </Button>
     )
   }
 }

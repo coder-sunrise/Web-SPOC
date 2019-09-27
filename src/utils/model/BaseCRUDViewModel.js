@@ -86,79 +86,75 @@ export default class BaseCRUDViewModel {
     const { namespace, param, setting = {}, config = {} } = this.options
     const { service } = param
     const { detailPath = '' } = setting
+    if (!config.timer) config.timer = 500
+    function* query (
+      { payload = { keepFilter: true, defaultQuery: false }, history },
+      { call, put, select },
+    ) {
+      // console.log(namespace, queryFnName, payload, service)
+      if (!service || !service[queryFnName]) return
+      let { filter = {} } = yield select((st) => st[namespace])
+      if (!payload.keepFilter) {
+        if (typeof payload === 'object') {
+          filter = {
+            ...filter,
+            ...payload,
+          }
+        } else {
+          filter = payload
+        }
+      }
 
+      const response = yield call(service[queryFnName], filter)
+      // console.log(response)
+      const { data, status, message } = response
+      if (status === '200' || data) {
+        yield put({
+          type: 'querySuccess',
+          payload: { data, filter, version: filter.version },
+        })
+        yield put({
+          type: 'queryDone',
+          payload: {
+            data,
+          },
+          history,
+        })
+      }
+      return data
+      // }
+    }
     return {
-      query: [
-        function* (
-          { payload = { keepFilter: true, defaultQuery: false }, history },
-          { call, put, select },
-        ) {
-          // console.log(namespace, queryFnName, payload, service)
-          if (!service || !service[queryFnName]) return
-          let {
-            filter = {},
-            exclude,
-            entity = {},
-            version,
-            list,
-          } = yield select((st) => st[namespace])
-          // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
-          // if (!disableAutoQuery) {
-          // console.log(namespace, version, payload.version)
-          if (payload.version) payload.version = Number(payload.version)
-          if (
-            payload.version &&
-            version === payload.version &&
-            payload.id === entity.id
-          )
-            return list || entity
-          if (!payload.keepFilter) {
-            if (typeof payload === 'object') {
-              filter = {
-                ...filter,
-                ...payload,
-              }
-            } else {
-              filter = payload
-            }
+      _query:
+        config.timer > 0
+          ? [
+              query,
+              { type: 'throttle', ms: config.timer || 500 },
+            ]
+          : query,
 
-            // yield put({
-            //   type: 'queryBegin',
-            //   payload: {
-            //     filter,
-            //   },
-            // })
-          }
+      *query (
+        { payload = { keepFilter: true, defaultQuery: false } },
+        { call, put, select },
+      ) {
+        if (!service || !service[queryFnName]) return
+        let { entity = {}, version, list } = yield select((st) => st[namespace])
+        // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
+        // if (!disableAutoQuery) {
+        // console.log(namespace, version, payload.version)
+        if (payload.version) payload.version = Number(payload.version)
+        if (
+          payload.version &&
+          version === payload.version &&
+          payload.id === entity.id
+        )
+          return list || entity
 
-          // const { list = {} } = config
-          // filter = {
-          //   ...filter,
-          //   // queryExcludeFields: list.exclude || exclude,
-          // }
-          // console.log({ filter })
-          // console.log(filter)
-
-          const response = yield call(service[queryFnName], filter)
-          // console.log(response)
-          const { data, status, message } = response
-          if (status === '200' || data) {
-            yield put({
-              type: 'querySuccess',
-              payload: { data, filter, version: filter.version },
-            })
-            yield put({
-              type: 'queryDone',
-              payload: {
-                data,
-              },
-              history,
-            })
-          }
-          return data
-          // }
-        },
-        { type: 'throttle', ms: 500 },
-      ],
+        yield put({
+          type: '_query',
+          payload,
+        })
+      },
 
       *upsert ({ payload, history }, { select, call, put }) {
         // console.log('upsert', payload)
