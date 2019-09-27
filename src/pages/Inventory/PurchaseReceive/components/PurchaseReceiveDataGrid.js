@@ -1,15 +1,11 @@
 import React, { useState } from 'react'
-import { connect } from 'dva'
 import { CommonTableGrid, Tooltip } from '@/components'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
-import { ContextMenuOptions, PurchaseReceiveGridCol, PurchaseReceiveGridTableConfig } from '../variables'
-import {
-  notification,
-} from '@/components'
+import { ContextMenuOptions, PurchaseReceiveGridCol } from '../variables'
+import { notification } from '@/components'
 import { formatMessage } from 'umi/locale'
 
 const PurchaseReceiveDataGrid = ({
-  purchaseReceiveList,
   actions: { handleDuplicatePO, handleNavigate },
 }) => {
   const [
@@ -40,16 +36,15 @@ const PurchaseReceiveDataGrid = ({
       selection={selectedRows}
       onSelectionChange={(selection) => setSelectedRows(selection)}
       columns={PurchaseReceiveGridCol}
+      onRowDoubleClick={(row) => handleNavigate('edit', row.id)}
       columnExtensions={[
         {
           columnName: 'purchaseOrderDate',
           type: 'date',
-          format: 'DD MMM YYYY',
         },
         {
           columnName: 'exceptedDeliveryDate',
           type: 'date',
-          format: 'DD MMM YYYY',
         },
         { columnName: 'totalAmount', type: 'number', currency: true },
         { columnName: 'outstanding', type: 'number', currency: true },
@@ -75,7 +70,12 @@ const PurchaseReceiveDataGrid = ({
           },
         },
       ]}
-      {...PurchaseReceiveGridTableConfig}
+      // FuncProps={{
+      //   selectable: true,
+      //   selectConfig: {
+      //     // showSelectAll: true
+      //   },
+      // }}
     />
   )
 }

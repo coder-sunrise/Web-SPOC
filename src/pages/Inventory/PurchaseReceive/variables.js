@@ -134,15 +134,6 @@ export const PurchaseReceiveGridCol = [
   { name: 'action', title: 'Action' },
 ]
 
-export const PurchaseReceiveGridTableConfig = {
-  FuncProps: {
-    selectable: true,
-    selectConfig: {
-      // showSelectAll: true
-    },
-  },
-}
-
 export const ContextMenuOptions = (row) => {
   return [
     {
