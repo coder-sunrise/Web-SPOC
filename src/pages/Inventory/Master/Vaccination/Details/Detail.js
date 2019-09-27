@@ -6,6 +6,7 @@ import { FastField } from 'formik'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import Sdd from '../../Sdd'
+import { getBizSession } from '@/services/queue'
 import {
   CommonModal,
   CardContainer,
@@ -19,7 +20,6 @@ import {
   dateFormatLong,
   CheckboxGroup,
 } from '@/components'
-import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
@@ -37,7 +37,7 @@ const Detail = ({
     setHasActiveSession,
   ] = useState(true)
   const checkHasActiveSession = async () => {
-    const result = await getActiveSession()
+    const result = await getBizSession()
     const { data } = result.data
     // let data = []
     if (!data || data.length === 0) {

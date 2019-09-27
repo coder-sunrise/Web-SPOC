@@ -13,6 +13,7 @@ import {
   NumberInput,
   CustomInput,
   serverDateTimeFormatFull,
+  serverDateFormat,
 } from '@/components'
 import config from './config'
 
@@ -58,8 +59,10 @@ String.prototype.replaceAll = function (search, replacement) {
 //   return moment(m.formatUTC()).add(-8, 'hours')
 // }
 
-moment.prototype.formatUTC = function () {
-  return this.format(serverDateTimeFormatFull)
+moment.prototype.formatUTC = function (dateOnly = true) {
+  return this.format(
+    dateOnly ? `${serverDateFormat}T00:00:00` : serverDateTimeFormatFull,
+  )
 }
 
 // moment.prototype.toUTC = function () {

@@ -37,7 +37,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
-    stockConsumableFK: Yup.number().required(),
+    inventoryConsumableFK: Yup.number().required(),
     // unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     quantity: Yup.number().required(),
@@ -79,7 +79,6 @@ class Consumable extends PureComponent {
     const { setFieldValue, values } = this.props
     console.log(v, op)
     setFieldValue('consumableName', op.displayValue)
-
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
@@ -116,13 +115,13 @@ class Consumable extends PureComponent {
       handleSubmit,
       setFieldValue,
     } = this.props
-    console.log(values)
+    // console.log(values)
     return (
       <div>
         <GridContainer>
           <GridItem xs={12}>
             <FastField
-              name='stockConsumableFK'
+              name='inventoryConsumableFK'
               render={(args) => {
                 return (
                   <CodeSelect

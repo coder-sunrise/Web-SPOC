@@ -32,12 +32,10 @@ let commitCount = 1000 // uniqueNumber
     adjustmentTransactionDate: Yup.date().required(),
   }),
   handleSubmit: (values, { props }) => {
-    // console.log('submitting', values, props)
     const {
       inventoryAdjustmentItems,
       stockList,
       inventoryAdjustmentStatusString,
-      // id,
       ...restValue
     } = values
     const { dispatch, onConfirm } = props
@@ -80,7 +78,6 @@ let commitCount = 1000 // uniqueNumber
         const { batchNo, code, displayValue, ...value } = val
         return {
           ...value,
-          // id: undefined,
           [getType.typeName]: {
             ...restValues,
             batchNo: o.batchNoString || o[getType.typeName].batchNo,
@@ -96,11 +93,9 @@ let commitCount = 1000 // uniqueNumber
       }
       return {
         ...o,
-        // id: undefined,
         [getType.typeName]: {
           batchNo: o.batchNoString,
           expiryDate: o.expiryDate,
-          // [getType.itemFK]: o.id,
           [getType.stockFK]: o.id,
           [getType.codeName]: o.code,
           [getType.nameName]: o.displayValue,
@@ -137,6 +132,7 @@ class Detail extends PureComponent {
     filterVaccinationItemList: [],
 
     selectedItem: null,
+    selectedBatch: null,
     inventoryAdjustmentItems: [],
 
     stockMedication: [], // medication
@@ -228,6 +224,7 @@ class Detail extends PureComponent {
         columnName: 'stock',
         disabled: true,
         type: 'number',
+        qty: true,
       },
       {
         columnName: 'adjustmentQty',
@@ -241,6 +238,42 @@ class Detail extends PureComponent {
   componentDidMount = async () => {
     const { dispatch, values, inventoryAdjustment, setValues } = this.props
     await this.initializeStateItemList()
+    const type = (v) => {
+      switch (v) {
+        case 1:
+          return {
+            typeName: 'medication',
+            codeName: 'medicationCode',
+            nameName: 'medicationName',
+            stockFK: 'medicationStockFK',
+            itemFK: 'inventoryMedicationFK',
+            stateName: 'stockMedication',
+            filterStateName: 'filterStockMedication',
+          }
+        case 2:
+          return {
+            typeName: 'vaccination',
+            codeName: 'vaccinationCode',
+            nameName: 'vaccinationName',
+            stockFK: 'vaccinationStockFK',
+            itemFK: 'inventoryVaccinationFK',
+            stateName: 'stockVaccination',
+            filterStateName: 'filterStockVaccination',
+          }
+        case 3:
+          return {
+            typeName: 'consumable',
+            codeName: 'consumableCode',
+            nameName: 'consumableName',
+            stockFK: 'consumableStockFK',
+            itemFK: 'inventoryConsumableFK',
+            stateName: 'stockConsumable',
+            filterStateName: 'filterStockConsumable',
+          }
+        default:
+          return {}
+      }
+    }
     dispatch({
       // force current edit row components to update
       type: 'global/updateState',
@@ -250,6 +283,16 @@ class Detail extends PureComponent {
     })
     if (values.stockList) {
       const newStockList = values.stockList.map((o) => {
+        const getType = type(o.inventoryTypeFK)
+        // const stockId = o[getType.typeName][getType.stockFK]
+        this.setState((prevState) => {
+          return {
+            [getType.filterStateName]: prevState[
+              getType.filterStateName
+            ].filter((j) => j.id !== o.id),
+          }
+        })
+
         return {
           ...o,
           batchNo: o.id,
@@ -262,39 +305,6 @@ class Detail extends PureComponent {
     } else if (inventoryAdjustment.entity) {
       const { inventoryAdjustmentItems } = inventoryAdjustment.entity
       const newList = inventoryAdjustmentItems.map((o) => {
-        const type = (v) => {
-          switch (v) {
-            case 1:
-              return {
-                typeName: 'medication',
-                codeName: 'medicationCode',
-                nameName: 'medicationName',
-                stockFK: 'medicationStockFK',
-                itemFK: 'inventoryMedicationFK',
-                stateName: 'stockMedication',
-              }
-            case 2:
-              return {
-                typeName: 'vaccination',
-                codeName: 'vaccinationCode',
-                nameName: 'vaccinationName',
-                stockFK: 'vaccinationStockFK',
-                itemFK: 'inventoryVaccinationFK',
-                stateName: 'stockVaccination',
-              }
-            case 3:
-              return {
-                typeName: 'consumable',
-                codeName: 'consumableCode',
-                nameName: 'consumableName',
-                stockFK: 'consumableStockFK',
-                itemFK: 'inventoryConsumableFK',
-                stateName: 'stockConsumable',
-              }
-            default:
-              return {}
-          }
-        }
         const getType = type(o.inventoryTypeFK)
         return {
           ...o,
@@ -314,6 +324,18 @@ class Detail extends PureComponent {
       await setValues({
         ...values,
         inventoryAdjustmentItems: newList,
+      })
+
+      values.inventoryAdjustmentItems.forEach((o) => {
+        const getType = type(o.inventoryTypeFK)
+        const stockId = o[getType.typeName][getType.stockFK]
+        this.setState((prevState) => {
+          return {
+            [getType.filterStateName]: prevState[
+              getType.filterStateName
+            ].filter((j) => j.id !== stockId),
+          }
+        })
       })
     }
   }
@@ -455,7 +477,6 @@ class Detail extends PureComponent {
   handleSelectedBatch = (e) => {
     const { option, row } = e
     if (option) {
-      console.log({ option })
       const { expiryDate, stock, value, batchNo } = option
       row.batchNo = value
       row.expiryDate = expiryDate
@@ -482,17 +503,100 @@ class Detail extends PureComponent {
       row.uomDisplayValue = uom
       row.codeString = code
       row.displayValueString = name
+
       this.setState({ selectedItem: e })
+
+      if (row.inventoryTypeFK && row.code && !row.batchNo) {
+        const type = (v) => {
+          switch (v) {
+            case 1:
+              return {
+                stateName: 'stockMedication',
+                filteredStateName: 'filterStockMedication',
+              }
+            case 2:
+              return {
+                stateName: 'stockVaccination',
+                filteredStateName: 'filterStockVaccination',
+              }
+            case 3:
+              return {
+                stateName: 'stockConsumable',
+                filteredStateName: 'filterStockConsumable',
+              }
+            default:
+              return {}
+          }
+        }
+        const getState = type(row.inventoryTypeFK)
+        const defaultStock = this.state[getState.filteredStateName].find(
+          (j) =>
+            j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
+        )
+
+        if (defaultStock) {
+          row.batchNo = defaultStock.id
+          row.stock = defaultStock.stock
+
+          if (!row.stock) {
+            row.stock = 1
+            row.adjustmentQty = 5
+          }
+
+          this.setState({ selectedBatch: defaultStock })
+        }
+      }
     }
   }
 
-  onCommitChanges = ({ rows, deleted }) => {
+  onCommitChanges = ({ rows, deleted, added }) => {
     const { setValues, setFieldValue, values } = this.props
-    const { stockList } = this.state
+    const { stockList, stockMedication } = this.state
+
+    const type = (v) => {
+      switch (v) {
+        case 1:
+          return {
+            stateName: 'stockMedication',
+            filteredStateName: 'filterStockMedication',
+          }
+        case 2:
+          return {
+            stateName: 'stockVaccination',
+            filteredStateName: 'filterStockVaccination',
+          }
+        case 3:
+          return {
+            stateName: 'stockConsumable',
+            filteredStateName: 'filterStockConsumable',
+          }
+        default:
+          return {}
+      }
+    }
+
     if (deleted) {
       const deletedSet = new Set(deleted)
+
+      const deletedRow = rows.find((row) => deletedSet.has(row.id))
       const changedRows = rows.filter((row) => !deletedSet.has(row.id))
-      // setFieldValue('inventoryAdjustmentItems', changedRows)
+
+      if (deletedRow.batchNo) {
+        const getState = type(deletedRow.inventoryTypeFK)
+
+        const stockItem = this.state[getState.stateName].find(
+          (o) => o.id === deletedRow.batchNo,
+        )
+        this.setState((prevState) => {
+          return {
+            [getState.filteredStateName]: [
+              ...prevState[getState.filteredStateName],
+              stockItem,
+            ],
+          }
+        })
+      }
+
       if (stockList.length > 0) {
         this.setState({ stockList: changedRows })
       } else {
@@ -504,6 +608,22 @@ class Detail extends PureComponent {
     if (this.state.selectedItem) {
       this.filterStockOption(this.state.selectedItem)
     }
+
+    // if (rows.length > 0) {
+    //   rows.forEach((o) => {
+    //     if (o.id < 0 && !o.batchNo) {
+    //       const getState = type(o.inventoryTypeFK)
+    //       const defaultStock = this.state[getState.filteredStateName].find(
+    //         (j) =>
+    //           j.inventoryItemFK === o.code && j.batchNo === 'Not Applicable',
+    //       )
+
+    //       o.batchNo = defaultStock.id
+    //       o.stock = defaultStock.stock
+    //     }
+    //   })
+    // }
+
     this.setState({ inventoryAdjustmentItems: rows })
     setValues({
       ...values,
@@ -514,8 +634,8 @@ class Detail extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
+    let returnRows
     if (this.state.selectedItem) {
-      let returnRows
       const { option } = this.state.selectedItem
       const { uom, expiryDate, stock } = option
       if (uom) {
@@ -539,6 +659,13 @@ class Detail extends PureComponent {
         },
       })
 
+      if (this.state.selectedBatch && returnRows) {
+        // const { stock } = this.state.selectedItem
+        returnRows = returnRows.map((r) => ({
+          ...r,
+          stock: this.state.selectedBatch.stock,
+        }))
+      }
       return returnRows
     }
 

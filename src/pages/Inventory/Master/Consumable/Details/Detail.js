@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-
+import { getBizSession } from '@/services/queue'
 import {
   CodeSelect,
   CardContainer,
@@ -19,7 +19,6 @@ import {
   dateFormatLong,
   CheckboxGroup,
 } from '@/components'
-import { getActiveSession } from '@/pages/Reception/Queue/services'
 
 const styles = () => ({})
 
@@ -29,7 +28,7 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
     setHasActiveSession,
   ] = useState(true)
   const checkHasActiveSession = async () => {
-    const result = await getActiveSession()
+    const result = await getBizSession()
     const { data } = result.data
     // let data = []
     if (!data || data.length === 0) {

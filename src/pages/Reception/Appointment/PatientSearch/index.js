@@ -32,7 +32,7 @@ class PatientSearch extends PureComponent {
       },
       {
         columnName: 'action',
-        width: 100,
+        width: 145,
         align: 'center',
         render: (row) => this.ActionButton(row),
       },
@@ -60,22 +60,16 @@ class PatientSearch extends PureComponent {
   })
 
   ActionButton = (row) => (
-    <Tooltip title='Select patient'>
-      <div>
-        <Button
-          // className='noPadding'
-          // variant='outlined'
-          justIcon
-          round
-          size='sm'
-          color='primary'
-          id={row.id}
-          onClick={() => this.props.handleSelectClick(row)}
-        >
-          <Add />
-        </Button>
-      </div>
-    </Tooltip>
+    <Button
+      style={{ marginRight: 0 }}
+      size='sm'
+      color='primary'
+      id={row.id}
+      onClick={() => this.props.handleSelectClick(row)}
+    >
+      <Add />
+      Select Patient
+    </Button>
   )
 
   render () {

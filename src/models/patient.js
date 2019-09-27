@@ -138,6 +138,7 @@ export default createFormViewModel({
             'cmt',
             'pid',
             'new',
+            // 'v',
           ]),
         )
         // yield put({
