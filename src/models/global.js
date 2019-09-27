@@ -41,13 +41,13 @@ export default createFormViewModel({
           //   },
           // })
         } else if (query.md2 === 'cons') {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              fullscreen: true,
-              showConsultationPanel: true,
-            },
-          })
+          // dispatch({
+          //   type: 'updateState',
+          //   payload: {
+          //     fullscreen: true,
+          //     showConsultationPanel: true,
+          //   },
+          // })
         } else if (query.md2 === 'disp') {
           dispatch({
             type: 'updateState',

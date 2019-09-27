@@ -87,19 +87,18 @@ const styles = () => ({
               ],
               getAppendUrl({
                 pid: r.id,
-                v: Date.now(),
               }),
             ),
           )
         }
-        // dispatch({
-        //   type: 'patient/query',
-        //   payload: {
-        //     id: r.id || patient.entity.id,
-        //   },
-        // }).then((value) => {
-        //   resetForm(value)
-        // })
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: r.id || values.id,
+          },
+        }).then((value) => {
+          resetForm(value)
+        })
         if (onConfirm) onConfirm()
       }
     })
@@ -243,13 +242,13 @@ class PatientDetail extends PureComponent {
     }
   }
 
-  componentDidMount () {
-    setTimeout(() => {
-      if (this.props.patient.entity) {
-        this.props.resetForm(this.props.patient.entity)
-      }
-    }, 2000)
-  }
+  // componentDidMount () {
+  //   setTimeout(() => {
+  //     if (this.props.patient.entity) {
+  //       this.props.resetForm(this.props.patient.entity)
+  //     }
+  //   }, 2000)
+  // }
 
   registerVisit = () => {
     router.push(

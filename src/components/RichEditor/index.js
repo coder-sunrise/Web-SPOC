@@ -35,9 +35,12 @@ class RichEditor extends React.PureComponent {
   static propTypes = {
     // optional props
     label: PropTypes.string,
+    delimiter: PropTypes.string,
   }
 
-  static defaultProps = {}
+  static defaultProps = {
+    delimiter: '\r\n',
+  }
 
   constructor (props) {
     super(props)
@@ -183,10 +186,16 @@ class RichEditor extends React.PureComponent {
   _onBlur = () => {
     this.setState({ isEditorFocused: false })
     const { props } = this
-    const { onChange } = props
+    const { onBlur, delimiter } = props
 
     const textEditorValue = this.state.value.getCurrentContent().getPlainText()
     // console.log('_onBlur')
+    // console.log(
+    //   this.state.value.getCurrentContent(),
+    //   convertToRaw(this.state.value.getCurrentContent()),
+    //   this.state.value.getCurrentContent().getPlainText('\r\n'),
+    //   draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
+    // )
     const v = {
       target: {
         value:
@@ -201,8 +210,11 @@ class RichEditor extends React.PureComponent {
       v.target.name = props.field.name
       props.field.onChange(v)
     }
-    if (onChange) {
-      onChange(v)
+    if (onBlur) {
+      onBlur(
+        v.target.value,
+        this.state.value.getCurrentContent().getPlainText(delimiter),
+      )
     }
   }
 
@@ -299,11 +311,11 @@ class RichEditor extends React.PureComponent {
           })}
           onEditorStateChange={this.onChange}
           onFocus={this._onFocus}
-          onBlur={this._onBlur}
           editorRef={this.setEditorReference}
           {...metionCfg}
           {...this.editorCfg}
           {...this.props}
+          onBlur={this._onBlur}
         />
       </div>
     )
@@ -378,7 +390,7 @@ class RichEditor extends React.PureComponent {
 
   render () {
     const { props } = this
-    const { classes, mode, onChange, tagList, ...restProps } = props
+    const { classes, mode, onChange, tagList, onBlur, ...restProps } = props
 
     const labelProps = {
       shrink: true,

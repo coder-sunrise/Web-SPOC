@@ -44,6 +44,7 @@ export default createFormViewModel({
             payload: {
               version: Number(query.v) || undefined,
               consultationID: Number(query.cid),
+              md: query.md2,
             },
           })
         }
@@ -51,7 +52,7 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { version, consultationID } = payload
+        const { version, consultationID, md } = payload
         yield put({
           type: 'consultation/query',
           payload: {
@@ -60,6 +61,15 @@ export default createFormViewModel({
           },
         })
         yield take('consultation/query/@@end')
+        if (md === 'cons') {
+          yield put({
+            type: 'global/updateState',
+            payload: {
+              fullscreen: true,
+              showConsultationPanel: true,
+            },
+          })
+        }
       },
 
       *newConsultation ({ payload }, { call, put }) {

@@ -31,6 +31,9 @@ const styles = () => ({
     position: 'relative',
     top: 3,
   },
+  autoHeight: {
+    height: 'auto',
+  },
 })
 
 @connect(({ streetAddress }) => ({
@@ -114,7 +117,7 @@ class Demographic extends PureComponent {
 
   render () {
     const { props } = this
-    const { values, theme, setFieldValue } = props
+    const { values, theme, setFieldValue, classes } = props
     return (
       <React.Fragment>
         <GridContainer gutter={0}>
@@ -307,7 +310,7 @@ class Demographic extends PureComponent {
           </GridItem>
           <GridItem xs={12} md={2} />
           <GridItem xs={12} md={5}>
-            <GridContainer>
+            <GridContainer className={classes.autoHeight}>
               <GridItem xs={4}>
                 <FastField
                   name='contact.mobileContactNumber.number'

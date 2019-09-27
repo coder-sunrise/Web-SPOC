@@ -110,6 +110,9 @@ const styles = (theme) => ({
     //   marginTop: theme.spacing(2),
     // },
   },
+  integratedLeftPanel: {
+    width: '100%',
+  },
 })
 // @withFormikExtend({
 //   // mapPropsToValues: ({ patientHistory }) => {
@@ -236,15 +239,23 @@ class PatientHistory extends Component {
     ]
   }
 
-  // componentDidMount () {
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'patientHistory/initState',
+      payload: {
+        queueID: Number(findGetParameter('qid')) || 0,
+        version: Number(findGetParameter('v')) || undefined,
+        visitID: findGetParameter('visit'),
+        patientID: Number(findGetParameter('pid')) || 0,
+      },
+    })
+  }
 
-  // }
-
-  // componentWillUnmount () {
-  //   this.props.dispatch({
-  //     type: 'patientHistory/reset',
-  //   })
-  // }
+  onSelectChange = (val) => {
+    this.setState({
+      selectedItems: val,
+    })
+  }
 
   getContent = (row) => {
     const { selectedSubRow } = this.props
@@ -294,7 +305,12 @@ class PatientHistory extends Component {
             >
               <ListItemText
                 primary={
-                  <div style={{ width: '100%', paddingRight: 20 }}>
+                  <div
+                    style={{
+                      width: '100%',
+                      paddingRight: 20,
+                    }}
+                  >
                     <GridContainer>
                       <GridItem sm={7}>
                         <TextField
@@ -302,7 +318,7 @@ class PatientHistory extends Component {
                           value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
                         />
                       </GridItem>
-                      <GridItem sm={5}>
+                      <GridItem sm={5} style={{ textAlign: 'right' }}>
                         {o.signOffDate && (
                           <DatePicker
                             text
@@ -315,6 +331,7 @@ class PatientHistory extends Component {
                   </div>
                 }
               />
+              <div>{this.getDetailPanel()}</div>
             </ListItem>
           )
         })}
@@ -336,7 +353,7 @@ class PatientHistory extends Component {
               </div>
             </p>
           </GridItem>
-          <GridItem sm={5}>
+          <GridItem sm={5} style={{ textAlign: 'right' }}>
             <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
               <DatePicker text value={row.visitDate} />
             </span>
@@ -345,24 +362,6 @@ class PatientHistory extends Component {
         </GridContainer>
       </div>
     )
-  }
-
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'patientHistory/initState',
-      payload: {
-        queueID: Number(findGetParameter('qid')) || 0,
-        version: Number(findGetParameter('v')) || undefined,
-        visitID: findGetParameter('visit'),
-        patientID: Number(findGetParameter('pid')) || 0,
-      },
-    })
-  }
-
-  onSelectChange = (val) => {
-    this.setState({
-      selectedItems: val,
-    })
   }
 
   // eslint-disable-next-line camelcase
@@ -400,6 +399,102 @@ class PatientHistory extends Component {
   //   }
   // }
 
+  getDetailPanel = () => {
+    const {
+      theme,
+      classes,
+      override = {},
+      patientHistory,
+      dispatch,
+      widget,
+    } = this.props
+    const { entity, selected } = patientHistory
+    return (
+      <CardContainer
+        hideHeader
+        size='sm'
+        className={classnames({
+          [classes.rightPanel]: true,
+          [override.rightPanel]: true,
+        })}
+        // style={{ marginLeft: theme.spacing.unit * 2 }}
+      >
+        <GridContainer gutter={0}>
+          <GridItem md={8}>
+            <Select
+              noWrapper
+              value={this.state.selectedItems}
+              allValue='0'
+              prefix='Filter By'
+              mode='multiple'
+              options={[
+                { name: 'Chief Complaints', value: '1' },
+                { name: 'Plan', value: '2' },
+                { name: 'Diagnosis', value: '3' },
+                { name: 'Consultation Document', value: '4' },
+                { name: 'Orders', value: '5' },
+                // { name: 'Result History', value: '6' },
+                { name: 'Invoice', value: '7' },
+              ]}
+              label='Filter By'
+              style={{ marginBottom: theme.spacing(1) }}
+              onChange={this.onSelectChange}
+            />
+          </GridItem>
+          <GridItem md={4}>
+            {!widget && (
+              <ProgressButton
+                color='primary'
+                style={{ marginLeft: theme.spacing(2) }}
+                size='sm'
+                onClick={() => {
+                  dispatch({
+                    type: `consultation/edit`,
+                    payload: {
+                      id: selected.id,
+                      version: patientHistory.version,
+                    },
+                  }).then((o) => {
+                    if (o)
+                      router.push(
+                        `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                      )
+                  })
+                }}
+              >
+                Edit Consultation
+              </ProgressButton>
+            )}
+          </GridItem>
+        </GridContainer>
+
+        <AuthorizedContext.Provider
+          value={{
+            view: 'default',
+            edit: 'none',
+          }}
+        >
+          {entity &&
+            this.widgets
+              .filter(
+                (o) =>
+                  this.state.selectedItems.indexOf('0') >= 0 ||
+                  this.state.selectedItems.indexOf(o.id) >= 0,
+              )
+              .map((o) => {
+                const Widget = o.component
+                return (
+                  <div>
+                    <h5>{o.name}</h5>
+                    <Widget current={entity || {}} {...this.props} />
+                  </div>
+                )
+              })}
+        </AuthorizedContext.Provider>
+      </CardContainer>
+    )
+  }
+
   render () {
     const {
       theme,
@@ -409,15 +504,23 @@ class PatientHistory extends Component {
       patientHistory,
       dispatch,
       widget,
+      mode = 'integrated',
     } = this.props
     const { entity, visitInfo, selected } = patientHistory
+    const cfg = {}
+    if (mode === 'split') {
+      cfg.style = style
+    } else if (mode === 'integrated') {
+      cfg.style = {}
+    }
     return (
-      <div style={style}>
+      <div {...cfg}>
         <CardContainer
           hideHeader
           size='sm'
           className={classnames({
             [classes.leftPanel]: true,
+            [classes.integratedLeftPanel]: mode === 'integrated',
             [override.leftPanel]: true,
           })}
         >
@@ -442,90 +545,7 @@ class PatientHistory extends Component {
             </React.Fragment>
           )}
         </CardContainer>
-        {selected && (
-          <CardContainer
-            hideHeader
-            size='sm'
-            className={classnames({
-              [classes.rightPanel]: true,
-              [override.rightPanel]: true,
-            })}
-            // style={{ marginLeft: theme.spacing.unit * 2 }}
-          >
-            <GridContainer gutter={0}>
-              <GridItem md={8}>
-                <Select
-                  noWrapper
-                  value={this.state.selectedItems}
-                  allValue='0'
-                  prefix='Filter By'
-                  mode='multiple'
-                  options={[
-                    { name: 'Chief Complaints', value: '1' },
-                    { name: 'Plan', value: '2' },
-                    { name: 'Diagnosis', value: '3' },
-                    { name: 'Consultation Document', value: '4' },
-                    { name: 'Orders', value: '5' },
-                    // { name: 'Result History', value: '6' },
-                    { name: 'Invoice', value: '7' },
-                  ]}
-                  label='Filter By'
-                  style={{ marginBottom: theme.spacing(1) }}
-                  onChange={this.onSelectChange}
-                />
-              </GridItem>
-              <GridItem md={4}>
-                {!widget && (
-                  <ProgressButton
-                    color='primary'
-                    style={{ marginLeft: theme.spacing(2) }}
-                    size='sm'
-                    onClick={() => {
-                      dispatch({
-                        type: `consultation/edit`,
-                        payload: {
-                          id: selected.id,
-                          version: patientHistory.version,
-                        },
-                      }).then((o) => {
-                        if (o)
-                          router.push(
-                            `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                          )
-                      })
-                    }}
-                  >
-                    Edit Consultation
-                  </ProgressButton>
-                )}
-              </GridItem>
-            </GridContainer>
-
-            <AuthorizedContext.Provider
-              value={{
-                view: 'default',
-                edit: 'none',
-              }}
-            >
-              {entity &&
-                this.widgets
-                  .filter(
-                    (o) =>
-                      this.state.selectedItems.indexOf('0') >= 0 ||
-                      this.state.selectedItems.indexOf(o.id) >= 0,
-                  )
-                  .map((o) => {
-                    const Widget = o.component
-                    return (
-                      <div>
-                        <h5>{o.name}</h5>
-                        <Widget current={entity || {}} {...this.props} />
-                      </div>
-                    )
-                  })}
-            </AuthorizedContext.Provider>
-          </CardContainer>
-        )}
+        {selected && mode === 'split' && this.getDetailPanel()}
       </div>
     )
   }
