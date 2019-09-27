@@ -58,7 +58,7 @@ import styles from './style'
 )
 @withFormikExtend({
   displayName: 'AppointmentForm',
-  enableReinitialize: true,
+  // enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
@@ -247,13 +247,16 @@ class Form extends React.PureComponent {
   }
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
-    const { values, onClose, user, dispatch } = this.props
-
+    const { appointmentStatuses, values, onClose, user, dispatch } = this.props
+    const noShowStatus = appointmentStatuses.find((ct) => ct.code === 'NOSHOW')
+    const cancelStatus = appointmentStatuses.find(
+      (ct) => ct.code === 'CANCELLED',
+    )
     const payload = {
       id: values.currentAppointment.id,
       concurrencyToken: values.currentAppointment.concurrencyToken,
-      appointmentStatusFK: 3,
-      isCancelled: true,
+      appointmentStatusFK:
+        reasonType === '1' ? noShowStatus.id : cancelStatus.id,
       cancellationDateTime: moment().formatUTC(),
       cancellationReasonTypeFK: reasonType,
       cancellationReason: reason,
@@ -492,6 +495,11 @@ class Form extends React.PureComponent {
       )
         newAppointmentStatusFK = rescheduleFK
 
+      const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
+        (editedAsSingle, appointment) =>
+          appointment.isEditedAsSingleAppointment || editedAsSingle,
+        false,
+      )
       this.setState(
         {
           tempNewAppointmentStatusFK: newAppointmentStatusFK,
@@ -500,6 +508,7 @@ class Form extends React.PureComponent {
           if (
             values.id !== undefined &&
             !isEditedAsSingleAppointment &&
+            hasModifiedAsSingle &&
             viewingAppointment.isEnableRecurrence
           )
             this.openSeriesUpdateConfirmation()

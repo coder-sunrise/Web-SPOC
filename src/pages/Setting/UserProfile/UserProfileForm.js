@@ -70,9 +70,7 @@ const styles = (theme) => ({
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       role: Yup.string().required('Role is a required field'),
       doctorProfile: Yup.object()
-        .transform((value, original) => {
-          return value === null ? {} : value
-        })
+        .transform((value) => (value === null ? {} : value))
         .when('role', {
           is: (val) => val === '2' || val === '3',
           then: Yup.object().shape({
@@ -126,6 +124,7 @@ const styles = (theme) => ({
         role: currentSelectedUser.userProfile
           ? currentSelectedUser.userProfile.role.id
           : undefined,
+        title: 'sdfds',
       }
     }
     return {}
@@ -249,6 +248,10 @@ class UserProfileForm extends React.PureComponent {
                     code='ctsalutation'
                     valueField='code'
                     label='Title'
+                    flexible
+                    // onChange={(value) => {
+                    //   console.log({ value })
+                    // }}
                   />
                 )}
               />

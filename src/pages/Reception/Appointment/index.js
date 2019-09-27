@@ -127,8 +127,11 @@ class Appointment extends React.PureComponent {
   closeAppointmentForm = () => {
     this.setState({ selectedAppointmentFK: -1, showAppointmentForm: false })
     this.props.dispatch({
-      type: 'calendar/setViewAppointment',
-      data: { appointments: [] },
+      type: 'calendar/updateState',
+      payload: {
+        currentViewAppointment: { appointments: [] },
+        isEditedAsSingleAppointment: false,
+      },
     })
     this.props.history.push(
       getRemovedUrl([
@@ -166,7 +169,6 @@ class Appointment extends React.PureComponent {
       id,
       appointmentFK,
       doctor,
-      appointmentStatusFk,
       isEditedAsSingleAppointment,
       isEnableRecurrence,
     } = selectedEvent
@@ -208,8 +210,10 @@ class Appointment extends React.PureComponent {
             type: 'calendar/getAppointmentDetails',
             payload: {
               id: selectedAppointmentID,
-              isEditedAsSingleAppointment:
-                isEditedAsSingleAppointment || !isEnableRecurrence,
+              // isEditedAsSingleAppointment: isEnableRecurrence
+              //   ? false
+              //   : isEditedAsSingleAppointment,
+              mode: isEditedAsSingleAppointment ? 'single' : 'series',
             },
           })
           .then((response) => {
@@ -218,6 +222,7 @@ class Appointment extends React.PureComponent {
                 selectedAppointmentFK: selectedAppointmentID,
                 showAppointmentForm: true,
                 isDragging: false,
+                isEditedAsSingleAppointment,
               })
           })
       }
@@ -322,7 +327,8 @@ class Appointment extends React.PureComponent {
       type: 'calendar/getAppointmentDetails',
       payload: {
         id: selectedAppointmentFK,
-        isEditedAsSingleAppointment,
+        // isEditedAsSingleAppointment,
+        mode: isEditedAsSingleAppointment ? 'single' : 'series',
       },
     }).then((response) => {
       if (response)
@@ -332,6 +338,7 @@ class Appointment extends React.PureComponent {
           popupAnchor: null,
           showSeriesConfirmation: false,
           showAppointmentForm: true,
+          isEditedAsSingleAppointment,
         })
     })
   }
@@ -350,20 +357,19 @@ class Appointment extends React.PureComponent {
       popoverEvent,
       filter,
       selectedAppointmentFK,
+      isEditedAsSingleAppointment: eventEditedAsSingle,
     } = this.state
 
-    const {
-      currentViewAppointment,
-      isEditedAsSingleAppointment,
-      calendarView,
-    } = CalendarModel
+    const { currentViewAppointment, mode, calendarView } = CalendarModel
 
-    const formTitle =
-      currentViewAppointment.id === undefined
-        ? 'Appointment'
-        : `Appointment ${isEditedAsSingleAppointment
-            ? '(Editing Single)'
-            : '(Editing Entire Series)'}`
+    let formTitle = 'Appointment'
+
+    if (currentViewAppointment.isEnableRecurrence) {
+      formTitle =
+        mode === 'single'
+          ? `${formTitle} (Editing Single) `
+          : `${formTitle} (Editing Entire Series) `
+    }
 
     return (
       <CardContainer hideHeader size='sm'>

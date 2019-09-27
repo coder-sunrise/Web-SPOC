@@ -96,6 +96,7 @@ export const mapPropsToValues = ({
         (item) => item.id === selectedAppointmentID,
       )
       const { recurrenceDto } = viewingAppointment
+
       values = {
         ...viewingAppointment,
         bookedByUser: clinicianProfile ? clinicianProfile.name : '',
@@ -111,7 +112,10 @@ export const mapPropsToValues = ({
                 ),
               },
 
-        currentAppointment: appointment,
+        currentAppointment: {
+          ...appointment,
+          appointmentDate: moment(appointment.appointmentDate).formatUTC(),
+        },
         appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({
           ...item,

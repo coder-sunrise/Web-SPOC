@@ -82,7 +82,7 @@ class Grid extends PureComponent {
             align: 'center',
             render: (row) => {
               return (
-                <Tooltip title="Edit SMS Template" placement='top-end'>
+                <Tooltip title='Edit SMS Template' placement='top-end'>
                   <Button
                     size='sm'
                     onClick={() => {

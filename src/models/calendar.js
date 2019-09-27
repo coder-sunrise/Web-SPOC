@@ -38,33 +38,28 @@ const updateApptResources = (oldResources) => (
   apptResource,
 ) => {
   const old = oldResources.find(
-    // (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
-    (oldItem) => oldItem.id === apptResource.id,
+    (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+    // (oldItem) => oldItem.id === apptResource.id,
   )
-
+  console.log({ oldResources, old })
   if (old === undefined)
     return [
       ...currentResources,
       { ...apptResource, isDeleted: true },
     ]
-  const {
-    clinicianFK,
-    appointmentTypeFK,
-    startTime,
-    endTime,
-    roomFk,
-    isPrimaryClinician,
-  } = old
+  // const {
+  //   clinicianFK,
+  //   appointmentTypeFK,
+  //   startTime,
+  //   endTime,
+  //   roomFk,
+  //   isPrimaryClinician,
+  // } = old
   return [
     ...currentResources,
     {
       ...apptResource,
-      clinicianFK,
-      appointmentTypeFK,
-      startTime,
-      endTime,
-      roomFk,
-      isPrimaryClinician,
+      ...old,
     },
   ]
 }
@@ -83,12 +78,10 @@ export default createListViewModel({
       currentViewAppointment: {
         appointments: [],
       },
-      currentViewDoctorBlock: {
-        doctorBlocks: [],
-      },
       calendarView: BigCalendar.Views.MONTH,
       publicHolidayList: [],
       isEditedAsSingleAppointment: false,
+      mode: 'single',
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen((location) => {
@@ -152,11 +145,14 @@ export default createListViewModel({
 
           const currentAppointment = {
             ...formikCurrentAppointment,
-            isEditedAsSingleAppointment:
-              calendarState.isEditedAsSingleAppointment,
+            isEditedAsSingleAppointment: !isEdit
+              ? false
+              : calendarState.mode === 'single',
             appointmentStatusFk: newAppointmentStatusFK,
             appointments_Resources: appointmentResources,
           }
+
+          console.log({ currentAppointment })
 
           const shouldGenerateRecurrence =
             !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
@@ -170,7 +166,7 @@ export default createListViewModel({
               formikValues.isEnableRecurrence,
               isRecurrenceChanged,
             )
-          } else if (calendarState.isEditedAsSingleAppointment) {
+          } else if (calendarState.mode === 'single') {
             appointments = [
               currentAppointment,
             ]
@@ -188,35 +184,70 @@ export default createListViewModel({
               (item) => !item.isNew,
             )
 
-            appointments = formikValues.appointments.reduce(
-              (updated, appt) =>
-                appt.isEditedAsSingleAppointment && !overwriteEntireSeries
-                  ? [
-                      ...updated,
+            console.log({
+              newResources,
+              oldResources,
+              appts: formikValues.appointments,
+            })
+            const updatedOldResources = oldResources.map((item) => ({
+              clinicianFK: item.clinicianFK,
+              appointmentTypeFK: item.appointmentTypeFK,
+              startTime: item.startTime,
+              endTime: item.endTime,
+              roomFk: item.roomFk,
+              isPrimaryClinician: item.isPrimaryClinician,
+            }))
+
+            appointments = formikValues.appointments.reduce((updated, appt) => {
+              if (overwriteEntireSeries) {
+                return [
+                  ...updated,
+                  {
+                    ...appt,
+                    appointmentStatusFk: newAppointmentStatusFK,
+                    appointmentRemarks: currentAppointment.appointmentRemarks,
+                    appointments_Resources: [
+                      ...newResources,
+                      ...appt.appointments_Resources.reduce(
+                        updateApptResources(updatedOldResources),
+                        [],
+                      ),
                     ]
-                  : [
-                      ...updated,
-                      {
-                        ...appt,
-                        appointmentStatusFk: newAppointmentStatusFK,
-                        appointmentRemarks:
-                          currentAppointment.appointmentRemarks,
-                        appointments_Resources: [
-                          ...newResources,
-                          ...appt.appointments_Resources.reduce(
-                            updateApptResources(oldResources),
-                            [],
-                          ),
-                        ]
-                          .sort(sortDataGrid)
-                          .map((item, index) => ({
-                            ...item,
-                            sortOrder: index,
-                          })),
-                      },
-                    ],
-              [],
-            )
+                      .sort(sortDataGrid)
+                      .map((item, index) => ({
+                        ...item,
+                        sortOrder: index,
+                      })),
+                  },
+                ]
+              }
+              if (appt.isEditedAsSingleAppointment)
+                return [
+                  ...updated,
+                  appt,
+                ]
+
+              return [
+                ...updated,
+                {
+                  ...appt,
+                  appointmentStatusFk: newAppointmentStatusFK,
+                  appointmentRemarks: currentAppointment.appointmentRemarks,
+                  appointments_Resources: [
+                    ...newResources,
+                    ...appt.appointments_Resources.reduce(
+                      updateApptResources(updatedOldResources),
+                      [],
+                    ),
+                  ]
+                    .sort(sortDataGrid)
+                    .map((item, index) => ({
+                      ...item,
+                      sortOrder: index,
+                    })),
+                },
+              ]
+            }, [])
           }
 
           // const cancelRecurrence =
@@ -255,7 +286,7 @@ export default createListViewModel({
             savePayload = {
               recurrenceChanged: isRecurrenceChanged,
               overwriteEntireSeries,
-              editSingleAppointment: calendarState.isEditedAsSingleAppointment,
+              editSingleAppointment: calendarState.mode === 'single',
               appointmentGroupDto: {
                 ...restFormikValues,
                 appointments,
@@ -263,11 +294,11 @@ export default createListViewModel({
               },
             }
           }
-
-          return yield put({
-            type: actionKey,
-            payload: savePayload,
-          })
+          console.log({ savePayload })
+          // return yield put({
+          //   type: actionKey,
+          //   payload: savePayload,
+          // })
         } catch (error) {
           console.log({ error })
         }
@@ -289,7 +320,7 @@ export default createListViewModel({
           })
           yield put({
             type: 'setEditType',
-            payload: payload.isEditedAsSingleAppointment,
+            payload: payload.mode,
           })
           yield put({
             type: 'cachePayload',
@@ -423,7 +454,7 @@ export default createListViewModel({
         return { ...state, cachedPayload: payload }
       },
       setEditType (state, { payload }) {
-        return { ...state, isEditedAsSingleAppointment: payload }
+        return { ...state, mode: payload }
       },
       setCurrentViewDate (state, { payload }) {
         return { ...state, currentViewDate: payload }
