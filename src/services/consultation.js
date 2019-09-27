@@ -18,7 +18,7 @@ module.exports = {
   },
   pause: async (params) => {
     // console.log(params)
-    const r = await request(`${url}/${params.id}`, {
+    const r = await request(`${url}/pause/${params.id}`, {
       method: 'PUT',
       body: params,
     })
