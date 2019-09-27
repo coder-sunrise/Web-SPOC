@@ -148,35 +148,6 @@ class OutlinedTextField extends PureComponent {
     }
   }
 
-  getTagButtonComponent = () => {
-    const { tagList } = this.props
-
-    return (
-      <div>
-        {tagList.map((tag) => (
-          <Button
-            key={tag.id}
-            style={{
-              marginRight: 5,
-              marginTop: 5,
-              backgroundColor: '#48C9B0',
-              color: 'white',
-              fontWeight: 'normal',
-              padding: 8,
-              fontSize: 12,
-            }}
-            onClick={() => {
-              // this.tagButtonOnClick(tag.text)
-              // this.tagButtonHandleClose()
-            }}
-          >
-            {tag.text}
-          </Button>
-        ))}
-      </div>
-    )
-  }
-
   render () {
     const {
       field,
@@ -305,7 +276,6 @@ class OutlinedTextField extends PureComponent {
             {...inputProps}
           />
         )}
-        {this.getTagButtonComponent()}
       </CustomInputWrapper>
     )
     return element

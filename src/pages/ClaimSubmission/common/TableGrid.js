@@ -36,8 +36,7 @@ const TableGrid = ({
         Icon: Money,
       },
     ]
-    const options =
-      contextMenuOptions !== undefined
+    const options = contextMenuOptions !== undefined
         ? contextMenuOptions.map((item) => ({
             ...item,
             onClick: handleMenuItemClick,
