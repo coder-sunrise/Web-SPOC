@@ -19,7 +19,6 @@ import {
   PageHeaderWrapper,
   Button,
   ProgressButton,
-  serverDateFormat,
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
@@ -29,8 +28,10 @@ import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'
 import { StatusIndicator, modelKey } from './variables'
 // utils
-import { getAppendUrl, convertToQuery } from '@/utils/utils'
+import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
+// services
+import { queryList as queryPatientList } from '@/services/patient'
 
 const drawerWidth = 400
 
@@ -72,12 +73,12 @@ const styles = (theme) => ({
 })
 
 @connect(({ queueLog, patientSearch, loading }) => ({
-  patientSearch,
+  patientSearchResult: patientSearch.list,
   queueLog,
   loading,
 }))
 @withFormik({ mapPropsToValues: () => ({}) })
-class Queue extends PureComponent {
+class Queue extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -90,22 +91,22 @@ class Queue extends PureComponent {
 
   componentWillMount = () => {
     const { dispatch, queueLog } = this.props
-    // const { sessionInfo } = queueLog
-    // dispatch({
-    //   type: 'calendar/updateState',
-    //   payload: {
-    //     list: [],
-    //   },
-    // })
-    // if (sessionInfo.id === '') {
-    //   dispatch({
-    //     type: `${modelKey}getSessionInfo`,
-    //   })
-    // } else {
-    //   dispatch({
-    //     type: `${modelKey}refresh`,
-    //   })
-    // }
+    const { sessionInfo } = queueLog
+    dispatch({
+      type: 'calendar/updateState',
+      payload: {
+        list: [],
+      },
+    })
+    if (sessionInfo.id === '') {
+      dispatch({
+        type: `${modelKey}getSessionInfo`,
+      })
+    } else {
+      dispatch({
+        type: `${modelKey}refresh`,
+      })
+    }
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)
@@ -133,12 +134,8 @@ class Queue extends PureComponent {
     if (visitID) parameter.vis = visitID
     if (appointmentID) parameter.apptid = appointmentID
 
-    this.setState(
-      {
-        showPatientSearch: false,
-      },
-      () => this.props.history.push(getAppendUrl(parameter)),
-    )
+    this.togglePatientSearch(false)
+    this.props.history.push(getAppendUrl(parameter))
   }
 
   handleActualizeAppointment = ({
@@ -163,9 +160,16 @@ class Queue extends PureComponent {
     })
   }
 
-  togglePatientSearch = () => {
+  togglePatientSearch = (override) => {
     const { showPatientSearch } = this.state
-    this.setState({ showPatientSearch: !showPatientSearch })
+    this.setState({
+      showPatientSearch: override === undefined ? !showPatientSearch : override,
+    })
+    this.props.history.push(
+      getRemovedUrl([
+        'v',
+      ]),
+    )
   }
 
   onStartSession = () => {
@@ -208,23 +212,35 @@ class Queue extends PureComponent {
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        [`${prefix}name`]: searchQuery,
-        [`${prefix}patientAccountNo`]: searchQuery,
-        [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
-        combineCondition: 'or',
+        keepFilter: false,
+        group: [
+          {
+            [`${prefix}name`]: searchQuery,
+            [`${prefix}patientAccountNo`]: searchQuery,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+            combineCondition: 'or',
+          },
+        ],
       },
     })
     this.showSearchResult()
   }
 
   showSearchResult = () => {
-    const { patientSearch } = this.props
-    const { list } = patientSearch
-
-    if (list.length === 1)
-      return this.showVisitRegistration({ patientID: list[0].id })
-    if (list.length > 1) return this.setState({ showPatientSearch: true })
-
+    const { patientSearchResult = [] } = this.props
+    const totalRecords = patientSearchResult.length
+    if (totalRecords === 1)
+      return this.showVisitRegistration({
+        patientID: patientSearchResult[0].id,
+      })
+    if (totalRecords > 1) {
+      this.props.history.push(
+        getAppendUrl({
+          v: Date.now(),
+        }),
+      )
+      return this.setState({ showPatientSearch: true })
+    }
     return this.toggleRegisterNewPatient()
   }
 
@@ -269,7 +285,6 @@ class Queue extends PureComponent {
 
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}

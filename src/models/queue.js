@@ -25,6 +25,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      list: [],
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
       currentFilter: StatusIndicator.ALL,
@@ -34,21 +35,21 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen((location) => {
-        const { pathname } = location
-        const allowedPaths = [
-          '/reception/queue',
-          '/reception/appointment',
-        ]
-        if (allowedPaths.includes(pathname)) {
-          dispatch({
-            type: 'getSessionInfo',
-            payload: {
-              shouldGetTodayAppointments: pathname === allowedPaths[0],
-            },
-          })
-        }
-      })
+      // history.listen((location) => {
+      //   const { pathname } = location
+      //   const allowedPaths = [
+      //     '/reception/queue',
+      //     '/reception/appointment',
+      //   ]
+      //   if (allowedPaths.includes(pathname)) {
+      //     dispatch({
+      //       type: 'getSessionInfo',
+      //       payload: {
+      //         shouldGetTodayAppointments: pathname === allowedPaths[0],
+      //       },
+      //     })
+      //   }
+      // })
       subscribeNotification('QueueListing', {
         callback: () => {
           dispatch({ type: 'refresh' })
@@ -100,7 +101,7 @@ export default createListViewModel({
       },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },
-        { call, put },
+        { call, put, all },
       ) {
         const { shouldGetTodayAppointments = true } = payload
         const bizSessionPayload = {
@@ -113,41 +114,45 @@ export default createListViewModel({
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
 
-          yield put({
-            type: 'query',
-            payload: {
-              pagesize: 999999,
-              'VisitFKNavigation.BizSessionFK': sessionData[0].id,
-            },
-          })
+          yield all([
+            put({
+              type: 'query',
+              payload: {
+                pagesize: 999999,
+                'VisitFKNavigation.BizSessionFK': sessionData[0].id,
+              },
+            }),
+            put({
+              type: 'updateSessionInfo',
+              payload: { ...sessionData[0] },
+            }),
+          ])
+
           if (shouldGetTodayAppointments)
             yield put({
               type: 'getTodayAppointments',
             })
 
-          yield put({
-            type: 'updateSessionInfo',
-            payload: { ...sessionData[0] },
-          })
           return true
         }
         return false
       },
       *getTodayAppointments (_, { put }) {
-        const today = moment().format(serverDateFormat)
+        const today = moment().format('YYYY-MM-DD')
         yield put({
           type: 'calendar/getCalendarList',
           payload: {
             combineCondition: 'and',
+            eql_appointmentDate: today,
             group: [
               {
                 appointmentStatusFk: 5,
                 eql_appointmentStatusFk: '1',
                 combineCondition: 'or',
               },
-              {
-                eql_appointmentDate: today,
-              },
+              // {
+              //   eql_appointmentDate: today,
+              // },
             ],
           },
         })
@@ -163,6 +168,24 @@ export default createListViewModel({
           type: 'getSessionInfo',
           payload,
         })
+        return true
+      },
+      *searchPatient ({ payload }, { take, put }) {
+        const prefix = 'like_'
+        const { searchQuery } = payload
+        yield put({
+          type: 'patientSearch/query',
+          payload: {
+            version: Date.now(),
+            [`${prefix}name`]: searchQuery,
+            [`${prefix}patientAccountNo`]: searchQuery,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+            combineCondition: 'or',
+          },
+        })
+
+        yield take('patientSearch/query/@@end')
+
         return true
       },
     },

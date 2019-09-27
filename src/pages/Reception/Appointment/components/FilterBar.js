@@ -128,7 +128,7 @@ const FilterBar = ({
           />
         </GridItem>
         <GridItem md={2}>
-          <Button color='primary' size='sm' onClick={onFilterClick}>
+          <Button color='primary' onClick={onFilterClick}>
             <Search />
             Filter
           </Button>

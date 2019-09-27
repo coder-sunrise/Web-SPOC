@@ -57,7 +57,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingSmsTemplate } = props
-    // console.log('detail', props)
+    console.log('detail', props.values)
 
     return (
       <React.Fragment>
@@ -105,6 +105,24 @@ class Detail extends PureComponent {
                       handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
+                      onBlur={(html, text) => {
+                        console.log(html, text)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={12}>
+              <Field
+                name='templateMessage'
+                render={(args) => {
+                  return (
+                    <TextField
+                      label='Template Message'
+                      multiline
+                      rowsMax='5'
                       {...args}
                     />
                   )

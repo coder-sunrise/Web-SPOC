@@ -38,8 +38,10 @@ const updateApptResources = (oldResources) => (
   apptResource,
 ) => {
   const old = oldResources.find(
-    (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+    // (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+    (oldItem) => oldItem.id === apptResource.id,
   )
+
   if (old === undefined)
     return [
       ...currentResources,
@@ -75,6 +77,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
+      list: [],
       calendarEvents: [],
       currentViewDate: new Date(),
       currentViewAppointment: {
@@ -87,8 +90,32 @@ export default createListViewModel({
       publicHolidayList: [],
       isEditedAsSingleAppointment: false,
     },
-    subscriptions: {},
+    subscriptions: ({ dispatch, history }) => {
+      history.listen((location) => {
+        const { pathname } = location
+        const allowedPaths = [
+          '/reception/appointment',
+        ]
+
+        if (allowedPaths.includes(pathname)) {
+          dispatch({
+            type: 'getActiveBizSessionQueue',
+          })
+        }
+      })
+    },
     effects: {
+      *getActiveBizSessionQueue (_, { call, put, select }) {
+        const queueLog = yield select((state) => state.queueLog)
+        const { sessionInfo } = queueLog
+        if (sessionInfo.id === '') {
+          // initialize biz session
+          yield put({
+            type: 'queueLog/getSessionInfo',
+            payload: { shouldGetTodayAppointments: false },
+          })
+        }
+      },
       *submit ({ payload }, { select, put }) {
         const calendarState = yield select((state) => state.calendar)
         // const { ltsppointmentstatus } = yield select((state) => state.codetable)

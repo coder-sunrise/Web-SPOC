@@ -174,6 +174,7 @@ const Grid = ({
     const {
       doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
     } = row
+    console.log(row)
     const { clinicianProfile: { doctorProfile } } = user
     if (!doctorProfile) {
       notification.error({
@@ -202,13 +203,28 @@ const Grid = ({
         break
       case '1': {
         // dispense
-        const parameters = {
-          vis: row.id,
-          pid: row.patientProfileFK,
-          md2: 'disp',
-        }
-        // history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
-        router.push(getAppendUrl(parameters, '/reception/queue'))
+        // const parameters = {
+        //   vis: row.id,
+        //   pid: row.patientProfileFK,
+        //   md2: 'disp',
+        // }
+        // // history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
+        // router.push(getAppendUrl(parameters, '/reception/queue'))
+        const version = Date.now()
+        dispatch({
+          type: `dispense/startDispense`,
+          payload: {
+            id: row.visitFK,
+            version,
+          },
+        }).then((o) => {
+          console.log(o)
+          // if (o)
+          // router.push(
+          //   `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+          // )
+        })
+
         break
       }
       case '1.1': {
@@ -344,17 +360,15 @@ const Grid = ({
   )
 }
 
-export default memo(
-  connect(({ queueLog, calendar, global, loading, user }) => ({
-    user: user.data,
-    filter: queueLog.currentFilter,
-    queueList: queueLog.list,
-    calendarEvents: calendar.list,
-    showingVisitRegistration: global.showVisitRegistration,
-    queryingData:
-      loading.effects['queueLog/refresh'] ||
-      loading.effects['queueLog/getSessionInfo'] ||
-      loading.effects['queueLog/query'] ||
-      loading.effects['calendar/getCalendarList'],
-  }))(Grid),
-)
+export default connect(({ queueLog, calendar, global, loading, user }) => ({
+  user: user.data,
+  filter: queueLog.currentFilter,
+  queueList: queueLog.list || [],
+  calendarEvents: calendar.list || [],
+  showingVisitRegistration: global.showVisitRegistration,
+  queryingData:
+    loading.effects['queueLog/refresh'] ||
+    loading.effects['queueLog/getSessionInfo'] ||
+    loading.effects['queueLog/query'] ||
+    loading.effects['calendar/getCalendarList'],
+}))(Grid)

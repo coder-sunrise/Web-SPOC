@@ -68,7 +68,6 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 
-let _getTime = null
 const saveConsultation = ({
   props,
   action,
@@ -101,7 +100,9 @@ const saveConsultation = ({
           values[p.prop] = (values[p.prop] || [])
             .concat(orderRows.filter((o) => o.type === p.value))
         })
-        if (_getTime) values.duration = Math.floor(Number(_getTime()) || 0)
+        values.duration = Math.floor(
+          Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
+        )
         dispatch({
           type: `consultation/${action}`,
           payload: values,
@@ -112,7 +113,7 @@ const saveConsultation = ({
                 message: successMessage,
               })
             }
-
+            sessionStorage.removeItem(`${values.id}_consultationTimer`)
             history.push(`/reception/queue`)
           }
         })
@@ -161,6 +162,7 @@ const getRights = (values) => {
   },
   mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
+    // console.log(consultation.entity, consultation.default)
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
@@ -317,7 +319,15 @@ class Consultation extends PureComponent {
               <GridItem>
                 <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
                   <Timer
-                    initialTime={values.duration || 0}
+                    initialTime={
+                      Number(
+                        sessionStorage.getItem(
+                          `${values.id}_consultationTimer`,
+                        ),
+                      ) ||
+                      values.duration ||
+                      0
+                    }
                     direction='forward'
                     startImmediately={this.state.recording}
                   >
@@ -330,7 +340,10 @@ class Consultation extends PureComponent {
                       getTimerState,
                       getTime,
                     }) => {
-                      _getTime = getTime
+                      sessionStorage.setItem(
+                        `${values.id}_consultationTimer`,
+                        getTime(),
+                      )
                       return (
                         <React.Fragment>
                           <TimerIcon
@@ -443,24 +456,24 @@ class Consultation extends PureComponent {
     )
   }
 
-  // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
-    // console.log(
-    //   nextProps.consultation,
-    //   nextProps.consultation.consultationID,
-    //   this.props.consultation.consultationID !==
-    //     nextProps.consultation.consultationID,
-    // )
-    if (
-      nextProps.consultation &&
-      nextProps.consultation.entity &&
-      nextProps.consultation.entity.concurrencyToken !==
-        nextProps.values.concurrencyToken
-    ) {
-      nextProps.resetForm(nextProps.consultation.entity)
-    }
-  }
+  // // eslint-disable-next-line camelcase
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
+  //   // console.log(
+  //   //   nextProps.consultation,
+  //   //   nextProps.consultation.consultationID,
+  //   //   this.props.consultation.consultationID !==
+  //   //     nextProps.consultation.consultationID,
+  //   // )
+  //   if (
+  //     nextProps.consultation &&
+  //     nextProps.consultation.entity &&
+  //     nextProps.consultation.entity.concurrencyToken !==
+  //       nextProps.values.concurrencyToken
+  //   ) {
+  //     nextProps.resetForm(nextProps.consultation.entity)
+  //   }
+  // }
 
   render () {
     const { props, state } = this

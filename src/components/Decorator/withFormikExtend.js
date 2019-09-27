@@ -53,9 +53,9 @@ const withFormikExtend = (props) => (Component) => {
     }
   }
   // const { mapPropsToValues } = props
-  // // console.log(props, lastVersion)
+  // console.log(props, lastVersion)
   @withFormik({
-    enableReinitialize: lastVersion !== findGetParameter('v'),
+    // enableReinitialize: lastVersion !== findGetParameter('v'),
     ...props,
     // mapPropsToValues: (p) => {
     //   // console.log(2, p, props)
@@ -107,7 +107,8 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     render () {
-      lastVersion = findGetParameter('v')
+      if (!displayName) return <Component {...this.props} />
+      // lastVersion = findGetParameter('v')
 
       const rights = {}
       if (authority) {
