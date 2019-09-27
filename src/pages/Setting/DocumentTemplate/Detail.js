@@ -13,7 +13,7 @@ import {
   OutlinedTextField,
   RichEditor,
   Field,
-  Select,   
+  Select,
   CodeSelect,
 } from '@/components'
 
@@ -53,7 +53,7 @@ const tagList = [
     documentTemplateTypeFK: Yup.string().required(),
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateContent: Yup.string().required(),
+    templateContent: Yup.string().required().max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
@@ -145,21 +145,22 @@ class Detail extends PureComponent {
                 name='templateContent'
                 render={(args) => {
                   return (
-                    <OutlinedTextField
+                    <RichEditor
+                      handlePastedText={() => false}
                       label='Template Message'
-                      multiline
-                      rowsMax={2}
-                      rows={2}
-                      {...args}
                       tagList={tagList}
+                      {...args}
+                      onBlur={(html, text) => {
+                        console.log("************")
+                        console.log(html, text)
+                        this.props.setFieldValue('templateContent', text)
+                      }}
                     />
                   )
                 }}
               />
             </GridItem>
           </GridContainer>
-
-         
         </div>
         {footer &&
           footer({
@@ -173,19 +174,5 @@ class Detail extends PureComponent {
     )
   }
 }
-
-// <Field
-//                 name='templateContent'
-//                 render={(args) => {
-//                   return (
-//                     <RichEditor
-//                       handlePastedText={() => false}
-//                       label='Template Message'
-//                       tagList={tagList}
-//                       {...args}
-//                     />
-//                   )
-//                 }}
-//               />
 
 export default Detail

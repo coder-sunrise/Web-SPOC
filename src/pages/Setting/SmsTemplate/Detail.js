@@ -22,10 +22,10 @@ const styles = (theme) => ({})
 @withFormikExtend({
   mapPropsToValues: ({ settingSmsTemplate }) =>
     settingSmsTemplate.entity || settingSmsTemplate.default,
-  validationSchema: Yup.object().shape({
+    validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateMessage: Yup.string().required(),
+    templateMessage: Yup.string().required().max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
@@ -33,7 +33,7 @@ const styles = (theme) => ({})
     const { dispatch, onConfirm } = props
     // console.log(restValues)
 
-    dispatch({
+    dispatch({    
       type: 'settingSmsTemplate/upsert',
       payload: {
         ...restValues,
@@ -106,7 +106,9 @@ class Detail extends PureComponent {
                       label='Template Message'
                       tagList={tagList}
                       onBlur={(html, text) => {
+                        console.log("************")
                         console.log(html, text)
+                        this.props.setFieldValue('templateMessage', text)
                       }}
                       {...args}
                     />
