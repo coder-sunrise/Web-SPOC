@@ -32,19 +32,30 @@ import { ValidationSchema, mapPropsToValues } from './formikUtils'
 import { getAppendUrl } from '@/utils/utils'
 import styles from './style'
 
-@connect(({ loginSEMR, loading, user, calendar, codetable, patient }) => ({
-  loginSEMR,
-  loading,
-  patientProfile: patient.entity,
-  patientProfileDefaultValue: patient.default,
-  user: user.data,
-  events: calendar.list,
-  viewingAppointment: calendar.currentViewAppointment,
-  isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
-  cachedPayload: calendar.cachedPayload,
-  appointmentStatuses: codetable.ltappointmentstatus,
-  clinicianProfiles: codetable.clinicianprofile,
-}))
+@connect(
+  ({
+    loginSEMR,
+    loading,
+    user,
+    calendar,
+    codetable,
+    patient,
+    patientSearch,
+  }) => ({
+    loginSEMR,
+    loading,
+    patientProfile: patient.entity,
+    patientProfileDefaultValue: patient.default,
+    user: user.data,
+    events: calendar.list,
+    viewingAppointment: calendar.currentViewAppointment,
+    isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
+    cachedPayload: calendar.cachedPayload,
+    appointmentStatuses: codetable.ltappointmentstatus,
+    clinicianProfiles: codetable.clinicianprofile,
+    patientSearchResult: patientSearch.list,
+  }),
+)
 @withFormikExtend({
   displayName: 'AppointmentForm',
   enableReinitialize: true,
@@ -142,15 +153,13 @@ class Form extends React.PureComponent {
     )
   }
 
-  checkShouldPopulate = (patientSearchResult) => {
-    const { totalRecords } = patientSearchResult
-    return totalRecords === 1
-  }
+  checkShouldPopulate = (patientSearchResult) =>
+    patientSearchResult.length === 1
 
-  onSearchPatient = async () => {
+  onSearchPatient = () => {
     const { dispatch, values } = this.props
     const prefix = 'like_'
-    const result = await dispatch({
+    dispatch({
       type: 'patientSearch/query',
       payload: {
         [`${prefix}name`]: values.patientName,
@@ -158,11 +167,19 @@ class Form extends React.PureComponent {
         [`${prefix}contactFkNavigation.contactNumber.number`]: values.patientContactNo,
         combineCondition: 'or',
       },
+    }).then(() => {
+      this.showSearchResult()
     })
-    if (result) {
-      const shouldPopulate = this.checkShouldPopulate(result)
+  }
+
+  showSearchResult = () => {
+    const { patientSearchResult } = this.props
+
+    if (patientSearchResult) {
+      const shouldPopulate = this.checkShouldPopulate(patientSearchResult)
+
       if (shouldPopulate) {
-        this.onSelectPatientClick(result.data[0], true)
+        this.onSelectPatientClick(patientSearchResult[0], true)
       } else this.toggleSearchPatientModal()
     }
   }
@@ -526,15 +543,24 @@ class Form extends React.PureComponent {
   }
 
   actualizeAppointment = () => {
-    const { values, history, onClose } = this.props
+    const { values, history } = this.props
     const parameters = {
       md: 'visreg',
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
     }
 
-    onClose()
+    this.onCloseFormClick()
     history.push(getAppendUrl(parameters))
+  }
+
+  onCloseFormClick = () => {
+    const { onClose, dispatch } = this.props
+    dispatch({
+      type: 'patientSearch/updateState',
+      payload: { list: undefined },
+    })
+    onClose()
   }
 
   render () {
@@ -559,11 +585,11 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
 
     // console.log({ datagrid })
-    console.log({
-      initialValues: this.props.initialValues,
-      values: this.props.values,
-      dirty: this.props.dirty,
-    })
+    // console.log({
+    //   initialValues: this.props.initialValues,
+    //   values: this.props.values,
+    //   dirty: this.props.dirty,
+    // })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
@@ -620,7 +646,7 @@ class Form extends React.PureComponent {
             <FormFooter
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={onClose}
+              onClose={this.onCloseFormClick}
               disabled={
                 !isDataGridValid ||
                 !values.patientName ||

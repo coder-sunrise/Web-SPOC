@@ -38,8 +38,10 @@ const updateApptResources = (oldResources) => (
   apptResource,
 ) => {
   const old = oldResources.find(
-    (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+    // (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
+    (oldItem) => oldItem.id === apptResource.id,
   )
+
   if (old === undefined)
     return [
       ...currentResources,
@@ -92,7 +94,7 @@ export default createListViewModel({
       history.listen((location) => {
         const { pathname } = location
         const allowedPaths = [
-          '/reception/queue',
+          '/reception/appointment',
         ]
 
         if (allowedPaths.includes(pathname)) {
