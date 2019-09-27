@@ -1,5 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services'
+import * as service from '../services/deliveryOrder'
 import moment from 'moment'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
@@ -60,7 +60,6 @@ export default createFormViewModel({
       },
 
       *getOutstandingPOItem ({ payload }, { call, put }) {
-        console.log({ payload })
         const { rows, purchaseOrder } = payload
         const { purchaseOrderStatusFK } = purchaseOrder
         let outstandingItem = []
@@ -103,7 +102,6 @@ export default createFormViewModel({
 
     reducers: {
       setAddNewDeliveryOrder (state, { payload }) {
-        console.log('setAddNewDeliveryOrder', state)
         const { deliveryOrderNo } = payload
         const { purchaseOrderDetails } = state
         const {
@@ -113,8 +111,7 @@ export default createFormViewModel({
         return {
           ...state,
           entity: {
-            deliveryOrderFK: purchaseOrder.id,
-            deliveryOrderStatusFK: purchaseOrder.purchaseOrderStatusFK,
+            purchaseOrderFK: purchaseOrder.id,
             deliveryOrderNo,
             deliveryOrderDate: moment(),
             remark: '',
@@ -133,8 +130,10 @@ export default createFormViewModel({
 
       setOutstandingPOItem (state, { payload }) {
         const { outstandingItem, rows, purchaseOrder } = payload
+        const { deliveryOrder } = purchaseOrder
         return {
           ...state,
+          list: deliveryOrder,
           purchaseOrderDetails: {
             purchaseOrder: { ...purchaseOrder },
             purchaseOrderItem: rows,

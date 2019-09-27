@@ -40,6 +40,13 @@ class index extends Component {
     })
   }
 
+  refreshDeliveryOrder = () => {
+    this.props.dispatch({
+      type: 'deliveryOrderDetails/getOutstandingPOItem',
+      payload: this.props.purchaseOrderDetails,
+    })
+  }
+
   onAddDeliveryOrderClicked = () => {
     const { dispatch } = this.props
     this.setState({ showDeliveryOrderDetails: true })
@@ -56,7 +63,7 @@ class index extends Component {
   render () {
     const { purchaseOrderDetails } = this.props
     const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = (purchaseOrder) ? purchaseOrder.purchaseOrderStatusFK : 1
+    const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
     const { showDeliveryOrderDetails } = this.state
 
     return (
@@ -78,7 +85,10 @@ class index extends Component {
             onConfirm={this.closeDODetailsModal}
             onClose={this.closeDODetailsModal}
           >
-            <DODetails {...this.props} />
+            <DODetails
+              refreshDeliveryOrder={this.refreshDeliveryOrder}
+              {...this.props}
+            />
           </CommonModal>
           <Button
             disabled={!isPOStatusFinalized(poStatus)}

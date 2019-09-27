@@ -25,6 +25,17 @@ import { isPOStatusFinalized } from '../../variables'
     const { dispatch, onConfirm } = props
 
     console.log('handleSubmit1', values)
+
+    const paymentPayload = {
+      purchaseOrderFK: values.id,
+      sequence: 1,
+      clinicPaymentDto: {},
+    }
+
+    dispatch({
+      type: 'podoPayment/upsert',
+      payload: { ...paymentPayload },
+    })
   },
 })
 class index extends PureComponent {

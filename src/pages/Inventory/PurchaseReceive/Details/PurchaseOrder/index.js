@@ -110,15 +110,15 @@ class index extends Component {
 
     switch (action) {
       case poSubmitAction.SAVE:
-        processedPayload = this.processSubmitPayload(1)
+        processedPayload = this.processSubmitPayload(true)
         break
       case poSubmitAction.CANCEL:
         dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-        processedPayload = this.processSubmitPayload(4)
+        processedPayload = this.processSubmitPayload(false, 4)
         break
       case poSubmitAction.FINALIZE:
         dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-        processedPayload = this.processSubmitPayload(2)
+        processedPayload = this.processSubmitPayload(false, 2)
         break
       case poSubmitAction.COMPLETE:
         //
@@ -142,7 +142,7 @@ class index extends Component {
     })
   }
 
-  processSubmitPayload = (purchaseOrderStatusFK) => {
+  processSubmitPayload = (isSaveAction = false, purchaseOrderStatusFK) => {
     const { purchaseOrderDetails, values } = this.props
     const { type } = purchaseOrderDetails
     const {
@@ -152,7 +152,9 @@ class index extends Component {
     } = values
     let purchaseOrderItem = []
     let newPoAdjustment
+    let newPurchaseOrderStatusFK = purchaseOrderStatusFK
     if (type === 'new') {
+      newPurchaseOrderStatusFK = 1
       purchaseOrderItem = rows.map((x) => {
         const itemType = podoOrderType.find((y) => y.value === x.type)
         return {
@@ -173,6 +175,7 @@ class index extends Component {
         }
       })
     } else if (type === 'dup') {
+      newPurchaseOrderStatusFK = 1
       delete purchaseOrder.id
       delete purchaseOrder.concurrencyToken
       newPoAdjustment = poAdjustment.map((adj) => {
@@ -202,6 +205,12 @@ class index extends Component {
         }
       })
     } else {
+      if (!isSaveAction) {
+        newPurchaseOrderStatusFK = purchaseOrderStatusFK
+      } else {
+        newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
+      }
+
       purchaseOrderItem = rows.map((x) => {
         const itemType = podoOrderType.find((y) => y.value === x.type)
         let result = {}
@@ -233,9 +242,10 @@ class index extends Component {
 
     return {
       ...purchaseOrder,
-      purchaseOrderStatusFK,
-      purchaseOrderStatusCode: getPurchaseOrderStatusFK(purchaseOrderStatusFK)
-        .code,
+      purchaseOrderStatusFK: newPurchaseOrderStatusFK,
+      purchaseOrderStatusCode: getPurchaseOrderStatusFK(
+        newPurchaseOrderStatusFK,
+      ).code,
       invoiceStatusFK: 3, // Soe will double confirm whether this will be done at server side
       purchaseOrderItem,
       purchaseOrderAdjustment: newPoAdjustment || [

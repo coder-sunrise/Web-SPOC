@@ -47,11 +47,18 @@ const receivingDetailsSchema = Yup.object().shape({
     const { rows, ...restValues } = values
     // console.log('handleSubmit1', values)
     // console.log('handleSubmit2', restValues)
-    const { dispatch, onConfirm } = props
+    const {
+      deliveryOrderDetails,
+      refreshDeliveryOrder,
+      dispatch,
+      onConfirm,
+    } = props
+    const { list } = deliveryOrderDetails
 
     let deliveryOrderItem = rows.map((x, index) => {
-      const itemType = podoOrderType.find((y) => y.value === x.type)
+      // const itemType = podoOrderType.find((y) => y.value === x.type)
       return {
+        inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
         purchaseOrderItemFK: x.id,
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
@@ -59,29 +66,31 @@ const receivingDetailsSchema = Yup.object().shape({
         // expiryDate: x.expiryDate,
         sortOrder: index + 1,
         inventoryTransactionItemDto: {
-          inventoryTypeFK: itemType.value,
+          // inventoryTypeFK: itemType.value,
         },
       }
-    })
-
-    console.log({
-      ...restValues,
-      sequence: 1,
-      deliveryOrderItem,
     })
 
     dispatch({
       type: 'deliveryOrderDetails/upsert',
       payload: {
         ...restValues,
-        sequence: 1,
+        sequence: list ? list.length + 1 : 1,
+        inventoryTransactionFK: 26, // Temporary hard code, will remove once Soe fix the API
+        deliveryOrderStatusFK: 1, // Temporary hard code, will remove once Soe fix the API
         deliveryOrderItem,
       },
     }).then((r) => {
       if (r) {
-        console.log('Upsert success')
-        // if (onConfirm) onConfirm()
-        // dispatch({})
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'purchaseOrderDetails/refresh',
+          payload: {
+            id: deliveryOrderDetails.id,
+          },
+        })
+
+        setTimeout(() => refreshDeliveryOrder(), 500)
       }
     })
   },
@@ -324,7 +333,6 @@ class DODetails extends PureComponent {
   }
 
   render () {
-    // console.log('DODetails', this.props)
     const isEditable = true
     const { props } = this
     const { footer, values } = props

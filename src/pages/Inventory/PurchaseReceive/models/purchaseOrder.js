@@ -20,11 +20,6 @@ export default createFormViewModel({
     state: {
       default: {
         purchaseOrder: {
-          // poNo: 'PO/000001',
-          // poDate: moment(),
-          // status: 'Draft',
-          // IsEnabledGST: false,
-          // --------------------
           purchaseOrderNo: 'PO/000001',
           purchaseOrderDate: moment(),
           purchaseOrderStatusFK: 1,

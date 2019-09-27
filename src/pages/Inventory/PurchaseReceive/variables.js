@@ -96,6 +96,7 @@ export const isPOStatusFinalized = (status) => {
   const allowedStatus = [
     // 'Finalized',
     2,
+    3,
   ]
   return allowedStatus.indexOf(status) > -1
 }
