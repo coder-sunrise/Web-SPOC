@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import { getUniqueGUID, convertToQuery } from '@/utils/utils'
 import * as service from '@/services/common'
 
-const url = '/api/consultation'
+const url = '/api/dispense'
 
 module.exports = {
   remove: (params) => service.remove(url, params),
@@ -18,7 +18,7 @@ module.exports = {
   },
   pause: async (params) => {
     // console.log(params)
-    const r = await request(`${url}/pause/${params.id}`, {
+    const r = await request(`${url}/${params.id}`, {
       method: 'PUT',
       body: params,
     })

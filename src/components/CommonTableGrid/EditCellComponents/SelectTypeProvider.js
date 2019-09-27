@@ -39,6 +39,7 @@ class SelectEditor extends PureComponent {
     const latestRow = window.$tempGridRow[gridId]
       ? window.$tempGridRow[gridId][getRowId(row)] || {}
       : row
+    // console.log(latestRow, row, getRowId(row), window.$tempGridRow, gridId)
     // console.log(
     //   columnName,
     //   latestRow,

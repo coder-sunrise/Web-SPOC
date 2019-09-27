@@ -7,104 +7,113 @@ import Save from '@material-ui/icons/Save'
 import Edit from '@material-ui/icons/Edit'
 import Cancel from '@material-ui/icons/Clear'
 
-import { Button } from '@/components'
+import { Button, Tooltip } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
 let commitCount = 0
-const EditButton = ({ onExecute, editingRowIds }) => (
-  <Button
-    size='sm'
-    onClick={(e) => {
-      onExecute(e)
-      setTimeout(() => {
-        if (editingRowIds.length === 0) {
-          window.g_app._store.dispatch({
-            type: 'global/updateState',
-            payload: {
-              disableSave: true,
-            },
-          })
-        }
-      }, 1)
+const EditButton = ({ onExecute, text, editingRowIds }) => (
+  <Tooltip title={text} placement='top'>
+    <Button
+      size='sm'
+      onClick={(e) => {
+        onExecute(e)
+        setTimeout(() => {
+          if (editingRowIds.length === 0) {
+            window.g_app._store.dispatch({
+              type: 'global/updateState',
+              payload: {
+                disableSave: true,
+              },
+            })
+          }
+        }, 1)
 
-      // console.log({ onExecute })
-    }}
-    justIcon
-    color='primary'
-    title='Edit'
-  >
-    <Edit />
-  </Button>
+        // console.log({ onExecute })
+      }}
+      justIcon
+      color='primary'
+    >
+      <Edit />
+    </Button>
+  </Tooltip>
 )
 
 const CancelButton = ({
   onExecute,
+  text,
   editingRowIds,
   row,
   schema,
   gridId,
   getRowId,
 }) => (
-  <Button
-    size='sm'
-    onClick={(e) => {
-      // delete window.$tempGridRow[gridId][row.id]
-      // updateGlobalVariable('gridIgnoreValidation', true)
-      // console.log(editingRowIds, Object.keys(window.$tempGridRow[gridId]))
-      const id = getRowId(row)
-      if (
-        (!id && editingRowIds.length === 0) ||
-        (id &&
-          editingRowIds.length === 1 &&
-          !window.$tempGridRow[gridId][undefined])
-      ) {
-        window.g_app._store.dispatch({
-          type: 'global/updateState',
-          payload: {
-            disableSave: false,
-          },
-        })
-      }
-      onExecute(e)
-    }}
-    justIcon
-    color='danger'
-    title='Cancel'
-  >
-    <Cancel />
-  </Button>
-)
-
-const DeleteButton = ({ onExecute }) => (
-  <Button
-    size='sm'
-    onClick={(e) => {
-      // updateGlobalVariable('gridIgnoreValidation', true)
-      onExecute(e)
-    }}
-    justIcon
-    color='primary'
-    title='Delete'
-  >
-    <Delete />
-  </Button>
-)
-
-const AddButton = ({ onExecute }) => (
-  <div style={{ textAlign: 'center' }}>
+  <Tooltip title={text} placement='top'>
     <Button
-      color='primary'
+      size='sm'
       onClick={(e) => {
-        // updateGlobalVariable('gridIgnoreValidation', false)
+        // delete window.$tempGridRow[gridId][row.id]
+        // updateGlobalVariable('gridIgnoreValidation', true)
+        // console.log(editingRowIds, Object.keys(window.$tempGridRow[gridId]))
+        const id = getRowId(row)
+        if (
+          (!id && editingRowIds.length === 0) ||
+          (id &&
+            editingRowIds.length === 1 &&
+            !window.$tempGridRow[gridId][undefined])
+        ) {
+          window.g_app._store.dispatch({
+            type: 'global/updateState',
+            payload: {
+              disableSave: false,
+            },
+          })
+        }
         onExecute(e)
       }}
-      title='Create new row'
-      className='medisys-table-add'
-      style={{ display: 'none' }}
+      justIcon
+      color='danger'
+      // title='Cancel'
     >
-      New
+      <Cancel />
     </Button>
-  </div>
+  </Tooltip>
+)
+
+const DeleteButton = ({ onExecute, text }) => {
+  return (
+    <Tooltip title={text} placement='top'>
+      <Button
+        size='sm'
+        onClick={(e) => {
+          // updateGlobalVariable('gridIgnoreValidation', true)
+          onExecute(e)
+        }}
+        justIcon
+        color='primary'
+      >
+        <Delete />
+      </Button>
+    </Tooltip>
+  )
+}
+
+const AddButton = ({ onExecute, text }) => (
+  <Tooltip title='Create New Row'>
+    <div style={{ textAlign: 'center' }}>
+      <Button
+        color='primary'
+        onClick={(e) => {
+          // updateGlobalVariable('gridIgnoreValidation', false)
+          onExecute(e)
+        }}
+        // title='Create new row'
+        className='medisys-table-add'
+        style={{ display: 'none' }}
+      >
+        New
+      </Button>
+    </div>
+  </Tooltip>
 )
 
 const isDisabled = (props) => {
@@ -155,70 +164,72 @@ class CommitButton extends React.PureComponent {
   // }
 
   render () {
-    const { onExecute, editingRowIds, row, schema, gridId } = this.props
+    const { onExecute, text, editingRowIds, row, schema, gridId } = this.props
 
     return (
       <div ref={this.myRef} style={{ display: 'inline-block' }}>
-        <Button
-          size='sm'
-          disabled={this.state.disabled}
-          onClick={(e) => {
-            // if (schema) {
-            //   try {
-            //     schema.validateSync(
-            //       window.$tempGridRow[gridId]
-            //         ? window.$tempGridRow[gridId][row.id] || {}
-            //         : row,
-            //       {
-            //         abortEarly: false,
-            //       },
-            //     )
-            //     // console.log({ r })
+        <Tooltip title={text} placement='top'>
+          <Button
+            size='sm'
+            disabled={this.state.disabled}
+            onClick={(e) => {
+              // if (schema) {
+              //   try {
+              //     schema.validateSync(
+              //       window.$tempGridRow[gridId]
+              //         ? window.$tempGridRow[gridId][row.id] || {}
+              //         : row,
+              //       {
+              //         abortEarly: false,
+              //       },
+              //     )
+              //     // console.log({ r })
 
-            //     // row._$error = false
-            //   } catch (er) {
-            //     // console.log(er)
-            //     // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
-            //     // console.log(er, this.myRef.current)
-            //     $(this.myRef.current).find('button').attr('disabled', true)
-            //     // const actualError = er.inner.find((o) => o.path === columnName)
-            //     // return actualError ? actualError.message : ''
-            //     // row._$error = true
-            //     window.g_app._store.dispatch({
-            //       type: 'global/updateState',
-            //       payload: {
-            //         commitCount: commitCount++,
-            //       },
-            //     })
-            //     return false
-            //   }
-            // }
+              //     // row._$error = false
+              //   } catch (er) {
+              //     // console.log(er)
+              //     // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
+              //     // console.log(er, this.myRef.current)
+              //     $(this.myRef.current).find('button').attr('disabled', true)
+              //     // const actualError = er.inner.find((o) => o.path === columnName)
+              //     // return actualError ? actualError.message : ''
+              //     // row._$error = true
+              //     window.g_app._store.dispatch({
+              //       type: 'global/updateState',
+              //       payload: {
+              //         commitCount: commitCount++,
+              //       },
+              //     })
+              //     return false
+              //   }
+              // }
 
-            // updateGlobalVariable('gridIgnoreValidation', false)
-            if (
-              (!row.id && editingRowIds.length === 0) ||
-              (row.id && editingRowIds.length === 1)
-            ) {
-              window.g_app._store.dispatch({
-                type: 'global/updateState',
-                payload: {
-                  disableSave: false,
-                },
-              })
-            }
-            // delete window.$tempGridRow[gridId][row.id]
-            // console.log(window.$tempGridRow[gridId])
-            onExecute(e)
-          }}
-          justIcon
-          data-button-type='progress'
-          data-grid-button='true'
-          color='primary'
-          title='Save'
-          className='grid-commit'
-        >
-          <Save />
-        </Button>
+              // updateGlobalVariable('gridIgnoreValidation', false)
+              if (
+                (!row.id && editingRowIds.length === 0) ||
+                (row.id && editingRowIds.length === 1)
+              ) {
+                window.g_app._store.dispatch({
+                  type: 'global/updateState',
+                  payload: {
+                    disableSave: false,
+                  },
+                })
+              }
+              // delete window.$tempGridRow[gridId][row.id]
+              // console.log(window.$tempGridRow[gridId])
+              onExecute(e)
+            }}
+            justIcon
+            data-button-type='progress'
+            data-grid-button='true'
+            color='primary'
+            // title='Save'
+            className='grid-commit'
+          >
+            <Save />
+          </Button>
+        </Tooltip>
       </div>
     )
   }

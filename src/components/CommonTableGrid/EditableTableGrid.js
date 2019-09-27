@@ -336,6 +336,12 @@ class EditableTableGrid extends PureComponent {
         showAddCommand = false,
         showEditCommand = true,
         showDeleteCommand = true,
+        messages = {
+          commitCommand: 'Save',
+          editCommand: 'Edit',
+          deleteCommand: 'Delete',
+          cancelCommand: 'Cancel',
+        },
         // EditCell = DefaultEditCell,
       } = {},
       getRowId = (r) => r.id,
@@ -396,6 +402,7 @@ class EditableTableGrid extends PureComponent {
           showEditCommand={showEditCommand}
           showDeleteCommand={showDeleteCommand}
           commandComponent={CommandComponent}
+          messages={messages}
           cellComponent={(cellProps) => {
             const { children, ...p } = cellProps
             return (

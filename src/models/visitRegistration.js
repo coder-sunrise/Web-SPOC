@@ -97,7 +97,7 @@ export default createFormViewModel({
                 id: patientProfileFK,
               }
               yield put({
-                type: 'fetchPatientInfoByPatientID',
+                type: 'patient/query',
                 payload: patientPayload,
               })
             }

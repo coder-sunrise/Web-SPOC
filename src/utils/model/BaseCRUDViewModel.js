@@ -86,75 +86,148 @@ export default class BaseCRUDViewModel {
     const { namespace, param, setting = {}, config = {} } = this.options
     const { service } = param
     const { detailPath = '' } = setting
-    if (!config.timer) config.timer = 500
-    function* query (
-      { payload = { keepFilter: true, defaultQuery: false }, history },
-      { call, put, select },
-    ) {
-      // console.log(namespace, queryFnName, payload, service)
-      if (!service || !service[queryFnName]) return
-      let { filter = {} } = yield select((st) => st[namespace])
-      if (!payload.keepFilter) {
-        if (typeof payload === 'object') {
-          filter = {
-            ...filter,
-            ...payload,
-          }
-        } else {
-          filter = payload
-        }
-      }
+    if (!config.timer) config.timer = 2000
+    // console.log(config, namespace)
 
-      const response = yield call(service[queryFnName], filter)
-      // console.log(response)
-      const { data, status, message } = response
-      if (status === '200' || data) {
-        yield put({
-          type: 'querySuccess',
-          payload: { data, filter, version: filter.version },
-        })
-        yield put({
-          type: 'queryDone',
-          payload: {
-            data,
-          },
-          history,
-        })
-      }
-      return data
-      // }
-    }
     return {
-      _query:
-        config.timer > 0
-          ? [
-              query,
-              { type: 'throttle', ms: config.timer || 500 },
-            ]
-          : query,
+      query: [
+        function* (
+          { payload = { keepFilter: true }, history },
+          { call, put, select },
+        ) {
+          // console.log(namespace, queryFnName, payload, service)
+          if (!service || !service[queryFnName]) return
+          let {
+            filter = {},
+            fixedFilter = {},
+            exclude,
+            entity = {},
+            version,
+            list,
+          } = yield select((st) => st[namespace])
+          // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
+          // if (!disableAutoQuery) {
+          // console.log(namespace, version, payload.version)
+          if (payload.version) payload.version = Number(payload.version)
+          if (
+            payload.version &&
+            version === payload.version &&
+            payload.id === entity.id
+          )
+            return list || entity
+          if (typeof payload === 'object') {
+            filter = {
+              ...fixedFilter,
+              ...filter,
+              ...payload,
+            }
+          } else {
+            filter = payload
+          }
 
-      *query (
-        { payload = { keepFilter: true, defaultQuery: false } },
-        { call, put, select },
-      ) {
-        if (!service || !service[queryFnName]) return
-        let { entity = {}, version, list } = yield select((st) => st[namespace])
-        // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
-        // if (!disableAutoQuery) {
-        // console.log(namespace, version, payload.version)
-        if (payload.version) payload.version = Number(payload.version)
-        if (
-          payload.version &&
-          version === payload.version &&
-          payload.id === entity.id
-        )
-          return list || entity
+          // yield put({
+          //   type: 'queryBegin',
+          //   payload: {
+          //     filter,
+          //   },
+          // })
+          // const { list = {} } = config
+          // filter = {
+          //   ...filter,
+          //   // queryExcludeFields: list.exclude || exclude,
+          // }
+          // console.log({ filter })
+          // console.log(filter)
 
-        yield put({
-          type: '_query',
-          payload,
-        })
-      },
+          const response = yield call(service[queryFnName], filter)
+          // console.log(response)
+          const { data, status, message } = response
+          if (status === '200' || data) {
+            yield put({
+              type: 'querySuccess',
+              payload: { data, filter, version: filter.version },
+            })
+            yield put({
+              type: 'queryDone',
+              payload: {
+                data,
+              },
+              history,
+            })
+          }
+          return data
+          // }
+        },
+        { type: 'throttle', ms: 500 },
+      ],
+      // _query: [
+      //   function* query (
+      //     { payload = { keepFilter: true, defaultQuery: false }, history },
+      //     { call, put, select },
+      //   ) {
+      //     // console.log(namespace, queryFnName, payload, service)
+      //     if (!service || !service[queryFnName]) return
+      //     let { filter = {} } = yield select((st) => st[namespace])
+      //     if (!payload.keepFilter) {
+      //       if (typeof payload === 'object') {
+      //         filter = {
+      //           ...filter,
+      //           ...payload,
+      //         }
+      //       } else {
+      //         filter = payload
+      //       }
+      //     }
+
+      //     const response = yield call(service[queryFnName], filter)
+      //     console.log(namespace, response)
+      //     const { data, status, message } = response
+      //     if (status === '200' || data) {
+      //       yield put({
+      //         type: 'querySuccess',
+      //         payload: { data, filter, version: filter.version },
+      //       })
+      //       yield put({
+      //         type: 'queryDone',
+      //         payload: {
+      //           data,
+      //         },
+      //         history,
+      //       })
+      //     }
+      //     return data
+      //     // }
+      //   },
+      //   { type: 'throttle', ms: 20000 },
+      // ],
+
+      // *query (
+      //   { payload = { keepFilter: true, defaultQuery: false } },
+      //   { call, put, select, take },
+      // ) {
+      //   if (!service || !service[queryFnName]) return
+      //   let { entity = {}, version, list } = yield select((st) => st[namespace])
+      //   // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
+      //   // if (!disableAutoQuery) {
+      //   // console.log(namespace, version, payload.version)
+      //   if (payload.version) payload.version = Number(payload.version)
+      //   console.log(namespace, list, entity)
+      //   if (
+      //     payload.version &&
+      //     version === payload.version &&
+      //     payload.id === entity.id
+      //   )
+      //     return list || entity
+
+      //   const r = yield put({
+      //     type: '_query',
+      //     payload,
+      //   })
+      //   yield take('_query/@@end')
+
+      //   console.log(r)
+      //   return r
+      // },
 
       *upsert ({ payload, history }, { select, call, put }) {
         // console.log('upsert', payload)

@@ -5,12 +5,14 @@ import { convertToQuery } from '@/utils/utils'
 
 export default createListViewModel({
   namespace: 'patientSearch',
-  config: {
-    queryOnLoad: false,
-  },
+  config: {},
   param: {
     service,
-    state: {},
+    state: {
+      fixedFilter: {
+        isActive: true,
+      },
+    },
     subscriptions: ({ dispatch, history }) => {
       // history.listen((loct, method) => {
       //   // const { pathname, search, query = {} } = loct

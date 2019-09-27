@@ -58,16 +58,23 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
         // console.log({ pathname })
         // console.log(loct, method)
-        // console.log(query)
+        console.log(query)
         if (query.md === 'pt' && query.cmt) {
+          dispatch({
+            type: 'updateState',
+            payload: {
+              currentComponent: query.cmt,
+            },
+          })
           dispatch({
             type: 'initState',
             payload: {
+              md: query.md,
               version: Number(query.v) || undefined,
-              currentComponent: query.cmt,
               currentId: Number(query.pid) || 0,
             },
           })
+
           // dispatch({
           //   type: 'updateState',
           //   payload: {
@@ -101,18 +108,13 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        let { currentId, version, currentComponent } = payload
-        yield put({
-          type: 'updateState',
-          payload: {
-            currentComponent,
-          },
-        })
+        let { currentId, version, currentComponent, md } = payload
+
         const patient = yield select((state) => state.patient)
         if (
           patient.version !== version ||
           (patient.entity && patient.entity.id !== currentId)
-        )
+        ) {
           yield put({
             type: 'query',
             payload: {
@@ -120,6 +122,34 @@ export default createFormViewModel({
               version,
             },
           })
+          yield take('patient/query/@@end')
+        }
+        if (md === 'pt')
+          yield put({
+            type: 'global/updateState',
+            payload: {
+              fullscreen: true,
+              showPatientInfoPanel: true,
+            },
+          })
+      },
+      *waitLoadComplete ({ payload }, { call, put, select, take }) {
+        // let { currentId, version, currentComponent } = payload
+
+        yield take('patient/query/@@end')
+        return ''
+        // const patient = yield select((state) => state.patient)
+        // if (
+        //   patient.version !== version ||
+        //   (patient.entity && patient.entity.id !== currentId)
+        // )
+        //   yield put({
+        //     type: 'query',
+        //     payload: {
+        //       id: currentId,
+        //       version,
+        //     },
+        //   })
       },
       // *fetchList ({ payload }, { call, put }) {
       //   const response = yield call(service.queryList)

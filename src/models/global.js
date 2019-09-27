@@ -1,5 +1,5 @@
-import { queryNotices } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
+import { queryNotices } from '@/services/api'
 import { notification } from '@/components'
 
 import config from '@/utils/config'
@@ -33,21 +33,21 @@ export default createFormViewModel({
 
         // console.log(loct, method)
         if (query.md === 'pt') {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              fullscreen: true,
-              showPatientInfoPanel: true,
-            },
-          })
+          // dispatch({
+          //   type: 'updateState',
+          //   payload: {
+          //     fullscreen: true,
+          //     showPatientInfoPanel: true,
+          //   },
+          // })
         } else if (query.md2 === 'cons') {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              fullscreen: true,
-              showConsultationPanel: true,
-            },
-          })
+          // dispatch({
+          //   type: 'updateState',
+          //   payload: {
+          //     fullscreen: true,
+          //     showConsultationPanel: true,
+          //   },
+          // })
         } else if (query.md2 === 'disp') {
           dispatch({
             type: 'updateState',

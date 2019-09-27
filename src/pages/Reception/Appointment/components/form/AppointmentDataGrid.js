@@ -133,10 +133,9 @@ class AppointmentDataGrid extends React.Component {
   }
 
   onRadioChange = (row, e, checked) => {
-    console.log({ row, e, checked })
     if (checked) {
       const { data, handleCommitChanges } = this.props
-      console.log({ data })
+
       const newRows = data.map(
         (eachRow) =>
           eachRow.id !== row.id
@@ -146,7 +145,7 @@ class AppointmentDataGrid extends React.Component {
               }
             : { ...eachRow, isPrimaryClinician: checked },
       )
-      console.log({ newRows })
+
       handleCommitChanges({ rows: newRows })
     }
   }
@@ -172,6 +171,9 @@ class AppointmentDataGrid extends React.Component {
             },
           }}
           EditingProps={{
+            messages: {
+              deleteCommand: 'Delete appointment slot',
+            },
             showAddCommand: true,
             onCommitChanges: handleCommitChanges,
             onEditingRowIdsChange: handleEditingRowsChange,

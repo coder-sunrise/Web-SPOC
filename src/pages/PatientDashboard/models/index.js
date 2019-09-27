@@ -68,6 +68,7 @@ export default createFormViewModel({
         yield take('visitRegistration/query/@@end')
         const visitRegistration = yield select((st) => st.visitRegistration)
         const { visit } = visitRegistration.entity
+        // console.log(visitRegistration, visit)
         if (!visit) return
         yield put({
           type: 'patient/query',
