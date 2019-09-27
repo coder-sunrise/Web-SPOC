@@ -32,12 +32,10 @@ let commitCount = 1000 // uniqueNumber
     adjustmentTransactionDate: Yup.date().required(),
   }),
   handleSubmit: (values, { props }) => {
-    // console.log('submitting', values, props)
     const {
       inventoryAdjustmentItems,
       stockList,
       inventoryAdjustmentStatusString,
-      // id,
       ...restValue
     } = values
     const { dispatch, onConfirm } = props
@@ -80,7 +78,6 @@ let commitCount = 1000 // uniqueNumber
         const { batchNo, code, displayValue, ...value } = val
         return {
           ...value,
-          // id: undefined,
           [getType.typeName]: {
             ...restValues,
             batchNo: o.batchNoString || o[getType.typeName].batchNo,
@@ -96,11 +93,9 @@ let commitCount = 1000 // uniqueNumber
       }
       return {
         ...o,
-        // id: undefined,
         [getType.typeName]: {
           batchNo: o.batchNoString,
           expiryDate: o.expiryDate,
-          // [getType.itemFK]: o.id,
           [getType.stockFK]: o.id,
           [getType.codeName]: o.code,
           [getType.nameName]: o.displayValue,
@@ -482,7 +477,6 @@ class Detail extends PureComponent {
   handleSelectedBatch = (e) => {
     const { option, row } = e
     if (option) {
-      console.log('handleBatchOption', option)
       const { expiryDate, stock, value, batchNo } = option
       row.batchNo = value
       row.expiryDate = expiryDate
@@ -586,14 +580,6 @@ class Detail extends PureComponent {
 
       const deletedRow = rows.find((row) => deletedSet.has(row.id))
       const changedRows = rows.filter((row) => !deletedSet.has(row.id))
-      console.log(
-        'delete',
-        rows,
-        deleted,
-        deletedSet,
-        deletedRow,
-        stockMedication,
-      )
 
       if (deletedRow.batchNo) {
         const getState = type(deletedRow.inventoryTypeFK)
@@ -621,8 +607,6 @@ class Detail extends PureComponent {
     }
     if (this.state.selectedItem) {
       this.filterStockOption(this.state.selectedItem)
-
-      console.log('oncommit', added, rows)
     }
 
     // if (rows.length > 0) {
@@ -654,14 +638,12 @@ class Detail extends PureComponent {
     if (this.state.selectedItem) {
       const { option } = this.state.selectedItem
       const { uom, expiryDate, stock } = option
-      console.log({ uom, addedRows, option })
       if (uom) {
         returnRows = addedRows.map((r) => ({
           ...r,
           uomDisplayValue: uom,
         }))
       } else {
-        console.log('error')
         returnRows = addedRows.map((r) => ({
           ...r,
           stock,
@@ -721,7 +703,7 @@ class Detail extends PureComponent {
       inventoryTypeFK: Yup.number().required(),
       code: Yup.number().required(),
       displayValue: Yup.number().required(),
-      // batchNo: Yup.number().required(),
+      batchNo: Yup.number().required(),
       adjustmentQty: Yup.number()
         .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
         .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
