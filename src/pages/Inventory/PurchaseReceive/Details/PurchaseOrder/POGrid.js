@@ -34,7 +34,7 @@ class Grid extends PureComponent {
     }
   }
 
-  componentDidMount () {
+  componentDidMount = () => {
     this.initializeStateItemList()
   }
 
@@ -48,6 +48,7 @@ class Grid extends PureComponent {
           code: x.ctName,
         },
       }).then((list) => {
+        console.log('initializeStateItemList')
         const { inventoryItemList } = getInventoryItemList(
           list,
           x.itemFKName,

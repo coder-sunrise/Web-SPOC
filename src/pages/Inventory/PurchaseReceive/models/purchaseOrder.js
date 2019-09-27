@@ -4,11 +4,7 @@ import moment from 'moment'
 import { notification } from '@/components'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
-import {
-  fakeQueryDoneData,
-  getPurchaseOrderStatusFK,
-  getInvoiceStatusFK,
-} from '../variables'
+import { getPurchaseOrderStatusFK, getInvoiceStatusFK } from '../variables'
 
 export default createFormViewModel({
   namespace: 'purchaseOrderDetails',
@@ -60,6 +56,10 @@ export default createFormViewModel({
       },
       *initializePurchaseOrder (_, { call, put, select }) {
         // Call API to get new PurchaseOrder#
+        const runningNumberResponse = yield call(service.queryRunningNumber, {
+          prefix: 'PO',
+        })
+        const { data: poRunningNumber } = runningNumberResponse
 
         // Access clinicInfo from store
         let clinicAddress = ''
@@ -77,7 +77,7 @@ export default createFormViewModel({
         }
 
         const purchaseOrder = {
-          purchaseOrderNo: 'PO/000001', // Mock PurchaseOrder#
+          purchaseOrderNo: poRunningNumber, // Mock PurchaseOrder#
           purchaseOrderDate: moment(),
           // status: 'Draft',
           purchaseOrderStatusFK: 1,

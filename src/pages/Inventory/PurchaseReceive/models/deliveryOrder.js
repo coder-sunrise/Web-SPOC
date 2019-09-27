@@ -32,6 +32,7 @@ export default createFormViewModel({
         remark: '',
         rows: [],
       },
+      data: undefined,
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -90,13 +91,23 @@ export default createFormViewModel({
 
       *addNewDeliveryOrder ({ payload }, { call, put }) {
         // Call API to query DeliveryOrder#
+        const runningNumberResponse = yield call(service.queryRunningNumber, {
+          prefix: 'DO',
+        })
+        const { data: doRunningNumber } = runningNumberResponse
 
         return yield put({
           type: 'setAddNewDeliveryOrder',
           payload: {
-            deliveryOrderNo: 'DO/000999',
+            deliveryOrderNo: doRunningNumber,
           },
         })
+      },
+
+      *getStockDetails ({ payload }, { call }) {
+        const result = yield call(service.queryStockDetails, payload)
+        return result
+        // yield put({ type: 'saveStockDetails', payload: result })
       },
     },
 
@@ -180,17 +191,8 @@ export default createFormViewModel({
 
       deleteRow (state, { payload }) {
         const { rows } = state.entity
-        return {
-          ...state,
-          entity: {
-            ...state.entity,
-            // rows: rows.map((o) => {
-            //   if (o.uid === payload) o.isDeleted = true
-            //   return o
-            // }),
-            rows: rows.filter((x) => x.uid !== payload),
-          },
-        }
+        rows.find((v) => v.uid === payload).isDeleted = true
+        return { ...state, entity: { ...state.entity, rows } }
       },
     },
   },

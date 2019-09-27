@@ -32,8 +32,8 @@ import { podoOrderType } from '@/utils/codes'
 })
 class index extends Component {
   state = {
-    settingGSTEnable: true,
-    settingGSTPercentage: 7,
+    settingGSTEnable: false,
+    settingGSTPercentage: 0,
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -242,6 +242,7 @@ class index extends Component {
 
     return {
       ...purchaseOrder,
+      supplierFK: 11,
       purchaseOrderStatusFK: newPurchaseOrderStatusFK,
       purchaseOrderStatusCode: getPurchaseOrderStatusFK(
         newPurchaseOrderStatusFK,

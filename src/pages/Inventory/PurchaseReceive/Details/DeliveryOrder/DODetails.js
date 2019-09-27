@@ -34,7 +34,7 @@ const receivingDetailsSchema = Yup.object().shape({
 
 @withFormikExtend({
   mapPropsToValues: ({ deliveryOrderDetails }) => {
-    return deliveryOrderDetails.entity || deliveryOrderDetails.default
+    return deliveryOrderDetails.entity
   },
   enableReinitialize: true,
   displayName: 'deliveryOrderDetails',
@@ -62,6 +62,7 @@ const receivingDetailsSchema = Yup.object().shape({
         purchaseOrderItemFK: x.id,
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
+        isDeleted: x.isDeleted,
         // batchNo: x.batchNo,
         // expiryDate: x.expiryDate,
         sortOrder: index + 1,
@@ -107,10 +108,21 @@ class DODetails extends PureComponent {
     filterConsumableItemList: [],
     filterMedicationItemList: [],
     filterVaccinationItemList: [],
+
+    // Batch No. #
+    expiryDateAvailability: false,
+    selectedBatch: {},
+    stockMedication: [], // medication
+    stockVaccination: [], // vaccination
+    stockConsumable: [], // consumable
+
+    filterStockMedication: [], // medication
+    filterStockVaccination: [], // vaccination
+    filterStockConsumable: [], // consumable
   }
 
-  componentDidMount () {
-    this.initializeStateItemList()
+  componentDidMount = async () => {
+    await this.initializeStateItemList()
   }
 
   forceUpdate = () => {
@@ -126,8 +138,9 @@ class DODetails extends PureComponent {
 
   initializeStateItemList = async () => {
     const { dispatch } = this.props
+    const result = []
 
-    await podoOrderType.forEach((x) => {
+    await podoOrderType.map((x) => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
@@ -143,7 +156,25 @@ class DODetails extends PureComponent {
           [x.stateName]: inventoryItemList,
         })
       })
+
+      result.push(
+        dispatch({
+          type: 'deliveryOrderDetails/getStockDetails',
+          payload: {
+            id: x.value,
+          },
+        }),
+      )
+      return null
     })
+
+    let [
+      medication,
+      vaccination,
+      consumable,
+    ] = await Promise.all(result)
+
+    this.setOption(medication, vaccination, consumable)
 
     dispatch({
       // force current edit row components to update
@@ -152,6 +183,41 @@ class DODetails extends PureComponent {
         commitCount: (commitCount += 1),
       },
     })
+  }
+
+  setOption = (m, v, c) => {
+    const mOptions = m.data.map((o) => {
+      return {
+        ...o,
+        name: o.batchNo,
+        value: o.batchNo,
+        // value: o.id,
+      }
+    })
+    const vOptions = v.data.map((o) => {
+      return {
+        ...o,
+        name: o.batchNo,
+        value: o.batchNo,
+        // value: o.id,
+      }
+    })
+
+    const cOptions = c.data.map((o) => {
+      return {
+        ...o,
+        name: o.batchNo,
+        value: o.batchNo,
+        // value: o.id,
+      }
+    })
+
+    this.setState({ stockMedication: mOptions })
+    this.setState({ stockVaccination: vOptions })
+    this.setState({ stockConsumable: cOptions })
+    this.setState({ filterStockMedication: mOptions })
+    this.setState({ filterStockVaccination: vOptions })
+    this.setState({ filterStockConsumable: cOptions })
   }
 
   handleOnOrderTypeChanged = async (e) => {
@@ -213,7 +279,28 @@ class DODetails extends PureComponent {
     return { ...row }
   }
 
+  handleSelectedBatch = (e) => {
+    // console.log('handleSelectedBatch', e)
+    // const { option, row } = e
+    // if (option) {
+    //   const { expiryDate, stock, value, batchNo } = option
+    //   row.batchNo = value
+    //   row.expiryDate = expiryDate
+    //   row.stock = stock
+    //   row.batchNoString = batchNo
+    //   this.setState({ selectedItem: e })
+    // }
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
+  }
+
   onCommitChanges = ({ rows, deleted, changed }) => {
+    // console.log({ rows, changed })
     const { dispatch } = this.props
 
     if (deleted) {
@@ -223,7 +310,6 @@ class DODetails extends PureComponent {
       })
     } else if (changed) {
       const existUid = Object.keys(changed)[0]
-
       dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: { uid: existUid, ...changed[existUid] },
@@ -332,7 +418,33 @@ class DODetails extends PureComponent {
     return []
   }
 
+  stockOptions = (row) => {
+    if (row.inventoryItemTypeFK === 1) {
+      let array = [
+        ...this.state.filterStockMedication,
+      ]
+      let x = array.filter((o) => o.inventoryItemFK === row.code)
+      return x
+    }
+    if (row.inventoryItemTypeFK === 2) {
+      let array = [
+        ...this.state.filterStockVaccination,
+      ]
+      let x = array.filter((o) => o.inventoryItemFK === row.code)
+      return x
+    }
+    if (row.inventoryItemTypeFK === 3) {
+      let array = [
+        ...this.state.filterStockConsumable,
+      ]
+      let x = array.filter((o) => o.inventoryItemFK === row.code)
+      return x
+    }
+    return []
+  }
+
   render () {
+    console.log(this.props)
     const isEditable = true
     const { props } = this
     const { footer, values } = props
@@ -443,9 +555,19 @@ class DODetails extends PureComponent {
           width: 180,
         },
         {
+          columnName: 'batchNo',
+          type: 'select',
+          options: (row) => {
+            return this.stockOptions(row)
+          },
+          onChange: (e) => {
+            this.handleSelectedBatch(e)
+          },
+        },
+        {
           columnName: 'expiryDate',
           type: 'date',
-          format: 'DD MMM YYYY',
+          // disabled: this.state.expiryDateAvailability,
         },
       ],
       onRowDoubleClick: undefined,
