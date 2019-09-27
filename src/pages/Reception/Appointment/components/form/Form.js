@@ -156,20 +156,24 @@ class Form extends React.PureComponent {
   checkShouldPopulate = (patientSearchResult) =>
     patientSearchResult.length === 1
 
-  onSearchPatient = () => {
+  onSearchPatient = async () => {
     const { dispatch, values } = this.props
     const prefix = 'like_'
-    dispatch({
+    await dispatch({
       type: 'patientSearch/query',
       payload: {
-        [`${prefix}name`]: values.patientName,
-        [`${prefix}patientAccountNo`]: values.patientName,
-        [`${prefix}contactFkNavigation.contactNumber.number`]: values.patientContactNo,
-        combineCondition: 'or',
+        keepFilter: false,
+        group: [
+          {
+            [`${prefix}name`]: values.patientName,
+            [`${prefix}patientAccountNo`]: values.patientName,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: values.patientContactNo,
+            combineCondition: 'or',
+          },
+        ],
       },
-    }).then(() => {
-      this.showSearchResult()
     })
+    this.showSearchResult()
   }
 
   showSearchResult = () => {

@@ -209,36 +209,25 @@ class Queue extends React.Component {
   onEnterPressed = async (searchQuery) => {
     const { dispatch } = this.props
     const prefix = 'like_'
-    // const result = await queryPatientList({
-    //   [`${prefix}name`]: searchQuery,
-    //   [`${prefix}patientAccountNo`]: searchQuery,
-    //   [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
-    //   combineCondition: 'or',
-    // })
-    // if (result && result.data) this.showSearchResult(result.data)
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        version: Date.now(),
-        [`${prefix}name`]: searchQuery,
-        [`${prefix}patientAccountNo`]: searchQuery,
-        [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
-        combineCondition: 'or',
+        keepFilter: false,
+        group: [
+          {
+            [`${prefix}name`]: searchQuery,
+            [`${prefix}patientAccountNo`]: searchQuery,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+            combineCondition: 'or',
+          },
+        ],
       },
     })
     this.showSearchResult()
-    // dispatch({
-    //   type: 'queueLog/searchPatient',
-    //   payload: { searchQuery },
-    // }).then((response) => {
-    //   console.log({ response })
-    //   this.showSearchResult()
-    // })
   }
 
   showSearchResult = () => {
     const { patientSearchResult = [] } = this.props
-    console.log('querydone', { patientSearchResult })
     const totalRecords = patientSearchResult.length
     if (totalRecords === 1)
       return this.showVisitRegistration({
@@ -296,7 +285,6 @@ class Queue extends React.Component {
 
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    console.log({ patientSearchResult: this.props.patientSearchResult })
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
