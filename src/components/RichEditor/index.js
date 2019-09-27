@@ -234,7 +234,10 @@ class RichEditor extends React.PureComponent {
   }
 
   tagButtonHandleClose = () => {
-    this.setState({ anchorEl: null })
+    // this.setState({ anchorEl: null })
+    setTimeout(() => {
+      if (this.editorReferece) this.editorReferece.focus()
+    }, 1)
   }
 
   insertSelectedTagToEditor = (selectedValue) => {
@@ -291,9 +294,11 @@ class RichEditor extends React.PureComponent {
     let metionCfg = {}
     if (tagList) {
       metionCfg = {
-        separator: ' ',
-        trigger: '@',
-        suggestions: tagList,
+        mention: {
+          separator: ' ',
+          trigger: '@',
+          suggestions: tagList,
+        },
       }
     }
     return (
@@ -396,31 +401,19 @@ class RichEditor extends React.PureComponent {
       shrink: true,
     }
 
-    if (tagList !== undefined) {
-      return (
-        <React.Fragment>
-          <CustomInput
-            labelProps={labelProps}
-            inputComponent={this.getComponent}
-            noUnderLine
-            preventDefaultChangeEvent
-            preventDefaultKeyDownEvent
-            {...restProps}
-          />
-          {/* <TagButton onChange={this.tagButtonOnClick} tagList={tagList} /> */}
-          {this.getTagButtonComponent()}
-        </React.Fragment>
-      )
-    }
     return (
-      <CustomInput
-        labelProps={labelProps}
-        inputComponent={this.getComponent}
-        noUnderLine
-        preventDefaultChangeEvent
-        preventDefaultKeyDownEvent
-        {...restProps}
-      />
+      <React.Fragment>
+        <CustomInput
+          labelProps={labelProps}
+          inputComponent={this.getComponent}
+          noUnderLine
+          preventDefaultChangeEvent
+          preventDefaultKeyDownEvent
+          {...restProps}
+        />
+        {/* <TagButton onChange={this.tagButtonOnClick} tagList={tagList} /> */}
+        {tagList && this.getTagButtonComponent()}
+      </React.Fragment>
     )
   }
 }

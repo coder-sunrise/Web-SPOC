@@ -113,7 +113,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
+            {/* <GridItem md={12}>
               <Field
                 name='templateMessage'
                 render={(args) => {
@@ -127,7 +127,7 @@ class Detail extends PureComponent {
                   )
                 }}
               />
-            </GridItem>
+            </GridItem> */}
           </GridContainer>
         </div>
         {footer &&
