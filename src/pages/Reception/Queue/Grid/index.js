@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
@@ -119,7 +119,6 @@ const columnExtensions = [
 ]
 
 const Grid = ({
-  history,
   dispatch,
   user,
   calendarEvents = [],
@@ -359,17 +358,15 @@ const Grid = ({
   )
 }
 
-export default memo(
-  connect(({ queueLog, calendar, global, loading, user }) => ({
-    user: user.data,
-    filter: queueLog.currentFilter,
-    queueList: queueLog.list || [],
-    calendarEvents: calendar.list || [],
-    showingVisitRegistration: global.showVisitRegistration,
-    queryingData:
-      loading.effects['queueLog/refresh'] ||
-      loading.effects['queueLog/getSessionInfo'] ||
-      loading.effects['queueLog/query'] ||
-      loading.effects['calendar/getCalendarList'],
-  }))(Grid),
-)
+export default connect(({ queueLog, calendar, global, loading, user }) => ({
+  user: user.data,
+  filter: queueLog.currentFilter,
+  queueList: queueLog.list || [],
+  calendarEvents: calendar.list || [],
+  showingVisitRegistration: global.showVisitRegistration,
+  queryingData:
+    loading.effects['queueLog/refresh'] ||
+    loading.effects['queueLog/getSessionInfo'] ||
+    loading.effects['queueLog/query'] ||
+    loading.effects['calendar/getCalendarList'],
+}))(Grid)

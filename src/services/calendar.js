@@ -39,8 +39,8 @@ export const cancel = (params) =>
   request(cancelURL, { method: 'POST', body: params })
 
 export const query = (payload) => {
-  let urlPrefix = payload.isEditedAsSingleAppointment ? '/single' : '/series'
-  if (payload.alwaysSingle) urlPrefix = '/single'
+  const urlPrefix = payload.isEditedAsSingleAppointment ? '/single' : '/series'
+  // if (payload.alwaysSingle) urlPrefix = '/single'
   return request(`${url}${urlPrefix}/${payload.id}`, { method: 'GET' })
 }
 

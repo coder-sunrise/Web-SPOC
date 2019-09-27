@@ -162,7 +162,14 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectEvent = (selectedEvent) => {
-    const { id, appointmentFK, doctor } = selectedEvent
+    const {
+      id,
+      appointmentFK,
+      doctor,
+      appointmentStatusFk,
+      isEditedAsSingleAppointment,
+      isEnableRecurrence,
+    } = selectedEvent
 
     if (doctor) {
       this.props
@@ -183,15 +190,26 @@ class Appointment extends React.PureComponent {
     } else {
       const selectedAppointmentID =
         appointmentFK === undefined ? id : appointmentFK
+      let shouldShowApptForm = true
+      if (isEnableRecurrence) {
+        if (!isEditedAsSingleAppointment) {
+          shouldShowApptForm = false
+          this.setState({
+            selectedAppointmentFK: selectedAppointmentID,
+            showSeriesConfirmation: true,
+            isDragging: false,
+          })
+        }
+      }
 
-      if (!selectedEvent.isEnableRecurrence) {
+      if (shouldShowApptForm) {
         this.props
           .dispatch({
             type: 'calendar/getAppointmentDetails',
             payload: {
               id: selectedAppointmentID,
-              isEditedAsSingleAppointment: false,
-              alwaysSingle: true,
+              isEditedAsSingleAppointment:
+                isEditedAsSingleAppointment || !isEnableRecurrence,
             },
           })
           .then((response) => {
@@ -202,12 +220,6 @@ class Appointment extends React.PureComponent {
                 isDragging: false,
               })
           })
-      } else {
-        this.setState({
-          selectedAppointmentFK: selectedAppointmentID,
-          showSeriesConfirmation: true,
-          isDragging: false,
-        })
       }
     }
   }
