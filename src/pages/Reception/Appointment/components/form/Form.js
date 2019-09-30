@@ -50,6 +50,7 @@ import styles from './style'
     events: calendar.list,
     viewingAppointment: calendar.currentViewAppointment,
     isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
+    mode: calendar.mode,
     cachedPayload: calendar.cachedPayload,
     appointmentStatuses: codetable.ltappointmentstatus,
     clinicianProfiles: codetable.clinicianprofile,
@@ -443,12 +444,7 @@ class Form extends React.PureComponent {
   }
 
   onSaveDraftClick = () => {
-    const {
-      appointmentStatuses,
-      values,
-      isEditedAsSingleAppointment,
-      viewingAppointment,
-    } = this.props
+    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
     const appointmentStatusFK = appointmentStatuses.find(
       (item) => item.code === 'DRAFT',
     ).id
@@ -464,7 +460,7 @@ class Form extends React.PureComponent {
       () => {
         if (
           values.id !== undefined &&
-          !isEditedAsSingleAppointment &&
+          mode === 'series' &&
           hasModifiedAsSingle &&
           viewingAppointment.isEnableRecurrence
         )
@@ -475,12 +471,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
-    const {
-      appointmentStatuses,
-      values,
-      isEditedAsSingleAppointment,
-      viewingAppointment,
-    } = this.props
+    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
 
     try {
       let newAppointmentStatusFK = appointmentStatuses.find(
@@ -507,7 +498,7 @@ class Form extends React.PureComponent {
         () => {
           if (
             values.id !== undefined &&
-            !isEditedAsSingleAppointment &&
+            mode === 'series' &&
             hasModifiedAsSingle &&
             viewingAppointment.isEnableRecurrence
           )
@@ -598,11 +589,11 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
 
     // console.log({ datagrid })
-    // console.log({
-    //   initialValues: this.props.initialValues,
-    //   values: this.props.values,
-    //   dirty: this.props.dirty,
-    // })
+    console.log({
+      initialValues: this.props.initialValues,
+      values: this.props.values,
+      dirty: this.props.dirty,
+    })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (

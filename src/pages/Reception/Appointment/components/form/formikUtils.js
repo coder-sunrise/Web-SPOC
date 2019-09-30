@@ -38,6 +38,8 @@ export const ValidationSchema = Yup.object().shape({
   recurrenceDto: Yup.object().when('isEnableRecurrence', {
     is: true,
     then: Yup.object().shape({
+      recurrenceFrequency: Yup.number().positive(),
+      recurrenceCount: Yup.number().positive(),
       recurrenceDayOfTheMonth: Yup.number()
         .transform((value) => {
           if (Number.isNaN(value)) return -1
@@ -83,6 +85,7 @@ export const mapPropsToValues = ({
     },
     appointmentStatusFk: 2,
     recurrenceDto: { ...initDailyRecurrence },
+    _appointmentDateIn: true,
   }
 
   try {
@@ -115,11 +118,13 @@ export const mapPropsToValues = ({
         currentAppointment: {
           ...appointment,
           appointmentDate: moment(appointment.appointmentDate).formatUTC(),
+          // appointmentDate,
         },
         appointmentStatusFk: appointment.appointmentStatusFk,
         appointments: viewingAppointment.appointments.map((item) => ({
           ...item,
         })),
+        _appointmentDateIn: true,
       }
     }
   } catch (error) {
@@ -194,12 +199,12 @@ export const generateRecurringAppointments = (
               appointments_Resources: restAppointmentValues.appointments_Resources.map(
                 ({ appointmentFK, ...restItem }) => ({ ...restItem }),
               ),
-              appointmentDate: parseDateToServerDateFormatString(date),
+              appointmentDate: moment(date).formatUTC(),
             }
           : {
               ...restAppointmentValues,
               id,
-              appointmentDate: parseDateToServerDateFormatString(date),
+              appointmentDate: moment(date).formatUTC(),
             },
     )
   }

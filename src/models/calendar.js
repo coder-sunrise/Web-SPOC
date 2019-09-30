@@ -39,22 +39,13 @@ const updateApptResources = (oldResources) => (
 ) => {
   const old = oldResources.find(
     (oldItem) => oldItem.sortOrder === apptResource.sortOrder,
-    // (oldItem) => oldItem.id === apptResource.id,
   )
-  console.log({ oldResources, old })
   if (old === undefined)
     return [
       ...currentResources,
       { ...apptResource, isDeleted: true },
     ]
-  // const {
-  //   clinicianFK,
-  //   appointmentTypeFK,
-  //   startTime,
-  //   endTime,
-  //   roomFk,
-  //   isPrimaryClinician,
-  // } = old
+
   return [
     ...currentResources,
     {
@@ -152,7 +143,7 @@ export default createListViewModel({
             appointments_Resources: appointmentResources,
           }
 
-          console.log({ currentAppointment })
+          console.log({ formikCurrentAppointment, currentAppointment })
 
           const shouldGenerateRecurrence =
             !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
@@ -184,11 +175,6 @@ export default createListViewModel({
               (item) => !item.isNew,
             )
 
-            console.log({
-              newResources,
-              oldResources,
-              appts: formikValues.appointments,
-            })
             const updatedOldResources = oldResources.map((item) => ({
               clinicianFK: item.clinicianFK,
               appointmentTypeFK: item.appointmentTypeFK,
@@ -196,6 +182,7 @@ export default createListViewModel({
               endTime: item.endTime,
               roomFk: item.roomFk,
               isPrimaryClinician: item.isPrimaryClinician,
+              sortOrder: item.sortOrder,
             }))
 
             appointments = formikValues.appointments.reduce((updated, appt) => {
@@ -221,6 +208,7 @@ export default createListViewModel({
                   },
                 ]
               }
+
               if (appt.isEditedAsSingleAppointment)
                 return [
                   ...updated,
@@ -295,10 +283,10 @@ export default createListViewModel({
             }
           }
           console.log({ savePayload })
-          // return yield put({
-          //   type: actionKey,
-          //   payload: savePayload,
-          // })
+          return yield put({
+            type: actionKey,
+            payload: savePayload,
+          })
         } catch (error) {
           console.log({ error })
         }
@@ -413,24 +401,30 @@ export default createListViewModel({
         let start
         let end
         let isDayView = false
+        let calendarView = 'month'
+        let offSet = -8
 
-        if (targetView === BigCalendar.Views.MONTH) {
-          start = moment(targetDate).startOf('month').formatUTC()
-          end = moment(targetDate).endOf('month').formatUTC()
-        }
-        if (targetView === BigCalendar.Views.WEEK) {
-          start = moment(targetDate).startOf('week').formatUTC()
-          end = moment(targetDate).endOf('week').formatUTC()
-        }
+        if (targetView === BigCalendar.Views.WEEK) calendarView = 'week'
         if (targetView === BigCalendar.Views.DAY) {
-          start = moment(targetDate).startOf('day').formatUTC()
-          end = moment(targetDate).endOf('day').formatUTC()
           isDayView = true
+          calendarView = 'day'
+          offSet = -8
         }
 
+        start = moment(targetDate)
+          .startOf(calendarView)
+          .add(offSet, 'hours')
+          .formatUTC()
+        end = moment(targetDate)
+          .endOf(calendarView)
+          .add(offSet, 'hours')
+          .formatUTC()
+        console.log({ start, targetDate })
         const getCalendarListPayload = isDayView
           ? {
-              eql_appointmentDate: start,
+              combineCondition: 'and',
+              lgteql_appointmentDate: start,
+              lsteql_appointmentDate: end,
             }
           : {
               combineCondition: 'and',

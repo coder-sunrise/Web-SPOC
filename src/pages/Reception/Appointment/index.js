@@ -95,8 +95,9 @@ class Appointment extends React.PureComponent {
 
   componentWillMount () {
     const { dispatch } = this.props
-    const startOfMonth = moment().startOf('month').format(serverDateFormat)
-    const endOfMonth = moment().endOf('month').format(serverDateFormat)
+    const startOfMonth = moment().startOf('month').add(-8, 'hours').formatUTC()
+    const endOfMonth = moment().endOf('month').add(-8, 'hours').formatUTC()
+
     dispatch({
       type: 'calendar/query',
       payload: {
