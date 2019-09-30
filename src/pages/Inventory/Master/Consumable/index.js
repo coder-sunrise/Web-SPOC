@@ -8,7 +8,13 @@ import Grid from '../Grid'
 import { status } from '@/utils/codes'
 
 const styles = () => ({})
-const Consumable = ({ dispatch, history, consumable, values }) => {
+const Consumable = ({
+  dispatch,
+  history,
+  consumable,
+  values,
+  setActiveTab,
+}) => {
   const [
     tableParas,
     setTableParas,
@@ -90,11 +96,19 @@ const Consumable = ({ dispatch, history, consumable, values }) => {
     colExtensions,
   }
 
-  // useEffect(() => {
-  //   dispatch({
-  //     type: 'consumable/query',
-  //   })
-  // }, [])
+  useEffect(() => {
+    dispatch({
+      type: 'consumable/query',
+    })
+
+    setActiveTab('1')
+    // dispatch({
+    //   type: 'inventoryMaster/updateState',
+    //   payload: {
+    //     currentTab: '1',
+    //   },
+    // })
+  }, [])
 
   return (
     <CardContainer

@@ -1,5 +1,5 @@
-import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import { createFormViewModel } from 'medisys-model'
+import { queryFakeList, fakeSubmitForm } from '@/services/api'
 // import * as service from '../services'
 
 export default createFormViewModel({
@@ -16,10 +16,13 @@ export default createFormViewModel({
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
         if (pathname === '/inventory/master') {
+          console.log('check', pathname, search, query)
+
           dispatch({
-            type: 'updateState',
+            type: 'inventoryMaster/updateState',
             payload: {
-              currentTab: Number(query.t) || 0,
+              currentTab: query.t,
+              shit: 'abc',
             },
           })
         }
@@ -43,7 +46,9 @@ export default createFormViewModel({
       updateCollectPaymentList (state, { payload }) {
         return {
           ...state,
-          collectPaymentList: [ ...payload ],
+          collectPaymentList: [
+            ...payload,
+          ],
         }
       },
     },

@@ -18,20 +18,20 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
-        if (pathname === '/inventory/master/consumable' && !query.uid) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentTab: Number(query.t) || 0,
-            },
-          })
-        }
+        // if (pathname === '/inventory/master/consumable' && !query.uid) {
+        //   dispatch({
+        //     type: 'updateState',
+        //     payload: {
+        //       currentTab: Number(query.t) || 0,
+        //     },
+        //   })
+        // }
 
-        if (pathname === '/inventory/master' && search === '?t=1') {
-          dispatch({
-            type: 'consumable/query',
-          })
-        }
+        // if (pathname === '/inventory/master' && search === '?t=1') {
+        //   dispatch({
+        //     type: 'consumable/query',
+        //   })
+        // }
       })
     },
     effects: {

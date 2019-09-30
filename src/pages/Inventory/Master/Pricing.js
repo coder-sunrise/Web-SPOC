@@ -89,6 +89,8 @@ const Pricing = ({
       hideHeader
       style={{
         margin: theme.spacing(2),
+        minHeight: 700,
+        maxHeight: 700,
       }}
     >
       <h4 style={{ fontWeight: 400 }}>

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
+import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { CardContainer } from '@/components'
-import { compose } from 'redux'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
 import { status } from '@/utils/codes'
 
 const styles = () => ({})
 
-const Vaccination = ({ dispatch, history, vaccination, values }) => {
+const Vaccination = ({
+  dispatch,
+  history,
+  vaccination,
+  values,
+  setActiveTab,
+}) => {
   const [
     tableParas,
     setTableParas,
@@ -86,12 +92,19 @@ const Vaccination = ({ dispatch, history, vaccination, values }) => {
     colExtensions,
   }
 
-  // useEffect(() => {
-  //   dispatch({
-  //     type: 'vaccination/query',
-  //   })
-  // }, [])
+  useEffect(() => {
+    dispatch({
+      type: 'vaccination/query',
+    })
 
+    setActiveTab('2')
+    dispatch({
+      type: 'inventoryMaster/updateState',
+      payload: {
+        currentTab: '2',
+      },
+    })
+  }, [])
   return (
     <CardContainer
       hideHeader

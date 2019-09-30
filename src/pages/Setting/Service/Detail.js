@@ -24,7 +24,11 @@ import {
   CodeSelect,
 } from '@/components'
 
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  sectionHeader: {
+    fontWeight: 400,
+  },
+})
 
 const itemSchema = Yup.object().shape({
   serviceCenterFK: Yup.string().required(),
@@ -199,104 +203,110 @@ class Detail extends PureComponent {
 
     return (
       <React.Fragment>
-        <SizeContainer size='sm'>
-          <div style={{ margin: theme.spacing(1) }}>
-            <h5 className={classes.detailHeader}>Service Details</h5>
-            <Divider />
-            <GridContainer>
-              <GridItem md={6}>
-                <FastField
-                  name='code'
-                  render={(args) => (
-                    <TextField
-                      label='Code'
-                      {...args}
-                      disabled={settingClinicService.entity ? true : false}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='displayValue'
-                  render={(args) => (
-                    <TextField label='Display Value' {...args} />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={10}>
-                <FastField
-                  name='effectiveDates'
-                  render={(args) => {
-                    return (
-                      <DateRangePicker
-                        label='Effective Start Date'
-                        label2='End Date'
-                        disabled={
-                          settingClinicService.entity ? (
-                            !this.state.hasActiveSession
-                          ) : (
-                            false
-                          )
-                        }
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={2}>
-                <FastField
-                  name='isAutoOrder'
-                  render={(args) => {
-                    return <Switch label='Auto Order' {...args} />
-                  }}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='serviceCategoryFK'
-                  render={(args) => {
-                    return (
-                      <CodeSelect
-                        label='Service Category'
-                        code='CTServiceCategory'
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='revenueCategoryFK'
-                  render={(args) => {
-                    return (
-                      <CodeSelect
-                        label='Revenue Category'
-                        code='CTRevenueCategory'
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={12}>
-                <FastField
-                  name='description'
-                  render={(args) => {
-                    return (
+        <div style={{ margin: theme.spacing(2) }}>
+          {/* <SizeContainer style={{ padding: 20 }}> */}
+          <h4 style={{ fontWeight: 400 }}>
+            <b>Service Details</b>
+          </h4>
+          <div>
+            <div style={{ margin: theme.spacing(1) }}>
+              <GridContainer>
+                <GridItem xs={6}>
+                  <FastField
+                    name='code'
+                    render={(args) => (
                       <TextField
-                        label='Description'
-                        multiline
-                        rowsMax={4}
+                        label='Code'
                         {...args}
+                        disabled={settingClinicService.entity ? true : false}
                       />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs={6}>
+                  <FastField
+                    name='displayValue'
+                    render={(args) => (
+                      <TextField label='Display Value' {...args} />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs={6}>
+                  <FastField
+                    name='effectiveDates'
+                    render={(args) => {
+                      return (
+                        <DateRangePicker
+                          label='Effective Start Date'
+                          label2='End Date'
+                          disabled={
+                            settingClinicService.entity ? (
+                              !this.state.hasActiveSession
+                            ) : (
+                              false
+                            )
+                          }
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={6}>
+                  <FastField
+                    name='isAutoOrder'
+                    render={(args) => {
+                      return (
+                        <Switch label='Consultation Auto Order' {...args} />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={6}>
+                  <FastField
+                    name='serviceCategoryFK'
+                    render={(args) => {
+                      return (
+                        <CodeSelect
+                          label='Service Category'
+                          code='CTServiceCategory'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={6}>
+                  <FastField
+                    name='revenueCategoryFK'
+                    render={(args) => {
+                      return (
+                        <CodeSelect
+                          label='Revenue Category'
+                          code='CTRevenueCategory'
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={12}>
+                  <FastField
+                    name='description'
+                    render={(args) => {
+                      return (
+                        <TextField
+                          label='Description'
+                          multiline
+                          rowsMax={4}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              </GridContainer>
+            </div>
             {/* <h5 className={classes.detailHeader}>Medisave Settings</h5>
             <Divider />
             <GridContainer>
@@ -376,10 +386,11 @@ class Detail extends PureComponent {
                 />
               </GridItem>
             </GridContainer> */}
-            <h5 className={classes.detailHeader}>Service Settings</h5>
-            <Divider />
+            <h4 style={{ fontWeight: 400 }}>
+              <b>Service Settings</b>
+            </h4>
             <EditableTableGrid
-              style={{ marginTop: theme.spacing(1) }}
+              style={{ marginTop: theme.spacing(1), margin: theme.spacing(2) }}
               rows={values.ctServiceCenter_ServiceNavigation}
               FuncProps={{
                 pagerConfig: {
@@ -394,7 +405,8 @@ class Detail extends PureComponent {
               {...this.tableParas}
             />
           </div>
-        </SizeContainer>
+        </div>
+        {/* </SizeContainer> */}
         {footer &&
           footer({
             onConfirm: props.handleSubmit,
