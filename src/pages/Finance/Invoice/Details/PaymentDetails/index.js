@@ -135,6 +135,8 @@ class PaymentDetails extends Component {
           payerName={entity ? entity.patientName : 'N/A'}
           payments={paymentTxnList.patientPaymentTxn}
           actions={paymentActionsProps}
+          totalPaid={values.totalPaid}
+          outstanding={values.outStanding}
         />
         {/* <PaymentCard
           actions={paymentActionsProps}
@@ -161,6 +163,7 @@ class PaymentDetails extends Component {
           title='Add Credit Note'
           onConfirm={this.closeAddCrNoteModal}
           onClose={this.closeAddCrNoteModal}
+          maxWidth='lg'
         >
           <AddCrNote />
         </CommonModal>

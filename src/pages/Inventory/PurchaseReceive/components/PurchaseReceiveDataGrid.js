@@ -37,6 +37,7 @@ const PurchaseReceiveDataGrid = ({
       onSelectionChange={(selection) => setSelectedRows(selection)}
       columns={PurchaseReceiveGridCol}
       onRowDoubleClick={(row) => handleNavigate('edit', row.id)}
+      // onRowDoubleClick={(row) => console.log(row)}
       columnExtensions={[
         {
           columnName: 'purchaseOrderDate',
@@ -70,12 +71,12 @@ const PurchaseReceiveDataGrid = ({
           },
         },
       ]}
-      // FuncProps={{
-      //   selectable: true,
-      //   selectConfig: {
-      //     // showSelectAll: true
-      //   },
-      // }}
+      FuncProps={{
+        selectable: true,
+        selectConfig: {
+          showSelectAll: true,
+        },
+      }}
     />
   )
 }

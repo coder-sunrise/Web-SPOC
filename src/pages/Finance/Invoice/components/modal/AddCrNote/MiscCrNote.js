@@ -27,6 +27,7 @@ import styles from './styles'
       itemType: 'Misc',
       itemName: values.description,
       quantity: 1,
+      unitPrice: values.total,
       totalAfterItemAdjustment: values.total,
       isDeleted: false,
     }
@@ -53,7 +54,7 @@ class MiscCrNote extends PureComponent {
             <React.Fragment>
               <GridContainer>
                 <GridItem md={8}>
-                  <GridContainer direction='column'>
+                  <GridContainer>
                     <GridItem md={10}>
                       <TextField label='Type' value='MISC' disabled />
                     </GridItem>
@@ -85,24 +86,9 @@ class MiscCrNote extends PureComponent {
                   </GridContainer>
                 </GridItem>
                 <GridItem md={4}>
-                  <GridContainer direction='column'>
-                    {/* <GridItem>
-                  <FastField
-                    name='unitPrice'
-                    render={(args) => (
-                      <NumberInput {...args} label='Unit Price: ' currency />
-                    )}
-                  />
-                </GridItem>
-                <GridItem>
-                  <FastField
-                    name='quantiy'
-                    render={(args) => (
-                      <NumberInput {...args} label='Quantity:' />
-                    )}
-                  />
-                </GridItem> */}
-                    <GridItem>
+                  <GridContainer>
+                    <GridItem md='12' />
+                    <GridItem md='12'>
                       <FastField
                         name='total'
                         render={(args) => (
@@ -110,6 +96,7 @@ class MiscCrNote extends PureComponent {
                         )}
                       />
                     </GridItem>
+                    <GridItem md='12' />
                   </GridContainer>
                 </GridItem>
               </GridContainer>

@@ -916,7 +916,7 @@ class CommonTableGrid extends PureComponent {
             {selectable && (
               <TableSelection
                 highlightRow
-                selectByRowClick={allowSelectRowByClick}
+                // selectByRowClick={allowSelectRowByClick}
                 showSelectionColumn
                 {...selectConfig}
               />

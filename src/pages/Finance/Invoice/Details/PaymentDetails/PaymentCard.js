@@ -36,6 +36,8 @@ const PaymentCard = ({
   payments = [
     // { ...DefaultPaymentInfo },
   ],
+  totalPaid,
+  outstanding,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
   return (
@@ -66,7 +68,7 @@ const PaymentCard = ({
           justify='center'
           alignItems='flex-end'
         >
-          <PaymentSummary />
+          <PaymentSummary totalPaid={totalPaid} outstanding={outstanding} />
         </GridItem>
         <GridItem />
       </GridContainer>

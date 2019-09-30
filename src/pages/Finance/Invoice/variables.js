@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { dateFormatLong } from '@/components'
+// import { dateFormatLong } from '@/components'
 export const TableConfig = {
   // FuncProps: { pager: false },
 }
@@ -36,7 +36,8 @@ const generateInvoiceGridData = () => {
     data.push({
       id: i,
       invoiceNo: `INV-00${i}`,
-      invoiceDate: moment().format({ dateFormatLong }),
+      // invoiceDate: moment().format({ dateFormatLong }),
+      invoiceDate: moment(),
       patientID: 'S1234567D',
       patientName: 'Lee Tian Kang',
       totalAfterGST: 0,

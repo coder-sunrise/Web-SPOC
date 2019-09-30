@@ -5,7 +5,8 @@ import { formatMessage } from 'umi/locale'
 import { withFormikExtend, GridContainer, GridItem, Button } from '@/components'
 import POForm from './POForm'
 import POGrid from './POGrid'
-import POSummary from './POSummary'
+// import POSummary from './POSummary'
+import POSummary from './Share/index'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
 import {
   isPOStatusDraft,
@@ -15,10 +16,8 @@ import {
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 
-// @connect(({ purchaseOrderDetails, clinicSettings, clinicInfo }) => ({
-//   purchaseOrderDetails,
+// @connect(({ clinicSettings }) => ({
 //   clinicSettings,
-//   clinicInfo,
 // }))
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
@@ -47,7 +46,7 @@ class index extends Component {
       )
         return {
           ...state,
-          settingGSTEnable: !settings.IsEnableGST,
+          settingGSTEnable: settings.IsEnableGST,
           settingGSTPercentage: settings.GSTPercentageInt,
         }
     }
@@ -371,9 +370,12 @@ class index extends Component {
   }
 
   render () {
-    const { purchaseOrderDetails } = this.props
-    const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 0
+    const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
+    const { purchaseOrder: po } = purchaseOrderDetails
+    const poStatus = po ? po.purchaseOrderStatusFK : 0
+    const { purchaseOrder, purchaseOrderAdjustment } = values
+    const { IsGSTEnabled } = purchaseOrder || false
+
     return (
       <div>
         <POForm
@@ -387,8 +389,15 @@ class index extends Component {
         />
         <POSummary
           toggleInvoiceAdjustment={this.showInvoiceAdjustment}
-          calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          {...this.props}
+          // calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
+          handleCalcInvoiceSummary={this.calcPurchaseOrderSummary}
+          prefix='purchaseOrder.'
+          adjustmentListName='purchaseOrderAdjustment'
+          adjustmentList={purchaseOrderAdjustment}
+          IsGSTEnabled={IsGSTEnabled}
+          dispatch={dispatch}
+          setFieldValue={setFieldValue}
+          // {...this.props}
         />
         <GridContainer direction='row' style={{ marginTop: 20 }}>
           <GridItem xs={4} md={8} />
