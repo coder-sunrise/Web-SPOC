@@ -194,11 +194,11 @@ class CommonTableGrid extends PureComponent {
       )
     }
 
-    this.TableRow = ({ row, ...restProps }) => (
+    this.TableRow = ({ row, tableRow, ...restProps }) => (
       <Table.Row
         {...restProps}
         onDoubleClick={(event) => {
-          onRowDoubleClick && onRowDoubleClick(row, event)
+          onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
         }}
         onClick={(event) => {
           onRowClick(row, event)
@@ -918,6 +918,7 @@ class CommonTableGrid extends PureComponent {
                 highlightRow
                 selectByRowClick={allowSelectRowByClick}
                 showSelectionColumn
+                rowComponent={this.TableRow}
                 {...selectConfig}
               />
             )}

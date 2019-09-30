@@ -43,4 +43,10 @@ module.exports = {
     })
     return r
   },
+  editOrder: async (id) => {
+    const r = await request(`${url}/editOrder/${id}`, {
+      method: 'PUT',
+    })
+    return r
+  },
 }

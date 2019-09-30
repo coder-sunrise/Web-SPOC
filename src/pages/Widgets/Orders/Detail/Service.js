@@ -70,6 +70,10 @@ class Service extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctservice',
+        filter: {
+          'serviceFKNavigation.IsActive': true,
+          combineCondition: 'or',
+        },
       },
     }).then((list) => {
       // console.log(list)

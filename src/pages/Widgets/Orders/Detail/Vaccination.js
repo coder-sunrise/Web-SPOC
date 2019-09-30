@@ -36,7 +36,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
-    stockVaccinationFK: Yup.number().required(),
+    inventoryVaccinationFK: Yup.number().required(),
     unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
@@ -129,13 +129,13 @@ class Vaccination extends PureComponent {
       handleSubmit,
       setFieldValue,
     } = this.props
-    // console.log('Vaccination', this.props)
+    console.log('Vaccination', this.props)
     return (
       <div>
         <GridContainer>
           <GridItem xs={12}>
             <FastField
-              name='stockVaccinationFK'
+              name='inventoryVaccinationFK'
               render={(args) => {
                 return (
                   <CodeSelect

@@ -237,7 +237,7 @@ const request = (url, option, showNotification = true) => {
   try {
     let r = $.when(
       $.ajax({
-        timeout: 20000,
+        timeout: 140000,
         ...newOptions,
         url: newUrl,
         type: newOptions.method,

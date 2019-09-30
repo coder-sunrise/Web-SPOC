@@ -34,9 +34,6 @@ import { sumReducer } from '@/utils/utils'
 
 import Grid from './Grid'
 import Detail from './Detail/index'
-import model from './models'
-
-window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
   rightAlign: {

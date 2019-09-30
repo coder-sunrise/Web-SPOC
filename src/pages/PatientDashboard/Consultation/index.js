@@ -58,6 +58,7 @@ import AuthorizedContext from '@/components/Context/Authorized'
 
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl } from '@/utils/utils'
+import model from '@/pages/Widgets/Orders/models'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -67,6 +68,8 @@ import Layout from './Layout'
 
 import schema from './schema'
 import styles from './style'
+
+window.g_app.replaceModel(model)
 
 const saveConsultation = ({
   props,

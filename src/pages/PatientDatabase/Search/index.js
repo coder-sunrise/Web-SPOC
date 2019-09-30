@@ -25,6 +25,7 @@ class PatientSearch extends PureComponent {
     // console.log(this)
 
     const showPatient = (row) => {
+      console.log(row)
       if (!this.props.history) return
       this.props.history.push(
         getAppendUrl({
