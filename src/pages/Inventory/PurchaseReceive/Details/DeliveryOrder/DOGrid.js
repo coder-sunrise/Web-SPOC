@@ -5,7 +5,7 @@ import Edit from '@material-ui/icons/Edit'
 const DOGrid = ({ setFieldValue, deliveryOrderDetails }) => {
   const { list } = deliveryOrderDetails
 
-  const editRow = (row, e) => { }
+  const editRow = (row, e) => {}
 
   return (
     <CardContainer hideHeader>
@@ -14,11 +14,11 @@ const DOGrid = ({ setFieldValue, deliveryOrderDetails }) => {
         rows={list}
         onRowDoubleClick={editRow}
         columns={[
-          { name: 'doDate', title: 'Delivery Order Date' },
-          { name: 'doNo', title: 'Delivery Order No.' },
+          { name: 'deliveryOrderDate', title: 'Delivery Order Date' },
+          { name: 'deliveryOrderNo', title: 'Delivery Order No.' },
           { name: 'total', title: 'Total Qty Received' },
           { name: 'outstanding', title: 'Outstanding Qty' },
-          { name: 'remarks', title: 'Remarks' },
+          { name: 'remark', title: 'Remarks' },
           {
             name: 'action',
             title: 'Action',
@@ -26,9 +26,8 @@ const DOGrid = ({ setFieldValue, deliveryOrderDetails }) => {
         ]}
         columnExtensions={[
           {
-            columnName: 'doDate',
+            columnName: 'deliveryOrderDate',
             type: 'date',
-            format: 'DD MMM YYYY',
           },
           {
             columnName: 'total',
@@ -47,7 +46,7 @@ const DOGrid = ({ setFieldValue, deliveryOrderDetails }) => {
                 <Button
                   size='sm'
                   onClick={() => {
-                    this.editRow(row)
+                    editRow(row)
                   }}
                   justIcon
                   color='primary'
@@ -66,4 +65,4 @@ const DOGrid = ({ setFieldValue, deliveryOrderDetails }) => {
   )
 }
 
-export default (DOGrid)
+export default DOGrid

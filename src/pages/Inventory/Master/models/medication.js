@@ -19,23 +19,23 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
-        if (pathname === '/inventory/master/medication' && !query.uid) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentTab: Number(query.t) || 0,
-            },
-          })
-        }
+        // if (pathname === '/inventory/master/medication' && !query.uid) {
+        //   dispatch({
+        //     type: 'updateState',
+        //     payload: {
+        //       currentTab: Number(query.t) || 0,
+        //     },
+        //   })
+        // }
 
-        if (
-          pathname === '/inventory/master' &&
-          (!search || search === '?t=0')
-        ) {
-          dispatch({
-            type: 'medication/query',
-          })
-        }
+        // if (
+        //   pathname === '/inventory/master' &&
+        //   (!search || search === '?t=0')
+        // ) {
+        //   dispatch({
+        //     type: 'medication/query',
+        //   })
+        // }
       })
     },
     effects: {},

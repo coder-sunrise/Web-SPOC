@@ -92,6 +92,7 @@ const ActionButton = ({ row, onClick }) => {
       }),
     [
       row.rowIndex,
+      row.visitStatus,
     ],
   )
 
@@ -106,4 +107,4 @@ const ActionButton = ({ row, onClick }) => {
   )
 }
 
-export default memo(ActionButton)
+export default ActionButton

@@ -3,15 +3,17 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import Yup from '@/utils/yup'
-import DetailPanel from './Detail'
-import Pricing from '../../Pricing'
-import Stock from '../../Stock'
+// import DetailPanel from './Detail'
+// import Pricing from '../../Pricing'
+// import Stock from '../../Stock'
 import {
   NavPills,
   ProgressButton,
   Button,
   withFormikExtend,
+  Tabs,
 } from '@/components'
+import { ConsumableDetailOption } from './variables'
 import {
   getAppendUrl,
   errMsgForOutOfRange as errMsg,
@@ -45,9 +47,14 @@ const Detail = ({
     setValues,
     values,
   }
+  const stockProps = {
+    consumableDetail,
+    values,
+    setFieldValue,
+  }
   return (
     <React.Fragment>
-      <NavPills
+      {/* <NavPills
         color='primary'
         onChange={(event, active) => {
           history.push(
@@ -77,6 +84,11 @@ const Detail = ({
             ),
           },
         ]}
+      /> */}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={ConsumableDetailOption(detailProps, stockProps)}
       />
       <div className={classes.actionDiv}>
         <ProgressButton

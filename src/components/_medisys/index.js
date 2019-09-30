@@ -13,3 +13,5 @@ export { default as Attachment } from './Attachment'
 export { default as ReportDataGrid } from './ReportDataGrid'
 export { default as AccordionTitle } from './AccordionTitle'
 export { default as DoctorProfileSelect } from './DoctorProfileSelect'
+
+export { default as LoginNavbar } from './LandingLayout/NavBar'

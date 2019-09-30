@@ -25,7 +25,9 @@ const styles = (theme) => ({})
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateMessage: Yup.string().required(),
+    templateMessage: Yup.string()
+      .required()
+      .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
@@ -57,7 +59,6 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingSmsTemplate } = props
-    console.log('detail', props.values)
 
     return (
       <React.Fragment>
@@ -102,10 +103,12 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <RichEditor
+                      toolbarHidden={() => true}
+                      handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
                       onBlur={(html, text) => {
-                        console.log(html, text)
+                        this.props.setFieldValue('templateMessage', text)
                       }}
                       {...args}
                     />

@@ -15,6 +15,7 @@ export default createListViewModel({
           moment('2099-12-31'),
         ],
         ctServiceCenter_ServiceNavigation: [],
+        description: '',
       },
     },
     subscriptions: ({ dispatch, history }) => {

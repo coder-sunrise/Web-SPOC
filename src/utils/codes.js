@@ -846,27 +846,28 @@ const _fetchAndSaveCodeTable = async (
   })
 
   let { status: statusCode, data } = response
-  let newData
-
-  if (code.split(',').length > 1) {
-    const codes = code.split(',')
-    newData = [
-      ...codes.reduce(
-        (merged, c) => [
-          ...merged,
-          ...data[c],
-        ],
-        [],
-      ),
-    ]
-  } else {
-    newData = useGeneral
-      ? [
-          ...data[code],
-        ]
-      : [
-          ...data.data,
-        ]
+  let newData = []
+  if (parseInt(statusCode, 10) === 200) {
+    if (code.split(',').length > 1) {
+      const codes = code.split(',')
+      newData = [
+        ...codes.reduce(
+          (merged, c) => [
+            ...merged,
+            ...data[c],
+          ],
+          [],
+        ),
+      ]
+    } else {
+      newData = useGeneral
+        ? [
+            ...data[code],
+          ]
+        : [
+            ...data.data,
+          ]
+    }
   }
 
   if (parseInt(statusCode, 10) === 200) {
@@ -1023,6 +1024,8 @@ export const podoOrderType = [
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
     stateName: 'MedicationItemList',
+    itemCode: 'inventoryMedicationCode',
+    itemName: 'inventoryMedicationName',
   },
   {
     value: 2,
@@ -1031,6 +1034,8 @@ export const podoOrderType = [
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
     stateName: 'VaccinationItemList',
+    itemCode: 'inventoryVaccinationCode',
+    itemName: 'inventoryVaccinationName',
   },
   {
     value: 3,
@@ -1039,6 +1044,8 @@ export const podoOrderType = [
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
     stateName: 'ConsumableItemList',
+    itemCode: 'inventoryConsumableCode',
+    itemName: 'inventoryConsumableName',
   },
 ]
 

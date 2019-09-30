@@ -41,8 +41,18 @@ export default class Grid extends PureComponent {
         // FuncProps={{ pager: false }}
         columnExtensions={[
           {
+            columnName: 'displayValue',
+            width: 320,
+          },
+          {
+            columnName: 'description',
+            width: 380,
+          },
+          {
             columnName: 'isActive',
             sortingEnabled: false,
+            align: 'center',
+            width: 150,
             type: 'select',
             options: status,
           },

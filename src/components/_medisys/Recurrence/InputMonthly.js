@@ -26,6 +26,7 @@ const RecurrenceMonthly = ({ classes, disabled, labelSize, inputSize }) => {
           render={(args) => (
             <NumberInput
               {...args}
+              min={1}
               disabled={disabled}
               prefix='of every: '
               suffix='month(s)'

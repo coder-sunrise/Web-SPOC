@@ -23,13 +23,25 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ clinicSettings }) => ({
+@connect(({ clinicSettings, formik }) => ({
   clinicSettings,
+  formik,
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ clinicSettings }) => clinicSettings.entity,
-
+  mapPropsToValues: ({ clinicSettings }) => {
+    if (clinicSettings.entity && clinicSettings.entity.IsEnableGST) {
+      const { IsEnableGST } = clinicSettings.entity
+      return {
+        ...clinicSettings.entity,
+        IsEnableGST: {
+          ...IsEnableGST,
+          settingValue: IsEnableGST.settingValue === 'true',
+        },
+      }
+    }
+    return clinicSettings.entity
+  },
   handleSubmit: (values, { props }) => {
     const { IsEnableGST, GSTRegistrationNumber, GSTPercentage } = values
 
@@ -99,21 +111,6 @@ class clinicSettings extends PureComponent {
         ? param.IsEnableGST.settingValue.toString() === 'true'
         : false,
     })
-    this.props.setFieldValue(
-      'IsEnableGST.settingValue',
-      param.IsEnableGST
-        ? param.IsEnableGST.settingValue.toString() === 'true'
-        : false,
-    )
-    // this.props.setValues({
-    //   ...this.props.values,
-    //   IsEnableGST: {
-    //     ...this.props.values.IsEnableGST,
-    //     settingValue: this.props.values.IsEnableGST
-    //       ? this.props.values.IsEnableGST.settingValue.toString() === 'true'
-    //       : false,
-    //   },
-    // })
   }
 
   handleOnChange = (event) => {

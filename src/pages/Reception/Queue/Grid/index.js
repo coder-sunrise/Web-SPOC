@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
@@ -119,7 +119,6 @@ const columnExtensions = [
 ]
 
 const Grid = ({
-  history,
   dispatch,
   user,
   calendarEvents = [],

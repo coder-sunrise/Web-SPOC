@@ -16,6 +16,7 @@ export default createListViewModel({
         ],
         enableRecurrence: true,
         recurrencePattern: 'daily',
+        description: '',
       },
     },
     subscriptions: ({ dispatch, history }) => {

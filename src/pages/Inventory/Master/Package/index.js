@@ -87,11 +87,17 @@ const Package = ({ dispatch, history, pack }) => {
     colExtensions,
   }
 
-  // useEffect(() => {
-  //   dispatch({
-  //     type: 'pack/query',
-  //   })
-  // }, [])
+  useEffect(() => {
+    dispatch({
+      type: 'pack/query',
+    })
+    dispatch({
+      type: 'inventoryMaster/updateState',
+      payload: {
+        currentTab: '3',
+      },
+    })
+  }, [])
 
   return (
     <CardContainer
