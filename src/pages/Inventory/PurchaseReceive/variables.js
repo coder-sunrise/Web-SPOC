@@ -8,51 +8,131 @@ import DeliveryOrder from './Details/DeliveryOrder'
 import Payment from './Details/Payment'
 import moment from 'moment'
 
+export const poSubmitAction = {
+  SAVE: 1,
+  CANCEL: 2,
+  FINALIZE: 3,
+  COMPLETE: 4,
+  PRINT: 5,
+}
+
+const LTPurchaseOrderStatus = [
+  {
+    code: 'DRAFT',
+    name: 'Draft',
+    id: 1,
+  },
+  {
+    code: 'FINALIZED',
+    name: 'Finalized',
+    id: 2,
+  },
+  {
+    code: 'PARTIALREVD',
+    name: 'Partially Received',
+    id: 3,
+  },
+  {
+    code: 'CANCELLED',
+    name: 'Cancelled',
+    id: 4,
+  },
+  {
+    code: 'FULFILLED',
+    name: 'Fulfilled',
+    id: 5,
+  },
+  {
+    code: 'COMPLETED',
+    name: 'Completed',
+    id: 6,
+  },
+]
+
+const LTInvoiceStatus = [
+  {
+    code: 'PAID',
+    name: 'Paid',
+    id: 1,
+  },
+  {
+    code: 'OVERPAID',
+    name: 'Overpaid',
+    id: 2,
+  },
+  {
+    code: 'OUTSTANDING',
+    name: 'Outstanding',
+    id: 3,
+  },
+  {
+    code: 'WRITEOFF',
+    name: 'Write-Off',
+    id: 4,
+  },
+]
+
 const isDuplicatePOAllowed = (status) => {
   const allowedStatus = [
     'Partially Received',
     'Finalized',
     'Fulfilled',
+    // 2,
+    // 3,
+    // 5,
   ]
   return !(allowedStatus.indexOf(status) > -1)
 }
 
 export const isPOStatusDraft = (status) => {
   const allowedStatus = [
-    'Draft',
-    'Cancelled',
+    // 'Draft',
+    1,
   ]
   return allowedStatus.indexOf(status) > -1
 }
 
 export const isPOStatusFinalized = (status) => {
   const allowedStatus = [
-    'Finalized',
+    // 'Finalized',
+    2,
+    3,
   ]
   return allowedStatus.indexOf(status) > -1
 }
 
+export const getPurchaseOrderStatusFK = (status) => {
+  let purchaseOrderStatusFK = {}
+  if (typeof status === 'number') {
+    purchaseOrderStatusFK = LTPurchaseOrderStatus.find((x) => x.id === status)
+  } else {
+    purchaseOrderStatusFK = LTPurchaseOrderStatus.find(
+      (x) => x.name.toLowerCase() === status.toLowerCase(),
+    )
+  }
+
+  return purchaseOrderStatusFK
+}
+
+export const getInvoiceStatusFK = (status) => {
+  const invoiceStatusFK = LTInvoiceStatus.find(
+    (x) => x.name.toLowerCase() === status.toLowerCase(),
+  )
+  return invoiceStatusFK
+}
+
 export const PurchaseReceiveGridCol = [
-  { name: 'poNo', title: 'PO No' },
-  { name: 'poDate', title: 'PO Date' },
+  { name: 'purchaseOrderNo', title: 'PO No' },
+  { name: 'purchaseOrderDate', title: 'PO Date' },
   { name: 'supplier', title: 'Supplier' },
-  { name: 'expectedDeliveryDate', title: 'Expected Delivery Date' },
-  { name: 'poStatus', title: 'PO Status' },
-  { name: 'total', title: 'Total' },
+  { name: 'exceptedDeliveryDate', title: 'Expected Delivery Date' },
+  { name: 'purchaseOrderStatus', title: 'PO Status' },
+  { name: 'totalAmount', title: 'Total' },
   { name: 'outstanding', title: 'Outstanding' },
   { name: 'invoiceStatus', title: 'Inv. Status' },
   { name: 'remarks', title: 'Remarks' },
   { name: 'action', title: 'Action' },
 ]
-
-export const PurchaseReceiveGridTableConfig = {
-  FuncProps: {
-    selectable: true,
-    selectConfig: {
-      // showSelectAll: true
-    },
-  }
-}
 
 export const ContextMenuOptions = (row) => {
   return [
@@ -66,7 +146,7 @@ export const ContextMenuOptions = (row) => {
       id: 1,
       label: 'Duplicate PO',
       Icon: Duplicate,
-      disabled: isDuplicatePOAllowed(row.poStatus),
+      disabled: isDuplicatePOAllowed(row.purchaseOrderStatus),
     },
     { isDivider: true },
     {

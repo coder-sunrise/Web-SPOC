@@ -34,15 +34,67 @@ const receivingDetailsSchema = Yup.object().shape({
 
 @withFormikExtend({
   mapPropsToValues: ({ deliveryOrderDetails }) => {
-    return deliveryOrderDetails.entity || deliveryOrderDetails.default
+    return deliveryOrderDetails.entity
   },
   enableReinitialize: true,
   displayName: 'deliveryOrderDetails',
   validationSchema: Yup.object().shape({
-    poNo: Yup.string().required(),
+    deliveryOrderNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
     rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
   }),
+  handleSubmit: (values, { props }) => {
+    const { rows, ...restValues } = values
+    // console.log('handleSubmit1', values)
+    // console.log('handleSubmit2', restValues)
+    const {
+      deliveryOrderDetails,
+      refreshDeliveryOrder,
+      dispatch,
+      onConfirm,
+    } = props
+    const { list } = deliveryOrderDetails
+
+    let deliveryOrderItem = rows.map((x, index) => {
+      // const itemType = podoOrderType.find((y) => y.value === x.type)
+      return {
+        inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
+        purchaseOrderItemFK: x.id,
+        recevingQuantity: x.currentReceivingQty,
+        bonusQuantity: x.currentReceivingBonusQty,
+        isDeleted: x.isDeleted,
+        // batchNo: x.batchNo,
+        // expiryDate: x.expiryDate,
+        sortOrder: index + 1,
+        inventoryTransactionItemDto: {
+          // inventoryTypeFK: itemType.value,
+        },
+      }
+    })
+
+    dispatch({
+      type: 'deliveryOrderDetails/upsert',
+      payload: {
+        ...restValues,
+        sequence: list ? list.length + 1 : 1,
+        inventoryTransactionFK: 26, // Temporary hard code, will remove once Soe fix the API
+        deliveryOrderStatusFK: 1, // Temporary hard code, will remove once Soe fix the API
+        deliveryOrderItem,
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'purchaseOrderDetails/refresh',
+          payload: {
+            id: deliveryOrderDetails.id,
+          },
+        })
+
+        setTimeout(() => refreshDeliveryOrder(), 500)
+      }
+    })
+  },
 })
 class DODetails extends PureComponent {
   state = {
@@ -56,10 +108,21 @@ class DODetails extends PureComponent {
     filterConsumableItemList: [],
     filterMedicationItemList: [],
     filterVaccinationItemList: [],
+
+    // Batch No. #
+    expiryDateAvailability: false,
+    selectedBatch: {},
+    stockMedication: [], // medication
+    stockVaccination: [], // vaccination
+    stockConsumable: [], // consumable
+
+    filterStockMedication: [], // medication
+    filterStockVaccination: [], // vaccination
+    filterStockConsumable: [], // consumable
   }
 
-  componentDidMount () {
-    this.initializeStateItemList()
+  componentDidMount = async () => {
+    await this.initializeStateItemList()
   }
 
   forceUpdate = () => {
@@ -75,8 +138,9 @@ class DODetails extends PureComponent {
 
   initializeStateItemList = async () => {
     const { dispatch } = this.props
+    const result = []
 
-    await podoOrderType.forEach((x) => {
+    await podoOrderType.map((x) => {
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
@@ -92,7 +156,25 @@ class DODetails extends PureComponent {
           [x.stateName]: inventoryItemList,
         })
       })
+
+      result.push(
+        dispatch({
+          type: 'deliveryOrderDetails/getStockDetails',
+          payload: {
+            id: x.value,
+          },
+        }),
+      )
+      return null
     })
+
+    let [
+      medication,
+      vaccination,
+      consumable,
+    ] = await Promise.all(result)
+
+    this.setOption(medication, vaccination, consumable)
 
     dispatch({
       // force current edit row components to update
@@ -101,6 +183,41 @@ class DODetails extends PureComponent {
         commitCount: (commitCount += 1),
       },
     })
+  }
+
+  setOption = (m, v, c) => {
+    const mOptions = m.data.map((o) => {
+      return {
+        ...o,
+        name: o.batchNo,
+        value: o.batchNo,
+        // value: o.id,
+      }
+    })
+    const vOptions = v.data.map((o) => {
+      return {
+        ...o,
+        name: o.batchNo,
+        value: o.batchNo,
+        // value: o.id,
+      }
+    })
+
+    const cOptions = c.data.map((o) => {
+      return {
+        ...o,
+        name: o.batchNo,
+        value: o.batchNo,
+        // value: o.id,
+      }
+    })
+
+    this.setState({ stockMedication: mOptions })
+    this.setState({ stockVaccination: vOptions })
+    this.setState({ stockConsumable: cOptions })
+    this.setState({ filterStockMedication: mOptions })
+    this.setState({ filterStockVaccination: vOptions })
+    this.setState({ filterStockConsumable: cOptions })
   }
 
   handleOnOrderTypeChanged = async (e) => {
@@ -162,8 +279,28 @@ class DODetails extends PureComponent {
     return { ...row }
   }
 
+  handleSelectedBatch = (e) => {
+    // console.log('handleSelectedBatch', e)
+    // const { option, row } = e
+    // if (option) {
+    //   const { expiryDate, stock, value, batchNo } = option
+    //   row.batchNo = value
+    //   row.expiryDate = expiryDate
+    //   row.stock = stock
+    //   row.batchNoString = batchNo
+    //   this.setState({ selectedItem: e })
+    // }
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
+  }
+
   onCommitChanges = ({ rows, deleted, changed }) => {
-    console.log('onCommitChanges')
+    // console.log({ rows, changed })
     const { dispatch } = this.props
 
     if (deleted) {
@@ -173,7 +310,6 @@ class DODetails extends PureComponent {
       })
     } else if (changed) {
       const existUid = Object.keys(changed)[0]
-
       dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: { uid: existUid, ...changed[existUid] },
@@ -268,14 +404,41 @@ class DODetails extends PureComponent {
       return row.uid
         ? this.state.MedicationItemList
         : this.state.filterMedicationItemList
-    } if (row.type === 2) {
+    }
+    if (row.type === 2) {
       return row.uid
         ? this.state.VaccinationItemList
         : this.state.filterVaccinationItemList
-    } if (row.type === 3) {
+    }
+    if (row.type === 3) {
       return row.uid
         ? this.state.ConsumableItemList
         : this.state.filterConsumableItemList
+    }
+    return []
+  }
+
+  stockOptions = (row) => {
+    if (row.inventoryItemTypeFK === 1) {
+      let array = [
+        ...this.state.filterStockMedication,
+      ]
+      let x = array.filter((o) => o.inventoryItemFK === row.code)
+      return x
+    }
+    if (row.inventoryItemTypeFK === 2) {
+      let array = [
+        ...this.state.filterStockVaccination,
+      ]
+      let x = array.filter((o) => o.inventoryItemFK === row.code)
+      return x
+    }
+    if (row.inventoryItemTypeFK === 3) {
+      let array = [
+        ...this.state.filterStockConsumable,
+      ]
+      let x = array.filter((o) => o.inventoryItemFK === row.code)
+      return x
     }
     return []
   }
@@ -293,8 +456,8 @@ class DODetails extends PureComponent {
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
         { name: 'uom', title: 'UOM' },
-        { name: 'orderQty', title: 'Order Qty' },
-        { name: 'bonusQty', title: 'Bonus Qty' },
+        { name: 'orderQuantity', title: 'Order Qty' },
+        { name: 'bonusQuantity', title: 'Bonus Qty' },
         { name: 'quantityReceived', title: 'Total Received' },
         { name: 'totalBonusReceived', title: 'Total Bonus Received' },
         { name: 'currentReceivingQty', title: 'Current Receiving Qty' },
@@ -350,21 +513,23 @@ class DODetails extends PureComponent {
           options: (row) => {
             if (row.type === 1) {
               return this.state.MedicationItemList
-            } if (row.type === 2) {
+            }
+            if (row.type === 2) {
               return this.state.VaccinationItemList
-            } if (row.type === 3) {
+            }
+            if (row.type === 3) {
               return this.state.ConsumableItemList
             }
             return []
           },
         },
         {
-          columnName: 'orderQty',
+          columnName: 'orderQuantity',
           type: 'number',
           disabled: true,
         },
         {
-          columnName: 'bonusQty',
+          columnName: 'bonusQuantity',
           type: 'number',
           disabled: true,
         },
@@ -390,9 +555,19 @@ class DODetails extends PureComponent {
           width: 180,
         },
         {
+          columnName: 'batchNo',
+          type: 'select',
+          options: (row) => {
+            return this.stockOptions(row)
+          },
+          onChange: (e) => {
+            this.handleSelectedBatch(e)
+          },
+        },
+        {
           columnName: 'expiryDate',
           type: 'date',
-          format: 'DD MMM YYYY',
+          // disabled: this.state.expiryDateAvailability,
         },
       ],
       onRowDoubleClick: undefined,
@@ -405,7 +580,7 @@ class DODetails extends PureComponent {
             <GridContainer>
               <GridItem xs={12}>
                 <FastField
-                  name='doNo'
+                  name='deliveryOrderNo'
                   render={(args) => {
                     return (
                       <TextField
@@ -441,13 +616,21 @@ class DODetails extends PureComponent {
           <GridItem xs={12} md={5}>
             <GridContainer>
               <GridItem xs={12}>
-                <OutlinedTextField
-                  label={formatMessage({
-                    id: 'inventory.pr.detail.dod.remarks',
-                  })}
-                  multiline
-                  rowsMax={2}
-                  rows={2}
+                <FastField
+                  name='remark'
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.dod.remarks',
+                        })}
+                        multiline
+                        rowsMax={2}
+                        rows={2}
+                        {...args}
+                      />
+                    )
+                  }}
                 />
               </GridItem>
             </GridContainer>

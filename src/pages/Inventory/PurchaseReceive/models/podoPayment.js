@@ -4,13 +4,12 @@ import moment from 'moment'
 import { fakePodoPaymentData } from '../variables'
 
 const InitialPurchaseOrder = {
-  poNo: 'PO/000001',
-  poDate: moment(),
-  status: 'Draft',
-  invoiceTotal: 0,
+  purchaseOrderNo: 'PO/000001',
+  purchaseOrderDate: '',
+  purchaseOrderStatus: 'Draft',
+  totalAmount: 0,
   outstandingAmount: 0,
 }
-
 
 export default createFormViewModel({
   namespace: 'podoPayment',
@@ -21,7 +20,7 @@ export default createFormViewModel({
     service,
     state: {
       purchaseOrderDetails: { ...InitialPurchaseOrder },
-      paymentList: [],
+      purchaseOrderPayment: [],
       default: {},
     },
     subscriptions: ({ dispatch, history }) => {
@@ -40,28 +39,33 @@ export default createFormViewModel({
     },
     effects: {
       *queryPodoPayment ({ payload }, { call, put }) {
-        // Call API to query delivery order listing
-        let data = fakePodoPaymentData
-
         return yield put({
           type: 'setPodoPayment',
-          payload: { data },
+          payload: { ...payload },
         })
       },
     },
     reducers: {
       setPodoPayment (state, { payload }) {
-        const { data } = payload
-        return {
-          ...state,
-          paymentList: data,
-        }
-      },
-      setPurchaseOrderDetails (state, { payload }) {
         const { purchaseOrder } = payload
+        const {
+          purchaseOrderPayment,
+          purchaseOrderNo,
+          purchaseOrderDate,
+          totalAmount,
+          purchaseOrderStatus,
+        } = purchaseOrder
+
         return {
           ...state,
-          purchaseOrderDetails: { ...purchaseOrder, outstandingAmount: 10.99 },
+          purchaseOrderDetails: {
+            purchaseOrderNo,
+            purchaseOrderDate,
+            totalAmount,
+            purchaseOrderStatus,
+            outstandingAmount: totalAmount,
+          },
+          purchaseOrderPayment,
         }
       },
     },
