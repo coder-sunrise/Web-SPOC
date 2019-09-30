@@ -838,27 +838,28 @@ const _fetchAndSaveCodeTable = async (
   })
 
   let { status: statusCode, data } = response
-  let newData
-
-  if (code.split(',').length > 1) {
-    const codes = code.split(',')
-    newData = [
-      ...codes.reduce(
-        (merged, c) => [
-          ...merged,
-          ...data[c],
-        ],
-        [],
-      ),
-    ]
-  } else {
-    newData = useGeneral
-      ? [
-          ...data[code],
-        ]
-      : [
-          ...data.data,
-        ]
+  let newData = []
+  if (parseInt(statusCode, 10) === 200) {
+    if (code.split(',').length > 1) {
+      const codes = code.split(',')
+      newData = [
+        ...codes.reduce(
+          (merged, c) => [
+            ...merged,
+            ...data[c],
+          ],
+          [],
+        ),
+      ]
+    } else {
+      newData = useGeneral
+        ? [
+            ...data[code],
+          ]
+        : [
+            ...data.data,
+          ]
+    }
   }
 
   if (parseInt(statusCode, 10) === 200) {

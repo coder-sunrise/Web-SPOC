@@ -124,7 +124,6 @@ const styles = (theme) => ({
         role: currentSelectedUser.userProfile
           ? currentSelectedUser.userProfile.role.id
           : undefined,
-        title: 'sdfds',
       }
     }
     return {}
