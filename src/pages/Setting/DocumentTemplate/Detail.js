@@ -53,7 +53,9 @@ const tagList = [
     documentTemplateTypeFK: Yup.string().required(),
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateContent: Yup.string().required().max(2000, 'Message should not exceed 2000 characters'),
+    templateContent: Yup.string()
+      .required()
+      .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
@@ -85,7 +87,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingDocumentTemplate, setFieldValue } = props
-    console.log('detail', props)
+
 
     return (
       <React.Fragment>
@@ -146,13 +148,12 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <RichEditor
+                      toolbarHidden={() => true}
                       handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
                       {...args}
                       onBlur={(html, text) => {
-                        console.log("************")
-                        console.log(html, text)
                         this.props.setFieldValue('templateContent', text)
                       }}
                     />

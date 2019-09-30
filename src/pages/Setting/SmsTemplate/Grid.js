@@ -99,7 +99,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
-                    style={{marginRight: 0}}
+                    style={{marginLeft: 0}}
                   >
                     <Edit />
                   </Button>

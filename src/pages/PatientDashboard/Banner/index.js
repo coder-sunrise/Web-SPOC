@@ -74,7 +74,6 @@ class Banner extends PureComponent {
       patientAllergy.find((m) => m.allergyFK === o.id),
     )
 
-    // console.log(da, da.length)
     return (
       <div style={{ display: 'inline-block' }}>
         {data === 'link' ? (
@@ -91,13 +90,52 @@ class Banner extends PureComponent {
           </Link>
         ) : (
           <div>
-            {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
+            {da.length ? ( `${da[0].name.length > 6 ? `${da[0].name.substring(0, 6)}... ,` : ' '}` ) : ( '-')}
+            <br />
+            {da.length ? (`${da[1].name.length > 6 ? `${da[1].name.substring(0, 6)}...` : ' '}` ) : ( '')}
+
+            {da.length ? 
+              <Popover
+                icon={null}
+                content={
+                  <div>
+                    {da.map(
+                      (item, i) => {
+                        return (
+                          <div>
+                            {i + 1}.) {  item.name}
+                            <br />
+                          </div>
+                        )
+                      },
+                    )}
+                  </div>
+                }
+                trigger='click'
+                placement='bottomLeft'
+              >
+                <Button
+                  color='primary'
+                  style={{
+                    backgroundColor: '#48C9B0',
+                    color: 'white',
+                    fontWeight: 'normal',
+                    marginLeft: 5,
+                    padding: 0,
+                  }}
+                >
+                More
+                </Button>
+              </Popover>
+              : ' '
+              }
           </div>
         )}
       </div>
     )
   }
 
+  // {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
   render () {
     const { props } = this
     const {
@@ -199,7 +237,26 @@ class Banner extends PureComponent {
             />
           </GridItem>
           <GridItem xs={6} md={2}>
-            <Block header='Medical Problem' body='Asthma' />
+            <Block
+              header='Medical Problem'
+              body={
+                <div>
+                  Fever
+                  <Button
+                    color='primary'
+                    style={{
+                      backgroundColor: '#48C9B0',
+                      color: 'white',
+                      fontWeight: 'normal',
+                      marginLeft: 5,
+                      padding: 0,
+                    }}
+                  >
+                    More
+                  </Button>
+                </div>
+              }
+            />
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block
@@ -213,9 +270,7 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme
-                    .filter((o) => o.schemeTypeFK <= 5)
-                    .map((o) => {
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
                       return (
                         <div>
                           <CodeSelect
@@ -271,12 +326,13 @@ class Banner extends PureComponent {
                                 placement='bottomLeft'
                               >
                                 <Button
-                                  size='sm'
                                   color='primary'
                                   style={{
                                     backgroundColor: '#48C9B0',
                                     color: 'white',
                                     fontWeight: 'normal',
+                                    marginLeft: 5,
+                                    padding: 0,
                                   }}
                                 >
                                   More
