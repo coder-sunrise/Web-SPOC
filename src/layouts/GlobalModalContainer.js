@@ -88,7 +88,7 @@ class GlobalModalContainer extends PureComponent {
           bodyNoPadding
           onClose={(e) => {
             dispatch({
-              type: 'consultation/closeConsultationModal',
+              type: 'consultation/closeModal',
             })
           }}
           fullScreen
@@ -104,7 +104,7 @@ class GlobalModalContainer extends PureComponent {
           bodyNoPadding
           onClose={(e) => {
             dispatch({
-              type: 'dispense/closeDispenseModal',
+              type: 'dispense/closeModal',
             })
           }}
           fullScreen

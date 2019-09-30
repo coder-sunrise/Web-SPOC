@@ -774,8 +774,17 @@ const tenantCodes = [
   'inventorypackage',
   'role',
   'ctsupplier',
-  'ctsnomeddiagnosis',
+  // 'ctsnomeddiagnosis',
 ]
+
+// const codes = [
+//   {
+//     code: 'ctservice',
+//     query: {
+//       'serviceFKNavigation.IsActive': true,
+//     },
+//   },
+// ]
 
 const noIsActiveProp = [
   'doctorProfile',

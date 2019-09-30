@@ -293,7 +293,7 @@ class Layout extends PureComponent {
     //     })
     //   } else if (consultation.visitFK) {
     //     dispatch({
-    //       type: 'consultation/newConsultation',
+    //       type: 'consultation/start',
     //       payload: consultation.visitFK,
     //     })
     //   }

@@ -9,23 +9,13 @@ import { sendNotification } from '@/utils/realtime'
 
 export default createFormViewModel({
   namespace: 'consultation',
-  config: {
-    queryOnLoad: false,
-  },
+  config: {},
   param: {
     service,
     state: {
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
-        // corDiagnosis: [
-        //   {
-        //     uid: getUniqueId(),
-        //     onsetDate: moment(),
-        //     isPersist: false,
-        //     remarks: '',
-        //   },
-        // ],
       },
       selectedWidgets: [
         '1',
@@ -54,13 +44,13 @@ export default createFormViewModel({
       *initState ({ payload }, { call, put, select, take }) {
         const { version, consultationID, md } = payload
         yield put({
-          type: 'consultation/query',
+          type: 'query',
           payload: {
             id: consultationID,
             version,
           },
         })
-        yield take('consultation/query/@@end')
+        yield take('query/@@end')
         if (md === 'cons') {
           yield put({
             type: 'global/updateState',
@@ -72,7 +62,7 @@ export default createFormViewModel({
         }
       },
 
-      *newConsultation ({ payload }, { call, put }) {
+      *start ({ payload }, { call, put }) {
         const response = yield call(service.create, payload.id)
         const { id } = response
         if (id) {
@@ -164,7 +154,26 @@ export default createFormViewModel({
         }
         return response
       },
-      *closeConsultationModal ({ payload }, { call, put }) {
+      *editOrder ({ payload }, { call, put }) {
+        const response = yield call(service.editOrder, payload.id)
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: response,
+              version: payload.version,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data: response,
+            },
+          })
+        }
+        return response
+      },
+      *closeModal ({ payload }, { call, put }) {
         router.push(
           getRemovedUrl([
             'md2',
@@ -190,7 +199,7 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-        // console.log('queryDone', payload)
+        console.log('queryDone', payload)
         const { data } = payload
         if (!data) return
         let cdRows = []
@@ -218,7 +227,7 @@ export default createFormViewModel({
         orderTypes.forEach((p) => {
           const datas =
             (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
-          // console.log(oRows, data[p.prop])
+          console.log(oRows, data[p.prop])
           oRows = oRows.concat(
             datas.map((o) => {
               const d = {
@@ -231,6 +240,8 @@ export default createFormViewModel({
             }),
           )
         })
+        console.log(oRows, _.sortBy(oRows, 'sequence'))
+
         yield put({
           type: 'orders/updateState',
           payload: {
@@ -241,6 +252,8 @@ export default createFormViewModel({
             })),
           },
         })
+        console.log(payload)
+
         yield put({
           type: 'orders/calculateAmount',
         })
@@ -264,13 +277,9 @@ export default createFormViewModel({
         //     remarks: '',
         //   })
         // }
-        // console.log(payload)
+        console.log(payload)
         return payload
       },
-      // *submit ({ payload }, { call }) {
-      //   // console.log(payload)
-      //   return yield call(service.upsert, payload)
-      // },
     },
     reducers: {},
   },

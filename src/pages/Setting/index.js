@@ -244,6 +244,7 @@ class SystemSetting extends PureComponent {
       return {
         title: o,
         items: this.group[o],
+        key: o,
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
             {this.group[o]
@@ -253,10 +254,10 @@ class SystemSetting extends PureComponent {
                     0 || !this.state.searchText
                 )
               })
-              .map((item) => {
+              .map((item, i) => {
                 return (
                   <GridItem
-                    key={item.name}
+                    key={i}
                     xs={4}
                     md={2}
                     style={{ marginBottom: theme.spacing(2) }}
