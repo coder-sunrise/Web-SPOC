@@ -15,6 +15,7 @@ import {
   NumberField,
   Checkbox,
   DatePicker,
+  DateRangePicker,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -63,20 +64,18 @@ class FilterBar extends PureComponent {
             {/* <div className={classes.tansactionCheck} /> */}
           </GridItem>
 
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={6}>
             <FastField
-              name='transactionDateFrom'
-              render={(args) => (
-                <DatePicker label='Transaction Date From' {...args} />
-              )}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='transactionDateTo'
-              render={(args) => (
-                <DatePicker label='Transaction Date To' {...args} />
-              )}
+              name='transactionDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    label='Transaction Date From'
+                    label2='To'
+                    {...args}
+                  />
+                )
+              }}
             />
           </GridItem>
 
@@ -162,8 +161,26 @@ class FilterBar extends PureComponent {
                 variant='contained'
                 color='primary'
                 onClick={() => {
+                  const { transactionDates, ExpenseType } = this.props.values
                   this.props.dispatch({
                     type: 'deposit/query',
+                    payload: {
+                      // patientDepositTransaction: {
+
+                      // },
+                      // lgteql_lastTransactionDate: transactionDates[0],
+                      // lsteql_lastTransactionDate: transactionDates[1],
+
+                      group: [
+                        {
+                          'contactFkNavigation.contactNumber.number': ExpenseType,
+                          // 'PatientDepositFKNavigation.creditCardTypeFK': 1,
+                          patientAccountNo: ExpenseType,
+                          name: ExpenseType,
+                          combineCondition: 'or',
+                        },
+                      ],
+                    },
                   })
                 }}
               >
