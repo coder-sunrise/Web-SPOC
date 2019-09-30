@@ -174,7 +174,7 @@ class FilterBar extends PureComponent {
                       group: [
                         {
                           'contactFkNavigation.contactNumber.number': ExpenseType,
-                          // 'PatientDepositFKNavigation.creditCardTypeFK': 1,
+                          // 'PatientDepositFKNavigation.ReferenceNo': ExpenseType,
                           patientAccountNo: ExpenseType,
                           name: ExpenseType,
                           combineCondition: 'or',

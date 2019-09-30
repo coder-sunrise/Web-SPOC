@@ -28,21 +28,26 @@ const style = () => ({
   },
 })
 
-@connect(({ deposit }) => ({
+@connect(({ deposit, codetable }) => ({
   deposit,
+  codetable,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ deposit, isDeposit }) => {
     if (deposit.entity) {
       console.log('entity', deposit.entity)
       const transactionTypeFK = isDeposit ? 1 : 2
+      const transactionType = transactionTypeFK === 1 ? 'Deposit' : 'Refund'
+      const transactionModeFK = isDeposit ? undefined : 3
       return {
         ...deposit.entity,
         // id: undefined,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
           transactionDate: moment(),
+          transactionType,
           transactionTypeFK,
+          transactionModeFK,
           amount: 0,
         },
       }
@@ -59,15 +64,15 @@ const style = () => ({
         is: (val) => val === 1,
         then: Yup.number().required(),
       }),
-      cardNumber: Yup.number().when('transactionModeFK', {
-        is: (val) => val === 1,
-        then: Yup.number().test(
-          'test-number', // this is used internally by yup
-          'Credit Card number is invalid', //validation message
-          (value) => valid.number(value).isValid,
-        ), // ret,
-        otherwise: Yup.number(),
-      }),
+      // cardNumber: Yup.number().when('transactionModeFK', {
+      //   is: (val) => false,
+      //   then: Yup.number().test(
+      //     'test-number', // this is used internally by yup
+      //     'Credit Card number is invalid', //validation message
+      //     (value) => valid.number(value).isValid,
+      //   ), // ret,
+      //   otherwise: Yup.number(),
+      // }),
       //   cardNumber: Yup.string()
       //     .test(
       //       'test-number', // this is used internally by yup
@@ -93,8 +98,24 @@ const style = () => ({
   //   return errors
   // },
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm } = props
+    const { dispatch, onConfirm, codetable } = props
     const { balanceAfter, patientDepositTransaction } = values
+    const {
+      transactionModeFK,
+      creditCardTypeFK,
+      transactionBizSessionFK,
+      ...restDepositTransaction
+    } = patientDepositTransaction
+    const { ctpaymentmode, ctcreditcardtype } = codetable
+    let transactionMode
+    let creditCardType
+    if (transactionModeFK === 1) {
+      transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
+        .displayValue
+      creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
+        .name
+    }
+
     console.log({ values })
     dispatch({
       type: 'deposit/upsert',
@@ -102,9 +123,13 @@ const style = () => ({
         ...values,
         balance: balanceAfter,
         patientDepositTransaction: {
-          ...patientDepositTransaction,
-          createdByBizSessionFK:
-            patientDepositTransaction.transactionBizSessionFK,
+          ...restDepositTransaction,
+          transactionMode,
+          creditCardType,
+          transactionModeFK,
+          creditCardTypeFK,
+          createdByBizSessionFK: transactionBizSessionFK,
+          transactionBizSessionFK,
           // creditCardTypeFK: 1,
         },
       },
