@@ -47,7 +47,7 @@ class CHAS extends React.Component {
     return (
       <CardContainer hideHeader size='sm'>
         <NavPills
-          active={1}
+          active={0}
           tabs={[
             {
               tabButton: 'Draft',

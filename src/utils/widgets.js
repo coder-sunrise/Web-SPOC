@@ -67,8 +67,6 @@ const widgets = [
                   >
                     Upload Attachment
                   </Menu.Item>
-                  <Menu.Divider />
-                  
                 </Menu>
               }
               trigger={[

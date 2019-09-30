@@ -49,14 +49,29 @@ class Grid extends PureComponent {
         // FuncProps={{ pager: false }}
         columnExtensions={[
           {
+            columnName: 'code',
+            width: 280,
+          },
+          {
+            columnName: 'displayValue',
+            width: 500,
+          },
+          {
+            columnName: 'description',
+            width: 600,
+          },
+          {
             columnName: 'isActive',
             sortingEnabled: false,
+            align: 'center',
+            width: 150,
             type: 'select',
             options: status,
           },
           {
             columnName: 'action',
             align: 'center',
+            width: 80,
             render: (row) => {
               return (
                 <Tooltip title='Edit Revenue Category' placement='top-end'>

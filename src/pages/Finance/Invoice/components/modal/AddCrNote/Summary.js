@@ -34,6 +34,26 @@ const Summary = ({ classes }) => {
               )}
             />
           </GridItem> */}
+          {/* <GridItem md={8} />
+          <GridItem md={3}>
+            <FastField
+              name='creditNoteBalance'
+              render={(args) => (
+                <NumberInput
+                  {...args}
+                  noUnderline
+                  currency
+                  disabled
+                  rightAlign
+                  normalText
+                  prefix='Total Paid: '
+                  defaultValue='0'
+                />
+              )}
+            />
+            <GridItem md={1} />
+          </GridItem> */}
+
           <GridItem md={8} />
           <GridItem md={3}>
             <FastField
@@ -46,8 +66,8 @@ const Summary = ({ classes }) => {
                   disabled
                   rightAlign
                   normalText
-                  defaultValue={128.4}
                   prefix='Final Credit: '
+                  defaultValue='0'
                 />
               )}
             />

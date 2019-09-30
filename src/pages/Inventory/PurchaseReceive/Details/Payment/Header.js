@@ -17,7 +17,7 @@ class Header extends PureComponent {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name={`${poPrefix}.poNo`}
+              name={`${poPrefix}.purchaseOrderNo`}
               render={(args) => (
                 <TextField
                   disabled
@@ -31,7 +31,7 @@ class Header extends PureComponent {
           </GridItem>
           <GridItem xs>
             <FastField
-              name={`${poPrefix}.poDate`}
+              name={`${poPrefix}.purchaseOrderDate`}
               render={(args) => (
                 <DatePicker
                   disabled
@@ -47,7 +47,7 @@ class Header extends PureComponent {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name={`${poPrefix}.invoiceTotal`}
+              name={`${poPrefix}.totalAmount`}
               render={(args) => (
                 <NumberInput
                   disabled

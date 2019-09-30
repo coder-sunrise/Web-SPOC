@@ -15,12 +15,17 @@ const styles = (theme) => ({
   },
 })
 
+// componentDidMount () {
+//   this.props.dispatch({
+//     type: 'settingDocumentTemplate/query',
+//   })
+// }
+
 class ClaimSubmission extends React.Component {
   navigate = ({ currentTarget }) => {
     const { history } = this.props
     const { location } = history
-
-    history.push(`${location.pathname}/${currentTarget.id}`)
+     history.push(`${location.pathname}/${currentTarget.id}`)
   }
 
   render () {

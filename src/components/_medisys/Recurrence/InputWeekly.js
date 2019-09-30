@@ -33,7 +33,12 @@ const InputWeekly = ({
         <FastField
           name='recurrenceDto.recurrenceFrequency'
           render={(args) => (
-            <NumberInput disabled={disabled} suffix='week(s)' {...args} />
+            <NumberInput
+              disabled={disabled}
+              min={1}
+              suffix='week(s)'
+              {...args}
+            />
           )}
         />
       </GridItem>

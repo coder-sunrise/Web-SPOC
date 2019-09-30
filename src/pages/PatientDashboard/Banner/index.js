@@ -4,6 +4,11 @@ import { connect } from 'dva'
 import moment from 'moment'
 import { Paper } from '@material-ui/core'
 import { headerHeight } from 'mui-pro-jss'
+import Warining from '@material-ui/icons/Error'
+import Edit from '@material-ui/icons/Edit'
+import Refresh from '@material-ui/icons/Sync'
+import More from '@material-ui/icons/MoreHoriz'
+import Button from '@material-ui/core/Button'
 import {
   GridContainer,
   GridItem,
@@ -12,6 +17,8 @@ import {
   dateFormatLong,
   Skeleton,
   Tooltip,
+  IconButton,
+  Popover,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
@@ -56,7 +63,7 @@ class Banner extends PureComponent {
     // props.setValues(props.patientDashboard.entity)
   }
 
-  getAllergyLink () {
+  getAllergyLink (data) {
     const { props } = this
     const { patient, codetable } = props
     const { entity } = patient
@@ -66,22 +73,69 @@ class Banner extends PureComponent {
     const da = ctdrugallergy.filter((o) =>
       patientAllergy.find((m) => m.allergyFK === o.id),
     )
-    // console.log(da, da.length)
+
     return (
-      <div>
-        <Link
-          to={getAppendUrl({
-            md: 'pt',
-            cmt: 3,
-            pid: info.id,
-          })}
-        >
-          {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
-        </Link>
+      <div style={{ display: 'inline-block' }}>
+        {data === 'link' ? (
+          <Link
+            to={getAppendUrl({
+              md: 'pt',
+              cmt: 3,
+              pid: info.id,
+            })}
+          >
+            <IconButton>
+              <Edit color='action' />
+            </IconButton>
+          </Link>
+        ) : (
+          <div>
+            {da.length ? ( `${da[0].name.length > 6 ? `${da[0].name.substring(0, 6)}... ,` : ' '}` ) : ( '-')}
+            <br />
+            {da.length ? (`${da[1].name.length > 6 ? `${da[1].name.substring(0, 6)}...` : ' '}` ) : ( '')}
+
+            {da.length ? 
+              <Popover
+                icon={null}
+                content={
+                  <div>
+                    {da.map(
+                      (item, i) => {
+                        return (
+                          <div>
+                            {i + 1}.) {  item.name}
+                            <br />
+                          </div>
+                        )
+                      },
+                    )}
+                  </div>
+                }
+                trigger='click'
+                placement='bottomLeft'
+              >
+                <Button
+                  color='primary'
+                  style={{
+                    backgroundColor: '#48C9B0',
+                    color: 'white',
+                    fontWeight: 'normal',
+                    marginLeft: 5,
+                    padding: 0,
+                  }}
+                >
+                More
+                </Button>
+              </Popover>
+              : ' '
+              }
+          </div>
+        )}
       </div>
     )
   }
 
+  // {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
   render () {
     const { props } = this
     const {
@@ -99,8 +153,8 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
-    // console.log("************** banner ***********")
-    // console.log(this.props)
+    console.log('************** banner ***********')
+    console.log(this.props)
     const { entity } = patient
     if (!entity)
       return (
@@ -126,47 +180,172 @@ class Banner extends PureComponent {
             <Block
               h3={
                 <Tooltip title={name}>
-                  <span style={{ whiteSpace: 'nowrap' }}>{name}</span>
+                  <Link
+                    to={getAppendUrl({
+                      md: 'pt',
+                      cmt: 1,
+                      pid: info.id,
+                    })}
+                  >
+                    <div>
+                      <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
+                    </div>
+                  </Link>
                 </Tooltip>
               }
               body={
                 <div>
-                  {info.patientAccountNo}{' '}
-                  <CodeSelect
-                    text
-                    code='ctNationality'
-                    value={info.nationalityFK}
-                  />
+                  <div>
+                    {info.patientAccountNo}
+                    {', '}
+                    <CodeSelect
+                      text
+                      code='ctNationality'
+                      value={info.nationalityFK}
+                    />
+                  </div>
+                  <div>
+                    {Math.floor(
+                      moment.duration(moment().diff(info.dob)).asYears(),
+                    )},&nbsp;
+                    {
+                      <CodeSelect
+                        code='ctGender'
+                        // optionLabelLength={1}
+                        text
+                        value={info.genderFK}
+                      />
+                    }
+                    {', '}
+                    <DatePicker text format={dateFormatLong} value={info.dob} />
+                  </div>
                 </div>
               }
             />
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block
-              header='Info'
+              header={
+                <div>
+                  <IconButton disabled>
+                    <Warining color='error' />
+                  </IconButton>
+                  {'Allergies'} {this.getAllergyLink('link')}
+                </div>
+              }
+              body={this.getAllergyLink(' ')}
+            />
+          </GridItem>
+          <GridItem xs={6} md={2}>
+            <Block
+              header='Medical Problem'
               body={
                 <div>
-                  <DatePicker text format={dateFormatLong} value={info.dob} />
-                  ({Math.floor(
-                    moment.duration(moment().diff(info.dob)).asYears(),
-                  )},&nbsp;
-                  {
-                    <CodeSelect
-                      code='ctGender'
-                      // optionLabelLength={1}
-                      text
-                      value={info.genderFK}
-                    />
-                  })
+                  Fever
+                  <Button
+                    color='primary'
+                    style={{
+                      backgroundColor: '#48C9B0',
+                      color: 'white',
+                      fontWeight: 'normal',
+                      marginLeft: 5,
+                      padding: 0,
+                    }}
+                  >
+                    More
+                  </Button>
                 </div>
               }
             />
           </GridItem>
           <GridItem xs={6} md={2}>
-            <Block header='Allergies' body={this.getAllergyLink()} />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <Block header='Medical Problem' body='Asthma' />
+            <Block
+              header={
+                <div>
+                  {'Scheme'}{' '}
+                  <IconButton>
+                    <Refresh />
+                  </IconButton>
+                </div>
+              }
+              body={
+                <div>
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
+                      return (
+                        <div>
+                          <CodeSelect
+                            text
+                            code='ctSchemeType'
+                            value={o.schemeTypeFK}
+                          />
+
+                          {o.validFrom && (
+                            <div style={{ display: 'inline-block' }}>
+                              <Popover
+                                icon={null}
+                                content={
+                                  <div>
+                                    <div
+                                      style={{
+                                        fontWeight: 500,
+                                        marginBottom: 0,
+                                      }}
+                                    >
+                                      <CodeSelect
+                                        text
+                                        code='ctSchemeType'
+                                        value={o.schemeTypeFK}
+                                      />
+                                      <IconButton>
+                                        <Refresh fontSize='large' />
+                                      </IconButton>
+                                    </div>
+
+                                    <div>
+                                      <p>
+                                        Validity:{' '}
+                                        <DatePicker
+                                          text
+                                          format={dateFormatLong}
+                                          value={o.validFrom}
+                                        />
+                                        {' - '}
+                                        <DatePicker
+                                          text
+                                          format={dateFormatLong}
+                                          value={o.validTo}
+                                        />
+                                      </p>
+                                    </div>
+                                    <div>Balance: </div>
+                                    <div>Patient Visit Balance: </div>
+                                    <div>Patient Clinic Balance: </div>
+                                  </div>
+                                }
+                                trigger='click'
+                                placement='bottomLeft'
+                              >
+                                <Button
+                                  color='primary'
+                                  style={{
+                                    backgroundColor: '#48C9B0',
+                                    color: 'white',
+                                    fontWeight: 'normal',
+                                    marginLeft: 5,
+                                    padding: 0,
+                                  }}
+                                >
+                                  More
+                                </Button>
+                              </Popover>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                </div>
+              }
+            />
           </GridItem>
           <GridItem xs={12} md={4}>
             {extraCmt}

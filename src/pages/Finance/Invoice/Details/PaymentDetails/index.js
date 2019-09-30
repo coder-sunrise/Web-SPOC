@@ -57,13 +57,13 @@ class PaymentDetails extends Component {
   }
 
   onAddCrNoteClick = (payerType) => {
-    const { dispatch, invoiceDetail, values } = this.props
+    const { dispatch, invoiceDetail, invoicePayment } = this.props
     dispatch({
       type: 'invoiceCreditNote/mapCreditNote',
       payload: {
         invoicePayerFK: payerType,
         invoiceDetail: invoiceDetail.entity,
-        creditNote: values.creditNote || [],
+        creditNote: invoicePayment.entity.creditNote || [],
       },
     })
 
@@ -110,7 +110,6 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    console.log('PaymentIndex', this.props)
     const { classes, invoiceDetail, values } = this.props
     const { entity } = invoiceDetail
     const { paymentTxnList } = values

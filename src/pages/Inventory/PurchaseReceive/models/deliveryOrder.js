@@ -1,5 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services'
+import * as service from '../services/deliveryOrder'
 import moment from 'moment'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
@@ -27,11 +27,12 @@ export default createFormViewModel({
       purchaseOrderDetails: { ...InitialPurchaseOrder },
       list: [],
       default: {
-        doNo: '',
+        deliveryOrderNo: '',
         deliveryOrderDate: moment(),
-        remarks: '',
+        remark: '',
         rows: [],
       },
+      data: undefined,
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -61,23 +62,22 @@ export default createFormViewModel({
 
       *getOutstandingPOItem ({ payload }, { call, put }) {
         const { rows, purchaseOrder } = payload
-        const { status } = purchaseOrder
+        const { purchaseOrderStatusFK } = purchaseOrder
         let outstandingItem = []
 
         // If PO status = Finalized, filter outstanding PO items
-        if (isPOStatusFinalized(status)) {
+        if (isPOStatusFinalized(purchaseOrderStatusFK)) {
           const tempList = rows.filter(
-            (x) => x.totalQty - x.quantityReceived > 0,
+            (x) => x.totalQuantity - x.quantityReceived > 0,
           )
           if (!_.isEmpty(tempList)) {
             outstandingItem = tempList.map((x) => {
               return {
                 ...x,
-                orderQty: x.inventoryMedicationFK ? 80 : x.orderQty,
-                // orderQty: x.orderQty,
-                totalBonusReceived: x.bonusQty,
-                currentReceivingQty: x.orderQty - x.quantityReceived,
-                currentReceivingBonusQty: x.orderQty - x.bonusQty,
+                orderQuantity: x.orderQuantity,
+                totalBonusReceived: x.bonusReceived,
+                currentReceivingQty: x.orderQuantity - x.quantityReceived,
+                currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
               }
             })
           }
@@ -91,26 +91,41 @@ export default createFormViewModel({
 
       *addNewDeliveryOrder ({ payload }, { call, put }) {
         // Call API to query DeliveryOrder#
+        const runningNumberResponse = yield call(service.queryRunningNumber, {
+          prefix: 'DO',
+        })
+        const { data: doRunningNumber } = runningNumberResponse
 
         return yield put({
           type: 'setAddNewDeliveryOrder',
           payload: {
-            doNo: 'DO/000999',
+            deliveryOrderNo: doRunningNumber,
           },
         })
+      },
+
+      *getStockDetails ({ payload }, { call }) {
+        const result = yield call(service.queryStockDetails, payload)
+        return result
+        // yield put({ type: 'saveStockDetails', payload: result })
       },
     },
 
     reducers: {
       setAddNewDeliveryOrder (state, { payload }) {
-        const { doNo } = payload
-        const { purchaseOrderOutstandingItem } = state.purchaseOrderDetails
+        const { deliveryOrderNo } = payload
+        const { purchaseOrderDetails } = state
+        const {
+          purchaseOrder,
+          purchaseOrderOutstandingItem,
+        } = purchaseOrderDetails
         return {
           ...state,
           entity: {
-            doNo,
+            purchaseOrderFK: purchaseOrder.id,
+            deliveryOrderNo,
             deliveryOrderDate: moment(),
-            remarks: '',
+            remark: '',
             rows: purchaseOrderOutstandingItem,
           },
         }
@@ -126,8 +141,10 @@ export default createFormViewModel({
 
       setOutstandingPOItem (state, { payload }) {
         const { outstandingItem, rows, purchaseOrder } = payload
+        const { deliveryOrder } = purchaseOrder
         return {
           ...state,
+          list: deliveryOrder,
           purchaseOrderDetails: {
             purchaseOrder: { ...purchaseOrder },
             purchaseOrderItem: rows,
@@ -143,9 +160,9 @@ export default createFormViewModel({
             const n =
               row.uid === payload.uid
                 ? {
-                  ...row,
-                  ...payload,
-                }
+                    ...row,
+                    ...payload,
+                  }
                 : row
             return n
           })
@@ -174,18 +191,8 @@ export default createFormViewModel({
 
       deleteRow (state, { payload }) {
         const { rows } = state.entity
-        console.log('deleteRow')
-        return {
-          ...state,
-          entity: {
-            ...state.entity,
-            // rows: rows.map((o) => {
-            //   if (o.uid === payload) o.isDeleted = true
-            //   return o
-            // }),
-            rows: rows.filter((x) => x.uid !== payload),
-          },
-        }
+        rows.find((v) => v.uid === payload).isDeleted = true
+        return { ...state, entity: { ...state.entity, rows } }
       },
     },
   },

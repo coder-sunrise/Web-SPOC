@@ -44,7 +44,7 @@ const POForm = ({ setFieldValue, isPOFinalized }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name={`${prefix}.poNo`}
+                name={`${prefix}.purchaseOrderNo`}
                 render={(args) => {
                   return (
                     <TextField
@@ -60,13 +60,22 @@ const POForm = ({ setFieldValue, isPOFinalized }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name={`${prefix}.status`}
+                name={`${prefix}.purchaseOrderStatusFK`}
                 render={(args) => {
                   return (
-                    <TextField
+                    // <TextField
+                    //   label={formatMessage({
+                    //     id: 'inventory.pr.status',
+                    //   })}
+                    //   disabled
+                    //   {...args}
+                    // />
+                    <CodeSelect
                       label={formatMessage({
                         id: 'inventory.pr.status',
                       })}
+                      code='LTPurchaseOrderStatus'
+                      labelField='name'
                       disabled
                       {...args}
                     />
@@ -76,7 +85,7 @@ const POForm = ({ setFieldValue, isPOFinalized }) => {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name={`${prefix}.expectedDeliveryDate`}
+                name={`${prefix}.exceptedDeliveryDate`}
                 render={(args) => {
                   return (
                     <DatePicker
@@ -116,7 +125,7 @@ const POForm = ({ setFieldValue, isPOFinalized }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name={`${prefix}.poDate`}
+                name={`${prefix}.purchaseOrderDate`}
                 render={(args) => {
                   return (
                     <DatePicker
@@ -179,7 +188,7 @@ const POForm = ({ setFieldValue, isPOFinalized }) => {
           <GridContainer>
             <GridItem xs={12}>
               <FastField
-                name={`${prefix}.supplier`}
+                name={`${prefix}.supplierFK`}
                 render={(args) => {
                   return (
                     <CodeSelect
@@ -274,4 +283,4 @@ const POForm = ({ setFieldValue, isPOFinalized }) => {
   )
 }
 
-export default (POForm)
+export default POForm
