@@ -12,7 +12,9 @@ import {
   ProgressButton,
   Button,
   withFormikExtend,
+  Tabs,
 } from '@/components'
+import { VaccinationDetailOption } from './variables'
 import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
@@ -46,9 +48,15 @@ const Detail = ({
     showTransfer: false,
     ...props,
   }
+
+  const stockProps = {
+    vaccinationDetail,
+    values: props.values,
+    setFieldValue,
+  }
   return (
     <React.Fragment>
-      <NavPills
+      {/* <NavPills
         color='primary'
         onChange={(event, active) => {
           history.push(
@@ -82,6 +90,11 @@ const Detail = ({
             ),
           },
         ]}
+      /> */}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={VaccinationDetailOption(detailProps, stockProps)}
       />
       <div className={classes.actionDiv}>
         <ProgressButton
