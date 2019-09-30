@@ -68,12 +68,15 @@ export const computeRRule = ({ date, recurrenceDto }) => {
     recurrencePatternFK,
     recurrenceFrequency = 1,
     recurrenceEndDate,
-    recurrenceCount,
+    recurrenceCount = 1,
     recurrenceRange,
     recurrenceDayOfTheMonth,
     recurrenceDaysOfTheWeek,
   } = recurrenceDto
   try {
+    if (recurrenceCount < 0 || recurrenceFrequency < 0) {
+      return undefined
+    }
     const _tempDate = moment(date).toDate()
 
     const start = new Date(

@@ -17,7 +17,12 @@ const InputDaily = ({ classes, labelSize, disabled, inputSize }) => {
         <FastField
           name='recurrenceDto.recurrenceFrequency'
           render={(args) => (
-            <NumberInput {...args} disabled={disabled} suffix='day(s)' />
+            <NumberInput
+              {...args}
+              min={1}
+              disabled={disabled}
+              suffix='day(s)'
+            />
           )}
         />
       </GridItem>

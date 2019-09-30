@@ -25,6 +25,6 @@ const PatientInfoCard = ({ entity }) => (
   </Card>
 )
 
-export default connect(({ visitRegistration }) => ({
-  entity: visitRegistration.patientInfo,
+export default connect(({ patient }) => ({
+  entity: patient.entity,
 }))(PatientInfoCard)

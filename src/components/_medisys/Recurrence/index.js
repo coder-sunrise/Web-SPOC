@@ -154,6 +154,7 @@ const Recurrence = ({
                     render={(args) => (
                       <NumberInput
                         {...args}
+                        min={1}
                         disabled={disabled}
                         suffix='occurences'
                       />
