@@ -115,7 +115,7 @@ class LoginCard extends PureComponent {
   }
 
   onForgotPasswordClick = () => {
-    router.push('/forgotpassword')
+    // router.push('/forgotpassword')
   }
 
   render () {
