@@ -41,7 +41,7 @@ export default createFormViewModel({
                 payload: { id: query.vis },
               })
             : dispatch({
-                type: 'fetchPatientInfoByPatientID',
+                type: 'patient/query',
                 payload: { id: query.pid },
               })
           if (query.apptid) {
