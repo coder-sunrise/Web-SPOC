@@ -28,11 +28,11 @@ export default createListViewModel({
         //   })
         // }
 
-        if (pathname === '/inventory/master' && search === '?t=3') {
-          dispatch({
-            type: 'pack/query',
-          })
-        }
+        // if (pathname === '/inventory/master' && search === '?t=3') {
+        //   dispatch({
+        //     type: 'pack/query',
+        //   })
+        // }
       })
     },
     effects: {

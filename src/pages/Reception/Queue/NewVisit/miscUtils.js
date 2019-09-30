@@ -31,37 +31,42 @@ const mapAttachmentToUploadInput = (
       }
 
 export const formikMapPropsToValues = ({ queueLog, visitRegistration }) => {
-  let qNo = 0.0
-  if (queueLog) {
-    const { list } = queueLog
-    const largestQNo = list.reduce(
-      (largest, { queueNo }) =>
-        parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
-      0,
+  try {
+    let qNo = 0.0
+    if (queueLog) {
+      const { list } = queueLog
+      const largestQNo = list.reduce(
+        (largest, { queueNo }) =>
+          parseFloat(queueNo) > largest ? parseFloat(queueNo) : largest,
+        0,
+      )
+      qNo = parseFloat(largestQNo + 1).toFixed(1)
+    }
+
+    const { visitInfo } = visitRegistration
+
+    if (Object.keys(visitInfo).length > 0) {
+      qNo = visitInfo.queueNo
+    }
+    const { visit = {} } = visitInfo
+
+    const visitEntries = Object.keys(visit).reduce(
+      (entries, key) => ({
+        ...entries,
+        [key]: visit[key] === null ? undefined : visit[key],
+      }),
+      {},
     )
-    qNo = parseFloat(largestQNo + 1).toFixed(1)
-  }
 
-  const { visitInfo } = visitRegistration
-
-  if (Object.keys(visitInfo).length > 0) {
-    qNo = visitInfo.queueNo
-  }
-  const { visit = {} } = visitInfo
-
-  const visitEntries = Object.keys(visit).reduce(
-    (entries, key) => ({
-      ...entries,
-      [key]: visit[key] === null ? undefined : visit[key],
-    }),
-    {},
-  )
-
-  return {
-    queueNo: qNo,
-    visitPurposeFK: 1,
-    visitStatus: VISIT_STATUS.WAITING,
-    ...visitEntries,
+    return {
+      queueNo: qNo,
+      visitPurposeFK: 1,
+      visitStatus: VISIT_STATUS.WAITING,
+      ...visitEntries,
+    }
+  } catch (error) {
+    console.log({ error })
+    return {}
   }
 }
 

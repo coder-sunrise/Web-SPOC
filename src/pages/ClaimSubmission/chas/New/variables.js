@@ -68,7 +68,7 @@ const generateNewCHASData = () => {
   for (let i = 0; i < 15; i++) {
     data.push({
       id: i,
-      visitDate: moment().format({ dateFormatLong }),
+      visitDate: moment().formatUTC({ dateFormatLong }),
       accountNo: 'S1234567D',
       patientName: 'Tan Kok Wei',
       doctor: 'Dr Levine',
@@ -76,7 +76,7 @@ const generateNewCHASData = () => {
       schemeType: 'CHAS Blue',
       schemeCategory: 'Chronic',
       invoiceNo: `INV/0000${i}`,
-      invoiceDate: moment().format('DD MM YYYY'),
+      invoiceDate: moment().formatUTC('DD MM YYYY'),
       invoiceAmount: 100,
       claimAmount: 80,
       rejectionReason: '',

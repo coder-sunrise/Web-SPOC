@@ -33,17 +33,28 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='isActive'
+              render={(args) => {
+                return <Select label='Status' options={status} {...args} />
+              }}
+            />
+          </GridItem>
+        </GridContainer>
 
+        <GridContainer>
           <GridItem xs={6} md={3}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue } = this.props.values
+                  const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingConsumableUOM/query',
                     payload: {
+                      isActive,
                       group: [
                         {
                           code: codeDisplayValue,

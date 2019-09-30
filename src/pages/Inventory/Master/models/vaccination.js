@@ -18,20 +18,20 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
-        if (pathname === '/inventory/master/vaccination' && !query.uid) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentTab: Number(query.t) || 0,
-            },
-          })
-        }
+        // if (pathname === '/inventory/master/vaccination' && !query.uid) {
+        //   dispatch({
+        //     type: 'updateState',
+        //     payload: {
+        //       currentTab: Number(query.t) || 0,
+        //     },
+        //   })
+        // }
 
-        if (pathname === '/inventory/master' && search === '?t=2') {
-          dispatch({
-            type: 'vaccination/query',
-          })
-        }
+        // if (pathname === '/inventory/master' && search === '?t=2') {
+        //   dispatch({
+        //     type: 'vaccination/query',
+        //   })
+        // }
       })
     },
     effects: {},

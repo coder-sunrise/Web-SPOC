@@ -43,14 +43,14 @@ class Grid extends PureComponent {
         type='settingDocumentTemplate'
         onRowDoubleClick={this.editRow}
         columns={[
-          { name: 'documentTemplateTypeFK', title: 'Document Type'},
+          { name: 'documentTemplateTypeFK', title: 'Document Type' },
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'templateContent', title: 'Template Message' },
           { name: 'isActive', title: 'Status' },
           // { name: 'effectiveStartDate', title: 'Effective Start Date' },
           // { name: 'effectiveEndDate', title: 'Effective End Date' },
-          
+
           {
             name: 'action',
             title: 'Action',
@@ -95,9 +95,12 @@ class Grid extends PureComponent {
             columnName: 'action',
             sortingEnabled: false,
             align: 'center',
-            render: (row) => {
+            alignContent: 'center',
+            alignItems: 'center',
+            justify: 'center',
+            render: (row) => {  
               return (
-                <Tooltip title="Edit Document Template" placement='top-end'>
+                <Tooltip title='Edit Document Template' placement='top-end'>
                   <Button
                     size='sm'
                     onClick={() => {
@@ -105,6 +108,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
+                    style={{ marginRight: 0}}
                   >
                     <Edit />
                   </Button>

@@ -183,6 +183,7 @@ class Detail extends PureComponent {
         columnName: 'code',
         type: 'select',
         labelField: 'code',
+        autoComplete: true,
         options: (row) => {
           return this.rowOptions(row)
         },
@@ -194,6 +195,7 @@ class Detail extends PureComponent {
         columnName: 'displayValue',
         type: 'select',
         labelField: 'name',
+        autoComplete: true,
         options: (row) => {
           return this.rowOptions(row)
         },
@@ -208,6 +210,7 @@ class Detail extends PureComponent {
       {
         columnName: 'batchNo',
         type: 'select',
+        autoComplete: true,
         options: (row) => {
           return this.stockOptions(row)
         },

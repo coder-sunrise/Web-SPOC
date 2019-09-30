@@ -29,28 +29,3 @@ export const InvoiceGridColExtensions = [
   { columnName: 'corpOutstanding', type: 'currency', currency: true },
   { columnName: 'totalOutstanding', type: 'currency', currency: true },
 ]
-
-const generateInvoiceGridData = () => {
-  let data = []
-  for (let i = 0; i < 4; i++) {
-    data.push({
-      id: i,
-      invoiceNo: `INV-00${i}`,
-      // invoiceDate: moment().format({ dateFormatLong }),
-      invoiceDate: moment(),
-      patientID: 'S1234567D',
-      patientName: 'Lee Tian Kang',
-      totalAfterGST: 0,
-      totalPayment: 0,
-      payableAmount: 0,
-      creditNote: 0,
-      patientOutstanding: 0,
-      governmentOutstanding: 0,
-      corpOutstanding: 0,
-      totalOutstanding: 0,
-    })
-  }
-  return data
-}
-
-export const InvoiceGridData = generateInvoiceGridData()

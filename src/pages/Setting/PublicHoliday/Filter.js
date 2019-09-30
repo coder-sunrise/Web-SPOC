@@ -62,7 +62,9 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
+        </GridContainer>
 
+        <GridContainer>
           <GridItem xs={6} md={4}>
             <div className={classes.filterBtn}>
               <ProgressButton

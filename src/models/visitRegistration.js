@@ -41,7 +41,7 @@ export default createFormViewModel({
                 payload: { id: query.vis },
               })
             : dispatch({
-                type: 'fetchPatientInfoByPatientID',
+                type: 'patient/query',
                 payload: { id: query.pid },
               })
           if (query.apptid) {
@@ -101,7 +101,7 @@ export default createFormViewModel({
                 payload: patientPayload,
               })
             }
-            yield take('fetchPatientInfoByPatientID/@@end')
+            // yield take('fetchPatientInfoByPatientID/@@end')
             yield put({
               type: 'updateState',
               payload: {
