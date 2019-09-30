@@ -15,10 +15,6 @@ import style from './style'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 // model
-import model from './models/dispense'
-
-window.g_app.replaceModel(model)
-
 @connect(({ dispense }) => ({ dispense }))
 class Dispense extends Component {
   makePayment = () => {

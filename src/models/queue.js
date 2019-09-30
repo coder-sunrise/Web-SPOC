@@ -101,7 +101,7 @@ export default createListViewModel({
       },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },
-        { call, put },
+        { call, put, all },
       ) {
         const { shouldGetTodayAppointments = true } = payload
         const bizSessionPayload = {
@@ -114,22 +114,25 @@ export default createListViewModel({
         if (data && data.totalRecords === 1) {
           const { data: sessionData } = data
 
-          yield put({
-            type: 'query',
-            payload: {
-              pagesize: 999999,
-              'VisitFKNavigation.BizSessionFK': sessionData[0].id,
-            },
-          })
+          yield all([
+            put({
+              type: 'query',
+              payload: {
+                pagesize: 999999,
+                'VisitFKNavigation.BizSessionFK': sessionData[0].id,
+              },
+            }),
+            put({
+              type: 'updateSessionInfo',
+              payload: { ...sessionData[0] },
+            }),
+          ])
+
           if (shouldGetTodayAppointments)
             yield put({
               type: 'getTodayAppointments',
             })
 
-          yield put({
-            type: 'updateSessionInfo',
-            payload: { ...sessionData[0] },
-          })
           return true
         }
         return false
@@ -165,6 +168,24 @@ export default createListViewModel({
           type: 'getSessionInfo',
           payload,
         })
+        return true
+      },
+      *searchPatient ({ payload }, { take, put }) {
+        const prefix = 'like_'
+        const { searchQuery } = payload
+        yield put({
+          type: 'patientSearch/query',
+          payload: {
+            version: Date.now(),
+            [`${prefix}name`]: searchQuery,
+            [`${prefix}patientAccountNo`]: searchQuery,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+            combineCondition: 'or',
+          },
+        })
+
+        yield take('patientSearch/query/@@end')
+
         return true
       },
     },

@@ -1,10 +1,13 @@
 import React, { useEffect, useReducer } from 'react'
 import * as Yup from 'yup'
 import moment from 'moment'
+import numeral from 'numeral'
 // formik
 import { withFormik } from 'formik'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
+// devgrid
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 // common components
 import {
   Accordion,
@@ -45,6 +48,28 @@ const initialState = {
   isLoading: false,
   activePanel: -1,
   salesSummaryData: [],
+  tableGroupRows: [],
+  tableSummaryRows: [
+    { columnName: 'amount', type: 'sum' },
+    { columnName: 'visitNum', type: 'sum' },
+  ],
+  columnExtensions: [
+    {
+      columnName: 'salesDate',
+      render: (row) => moment(row.salesDate).format(dateFormatLong),
+    },
+    {
+      columnName: 'amount',
+      type: 'currency',
+    },
+    {
+      columnName: 'visitNum',
+      type: 'number',
+    },
+  ],
+  dynamicColumns: [
+    ...SalesSummaryDetailsColumns,
+  ],
 }
 const reducer = (state, action) => {
   switch (action.type) {
@@ -64,10 +89,27 @@ const reducer = (state, action) => {
   }
 }
 
+const sumReducer = (p, n) => {
+  return p + n
+}
+const summaryCalculator = (type, rows, getValue) => {
+  // console.log(type, rows, getValue)
+
+  if (type === 'gst') {
+    return numeral(rows.map((o) => o.amount).reduce(sumReducer) * 0.07).value()
+  }
+  if (type === 'subTotal') {
+    return IntegratedSummary.defaultCalculator('sum', rows, getValue)
+  }
+  if (type === 'total') {
+    return numeral(rows.map((o) => o.amount).reduce(sumReducer) * 1.07).value()
+  }
+  return IntegratedSummary.defaultCalculator(type, rows, getValue)
+}
+
 const todayDate = moment().set({ hour: 0, minute: 0, second: 0 }).formatUTC()
-const mergeData = (result) => {
+const mergeData = (result, dynamicColumnsInitialData) => {
   const { SalesSummaryDetails } = result
-  // const trimmedData = SalesSummaryDetails.slice(0, 200)
   const groupedByDoctor = SalesSummaryDetails.reduce((grouped, data, index) => {
     const currentData = { ...data, salesDate: data.salesDate || todayDate }
     if (grouped[currentData.doctorName] === undefined) {
@@ -76,7 +118,8 @@ const mergeData = (result) => {
         [currentData.doctorName]: [
           {
             ...currentData,
-            [currentData.category.toLowerCase()]: currentData.amount,
+            ...dynamicColumnsInitialData,
+            [currentData.category.toLowerCase()]: currentData.amount || 0,
           },
         ],
       }
@@ -92,7 +135,9 @@ const mergeData = (result) => {
         id: `${currentData.doctorName}-${index}`,
         ...sameDateData,
         ...currentData,
-        [currentData.category.toLowerCase()]: currentData.amount,
+        ...dynamicColumnsInitialData,
+
+        [currentData.category.toLowerCase()]: currentData.amount || 0,
       },
     ]
     return {
@@ -104,17 +149,23 @@ const mergeData = (result) => {
             {
               id: `${currentData.doctorName}-${index}`,
               ...currentData,
-              [currentData.category.toLowerCase()]: currentData.amount,
+              ...dynamicColumnsInitialData,
+
+              [currentData.category.toLowerCase()]: currentData.amount || 0,
             },
           ],
     }
   }, {})
 
-  console.log({ groupedByDoctor })
-  const mergedData = Object.keys(groupedByDoctor).map((key) => [
-    ...groupedByDoctor[key],
-  ])
-  return mergedData
+  const mergedData = Object.keys(groupedByDoctor).reduce((merged, key) => {
+    const d = groupedByDoctor[key]
+    return [
+      ...merged,
+      ...d,
+    ]
+  }, [])
+  const groups = Object.keys(groupedByDoctor)
+  return { mergedData, groups }
 }
 
 const reportID = 3
@@ -126,68 +177,60 @@ const SalesSummary = ({ values, validateForm }) => {
     dispatch,
   ] = useReducer(reducer, initialState)
 
-  const handleActivePanelChange = (event, panel) =>
-    dispatch({
-      type: 'setActivePanel',
-      payload: state.activePanel === panel.key ? -1 : panel.key,
-    })
   const asyncGetData = async () => {
     dispatch({
       type: 'toggleLoading',
     })
-    // const result = await getRawData(reportID, values)
 
-    // if (result) {
-    //   dispatch({
-    //     type: 'updateState',
-    //     payload: {
-    //       activePanel: 0,
-    //       loaded: true,
-    //       isLoading: false,
-    //       salesSummaryData: result.SalesSummaryDetails.map(
-    //         (item, index) => ({
-    //           ...item,
-    //           id: `salesSummary-${index}`,
-    //         }),
-    //         ),
-    //       },
-    //     })
-    //   } else {
-    //     dispatch({
-    //       type: 'updateState',
-    //       payload: {
-    //         loaded: false,
-    //         isLoading: false,
-    //       },
-    //     })
-    //   }
     const result = dummyData
     if (result) {
+      const newColumns = [
+        ...SalesSummaryDetailsColumns,
+        ...Object.keys(result.SalesSummaryCategories[0]).reduce(
+          (columns, column) =>
+            column !== 'salesSummaryCategories'
+              ? [
+                  ...columns,
+                  {
+                    name: column,
+                    title: column.toUpperCase(),
+                  },
+                ]
+              : [
+                  ...columns,
+                ],
+          [],
+        ),
+      ]
+      const initialData = Object.keys(result.SalesSummaryCategories[0]).reduce(
+        (initial, item) => ({ ...initial, [item]: 0 }),
+        {},
+      )
+
+      const { mergedData, groups } = mergeData(result, initialData)
       dispatch({
         type: 'updateState',
         payload: {
           activePanel: 0,
           loaded: true,
           isLoading: false,
-          salesSummaryData: mergeData(result),
-          dynamicColumns: [
-            ...SalesSummaryDetailsColumns,
-            ...Object.keys(result.SalesSummaryCategories[0]).reduce(
-              (columns, column) =>
-                column !== 'salesSummaryCategories'
-                  ? [
-                      ...columns,
-                      {
-                        name: column,
-                        title: column.toUpperCase(),
-                      },
-                    ]
-                  : [
-                      ...columns,
-                    ],
-              [],
-            ),
+          salesSummaryData: mergedData,
+          tableGroupRows: groups,
+          tableSummaryRows: [
+            ...initialState.tableSummaryRows,
+            ...Object.keys(result.SalesSummaryCategories[0]).map((item) => ({
+              columnName: item,
+              type: 'sum',
+            })),
           ],
+          columnExtensions: [
+            ...initialState.columnExtensions,
+            ...Object.keys(result.SalesSummaryCategories[0]).map((item) => ({
+              columnName: item.toLowerCase(),
+              type: 'currency',
+            })),
+          ],
+          dynamicColumns: newColumns,
         },
       })
     } else {
@@ -222,8 +265,15 @@ const SalesSummary = ({ values, validateForm }) => {
       })
   }, [])
 
-  console.log({ dummyData })
-
+  const handleExpandedGroupsChange = (expandedGroups) => {
+    dispatch({
+      type: 'updateState',
+      payload: {
+        groups: expandedGroups,
+      },
+    })
+  }
+  console.log({ state })
   return (
     <CardContainer hideHeader>
       <GridContainer>
@@ -239,58 +289,45 @@ const SalesSummary = ({ values, validateForm }) => {
             fileName={fileName}
           >
             <ReportDataGrid
+              style={{ marginTop: 16 }}
               height='auto'
               data={state.salesSummaryData}
               columns={state.dynamicColumns}
-              grouping={[
-                { columnName: 'doctorName' },
-              ]}
-              columnExtensions={[
-                {
-                  columnName: 'salesDate',
-                  render: (row) => moment(row.salesDate).format(dateFormatLong),
-                },
-              ]}
-            />
-            {/* <Accordion
-              active={state.activePanel}
-              onChange={handleActivePanelChange}
-              leftIcon
-              expandIcon={<SolidExpandMore fontSize='large' />}
-              collapses={Object.keys(state.salesSummaryData).map((key) => ({
-                title: <AccordionTitle title={key} />,
-                content: (
-                  <ReportDataGrid
-                    height='auto'
-                    data={state.salesSummaryData[key]}
-                    columns={state.dynamicColumns}
-                    grouping={[
+              columnExtensions={state.columnExtensions}
+              FuncProps={{
+                pager: false,
+                grouping: true,
+                summary: true,
+                groupingConfig: {
+                  state: {
+                    grouping: [
                       { columnName: 'doctorName' },
-                    ]}
-                    columnExtensions={[
-                      {
-                        columnName: 'salesDate',
-                        render: (row) =>
-                          moment(row.salesDate).format(dateFormatLong),
-                      },
-                    ]}
-                  />
-                ),
-              }))
-              //   [
-              //   {
-              //     title: <AccordionTitle title='Patient Listing Summary' />,
-              //     content: (
-              //       <ReportDataGrid
-              //         height={500}
-              //         data={state.salesSummaryData}
-              //         columns={state.dynamicColumns}
-              //       />
-              //     ),
-              //   },
-              // ]
-              }
-            /> */}
+                    ],
+                    expandedGroups: [
+                      ...state.tableGroupRows,
+                    ],
+                    onExpandedGroupsChange: handleExpandedGroupsChange,
+                  },
+                },
+                summaryConfig: {
+                  state: {
+                    totalItems: state.tableSummaryRows,
+                    groupItems: state.tableSummaryRows,
+                  },
+                  integrated: {
+                    calculator: summaryCalculator,
+                  },
+                  row: {
+                    messages: {
+                      sum: 'Total',
+                      // subTotal: 'Sub Total',
+                      // gst: 'GST',
+                      // total: 'Total',
+                    },
+                  },
+                },
+              }}
+            />
           </ReportLayoutWrapper>
         </GridItem>
       </GridContainer>
