@@ -26,7 +26,10 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
   console.log({ activeTab, setActiveTab })
 
   useEffect(() => {
-    const tabIndex = inventoryMaster.currentTab
+    let tabIndex = inventoryMaster.currentTab
+    if (!tabIndex) {
+      tabIndex = '0'
+    }
     setActiveTab(tabIndex)
   }, [])
   return (
@@ -63,6 +66,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     <Tabs
       style={{ marginTop: 20 }}
       activeKey={activeTab}
+      defaultActivekey='0'
       onChange={(e) => setActiveTab(e)}
       options={InventoryMasterOption(componentProps)}
     />
