@@ -369,6 +369,11 @@ class index extends Component {
     }, 1)
   }
 
+  handleDeleteInvoiceAdjustment = (adjustmentList) => {
+    const { setFieldValue } = this.props
+    setFieldValue('purchaseOrderAdjustment', adjustmentList)
+  }
+
   render () {
     const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
     const { purchaseOrder: po } = purchaseOrderDetails
@@ -389,13 +394,12 @@ class index extends Component {
         />
         <POSummary
           toggleInvoiceAdjustment={this.showInvoiceAdjustment}
-          // calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           handleCalcInvoiceSummary={this.calcPurchaseOrderSummary}
+          handleDeleteInvoiceAdjustment={this.handleDeleteInvoiceAdjustment}
           prefix='purchaseOrder.'
           adjustmentListName='purchaseOrderAdjustment'
           adjustmentList={purchaseOrderAdjustment}
           IsGSTEnabled={IsGSTEnabled}
-          dispatch={dispatch}
           setFieldValue={setFieldValue}
           // {...this.props}
         />

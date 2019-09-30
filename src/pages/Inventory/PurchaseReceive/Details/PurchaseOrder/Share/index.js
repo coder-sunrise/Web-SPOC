@@ -56,17 +56,16 @@ class InvoiceSummary extends PureComponent {
   }
 
   render () {
-    console.log('', this.props)
     const { settingGSTEnable, settingGSTPercentage } = this.state
     const {
-      dispatch,
-      setFieldValue,
       toggleInvoiceAdjustment,
+      handleDeleteInvoiceAdjustment,
+      prefix = '',
+      adjustmentListName = '',
       adjustmentList = [],
       IsGSTEnabled = false,
       handleCalcInvoiceSummary,
-      prefix = '',
-      adjustmentListName = '',
+      setFieldValue,
     } = this.props
 
     return (
@@ -107,6 +106,9 @@ class InvoiceSummary extends PureComponent {
                     handleCalcInvoiceSummary={handleCalcInvoiceSummary}
                     adjustmentListName={adjustmentListName}
                     setFieldValue={setFieldValue}
+                    handleDeleteInvoiceAdjustment={
+                      handleDeleteInvoiceAdjustment
+                    }
                     {...amountProps}
                   />
                 )

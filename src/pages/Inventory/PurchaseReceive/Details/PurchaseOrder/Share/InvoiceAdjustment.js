@@ -12,7 +12,7 @@ import DeleteOutline from '@material-ui/icons/DeleteOutline'
 const InvoiceAdjustment = ({
   index,
   adjustmentList,
-  dispatch,
+  handleDeleteInvoiceAdjustment,
   handleCalcInvoiceSummary,
   adjustmentListName,
   setFieldValue,
@@ -28,14 +28,11 @@ const InvoiceAdjustment = ({
             title='Do you want to remove this adjustment?'
             onConfirm={() => {
               adjustmentList[index].isDeleted = true
-              // dispatch({
-              //   // type: `${modelName}/deleteAdjustment`,
-              //   type: `purchaseOrderDetails/deleteAdjustment`,
-              //   payload: { adjustmentList },
-              // })
-
-              setFieldValue(adjustmentListName, adjustmentList)
-              setTimeout(() => handleCalcInvoiceSummary(), 500)
+              setTimeout(
+                () => handleDeleteInvoiceAdjustment(),
+                handleCalcInvoiceSummary(),
+                500,
+              )
             }}
           >
             <Button color='danger' size='sm' aria-label='Delete' justIcon>
@@ -46,12 +43,6 @@ const InvoiceAdjustment = ({
         </GridItem>
       </GridItem>
       <GridItem xs={5} md={1}>
-        {/* <Field
-          name={`adjustmentList[${index}].adjValue`}
-          render={(args) => {
-            return <NumberInput {...amountProps} {...args} />
-          }}
-        /> */}
         <NumberInput defaultValue={adjValue} {...amountProps} />
       </GridItem>
     </GridContainer>
