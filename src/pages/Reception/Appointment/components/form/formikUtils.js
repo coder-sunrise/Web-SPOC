@@ -189,7 +189,17 @@ export const generateRecurringAppointments = (
     date: appointment.appointmentDate,
   })
   if (rrule) {
-    const allDates = rrule.all() || []
+    let allDates =
+      [
+        ...rrule.all(),
+      ] || []
+    if (recurrenceDto.recurrenceRange === 'by') {
+      allDates = [
+        ...allDates,
+        moment(allDates[allDates.length - 1]).add(1, 'days').toDate(),
+      ]
+    }
+    console.log({ recurrenceDto, allDates })
     const { id, ...restAppointmentValues } = appointment
     return allDates.map(
       (date) =>

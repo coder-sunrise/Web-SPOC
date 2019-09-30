@@ -558,15 +558,6 @@ class Form extends React.PureComponent {
     history.push(getAppendUrl(parameters))
   }
 
-  onCloseFormClick = () => {
-    const { onClose, dispatch } = this.props
-    dispatch({
-      type: 'patientSearch/updateState',
-      payload: { list: undefined },
-    })
-    onClose()
-  }
-
   render () {
     const {
       classes,
@@ -650,7 +641,7 @@ class Form extends React.PureComponent {
             <FormFooter
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={this.onCloseFormClick}
+              onClose={onClose}
               disabled={
                 !isDataGridValid ||
                 !values.patientName ||

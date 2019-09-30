@@ -5,7 +5,7 @@ import moment from 'moment'
 // medisys model
 import { createListViewModel } from 'medisys-model'
 // common components
-import { notification, serverDateFormat } from '@/components'
+import { notification } from '@/components'
 import * as service from '@/services/calendar'
 import { queryList as queryPublicHolidays } from '@/pages/Setting/PublicHoliday/services'
 // utils
@@ -89,7 +89,7 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getActiveBizSessionQueue (_, { call, put, select }) {
+      *getActiveBizSessionQueue (_, { put, select }) {
         const queueLog = yield select((state) => state.queueLog)
         const { sessionInfo } = queueLog
         if (sessionInfo.id === '') {
@@ -283,10 +283,10 @@ export default createListViewModel({
             }
           }
           console.log({ savePayload })
-          return yield put({
-            type: actionKey,
-            payload: savePayload,
-          })
+          // return yield put({
+          //   type: actionKey,
+          //   payload: savePayload,
+          // })
         } catch (error) {
           console.log({ error })
         }
