@@ -68,7 +68,7 @@ const generateNewCHASData = () => {
   for (let i = 0; i < 15; i++) {
     data.push({
       id: i,
-      vistDate: moment().format({ dateFormatLong }),
+      vistDate: moment().formatUTC({ dateFormatLong }),
       accountNo: 'S1234567D',
       patientName: 'Tan Kok Wei',
       doctor: 'Dr Levine',

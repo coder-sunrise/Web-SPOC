@@ -2,7 +2,13 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import { CardContainer, withFormikExtend, CommonModal, GridItem, Button } from '@/components'
+import {
+  CardContainer,
+  withFormik,
+  CommonModal,
+  GridItem,
+  Button,
+} from '@/components'
 import FilterBar from './components/FilterBar'
 import PurchaseReceiveDataGrid from './components/PurchaseReceiveDataGrid'
 import WriteOff from './components/Modal/WriteOff'
@@ -19,7 +25,7 @@ const styles = (theme) => ({
 @connect(({ purchaseReceiveList }) => ({
   purchaseReceiveList,
 }))
-@withFormikExtend({
+@withFormik({
   name: 'purchaseReceiveList',
   mapPropsToValues: ({ purchaseReceiveList }) => {
     return purchaseReceiveList
@@ -33,7 +39,7 @@ class PurchaseReceive extends Component {
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'purchaseReceiveList/fakeQueryDone',
+      type: 'purchaseReceiveList/query',
     })
   }
 
@@ -55,7 +61,9 @@ class PurchaseReceive extends Component {
 
   closeDuplicatePOModal = () => this.setState({ showDuplicatePO: false })
 
-  onSubmitWriteOff = (writeOffReason) => { this.closeWriteOffModal() }
+  onSubmitWriteOff = (writeOffReason) => {
+    this.closeWriteOffModal()
+  }
 
   onNavigate = (type, rowId) => {
     const { history } = this.props
@@ -83,10 +91,7 @@ class PurchaseReceive extends Component {
       handleNavigate: this.onNavigate,
     }
 
-    const {
-      showWriteOff,
-      showDuplicatePO,
-    } = this.state
+    const { showWriteOff, showDuplicatePO } = this.state
 
     return (
       <CardContainer hideHeader>
@@ -109,16 +114,10 @@ class PurchaseReceive extends Component {
           onConfirm={this.closeDuplicatePOModal}
           onClose={this.closeDuplicatePOModal}
         >
-          <DuplicatePO
-            actions={actionProps}
-            {...this.props}
-          />
+          <DuplicatePO actions={actionProps} {...this.props} />
         </CommonModal>
         <GridItem md={4} className={classes.buttonGroup}>
-          <Button
-            color='primary'
-            onClick={this.onWriteOffClick}
-          >
+          <Button color='primary' onClick={this.onWriteOffClick}>
             Write-Off
           </Button>
         </GridItem>
@@ -127,4 +126,3 @@ class PurchaseReceive extends Component {
   }
 }
 export default withStyles(styles, { withTheme: true })(PurchaseReceive)
-

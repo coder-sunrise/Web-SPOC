@@ -290,13 +290,13 @@ const routes = [
             // component: './Finance/CreditDebitNote',
             mini: 'CD',
           },
-          {
-            path: '/finance/billing',
-            name: 'corporate-billing',
-            mini: 'CB',
-            exact: true,
-            // component: './Finance/CorporateBilling',
-          },
+          // {
+          //   path: '/finance/billing',
+          //   name: 'corporate-billing',
+          //   mini: 'CB',
+          //   exact: true,
+          //   // component: './Finance/CorporateBilling',
+          // },
           {
             path: '/finance/billing/:companyName',
             name: 'corporate-billing/detail',
@@ -384,12 +384,12 @@ const routes = [
       // Forms
       //
       // Lab Report
-      {
-        path: '/labsresult',
-        icon: 'poll',
-        name: 'labsresult',
-        // component: '',
-      },
+      // {
+      //   path: '/labsresult',
+      //   icon: 'poll',
+      //   name: 'labsresult',
+      //   // component: '',
+      // },
       // Lab Report
       //
       // Report
@@ -662,7 +662,7 @@ const routes = [
           },
           {
             path: '/setting/documenttemplate',
-            name: 'documenttertemplate',
+            name: 'documenttemplate',
             component: './Setting/DocumentTemplate',
           },
           {

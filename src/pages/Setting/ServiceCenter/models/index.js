@@ -10,11 +10,11 @@ export default createListViewModel({
     state: {
       default: {
         isUserMaintainable: true,
-        description: '',
         effectiveDates: [
           moment(),
           moment('2099-12-31'),
         ],
+        description: '',
       },
     },
     subscriptions: ({ dispatch, history }) => {

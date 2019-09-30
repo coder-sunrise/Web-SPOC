@@ -56,9 +56,14 @@ class Grid extends PureComponent {
         // FuncProps={{ pager: false }}
         columnExtensions={[
           {
+            columnName: 'displayValue',
+            width: 500,
+          },
+          {
             columnName: 'templateMessage',
+            width: 500,
             render: (row) => {
-              //return htmlToText.fromString(row.templateMessage)
+              // return htmlToText.fromString(row.templateMessage)
               const templateMessageProps = {
                 templateMessage: htmlToText.fromString(row.templateMessage),
               }
@@ -68,11 +73,15 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'effectiveStartDate',
+            sortingEnabled: false,
+            width: 130,
             type: 'date',
             format: { dateFormatLong },
           },
           {
             columnName: 'effectiveEndDate',
+            sortingEnabled: false,
+            width: 130,
             type: 'date',
             format: { dateFormatLong },
           },
@@ -90,6 +99,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
+                    style={{marginLeft: 0}}
                   >
                     <Edit />
                   </Button>

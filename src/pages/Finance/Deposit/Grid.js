@@ -106,12 +106,6 @@ class Grid extends PureComponent {
     leftColumns: [],
   }
 
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'deposit/query',
-    })
-  }
-
   toggleModal = () => {
     this.setState((prevState) => ({
       showDepositRefundModal: !prevState.showDepositRefundModal,

@@ -173,6 +173,7 @@ const Grid = ({
     const {
       doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
     } = row
+    console.log(row)
     const { clinicianProfile: { doctorProfile } } = user
     if (!doctorProfile) {
       notification.error({

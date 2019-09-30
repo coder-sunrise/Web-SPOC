@@ -11,7 +11,8 @@ import Grid from './Grid'
 import { isPOStatusFinalized } from '../../variables'
 
 @connect(({ podoPayment, purchaseOrderDetails }) => ({
-  podoPayment, purchaseOrderDetails,
+  podoPayment,
+  purchaseOrderDetails,
 }))
 @withFormikExtend({
   displayName: 'podoPayment',
@@ -19,23 +20,39 @@ import { isPOStatusFinalized } from '../../variables'
   mapPropsToValues: ({ podoPayment }) => {
     return podoPayment
   },
+  handleSubmit: (values, { props }) => {
+    const { rows, ...restValues } = values
+    const { dispatch, onConfirm } = props
+
+    console.log('handleSubmit1', values)
+
+    const paymentPayload = {
+      purchaseOrderFK: values.id,
+      sequence: 1,
+      clinicPaymentDto: {},
+    }
+
+    dispatch({
+      type: 'podoPayment/upsert',
+      payload: { ...paymentPayload },
+    })
+  },
 })
 class index extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'podoPayment/queryPodoPayment',
-    })
-
-    this.props.dispatch({
-      type: 'podoPayment/setPurchaseOrderDetails',
       payload: this.props.purchaseOrderDetails,
     })
   }
 
   render () {
+    console.log(this.props)
     const { purchaseOrderDetails } = this.props
-    const { status } = purchaseOrderDetails
-    const isEditable = isPOStatusFinalized(status)
+    const poStatus = purchaseOrderDetails
+      ? purchaseOrderDetails.purchaseOrderStatusFK
+      : 1
+    const isEditable = isPOStatusFinalized(poStatus)
     return (
       <React.Fragment>
         <GridContainer>
@@ -44,14 +61,11 @@ class index extends PureComponent {
         </GridContainer>
         <div style={{ textAlign: 'center' }}>
           <ProgressButton
-            // submitKey='medicationDetail/submit'
-            // onClick={handleSubmit}
+            onClick={this.props.handleSubmit}
             disabled={isEditable}
           />
-          <Button
-            color='danger'
-            disabled={isEditable}
-          >Cancel
+          <Button color='danger' disabled={isEditable}>
+            Cancel
           </Button>
         </div>
       </React.Fragment>

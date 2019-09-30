@@ -162,6 +162,7 @@ const getRights = (values) => {
   },
   mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
+    // console.log(consultation.entity, consultation.default)
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
@@ -289,6 +290,12 @@ class Consultation extends PureComponent {
     if (!vistEntity) return null
     const { visit = {} } = vistEntity
     const { summary } = orders
+    // const { adjustments, total, gst, totalWithGst } = summary
+    console.log("*********************************")
+    console.log('values', values, this.props)
+    // console.log(currentLayout)
+
+    // console.log(state.currentLayout)
     return (
       <SizeContainer size='sm'>
         <div
@@ -449,24 +456,24 @@ class Consultation extends PureComponent {
     )
   }
 
-  // eslint-disable-next-line camelcase
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
-    // console.log(
-    //   nextProps.consultation,
-    //   nextProps.consultation.consultationID,
-    //   this.props.consultation.consultationID !==
-    //     nextProps.consultation.consultationID,
-    // )
-    if (
-      nextProps.consultation &&
-      nextProps.consultation.entity &&
-      nextProps.consultation.entity.concurrencyToken !==
-        nextProps.values.concurrencyToken
-    ) {
-      nextProps.resetForm(nextProps.consultation.entity)
-    }
-  }
+  // // eslint-disable-next-line camelcase
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
+  //   // console.log(
+  //   //   nextProps.consultation,
+  //   //   nextProps.consultation.consultationID,
+  //   //   this.props.consultation.consultationID !==
+  //   //     nextProps.consultation.consultationID,
+  //   // )
+  //   if (
+  //     nextProps.consultation &&
+  //     nextProps.consultation.entity &&
+  //     nextProps.consultation.entity.concurrencyToken !==
+  //       nextProps.values.concurrencyToken
+  //   ) {
+  //     nextProps.resetForm(nextProps.consultation.entity)
+  //   }
+  // }
 
   render () {
     const { props, state } = this

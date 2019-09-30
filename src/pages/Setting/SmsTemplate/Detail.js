@@ -21,11 +21,13 @@ const styles = (theme) => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingSmsTemplate }) =>
-  settingSmsTemplate.entity || settingSmsTemplate.default,
+    settingSmsTemplate.entity || settingSmsTemplate.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateMessage: Yup.string().required(),
+    templateMessage: Yup.string()
+      .required()
+      .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
@@ -57,7 +59,6 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingSmsTemplate } = props
-    // console.log('detail', props)
 
     return (
       <React.Fragment>
@@ -102,14 +103,34 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <RichEditor
+                      toolbarHidden={() => true}
+                      handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
+                      onBlur={(html, text) => {
+                        this.props.setFieldValue('templateMessage', text)
+                      }}
                       {...args}
                     />
                   )
                 }}
               />
             </GridItem>
+            {/* <GridItem md={12}>
+              <Field
+                name='templateMessage'
+                render={(args) => {
+                  return (
+                    <TextField
+                      label='Template Message'
+                      multiline
+                      rowsMax='5'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem> */}
           </GridContainer>
         </div>
         {footer &&

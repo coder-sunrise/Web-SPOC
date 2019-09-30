@@ -27,63 +27,19 @@ export default createListViewModel({
       },
     },
     reducers: {
-      queryDone (state, { payload }) {
+      queryDone (st, { payload }) {
         const { data } = payload
 
         return {
-          ...state,
-          list: [
-            {
-              id: 1,
-              patientName: 'Ali Bin Abu',
-              accountNo: 'S1234567890',
-              balance: 9999,
-              lastTxnDate: moment(),
-            },
-            {
-              id: 2,
-              patientName: 'Abu Bin Ali',
-              accountNo: 'S1234567890',
-              balance: 8888,
-              lastTxnDate: moment(),
-            },
-            {
-              id: 3,
-
-              patientName: 'Ali Bin Abu',
-              accountNo: 'S1234567890',
-              balance: 7777,
-              lastTxnDate: moment(),
-            },
-            {
-              id: 4,
-              patientName: 'Abu Bin Ali',
-              accountNo: 'S1234567890',
-              balance: 6666,
-              lastTxnDate: moment(),
-            },
-            {
-              id: 5,
-              patientName: 'Ali Bin Abu',
-              accountNo: 'S1234567890',
-              balance: 0,
-              lastTxnDate: moment(),
-            },
-            {
-              id: 6,
-              patientName: 'Abu Bin Ali',
-              accountNo: 'S1234567890',
-              balance: 0,
-              lastTxnDate: moment(),
-            },
-          ],
-          // list: data.data.map((o) => {
-          //   return {
-          //     ...o,
-          //   }
-          // }),
+          ...st,
+          list: data.data.map((o) => {
+            return {
+              ...o,
+            }
+          }),
         }
       },
+
       updateBizSessionList (state, { payload }) {
         const { data } = payload
         return {

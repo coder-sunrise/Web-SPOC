@@ -48,7 +48,6 @@ class ServiceCenter extends PureComponent {
   // }
   
   render () {
-    console.log("ggggggggg")
     const { settingDocumentTemplate } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
