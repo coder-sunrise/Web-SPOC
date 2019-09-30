@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'dva'
-import * as Yup from 'yup'
-// formik
 import { FastField, withFormik } from 'formik'
-// umi
-import router from 'umi/router'
+import * as Yup from 'yup'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
@@ -114,10 +111,6 @@ class LoginCard extends PureComponent {
     handleSubmit()
   }
 
-  onForgotPasswordClick = () => {
-    router.push('/forgotpassword')
-  }
-
   render () {
     const { classes, login } = this.props
     const { isInvalidLogin } = login
@@ -198,7 +191,7 @@ class LoginCard extends PureComponent {
                     md={12}
                     style={{ marginTop: 12, textAlign: 'right' }}
                   >
-                    <a onClick={this.onForgotPasswordClick}>Forgot Password</a>
+                    <a>Forgot Password</a>
                   </GridItem>
                 </GridContainer>
               </CardFooter>
