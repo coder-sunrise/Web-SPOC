@@ -22,7 +22,6 @@ import {
 })
 class Filter extends PureComponent {
   render () {
-    console.log({ props: this.props.values })
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -35,7 +34,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem md={2}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='documentTemplateTypeFK'
               render={(args) => {
@@ -49,7 +48,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem md={2}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='isActive'
               render={(args) => {

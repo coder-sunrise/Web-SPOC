@@ -10,6 +10,7 @@ import {
   withStyles,
 } from '@material-ui/core'
 import { CustomInputWrapper } from 'mui-pro-components'
+import Button from '@material-ui/core/Button'
 
 const styles = () => ({})
 
