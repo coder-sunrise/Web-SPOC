@@ -774,6 +774,7 @@ const tenantCodes = [
   'inventorypackage',
   'role',
   'ctsupplier',
+  'ctpaymentmode',
   // 'ctsnomeddiagnosis',
   'codetable/ctsnomeddiagnosis',
 ]
