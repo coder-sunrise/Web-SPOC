@@ -109,8 +109,8 @@ export default createFormViewModel({
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
         let { currentId, version, currentComponent, md } = payload
-
         const patient = yield select((state) => state.patient)
+
         if (
           patient.version !== version ||
           (patient.entity && patient.entity.id !== currentId)

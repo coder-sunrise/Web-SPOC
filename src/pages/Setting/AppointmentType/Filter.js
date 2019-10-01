@@ -52,19 +52,20 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
             color='primary'
             icon={null}
             onClick={() => {
-              const { codeDisplayValue } = values
-              // dispatch({
-              //   type: 'settingMedicationConsumptionMethod/query',
-              //   payload: {
-              //     group: [
-              //       {
-              //         code: codeDisplayValue,
-              //         displayValue: codeDisplayValue,
-              //         combineCondition: 'or',
-              //       },
-              //     ],
-              //   },
-              // })
+              const { codeDisplayValue, isActive } = values
+              dispatch({
+                type: 'settingAppointmentType/query',
+                payload: {
+                  isActive,
+                  group: [
+                    {
+                      code: codeDisplayValue,
+                      displayValue: codeDisplayValue,
+                      combineCondition: 'or',
+                    },
+                  ],
+                },
+              })
             }}
           >
             <FormattedMessage id='form.search' />

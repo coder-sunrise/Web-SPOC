@@ -123,6 +123,7 @@ const Grid = ({
   user,
   calendarEvents = [],
   filter = StatusIndicator.ALL,
+  selfOnly = false,
   queueList = [],
   queryingData = false,
   showingVisitRegistration = false,
@@ -146,11 +147,32 @@ const Grid = ({
 
   const computeQueueListingData = () => {
     if (filter === StatusIndicator.APPOINTMENT) return calendarData
-    return filterData(filter, queueList)
+
+    let data = [
+      ...queueList,
+    ]
+
+    const { clinicianProfile: { doctorProfile } } = user
+
+    if (selfOnly)
+      data = data.filter((item) => {
+        const {
+          doctor: {
+            clinicianProfile: { doctorProfile: assignedDoctorProfile },
+          },
+        } = item
+
+        return doctorProfile
+          ? assignedDoctorProfile.id === doctorProfile.id
+          : false
+      })
+
+    return filterData(filter, data)
   }
 
   const queueListingData = useMemo(computeQueueListingData, [
     filter,
+    selfOnly,
     calendarEvents,
     queueList,
   ])
@@ -170,11 +192,12 @@ const Grid = ({
   }
 
   const isAssignedDoctor = (row) => {
+    console.log({ row })
     const {
       doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
     } = row
-    console.log(row)
     const { clinicianProfile: { doctorProfile } } = user
+    console.log({ user })
     if (!doctorProfile) {
       notification.error({
         message: 'Unauthorized Access',
@@ -361,6 +384,7 @@ const Grid = ({
 export default connect(({ queueLog, calendar, global, loading, user }) => ({
   user: user.data,
   filter: queueLog.currentFilter,
+  selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],
   calendarEvents: calendar.list || [],
   showingVisitRegistration: global.showVisitRegistration,
