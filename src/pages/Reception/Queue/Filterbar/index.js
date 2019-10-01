@@ -12,6 +12,7 @@ import {
   Button,
   GridContainer,
   GridItem,
+  Switch,
   TextField,
   ProgressButton,
 } from '@/components'
@@ -20,23 +21,21 @@ import StatusFilterButton from './StatusFilterButton'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
+  switch: { display: 'inline-block', minWidth: '200px' },
 })
 const Filterbar = ({ classes, toggleNewPatient, handleSubmit }) => (
   <GridContainer className={classes.actionBar} alignItems='center'>
-    <GridItem xs={6} sm={6} md={6} lg={4}>
+    <GridItem xs={4} sm={4} md={4} lg={3}>
       <FastField
         name='search'
         render={(args) => {
           return (
-            <TextField
-              label='Register visit (Patient Name, Acc No., Phone No.)'
-              {...args}
-            />
+            <TextField label='Patient Name, Acc No., Phone No.' {...args} />
           )
         }}
       />
     </GridItem>
-    <GridItem xs={6} sm={6} md={6} lg={3}>
+    <GridItem xs={6} sm={6} md={6} lg={4}>
       <ProgressButton
         variant='contained'
         color='primary'
@@ -58,7 +57,16 @@ const Filterbar = ({ classes, toggleNewPatient, handleSubmit }) => (
         </Hidden>
         <FormattedMessage id='reception.queue.createPatient' />
       </Button>
+      <div className={classes.switch}>
+        <FastField
+          name='myVisitOnly'
+          render={(args) => {
+            return <Switch label='Visit assign to me only' {...args} />
+          }}
+        />
+      </div>
     </GridItem>
+
     <GridItem
       xs={12}
       sm={12}

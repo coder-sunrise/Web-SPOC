@@ -293,7 +293,7 @@ class Queue extends React.Component {
         <Card>
           <CardHeader icon>
             <h3 className={classNames(classes.sessionNo)}>
-              {`Queue (Session No.: ${sessionNo})`}
+              {`Session No.: ${sessionNo}`}
             </h3>
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
