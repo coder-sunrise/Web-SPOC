@@ -87,6 +87,7 @@ class Grid extends PureComponent {
                     rel='noopener noreferrer'
                     target='_blank'
                     href={
+                      row.contact &&
                       row.contact.contactWebsite.website !== '' ? (
                         row.contact.contactWebsite.website
                       ) : (
@@ -94,7 +95,8 @@ class Grid extends PureComponent {
                       )
                     }
                   >
-                    {row.contact.contactWebsite.website !== '' ? (
+                    {row.contact &&
+                    row.contact.contactWebsite.website !== '' ? (
                       row.contact.contactWebsite.website
                     ) : (
                       '-'
@@ -108,7 +110,8 @@ class Grid extends PureComponent {
                 width: 120,
                 render: (row) => (
                   <span>
-                    {row.contact.officeContactNumber.number !== '' ? (
+                    {row.contact &&
+                    row.contact.officeContactNumber.number !== '' ? (
                       row.contact.officeContactNumber.number
                     ) : (
                       '-'
@@ -132,7 +135,7 @@ class Grid extends PureComponent {
             width: 120,
             render: (row) => (
               <span>
-                {row.contact.faxContactNumber.number !== '' ? (
+                {row.contact && row.contact.faxContactNumber.number !== '' ? (
                   row.contact.faxContactNumber.number
                 ) : (
                   '-'
@@ -147,7 +150,8 @@ class Grid extends PureComponent {
             width: 120,
             render: (row) => (
               <span>
-                {row.contact.mobileContactNumber.number !== '' ? (
+                {row.contact &&
+                row.contact.mobileContactNumber.number !== '' ? (
                   row.contact.mobileContactNumber.number
                 ) : (
                   '-'
