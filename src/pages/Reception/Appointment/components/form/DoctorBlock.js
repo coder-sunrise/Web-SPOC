@@ -197,18 +197,6 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
               )}
             />
           </GridItem>
-          <GridItem xs md={4}>
-            <FastField
-              name='durationMinute'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  label='test'
-                  code='codetable/ctsnomeddiagnosis'
-                />
-              )}
-            />
-          </GridItem>
         </GridContainer>
         <GridItem xs md={12}>
           <FastField

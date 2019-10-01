@@ -37,7 +37,7 @@ export default createListViewModel({
         if (ctcode !== undefined) {
           if (codetableState[ctcode] === undefined || payload.force) {
             const response = yield call(getCodes, payload)
-            console.log({ response })
+            console.log({ ctcode, response })
             if (response.length > 0) {
               // list = { ...list, [lowerCaseCode]: response }
               yield put({
