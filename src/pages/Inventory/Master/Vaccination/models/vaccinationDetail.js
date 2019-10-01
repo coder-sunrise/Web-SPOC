@@ -28,10 +28,9 @@ export default createFormViewModel({
         sellingPrice: 0,
         maxDiscount: 0,
         markupMargin: 0,
-        chas: [
-          'acute',
-          'chronic',
-        ],
+        vaccinationStock: [],
+        isChasAcuteClaimable: true,
+        isChasChronicClaimable: true,
       },
       // entity: {},
     },
