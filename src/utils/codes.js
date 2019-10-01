@@ -775,6 +775,7 @@ const tenantCodes = [
   'role',
   'ctsupplier',
   // 'ctsnomeddiagnosis',
+  'codetable/ctsnomeddiagnosis',
 ]
 
 // const codes = [
