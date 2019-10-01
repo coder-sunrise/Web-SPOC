@@ -185,8 +185,8 @@ class CommonTableGrid extends PureComponent {
       return height ? (
         <VirtualTable
           {...restProps}
-          // height={height}
-          height='auto'
+          height={height}
+          // height='auto'
           tableComponent={TableComponent}
         />
       ) : (
@@ -818,7 +818,7 @@ class CommonTableGrid extends PureComponent {
           })}
           style={{
             ...this.props.style,
-            height,
+            // height,
           }}
         >
           {isLoading && (
@@ -901,7 +901,7 @@ class CommonTableGrid extends PureComponent {
             <DateTypeProvider {...cellComponentConfig} />
             <RangeDateTypeProvider {...cellComponentConfig} />
             <RadioTypeProvider {...cellComponentConfig} />
-            <StatusTypeProvider {...cellComponentConfig} />
+
             <TimeTypeProvider {...cellComponentConfig} />
             <RowErrorTypeProvider {...cellComponentConfig} />
 
