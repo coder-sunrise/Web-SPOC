@@ -23,6 +23,8 @@ const ItemList = ({
   values,
   // ...props
 }) => {
+  const { isUserMaintainable } = values
+
   function callback (key) {
     console.log('key', key)
   }
@@ -73,6 +75,7 @@ const ItemList = ({
                   labelField='displayValue'
                   onChange={(e, option) => onItemSelect(e, option)}
                   code={type}
+                  disabled={!isUserMaintainable}
                   {...args}
                 />
               )
@@ -80,7 +83,11 @@ const ItemList = ({
           />
         </GridItem>
         <GridItem xs={4}>
-          <Button color='primary' onClick={() => onClickAdd(type)}>
+          <Button
+            color='primary'
+            onClick={() => onClickAdd(type)}
+            disabled={!isUserMaintainable}
+          >
             Add
           </Button>
         </GridItem>
@@ -207,7 +214,12 @@ const ItemList = ({
               // onConfirm={() => onClickDelete(row)}
             >
               <Tooltip title='Delete'>
-                <Button size='sm' color='danger' justIcon>
+                <Button
+                  size='sm'
+                  color='danger'
+                  justIcon
+                  disabled={!isUserMaintainable}
+                >
                   <Delete />
                 </Button>
               </Tooltip>
