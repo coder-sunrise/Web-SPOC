@@ -51,11 +51,6 @@ class UserProfile extends React.Component {
   componentDidMount = () => {
     this.props.dispatch({
       type: 'settingUserProfile/query',
-      payload: {
-        sorting: [
-          { sortby: 'id', order: 'desc' },
-        ],
-      },
     })
   }
 
@@ -87,25 +82,12 @@ class UserProfile extends React.Component {
 
   handleSearchClick = () => {
     const { dispatch, values } = this.props
-    const prefix = 'like_'
     dispatch({
       type: 'settingUserProfile/query',
       payload: {
-        // group: [
-        //   {
-        //     'userProfileFKNavigation.userName': values.searchQuery,
-        //     name: values.searchQuery,
-        //     isActive: values.status,
-        //     combineCondition: 'or',
-        //   },
-        // ],
         'userProfileFKNavigation.userName': values.searchQuery,
         name: values.searchQuery,
         combineCondition: 'or',
-        // isActive: values.status,
-        // [`${prefix}userName`]: values.searchQuery,
-        // [`${prefix}name`]: values.searchQuery,
-        // combineCondition: 'or',
       },
     })
   }
@@ -128,9 +110,7 @@ class UserProfile extends React.Component {
   }
 
   render () {
-    const { classes, settingUserProfile } = this.props
-    const { list = [] } = settingUserProfile
-    // console.log({ settingUserProfile, list })
+    const { classes } = this.props
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -167,7 +147,7 @@ class UserProfile extends React.Component {
           </GridItem>
           <GridItem md={12}>
             <CommonTableGrid
-              rows={list}
+              type='settingUserProfile'
               {...this.state.gridConfig}
               onRowDoubleClick={this.handleDoubleClick}
             />

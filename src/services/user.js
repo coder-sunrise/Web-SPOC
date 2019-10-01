@@ -21,3 +21,15 @@ export const changeUserPassword = (payload) =>
     method: 'PUT',
     body: payload,
   })
+
+export const getOTP = (payload) =>
+  request(`${userProfileURL}/generateResetPasswordCode`, {
+    method: 'PUT',
+    body: payload,
+  })
+
+export const resetPassword = (payload) =>
+  request(`${userProfileURL}/ResetPassword`, {
+    method: 'PUT',
+    body: payload,
+  })

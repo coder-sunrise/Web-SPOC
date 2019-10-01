@@ -54,7 +54,6 @@ class LoginPage extends PureComponent {
       <div className={classes.wrapper}>
         <SizeContainer size='lg'>
           <React.Fragment>
-            <NavBar {...rest} />
             <div className={classes.content}>
               <div
                 className={classes.fullPage}
