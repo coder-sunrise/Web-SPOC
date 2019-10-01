@@ -35,13 +35,11 @@ const style = () => ({
 @withFormikExtend({
   mapPropsToValues: ({ deposit, isDeposit }) => {
     if (deposit.entity) {
-      console.log('entity', deposit.entity)
       const transactionTypeFK = isDeposit ? 1 : 2
       const transactionType = transactionTypeFK === 1 ? 'Deposit' : 'Refund'
       const transactionModeFK = isDeposit ? undefined : 3
       return {
         ...deposit.entity,
-        // id: undefined,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
           transactionDate: moment(),
@@ -64,6 +62,13 @@ const style = () => ({
         is: (val) => val === 1,
         then: Yup.number().required(),
       }),
+      cardNumber: Yup.string().nullable().when('transactionModeFK', {
+        is: (val) => val === 1,
+        then: Yup.string()
+          .nullable()
+          .length(4, 'Enter 4 digits of the card number'),
+      }),
+
       // cardNumber: Yup.number().when('transactionModeFK', {
       //   is: (val) => false,
       //   then: Yup.number().test(
@@ -82,21 +87,7 @@ const style = () => ({
       //     .required(),
     }),
   }),
-  // validate: (values, props) => {
-  //   let errors = {}
 
-  //   if (
-  //     moment(values.date).format('YYMMDD') === moment().format('YYMMDD') &&
-  //     props.isDeposit
-  //   ) {
-  //   } else {
-  //     if (!values.session) {
-  //       errors.session = 'This is a required field'
-  //     }
-  //   }
-
-  //   return errors
-  // },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, codetable } = props
     const { balanceAfter, patientDepositTransaction } = values
@@ -116,7 +107,6 @@ const style = () => ({
         .name
     }
 
-    console.log({ values })
     dispatch({
       type: 'deposit/upsert',
       payload: {
@@ -141,21 +131,6 @@ const style = () => ({
         })
       }
     })
-    // props
-    //   .dispatch({
-    //     type: 'deposit/submit',
-    //     payload: values,
-    //   })
-    //   .then((r) => {
-    //     if (r && r.message === 'Ok') {
-    //       // toast.success('test')
-    //       notification.success({
-    //         // duration:0,
-    //         message: 'Done',
-    //       })
-    //       if (props.onConfirm) props.onConfirm()
-    //     }
-    //   })
   },
 })
 class Modal extends PureComponent {
@@ -237,13 +212,11 @@ class Modal extends PureComponent {
   }
 
   calculateBalanceAfter = () => {
-    console.log('props', this.props)
     const { isDeposit, errors, initialValues, setFieldValue } = this.props
     const { balance, patientDepositTransaction } = this.props.values || 0
     const { amount } = patientDepositTransaction
     let finalBalance
     if (!errors.amount) {
-      console.log({ balance, amount })
       finalBalance = isDeposit ? balance + amount : balance - amount
     } else {
       finalBalance = initialValues.balance
@@ -252,7 +225,6 @@ class Modal extends PureComponent {
       balanceAfter: finalBalance,
     })
 
-    console.log({ finalBalance })
     setFieldValue('balanceAfter', finalBalance)
   }
 
@@ -267,7 +239,6 @@ class Modal extends PureComponent {
         style: { width: '100%' },
       },
     }
-    console.log({ props })
 
     return (
       <React.Fragment>
@@ -329,7 +300,9 @@ class Modal extends PureComponent {
               <GridItem xs={12}>
                 <Field
                   name='patientDepositTransaction.cardNumber'
-                  render={(args) => <TextField label='Card Number' {...args} />}
+                  render={(args) => (
+                    <NumberInput label='Card Number' {...args} />
+                  )}
                 />
               </GridItem>
             )}
