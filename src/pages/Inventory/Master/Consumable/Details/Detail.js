@@ -134,7 +134,7 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
                     textField='name'
                     options={[
                       {
-                        id: 'acute',
+                        id: 'isChasAcuteClaimable',
                         name: 'CHAS Acute Claimable',
 
                         layoutConfig: {
@@ -142,7 +142,7 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
                         },
                       },
                       {
-                        id: 'chronic',
+                        id: 'isChasChronicClaimable',
                         name: 'CHAS Chronic Claimable',
 
                         layoutConfig: {

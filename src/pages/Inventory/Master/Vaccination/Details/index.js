@@ -53,6 +53,7 @@ const Detail = ({
     vaccinationDetail,
     values: props.values,
     setFieldValue,
+    dispatch,
   }
   return (
     <React.Fragment>
@@ -120,9 +121,23 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ vaccinationDetail }) => {
-      return vaccinationDetail.entity
+      const returnValue = vaccinationDetail.entity
         ? vaccinationDetail.entity
         : vaccinationDetail.default
+
+      let chas = []
+      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      if (isChasAcuteClaimable) {
+        chas.push('isChasAcuteClaimable')
+      }
+      if (isChasChronicClaimable) {
+        chas.push('isChasChronicClaimable')
+      }
+
+      return {
+        ...returnValue,
+        chas,
+      }
     },
 
     validationSchema: Yup.object().shape({
@@ -170,10 +185,22 @@ export default compose(
           },
         ]
       }
+      let chas = {
+        isChasAcuteClaimable: false,
+        isChasChronicClaimable: false,
+      }
+      values.chas.forEach((o) => {
+        if (o === 'isChasAcuteClaimable') {
+          chas[o] = true
+        } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+      })
       dispatch({
         type: 'vaccinationDetail/upsert',
         payload: {
           ...restValues,
+          ...chas,
           id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],

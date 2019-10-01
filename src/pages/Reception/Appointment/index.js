@@ -194,6 +194,7 @@ class Appointment extends React.PureComponent {
       const selectedAppointmentID =
         appointmentFK === undefined ? id : appointmentFK
       let shouldShowApptForm = true
+
       if (isEnableRecurrence) {
         if (!isEditedAsSingleAppointment) {
           shouldShowApptForm = false
@@ -204,7 +205,6 @@ class Appointment extends React.PureComponent {
           })
         }
       }
-
       if (shouldShowApptForm) {
         this.props
           .dispatch({
@@ -214,7 +214,7 @@ class Appointment extends React.PureComponent {
               // isEditedAsSingleAppointment: isEnableRecurrence
               //   ? false
               //   : isEditedAsSingleAppointment,
-              mode: isEditedAsSingleAppointment ? 'single' : 'series',
+              mode: 'single',
             },
           })
           .then((response) => {

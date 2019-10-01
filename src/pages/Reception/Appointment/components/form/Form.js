@@ -558,6 +558,18 @@ class Form extends React.PureComponent {
     history.push(getAppendUrl(parameters))
   }
 
+  onViewPatientProfile = () => {
+    const { values, history } = this.props
+    history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: '1',
+        pid: values.patientProfileFK,
+        v: Date.now(),
+      }),
+    )
+  }
+
   render () {
     const {
       classes,
@@ -580,11 +592,11 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
 
     // console.log({ datagrid })
-    console.log({
-      initialValues: this.props.initialValues,
-      values: this.props.values,
-      dirty: this.props.dirty,
-    })
+    // console.log({
+    //   initialValues: this.props.initialValues,
+    //   values: this.props.values,
+    //   dirty: this.props.dirty,
+    // })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
@@ -594,9 +606,11 @@ class Form extends React.PureComponent {
             <GridContainer className={classnames(classes.formContent)}>
               <GridItem container xs md={6}>
                 <PatientInfoInput
+                  onViewPatientProfileClick={this.onViewPatientProfile}
                   onSearchPatientClick={this.onSearchPatient}
                   onCreatePatientClick={this.togglePatientProfileModal}
                   onRegisterToVisitClick={this.actualizeAppointment}
+                  patientContactNo={values.patientContactNo}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
                   isEdit={values.id}

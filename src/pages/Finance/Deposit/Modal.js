@@ -1,12 +1,11 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { Field, withFormik } from 'formik'
 import moment from 'moment'
 import * as Yup from 'yup'
+import valid from 'card-validator'
 import { formatMessage } from 'umi/locale'
 import { withStyles, Grid } from '@material-ui/core'
 import { paymentMethods } from '@/utils/codes'
-
 import {
   GridContainer,
   GridItem,
@@ -14,6 +13,10 @@ import {
   TextField,
   DatePicker,
   Select,
+  CodeSelect,
+  Field,
+  FastField,
+  withFormikExtend,
 } from '@/components'
 
 const style = () => ({
@@ -25,53 +28,109 @@ const style = () => ({
   },
 })
 
-@connect(({ deposit }) => ({
+@connect(({ deposit, codetable }) => ({
   deposit,
+  codetable,
 }))
-@withFormik({
-  mapPropsToValues: ({ deposit }) => {
+@withFormikExtend({
+  mapPropsToValues: ({ deposit, isDeposit }) => {
     if (deposit.entity) {
-      return { ...deposit.entity, date: moment(), amount: 0, mode: 'cash' }
-    } else {
-      return deposit.default
-    }
-  },
-  validationSchema: Yup.object().shape({
-    date: Yup.string().required('Date is required'),
-    mode: Yup.string().required('Mode is required'),
-    amount: Yup.number().moreThan(0, 'Please type in correct amount'),
-  }),
-  validate: (values, props) => {
-    let errors = {}
-
-    if (
-      moment(values.date).format('YYMMDD') == moment().format('YYMMDD') &&
-      props.isDeposit
-    ) {
-    } else {
-      if (!values.session) {
-        errors.session = 'This is a required field'
+      const transactionTypeFK = isDeposit ? 1 : 2
+      const transactionType = transactionTypeFK === 1 ? 'Deposit' : 'Refund'
+      const transactionModeFK = isDeposit ? undefined : 3
+      return {
+        ...deposit.entity,
+        patientDepositTransaction: {
+          patientDepositFK: deposit.entity.patientDepositFK,
+          transactionDate: moment(),
+          transactionType,
+          transactionTypeFK,
+          transactionModeFK,
+          amount: 0,
+        },
       }
     }
-
-    return errors
+    return deposit.default
   },
+  validationSchema: Yup.object().shape({
+    patientDepositTransaction: Yup.object().shape({
+      transactionDate: Yup.string().required('Date is required'),
+      transactionBizSessionFK: Yup.number().required(),
+      transactionModeFK: Yup.number().required('Mode is required'),
+      amount: Yup.number().min(0.01, 'The amount should be more than 0.01'),
+      creditCardTypeFK: Yup.number().when('transactionModeFK', {
+        is: (val) => val === 1,
+        then: Yup.number().required(),
+      }),
+      cardNumber: Yup.string().nullable().when('transactionModeFK', {
+        is: (val) => val === 1,
+        then: Yup.string()
+          .nullable()
+          .length(4, 'Enter 4 digits of the card number'),
+      }),
+
+      // cardNumber: Yup.number().when('transactionModeFK', {
+      //   is: (val) => false,
+      //   then: Yup.number().test(
+      //     'test-number', // this is used internally by yup
+      //     'Credit Card number is invalid', //validation message
+      //     (value) => valid.number(value).isValid,
+      //   ), // ret,
+      //   otherwise: Yup.number(),
+      // }),
+      //   cardNumber: Yup.string()
+      //     .test(
+      //       'test-number', // this is used internally by yup
+      //       'Credit Card number is invalid', //validation message
+      //       (value) => valid.number(value).isValid,
+      //     ) // return true false based on validation
+      //     .required(),
+    }),
+  }),
+
   handleSubmit: (values, { props }) => {
-    // props
-    //   .dispatch({
-    //     type: 'deposit/submit',
-    //     payload: values,
-    //   })
-    //   .then((r) => {
-    //     if (r && r.message === 'Ok') {
-    //       // toast.success('test')
-    //       notification.success({
-    //         // duration:0,
-    //         message: 'Done',
-    //       })
-    //       if (props.onConfirm) props.onConfirm()
-    //     }
-    //   })
+    const { dispatch, onConfirm, codetable } = props
+    const { balanceAfter, patientDepositTransaction } = values
+    const {
+      transactionModeFK,
+      creditCardTypeFK,
+      transactionBizSessionFK,
+      ...restDepositTransaction
+    } = patientDepositTransaction
+    const { ctpaymentmode, ctcreditcardtype } = codetable
+    let transactionMode
+    let creditCardType
+    if (transactionModeFK === 1) {
+      transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
+        .displayValue
+      creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
+        .name
+    }
+
+    dispatch({
+      type: 'deposit/upsert',
+      payload: {
+        ...values,
+        balance: balanceAfter,
+        patientDepositTransaction: {
+          ...restDepositTransaction,
+          transactionMode,
+          creditCardType,
+          transactionModeFK,
+          creditCardTypeFK,
+          createdByBizSessionFK: transactionBizSessionFK,
+          transactionBizSessionFK,
+          // creditCardTypeFK: 1,
+        },
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'deposit/query',
+        })
+      }
+    })
   },
 })
 class Modal extends PureComponent {
@@ -80,66 +139,93 @@ class Modal extends PureComponent {
     const { isDeposit, deposit } = this.props
     const { entity } = deposit
     this.state = {
-      balanceAfter: entity.balance || 0,
-      isSessionRequired: isDeposit ? false : true,
+      // balanceAfter: entity.balance || 0,
+      // isSessionRequired: isDeposit ? false : true,
+      isSessionRequired: false,
       isCardPayment: false,
     }
+  }
+
+  componentDidMount () {
+    this.getBizList(moment().format('YYMMDD'))
   }
 
   onChangeDate = (event) => {
     const { dispatch, setFieldValue, isDeposit } = this.props
     const selectedDate = moment(event).format('YYMMDD')
 
-    if (isDeposit && selectedDate == moment().format('YYMMDD')) {
+    if (isDeposit && selectedDate === moment().format('YYMMDD')) {
       this.setState({ isSessionRequired: false })
     } else {
       this.setState({ isSessionRequired: true })
 
-      dispatch({
-        type: 'deposit/bizSessionList',
-        payload: {
-          sessionNoPrefix: selectedDate,
-          pagesize: 999999,
-        },
-      }).then(() => {
-        const { bizSessionList } = this.props.deposit
-        setFieldValue(
-          'session',
-          bizSessionList.length == 0 || bizSessionList === undefined
-            ? ''
-            : bizSessionList[0].value,
-        )
-      })
+      // dispatch({
+      //   type: 'deposit/bizSessionList',
+      //   payload: {
+      //     sessionNoPrefix: selectedDate,
+      //     pagesize: 999999,
+      //   },
+      // }).then(() => {
+      //   const { bizSessionList } = this.props.deposit
+      //   setFieldValue(
+      //     'patientDepositTransaction.transactionBizSessionFK',
+      //     bizSessionList.length === 0 || bizSessionList === undefined
+      //       ? ''
+      //       : bizSessionList[0].value,
+      //   )
+      // })
+      this.getBizList(selectedDate)
     }
+  }
+
+  getBizList = (e) => {
+    const { dispatch, setFieldValue } = this.props
+    dispatch({
+      type: 'deposit/bizSessionList',
+      payload: {
+        sessionNoPrefix: e,
+        pagesize: 999999,
+      },
+    }).then(() => {
+      const { bizSessionList } = this.props.deposit
+      setFieldValue(
+        'patientDepositTransaction.transactionBizSessionFK',
+        bizSessionList.length === 0 || bizSessionList === undefined
+          ? undefined
+          : bizSessionList.slice(-1)[0].value, // bizSessionList[0].value
+      )
+    })
   }
 
   onChangePaymentMode = (event) => {
     const { setFieldValue } = this.props
     const selectedValue = event || ''
 
-    if (selectedValue.trim().toLowerCase() == 'creditcard') {
+    if (selectedValue === 1) {
       this.setState({ isCardPayment: true })
-      setFieldValue('cardType', 'Visa')
+      setFieldValue('patientDepositTransaction.creditCardTypeFK', 1)
     } else {
       this.setState({ isCardPayment: false })
-      setFieldValue('cardNumber', '')
+      setFieldValue('patientDepositTransaction.cardNumber', '')
+      setFieldValue('patientDepositTransaction.creditCardTypeFK', undefined)
     }
   }
 
   calculateBalanceAfter = () => {
-    console.log('props', this.props)
-    const { isDeposit, errors, initialValues } = this.props
-    const { balance, amount } = this.props.values || 0
-
+    const { isDeposit, errors, initialValues, setFieldValue } = this.props
+    const { balance, patientDepositTransaction } = this.props.values || 0
+    const { amount } = patientDepositTransaction
+    let finalBalance
     if (!errors.amount) {
-      this.setState({
-        balanceAfter: isDeposit ? balance + amount : balance - amount,
-      })
+      finalBalance = isDeposit ? balance + amount : balance - amount
     } else {
-      this.setState({
-        balanceAfter: initialValues.balance,
-      })
+      finalBalance = initialValues.balance
     }
+    this.setState({
+      balanceAfter: finalBalance,
+    })
+
+    setFieldValue('balanceAfter', finalBalance)
   }
 
   render () {
@@ -153,17 +239,14 @@ class Modal extends PureComponent {
         style: { width: '100%' },
       },
     }
+
     return (
       <React.Fragment>
-        <div style={{ padding: '0 0' }}>
-          <GridContainer
-            direction='column'
-            justify='center'
-            alignItems='stretch'
-          >
+        <div>
+          <GridContainer>
             <GridItem xs={12}>
               <Field
-                name='date'
+                name='patientDepositTransaction.transactionDate'
                 render={(args) => (
                   <DatePicker
                     timeFomat={false}
@@ -175,67 +258,65 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem xs={12}>
-              {isSessionRequired ? (
-                <Field
-                  name='session'
-                  render={(args) => (
-                    <Select
-                      label='Session'
-                      options={bizSessionList}
-                      {...args}
-                    />
-                  )}
-                />
-              ) : (
-                ''
-              )}
-            </GridItem>
+
             <GridItem xs={12}>
               <Field
-                name='mode'
+                name='patientDepositTransaction.transactionBizSessionFK'
                 render={(args) => (
-                  <Select
-                    label='Mode'
-                    onChange={this.onChangePaymentMode}
-                    options={paymentMethods}
-                    {...args}
-                  />
+                  <Select label='Session' options={bizSessionList} {...args} />
                 )}
               />
             </GridItem>
 
             <GridItem xs={12}>
-              {isCardPayment ? (
-                <Field
-                  name='cardType'
-                  render={(args) => <Select label='Card Type' {...args} />}
-                />
-              ) : (
-                ''
-              )}
+              <Field
+                name='patientDepositTransaction.transactionModeFK'
+                render={(args) => (
+                  <CodeSelect
+                    label='Mode'
+                    labelField='displayValue'
+                    onChange={(e) => this.onChangePaymentMode(e)}
+                    code='ctpaymentmode'
+                    {...args}
+                  />
+                )}
+              />
             </GridItem>
-            <GridItem xs={12}>
-              {isCardPayment ? (
+            {isCardPayment && (
+              <GridItem xs={12}>
                 <Field
-                  name='cardNumber'
-                  render={(args) => <TextField label='Card Number' {...args} />}
+                  name='patientDepositTransaction.creditCardTypeFK'
+                  render={(args) => (
+                    <CodeSelect
+                      label='Card Type'
+                      code='ctCreditCardType'
+                      {...args}
+                    />
+                  )}
                 />
-              ) : (
-                ''
-              )}
-            </GridItem>
-            <GridItem xs={12}>
+              </GridItem>
+            )}
+            {isCardPayment && (
+              <GridItem xs={12}>
+                <Field
+                  name='patientDepositTransaction.cardNumber'
+                  render={(args) => (
+                    <NumberInput label='Card Number' {...args} />
+                  )}
+                />
+              </GridItem>
+            )}
+            {/* <GridItem xs={12}>
               <Field
                 name='remarks'
                 render={(args) => (
                   <TextField multiline rowsMax='5' label='Remarks' {...args} />
                 )}
               />
-            </GridItem>
+            </GridItem> */}
             <GridItem xs={12}>
               <Field
-                name='depositRefundRemarks'
+                name='patientDepositTransaction.remarks'
                 render={(args) => (
                   <TextField
                     multiline
@@ -258,6 +339,7 @@ class Modal extends PureComponent {
                     }}
                     disabled
                     simple
+                    currency
                     prefix='Balance'
                     {...args}
                   />
@@ -266,9 +348,10 @@ class Modal extends PureComponent {
             </GridItem>
             <GridItem xs={12}>
               <Field
-                name='amount'
+                name='patientDepositTransaction.amount'
                 render={(args) => (
                   <NumberInput
+                    currency
                     onChange={this.calculateBalanceAfter}
                     {...commonAmountOpts}
                     prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
@@ -285,7 +368,7 @@ class Modal extends PureComponent {
                     {...commonAmountOpts}
                     disabled
                     simple
-                    value={this.state.balanceAfter}
+                    currency
                     prefix=' '
                     {...args}
                   />

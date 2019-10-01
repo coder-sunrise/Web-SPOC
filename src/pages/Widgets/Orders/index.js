@@ -212,10 +212,10 @@ class Orders extends PureComponent {
 
   render () {
     const { state, props } = this
-    const { theme, classes, orders } = props
+    const { theme, classes, orders, className } = props
     // console.log(props)
     return (
-      <div>
+      <div className={className}>
         <Detail {...props} />
         <Divider light />
 

@@ -51,6 +51,7 @@ const Detail = ({
     consumableDetail,
     values,
     setFieldValue,
+    dispatch,
   }
   return (
     <React.Fragment>
@@ -115,10 +116,23 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ consumableDetail }) => {
-      // console.log('consumableDetail', consumableDetail)
-      return consumableDetail.entity
+      const returnValue = consumableDetail.entity
         ? consumableDetail.entity
         : consumableDetail.default
+
+      let chas = []
+      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      if (isChasAcuteClaimable) {
+        chas.push('isChasAcuteClaimable')
+      }
+      if (isChasChronicClaimable) {
+        chas.push('isChasChronicClaimable')
+      }
+
+      return {
+        ...returnValue,
+        chas,
+      }
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
@@ -165,10 +179,22 @@ export default compose(
           },
         ]
       }
+      let chas = {
+        isChasAcuteClaimable: false,
+        isChasChronicClaimable: false,
+      }
+      values.chas.forEach((o) => {
+        if (o === 'isChasAcuteClaimable') {
+          chas[o] = true
+        } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+      })
       dispatch({
         type: 'consumableDetail/upsert',
         payload: {
           ...restValues,
+          ...chas,
           id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],

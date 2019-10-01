@@ -37,7 +37,15 @@ import model from './models'
 
 window.g_app.replaceModel(model)
 
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  money: {
+    width: 16,
+    height: 16,
+    top: 3,
+    position: 'relative',
+    color: 'green',
+  },
+})
 
 // @compare('diagnosis')
 // @withFormikExtend({

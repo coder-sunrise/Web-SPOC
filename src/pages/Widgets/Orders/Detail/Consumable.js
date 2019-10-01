@@ -75,7 +75,7 @@ class Consumable extends PureComponent {
     }
   }
 
-  changeConsumable = (v, op) => {
+  changeConsumable = (v, op = {}) => {
     const { setFieldValue, values } = this.props
     console.log(v, op)
     setFieldValue('consumableName', op.displayValue)

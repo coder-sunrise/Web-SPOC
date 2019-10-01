@@ -140,7 +140,7 @@ const styles = (theme) => ({
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
     }
-
+    // console.log({ values, str: JSON.stringify(values) })
     dispatch({
       type: 'settingUserProfile/upsert',
       payload,
@@ -168,7 +168,7 @@ class UserProfileForm extends React.PureComponent {
     const { classes, footer, handleSubmit, values } = this.props
     const { showChangePassword } = this.state
     const isEdit = values.id !== undefined
-
+    console.log({ values })
     return (
       <React.Fragment>
         <GridContainer

@@ -1,8 +1,6 @@
-import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
-import { queryBizSession } from '../services'
 import moment from 'moment'
+import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'deposit',
@@ -11,7 +9,16 @@ export default createListViewModel({
   },
   param: {
     service,
-    state: {},
+    state: {
+      default: {
+        balance: 0,
+        patientDepositTransaction: {
+          transactionDate: moment(),
+          amount: 0,
+        },
+      },
+    },
+
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
@@ -19,7 +26,7 @@ export default createListViewModel({
     },
     effects: {
       *bizSessionList ({ payload }, { call, put }) {
-        const response = yield call(queryBizSession, payload)
+        const response = yield call(service.queryBizSession, payload)
         yield put({
           type: 'updateBizSessionList',
           payload: response.status == '200' ? response.data : {},
@@ -40,13 +47,22 @@ export default createListViewModel({
         }
       },
 
+      querySingleDone (st, { payload }) {
+        const { data } = payload
+        console.log('single', payload)
+        return {
+          ...st,
+          entity: data,
+        }
+      },
+
       updateBizSessionList (state, { payload }) {
         const { data } = payload
         return {
           ...state,
           bizSessionList: data.map((x) => {
             return {
-              value: x.sessionNo,
+              value: x.id,
               name: x.sessionNo,
             }
           }),

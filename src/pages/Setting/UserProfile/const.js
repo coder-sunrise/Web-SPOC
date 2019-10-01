@@ -14,6 +14,7 @@ export const UserProfileTableConfig = {
   columnExtensions: [
     {
       columnName: 'userName',
+      sortBy: 'userProfileNavigation.userName',
       render: (row) => row.userProfile.userName,
     },
     {
@@ -28,9 +29,6 @@ export const UserProfileTableConfig = {
       sortingEnabled: false,
     },
   ],
-  FuncProps: {
-    pager: false,
-  },
 }
 
 const generateDummyData = () => {

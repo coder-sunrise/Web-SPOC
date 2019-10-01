@@ -59,6 +59,7 @@ const Detail = ({
     medicationDetail,
     values,
     setFieldValue,
+    dispatch,
   }
 
   return (
@@ -138,7 +139,15 @@ export default compose(
         ? medicationDetail.entity
         : medicationDetail.default
 
-      const { sddfk } = returnValue
+      let chas = []
+      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      if (isChasAcuteClaimable) {
+        chas.push('isChasAcuteClaimable')
+      }
+      if (isChasChronicClaimable) {
+        chas.push('isChasChronicClaimable')
+      }
+      // const { sddfk } = returnValue
       // if (sddfk) {
       //   console.log('sddfk', sddfk)
       //   // console.log('sddfk', this.props)
@@ -156,8 +165,10 @@ export default compose(
       //     })
       // }
 
-      console.log('codetable', returnValue)
-      return returnValue
+      return {
+        ...returnValue,
+        chas,
+      }
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
@@ -192,11 +203,9 @@ export default compose(
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
-      // console.log('restValues')
-      // console.log('restValues', values)
       const { id, medicationStock, effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
-      // console.log('medicationDetail', medicationDetail)
+
       let defaultMedicationStock = medicationStock
       if (medicationStock.length === 0) {
         defaultMedicationStock = [
@@ -209,13 +218,26 @@ export default compose(
         ]
       }
 
+      let chas = {
+        isChasAcuteClaimable: false,
+        isChasChronicClaimable: false,
+      }
+      values.chas.forEach((o) => {
+        if (o === 'isChasAcuteClaimable') {
+          chas[o] = true
+        } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+      })
       const payload = {
         ...restValues,
+        ...chas,
         id,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         medicationStock: defaultMedicationStock,
       }
+
       dispatch({
         type: 'medicationDetail/upsert',
         payload,

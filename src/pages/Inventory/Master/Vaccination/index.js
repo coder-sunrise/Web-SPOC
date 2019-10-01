@@ -44,7 +44,7 @@ const Vaccination = ({
       type: 'codeSelect',
       code: 'ctSupplier',
       labelField: 'displayValue',
-      sortBy: 'favouriteSupplierFK',
+      sortBy: 'FavouriteSupplierFkNavigation.displayValue',
     },
     {
       columnName: 'dispensingUOM',

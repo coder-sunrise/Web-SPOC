@@ -8,7 +8,7 @@ import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
 import More from '@material-ui/icons/MoreHoriz'
-import Button from '@material-ui/core/Button'
+// import Button from '@material-ui/core/Button'
 import {
   GridContainer,
   GridItem,
@@ -19,6 +19,7 @@ import {
   Tooltip,
   IconButton,
   Popover,
+  Button,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
@@ -70,10 +71,10 @@ class Banner extends PureComponent {
     const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
-    const da = ctdrugallergy.filter((o) =>
-      patientAllergy.find((m) => m.allergyFK === o.id),
-    )
-
+    const da =
+      ctdrugallergy.filter((o) =>
+        patientAllergy.find((m) => m.allergyFK === o.id),
+      ) || []
     return (
       <div style={{ display: 'inline-block' }}>
         {data === 'link' ? (
@@ -90,25 +91,35 @@ class Banner extends PureComponent {
           </Link>
         ) : (
           <div>
-            {da.length ? ( `${da[0].name.length > 6 ? `${da[0].name.substring(0, 6)}... ,` : ' '}` ) : ( '-')}
+            {da.length ? (
+              `${da[0].name.length > 6
+                ? `${da[0].name.substring(0, 6)}... ,`
+                : ' '}`
+            ) : (
+              '-'
+            )}
             <br />
-            {da.length ? (`${da[1].name.length > 6 ? `${da[1].name.substring(0, 6)}...` : ' '}` ) : ( '')}
+            {da.length > 1 ? (
+              `${da[1].name.length > 6
+                ? `${da[1].name.substring(0, 6)}...`
+                : ' '}`
+            ) : (
+              ''
+            )}
 
-            {da.length ? 
+            {da.length ? (
               <Popover
                 icon={null}
                 content={
                   <div>
-                    {da.map(
-                      (item, i) => {
-                        return (
-                          <div>
-                            {i + 1}.) {  item.name}
-                            <br />
-                          </div>
-                        )
-                      },
-                    )}
+                    {da.map((item, i) => {
+                      return (
+                        <div>
+                          {i + 1}.) {item.name}
+                          <br />
+                        </div>
+                      )
+                    })}
                   </div>
                 }
                 trigger='click'
@@ -124,11 +135,12 @@ class Banner extends PureComponent {
                     padding: 0,
                   }}
                 >
-                More
+                  More
                 </Button>
               </Popover>
-              : ' '
-              }
+            ) : (
+              ' '
+            )}
           </div>
         )}
       </div>
@@ -153,8 +165,8 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
-    console.log('************** banner ***********')
-    console.log(this.props)
+    // console.log('************** banner ***********')
+    // console.log(this.props)
     const { entity } = patient
     if (!entity)
       return (
@@ -242,16 +254,7 @@ class Banner extends PureComponent {
               body={
                 <div>
                   Fever
-                  <Button
-                    color='primary'
-                    style={{
-                      backgroundColor: '#48C9B0',
-                      color: 'white',
-                      fontWeight: 'normal',
-                      marginLeft: 5,
-                      padding: 0,
-                    }}
-                  >
+                  <Button color='info' size='sm'>
                     More
                   </Button>
                 </div>
@@ -270,7 +273,9 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
+                  {entity.patientScheme
+                    .filter((o) => o.schemeTypeFK <= 5)
+                    .map((o) => {
                       return (
                         <div>
                           <CodeSelect

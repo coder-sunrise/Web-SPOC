@@ -13,12 +13,14 @@ import {
   Button,
   GridContainer,
   GridItem,
+  CodeSelect,
   Select,
   DatePicker,
   TimePicker,
   SizeContainer,
   TextField,
   dateFormatLong,
+  timeFormat24Hour,
 } from '@/components'
 // import Recurrence from './Recurrence'
 import {
@@ -191,7 +193,7 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
             <FastField
               name='durationMinute'
               render={(args) => (
-                <Select {...args} label='Minute: ' options={durationMinutes} />
+                <Select {...args} label='Minute' options={durationMinutes} />
               )}
             />
           </GridItem>
@@ -286,12 +288,14 @@ export default compose(
         let doctorBlocks = [
           doctorBlock,
         ]
+        console.log({ isEnableRecurrence, restValues })
         if (isEnableRecurrence && restValues.id === undefined) {
           doctorBlocks = generateRecurringDoctorBlock(
             recurrenceDto,
             doctorBlock,
           )
         }
+        console.log({ doctorBlocks })
 
         // compute startTime and endTime on all recurrence
         doctorBlocks = doctorBlocks.map((item) => {
@@ -311,8 +315,8 @@ export default compose(
           )
           return {
             ...rest,
-            startDateTime: startDate.formatUTC(),
-            endDateTime: endDate.formatUTC(),
+            startDateTime: startDate.formatUTC(false),
+            endDateTime: endDate.formatUTC(false),
           }
         })
 
@@ -330,18 +334,18 @@ export default compose(
           }
         console.log({ payload })
 
-        dispatch({
-          type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
-          payload,
-        }).then((response) => {
-          if (response) {
-            dispatch({
-              type: 'calendar/refresh',
-            })
-            resetForm()
-            onClose()
-          }
-        })
+        // dispatch({
+        //   type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
+        //   payload,
+        // }).then((response) => {
+        //   if (response) {
+        //     dispatch({
+        //       type: 'calendar/refresh',
+        //     })
+        //     resetForm()
+        //     onClose()
+        //   }
+        // })
       } catch (error) {
         console.log({ error })
       }
@@ -356,15 +360,19 @@ export default compose(
         const doctorBlock = doctorBlocks[0]
         const start = moment(doctorBlock.startDateTime)
         const end = moment(doctorBlock.endDateTime)
+        const [
+          hour,
+          minute,
+        ] = end.format(timeFormat24Hour).split(':')
         const durationHour = end.diff(start, 'hour')
-        const durationMinute = end.diff(start, 'minute')
-        console.log({ doctorBlock })
+        const durationMinute = end.format()
+        console.log({ hour, minute, doctorBlock })
         return {
           ...restValues,
           eventDate: start.format(dateFormatLong),
           eventTime: start.format(_timeFormat),
-          durationHour,
-          durationMinute,
+          durationHour: hour,
+          durationMinute: minute,
           restDoctorBlock: { ...doctorBlock },
           remarks: doctorBlock.remarks,
           recurrenceDto:

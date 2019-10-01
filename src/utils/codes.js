@@ -767,14 +767,16 @@ const tenantCodes = [
   'clinicianprofile',
   'ctappointmenttype',
   'ctservice',
-  'ctreferrallettertemplate',
   'inventorymedication',
   'inventoryconsumable',
   'inventoryvaccination',
   'inventorypackage',
   'role',
   'ctsupplier',
+  'ctpaymentmode',
   // 'ctsnomeddiagnosis',
+  'codetable/ctsnomeddiagnosis',
+  'documenttemplate',
 ]
 
 // const codes = [
@@ -789,6 +791,7 @@ const tenantCodes = [
 const noIsActiveProp = [
   'doctorProfile',
   'role',
+  'ctservice',
 ]
 
 const defaultParams = {

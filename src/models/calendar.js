@@ -283,10 +283,10 @@ export default createListViewModel({
             }
           }
           console.log({ savePayload })
-          // return yield put({
-          //   type: actionKey,
-          //   payload: savePayload,
-          // })
+          return yield put({
+            type: actionKey,
+            payload: savePayload,
+          })
         } catch (error) {
           console.log({ error })
         }
@@ -419,7 +419,7 @@ export default createListViewModel({
           .endOf(calendarView)
           .add(offSet, 'hours')
           .formatUTC()
-        console.log({ start, targetDate })
+        // console.log({ start, targetDate })
         const getCalendarListPayload = isDayView
           ? {
               combineCondition: 'and',
