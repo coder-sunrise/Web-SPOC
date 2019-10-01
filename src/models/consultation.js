@@ -174,20 +174,6 @@ export default createFormViewModel({
         return response
       },
       *closeModal ({ payload }, { call, put }) {
-        router.push(
-          getRemovedUrl([
-            'md2',
-            'cmt',
-            // 'pid',
-            'new',
-          ]),
-        )
-        yield put({
-          type: 'updateState',
-          payload: {
-            entity: undefined,
-          },
-        })
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -199,7 +185,7 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-        console.log('queryDone', payload)
+        // console.log('queryDone', payload)
         const { data } = payload
         if (!data) return
         let cdRows = []
@@ -227,7 +213,6 @@ export default createFormViewModel({
         orderTypes.forEach((p) => {
           const datas =
             (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
-          console.log(oRows, data[p.prop])
           oRows = oRows.concat(
             datas.map((o) => {
               const d = {
@@ -240,7 +225,6 @@ export default createFormViewModel({
             }),
           )
         })
-        console.log(oRows, _.sortBy(oRows, 'sequence'))
 
         yield put({
           type: 'orders/updateState',
@@ -252,7 +236,6 @@ export default createFormViewModel({
             })),
           },
         })
-        console.log(payload)
 
         yield put({
           type: 'orders/calculateAmount',

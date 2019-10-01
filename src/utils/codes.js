@@ -774,7 +774,7 @@ const tenantCodes = [
   'inventorypackage',
   'role',
   'ctsupplier',
-  // 'ctsnomeddiagnosis',
+  // 'codetable/ctsnomeddiagnosis',
 ]
 
 // const codes = [
@@ -789,6 +789,7 @@ const tenantCodes = [
 const noIsActiveProp = [
   'doctorProfile',
   'role',
+  'ctservice',
 ]
 
 const defaultParams = {

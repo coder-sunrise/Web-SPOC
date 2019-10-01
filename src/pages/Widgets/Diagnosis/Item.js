@@ -44,6 +44,10 @@ export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
                 <CodeSelect
                   label='Diagnosis'
                   code='ctsnomeddiagnosis'
+                  filter={{
+                    props: 'id,displayvalue,code,complication',
+                  }}
+                  labelField='displayvalue'
                   autoComplete
                   onChange={(v, op) => {
                     const { setFieldValue } = form
