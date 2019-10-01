@@ -89,6 +89,8 @@ export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
                   label='Complication'
                   mode='multiple'
                   code='ctComplication'
+                  maxTagCount={2}
+                  disableAll
                   onChange={(v, opts) => {
                     const { setFieldValue } = form
                     setFieldValue(`corDiagnosis[${index}]corComplication`, [])

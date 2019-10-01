@@ -11,8 +11,8 @@ export const PrescriptionColumns = [
     title: 'Name',
   },
   {
-    name: 'description',
-    title: 'Description',
+    name: 'instruction',
+    title: 'Instructions',
   },
   {
     name: 'batchNo',
@@ -23,20 +23,20 @@ export const PrescriptionColumns = [
     title: 'Expiry Date',
   },
   {
-    name: 'qtyOrdered',
+    name: 'orderedQuantity',
     title: 'Qty Ordered',
   },
   {
-    name: 'qtyDispensed',
+    name: 'dispensedQuanity',
     title: 'Qty Dispensed',
   },
   {
     name: 'unitPrice',
-    title: 'Unit Price ($)',
+    title: 'Unit Price',
   },
   {
     name: 'totalPrice',
-    title: 'Total Price ($)',
+    title: 'Total Price',
   },
   {
     name: 'action',
@@ -46,34 +46,14 @@ export const PrescriptionColumns = [
 
 export const PrescriptionColumnExtensions = [
   { columnName: 'expiryDate', type: 'date' },
-  { columnName: 'unitPrice', type: 'currency', align: 'right', currency: true },
+  { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
     type: 'currency',
-    align: 'right',
-    currency: true,
   },
+  { columnName: 'dispensedQuanity', type: 'number' },
+  { columnName: 'orderedQuantity', type: 'number' },
 ]
-
-const generatePrescriptionData = () => {
-  let data = []
-  for (let i = 0; i < 15; i++) {
-    data.push({
-      id: i,
-      name: 'Anarex',
-      desription: '',
-      batchNo: '324792',
-      expiryDate: moment().formatUTC(),
-      qtyOrdered: 10,
-      qtyDispensed: 10,
-      unitPrice: 50,
-      totalPrice: 500,
-    })
-  }
-  return data
-}
-
-export const PrescriptionTableData = generatePrescriptionData()
 
 export const VaccinationColumn = [
   {
@@ -89,7 +69,7 @@ export const VaccinationColumn = [
     title: 'Batch #',
   },
   {
-    name: 'qtyDispensed',
+    name: 'dispensedQuanity',
     title: 'Qty Dispensed',
   },
   {
@@ -100,45 +80,21 @@ export const VaccinationColumn = [
     name: 'totalPrice',
     title: 'Total Price ($)',
   },
-  {
-    name: 'action',
-    title: 'Action',
-  },
 ]
 
 export const VaccinationColumnExtensions = [
-  { columnName: 'qtyDispensed', align: 'right' },
-  { columnName: 'unitPrice', type: 'currency', align: 'right', currency: true },
+  { columnName: 'dispensedQuanity', type: 'number' },
+  { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
     type: 'currency',
-    align: 'right',
-    currency: true,
   },
 ]
 
-const generateVaccinationData = () => {
-  let data = []
-  for (let i = 0; i < 15; i++) {
-    data.push({
-      id: i,
-      name: 'Anarex',
-      sequence: i,
-      batchNo: '324792',
-      qtyDispensed: 10,
-      unitPrice: 50,
-      totalPrice: 500,
-    })
-  }
-  return data
-}
-
-export const VaccinationData = generateVaccinationData()
-
 export const OtherOrdersColumns = [
   {
-    name: 'name',
-    title: 'Name',
+    name: 'type',
+    title: 'Type',
   },
   {
     name: 'description',
@@ -146,11 +102,11 @@ export const OtherOrdersColumns = [
   },
   {
     name: 'unitPrice',
-    title: 'Unit Price ($)',
+    title: 'Unit Price',
   },
   {
     name: 'totalPrice',
-    title: 'Total Price ($)',
+    title: 'Total Price',
   },
   {
     name: 'action',
@@ -159,27 +115,9 @@ export const OtherOrdersColumns = [
 ]
 
 export const OtherOrdersColumnExtensions = [
-  { columnName: 'unitPrice', type: 'currency', align: 'right', currency: true },
+  { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
     type: 'currency',
-    align: 'right',
-    currency: true,
   },
 ]
-
-const generateOtherOrdersData = () => {
-  let data = []
-  for (let i = 0; i < 15; i++) {
-    data.push({
-      id: i,
-      name: 'Anarex',
-      description: 'Consulation Service',
-      unitPrice: 50,
-      totalPrice: 500,
-    })
-  }
-  return data
-}
-
-export const OtherOrdersData = generateOtherOrdersData()

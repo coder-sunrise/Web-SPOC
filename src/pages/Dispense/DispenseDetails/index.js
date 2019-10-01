@@ -9,34 +9,34 @@ import { GridItem } from '@/components'
 import {
   PrescriptionColumns,
   PrescriptionColumnExtensions,
-  PrescriptionTableData,
   VaccinationColumn,
   VaccinationColumnExtensions,
-  VaccinationData,
   OtherOrdersColumns,
   OtherOrdersColumnExtensions,
-  OtherOrdersData,
 } from '../variables'
 
-const styles = (theme) => ({
-  gridRow: {
-    margin: `${theme.spacing.unit}px 0px`,
-    '& > h5': {
-      padding: theme.spacing.unit,
-    },
-  },
-})
+// const styles = (theme) => ({
+//   gridRow: {
+//     margin: `${theme.spacing.unit}px 0px`,
+//     '& > h5': {
+//       padding: theme.spacing.unit,
+//     },
+//   },
+// })
 
-const DispenseDetails = ({ classes }) => {
+const DispenseDetails = ({ classes, dispense }) => {
+  const { entity } = dispense
+  const { prescription, vaccination, otherOrder } = entity
+  console.log(prescription, vaccination, otherOrder, dispense)
   return (
     <React.Fragment>
       <GridItem className={classes.gridRow}>
         <TableData
-          title='Medication'
+          title='Prescription'
           height={200}
           columns={PrescriptionColumns}
           colExtensions={PrescriptionColumnExtensions}
-          data={PrescriptionTableData}
+          data={prescription}
         />
       </GridItem>
       <GridItem className={classes.gridRow}>
@@ -45,7 +45,7 @@ const DispenseDetails = ({ classes }) => {
           height={150}
           columns={VaccinationColumn}
           colExtensions={VaccinationColumnExtensions}
-          data={VaccinationData}
+          data={vaccination}
         />
       </GridItem>
       <GridItem className={classes.gridRow}>
@@ -54,11 +54,11 @@ const DispenseDetails = ({ classes }) => {
           height={150}
           columns={OtherOrdersColumns}
           colExtensions={OtherOrdersColumnExtensions}
-          data={OtherOrdersData}
+          data={otherOrder}
         />
       </GridItem>
     </React.Fragment>
   )
 }
 
-export default withStyles(styles, { name: 'DispenseDetails' })(DispenseDetails)
+export default DispenseDetails

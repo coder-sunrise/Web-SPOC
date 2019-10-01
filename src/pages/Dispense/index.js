@@ -15,7 +15,7 @@ import style from './style'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 // model
-@connect(({ dispense }) => ({ dispense }))
+@connect(({ dispense, visitRegistration }) => ({ dispense, visitRegistration }))
 class Dispense extends Component {
   makePayment = () => {
     const { dispatch, dispense } = this.props
@@ -31,6 +31,25 @@ class Dispense extends Component {
     // this.props.history.push(`${location.pathname}/billing`)
   }
 
+  editOrder = () => {
+    const { dispatch, dispense, visitRegistration } = this.props
+    dispatch({
+      type: `consultation/editOrder`,
+      payload: {
+        id: visitRegistration.entity.visit.id,
+        version: dispense.version,
+      },
+    }).then((o) => {
+      if (o)
+        router.push(
+          getAppendUrl({
+            md: 'pt',
+            cid: o.id,
+          }),
+        )
+    })
+  }
+
   render () {
     const { classes, dispense } = this.props
 
@@ -39,25 +58,25 @@ class Dispense extends Component {
         <PatientBanner style={{}} patientInfo={dispense.patientInfo} />
         <GridContainer direction='column' className={classes.content}>
           <GridItem justify='flex-end' container>
-            <Button color='info' size='sm' disabled>
+            <Button color='info' size='sm'>
               <Refresh />
               Refresh
             </Button>
-            <Button color='primary' size='sm' disabled>
+            <Button color='primary' size='sm'>
               <Print />
               Print All Label
             </Button>
-            <Button color='primary' size='sm' disabled>
+            <Button color='primary' size='sm'>
               <Print />
               Print Label
             </Button>
           </GridItem>
-          <DispenseDetails />
+          <DispenseDetails {...this.props} />
           <GridItem justify='flex-end' container className={classes.footerRow}>
-            <Button color='success' size='sm' disabled>
+            <Button color='success' size='sm'>
               Save Dispense
             </Button>
-            <Button color='primary' size='sm' disabled>
+            <Button color='primary' size='sm' onClick={this.editOrder}>
               Edit Order
             </Button>
             <Button color='primary' size='sm' onClick={this.makePayment}>

@@ -211,17 +211,16 @@ const Grid = ({
         // router.push(getAppendUrl(parameters, '/reception/queue'))
         const version = Date.now()
         dispatch({
-          type: `dispense/startDispense`,
+          type: `dispense/start`,
           payload: {
             id: row.visitFK,
             version,
           },
         }).then((o) => {
-          console.log(o)
-          // if (o)
-          // router.push(
-          //   `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-          // )
+          if (o)
+            router.push(
+              `/reception/queue/patientdashboard?qid=${row.id}&did=${o.id}&v=${version}&md2=cons`,
+            )
         })
 
         break
@@ -253,7 +252,7 @@ const Grid = ({
         if (valid) {
           const version = Date.now()
           dispatch({
-            type: `consultation/newConsultation`,
+            type: `consultation/start`,
             payload: {
               id: row.visitFK,
               version,
