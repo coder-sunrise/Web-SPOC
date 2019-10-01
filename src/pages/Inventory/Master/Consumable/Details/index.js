@@ -51,6 +51,7 @@ const Detail = ({
     consumableDetail,
     values,
     setFieldValue,
+    dispatch,
   }
   return (
     <React.Fragment>

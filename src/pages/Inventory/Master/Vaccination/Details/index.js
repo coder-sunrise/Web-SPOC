@@ -53,6 +53,7 @@ const Detail = ({
     vaccinationDetail,
     values: props.values,
     setFieldValue,
+    dispatch,
   }
   return (
     <React.Fragment>
