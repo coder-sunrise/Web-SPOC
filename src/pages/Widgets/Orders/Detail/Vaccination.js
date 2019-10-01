@@ -78,7 +78,7 @@ class Vaccination extends PureComponent {
     }
   }
 
-  changeVaccination = (v, op) => {
+  changeVaccination = (v, op = {}) => {
     const { setFieldValue, values } = this.props
 
     setFieldValue(

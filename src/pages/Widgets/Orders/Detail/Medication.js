@@ -145,7 +145,7 @@ class Medication extends PureComponent {
     )
   }
 
-  changeMedication = (v, op) => {
+  changeMedication = (v, op = {}) => {
     console.log(v, op)
     const { setFieldValue, values } = this.props
 
@@ -468,7 +468,7 @@ class Medication extends PureComponent {
                                       // label='Precaution'
                                       simple
                                       code='ctMedicationPrecaution'
-                                      onChange={(v, option) => {
+                                      onChange={(v, option = {}) => {
                                         // console.log(v, option)
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precaution`,

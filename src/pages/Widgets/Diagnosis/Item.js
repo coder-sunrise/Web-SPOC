@@ -2,6 +2,8 @@ import React, { Component, PureComponent, useState } from 'react'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
+import AttachMoney from '@material-ui/icons/AttachMoney'
+
 import {
   Button,
   CommonHeader,
@@ -27,12 +29,26 @@ import {
   Tooltip,
 } from '@/components'
 
-export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
+export default ({
+  theme,
+  index,
+  arrayHelpers,
+  codetable,
+  diagnosises,
+  classes,
+  ...props
+}) => {
   const [
     show,
     setShow,
   ] = useState(false)
   const { form } = arrayHelpers
+  // if (codetable['codetable/ctsnomeddiagnosis'])
+  //   console.log(
+  //     codetable['codetable/ctsnomeddiagnosis'].filter(
+  //       (o) => o.complication.length > 0,
+  //     ),
+  //   )
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
@@ -45,20 +61,59 @@ export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
                   label='Diagnosis'
                   code='codetable/ctsnomeddiagnosis'
                   filter={{
-                    props: 'id,displayvalue,code,complication',
+                    props:
+                      'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
                   }}
                   labelField='displayvalue'
                   autoComplete
+                  renderDropdown={(option) => {
+                    const {
+                      isChasAcuteClaimable,
+                      isChasChronicClaimable,
+                      isHazeClaimable,
+                    } = option
+                    return (
+                      <span>
+                        {(isChasAcuteClaimable ||
+                          isChasChronicClaimable ||
+                          isHazeClaimable) && (
+                          <AttachMoney className={classes.money} />
+                        )}
+
+                        {option.displayvalue}
+                      </span>
+                    )
+                  }}
                   onChange={(v, op) => {
                     const { setFieldValue } = form
-                    setFieldValue(
-                      `corDiagnosis[${index}]diagnosisCode`,
-                      op.code,
-                    )
-                    setFieldValue(
-                      `corDiagnosis[${index}]diagnosisDescription`,
-                      op.name,
-                    )
+                    if (op) {
+                      setFieldValue(
+                        `corDiagnosis[${index}]diagnosisCode`,
+                        op.code,
+                      )
+                      setFieldValue(
+                        `corDiagnosis[${index}]diagnosisDescription`,
+                        op.name,
+                      )
+
+                      if (op.complication && op.complication.length) {
+                        setFieldValue(
+                          `corDiagnosis[${index}]complication`,
+                          op.complication.map((o) => o.id),
+                        )
+                        // console.log(
+                        //   op.complication.map((o) => ({
+                        //     complicationFK: o,
+                        //   })),
+                        // )
+                        setFieldValue(
+                          `corDiagnosis[${index}]corComplication`,
+                          op.complication.map((o) => ({
+                            complicationFK: o.id,
+                          })),
+                        )
+                      }
+                    }
                   }}
                   {...args}
                 />

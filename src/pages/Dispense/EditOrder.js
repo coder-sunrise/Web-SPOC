@@ -45,7 +45,7 @@ class EditOrder extends Component {
   }
 
   render () {
-    const { classes, dispense } = this.props
+    const { classes, dispense, consultation } = this.props
     const orderWidget = widgets.find((o) => o.id === '5')
     const cdWidget = widgets.find((o) => o.id === '3')
     const Order = orderWidget.component
@@ -55,10 +55,24 @@ class EditOrder extends Component {
       <div className={classes.root}>
         <GridContainer>
           <GridItem xs={12} md={6}>
-            <Order />
+            <h5>Orders</h5>
+            <Order className={classes.orderPanel} />
           </GridItem>
           <GridItem xs={12} md={6}>
-            <ConsultationDocument />
+            <h5>
+              <span style={{ display: 'inline-block' }}>
+                Consultation Document
+              </span>
+              <span className={classes.cdAddButton}>
+                {cdWidget.toolbarAddon}
+              </span>
+            </h5>
+            <ConsultationDocument
+              forDispense
+              parentProps={{
+                values: consultation.entity,
+              }}
+            />
           </GridItem>
         </GridContainer>
       </div>

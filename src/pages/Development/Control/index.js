@@ -1,13 +1,10 @@
 import React, { PureComponent, Suspense } from 'react'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
-import { deepDiffMapper } from '@/utils/cdrss'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import Yup from '@/utils/yup'
 import numeral from 'numeral'
 import Search from '@material-ui/icons/Search'
+import AttachMoney from '@material-ui/icons/AttachMoney'
 
 import {
   FormControl,
@@ -33,6 +30,7 @@ import WarningIcon from '@material-ui/icons/Warning'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
 import CloseIcon from '@material-ui/icons/Close'
+import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import {
   CardContainer,
   TextField,
@@ -63,7 +61,10 @@ import {
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
-import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import Yup from '@/utils/yup'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
+import { deepDiffMapper } from '@/utils/cdrss'
+import Loading from '@/components/PageLoading/index'
 
 console.log(deepDiffMapper)
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -435,6 +436,41 @@ class ControlTest extends PureComponent {
               name='switch'
               render={(args) => {
                 return <Switch label='Switch' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='diagnosis'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Diagnosis'
+                    code='codetable/ctsnomeddiagnosis'
+                    filter={{
+                      props:
+                        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
+                    }}
+                    labelField='displayvalue'
+                    autoComplete
+                    renderDropdown={(option) => {
+                      return (
+                        <span>
+                          <AttachMoney
+                            style={{
+                              width: 16,
+                              height: 16,
+                              top: 3,
+                              position: 'relative',
+                            }}
+                          />
+                          {option.displayvalue}
+                        </span>
+                      )
+                    }}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

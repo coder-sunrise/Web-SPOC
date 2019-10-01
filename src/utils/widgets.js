@@ -168,7 +168,7 @@ const widgets = [
       loader: () => import('@/pages/Widgets/PatientHistory'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...p} widget />
+        return <Cmpnet {...p} widget mode='integrated' />
       },
       loading: Loading,
     }),
