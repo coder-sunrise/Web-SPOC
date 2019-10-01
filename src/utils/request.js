@@ -235,7 +235,6 @@ const request = (url, option, showNotification = true) => {
     newUrl = dynamicURL + newUrl
   }
   try {
-    console.log({ newOptions })
     let r = $.when(
       $.ajax({
         timeout: 140000,

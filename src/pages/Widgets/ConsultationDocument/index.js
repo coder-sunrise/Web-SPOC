@@ -40,9 +40,9 @@ export const printRow = async (row, props) => {
       },
     )
   } else {
-    const { codetable, patientDashboard } = props
+    const { codetable, patient } = props
     const { clinicianprofile = [] } = codetable
-    const { patientInfo } = patientDashboard
+    const { entity } = patient
     const obj =
       clinicianprofile.find(
         (o) =>
@@ -53,8 +53,8 @@ export const printRow = async (row, props) => {
     row.doctorName = obj.name
     row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
 
-    row.patientName = patientInfo.name
-    row.patientAccountNo = patientInfo.patientAccountNo
+    row.patientName = entity.name
+    row.patientAccountNo = entity.patientAccountNo
 
     download(
       `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
@@ -121,7 +121,7 @@ class ConsultationDocument extends PureComponent {
     const { consultationDocument, dispatch } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-// console.log(consultationDocumentTypes,rows)
+    // console.log(consultationDocumentTypes,rows)
     return (
       <div>
         <CommonTableGrid

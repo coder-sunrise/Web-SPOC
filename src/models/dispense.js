@@ -27,14 +27,14 @@ export default createFormViewModel({
 
         if (
           pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
-          Number(query.did)
+          Number(query.vid)
         ) {
           dispatch({
             type: 'initState',
             payload: {
               version: Number(query.v) || undefined,
-              consultationID: Number(query.did),
-              md: query.md2,
+              visitID: Number(query.vid),
+              md: query.md3,
             },
           })
         }
@@ -42,16 +42,16 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { version, consultationID, md } = payload
+        const { version, visitID, md } = payload
         yield put({
           type: 'query',
           payload: {
-            id: consultationID,
+            id: visitID,
             version,
           },
         })
         yield take('query/@@end')
-        if (md === 'cons') {
+        if (md === 'dsps') {
           yield put({
             type: 'global/updateState',
             payload: {
@@ -141,7 +141,7 @@ export default createFormViewModel({
           getRemovedUrl([
             'md2',
             'cmt',
-            'did',
+            'vid',
           ]),
         )
         yield put({
@@ -165,7 +165,7 @@ export default createFormViewModel({
       //   const { data } = payload
       //   if (!data) return
       //   let cdRows = []
-      //   consultationDocumentTypes.forEach((p) => {
+      //   dispenseDocumentTypes.forEach((p) => {
       //     cdRows = cdRows.concat(
       //       (data[p.prop] || []).map((o) => {
       //         const d = {
@@ -179,7 +179,7 @@ export default createFormViewModel({
       //     )
       //   })
       //   yield put({
-      //     type: 'consultationDocument/updateState',
+      //     type: 'dispenseDocument/updateState',
       //     payload: {
       //       rows: _.sortBy(cdRows, 'sequence'),
       //     },
