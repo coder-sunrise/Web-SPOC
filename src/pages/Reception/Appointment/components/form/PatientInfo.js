@@ -16,6 +16,7 @@ import style from './style'
 
 const PatientInfoInput = ({
   classes,
+  onViewPatientProfileClick,
   onSearchPatientClick,
   onCreatePatientClick,
   onRegisterToVisitClick,
@@ -50,7 +51,12 @@ const PatientInfoInput = ({
           />
         ) : (
           <div className={classnames(classes.buttonGroup)}>
-            <Button color='primary' link className={classes.patientNameButton}>
+            <Button
+              color='primary'
+              link
+              className={classes.patientNameButton}
+              onClick={onViewPatientProfileClick}
+            >
               {patientName}
             </Button>
           </div>

@@ -85,9 +85,14 @@ class UserProfile extends React.Component {
     dispatch({
       type: 'settingUserProfile/query',
       payload: {
-        'userProfileFKNavigation.userName': values.searchQuery,
-        name: values.searchQuery,
-        combineCondition: 'or',
+        group: [
+          {
+            name: values.searchQuery,
+            'userProfileFKNavigation.userName': values.searchQuery,
+            combineCondition: 'or',
+          },
+        ],
+        isActive: values.status,
       },
     })
   }

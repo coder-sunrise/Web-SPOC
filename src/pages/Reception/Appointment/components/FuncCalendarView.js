@@ -412,5 +412,7 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   publicHolidays: calendar.publicHolidayList || [],
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
-  loading: loading.effects['calendar/getCalendarList'],
+  loading:
+    loading.effects['calendar/getCalendarList'] ||
+    loading.effects['calendar/getAppointmentDetails'],
 }))(CalendarView)
