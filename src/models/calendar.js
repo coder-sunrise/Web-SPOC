@@ -419,7 +419,7 @@ export default createListViewModel({
           .endOf(calendarView)
           .add(offSet, 'hours')
           .formatUTC()
-        console.log({ start, targetDate })
+        // console.log({ start, targetDate })
         const getCalendarListPayload = isDayView
           ? {
               combineCondition: 'and',

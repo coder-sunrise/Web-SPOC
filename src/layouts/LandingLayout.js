@@ -19,13 +19,12 @@ class LandingLayout extends React.Component {
   }
 
   render () {
-    console.log({ props: this.props })
     const { children, classes } = this.props
     return (
       <div className={classes.wrapper}>
         <SizeContainer size='lg'>
           <React.Fragment>
-            <LoginNavbar />
+            <LoginNavbar {...this.props} />
             <div className={classes.content}>
               <div
                 className={classes.fullPage}

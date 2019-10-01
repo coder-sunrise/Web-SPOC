@@ -43,7 +43,7 @@ export default ({ theme, index, arrayHelpers, diagnosises, ...props }) => {
               return (
                 <CodeSelect
                   label='Diagnosis'
-                  code='ctsnomeddiagnosis'
+                  code='codetable/ctsnomeddiagnosis'
                   filter={{
                     props: 'id,displayvalue,code,complication',
                   }}

@@ -58,7 +58,7 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
         // console.log({ pathname })
         // console.log(loct, method)
-        console.log(query)
+        // console.log(query)
         if (query.md === 'pt' && query.cmt) {
           dispatch({
             type: 'updateState',

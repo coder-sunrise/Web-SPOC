@@ -479,7 +479,7 @@ class CommonTableGrid extends PureComponent {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query' } = this.props
-
+    console.log({ payload, type, query })
     if (query) {
       query({
         callback: (data) => {
@@ -505,7 +505,7 @@ class CommonTableGrid extends PureComponent {
         ...this.state.entity.pagination,
         ...payload,
       }
-      console.log(p)
+      console.log({ p, entity: this.state })
       dispatch({
         type: `${type}/${queryMethod}`,
         payload: p,

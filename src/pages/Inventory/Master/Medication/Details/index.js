@@ -59,6 +59,7 @@ const Detail = ({
     medicationDetail,
     values,
     setFieldValue,
+    dispatch,
   }
 
   return (
@@ -138,7 +139,7 @@ export default compose(
         ? medicationDetail.entity
         : medicationDetail.default
 
-      const { sddfk } = returnValue
+      // const { sddfk } = returnValue
       // if (sddfk) {
       //   console.log('sddfk', sddfk)
       //   // console.log('sddfk', this.props)
@@ -156,7 +157,8 @@ export default compose(
       //     })
       // }
 
-      console.log('codetable', returnValue)
+      // console.log('codetable', returnValue)
+
       return returnValue
     },
     validationSchema: Yup.object().shape({

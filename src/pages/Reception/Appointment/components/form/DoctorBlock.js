@@ -13,12 +13,14 @@ import {
   Button,
   GridContainer,
   GridItem,
+  CodeSelect,
   Select,
   DatePicker,
   TimePicker,
   SizeContainer,
   TextField,
   dateFormatLong,
+  timeFormat24Hour,
 } from '@/components'
 // import Recurrence from './Recurrence'
 import {
@@ -191,7 +193,19 @@ const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
             <FastField
               name='durationMinute'
               render={(args) => (
-                <Select {...args} label='Minute: ' options={durationMinutes} />
+                <Select {...args} label='Minute' options={durationMinutes} />
+              )}
+            />
+          </GridItem>
+          <GridItem xs md={4}>
+            <FastField
+              name='durationMinute'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='test'
+                  code='codetable/ctsnomeddiagnosis'
+                />
               )}
             />
           </GridItem>
@@ -296,6 +310,13 @@ export default compose(
         // compute startTime and endTime on all recurrence
         doctorBlocks = doctorBlocks.map((item) => {
           const { eventDate: date, eventTime: time, ...rest } = item
+          console.log({
+            date,
+            dateFormatLong,
+            time,
+            durationHour,
+            durationMinute,
+          })
           const doctorBlockDate = moment(date).format(dateFormatLong)
 
           const endDate = moment(
@@ -309,10 +330,15 @@ export default compose(
             `${doctorBlockDate} ${time}`,
             `${dateFormatLong} ${_timeFormat}`,
           )
+          // console.log({
+          //   startDate,
+          //   endDate: endDate.format(),
+          //   endDateUTC: endDate.formatUTC(false),
+          // })
           return {
             ...rest,
-            startDateTime: startDate.formatUTC(),
-            endDateTime: endDate.formatUTC(),
+            startDateTime: startDate.formatUTC(false),
+            endDateTime: endDate.formatUTC(false),
           }
         })
 
@@ -356,15 +382,19 @@ export default compose(
         const doctorBlock = doctorBlocks[0]
         const start = moment(doctorBlock.startDateTime)
         const end = moment(doctorBlock.endDateTime)
+        const [
+          hour,
+          minute,
+        ] = end.format(timeFormat24Hour).split(':')
         const durationHour = end.diff(start, 'hour')
-        const durationMinute = end.diff(start, 'minute')
-        console.log({ doctorBlock })
+        const durationMinute = end.format()
+        console.log({ hour, minute, doctorBlock })
         return {
           ...restValues,
           eventDate: start.format(dateFormatLong),
           eventTime: start.format(_timeFormat),
-          durationHour,
-          durationMinute,
+          durationHour: hour,
+          durationMinute: minute,
           restDoctorBlock: { ...doctorBlock },
           remarks: doctorBlock.remarks,
           recurrenceDto:

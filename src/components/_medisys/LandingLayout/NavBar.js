@@ -27,8 +27,8 @@ class NavBar extends PureComponent {
   }
 
   activeRoute = (routeName) => {
-    const { route } = this.props
-    return route.path === routeName
+    // const { route } = this.props
+    // return route.path === routeName
   }
 
   render () {
@@ -63,6 +63,21 @@ class NavBar extends PureComponent {
             <Fingerprint className={classes.listItemIcon} />
             <ListItemText
               primary={formatMessage({ id: 'app.login.login' })}
+              disableTypography
+              className={classes.listItemText}
+            />
+          </NavLink>
+        </ListItem>
+        <ListItem className={classes.listItem}>
+          <NavLink
+            to='/auth/forgotpassword'
+            className={cx(classes.navLink, {
+              [classes.navLinkActive]: this.activeRoute('/forgotpassword'),
+            })}
+          >
+            <Fingerprint className={classes.listItemIcon} />
+            <ListItemText
+              primary='Forgot Password'
               disableTypography
               className={classes.listItemText}
             />

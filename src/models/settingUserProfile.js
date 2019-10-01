@@ -12,6 +12,11 @@ export default createListViewModel({
       list: [],
       currentSelectedUser: {},
       showUserProfileModal: false,
+      // filter: {
+      //   sorting: [
+      //     { sortby: 'name', order: 'asc', columnName: 'name' },
+      //   ],
+      // },
     },
     subscriptions: {},
     effects: {

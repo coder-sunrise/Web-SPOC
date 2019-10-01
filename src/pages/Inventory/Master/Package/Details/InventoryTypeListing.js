@@ -770,6 +770,9 @@ const InventoryTypeListing = ({
               rows={medicationRows}
               FuncProps={{ pager: false }}
               EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete medication',
+                },
                 showAddCommand: true,
                 showEditCommand: false,
                 onCommitChanges: onCommitChanges('medicationPackageItem'),
@@ -787,6 +790,9 @@ const InventoryTypeListing = ({
               rows={consumableRows}
               FuncProps={{ pager: false }}
               EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete consumable',
+                },
                 showAddCommand: true,
                 showEditCommand: false,
                 onAddedRowsChange: onAddedRowsChange('consumable'),
@@ -804,6 +810,9 @@ const InventoryTypeListing = ({
               rows={vaccinationRows}
               FuncProps={{ pager: false }}
               EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete vaccination',
+                },
                 showAddCommand: true,
                 showEditCommand: false,
                 onCommitChanges: onCommitChanges('vaccinationPackageItem'),
@@ -821,6 +830,9 @@ const InventoryTypeListing = ({
               rows={serviceRows}
               FuncProps={{ pager: false }}
               EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete service',
+                },
                 showAddCommand: true,
                 showEditCommand: false,
                 onAddedRowsChange: onAddedRowsChange('service'),
