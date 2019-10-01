@@ -288,23 +288,18 @@ export default compose(
         let doctorBlocks = [
           doctorBlock,
         ]
+        console.log({ isEnableRecurrence, restValues })
         if (isEnableRecurrence && restValues.id === undefined) {
           doctorBlocks = generateRecurringDoctorBlock(
             recurrenceDto,
             doctorBlock,
           )
         }
+        console.log({ doctorBlocks })
 
         // compute startTime and endTime on all recurrence
         doctorBlocks = doctorBlocks.map((item) => {
           const { eventDate: date, eventTime: time, ...rest } = item
-          console.log({
-            date,
-            dateFormatLong,
-            time,
-            durationHour,
-            durationMinute,
-          })
           const doctorBlockDate = moment(date).format(dateFormatLong)
 
           const endDate = moment(
@@ -318,11 +313,6 @@ export default compose(
             `${doctorBlockDate} ${time}`,
             `${dateFormatLong} ${_timeFormat}`,
           )
-          // console.log({
-          //   startDate,
-          //   endDate: endDate.format(),
-          //   endDateUTC: endDate.formatUTC(false),
-          // })
           return {
             ...rest,
             startDateTime: startDate.formatUTC(false),
@@ -344,18 +334,18 @@ export default compose(
           }
         console.log({ payload })
 
-        dispatch({
-          type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
-          payload,
-        }).then((response) => {
-          if (response) {
-            dispatch({
-              type: 'calendar/refresh',
-            })
-            resetForm()
-            onClose()
-          }
-        })
+        // dispatch({
+        //   type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
+        //   payload,
+        // }).then((response) => {
+        //   if (response) {
+        //     dispatch({
+        //       type: 'calendar/refresh',
+        //     })
+        //     resetForm()
+        //     onClose()
+        //   }
+        // })
       } catch (error) {
         console.log({ error })
       }

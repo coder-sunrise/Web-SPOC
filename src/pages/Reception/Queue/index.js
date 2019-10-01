@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 // dva
 import { connect } from 'dva'
 // umi locale
@@ -26,12 +26,10 @@ import DetailsActionBar from './Filterbar'
 import DetailsGrid from './Grid'
 import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'
-import { StatusIndicator, modelKey } from './variables'
+import { modelKey } from './variables'
 // utils
 import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
-// services
-import { queryList as queryPatientList } from '@/services/patient'
 
 const drawerWidth = 400
 
@@ -72,10 +70,11 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, patientSearch, loading }) => ({
+@connect(({ queueLog, patientSearch, loading, user }) => ({
   patientSearchResult: patientSearch.list,
   queueLog,
   loading,
+  user: user.data,
 }))
 @withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends React.Component {
@@ -84,7 +83,6 @@ class Queue extends React.Component {
     this.state = {
       showPatientSearch: false,
       showEndSessionSummary: false,
-      currentFilter: StatusIndicator.ALL,
     }
     this._timer = null
   }
@@ -93,11 +91,14 @@ class Queue extends React.Component {
     const { dispatch, queueLog } = this.props
     const { sessionInfo } = queueLog
     dispatch({
-      type: 'calendar/updateState',
-      payload: {
-        list: [],
-      },
+      type: `${modelKey}initState`,
     })
+    // dispatch({
+    //   type: 'calendar/updateState',
+    //   payload: {
+    //     list: [],
+    //   },
+    // })
     if (sessionInfo.id === '') {
       dispatch({
         type: `${modelKey}getSessionInfo`,
@@ -257,6 +258,7 @@ class Queue extends React.Component {
         md: 'pt',
         cmt: '1',
         pid: patientProfileFK,
+        v: Date.now(),
       }),
     )
   }
@@ -275,14 +277,19 @@ class Queue extends React.Component {
     SendNotification({ test: '123' })
   }
 
+  // toggleFilterSelfOnly = () => {
+  //   const { queueLog, dispatch } = this.props
+  //   dispatch({
+  //     type: 'queueLog/updateState',
+  //     payload: {
+  //       selfOnly: !queueLog.selfOnly,
+  //     },
+  //   })
+  // }
+
   render () {
     const { classes, queueLog, loading, history } = this.props
-    const {
-      showEndSessionSummary,
-      showPatientSearch,
-      currentFilter,
-    } = this.state
-
+    const { showEndSessionSummary, showPatientSearch } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     return (
@@ -293,7 +300,7 @@ class Queue extends React.Component {
         <Card>
           <CardHeader icon>
             <h3 className={classNames(classes.sessionNo)}>
-              {`Queue (Session No.: ${sessionNo})`}
+              {`Session No.: ${sessionNo}`}
             </h3>
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
@@ -337,6 +344,8 @@ class Queue extends React.Component {
             ) : (
               <React.Fragment>
                 <DetailsActionBar
+                  // selfOnly={queueLog.selfOnly}
+                  // onSwitchClick={this.toggleFilterSelfOnly}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                 />
@@ -346,7 +355,6 @@ class Queue extends React.Component {
                   onRegisterPatientClick={this.toggleRegisterNewPatient}
                   handleEditVisitClick={this.showVisitRegistration}
                   handleActualizeAppointment={this.handleActualizeAppointment}
-                  currentFilter={currentFilter}
                   history={history}
                 />
               </React.Fragment>

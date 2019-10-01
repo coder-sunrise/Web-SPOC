@@ -87,6 +87,7 @@ class UserProfile extends React.Component {
       payload: {
         'userProfileFKNavigation.userName': values.searchQuery,
         name: values.searchQuery,
+        isActive: values.status,
         combineCondition: 'or',
       },
     })

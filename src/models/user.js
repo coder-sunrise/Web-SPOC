@@ -7,7 +7,9 @@ export default {
   state: {
     accessRights: [],
     data: {
-      clinicianProfile: {},
+      clinicianProfile: {
+        userProfile: {},
+      },
     },
     profileDetails: undefined,
   },
