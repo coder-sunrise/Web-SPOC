@@ -55,8 +55,14 @@ class index extends Component {
     })
   }
 
-  onEditDeliveryOrderClicked = () =>
+  onEditDeliveryOrderClicked = (row) => {
+    const { dispatch } = this.props
     this.setState({ showDeliveryOrderDetails: true })
+    dispatch({
+      type: 'deliveryOrderDetails/editDeliveryOrder',
+      payload: { ...row },
+    })
+  }
 
   closeDODetailsModal = () => this.setState({ showDeliveryOrderDetails: false })
 
@@ -76,7 +82,10 @@ class index extends Component {
               })}
             </h4>
           </GridItem>
-          <DOGrid {...this.props} />
+          <DOGrid
+            onEditDeliveryOrderClicked={this.onEditDeliveryOrderClicked}
+            {...this.props}
+          />
           <CommonModal
             open={showDeliveryOrderDetails}
             title='Delivery Order Details'

@@ -6,12 +6,13 @@ import { notification } from '@/components'
 import { formatMessage } from 'umi/locale'
 
 const PurchaseReceiveDataGrid = ({
-  actions: { handleDuplicatePO, handleNavigate },
+  selectedRows,
+  actions: { handleDuplicatePO, handleNavigate, handleOnSelectionChange },
 }) => {
-  const [
-    selectedRows,
-    setSelectedRows,
-  ] = useState([])
+  // const [
+  //   selectedRows,
+  //   setSelectedRows,
+  // ] = useState([])
 
   const onContextButtonClick = (row, id) => {
     switch (id) {
@@ -34,7 +35,8 @@ const PurchaseReceiveDataGrid = ({
       style={{ margin: 0 }}
       type='purchaseReceiveList'
       selection={selectedRows}
-      onSelectionChange={(selection) => setSelectedRows(selection)}
+      // onSelectionChange={(selection) => setSelectedRows(selection)}
+      onSelectionChange={handleOnSelectionChange}
       columns={PurchaseReceiveGridCol}
       onRowDoubleClick={(row) => handleNavigate('edit', row.id)}
       // onRowDoubleClick={(row) => console.log(row)}

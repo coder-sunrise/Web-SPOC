@@ -1,13 +1,10 @@
-import moment from 'moment'
-import { dateFormatLong } from '@/components'
-
 export const NewCHASColumns = [
   {
     name: 'visitDate',
     title: 'Visit Date',
   },
   {
-    name: 'accountNo',
+    name: 'patientAccountNo',
     title: 'Account No',
   },
   {
@@ -15,7 +12,7 @@ export const NewCHASColumns = [
     title: 'Patient Name',
   },
   {
-    name: 'doctor',
+    name: 'visitDoctorName',
     title: 'Doctor',
   },
   {
@@ -47,45 +44,17 @@ export const NewCHASColumns = [
     title: 'Claim Amt.',
   },
   {
-    name: 'rejectionReason',
-    title: 'Rejection Reason',
-  },
-  {
     name: 'action',
     title: 'Action',
   },
 ]
 
 export const NewCHASColumnExtensions = [
-  { columnName: 'vistDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },
 ]
-
-const generateNewCHASData = () => {
-  let data = []
-  for (let i = 0; i < 15; i++) {
-    data.push({
-      id: i,
-      visitDate: moment().formatUTC({ dateFormatLong }),
-      accountNo: 'S1234567D',
-      patientName: 'Tan Kok Wei',
-      doctor: 'Dr Levine',
-      diagnosis: 'Asthma',
-      schemeType: 'CHAS Blue',
-      schemeCategory: 'Chronic',
-      invoiceNo: `INV/0000${i}`,
-      invoiceDate: moment().formatUTC('DD MM YYYY'),
-      invoiceAmount: 100,
-      claimAmount: 80,
-      rejectionReason: '',
-    })
-  }
-  return data
-}
-
-export const NewCHASTableData = generateNewCHASData()
 
 export const TableConfig = {
   FuncProps: {},

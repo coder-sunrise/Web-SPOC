@@ -7,7 +7,7 @@ import POForm from './POForm'
 import POGrid from './POGrid'
 // import POSummary from './POSummary'
 import POSummary from './Share/index'
-import { calculateItemLevelAdjustment } from '@/utils/utils'
+import { calculateItemLevelAdjustment, sumReducer } from '@/utils/utils'
 import {
   isPOStatusDraft,
   isPOStatusFinalized,
@@ -259,6 +259,43 @@ class index extends Component {
     }
   }
 
+  calculateAmount = ({
+    adjustmentList = [],
+    rows = [],
+    IsGSTEnabled = false,
+    IsGSTInclusive = false,
+    clinicSettings: { settingGSTEnable, settingGSTPercentage },
+  }) => {
+    let processedRows = rows
+
+    const total = processedRows
+      .map((o) => o.totalAfterItemAdjustment)
+      .reduce(sumReducer, 0)
+    processedRows.forEach((r) => {
+      r.weightage = r.totalAfterItemAdjustment / total
+      r.totalAfterOverallAdjustment = r.totalAfterItemAdjustment
+    })
+    adjustmentList.filter((o) => !o.isDeleted).forEach((fa) => {
+      processedRows.forEach((r) => {
+        r.totalAfterOverallAdjustment += r.weightage * fa.adjAmount
+      })
+    })
+
+    const totalAfterAdj = processedRows
+      .map((o) => o.totalAfterOverallAdjustment)
+      .reduce(sumReducer, 0)
+    const gst = totalAfterAdj * settingGSTPercentage / 100
+
+    return {
+      processedRows,
+      summary: {
+        gst,
+        total: totalAfterAdj,
+        totalWithGST: gst + totalAfterAdj,
+      },
+    }
+  }
+
   calcPurchaseOrderSummary = () => {
     const { settingGSTEnable, settingGSTPercentage } = this.state
     const { values, setFieldValue } = this.props
@@ -367,6 +404,24 @@ class index extends Component {
     setTimeout(() => {
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
     }, 1)
+
+    // {
+    //   adjustmentList = [],
+    //   rows = [],
+    //   IsGSTEnabled = false,
+    //   IsGSTInclusive = false,
+    //   clinicSettings: { settingGSTEnable, settingGSTPercentage
+    // }
+
+    const result = this.calculateAmount({
+      rows,
+      adjustmentList: purchaseOrderAdjustment,
+      IsGSTEnabled,
+      IsGSTInclusive,
+      clinicSettings: { settingGSTEnable, settingGSTPercentage },
+    })
+
+    console.log('calculateAmount', result)
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
