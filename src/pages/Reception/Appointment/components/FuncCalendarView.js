@@ -43,7 +43,7 @@ const styles = () => ({
     maxWidth: '90%',
     fontSize: '0.9rem',
     fontWeight: '450',
-    color: '#6f6f6f',
+    color: '#fff',
   },
 })
 
