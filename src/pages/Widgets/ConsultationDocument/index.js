@@ -29,6 +29,7 @@ import {
   ProgressButton,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
+
 import model from './models'
 
 window.g_app.replaceModel(model)
@@ -89,14 +90,12 @@ export const printRow = async (row, props) => {
 
 // @skeleton(['consultationDocument'])
 
-@connect(
-  ({ consultationDocument, codetable, patientDashboard, consultation }) => ({
-    consultationDocument,
-    codetable,
-    patientDashboard,
-    consultation,
-  }),
-)
+@connect(({ consultationDocument, codetable, patient, consultation }) => ({
+  consultationDocument,
+  codetable,
+  patient,
+  consultation,
+}))
 @withFormikExtend({
   mapPropsToValues: ({ consultation }) => {
     return consultation.entity || consultation.default
@@ -104,6 +103,10 @@ export const printRow = async (row, props) => {
   validationSchema: Yup.object().shape({
     dispenseAcknowledgement: Yup.object().shape({
       editDispenseReasonFK: Yup.number().required(),
+      remarks: Yup.string().when('editDispenseReasonFK', {
+        is: (val) => val === 2,
+        then: Yup.string().required(),
+      }),
     }),
     // issuedByUserFK: Yup.number().required(),
     // subject: Yup.string().required(),

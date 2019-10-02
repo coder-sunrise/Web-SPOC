@@ -17,16 +17,22 @@ import style from './style'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 // model
-@connect(({ dispense, visitRegistration, consultation }) => ({
-  dispense,
-  visitRegistration,
-  consultation,
-}))
+@connect(
+  ({
+    dispense,
+    visitRegistration,
+    consultation,
+    consultationDocument,
+    orders,
+  }) => ({
+    dispense,
+    visitRegistration,
+    consultation,
+    consultationDocument,
+    orders,
+  }),
+)
 class Dispense extends Component {
-  state = {
-    editingOrder: false,
-  }
-
   getExtraComponent = () => {
     return <div>test</div>
   }

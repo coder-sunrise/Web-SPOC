@@ -70,7 +70,6 @@ console.log(deepDiffMapper)
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 const doctors = [
-  { value: 'all', name: 'All' },
   { value: 'bao', name: 'Bao' },
   { value: 'cheah', name: 'Cheah' },
   // { value: 'tan', name: 'Tan' },
@@ -385,8 +384,25 @@ class ControlTest extends PureComponent {
               name='doctor'
               render={(args) => (
                 <Select
-                  label='Filter by Doctor'
+                  label='Filter by Doctor (Multiple)'
                   mode='multiple'
+                  options={doctors}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='doctor'
+              render={(args) => (
+                <Select
+                  mode='tags'
+                  maxSelected={1}
+                  label='Filter by Doctor (Tags)'
+                  onChange={(v) => {
+                    console.log(v)
+                  }}
                   options={doctors}
                   {...args}
                 />
@@ -405,6 +421,7 @@ class ControlTest extends PureComponent {
               )}
             />
           </GridItem>
+
           <GridItem sm={3}>
             <FastField
               name='numberField'

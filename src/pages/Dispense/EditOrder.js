@@ -5,6 +5,7 @@ import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
 import { Button, GridContainer, GridItem, notification } from '@/components'
+import { convertToConsultation } from '@/pages/PatientDashboard/Consultation/utils'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
@@ -54,24 +55,23 @@ class EditOrder extends Component {
   }
 
   signOrder = (values) => {
-    this.props
-      .dispatch({
-        type: `consultation/signOrder`,
-        payload: values,
-      })
-      .then((o) => {
-        if (o) {
-          this.props.dispatch({
-            type: `dispense/updateState`,
-            payload: {
-              editingOrder: false,
-            },
-          })
-          notification.success({
-            message: 'Order signed',
-          })
-        }
-      })
+    const { consultationDocument, orders, dispatch } = this.props
+    dispatch({
+      type: `consultation/signOrder`,
+      payload: convertToConsultation(values, { consultationDocument, orders }),
+    }).then((o) => {
+      if (o) {
+        dispatch({
+          type: `dispense/updateState`,
+          payload: {
+            editingOrder: false,
+          },
+        })
+        notification.success({
+          message: 'Order signed',
+        })
+      }
+    })
   }
 
   render () {
