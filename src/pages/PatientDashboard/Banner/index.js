@@ -364,7 +364,7 @@ class Banner extends PureComponent {
                                 currency
                                 value={
                                   o.patientSchemeBalance.length <= 0 ? (
-                                    ''
+                                    0.00
                                   ) : (
                                     o.patientSchemeBalance[0].balance
                                   )

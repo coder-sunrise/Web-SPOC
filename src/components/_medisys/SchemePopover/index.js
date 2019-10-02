@@ -33,7 +33,11 @@ const SchemePopover = ({
                   paddingLeft: 0,
                 }}
               >
-                <CodeSelect text code='ctSchemeType' value={data.schemeTypeFK} />
+                <CodeSelect
+                  text
+                  code='ctSchemeType'
+                  value={data.schemeTypeFK}
+                />
                 <IconButton>
                   <Refresh fontSize='large' />
                 </IconButton>
@@ -45,7 +49,11 @@ const SchemePopover = ({
             <GridItem>
               <p>
                 Validity:{' '}
-                <DatePicker text format={dateFormatLong} value={data.validFrom} />
+                <DatePicker
+                  text
+                  format={dateFormatLong}
+                  value={data.validFrom}
+                />
                 {' - '}
                 <DatePicker text format={dateFormatLong} value={data.validTo} />
               </p>
@@ -54,12 +62,13 @@ const SchemePopover = ({
           <GridContainer>
             <GridItem>
               {' '}
-              Balance: <NumberInput
+              Balance:{' '}
+              <NumberInput
                 text
                 currency
                 value={
                   data.patientSchemeBalance.length <= 0 ? (
-                    ''
+                    0.00
                   ) : (
                     data.patientSchemeBalance[0].balance
                   )
@@ -116,7 +125,7 @@ const SchemePopover = ({
         style={{
           display: 'inline-block',
           right: 10,
-          position: isBanner ?  '' : 'absolute' ,
+          position: isBanner ? '' : 'absolute',
         }}
       >
         {isBanner ? (
