@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -55,6 +55,45 @@ const Detail = ({
     setFieldValue,
     dispatch,
   }
+
+  useEffect(() => {
+    if (vaccinationDetail.currentId) {
+      dispatch({
+        type: 'vaccinationDetail/query',
+        payload: {
+          id: vaccinationDetail.currentId,
+        },
+      }).then((vac) => {
+        const { sddfk } = vac
+        if (sddfk) {
+          dispatch({
+            type: 'sddDetail/queryOne',
+            payload: {
+              id: sddfk,
+            },
+          }).then((sdd) => {
+            const { data } = sdd
+            const { code, name } = data[0]
+            dispatch({
+              type: 'vaccinationDetail/updateState',
+              payload: {
+                entity: {
+                  ...vac,
+                  effectiveDates: [
+                    vac.effectiveStartDate,
+                    vac.effectiveEndDate,
+                  ],
+                  sddCode: code,
+                  sddDescription: name,
+                },
+              },
+            })
+          })
+        }
+      })
+    }
+  }, [])
+
   return (
     <React.Fragment>
       {/* <NavPills

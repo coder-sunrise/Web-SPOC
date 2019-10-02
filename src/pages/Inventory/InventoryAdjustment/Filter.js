@@ -76,7 +76,7 @@ class Filter extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={4}>
             <Field
               name='transDates'
               render={(args) => {

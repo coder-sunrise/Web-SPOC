@@ -79,7 +79,6 @@ let commitCount = 1000 // uniqueNumber
       if (list === inventoryAdjustmentItems) {
         const { restValues, ...val } = o
         const { batchNo, code, displayValue, ...value } = val
-        console.log('as', o, val, getType)
         return {
           ...value,
           [getType.typeName]: {
@@ -200,6 +199,7 @@ class Detail extends PureComponent {
         columnName: 'displayValue',
         type: 'select',
         labelField: 'name',
+        width: 250,
         autoComplete: true,
         options: (row) => {
           return this.rowOptions(row)
@@ -211,7 +211,7 @@ class Detail extends PureComponent {
       {
         columnName: 'uomDisplayValue',
         disabled: true,
-        // type: 'number',
+        width: 90,
       },
       {
         columnName: 'batchNo',
@@ -228,6 +228,7 @@ class Detail extends PureComponent {
         columnName: 'expiryDate',
         type: 'date',
         disabled: true,
+        width: 120,
       },
       {
         columnName: 'stock',
@@ -473,7 +474,6 @@ class Detail extends PureComponent {
 
   filterStockOption = (e) => {
     const { option, row } = e
-    console.log('filter', option, row)
     if (row.batchNo) {
       const getState = this.type(row.inventoryTypeFK)
       this.setState((prevState) => {
@@ -532,15 +532,12 @@ class Detail extends PureComponent {
     const { option, row } = e
     if (option) {
       const { uom, value, code, name } = option
-      console.log('handleOption', option, uom)
       this.setState({ selectedItem: e })
       row.code = value
       row.displayValue = value
       row.uomDisplayValue = uom
       row.codeString = code
       row.displayValueString = name
-
-      console.log('row', row)
 
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
         const getState = this.type(row.inventoryTypeFK)
@@ -644,19 +641,11 @@ class Detail extends PureComponent {
     if (this.state.selectedItem) {
       const { option } = this.state.selectedItem
       const { uom, expiryDate, stock } = option
-      console.log('option', option)
       if (uom) {
         returnRows = addedRows.map((r) => ({
           ...r,
           uomDisplayValue: 123,
         }))
-        // this.props.dispatch({
-        //   // force current edit row components to update
-        //   type: 'global/updateState',
-        //   payload: {
-        //     commitCount: (commitCount += 1),
-        //   },
-        // })
       } else {
         returnRows = addedRows.map((r) => ({
           ...r,
@@ -664,15 +653,6 @@ class Detail extends PureComponent {
           expiryDate,
         }))
       }
-      console.log(returnRows, 'returnRows')
-
-      // this.props.dispatch({
-      //   // force current edit row components to update
-      //   type: 'global/updateState',s
-      //   payload: {
-      //     commitCount: (commitCount += 1),
-      //   },
-      // })
 
       if (this.state.selectedBatch && returnRows) {
         // const { stock } = this.state.selectedItem
@@ -721,7 +701,6 @@ class Detail extends PureComponent {
         .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
         .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
     })
-    // console.log('state', this.state)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

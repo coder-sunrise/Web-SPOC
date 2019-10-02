@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
-import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
 import { getBizSession } from '@/services/queue'
@@ -13,9 +11,6 @@ import {
   TextField,
   GridContainer,
   GridItem,
-  Select,
-  DatePicker,
-  Switch,
   DateRangePicker,
   Button,
   CommonModal,
@@ -34,7 +29,6 @@ const Detail = ({
   theme,
   ...props
 }) => {
-  const field = medicationDetail.entity ? 'entity' : 'default'
   const [
     hasActiveSession,
     setHasActiveSession,
@@ -48,33 +42,6 @@ const Detail = ({
     }
   }
 
-  useEffect(() => {
-    if (medicationDetail.currentId) {
-      dispatch({
-        type: 'medicationDetail/query',
-        payload: {
-          id: medicationDetail.currentId,
-        },
-      }).then((med) => {
-        const { sddfk } = med
-        if (sddfk) {
-          dispatch({
-            type: 'sddDetail/queryOne',
-            payload: {
-              id: sddfk,
-            },
-          }).then((sdd) => {
-            const { data } = sdd
-            const { code, name } = data[0]
-            setFieldValue('sddCode', code)
-            setFieldValue('sddDescription', name)
-          })
-        }
-      })
-      checkHasActiveSession()
-    }
-  }, [])
-
   const [
     toggle,
     setToggle,
@@ -84,21 +51,17 @@ const Detail = ({
     setToggle(!toggle)
   }
   const handleSelectSdd = (row) => {
-    const { setFieldTouched } = props
     const { id, code, name } = row
     setToggle(!toggle)
-    dispatch({
-      type: 'medicationDetail/updateState',
-      payload: {
-        [field]: {
-          ...props.values,
-          sddfk: id,
-          sddCode: code,
-          sddDescription: name,
-        },
-      },
-    })
+
+    setFieldValue('sddfk', id)
+    setFieldValue('sddCode', code)
+    setFieldValue('sddDescription', name)
   }
+
+  useEffect(() => {
+    checkHasActiveSession()
+  }, [])
   return (
     <CardContainer
       hideHeader
@@ -283,7 +246,7 @@ const Detail = ({
       </h4>
       <GridContainer>
         <GridItem xs={5}>
-          <FastField
+          <Field
             name='sddCode'
             render={(args) => {
               return (
@@ -304,7 +267,7 @@ const Detail = ({
           </Button>
         </GridItem>
         <GridItem xs={5}>
-          <FastField
+          <Field
             name='sddDescription'
             render={(args) => {
               return (

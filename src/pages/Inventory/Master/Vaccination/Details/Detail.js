@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
 import { FastField } from 'formik'
-import { connect } from 'dva'
 import { compose } from 'redux'
 import Sdd from '../../Sdd'
 import { getBizSession } from '@/services/queue'
@@ -16,7 +14,6 @@ import {
   DateRangePicker,
   Button,
   CodeSelect,
-  Field,
   dateFormatLong,
   CheckboxGroup,
 } from '@/components'
@@ -46,30 +43,7 @@ const Detail = ({
   }
 
   useEffect(() => {
-    if (vaccinationDetail.currentId) {
-      dispatch({
-        type: 'vaccinationDetail/query',
-        payload: {
-          id: vaccinationDetail.currentId,
-        },
-      }).then((vac) => {
-        const { sddfk } = vac
-        if (sddfk) {
-          dispatch({
-            type: 'sddDetail/query',
-            payload: {
-              id: sddfk,
-            },
-          }).then((sdd) => {
-            const { data } = sdd
-            const { code, name } = data[0]
-            setFieldValue('sddCode', code)
-            setFieldValue('sddDescription', name)
-          })
-        }
-      })
-      checkHasActiveSession()
-    }
+    checkHasActiveSession()
   }, [])
 
   const [
@@ -81,20 +55,12 @@ const Detail = ({
     setToggle(!toggle)
   }
   const handleSelectSdd = (row) => {
-    const { values } = props
     const { id, code, name } = row
     setToggle(!toggle)
-    dispatch({
-      type: 'vaccinationDetail/updateState',
-      payload: {
-        [field]: {
-          ...values,
-          sddfk: id,
-          sddCode: code,
-          sddDescription: name,
-        },
-      },
-    })
+
+    setFieldValue('sddfk', id)
+    setFieldValue('sddCode', code)
+    setFieldValue('sddDescription', name)
   }
 
   return (
