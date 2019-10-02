@@ -241,7 +241,6 @@ class index extends Component {
 
     return {
       ...purchaseOrder,
-      supplierFK: 11,
       purchaseOrderStatusFK: newPurchaseOrderStatusFK,
       purchaseOrderStatusCode: getPurchaseOrderStatusFK(
         newPurchaseOrderStatusFK,

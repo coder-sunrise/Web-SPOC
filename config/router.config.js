@@ -346,13 +346,13 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Statement/Details/StatementDetails',
           },
-          {
-            path: '/finance/expense',
-            name: 'doctor-expense',
-            // mini: 'DE',
-            exact: true,
-            component: './Finance/DoctorExpense',
-          },
+          // {
+          //   path: '/finance/expense',
+          //   name: 'doctor-expense',
+          //   // mini: 'DE',
+          //   exact: true,
+          //   component: './Finance/DoctorExpense',
+          // },
           {
             path: '/finance/scheme',
             name: 'scheme',
