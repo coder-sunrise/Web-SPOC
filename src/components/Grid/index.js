@@ -183,6 +183,7 @@ module.exports = {
   serverDateTimeFormatFull,
   timeFormat,
   timeFormatWithoutSecond,
+  timeFormat24HourWithSecond,
   timeFormat24Hour,
   ...module.exports,
 }
