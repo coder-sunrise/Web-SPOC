@@ -1,8 +1,9 @@
-import React, { PureComponent } from 'react'
+import React, { useState } from 'react'
 import Refresh from '@material-ui/icons/Sync'
 import More from '@material-ui/icons/MoreHoriz'
 import moment from 'moment'
 import {
+  CommonModal,
   GridContainer,
   GridItem,
   Button,
@@ -13,12 +14,17 @@ import {
   dateFormatLong,
   NumberInput,
 } from '@/components'
+import CHASCardReplacement from './CHASCardReplacement'
 
 const SchemePopover = ({
   isBanner = false,
   data,
   handleRefreshChasBalance,
 }) => {
+  const [
+    showReplacementModal,
+    setShowReplacementModal,
+  ] = useState(false)
   return (
     <Popover
       icon={null}
@@ -38,7 +44,8 @@ const SchemePopover = ({
                   code='ctSchemeType'
                   value={data.schemeTypeFK}
                 />
-                <IconButton>
+                <IconButton onClick={handleRefreshChasBalance}>
+                  {' '}
                   <Refresh fontSize='large' />
                 </IconButton>
               </div>
@@ -68,7 +75,7 @@ const SchemePopover = ({
                 currency
                 value={
                   data.patientSchemeBalance.length <= 0 ? (
-                    0.00
+                    0.0
                   ) : (
                     data.patientSchemeBalance[0].balance
                   )
@@ -138,6 +145,17 @@ const SchemePopover = ({
           </IconButton>
         )}
       </div>
+      <CommonModal
+        open={showReplacementModal}
+        title='CHAS Card Replacement'
+        maxWidth='md'
+        onConfirm={() => setShowReplacementModal(false)}
+        onClose={() => setShowReplacementModal(false)}
+      >
+        <CHASCardReplacement
+          handleOnClose={() => setShowReplacementModal(false)}
+        />
+      </CommonModal>
     </Popover>
   )
 }

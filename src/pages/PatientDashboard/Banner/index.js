@@ -152,6 +152,25 @@ class Banner extends PureComponent {
     )
   }
 
+  refreshChasBalance = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/refreshChasBalance',
+      payload: entity,
+    }).then((result) => {
+      if (result) {
+        const {
+          balance,
+          patientCoPaymentSchemeFk,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+        } = result
+      }
+    })
+  }
+
   // {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
   render () {
     const { props } = this
@@ -263,7 +282,7 @@ class Banner extends PureComponent {
               header='Medical Problem'
               body={
                 <div>
-                  <div style={{paddingTop: 5}}>
+                  <div style={{ paddingTop: 5 }}>
                     {entity.patientHistoryDiagnosis.length ? (
                       `${entity.patientHistoryDiagnosis[0].diagnosisDescription
                         .length > 8
@@ -332,7 +351,7 @@ class Banner extends PureComponent {
               header={
                 <div>
                   {'Scheme'}{' '}
-                  <IconButton>
+                  <IconButton onClick={this.refreshChasBalance}>
                     <Refresh />
                   </IconButton>
                 </div>
@@ -372,7 +391,11 @@ class Banner extends PureComponent {
                               />
                             </div>
                             <br />
-                            <SchemePopover data={o} isBanner={true} />
+                            <SchemePopover
+                              data={o}
+                              isBanner
+                              handleRefreshChasBalance={this.refreshChasBalance}
+                            />
                           </div>
                         )
                       })

@@ -19,7 +19,6 @@ import {
   CommonModal,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
-import { CHASCardReplacement } from './CHASCardReplacement'
 // assets
 import styles from './styles.js'
 
@@ -34,10 +33,6 @@ const PatientInfoSideBanner = ({
     [classes.cardCategory]: true,
     [classes.entityName]: true,
   })
-  const [
-    showReplacementModal,
-    setShowReplacementModal,
-  ] = useState(false)
   return entity && entity.id ? (
     <React.Fragment>
       <h4 className={entityNameClass}>
@@ -89,63 +84,6 @@ const PatientInfoSideBanner = ({
                   handleRefreshChasBalance={handleRefreshChasBalance}
                   data={o}
                 />
-
-                {/* <Popover
-                  icon={null}
-                  content={
-                    <div>
-                      <div
-                        style={{
-                          fontWeight: 500,
-                          marginBottom: 0,
-                        }}
-                      >
-                        <CodeSelect
-                          text
-                          code='ctSchemeType'
-                          value={o.schemeTypeFK}
-                        />
-                        <IconButton onClick={handleRefreshChasBalance}>
-                          <Refresh fontSize='large' />
-                        </IconButton>
-                      </div>
-
-                      <div>
-                        <p>
-                          Validity:{' '}
-                          <DatePicker
-                            text
-                            format={dateFormatLong}
-                            value={o.validFrom}
-                          />
-                          {' - '}
-                          <DatePicker
-                            text
-                            format={dateFormatLong}
-                            value={o.validTo}
-                          />
-                        </p>
-                      </div>
-                      <div>Balance: </div>
-                      <div>Patient Visit Balance: </div>
-                      <div>Patient Clinic Balance: </div>
-                    </div>
-                  }
-                  trigger='click'
-                  placement='bottomLeft'
-                >
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      right: 10,
-                      position: 'absolute',
-                    }}
-                  >
-                    <IconButton>
-                      <More />
-                    </IconButton>
-                  </div>
-                </Popover> */}
               </p>
               {o.validFrom && (
                 <div>
@@ -175,18 +113,6 @@ const PatientInfoSideBanner = ({
       {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
         <Divider light />
       )}
-      <CommonModal
-        open={showReplacementModal}
-        title='CHAS Card Replacement'
-        maxWidth='md'
-        onConfirm={() => setShowReplacementModal(false)}
-        onClose={() => setShowReplacementModal(false)}
-      >
-        <CHASCardReplacement
-          handleOnClose={() => setShowReplacementModal(false)}
-          entity={entity}
-        />
-      </CommonModal>
     </React.Fragment>
   ) : null
 }
