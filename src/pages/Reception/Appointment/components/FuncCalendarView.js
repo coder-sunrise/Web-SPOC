@@ -309,6 +309,7 @@ const CalendarView = ({
       return calendarEvents.reduce((events, appointment) => {
         const {
           appointmentDate,
+          patientProfile,
           patientName,
           patientContactNo,
           isEnableRecurrence,
@@ -319,6 +320,7 @@ const CalendarView = ({
           ...item,
           resourceId: item.clinicianFK,
           clinicianFK: item.clinicianFK,
+          patientProfile,
           patientName,
           patientContactNo,
           isEnableRecurrence,

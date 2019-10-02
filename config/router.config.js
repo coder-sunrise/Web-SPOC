@@ -13,31 +13,31 @@ const routes = [
   //
   // login
   {
-    path: '/auth',
+    path: '/login',
     component: '../layouts/LandingLayout',
     routes: [
       {
-        path: '/auth/login',
-        component: './Login',
+        path: '/login',
+        component: './NewLogin',
         hideInMenu: true,
       },
       {
-        path: '/auth/forgotpassword',
+        path: '/login/forgotpassword',
         component: './ForgotPassword',
         hideInMenu: true,
       },
     ],
   },
-  {
-    path: '/login',
-    component: './Login',
-    hideInMenu: true,
-  },
-  {
-    path: '/forgotpassword',
-    component: './ForgotPassword',
-    hideInMenu: true,
-  },
+  // {
+  //   path: '/login',
+  //   component: './Login',
+  //   hideInMenu: true,
+  // },
+  // {
+  //   path: '/forgotpassword',
+  //   component: './ForgotPassword',
+  //   hideInMenu: true,
+  // },
   //
   // CMS
   {

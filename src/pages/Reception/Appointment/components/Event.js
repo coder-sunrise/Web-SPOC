@@ -69,11 +69,23 @@ class Event extends React.PureComponent {
 
   render () {
     const { event, classes, calendarView } = this.props
-    const { doctor, hasConflict, isEnableRecurrence } = event
+    const { doctor, hasConflict, isEnableRecurrence, patientProfile } = event
+    let { patientName, patientAccountNo, patientContactNo } = event
+    console.log({ patientProfile, event })
+    if (patientProfile) {
+      const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
+      const _mobileContact = contactNumbers.find(
+        (item) => item.numberTypeFK === 1,
+      )
+      if (_mobileContact) patientContactNo = _mobileContact.number
 
-    let title = event.patientName
-    let accountNo = this.constructAccountNo(event.patientAccountNo)
-    let subtitle = event.patientContactNo || ''
+      patientName = name
+      patientAccountNo = accNo
+    }
+
+    let title = patientName
+    let accountNo = this.constructAccountNo(patientAccountNo)
+    let subtitle = patientContactNo || ''
     if (doctor) {
       const { clinicianProfile = {} } = doctor
       const { doctorProfile } = clinicianProfile
