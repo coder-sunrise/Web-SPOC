@@ -34,9 +34,8 @@ const CHASCardReplacement = ({
         <GridItem md={6}>Account No: {patientAccountNo}</GridItem>
       </GridContainer>
       <GridContainer>
-        <GridItem md={12}>{' '}</GridItem>
+        <GridItem md={12}> </GridItem>
       </GridContainer>
-      <GridItem md={12} />
       <GridContainer>
         <GridItem md={2} />
         <GridItem md={4}>Old CHAS Card:</GridItem>
