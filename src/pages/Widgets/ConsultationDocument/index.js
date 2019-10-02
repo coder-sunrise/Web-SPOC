@@ -1,5 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
+
+import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
@@ -8,19 +10,28 @@ import Print from '@material-ui/icons/Print'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
+import Yup from '@/utils/yup'
+
 import {
   CommonTableGrid,
   Button,
   CommonModal,
   Popconfirm,
   skeleton,
+  GridContainer,
+  GridItem,
   notification,
+  withFormikExtend,
+  FastField,
+  CodeSelect,
+  Checkbox,
+  TextField,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 import model from './models'
 
 window.g_app.replaceModel(model)
-
+const styles = (theme) => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
@@ -77,11 +88,35 @@ export const printRow = async (row, props) => {
 
 // @skeleton(['consultationDocument'])
 
-@connect(({ consultationDocument, codetable, patientDashboard }) => ({
+@connect(({ consultationDocument, codetable, patientDashboard, dispense }) => ({
   consultationDocument,
   codetable,
   patientDashboard,
+  dispense,
 }))
+@withFormikExtend({
+  mapPropsToValues: ({ dispense }) => {
+    return dispense.entity || dispense.default
+  },
+  validationSchema: Yup.object().shape(
+    {
+      // issuedByUserFK: Yup.number().required(),
+      // subject: Yup.string().required(),
+      // content: Yup.string().required(),
+    },
+  ),
+
+  handleSubmit: (values, { props }) => {
+    // // console.log(values)
+    // const { dispatch, onConfirm } = props
+    // dispatch({
+    //   type: 'consultationDocument/upsertRow',
+    //   payload: values,
+    // })
+    // if (onConfirm) onConfirm()
+  },
+  displayName: 'ConsultationDocumentList',
+})
 class ConsultationDocument extends PureComponent {
   constructor (props) {
     super(props)
@@ -118,7 +153,7 @@ class ConsultationDocument extends PureComponent {
   }
 
   render () {
-    const { consultationDocument, dispatch } = this.props
+    const { consultationDocument, dispatch, forDispense, theme } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
     // console.log(consultationDocumentTypes,rows)
@@ -220,6 +255,59 @@ class ConsultationDocument extends PureComponent {
             },
           ]}
         />
+        {forDispense && (
+          <GridContainer>
+            <GridItem xs={12} md={6}>
+              <FastField
+                name='reasonFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Reason'
+                      code='cteditdispensereasons'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='remarks'
+                render={(args) => {
+                  return (
+                    <TextField
+                      multiline
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='acknowledged'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='I hereby confirm the above orders are instructed by the attending physician'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem
+              xs={12}
+              style={{ textAlign: 'center', paddingTop: theme.spacing(1) }}
+            >
+              <Button color='danger'>Cancel</Button>
+              <Button color='primary'>Save</Button>
+            </GridItem>
+          </GridContainer>
+        )}
         <CommonModal
           open={showModal}
           title='Add Consultation Document'
@@ -242,4 +330,4 @@ class ConsultationDocument extends PureComponent {
     )
   }
 }
-export default ConsultationDocument
+export default withStyles(styles, { withTheme: true })(ConsultationDocument)

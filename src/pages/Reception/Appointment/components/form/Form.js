@@ -546,16 +546,44 @@ class Form extends React.PureComponent {
     return rows
   }
 
+  onCloseFormClick = () => {
+    const { onClose, dispatch } = this.props
+    dispatch({
+      type: 'patientSearch/updateState',
+      payload: { list: undefined },
+    })
+    onClose()
+  }
+
   actualizeAppointment = () => {
+    const { datagrid } = this.state
     const { values, history } = this.props
+    const primaryDoctorResource = datagrid.find(
+      (item) => item.isPrimaryClinician,
+    )
+
     const parameters = {
       md: 'visreg',
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
+      pdid: primaryDoctorResource.clinicianFK, // primary clinician id
     }
 
     this.onCloseFormClick()
+
     history.push(getAppendUrl(parameters))
+  }
+
+  onViewPatientProfile = () => {
+    const { values, history } = this.props
+    history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: '1',
+        pid: values.patientProfileFK,
+        v: Date.now(),
+      }),
+    )
   }
 
   render () {
@@ -580,11 +608,11 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
 
     // console.log({ datagrid })
-    console.log({
-      initialValues: this.props.initialValues,
-      values: this.props.values,
-      dirty: this.props.dirty,
-    })
+    // console.log({
+    //   initialValues: this.props.initialValues,
+    //   values: this.props.values,
+    //   dirty: this.props.dirty,
+    // })
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
@@ -594,9 +622,11 @@ class Form extends React.PureComponent {
             <GridContainer className={classnames(classes.formContent)}>
               <GridItem container xs md={6}>
                 <PatientInfoInput
+                  onViewPatientProfileClick={this.onViewPatientProfile}
                   onSearchPatientClick={this.onSearchPatient}
                   onCreatePatientClick={this.togglePatientProfileModal}
                   onRegisterToVisitClick={this.actualizeAppointment}
+                  patientContactNo={values.patientContactNo}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
                   isEdit={values.id}

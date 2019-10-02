@@ -6,8 +6,15 @@ const DispenseIndexStyle = (theme) => ({
     marginTop: theme.spacing(1),
   },
   footerRow: {
-    marginTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit,
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+  },
+  orderPanel: {
+    marginTop: -theme.spacing(1),
+  },
+  cdAddButton: {
+    position: 'absolute',
+    top: 3,
   },
 })
 

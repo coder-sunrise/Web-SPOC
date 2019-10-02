@@ -767,7 +767,6 @@ const tenantCodes = [
   'clinicianprofile',
   'ctappointmenttype',
   'ctservice',
-  'ctreferrallettertemplate',
   'inventorymedication',
   'inventoryconsumable',
   'inventoryvaccination',
@@ -777,6 +776,7 @@ const tenantCodes = [
   'ctpaymentmode',
   // 'ctsnomeddiagnosis',
   'codetable/ctsnomeddiagnosis',
+  'documenttemplate',
 ]
 
 // const codes = [

@@ -8,7 +8,11 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // material ui
 import { withStyles } from '@material-ui/core'
 // components
-import { serverDateFormat, Tooltip } from '@/components'
+import {
+  serverDateFormat,
+  timeFormat24HourWithSecond,
+  Tooltip,
+} from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // setting
@@ -16,6 +20,7 @@ import { doctorEventColorOpts } from '../setting'
 // sub component
 import CalendarToolbar from './Toolbar'
 import Event from './Event'
+import TimeSlotComponent from './TimeSlotComponent'
 import { getFirstAppointmentType } from './form/formikUtils'
 // assets
 import { primaryColor } from '@/assets/jss'
@@ -149,6 +154,7 @@ const CalendarView = ({
   // --- variables ---
   calendarEvents,
   publicHolidays,
+  clinicBreakHours,
   doctorBlocks,
   resources,
   displayDate,
@@ -196,6 +202,7 @@ const CalendarView = ({
 
   const _customDayPropGetter = (date) => {
     // const { publicHolidays } = this.props
+    // console.log({ date })
     const momentDate = moment(date)
     const publicHoliday = publicHolidays.find((item) => {
       const momentStartDate = moment(item.startDate)
@@ -361,6 +368,7 @@ const CalendarView = ({
           // https://github.com/intljusticemission/react-big-calendar/blob/master/src/Calendar.js
           toolbar: Toolbar,
           event: EventComponent,
+          timeSlotWrapper: TimeSlotComponent,
           month: {
             dateHeader: MonthDateHeader,
           },
@@ -379,7 +387,7 @@ const CalendarView = ({
         resizable={false}
         showMultiDayTimes={false}
         step={15}
-        timeslots={2}
+        timeslots={1}
         longPressThreshold={500}
         tooltipAccessor={null}
         // #endregion --- functional props ---
@@ -395,6 +403,7 @@ const CalendarView = ({
         onView={_onViewChange}
         eventPropGetter={_eventColors}
         dayPropGetter={_customDayPropGetter}
+        // slotPropGetter={TimeSlotComponent}
         onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}
         onDoubleClickEvent={handleDoubleClick}
@@ -410,7 +419,10 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list || [],
   publicHolidays: calendar.publicHolidayList || [],
+  clinicBreakHours: calendar.clinicBreakHourList || [],
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
-  loading: loading.effects['calendar/getCalendarList'],
+  loading:
+    loading.effects['calendar/getCalendarList'] ||
+    loading.effects['calendar/getAppointmentDetails'],
 }))(CalendarView)

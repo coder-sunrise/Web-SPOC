@@ -3,7 +3,12 @@ import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-import { CommonTableGrid, DateFormatter, notification } from '@/components'
+import {
+  Badge,
+  CommonTableGrid,
+  DateFormatter,
+  notification,
+} from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
@@ -11,6 +16,7 @@ import ActionButton from './ActionButton'
 import { getAppendUrl } from '@/utils/utils'
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { filterData, formatAppointmentTimes } from '../utils'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { StatusIndicator } from '../variables'
 
 const compareQueueNo = (a, b) => {
@@ -64,6 +70,58 @@ const TableConfig = {
 }
 
 const columnExtensions = [
+  {
+    columnName: 'visitStatus',
+    width: 180,
+    render: (row) => {
+      const { visitStatus: value } = row
+      // const hasBadge = Object.keys(VISIT_STATUS).map((key) => VISIT_STATUS[key])
+      let color = 'primary'
+      let hasBadge = true
+      switch (value.toUpperCase()) {
+        case VISIT_STATUS.WAITING:
+          color = 'primary'
+          break
+        case VISIT_STATUS.DISPENSE:
+        case VISIT_STATUS.BILLING:
+        case VISIT_STATUS.ORDER_UPDATED:
+          color = 'success'
+          break
+        case VISIT_STATUS.IN_CONS:
+        case VISIT_STATUS.PAUSED:
+          color = 'danger'
+          break
+        case VISIT_STATUS.UPCOMING_APPT:
+          color = 'gray'
+          break
+        default:
+          color = 'gray'
+          hasBadge = false
+          break
+      }
+      // return value
+      return hasBadge ? (
+        <Badge
+          style={{
+            padding: 8,
+            fontSize: '.875rem',
+          }}
+          color={color}
+        >
+          {value}
+        </Badge>
+      ) : (
+        <span
+          style={{
+            padding: 8,
+            fontSize: '.875rem',
+          }}
+        >
+          {value}
+        </span>
+      )
+    },
+  },
   { columnName: 'queueNo', width: 80, compare: compareQueueNo },
   { columnName: 'patientAccountNo', compare: compareString },
   { columnName: 'visitStatus', type: 'status', width: 150 },
@@ -118,11 +176,14 @@ const columnExtensions = [
   },
 ]
 
+const gridHeight = window.innerHeight - 250
+
 const Grid = ({
   dispatch,
   user,
   calendarEvents = [],
   filter = StatusIndicator.ALL,
+  selfOnly = false,
   queueList = [],
   queryingData = false,
   showingVisitRegistration = false,
@@ -146,11 +207,32 @@ const Grid = ({
 
   const computeQueueListingData = () => {
     if (filter === StatusIndicator.APPOINTMENT) return calendarData
-    return filterData(filter, queueList)
+
+    let data = [
+      ...queueList,
+    ]
+
+    const { clinicianProfile: { doctorProfile } } = user
+
+    if (selfOnly)
+      data = data.filter((item) => {
+        const {
+          doctor: {
+            clinicianProfile: { doctorProfile: assignedDoctorProfile },
+          },
+        } = item
+
+        return doctorProfile
+          ? assignedDoctorProfile.id === doctorProfile.id
+          : false
+      })
+
+    return filterData(filter, data)
   }
 
   const queueListingData = useMemo(computeQueueListingData, [
     filter,
+    selfOnly,
     calendarEvents,
     queueList,
   ])
@@ -170,11 +252,12 @@ const Grid = ({
   }
 
   const isAssignedDoctor = (row) => {
+    console.log({ row })
     const {
       doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
     } = row
-    console.log(row)
     const { clinicianProfile: { doctorProfile } } = user
+    console.log({ user })
     if (!doctorProfile) {
       notification.error({
         message: 'Unauthorized Access',
@@ -339,14 +422,16 @@ const Grid = ({
       render: (row) => <ActionButton row={row} onClick={onClick} />,
     },
   ])
-
+  console.log({ gridHeight })
   const isLoading = showingVisitRegistration ? false : queryingData
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
         <CommonTableGrid
-          style={{ maxHeight: '76.5vh', overflow: 'auto' }}
+          // style={{ maxHeight: '76.5vh', overflow: 'auto' }}
           size='sm'
+          // height={600}
+          TableProps={{ height: gridHeight }}
           rows={queueListingData}
           columnExtensions={colExtensions}
           FuncProps={FuncConfig}
@@ -361,6 +446,7 @@ const Grid = ({
 export default connect(({ queueLog, calendar, global, loading, user }) => ({
   user: user.data,
   filter: queueLog.currentFilter,
+  selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],
   calendarEvents: calendar.list || [],
   showingVisitRegistration: global.showVisitRegistration,

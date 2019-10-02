@@ -218,6 +218,7 @@ class AntdSelect extends React.PureComponent {
 
   handleFilter = (input, option) => {
     // console.log(input, option, option.props.children, this.props.labelField)
+    let match = false
     try {
       if (Array.isArray(option.props.children)) {
         // return (
@@ -226,15 +227,14 @@ class AntdSelect extends React.PureComponent {
         //       o.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0,
         //   ).length > 0
         // )
-        return false
+        match = false
       }
-      return (
-        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      )
+      match = option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
     } catch (error) {
       console.log({ error })
-      return false
+      match = false
     }
+    return match
   }
 
   handleFocus = () => {
@@ -253,7 +253,7 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  handleValueChange = (val, a, b, c) => {
+  handleValueChange = (val) => {
     const {
       form,
       field,
@@ -278,6 +278,11 @@ class AntdSelect extends React.PureComponent {
         }
       } else if (this.state.value.indexOf(allValue) >= 0) {
         newVal = []
+      } else if (val.length === options.length) {
+        newVal = [
+          allValue,
+          ...options.map((o) => o[valueField]),
+        ]
       }
     }
 
@@ -337,7 +342,13 @@ class AntdSelect extends React.PureComponent {
 
       const { props } = this
       const { options, valueField, labelField, max } = props
-
+      console.log(
+        max,
+        _.filter(
+          options,
+          (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
+        ).splice(0, max),
+      )
       this.setState({
         data: _.filter(
           options,
@@ -413,7 +424,6 @@ class AntdSelect extends React.PureComponent {
       ...restProps
     } = this.props
     // console.log(options)
-
     const source =
       autoComplete || query
         ? this.state.data
@@ -482,6 +492,7 @@ class AntdSelect extends React.PureComponent {
           onSearch={this.fetchData}
           defaultValue={defaultValue}
           filterOption={this.handleFilter}
+          // optionFilterProp={labelField}
           allowClear={allowClear}
           dropdownMatchSelectWidth={dropdownMatchSelectWidth}
           maxTagPlaceholder={(vv) => {
@@ -531,7 +542,6 @@ class AntdSelect extends React.PureComponent {
       labelProps.shrink = (value && value.length > 0) || this.state.shrink
     }
     // console.log(labelProps)
-
     return (
       <CustomInput
         labelProps={labelProps}

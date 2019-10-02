@@ -17,7 +17,11 @@ import style from './style'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 // model
-@connect(({ dispense, visitRegistration }) => ({ dispense, visitRegistration }))
+@connect(({ dispense, visitRegistration, consultation }) => ({
+  dispense,
+  visitRegistration,
+  consultation,
+}))
 class Dispense extends Component {
   state = {
     editingOrder: false,

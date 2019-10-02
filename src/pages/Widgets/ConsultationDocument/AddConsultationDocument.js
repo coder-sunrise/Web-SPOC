@@ -128,7 +128,7 @@ class AddConsultationDocument extends PureComponent {
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'ctreferrallettertemplate',
+        code: 'documenttemplate',
       },
     })
   }
@@ -147,15 +147,15 @@ class AddConsultationDocument extends PureComponent {
 
   getLoader = (editor, setFieldValue) => {
     const { classes, parentProps, codetable } = this.props
-    const { ctreferrallettertemplate } = codetable
+    const { documenttemplate } = codetable
     return (
       <div className={classes.editorBtn}>
         <ButtonSelect
-          options={ctreferrallettertemplate}
+          options={documenttemplate}
           textField='displayValue'
           onClick={(option) => {
-            let msg = option.templateMessage
-            const match = option.templateMessage.match(templateReg)
+            let msg = option.templateContent
+            const match = option.templateContent.match(templateReg) || []
             match.forEach((s) => {
               const text = s.match(/data-value="(.*?)"/)[1]
               const m = tagList.find((o) => o.text === text)

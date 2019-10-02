@@ -214,6 +214,7 @@ module.exports = {
     remote: remoteValidator,
   },
   currencyFormat: '0,0.00',
+  percentageFormat: '0.00%',
   currencySymbol: '$',
   qtyFormat: '0.0',
   ...userSetting,
