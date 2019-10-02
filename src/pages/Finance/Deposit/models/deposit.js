@@ -29,8 +29,13 @@ export default createListViewModel({
         const response = yield call(service.queryBizSession, payload)
         yield put({
           type: 'updateBizSessionList',
-          payload: response.status == '200' ? response.data : {},
+          payload: response.status === '200' ? response.data : {},
         })
+      },
+
+      *updateDeposit ({ payload }, { call, put }) {
+        const response = yield call(service.upsertDeposit, payload)
+        return response
       },
     },
     reducers: {

@@ -45,6 +45,17 @@ class InventoryAdjustment extends PureComponent {
     })
   }
 
+  getRunningNo = () => {
+    this.props
+      .dispatch({
+        type: 'inventoryAdjustment/generateRunningNo',
+      })
+      .then((v) => {
+        const { data } = v
+        return data
+      })
+  }
+
   render () {
     const {
       classes,
