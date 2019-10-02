@@ -7,6 +7,7 @@ import { headerHeight } from 'mui-pro-jss'
 import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
+import { SchemePopover } from 'medisys-components'
 import {
   GridContainer,
   GridItem,
@@ -262,18 +263,28 @@ class Banner extends PureComponent {
               header='Medical Problem'
               body={
                 <div>
-                  <div>
+                  <div style={{paddingTop: 5}}>
                     {entity.patientHistoryDiagnosis.length ? (
-                      `${entity.patientHistoryDiagnosis[0].diagnosisDescription.length > 8
-                        ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(0, 8)}... `
-                        : entity.patientHistoryDiagnosis[0].diagnosisDescription} `
+                      `${entity.patientHistoryDiagnosis[0].diagnosisDescription
+                        .length > 8
+                        ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(
+                            0,
+                            8,
+                          )}... `
+                        : entity.patientHistoryDiagnosis[0]
+                            .diagnosisDescription} `
                     ) : (
                       '-'
                     )}
                     {entity.patientHistoryDiagnosis.length >= 2 ? (
-                      `${entity.patientHistoryDiagnosis[1].diagnosisDescription.length > 8
-                        ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(0, 8)}...`
-                        : `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription}`}`
+                      `${entity.patientHistoryDiagnosis[1].diagnosisDescription
+                        .length > 8
+                        ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(
+                            0,
+                            8,
+                          )}...`
+                        : `, ${entity.patientHistoryDiagnosis[1]
+                            .diagnosisDescription}`}`
                     ) : (
                       ''
                     )}
@@ -299,7 +310,12 @@ class Banner extends PureComponent {
                       placement='bottomLeft'
                     >
                       <div>
-                        <Button simple variant='outlined' color='info' size='sm'>
+                        <Button
+                          simple
+                          variant='outlined'
+                          color='info'
+                          size='sm'
+                        >
                           More
                         </Button>
                       </div>
@@ -323,12 +339,12 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length >= 1 ? (
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
+                    .length >= 1 ? (
                     entity.patientScheme
                       .filter((o) => o.schemeTypeFK <= 5)
                       .map((o) => {
                         return (
-                          
                           <div>
                             <CodeSelect
                               text
@@ -343,128 +359,20 @@ class Banner extends PureComponent {
                               }}
                             >
                               :{' '}
-
                               <NumberInput
                                 text
                                 currency
-                                value={o.patientSchemeBalance.length <= 0 ? '' : o.patientSchemeBalance[0].balance}
+                                value={
+                                  o.patientSchemeBalance.length <= 0 ? (
+                                    ''
+                                  ) : (
+                                    o.patientSchemeBalance[0].balance
+                                  )
+                                }
                               />
                             </div>
                             <br />
-
-                            {o.validFrom && (
-                              <div style={{ display: 'inline-block' }}>
-                                <Popover
-                                  icon={null}
-                                  content={
-                                    <div>
-                                      <GridContainer>
-                                        <GridItem>
-                                          <div
-                                            style={{
-                                              fontWeight: 500,
-                                              marginBottom: 0,
-                                              paddingLeft: 0,
-                                            }}
-                                          >
-                                            <CodeSelect
-                                              text
-                                              code='ctSchemeType'
-                                              value={o.schemeTypeFK}
-                                            />
-                                            <IconButton>
-                                              <Refresh fontSize='large' />
-                                            </IconButton>
-                                          </div>
-                                        </GridItem>
-                                      </GridContainer>
-
-                                      <GridContainer>
-                                        <GridItem>
-                                          <p>
-                                            Validity:{' '}
-                                            <DatePicker
-                                              text
-                                              format={dateFormatLong}
-                                              value={o.validFrom}
-                                            />
-                                            {' - '}
-                                            <DatePicker
-                                              text
-                                              format={dateFormatLong}
-                                              value={o.validTo}
-                                            />
-                                          </p>
-                                        </GridItem>
-                                      </GridContainer>
-                                      <GridContainer>
-                                        <GridItem>
-                                          {' '}
-                                          Balance: $<NumberInput
-                                            text
-                                            currency
-                                            value={
-                                              o.patientSchemeBalance.length <= 0 ? '' :
-                                              o.patientSchemeBalance[0].balance 
-                                            }
-                                          />
-                                        </GridItem>
-                                      </GridContainer>
-                                      <GridContainer>
-                                        <GridItem>
-                                          Patient Visit Balance:{' '}
-                                          <div
-                                            style={{
-                                              fontWeight: 500,
-                                              display: 'inline-block',
-                                              paddingLeft: 2,
-                                            }}
-                                          >
-                                            {
-                                              o.patientSchemeBalance.length <= 0 ? '' : o.patientSchemeBalance[0].acuteVisitPatientBalance 
-                                            }{' '}
-                                            Remaining{' '}
-                                          </div>{' '}
-                                          for Year {moment().year()}
-                                        </GridItem>
-                                      </GridContainer>
-                                      <GridContainer>
-                                        <GridItem>
-                                          Patient Clinic Balance:
-                                          <div
-                                            style={{
-                                              fontWeight: 500,
-                                              display: 'inline-block',
-                                              paddingLeft: 2,
-                                            }}
-                                          >
-                                            {
-                                              o.patientSchemeBalance.length <= 0 ? '' : o.patientSchemeBalance[0].acuteVisitClinicBalance 
-                                            }{' '}
-                                            Remaining
-                                          </div>{' '}
-                                          for {moment().format('MMMM')}{' '}
-                                          {moment().year()}
-                                        </GridItem>
-                                      </GridContainer>
-                                    </div>
-                                  }
-                                  trigger='click'
-                                  placement='bottomLeft'
-                                >
-                                  <div>
-                                    <Button
-                                      simple
-                                      variant='outlined'
-                                      color='info'
-                                      size='sm'
-                                    >
-                                      More
-                                    </Button>
-                                  </div>
-                                </Popover>
-                              </div>
-                            )}
+                            <SchemePopover data={o} isBanner={true} />
                           </div>
                         )
                       })
