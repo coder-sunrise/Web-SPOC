@@ -420,7 +420,6 @@ class AntdNumberInput extends React.PureComponent {
     // if (selectValue !== undefined) {
     //   cfg.value = selectValue
     // }
-    console.log(this.state.value)
     if (this.props.text) {
       const cfg = this.getConfig()
       return (
