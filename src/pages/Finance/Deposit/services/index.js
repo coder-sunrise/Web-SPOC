@@ -6,14 +6,13 @@ const bizSessionUrl = '/api/bizSession'
 
 module.exports = {
   queryList: (params) => service.queryList(url, params),
-  upsert: async (params) => {
+  upsertDeposit: async (params) => {
     const r = await request(`${url}`, {
       method: 'POST',
       body: {
         ...params,
       },
     })
-    console.log({ r })
     return r
   },
 

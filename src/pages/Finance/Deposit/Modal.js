@@ -4,7 +4,7 @@ import moment from 'moment'
 import * as Yup from 'yup'
 import valid from 'card-validator'
 import { formatMessage } from 'umi/locale'
-import { withStyles, Grid } from '@material-ui/core'
+import { withStyles, Grid, Divider } from '@material-ui/core'
 import { paymentMethods } from '@/utils/codes'
 import {
   GridContainer,
@@ -17,6 +17,7 @@ import {
   Field,
   FastField,
   withFormikExtend,
+  notification,
 } from '@/components'
 
 const style = () => ({
@@ -46,8 +47,10 @@ const style = () => ({
           transactionType,
           transactionTypeFK,
           transactionModeFK,
+
           amount: 0,
         },
+        balanceAfter: deposit.entity.balance,
       }
     }
     return deposit.default
@@ -106,9 +109,10 @@ const style = () => ({
       creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
         .name
     }
+    // console.log('transactionType', restDepositTransaction.transactionType)
 
     dispatch({
-      type: 'deposit/upsert',
+      type: 'deposit/updateDeposit',
       payload: {
         ...values,
         balance: balanceAfter,
@@ -125,6 +129,11 @@ const style = () => ({
       },
     }).then((r) => {
       if (r) {
+        // console.log('r', r)
+        notification.success({
+          message: `${r.patientDepositTransaction
+            .transactionType} successfully`,
+        })
         if (onConfirm) onConfirm()
         dispatch({
           type: 'deposit/query',
@@ -321,14 +330,31 @@ class Modal extends PureComponent {
                   <TextField
                     multiline
                     rowsMax='5'
-                    prefix={isDeposit ? 'Deposit Remarks' : 'Refund Remarks'}
+                    // prefix={isDeposit ? 'Deposit Remarks' : 'Refund Remarks'}
                     label={isDeposit ? 'Deposit Remarks' : 'Refund Remarks'}
                     {...args}
                   />
                 )}
               />
             </GridItem>
-            <GridItem xs={12}>
+          </GridContainer>
+          {/* <GridContainer>
+            <GridItem xs={2} md={9} />
+            <GridItem xs={10} md={3}>
+              <Divider />
+            </GridItem>
+            <GridItem xs={2} md={9} />
+            <GridItem xs={10} md={3}>
+              <FastField
+                name='total'
+                render={(args) => {
+                  return <NumberInput prefix='Total' {...args} />
+                }}
+              />
+            </GridItem>
+          </GridContainer> */}
+
+          {/* <GridItem xs={6} justify='flex-end'>
               <Field
                 name='balance'
                 render={(args) => (
@@ -346,7 +372,7 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem xs={12}>
+            <GridItem xs={6} justify='flex-end'>
               <Field
                 name='patientDepositTransaction.amount'
                 render={(args) => (
@@ -360,7 +386,7 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem xs={12}>
+            <GridItem xs={6} justify='flex-end' direction='row'>
               <Field
                 name='balanceAfter'
                 render={(args) => (
@@ -375,7 +401,55 @@ class Modal extends PureComponent {
                 )}
               />
             </GridItem>
-          </GridContainer>
+           */}
+
+          <div style={{ width: '50%', margin: 'auto' }}>
+            <Field
+              name='balance'
+              render={(args) => (
+                <NumberInput
+                  {...commonAmountOpts}
+                  style={{
+                    marginTop: theme.spacing.unit * 2,
+                  }}
+                  disabled
+                  simple
+                  noUnderline
+                  defaultValue='0.00'
+                  prefix='Balance'
+                  {...args}
+                />
+              )}
+            />
+            <Field
+              name='patientDepositTransaction.amount'
+              render={(args) => (
+                <NumberInput
+                  noUnderline
+                  defaultValue='0.00'
+                  onChange={this.calculateBalanceAfter}
+                  {...commonAmountOpts}
+                  prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
+                  {...args}
+                />
+              )}
+            />
+            <Divider style={{ width: '50%', float: 'right' }} />
+            <Field
+              name='balanceAfter'
+              render={(args) => (
+                <NumberInput
+                  style={{ top: -5 }}
+                  {...commonAmountOpts}
+                  disabled
+                  noUnderline
+                  defaultValue='0.00'
+                  prefix=' '
+                  {...args}
+                />
+              )}
+            />
+          </div>
         </div>
 
         {footer &&

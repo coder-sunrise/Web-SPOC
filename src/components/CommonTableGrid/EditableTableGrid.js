@@ -257,12 +257,15 @@ class EditableTableGrid extends PureComponent {
           <Button
             hideIfNoEditRights
             onClick={(e) => {
-              window.g_app._store.dispatch({
-                type: 'global/updateState',
-                payload: {
-                  disableSave: true,
-                },
-              })
+              setTimeout(() => {
+                window.g_app._store.dispatch({
+                  type: 'global/updateState',
+                  payload: {
+                    disableSave: true,
+                  },
+                })
+              }, 1)
+
               $(e.target)
                 .parents(selector)
                 .find('.medisys-table-add')

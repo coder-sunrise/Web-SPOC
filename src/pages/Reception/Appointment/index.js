@@ -107,8 +107,12 @@ class Appointment extends React.PureComponent {
       },
     })
 
+    // dispatch({
+    //   type: 'calendar/getPublicHolidayList',
+    //   payload: { start: startOfMonth },
+    // })
     dispatch({
-      type: 'calendar/getPublicHolidayList',
+      type: 'calendar/initState',
       payload: { start: startOfMonth },
     })
     dispatch({
@@ -273,21 +277,23 @@ class Appointment extends React.PureComponent {
   onFilterUpdate = (filter) => {
     const { filterByDoctor = [] } = filter
     const { clinicianProfiles } = this.props
-    const newResources = clinicianProfiles.reduce(
-      (resources, doctor) =>
-        filterByDoctor.includes(doctor.id)
-          ? [
-              ...resources,
-              {
-                clinicianFK: doctor.id,
-                doctorName: doctor.name,
-              },
-            ]
-          : [
-              ...resources,
-            ],
-      [],
-    )
+    const newResources = filterByDoctor.includes(-99)
+      ? []
+      : clinicianProfiles.reduce(
+          (resources, doctor) =>
+            filterByDoctor.includes(doctor.id)
+              ? [
+                  ...resources,
+                  {
+                    clinicianFK: doctor.id,
+                    doctorName: doctor.name,
+                  },
+                ]
+              : [
+                  ...resources,
+                ],
+          [],
+        )
     this.setState((preState) => ({
       filter: { ...preState.filter, ...filter },
       resources: newResources.length > 0 ? newResources : null,

@@ -173,6 +173,11 @@ export default createFormViewModel({
         }
         return response
       },
+      *signOrder ({ payload }, { call, put }) {
+        const response = yield call(service.signOrder, payload)
+        console.log(response)
+        return response
+      },
       *closeModal ({ payload }, { call, put }) {
         yield put({
           type: 'global/updateAppState',

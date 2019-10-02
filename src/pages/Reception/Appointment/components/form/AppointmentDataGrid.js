@@ -156,9 +156,6 @@ class AppointmentDataGrid extends React.Component {
       <div>
         <EditableTableGrid
           rows={data}
-          // leftColumns={[
-          //   'conflict',
-          // ]}
           columns={AppointmentDataColumn}
           columnExtensions={this.columnExtensions}
           FuncProps={{

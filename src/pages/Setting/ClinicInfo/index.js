@@ -60,8 +60,8 @@ const styles = (theme) => ({
         history.push('/setting')
         dispatch({
           type: 'clinicInfo/query',
-          payload: 'Tenant_000',
-          // payload: localStorage.getItem('clinicCode'),
+          // payload: 'Tenant_000',
+          payload: localStorage.getItem('clinicCode'),
         })
       }
     })
@@ -77,8 +77,7 @@ class ClinicInfo extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'clinicInfo/query',
-      payload: 'Tenant_000',
-      // payload: localStorage.getItem('clinicCode'),
+      payload: localStorage.getItem('clinicCode'),
     })
 
     this.props

@@ -83,6 +83,7 @@ class AntdDateRangePicker extends PureComponent {
       formatter,
       parser,
       local,
+      dateOnly,
       showTime,
     } = props
     this.state = {
@@ -103,12 +104,14 @@ class AntdDateRangePicker extends PureComponent {
                 i === 0
                 ? showTime
                   ? moment(o).formatUTC()
-                  : moment(o).set({ hour: 0, minute: 0, second: 0 }).formatUTC()
+                  : moment(o)
+                      .set({ hour: 0, minute: 0, second: 0 })
+                      .formatUTC(false)
                 : showTime
                   ? moment(o).formatUTC()
                   : moment(o)
                       .set({ hour: 23, minute: 59, second: 59 })
-                      .formatUTC()
+                      .formatUTC(false)
               : o
           }),
         )
@@ -145,7 +148,8 @@ class AntdDateRangePicker extends PureComponent {
   }
 
   handleChange = (dateArray, dateString) => {
-    const { form, field, onChange, showTime } = this.props
+    console.log(dateArray, dateString)
+    const { form, field, onChange, showTime, dateOnly } = this.props
     const v = Array.isArray(dateArray)
       ? dateArray.map((o, i) => {
           // eslint-disable-next-line no-nested-ternary
@@ -154,10 +158,10 @@ class AntdDateRangePicker extends PureComponent {
               i === 0
               ? showTime
                 ? o.formatUTC()
-                : o.set({ hour: 0, minute: 0, second: 0 }).formatUTC()
+                : o.set({ hour: 0, minute: 0, second: 0 }).formatUTC(false)
               : showTime
                 ? o.formatUTC()
-                : o.set({ hour: 23, minute: 59, second: 59 }).formatUTC()
+                : o.set({ hour: 23, minute: 59, second: 59 }).formatUTC(false)
             : o
         })
       : []

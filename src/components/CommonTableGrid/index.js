@@ -807,7 +807,7 @@ class CommonTableGrid extends PureComponent {
       newColumns.unshift({ name: 'rowIndex', title: 'No.' })
     }
     // console.log(window.$tempGridRow)
-    // console.log(this.state)
+    // console.log(this.state.entity.list)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper

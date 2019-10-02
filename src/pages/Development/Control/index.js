@@ -441,6 +441,14 @@ class ControlTest extends PureComponent {
           </GridItem>
           <GridItem sm={3}>
             <FastField
+              name='numberField'
+              render={(args) => {
+                return <NumberInput currency label='Number' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
               name='diagnosis'
               render={(args) => {
                 return (
