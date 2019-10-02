@@ -1,5 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
+
+import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
@@ -29,7 +31,7 @@ import AddConsultationDocument from './AddConsultationDocument'
 import model from './models'
 
 window.g_app.replaceModel(model)
-
+const styles = (theme) => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
@@ -151,7 +153,7 @@ class ConsultationDocument extends PureComponent {
   }
 
   render () {
-    const { consultationDocument, dispatch, forDispense } = this.props
+    const { consultationDocument, dispatch, forDispense, theme } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
     // console.log(consultationDocumentTypes,rows)
@@ -297,7 +299,10 @@ class ConsultationDocument extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={12} style={{ textAlign: 'center' }}>
+            <GridItem
+              xs={12}
+              style={{ textAlign: 'center', paddingTop: theme.spacing(1) }}
+            >
               <Button color='danger'>Cancel</Button>
               <Button color='primary'>Save</Button>
             </GridItem>
@@ -325,4 +330,4 @@ class ConsultationDocument extends PureComponent {
     )
   }
 }
-export default ConsultationDocument
+export default withStyles(styles, { withTheme: true })(ConsultationDocument)
