@@ -68,7 +68,6 @@ class History {
         mainObject,
       ] = obj
       // if (mainObject.id !== 'delete' && mainObject.id !== 'oldTemplate') {
-      //   console.log("not equal")
       //   this.redoList = []
       //   this.allList.push({
       //     data: obj,
@@ -99,7 +98,6 @@ class History {
           }
         }
       }else if(mainObject.id === 'move'){
-        console.log("move")
         let movingObject = JSON.stringify(mainObject.__originalState)
         let movingJsonObject = JSON.parse(movingObject)
         delete movingJsonObject.left
@@ -107,7 +105,6 @@ class History {
         delete movingJsonObject.scaleX
         delete movingJsonObject.scaleY
 
-        console.log(movingJsonObject)
 
         for(let i = 0; i < this.allList.length; i++){
           let layerContent = JSON.parse(this.allList[i].layerContent)
@@ -115,14 +112,9 @@ class History {
           delete layerContent.top
           delete layerContent.scaleX
           delete layerContent.scaleY
-          console.log(layerContent)
 
           if(JSON.stringify(movingJsonObject) === JSON.stringify(layerContent)){
-            console.log("same data")
-            console.log(layerContent)
             this.allList[i].layerContent = movingObject
-            console.log("after")
-            console.log(this.allList[i].layerContent)
           }
 
         }
@@ -136,7 +128,6 @@ class History {
             layerContent: JSON.stringify(mainObject),
             templateFK: null,
           })
-          console.log('move ', mainObject.id)
    
           this.count = 0
           this.itemCount = this.itemCount + 1
@@ -174,8 +165,6 @@ class History {
             for (let a = 0; a < temp.length; a++) {
               if (temp[a].layerContent !== JSON.stringify(mainObject)) {
                 this.allList.push(temp[a])
-              } else {
-                console.log('skip')
               }
             }
           }

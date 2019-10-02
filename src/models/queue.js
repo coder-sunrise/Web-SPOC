@@ -5,7 +5,7 @@ import { subscribeNotification } from '@/utils/realtime'
 import * as service from '../services/queue'
 import { save as updateAppt } from '@/services/calendar'
 import { StatusIndicator } from '@/pages/Reception/Queue/variables'
-import { serverDateFormat } from '@/components'
+import { serverDateTimeFormatFull } from '@/components'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -160,21 +160,22 @@ export default createListViewModel({
         const { shouldGetTodayAppointments = true } = payload
 
         if (shouldGetTodayAppointments) {
-          const today = moment().add(-8, 'hours').formatUTC()
+          const today = moment()
+          const start = moment(today.formatUTC(), serverDateTimeFormatFull)
+            .add(-8, 'hours')
+            .formatUTC(false)
+
           yield put({
             type: 'calendar/getCalendarList',
             payload: {
               combineCondition: 'and',
-              eql_appointmentDate: today,
+              eql_appointmentDate: start,
               group: [
                 {
                   appointmentStatusFk: 5,
                   eql_appointmentStatusFk: '1',
                   combineCondition: 'or',
                 },
-                // {
-                //   eql_appointmentDate: today,
-                // },
               ],
             },
           })

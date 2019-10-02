@@ -294,8 +294,7 @@ class Consultation extends PureComponent {
     const { visit = {} } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
-    // console.log("*********************************")
-    // console.log('values', values, this.props)
+    console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)

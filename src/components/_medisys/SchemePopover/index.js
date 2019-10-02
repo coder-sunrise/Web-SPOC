@@ -1,16 +1,20 @@
-import React, { PureComponent, useState } from 'react'
+import React, { useState } from 'react'
 import Refresh from '@material-ui/icons/Sync'
 import More from '@material-ui/icons/MoreHoriz'
-import CHASCardReplacement from './CHASCardReplacement'
+import moment from 'moment'
 import {
   CommonModal,
+  GridContainer,
+  GridItem,
   Button,
   Popover,
   CodeSelect,
   IconButton,
   DatePicker,
   dateFormatLong,
+  NumberInput,
 } from '@/components'
+import CHASCardReplacement from './CHASCardReplacement'
 
 const SchemePopover = ({
   isBanner = false,
@@ -21,27 +25,34 @@ const SchemePopover = ({
     showReplacementModal,
     setShowReplacementModal,
   ] = useState(false)
-
   return (
-    <React.Fragment>
-      <Popover
-        icon={null}
-        content={
-          <div>
-            <div
-              style={{
-                fontWeight: 500,
-                marginBottom: 0,
-              }}
-            >
-              <CodeSelect text code='ctSchemeType' value={data.schemeTypeFK} />
-              <CodeSelect text code='ctSchemeType' />
-              <IconButton onClick={handleRefreshChasBalance}>
-                <Refresh fontSize='large' />
-              </IconButton>
-            </div>
+    <Popover
+      icon={null}
+      content={
+        <div>
+          <GridContainer>
+            <GridItem>
+              <div
+                style={{
+                  fontWeight: 500,
+                  marginBottom: 0,
+                  paddingLeft: 0,
+                }}
+              >
+                <CodeSelect
+                  text
+                  code='ctSchemeType'
+                  value={data.schemeTypeFK}
+                />
+                <IconButton>
+                  <Refresh fontSize='large' />
+                </IconButton>
+              </div>
+            </GridItem>
+          </GridContainer>
 
-            <div>
+          <GridContainer>
+            <GridItem>
               <p>
                 Validity:{' '}
                 <DatePicker
@@ -52,33 +63,87 @@ const SchemePopover = ({
                 {' - '}
                 <DatePicker text format={dateFormatLong} value={data.validTo} />
               </p>
-            </div>
-            <div>Balance: </div>
-            <div>Patient Visit Balance: </div>
-            <div>Patient Clinic Balance: </div>
-          </div>
-        }
-        trigger='click'
-        placement='bottomLeft'
-      >
-        <div
-          style={{
-            display: 'inline-block',
-            right: 10,
-            position: 'absolute',
-          }}
-        >
-          {isBanner ? (
-            <Button simple variant='outlined' color='info' size='sm'>
-              More
-            </Button>
-          ) : (
-            <IconButton>
-              <More />
-            </IconButton>
-          )}
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem>
+              {' '}
+              Balance:{' '}
+              <NumberInput
+                text
+                currency
+                value={
+                  data.patientSchemeBalance.length <= 0 ? (
+                    ''
+                  ) : (
+                    data.patientSchemeBalance[0].balance
+                  )
+                }
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem>
+              Patient Visit Balance:{' '}
+              <div
+                style={{
+                  fontWeight: 500,
+                  display: 'inline-block',
+                  paddingLeft: 2,
+                }}
+              >
+                {data.patientSchemeBalance.length <= 0 ? (
+                  ''
+                ) : (
+                  data.patientSchemeBalance[0].acuteVisitPatientBalance
+                )}{' '}
+                Remaining{' '}
+              </div>{' '}
+              for Year {moment().year()}
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem>
+              Patient Clinic Balance:
+              <div
+                style={{
+                  fontWeight: 500,
+                  display: 'inline-block',
+                  paddingLeft: 2,
+                }}
+              >
+                {data.patientSchemeBalance.length <= 0 ? (
+                  ''
+                ) : (
+                  data.patientSchemeBalance[0].acuteVisitClinicBalance
+                )}{' '}
+                Remaining
+              </div>{' '}
+              for {moment().format('MMMM')} {moment().year()}
+            </GridItem>
+          </GridContainer>
         </div>
-      </Popover>
+      }
+      trigger='click'
+      placement='bottomLeft'
+    >
+      <div
+        style={{
+          display: 'inline-block',
+          right: 10,
+          position: isBanner ? '' : 'absolute',
+        }}
+      >
+        {isBanner ? (
+          <Button simple variant='outlined' color='info' size='sm'>
+            More
+          </Button>
+        ) : (
+          <IconButton>
+            <More />
+          </IconButton>
+        )}
+      </div>
       <CommonModal
         open={showReplacementModal}
         title='CHAS Card Replacement'
@@ -90,7 +155,7 @@ const SchemePopover = ({
           handleOnClose={() => setShowReplacementModal(false)}
         />
       </CommonModal>
-    </React.Fragment>
+    </Popover>
   )
 }
 

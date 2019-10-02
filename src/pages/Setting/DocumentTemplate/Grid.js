@@ -94,10 +94,6 @@ class Grid extends PureComponent {
           {
             columnName: 'action',
             sortingEnabled: false,
-            align: 'center',
-            alignContent: 'center',
-            alignItems: 'center',
-            justify: 'center',
             render: (row) => {  
               return (
                 <Tooltip title='Edit Document Template' placement='top-end'>

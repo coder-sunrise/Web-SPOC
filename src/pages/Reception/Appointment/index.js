@@ -127,14 +127,23 @@ class Appointment extends React.PureComponent {
 
   closeAppointmentForm = () => {
     this.setState({ selectedAppointmentFK: -1, showAppointmentForm: false })
-    this.props.dispatch({
+    const { dispatch, history } = this.props
+    dispatch({
       type: 'calendar/updateState',
       payload: {
         currentViewAppointment: { appointments: [] },
         isEditedAsSingleAppointment: false,
       },
     })
-    this.props.history.push(
+
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
+
+    history.push(
       getRemovedUrl([
         'md',
         'pid',
