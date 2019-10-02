@@ -8,7 +8,7 @@ class Grid extends PureComponent {
       { name: 'transactionNo', title: 'Transaction No' },
       { name: 'transactionDate', title: 'Transaction Date' },
       { name: 'status', title: 'Status' },
-      { name: 'remarks', title: 'Remarks' },
+      { name: 'remarks', title: 'Remark' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
@@ -56,10 +56,6 @@ class Grid extends PureComponent {
       {
         columnName: 'status',
         sortBy: 'inventoryAdjustmentStatusFK',
-      },
-      {
-        columnName: 'remarks',
-        width: 900,
       },
     ],
   }

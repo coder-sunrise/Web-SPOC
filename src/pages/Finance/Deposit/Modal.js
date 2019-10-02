@@ -58,9 +58,7 @@ const style = () => ({
   validationSchema: Yup.object().shape({
     patientDepositTransaction: Yup.object().shape({
       transactionDate: Yup.string().required('Date is required'),
-      transactionBizSessionFK: Yup.number().required(
-        'No session for the selected date',
-      ),
+      transactionBizSessionFK: Yup.number().required(),
       transactionModeFK: Yup.number().required('Mode is required'),
       amount: Yup.number().min(0.01, 'The amount should be more than 0.01'),
       creditCardTypeFK: Yup.number().when('transactionModeFK', {

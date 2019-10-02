@@ -1,24 +1,35 @@
 import React, { useState, useEffect } from 'react'
-import { connect } from 'dva'
-import { FormattedMessage } from 'umi/locale'
-import { compose } from 'redux'
 import {
+  Card,
+  CardHeader,
+  CardText,
+  CardBody,
   GridContainer,
   GridItem,
+  Select,
   TextField,
+  Transfer,
+  CodeSelect,
   FastField,
   Button,
   CommonTableGrid,
+  withFormikExtend,
   ProgressButton,
 } from '@/components'
+import { FormattedMessage } from 'umi/locale'
+import { compose } from 'redux'
+import { connect } from 'dva'
 
 const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
   useEffect(() => {
+    console.log('sddduseeffect')
     dispatch({
       type: 'sddDetail/query',
       payload: {
         keepFilter: false,
       },
+    }).then((response) => {
+      console.log({ response })
     })
   }, [])
 
@@ -102,7 +113,6 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
             dispatch({
               type: 'sddDetail/query',
               payload: {
-                keepFilter: false,
                 group: [
                   {
                     code: sddIdName,
