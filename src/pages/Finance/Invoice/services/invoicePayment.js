@@ -3,7 +3,7 @@ import * as service from '@/services/common'
 const url = '/api/invoicePayer'
 const invoicePaymentUrl = '/api/invoicePayment'
 const writeOffUrl = '/api/InvoicePayerWriteOff'
-const creditNoteUrl = 'api/CreditNote'
+const creditNoteUrl = '/api/CreditNote'
 
 module.exports = {
   query: (params) => service.query(url, params),
@@ -13,7 +13,7 @@ module.exports = {
   writeOff: (params) => {
     return service.upsert(writeOffUrl, params)
   },
-  addCreditNote: (params) => {
+  upsert: (params) => {
     return service.upsert(creditNoteUrl, params)
   },
 }

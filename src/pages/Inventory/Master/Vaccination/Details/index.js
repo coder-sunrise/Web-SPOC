@@ -12,7 +12,9 @@ import {
   ProgressButton,
   Button,
   withFormikExtend,
+  Tabs,
 } from '@/components'
+import { VaccinationDetailOption } from './variables'
 import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
@@ -46,9 +48,16 @@ const Detail = ({
     showTransfer: false,
     ...props,
   }
+
+  const stockProps = {
+    vaccinationDetail,
+    values: props.values,
+    setFieldValue,
+    dispatch,
+  }
   return (
     <React.Fragment>
-      <NavPills
+      {/* <NavPills
         color='primary'
         onChange={(event, active) => {
           history.push(
@@ -82,6 +91,11 @@ const Detail = ({
             ),
           },
         ]}
+      /> */}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={VaccinationDetailOption(detailProps, stockProps)}
       />
       <div className={classes.actionDiv}>
         <ProgressButton
@@ -107,9 +121,23 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ vaccinationDetail }) => {
-      return vaccinationDetail.entity
+      const returnValue = vaccinationDetail.entity
         ? vaccinationDetail.entity
         : vaccinationDetail.default
+
+      let chas = []
+      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      if (isChasAcuteClaimable) {
+        chas.push('isChasAcuteClaimable')
+      }
+      if (isChasChronicClaimable) {
+        chas.push('isChasChronicClaimable')
+      }
+
+      return {
+        ...returnValue,
+        chas,
+      }
     },
 
     validationSchema: Yup.object().shape({
@@ -157,10 +185,22 @@ export default compose(
           },
         ]
       }
+      let chas = {
+        isChasAcuteClaimable: false,
+        isChasChronicClaimable: false,
+      }
+      values.chas.forEach((o) => {
+        if (o === 'isChasAcuteClaimable') {
+          chas[o] = true
+        } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+      })
       dispatch({
         type: 'vaccinationDetail/upsert',
         payload: {
           ...restValues,
+          ...chas,
           id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],

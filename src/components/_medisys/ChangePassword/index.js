@@ -36,10 +36,12 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
     }
     const isCurrentLogin = userID === currentUser.id
     let response
+
     if (isCurrentLogin) response = await changeCurrentUserPassword(payload)
     else response = await changeUserPassword(payload)
 
     const { data } = response
+
     if (data.succeeded) {
       notification.success({
         message: 'Change password success.',

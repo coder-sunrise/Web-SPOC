@@ -96,11 +96,17 @@ const Medication = ({ dispatch, history, medication, values }) => {
     colExtensions,
   }
 
-  // useEffect(() => {
-  //   dispatch({
-  //     type: 'medication/query',
-  //   })
-  // }, [])
+  useEffect(() => {
+    dispatch({
+      type: 'medication/query',
+    })
+    // dispatch({
+    //   type: 'inventoryMaster/updateState',
+    //   payload: {
+    //     currentTab: '0',
+    //   },
+    // })
+  }, [])
 
   return (
     <CardContainer

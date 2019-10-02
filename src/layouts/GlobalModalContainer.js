@@ -76,7 +76,22 @@ class GlobalModalContainer extends PureComponent {
             this.props.handleSubmit()
           }}
         /> */}
-
+        <CommonModal
+          open={global.showDispensePanel}
+          title='Dispensing'
+          observe='Dispense'
+          authority='dispense'
+          bodyNoPadding
+          onClose={(e) => {
+            dispatch({
+              type: 'dispense/closeModal',
+            })
+          }}
+          fullScreen
+          showFooter={false}
+        >
+          {global.showDispensePanel && <Dispense />}
+        </CommonModal>
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
@@ -88,7 +103,7 @@ class GlobalModalContainer extends PureComponent {
           bodyNoPadding
           onClose={(e) => {
             dispatch({
-              type: 'consultation/closeConsultationModal',
+              type: 'consultation/closeModal',
             })
           }}
           fullScreen
@@ -96,22 +111,7 @@ class GlobalModalContainer extends PureComponent {
         >
           {global.showConsultationPanel && <Consultation {...this.props} />}
         </CommonModal>
-        <CommonModal
-          open={global.showDispensePanel}
-          title='Dispensing'
-          observe='Dispense'
-          authority='dispense'
-          bodyNoPadding
-          onClose={(e) => {
-            dispatch({
-              type: 'dispense/closeDispenseModal',
-            })
-          }}
-          fullScreen
-          showFooter={false}
-        >
-          {global.showDispensePanel && <Dispense />}
-        </CommonModal>
+
         <CommonModal
           open={global.showBillingPanel}
           title='Billing'

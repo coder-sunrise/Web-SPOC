@@ -258,7 +258,8 @@ class PatientHistory extends Component {
   }
 
   getContent = (row) => {
-    const { selectedSubRow } = this.props
+    const { patientHistory } = this.props
+    const { selectedSubRow } = patientHistory
     return (
       <List
         component='nav'
@@ -269,70 +270,73 @@ class PatientHistory extends Component {
       >
         {row.coHistory.map((o) => {
           return (
-            <ListItem
-              alignItems='flex-start'
-              classes={{
-                root: this.props.classes.listItemRoot,
-              }}
-              selected={selectedSubRow && o.id === selectedSubRow.id}
-              divider
-              disableGutters
-              button
-              onClick={() => {
-                this.props
-                  .dispatch({
-                    type: 'patientHistory/queryOne',
-                    payload: o.id,
-                  })
-                  .then((r) => {
-                    if (r) {
-                      this.props.dispatch({
-                        type: 'patientHistory/updateState',
-                        payload: {
-                          selected: row,
-                          selectedSubRow: o,
-                        },
-                      })
-                      // this.props.dispatch({
-                      //   type: 'consultationDocument/updateState',
-                      //   payload: {
-                      //     rows: r.documents,
-                      //   },
-                      // })
-                    }
-                  })
-              }}
-            >
-              <ListItemText
-                primary={
-                  <div
-                    style={{
-                      width: '100%',
-                      paddingRight: 20,
-                    }}
-                  >
-                    <GridContainer>
-                      <GridItem sm={7}>
-                        <TextField
-                          text
-                          value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
-                        />
-                      </GridItem>
-                      <GridItem sm={5} style={{ textAlign: 'right' }}>
-                        {o.signOffDate && (
-                          <DatePicker
+            <React.Fragment>
+              <ListItem
+                alignItems='flex-start'
+                classes={{
+                  root: this.props.classes.listItemRoot,
+                }}
+                selected={selectedSubRow && o.id === selectedSubRow.id}
+                divider
+                disableGutters
+                button
+                onClick={() => {
+                  this.props
+                    .dispatch({
+                      type: 'patientHistory/queryOne',
+                      payload: o.id,
+                    })
+                    .then((r) => {
+                      if (r) {
+                        this.props.dispatch({
+                          type: 'patientHistory/updateState',
+                          payload: {
+                            selected: row,
+                            selectedSubRow: o,
+                          },
+                        })
+                        // this.props.dispatch({
+                        //   type: 'consultationDocument/updateState',
+                        //   payload: {
+                        //     rows: r.documents,
+                        //   },
+                        // })
+                      }
+                    })
+                }}
+              >
+                <ListItemText
+                  primary={
+                    <div
+                      style={{
+                        width: '100%',
+                        paddingRight: 20,
+                      }}
+                    >
+                      <GridContainer>
+                        <GridItem sm={7}>
+                          <TextField
                             text
-                            // showTime
-                            value={o.signOffDate}
+                            value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
                           />
-                        )}
-                      </GridItem>
-                    </GridContainer>
-                  </div>
-                }
-              />
-              {/* <div>{this.getDetailPanel()}</div> */}
-            </ListItem>
+                        </GridItem>
+                        <GridItem sm={5} style={{ textAlign: 'right' }}>
+                          {o.signOffDate && (
+                            <DatePicker
+                              text
+                              // showTime
+                              value={o.signOffDate}
+                            />
+                          )}
+                        </GridItem>
+                      </GridContainer>
+                    </div>
+                  }
+                />
+              </ListItem>
+              {selectedSubRow &&
+              selectedSubRow.id === o.id && <div>{this.getDetailPanel()}</div>}
+            </React.Fragment>
           )
         })}
       </List>

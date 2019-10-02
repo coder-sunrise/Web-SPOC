@@ -34,8 +34,7 @@ const PaymentCard = ({
   payerName = 'N/A',
   payerType = PayerType.PATIENT,
   payments = [
-    { ...DefaultPaymentInfo },
-    { ...DefaultPaymentInfo },
+    // { ...DefaultPaymentInfo },
   ],
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {

@@ -1,91 +1,68 @@
-// import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
-import { createListViewModel } from 'medisys-model'
-import { getRemovedUrl } from '@/utils/utils'
+import _ from 'lodash'
+import moment from 'moment'
+import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/dispense'
-import { query as queryPatient } from '@/services/patient'
+import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
+import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { sendNotification } from '@/utils/realtime'
 
-export default createListViewModel({
+export default createFormViewModel({
   namespace: 'dispense',
-  config: {
-    queryOnLoad: false,
-  },
+  config: {},
   param: {
     service,
     state: {
-      patientInfo: {},
-      invoiceItems: [
-        {
-          PRN: false,
-          amount: 9,
-          batchNo: '',
-          category: 'Drug',
-          consumptionMethod: '',
-          discount: 0,
-          discountType: '',
-          dosage: '',
-          dosageUnit: '',
-          expireDate: '',
-          frequency: '',
-          instruction: '',
-          itemCode: 'drug01',
-          period: '',
-          periodAmount: undefined,
-          precautionOne: '',
-          precautionThree: '',
-          precautionTwo: '',
-          quantity: 3,
-          remark: '',
-          scheme: 0,
-          stock: '44',
-          subTotal: 9,
-          unitPrice: 3,
-        },
-        {
-          PRN: false,
-          amount: 6,
-          batchNo: '',
-          category: 'Drug',
-          consumptionMethod: '',
-          discount: 0,
-          discountType: '',
-          dosage: '',
-          dosageUnit: '',
-          expireDate: '',
-          frequency: '',
-          instruction: '',
-          itemCode: 'drug02',
-          period: '',
-          periodAmount: undefined,
-          precautionOne: '',
-          precautionThree: '',
-          precautionTwo: '',
-          quantity: 4,
-          remark: '',
-          scheme: 0,
-          stock: '44',
-          subTotal: 8,
-          unitPrice: 2,
-        },
+      default: {
+        corAttachment: [],
+        corPatientNoteVitalSign: [],
+      },
+      selectedWidgets: [
+        '1',
       ],
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (location) => {
-        const { query, pathname } = location
-        if (pathname === '/reception/queue') {
-          const { pid, vis, md2 } = query
-          if (md2 === 'disp') {
-            dispatch({
-              type: 'fetchPatientInfo',
-              payload: { id: pid },
-            })
-          }
+      history.listen(async (loct, method) => {
+        const { pathname, search, query = {} } = loct
+
+        if (
+          pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
+          Number(query.vid)
+        ) {
+          dispatch({
+            type: 'initState',
+            payload: {
+              version: Number(query.v) || undefined,
+              visitID: Number(query.vid),
+              md: query.md3,
+            },
+          })
         }
       })
     },
     effects: {
-      *startDispense ({ payload }, { call, put }) {
+      *initState ({ payload }, { call, put, select, take }) {
+        const { version, visitID, md } = payload
+        yield put({
+          type: 'query',
+          payload: {
+            id: visitID,
+            version,
+          },
+        })
+        yield take('query/@@end')
+        if (md === 'dsps') {
+          yield put({
+            type: 'global/updateState',
+            payload: {
+              fullscreen: true,
+              showDispensePanel: true,
+            },
+          })
+        }
+      },
+
+      *start ({ payload }, { call, put }) {
         const response = yield call(service.create, payload.id)
         const { id } = response
         if (id) {
@@ -108,14 +85,63 @@ export default createListViewModel({
         }
         return response
       },
+      *pause ({ payload }, { call, put }) {
+        const response = yield call(service.pause, payload)
+        if (response) {
+          sendNotification('QueueListing', {
+            message: `Dispense paused`,
+          })
+        }
+        return response
+      },
+      *resume ({ payload }, { call, put }) {
+        const response = yield call(service.resume, payload.id || payload)
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: response,
+              version: payload.version,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data: response,
+            },
+          })
+          sendNotification('QueueListing', {
+            message: `Dispense resumed`,
+          })
+        }
+        return response
+      },
 
-      *closeDispenseModal (_, { put }) {
+      *sign ({ payload }, { call, put }) {
+        const response = yield call(service.sign, payload)
+        if (response) {
+          sendNotification('QueueListing', {
+            message: `Dispense signed`,
+          })
+        }
+        return response
+      },
+      *discard ({ payload }, { call, put }) {
+        const response = yield call(service.remove, payload)
+
+        if (response) {
+          sendNotification('QueueListing', {
+            message: `Dispense discarded`,
+          })
+        }
+        return response
+      },
+      *closeModal ({ payload }, { call, put }) {
         router.push(
           getRemovedUrl([
             'md2',
             'cmt',
-            // 'pid',
-            'new',
+            'vid',
           ]),
         )
         yield put({
@@ -134,28 +160,85 @@ export default createListViewModel({
         })
         router.push('/reception/queue')
       },
-      *fetchPatientInfo ({ payload }, { call, put }) {
-        const response = yield call(queryPatient, payload)
-        const { data } = response
+      // *queryDone ({ payload }, { call, put, select }) {
+      //   // console.log('queryDone', payload)
+      //   const { data } = payload
+      //   if (!data) return
+      //   let cdRows = []
+      //   dispenseDocumentTypes.forEach((p) => {
+      //     cdRows = cdRows.concat(
+      //       (data[p.prop] || []).map((o) => {
+      //         const d = {
+      //           uid: getUniqueId(),
+      //           type: p.value,
+      //           subject: p.getSubject ? p.getSubject(o) : '',
+      //           ...o,
+      //         }
+      //         return p.convert ? p.convert(d) : d
+      //       }),
+      //     )
+      //   })
+      //   yield put({
+      //     type: 'dispenseDocument/updateState',
+      //     payload: {
+      //       rows: _.sortBy(cdRows, 'sequence'),
+      //     },
+      //   })
 
-        yield put({
-          type: 'updateState',
-          payload: {
-            patientInfo: { ...data },
-          },
-        })
-      },
+      //   let oRows = []
+      //   orderTypes.forEach((p) => {
+      //     const datas =
+      //       (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
+      //     // console.log(oRows, data[p.prop])
+      //     oRows = oRows.concat(
+      //       datas.map((o) => {
+      //         const d = {
+      //           uid: getUniqueId(),
+      //           type: p.value,
+      //           subject: p.getSubject ? p.getSubject(o) : '',
+      //           ...o,
+      //         }
+      //         return p.convert ? p.convert(d) : d
+      //       }),
+      //     )
+      //   })
+      //   yield put({
+      //     type: 'orders/updateState',
+      //     payload: {
+      //       rows: _.sortBy(oRows, 'sequence'),
+      //       finalAdjustments: data.corOrderAdjustment.map((o) => ({
+      //         ...o,
+      //         uid: o.id,
+      //       })),
+      //     },
+      //   })
+      //   yield put({
+      //     type: 'orders/calculateAmount',
+      //   })
+
+      //   yield put({
+      //     type: 'diagnosis/updateState',
+      //     payload: {
+      //       rows: _.sortBy(data.corDiagnosis, 'sequence'),
+      //     },
+      //   })
+
+      //   // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
+      //   //   data.corDiagnosis.forEach((cd) => {
+      //   //     cd.complication = cd.corComplication.map((o) => o.complicationFK)
+      //   //   })
+      //   // }
+      //   // if (data.corDiagnosis && data.corDiagnosis.length === 0) {
+      //   //   data.corDiagnosis.push({
+      //   //     onsetDate: moment(),
+      //   //     isPersist: false,
+      //   //     remarks: '',
+      //   //   })
+      //   // }
+      //   // console.log(payload)
+      //   return payload
+      // },
     },
-    reducers: {
-      addItems (state, { payload }) {
-        return {
-          ...state,
-          invoiceItems: [
-            ...state.invoiceItems,
-            payload,
-          ],
-        }
-      },
-    },
+    reducers: {},
   },
 })

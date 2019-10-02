@@ -5,7 +5,7 @@ import { subscribeNotification } from '@/utils/realtime'
 import * as service from '../services/queue'
 import { save as updateAppt } from '@/services/calendar'
 import { StatusIndicator } from '@/pages/Reception/Queue/variables'
-import { serverDateFormat } from '@/components'
+import { serverDateTimeFormatFull } from '@/components'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -29,6 +29,7 @@ export default createListViewModel({
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
       currentFilter: StatusIndicator.ALL,
+      selfOnly: false,
       error: {
         hasError: false,
         message: '',
@@ -39,14 +40,10 @@ export default createListViewModel({
       //   const { pathname } = location
       //   const allowedPaths = [
       //     '/reception/queue',
-      //     '/reception/appointment',
       //   ]
       //   if (allowedPaths.includes(pathname)) {
       //     dispatch({
-      //       type: 'getSessionInfo',
-      //       payload: {
-      //         shouldGetTodayAppointments: pathname === allowedPaths[0],
-      //       },
+      //       type: 'initState',
       //     })
       //   }
       // })
@@ -57,6 +54,25 @@ export default createListViewModel({
       })
     },
     effects: {
+      *initState (_, { select, put, take }) {
+        let user = yield select((state) => state.user.data)
+
+        let { clinicianProfile: { userProfile: { role: userRole } } } = user
+        console.log({ userRole })
+        if (userRole === undefined) {
+          console.log('fetch user')
+          yield take('user/fetchCurrent/@@end')
+          user = yield select((state) => state.user.data)
+          userRole = user.clinicianProfile.userProfile.role
+        }
+        yield put({
+          type: 'updateState',
+          payload: {
+            list: [],
+            selfOnly: userRole && userRole.clinicRoleFK === 1,
+          },
+        })
+      },
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)
         const { data } = response
@@ -126,36 +142,44 @@ export default createListViewModel({
               type: 'updateSessionInfo',
               payload: { ...sessionData[0] },
             }),
+            put({
+              type: 'getTodayAppointments',
+              payload: {
+                shouldGetTodayAppointments,
+              },
+            }),
           ])
 
-          if (shouldGetTodayAppointments)
-            yield put({
-              type: 'getTodayAppointments',
-            })
+          // if (shouldGetTodayAppointments)
 
           return true
         }
         return false
       },
-      *getTodayAppointments (_, { put }) {
-        const today = moment().format('YYYY-MM-DD')
-        yield put({
-          type: 'calendar/getCalendarList',
-          payload: {
-            combineCondition: 'and',
-            eql_appointmentDate: today,
-            group: [
-              {
-                appointmentStatusFk: 5,
-                eql_appointmentStatusFk: '1',
-                combineCondition: 'or',
-              },
-              // {
-              //   eql_appointmentDate: today,
-              // },
-            ],
-          },
-        })
+      *getTodayAppointments ({ payload }, { put }) {
+        const { shouldGetTodayAppointments = true } = payload
+
+        if (shouldGetTodayAppointments) {
+          const today = moment()
+          const start = moment(today.formatUTC(), serverDateTimeFormatFull)
+            .add(-8, 'hours')
+            .formatUTC(false)
+
+          yield put({
+            type: 'calendar/getCalendarList',
+            payload: {
+              combineCondition: 'and',
+              eql_appointmentDate: start,
+              group: [
+                {
+                  appointmentStatusFk: 5,
+                  eql_appointmentStatusFk: '1',
+                  combineCondition: 'or',
+                },
+              ],
+            },
+          })
+        }
       },
       *deleteQueueByQueueID ({ payload }, { call, put }) {
         yield call(service.deleteQueue, payload)
@@ -190,6 +214,9 @@ export default createListViewModel({
       },
     },
     reducers: {
+      toggleSelfOnly (state) {
+        return { ...state, selfOnly: !state.selfOnly }
+      },
       toggleError (state, { error = {} }) {
         return { ...state, error: { ...error } }
       },

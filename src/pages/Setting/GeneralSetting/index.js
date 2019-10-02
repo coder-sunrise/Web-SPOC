@@ -20,6 +20,7 @@ import {
   CardContainer,
   Select,
   Button,
+  Switch,
 } from '@/components'
 import WarningSnackbar from './WarningSnackbar'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -35,6 +36,19 @@ const styles = (theme) => ({
   enableReinitialize: true,
 
   mapPropsToValues: ({ clinicSettings }) => {
+    if (
+      clinicSettings.entity &&
+      clinicSettings.entity.ShowConsultationVersioning
+    ) {
+      const { ShowConsultationVersioning } = clinicSettings.entity
+      return {
+        ...clinicSettings.entity,
+        ShowConsultationVersioning: {
+          ...ShowConsultationVersioning,
+          settingValue: ShowConsultationVersioning.settingValue === 'true',
+        },
+      }
+    }
     return clinicSettings.entity
   },
 
@@ -43,6 +57,7 @@ const styles = (theme) => ({
       SystemCurrency,
       CurrencyRounding,
       CurrencyRoundingToTheClosest,
+      ShowConsultationVersioning,
     } = values
 
     const payload = [
@@ -54,6 +69,9 @@ const styles = (theme) => ({
       },
       {
         ...CurrencyRoundingToTheClosest,
+      },
+      {
+        ...ShowConsultationVersioning,
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -156,6 +174,34 @@ class GeneralSetting extends PureComponent {
                   <Select
                     label='To The Closest'
                     options={currencyRoundingToTheClosest}
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+
+          <GridContainer>
+            {/* <GridItem md={3}>
+              <Field
+                name='.settingValue'
+                render={(args) => (
+                  <Select
+                    label='To The Closest'
+                    options={currencyRoundingToTheClosest}
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem> */}
+            <GridItem md={3}>
+              <Field
+                name='ShowConsultationVersioning.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Show Consultation Versioning'
                     {...args}
                     disabled={!!hasActiveSession}
                   />

@@ -102,6 +102,8 @@ const Detail = ({
       hideHeader
       style={{
         margin: theme.spacing(2),
+        minHeight: 700,
+        maxHeight: 700,
       }}
     >
       <GridContainer gutter={0}>
@@ -275,7 +277,7 @@ const Detail = ({
                 textField='name'
                 options={[
                   {
-                    id: 'acute',
+                    id: 'isChasAcuteClaimable',
                     name: 'CHAS Acute Claimable',
 
                     layoutConfig: {
@@ -283,7 +285,7 @@ const Detail = ({
                     },
                   },
                   {
-                    id: 'chronic',
+                    id: 'isChasChronicClaimable',
                     name: 'CHAS Chronic Claimable',
 
                     layoutConfig: {

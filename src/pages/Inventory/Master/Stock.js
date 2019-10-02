@@ -18,6 +18,7 @@ const styles = (theme) => ({
   },
 })
 
+let commitCount = 1000 // uniqueNumber
 const Stock = ({
   classes,
   vaccinationDetail,
@@ -26,6 +27,7 @@ const Stock = ({
   values,
   setFieldValue,
   theme,
+  dispatch,
 }) => {
   const objectType = () => {
     if (vaccinationDetail) return 'vaccinationStock'
@@ -33,6 +35,31 @@ const Stock = ({
     if (consumableDetail) return 'consumableStock'
     return ''
   }
+
+  const [
+    stock,
+    setStock,
+  ] = useState(values[objectType()])
+
+  const changeIsDefault = (row) => {
+    stock.forEach((o) => {
+      if (o.id === row.id) {
+        o.isDefault = true
+      } else {
+        o.isDefault = false
+      }
+    })
+    setStock(stock)
+
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
+  }
+
   const [
     tableParas,
     setTableParas,
@@ -58,7 +85,12 @@ const Stock = ({
         columnName: 'isDefault',
         align: 'center',
         render: (row) => {
-          return <Radio checked={row.isDefault} />
+          return (
+            <Radio
+              checked={row.isDefault}
+              onChange={() => changeIsDefault(row)}
+            />
+          )
         },
       },
     ],
@@ -68,6 +100,8 @@ const Stock = ({
       hideHeader
       style={{
         margin: theme.spacing(2),
+        minHeight: 700,
+        maxHeight: 700,
       }}
     >
       <h4 style={{ fontWeight: 400 }}>
@@ -137,7 +171,7 @@ const Stock = ({
           />
         </GridItem>
       </GridContainer>
-      <CommonTableGrid rows={values[objectType()]} {...tableParas} />
+      <CommonTableGrid rows={stock} {...tableParas} />
       {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
     </CardContainer>
   )

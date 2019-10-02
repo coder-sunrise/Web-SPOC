@@ -67,7 +67,7 @@ import * as service from '@/services/common'
 class CertificateAttendance extends PureComponent {
   componentDidMount () {
     const { setFieldValue } = this.props
-    service.runningNumber('coa').then((o) => {
+    service.runningNumber('ds').then((o) => {
       if (o && o.data) {
         setFieldValue('referenceNo', o.data)
       } else {

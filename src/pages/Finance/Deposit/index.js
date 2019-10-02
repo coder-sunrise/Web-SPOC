@@ -20,6 +20,12 @@ const styles = () => ({
 }))
 @compare('deposit')
 class Deposit extends PureComponent {
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'deposit/query',
+    })
+  }
+
   render () {
     const { props } = this
     const { classes, ...restProps } = props

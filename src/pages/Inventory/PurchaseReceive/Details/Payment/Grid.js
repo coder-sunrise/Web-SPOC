@@ -11,7 +11,7 @@ import moment from 'moment'
 const purchaseOrderPaymentSchema = Yup.object().shape({
   paymentNo: Yup.string().required(),
   // paymentDate: Yup.string().required(),
-  paymentMode: Yup.string().required(),
+  paymentModeFK: Yup.string().required(),
   // reference: Yup.string().required(),
   paymentAmount: Yup.number().min(0).required(),
   // Remarks: Yup.string().required(),
@@ -22,8 +22,8 @@ class Grid extends PureComponent {
     columns: [
       { name: 'paymentNo', title: 'Payment No.' },
       { name: 'paymentDate', title: 'Date' },
-      { name: 'paymentMode', title: 'Payment Mode' },
-      { name: 'reference', title: 'Reference' },
+      { name: 'paymentModeFK', title: 'Payment Mode' },
+      { name: 'referenceNo', title: 'Reference' },
       { name: 'paymentAmount', title: 'Payment Amount' },
       { name: 'remarks', title: 'Remarks' },
     ],
@@ -36,9 +36,9 @@ class Grid extends PureComponent {
         disabled: true,
       },
       {
-        columnName: 'paymentMode',
+        columnName: 'paymentModeFK',
         type: 'codeSelect',
-        code: 'CTCreditCardType',
+        code: 'CTPaymentMode',
       },
       {
         columnName: 'paymentAmount',
@@ -48,9 +48,16 @@ class Grid extends PureComponent {
     ],
   }
 
-  onCommitChanges = ({ rows }) => {
+  onCommitChanges = ({ rows, deleted }) => {
     const { setFieldValue } = this.props
-    setFieldValue('paymentList', rows)
+    if (deleted) {
+      console.log('onCommitChangesDelete', { deleted, rows })
+    } else {
+      console.log('onCommitChangesAdd', rows)
+    }
+
+    setFieldValue('purchaseOrderPayment', rows)
+    return rows
   }
 
   render () {
@@ -59,7 +66,7 @@ class Grid extends PureComponent {
     return (
       <GridContainer>
         <EditableTableGrid
-          rows={values.paymentList}
+          rows={values.purchaseOrderPayment}
           schema={purchaseOrderPaymentSchema}
           FuncProps={{
             edit: isEditable,

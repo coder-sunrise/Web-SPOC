@@ -185,8 +185,8 @@ class CommonTableGrid extends PureComponent {
       return height ? (
         <VirtualTable
           {...restProps}
-          // height={height}
-          height='auto'
+          height={height}
+          // height='auto'
           tableComponent={TableComponent}
         />
       ) : (
@@ -194,11 +194,11 @@ class CommonTableGrid extends PureComponent {
       )
     }
 
-    this.TableRow = ({ row, ...restProps }) => (
+    this.TableRow = ({ row, tableRow, ...restProps }) => (
       <Table.Row
         {...restProps}
         onDoubleClick={(event) => {
-          onRowDoubleClick && onRowDoubleClick(row, event)
+          onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
         }}
         onClick={(event) => {
           onRowClick(row, event)
@@ -479,7 +479,7 @@ class CommonTableGrid extends PureComponent {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query' } = this.props
-
+    console.log({ payload, type, query })
     if (query) {
       query({
         callback: (data) => {
@@ -505,7 +505,7 @@ class CommonTableGrid extends PureComponent {
         ...this.state.entity.pagination,
         ...payload,
       }
-      console.log(p)
+      console.log({ p, entity: this.state })
       dispatch({
         type: `${type}/${queryMethod}`,
         payload: p,
@@ -818,7 +818,7 @@ class CommonTableGrid extends PureComponent {
           })}
           style={{
             ...this.props.style,
-            height,
+            // height,
           }}
         >
           {isLoading && (
@@ -901,7 +901,7 @@ class CommonTableGrid extends PureComponent {
             <DateTypeProvider {...cellComponentConfig} />
             <RangeDateTypeProvider {...cellComponentConfig} />
             <RadioTypeProvider {...cellComponentConfig} />
-            <StatusTypeProvider {...cellComponentConfig} />
+
             <TimeTypeProvider {...cellComponentConfig} />
             <RowErrorTypeProvider {...cellComponentConfig} />
 
@@ -918,6 +918,7 @@ class CommonTableGrid extends PureComponent {
                 highlightRow
                 selectByRowClick={allowSelectRowByClick}
                 showSelectionColumn
+                rowComponent={this.TableRow}
                 {...selectConfig}
               />
             )}

@@ -50,6 +50,7 @@ import styles from './style'
     events: calendar.list,
     viewingAppointment: calendar.currentViewAppointment,
     isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
+    mode: calendar.mode,
     cachedPayload: calendar.cachedPayload,
     appointmentStatuses: codetable.ltappointmentstatus,
     clinicianProfiles: codetable.clinicianprofile,
@@ -58,7 +59,7 @@ import styles from './style'
 )
 @withFormikExtend({
   displayName: 'AppointmentForm',
-  enableReinitialize: true,
+  // enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
@@ -247,13 +248,16 @@ class Form extends React.PureComponent {
   }
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
-    const { values, onClose, user, dispatch } = this.props
-
+    const { appointmentStatuses, values, onClose, user, dispatch } = this.props
+    const noShowStatus = appointmentStatuses.find((ct) => ct.code === 'NOSHOW')
+    const cancelStatus = appointmentStatuses.find(
+      (ct) => ct.code === 'CANCELLED',
+    )
     const payload = {
       id: values.currentAppointment.id,
       concurrencyToken: values.currentAppointment.concurrencyToken,
-      appointmentStatusFK: 3,
-      isCancelled: true,
+      appointmentStatusFK:
+        reasonType === '1' ? noShowStatus.id : cancelStatus.id,
       cancellationDateTime: moment().formatUTC(),
       cancellationReasonTypeFK: reasonType,
       cancellationReason: reason,
@@ -440,12 +444,7 @@ class Form extends React.PureComponent {
   }
 
   onSaveDraftClick = () => {
-    const {
-      appointmentStatuses,
-      values,
-      isEditedAsSingleAppointment,
-      viewingAppointment,
-    } = this.props
+    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
     const appointmentStatusFK = appointmentStatuses.find(
       (item) => item.code === 'DRAFT',
     ).id
@@ -461,7 +460,7 @@ class Form extends React.PureComponent {
       () => {
         if (
           values.id !== undefined &&
-          !isEditedAsSingleAppointment &&
+          mode === 'series' &&
           hasModifiedAsSingle &&
           viewingAppointment.isEnableRecurrence
         )
@@ -472,12 +471,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
-    const {
-      appointmentStatuses,
-      values,
-      isEditedAsSingleAppointment,
-      viewingAppointment,
-    } = this.props
+    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
 
     try {
       let newAppointmentStatusFK = appointmentStatuses.find(
@@ -492,6 +486,11 @@ class Form extends React.PureComponent {
       )
         newAppointmentStatusFK = rescheduleFK
 
+      const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
+        (editedAsSingle, appointment) =>
+          appointment.isEditedAsSingleAppointment || editedAsSingle,
+        false,
+      )
       this.setState(
         {
           tempNewAppointmentStatusFK: newAppointmentStatusFK,
@@ -499,7 +498,8 @@ class Form extends React.PureComponent {
         () => {
           if (
             values.id !== undefined &&
-            !isEditedAsSingleAppointment &&
+            mode === 'series' &&
+            hasModifiedAsSingle &&
             viewingAppointment.isEnableRecurrence
           )
             this.openSeriesUpdateConfirmation()
@@ -558,13 +558,16 @@ class Form extends React.PureComponent {
     history.push(getAppendUrl(parameters))
   }
 
-  onCloseFormClick = () => {
-    const { onClose, dispatch } = this.props
-    dispatch({
-      type: 'patientSearch/updateState',
-      payload: { list: undefined },
-    })
-    onClose()
+  onViewPatientProfile = () => {
+    const { values, history } = this.props
+    history.push(
+      getAppendUrl({
+        md: 'pt',
+        cmt: '1',
+        pid: values.patientProfileFK,
+        v: Date.now(),
+      }),
+    )
   }
 
   render () {
@@ -603,9 +606,11 @@ class Form extends React.PureComponent {
             <GridContainer className={classnames(classes.formContent)}>
               <GridItem container xs md={6}>
                 <PatientInfoInput
+                  onViewPatientProfileClick={this.onViewPatientProfile}
                   onSearchPatientClick={this.onSearchPatient}
                   onCreatePatientClick={this.togglePatientProfileModal}
                   onRegisterToVisitClick={this.actualizeAppointment}
+                  patientContactNo={values.patientContactNo}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
                   isEdit={values.id}
@@ -650,7 +655,7 @@ class Form extends React.PureComponent {
             <FormFooter
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={this.onCloseFormClick}
+              onClose={onClose}
               disabled={
                 !isDataGridValid ||
                 !values.patientName ||

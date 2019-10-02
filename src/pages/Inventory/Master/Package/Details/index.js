@@ -5,21 +5,25 @@ import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import DetailPanel from './Detail'
 import InventoryTypeListing from './InventoryTypeListing'
+import { PackageDetailOption } from './variables'
+
 import {
   NavPills,
   ProgressButton,
   Button,
   withFormikExtend,
+  Tabs,
 } from '@/components'
 import Yup from '@/utils/yup'
 
 const styles = () => ({
   actionDiv: {
-    float: 'center',
     textAlign: 'center',
     marginTop: '22px',
-    marginBottom: '15px',
-    marginRight: '10px',
+    position: 'sticky',
+    bottom: 0,
+    width: '100%',
+    paddingBottom: 10,
   },
 })
 
@@ -131,6 +135,21 @@ const Detail = ({
     setTotalPrice,
   ] = useState(0)
 
+  const typeListingProps = {
+    dispatch,
+    packDetail,
+    setFieldValue,
+    values,
+    selectedItem,
+    setSelectedItem,
+    price,
+    serviceCenterFK,
+    serviceCenterServicess,
+    totalPrice,
+    setTotalPrice,
+    ...props,
+  }
+
   // const [
   //   total,
   //   setTotal,
@@ -156,7 +175,7 @@ const Detail = ({
   // console.log('packDetail', packDetail)
   return (
     <React.Fragment>
-      <NavPills
+      {/* <NavPills
         color='primary'
         onChange={(event, active) => {
           history.push(
@@ -192,6 +211,11 @@ const Detail = ({
             ),
           },
         ]}
+      /> */}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={PackageDetailOption(detailProps, typeListingProps)}
       />
       <div className={classes.actionDiv}>
         <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />

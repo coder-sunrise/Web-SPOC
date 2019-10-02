@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import moment from 'moment'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 import { Tooltip, withStyles } from '@material-ui/core'
@@ -18,29 +17,12 @@ class Grid extends PureComponent {
     showDepositRefundModal: false,
   }
 
-  editRow = (row, isDeposit) => {
-    const { dispatch, deposit } = this.props
-    const { list } = deposit
-
-    dispatch({
-      type: 'deposit/updateState',
-      payload: {
-        entity: list.find((o) => o.id === row.id),
-      },
-    })
-
-    this.setState({
-      showDepositRefundModal: true,
-      isDeposit: isDeposit,
-    })
-  }
-
   tableParas = {
     columns: [
-      { name: 'patientName', title: 'Patient Name' },
-      { name: 'accountNo', title: 'Account No' },
+      { name: 'name', title: 'Patient Name' },
+      { name: 'patientAccountNo', title: 'Account No' },
       { name: 'balance', title: 'Balance' },
-      { name: 'lastTxnDate', title: 'Last Transaction' },
+      { name: 'lastTransactionDate', title: 'Last Transaction' },
       { name: 'action', title: 'Action' },
     ],
     columnExtensions: [
@@ -50,12 +32,12 @@ class Grid extends PureComponent {
         currency: true,
       },
       {
-        columnName: 'lastTxnDate',
+        columnName: 'lastTransactionDate',
         type: 'date',
         format: { dateFormatLong },
       },
       {
-        columnName: 'Action',
+        columnName: 'action',
         width: 110,
         align: 'center',
         sortingEnabled: false,
@@ -106,9 +88,31 @@ class Grid extends PureComponent {
     leftColumns: [],
   }
 
-  componentDidMount () {
-    this.props.dispatch({
-      type: 'deposit/query',
+  editRow = async (row, isDeposit) => {
+    const { dispatch, deposit } = this.props
+    const { list } = deposit
+    console.log({ row })
+
+    if (row.patientDepositFK > 0) {
+      await dispatch({
+        type: 'deposit/queryOne',
+        payload: {
+          id: row.patientDepositFK,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'deposit/updateState',
+        payload: {
+          showModal: true,
+          entity: list.find((o) => o.id === row.id),
+        },
+      })
+    }
+
+    this.setState({
+      showDepositRefundModal: true,
+      isDeposit,
     })
   }
 
@@ -120,7 +124,6 @@ class Grid extends PureComponent {
 
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
-    const { deposit: { list }, dispatch } = this.props
     return (
       <React.Fragment>
         <CommonTableGrid type='deposit' {...this.tableParas} />
@@ -131,6 +134,7 @@ class Grid extends PureComponent {
           onConfirm={this.toggleModal}
           maxWidth='sm'
           showFooter={false}
+          bodyNoPadding
         >
           <Modal isDeposit={isDeposit} />
         </CommonModal>

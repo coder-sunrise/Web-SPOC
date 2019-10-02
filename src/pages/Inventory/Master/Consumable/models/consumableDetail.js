@@ -28,10 +28,9 @@ export default createFormViewModel({
         suggestSellingPrice: 0,
         sellingPrice: 0,
         maxDiscount: 0,
-        chas: [
-          'acute',
-          'chronic',
-        ],
+        consumableStock: [],
+        isChasAcuteClaimable: true,
+        isChasChronicClaimable: true,
       },
     },
     subscriptions: ({ dispatch, history }) => {

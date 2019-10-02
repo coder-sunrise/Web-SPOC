@@ -730,96 +730,119 @@ const InventoryTypeListing = ({
   }
 
   return (
-    <CardContainer
-      hideHeader
-      style={{
-        margin: theme.spacing(2),
-      }}
-    >
-      <GridContainer>
-        <GridItem xs={12}>
-          <div className={classes.displayDiv}>
-            <h4>
-              <b>Package Price: ${totalPrice.toFixed(2)}</b>
+    <div>
+      <CardContainer
+        hideHeader
+        style={{
+          margin: theme.spacing(2),
+          maxHeight: 700,
+          minHeight: 700,
+        }}
+      >
+        <GridContainer>
+          <GridItem xs={12}>
+            <div className={classes.displayDiv}>
+              <h4>
+                <b>Package Price: ${totalPrice.toFixed(2)}</b>
+              </h4>
+            </div>
+          </GridItem>
+        </GridContainer>
+        <GridContainer
+          style={{
+            overflow: 'auto',
+            minHeight: 550,
+            maxHeight: 550,
+            padding: 10,
+          }}
+        >
+          <GridItem xs={12}>
+            <h4 className={classes.tableSectionHeader}>
+              <b>Medication</b>
             </h4>
-          </div>
-        </GridItem>
-      </GridContainer>
-      <GridContainer>
-        <GridItem xs={12}>
-          <h4 className={classes.tableSectionHeader}>
-            <b>Medication</b>
-          </h4>
-          <EditableTableGrid
-            {...medicationProps}
-            editingRowIds={editingRowIds}
-            onEditingRowIdsChange={onEditingRowIdsChange()}
-            rowChanges={rowChanges}
-            onRowChangesChange={onRowChangesChange()}
-            schema={medicationSchema}
-            rows={medicationRows}
-            FuncProps={{ pager: false }}
-            EditingProps={{
-              showAddCommand: true,
-              showEditCommand: false,
-              onCommitChanges: onCommitChanges('medicationPackageItem'),
-              onAddedRowsChange: onAddedRowsChange('medication'),
-            }}
-          />
-        </GridItem>
-        <GridItem xs={12} className={classes.tableHeader}>
-          <h4 className={classes.tableSectionHeader}>
-            <b>Consumable</b>
-          </h4>
-          <EditableTableGrid
-            {...consumableProps}
-            schema={consumableSchema}
-            rows={consumableRows}
-            FuncProps={{ pager: false }}
-            EditingProps={{
-              showAddCommand: true,
-              showEditCommand: false,
-              onAddedRowsChange: onAddedRowsChange('consumable'),
-              onCommitChanges: onCommitChanges('consumablePackageItem'),
-            }}
-          />
-        </GridItem>
-        <GridItem xs={12} className={classes.tableHeader}>
-          <h4 className={classes.tableSectionHeader}>
-            <b>Vaccination</b>
-          </h4>
-          <EditableTableGrid
-            {...vaccinationProps}
-            schema={vaccinationSchema}
-            rows={vaccinationRows}
-            FuncProps={{ pager: false }}
-            EditingProps={{
-              showAddCommand: true,
-              showEditCommand: false,
-              onCommitChanges: onCommitChanges('vaccinationPackageItem'),
-              onAddedRowsChange: onAddedRowsChange('vaccination'),
-            }}
-          />
-        </GridItem>
-        <GridItem xs={12} className={classes.tableHeader}>
-          <h4 className={classes.tableSectionHeader}>
-            <b>Service</b>
-          </h4>
-          <EditableTableGrid
-            {...serviceProps}
-            schema={serviceSchema}
-            rows={serviceRows}
-            FuncProps={{ pager: false }}
-            EditingProps={{
-              showAddCommand: true,
-              showEditCommand: false,
-              onAddedRowsChange: onAddedRowsChange('service'),
-              onCommitChanges: onCommitChanges('servicePackageItem'),
-            }}
-          />
-        </GridItem>
-      </GridContainer>
-    </CardContainer>
+            <EditableTableGrid
+              {...medicationProps}
+              editingRowIds={editingRowIds}
+              onEditingRowIdsChange={onEditingRowIdsChange()}
+              rowChanges={rowChanges}
+              onRowChangesChange={onRowChangesChange()}
+              schema={medicationSchema}
+              rows={medicationRows}
+              FuncProps={{ pager: false }}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete medication',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onCommitChanges: onCommitChanges('medicationPackageItem'),
+                onAddedRowsChange: onAddedRowsChange('medication'),
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} className={classes.tableHeader}>
+            <h4 className={classes.tableSectionHeader}>
+              <b>Consumable</b>
+            </h4>
+            <EditableTableGrid
+              {...consumableProps}
+              schema={consumableSchema}
+              rows={consumableRows}
+              FuncProps={{ pager: false }}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete consumable',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onAddedRowsChange: onAddedRowsChange('consumable'),
+                onCommitChanges: onCommitChanges('consumablePackageItem'),
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} className={classes.tableHeader}>
+            <h4 className={classes.tableSectionHeader}>
+              <b>Vaccination</b>
+            </h4>
+            <EditableTableGrid
+              {...vaccinationProps}
+              schema={vaccinationSchema}
+              rows={vaccinationRows}
+              FuncProps={{ pager: false }}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete vaccination',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onCommitChanges: onCommitChanges('vaccinationPackageItem'),
+                onAddedRowsChange: onAddedRowsChange('vaccination'),
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} className={classes.tableHeader}>
+            <h4 className={classes.tableSectionHeader}>
+              <b>Service</b>
+            </h4>
+            <EditableTableGrid
+              {...serviceProps}
+              schema={serviceSchema}
+              rows={serviceRows}
+              FuncProps={{ pager: false }}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete service',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onAddedRowsChange: onAddedRowsChange('service'),
+                onCommitChanges: onCommitChanges('servicePackageItem'),
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+      </CardContainer>
+    </div>
   )
 }
 export default withStyles(styles, { withTheme: true })(InventoryTypeListing)

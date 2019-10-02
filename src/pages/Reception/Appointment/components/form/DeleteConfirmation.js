@@ -55,16 +55,16 @@ const DeleteConfirmation = ({
       setStep(1)
     }
   }
-
+  const message = isSeries
+    ? 'Do you want to cancel all occurences of the recurring appointment, or just this one?'
+    : 'Do you want to cancel this appointment?'
   if (step === 0)
     return (
       <GridContainer justify='center'>
         <GridItem>
           <div className={classes.title}>
             <Warning fontSize='large' className={classes.warningIcon} />
-            <h4 style={{ textAlign: 'left' }}>
-              Do you want to cancel this appointment?
-            </h4>
+            <h4 style={{ textAlign: 'left' }}>{message}</h4>
           </div>
         </GridItem>
         {isSeries && (

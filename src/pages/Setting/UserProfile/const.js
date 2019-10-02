@@ -1,3 +1,5 @@
+import { status } from '@/utils/codes'
+
 export const UserProfileTableConfig = {
   columns: [
     { name: 'userName', title: 'Login Account' },
@@ -12,6 +14,7 @@ export const UserProfileTableConfig = {
   columnExtensions: [
     {
       columnName: 'userName',
+      sortBy: 'userProfileNavigation.userName',
       render: (row) => row.userProfile.userName,
     },
     {
@@ -20,12 +23,12 @@ export const UserProfileTableConfig = {
     },
     {
       columnName: 'isActive',
-      render: (row) => (row.isActive ? 'Active' : 'Inactive'),
+      type: 'select',
+      options: status,
+      align: 'center',
+      sortingEnabled: false,
     },
   ],
-  FuncProps: {
-    pager: false,
-  },
 }
 
 const generateDummyData = () => {

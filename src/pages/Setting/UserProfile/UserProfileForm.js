@@ -1,5 +1,6 @@
 import React from 'react'
 import * as Yup from 'yup'
+import moment from 'moment'
 import { connect } from 'dva'
 // formik
 import { FastField, Field, withFormik } from 'formik'
@@ -15,7 +16,7 @@ import {
   DateRangePicker,
   GridContainer,
   GridItem,
-  Select,
+  NumberInput,
   TextField,
 } from '@/components'
 import { ChangePassword } from '@/components/_medisys'
@@ -65,15 +66,13 @@ const styles = (theme) => ({
       userAccountNo: Yup.string().required(
         'User Account No. is a required field',
       ),
+      email: Yup.string().email('Invalid email'),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       role: Yup.string().required('Role is a required field'),
       doctorProfile: Yup.object()
-        .transform((value, original) => {
-          console.log({ value, original })
-          return value === null ? {} : value
-        })
+        .transform((value) => (value === null ? {} : value))
         .when('role', {
-          is: (val) => val === '1',
+          is: (val) => val === '2' || val === '3',
           then: Yup.object().shape({
             doctorMCRNo: Yup.string().required(),
           }),
@@ -114,7 +113,10 @@ const styles = (theme) => ({
         // ...currentSelectedUser.doctorProfile,
         effectiveDates:
           Object.entries(currentSelectedUser).length <= 0
-            ? []
+            ? [
+                moment(),
+                moment('2099-12-31'),
+              ]
             : [
                 currentSelectedUser.effectiveStartDate,
                 currentSelectedUser.effectiveEndDate,
@@ -138,14 +140,16 @@ const styles = (theme) => ({
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
     }
-
+    // console.log({ values, str: JSON.stringify(values) })
     dispatch({
       type: 'settingUserProfile/upsert',
       payload,
     }).then((response) => {
-      resetForm()
-      dispatch({ type: 'settingUserProfile/query' })
-      response && onConfirm()
+      if (response) {
+        dispatch({ type: 'settingUserProfile/query' })
+        resetForm()
+        onConfirm()
+      }
     })
   },
 })
@@ -163,8 +167,8 @@ class UserProfileForm extends React.PureComponent {
   render () {
     const { classes, footer, handleSubmit, values } = this.props
     const { showChangePassword } = this.state
-    const isEdit = values.userProfileFK !== undefined
-
+    const isEdit = values.id !== undefined
+    console.log({ values })
     return (
       <React.Fragment>
         <GridContainer
@@ -238,7 +242,16 @@ class UserProfileForm extends React.PureComponent {
               <FastField
                 name='title'
                 render={(args) => (
-                  <Select {...args} label='Title' options={[]} />
+                  <CodeSelect
+                    {...args}
+                    code='ctsalutation'
+                    valueField='code'
+                    label='Title'
+                    flexible
+                    // onChange={(value) => {
+                    //   console.log({ value })
+                    // }}
+                  />
                 )}
               />
             </GridItem>
@@ -269,7 +282,7 @@ class UserProfileForm extends React.PureComponent {
             <GridItem md={6}>
               <FastField
                 name='phoneNumber'
-                render={(args) => <TextField {...args} label='Contact No.' />}
+                render={(args) => <NumberInput {...args} label='Contact No.' />}
               />
             </GridItem>
             <GridItem md={6}>
@@ -347,7 +360,7 @@ class UserProfileForm extends React.PureComponent {
         {footer &&
           footer({
             onConfirm: handleSubmit,
-            confirmBtnText: isEdit ? 'Save' : 'Add',
+            confirmBtnText: 'Save',
           })}
       </React.Fragment>
     )

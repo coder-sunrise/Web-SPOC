@@ -1,13 +1,17 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { connect } from 'dva'
-import { FastField, withFormik } from 'formik'
 import * as Yup from 'yup'
+// formik
+import { FastField, withFormik } from 'formik'
+// umi
+import router from 'umi/router'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
 import LockOpen from '@material-ui/icons/LockOpen'
 import {
+  Button,
   GridContainer,
   GridItem,
   TextField,
@@ -110,6 +114,10 @@ class LoginCard extends PureComponent {
     handleSubmit()
   }
 
+  onForgotPasswordClick = () => {
+    // router.push('/forgotpassword')
+  }
+
   render () {
     const { classes, login } = this.props
     const { isInvalidLogin } = login
@@ -175,15 +183,24 @@ class LoginCard extends PureComponent {
                 />
               </CardBody>
               <CardFooter className={classnames(classes.justifyContentCenter)}>
-                <ProgressButton
-                  submitKey={submitKey}
-                  text='Enter'
-                  simple
-                  icon={<LockOpen />}
-                  block
-                  color='primary'
-                  onClick={this.onEnterPressed}
-                />
+                <GridContainer>
+                  <GridItem md={12}>
+                    <ProgressButton
+                      submitKey={submitKey}
+                      text='Enter'
+                      icon={<LockOpen />}
+                      block
+                      color='primary'
+                      onClick={this.onEnterPressed}
+                    />
+                  </GridItem>
+                  <GridItem
+                    md={12}
+                    style={{ marginTop: 12, textAlign: 'right' }}
+                  >
+                    <a onClick={this.onForgotPasswordClick}>Forgot Password</a>
+                  </GridItem>
+                </GridContainer>
               </CardFooter>
             </Card>
           </GridItem>

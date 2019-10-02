@@ -8,13 +8,22 @@ import Print from '@material-ui/icons/Print'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
+import Yup from '@/utils/yup'
+
 import {
   CommonTableGrid,
   Button,
   CommonModal,
   Popconfirm,
   skeleton,
+  GridContainer,
+  GridItem,
   notification,
+  withFormikExtend,
+  FastField,
+  CodeSelect,
+  Checkbox,
+  TextField,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 import model from './models'
@@ -40,9 +49,9 @@ export const printRow = async (row, props) => {
       },
     )
   } else {
-    const { codetable, patientDashboard } = props
+    const { codetable, patient } = props
     const { clinicianprofile = [] } = codetable
-    const { patientInfo } = patientDashboard
+    const { entity } = patient
     const obj =
       clinicianprofile.find(
         (o) =>
@@ -53,8 +62,8 @@ export const printRow = async (row, props) => {
     row.doctorName = obj.name
     row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
 
-    row.patientName = patientInfo.name
-    row.patientAccountNo = patientInfo.patientAccountNo
+    row.patientName = entity.name
+    row.patientAccountNo = entity.patientAccountNo
 
     download(
       `/api/Reports/${downloadConfig.id}?ReportFormat=pdf`,
@@ -77,11 +86,35 @@ export const printRow = async (row, props) => {
 
 // @skeleton(['consultationDocument'])
 
-@connect(({ consultationDocument, codetable, patientDashboard }) => ({
+@connect(({ consultationDocument, codetable, patientDashboard, dispense }) => ({
   consultationDocument,
   codetable,
   patientDashboard,
+  dispense,
 }))
+@withFormikExtend({
+  mapPropsToValues: ({ dispense }) => {
+    return dispense.entity || dispense.default
+  },
+  validationSchema: Yup.object().shape(
+    {
+      // issuedByUserFK: Yup.number().required(),
+      // subject: Yup.string().required(),
+      // content: Yup.string().required(),
+    },
+  ),
+
+  handleSubmit: (values, { props }) => {
+    // // console.log(values)
+    // const { dispatch, onConfirm } = props
+    // dispatch({
+    //   type: 'consultationDocument/upsertRow',
+    //   payload: values,
+    // })
+    // if (onConfirm) onConfirm()
+  },
+  displayName: 'ConsultationDocumentList',
+})
 class ConsultationDocument extends PureComponent {
   constructor (props) {
     super(props)
@@ -118,10 +151,10 @@ class ConsultationDocument extends PureComponent {
   }
 
   render () {
-    const { consultationDocument, dispatch } = this.props
+    const { consultationDocument, dispatch, forDispense } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-// console.log(consultationDocumentTypes,rows)
+    // console.log(consultationDocumentTypes,rows)
     return (
       <div>
         <CommonTableGrid
@@ -220,6 +253,56 @@ class ConsultationDocument extends PureComponent {
             },
           ]}
         />
+        {forDispense && (
+          <GridContainer>
+            <GridItem xs={12} md={6}>
+              <FastField
+                name='reasonFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Reason'
+                      code='cteditdispensereasons'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='remarks'
+                render={(args) => {
+                  return (
+                    <TextField
+                      multiline
+                      rowsMax='5'
+                      label='Remarks'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name='acknowledged'
+                render={(args) => {
+                  return (
+                    <Checkbox
+                      label='I hereby confirm the above orders are instructed by the attending physician'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={12} style={{ textAlign: 'center' }}>
+              <Button color='danger'>Cancel</Button>
+              <Button color='primary'>Save</Button>
+            </GridItem>
+          </GridContainer>
+        )}
         <CommonModal
           open={showModal}
           title='Add Consultation Document'

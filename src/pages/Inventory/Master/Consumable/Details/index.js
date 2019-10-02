@@ -3,15 +3,17 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import Yup from '@/utils/yup'
-import DetailPanel from './Detail'
-import Pricing from '../../Pricing'
-import Stock from '../../Stock'
+// import DetailPanel from './Detail'
+// import Pricing from '../../Pricing'
+// import Stock from '../../Stock'
 import {
   NavPills,
   ProgressButton,
   Button,
   withFormikExtend,
+  Tabs,
 } from '@/components'
+import { ConsumableDetailOption } from './variables'
 import {
   getAppendUrl,
   errMsgForOutOfRange as errMsg,
@@ -45,9 +47,15 @@ const Detail = ({
     setValues,
     values,
   }
+  const stockProps = {
+    consumableDetail,
+    values,
+    setFieldValue,
+    dispatch,
+  }
   return (
     <React.Fragment>
-      <NavPills
+      {/* <NavPills
         color='primary'
         onChange={(event, active) => {
           history.push(
@@ -77,6 +85,11 @@ const Detail = ({
             ),
           },
         ]}
+      /> */}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={ConsumableDetailOption(detailProps, stockProps)}
       />
       <div className={classes.actionDiv}>
         <ProgressButton
@@ -103,10 +116,23 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ consumableDetail }) => {
-      // console.log('consumableDetail', consumableDetail)
-      return consumableDetail.entity
+      const returnValue = consumableDetail.entity
         ? consumableDetail.entity
         : consumableDetail.default
+
+      let chas = []
+      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      if (isChasAcuteClaimable) {
+        chas.push('isChasAcuteClaimable')
+      }
+      if (isChasChronicClaimable) {
+        chas.push('isChasChronicClaimable')
+      }
+
+      return {
+        ...returnValue,
+        chas,
+      }
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
@@ -153,10 +179,22 @@ export default compose(
           },
         ]
       }
+      let chas = {
+        isChasAcuteClaimable: false,
+        isChasChronicClaimable: false,
+      }
+      values.chas.forEach((o) => {
+        if (o === 'isChasAcuteClaimable') {
+          chas[o] = true
+        } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+      })
       dispatch({
         type: 'consumableDetail/upsert',
         payload: {
           ...restValues,
+          ...chas,
           id,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],

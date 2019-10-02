@@ -14,7 +14,9 @@ const defaultRule = {
 const getEndType = (range, count, endDate) => {
   if (range === RECURRENCE_RANGE.AFTER) return { count }
 
-  const until = moment(endDate).toDate()
+  // add one day to end date
+  // RRule does not generate recurrence for end date
+  const until = moment(endDate).add(1, 'days').toDate()
   return {
     until: new Date(
       Date.UTC(until.getUTCFullYear(), until.getUTCMonth(), until.getUTCDate()),
@@ -68,12 +70,15 @@ export const computeRRule = ({ date, recurrenceDto }) => {
     recurrencePatternFK,
     recurrenceFrequency = 1,
     recurrenceEndDate,
-    recurrenceCount,
+    recurrenceCount = 1,
     recurrenceRange,
     recurrenceDayOfTheMonth,
     recurrenceDaysOfTheWeek,
   } = recurrenceDto
   try {
+    if (recurrenceCount < 0 || recurrenceFrequency < 0) {
+      return undefined
+    }
     const _tempDate = moment(date).toDate()
 
     const start = new Date(

@@ -52,6 +52,8 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
       hideHeader
       style={{
         margin: theme.spacing(2),
+        minHeight: 700,
+        maxHeight: 700,
       }}
     >
       <GridContainer gutter={0}>
@@ -132,7 +134,7 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
                     textField='name'
                     options={[
                       {
-                        id: 'acute',
+                        id: 'isChasAcuteClaimable',
                         name: 'CHAS Acute Claimable',
 
                         layoutConfig: {
@@ -140,7 +142,7 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
                         },
                       },
                       {
-                        id: 'chronic',
+                        id: 'isChasChronicClaimable',
                         name: 'CHAS Chronic Claimable',
 
                         layoutConfig: {

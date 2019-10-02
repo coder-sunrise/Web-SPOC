@@ -383,6 +383,7 @@ const convertToQuery = (
     includeParentDeleted,
     // queryExcludeFields,
     sorting = [],
+    props,
   } = query
   let customQuerys = { ...query }
   delete customQuerys.keepFilter
@@ -395,6 +396,8 @@ const convertToQuery = (
   delete customQuerys.totalRecords
   delete customQuerys.combineCondition
   delete customQuerys.version
+  delete customQuerys.excludeInactiveCodes
+  delete customQuerys.props
 
   // console.log(query)
   let newQuery = {}
@@ -502,6 +505,7 @@ const convertToQuery = (
     combineCondition,
     includeDeleted,
     includeParentDeleted,
+    props,
     // queryExcludeFields,
   }
   convertExcludeFields.forEach((p) => {

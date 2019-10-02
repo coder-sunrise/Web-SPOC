@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-// import { withFormik } from 'formik'
 import { compose } from 'redux'
 import {
   getAppendUrl,
@@ -13,7 +12,10 @@ import {
   ProgressButton,
   Button,
   withFormikExtend,
+  Tabs,
+  CardContainer,
 } from '@/components'
+import { MedicationDetailOption } from './variables'
 import Yup from '@/utils/yup'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
@@ -22,10 +24,12 @@ import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
-    float: 'center',
     textAlign: 'center',
     marginTop: '22px',
-    marginRight: '10px',
+    position: 'sticky',
+    bottom: 0,
+    width: '100%',
+    paddingBottom: 10,
   },
 })
 const Detail = ({
@@ -37,6 +41,7 @@ const Detail = ({
   handleSubmit,
   setFieldValue,
   values,
+  theme,
   ...props
 }) => {
   const { currentTab } = medication
@@ -50,9 +55,16 @@ const Detail = ({
     ...props,
   }
 
+  const stockProps = {
+    medicationDetail,
+    values,
+    setFieldValue,
+    dispatch,
+  }
+
   return (
     <React.Fragment>
-      <NavPills
+      {/* <NavPills
         color='primary'
         onChange={(event, active) => {
           history.push(
@@ -86,7 +98,19 @@ const Detail = ({
             ),
           },
         ]}
+      /> */}
+      {/* <CardContainer
+        hideHeader
+        style={{
+          margin: theme.spacing(2),
+        }}
+      > */}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={MedicationDetailOption(detailProps, stockProps)}
       />
+      {/* </CardContainer> */}
       <div className={classes.actionDiv}>
         <ProgressButton
           submitKey='medicationDetail/submit'
@@ -115,7 +139,15 @@ export default compose(
         ? medicationDetail.entity
         : medicationDetail.default
 
-      const { sddfk } = returnValue
+      let chas = []
+      const { isChasAcuteClaimable, isChasChronicClaimable } = returnValue
+      if (isChasAcuteClaimable) {
+        chas.push('isChasAcuteClaimable')
+      }
+      if (isChasChronicClaimable) {
+        chas.push('isChasChronicClaimable')
+      }
+      // const { sddfk } = returnValue
       // if (sddfk) {
       //   console.log('sddfk', sddfk)
       //   // console.log('sddfk', this.props)
@@ -133,8 +165,10 @@ export default compose(
       //     })
       // }
 
-      console.log('codetable', returnValue)
-      return returnValue
+      return {
+        ...returnValue,
+        chas,
+      }
     },
     validationSchema: Yup.object().shape({
       code: Yup.string().required(),
@@ -169,11 +203,9 @@ export default compose(
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
-      // console.log('restValues')
-      // console.log('restValues', values)
       const { id, medicationStock, effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm, medicationDetail } = props
-      // console.log('medicationDetail', medicationDetail)
+
       let defaultMedicationStock = medicationStock
       if (medicationStock.length === 0) {
         defaultMedicationStock = [
@@ -186,13 +218,26 @@ export default compose(
         ]
       }
 
+      let chas = {
+        isChasAcuteClaimable: false,
+        isChasChronicClaimable: false,
+      }
+      values.chas.forEach((o) => {
+        if (o === 'isChasAcuteClaimable') {
+          chas[o] = true
+        } else if (o === 'isChasChronicClaimable') {
+          chas[o] = true
+        }
+      })
       const payload = {
         ...restValues,
+        ...chas,
         id,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         medicationStock: defaultMedicationStock,
       }
+
       dispatch({
         type: 'medicationDetail/upsert',
         payload,
