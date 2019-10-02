@@ -33,6 +33,9 @@ import Block from './Block'
 class Banner extends PureComponent {
   state = {
     showWarning: false,
+    balanceValue: 0,
+    dateFrom: '',
+    dateTo: '',
   }
 
   constructor (props) {
@@ -167,6 +170,20 @@ class Banner extends PureComponent {
           validFrom,
           validTo,
         } = result
+        console.log({
+          balance,
+          patientCoPaymentSchemeFk,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+        })
+
+        this.setState({
+          balanceValue: balance,
+          dateFrom: validFrom,
+          dateTo: validTo,
+        })
+
       }
     })
   }
@@ -363,6 +380,11 @@ class Banner extends PureComponent {
                     entity.patientScheme
                       .filter((o) => o.schemeTypeFK <= 5)
                       .map((o) => {
+                        this.setState({
+                          balanceValue: o.patientSchemeBalance.length <= 0 ? 0 : o.patientSchemeBalance[0].balance,
+                          dateFrom: o.validFrom,
+                          dateTo: o.validTo,
+                        })
                         return (
                           <div>
                             <CodeSelect
@@ -381,19 +403,16 @@ class Banner extends PureComponent {
                               <NumberInput
                                 text
                                 currency
-                                value={
-                                  o.patientSchemeBalance.length <= 0 ? (
-                                    ''
-                                  ) : (
-                                    o.patientSchemeBalance[0].balance
-                                  )
-                                }
+                                value={this.state.balanceValue}
                               />
                             </div>
                             <br />
                             <SchemePopover
                               data={o}
                               isBanner
+                              balanceValue={this.state.balanceValue}
+                              dataFrom={this.state.dateFrom}
+                              dateTo={this.state.dateTo}
                               handleRefreshChasBalance={this.refreshChasBalance}
                             />
                           </div>

@@ -19,6 +19,9 @@ import CHASCardReplacement from './CHASCardReplacement'
 const SchemePopover = ({
   isBanner = false,
   data,
+  balanceValue,
+  dataFrom,
+  dateTo,
   handleRefreshChasBalance,
 }) => {
   const [
@@ -44,10 +47,13 @@ const SchemePopover = ({
                   code='ctSchemeType'
                   value={data.schemeTypeFK}
                 />
-                <IconButton onClick={handleRefreshChasBalance}>
-                  {' '}
-                  <Refresh fontSize='large' />
-                </IconButton>
+
+                <div style={{display: 'inline-block', position: 'absolute'}}>
+                  <IconButton onClick={handleRefreshChasBalance}>
+                    {' '}
+                    <Refresh fontSize='large' />
+                  </IconButton>
+                </div>
               </div>
             </GridItem>
           </GridContainer>
@@ -56,31 +62,16 @@ const SchemePopover = ({
             <GridItem>
               <p>
                 Validity:{' '}
-                <DatePicker
-                  text
-                  format={dateFormatLong}
-                  value={data.validFrom}
-                />
+                <DatePicker text format={dateFormatLong} value={dataFrom} />
                 {' - '}
-                <DatePicker text format={dateFormatLong} value={data.validTo} />
+                <DatePicker text format={dateFormatLong} value={dateTo} />
               </p>
             </GridItem>
           </GridContainer>
           <GridContainer>
             <GridItem>
               {' '}
-              Balance:{' '}
-              <NumberInput
-                text
-                currency
-                value={
-                  data.patientSchemeBalance.length <= 0 ? (
-                    ''
-                  ) : (
-                    data.patientSchemeBalance[0].balance
-                  )
-                }
-              />
+              Balance: <NumberInput text currency value={balanceValue} />
             </GridItem>
           </GridContainer>
           <GridContainer>
