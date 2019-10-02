@@ -326,8 +326,6 @@ class AntdNumberInput extends React.PureComponent {
         if (!format) format = `${currencySymbol}${currencyFormat}`
 
         extraCfg.formatter = (v) => {
-          console.log('formatter', v, this.state.value)
-
           if (v === '') return ''
           if (!this.state.focused) {
             const nv = numeral(v)
