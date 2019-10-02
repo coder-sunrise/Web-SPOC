@@ -8,6 +8,7 @@ import {
 } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
+import Exception403 from '@/pages/Exception/403'
 
 window.beforeReloadHandlerAdded = false
 const _localFormik = {}
@@ -137,7 +138,7 @@ const withFormikExtend = (props) => (Component) => {
           noMatch={() => {
             console.log('nomatch', this.props)
 
-            return null
+            return <Exception403 />
           }}
         >
           {(matches) => {

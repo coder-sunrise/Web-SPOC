@@ -16,16 +16,16 @@ module.exports = {
     })
     return r
   },
-  pause: async (params) => {
+  save: async (params) => {
     // console.log(params)
-    const r = await request(`${url}/${params.id}`, {
+    const r = await request(`${url}/save/${params.id}`, {
       method: 'PUT',
-      body: params,
+      body: params.values,
     })
     return r
   },
-  resume: async (id) => {
-    const r = await request(`${url}/resume/${id}`, {
+  refresh: async (id) => {
+    const r = await request(`${url}/refresh/${id}`, {
       method: 'PUT',
     })
     return r
