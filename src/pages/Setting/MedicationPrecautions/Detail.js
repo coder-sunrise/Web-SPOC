@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
-import _ from 'lodash'
-import { FormattedMessage } from 'umi/locale'
 import {
   withFormikExtend,
   FastField,
@@ -9,6 +7,7 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -71,9 +70,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={
-                      settingMedicationPrecautions.entity ? true : false
-                    }
+                    disabled={!!settingMedicationPrecautions.entity}
                   />
                 )}
               />
@@ -117,6 +114,30 @@ class Detail extends PureComponent {
                       rowsMax={4}
                       {...args}
                     />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='translationLanguage'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Translation Language'
+                      code='ctLanguage'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='translatedDisplayValue'
+                render={(args) => {
+                  return (
+                    <TextField label='Translated Display Value' {...args} />
                   )
                 }}
               />

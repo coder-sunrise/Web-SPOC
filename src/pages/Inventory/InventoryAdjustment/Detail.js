@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -22,7 +23,6 @@ let commitCount = 1000 // uniqueNumber
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment, runningNo }) => {
     const value = inventoryAdjustment.entity || inventoryAdjustment.default
-
     return {
       ...value,
       adjustmentTransactionNo: value.adjustmentTransactionNo || runningNo,
@@ -30,6 +30,7 @@ let commitCount = 1000 // uniqueNumber
   },
   validationSchema: Yup.object().shape({
     adjustmentTransactionDate: Yup.date().required(),
+    remarks: Yup.string().max(2000, 'Max 2000 characters for remarks.'),
   }),
   handleSubmit: (values, { props }) => {
     const {
@@ -38,6 +39,8 @@ let commitCount = 1000 // uniqueNumber
       inventoryAdjustmentStatusString,
       ...restValue
     } = values
+
+    console.log('submit', values)
     const { dispatch, onConfirm } = props
     const list = inventoryAdjustmentItems || stockList
     const newInventoryAdjustmentItem = list.map((o) => {
@@ -76,6 +79,7 @@ let commitCount = 1000 // uniqueNumber
       if (list === inventoryAdjustmentItems) {
         const { restValues, ...val } = o
         const { batchNo, code, displayValue, ...value } = val
+        console.log('as', o, val, getType)
         return {
           ...value,
           [getType.typeName]: {
@@ -206,6 +210,7 @@ class Detail extends PureComponent {
       {
         columnName: 'uomDisplayValue',
         disabled: true,
+        // type: 'number',
       },
       {
         columnName: 'batchNo',
@@ -233,6 +238,7 @@ class Detail extends PureComponent {
         columnName: 'adjustmentQty',
         type: 'number',
         format: '0.0',
+        qty: true,
       },
     ],
     columnEditingEnabled: false,
@@ -452,25 +458,27 @@ class Detail extends PureComponent {
         ...this.state.filterStockVaccination,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return row.uid ? this.state.stockVaccination : x
+      return row.id ? this.state.stockVaccination : x
     }
     if (row.inventoryTypeFK === 3) {
       let array = [
         ...this.state.filterStockConsumable,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return row.uid ? this.state.stockConsumable : x
+      return row.id ? this.state.stockConsumable : x
     }
     return []
   }
 
   filterStockOption = (e) => {
     const { option, row } = e
+    console.log('filter', option, row)
     if (row.batchNo) {
+      const getState = this.type(row.inventoryTypeFK)
       this.setState((prevState) => {
         return {
-          filterStockMedication: prevState.stockMedication.filter(
-            (o) => o.batchNo !== option.batchNo,
+          [getState.filteredStateName]: prevState[getState.stateName].filter(
+            (o) => o.id !== row.batchNo,
           ),
         }
       })
@@ -483,7 +491,7 @@ class Detail extends PureComponent {
       const { expiryDate, stock, value, batchNo } = option
       row.batchNo = value
       row.expiryDate = expiryDate
-      row.stock = stock
+      // row.stock = stock
       row.batchNoString = batchNo
       this.setState({ selectedItem: e })
     }
@@ -497,41 +505,44 @@ class Detail extends PureComponent {
     })
   }
 
+  type = (v) => {
+    switch (v) {
+      case 1:
+        return {
+          stateName: 'stockMedication',
+          filteredStateName: 'filterStockMedication',
+        }
+      case 2:
+        return {
+          stateName: 'stockVaccination',
+          filteredStateName: 'filterStockVaccination',
+        }
+      case 3:
+        return {
+          stateName: 'stockConsumable',
+          filteredStateName: 'filterStockConsumable',
+        }
+      default:
+        return {}
+    }
+  }
+
   handleSelectedItem = (e) => {
     const { option, row } = e
     if (option) {
       const { uom, value, code, name } = option
+      console.log('handleOption', option, uom)
+      this.setState({ selectedItem: e })
       row.code = value
       row.displayValue = value
       row.uomDisplayValue = uom
       row.codeString = code
       row.displayValueString = name
 
-      this.setState({ selectedItem: e })
+      console.log('row', row)
 
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
-        const type = (v) => {
-          switch (v) {
-            case 1:
-              return {
-                stateName: 'stockMedication',
-                filteredStateName: 'filterStockMedication',
-              }
-            case 2:
-              return {
-                stateName: 'stockVaccination',
-                filteredStateName: 'filterStockVaccination',
-              }
-            case 3:
-              return {
-                stateName: 'stockConsumable',
-                filteredStateName: 'filterStockConsumable',
-              }
-            default:
-              return {}
-          }
-        }
-        const getState = type(row.inventoryTypeFK)
+        const getState = this.type(row.inventoryTypeFK)
         const defaultStock = this.state[getState.filteredStateName].find(
           (j) =>
             j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
@@ -541,51 +552,35 @@ class Detail extends PureComponent {
           row.batchNo = defaultStock.id
           row.stock = defaultStock.stock
 
-          if (!row.stock) {
-            row.stock = 1
-            row.adjustmentQty = 5
-          }
-
           this.setState({ selectedBatch: defaultStock })
         }
       }
     }
+
+    this.props.dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
   }
 
   onCommitChanges = ({ rows, deleted, added }) => {
     const { setValues, setFieldValue, values } = this.props
     const { stockList, stockMedication } = this.state
 
-    const type = (v) => {
-      switch (v) {
-        case 1:
-          return {
-            stateName: 'stockMedication',
-            filteredStateName: 'filterStockMedication',
-          }
-        case 2:
-          return {
-            stateName: 'stockVaccination',
-            filteredStateName: 'filterStockVaccination',
-          }
-        case 3:
-          return {
-            stateName: 'stockConsumable',
-            filteredStateName: 'filterStockConsumable',
-          }
-        default:
-          return {}
-      }
-    }
-
     if (deleted) {
       const deletedSet = new Set(deleted)
 
       const deletedRow = rows.find((row) => deletedSet.has(row.id))
+
+      deletedRow.isDeleted = true
+
       const changedRows = rows.filter((row) => !deletedSet.has(row.id))
 
       if (deletedRow.batchNo) {
-        const getState = type(deletedRow.inventoryTypeFK)
+        const getState = this.type(deletedRow.inventoryTypeFK)
 
         const stockItem = this.state[getState.stateName].find(
           (o) => o.id === deletedRow.batchNo,
@@ -601,12 +596,16 @@ class Detail extends PureComponent {
       }
 
       if (stockList.length > 0) {
-        this.setState({ stockList: changedRows })
+        this.setState({ stockList: rows })
       } else {
-        this.setState({ inventoryAdjustmentItems: changedRows })
+        this.setState({ inventoryAdjustmentItems: rows })
       }
+      setValues({
+        ...values,
+        inventoryAdjustmentItems: rows,
+      })
 
-      return changedRows
+      return rows
     }
     if (this.state.selectedItem) {
       this.filterStockOption(this.state.selectedItem)
@@ -633,6 +632,9 @@ class Detail extends PureComponent {
       inventoryAdjustmentItems: rows,
     })
 
+    this.setState({ selectedBatch: undefined })
+    this.setState({ selectedItem: undefined })
+
     return rows
   }
 
@@ -641,11 +643,19 @@ class Detail extends PureComponent {
     if (this.state.selectedItem) {
       const { option } = this.state.selectedItem
       const { uom, expiryDate, stock } = option
+      console.log('option', option)
       if (uom) {
         returnRows = addedRows.map((r) => ({
           ...r,
-          uomDisplayValue: uom,
+          uomDisplayValue: 123,
         }))
+        // this.props.dispatch({
+        //   // force current edit row components to update
+        //   type: 'global/updateState',
+        //   payload: {
+        //     commitCount: (commitCount += 1),
+        //   },
+        // })
       } else {
         returnRows = addedRows.map((r) => ({
           ...r,
@@ -653,20 +663,22 @@ class Detail extends PureComponent {
           expiryDate,
         }))
       }
+      console.log(returnRows, 'returnRows')
 
-      this.props.dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
+      // this.props.dispatch({
+      //   // force current edit row components to update
+      //   type: 'global/updateState',s
+      //   payload: {
+      //     commitCount: (commitCount += 1),
+      //   },
+      // })
 
       if (this.state.selectedBatch && returnRows) {
         // const { stock } = this.state.selectedItem
         returnRows = returnRows.map((r) => ({
           ...r,
           stock: this.state.selectedBatch.stock,
+          batchNoString: this.state.selectedBatch.batchNo,
         }))
       }
       return returnRows
@@ -685,13 +697,10 @@ class Detail extends PureComponent {
   }
 
   updateStatus = async () => {
-    const { setFieldValue, setValues, values, handleSubmit } = this.props
-    await setFieldValue('inventoryAdjustmentStatusFK', 2)
-    // await setValues({
-    //   ...values,
-    //   inventoryAdjustmentStatusFK: 2,
-    //   inventoryAdjustmentStatusString: 'Finalized',
-    // })
+    const { setFieldValue, handleSubmit, errors } = this.props
+    if (_.isEmpty(errors)) {
+      await setFieldValue('inventoryAdjustmentStatusFK', 2)
+    }
     handleSubmit()
   }
 
@@ -711,7 +720,7 @@ class Detail extends PureComponent {
         .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
         .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
     })
-
+    // console.log('state', this.state)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
