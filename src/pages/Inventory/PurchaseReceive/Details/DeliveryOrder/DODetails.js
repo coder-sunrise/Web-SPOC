@@ -557,6 +557,9 @@ class DODetails extends PureComponent {
         {
           columnName: 'batchNo',
           type: 'select',
+          mode: 'tags',
+          maxSelected: 1,
+          disableAll: true,
           options: (row) => {
             return this.stockOptions(row)
           },
