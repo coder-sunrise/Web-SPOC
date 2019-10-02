@@ -4,11 +4,12 @@ import { Affix } from 'antd'
 import { withFormik } from 'formik'
 import { Book } from '@material-ui/icons'
 import { withStyles, Paper } from '@material-ui/core'
-import { NavPills, CommonHeader, CommonModal } from '@/components'
+import { NavPills, CommonHeader, CommonModal, Tabs } from '@/components'
 import DetailsHeader from './DetailsHeader'
 import Details from './Details'
 // import CollectPayment from './CollectPayment'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
+import { StatementDetailOption } from './variables'
 
 const styles = () => ({})
 
@@ -27,7 +28,7 @@ class StatementDetails extends PureComponent {
           <DetailsHeader {...this.props} />
         </Paper>
         <Paper style={{ padding: 5 }}>
-          <NavPills
+          {/* <NavPills
             color='primary'
             tabs={[
               {
@@ -52,6 +53,11 @@ class StatementDetails extends PureComponent {
                 ),
               },
             ]}
+          /> */}
+          <Tabs
+            style={{ marginTop: 20 }}
+            defaultActiveKey='0'
+            options={StatementDetailOption(this.props)}
           />
 
           {/* <Details /> */}
