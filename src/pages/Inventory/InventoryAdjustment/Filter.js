@@ -76,7 +76,7 @@ class Filter extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={3}>
             <Field
               name='transDates'
               render={(args) => {
@@ -154,7 +154,7 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <ProgressButton
+              <Button
                 color='primary'
                 onClick={() => {
                   const { inventoryAdjustment } = this.props
@@ -172,8 +172,8 @@ class Filter extends PureComponent {
                 }}
               >
                 Add New
-              </ProgressButton>
-              <ProgressButton
+              </Button>
+              <Button
                 color='primary'
                 onClick={this.handleToggle}
                 buttonRef={(node) => {
@@ -181,7 +181,7 @@ class Filter extends PureComponent {
                 }}
               >
                 Mass Adjustment
-              </ProgressButton>
+              </Button>
               <Popper
                 open={open}
                 anchorEl={this.anchorElAccount}

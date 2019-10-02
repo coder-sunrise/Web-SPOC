@@ -52,7 +52,7 @@ class InventoryAdjustment extends PureComponent {
       })
       .then((v) => {
         const { data } = v
-        this.setState({ runningNo: data })
+        return data
       })
   }
 
@@ -86,12 +86,7 @@ class InventoryAdjustment extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail
-            {...cfg}
-            {...this.props}
-            runningNo={this.state.runningNo}
-            getRunningNo={this.getRunningNo}
-          />
+          <Detail {...cfg} {...this.props} runningNo={this.state.runningNo} />
         </CommonModal>
       </CardContainer>
     )
