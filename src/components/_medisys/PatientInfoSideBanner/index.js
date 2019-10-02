@@ -7,7 +7,7 @@ import { Skeleton } from 'antd'
 import { withStyles, Divider } from '@material-ui/core'
 // common components
 import Refresh from '@material-ui/icons/Sync'
-import { SchemePopover } from 'medisys-components'
+import { SchemePopover, CHASCardReplacement } from 'medisys-components'
 import More from '@material-ui/icons/MoreHoriz'
 import {
   NumberInput,
@@ -27,12 +27,39 @@ const PatientInfoSideBanner = ({
   theme,
   classes,
   entity,
-  handleRefreshChasBalance,
+  dispatch,
 }) => {
   const entityNameClass = classnames({
     [classes.cardCategory]: true,
     [classes.entityName]: true,
   })
+
+  const [
+    showReplacementModal,
+    setShowReplacementModal,
+  ] = useState(false)
+
+  const refreshChasBalance = (selectedSchemeTypeFK) => {
+    dispatch({
+      type: 'patient/refreshChasBalance',
+      payload: entity,
+    }).then((result) => {
+      if (result) {
+        const {
+          balance,
+          patientCoPaymentSchemeFk,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+        } = result
+
+        if (selectedSchemeTypeFK !== schemeTypeFk) {
+          setShowReplacementModal(true)
+        }
+      }
+    })
+  }
+
   return entity && entity.id ? (
     <React.Fragment>
       <h4 className={entityNameClass}>
@@ -77,18 +104,29 @@ const PatientInfoSideBanner = ({
               <p style={{ fontWeight: 500 }}>
                 <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} />
                 <IconButton>
-                  <Refresh onClick={handleRefreshChasBalance} />
+                  <Refresh onClick={() => refreshChasBalance(o.schemeTypeFK)} />
                 </IconButton>
 
                 <SchemePopover
-                  handleRefreshChasBalance={handleRefreshChasBalance}
+                  handleRefreshChasBalance={refreshChasBalance}
                   data={o}
                 />
               </p>
               {o.validFrom && (
                 <div>
                   <p>
-                    Balance: <NumberInput value={80} currency text />
+                    Balance:{' '}
+                    <NumberInput
+                      text
+                      currency
+                      value={
+                        o.patientSchemeBalance.length <= 0 ? (
+                          ''
+                        ) : (
+                          o.patientSchemeBalance[0].balance
+                        )
+                      }
+                    />
                   </p>
                   <p>
                     Validity:{' '}
@@ -113,6 +151,18 @@ const PatientInfoSideBanner = ({
       {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
         <Divider light />
       )}
+
+      <CommonModal
+        open={showReplacementModal}
+        title='CHAS Card Replacement'
+        maxWidth='md'
+        onConfirm={() => setShowReplacementModal(false)}
+        onClose={() => setShowReplacementModal(false)}
+      >
+        <CHASCardReplacement
+          handleOnClose={() => setShowReplacementModal(false)}
+        />
+      </CommonModal>
     </React.Fragment>
   ) : null
 }

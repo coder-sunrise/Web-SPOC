@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'dva'
 // antd
 import { Skeleton } from 'antd'
+import { PatientInfoSideBanner } from 'medisys-components'
 // custom components
 import { Card, CardBody } from '@/components'
-import { PatientInfoSideBanner } from 'medisys-components'
 
 const PatientInfoCard = ({ entity }) => (
   <Card profile>

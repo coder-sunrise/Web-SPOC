@@ -6,7 +6,7 @@ import _ from 'lodash'
 import router from 'umi/router'
 
 // medisys-components
-import { PatientInfoSideBanner } from 'medisys-components'
+import { PatientInfoSideBanner, CHASCardReplacement } from 'medisys-components'
 import {
   withStyles,
   MenuItem,
@@ -33,6 +33,7 @@ import {
   DateRangePicker,
   DatePicker,
   Button,
+  CommonModal,
 } from '@/components'
 import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
@@ -256,24 +257,11 @@ class PatientDetail extends PureComponent {
     )
   }
 
-  refreshChasBalance = () => {
-    const { dispatch, patient } = this.props
-    const { entity } = patient
-    dispatch({
-      type: 'patient/refreshChasBalance',
-      payload: entity,
-    }).then((result) => {
-      if (result) {
-        const {
-          balance,
-          patientCoPaymentSchemeFk,
-          schemeTypeFk,
-          validFrom,
-          validTo,
-        } = result
-      }
-    })
-  }
+  handleOpenReplacementModal = () =>
+    this.setState({ showReplacementModal: true })
+
+  handleCloseReplacementModal = () =>
+    this.setState({ showReplacementModal: false })
 
   render () {
     const {
@@ -313,10 +301,7 @@ class PatientDetail extends PureComponent {
         <GridItem xs={12} sm={12} md={2}>
           <Card profile>
             <CardBody profile>
-              <PatientInfoSideBanner
-                entity={entity}
-                handleRefreshChasBalance={this.refreshChasBalance}
-              />
+              <PatientInfoSideBanner entity={entity} dispatch={dispatch} />
               <MenuList>
                 {this.widgets
                   .filter(
