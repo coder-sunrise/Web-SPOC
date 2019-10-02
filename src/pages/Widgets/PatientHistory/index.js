@@ -258,8 +258,9 @@ class PatientHistory extends Component {
   }
 
   getContent = (row) => {
-    const { patientHistory } = this.props
+    const { patientHistory, mode} = this.props
     const { selectedSubRow } = patientHistory
+
     return (
       <List
         component='nav'
@@ -334,8 +335,7 @@ class PatientHistory extends Component {
                   }
                 />
               </ListItem>
-              {selectedSubRow &&
-              selectedSubRow.id === o.id && <div>{this.getDetailPanel()}</div>}
+              {selectedSubRow && selectedSubRow.id === o.id &&  mode === 'integrated'  && <div>{this.getDetailPanel()}</div>}
             </React.Fragment>
           )
         })}
@@ -479,14 +479,7 @@ class PatientHistory extends Component {
             edit: 'none',
           }}
         >
-          {entity &&
-            this.widgets
-              .filter(
-                (o) =>
-                  this.state.selectedItems.indexOf('0') >= 0 ||
-                  this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
+          {entity && this.widgets.filter((o) =>this.state.selectedItems.indexOf('0') >= 0 || this.state.selectedItems.indexOf(o.id) >= 0,).map((o) => {
                 const Widget = o.component
                 return (
                   <div>
@@ -518,6 +511,7 @@ class PatientHistory extends Component {
     } else if (mode === 'integrated') {
       cfg.style = {}
     }
+
     return (
       <div {...cfg}>
         <CardContainer

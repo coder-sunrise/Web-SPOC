@@ -7,7 +7,6 @@ import { headerHeight } from 'mui-pro-jss'
 import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
-import More from '@material-ui/icons/MoreHoriz'
 import {
   GridContainer,
   GridItem,
@@ -19,6 +18,7 @@ import {
   IconButton,
   Popover,
   Button,
+  NumberInput,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
@@ -112,7 +112,7 @@ class Banner extends PureComponent {
             {da.length >= 2 ? (
               `${da[1].name.length > 8
                 ? `, ${da[1].name.substring(0, 8)}...`
-                : `, ${  da[1].name}`}`
+                : `, ${da[1].name}`}`
             ) : (
               ''
             )}
@@ -124,10 +124,11 @@ class Banner extends PureComponent {
                   <div>
                     {da.map((item, i) => {
                       return (
-                        <div>
-                          {i + 1}.) {item.name}
-                          <br />
-                        </div>
+                        <GridContainer>
+                          <GridItem>
+                            {i + 1}.) {item.name}
+                          </GridItem>
+                        </GridContainer>
                       )
                     })}
                   </div>
@@ -136,7 +137,7 @@ class Banner extends PureComponent {
                 placement='bottomLeft'
               >
                 <div>
-                  <Button simple color='info' size='sm'>
+                  <Button simple variant='outlined' color='info' size='sm'>
                     More
                   </Button>
                 </div>
@@ -261,11 +262,51 @@ class Banner extends PureComponent {
               header='Medical Problem'
               body={
                 <div>
-                  Fever
-                  <br />
-                  <Button simple color='info' size='sm'>
-                    More
-                  </Button>
+                  <div>
+                    {entity.patientHistoryDiagnosis.length ? (
+                      `${entity.patientHistoryDiagnosis[0].diagnosisDescription.length > 8
+                        ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(0, 8)}... `
+                        : entity.patientHistoryDiagnosis[0].diagnosisDescription} `
+                    ) : (
+                      '-'
+                    )}
+                    {entity.patientHistoryDiagnosis.length >= 2 ? (
+                      `${entity.patientHistoryDiagnosis[1].diagnosisDescription.length > 8
+                        ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(0, 8)}...`
+                        : `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription}`}`
+                    ) : (
+                      ''
+                    )}
+                  </div>
+
+                  {entity.patientHistoryDiagnosis.length ? (
+                    <Popover
+                      icon={null}
+                      content={
+                        <div>
+                          {entity.patientHistoryDiagnosis.map((item, i) => {
+                            return (
+                              <GridContainer>
+                                <GridItem>
+                                  {i + 1}.) {item.diagnosisDescription}
+                                </GridItem>
+                              </GridContainer>
+                            )
+                          })}
+                        </div>
+                      }
+                      trigger='click'
+                      placement='bottomLeft'
+                    >
+                      <div>
+                        <Button simple variant='outlined' color='info' size='sm'>
+                          More
+                        </Button>
+                      </div>
+                    </Popover>
+                  ) : (
+                    ' '
+                  )}
                 </div>
               }
             />
@@ -282,84 +323,154 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length >= 1 ? ( '') : ( '-')}
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length >= 1 ? (
+                    entity.patientScheme
+                      .filter((o) => o.schemeTypeFK <= 5)
+                      .map((o) => {
+                        return (
+                          
+                          <div>
+                            <CodeSelect
+                              text
+                              code='ctSchemeType'
+                              value={o.schemeTypeFK}
+                            />
 
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
-                      return (
-                        <div>
-                          <CodeSelect
-                            text
-                            code='ctSchemeType'
-                            value={o.schemeTypeFK}
-                          />
-                          <div
-                            style={{ fontWeight: 500, display: 'inline-block' }}
-                          >
-                            : $ 80
-                          </div>
-                          <br />
+                            <div
+                              style={{
+                                fontWeight: 500,
+                                display: 'inline-block',
+                              }}
+                            >
+                              :{' '}
 
-                          {o.validFrom && (
-                            <div style={{ display: 'inline-block' }}>
-                              <Popover
-                                icon={null}
-                                content={
-                                  <div>
-                                    <div
-                                      style={{
-                                        fontWeight: 500,
-                                        marginBottom: 0,
-                                      }}
-                                    >
-                                      <CodeSelect
-                                        text
-                                        code='ctSchemeType'
-                                        value={o.schemeTypeFK}
-                                      />
-                                      <IconButton>
-                                        <Refresh fontSize='large' />
-                                      </IconButton>
-                                    </div>
-
-                                    <div>
-                                      <p>
-                                        Validity:{' '}
-                                        <DatePicker
-                                          text
-                                          format={dateFormatLong}
-                                          value={o.validFrom}
-                                        />
-                                        {' - '}
-                                        <DatePicker
-                                          text
-                                          format={dateFormatLong}
-                                          value={o.validTo}
-                                        />
-                                      </p>
-                                    </div>
-                                    <div>Balance: </div>
-                                    <div>Patient Visit Balance: </div>
-                                    <div>Patient Clinic Balance: </div>
-                                  </div>
-                                }
-                                trigger='click'
-                                placement='bottomLeft'
-                              >
-                                <div>
-                                  <Button
-                                    simple
-                                    color='info'
-                                    size='sm'
-                                  >
-                                    More
-                                  </Button>
-                                </div>
-                              </Popover>
+                              <NumberInput
+                                text
+                                currency
+                                value={o.patientSchemeBalance.length <= 0 ? '' : o.patientSchemeBalance[0].balance}
+                              />
                             </div>
-                          )}
-                        </div>
-                      )
-                    })}
+                            <br />
+
+                            {o.validFrom && (
+                              <div style={{ display: 'inline-block' }}>
+                                <Popover
+                                  icon={null}
+                                  content={
+                                    <div>
+                                      <GridContainer>
+                                        <GridItem>
+                                          <div
+                                            style={{
+                                              fontWeight: 500,
+                                              marginBottom: 0,
+                                              paddingLeft: 0,
+                                            }}
+                                          >
+                                            <CodeSelect
+                                              text
+                                              code='ctSchemeType'
+                                              value={o.schemeTypeFK}
+                                            />
+                                            <IconButton>
+                                              <Refresh fontSize='large' />
+                                            </IconButton>
+                                          </div>
+                                        </GridItem>
+                                      </GridContainer>
+
+                                      <GridContainer>
+                                        <GridItem>
+                                          <p>
+                                            Validity:{' '}
+                                            <DatePicker
+                                              text
+                                              format={dateFormatLong}
+                                              value={o.validFrom}
+                                            />
+                                            {' - '}
+                                            <DatePicker
+                                              text
+                                              format={dateFormatLong}
+                                              value={o.validTo}
+                                            />
+                                          </p>
+                                        </GridItem>
+                                      </GridContainer>
+                                      <GridContainer>
+                                        <GridItem>
+                                          {' '}
+                                          Balance: $<NumberInput
+                                            text
+                                            currency
+                                            value={
+                                              o.patientSchemeBalance.length <= 0 ? '' :
+                                              o.patientSchemeBalance[0].balance 
+                                            }
+                                          />
+                                        </GridItem>
+                                      </GridContainer>
+                                      <GridContainer>
+                                        <GridItem>
+                                          Patient Visit Balance:{' '}
+                                          <div
+                                            style={{
+                                              fontWeight: 500,
+                                              display: 'inline-block',
+                                              paddingLeft: 2,
+                                            }}
+                                          >
+                                            {
+                                              o.patientSchemeBalance.length <= 0 ? '' : o.patientSchemeBalance[0].acuteVisitPatientBalance 
+                                            }{' '}
+                                            Remaining{' '}
+                                          </div>{' '}
+                                          for Year {moment().year()}
+                                        </GridItem>
+                                      </GridContainer>
+                                      <GridContainer>
+                                        <GridItem>
+                                          Patient Clinic Balance:
+                                          <div
+                                            style={{
+                                              fontWeight: 500,
+                                              display: 'inline-block',
+                                              paddingLeft: 2,
+                                            }}
+                                          >
+                                            {
+                                              o.patientSchemeBalance.length <= 0 ? '' : o.patientSchemeBalance[0].acuteVisitClinicBalance 
+                                            }{' '}
+                                            Remaining
+                                          </div>{' '}
+                                          for {moment().format('MMMM')}{' '}
+                                          {moment().year()}
+                                        </GridItem>
+                                      </GridContainer>
+                                    </div>
+                                  }
+                                  trigger='click'
+                                  placement='bottomLeft'
+                                >
+                                  <div>
+                                    <Button
+                                      simple
+                                      variant='outlined'
+                                      color='info'
+                                      size='sm'
+                                    >
+                                      More
+                                    </Button>
+                                  </div>
+                                </Popover>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })
+                  ) : (
+                    '-'
+                  )}
                 </div>
               }
             />
