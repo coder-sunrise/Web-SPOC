@@ -315,7 +315,7 @@ class PatientHistory extends Component {
                       }}
                     >
                       <GridContainer>
-                        <GridItem sm={7}>
+                        <GridItem sm={7}>  
                           <TextField
                             text
                             value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
