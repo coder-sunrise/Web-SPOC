@@ -411,7 +411,7 @@ class Banner extends PureComponent {
                               data={o}
                               isBanner
                               balanceValue={this.state.balanceValue}
-                              dataFrom={this.state.dateFrom}
+                              dateFrom={this.state.dateFrom}
                               dateTo={this.state.dateTo}
                               handleRefreshChasBalance={this.refreshChasBalance}
                             />

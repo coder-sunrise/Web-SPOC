@@ -14,20 +14,16 @@ import {
   dateFormatLong,
   NumberInput,
 } from '@/components'
-import CHASCardReplacement from './CHASCardReplacement'
 
 const SchemePopover = ({
   isBanner = false,
   data,
+  schemeTypeFK,
   balanceValue,
-  dataFrom,
+  dateFrom,
   dateTo,
   handleRefreshChasBalance,
 }) => {
-  const [
-    showReplacementModal,
-    setShowReplacementModal,
-  ] = useState(false)
   return (
     <Popover
       icon={null}
@@ -42,13 +38,9 @@ const SchemePopover = ({
                   paddingLeft: 0,
                 }}
               >
-                <CodeSelect
-                  text
-                  code='ctSchemeType'
-                  value={data.schemeTypeFK}
-                />
+                <CodeSelect text code='ctSchemeType' value={schemeTypeFK} />
 
-                <div style={{display: 'inline-block', position: 'absolute'}}>
+                <div style={{ display: 'inline-block', position: 'absolute' }}>
                   <IconButton onClick={handleRefreshChasBalance}>
                     {' '}
                     <Refresh fontSize='large' />
@@ -62,7 +54,7 @@ const SchemePopover = ({
             <GridItem>
               <p>
                 Validity:{' '}
-                <DatePicker text format={dateFormatLong} value={dataFrom} />
+                <DatePicker text format={dateFormatLong} value={dateFrom} />
                 {' - '}
                 <DatePicker text format={dateFormatLong} value={dateTo} />
               </p>
@@ -136,17 +128,6 @@ const SchemePopover = ({
           </IconButton>
         )}
       </div>
-      <CommonModal
-        open={showReplacementModal}
-        title='CHAS Card Replacement'
-        maxWidth='md'
-        onConfirm={() => setShowReplacementModal(false)}
-        onClose={() => setShowReplacementModal(false)}
-      >
-        <CHASCardReplacement
-          handleOnClose={() => setShowReplacementModal(false)}
-        />
-      </CommonModal>
     </Popover>
   )
 }

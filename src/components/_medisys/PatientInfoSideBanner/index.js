@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import classnames from 'classnames'
 import moment from 'moment'
+import _ from 'lodash'
 // antd
 import { Skeleton } from 'antd'
 // material ui
@@ -39,6 +40,15 @@ const PatientInfoSideBanner = ({
     setShowReplacementModal,
   ] = useState(false)
 
+  const [
+    refreshedSchemeData,
+    setRefreshedSchemeData,
+  ] = useState({})
+
+  const handleReplacementModalVisibility = (show = false) => {
+    setShowReplacementModal(show)
+  }
+
   const refreshChasBalance = (selectedSchemeTypeFK) => {
     dispatch({
       type: 'patient/refreshChasBalance',
@@ -53,8 +63,16 @@ const PatientInfoSideBanner = ({
           validTo,
         } = result
 
+        setRefreshedSchemeData({
+          oldSchemeTypeFK: selectedSchemeTypeFK,
+          schemeTypeFK: schemeTypeFk,
+          balance,
+          validFrom,
+          validTo,
+        })
+
         if (selectedSchemeTypeFK !== schemeTypeFk) {
-          setShowReplacementModal(true)
+          handleReplacementModalVisibility(true)
         }
       }
     })
@@ -99,20 +117,46 @@ const PatientInfoSideBanner = ({
       >
         {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
           // console.log('patientScheme', o)
+          const schemeTypeFK = _.isEmpty(refreshedSchemeData)
+            ? o.schemeTypeFK
+            : refreshedSchemeData.schemeTypeFK
+          const balance =
+            o.patientSchemeBalance.length <= 0
+              ? ''
+              : o.patientSchemeBalance[0].balance
+          const validFrom = _.isEmpty(refreshedSchemeData)
+            ? o.validFrom
+            : refreshedSchemeData.validFrom
+          const validTo = _.isEmpty(refreshedSchemeData)
+            ? o.validTo
+            : refreshedSchemeData.validTo
+
           return (
             <div style={{ marginBottom: theme.spacing(1) }}>
               <p style={{ fontWeight: 500 }}>
-                <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} />
+                {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
+                <CodeSelect text code='ctSchemeType' value={schemeTypeFK} />
                 <IconButton>
                   <Refresh onClick={() => refreshChasBalance(o.schemeTypeFK)} />
                 </IconButton>
 
                 <SchemePopover
-                  handleRefreshChasBalance={refreshChasBalance}
+                  handleRefreshChasBalance={() =>
+                    refreshChasBalance(o.schemeTypeFK)}
                   data={o}
+                  schemeTypeFK={schemeTypeFK}
+                  balanceValue={
+                    _.isEmpty(refreshedSchemeData) ? (
+                      balance
+                    ) : (
+                      refreshedSchemeData.balance
+                    )
+                  }
+                  dateFrom={validFrom}
+                  dateTo={validTo}
                 />
               </p>
-              {o.validFrom && (
+              {validFrom && (
                 <div>
                   <p>
                     Balance:{' '}
@@ -120,10 +164,10 @@ const PatientInfoSideBanner = ({
                       text
                       currency
                       value={
-                        o.patientSchemeBalance.length <= 0 ? (
-                          ''
+                        _.isEmpty(refreshedSchemeData) ? (
+                          balance
                         ) : (
-                          o.patientSchemeBalance[0].balance
+                          refreshedSchemeData.balance
                         )
                       }
                     />
@@ -133,13 +177,15 @@ const PatientInfoSideBanner = ({
                     <DatePicker
                       text
                       format={dateFormatLong}
-                      value={o.validFrom}
+                      // value={o.validFrom}
+                      value={validFrom}
                     />{' '}
                     -{' '}
                     <DatePicker
                       text
                       format={dateFormatLong}
-                      value={o.validTo}
+                      // value={o.validTo}
+                      value={validTo}
                     />
                   </p>
                 </div>
@@ -155,12 +201,14 @@ const PatientInfoSideBanner = ({
       <CommonModal
         open={showReplacementModal}
         title='CHAS Card Replacement'
-        maxWidth='md'
-        onConfirm={() => setShowReplacementModal(false)}
-        onClose={() => setShowReplacementModal(false)}
+        maxWidth='sm'
+        onConfirm={() => handleReplacementModalVisibility(false)}
+        onClose={() => handleReplacementModalVisibility(false)}
       >
         <CHASCardReplacement
-          handleOnClose={() => setShowReplacementModal(false)}
+          entity={entity}
+          refreshedSchemeData={refreshedSchemeData}
+          handleOnClose={() => handleReplacementModalVisibility(false)}
         />
       </CommonModal>
     </React.Fragment>

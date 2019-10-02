@@ -1,40 +1,109 @@
-import React, { PureComponent } from 'react'
-import { GridContainer, GridItem, Button } from '@/components'
+import React from 'react'
+import moment from 'moment'
+import {
+  GridContainer,
+  GridItem,
+  Button,
+  NumberInput,
+  DatePicker,
+  dateFormatLong,
+  CodeSelect,
+} from '@/components'
 
-const CHASCardReplacement = ({ handleOnClose }) => {
+const CHASCardReplacement = ({
+  entity,
+  refreshedSchemeData,
+  handleOnClose,
+}) => {
+  const {
+    balance,
+    schemeTypeFK,
+    validTo,
+    oldSchemeTypeFK,
+  } = refreshedSchemeData
+  const { callingName, patientAccountNo } = entity
+
+  const data = entity.patientScheme.filter(
+    (o) => o.schemeTypeFK === oldSchemeTypeFK,
+  )[0]
+
   return (
     <GridContainer>
       <GridContainer>
-        <GridItem md={6}>Patient: {'Mr John Smith'}</GridItem>
-        <GridItem md={6}>Account No: {'S132456D'}</GridItem>
+        <GridItem md={6}>Patient: {callingName}</GridItem>
+        <GridItem md={6}>Account No: {patientAccountNo}</GridItem>
       </GridContainer>
+      <GridContainer>
+        <GridItem md={12}>{' '}</GridItem>
+      </GridContainer>
+      <GridItem md={12} />
       <GridContainer>
         <GridItem md={2} />
         <GridItem md={4}>Old CHAS Card:</GridItem>
-        <GridItem md={4}>{'CHAS Blue'}</GridItem>
+        <GridItem md={4}>
+          <CodeSelect text code='ctSchemeType' value={oldSchemeTypeFK} />
+        </GridItem>
         <GridItem md={2} />
 
         <GridItem md={2} />
         <GridItem md={4}>New CHAS Card:</GridItem>
-        <GridItem md={4}>{'CHAS Orange'}</GridItem>
+        <GridItem md={4}>
+          <CodeSelect text code='ctSchemeType' value={schemeTypeFK} />
+        </GridItem>
         <GridItem md={2} />
       </GridContainer>
       <GridContainer>
-        <GridItem md={3}>CHAS Balance:</GridItem>
-        <GridItem md={3}>{'$50.00'}</GridItem>
-        <GridItem md={6} />
+        <GridItem md={5}>CHAS Balance:</GridItem>
+        <GridItem md={5}>
+          <NumberInput text currency value={balance} />
+        </GridItem>
+        <GridItem md={2} />
 
-        <GridItem md={3}>CHAS Validity: </GridItem>
-        <GridItem md={3}>{'15 Sep 2021'}</GridItem>
-        <GridItem md={6} />
+        <GridItem md={5}>CHAS Validity: </GridItem>
+        <GridItem md={5}>
+          <DatePicker text format={dateFormatLong} value={validTo} />
+        </GridItem>
+        <GridItem md={2} />
 
-        <GridItem md={3}>Patient Acute Visit Balance:</GridItem>
-        <GridItem md={3}>{'2 Remaining for Year 2020'}</GridItem>
-        <GridItem md={6} />
+        <GridItem md={5}>Patient Acute Visit Balance:</GridItem>
+        <GridItem md={5}>
+          <div
+            style={{
+              fontWeight: 500,
+              display: 'inline-block',
+              paddingLeft: 2,
+            }}
+          >
+            {data.patientSchemeBalance.length <= 0 ? (
+              ''
+            ) : (
+              data.patientSchemeBalance[0].acuteVisitPatientBalance
+            )}{' '}
+            Remaining{' '}
+          </div>{' '}
+          for Year {moment().year()}
+        </GridItem>
+        <GridItem md={2} />
 
-        <GridItem md={3}>Patient Acute Clinic Balance:</GridItem>
-        <GridItem md={3}>{'2 Remaining for January 2020'}</GridItem>
-        <GridItem md={6} />
+        <GridItem md={5}>Patient Acute Clinic Balance:</GridItem>
+        <GridItem md={5}>
+          <div
+            style={{
+              fontWeight: 500,
+              display: 'inline-block',
+              paddingLeft: 2,
+            }}
+          >
+            {data.patientSchemeBalance.length <= 0 ? (
+              ''
+            ) : (
+              data.patientSchemeBalance[0].acuteVisitClinicBalance
+            )}{' '}
+            Remaining
+          </div>{' '}
+          for {moment().format('MMMM')} {moment().year()}
+        </GridItem>
+        <GridItem md={2} />
       </GridContainer>
       <GridContainer>
         <GridItem>
