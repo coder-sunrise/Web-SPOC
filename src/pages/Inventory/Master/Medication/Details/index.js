@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -62,6 +62,45 @@ const Detail = ({
     dispatch,
   }
 
+  useEffect(() => {
+    if (medicationDetail.currentId) {
+      dispatch({
+        type: 'medicationDetail/query',
+        payload: {
+          id: medicationDetail.currentId,
+        },
+      }).then((med) => {
+        const { sddfk } = med
+        if (sddfk) {
+          dispatch({
+            type: 'sddDetail/queryOne',
+            payload: {
+              id: sddfk,
+            },
+          }).then((sdd) => {
+            const { data } = sdd
+            const { code, name } = data[0]
+
+            dispatch({
+              type: 'medicationDetail/updateState',
+              payload: {
+                entity: {
+                  ...med,
+                  effectiveDates: [
+                    med.effectiveStartDate,
+                    med.effectiveEndDate,
+                  ],
+                  sddCode: code,
+                  sddDescription: name,
+                },
+              },
+            })
+          })
+        }
+      })
+    }
+  }, [])
+
   return (
     <React.Fragment>
       {/* <NavPills
@@ -112,16 +151,16 @@ const Detail = ({
       />
       {/* </CardContainer> */}
       <div className={classes.actionDiv}>
-        <ProgressButton
-          submitKey='medicationDetail/submit'
-          onClick={handleSubmit}
-        />
         <Button
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=0')}
         >
           Cancel
         </Button>
+        <ProgressButton
+          submitKey='medicationDetail/submit'
+          onClick={handleSubmit}
+        />
       </div>
     </React.Fragment>
   )
@@ -134,7 +173,7 @@ export default compose(
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ medicationDetail }) => {
+    mapPropsToValues: ({ medicationDetail, dispatch }) => {
       const returnValue = medicationDetail.entity
         ? medicationDetail.entity
         : medicationDetail.default
@@ -147,23 +186,6 @@ export default compose(
       if (isChasChronicClaimable) {
         chas.push('isChasChronicClaimable')
       }
-      // const { sddfk } = returnValue
-      // if (sddfk) {
-      //   console.log('sddfk', sddfk)
-      //   // console.log('sddfk', this.props)
-      //   this.props
-      //     .dispatch({
-      //       type: 'sddDetail/queryOne',
-      //       payload: {
-      //         id: sddfk,
-      //       },
-      //     })
-      //     .then((sdd) => {
-      //       const { data } = sdd
-      //       const { code, name } = data[0]
-      //       console.log('data', data)
-      //     })
-      // }
 
       return {
         ...returnValue,
