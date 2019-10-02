@@ -444,7 +444,6 @@ class DODetails extends PureComponent {
   }
 
   render () {
-    console.log(this.props)
     const isEditable = true
     const { props } = this
     const { footer, values } = props

@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'dva'
 // common components
 import { CommonModal, CardContainer, NavPills } from '@/components'
 // sub components
@@ -9,14 +10,19 @@ import Approved from './Approved'
 import Rejected from './Rejected'
 import ClaimDetails from '../common/ClaimDetails'
 
+@connect(({ claimSubmission }) => ({
+  claimSubmission,
+}))
 class CHAS extends React.Component {
   state = {
     showClaimDetails: false,
     claimDetails: {},
   }
 
-  openClaimDetails = ({ claimDetails }) =>
-    this.setState({ showClaimDetails: true, claimDetails })
+  // openClaimDetails = ({ claimDetails }) =>
+  //   this.setState({ showClaimDetails: true, claimDetails })
+
+  openClaimDetails = () => this.setState({ showClaimDetails: true })
 
   closeClaimDetails = () =>
     this.setState({ showClaimDetails: false, claimDetails: {} })
@@ -30,9 +36,15 @@ class CHAS extends React.Component {
   }
 
   handleContextMenuItemClick = (row, id) => {
+    const { dispatch } = this.props
     switch (id) {
       case '0':
-        this.openClaimDetails({ claimDetails: row })
+        dispatch({
+          type: 'claimSubmission/queryById',
+          payload: row.id,
+        })
+        // this.openClaimDetails({ claimDetails: row })
+        this.openClaimDetails()
         break
       case '1':
         this.navigateToInvoiceDetails(row)

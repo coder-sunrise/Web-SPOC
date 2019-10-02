@@ -1,7 +1,6 @@
 import { createListViewModel } from 'medisys-model'
-import moment from 'moment'
+import { FakeDataInvoiceClaimCount, FakeDataQueryById } from '../variables'
 import * as service from '../services'
-
 
 export default createListViewModel({
   namespace: 'claimSubmission',
@@ -9,31 +8,47 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      default: {
-        isUserMaintainable: true,
-      },
+      default: {},
+      invoiceClaimCount: [],
+      entity: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *getClaimCount (_, { call, put }) {
+        // const response = yield call(service.queryBadgeCount)
+        // const { data } = response
+        return yield put({
+          type: 'setClaimCount',
+          // payload: { data },
+          payload: {},
+        })
+      },
+      *queryById ({ payload }, { call, put }) {
+        // const response = yield call(service.queryById, payload.id)
+        // const { data } = response
+        return yield put({
+          type: 'setQueryClaimResult',
+          // payload: { data },
+          payload: {},
+        })
+      },
+    },
     reducers: {
-      queryDone (st, { payload }) {
-        const { data } = payload
-
+      setClaimCount (state, { payload }) {
         return {
-          ...st,
-          list: data.data.map((o) => {
-            return {
-              ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
-            }
-          }),
+          ...state,
+          // invoiceClaimCount: payload,
+          invoiceClaimCount: FakeDataInvoiceClaimCount,
+        }
+      },
+      setQueryClaimResult (state, { payload }) {
+        return {
+          ...state,
+          entity: FakeDataQueryById(),
         }
       },
     },

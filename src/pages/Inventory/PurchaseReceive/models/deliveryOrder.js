@@ -112,6 +112,21 @@ export default createFormViewModel({
     },
 
     reducers: {
+      editDeliveryOrder (state, { payload }) {
+        const { purchaseOrderDetails } = state
+        const {
+          purchaseOrder,
+          // purchaseOrderOutstandingItem,
+        } = purchaseOrderDetails
+        return {
+          ...state,
+          entity: {
+            ...payload,
+            // rows: purchaseOrderOutstandingItem,
+          },
+        }
+      },
+
       setAddNewDeliveryOrder (state, { payload }) {
         const { deliveryOrderNo } = payload
         const { purchaseOrderDetails } = state
