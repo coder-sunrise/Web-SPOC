@@ -8,7 +8,6 @@ import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
 import More from '@material-ui/icons/MoreHoriz'
-import Button from '@material-ui/core/Button'
 import {
   GridContainer,
   GridItem,
@@ -19,6 +18,7 @@ import {
   Tooltip,
   IconButton,
   Popover,
+  Button,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
@@ -30,7 +30,9 @@ import Block from './Block'
   codetable,
 }))
 class Banner extends PureComponent {
-  state = {}
+  state = {
+    showWarning: false,
+  }
 
   constructor (props) {
     super(props)
@@ -74,6 +76,16 @@ class Banner extends PureComponent {
       patientAllergy.find((m) => m.allergyFK === o.id),
     )
 
+    if (da.length) {
+      this.setState({
+        showWarning: true,
+      })
+    } else {
+      this.setState({
+        showWarning: false,
+      })
+    }
+
     return (
       <div style={{ display: 'inline-block' }}>
         {data === 'link' ? (
@@ -90,45 +102,48 @@ class Banner extends PureComponent {
           </Link>
         ) : (
           <div>
-            {da.length ? ( `${da[0].name.length > 6 ? `${da[0].name.substring(0, 6)}... ,` : ' '}` ) : ( '-')}
-            <br />
-            {da.length ? (`${da[1].name.length > 6 ? `${da[1].name.substring(0, 6)}...` : ' '}` ) : ( '')}
+            {da.length ? (
+              `${da[0].name.length > 8
+                ? `${da[0].name.substring(0, 8)}... `
+                : da[0].name} `
+            ) : (
+              '-'
+            )}
+            {da.length >= 2 ? (
+              `${da[1].name.length > 8
+                ? `, ${da[1].name.substring(0, 8)}...`
+                : `, ${  da[1].name}`}`
+            ) : (
+              ''
+            )}
 
-            {da.length ? 
+            {da.length ? (
               <Popover
                 icon={null}
                 content={
                   <div>
-                    {da.map(
-                      (item, i) => {
-                        return (
-                          <div>
-                            {i + 1}.) {  item.name}
-                            <br />
-                          </div>
-                        )
-                      },
-                    )}
+                    {da.map((item, i) => {
+                      return (
+                        <div>
+                          {i + 1}.) {item.name}
+                          <br />
+                        </div>
+                      )
+                    })}
                   </div>
                 }
                 trigger='click'
                 placement='bottomLeft'
               >
-                <Button
-                  color='primary'
-                  style={{
-                    backgroundColor: '#48C9B0',
-                    color: 'white',
-                    fontWeight: 'normal',
-                    marginLeft: 5,
-                    padding: 0,
-                  }}
-                >
-                More
-                </Button>
+                <div>
+                  <Button simple color='info' size='sm'>
+                    More
+                  </Button>
+                </div>
               </Popover>
-              : ' '
-              }
+            ) : (
+              ' '
+            )}
           </div>
         )}
       </div>
@@ -156,6 +171,7 @@ class Banner extends PureComponent {
     console.log('************** banner ***********')
     console.log(this.props)
     const { entity } = patient
+
     if (!entity)
       return (
         <Paper>
@@ -227,9 +243,13 @@ class Banner extends PureComponent {
             <Block
               header={
                 <div>
-                  <IconButton disabled>
-                    <Warining color='error' />
-                  </IconButton>
+                  {this.state.showWarning ? (
+                    <IconButton disabled>
+                      <Warining color='error' />
+                    </IconButton>
+                  ) : (
+                    ''
+                  )}
                   {'Allergies'} {this.getAllergyLink('link')}
                 </div>
               }
@@ -242,16 +262,8 @@ class Banner extends PureComponent {
               body={
                 <div>
                   Fever
-                  <Button
-                    color='primary'
-                    style={{
-                      backgroundColor: '#48C9B0',
-                      color: 'white',
-                      fontWeight: 'normal',
-                      marginLeft: 5,
-                      padding: 0,
-                    }}
-                  >
+                  <br />
+                  <Button simple color='info' size='sm'>
                     More
                   </Button>
                 </div>
@@ -270,6 +282,8 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length >= 1 ? ( '') : ( '-')}
+
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
                       return (
                         <div>
@@ -278,6 +292,12 @@ class Banner extends PureComponent {
                             code='ctSchemeType'
                             value={o.schemeTypeFK}
                           />
+                          <div
+                            style={{ fontWeight: 500, display: 'inline-block' }}
+                          >
+                            : $ 80
+                          </div>
+                          <br />
 
                           {o.validFrom && (
                             <div style={{ display: 'inline-block' }}>
@@ -325,18 +345,15 @@ class Banner extends PureComponent {
                                 trigger='click'
                                 placement='bottomLeft'
                               >
-                                <Button
-                                  color='primary'
-                                  style={{
-                                    backgroundColor: '#48C9B0',
-                                    color: 'white',
-                                    fontWeight: 'normal',
-                                    marginLeft: 5,
-                                    padding: 0,
-                                  }}
-                                >
-                                  More
-                                </Button>
+                                <div>
+                                  <Button
+                                    simple
+                                    color='info'
+                                    size='sm'
+                                  >
+                                    More
+                                  </Button>
+                                </div>
                               </Popover>
                             </div>
                           )}

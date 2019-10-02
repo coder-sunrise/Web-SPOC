@@ -413,9 +413,10 @@ class PatientHistory extends Component {
       <CardContainer
         hideHeader
         size='sm'
+        
         className={classnames({
-          [classes.rightPanel]: true,
-          [override.rightPanel]: true,
+          [classes.rightPanel]: !widget ? true : false,
+          [override.rightPanel]: !widget ? true : false,
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
@@ -519,9 +520,9 @@ class PatientHistory extends Component {
           hideHeader
           size='sm'
           className={classnames({
-            [classes.leftPanel]: true,
+            [classes.leftPanel]: !widget ? true : false,
             [classes.integratedLeftPanel]: mode === 'integrated',
-            [override.leftPanel]: true,
+            [override.leftPanel]: !widget ? true : false,
           })}
         >
           {patientHistory.list ? patientHistory.list.length > 0 ? (
