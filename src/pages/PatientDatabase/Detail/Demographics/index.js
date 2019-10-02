@@ -119,7 +119,7 @@ class Demographic extends PureComponent {
     const { props } = this
     const { values, theme, setFieldValue, classes } = props
     return (
-      <React.Fragment>
+      <div>
         <GridContainer gutter={0}>
           <GridItem xs={12} md={5}>
             <GridContainer>
@@ -530,7 +530,7 @@ class Demographic extends PureComponent {
             </GridItem>
           </GridContainer>
         </Paper>
-      </React.Fragment>
+      </div>
     )
   }
 }

@@ -125,18 +125,18 @@ const saveConsultation = ({
   })
 }
 
-const getRights = (values) => {
-  return {
-    view: {
-      name: 'consultation.view',
-      rights: values.status === 'Paused' ? 'disable' : 'enable',
-    },
-    edit: {
-      name: 'consultation.edit',
-      rights: values.status === 'Paused' ? 'disable' : 'enable',
-    },
-  }
-}
+// const getRights = (values) => {
+//   return {
+//     view: {
+//       name: 'consultation.view',
+//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//     },
+//     edit: {
+//       name: 'consultation.edit',
+//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//     },
+//   }
+// }
 
 // @skeleton()
 @connect(

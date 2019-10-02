@@ -75,7 +75,7 @@ class TextEditorBase extends PureComponent {
         <TextField
           showErrorIcon
           noWrapper
-          defaultValue={value}
+          defaultValue={latestRow[columnName]}
           onChange={submitValue}
           // onCommit={submitValue}
           // onChange={submitValue}
