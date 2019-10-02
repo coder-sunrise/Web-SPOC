@@ -185,9 +185,7 @@ const request = (url, option, showNotification = true) => {
       newOptions.body = JSON.stringify(
         commonDataWriterTransform(newOptions.body),
       )
-      if (newOptions.data) {
-        newOptions.data = commonDataWriterTransform(newOptions.data)
-      }
+
       // } else {
       //   // newOptions.body is FormData
       //   newOptions.headers = {
@@ -196,12 +194,13 @@ const request = (url, option, showNotification = true) => {
       //   }
     }
   } else if (newOptions.method === 'GET' || !newOptions.method) {
-    // const search = queryString.stringify(newOptions.data)
     // if (search) {
     //   newUrl += `?${queryString.stringify(newOptions.data)}`
     // }
   }
-
+  if (newOptions.data) {
+    newOptions.data = commonDataWriterTransform(newOptions.data)
+  }
   // const expirys = options.expirys && 60
   // // options.expirys !== false, return the cache,
   // if (options.expirys !== false) {

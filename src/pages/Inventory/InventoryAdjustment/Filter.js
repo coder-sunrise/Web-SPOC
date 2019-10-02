@@ -125,7 +125,7 @@ class Filter extends PureComponent {
                 icon={null}
                 onClick={() => {
                   const { transactionNo, status, transDates, allDate } = values
-                  
+
                   let fromDate
                   let toDate
 
