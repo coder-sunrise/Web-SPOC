@@ -546,15 +546,31 @@ class Form extends React.PureComponent {
     return rows
   }
 
+  onCloseFormClick = () => {
+    const { onClose, dispatch } = this.props
+    dispatch({
+      type: 'patientSearch/updateState',
+      payload: { list: undefined },
+    })
+    onClose()
+  }
+
   actualizeAppointment = () => {
+    const { datagrid } = this.state
     const { values, history } = this.props
+    const primaryDoctorResource = datagrid.find(
+      (item) => item.isPrimaryClinician,
+    )
+
     const parameters = {
       md: 'visreg',
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
+      pdid: primaryDoctorResource.clinicianFK, // primary clinician id
     }
 
     this.onCloseFormClick()
+
     history.push(getAppendUrl(parameters))
   }
 

@@ -253,7 +253,7 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  handleValueChange = (val, a, b, c) => {
+  handleValueChange = (val) => {
     const {
       form,
       field,
@@ -278,6 +278,11 @@ class AntdSelect extends React.PureComponent {
         }
       } else if (this.state.value.indexOf(allValue) >= 0) {
         newVal = []
+      } else if (val.length === options.length) {
+        newVal = [
+          allValue,
+          ...options.map((o) => o[valueField]),
+        ]
       }
     }
 

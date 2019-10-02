@@ -30,9 +30,15 @@ const mapAttachmentToUploadInput = (
         sortOrder: index,
       }
 
-export const formikMapPropsToValues = ({ queueLog, visitRegistration }) => {
+export const formikMapPropsToValues = ({
+  queueLog,
+  visitRegistration,
+  doctorProfiles,
+  history,
+}) => {
   try {
     let qNo = 0.0
+    let doctorProfile
     if (queueLog) {
       const { list } = queueLog
       const largestQNo = list.reduce(
@@ -58,10 +64,18 @@ export const formikMapPropsToValues = ({ queueLog, visitRegistration }) => {
       {},
     )
 
+    const { location } = history
+    if (location.query.pdid)
+      doctorProfile = doctorProfiles.find(
+        (item) =>
+          item.clinicianProfile.id === parseInt(location.query.pdid, 10),
+      )
+
     return {
       queueNo: qNo,
       visitPurposeFK: 1,
       visitStatus: VISIT_STATUS.WAITING,
+      doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       ...visitEntries,
     }
   } catch (error) {
@@ -75,12 +89,19 @@ export const formikHandleSubmit = (
   { props, resetForm, setSubmitting },
 ) => {
   const { queueNo, visitAttachment, ...restValues } = values
-  const { history, dispatch, queueLog, visitRegistration, onConfirm } = props
+  const {
+    history,
+    dispatch,
+    queueLog,
+    patientInfo,
+    visitRegistration,
+    onConfirm,
+  } = props
 
   const { sessionInfo } = queueLog
   const {
     visitInfo: { id = undefined, visit, ...restVisitInfo },
-    patientInfo,
+    // patientInfo,
     appointmentFK,
   } = visitRegistration
   const bizSessionFK = sessionInfo.id
