@@ -34,7 +34,11 @@ const Filterbar = ({
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
 
   return (
-    <GridContainer className={classes.actionBar} alignItems='center'>
+    <GridContainer
+      className={classes.actionBar}
+      justify='center'
+      alignItems='center'
+    >
       <GridItem xs={4} sm={4} md={4} lg={3}>
         <FastField
           name='search'
