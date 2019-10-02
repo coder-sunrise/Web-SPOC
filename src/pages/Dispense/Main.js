@@ -6,7 +6,7 @@ import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem, withFormikExtend } from '@/components'
 // sub component
 // import PatientBanner from './components/PatientBanner'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -15,6 +15,37 @@ import style from './style'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 // model
+
+@withFormikExtend({
+  authority: {
+    view: 'dispense.view',
+    edit: 'dispense.edit',
+  },
+  mapPropsToValues: ({ dispense = {} }) => {
+    return dispense.entity || dispense.default
+  },
+
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm, codetable, visitRegistration } = props
+    const vid = visitRegistration.entity.visit.id
+    console.log(values)
+    dispatch({
+      type: `dispense/save`,
+      payload: {
+        id: vid,
+        values,
+      },
+    }).then((o) => {
+      if (o) {
+        dispatch({
+          type: `dispense/refresh`,
+          payload: vid,
+        })
+      }
+    })
+  },
+  displayName: 'DispensePage',
+})
 class Main extends Component {
   makePayment = () => {
     const { dispatch, dispense } = this.props
@@ -46,18 +77,28 @@ class Main extends Component {
             editingOrder: true,
           },
         })
+        this.refresh()
       }
     })
   }
 
+  refresh = () => {
+    const { dispatch, dispense, visitRegistration } = this.props
+
+    dispatch({
+      type: `dispense/refresh`,
+      payload: visitRegistration.entity.visit.id,
+    })
+  }
+
   render () {
-    const { classes, dispense } = this.props
+    const { classes, dispense, handleSubmit } = this.props
 
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
           <GridItem justify='flex-end' container>
-            <Button color='info' size='sm'>
+            <Button color='info' size='sm' onClick={this.refresh}>
               <Refresh />
               Refresh
             </Button>
@@ -72,7 +113,7 @@ class Main extends Component {
           </GridItem>
           <DispenseDetails {...this.props} />
           <GridItem justify='flex-end' container className={classes.footerRow}>
-            <Button color='success' size='sm'>
+            <Button color='success' size='sm' onClick={handleSubmit}>
               Save Dispense
             </Button>
             <Button color='primary' size='sm' onClick={this.editOrder}>
