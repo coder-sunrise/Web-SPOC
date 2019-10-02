@@ -706,11 +706,11 @@ const defaultFormBehavior = (
 }
 
 const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
-const commonDataReaderTransform = (data, fieldName = 'id') => {
+const commonDataReaderTransform = (data, fieldName) => {
   // console.log(data, fieldName)
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
-      data = data.sort((a, b) => a[fieldName] - b[fieldName])
+      if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
       data.forEach((element) => {
         commonDataReaderTransform(element)
       })
@@ -723,9 +723,10 @@ const commonDataReaderTransform = (data, fieldName = 'id') => {
             continue
           }
           if (Array.isArray(v)) {
-            data[field] = lodash.sortBy(data[field], [
-              (o) => o[fieldName],
-            ])
+            if (fieldName)
+              data[field] = lodash.sortBy(data[field], [
+                (o) => o[fieldName],
+              ])
             for (let subfield in v) {
               if (Object.prototype.hasOwnProperty.call(v, subfield)) {
                 commonDataReaderTransform(data[field][subfield])
@@ -751,7 +752,7 @@ const commonDataReaderTransform = (data, fieldName = 'id') => {
   return data
 }
 
-const commonDataWriterTransform = (data, fieldName = 'id') => {
+const commonDataWriterTransform = (data) => {
   if (typeof data === 'object') {
     if (Array.isArray(data)) {
       data.forEach((element) => {

@@ -16,7 +16,7 @@ import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 import config from '@/utils/config'
 
-const { currencyFormat, qtyFormat, currencySymbol } = config
+const { currencyFormat, percentageFormat, qtyFormat, currencySymbol } = config
 
 const STYLES = () => {
   return {
@@ -126,7 +126,6 @@ class AntdNumberInput extends React.PureComponent {
       value,
     } = props
     this.state = {
-      shrink: field.value !== undefined && field.value !== '',
       value:
         field.value !== undefined && field.value !== ''
           ? field.value
@@ -138,13 +137,18 @@ class AntdNumberInput extends React.PureComponent {
     this.debouncedOnChange = _.debounce(this.debouncedOnChange.bind(this), 100)
   }
 
-  handleFocus = () => {
-    window.$_inputFocused = true
+  handleFocus = (e) => {
+    // console.log('handleFocus', e.target.value)
     this.setState({
-      shrink: true,
       focused: true,
     })
-
+    // if (!e.target.value && e.target.value !== 0) {
+    //   const cfg = this.getConfig()
+    //   if (cfg && cfg.formatter)
+    //     this.setState({
+    //       value: 0.0000000000000001,
+    //     })
+    // }
     // const { parser } = this.props
     // if (parser) {
     //   this.setState({
@@ -156,13 +160,6 @@ class AntdNumberInput extends React.PureComponent {
   handleBlur = () => {
     window.$_inputFocused = false
 
-    if (
-      this.state.value === undefined ||
-      this.state.value === null ||
-      this.state.value === ''
-    ) {
-      this.setState({ shrink: false })
-    }
     this.setState({
       focused: false,
     })
@@ -211,6 +208,45 @@ class AntdNumberInput extends React.PureComponent {
     }
   }
 
+  handleKeyDown = (e) => {
+    if (
+      !e.ctrlKey &&
+      !(e.keyCode >= 48 && e.keyCode <= 57) &&
+      !(e.keyCode >= 96 && e.keyCode <= 105) &&
+      !(e.keyCode >= 37 && e.keyCode <= 40) &&
+      e.keyCode !== 8 &&
+      e.keyCode !== 46 &&
+      e.keyCode !== 189
+    ) {
+      e.preventDefault()
+    }
+
+    if (
+      e.ctrlKey &&
+      ![
+        65,
+        67,
+        86,
+        88,
+      ].includes(e.keyCode)
+    ) {
+      e.preventDefault()
+    }
+    if (e.keyCode === 8 && Number(this.state.value) === 0) {
+      this.setState({
+        value: '',
+      })
+    }
+
+    // if (e.keyCode === 190 && e.target.value.indexOf('.') >= 0)
+    //   e.preventDefault()
+
+    // console.log('handleKeyDown', e.ctrlKey, e.target.value, e.keyCode)
+    // this.setState({
+    //   selectionStart: e.target.selectionStart,
+    // })
+  }
+
   handleValueChange = (v) => {
     // if ((v === undefined || !/\S/.test(v)) && !this.props.allowEmpty) {
     //   return false
@@ -220,19 +256,19 @@ class AntdNumberInput extends React.PureComponent {
     // if (!re.test(v)) {
     //   return
     // }
+    // console.log('handleValueChange', v)
+
     let newV = v
     if (!isNumber(newV)) {
       newV = undefined
-      return false
     }
     if (v === undefined && !this.props.allowEmpty) {
       newV = this.props.min
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-
     this.setState({
-      value: newV,
+      value: newV === undefined ? '' : newV,
     })
 
     this.debouncedOnChange(newV)
@@ -270,52 +306,97 @@ class AntdNumberInput extends React.PureComponent {
   // }
 
   getConfig = () => {
-    const { currency, percentage, formatter = (v) => v, max, min } = this.props
+    const {
+      currency,
+      percentage,
+      formatter = (v) => v,
+      max,
+      min,
+      parser,
+    } = this.props
+    let { format } = this.props
+    const { selectionStart } = this.state
     const extraCfg = {
       formatter,
       max,
       min,
     }
+    if (!format) {
+      if (currency) {
+        if (!format) format = `${currencySymbol}${currencyFormat}`
 
-    if (currency) {
-      extraCfg.formatter = (v) => {
-        if (v === '') return ''
-        if (!this.state.focused) {
-          const nv = numeral(v)
-          if (nv._value < 0)
-            return nv.format(`(${currencySymbol}${currencyFormat})`)
-          return nv.format(`${currencySymbol}${currencyFormat}`)
+        extraCfg.formatter = (v) => {
+          console.log('formatter', v, this.state.value)
+
+          if (v === '') return ''
+          if (!this.state.focused) {
+            const nv = numeral(v)
+            if (nv._value < 0) return nv.format(`(${format})`)
+            return nv.format(format)
+          }
+          return `${v}`
         }
-        return v
+        // extraCfg.precision = 2
+      } else if (percentage) {
+        if (!format) format = percentageFormat
+
+        extraCfg.formatter = (v) => {
+          if (v === '') return ''
+          if (!this.state.focused) {
+            return numeral(v / 100).format(percentageFormat)
+          }
+          return v
+        }
+
+        extraCfg.max = extraCfg.max || 100
+        extraCfg.min = -100
+      } else if (formatter) {
+        extraCfg.formatter = (v) => {
+          if (v === '') return ''
+          console.log(v, numeral(v).format(format))
+
+          if (!this.state.focused) {
+            return formatter(v)
+          }
+          return v
+        }
+      } else if (format) {
+        extraCfg.formatter = (v) => {
+          if (v === '') return ''
+          console.log(v, numeral(v).format(format))
+
+          if (!this.state.focused) {
+            return numeral(v).format(format)
+          }
+          return v
+        }
       }
+    }
+    if (!parser) {
+      const dotPos = format
+        ? format.substring(
+            format.lastIndexOf('.') + 1,
+            format.lastIndexOf('0') + 1,
+          )
+        : ''
       extraCfg.parser = (v) => {
+        // console.log('parser3', v, this.state.value)
+        if (!Number(v) && this.state.value === '') return ''
+        if (v === '') return v
+        if (format) {
+          if (format.lastIndexOf('.') > 0) {
+            v = `${v}`.replace('.', '')
+            const lastCharIsZero = v[v.length - 1] === '0'
+
+            v = `${Number(v) / Math.pow(10, dotPos.length)}`
+            if (lastCharIsZero && v.indexOf('.') >= 0) v += '0'
+            if (v.indexOf('.') < 0) v += `.${dotPos}`
+          }
+        }
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
       }
-
-      extraCfg.precision = 2
-    } else if (percentage) {
-      extraCfg.formatter = (v) => {
-        if (v === '') return ''
-        if (!this.state.focused) {
-          return numeral(v / 100).format('0.00%')
-        }
-        return v
-      }
-      extraCfg.parser = (v) => {
-        if (typeof v === 'number') return v
-        return v.replace(/\$\s?|(,*)/g, '')
-      }
-      extraCfg.max = extraCfg.max || 100
-      extraCfg.min = -100
-    } else if (formatter) {
-      extraCfg.formatter = (v) => {
-        if (v === '') return ''
-        if (!this.state.focused) {
-          return formatter(v)
-        }
-        return v
-      }
+      if (dotPos.length) extraCfg.precision = dotPos.length
     }
     return extraCfg
   }
@@ -339,8 +420,7 @@ class AntdNumberInput extends React.PureComponent {
     // if (selectValue !== undefined) {
     //   cfg.value = selectValue
     // }
-    // console.log(props)
-
+    console.log(this.state.value)
     if (this.props.text) {
       const cfg = this.getConfig()
       return (
@@ -360,6 +440,7 @@ class AntdNumberInput extends React.PureComponent {
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
           value={this.state.value}
+          onKeyDown={this.handleKeyDown}
           {...this.getConfig()}
           {...restProps}
           // formatter={this.handleFormatter}
@@ -375,17 +456,14 @@ class AntdNumberInput extends React.PureComponent {
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
-        shrink: field.value !== undefined,
       })
     } else if (value) {
       this.setState({
         value: value === undefined ? '' : value,
-        shrink: value !== undefined,
       })
     } else {
       this.setState({
         value: undefined,
-        shrink: false,
       })
     }
     // console.log(field)
@@ -400,7 +478,7 @@ class AntdNumberInput extends React.PureComponent {
           this.state.value === undefined ||
           this.state.value === '' ||
           this.state.value === null
-        ) || this.state.shrink,
+        ) || this.state.focused,
     }
 
     return (
