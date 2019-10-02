@@ -84,63 +84,6 @@ const PatientInfoSideBanner = ({
                   handleRefreshChasBalance={handleRefreshChasBalance}
                   data={o}
                 />
-
-                {/* <Popover
-                  icon={null}
-                  content={
-                    <div>
-                      <div
-                        style={{
-                          fontWeight: 500,
-                          marginBottom: 0,
-                        }}
-                      >
-                        <CodeSelect
-                          text
-                          code='ctSchemeType'
-                          value={o.schemeTypeFK}
-                        />
-                        <IconButton onClick={handleRefreshChasBalance}>
-                          <Refresh fontSize='large' />
-                        </IconButton>
-                      </div>
-
-                      <div>
-                        <p>
-                          Validity:{' '}
-                          <DatePicker
-                            text
-                            format={dateFormatLong}
-                            value={o.validFrom}
-                          />
-                          {' - '}
-                          <DatePicker
-                            text
-                            format={dateFormatLong}
-                            value={o.validTo}
-                          />
-                        </p>
-                      </div>
-                      <div>Balance: </div>
-                      <div>Patient Visit Balance: </div>
-                      <div>Patient Clinic Balance: </div>
-                    </div>
-                  }
-                  trigger='click'
-                  placement='bottomLeft'
-                >
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      right: 10,
-                      position: 'absolute',
-                    }}
-                  >
-                    <IconButton>
-                      <More />
-                    </IconButton>
-                  </div>
-                </Popover> */}
               </p>
               {o.validFrom && (
                 <div>

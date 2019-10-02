@@ -44,7 +44,8 @@ const SchemePopover = ({
                   code='ctSchemeType'
                   value={data.schemeTypeFK}
                 />
-                <IconButton>
+                <IconButton onClick={handleRefreshChasBalance}>
+                  {' '}
                   <Refresh fontSize='large' />
                 </IconButton>
               </div>
