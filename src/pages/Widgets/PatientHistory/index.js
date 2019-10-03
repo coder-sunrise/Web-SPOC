@@ -240,8 +240,8 @@ class PatientHistory extends Component {
     ]
   }
 
-  componentDidMount () {
-    this.props.dispatch({
+   componentDidMount () {
+     this.props.dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
@@ -250,7 +250,8 @@ class PatientHistory extends Component {
         patientID: Number(findGetParameter('pid')) || 0,
       },
     })
-
+    console.log("gggg")
+    console.log(this.props)
     this.props.dispatch({
       type: 'patientHistory/updateState',
       payload: {
@@ -258,8 +259,7 @@ class PatientHistory extends Component {
         selectedSubRow: '',
       },
     })
-    console.log('**********')
-    console.log(this.props)
+
   }
 
   onSelectChange = (val) => {
@@ -280,6 +280,7 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
+ 
 
     return (
       <List
@@ -302,8 +303,7 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  this.props
-                    .dispatch({
+                  this.props.dispatch({
                       type: 'patientHistory/queryOne',
                       payload: o.id,
                     })
@@ -351,7 +351,7 @@ class PatientHistory extends Component {
                             <DatePicker
                               text
                               showTime
-                              value={!clinicSettings.settings.ShowConsultationVersioning ? o.signOffDate : row.visitDate}
+                              value={o.signOffDate }
                             />
                           )}
                         </GridItem>
@@ -473,7 +473,7 @@ class PatientHistory extends Component {
               onChange={this.onSelectChange}
             />
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={2}>
             {!widget && (
               <ProgressButton
                 color='primary'
@@ -499,10 +499,12 @@ class PatientHistory extends Component {
             )}
           </GridItem>
           <GridItem style={{ textAlign: 'right' }}>
+            Update Date :
             {patientHistory.selectedSubRow.signOffDate && (
+              
               <DatePicker
                 text
-                value={`Update Date :${patientHistory.selectedSubRow.signOffDate}`}
+                value={patientHistory.selectedSubRow.signOffDate}
               />
             )}
           </GridItem>
@@ -555,10 +557,13 @@ class PatientHistory extends Component {
       cfg.style = {}
     }
 
-    const sortedPatientHistory = patientHistory.list
+    let sortedPatientHistory = ''
+
+    sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-  
+     
+
     return (
       <div {...cfg}>
         <CardContainer
