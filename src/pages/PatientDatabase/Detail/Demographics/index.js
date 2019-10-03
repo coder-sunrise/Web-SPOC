@@ -419,7 +419,7 @@ class Demographic extends PureComponent {
                   )}
                 />
               </GridItem>
-              <GridItem xs={5}>
+              <GridItem xs={12}>
                 <FastField
                   name='referredBy'
                   render={(args) => (
@@ -439,21 +439,6 @@ class Demographic extends PureComponent {
                     />
                   )}
                 />
-              </GridItem>
-              <GridItem
-                xs={6}
-                justify='flex-start'
-                alignItems='center'
-                container
-              >
-                <Button
-                  size='sm'
-                  color='danger'
-                  style={{ minWidth: 20 }}
-                  onClick={(e) => setFieldValue('referredBy', undefined)}
-                >
-                  X
-                </Button>
               </GridItem>
               {values.referredBy === 'Patient' && (
                 <GridItem xs={12}>
