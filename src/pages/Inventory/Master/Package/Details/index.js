@@ -128,6 +128,7 @@ const Detail = ({
     dispatch,
     setFieldValue,
     showTransfer: false,
+    errors: props.errors,
   }
 
   const [

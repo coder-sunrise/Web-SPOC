@@ -39,6 +39,7 @@ const Detail = ({
   setFieldValue,
   setValues,
   values,
+  errors,
 }) => {
   const detailProps = {
     consumableDetail,
@@ -46,6 +47,7 @@ const Detail = ({
     setFieldValue,
     setValues,
     values,
+    errors,
   }
   const stockProps = {
     consumableDetail,
