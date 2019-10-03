@@ -471,56 +471,51 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5) >=
-                  1 ? (
-                    entity.patientScheme
-                      .filter((o) => o.schemeTypeFK <= 5)
-                      .map((o) => {
-                        const schemeData = this.getSchemeDetails(o)
-                        return (
-                          <div>
-                            <CodeSelect
-                              text
-                              code='ctSchemeType'
-                              value={schemeData.schemeTypeFK}
-                            />
+                  {entity.patientScheme
+                    .filter((o) => o.schemeTypeFK <= 5)
+                    .map((o) => {
+                      const schemeData = this.getSchemeDetails(o)
+                      return (
+                        <div>
+                          <CodeSelect
+                            text
+                            code='ctSchemeType'
+                            value={schemeData.schemeTypeFK}
+                          />
 
-                            <div
-                              style={{
-                                fontWeight: 500,
-                                display: 'inline-block',
-                              }}
-                            >
-                              :{' '}
-                              <NumberInput
-                                text
-                                currency
-                                value={schemeData.balance}
-                              />
-                            </div>
-                            <br />
-                            <SchemePopover
-                              isBanner
-                              isShowReplacementModal={
-                                schemeData.isShowReplacementModal
-                              }
-                              handleRefreshChasBalance={() =>
-                                this.refreshChasBalance(
-                                  schemeData.patientCoPaymentSchemeFK,
-                                  schemeData.schemeTypeFK,
-                                )}
-                              entity={entity}
-                              schemeData={schemeData}
+                          <div
+                            style={{
+                              fontWeight: 500,
+                              display: 'inline-block',
+                            }}
+                          >
+                            :{' '}
+                            <NumberInput
+                              text
+                              currency
+                              value={schemeData.balance}
                             />
-                            <p style={{ color: 'red' }}>
-                              {schemeData.statusDescription}
-                            </p>
                           </div>
-                        )
-                      })
-                  ) : (
-                    ''
-                  )}
+                          <br />
+                          <SchemePopover
+                            isBanner
+                            isShowReplacementModal={
+                              schemeData.isShowReplacementModal
+                            }
+                            handleRefreshChasBalance={() =>
+                              this.refreshChasBalance(
+                                schemeData.patientCoPaymentSchemeFK,
+                                schemeData.schemeTypeFK,
+                              )}
+                            entity={entity}
+                            schemeData={schemeData}
+                          />
+                          <p style={{ color: 'red' }}>
+                            {schemeData.statusDescription}
+                          </p>
+                        </div>
+                      )
+                    })}
                 </div>
               }
 
