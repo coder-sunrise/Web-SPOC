@@ -4,8 +4,9 @@ import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles, Divider } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
+import { connect } from 'dva'
 import ErrorBoundary from '@/layouts/ErrorBoundary'
-
+import Yup from '@/utils/yup'
 import {
   Button,
   DatePicker,
@@ -21,6 +22,8 @@ import {
   Field,
   CommonTableGrid,
   dateFormatLong,
+  CodeSelect,
+  withFormikExtend,
 } from '@/components'
 
 const styles = () => ({
@@ -34,10 +37,37 @@ const styles = () => ({
   },
 })
 
-@withFormik({
-  mapPropsToValues: () => ({
-    PaymentTerms: 0,
+@connect(({ statement }) => ({
+  statement,
+}))
+@withFormikExtend({
+  mapPropsToValues: ({ statement }) => statement,
+
+  validationSchema: Yup.object().shape({
+    code: Yup.string().required(),
+    displayValue: Yup.string().required(),
+    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
+
+  handleSubmit: (values, { props }) => {
+    const { effectiveDates, ...restValues } = values
+    const { dispatch, onConfirm } = props
+    dispatch({
+      type: 'statement/upsert',
+      payload: {
+        ...restValues,
+        effectiveStartDate: effectiveDates[0],
+        effectiveEndDate: effectiveDates[1],
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'statement/query',
+        })
+      }
+    })
+  },
 })
 class AddNewStatement extends PureComponent {
   state = {
@@ -88,6 +118,14 @@ class AddNewStatement extends PureComponent {
     selectedRows: [],
   }
 
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'statement/queryInvoiceList',
+    })
+
+    // .then((v) => console.log({ v }))
+  }
+
   handleSelectionChange = (selection) => {
     this.setState({ selectedRows: selection })
   }
@@ -105,6 +143,7 @@ class AddNewStatement extends PureComponent {
     const editRow = (row, e) => {
       history.push(`/finance/statement`)
     }
+    console.log('props', this.props)
 
     return (
       <React.Fragment>
@@ -127,7 +166,9 @@ class AddNewStatement extends PureComponent {
                 <FastField
                   name='coPayer'
                   render={(args) => {
-                    return <TextField label='Co-Payer' {...args} />
+                    return (
+                      <CodeSelect label='Co-Payer' code='ctcopayer' {...args} />
+                    )
                   }}
                 />
               </GridItem>
@@ -400,4 +441,4 @@ class AddNewStatement extends PureComponent {
   }
 }
 
-export default withStyles(styles)(AddNewStatement)
+export default withStyles(styles, { withTheme: true })(AddNewStatement)

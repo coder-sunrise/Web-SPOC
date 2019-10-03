@@ -111,6 +111,12 @@ class Statement extends PureComponent {
     ],
   }
 
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'statementDetails/query',
+    })
+  }
+
   handleSelectionChange = (selection) => {
     this.setState({ selectedRows: selection })
   }
