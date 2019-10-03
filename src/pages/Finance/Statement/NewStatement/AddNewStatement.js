@@ -427,10 +427,7 @@ class AddNewStatement extends PureComponent {
               justifyContent: 'flex-end',
             }}
           >
-            <Button
-              color='danger'
-              onClick={() => history.push(`/finance/statement`)}
-            >
+            <Button color='danger' onClick={() => history.goBack()}>
               Cancel
             </Button>
             <Button color='primary'>Save</Button>

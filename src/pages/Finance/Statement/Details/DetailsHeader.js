@@ -294,12 +294,12 @@ class DetailsHeader extends PureComponent {
               />
             </GridItem>
             <GridItem md={4} />
-            {/* <GridItem md={5}>
+            <GridItem md={5}>
               <h5 className={classes.boldText}>&nbsp;</h5>
             </GridItem>
             <GridItem md={7}>
               <h5 className={classes.normalText}>&nbsp;</h5>
-            </GridItem> */}
+            </GridItem>
           </GridContainer>
 
           <GridContainer item md={3} alignItems='flex-start'>
@@ -321,6 +321,23 @@ class DetailsHeader extends PureComponent {
                 name='outstandingBalance'
                 render={(args) => <NumberInput {...amountProps} {...args} />}
               />
+            </GridItem>
+            <GridItem md={4} />
+            <GridItem md={5}>
+              <h5 className={classes.boldText}>&nbsp;</h5>
+            </GridItem>
+            <GridItem md={4}>
+              <a
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  margin: 10,
+                }}
+                onClick={() => history.push(`/finance/statement/editstatement`)}
+              >
+                Edit statement
+              </a>
             </GridItem>
           </GridContainer>
         </GridContainer>
