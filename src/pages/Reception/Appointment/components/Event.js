@@ -71,7 +71,6 @@ class Event extends React.PureComponent {
     const { event, classes, calendarView } = this.props
     const { doctor, hasConflict, isEnableRecurrence, patientProfile } = event
     let { patientName, patientAccountNo, patientContactNo } = event
-    console.log({ patientProfile, event })
     if (patientProfile) {
       const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
       const _mobileContact = contactNumbers.find(

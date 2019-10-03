@@ -27,6 +27,7 @@ import AppointmentDateInput from './AppointmentDate'
 // import Recurrence from './Recurrence'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
+import RescheduleForm from './RescheduleForm'
 // utils
 import { ValidationSchema, mapPropsToValues } from './formikUtils'
 import { getAppendUrl } from '@/utils/utils'
@@ -68,6 +69,7 @@ class Form extends React.PureComponent {
     showPatientProfile: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
+    showRescheduleForm: false,
     datagrid:
       this.props.values && this.props.values.currentAppointment
         ? this.props.values.currentAppointment.appointments_Resources
@@ -79,20 +81,27 @@ class Form extends React.PureComponent {
   }
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'clinicianprofile',
-      },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ltappointmentstatus' },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ltcancelreasontype' },
-    })
+    Promise.all([
+      this.props.dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'clinicianprofile',
+        },
+      }),
+      this.props.dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ltappointmentstatus' },
+      }),
+      this.props.dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ltcancelreasontype' },
+      }),
+      // this.props.dispatch({
+      //   type: 'codetable/fetchCodes',
+      //   payload: { code: 'LTRescheduleBy' },
+      // }),
+    ])
+
     this.validateDataGrid()
   }
 
@@ -529,6 +538,10 @@ class Form extends React.PureComponent {
     this.setState({ showSeriesUpdateConfirmation: false }, callback)
   }
 
+  closeRescheduleForm = () => {
+    this.setState({ showRescheduleForm: false })
+  }
+
   onConfirmSeriesUpdate = async (type) => {
     await this.props.setFieldValue('overwriteEntireSeries', type === '2', false)
     this.closeSeriesUpdateConfirmation(this._submit)
@@ -612,6 +625,7 @@ class Form extends React.PureComponent {
       showSearchPatientModal,
       showDeleteConfirmationModal,
       showSeriesUpdateConfirmation,
+      showRescheduleForm,
       datagrid,
       isDataGridValid,
     } = this.state
@@ -738,6 +752,14 @@ class Form extends React.PureComponent {
               <SeriesUpdateConfirmation
                 handleConfirm={this.onConfirmSeriesUpdate}
               />
+            </CommonModal>
+            <CommonModal
+              open={showRescheduleForm}
+              title='Alert'
+              onClose={this.closeRescheduleForm}
+              maxWidth='sm'
+            >
+              <RescheduleForm />
             </CommonModal>
           </React.Fragment>
         </SizeContainer>
