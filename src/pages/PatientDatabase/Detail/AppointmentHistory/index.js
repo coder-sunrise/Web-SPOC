@@ -10,9 +10,9 @@ import {
   GridContainer,
   GridItem,
   CommonTableGrid,
-  serverDateFormat,
   dateFormatLong,
 } from '@/components'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 // services
 import { queryList as queryAppointments } from '@/services/calendar'
 
@@ -127,11 +127,8 @@ class AppointmentHistory extends PureComponent {
   }
 
   async getAppts () {
-    const today = moment().format(serverDateFormat)
     const commonParams = {
       combineCondition: 'and',
-      isCancelled: false,
-      neql_appointmentStatusFk: '2',
       sorting: [
         { columnName: 'appointmentDate', direction: 'asc' },
       ],
@@ -142,11 +139,18 @@ class AppointmentHistory extends PureComponent {
       future,
     ] = await Promise.all([
       queryAppointments({
-        lst_appointmentDate: today,
+        in_appointmentStatusFk: [
+          APPOINTMENT_STATUS.CANCELLED,
+          APPOINTMENT_STATUS.TURNEDUP,
+          APPOINTMENT_STATUS.NOSHOW,
+        ].join('|'),
         ...commonParams,
       }),
       queryAppointments({
-        lgteql_appointmentDate: today,
+        in_appointmentStatusFk: [
+          APPOINTMENT_STATUS.SCHEDULED,
+          APPOINTMENT_STATUS.RESCHEDULED,
+        ].join('|'),
         ...commonParams,
       }),
     ])

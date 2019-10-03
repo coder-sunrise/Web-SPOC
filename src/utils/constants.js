@@ -1,0 +1,8 @@
+export const APPOINTMENT_STATUS = {
+  SCHEDULED: 1,
+  DRAFT: 2,
+  CANCELLED: 3,
+  TURNEDUP: 4,
+  RESCHEDULED: 5,
+  NOSHOW: 6,
+}
