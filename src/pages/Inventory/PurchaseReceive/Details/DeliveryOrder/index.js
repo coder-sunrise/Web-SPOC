@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
+import { withStyles } from '@material-ui/core'
+import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Add from '@material-ui/icons/Add'
 import {
   GridContainer,
@@ -9,9 +11,13 @@ import {
   CommonModal,
   withFormikExtend,
 } from '@/components'
-import { isPOStatusFinalized } from '../../variables'
 import DOGrid from './DOGrid'
 import DODetails from './DODetails'
+import { isPOStatusFinalized } from '../../variables'
+
+const styles = (theme) => ({
+  ...basicStyle(theme),
+})
 
 // @withFormikExtend({
 //   displayName: 'deliveryOrderDetails',
@@ -67,7 +73,7 @@ class index extends Component {
   closeDODetailsModal = () => this.setState({ showDeliveryOrderDetails: false })
 
   render () {
-    const { purchaseOrderDetails } = this.props
+    const { purchaseOrderDetails, theme } = this.props
     const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
     const { showDeliveryOrderDetails } = this.state
@@ -116,5 +122,4 @@ class index extends Component {
     )
   }
 }
-
-export default index
+export default withStyles(styles, { withTheme: true })(index)
