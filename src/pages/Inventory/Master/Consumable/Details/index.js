@@ -92,16 +92,16 @@ const Detail = ({
         options={ConsumableDetailOption(detailProps, stockProps)}
       />
       <div className={classes.actionDiv}>
-        <ProgressButton
-          submitKey='consumableDetail/submit'
-          onClick={handleSubmit}
-        />
         <Button
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=1')}
         >
           Cancel
         </Button>
+        <ProgressButton
+          submitKey='consumableDetail/submit'
+          onClick={handleSubmit}
+        />
       </div>
     </React.Fragment>
   )
