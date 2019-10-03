@@ -21,8 +21,8 @@ class InvoiceDetails extends Component {
   componentDidMount () {
     const { dispatch, invoiceDetail } = this.props
     dispatch({
-      // type: 'invoiceDetail/query',
-      type: 'invoiceDetail/fakeQueryDone',
+      type: 'invoiceDetail/query',
+      // type: 'invoiceDetail/fakeQueryDone',
       payload: {
         id: invoiceDetail.currentId,
       },

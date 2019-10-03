@@ -101,6 +101,9 @@ const styles = () => ({
           resetForm(value)
         })
         if (onConfirm) onConfirm()
+        dispatch({
+          type: 'patient/closePatientModal',
+        })
       }
     })
   },

@@ -20,10 +20,13 @@ const CHASCardReplacement = ({
   handleOnClose,
 }) => {
   const {
+    oldSchemeTypeFK,
     balance,
     schemeTypeFK,
+    validFrom,
     validTo,
-    oldSchemeTypeFK,
+    acuteVisitPatientBalance,
+    acuteVisitClinicBalance,
   } = refreshedSchemeData
   const { callingName, patientAccountNo } = entity
 
@@ -82,12 +85,7 @@ const CHASCardReplacement = ({
               paddingLeft: 2,
             }}
           >
-            {data.patientSchemeBalance.length <= 0 ? (
-              ''
-            ) : (
-              data.patientSchemeBalance[0].acuteVisitPatientBalance
-            )}{' '}
-            Remaining{' '}
+            {acuteVisitPatientBalance ? '' : acuteVisitPatientBalance} Remaining{' '}
           </div>{' '}
           for Year {moment().year()}
         </GridItem>
@@ -102,11 +100,7 @@ const CHASCardReplacement = ({
               paddingLeft: 2,
             }}
           >
-            {data.patientSchemeBalance.length <= 0 ? (
-              ''
-            ) : (
-              data.patientSchemeBalance[0].acuteVisitClinicBalance
-            )}{' '}
+            {acuteVisitClinicBalance <= 0 ? '' : acuteVisitClinicBalance}{' '}
             Remaining
           </div>{' '}
           for {moment().format('MMMM')} {moment().year()}
