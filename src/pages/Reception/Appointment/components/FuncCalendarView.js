@@ -43,7 +43,7 @@ const styles = () => ({
     maxWidth: '90%',
     fontSize: '0.9rem',
     fontWeight: '450',
-    color: '#6f6f6f',
+    color: '#fff',
   },
 })
 
@@ -309,6 +309,7 @@ const CalendarView = ({
       return calendarEvents.reduce((events, appointment) => {
         const {
           appointmentDate,
+          patientProfile,
           patientName,
           patientContactNo,
           isEnableRecurrence,
@@ -319,6 +320,7 @@ const CalendarView = ({
           ...item,
           resourceId: item.clinicianFK,
           clinicianFK: item.clinicianFK,
+          patientProfile,
           patientName,
           patientContactNo,
           isEnableRecurrence,
