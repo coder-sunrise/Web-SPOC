@@ -16,6 +16,3 @@ export { default as DoctorProfileSelect } from './DoctorProfileSelect'
 
 export { default as LoginNavbar } from './LandingLayout/NavBar'
 export { default as SchemePopover } from './SchemePopover'
-export {
-  default as CHASCardReplacement,
-} from './SchemePopover/CHASCardReplacement'
