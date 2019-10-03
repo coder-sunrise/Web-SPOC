@@ -53,7 +53,7 @@ const FilterBar = ({
   const maxDoctorTagPlaceholder = filterByDoctor
     ? `${filterByDoctor.filter((o) => o !== -99).length} doctors selected...`
     : ''
-
+  console.log({ values })
   const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxAppointmentTagPlaceholder = `${filterByApptType.length} appointment types selected...`
   return (
@@ -78,17 +78,23 @@ const FilterBar = ({
             render={(args) => (
               <CodeSelect
                 {...args}
+                // allLabel='All Doctors'
                 allValue={-99}
-                allLabel='All Doctors'
+                allValueOption={{
+                  clinicianProfile: {
+                    name: 'All',
+                    id: -99,
+                  },
+                }}
                 allowClear={false}
                 label='Filter by Doctor'
                 mode='multiple'
-                code='clinicianprofile'
-                labelField='name'
-                valueField='id'
-                // code='doctorprofile'
-                // labelField='clinicianProfile.name'
-                // valueField='clinicianProfile.id'
+                // code='clinicianprofile'
+                // labelField='name'
+                // valueField='id'
+                code='doctorprofile'
+                labelField='clinicianProfile.name'
+                valueField='clinicianProfile.id'
                 maxTagCount={maxDoctorTagCount}
                 maxTagPlaceholder='doctors'
                 renderDropdown={renderDropdown}

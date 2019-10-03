@@ -31,6 +31,7 @@ const mapAttachmentToUploadInput = (
       }
 
 export const formikMapPropsToValues = ({
+  clinicInfo,
   queueLog,
   visitRegistration,
   doctorProfiles,
@@ -39,6 +40,14 @@ export const formikMapPropsToValues = ({
   try {
     let qNo = 0.0
     let doctorProfile
+    // let doctorProfileFK
+
+    if (clinicInfo) {
+      doctorProfile = doctorProfiles.find(
+        (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
+      )
+    }
+
     if (queueLog) {
       const { list } = queueLog
       const largestQNo = list.reduce(
@@ -65,12 +74,13 @@ export const formikMapPropsToValues = ({
     )
 
     const { location } = history
-    if (location.query.pdid)
+    if (location.query.pdid) {
       doctorProfile = doctorProfiles.find(
         (item) =>
           item.clinicianProfile.id === parseInt(location.query.pdid, 10),
       )
-
+    }
+    console.log({ doctorProfile })
     return {
       queueNo: qNo,
       visitPurposeFK: 1,

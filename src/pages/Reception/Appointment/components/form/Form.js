@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import moment from 'moment'
 import classnames from 'classnames'
 // formik
-import { FastField } from 'formik'
+import { Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
@@ -258,7 +258,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
-    const { appointmentStatuses, values, onClose, user, dispatch } = this.props
+    const { values, onClose, user, dispatch } = this.props
     const noShowStatus = APPOINTMENT_STATUS.NOSHOW
     const cancelStatus = APPOINTMENT_STATUS.CANCELLED
 
@@ -453,7 +453,7 @@ class Form extends React.PureComponent {
   }
 
   onSaveDraftClick = () => {
-    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
+    const { values, mode, viewingAppointment } = this.props
     const appointmentStatusFK = APPOINTMENT_STATUS.DRAFT
 
     const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
@@ -479,7 +479,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
-    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
+    const { values, mode, viewingAppointment } = this.props
 
     try {
       let newAppointmentStatusFK = APPOINTMENT_STATUS.SCHEDULED
@@ -605,7 +605,14 @@ class Form extends React.PureComponent {
       APPOINTMENT_STATUS.CANCELLED,
       APPOINTMENT_STATUS.TURNEDUP,
     ]
-
+    console.log({
+      isDataGridValid,
+      values,
+      currentAppointment,
+      isDisabledStatus: _disabledStatus.includes(
+        currentAppointment.appointmentStatusFk,
+      ),
+    })
     if (values.id === undefined) return false
 
     if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
@@ -627,12 +634,11 @@ class Form extends React.PureComponent {
       showSeriesUpdateConfirmation,
       showRescheduleForm,
       datagrid,
-      isDataGridValid,
     } = this.state
 
     const { currentAppointment = {} } = values
     const shouldDisable = this.checkShouldDisable()
-
+    // console.log({ shouldDisable })
     // console.log({ datagrid })
     // console.log({
     //   initialValues: this.props.initialValues,
@@ -662,7 +668,7 @@ class Form extends React.PureComponent {
                 <AppointmentDateInput />
               </GridItem>
               <GridItem xs md={6} className={classnames(classes.remarksField)}>
-                <FastField
+                <Field
                   name='currentAppointment.appointmentRemarks'
                   render={(args) => (
                     <OutlinedTextField
