@@ -89,7 +89,7 @@ class Grid extends PureComponent {
                   onClick={() => {
                     this.editRow(row, false)
                   }}
-                  color='info'
+                  color='primary'
                   style={{ marginRight: 5, width: 60, minWidth: 60 }}
                 >
                   {/* <Payment /> */}
@@ -109,7 +109,6 @@ class Grid extends PureComponent {
   editRow = async (row, isDeposit) => {
     const { dispatch, deposit } = this.props
     const { list } = deposit
-    console.log({ row })
 
     if (row.patientDepositFK > 0) {
       await dispatch({
