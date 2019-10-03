@@ -63,8 +63,8 @@ const receivingDetailsSchema = Yup.object().shape({
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
-        // batchNo: x.batchNo,
-        // expiryDate: x.expiryDate,
+        batchNo: x.batchNo[0],
+        expiryDate: x.expiryDate,
         sortOrder: index + 1,
         inventoryTransactionItemDto: {
           // inventoryTypeFK: itemType.value,
