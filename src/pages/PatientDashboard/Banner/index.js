@@ -36,6 +36,7 @@ class Banner extends PureComponent {
     balanceValue: 0,
     dateFrom: '',
     dateTo: '',
+    schemeType: '',
   }
 
   constructor (props) {
@@ -80,6 +81,33 @@ class Banner extends PureComponent {
       patientAllergy.find((m) => m.allergyFK === o.id),
     )
 
+    let allergyData = ' '
+
+    if (da.length) {
+      if (da.length >= 2) {
+        allergyData = `${da[0].name}, ${da[1].name}`
+      } else {
+        allergyData = `${da[0].name}`
+      }
+    } else {
+      allergyData = '-'
+    }
+
+    // {da.length ? (
+    //   `${da[0].name.length > 8
+    //     ? `${da[0].name.substring(0, 8)}... `
+    //     : da[0].name} `
+    // ) : (
+    //   '-'
+    // )}
+    // {da.length >= 2 ? (
+    //   `${da[1].name.length > 8
+    //     ? `, ${da[1].name.substring(0, 8)}...`
+    //     : `, ${da[1].name}`}`
+    // ) : (
+    //   ''
+    // )}
+
     if (da.length) {
       this.setState({
         showWarning: true,
@@ -106,19 +134,10 @@ class Banner extends PureComponent {
           </Link>
         ) : (
           <div>
-            {da.length ? (
-              `${da[0].name.length > 8
-                ? `${da[0].name.substring(0, 8)}... `
-                : da[0].name} `
+            {allergyData.length > 25 ? (
+              `${allergyData.substring(0, 25)}...`
             ) : (
-              '-'
-            )}
-            {da.length >= 2 ? (
-              `${da[1].name.length > 8
-                ? `, ${da[1].name.substring(0, 8)}...`
-                : `, ${da[1].name}`}`
-            ) : (
-              ''
+              allergyData
             )}
 
             {da.length ? (
@@ -130,7 +149,7 @@ class Banner extends PureComponent {
                       return (
                         <GridContainer>
                           <GridItem>
-                            {i + 1}.) {item.name}
+                            {i + 1}. {item.name}
                           </GridItem>
                         </GridContainer>
                       )
@@ -170,22 +189,89 @@ class Banner extends PureComponent {
           validFrom,
           validTo,
         } = result
-        console.log({
-          balance,
-          patientCoPaymentSchemeFk,
-          schemeTypeFk,
-          validFrom,
-          validTo,
-        })
 
         this.setState({
           balanceValue: balance,
           dateFrom: validFrom,
           dateTo: validTo,
+          schemeType: schemeTypeFk,
         })
-
       }
     })
+  }
+
+  displayMedicalProblemData (entity) {
+    // {entity.patientHistoryDiagnosis.length ? (
+    //   `${entity.patientHistoryDiagnosis[0].diagnosisDescription.length > 8
+    //     ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(
+    //         0,
+    //         8,
+    //       )}... `
+    //     : entity.patientHistoryDiagnosis[0].diagnosisDescription} `
+    // ) : (
+    //   '-'
+    // )}
+    // {entity.patientHistoryDiagnosis.length >= 2 ? (
+    //   `${entity.patientHistoryDiagnosis[1].diagnosisDescription.length > 8
+    //     ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(
+    //         0,
+    //         8,
+    //       )}...`
+    //     : `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription}`}`
+    // ) : (
+    //   ''
+    // )}
+    let medicalProblemData = ''
+
+    if (entity.patientHistoryDiagnosis.length) {
+      if (entity.patientHistoryDiagnosis.length >= 2) {
+        medicalProblemData = `${entity.patientHistoryDiagnosis[0].diagnosisDescription}, ${entity.patientHistoryDiagnosis[1].diagnosisDescription}`
+      } else {
+        medicalProblemData = `${entity.patientHistoryDiagnosis[0].diagnosisDescription}`
+      }
+    } else {
+      medicalProblemData = '-'
+    }
+    return (
+      <div>
+        <div style={{ paddingTop: 5 }}>
+          {medicalProblemData.length > 25 ? (
+            `${medicalProblemData.substring(0, 25)}...`
+          ) : (
+            medicalProblemData
+          )}
+        </div>
+
+        {entity.patientHistoryDiagnosis.length ? (
+          <Popover
+            icon={null}
+            content={
+              <div>
+                {entity.patientHistoryDiagnosis.map((item, i) => {
+                  return (
+                    <GridContainer>
+                      <GridItem>
+                        {i + 1}. {item.diagnosisDescription}
+                      </GridItem>
+                    </GridContainer>
+                  )
+                })}
+              </div>
+            }
+            trigger='click'
+            placement='bottomLeft'
+          >
+            <div>
+              <Button simple variant='outlined' color='info' size='sm'>
+                More
+              </Button>
+            </div>
+          </Popover>
+        ) : (
+          ' '
+        )}
+      </div>
+    )
   }
 
   // {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
@@ -297,70 +383,7 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               header='Medical Problem'
-              body={
-                <div>
-                  <div style={{ paddingTop: 5 }}>
-                    {entity.patientHistoryDiagnosis.length ? (
-                      `${entity.patientHistoryDiagnosis[0].diagnosisDescription
-                        .length > 8
-                        ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(
-                            0,
-                            8,
-                          )}... `
-                        : entity.patientHistoryDiagnosis[0]
-                            .diagnosisDescription} `
-                    ) : (
-                      '-'
-                    )}
-                    {entity.patientHistoryDiagnosis.length >= 2 ? (
-                      `${entity.patientHistoryDiagnosis[1].diagnosisDescription
-                        .length > 8
-                        ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(
-                            0,
-                            8,
-                          )}...`
-                        : `, ${entity.patientHistoryDiagnosis[1]
-                            .diagnosisDescription}`}`
-                    ) : (
-                      ''
-                    )}
-                  </div>
-
-                  {entity.patientHistoryDiagnosis.length ? (
-                    <Popover
-                      icon={null}
-                      content={
-                        <div>
-                          {entity.patientHistoryDiagnosis.map((item, i) => {
-                            return (
-                              <GridContainer>
-                                <GridItem>
-                                  {i + 1}.) {item.diagnosisDescription}
-                                </GridItem>
-                              </GridContainer>
-                            )
-                          })}
-                        </div>
-                      }
-                      trigger='click'
-                      placement='bottomLeft'
-                    >
-                      <div>
-                        <Button
-                          simple
-                          variant='outlined'
-                          color='info'
-                          size='sm'
-                        >
-                          More
-                        </Button>
-                      </div>
-                    </Popover>
-                  ) : (
-                    ' '
-                  )}
-                </div>
-              }
+              body={this.displayMedicalProblemData(entity)}
             />
           </GridItem>
           <GridItem xs={6} md={2}>
@@ -375,22 +398,41 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
-                    .length >= 1 ? (
+                  {entity.patientScheme.filter(
+                    (o) =>
+                      (this.state.schemeType === ''
+                        ? o.schemeTypeFK
+                        : this.state.schemeType) <= 5,
+                  ).length >= 1 ? (
                     entity.patientScheme
-                      .filter((o) => o.schemeTypeFK <= 5)
+                      .filter(
+                        (o) =>
+                          (this.state.schemeType === ''
+                            ? o.schemeTypeFK
+                            : this.state.schemeType) <= 5,
+                      )
                       .map((o) => {
                         this.setState({
-                          balanceValue: o.patientSchemeBalance.length <= 0 ? 0 : o.patientSchemeBalance[0].balance,
+                          balanceValue:
+                            o.patientSchemeBalance.length <= 0
+                              ? 0
+                              : o.patientSchemeBalance[0].balance,
                           dateFrom: o.validFrom,
                           dateTo: o.validTo,
                         })
+                        console.log(this.state.schemeType)
                         return (
                           <div>
                             <CodeSelect
                               text
                               code='ctSchemeType'
-                              value={o.schemeTypeFK}
+                              value={
+                                this.state.schemeType === '' ? (
+                                  o.schemeTypeFK
+                                ) : (
+                                  this.state.schemeType
+                                )
+                              }
                             />
 
                             <div
@@ -411,6 +453,13 @@ class Banner extends PureComponent {
                               data={o}
                               isBanner
                               balanceValue={this.state.balanceValue}
+                              schemeTypeFK={
+                                this.state.schemeType === '' ? (
+                                  o.schemeTypeFK
+                                ) : (
+                                  this.state.schemeType
+                                )
+                              }
                               dataFrom={this.state.dateFrom}
                               dateTo={this.state.dateTo}
                               handleRefreshChasBalance={this.refreshChasBalance}

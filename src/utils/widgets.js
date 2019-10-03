@@ -25,8 +25,7 @@ import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Loading from '@/components/PageLoading/index'
-
-import { AuthorizedContext, IconButton } from '@/components'
+import { AuthorizedContext, IconButton, Button } from '@/components'
 
 const widgets = [
   {
@@ -73,9 +72,15 @@ const widgets = [
                 'click',
               ]}
             >
-              <IconButton style={{ float: 'left' }}>
-                <MoreHoriz />
-              </IconButton>
+              <Button
+                justIcon
+                round
+                color='primary'
+                size='sm'
+                style={{ float: 'left' }}
+              >
+                <MoreVert />
+              </Button>
             </Dropdown>
           )
         }}
