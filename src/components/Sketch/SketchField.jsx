@@ -150,7 +150,6 @@ class SketchField extends PureComponent {
       return
     }
     // if(e.target.type != "image"){
-      console.log(e.target.id)
     if (e.target.id !== 'SKIP' ) {
       let obj = e.target
       obj.__version = 1
@@ -181,20 +180,14 @@ class SketchField extends PureComponent {
     let count = allList[allList.length - 1].layerNumber
     let testData = { objects: [] }
     this.initialData = data
-    console.log('@@@@@@@@@@')
-    console.log(this.initialData)
+
     //history.getInitializeList(data, count)
     for (let i = 0; i < allList.length; i++) {
       // let decodeObject = JSON.parse(allList[i].layerContent)
-      // console.log("--- ", decodeObject)
-      console.log('************')
-      let obj = JSON.parse(allList[i].layerContent)
-      console.log(obj)
 
-      // console.log(allList[i].layerContent)
-      // let obj = JSON.parse(allList[i].layerContent)
-      // console.log(JSON.parse(allList[i].layerContent))
-      //   console.log(object)
+      let obj = JSON.parse(allList[i].layerContent)
+
+
 
       // let testData = {objects: []}
 
@@ -612,7 +605,6 @@ class SketchField extends PureComponent {
 
     setTimeout(() => {
       let originalList = history.getOriginalList()
-      console.log(originalList)
       for (let i = 0; i < this.initialData.length; i++) {
         let [
           mainObject,
@@ -644,7 +636,6 @@ class SketchField extends PureComponent {
           mainObject,
         ] = originalList[i]
         if (this.initialData[i].layerType !== 'image') {
-          console.log("front")
           canvas.bringToFront(mainObject)
         }
       }
@@ -744,7 +735,6 @@ class SketchField extends PureComponent {
     let newIndexCount = indexCount + 1
 
     history.updateCount(oldIndexCount)
-    console.log('image index ', indexCount)
 
     this.setState({
       indexCount: newIndexCount,
@@ -772,8 +762,6 @@ class SketchField extends PureComponent {
       }else{
         canvas.moveTo(imgbase64, oldIndexCount)
       }
-      console.log(imgbase64)
-      console.log(canvas.getObjects().indexOf(imgbase64))
 
       // context.drawImage(imgbase64, 0, 0);
     }
@@ -863,8 +851,7 @@ class SketchField extends PureComponent {
       imgbase64.selectable = false
       imgbase64.evented = false
       canvas.sendToBack(imgbase64)
-      console.log(imgbase64)
-      console.log(canvas.getObjects().indexOf(imgbase64))
+
       // canvas.moveTo(imgbase64, -500)
     }
     image.src = dataUrl
@@ -889,7 +876,7 @@ class SketchField extends PureComponent {
     // canvas.toDataURL().set({
     //   id: 'template',
     // })
-    // console.log(canvas.toDataURL())
+
 
     link.click()
   }

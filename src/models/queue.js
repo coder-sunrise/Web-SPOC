@@ -160,16 +160,13 @@ export default createListViewModel({
         const { shouldGetTodayAppointments = true } = payload
 
         if (shouldGetTodayAppointments) {
-          const today = moment()
-          const start = moment(today.formatUTC(), serverDateTimeFormatFull)
-            .add(-8, 'hours')
-            .formatUTC(false)
+          const today = moment().formatUTC()
 
           yield put({
             type: 'calendar/getCalendarList',
             payload: {
               combineCondition: 'and',
-              eql_appointmentDate: start,
+              eql_appointmentDate: today,
               group: [
                 {
                   appointmentStatusFk: 5,

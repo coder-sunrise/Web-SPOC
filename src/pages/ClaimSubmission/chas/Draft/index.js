@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'dva'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -12,7 +13,6 @@ import TableGrid from '../../common/TableGrid'
 import {
   NewCHASColumnExtensions,
   NewCHASColumns,
-  NewCHASTableData,
   TableConfig,
 } from './variables'
 
@@ -26,12 +26,35 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ claimSubmissionDraft }) => ({
+  claimSubmissionDraft,
+}))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
 class DraftCHAS extends React.Component {
+  componentDidMount () {
+    this.refreshDataGrid()
+  }
+
+  refreshDataGrid = () => {
+    this.props.dispatch({
+      type: 'claimSubmissionDraft/fakeQueryDone',
+      payload: {
+        status: 'draft',
+      },
+    })
+  }
+
+  onRefreshClicked = () => this.refreshDataGrid()
+
   render () {
-    const { classes, handleContextMenuItemClick } = this.props
+    const {
+      classes,
+      claimSubmissionDraft,
+      handleContextMenuItemClick,
+    } = this.props
+    const { list } = claimSubmissionDraft || []
 
     return (
       <CardContainer hideHeader size='sm'>
@@ -39,7 +62,7 @@ class DraftCHAS extends React.Component {
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
-              data={NewCHASTableData}
+              data={list}
               columnExtensions={NewCHASColumnExtensions}
               columns={NewCHASColumns}
               tableConfig={TableConfig}
@@ -47,7 +70,9 @@ class DraftCHAS extends React.Component {
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
-            <Button color='info'>Refresh</Button>
+            <Button color='info' onClick={this.onRefreshClicked}>
+              Refresh
+            </Button>
           </GridItem>
         </GridContainer>
       </CardContainer>

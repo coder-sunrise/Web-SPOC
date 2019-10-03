@@ -35,7 +35,7 @@ class POSummary extends PureComponent {
       )
         return {
           ...state,
-          settingGSTEnable: !settings.IsEnableGST,
+          settingGSTEnable: settings.IsEnableGST,
           settingGSTPercentage: settings.GSTPercentageInt,
         }
     }

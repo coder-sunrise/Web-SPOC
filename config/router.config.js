@@ -13,31 +13,31 @@ const routes = [
   //
   // login
   {
-    path: '/auth',
+    path: '/login',
     component: '../layouts/LandingLayout',
     routes: [
       {
-        path: '/auth/login',
-        component: './Login',
+        path: '/login',
+        component: './NewLogin',
         hideInMenu: true,
       },
       {
-        path: '/auth/forgotpassword',
+        path: '/login/forgotpassword',
         component: './ForgotPassword',
         hideInMenu: true,
       },
     ],
   },
-  {
-    path: '/login',
-    component: './Login',
-    hideInMenu: true,
-  },
-  {
-    path: '/forgotpassword',
-    component: './ForgotPassword',
-    hideInMenu: true,
-  },
+  // {
+  //   path: '/login',
+  //   component: './Login',
+  //   hideInMenu: true,
+  // },
+  // {
+  //   path: '/forgotpassword',
+  //   component: './ForgotPassword',
+  //   hideInMenu: true,
+  // },
   //
   // CMS
   {
@@ -65,7 +65,7 @@ const routes = [
             path: '/reception/queue',
             name: 'queue',
             component: './Reception/Queue',
-            mini: 'QE',
+            // mini: 'QE',
             exact: true,
           },
           // {
@@ -85,7 +85,7 @@ const routes = [
           {
             path: '/reception/appointment',
             name: 'appointment',
-            mini: 'AP',
+            // mini: 'AP',
             component: './Reception/Appointment',
           },
           {
@@ -141,7 +141,7 @@ const routes = [
           {
             path: '/patientdb/search',
             name: 'search',
-            mini: 'SP',
+            // mini: 'SP',
             component: './PatientDatabase/Search',
           },
         ],
@@ -178,7 +178,7 @@ const routes = [
             path: '/inventory/master',
             name: 'master',
             component: './Inventory/Master',
-            mini: 'IM',
+            // mini: 'IM',
           },
           {
             path: '/inventory/master/consumable',
@@ -244,7 +244,7 @@ const routes = [
             path: '/inventory/pr',
             name: 'pd',
             component: './Inventory/PurchaseReceive',
-            mini: 'PR',
+            // mini: 'PR',
           },
           {
             path: '/inventory/pr/pdodetails',
@@ -256,7 +256,7 @@ const routes = [
             path: '/inventory/inventoryadjustment',
             name: 'inventoryadjustment',
             component: './Inventory/InventoryAdjustment',
-            mini: 'IA',
+            // mini: 'IA',
           },
         ],
       },
@@ -274,7 +274,7 @@ const routes = [
             path: '/finance/invoice',
             name: 'invoice/list',
             component: './Finance/Invoice',
-            mini: 'IP',
+            // mini: 'IP',
             exact: true,
           },
           {
@@ -288,7 +288,7 @@ const routes = [
             name: 'credit/debitnote',
             hideInMenu: true,
             // component: './Finance/CreditDebitNote',
-            mini: 'CD',
+            // mini: 'CD',
           },
           // {
           //   path: '/finance/billing',
@@ -307,7 +307,7 @@ const routes = [
           {
             path: '/finance/deposit',
             name: 'deposit',
-            mini: 'DP',
+            // mini: 'DP',
             component: './Finance/Deposit',
           },
           {
@@ -319,7 +319,7 @@ const routes = [
           {
             path: '/finance/statement',
             name: 'statement',
-            mini: 'ST',
+            // mini: 'ST',
             component: './Finance/Statement',
           },
           {
@@ -346,17 +346,17 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Statement/Details/StatementDetails',
           },
-          {
-            path: '/finance/expense',
-            name: 'doctor-expense',
-            mini: 'DE',
-            exact: true,
-            component: './Finance/DoctorExpense',
-          },
+          // {
+          //   path: '/finance/expense',
+          //   name: 'doctor-expense',
+          //   // mini: 'DE',
+          //   exact: true,
+          //   component: './Finance/DoctorExpense',
+          // },
           {
             path: '/finance/scheme',
             name: 'scheme',
-            mini: 'SC',
+            // mini: 'SC',
             component: './Finance/Scheme',
           },
           {
@@ -368,7 +368,7 @@ const routes = [
           {
             path: '/finance/copayer',
             name: 'copayer',
-            mini: 'CP',
+            // mini: 'CP',
             component: './Setting/Company',
           },
         ],
@@ -687,7 +687,7 @@ const routes = [
           {
             path: '/development/control',
             name: 'Control',
-            mini: 'C',
+            // mini: 'C',
             component: './Development/Control',
           },
           // {
@@ -699,19 +699,19 @@ const routes = [
           {
             path: '/development/imageeditor2',
             name: 'LCImageEditor',
-            mini: 'CA',
+            // mini: 'CA',
             component: './Development/LCImageEditor',
           },
           {
             path: '/development/scribble',
             name: 'Scribble',
-            mini: 'CA',
+            // mini: 'CA',
             component: './Development/Scribble',
           },
           {
             path: '/development/reportviewer',
             name: 'Report Sample',
-            mini: 'RS',
+            // mini: 'RS',
             component: './Development/Report',
           },
         ],

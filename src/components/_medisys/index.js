@@ -15,3 +15,4 @@ export { default as AccordionTitle } from './AccordionTitle'
 export { default as DoctorProfileSelect } from './DoctorProfileSelect'
 
 export { default as LoginNavbar } from './LandingLayout/NavBar'
+export { default as SchemePopover } from './SchemePopover'

@@ -23,6 +23,7 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     history,
     setActiveTab,
   }
+  console.log({ activeTab, setActiveTab })
 
   useEffect(() => {
     let tabIndex = inventoryMaster.currentTab

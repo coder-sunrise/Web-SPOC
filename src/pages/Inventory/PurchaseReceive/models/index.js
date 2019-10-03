@@ -21,7 +21,12 @@ export default createListViewModel({
       },
     },
     subscriptions: ({ dispatch, history }) => {},
-    effects: {},
+    effects: {
+      *batchWriteOff ({ payload }, { call }) {
+        const r = yield call(service.upsertWithStatusCode, payload)
+        return r
+      },
+    },
     reducers: {
       queryDone (state, { payload }) {
         const { data } = payload

@@ -27,6 +27,7 @@ import AppointmentDateInput from './AppointmentDate'
 // import Recurrence from './Recurrence'
 import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
+import RescheduleForm from './RescheduleForm'
 // utils
 import { ValidationSchema, mapPropsToValues } from './formikUtils'
 import { getAppendUrl } from '@/utils/utils'
@@ -68,6 +69,7 @@ class Form extends React.PureComponent {
     showPatientProfile: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
+    showRescheduleForm: false,
     datagrid:
       this.props.values && this.props.values.currentAppointment
         ? this.props.values.currentAppointment.appointments_Resources
@@ -79,20 +81,27 @@ class Form extends React.PureComponent {
   }
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'clinicianprofile',
-      },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ltappointmentstatus' },
-    })
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'ltcancelreasontype' },
-    })
+    Promise.all([
+      this.props.dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'clinicianprofile',
+        },
+      }),
+      this.props.dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ltappointmentstatus' },
+      }),
+      this.props.dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ltcancelreasontype' },
+      }),
+      // this.props.dispatch({
+      //   type: 'codetable/fetchCodes',
+      //   payload: { code: 'LTRescheduleBy' },
+      // }),
+    ])
+
     this.validateDataGrid()
   }
 
@@ -529,6 +538,10 @@ class Form extends React.PureComponent {
     this.setState({ showSeriesUpdateConfirmation: false }, callback)
   }
 
+  closeRescheduleForm = () => {
+    this.setState({ showRescheduleForm: false })
+  }
+
   onConfirmSeriesUpdate = async (type) => {
     await this.props.setFieldValue('overwriteEntireSeries', type === '2', false)
     this.closeSeriesUpdateConfirmation(this._submit)
@@ -586,26 +599,39 @@ class Form extends React.PureComponent {
     )
   }
 
+  checkShouldDisable = () => {
+    const { appointmentStatuses, values } = this.props
+    const { isDataGridValid } = this.state
+
+    const { currentAppointment = {} } = values
+    const actualizeStatus = appointmentStatuses.find(
+      (item) => item.code === 'ACTUALISED',
+    )
+
+    if (currentAppointment.appointmentStatusFk === actualizeStatus.id)
+      return true
+
+    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
+      return true
+
+    return false
+  }
+
   render () {
-    const {
-      classes,
-      onClose,
-      loading,
-      values,
-      isSubmitting,
-      isEditedAsSingleAppointment,
-    } = this.props
+    const { classes, onClose, loading, values, isSubmitting, mode } = this.props
 
     const {
       showPatientProfile,
       showSearchPatientModal,
       showDeleteConfirmationModal,
       showSeriesUpdateConfirmation,
+      showRescheduleForm,
       datagrid,
       isDataGridValid,
     } = this.state
 
     const { currentAppointment = {} } = values
+    const shouldDisable = this.checkShouldDisable()
 
     // console.log({ datagrid })
     // console.log({
@@ -640,6 +666,7 @@ class Form extends React.PureComponent {
                   render={(args) => (
                     <OutlinedTextField
                       {...args}
+                      disabled={shouldDisable}
                       multiline
                       rowsMax={3}
                       rows={3}
@@ -651,6 +678,7 @@ class Form extends React.PureComponent {
 
               <GridItem xs md={12} className={classes.verticalSpacing}>
                 <AppointmentDataGrid
+                  disabled={shouldDisable}
                   appointmentDate={currentAppointment.appointmentDate}
                   data={datagrid}
                   handleCommitChanges={this.onCommitChanges}
@@ -672,11 +700,7 @@ class Form extends React.PureComponent {
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
               onClose={onClose}
-              disabled={
-                !isDataGridValid ||
-                !values.patientName ||
-                !values.patientContactNo
-              }
+              disabled={shouldDisable}
               handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
               handleSaveDraftClick={this.onSaveDraftClick}
               handleConfirmClick={this.onConfirmClick}
@@ -716,9 +740,7 @@ class Form extends React.PureComponent {
             >
               <DeleteConfirmation
                 handleConfirmClick={this.onConfirmCancelAppointment}
-                isSeries={
-                  !isEditedAsSingleAppointment && values.isEnableRecurrence
-                }
+                isSeries={values.isEnableRecurrence && mode === 'series'}
               />
             </CommonModal>
             <CommonModal
@@ -730,6 +752,14 @@ class Form extends React.PureComponent {
               <SeriesUpdateConfirmation
                 handleConfirm={this.onConfirmSeriesUpdate}
               />
+            </CommonModal>
+            <CommonModal
+              open={showRescheduleForm}
+              title='Alert'
+              onClose={this.closeRescheduleForm}
+              maxWidth='sm'
+            >
+              <RescheduleForm />
             </CommonModal>
           </React.Fragment>
         </SizeContainer>

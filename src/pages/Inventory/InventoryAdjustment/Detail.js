@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import _ from 'lodash'
 import Yup from '@/utils/yup'
 import { navigateDirtyCheck } from '@/utils/utils'
 import {
@@ -24,6 +23,7 @@ let commitCount = 1000 // uniqueNumber
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment, runningNo }) => {
     const value = inventoryAdjustment.entity || inventoryAdjustment.default
+
     return {
       ...value,
       adjustmentTransactionNo: value.adjustmentTransactionNo || runningNo,
@@ -31,7 +31,6 @@ let commitCount = 1000 // uniqueNumber
   },
   validationSchema: Yup.object().shape({
     adjustmentTransactionDate: Yup.date().required(),
-    remarks: Yup.string().max(2000, 'Max 2000 characters for remarks.'),
   }),
   handleSubmit: (values, { props }) => {
     const {
@@ -40,9 +39,7 @@ let commitCount = 1000 // uniqueNumber
       inventoryAdjustmentStatusString,
       ...restValue
     } = values
-
-    const { dispatch, onConfirm, getRunningNo } = props
-
+    const { dispatch, onConfirm } = props
     const list = inventoryAdjustmentItems || stockList
     const newInventoryAdjustmentItem = list.map((o) => {
       const type = (v) => {
@@ -119,7 +116,6 @@ let commitCount = 1000 // uniqueNumber
         dispatch({
           type: 'inventoryAdjustment/query',
         })
-        getRunningNo()
       }
     })
   },
@@ -200,7 +196,6 @@ class Detail extends PureComponent {
         columnName: 'displayValue',
         type: 'select',
         labelField: 'name',
-        width: 250,
         autoComplete: true,
         options: (row) => {
           return this.rowOptions(row)
@@ -212,7 +207,6 @@ class Detail extends PureComponent {
       {
         columnName: 'uomDisplayValue',
         disabled: true,
-        width: 90,
       },
       {
         columnName: 'batchNo',
@@ -229,7 +223,6 @@ class Detail extends PureComponent {
         columnName: 'expiryDate',
         type: 'date',
         disabled: true,
-        width: 120,
       },
       {
         columnName: 'stock',
@@ -241,7 +234,6 @@ class Detail extends PureComponent {
         columnName: 'adjustmentQty',
         type: 'number',
         format: '0.0',
-        qty: true,
       },
     ],
     columnEditingEnabled: false,
@@ -461,14 +453,14 @@ class Detail extends PureComponent {
         ...this.state.filterStockVaccination,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return row.id ? this.state.stockVaccination : x
+      return row.uid ? this.state.stockVaccination : x
     }
     if (row.inventoryTypeFK === 3) {
       let array = [
         ...this.state.filterStockConsumable,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return row.id ? this.state.stockConsumable : x
+      return row.uid ? this.state.stockConsumable : x
     }
     return []
   }
@@ -476,11 +468,10 @@ class Detail extends PureComponent {
   filterStockOption = (e) => {
     const { option, row } = e
     if (row.batchNo) {
-      const getState = this.type(row.inventoryTypeFK)
       this.setState((prevState) => {
         return {
-          [getState.filteredStateName]: prevState[getState.stateName].filter(
-            (o) => o.id !== row.batchNo,
+          filterStockMedication: prevState.stockMedication.filter(
+            (o) => o.batchNo !== option.batchNo,
           ),
         }
       })
@@ -493,7 +484,7 @@ class Detail extends PureComponent {
       const { expiryDate, stock, value, batchNo } = option
       row.batchNo = value
       row.expiryDate = expiryDate
-      // row.stock = stock
+      row.stock = stock
       row.batchNoString = batchNo
       this.setState({ selectedItem: e })
     }
@@ -507,41 +498,41 @@ class Detail extends PureComponent {
     })
   }
 
-  type = (v) => {
-    switch (v) {
-      case 1:
-        return {
-          stateName: 'stockMedication',
-          filteredStateName: 'filterStockMedication',
-        }
-      case 2:
-        return {
-          stateName: 'stockVaccination',
-          filteredStateName: 'filterStockVaccination',
-        }
-      case 3:
-        return {
-          stateName: 'stockConsumable',
-          filteredStateName: 'filterStockConsumable',
-        }
-      default:
-        return {}
-    }
-  }
-
   handleSelectedItem = (e) => {
     const { option, row } = e
     if (option) {
       const { uom, value, code, name } = option
-      this.setState({ selectedItem: e })
       row.code = value
       row.displayValue = value
       row.uomDisplayValue = uom
       row.codeString = code
       row.displayValueString = name
 
+      this.setState({ selectedItem: e })
+
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
-        const getState = this.type(row.inventoryTypeFK)
+        const type = (v) => {
+          switch (v) {
+            case 1:
+              return {
+                stateName: 'stockMedication',
+                filteredStateName: 'filterStockMedication',
+              }
+            case 2:
+              return {
+                stateName: 'stockVaccination',
+                filteredStateName: 'filterStockVaccination',
+              }
+            case 3:
+              return {
+                stateName: 'stockConsumable',
+                filteredStateName: 'filterStockConsumable',
+              }
+            default:
+              return {}
+          }
+        }
+        const getState = type(row.inventoryTypeFK)
         const defaultStock = this.state[getState.filteredStateName].find(
           (j) =>
             j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
@@ -551,35 +542,51 @@ class Detail extends PureComponent {
           row.batchNo = defaultStock.id
           row.stock = defaultStock.stock
 
+          if (!row.stock) {
+            row.stock = 1
+            row.adjustmentQty = 5
+          }
+
           this.setState({ selectedBatch: defaultStock })
         }
       }
     }
-
-    this.props.dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
   }
 
   onCommitChanges = ({ rows, deleted, added }) => {
     const { setValues, setFieldValue, values } = this.props
     const { stockList, stockMedication } = this.state
 
+    const type = (v) => {
+      switch (v) {
+        case 1:
+          return {
+            stateName: 'stockMedication',
+            filteredStateName: 'filterStockMedication',
+          }
+        case 2:
+          return {
+            stateName: 'stockVaccination',
+            filteredStateName: 'filterStockVaccination',
+          }
+        case 3:
+          return {
+            stateName: 'stockConsumable',
+            filteredStateName: 'filterStockConsumable',
+          }
+        default:
+          return {}
+      }
+    }
+
     if (deleted) {
       const deletedSet = new Set(deleted)
 
       const deletedRow = rows.find((row) => deletedSet.has(row.id))
-
-      deletedRow.isDeleted = true
-
       const changedRows = rows.filter((row) => !deletedSet.has(row.id))
 
       if (deletedRow.batchNo) {
-        const getState = this.type(deletedRow.inventoryTypeFK)
+        const getState = type(deletedRow.inventoryTypeFK)
 
         const stockItem = this.state[getState.stateName].find(
           (o) => o.id === deletedRow.batchNo,
@@ -595,16 +602,12 @@ class Detail extends PureComponent {
       }
 
       if (stockList.length > 0) {
-        this.setState({ stockList: rows })
+        this.setState({ stockList: changedRows })
       } else {
-        this.setState({ inventoryAdjustmentItems: rows })
+        this.setState({ inventoryAdjustmentItems: changedRows })
       }
-      setValues({
-        ...values,
-        inventoryAdjustmentItems: rows,
-      })
 
-      return rows
+      return changedRows
     }
     if (this.state.selectedItem) {
       this.filterStockOption(this.state.selectedItem)
@@ -631,9 +634,6 @@ class Detail extends PureComponent {
       inventoryAdjustmentItems: rows,
     })
 
-    this.setState({ selectedBatch: undefined })
-    this.setState({ selectedItem: undefined })
-
     return rows
   }
 
@@ -645,7 +645,7 @@ class Detail extends PureComponent {
       if (uom) {
         returnRows = addedRows.map((r) => ({
           ...r,
-          uomDisplayValue: 123,
+          uomDisplayValue: uom,
         }))
       } else {
         returnRows = addedRows.map((r) => ({
@@ -655,12 +655,19 @@ class Detail extends PureComponent {
         }))
       }
 
+      this.props.dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+
       if (this.state.selectedBatch && returnRows) {
         // const { stock } = this.state.selectedItem
         returnRows = returnRows.map((r) => ({
           ...r,
           stock: this.state.selectedBatch.stock,
-          batchNoString: this.state.selectedBatch.batchNo,
         }))
       }
       return returnRows
@@ -679,10 +686,13 @@ class Detail extends PureComponent {
   }
 
   updateStatus = async () => {
-    const { setFieldValue, handleSubmit, errors } = this.props
-    if (_.isEmpty(errors)) {
-      await setFieldValue('inventoryAdjustmentStatusFK', 2)
-    }
+    const { setFieldValue, setValues, values, handleSubmit } = this.props
+    await setFieldValue('inventoryAdjustmentStatusFK', 2)
+    // await setValues({
+    //   ...values,
+    //   inventoryAdjustmentStatusFK: 2,
+    //   inventoryAdjustmentStatusString: 'Finalized',
+    // })
     handleSubmit()
   }
 
@@ -702,6 +712,7 @@ class Detail extends PureComponent {
         .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
         .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
     })
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

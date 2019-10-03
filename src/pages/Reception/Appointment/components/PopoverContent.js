@@ -107,13 +107,31 @@ class PopoverContent extends React.Component {
     const {
       hasConflict,
       doctor,
-      patientName,
-      patientContactNo,
+      // patientName,
+      // patientContactNo,
       clinicianFK,
       appointmentTypeFK,
       appointmentStatusFk,
+      patientProfile,
     } = popoverEvent
 
+    let { patientName, patientContactNo } = popoverEvent
+
+    // const _contactNo =
+    //   patientProfile &&
+    //   patientProfile.contactNumbers.find((item) => item.numberTypeFK === 1)
+
+    if (patientProfile) {
+      const { name, contactNumbers } = patientProfile
+      const _mobileContact = contactNumbers.find(
+        (item) => item.numberTypeFK === 1,
+      )
+      if (_mobileContact) patientContactNo = _mobileContact.number
+      patientName = name
+      // patientAccountNo = accNo
+    }
+
+    // const _patientContactNo = _contactNo ? _contactNo.number : patientContactNo
     return (
       <CardBody>
         <div className={classes.statusRow}>
