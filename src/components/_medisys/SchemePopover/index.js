@@ -19,6 +19,7 @@ import CHASCardReplacement from './CHASCardReplacement'
 const SchemePopover = ({
   isBanner = false,
   data,
+  schemeTypeFK,
   balanceValue,
   dataFrom,
   dateTo,
@@ -45,7 +46,7 @@ const SchemePopover = ({
                 <CodeSelect
                   text
                   code='ctSchemeType'
-                  value={data.schemeTypeFK}
+                  value={schemeTypeFK}
                 />
 
                 <div style={{display: 'inline-block', position: 'absolute'}}>

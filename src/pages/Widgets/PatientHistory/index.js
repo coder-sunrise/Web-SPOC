@@ -139,8 +139,8 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'PatientHistory',
 // })
-@connect(({ patientHistory }) => ({
-  patientHistory,
+@connect(({ patientHistory, clinicSettings }) => ({
+  patientHistory, clinicSettings,
 }))
 class PatientHistory extends Component {
   state = {
@@ -258,8 +258,17 @@ class PatientHistory extends Component {
   }
 
   getContent = (row) => {
-    const { patientHistory, mode} = this.props
+    const { patientHistory, mode, clinicSettings} = this.props
     const { selectedSubRow } = patientHistory
+
+    let newArray = []
+    if(clinicSettings.settings.ShowConsultationVersioning && mode === 'integrated'){
+      if(row.coHistory.length >= 1){
+        newArray.push(row.coHistory[row.coHistory.length - 1])
+      }
+    }else{
+      newArray = row.coHistory   
+    }
 
     return (
       <List
@@ -269,7 +278,7 @@ class PatientHistory extends Component {
         }}
         disablePadding
       >
-        {row.coHistory.map((o) => {
+        {newArray.map((o) => {
           return (
             <React.Fragment>
               <ListItem
