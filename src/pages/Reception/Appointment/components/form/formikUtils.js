@@ -71,10 +71,24 @@ export const mapPropsToValues = ({
   viewingAppointment,
   selectedAppointmentID,
   selectedSlot,
+  patientProfile: patientEntity,
   user,
   clinicianProfiles,
 }) => {
+  let _patientContactNo
+  let _patientName
+  let _patientAccountNo
+  if (patientEntity) {
+    const { name, patientAccountNo: accNo, contact } = patientEntity
+    _patientContactNo = contact.mobileContactNumber.number
+    _patientName = name
+    _patientAccountNo = accNo
+  }
+
   let values = {
+    patientContactNo: _patientContactNo,
+    patientName: _patientName,
+    patientAccountNo: _patientAccountNo,
     isEnableRecurrence: false,
     isEditedAsSingleAppointment: false,
     overwriteEntireSeries: false,
