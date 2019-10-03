@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import { withStyles } from '@material-ui/core'
 import {
   GridContainer,
   GridItem,
@@ -9,8 +10,11 @@ import {
   dateFormatLong,
   CodeSelect,
 } from '@/components'
+import styles from './styles'
 
 const CHASCardReplacement = ({
+  theme,
+  classes,
   entity,
   refreshedSchemeData,
   handleOnClose,
@@ -28,22 +32,23 @@ const CHASCardReplacement = ({
   )[0]
 
   return (
-    <GridContainer>
-      <GridContainer>
+    <GridContainer style={{ marginBottom: theme.spacing(1) }}>
+      <GridContainer className={classes.patientDetail}>
         <GridItem md={6}>Patient: {callingName}</GridItem>
         <GridItem md={6}>Account No: {patientAccountNo}</GridItem>
       </GridContainer>
       <GridContainer>
-        <GridItem md={12}> </GridItem>
+        <GridItem>
+          <br />
+        </GridItem>
       </GridContainer>
-      <GridContainer>
+      <GridContainer className={classes.schemeName}>
         <GridItem md={2} />
         <GridItem md={4}>Old CHAS Card:</GridItem>
         <GridItem md={4}>
           <CodeSelect text code='ctSchemeType' value={oldSchemeTypeFK} />
         </GridItem>
         <GridItem md={2} />
-
         <GridItem md={2} />
         <GridItem md={4}>New CHAS Card:</GridItem>
         <GridItem md={4}>
@@ -52,12 +57,16 @@ const CHASCardReplacement = ({
         <GridItem md={2} />
       </GridContainer>
       <GridContainer>
+        <GridItem>
+          <br />
+        </GridItem>
+      </GridContainer>
+      <GridContainer>
         <GridItem md={5}>CHAS Balance:</GridItem>
         <GridItem md={5}>
           <NumberInput text currency value={balance} />
         </GridItem>
         <GridItem md={2} />
-
         <GridItem md={5}>CHAS Validity: </GridItem>
         <GridItem md={5}>
           <DatePicker text format={dateFormatLong} value={validTo} />
@@ -104,15 +113,16 @@ const CHASCardReplacement = ({
         </GridItem>
         <GridItem md={2} />
       </GridContainer>
-      <GridContainer>
-        <GridItem>
-          <Button color='primary' onClick={handleOnClose}>
-            OK
-          </Button>
-        </GridItem>
+      <GridContainer className={classes.confirmButton}>
+        <Button color='primary' onClick={handleOnClose}>
+          OK
+        </Button>
       </GridContainer>
     </GridContainer>
   )
 }
 
-export default CHASCardReplacement
+export default withStyles(styles, {
+  withTheme: true,
+  name: 'CHASCardReplacement',
+})(CHASCardReplacement)

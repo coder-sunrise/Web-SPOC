@@ -36,18 +36,9 @@ const PatientInfoSideBanner = ({
   })
 
   const [
-    showReplacementModal,
-    setShowReplacementModal,
-  ] = useState(false)
-
-  const [
     refreshedSchemeData,
     setRefreshedSchemeData,
   ] = useState({})
-
-  const handleReplacementModalVisibility = (show = false) => {
-    setShowReplacementModal(show)
-  }
 
   const refreshChasBalance = (selectedSchemeTypeFK) => {
     dispatch({
@@ -62,6 +53,11 @@ const PatientInfoSideBanner = ({
           validFrom,
           validTo,
         } = result
+        let isShowReplacementModal = false
+
+        if (selectedSchemeTypeFK !== schemeTypeFk) {
+          isShowReplacementModal = true
+        }
 
         setRefreshedSchemeData({
           oldSchemeTypeFK: selectedSchemeTypeFK,
@@ -69,11 +65,8 @@ const PatientInfoSideBanner = ({
           balance,
           validFrom,
           validTo,
+          isShowReplacementModal,
         })
-
-        if (selectedSchemeTypeFK !== schemeTypeFk) {
-          handleReplacementModalVisibility(true)
-        }
       }
     })
   }
@@ -141,10 +134,15 @@ const PatientInfoSideBanner = ({
                 </IconButton>
 
                 <SchemePopover
+                  isShowReplacementModal={
+                    refreshedSchemeData.isShowReplacementModal
+                  }
                   handleRefreshChasBalance={() =>
                     refreshChasBalance(o.schemeTypeFK)}
                   data={o}
+                  entity={entity}
                   schemeTypeFK={schemeTypeFK}
+                  refreshedSchemeData={refreshedSchemeData}
                   balanceValue={
                     _.isEmpty(refreshedSchemeData) ? (
                       balance
@@ -197,20 +195,6 @@ const PatientInfoSideBanner = ({
       {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
         <Divider light />
       )}
-
-      <CommonModal
-        open={showReplacementModal}
-        title='CHAS Card Replacement'
-        maxWidth='sm'
-        onConfirm={() => handleReplacementModalVisibility(false)}
-        onClose={() => handleReplacementModalVisibility(false)}
-      >
-        <CHASCardReplacement
-          entity={entity}
-          refreshedSchemeData={refreshedSchemeData}
-          handleOnClose={() => handleReplacementModalVisibility(false)}
-        />
-      </CommonModal>
     </React.Fragment>
   ) : null
 }

@@ -6,7 +6,7 @@ import _ from 'lodash'
 import router from 'umi/router'
 
 // medisys-components
-import { PatientInfoSideBanner, CHASCardReplacement } from 'medisys-components'
+import { PatientInfoSideBanner } from 'medisys-components'
 import {
   withStyles,
   MenuItem,
