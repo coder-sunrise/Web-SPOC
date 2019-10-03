@@ -77,9 +77,7 @@ class Banner extends PureComponent {
     const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
-    const da = ctdrugallergy.filter((o) =>
-      patientAllergy.find((m) => m.allergyFK === o.id),
-    )
+    const da = ctdrugallergy.filter((o) => patientAllergy.find((m) => m.allergyFK === o.id), )
 
     let allergyData = ' '
 
