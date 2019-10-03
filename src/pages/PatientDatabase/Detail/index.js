@@ -256,6 +256,25 @@ class PatientDetail extends PureComponent {
     )
   }
 
+  refreshChasBalance = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/refreshChasBalance',
+      payload: entity,
+    }).then((result) => {
+      if (result) {
+        const {
+          balance,
+          patientCoPaymentSchemeFk,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+        } = result
+      }
+    })
+  }
+
   render () {
     const {
       theme,
@@ -294,7 +313,10 @@ class PatientDetail extends PureComponent {
         <GridItem xs={12} sm={12} md={2}>
           <Card profile>
             <CardBody profile>
-              <PatientInfoSideBanner entity={entity} />
+              <PatientInfoSideBanner
+                entity={entity}
+                handleRefreshChasBalance={this.refreshChasBalance}
+              />
               <MenuList>
                 {this.widgets
                   .filter(

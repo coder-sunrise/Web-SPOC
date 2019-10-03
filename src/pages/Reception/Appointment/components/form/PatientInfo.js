@@ -10,6 +10,7 @@ import {
   CodeSelect,
   GridItem,
   TextField,
+  NumberInput,
   ProgressButton,
 } from '@/components'
 import style from './style'
@@ -20,9 +21,9 @@ const PatientInfoInput = ({
   onSearchPatientClick,
   onCreatePatientClick,
   onRegisterToVisitClick,
-  patientName,
   patientProfileFK,
   isEdit,
+  disabled,
   appointmentStatusFK,
 }) => {
   const isRegisteredPatient =
@@ -31,36 +32,23 @@ const PatientInfoInput = ({
     1,
     5,
   ].includes(appointmentStatusFK)
+
   return (
     <React.Fragment>
       <GridItem xs md={6}>
-        {!isRegisteredPatient ? (
-          <FastField
-            name='patientName'
-            render={(args) => {
-              return (
-                <TextField
-                  {...args}
-                  autoFocus
-                  // onEnterPressed={onSearchPatient}
-                  label='Patient Name / Acc. No.'
-                  disabled={isEdit}
-                />
-              )
-            }}
-          />
-        ) : (
-          <div className={classnames(classes.buttonGroup)}>
-            <Button
-              color='primary'
-              link
-              className={classes.patientNameButton}
-              onClick={onViewPatientProfileClick}
-            >
-              {patientName}
-            </Button>
-          </div>
-        )}
+        <FastField
+          name='patientName'
+          render={(args) => {
+            return (
+              <TextField
+                {...args}
+                autoFocus
+                label='Patient Name / Acc. No.'
+                disabled={isEdit}
+              />
+            )
+          }}
+        />
       </GridItem>
       <GridItem xs md={6}>
         <div className={classnames(classes.buttonGroup)}>
@@ -71,7 +59,7 @@ const PatientInfoInput = ({
                 color='primary'
                 variant='contained'
                 submitKey='patientSearch/query'
-                disabled={isEdit}
+                disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
                 icon={null}
               >
@@ -80,21 +68,31 @@ const PatientInfoInput = ({
               <Button
                 size='sm'
                 color='primary'
-                // disabled={isEdit}
+                disabled={disabled}
                 onClick={onCreatePatientClick}
               >
                 Create Patient
               </Button>
             </React.Fragment>
           ) : (
-            <Button
-              size='sm'
-              color='primary'
-              disabled={!isEdit || !allowedToActualize}
-              onClick={onRegisterToVisitClick}
-            >
-              Register To Visit
-            </Button>
+            <React.Fragment>
+              <Button
+                color='primary'
+                size='sm'
+                // className={classes.patientNameButton}
+                onClick={onViewPatientProfileClick}
+              >
+                Patient Profile
+              </Button>
+              <Button
+                size='sm'
+                color='primary'
+                disabled={!isEdit || !allowedToActualize}
+                onClick={onRegisterToVisitClick}
+              >
+                Register To Visit
+              </Button>
+            </React.Fragment>
           )}
         </div>
       </GridItem>
@@ -102,9 +100,9 @@ const PatientInfoInput = ({
         <FastField
           name='patientContactNo'
           render={(args) => (
-            <TextField
+            <NumberInput
               {...args}
-              disabled={isEdit && appointmentStatusFK !== 2}
+              disabled={isRegisteredPatient || disabled || isEdit}
               label='Contact No.'
             />
           )}

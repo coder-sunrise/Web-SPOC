@@ -35,6 +35,7 @@ const styles = (theme) => ({
     left: 305,
     right: 0,
     top: 25,
+    
   },
   linkBtn: {
     position: 'absolute',
@@ -52,8 +53,8 @@ const styles = (theme) => ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    overflow: 'visible',
-    
+    overflow: 'hidden',
+
     backgroundColor: theme.palette.background.paper,
   },
 })
@@ -127,15 +128,18 @@ class ClinicalNotes extends Component {
   }
 
   resize = () => {
-    this.setState({
-      width: window.innerWidth / 9.5,
-    })
-
-
-    console.log(this.state.width)
+    if(window.innerWidth >= 1812){
+      this.setState({
+        width: window.innerWidth / 4,
+      })
+    }else{
+      this.setState({
+        width: window.innerWidth / 7.8,
+      })
+    }
   }
 
-  scribbleNoteDrawing = (values, temp, scribbleId) => {
+  scribbleNoteDrawing = (values, temp) => {
     const { scriblenotes } = this.props
     const { category, arrayName, categoryIndex } = this.state
     let previousData = this.form.values.corScribbleNotes
@@ -143,8 +147,6 @@ class ClinicalNotes extends Component {
     let chiefComplaintsArray =
       scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
     let planArray = scriblenotes.Plan.planScribbleArray
-
-    console.log(clinicianArray)
 
     if (scriblenotes.editEnable) {
       const newArrayItems = [
@@ -178,11 +180,6 @@ class ClinicalNotes extends Component {
         planArray = newArrayItems
       }
 
-      console.log('********')
-      console.log(clinicianArray)
-      console.log(chiefComplaintsArray)
-      console.log(planArray)
-
       previousData = []
 
       for (let i = 0; i < clinicianArray.length; i++) {
@@ -196,7 +193,6 @@ class ClinicalNotes extends Component {
       for (let i = 0; i < planArray.length; i++) {
         previousData.push(planArray[i])
       }
-      console.log('updated ', previousData)
     } else {
       this.props.dispatch({
         type: 'scriblenotes/updateState',
@@ -226,6 +222,83 @@ class ClinicalNotes extends Component {
     this.form.setFieldValue('corScribbleNotes', previousData)
   }
 
+  deleteScribbleNote = () => {
+    const { scriblenotes } = this.props
+    const { category, arrayName } = this.state
+    let previousData = this.form.values.corScribbleNotes
+    let clinicianArray = scriblenotes.ClinicianNote.notesScribbleArray
+    let chiefComplaintsArray =
+      scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
+    let planArray = scriblenotes.Plan.planScribbleArray
+    const tempArrayItems = [
+      ...scriblenotes[category][arrayName],
+    ]
+    const newArrayItems = []
+    const deleteItem = tempArrayItems[scriblenotes.selectedIndex]
+
+    for (let i = 0; i < tempArrayItems.length; i++) {
+      if (tempArrayItems[i] !== deleteItem) {
+        newArrayItems.push(tempArrayItems[i])
+      }
+    }
+
+    this.props.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        ...scriblenotes,
+        [category]: {
+          [arrayName]: newArrayItems,
+        },
+      },
+    })
+
+    if (category === 'ClinicianNote') {
+      clinicianArray = newArrayItems
+    } else if (category === 'ChiefComplaints') {
+      chiefComplaintsArray = newArrayItems
+    } else if (category === 'Plan') {
+      planArray = newArrayItems
+    }
+
+    this.props.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        ...scriblenotes,
+        [category]: {
+          [arrayName]: newArrayItems,
+        },
+      },
+    })
+
+    previousData = []
+
+    for (let i = 0; i < clinicianArray.length; i++) {
+      previousData.push(clinicianArray[i])
+    }
+
+    for (let i = 0; i < chiefComplaintsArray.length; i++) {
+      previousData.push(chiefComplaintsArray[i])
+    }
+
+    for (let i = 0; i < planArray.length; i++) {
+      previousData.push(planArray[i])
+    }
+
+    for (let i = 0; i < previousData.length; i++) {
+      if (JSON.stringify(previousData[i]) === JSON.stringify(deleteItem)) {
+        if (previousData[i].isDeleted !== undefined) {
+          previousData[i].isDeleted = true
+        } else {
+          previousData.splice(i, 1)
+        }
+      }
+    }
+
+    this.form.setFieldValue('corScribbleNotes', previousData)
+
+    this.toggleScribbleModal()
+  }
+
   toggleAttachmentModal = () => {
     const { clinicalnotes } = this.props
 
@@ -252,9 +325,9 @@ class ClinicalNotes extends Component {
   }
 
   updateAttachments = (args) => ({ added, deleted }) => {
-    console.log({ added, deleted }, args)
+    // console.log({ added, deleted }, args)
     const { form, field } = args
-    console.log(form)
+
     let updated = [
       ...(field.value || []),
     ]
@@ -283,22 +356,8 @@ class ClinicalNotes extends Component {
           { ...item },
         ]
       }, [])
-    console.log('abc ', form.values.corAttachment)
 
-    // form.setFieldValue('corAttachment', updated)
-    form.setFieldValue('corAttachment', [
-      {
-        attachmentType: 'ClinicalNotes',
-        clinicalObjectRecordFK: 139,
-        concurrencyToken: 77704,
-        fileExtension: '.jpg',
-        fileIndexFK: 203,
-        fileName: 'Photoshop-Replace-Background-Featured-670x335.jpg',
-        id: 203,
-        isDeleted: false,
-        sortOrder: 0,
-      },
-    ])
+    form.setFieldValue('corAttachment', updated)
   }
 
   editRow = () => {
@@ -341,14 +400,13 @@ class ClinicalNotes extends Component {
   // </IconButton>
 
   render () {
-    // console.log('ClinicalNotes', this.props)
     const {
       prefix = 'corDoctorNote[0].',
       clinicalnotes,
       classes,
       scriblenotes,
     } = this.props
-    // console.log(this.state)
+
     return (
       <div>
         <div className={classes.editor}>
@@ -372,17 +430,36 @@ class ClinicalNotes extends Component {
               let plan = values.corScribbleNotes.filter(
                 (o) => o.scribbleNoteTypeFK === 3,
               )
-              // if (!this.state.runOnce) {
-              //   scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
-              //   scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
-              //   scriblenotes.Plan.planScribbleArray = plan
-              //   this.setState({
-              //     runOnce: true,
-              //   })
-              // }
-              scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
-              scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
-              scriblenotes.Plan.planScribbleArray = plan
+
+              // scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
+              // scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
+              // scriblenotes.Plan.planScribbleArray = plan
+              if (this.state.runOnce === false) {
+                setTimeout(() => {
+                  this.props.dispatch({
+                    type: 'scriblenotes/updateState',
+                    payload: {
+                      entity: '',
+                      selectedIndex: '',
+                      ClinicianNote: {
+                        notesScribbleArray: clinicianNote,
+                      },
+                      ChiefComplaints: {
+                        chiefComplaintsScribbleArray: chiefComplaints,
+                      },
+                      Plan: {
+                        planScribbleArray: plan,
+                      },
+                    },
+                  })
+                  // scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
+                  // scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
+                  // scriblenotes.Plan.planScribbleArray = plan
+                }, 500)
+                this.setState({
+                  runOnce: true,
+                })
+              }
 
               return null
               // if (diagnosises.length === 0) {
@@ -410,12 +487,7 @@ class ClinicalNotes extends Component {
                 <div>
                   <div className={classes.editorBtn}>
                     <Button
-                      style={{
-                        backgroundColor: '#48C9B0',
-                        color: 'white',
-                        fontWeight: 'normal',
-                        fontSize: 5,
-                      }}
+                      color='info'
                       onClick={() => {
                         this.setState({
                           category: 'ClinicianNote',
@@ -437,29 +509,31 @@ class ClinicalNotes extends Component {
                       Scribble Note
                     </Button>
 
-                    <div style={{ display: 'inline-block' }}>
+                    <div style={{ display: 'inline-block', position: 'absolute' }}>
                       {scriblenotes.ClinicianNote.notesScribbleArray.length >
                       0 ? (
                         <GridContainer>
-                          <div className={classes.root} style={{ width: this.state.width}}>
+                          <div
+                            className={classes.root}
+                            style={{ width: this.state.width, paddingLeft: 20 }}
+                          >
                             <GridList
                               className={classes.gridList}
                               cols={0}
                               cellHeight={20}
-                              spacing={1}
                             >
                               {scriblenotes.ClinicianNote.notesScribbleArray.map(
                                 (item, i) => {
                                   return (
                                     <GridListTile key={i} cols={0}>
-                                      <GridItem md={1}>
+                                      <GridItem md={2}>
                                         <Button
                                           link
                                           style={{
                                             textDecoration: 'underline',
+                                            minWidth: 150,
                                           }}
                                           // className={classes.linkBtn}
-                                          tabindex='-1'
                                           value={item}
                                           onClick={() => {
                                             if (item.scribbleNoteLayers) {
@@ -563,12 +637,7 @@ class ClinicalNotes extends Component {
                 <div>
                   <div className={classes.editorBtn}>
                     <Button
-                      style={{
-                        backgroundColor: '#48C9B0',
-                        color: 'white',
-                        fontWeight: 'normal',
-                        fontSize: 5,
-                      }}
+                      color='info'
                       onClick={() => {
                         this.setState({
                           category: 'ChiefComplaints',
@@ -589,10 +658,14 @@ class ClinicalNotes extends Component {
                     >
                       Scribble Note
                     </Button>
-                    <div style={{ display: 'inline-block' }}>
-                      {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray.length > 0 ? (
+                    <div style={{ display: 'inline-block', position: 'absolute' }}>
+                      {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
+                        .length > 0 ? (
                         <GridContainer>
-                          <div className={classes.root} style={{ width: this.state.width}}>
+                          <div
+                            className={classes.root}
+                            style={{ width: this.state.width, paddingLeft: 20 }}
+                          >
                             <GridList
                               className={classes.gridList}
                               cols={0}
@@ -608,6 +681,7 @@ class ClinicalNotes extends Component {
                                           // className={classes.linkBtn}
                                           style={{
                                             textDecoration: 'underline',
+                                            minWidth: 150,
                                           }}
                                           value={item}
                                           onClick={() => {
@@ -738,12 +812,7 @@ class ClinicalNotes extends Component {
                 <div>
                   <div className={classes.editorBtn}>
                     <Button
-                      style={{
-                        backgroundColor: '#48C9B0',
-                        color: 'white',
-                        fontWeight: 'normal',
-                        fontSize: 5,
-                      }}
+                      color='info'
                       onClick={() => {
                         this.setState({
                           category: 'Plan',
@@ -765,10 +834,13 @@ class ClinicalNotes extends Component {
                       Scribble Note
                     </Button>
 
-                    <div style={{ display: 'inline-block'}}>
+                    <div style={{ display: 'inline-block',position: 'absolute' }}>
                       {scriblenotes.Plan.planScribbleArray.length > 0 ? (
                         <GridContainer>
-                          <div className={classes.root} style={{ width: this.state.width}}>
+                          <div
+                            className={classes.root}
+                            style={{ width: this.state.width, paddingLeft: 20 }}
+                          >
                             <GridList
                               className={classes.gridList}
                               cols={0}
@@ -784,6 +856,7 @@ class ClinicalNotes extends Component {
                                           // className={classes.linkBtn}
                                           style={{
                                             textDecoration: 'underline',
+                                            minWidth: 150,
                                           }}
                                           value={item}
                                           onClick={() => {
@@ -950,6 +1023,7 @@ class ClinicalNotes extends Component {
             addScribble={this.scribbleNoteDrawing}
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
+            deleteScribbleNote={this.deleteScribbleNote}
           />
         </CommonModal>
       </div>

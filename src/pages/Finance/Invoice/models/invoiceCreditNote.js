@@ -67,13 +67,16 @@ export default createFormViewModel({
 
         const remainingItems = invoiceItem.map((item) => {
           const pastItemQuantity = pastCreditNoteItems[item.itemName]
-          if (pastItemQuantity)
+          if (pastItemQuantity) {
+            const remainingQty = item.quantity - pastItemQuantity
             return {
               ...item,
-              quantity: item.quantity - pastItemQuantity,
+              quantity: remainingQty,
+              originRemainingQty: remainingQty,
               // totalAfterItemAdjustment: remaining quantity multiply unit price
               totalAfterItemAdjustment: (item.quantity - pastItemQuantity) * 10,
             }
+          }
           return { ...item }
         })
 

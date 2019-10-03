@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'dva'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -26,10 +27,22 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ claimSubmissionRejected }) => ({
+  claimSubmissionRejected,
+}))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
 class RejectedCHAS extends React.Component {
+  // componentDidMount () {
+  //   this.props.dispatch({
+  //     type: 'claimSubmissionDraft/query',
+  //     payload: {
+  //       status: 'rejected',
+  //     },
+  //   })
+  // }
+
   render () {
     const { classes, handleContextMenuItemClick } = this.props
     return (

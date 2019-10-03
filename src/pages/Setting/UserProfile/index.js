@@ -123,7 +123,11 @@ class UserProfile extends React.Component {
             <FastField
               name='searchQuery'
               render={(args) => (
-                <TextField {...args} label='Name / Login Account' />
+                <TextField
+                  {...args}
+                  label='Name / Login Account'
+                  inputProps={{ autoComplete: 'off' }}
+                />
               )}
             />
           </GridItem>

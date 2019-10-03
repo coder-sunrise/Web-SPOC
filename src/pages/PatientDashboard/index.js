@@ -16,7 +16,7 @@ import {
   ListItemSecondaryAction,
   Typography,
 } from '@material-ui/core'
-
+import router from 'umi/router'
 import { unstable_Box as Box } from '@material-ui/core/Box'
 import { Icon, Input, AutoComplete, Form } from 'antd'
 import Loadable from 'react-loadable'
@@ -86,8 +86,6 @@ const styles = (theme) => ({
 }))
 class PatientDashboard extends PureComponent {
   componentDidMount () {
-    // console.log('=====')
-    // console.log(this.props)
     if (this.props.patientDashboard.currentId) {
       this.props.dispatch({
         type: 'patientDashboard/query',

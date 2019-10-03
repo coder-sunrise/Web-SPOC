@@ -76,26 +76,26 @@ const columnExtensions = [
     render: (row) => {
       const { visitStatus: value } = row
       // const hasBadge = Object.keys(VISIT_STATUS).map((key) => VISIT_STATUS[key])
-      let color = 'primary'
+      let color = '#999999'
       let hasBadge = true
       switch (value.toUpperCase()) {
         case VISIT_STATUS.WAITING:
-          color = 'primary'
+          color = '#4255BD'
           break
         case VISIT_STATUS.DISPENSE:
         case VISIT_STATUS.BILLING:
         case VISIT_STATUS.ORDER_UPDATED:
-          color = 'success'
+          color = '#098257'
           break
         case VISIT_STATUS.IN_CONS:
         case VISIT_STATUS.PAUSED:
-          color = 'danger'
+          color = '#CF1322'
           break
         case VISIT_STATUS.UPCOMING_APPT:
-          color = 'gray'
+          color = '#999999'
           break
         default:
-          color = 'gray'
+          color = '#999999'
           hasBadge = false
           break
       }
@@ -103,8 +103,9 @@ const columnExtensions = [
       return hasBadge ? (
         <Badge
           style={{
-            padding: 8,
-            fontSize: '.875rem',
+            padding: 6,
+            fontSize: '.75rem',
+            backgroundColor: color,
           }}
           color={color}
         >
@@ -422,15 +423,14 @@ const Grid = ({
       render: (row) => <ActionButton row={row} onClick={onClick} />,
     },
   ])
-  // console.log({ gridHeight })
   const isLoading = showingVisitRegistration ? false : queryingData
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
         <CommonTableGrid
           // style={{ maxHeight: '76.5vh', overflow: 'auto' }}
-          size='sm'
           // height={600}
+          size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
           columnExtensions={colExtensions}

@@ -2,10 +2,17 @@ import React from 'react'
 import { CardContainer, CommonTableGrid, Button } from '@/components'
 import Edit from '@material-ui/icons/Edit'
 
-const DOGrid = ({ setFieldValue, deliveryOrderDetails }) => {
+const DOGrid = ({
+  setFieldValue,
+  onEditDeliveryOrderClicked,
+  deliveryOrderDetails,
+}) => {
   const { list } = deliveryOrderDetails
+  console.log('DOGrid', list)
 
-  const editRow = (row, e) => {}
+  const editRow = (row, e) => {
+    onEditDeliveryOrderClicked(row)
+  }
 
   return (
     <CardContainer hideHeader>

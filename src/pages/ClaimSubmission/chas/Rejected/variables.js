@@ -57,7 +57,7 @@ export const NewCHASColumns = [
 ]
 
 export const NewCHASColumnExtensions = [
-  { columnName: 'vistDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },

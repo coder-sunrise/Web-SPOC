@@ -16,6 +16,7 @@ import { convertToQuery } from '@/utils/utils'
 import request from '@/utils/request'
 
 const url = '/api/patient'
+const chasBalanceUrl = '/api/PatientCoPaymentScheme/ChasBalance'
 
 // const { api } = config
 // const { url, subjects, getListWithoutCheckRights } = api
@@ -27,4 +28,5 @@ module.exports = {
   create: (params) => service.create(url, params),
   update: (params) => service.update(url, params),
   upsert: (params) => service.upsert(url, params),
+  requestChasBalance: (params) => service.upsert(chasBalanceUrl, params),
 }

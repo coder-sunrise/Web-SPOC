@@ -5,8 +5,9 @@ import { formatMessage } from 'umi/locale'
 import { withFormikExtend, GridContainer, GridItem, Button } from '@/components'
 import POForm from './POForm'
 import POGrid from './POGrid'
-import POSummary from './POSummary'
-import { calculateItemLevelAdjustment } from '@/utils/utils'
+// import POSummary from './POSummary'
+import POSummary from './Share/index'
+import { calculateItemLevelAdjustment, sumReducer } from '@/utils/utils'
 import {
   isPOStatusDraft,
   isPOStatusFinalized,
@@ -15,10 +16,8 @@ import {
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 
-// @connect(({ purchaseOrderDetails, clinicSettings, clinicInfo }) => ({
-//   purchaseOrderDetails,
+// @connect(({ clinicSettings }) => ({
 //   clinicSettings,
-//   clinicInfo,
 // }))
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
@@ -47,7 +46,7 @@ class index extends Component {
       )
         return {
           ...state,
-          settingGSTEnable: !settings.IsEnableGST,
+          settingGSTEnable: settings.IsEnableGST,
           settingGSTPercentage: settings.GSTPercentageInt,
         }
     }
@@ -242,7 +241,6 @@ class index extends Component {
 
     return {
       ...purchaseOrder,
-      supplierFK: 11,
       purchaseOrderStatusFK: newPurchaseOrderStatusFK,
       purchaseOrderStatusCode: getPurchaseOrderStatusFK(
         newPurchaseOrderStatusFK,
@@ -257,6 +255,43 @@ class index extends Component {
           return adj
         }),
       ],
+    }
+  }
+
+  calculateAmount = ({
+    adjustmentList = [],
+    rows = [],
+    IsGSTEnabled = false,
+    IsGSTInclusive = false,
+    clinicSettings: { settingGSTEnable, settingGSTPercentage },
+  }) => {
+    let processedRows = rows
+
+    const total = processedRows
+      .map((o) => o.totalAfterItemAdjustment)
+      .reduce(sumReducer, 0)
+    processedRows.forEach((r) => {
+      r.weightage = r.totalAfterItemAdjustment / total
+      r.totalAfterOverallAdjustment = r.totalAfterItemAdjustment
+    })
+    adjustmentList.filter((o) => !o.isDeleted).forEach((fa) => {
+      processedRows.forEach((r) => {
+        r.totalAfterOverallAdjustment += r.weightage * fa.adjAmount
+      })
+    })
+
+    const totalAfterAdj = processedRows
+      .map((o) => o.totalAfterOverallAdjustment)
+      .reduce(sumReducer, 0)
+    const gst = totalAfterAdj * settingGSTPercentage / 100
+
+    return {
+      processedRows,
+      summary: {
+        gst,
+        total: totalAfterAdj,
+        totalWithGST: gst + totalAfterAdj,
+      },
     }
   }
 
@@ -368,12 +403,38 @@ class index extends Component {
     setTimeout(() => {
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
     }, 1)
+
+    // {
+    //   adjustmentList = [],
+    //   rows = [],
+    //   IsGSTEnabled = false,
+    //   IsGSTInclusive = false,
+    //   clinicSettings: { settingGSTEnable, settingGSTPercentage
+    // }
+
+    const result = this.calculateAmount({
+      rows,
+      adjustmentList: purchaseOrderAdjustment,
+      IsGSTEnabled,
+      IsGSTInclusive,
+      clinicSettings: { settingGSTEnable, settingGSTPercentage },
+    })
+
+    console.log('calculateAmount', result)
+  }
+
+  handleDeleteInvoiceAdjustment = (adjustmentList) => {
+    const { setFieldValue } = this.props
+    setFieldValue('purchaseOrderAdjustment', adjustmentList)
   }
 
   render () {
-    const { purchaseOrderDetails } = this.props
-    const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 0
+    const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
+    const { purchaseOrder: po } = purchaseOrderDetails
+    const poStatus = po ? po.purchaseOrderStatusFK : 0
+    const { purchaseOrder, purchaseOrderAdjustment } = values
+    const { IsGSTEnabled } = purchaseOrder || false
+
     return (
       <div>
         <POForm
@@ -387,8 +448,14 @@ class index extends Component {
         />
         <POSummary
           toggleInvoiceAdjustment={this.showInvoiceAdjustment}
-          calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          {...this.props}
+          handleCalcInvoiceSummary={this.calcPurchaseOrderSummary}
+          handleDeleteInvoiceAdjustment={this.handleDeleteInvoiceAdjustment}
+          prefix='purchaseOrder.'
+          adjustmentListName='purchaseOrderAdjustment'
+          adjustmentList={purchaseOrderAdjustment}
+          IsGSTEnabled={IsGSTEnabled}
+          setFieldValue={setFieldValue}
+          // {...this.props}
         />
         <GridContainer direction='row' style={{ marginTop: 20 }}>
           <GridItem xs={4} md={8} />

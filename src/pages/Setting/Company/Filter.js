@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
+import { status } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -55,7 +56,6 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-
           <GridItem xs={isCopayer ? 6 : 0} md={isCopayer ? 3 : 0}>
             {isCopayer ? (
               <FastField
@@ -74,6 +74,14 @@ class Filter extends PureComponent {
               []
             )}
           </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='isActive'
+              render={(args) => {
+                return <Select label='Status' options={status} {...args} />
+              }}
+            />
+          </GridItem>
           <GridContainer>
             <GridItem xs={6} md={3}>
               <div className={classes.filterBtn}>
@@ -83,14 +91,15 @@ class Filter extends PureComponent {
                   onClick={() => {
                     const {
                       codeDisplayValue,
+                      isActive,
                       coPayerTypeFK,
                     } = this.props.values
-                    console.log(123)
                     this.props.dispatch({
                       type: 'settingCompany/query',
                       payload: {
                         companyType,
                         coPayerTypeFK,
+                        isActive,
                         group: [
                           {
                             code: codeDisplayValue,

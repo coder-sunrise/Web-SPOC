@@ -1,5 +1,6 @@
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
+import moment from 'moment'
 import * as service from '@/services/patient'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 
@@ -198,6 +199,25 @@ export default createFormViewModel({
       //   // console.log(payload)
       //   return yield call(service.upsert, payload)
       // },
+      *refreshChasBalance ({ payload }, { call }) {
+        const { patientAccountNo } = payload
+        const newPayload = {
+          patientNric: patientAccountNo,
+          year: moment().year(),
+        }
+
+        const response = yield call(service.requestChasBalance, newPayload)
+        const { data } = response
+        let result
+        if (data) {
+          const { isSuccessful } = data
+          if (isSuccessful) {
+            return data
+          }
+        }
+
+        return result
+      },
     },
     reducers: {
       queryDone (st, { payload }) {

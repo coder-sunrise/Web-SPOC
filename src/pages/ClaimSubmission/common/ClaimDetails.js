@@ -1,6 +1,5 @@
-import React from 'react'
-// formik
-import { FastField, Formik } from 'formik'
+import React, { Component } from 'react'
+import { connect } from 'dva'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // common components
@@ -13,6 +12,8 @@ import {
   Select,
   TextField,
   SizeContainer,
+  FastField,
+  withFormikExtend,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -32,17 +33,30 @@ const styles = (theme) => ({
   },
 })
 
-const ClaimDetails = ({
-  classes,
-  claimDetails,
-  onConfirm,
-  onClose,
-  readOnly = true,
-  renderClaimDetails,
-}) => {
-  return (
-    <Formik initialValues={{ ...claimDetails }}>
-      <SizeContainer size='sm'>
+@connect(({ claimSubmission }) => ({
+  claimSubmission,
+}))
+@withFormikExtend({
+  enableReinitialize: true,
+  mapPropsToValues: ({ claimSubmission }) => {
+    console.log(claimSubmission)
+    return claimSubmission.entity || {}
+  },
+})
+class ClaimDetails extends Component {
+  render () {
+    const {
+      classes,
+      onConfirm,
+      onClose,
+      claimDetails,
+      renderClaimDetails,
+    } = this.props
+    // console.log(this.props)
+
+    const { readOnly } = true
+    return (
+      <SizeContainer size='md'>
         <React.Fragment>
           <GridContainer className={classes.container}>
             <GridItem md={12}>
@@ -60,7 +74,7 @@ const ClaimDetails = ({
               </GridItem>
               <GridItem md={12}>
                 <FastField
-                  name='accountNo'
+                  name='patientAccountNo'
                   render={(args) => (
                     <TextField {...args} disabled label='Patient Acc No.' />
                   )}
@@ -87,7 +101,7 @@ const ClaimDetails = ({
               </GridItem>
               <GridItem md={12}>
                 <FastField
-                  name='doctor'
+                  name='visitDoctorName'
                   render={(args) => (
                     <TextField {...args} disabled label='Doctor' />
                   )}
@@ -95,7 +109,7 @@ const ClaimDetails = ({
               </GridItem>
               <GridItem md={12}>
                 <FastField
-                  name='dob'
+                  name='patientDob'
                   render={(args) => (
                     <TextField {...args} disabled label='DOB' />
                   )}
@@ -118,7 +132,7 @@ const ClaimDetails = ({
               </GridItem>
               <GridItem md={12}>
                 <FastField
-                  name='invoiceDate'
+                  name='visitDate'
                   render={(args) => (
                     <DatePicker {...args} disabled label='Invoice Date' />
                   )}
@@ -126,7 +140,7 @@ const ClaimDetails = ({
               </GridItem>
               <GridItem md={12}>
                 <FastField
-                  name='invoiceAmount'
+                  name='invoiceAmt'
                   render={(args) => (
                     <NumberInput
                       {...args}
@@ -156,56 +170,64 @@ const ClaimDetails = ({
                     )}
                   />
                 </GridItem>
-                <GridContainer item md={12}>
-                  <GridItem md={5}>
-                    <FastField
-                      name='schemeCategory'
-                      render={(args) => (
-                        <TextField {...args} disabled label='Scheme Category' />
-                      )}
-                    />
-                  </GridItem>
-                  <GridItem md={1} />
-                  <GridItem md={2}>
-                    <FastField
-                      name='tier'
-                      render={(args) => (
-                        <TextField {...args} disabled label='Tier' />
-                      )}
-                    />
-                  </GridItem>
-                </GridContainer>
-
-                <GridContainer item md={5}>
-                  <GridItem md={12}>
-                    <FastField
-                      name='diagnosis'
-                      render={(args) => (
-                        <Select
-                          {...args}
-                          label='Diagnosis'
-                          options={[
-                            { name: 'Asthma', value: 'asthma' },
-                            { name: 'Hypertension', value: 'hypertension' },
-                          ]}
-                        />
-                      )}
-                    />
-                  </GridItem>
-                  <GridItem md={12}>
-                    <FastField
-                      name='claimAmount'
-                      render={(args) => (
-                        <NumberInput
-                          {...args}
-                          disabled
-                          currency
-                          label='Claim Amount'
-                        />
-                      )}
-                    />
-                  </GridItem>
-                </GridContainer>
+                <GridItem md={7} />
+                <GridItem md={5}>
+                  <FastField
+                    name='schemeCategory'
+                    render={(args) => (
+                      <TextField {...args} disabled label='Scheme Category' />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={1} />
+                <GridItem md={2}>
+                  <FastField
+                    name='tier'
+                    render={(args) => (
+                      <TextField {...args} disabled label='Tier' />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={4} />
+                <GridItem md={5}>
+                  <FastField
+                    name='schemeType'
+                    render={(args) => (
+                      <TextField {...args} disabled label='Scheme Type' />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={7} />
+                <GridItem md={5}>
+                  <FastField
+                    name='diagnosis'
+                    render={(args) => (
+                      <Select
+                        {...args}
+                        label='Diagnosis'
+                        options={[
+                          { name: 'Asthma', value: 'asthma' },
+                          { name: 'Hypertension', value: 'hypertension' },
+                        ]}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={7} />
+                <GridItem md={5}>
+                  <FastField
+                    name='claimAmt'
+                    render={(args) => (
+                      <NumberInput
+                        {...args}
+                        disabled
+                        currency
+                        label='Claim Amount'
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={7} />
               </GridItem>
             )}
 
@@ -220,8 +242,8 @@ const ClaimDetails = ({
           </GridContainer>
         </React.Fragment>
       </SizeContainer>
-    </Formik>
-  )
+    )
+  }
 }
 
 export default withStyles(styles, { name: 'ClaimDetails' })(ClaimDetails)
