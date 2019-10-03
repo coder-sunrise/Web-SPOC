@@ -506,7 +506,7 @@ const addressTypes = [
   { label: 'Primary Address', value: '2' },
 ]
 
-const currencyRounding = [
+const currencyRoundingList = [
   {
     name: 'Up',
     value: 'Up',
@@ -517,7 +517,7 @@ const currencyRounding = [
   },
 ]
 
-const currencyRoundingToTheClosest = [
+const currencyRoundingToTheClosestList = [
   {
     name: '5 Cents',
     value: '0.05',
@@ -536,7 +536,7 @@ const currencyRoundingToTheClosest = [
   },
 ]
 
-const currencies = [
+const currenciesList = [
   {
     value: 'SGD',
     name: 'S$',
@@ -1245,9 +1245,9 @@ module.exports = {
 
   addressTypes,
   orderTypes,
-  currencies,
-  currencyRounding,
-  currencyRoundingToTheClosest,
+  currenciesList,
+  currencyRoundingList,
+  currencyRoundingToTheClosestList,
   coPayerType,
   // country,
   consultationDocumentTypes,
