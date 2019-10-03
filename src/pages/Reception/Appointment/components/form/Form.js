@@ -31,6 +31,7 @@ import RescheduleForm from './RescheduleForm'
 // utils
 import { ValidationSchema, mapPropsToValues } from './formikUtils'
 import { getAppendUrl } from '@/utils/utils'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
 
 @connect(
@@ -258,20 +259,19 @@ class Form extends React.PureComponent {
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
     const { appointmentStatuses, values, onClose, user, dispatch } = this.props
-    const noShowStatus = appointmentStatuses.find((ct) => ct.code === 'NOSHOW')
-    const cancelStatus = appointmentStatuses.find(
-      (ct) => ct.code === 'CANCELLED',
-    )
+    const noShowStatus = APPOINTMENT_STATUS.NOSHOW
+    const cancelStatus = APPOINTMENT_STATUS.CANCELLED
+
     const payload = {
       id: values.currentAppointment.id,
       concurrencyToken: values.currentAppointment.concurrencyToken,
-      appointmentStatusFK:
-        reasonType === '1' ? noShowStatus.id : cancelStatus.id,
+      appointmentStatusFK: reasonType === '1' ? noShowStatus : cancelStatus,
       cancellationDateTime: moment().formatUTC(),
       cancellationReasonTypeFK: reasonType,
       cancellationReason: reason,
       cancelByUserFk: user.id,
       cancelSeries: type === '2',
+      isCancelled: false,
     }
 
     dispatch({
@@ -454,9 +454,8 @@ class Form extends React.PureComponent {
 
   onSaveDraftClick = () => {
     const { appointmentStatuses, values, mode, viewingAppointment } = this.props
-    const appointmentStatusFK = appointmentStatuses.find(
-      (item) => item.code === 'DRAFT',
-    ).id
+    const appointmentStatusFK = APPOINTMENT_STATUS.DRAFT
+
     const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
       (editedAsSingle, appointment) =>
         appointment.isEditedAsSingleAppointment || editedAsSingle,
@@ -483,12 +482,9 @@ class Form extends React.PureComponent {
     const { appointmentStatuses, values, mode, viewingAppointment } = this.props
 
     try {
-      let newAppointmentStatusFK = appointmentStatuses.find(
-        (item) => item.code === 'SCHEDULED',
-      ).id
-      const rescheduleFK = appointmentStatuses.find(
-        (item) => item.code === 'RESCHEDULED',
-      ).id
+      let newAppointmentStatusFK = APPOINTMENT_STATUS.SCHEDULED
+      const rescheduleFK = APPOINTMENT_STATUS.RESCHEDULED
+
       if (
         values.currentAppointment &&
         values.currentAppointment.appointmentStatusFk === 1
@@ -600,15 +596,19 @@ class Form extends React.PureComponent {
   }
 
   checkShouldDisable = () => {
-    const { appointmentStatuses, values } = this.props
+    const { values } = this.props
     const { isDataGridValid } = this.state
 
     const { currentAppointment = {} } = values
-    const actualizeStatus = appointmentStatuses.find(
-      (item) => item.code === 'ACTUALISED',
-    )
 
-    if (currentAppointment.appointmentStatusFk === actualizeStatus.id)
+    const _disabledStatus = [
+      APPOINTMENT_STATUS.CANCELLED,
+      APPOINTMENT_STATUS.TURNEDUP,
+    ]
+
+    if (values.id === undefined) return false
+
+    if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
       return true
 
     if (!isDataGridValid || !values.patientName || !values.patientContactNo)
@@ -648,6 +648,7 @@ class Form extends React.PureComponent {
             <GridContainer className={classnames(classes.formContent)}>
               <GridItem container xs md={6}>
                 <PatientInfoInput
+                  disabled={shouldDisable}
                   onViewPatientProfileClick={this.onViewPatientProfile}
                   onSearchPatientClick={this.onSearchPatient}
                   onCreatePatientClick={this.togglePatientProfileModal}

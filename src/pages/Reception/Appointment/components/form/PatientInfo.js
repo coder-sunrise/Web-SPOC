@@ -23,6 +23,7 @@ const PatientInfoInput = ({
   onRegisterToVisitClick,
   patientProfileFK,
   isEdit,
+  disabled,
   appointmentStatusFK,
 }) => {
   const isRegisteredPatient =
@@ -31,6 +32,7 @@ const PatientInfoInput = ({
     1,
     5,
   ].includes(appointmentStatusFK)
+
   return (
     <React.Fragment>
       <GridItem xs md={6}>
@@ -57,7 +59,7 @@ const PatientInfoInput = ({
                 color='primary'
                 variant='contained'
                 submitKey='patientSearch/query'
-                disabled={isEdit}
+                disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
                 icon={null}
               >
@@ -66,7 +68,7 @@ const PatientInfoInput = ({
               <Button
                 size='sm'
                 color='primary'
-                // disabled={isEdit}
+                disabled={disabled}
                 onClick={onCreatePatientClick}
               >
                 Create Patient
@@ -100,7 +102,7 @@ const PatientInfoInput = ({
           render={(args) => (
             <NumberInput
               {...args}
-              disabled={isRegisteredPatient || isEdit}
+              disabled={isRegisteredPatient || disabled || isEdit}
               label='Contact No.'
             />
           )}

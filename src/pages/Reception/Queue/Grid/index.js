@@ -426,15 +426,15 @@ const Grid = ({
       render: (row) => <ActionButton row={row} onClick={onClick} />,
     },
   ])
-  console.log({ gridHeight })
+
   const isLoading = showingVisitRegistration ? false : queryingData
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
         <CommonTableGrid
           // style={{ maxHeight: '76.5vh', overflow: 'auto' }}
-          size='sm'
           // height={600}
+          size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
           columnExtensions={colExtensions}
