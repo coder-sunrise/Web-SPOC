@@ -26,8 +26,8 @@ import {
 
 const DispenseDetails = ({ classes, dispense }) => {
   const { entity } = dispense
-  const { prescription, vaccination, otherOrder } = entity
-  console.log(prescription, vaccination, otherOrder, dispense)
+  const { prescription, vaccination, otherOrder } = entity || {}
+  // console.log(prescription, vaccination, otherOrder, dispense)
   return (
     <React.Fragment>
       <GridItem className={classes.gridRow}>

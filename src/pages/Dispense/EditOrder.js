@@ -7,7 +7,7 @@ import Print from '@material-ui/icons/Print'
 import { Button, GridContainer, GridItem, notification } from '@/components'
 import { convertToConsultation } from '@/pages/PatientDashboard/Consultation/utils'
 // utils
-import { getAppendUrl } from '@/utils/utils'
+import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 // model
 class EditOrder extends Component {
@@ -45,17 +45,24 @@ class EditOrder extends Component {
     })
   }
 
-  cancelOrder = () => {
-    this.props.dispatch({
-      type: `dispense/updateState`,
-      payload: {
-        editingOrder: false,
-      },
-    })
+  cancelOrder = (e) => {
+    navigateDirtyCheck(() => {
+      this.props.dispatch({
+        type: `dispense/updateState`,
+        payload: {
+          editingOrder: false,
+        },
+      })
+    })(e)
   }
 
   signOrder = (values) => {
-    const { consultationDocument, orders, dispatch } = this.props
+    const {
+      consultationDocument,
+      orders,
+      dispatch,
+      visitRegistration,
+    } = this.props
     dispatch({
       type: `consultation/signOrder`,
       payload: convertToConsultation(values, { consultationDocument, orders }),
@@ -66,6 +73,11 @@ class EditOrder extends Component {
           payload: {
             editingOrder: false,
           },
+        })
+
+        dispatch({
+          type: `dispense/refresh`,
+          payload: visitRegistration.entity.visit.id,
         })
         notification.success({
           message: 'Order signed',

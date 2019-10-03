@@ -453,6 +453,7 @@ class Appointment extends React.PureComponent {
           title='Doctor Block'
           onClose={this.closeDoctorBlockModal}
           onConfirm={this.handleDoctorEventClick}
+          observe='DoctorBlockForm'
         >
           <DoctorBlockForm
             initialProps={selectedSlot}

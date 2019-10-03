@@ -60,38 +60,25 @@ export default createFormViewModel({
         // console.log({ pathname })
         // console.log(loct, method)
         // console.log(query)
-        if (query.md === 'pt' && query.cmt) {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentComponent: query.cmt,
-            },
-          })
-          dispatch({
-            type: 'initState',
-            payload: {
-              md: query.md,
-              version: Number(query.v) || undefined,
-              currentId: Number(query.pid) || 0,
-            },
-          })
+        setTimeout(() => {
+          if (query.md === 'pt' && query.cmt) {
+            dispatch({
+              type: 'updateState',
+              payload: {
+                currentComponent: query.cmt,
+              },
+            })
+            dispatch({
+              type: 'initState',
+              payload: {
+                md: query.md,
+                version: Number(query.v) || undefined,
+                currentId: Number(query.pid) || 0,
+              },
+            })
+          }
+        }, 1)
 
-          // dispatch({
-          //   type: 'updateState',
-          //   payload: {
-          //     currentComponent: query.cmt,
-          //     currentId: Number(query.pid) || 0,
-          //   },
-          // })
-          // if (query.pid) {
-          //   dispatch({
-          //     type: 'query',
-          //     payload: {
-          //       id: query.pid,
-          //     },
-          //   })
-          // }
-        }
         // if (
         //   query.new ||
         //   pathname === '/patientdb/new' ||

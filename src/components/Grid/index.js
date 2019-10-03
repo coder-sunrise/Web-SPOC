@@ -48,7 +48,7 @@ export function NumberInputEditor (props) {
           return (
             <NumberInput
               showErrorIcon
-              noWrapper
+              simple
               {...resetProps}
               {...otherInputProps}
               {...args}
@@ -70,7 +70,7 @@ export function NumberInputEditor (props) {
   return (
     <NumberInput
       value={v || value}
-      noWrapper
+      simple
       {...resetProps}
       {...otherInputProps}
     />

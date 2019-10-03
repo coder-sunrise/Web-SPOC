@@ -90,7 +90,7 @@ const styles = (theme) => ({
   },
   mapPropsToValues: (props) => {
     const { settingUserProfile, currentUser } = props
-
+    console.log({ settingUserProfile, currentUser })
     if (currentUser) {
       return {
         ...currentUser,
@@ -194,7 +194,14 @@ class UserProfileForm extends React.PureComponent {
                   <FastField
                     name='userProfile.password'
                     render={(args) => (
-                      <TextField {...args} label='Password' type='password' />
+                      <TextField
+                        {...args}
+                        label='Password'
+                        type='password'
+                        inputProps={{
+                          autoComplete: 'new-password',
+                        }}
+                      />
                     )}
                   />
                 </GridItem>

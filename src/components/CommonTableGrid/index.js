@@ -71,6 +71,7 @@ import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import { watchForElementChange } from '@/utils/utils'
+import { isNumber } from 'util'
 
 window.$tempGridRow = {}
 
@@ -133,8 +134,8 @@ const DefaultTableCell = React.memo(
 )
 const getIndexedRows = (rows = [], pagerConfig = {}) => {
   const startIndex = pagerConfig.current
-    ? pagerConfig.pagesize * (pagerConfig.current - 1) + 1
-    : 1
+    ? pagerConfig.pagesize * (pagerConfig.current - 1)
+    : 0
   // console.log(startIndex)
   // console.log(rows)
   return rows.map((o, i) => {
@@ -290,6 +291,11 @@ class CommonTableGrid extends PureComponent {
           root: {
             height: 'auto',
             ...tableRowSharedRootConfig,
+          },
+        },
+        TableNoDataCell: {
+          cell: {
+            padding: '24px 0px',
           },
         },
         MuiTableCell: {
@@ -701,6 +707,12 @@ class CommonTableGrid extends PureComponent {
           width: 80,
           align: 'left',
           disabled: true,
+          render: (row) => {
+            return isNumber(row.rowIndex) ? row.rowIndex + 1 : ''
+          },
+          editRender: (row) => {
+            return isNumber(row.rowIndex) ? row.rowIndex + 1 : ''
+          },
         },
         {
           columnName: 'rowMove',

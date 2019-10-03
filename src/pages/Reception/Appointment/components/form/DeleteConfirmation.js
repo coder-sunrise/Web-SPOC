@@ -58,9 +58,15 @@ const DeleteConfirmation = ({
   const message = isSeries
     ? 'Do you want to cancel all occurences of the recurring appointment, or just this one?'
     : 'Do you want to cancel this appointment?'
+
+  const radioLabelSingle = isSeries
+    ? 'Cancel this occurence'
+    : 'Only appointment that has not been modified'
+  const radioLabelAll = isSeries ? 'Cancel the series' : 'All appointment'
+
   if (step === 0)
     return (
-      <GridContainer justify='center'>
+      <GridContainer justify='center' alignItems='center'>
         <GridItem>
           <div className={classes.title}>
             <Warning fontSize='large' className={classes.warningIcon} />
@@ -68,7 +74,7 @@ const DeleteConfirmation = ({
           </div>
         </GridItem>
         {isSeries && (
-          <GridItem>
+          <GridItem md={8}>
             <Field
               name='type'
               render={(args) => (
@@ -80,11 +86,11 @@ const DeleteConfirmation = ({
                   options={[
                     {
                       value: '1',
-                      label: 'Only appointment that has not been modified',
+                      label: radioLabelSingle,
                     },
                     {
                       value: '2',
-                      label: 'All appointment',
+                      label: radioLabelAll,
                     },
                   ]}
                 />

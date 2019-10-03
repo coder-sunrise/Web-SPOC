@@ -156,7 +156,7 @@ class BaseInput extends React.PureComponent {
 
   render () {
     // console.log(this)
-    const { field, form, theme, simple, classes, ...props } = this.props
+    const { field, form, theme, classes, ...props } = this.props
     for (const key in _config) {
       if (Object.prototype.hasOwnProperty.call(_config, key)) {
         const element = _config[key]

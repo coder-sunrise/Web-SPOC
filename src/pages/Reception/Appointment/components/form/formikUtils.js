@@ -2,6 +2,7 @@ import moment from 'moment'
 import * as Yup from 'yup'
 import { serverDateFormat, timeFormat, timeFormat24Hour } from '@/components'
 import { computeRRule } from '@/components/_medisys'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 
 const initDailyRecurrence = {
   recurrencePatternFK: 1,
@@ -83,7 +84,7 @@ export const mapPropsToValues = ({
       appointmentDate: moment(selectedSlot.start).formatUTC(),
       appointments_Resources: [],
     },
-    appointmentStatusFk: 2,
+    appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
     recurrenceDto: { ...initDailyRecurrence },
     _appointmentDateIn: true,
   }
@@ -99,9 +100,28 @@ export const mapPropsToValues = ({
         (item) => item.id === selectedAppointmentID,
       )
       const { recurrenceDto } = viewingAppointment
+      let {
+        patientContactNo,
+        patientName,
+        patientAccountNo,
+        patientProfile,
+        ...restViewingAppointment
+      } = viewingAppointment
 
+      if (patientProfile) {
+        const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
+        const _mobileContact = contactNumbers.find(
+          (item) => item.numberTypeFK === 1,
+        )
+        if (_mobileContact) patientContactNo = _mobileContact.number
+        patientName = name
+        patientAccountNo = accNo
+      }
       values = {
-        ...viewingAppointment,
+        ...restViewingAppointment,
+        patientContactNo,
+        patientName,
+        patientAccountNo,
         bookedByUser: clinicianProfile ? clinicianProfile.name : '',
         overwriteEntireSeries: false,
         recurrenceChanged: false,
@@ -134,10 +154,7 @@ export const mapPropsToValues = ({
   return values
 }
 
-export const mapDatagridToAppointmentResources = (shouldDumpID) => (
-  event,
-  index,
-) => {
+export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
   const { id, startTime: timeFrom, endTime: timeTo, ...restEvent } = event
   const startTime =
     timeFrom.includes('AM') || timeFrom.includes('PM')
@@ -147,7 +164,7 @@ export const mapDatagridToAppointmentResources = (shouldDumpID) => (
     timeTo.includes('AM') || timeTo.includes('PM')
       ? moment(timeTo, timeFormat).format(timeFormat24Hour)
       : timeTo
-  const sortOrder = index
+
   if (id < 0 || shouldDumpID) {
     return { ...restEvent, startTime, endTime }
   }

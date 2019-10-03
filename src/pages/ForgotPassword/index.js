@@ -3,7 +3,7 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { GridContainer, GridItem } from '@/components'
+import { GridContainer, GridItem, notification } from '@/components'
 // sub component
 import ResetPassForm from './ResetPasswordForm'
 import NewPassForm from './NewPasswordForm'
@@ -21,30 +21,55 @@ const styles = (theme) => ({
     },
   },
 })
+
 @connect(({ login, loading, global }) => ({ login, loading, global }))
 class ForgotPassword extends React.Component {
   state = {
     step: 1,
-    payload: {},
+    firstStepPayload: {},
   }
 
   handleResetClick = (values) => {
     getOTP(values).then((response) => {
-      console.log({ response })
-
-      this.setState({
-        step: 2,
-      })
+      const { data } = response
+      if (data.succeeded)
+        this.setState({
+          step: 2,
+          firstStepPayload: { ...values },
+        })
+      else {
+        console.log({ data, response })
+        notification.error({
+          message: 'Failed to get OTP',
+        })
+      }
     })
   }
 
-  handleCancelClick = () => {}
+  handleCancelClick = () => {
+    this.props.history.push('/login')
+  }
 
   handleBackClick = () => {
     this.setState({ step: 1 })
   }
 
-  handleChangePasswordClick = () => {}
+  handleChangePasswordClick = (values) => {
+    const { firstStepPayload } = this.state
+    const { history } = this.props
+    resetPassword({ ...firstStepPayload, ...values }).then((response) => {
+      console.log({ response })
+      const { data } = response
+      if (data.succeeded) {
+        history.push('/login')
+      } else {
+        console.log({ data, response })
+        notification.error({
+          message: 'Failed to reset password',
+        })
+      }
+    })
+  }
 
   render () {
     const { classes } = this.props
