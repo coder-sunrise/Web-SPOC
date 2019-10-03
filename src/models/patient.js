@@ -213,20 +213,19 @@ export default createFormViewModel({
       //   return yield call(service.upsert, payload)
       // },
       *refreshChasBalance ({ payload }, { call }) {
-        const { patientAccountNo } = payload
+        const { patientAccountNo, patientCoPaymentSchemeFK } = payload
         const newPayload = {
           patientNric: patientAccountNo,
+          patientCoPaymentSchemeFK,
           year: moment().year(),
+          // isSaveToDb: true,
         }
 
         const response = yield call(service.requestChasBalance, newPayload)
         const { data } = response
         let result
         if (data) {
-          const { isSuccessful } = data
-          if (isSuccessful) {
-            return data
-          }
+          return data
         }
 
         return result

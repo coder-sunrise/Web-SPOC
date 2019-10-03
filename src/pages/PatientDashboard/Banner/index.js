@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import Link from 'umi/link'
 import { connect } from 'dva'
+import _ from 'lodash'
 import moment from 'moment'
 import { Paper } from '@material-ui/core'
 import { headerHeight } from 'mui-pro-jss'
@@ -33,10 +34,9 @@ import Block from './Block'
 class Banner extends PureComponent {
   state = {
     showWarning: false,
-    balanceValue: 0,
-    dateFrom: '',
-    dateTo: '',
-    schemeType: '',
+    refreshedSchemeData: {},
+    currPatientCoPaymentSchemeFK: 0,
+    currentSchemeType: 0,
   }
 
   constructor (props) {
@@ -77,7 +77,9 @@ class Banner extends PureComponent {
     const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
-    const da = ctdrugallergy.filter((o) => patientAllergy.find((m) => m.allergyFK === o.id), )
+    const da = ctdrugallergy.filter((o) =>
+      patientAllergy.find((m) => m.allergyFK === o.id),
+    )
 
     let allergyData = ' '
 
@@ -175,27 +177,81 @@ class Banner extends PureComponent {
   refreshChasBalance = () => {
     const { dispatch, patient } = this.props
     const { entity } = patient
+    const { currPatientCoPaymentSchemeFK, currentSchemeType } = this.state
+    let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
+    let oldSchemeTypeFK = currentSchemeType
+
     dispatch({
       type: 'patient/refreshChasBalance',
-      payload: entity,
+      payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
       if (result) {
         const {
           balance,
-          patientCoPaymentSchemeFk,
           schemeTypeFk,
           validFrom,
           validTo,
+          acuteVisitPatientBalance,
+          acuteVisitClinicBalance,
         } = result
+        let isShowReplacementModal = false
+
+        if (oldSchemeTypeFK !== schemeTypeFk) {
+          isShowReplacementModal = true
+        }
 
         this.setState({
-          balanceValue: balance,
-          dateFrom: validFrom,
-          dateTo: validTo,
-          schemeType: schemeTypeFk,
+          refreshedSchemeData: {
+            isShowReplacementModal,
+            oldSchemeTypeFK,
+            balance,
+            patientCoPaymentSchemeFK,
+            schemeTypeFK: schemeTypeFk,
+            validFrom,
+            validTo,
+            acuteVisitPatientBalance,
+            acuteVisitClinicBalance,
+          },
         })
       }
     })
+  }
+
+  getSchemeDetails = (schemeData) => {
+    const { refreshedSchemeData } = this.state
+    if (!_.isEmpty(refreshedSchemeData)) {
+      return { ...refreshedSchemeData }
+    }
+    // Scheme Balance
+    const balance =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].balance
+    // Patient Acute Visit Patient Balance
+    const acuteVPBal =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
+    // Patient Acute Visit Clinic Balance
+    const acuteVCBal =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
+
+    this.setState({
+      currPatientCoPaymentSchemeFK: schemeData.id,
+      currentSchemeType: schemeData.schemeTypeFK,
+    })
+
+    return {
+      balance,
+      patientCoPaymentSchemeFK: schemeData.id,
+      schemeTypeFK: schemeData.schemeTypeFK,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
+      acuteVisitPatientBalance: acuteVPBal,
+      acuteVisitClinicBalance: acuteVCBal,
+    }
   }
 
   displayMedicalProblemData (entity) {
@@ -223,9 +279,12 @@ class Banner extends PureComponent {
 
     if (entity.patientHistoryDiagnosis.length) {
       if (entity.patientHistoryDiagnosis.length >= 2) {
-        medicalProblemData = `${entity.patientHistoryDiagnosis[0].diagnosisDescription}, ${entity.patientHistoryDiagnosis[1].diagnosisDescription}`
+        medicalProblemData = `${entity.patientHistoryDiagnosis[0]
+          .diagnosisDescription}, ${entity.patientHistoryDiagnosis[1]
+          .diagnosisDescription}`
       } else {
-        medicalProblemData = `${entity.patientHistoryDiagnosis[0].diagnosisDescription}`
+        medicalProblemData = `${entity.patientHistoryDiagnosis[0]
+          .diagnosisDescription}`
       }
     } else {
       medicalProblemData = '-'
@@ -396,80 +455,128 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme.filter(
-                    (o) =>
-                      (this.state.schemeType === ''
-                        ? o.schemeTypeFK
-                        : this.state.schemeType) <= 5,
-                  ).length >= 1 ? (
-                    entity.patientScheme
-                      .filter(
-                        (o) =>
-                          (this.state.schemeType === ''
-                            ? o.schemeTypeFK
-                            : this.state.schemeType) <= 5,
-                      )
-                      .map((o) => {
-                        this.setState({
-                          balanceValue:
-                            o.patientSchemeBalance.length <= 0
-                              ? 0
-                              : o.patientSchemeBalance[0].balance,
-                          dateFrom: o.validFrom,
-                          dateTo: o.validTo,
-                        })
-                        console.log(this.state.schemeType)
-                        return (
-                          <div>
-                            <CodeSelect
-                              text
-                              code='ctSchemeType'
-                              value={
-                                this.state.schemeType === '' ? (
-                                  o.schemeTypeFK
-                                ) : (
-                                  this.state.schemeType
-                                )
-                              }
-                            />
+                  {entity.patientScheme
+                    .filter((o) => o.schemeTypeFK <= 5)
+                    .map((o) => {
+                      const schemeData = this.getSchemeDetails(o)
 
-                            <div
-                              style={{
-                                fontWeight: 500,
-                                display: 'inline-block',
-                              }}
-                            >
-                              :{' '}
-                              <NumberInput
-                                text
-                                currency
-                                value={this.state.balanceValue}
-                              />
-                            </div>
-                            <br />
-                            <SchemePopover
-                              data={o}
-                              isBanner
-                              balanceValue={this.state.balanceValue}
-                              schemeTypeFK={
-                                this.state.schemeType === '' ? (
-                                  o.schemeTypeFK
-                                ) : (
-                                  this.state.schemeType
-                                )
-                              }
-                              dataFrom={this.state.dateFrom}
-                              dateTo={this.state.dateTo}
-                              handleRefreshChasBalance={this.refreshChasBalance}
+                      return (
+                        <div>
+                          <CodeSelect
+                            text
+                            code='ctSchemeType'
+                            value={schemeData.schemeTypeFK}
+                          />
+
+                          <div
+                            style={{
+                              fontWeight: 500,
+                              display: 'inline-block',
+                            }}
+                          >
+                            :{' '}
+                            <NumberInput
+                              text
+                              currency
+                              value={schemeData.balance}
                             />
                           </div>
-                        )
-                      })
-                  ) : (
-                    '-'
-                  )}
+                          <br />
+                          <SchemePopover
+                            isBanner
+                            isShowReplacementModal={
+                              schemeData.isShowReplacementModal
+                            }
+                            handleRefreshChasBalance={() =>
+                              this.refreshChasBalance(
+                                schemeData.patientCoPaymentSchemeFK,
+                                schemeData.schemeTypeFK,
+                              )}
+                            entity={entity}
+                            schemeData={schemeData}
+                          />
+                        </div>
+                      )
+                    })}
                 </div>
               }
+
+              // body={
+              //   <div>
+              //     {entity.patientScheme.filter(
+              //       (o) =>
+              //         (this.state.schemeType === ''
+              //           ? o.schemeTypeFK
+              //           : this.state.schemeType) <= 5,
+              //     ).length >= 1 ? (
+              //       entity.patientScheme
+              //         .filter(
+              //           (o) =>
+              //             (this.state.schemeType === ''
+              //               ? o.schemeTypeFK
+              //               : this.state.schemeType) <= 5,
+              //         )
+              //         .map((o) => {
+              //           this.setState({
+              //             balanceValue:
+              //               o.patientSchemeBalance.length <= 0
+              //                 ? 0
+              //                 : o.patientSchemeBalance[0].balance,
+              //             dateFrom: o.validFrom,
+              //             dateTo: o.validTo,
+              //           })
+              //           console.log(this.state.schemeType)
+              //           return (
+              //             <div>
+              //               <CodeSelect
+              //                 text
+              //                 code='ctSchemeType'
+              //                 value={
+              //                   this.state.schemeType === '' ? (
+              //                     o.schemeTypeFK
+              //                   ) : (
+              //                     this.state.schemeType
+              //                   )
+              //                 }
+              //               />
+
+              //               <div
+              //                 style={{
+              //                   fontWeight: 500,
+              //                   display: 'inline-block',
+              //                 }}
+              //               >
+              //                 :{' '}
+              //                 <NumberInput
+              //                   text
+              //                   currency
+              //                   value={this.state.balanceValue}
+              //                 />
+              //               </div>
+              //               <br />
+              //               {/* <SchemePopover
+              //                 data={o}
+              //                 isBanner
+              //                 balanceValue={this.state.balanceValue}
+              //                 schemeTypeFK={
+              //                   this.state.schemeType === '' ? (
+              //                     o.schemeTypeFK
+              //                   ) : (
+              //                     this.state.schemeType
+              //                   )
+              //                 }
+              //                 dataFrom={this.state.dateFrom}
+              //                 dateTo={this.state.dateTo}
+              //                 handleRefreshChasBalance={this.refreshChasBalance}
+              //               /> */}
+              //             </div>
+              //           )
+              //         })
+              //     ) : (
+              //       '-'
+              //     )}
+              //   </div>
+              // }
             />
           </GridItem>
           <GridItem xs={12} md={4}>
