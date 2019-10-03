@@ -102,59 +102,6 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
-
-          {/*<GridItem xs sm={12} md={2}>
-            <FastField
-              name='ExpenseType'
-              render={(args) => {
-                return (
-                  <Select
-                    label={formatMessage({
-                      id: 'finance.deposit.search.gender',
-                    })}
-                    // noWrapper
-                    options={[
-                      { name: 'All', value: '0' },
-                      { name: 'Male', value: '1' },
-                      { name: 'Female', value: '2' },
-                      { name: 'Unknown', value: '3' },
-                    ]}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-           <GridItem xs sm={6} md={1}>
-            <FastField
-              name='AgeStart'
-              render={(args) => {
-                return (
-                  <NumberField
-                    label={formatMessage({
-                      id: 'finance.deposit.search.age.start',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs sm={6} md={1}>
-            <FastField
-              name='AgeEnd'
-              render={(args) => {
-                return (
-                  <NumberField
-                    label={formatMessage({
-                      id: 'finance.deposit.search.age.end',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem> */}
           <GridItem xs={12} md={12}>
             <div className={classes.filterBtn}>
               <Button
@@ -162,19 +109,24 @@ class FilterBar extends PureComponent {
                 color='primary'
                 onClick={() => {
                   const { transactionDates, ExpenseType } = this.props.values
+
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
                       // patientDepositTransaction: {
 
                       // },
-                      // lgteql_lastTransactionDate: transactionDates[0],
-                      // lsteql_lastTransactionDate: transactionDates[1],
+                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
+                        ? transactionDates[0]
+                        : undefined,
+                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
+                        ? transactionDates[1]
+                        : undefined,
 
                       group: [
                         {
                           'contactFkNavigation.contactNumber.number': ExpenseType,
-                          // 'PatientDepositFKNavigation.ReferenceNo': ExpenseType,
+                          patientReferenceNo: ExpenseType,
                           patientAccountNo: ExpenseType,
                           name: ExpenseType,
                           combineCondition: 'or',
