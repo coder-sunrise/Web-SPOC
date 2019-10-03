@@ -1,3 +1,5 @@
+import Error from '@material-ui/icons/Error'
+import _ from 'lodash'
 import DetailPanel from './Detail'
 import Pricing from '../../Pricing'
 import Stock from '../../Stock'
@@ -16,15 +18,46 @@ const addContent = (type, props) => {
   }
 }
 
+const tabHeader = (tabName, detailsProps) => {
+  const errorHeader = (
+    <span style={{ color: 'red' }}>
+      {tabName} <Error />
+    </span>
+  )
+  const returnTabHeader = () => {
+    if (detailsProps.errors && !_.isEmpty(detailsProps.errors)) {
+      const {
+        code,
+        displayValue,
+        revenueCategoryFK,
+        dispensingUOMFK,
+        prescribingUOMFK,
+      } = detailsProps.errors
+      if ((dispensingUOMFK || prescribingUOMFK) && tabName === 'Setting') {
+        return errorHeader
+      }
+      if (
+        (code || displayValue || revenueCategoryFK) &&
+        tabName === 'General'
+      ) {
+        return errorHeader
+      }
+    }
+    return <span>{tabName}</span>
+  }
+
+  return returnTabHeader()
+}
+
 export const MedicationDetailOption = (detailsProps, stockProps) => [
   {
     id: 0,
-    name: 'General',
+    name: tabHeader('General', detailsProps),
     content: addContent(1, detailsProps),
   },
   {
     id: 1,
-    name: 'Setting',
+    name: tabHeader('Setting', detailsProps),
     content: addContent(2, detailsProps),
   },
   {

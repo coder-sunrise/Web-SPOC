@@ -5,7 +5,6 @@ import * as Yup from 'yup'
 import valid from 'card-validator'
 import { formatMessage } from 'umi/locale'
 import { withStyles, Grid, Divider } from '@material-ui/core'
-import { paymentMethods } from '@/utils/codes'
 import {
   GridContainer,
   GridItem,
@@ -15,7 +14,6 @@ import {
   Select,
   CodeSelect,
   Field,
-  FastField,
   withFormikExtend,
   notification,
 } from '@/components'
@@ -109,8 +107,7 @@ const style = () => ({
       creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
         .name
     }
-    // console.log('transactionType', restDepositTransaction.transactionType)
-
+    const transType = patientDepositTransaction.transactionType
     dispatch({
       type: 'deposit/updateDeposit',
       payload: {
@@ -124,15 +121,12 @@ const style = () => ({
           creditCardTypeFK,
           createdByBizSessionFK: transactionBizSessionFK,
           transactionBizSessionFK,
-          // creditCardTypeFK: 1,
         },
       },
     }).then((r) => {
       if (r) {
-        // console.log('r', r)
         notification.success({
-          message: `${r.patientDepositTransaction
-            .transactionType} successfully`,
+          message: `${transType} successfully`,
         })
         if (onConfirm) onConfirm()
         dispatch({
@@ -145,8 +139,6 @@ const style = () => ({
 class Modal extends PureComponent {
   constructor (props) {
     super(props)
-    const { isDeposit, deposit } = this.props
-    const { entity } = deposit
     this.state = {
       // balanceAfter: entity.balance || 0,
       // isSessionRequired: isDeposit ? false : true,
@@ -160,7 +152,7 @@ class Modal extends PureComponent {
   }
 
   onChangeDate = (event) => {
-    const { dispatch, setFieldValue, isDeposit } = this.props
+    const { isDeposit } = this.props
     const selectedDate = moment(event).format('YYMMDD')
 
     if (isDeposit && selectedDate === moment().format('YYMMDD')) {
@@ -201,7 +193,7 @@ class Modal extends PureComponent {
         'patientDepositTransaction.transactionBizSessionFK',
         bizSessionList.length === 0 || bizSessionList === undefined
           ? undefined
-          : bizSessionList.slice(-1)[0].value, // bizSessionList[0].value
+          : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
       )
     })
   }

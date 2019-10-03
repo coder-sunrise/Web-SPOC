@@ -25,7 +25,8 @@ class Invoice extends React.Component {
   }
 
   onRowDoubleClick = (row) => {
-    this.props.history.push(`/finance/invoice/details?id=${row.invoiceNo}`)
+    // this.props.history.push(`/finance/invoice/details?id=${row.invoiceNo}`)
+    this.props.history.push(`/finance/invoice/details?id=${row.id}`)
   }
 
   render () {

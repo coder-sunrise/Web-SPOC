@@ -302,6 +302,7 @@ class Scribble extends React.Component {
       toggleScribbleModal,
       handleSubmit,
       deleteScribbleNote,
+      setFieldValue,
     } = this.props
     return (
       <div className={classes.layout}>
@@ -314,7 +315,14 @@ class Scribble extends React.Component {
                   return (
                     <TextField
                       label='Scribble Subject'
+                      inputProps={{ maxLength: 2 }}
                       {...args}
+                      onChange={(e) => {
+                        const subject = e.target.value
+                        if (subject.length > 20) {
+                          setFieldValue('subject', subject.substring(0, 20))
+                        }
+                      }}
                     />
                   )
                 }}

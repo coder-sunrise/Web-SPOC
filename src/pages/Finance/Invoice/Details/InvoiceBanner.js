@@ -11,6 +11,7 @@ import {
   GridItem,
   TextField,
   NumberInput,
+  dateFormatLong,
 } from '@/components'
 // styles
 import styles from './styles'
@@ -47,7 +48,13 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
             <h5 className={classes.boldText}>Invoice Date:</h5>
           </GridItem>
           <GridItem md={8}>
-            <h5 className={classes.normalText}>{values.invoiceDate}</h5>
+            <h5 className={classes.normalText}>
+              <DatePicker
+                text
+                format={dateFormatLong}
+                value={values.invoiceDate}
+              />{' '}
+            </h5>
           </GridItem>
         </GridContainer>
 
