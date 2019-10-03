@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
+import { navigateDirtyCheck } from '@/utils/utils'
 import {
   withFormikExtend,
   FastField,
@@ -332,10 +333,10 @@ class Detail extends PureComponent {
         }
       })
       this.setState({ inventoryAdjustmentItems: newList })
-      await setValues({
-        ...values,
-        inventoryAdjustmentItems: newList,
-      })
+      // await setValues({
+      //   ...values,
+      //   inventoryAdjustmentItems: newList,
+      // })
 
       values.inventoryAdjustmentItems.forEach((o) => {
         const getType = type(o.inventoryTypeFK)
@@ -687,7 +688,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, values, handleSubmit, getRunningNo } = props
+    const { theme, values, handleSubmit, getRunningNo, footer } = props
     const cfg = {}
     if (values.inventoryAdjustmentStatusFK !== 1) {
       cfg.onRowDoubleClick = undefined
@@ -793,12 +794,12 @@ class Detail extends PureComponent {
             }
             {...this.tableParas}
           />
-          <GridContainer
+          {/* <GridContainer
             direction='row'
             justify='flex-end'
             alignItems='flex-end'
           >
-            <Button color='danger' onClick={() => this.handleCancel()}>
+            <Button color='danger' onClick={navigateDirtyCheck('/inventory/master?t=0')}>
               Cancel
             </Button>
             <ProgressButton
@@ -814,7 +815,25 @@ class Detail extends PureComponent {
             >
               Finalize
             </Button>
-          </GridContainer>
+          </GridContainer> */}
+          {footer &&
+            footer({
+              onConfirm: props.handleSubmit,
+              confirmBtnText: 'Save',
+              extraButtons: (
+                <Button
+                  color='info'
+                  type='submit'
+                  onClick={this.updateStatus}
+                  disabled={values.inventoryAdjustmentStatusFK !== 1}
+                >
+                  Finalize
+                </Button>
+              ),
+              confirmProps: {
+                disabled: false,
+              },
+            })}
         </div>
       </React.Fragment>
     )
