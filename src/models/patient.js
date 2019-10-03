@@ -22,7 +22,7 @@ export default createFormViewModel({
         patientMedicalAlert: [],
         patientScheme: [],
         schemePayer: [],
-        referredBy: '',
+        referredBy: 'none',
         // dob: new Date(),
         contact: {
           contactAddress: [

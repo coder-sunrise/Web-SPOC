@@ -66,7 +66,7 @@ const styles = () => ({
   // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
     // console.log({ patient })
-    console.log(patient.entity, patient.default)
+    // console.log(patient.entity, patient.default)
     return patient.entity || patient.default
   },
   validationSchema: schema,

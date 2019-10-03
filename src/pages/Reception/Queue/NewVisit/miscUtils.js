@@ -120,6 +120,9 @@ export const formikHandleSubmit = (
   }
 
   const payload = {
+    cfg: {
+      message: id ? 'Visit updated' : 'Visit created',
+    },
     id,
     ...restVisitInfo,
     queueNo: parseFloat(queueNo).toFixed(1),
