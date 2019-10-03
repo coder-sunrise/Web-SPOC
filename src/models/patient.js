@@ -218,7 +218,7 @@ export default createFormViewModel({
           patientNric: patientAccountNo,
           patientCoPaymentSchemeFK,
           year: moment().year(),
-          // isSaveToDb: true,
+          isSaveToDb: true,
         }
 
         const response = yield call(service.requestChasBalance, newPayload)
