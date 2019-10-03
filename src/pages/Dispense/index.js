@@ -6,7 +6,7 @@ import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem, SizeContainer } from '@/components'
 // sub component
 import Banner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
@@ -47,11 +47,13 @@ class Dispense extends Component {
           patientInfo={dispense.patientInfo}
           extraCmt={this.getExtraComponent()}
         />
-        {!editingOrder ? (
-          <Main {...this.props} />
-        ) : (
-          <EditOrder {...this.props} />
-        )}
+        <SizeContainer size='sm'>
+          {!editingOrder ? (
+            <Main {...this.props} />
+          ) : (
+            <EditOrder {...this.props} />
+          )}
+        </SizeContainer>
       </div>
     )
   }

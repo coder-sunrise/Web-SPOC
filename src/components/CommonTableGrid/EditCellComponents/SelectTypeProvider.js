@@ -151,7 +151,7 @@ class SelectEditor extends PureComponent {
     // console.log(window.$tempGridRow, row, latestRow[columnName])
     // console.log(options, this.state, codes, columnName)
     const commonCfg = {
-      noWrapper: true,
+      simple: true,
       showErrorIcon: true,
       error: this.state.error,
       value: latestRow[columnName],
@@ -181,7 +181,7 @@ class SelectEditor extends PureComponent {
       }
       return null
     }
-    return <TextField value={value} noWrapper />
+    return <TextField value={value} simple />
   }
 }
 

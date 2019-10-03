@@ -11,6 +11,7 @@ import Authorized from '@/utils/Authorized'
 import Exception403 from '@/pages/Exception/403'
 
 window.beforeReloadHandlerAdded = false
+window.dirtyForms = []
 const _localFormik = {}
 const _localAuthority = {}
 let lastVersion = null
@@ -47,10 +48,12 @@ const withFormikExtend = (props) => (Component) => {
     })
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
+      window.dirtyForms.push(displayName)
       window.addEventListener('beforeunload', confirmBeforeReload)
     } else if (!dirty && window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = false
       window.removeEventListener('beforeunload', confirmBeforeReload)
+      window.dirtyForms = _.reject(window.dirtyForms, (v) => v === displayName)
     }
   }
   // const { mapPropsToValues } = props

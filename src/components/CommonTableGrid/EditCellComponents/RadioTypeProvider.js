@@ -42,7 +42,6 @@ const RadioEditorBase = React.memo(
       ...restConfig
     } = cfg
     // console.log(cfg)
-    const error = errors.find((o) => o.index === row.rowIndex) || {}
     const submitValue = (e) => {
       if (value !== e.target.value) onValueChange(e.target.value)
     }

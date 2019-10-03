@@ -140,7 +140,8 @@ const styles = (theme) => ({
 //   displayName: 'PatientHistory',
 // })
 @connect(({ patientHistory, clinicSettings }) => ({
-  patientHistory, clinicSettings,
+  patientHistory,
+  clinicSettings,
 }))
 class PatientHistory extends Component {
   state = {
@@ -258,16 +259,16 @@ class PatientHistory extends Component {
   }
 
   getContent = (row) => {
-    const { patientHistory, mode, clinicSettings} = this.props
+    const { patientHistory, mode, clinicSettings } = this.props
     const { selectedSubRow } = patientHistory
 
     let newArray = []
-    if(clinicSettings.settings.ShowConsultationVersioning && mode === 'integrated'){
-      if(row.coHistory.length >= 1){
+    if (clinicSettings.settings.ShowConsultationVersioning) {
+      if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[row.coHistory.length - 1])
       }
-    }else{
-      newArray = row.coHistory   
+    } else {
+      newArray = row.coHistory
     }
 
     return (
@@ -324,10 +325,10 @@ class PatientHistory extends Component {
                       }}
                     >
                       <GridContainer>
-                        <GridItem sm={7}>  
+                        <GridItem sm={7}>
                           <TextField
                             text
-                            value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
+                            value={ clinicSettings.settings.ShowConsultationVersioning ? `${o.doctorTitle} ${o.doctorName}` : `V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
                           />
                         </GridItem>
                         <GridItem sm={5} style={{ textAlign: 'right' }}>
@@ -344,7 +345,9 @@ class PatientHistory extends Component {
                   }
                 />
               </ListItem>
-              {selectedSubRow && selectedSubRow.id === o.id &&  mode === 'integrated'  && <div>{this.getDetailPanel()}</div>}
+              {selectedSubRow &&
+              selectedSubRow.id === o.id &&
+              mode === 'integrated' && <div>{this.getDetailPanel()}</div>}
             </React.Fragment>
           )
         })}
@@ -426,7 +429,6 @@ class PatientHistory extends Component {
       <CardContainer
         hideHeader
         size='sm'
-        
         className={classnames({
           [classes.rightPanel]: !widget ? true : false,
           [override.rightPanel]: !widget ? true : false,
@@ -436,7 +438,7 @@ class PatientHistory extends Component {
         <GridContainer gutter={0}>
           <GridItem md={8}>
             <Select
-              noWrapper
+              simple
               value={this.state.selectedItems}
               allValue='0'
               prefix='Filter By'
@@ -488,7 +490,14 @@ class PatientHistory extends Component {
             edit: 'none',
           }}
         >
-          {entity && this.widgets.filter((o) =>this.state.selectedItems.indexOf('0') >= 0 || this.state.selectedItems.indexOf(o.id) >= 0,).map((o) => {
+          {entity &&
+            this.widgets
+              .filter(
+                (o) =>
+                  this.state.selectedItems.indexOf('0') >= 0 ||
+                  this.state.selectedItems.indexOf(o.id) >= 0,
+              )
+              .map((o) => {
                 const Widget = o.component
                 return (
                   <div>
@@ -511,6 +520,7 @@ class PatientHistory extends Component {
       patientHistory,
       dispatch,
       widget,
+      clinicSettings,
       mode = 'split',
     } = this.props
     const { entity, visitInfo, selected } = patientHistory
@@ -521,6 +531,11 @@ class PatientHistory extends Component {
       cfg.style = {}
     }
 
+    const sortedPatientHistory = patientHistory.list
+      ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
+      : ''
+    console.log("*******")
+    console.log(sortedPatientHistory)
     return (
       <div {...cfg}>
         <CardContainer
@@ -532,14 +547,19 @@ class PatientHistory extends Component {
             [override.leftPanel]: !widget ? true : false,
           })}
         >
-          {patientHistory.list ? patientHistory.list.length > 0 ? (
+          {sortedPatientHistory ? sortedPatientHistory.length >
+          0 ? !clinicSettings.settings.ShowConsultationVersioning ? (
             <Accordion
               defaultActive={0}
-              collapses={patientHistory.list.map((o) => ({
+              collapses={sortedPatientHistory.map((o) => ({
                 title: this.getTitle(o),
                 content: this.getContent(o),
               }))}
             />
+          ) : (
+            sortedPatientHistory.map((o) => (
+              this.getContent(o)
+            ))
           ) : (
             <p>No visit record</p>
           ) : (

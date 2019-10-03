@@ -17,7 +17,6 @@ import {
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import InputLabel from '@material-ui/core/InputLabel'
 // import Select from '@material-ui/core/Select'
-import { extendFunc } from '@/utils/utils'
 import CustomInput from 'mui-pro-components/CustomInput'
 
 import InputAdornment from '@material-ui/core/InputAdornment'
@@ -27,6 +26,7 @@ import CustomInputWrapper from 'mui-pro-components/CustomInputWrapper'
 import Datetime from 'react-datetime'
 import moment from 'moment'
 import CancelIcon from '@material-ui/icons/Cancel'
+import { extendFunc } from '@/utils/utils'
 
 import selectStyle from './selectStyle.jsx'
 
@@ -184,9 +184,9 @@ function Control (props) {
       fullWidth
       className={`${classNames({
         [props.selectProps.classes.disabled]: props.isDisabled,
-        [props.selectProps.classes.selectRoot]: props.selectProps.noWrapper,
+        [props.selectProps.classes.selectRoot]: props.selectProps.simple,
         [props.selectProps.classes.selectRootWithWrapper]: !props.selectProps
-          .noWrapper,
+          .simple,
       })} ${props.selectProps.classes.underline}`}
       inputComponent={inputComponent}
       inputProps={{
@@ -313,7 +313,7 @@ class CustomSelect extends React.Component {
       filterOption,
       ...restProps
     } = this.props
-    const { noWrapper, label } = restProps
+    const { simple, label } = restProps
     const newOpts = options.map((s) => ({
       ...s,
       value: s[valueField],
@@ -359,11 +359,11 @@ class CustomSelect extends React.Component {
               onChange={this.handleChange('single')}
               onFocus={this.onFocus}
               onBlur={this.onBlur}
-              placeholder={noWrapper ? label : ''}
+              placeholder={simple ? label : ''}
               filterOption={filterOption}
               isClearable={isClearable}
               isDisabled={restProps.disabled}
-              noWrapper={noWrapper}
+              simple={simple}
               isOptionDisabled={(option) => !!option.disabled}
               {...restProps}
             />
@@ -393,13 +393,13 @@ class CustomSelect extends React.Component {
       //         onBlur={extendFunc(onBlur, () =>
       //           this.setState({ shrink: !!this.state.value }),
       //         )}
-      //         placeholder={noWrapper ? label : ''}
+      //         placeholder={simple ? label : ''}
       //         filterOption={filterOption}
       //         isClearable={isClearable}
       //         // defaultMenuIsOpen
       //         // closeMenuOnSelect={false}
       //         isDisabled={restProps.disabled}
-      //         noWrapper={noWrapper}
+      //         simple={simple}
       //       />
       //     )
       //   }}

@@ -73,7 +73,7 @@ const showErrorNotification = (header, message) => {
         <p>{message}</p>
       </div>
     ),
-    duration: 5000,
+    duration: 15,
   })
 }
 
@@ -354,7 +354,7 @@ const request = (url, option, showNotification = true) => {
                   description:
                     response.responseJSON.message ||
                     response.responseJSON.title,
-                  duration: 5000,
+                  duration: 15,
                 })
             } else {
               showNotification &&
@@ -368,7 +368,7 @@ const request = (url, option, showNotification = true) => {
                       )}
                     </div>
                   ),
-                  duration: 5000,
+                  duration: 15,
                 })
             }
 

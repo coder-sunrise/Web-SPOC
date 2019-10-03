@@ -73,7 +73,7 @@ class DateEditorBase extends PureComponent {
     return (
       <div ref={this.myRef}>
         <DateRangePicker
-          noWrapper
+          simple
           timeFormat={false}
           showErrorIcon
           error={this.state.error}

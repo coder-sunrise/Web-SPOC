@@ -1,9 +1,6 @@
 import React, { PureComponent, Suspense } from 'react'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 import Loadable from 'react-loadable'
-import Loading from '@/components/PageLoading/index'
-import { getUniqueId } from '@/utils/utils'
-
 import {
   FormControl,
   InputLabel,
@@ -17,6 +14,9 @@ import {
   Fade,
   ClickAwayListener,
 } from '@material-ui/core'
+import Loading from '@/components/PageLoading/index'
+import { getUniqueId } from '@/utils/utils'
+
 import MoreVert from '@material-ui/icons/MoreVert'
 
 import {

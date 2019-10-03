@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { TextField, FastField, DatePicker } from '@/components'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -45,7 +46,6 @@ export const PrescriptionColumns = [
 ]
 
 export const PrescriptionColumnExtensions = [
-  { columnName: 'expiryDate', type: 'date' },
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
@@ -53,6 +53,34 @@ export const PrescriptionColumnExtensions = [
   },
   { columnName: 'dispensedQuanity', type: 'number' },
   { columnName: 'orderedQuantity', type: 'number' },
+  {
+    columnName: 'batchNo',
+    render: (row) => {
+      return (
+        <FastField
+          name={`prescription[${row.rowIndex}]batchNo`}
+          render={(args) => <TextField simple {...args} />}
+        />
+      )
+    },
+  },
+  {
+    columnName: 'expiryDate',
+    render: (row) => {
+      return (
+        <FastField
+          name={`prescription[${row.rowIndex}]expiryDate`}
+          render={(args) => (
+            <DatePicker
+              disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+              simple
+              {...args}
+            />
+          )}
+        />
+      )
+    },
+  },
 ]
 
 export const VaccinationColumn = [
@@ -67,6 +95,10 @@ export const VaccinationColumn = [
   {
     name: 'batchNo',
     title: 'Batch #',
+  },
+  {
+    name: 'expiryDate',
+    title: 'Expiry Date',
   },
   {
     name: 'dispensedQuanity',
@@ -88,6 +120,34 @@ export const VaccinationColumnExtensions = [
   {
     columnName: 'totalPrice',
     type: 'currency',
+  },
+  {
+    columnName: 'batchNo',
+    render: (row) => {
+      return (
+        <FastField
+          name={`vaccination[${row.rowIndex}]batchNo`}
+          render={(args) => <TextField simple {...args} />}
+        />
+      )
+    },
+  },
+  {
+    columnName: 'expiryDate',
+    render: (row) => {
+      return (
+        <FastField
+          name={`vaccination[${row.rowIndex}]expiryDate`}
+          render={(args) => (
+            <DatePicker
+              disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+              simple
+              {...args}
+            />
+          )}
+        />
+      )
+    },
   },
 ]
 
