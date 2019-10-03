@@ -54,7 +54,7 @@ const SchemePopover = ({
                     {' '}
                     <Refresh fontSize='large' />
                   </IconButton>
-                </div>
+                </div> 
               </div>
             </GridItem>
           </GridContainer>

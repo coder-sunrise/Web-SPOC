@@ -311,7 +311,12 @@ class Scribble extends React.Component {
               <FastField
                 name='subject'
                 render={(args) => {
-                  return <TextField label='Scribble Subject' {...args} />
+                  return (
+                    <TextField
+                      label='Scribble Subject'
+                      {...args}
+                    />
+                  )
                 }}
               />
             </div>

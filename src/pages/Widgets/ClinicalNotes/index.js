@@ -526,7 +526,7 @@ class ClinicalNotes extends Component {
                                 (item, i) => {
                                   return (
                                     <GridListTile key={i} cols={0}>
-                                      <GridItem md={2}>
+                                      <GridItem md={3}>
                                         <Button
                                           link
                                           style={{
