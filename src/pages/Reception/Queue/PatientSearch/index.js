@@ -73,11 +73,14 @@ class PatientSearch extends PureComponent {
     loading: Loading,
     render: (loaded) => {
       const Component = loaded.default
+      const { search } = this.props
+      console.log('this.props', this.props)
       return (
         <Component
           renderActionFn={this.Cell}
           simple
           size='sm'
+          search={search}
           disableQueryOnLoad
           overrideTableParas={{
             columns: this.state.columns,

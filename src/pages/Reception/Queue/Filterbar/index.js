@@ -30,6 +30,7 @@ const Filterbar = ({
   toggleNewPatient,
   handleSubmit,
   selfOnly,
+  setSearch,
 }) => {
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
 
@@ -44,7 +45,11 @@ const Filterbar = ({
           name='search'
           render={(args) => {
             return (
-              <TextField label='Patient Name, Acc No., Phone No.' {...args} />
+              <TextField
+                label='Patient Name, Acc No., Phone No.'
+                onChange={(e) => setSearch(e.target.value)}
+                {...args}
+              />
             )
           }}
         />

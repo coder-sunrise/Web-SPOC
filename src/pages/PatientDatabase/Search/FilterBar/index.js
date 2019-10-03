@@ -36,7 +36,11 @@ const styles = (theme) => ({
 })
 
 @withFormik({
-  mapPropsToValues: () => {},
+  mapPropsToValues: ({ search }) => {
+    return {
+      search,
+    }
+  },
 })
 class FilterBar extends PureComponent {
   render () {
