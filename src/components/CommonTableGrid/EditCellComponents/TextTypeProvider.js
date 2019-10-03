@@ -47,13 +47,16 @@ class TextEditorBase extends PureComponent {
       isDisabled = () => false,
       onChange,
       gridId,
+      editRender,
       ...restConfig
     } = cfg
 
     const latestRow = window.$tempGridRow[gridId]
       ? window.$tempGridRow[gridId][row.id] || {}
       : row
-
+    if (editRender) {
+      return editRender(row)
+    }
     const submitValue = (e) => {
       const error = updateCellValue(
         this.props,
@@ -74,7 +77,7 @@ class TextEditorBase extends PureComponent {
       <div ref={this.myRef}>
         <TextField
           showErrorIcon
-          noWrapper
+          simple
           defaultValue={latestRow[columnName]}
           onChange={submitValue}
           // onCommit={submitValue}
@@ -98,7 +101,6 @@ const TextFormatter = (columnExtensions) =>
             currentColumnName === columnName,
         ) || {}
       const { type, render, onClick, ...restProps } = cfg
-      // console.log(props)
       if (render) {
         return render(row)
       }

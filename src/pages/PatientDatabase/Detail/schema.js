@@ -14,12 +14,13 @@ const _multiples = [2,7,6,5,4,3,2]
 Yup.addMethod(Yup.string, 'NRIC', function (message) {
   return this.test('isValidNRIC', message, function (value = '') {
     const { parent, createError } = this
-    const { patientAccountNoTypeFK, dob } = parent
 
+    const { patientAccountNoTypeFK, accountNoTypeFK, dob } = parent
+    const typeFK = Number(patientAccountNoTypeFK || accountNoTypeFK)
     const firstChar = value[0] || ''
     const lastChar = value[value.length - 1] || ''
     let outputChars = []
-    switch (patientAccountNoTypeFK) {
+    switch (typeFK) {
       case 1: // fin
         if (firstChar === 'F')
           // prettier-ignore
@@ -77,7 +78,7 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
     if (dob) {
       const mDob = moment(dob)
 
-      switch (patientAccountNoTypeFK) {
+      switch (typeFK) {
         case 5:
         case 6:
         case 10:
@@ -96,10 +97,7 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
               message: 'Invalid date of birth',
             })
           }
-          if (
-            patientAccountNoTypeFK === 13 &&
-            Math.abs(mDob.diff(moment(), 'year')) >= 15
-          ) {
+          if (typeFK === 13 && Math.abs(mDob.diff(moment(), 'year')) >= 15) {
             return createError({
               message:
                 'For Singaporean age 15 and above, please choose others than SG Birth Cert',

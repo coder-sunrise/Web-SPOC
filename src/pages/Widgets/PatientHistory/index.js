@@ -438,7 +438,7 @@ class PatientHistory extends Component {
         <GridContainer gutter={0}>
           <GridItem md={8}>
             <Select
-              noWrapper
+              simple
               value={this.state.selectedItems}
               allValue='0'
               prefix='Filter By'

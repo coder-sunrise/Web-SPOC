@@ -13,8 +13,8 @@ import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
 import style from './style'
 // utils
-import { getAppendUrl } from '@/utils/utils'
-// model
+import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
+import Yup from '@/utils/yup'
 
 @withFormikExtend({
   authority: {
@@ -24,7 +24,14 @@ import { getAppendUrl } from '@/utils/utils'
   mapPropsToValues: ({ dispense = {} }) => {
     return dispense.entity || dispense.default
   },
-
+  validationSchema: Yup.object().shape({
+    prescription: Yup.array().of(
+      Yup.object().shape({
+        batchNo: Yup.string(),
+        expiryDate: Yup.date(),
+      }),
+    ),
+  }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, codetable, visitRegistration } = props
     const vid = visitRegistration.entity.visit.id
@@ -61,25 +68,27 @@ class Main extends Component {
     // this.props.history.push(`${location.pathname}/billing`)
   }
 
-  editOrder = () => {
-    const { dispatch, dispense, visitRegistration } = this.props
-    dispatch({
-      type: `consultation/editOrder`,
-      payload: {
-        id: visitRegistration.entity.visit.id,
-        version: dispense.version,
-      },
-    }).then((o) => {
-      if (o) {
-        dispatch({
-          type: `dispense/updateState`,
-          payload: {
-            editingOrder: true,
-          },
-        })
-        this.refresh()
-      }
-    })
+  editOrder = (e) => {
+    const { dispatch, dispense, visitRegistration, handleSubmit } = this.props
+    navigateDirtyCheck(() => {
+      dispatch({
+        type: `consultation/editOrder`,
+        payload: {
+          id: visitRegistration.entity.visit.id,
+          version: dispense.version,
+        },
+      }).then((o) => {
+        if (o) {
+          dispatch({
+            type: `dispense/updateState`,
+            payload: {
+              editingOrder: true,
+            },
+          })
+          this.refresh()
+        }
+      })
+    }, handleSubmit)(e)
   }
 
   refresh = () => {
@@ -108,7 +117,7 @@ class Main extends Component {
             </Button>
             <Button color='primary' size='sm'>
               <Print />
-              Print Label
+              Patient Label
             </Button>
           </GridItem>
           <DispenseDetails {...this.props} />

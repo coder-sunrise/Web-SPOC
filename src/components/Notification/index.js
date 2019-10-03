@@ -4,10 +4,10 @@ import Notification from 'rc-notification'
 import { Close as Icon, AddAlert } from '@material-ui/icons'
 import Snackbar from 'mui-pro-components/Snackbar/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
+import Close from '@material-ui/icons/Close'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
 // @material-ui/icons
-import Close from '@material-ui/icons/Close'
 
 // <Snackbar
 //             place="lr"

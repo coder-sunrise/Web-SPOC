@@ -163,7 +163,6 @@ class TextField extends React.PureComponent {
     //   inputProps.value = this.state.value
     // }
     const cfg = {}
-    // console.log(this.props)
     if (field && form) {
       cfg.value = state.value
       cfg.name = field.name

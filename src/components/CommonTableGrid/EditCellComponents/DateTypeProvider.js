@@ -46,7 +46,14 @@ class DateEditorBase extends PureComponent {
         error: updateCellValue(this.props, this.myRef.current, date || ''),
       })
     }
-    const { type, isDisabled = () => false, gridId, format,getRowId, ...restProps } = cfg
+    const {
+      type,
+      isDisabled = () => false,
+      gridId,
+      format,
+      getRowId,
+      ...restProps
+    } = cfg
 
     const commonCfg = {
       text,
@@ -65,7 +72,7 @@ class DateEditorBase extends PureComponent {
     return (
       <div ref={this.myRef}>
         <DatePicker
-          noWrapper
+          simple
           timeFormat={false}
           showErrorIcon
           error={this.state.error}
