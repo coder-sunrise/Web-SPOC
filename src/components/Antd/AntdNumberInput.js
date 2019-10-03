@@ -214,9 +214,12 @@ class AntdNumberInput extends React.PureComponent {
       !(e.keyCode >= 48 && e.keyCode <= 57) &&
       !(e.keyCode >= 96 && e.keyCode <= 105) &&
       !(e.keyCode >= 37 && e.keyCode <= 40) &&
-      e.keyCode !== 8 &&
-      e.keyCode !== 46 &&
-      e.keyCode !== 189
+      ![
+        8,
+        46,
+        189,
+        9,
+      ].includes(e.keyCode)
     ) {
       e.preventDefault()
     }
@@ -351,7 +354,6 @@ class AntdNumberInput extends React.PureComponent {
       } else if (formatter) {
         extraCfg.formatter = (v) => {
           if (v === '') return ''
-          console.log(v, numeral(v).format(format))
 
           if (!this.state.focused) {
             return formatter(v)
@@ -361,7 +363,6 @@ class AntdNumberInput extends React.PureComponent {
       } else if (format) {
         extraCfg.formatter = (v) => {
           if (v === '') return ''
-          console.log(v, numeral(v).format(format))
 
           if (!this.state.focused) {
             return numeral(v).format(format)

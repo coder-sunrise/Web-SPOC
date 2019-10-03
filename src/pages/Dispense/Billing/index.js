@@ -31,7 +31,7 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ billing }) => ({ billing }))
+@connect(({ billing, dispense }) => ({ billing, dispense }))
 class Billing extends Component {
   state = {
     showClaimSeqModal: false,
@@ -82,7 +82,7 @@ class Billing extends Component {
                 title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                 content: (
                   <GridContainer direction='column'>
-                    <DispenseDetails />
+                    <DispenseDetails {...this.props} />
                   </GridContainer>
                 ),
               },

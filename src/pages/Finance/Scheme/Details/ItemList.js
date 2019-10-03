@@ -148,7 +148,7 @@ const ItemList = ({
 
           return (
             <FastField
-              name={`rows[${row.rowIndex - 1}].${itemFKName}`}
+              name={`rows[${row.rowIndex}].${itemFKName}`}
               render={(args) => {
                 console.log(args)
                 return (
@@ -175,22 +175,22 @@ const ItemList = ({
             <GridContainer>
               <GridItem xs={8}>
                 {/* <Field
-                name={`packageValueDto[${row.rowIndex - 1}].itemValue`}
+                name={`packageValueDto[${row.rowIndex }].itemValue`}
                 render={(args) => <NumberInput {...args} />}
               /> */}
                 <Field
-                  name={`rows[${row.rowIndex - 1}].itemValue`}
+                  name={`rows[${row.rowIndex}].itemValue`}
                   render={CPNumber(
                     undefined,
                     Array.isArray(values.rows) && values.rows.length >= 1
-                      ? values.rows[row.rowIndex - 1].itemValueType
+                      ? values.rows[row.rowIndex].itemValueType
                       : 'ExactAmount',
                   )}
                 />
               </GridItem>
               <GridItem xs={4}>
                 <Field
-                  name={`rows[${row.rowIndex - 1}].itemValueType`}
+                  name={`rows[${row.rowIndex}].itemValueType`}
                   render={CPSwitch(undefined)}
                 />
               </GridItem>

@@ -92,7 +92,7 @@ class NumberEditor extends PureComponent {
     }
     // console.log(columnName, value)
     const commonCfg = {
-      noWrapper: true,
+      simple: true,
       showErrorIcon: true,
       error: this.state.error,
       value,

@@ -1,10 +1,9 @@
 import React from 'react'
-
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import PerfectScrollbar from 'perfect-scrollbar'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import classNames from 'classnames'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -168,7 +167,7 @@ class CommonModal extends React.PureComponent {
               {...confirmProps}
               // disabled={disabled || loading.global || global.disableSave}
             >
-              {confirmBtnText || confirmText}
+              {confirmText || confirmBtnText}
             </ProgressButton>
           )}
         </DialogActions>
@@ -256,6 +255,7 @@ class CommonModal extends React.PureComponent {
       keepMounted = true,
       overrideLoading = false,
       footProps = {},
+      className,
     } = this.props
     if (!children || !open) return null
     // console.log(bodyNoPadding)
@@ -279,13 +279,15 @@ class CommonModal extends React.PureComponent {
       }),
     )
     // console.log(this.props)
+    const classControl = {
+      [className]: true,
+      [classes.modalRoot]: true,
+      [classes.modal]: true,
+    }
     return (
       <React.Fragment>
         <Dialog
-          classes={{
-            root: `${classes.modalRoot}`,
-            paper: classes.modal,
-          }}
+          className={classnames(classControl)}
           disableBackdropClick={disableBackdropClick}
           open={open}
           fullScreen={this.props.fullScreen}
@@ -391,7 +393,6 @@ class CommonModal extends React.PureComponent {
                   Cancel
                 </Button>
                 <Button
-                  color='primary'
                   onClick={() => {
                     this.setState({
                       openConfirm: false,
@@ -404,8 +405,9 @@ class CommonModal extends React.PureComponent {
                     this.onClose(true)
                   }}
                 >
-                  Confirm
+                  Discard changes
                 </Button>
+                <Button color='primary'>Save Changes</Button>
               </React.Fragment>
             </SizeContainer>
           </DialogActions>

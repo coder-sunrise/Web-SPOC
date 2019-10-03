@@ -137,6 +137,12 @@ const customInputStyle = {
     //   color: "#495057",
     // },
   },
+  simple: {
+    margin: 0,
+    '& > *': {
+      padding: '1px 0 0px',
+    },
+  },
   medium: {
     margin: '6px 0 5px 0',
     paddingTop: 20,

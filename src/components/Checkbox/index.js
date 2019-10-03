@@ -4,13 +4,13 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import withStyles from '@material-ui/core/styles/withStyles'
 import CustomInput from 'mui-pro-components/CustomInput'
-import { control } from '@/components/Decorator'
 import {
   FormLabel,
   Checkbox as MUICheckbox,
   Switch,
   FormControlLabel,
 } from '@material-ui/core'
+import { control } from '@/components/Decorator'
 
 @control()
 class Checkbox extends React.Component {

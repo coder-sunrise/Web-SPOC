@@ -97,8 +97,8 @@ class Filter extends PureComponent {
                     this.props.dispatch({
                       type: 'settingCompany/query',
                       payload: {
-                        companyType,
-                        coPayerTypeFK,
+                        // companyType,
+                        // coPayerTypeFK,
                         isActive,
                         group: [
                           {

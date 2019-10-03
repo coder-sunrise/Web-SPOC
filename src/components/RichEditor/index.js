@@ -20,6 +20,7 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import { control } from '@/components/Decorator'
 import { CustomInput } from '@/components'
+import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
 const STYLES = (theme) => {
   return {
@@ -45,7 +46,9 @@ class RichEditor extends React.PureComponent {
   constructor (props) {
     super(props)
     const { form, field } = props
-    const v = form && field ? field.value : props.value || props.defaultValue
+    const v = htmlDecodeByRegExp(
+      form && field ? field.value : props.value || props.defaultValue,
+    )
     let editorState
 
     if (v) {
@@ -106,6 +109,7 @@ class RichEditor extends React.PureComponent {
       //   value: field.value,
       // })
     }
+    v = htmlDecodeByRegExp(v)
     // console.log(
     //   isEditorFocused,
     //   v,
@@ -201,7 +205,9 @@ class RichEditor extends React.PureComponent {
         value:
           textEditorValue === ''
             ? ''
-            : draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
+            : htmlEncodeByRegExp(
+                draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
+              ),
         // name: props.field.name,
       },
     }

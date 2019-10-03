@@ -102,6 +102,7 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
+
           <GridItem xs={12} md={12}>
             <div className={classes.filterBtn}>
               <Button
