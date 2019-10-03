@@ -80,7 +80,7 @@ export const formikMapPropsToValues = ({
           item.clinicianProfile.id === parseInt(location.query.pdid, 10),
       )
     }
-    console.log({ doctorProfile })
+    // console.log({ doctorProfile })
     return {
       queueNo: qNo,
       visitPurposeFK: 1,

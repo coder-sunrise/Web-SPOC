@@ -15,7 +15,6 @@ import {
   GridItem,
   TextField,
   CodeSelect,
-  SizeContainer,
 } from '@/components'
 // sub components
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
@@ -38,24 +37,12 @@ const FilterBar = ({
 }) => {
   const onFilterClick = () => handleUpdateFilter(values)
 
-  const renderDropdown = (option) => {
-    return <DoctorLabel doctor={option} />
-    // const { name, doctorProfile } = option
-    // const title = option.title || ''
-    // const mcrNo =
-    //   doctorProfile !== null && doctorProfile !== undefined
-    //     ? `(${doctorProfile.doctorMCRNo})`
-    //     : ''
-    // return <div>{`${title} ${name} ${mcrNo}`}</div>
-  }
+  const renderDropdown = (option) => <DoctorLabel doctor={option} />
+
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
-  const maxDoctorTagPlaceholder = filterByDoctor
-    ? `${filterByDoctor.filter((o) => o !== -99).length} doctors selected...`
-    : ''
-  console.log({ values })
   const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
-  const maxAppointmentTagPlaceholder = `${filterByApptType.length} appointment types selected...`
+
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>

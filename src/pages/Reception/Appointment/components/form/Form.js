@@ -50,6 +50,7 @@ import styles from './style'
     patientProfileDefaultValue: patient.default,
     user: user.data,
     events: calendar.list,
+    conflicts: calendar.conflicts,
     viewingAppointment: calendar.currentViewAppointment,
     isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
     mode: calendar.mode,
@@ -605,14 +606,7 @@ class Form extends React.PureComponent {
       APPOINTMENT_STATUS.CANCELLED,
       APPOINTMENT_STATUS.TURNEDUP,
     ]
-    console.log({
-      isDataGridValid,
-      values,
-      currentAppointment,
-      isDisabledStatus: _disabledStatus.includes(
-        currentAppointment.appointmentStatusFk,
-      ),
-    })
+
     if (values.id === undefined) return false
 
     if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
@@ -625,7 +619,15 @@ class Form extends React.PureComponent {
   }
 
   render () {
-    const { classes, onClose, loading, values, isSubmitting, mode } = this.props
+    const {
+      classes,
+      onClose,
+      loading,
+      values,
+      isSubmitting,
+      mode,
+      conflicts,
+    } = this.props
 
     const {
       showPatientProfile,
@@ -645,7 +647,25 @@ class Form extends React.PureComponent {
     //   values: this.props.values,
     //   dirty: this.props.dirty,
     // })
-
+    const _datagrid =
+      conflicts.length > 0
+        ? datagrid.reduce(
+            (data, d) => [
+              ...data,
+              {
+                ...d,
+                conflicts:
+                  conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                    ? conflicts[d.sortOrder].conflicts
+                    : [],
+              },
+            ],
+            [],
+          )
+        : [
+            ...datagrid,
+          ]
+    console.log({ _datagrid })
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
       <LoadingWrapper loading={show} text='Loading...'>
@@ -687,7 +707,7 @@ class Form extends React.PureComponent {
                 <AppointmentDataGrid
                   disabled={shouldDisable}
                   appointmentDate={currentAppointment.appointmentDate}
-                  data={datagrid}
+                  data={_datagrid}
                   handleCommitChanges={this.onCommitChanges}
                   handleEditingRowsChange={this.onEditingRowsChange}
                 />

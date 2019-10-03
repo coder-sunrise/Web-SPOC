@@ -166,6 +166,7 @@ class Queue extends React.Component {
     this.setState({
       showPatientSearch: override === undefined ? !showPatientSearch : override,
     })
+
     this.props.history.push(
       getRemovedUrl([
         'v',
@@ -276,16 +277,6 @@ class Queue extends React.Component {
     // })
     SendNotification({ test: '123' })
   }
-
-  // toggleFilterSelfOnly = () => {
-  //   const { queueLog, dispatch } = this.props
-  //   dispatch({
-  //     type: 'queueLog/updateState',
-  //     payload: {
-  //       selfOnly: !queueLog.selfOnly,
-  //     },
-  //   })
-  // }
 
   render () {
     const { classes, queueLog, loading, history } = this.props

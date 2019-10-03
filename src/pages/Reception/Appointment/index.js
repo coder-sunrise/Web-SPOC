@@ -136,6 +136,7 @@ class Appointment extends React.PureComponent {
       type: 'calendar/updateState',
       payload: {
         currentViewAppointment: { appointments: [] },
+        conflicts: [],
         isEditedAsSingleAppointment: false,
       },
     })
