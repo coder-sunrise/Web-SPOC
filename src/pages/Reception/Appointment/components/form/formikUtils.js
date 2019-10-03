@@ -99,9 +99,28 @@ export const mapPropsToValues = ({
         (item) => item.id === selectedAppointmentID,
       )
       const { recurrenceDto } = viewingAppointment
+      let {
+        patientContactNo,
+        patientName,
+        patientAccountNo,
+        patientProfile,
+        ...restViewingAppointment
+      } = viewingAppointment
 
+      if (patientProfile) {
+        const { name, patientAccountNo: accNo, contactNumbers } = patientProfile
+        const _mobileContact = contactNumbers.find(
+          (item) => item.numberTypeFK === 1,
+        )
+        if (_mobileContact) patientContactNo = _mobileContact.number
+        patientName = name
+        patientAccountNo = accNo
+      }
       values = {
-        ...viewingAppointment,
+        ...restViewingAppointment,
+        patientContactNo,
+        patientName,
+        patientAccountNo,
         bookedByUser: clinicianProfile ? clinicianProfile.name : '',
         overwriteEntireSeries: false,
         recurrenceChanged: false,

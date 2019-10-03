@@ -4,7 +4,7 @@ import moment from 'moment'
 import * as Yup from 'yup'
 import { connect } from 'dva'
 // formik
-import { FastField, Field, withFormik } from 'formik'
+import { FastField, Field } from 'formik'
 // material ui
 import { Popover, withStyles } from '@material-ui/core'
 import Info from '@material-ui/icons/Info'
@@ -13,7 +13,6 @@ import {
   Button,
   GridContainer,
   GridItem,
-  CodeSelect,
   Select,
   DatePicker,
   TimePicker,
@@ -21,6 +20,7 @@ import {
   TextField,
   dateFormatLong,
   timeFormat24Hour,
+  withFormikExtend,
 } from '@/components'
 // import Recurrence from './Recurrence'
 import {
@@ -84,7 +84,7 @@ const convertReccurenceDaysOfTheWeek = (week = '') =>
     ? week.split(', ').map((eachDay) => parseInt(eachDay, 10))
     : week
 
-const DoctorEventForm = ({ classes, handleSubmit, values, errors, footer }) => {
+const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
   const { hasConflict } = values
   const [
     anchorEl,
@@ -253,13 +253,13 @@ export default compose(
   connect(({ doctorBlock }) => ({
     currentViewDoctorBlock: doctorBlock.currentViewDoctorBlock,
   })),
-  withFormik({
+  withFormikExtend({
+    displayName: 'DoctorBlockForm',
     enableReinitialize: true,
     validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
       validationSchema,
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, onClose } = props
-
       const {
         restDoctorBlock,
         doctorBlockUserFk,
@@ -288,14 +288,13 @@ export default compose(
         let doctorBlocks = [
           doctorBlock,
         ]
-        console.log({ isEnableRecurrence, restValues })
+
         if (isEnableRecurrence && restValues.id === undefined) {
           doctorBlocks = generateRecurringDoctorBlock(
             recurrenceDto,
             doctorBlock,
           )
         }
-        console.log({ doctorBlocks })
 
         // compute startTime and endTime on all recurrence
         doctorBlocks = doctorBlocks.map((item) => {
@@ -332,20 +331,18 @@ export default compose(
             ...payload,
             recurrenceDto: filterRecurrenceDto(recurrenceDto),
           }
-        console.log({ payload })
-
-        // dispatch({
-        //   type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
-        //   payload,
-        // }).then((response) => {
-        //   if (response) {
-        //     dispatch({
-        //       type: 'calendar/refresh',
-        //     })
-        //     resetForm()
-        //     onClose()
-        //   }
-        // })
+        dispatch({
+          type: restValues.id ? 'doctorBlock/update' : 'doctorBlock/upsert',
+          payload,
+        }).then((response) => {
+          if (response) {
+            dispatch({
+              type: 'calendar/refresh',
+            })
+            resetForm()
+            onClose()
+          }
+        })
       } catch (error) {
         console.log({ error })
       }
@@ -360,16 +357,12 @@ export default compose(
         const doctorBlock = doctorBlocks[0]
         const start = moment(doctorBlock.startDateTime)
         const end = moment(doctorBlock.endDateTime)
-        const [
-          hour,
-          minute,
-        ] = end.format(timeFormat24Hour).split(':')
-        const durationHour = end.diff(start, 'hour')
-        const durationMinute = end.format()
-        console.log({ hour, minute, doctorBlock })
+        const hour = end.diff(start, 'hour')
+        const minute = end.format(timeFormat24Hour).split(':')[1]
+
         return {
           ...restValues,
-          eventDate: start.format(dateFormatLong),
+          eventDate: start.formatUTC(),
           eventTime: start.format(_timeFormat),
           durationHour: hour,
           durationMinute: minute,
@@ -391,7 +384,7 @@ export default compose(
         recordClinicFK: 1,
         durationHour: '0',
         durationMinute: '15',
-        eventDate: moment(),
+        eventDate: moment().formatUTC(),
         eventTime: undefined,
         startDateTime: '',
         endDateTime: '',
