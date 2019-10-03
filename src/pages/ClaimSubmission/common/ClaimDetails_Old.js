@@ -1,5 +1,6 @@
-import React, { Component } from 'react'
-import { connect } from 'dva'
+import React from 'react'
+// formik
+import { FastField, Formik } from 'formik'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // common components
@@ -12,8 +13,6 @@ import {
   Select,
   TextField,
   SizeContainer,
-  FastField,
-  withFormikExtend,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -33,29 +32,16 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmission }) => ({
-  claimSubmission,
-}))
-@withFormikExtend({
-  enableReinitialize: true,
-  mapPropsToValues: ({ claimSubmission }) => {
-    console.log(claimSubmission)
-    return claimSubmission.entity || {}
-  },
-})
-class ClaimDetails extends Component {
-  render () {
-    const {
-      classes,
-      onConfirm,
-      onClose,
-      claimDetails,
-      renderClaimDetails,
-    } = this.props
-    // console.log(this.props)
-
-    const { readOnly } = true
-    return (
+const ClaimDetails = ({
+  classes,
+  claimDetails,
+  onConfirm,
+  onClose,
+  readOnly = true,
+  renderClaimDetails,
+}) => {
+  return (
+    <Formik initialValues={{ ...claimDetails }}>
       <SizeContainer size='md'>
         <React.Fragment>
           <GridContainer className={classes.container}>
@@ -242,8 +228,8 @@ class ClaimDetails extends Component {
           </GridContainer>
         </React.Fragment>
       </SizeContainer>
-    )
-  }
+    </Formik>
+  )
 }
 
 export default withStyles(styles, { name: 'ClaimDetails' })(ClaimDetails)

@@ -7,8 +7,7 @@ import { headerHeight } from 'mui-pro-jss'
 import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
-import More from '@material-ui/icons/MoreHoriz'
-// import Button from '@material-ui/core/Button'
+import { SchemePopover } from 'medisys-components'
 import {
   GridContainer,
   GridItem,
@@ -20,6 +19,7 @@ import {
   IconButton,
   Popover,
   Button,
+  NumberInput,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
@@ -31,7 +31,12 @@ import Block from './Block'
   codetable,
 }))
 class Banner extends PureComponent {
-  state = {}
+  state = {
+    showWarning: false,
+    balanceValue: 0,
+    dateFrom: '',
+    dateTo: '',
+  }
 
   constructor (props) {
     super(props)
@@ -71,10 +76,20 @@ class Banner extends PureComponent {
     const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
-    const da =
-      ctdrugallergy.filter((o) =>
-        patientAllergy.find((m) => m.allergyFK === o.id),
-      ) || []
+    const da = ctdrugallergy.filter((o) =>
+      patientAllergy.find((m) => m.allergyFK === o.id),
+    )
+
+    if (da.length) {
+      this.setState({
+        showWarning: true,
+      })
+    } else {
+      this.setState({
+        showWarning: false,
+      })
+    }
+
     return (
       <div style={{ display: 'inline-block' }}>
         {data === 'link' ? (
@@ -92,17 +107,16 @@ class Banner extends PureComponent {
         ) : (
           <div>
             {da.length ? (
-              `${da[0].name.length > 6
-                ? `${da[0].name.substring(0, 6)}... ,`
-                : ' '}`
+              `${da[0].name.length > 8
+                ? `${da[0].name.substring(0, 8)}... `
+                : da[0].name} `
             ) : (
               '-'
             )}
-            <br />
-            {da.length > 1 ? (
-              `${da[1].name.length > 6
-                ? `${da[1].name.substring(0, 6)}...`
-                : ' '}`
+            {da.length >= 2 ? (
+              `${da[1].name.length > 8
+                ? `, ${da[1].name.substring(0, 8)}...`
+                : `, ${da[1].name}`}`
             ) : (
               ''
             )}
@@ -114,10 +128,11 @@ class Banner extends PureComponent {
                   <div>
                     {da.map((item, i) => {
                       return (
-                        <div>
-                          {i + 1}.) {item.name}
-                          <br />
-                        </div>
+                        <GridContainer>
+                          <GridItem>
+                            {i + 1}.) {item.name}
+                          </GridItem>
+                        </GridContainer>
                       )
                     })}
                   </div>
@@ -125,18 +140,11 @@ class Banner extends PureComponent {
                 trigger='click'
                 placement='bottomLeft'
               >
-                <Button
-                  color='primary'
-                  style={{
-                    backgroundColor: '#48C9B0',
-                    color: 'white',
-                    fontWeight: 'normal',
-                    marginLeft: 5,
-                    padding: 0,
-                  }}
-                >
-                  More
-                </Button>
+                <div>
+                  <Button simple variant='outlined' color='info' size='sm'>
+                    More
+                  </Button>
+                </div>
               </Popover>
             ) : (
               ' '
@@ -145,6 +153,39 @@ class Banner extends PureComponent {
         )}
       </div>
     )
+  }
+
+  refreshChasBalance = () => {
+    const { dispatch, patient } = this.props
+    const { entity } = patient
+    dispatch({
+      type: 'patient/refreshChasBalance',
+      payload: entity,
+    }).then((result) => {
+      if (result) {
+        const {
+          balance,
+          patientCoPaymentSchemeFk,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+        } = result
+        console.log({
+          balance,
+          patientCoPaymentSchemeFk,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+        })
+
+        this.setState({
+          balanceValue: balance,
+          dateFrom: validFrom,
+          dateTo: validTo,
+        })
+
+      }
+    })
   }
 
   // {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
@@ -168,6 +209,7 @@ class Banner extends PureComponent {
     // console.log('************** banner ***********')
     // console.log(this.props)
     const { entity } = patient
+
     if (!entity)
       return (
         <Paper>
@@ -239,9 +281,13 @@ class Banner extends PureComponent {
             <Block
               header={
                 <div>
-                  <IconButton disabled>
-                    <Warining color='error' />
-                  </IconButton>
+                  {this.state.showWarning ? (
+                    <IconButton disabled>
+                      <Warining color='error' />
+                    </IconButton>
+                  ) : (
+                    ''
+                  )}
                   {'Allergies'} {this.getAllergyLink('link')}
                 </div>
               }
@@ -253,10 +299,66 @@ class Banner extends PureComponent {
               header='Medical Problem'
               body={
                 <div>
-                  Fever
-                  <Button color='info' size='sm'>
-                    More
-                  </Button>
+                  <div style={{ paddingTop: 5 }}>
+                    {entity.patientHistoryDiagnosis.length ? (
+                      `${entity.patientHistoryDiagnosis[0].diagnosisDescription
+                        .length > 8
+                        ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(
+                            0,
+                            8,
+                          )}... `
+                        : entity.patientHistoryDiagnosis[0]
+                            .diagnosisDescription} `
+                    ) : (
+                      '-'
+                    )}
+                    {entity.patientHistoryDiagnosis.length >= 2 ? (
+                      `${entity.patientHistoryDiagnosis[1].diagnosisDescription
+                        .length > 8
+                        ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(
+                            0,
+                            8,
+                          )}...`
+                        : `, ${entity.patientHistoryDiagnosis[1]
+                            .diagnosisDescription}`}`
+                    ) : (
+                      ''
+                    )}
+                  </div>
+
+                  {entity.patientHistoryDiagnosis.length ? (
+                    <Popover
+                      icon={null}
+                      content={
+                        <div>
+                          {entity.patientHistoryDiagnosis.map((item, i) => {
+                            return (
+                              <GridContainer>
+                                <GridItem>
+                                  {i + 1}.) {item.diagnosisDescription}
+                                </GridItem>
+                              </GridContainer>
+                            )
+                          })}
+                        </div>
+                      }
+                      trigger='click'
+                      placement='bottomLeft'
+                    >
+                      <div>
+                        <Button
+                          simple
+                          variant='outlined'
+                          color='info'
+                          size='sm'
+                        >
+                          More
+                        </Button>
+                      </div>
+                    </Popover>
+                  ) : (
+                    ' '
+                  )}
                 </div>
               }
             />
@@ -266,88 +368,59 @@ class Banner extends PureComponent {
               header={
                 <div>
                   {'Scheme'}{' '}
-                  <IconButton>
+                  <IconButton onClick={this.refreshChasBalance}>
                     <Refresh />
                   </IconButton>
                 </div>
               }
               body={
                 <div>
-                  {entity.patientScheme
-                    .filter((o) => o.schemeTypeFK <= 5)
-                    .map((o) => {
-                      return (
-                        <div>
-                          <CodeSelect
-                            text
-                            code='ctSchemeType'
-                            value={o.schemeTypeFK}
-                          />
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
+                    .length >= 1 ? (
+                    entity.patientScheme
+                      .filter((o) => o.schemeTypeFK <= 5)
+                      .map((o) => {
+                        this.setState({
+                          balanceValue: o.patientSchemeBalance.length <= 0 ? 0 : o.patientSchemeBalance[0].balance,
+                          dateFrom: o.validFrom,
+                          dateTo: o.validTo,
+                        })
+                        return (
+                          <div>
+                            <CodeSelect
+                              text
+                              code='ctSchemeType'
+                              value={o.schemeTypeFK}
+                            />
 
-                          {o.validFrom && (
-                            <div style={{ display: 'inline-block' }}>
-                              <Popover
-                                icon={null}
-                                content={
-                                  <div>
-                                    <div
-                                      style={{
-                                        fontWeight: 500,
-                                        marginBottom: 0,
-                                      }}
-                                    >
-                                      <CodeSelect
-                                        text
-                                        code='ctSchemeType'
-                                        value={o.schemeTypeFK}
-                                      />
-                                      <IconButton>
-                                        <Refresh fontSize='large' />
-                                      </IconButton>
-                                    </div>
-
-                                    <div>
-                                      <p>
-                                        Validity:{' '}
-                                        <DatePicker
-                                          text
-                                          format={dateFormatLong}
-                                          value={o.validFrom}
-                                        />
-                                        {' - '}
-                                        <DatePicker
-                                          text
-                                          format={dateFormatLong}
-                                          value={o.validTo}
-                                        />
-                                      </p>
-                                    </div>
-                                    <div>Balance: </div>
-                                    <div>Patient Visit Balance: </div>
-                                    <div>Patient Clinic Balance: </div>
-                                  </div>
-                                }
-                                trigger='click'
-                                placement='bottomLeft'
-                              >
-                                <Button
-                                  color='primary'
-                                  style={{
-                                    backgroundColor: '#48C9B0',
-                                    color: 'white',
-                                    fontWeight: 'normal',
-                                    marginLeft: 5,
-                                    padding: 0,
-                                  }}
-                                >
-                                  More
-                                </Button>
-                              </Popover>
+                            <div
+                              style={{
+                                fontWeight: 500,
+                                display: 'inline-block',
+                              }}
+                            >
+                              :{' '}
+                              <NumberInput
+                                text
+                                currency
+                                value={this.state.balanceValue}
+                              />
                             </div>
-                          )}
-                        </div>
-                      )
-                    })}
+                            <br />
+                            <SchemePopover
+                              data={o}
+                              isBanner
+                              balanceValue={this.state.balanceValue}
+                              dataFrom={this.state.dateFrom}
+                              dateTo={this.state.dateTo}
+                              handleRefreshChasBalance={this.refreshChasBalance}
+                            />
+                          </div>
+                        )
+                      })
+                  ) : (
+                    '-'
+                  )}
                 </div>
               }
             />

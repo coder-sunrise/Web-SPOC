@@ -97,6 +97,10 @@ export default createFormViewModel({
         // Call API to query selected Purchase Order
         const response = yield call(service.queryById, payload.id)
         // Call API to get new PurchaseOrder#
+        const runningNumberResponse = yield call(service.queryRunningNumber, {
+          prefix: 'PO',
+        })
+        const { data: poRunningNumber } = runningNumberResponse
 
         const { data } = response
 
@@ -104,7 +108,7 @@ export default createFormViewModel({
           type: 'setPurchaseOrder',
           payload: {
             ...data,
-            purchaseOrderNo: 'PO/000876', // Mock PurchaseOrder#
+            purchaseOrderNo: poRunningNumber, // Mock PurchaseOrder#
             purchaseOrderDate: moment(),
             purchaseOrderStatusFK: 1,
             purchaseOrderStatus: getPurchaseOrderStatusFK(1).name,

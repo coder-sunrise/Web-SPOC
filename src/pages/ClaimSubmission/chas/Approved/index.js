@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'dva'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -18,7 +19,6 @@ import TableGrid from '../../common/TableGrid'
 import {
   NewCHASColumnExtensions,
   NewCHASColumns,
-  NewCHASTableData,
   TableConfig,
 } from './variables'
 
@@ -32,12 +32,44 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ claimSubmissionApproved }) => ({
+  claimSubmissionApproved,
+}))
 @withFormik({
   mapPropsToValues: () => ({}),
 })
 class ApprovedCHAS extends React.Component {
+  state = {
+    selectedRows: [],
+  }
+
+  componentDidMount () {
+    this.refreshDataGrid()
+  }
+
+  onRefreshClicked = () => this.refreshDataGrid()
+
+  handleSelectionChange = (selection) =>
+    this.setState({ selectedRows: selection })
+
+
+  refreshDataGrid = () => {
+    this.props.dispatch({
+      type: 'claimSubmissionApproved/query',
+      payload: {
+        status: 'approved',
+      },
+    })
+  }
+
   render () {
-    const { classes, handleContextMenuItemClick } = this.props
+    const {
+      classes,
+      claimSubmissionApproved,
+      handleContextMenuItemClick,
+    } = this.props
+    const { list } = claimSubmissionApproved || []
+
     return (
       <CardContainer hideHeader size='sm'>
         <BaseSearchBar>
@@ -53,10 +85,12 @@ class ApprovedCHAS extends React.Component {
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
-              data={NewCHASTableData}
+              data={list}
               columnExtensions={NewCHASColumnExtensions}
               columns={NewCHASColumns}
               tableConfig={TableConfig}
+              selection={this.state.selectedRows}
+              onSelectionChange={this.handleSelectionChange}
               onContextMenuItemClick={handleContextMenuItemClick}
             />
           </GridItem>

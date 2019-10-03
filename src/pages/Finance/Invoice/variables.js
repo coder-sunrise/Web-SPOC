@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { dateFormatLong } from '@/components'
+// import { dateFormatLong } from '@/components'
 export const TableConfig = {
   // FuncProps: { pager: false },
 }

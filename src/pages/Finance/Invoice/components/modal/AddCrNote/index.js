@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
+import Yup from '@/utils/yup'
 // common components
 import {
   CommonTableGrid,
@@ -11,13 +12,20 @@ import {
   GridContainer,
   GridItem,
   Button,
+  Field,
+  NumberInput,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
+import { notification } from '@/components'
 import { CrNoteColumns, TableConfig } from './variables'
 // sub components
 import CrNoteForm from './CrNoteForm'
 import Summary from './Summary'
 import MiscCrNote from './MiscCrNote'
+
+const crNoteItemSchema = Yup.object().shape({
+  quantity: Yup.number().min(0).required(),
+})
 
 @connect(({ invoiceCreditNote }) => ({
   invoiceCreditNote,
@@ -39,7 +47,7 @@ import MiscCrNote from './MiscCrNote'
   },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm } = props
-    console.log({ values })
+    // console.log({ values })
     const {
       creditNoteItem,
       invoicePayerFK,
@@ -70,10 +78,15 @@ import MiscCrNote from './MiscCrNote'
   },
 })
 class AddCrNote extends Component {
-  state = {
-    selectedRows: [
-      undefined,
-    ],
+  constructor (props) {
+    super(props)
+    this.state = {
+      selectedRows: [
+        undefined,
+      ],
+    }
+
+    this.handleOnChangeQuantity = _.debounce(this.handleOnChangeQuantity, 100)
   }
 
   handleEditRow = (row) => {}
@@ -117,6 +130,36 @@ class AddCrNote extends Component {
     this.handleCalcCrNoteItem(selection)
   }
 
+  onCommitChanges = ({ rows, deleted }) => {
+    const { setFieldValue, values } = this.props
+    const { creditNoteItem } = values
+    // console.log('onCommitChanges1', { rows, deleted })
+
+    if (deleted) {
+      const selectedCrItem = creditNoteItem.find(
+        (crItem) => crItem.id === deleted[0],
+      )
+      if (selectedCrItem.itemType.toLowerCase() !== 'misc') {
+        notification.destroy()
+        notification.error({
+          message: (
+            <div>
+              <h4> </h4>
+              <p>Sorry you are not allowed to delete this item.</p>
+            </div>
+          ),
+          duration: 3,
+        })
+      } else {
+        const filteredRows = rows.filter((x) => x.id !== selectedCrItem.id)
+        setFieldValue('creditNoteItem', filteredRows)
+        setTimeout(() => this.handleCalcCrNoteItem(), 100)
+      }
+    }
+
+    return rows
+  }
+
   handleDeleteRow = (row) => {
     if (row.itemType.toLowerCase() !== 'misc') {
       showErrorNotification(
@@ -133,9 +176,22 @@ class AddCrNote extends Component {
     return row
   }
 
+  handleOnChangeQuantity = () => {
+    const { values } = this.props
+    const { creditNoteItem } = values
+
+    creditNoteItem.map((x) => {
+      x.totalAfterItemAdjustment = x.quantity * x.unitPrice
+      return x
+    })
+
+    setTimeout(() => this.handleCalcCrNoteItem(), 100)
+  }
+
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
+    console.log(values)
     return (
       <div>
         <CrNoteForm />
@@ -143,22 +199,41 @@ class AddCrNote extends Component {
           {...TableConfig}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
-          onSelectRow={this.handleSelectRows}
           rows={creditNoteItem}
           columns={CrNoteColumns}
           columnExtensions={[
-            { columnName: 'quantity', type: 'number' },
-            // {
-            //   columnName: 'unitPrice',
-            //   type: 'currency',
-            //   currency: true,
-            // },
-
+            {
+              columnName: 'quantity',
+              render: (row) => {
+                return (
+                  <Field
+                    name={`creditNoteItem[${row.rowIndex - 1}].quantity`}
+                    render={(args) => {
+                      return (
+                        <NumberInput
+                          disabled={row.itemType.toLowerCase() === 'misc'}
+                          onChange={() => this.handleOnChangeQuantity()}
+                          min={0}
+                          max={row.originRemainingQty}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                )
+              },
+            },
+            {
+              columnName: 'unitPrice',
+              type: 'currency',
+              currency: true,
+            },
             {
               columnName: 'totalAfterItemAdjustment',
               type: 'currency',
               currency: true,
             },
+
             {
               columnName: 'action',
               align: 'center',
@@ -169,18 +244,18 @@ class AddCrNote extends Component {
                     {row.itemType.toLowerCase() === 'misc' ? (
                       ''
                     ) : (
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          this.handleEditRow(row)
-                        }}
-                        justIcon
-                        color='primary'
-                      >
-                        <Edit />
-                      </Button>
+                      // <Button
+                      //   size='sm'
+                      //   onClick={() => {
+                      //     this.handleEditRow(row)
+                      //   }}
+                      //   justIcon
+                      //   color='primary'
+                      // >
+                      //   <Edit />
+                      // </Button>
+                      ''
                     )}
-
                     {row.itemType.toLowerCase() === 'misc' ? (
                       <Button
                         size='sm'
@@ -206,21 +281,38 @@ class AddCrNote extends Component {
           {...TableConfig}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
-          onSelectRow={this.handleSelectRows}
+          onSelectRow={undefined}
+          schema={crNoteItemSchema}
           rows={creditNoteItem}
           columns={CrNoteColumns}
           columnExtensions={[
-            { columnName: 'quantity', type: 'number' },
+            { columnName: 'itemType', disabled: true },
+            { columnName: 'itemName', disabled: true },
+            {
+              columnName: 'quantity',
+              render: (row) => {
+                return (
+                  <Field
+                    name={`creditNoteItem[${row.rowIndex - 1}].quantity`}
+                    render={(args) => {
+                      return <NumberInput {...args} />
+                    }}
+                  />
+                )
+              },
+            },
             {
               columnName: 'unitPrice',
               type: 'currency',
               currency: true,
+              disabled: true,
             },
 
             {
               columnName: 'totalAfterItemAdjustment',
               type: 'currency',
               currency: true,
+              disabled: true,
             },
             {
               columnName: 'action',
@@ -235,7 +327,7 @@ class AddCrNote extends Component {
                       <Button
                         size='sm'
                         onClick={() => {
-                          this.handleEditRow(row)
+                          // this.handleEditRow(row)
                         }}
                         justIcon
                         color='primary'
@@ -248,7 +340,7 @@ class AddCrNote extends Component {
                       <Button
                         size='sm'
                         onClick={() => {
-                          this.handleDeleteRow(row)
+                          // this.handleDeleteRow(row)
                         }}
                         justIcon
                         color='danger'
@@ -265,10 +357,11 @@ class AddCrNote extends Component {
           ]}
           EditingProps={{
             showAddCommand: false,
-            showEditCommand: true,
-            showDeleteCommand: true,
+            showEditCommand: false,
+            showDeleteCommand: false,
             // onCommitChanges: this.onCommitChanges,
             // onAddedRowsChange: this.onAddedRowsChange,
+            // onRowChangesChange: this.onRowChangesChange,
           }}
         /> */}
 
