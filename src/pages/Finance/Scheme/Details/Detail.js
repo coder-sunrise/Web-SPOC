@@ -15,7 +15,9 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ height }) => {
+const Detail = ({ height, ...props }) => {
+  const { isUserMaintainable } = props.values
+
   return (
     <CardContainer
       hideHeader
@@ -25,153 +27,155 @@ const Detail = ({ height }) => {
       }}
     >
       <GridContainer gutter={0}>
-        <GridItem xs={12} md={5}>
-          <GridContainer>
-            <GridItem xs={12}>
-              <FastField
-                name='code'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'finance.scheme.detail.code',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='name'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'finance.scheme.detail.name',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='description'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'finance.scheme.detail.description',
-                      })}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='remarks'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'finance.scheme.detail.remarks',
-                      })}
-                      multiline
-                      rowsMax='5'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
+        <GridItem xs={6} md={6} direction='column'>
+          <GridItem xs={9}>
+            <FastField
+              name='code'
+              render={(args) => {
+                return (
+                  <TextField
+                    label={formatMessage({
+                      id: 'finance.scheme.detail.code',
+                    })}
+                    disabled={!isUserMaintainable}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={9}>
+            <FastField
+              name='name'
+              render={(args) => {
+                return (
+                  <TextField
+                    label={formatMessage({
+                      id: 'finance.scheme.detail.name',
+                    })}
+                    disabled={!isUserMaintainable}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={9}>
+            <FastField
+              name='description'
+              render={(args) => {
+                return (
+                  <TextField
+                    label={formatMessage({
+                      id: 'finance.scheme.detail.description',
+                    })}
+                    disabled={!isUserMaintainable}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={9}>
+            <FastField
+              name='remarks'
+              render={(args) => {
+                return (
+                  <TextField
+                    label={formatMessage({
+                      id: 'finance.scheme.detail.remarks',
+                    })}
+                    multiline
+                    rowsMax='5'
+                    disabled={!isUserMaintainable}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
         </GridItem>
-        <GridItem xs={12} md={2} />
-        <GridItem xs={12} md={5}>
-          <GridContainer>
-            <GridItem xs={6}>
-              <FastField
-                name='schemeTypeFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'finance.scheme.detail.type',
-                      })}
-                      code='ctSchemeType'
-                      disabled
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-
-            <GridItem xs={6}>
-              <FastField
-                name='schemeCategoryFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'finance.scheme.detail.category',
-                      })}
-                      code='ctSchemeCategory'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={6}>
-              <FastField
-                name='companyCoPaymentSchemeDto[0].coPaymentSchemeFk'
-                render={(args) => (
+        <GridItem xs={6} md={6} direction='column'>
+          <GridItem xs={9}>
+            <FastField
+              name='schemeTypeFK'
+              render={(args) => {
+                return (
                   <CodeSelect
-                    label='Co-Payer Type'
-                    code='ctCopayerType'
+                    label={formatMessage({
+                      id: 'finance.scheme.detail.type',
+                    })}
+                    code='ctSchemeType'
                     disabled
                     {...args}
                   />
-                )}
-              />
-            </GridItem>
+                )
+              }}
+            />
+          </GridItem>
 
-            <GridItem xs={6}>
-              <FastField
-                name='companyCoPaymentSchemeDto[0].companyFk'
-                render={(args) => (
+          <GridItem xs={9}>
+            <FastField
+              name='schemeCategoryFK'
+              render={(args) => {
+                return (
                   <CodeSelect
                     label={formatMessage({
-                      id: 'finance.scheme.detail.coPayer',
+                      id: 'finance.scheme.detail.category',
                     })}
-                    code='ctCopayer'
-                    max={50}
+                    code='ctSchemeCategory'
+                    disabled={!isUserMaintainable}
                     {...args}
                   />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name='effectiveDates'
-                render={(args) => {
-                  return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={9}>
+            <FastField
+              name='companyCoPaymentSchemeDto[0].coPaymentSchemeFk'
+              render={(args) => (
+                <CodeSelect
+                  label='Co-Payer Type'
+                  code='ctCopayerType'
+                  disabled
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+
+          <GridItem xs={9}>
+            <FastField
+              name='companyCoPaymentSchemeDto[0].companyFk'
+              render={(args) => (
+                <CodeSelect
+                  label={formatMessage({
+                    id: 'finance.scheme.detail.coPayer',
+                  })}
+                  code='ctCopayer'
+                  max={50}
+                  disabled={!isUserMaintainable}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs={9}>
+            <FastField
+              name='effectiveDates'
+              render={(args) => {
+                return (
+                  <DateRangePicker
+                    label='Effective Start Date'
+                    label2='End Date'
+                    disabled={!isUserMaintainable}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
         </GridItem>
       </GridContainer>
     </CardContainer>

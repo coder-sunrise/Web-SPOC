@@ -82,6 +82,8 @@ class AntdSelect extends React.PureComponent {
     allValue: PropTypes.number,
     allLabel: PropTypes.string,
     maxTagCount: PropTypes.number,
+    maxTagTextLength: PropTypes.number,
+    maxSelected: PropTypes.number,
   }
 
   static defaultProps = {
@@ -94,7 +96,9 @@ class AntdSelect extends React.PureComponent {
     max: 50,
     allValue: -99,
     allLabel: 'All',
-    maxTagCount: 0,
+    maxTagCount: 5,
+    maxTagTextLength: 10,
+    maxSelected: 0,
   }
 
   constructor (props) {
@@ -111,10 +115,19 @@ class AntdSelect extends React.PureComponent {
       value,
     } = props
     let v = form && field ? field.value : props.value || props.defaultValue
-
     if (field) {
-      v = mode === 'multiple' ? field.value || [] : field.value
-      if (mode === 'multiple') {
+      v = [
+        'multiple',
+        'tags',
+      ].includes(mode)
+        ? field.value || []
+        : field.value
+      if (
+        [
+          'multiple',
+          'tags',
+        ].includes(mode)
+      ) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
             allValue,
@@ -124,8 +137,18 @@ class AntdSelect extends React.PureComponent {
         }
       }
     } else if (value) {
-      v = mode === 'multiple' ? value || [] : value
-      if (mode === 'multiple') {
+      v = [
+        'multiple',
+        'tags',
+      ].includes(mode)
+        ? value || []
+        : value
+      if (
+        [
+          'multiple',
+          'tags',
+        ].includes(mode)
+      ) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
             allValue,
@@ -134,7 +157,13 @@ class AntdSelect extends React.PureComponent {
         }
       }
     }
-    const shrink = mode === 'multiple' ? v && v.length > 0 : v !== undefined
+
+    const shrink = [
+      'multiple',
+      'tags',
+    ].includes(mode)
+      ? v && v.length > 0
+      : v !== undefined
     this.state = {
       shrink,
       value: v,
@@ -170,27 +199,56 @@ class AntdSelect extends React.PureComponent {
       autoComplete,
       mode,
       allValue,
+      maxSelected,
     } = nextProps
     let v = this.state.value
 
     if (field) {
-      v = mode === 'multiple' ? field.value || [] : field.value
-      if (mode === 'multiple') {
+      v = [
+        'multiple',
+        'tags',
+      ].includes(mode)
+        ? field.value || []
+        : field.value
+      if (
+        [
+          'multiple',
+          'tags',
+        ].includes(mode)
+      ) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
             allValue,
             ...options.map((o) => o[valueField]),
           ]
+          if (maxSelected) {
+            v = v.slice(Math.max(v.length - maxSelected, 1))
+          }
           form.setFieldValue(field.name, v)
         }
       }
       this.setState({
         value: v,
-        shrink: mode === 'multiple' ? v && v.length > 0 : v !== undefined,
+        shrink: [
+          'multiple',
+          'tags',
+        ].includes(mode)
+          ? v && v.length > 0
+          : v !== undefined,
       })
     } else if (value) {
-      v = mode === 'multiple' ? value || [] : value
-      if (mode === 'multiple') {
+      v = [
+        'multiple',
+        'tags',
+      ].includes(mode)
+        ? value || []
+        : value
+      if (
+        [
+          'multiple',
+          'tags',
+        ].includes(mode)
+      ) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
             allValue,
@@ -201,11 +259,21 @@ class AntdSelect extends React.PureComponent {
 
       this.setState({
         value: v,
-        shrink: mode === 'multiple' ? v && v.length > 0 : v !== undefined,
+        shrink: [
+          'multiple',
+          'tags',
+        ].includes(mode)
+          ? v && v.length > 0
+          : v !== undefined,
       })
     } else {
       this.setState({
-        value: mode === 'multiple' ? [] : undefined,
+        value: [
+          'multiple',
+          'tags',
+        ].includes(mode)
+          ? []
+          : undefined,
         shrink: false,
       })
     }
@@ -253,7 +321,7 @@ class AntdSelect extends React.PureComponent {
     }
   }
 
-  handleValueChange = (val, a, b, c) => {
+  handleValueChange = (val) => {
     const {
       form,
       field,
@@ -264,9 +332,15 @@ class AntdSelect extends React.PureComponent {
       autoComplete,
       query,
       valueField,
+      maxSelected,
     } = this.props
     let newVal = val
-    if (mode === 'multiple') {
+    if (
+      [
+        'multiple',
+        'tags',
+      ].includes(mode)
+    ) {
       if (val.indexOf(allValue) >= 0) {
         if (this.state.value.indexOf(allValue) >= 0) {
           newVal = _.reject(newVal, (v) => v === allValue)
@@ -278,6 +352,19 @@ class AntdSelect extends React.PureComponent {
         }
       } else if (this.state.value.indexOf(allValue) >= 0) {
         newVal = []
+      } else if (
+        val.length &&
+        val.length ===
+          val.filter((o) => options.find((m) => m[valueField] === o)).length
+      ) {
+        newVal = [
+          allValue,
+          ...options.map((o) => o[valueField]),
+        ]
+      }
+      if (maxSelected && newVal.length > maxSelected) {
+        newVal = _.reject(newVal, (v) => v === allValue)
+        newVal = newVal.slice(-maxSelected)
       }
     }
 
@@ -301,10 +388,12 @@ class AntdSelect extends React.PureComponent {
         form.setFieldTouched(field.name, true)
       }
       this.setState({
-        shrink:
-          mode === 'multiple'
-            ? newVal && newVal.length > 0
-            : newVal !== undefined,
+        shrink: [
+          'multiple',
+          'tags',
+        ].includes(mode)
+          ? newVal && newVal.length > 0
+          : newVal !== undefined,
         value: newVal,
       })
     }
@@ -337,13 +426,7 @@ class AntdSelect extends React.PureComponent {
 
       const { props } = this
       const { options, valueField, labelField, max } = props
-      console.log(
-        max,
-        _.filter(
-          options,
-          (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
-        ).splice(0, max),
-      )
+
       this.setState({
         data: _.filter(
           options,
@@ -355,14 +438,14 @@ class AntdSelect extends React.PureComponent {
   }
 
   getSelectOptions = (source, renderDropdown) => {
-    const { valueField, labelField, optionLabelLength = 0 } = this.props
+    const { valueField, labelField, optionLabelLength = 0, mode } = this.props
 
     return source
       .map((s) => {
         // console.log({ label: Object.byString(s, labelField) })
         return {
           ...s,
-          value: Object.byString(s, valueField),
+          value: Object.byString(s, mode === 'tags' ? labelField : valueField),
           label: Object.byString(s, labelField),
           // value: s[valueField],
           // label: s[labelField],
@@ -423,7 +506,10 @@ class AntdSelect extends React.PureComponent {
       autoComplete || query
         ? this.state.data
         : [
-            ...(restProps.mode === 'multiple' && !disableAll
+            ...([
+              'multiple',
+              'tags',
+            ].includes(restProps.mode) && !disableAll
               ? [
                   {
                     [valueField]: allValue,
@@ -437,7 +523,6 @@ class AntdSelect extends React.PureComponent {
     const cfg = {
       value: this.state.value,
     }
-
     let opts = []
     if (source[0] && source[0][groupField]) {
       const groups = _.groupBy(source, groupField)

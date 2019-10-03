@@ -59,7 +59,7 @@ import AuthorizedContext from '@/components/Context/Authorized'
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl } from '@/utils/utils'
 import model from '@/pages/Widgets/Orders/models'
-
+import { convertToConsultation } from './utils'
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 import Banner from '../Banner'
@@ -92,23 +92,16 @@ const saveConsultation = ({
       openConfirm: true,
       openConfirmContent: confirmMessage,
       onOpenConfirm: () => {
-        const { rows = [] } = consultationDocument
-        consultationDocumentTypes.forEach((p) => {
-          values[p.prop] = rows.filter((o) => o.type === p.value)
+        const newValues = convertToConsultation(values, {
+          orders,
+          consultationDocument,
         })
-
-        const { rows: orderRows = [], finalAdjustments = [] } = orders
-        values.corOrderAdjustment = finalAdjustments
-        orderTypes.forEach((p) => {
-          values[p.prop] = (values[p.prop] || [])
-            .concat(orderRows.filter((o) => o.type === p.value))
-        })
-        values.duration = Math.floor(
+        newValues.duration = Math.floor(
           Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
         )
         dispatch({
           type: `consultation/${action}`,
-          payload: values,
+          payload: newValues,
         }).then((r) => {
           if (r) {
             if (successMessage) {
@@ -125,18 +118,18 @@ const saveConsultation = ({
   })
 }
 
-const getRights = (values) => {
-  return {
-    view: {
-      name: 'consultation.view',
-      rights: values.status === 'Paused' ? 'disable' : 'enable',
-    },
-    edit: {
-      name: 'consultation.edit',
-      rights: values.status === 'Paused' ? 'disable' : 'enable',
-    },
-  }
-}
+// const getRights = (values) => {
+//   return {
+//     view: {
+//       name: 'consultation.view',
+//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//     },
+//     edit: {
+//       name: 'consultation.edit',
+//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//     },
+//   }
+// }
 
 // @skeleton()
 @connect(

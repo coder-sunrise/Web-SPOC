@@ -8,6 +8,8 @@ import { createListViewModel } from 'medisys-model'
 import { notification } from '@/components'
 import * as service from '@/services/calendar'
 import { queryList as queryPublicHolidays } from '@/pages/Setting/PublicHoliday/services'
+import { queryList as queryClinicBreakHour } from '@/pages/Setting/ClinicBreakHour/services'
+import { queryList as queryClinicOperationHour } from '@/pages/Setting/ClinicOperationHour/services'
 // utils
 import {
   generateRecurringAppointments,
@@ -71,6 +73,8 @@ export default createListViewModel({
       },
       calendarView: BigCalendar.Views.MONTH,
       publicHolidayList: [],
+      clinicBreakHourList: [],
+      clinicOperationHourList: [],
       isEditedAsSingleAppointment: false,
       mode: 'single',
     },
@@ -89,6 +93,13 @@ export default createListViewModel({
       })
     },
     effects: {
+      *initState ({ payload }, { all, put }) {
+        const result = yield all([
+          put({ type: 'getPublicHolidayList', payload }),
+          put({ type: 'getClinicBreakHourList', payload }),
+        ])
+        console.log({ result })
+      },
       *getActiveBizSessionQueue (_, { put, select }) {
         const queueLog = yield select((state) => state.queueLog)
         const { sessionInfo } = queueLog
@@ -332,11 +343,33 @@ export default createListViewModel({
           })
         }
       },
+      *getClinicBreakHourList ({ payload }, { call, put, select }) {
+        const calendarState = yield select((state) => state.calendar)
+        const { date, view } = payload
+
+        if (view !== 'month') {
+          const result = yield call(queryClinicBreakHour, {
+            isActive: true,
+            lgteql_effectiveStartDate: payload.start,
+            // lsteql_effectiveEndDate: payload.start,
+            pagesize: 99999,
+          })
+          console.log({ result })
+          if (result.status === '200') {
+            yield put({
+              type: 'saveClinicBreakHours',
+              payload: result.data.data,
+            })
+          }
+        }
+      },
       *getPublicHolidayList ({ payload }, { call, put }) {
         const result = yield call(queryPublicHolidays, {
+          isActive: true,
           lgteql_startDate: payload.start,
           pagesize: 99999,
         })
+        console.log({ result })
         if (result.status === '200') {
           yield put({
             type: 'savePublicHolidays',
@@ -463,6 +496,22 @@ export default createListViewModel({
         return {
           ...state,
           publicHolidayList: [
+            ...payload,
+          ],
+        }
+      },
+      saveClinicBreakHours (state, { payload }) {
+        return {
+          ...state,
+          clinicBreakHourList: [
+            ...payload,
+          ],
+        }
+      },
+      saveClinicOperationHours (state, { payload }) {
+        return {
+          ...state,
+          clinicOperationHourList: [
             ...payload,
           ],
         }

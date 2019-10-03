@@ -14,7 +14,6 @@ import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import CustomInput from 'mui-pro-components/CustomInput'
 import Modal from '@material-ui/core/Modal'
-import { sleep } from '@/utils/utils'
 import ReactPDF, {
   Text,
   Document,
@@ -54,6 +53,7 @@ import {
 import Button from 'mui-pro-components/CustomButtons'
 import { Print, Info, Clear } from '@material-ui/icons'
 import SimpleTable from 'mui-pro-components/Table'
+import { sleep } from '@/utils/utils'
 import {
   SimpleModal,
   CommonModal,
@@ -65,6 +65,7 @@ import AddPayment from './AddPayment'
 import AddCreditNote from './AddCreditNote'
 
 const currencyFormat = '$0,0.00'
+const percentageFormat = '0.00%'
 const qtyFormat = '0.0'
 const NumberFormatter = ({ value, color = 'darkblue' }) => {
   if (value && `${value}`.indexOf('-') === 0) color = 'red'

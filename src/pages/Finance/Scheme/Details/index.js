@@ -7,6 +7,7 @@ import {
   ProgressButton,
   Button,
   withFormikExtend,
+  Tabs,
 } from '@/components'
 
 import { Divider } from '@material-ui/core'
@@ -15,7 +16,7 @@ import { compose } from 'redux'
 import DetailPanel from './Detail'
 import Setting from './Setting'
 import { InventoryTypes } from '@/utils/codes'
-
+import { SchemeDetailOption } from './variables'
 const styles = (theme) => ({
   actionDiv: {
     margin: theme.spacing(1),
@@ -51,7 +52,7 @@ const Detail = (props) => {
   const { currentTab } = schemeDetail
   return (
     <div>
-      <NavPills
+      {/* <NavPills
         color='primary'
         onChange={(event, active) => {
           history.push(
@@ -72,8 +73,14 @@ const Detail = (props) => {
             tabContent: <Setting {...detailProps} />,
           },
         ]}
+      /> */}
+      {/* <Divider /> */}
+
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={SchemeDetailOption(detailProps)}
       />
-      <Divider />
       <div className={classes.actionDiv}>
         <Button
           color='danger'

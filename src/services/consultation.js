@@ -44,8 +44,15 @@ module.exports = {
     return r
   },
   editOrder: async (id) => {
-    const r = await request(`${url}/editOrder/${id}`, {
+    const r = await request(`${url}/editorder/${id}`, {
       method: 'PUT',
+    })
+    return r
+  },
+  signOrder: async (params) => {
+    const r = await request(`${url}/signorder/${params.id}`, {
+      method: 'PUT',
+      body: params,
     })
     return r
   },

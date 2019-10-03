@@ -1,5 +1,7 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
+
+import withStyles from '@material-ui/core/styles/withStyles'
 import { Tooltip } from '@material-ui/core'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
@@ -24,12 +26,14 @@ import {
   CodeSelect,
   Checkbox,
   TextField,
+  ProgressButton,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
+
 import model from './models'
 
 window.g_app.replaceModel(model)
-
+const styles = (theme) => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
@@ -86,36 +90,46 @@ export const printRow = async (row, props) => {
 
 // @skeleton(['consultationDocument'])
 
-@connect(({ consultationDocument, codetable, patientDashboard, dispense }) => ({
+@connect(({ consultationDocument, codetable, patient, consultation }) => ({
   consultationDocument,
   codetable,
-  patientDashboard,
-  dispense,
+  patient,
+  consultation,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ dispense }) => {
-    return dispense.entity || dispense.default
+  mapPropsToValues: ({ consultation }) => {
+    return consultation.entity || consultation.default
   },
-  validationSchema: Yup.object().shape(
-    {
-      // issuedByUserFK: Yup.number().required(),
-      // subject: Yup.string().required(),
-      // content: Yup.string().required(),
-    },
-  ),
+  validationSchema: Yup.object().shape({
+    dispenseAcknowledgement: Yup.object().shape({
+      editDispenseReasonFK: Yup.number().required(),
+      remarks: Yup.string().when('editDispenseReasonFK', {
+        is: (val) => val === 2,
+        then: Yup.string().required(),
+      }),
+    }),
+    // issuedByUserFK: Yup.number().required(),
+    // subject: Yup.string().required(),
+    // content: Yup.string().required(),
+  }),
 
   handleSubmit: (values, { props }) => {
     // // console.log(values)
-    // const { dispatch, onConfirm } = props
+    const { dispatch, onSave } = props
     // dispatch({
     //   type: 'consultationDocument/upsertRow',
     //   payload: values,
     // })
     // if (onConfirm) onConfirm()
+    if (onSave) onSave(values)
   },
   displayName: 'ConsultationDocumentList',
 })
 class ConsultationDocument extends PureComponent {
+  state = {
+    acknowledged: false,
+  }
+
   constructor (props) {
     super(props)
     const { dispatch } = props
@@ -151,10 +165,18 @@ class ConsultationDocument extends PureComponent {
   }
 
   render () {
-    const { consultationDocument, dispatch, forDispense } = this.props
+    const {
+      consultationDocument,
+      dispatch,
+      forDispense,
+      theme,
+      onCancel,
+      onSave,
+      values,
+    } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-    // console.log(consultationDocumentTypes,rows)
+    console.log('consultationDocumentTypes', values)
     return (
       <div>
         <CommonTableGrid
@@ -257,7 +279,7 @@ class ConsultationDocument extends PureComponent {
           <GridContainer>
             <GridItem xs={12} md={6}>
               <FastField
-                name='reasonFK'
+                name='dispenseAcknowledgement.editDispenseReasonFK'
                 render={(args) => {
                   return (
                     <CodeSelect
@@ -271,7 +293,7 @@ class ConsultationDocument extends PureComponent {
             </GridItem>
             <GridItem xs={12}>
               <FastField
-                name='remarks'
+                name='dispenseAcknowledgement.remarks'
                 render={(args) => {
                   return (
                     <TextField
@@ -290,6 +312,12 @@ class ConsultationDocument extends PureComponent {
                 render={(args) => {
                   return (
                     <Checkbox
+                      onChange={(e) => {
+                        console.log(e)
+                        this.setState({
+                          acknowledged: e.target.value,
+                        })
+                      }}
                       label='I hereby confirm the above orders are instructed by the attending physician'
                       {...args}
                     />
@@ -297,9 +325,20 @@ class ConsultationDocument extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={12} style={{ textAlign: 'center' }}>
-              <Button color='danger'>Cancel</Button>
-              <Button color='primary'>Save</Button>
+            <GridItem
+              xs={12}
+              style={{ textAlign: 'center', paddingTop: theme.spacing(2) }}
+            >
+              <Button color='danger' onClick={onCancel}>
+                Cancel
+              </Button>
+              <ProgressButton
+                color='primary'
+                disabled={!this.state.acknowledged}
+                onClick={this.props.handleSubmit}
+              >
+                Save
+              </ProgressButton>
             </GridItem>
           </GridContainer>
         )}
@@ -325,4 +364,4 @@ class ConsultationDocument extends PureComponent {
     )
   }
 }
-export default ConsultationDocument
+export default withStyles(styles, { withTheme: true })(ConsultationDocument)

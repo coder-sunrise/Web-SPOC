@@ -94,36 +94,23 @@ export default createFormViewModel({
         }
         return response
       },
-      *resume ({ payload }, { call, put }) {
-        const response = yield call(service.resume, payload.id || payload)
+      *refresh ({ payload }, { call, put }) {
+        const response = yield call(service.refresh, payload)
         if (response) {
           yield put({
             type: 'updateState',
             payload: {
               entity: response,
-              version: payload.version,
+              version: Date.now(),
             },
-          })
-          yield put({
-            type: 'queryDone',
-            payload: {
-              data: response,
-            },
-          })
-          sendNotification('QueueListing', {
-            message: `Dispense resumed`,
           })
         }
         return response
       },
 
-      *sign ({ payload }, { call, put }) {
-        const response = yield call(service.sign, payload)
-        if (response) {
-          sendNotification('QueueListing', {
-            message: `Dispense signed`,
-          })
-        }
+      *save ({ payload }, { call, put }) {
+        const response = yield call(service.save, payload)
+
         return response
       },
       *discard ({ payload }, { call, put }) {

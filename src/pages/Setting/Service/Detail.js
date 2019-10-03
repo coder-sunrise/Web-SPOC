@@ -37,8 +37,21 @@ const itemSchema = Yup.object().shape({
 })
 
 @withFormik({
-  mapPropsToValues: ({ settingClinicService }) =>
-    settingClinicService.entity || settingClinicService.default,
+  mapPropsToValues: ({ settingClinicService }) => {
+    const returnValue =
+      settingClinicService.entity || settingClinicService.default
+    const { isAutoOrder, ctServiceCenter_ServiceNavigation } = returnValue
+    if (isAutoOrder) {
+      const checkDefaultExist = ctServiceCenter_ServiceNavigation.find(
+        (o) => o.isDefault === true,
+      )
+      if (!checkDefaultExist && ctServiceCenter_ServiceNavigation.length > 0) {
+        ctServiceCenter_ServiceNavigation[0].isDefault = true
+      }
+    }
+    return returnValue
+  },
+
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -46,6 +59,7 @@ const itemSchema = Yup.object().shape({
     revenueCategoryFK: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     serviceSettingItem: Yup.array().compact((v) => v.isDeleted).of(itemSchema),
+
     //medisaveHealthScreeningDiagnosisFK: Yup.string().required(),
   }),
   handleSubmit: (values, { props }) => {
@@ -85,48 +99,12 @@ const itemSchema = Yup.object().shape({
   displayName: 'ServiceModal',
 })
 class Detail extends PureComponent {
-  componentDidMount () {
-    this.checkHasActiveSession()
-    //this.initMedisaveSetting()
-  }
-
-  checkHasActiveSession = async () => {
-    const result = await getBizSession()
-    const { data } = result.data
-
-    this.setState({
-      hasActiveSession: data ? true : false,
-    })
-  }
-
   state = {
     editingRowIds: [],
     rowChanges: {},
     ddlMedisaveHealthScreening: true,
     ddlOutpatientScan: true,
-  }
-
-  initMedisaveSetting = () => {
-    const { settingClinicService } = this.props
-    if (settingClinicService.entity) {
-      this.setState({
-        ddlMedisaveHealthScreening:
-          settingClinicService.entity.isMedisaveHealthScreening,
-        ddlOutpatientScan: settingClinicService.entity.isOutpatientScan,
-      })
-    }
-  }
-
-  onChangeMedisaveHealthScreening = () => {
-    this.setState(({ ddlMedisaveHealthScreening }) => ({
-      ddlMedisaveHealthScreening: !ddlMedisaveHealthScreening,
-    }))
-  }
-
-  onChangeOutpatientScan = () => {
-    this.setState(({ ddlOutpatientScan }) => ({
-      ddlOutpatientScan: !ddlOutpatientScan,
-    }))
+    serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
   }
 
   tableParas = {
@@ -174,6 +152,50 @@ class Detail extends PureComponent {
     ],
   }
 
+  componentDidMount () {
+    this.checkHasActiveSession()
+    // let commitCount = 1000 // uniqueNumber
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
+  }
+
+  checkHasActiveSession = async () => {
+    const result = await getBizSession()
+    const { data } = result.data
+
+    this.setState({
+      hasActiveSession: data ? true : false,
+    })
+  }
+
+  initMedisaveSetting = () => {
+    const { settingClinicService } = this.props
+    if (settingClinicService.entity) {
+      this.setState({
+        ddlMedisaveHealthScreening:
+          settingClinicService.entity.isMedisaveHealthScreening,
+        ddlOutpatientScan: settingClinicService.entity.isOutpatientScan,
+      })
+    }
+  }
+
+  onChangeMedisaveHealthScreening = () => {
+    this.setState(({ ddlMedisaveHealthScreening }) => ({
+      ddlMedisaveHealthScreening: !ddlMedisaveHealthScreening,
+    }))
+  }
+
+  onChangeOutpatientScan = () => {
+    this.setState(({ ddlOutpatientScan }) => ({
+      ddlOutpatientScan: !ddlOutpatientScan,
+    }))
+  }
+
   commitChanges = ({ rows, added, changed, deleted }) => {
     //commitChanges = ({ rows }) => {
 
@@ -183,6 +205,20 @@ class Detail extends PureComponent {
     })
 
     setFieldValue('ctServiceCenter_ServiceNavigation', rows)
+  }
+
+  handleAutoOrder = (e) => {
+    console.log({ e })
+    if (e) {
+      const { serviceSettings } = this.state
+      const checkDefaultExist = serviceSettings.find(
+        (o) => o.isDefault === true,
+      )
+      console.log({ checkDefaultExist })
+      if (!checkDefaultExist && serviceSettings.length > 0) {
+        serviceSettings[0].isDefault = true
+      }
+    }
   }
 
   render () {
@@ -200,6 +236,7 @@ class Detail extends PureComponent {
       ],
     }
     //console.log('detail', props)
+    console.log('asd', this.props.values.ctServiceCenter_ServiceNavigation)
 
     return (
       <React.Fragment>
@@ -257,7 +294,11 @@ class Detail extends PureComponent {
                     name='isAutoOrder'
                     render={(args) => {
                       return (
-                        <Switch label='Consultation Auto Order' {...args} />
+                        <Switch
+                          label='Consultation Auto Order'
+                          onChange={(e) => this.handleAutoOrder(e)}
+                          {...args}
+                        />
                       )
                     }}
                   />
@@ -391,7 +432,7 @@ class Detail extends PureComponent {
             </h4>
             <EditableTableGrid
               style={{ marginTop: theme.spacing(1), margin: theme.spacing(2) }}
-              rows={values.ctServiceCenter_ServiceNavigation}
+              rows={this.state.serviceSettings}
               FuncProps={{
                 pagerConfig: {
                   containerExtraComponent: this.PagerContent,

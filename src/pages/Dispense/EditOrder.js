@@ -4,7 +4,8 @@ import router from 'umi/router'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem, notification } from '@/components'
+import { convertToConsultation } from '@/pages/PatientDashboard/Consultation/utils'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
@@ -44,8 +45,37 @@ class EditOrder extends Component {
     })
   }
 
+  cancelOrder = () => {
+    this.props.dispatch({
+      type: `dispense/updateState`,
+      payload: {
+        editingOrder: false,
+      },
+    })
+  }
+
+  signOrder = (values) => {
+    const { consultationDocument, orders, dispatch } = this.props
+    dispatch({
+      type: `consultation/signOrder`,
+      payload: convertToConsultation(values, { consultationDocument, orders }),
+    }).then((o) => {
+      if (o) {
+        dispatch({
+          type: `dispense/updateState`,
+          payload: {
+            editingOrder: false,
+          },
+        })
+        notification.success({
+          message: 'Order signed',
+        })
+      }
+    })
+  }
+
   render () {
-    const { classes, dispense, consultation } = this.props
+    const { classes, dispense, consultation, dispatch } = this.props
     const orderWidget = widgets.find((o) => o.id === '5')
     const cdWidget = widgets.find((o) => o.id === '3')
     const Order = orderWidget.component
@@ -72,6 +102,8 @@ class EditOrder extends Component {
               parentProps={{
                 values: consultation.entity,
               }}
+              onCancel={this.cancelOrder}
+              onSave={this.signOrder}
             />
           </GridItem>
         </GridContainer>

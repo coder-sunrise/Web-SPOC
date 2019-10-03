@@ -17,15 +17,20 @@ const Contact = (props) => {
     <React.Fragment>
       <div
         style={{
-          marginLeft: theme.spacing(1),
-          marginRight: theme.spacing(1),
-          marginTop: theme.spacing(3),
+          margin: theme.spacing(1),
         }}
       >
-        <h5>Contact</h5>
-        <Divider />
+        <h4 style={{ fontWeight: 400, marginTop: 15 }}>
+          <b>Contact</b>
+        </h4>
       </div>
-      <div style={{ margin: theme.spacing(1) }}>
+      <div
+        style={{
+          marginRight: theme.spacing(2),
+          marginLeft: theme.spacing(2),
+          marginBottom: theme.spacing(2),
+        }}
+      >
         <GridContainer>
           <GridItem md={12}>
             <FastField

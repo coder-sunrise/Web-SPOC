@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'dva'
 import classnames from 'classnames'
 // material ui

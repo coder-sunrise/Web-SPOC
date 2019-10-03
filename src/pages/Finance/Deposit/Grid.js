@@ -38,44 +38,62 @@ class Grid extends PureComponent {
       },
       {
         columnName: 'action',
-        width: 110,
+        width: 160,
         align: 'center',
         sortingEnabled: false,
       },
+      // {
+      //   columnName: 'action',
+      //   align: 'center',
+      //   width: 500,
+      //   sortingEnabled: false,
+      //   render: (row) => {
+      //     return (
+      //       <Tooltip title='Edit Room'>
+      //         <Button
+      //           size='sm'
+      //           onClick={() => {
+      //             this.editRow(row)
+      //           }}
+      //           color='primary'
+      //         >
+      //           Deposit
+      //         </Button>
+      //       </Tooltip>
+      //     )
+      //   },
+      // },
     ],
     ActionProps: {
       TableCellComponent: ({ column, row, dispatch, classes, ...props }) => {
-        // console.log(this)
         if (column.name === 'action') {
           return (
-            <Table.Cell {...props}>
+            <Table.Cell {...props} style={{ paddingRight: 0 }}>
               <Tooltip title='Deposit' placement='bottom'>
                 <Button
                   size='sm'
                   onClick={() => {
                     this.editRow(row, true)
                   }}
-                  justIcon
-                  round
                   color='primary'
-                  style={{ marginRight: 5 }}
+                  style={{ marginRight: 5, width: 60, minWidth: 60 }}
                 >
-                  <PanTool />
+                  {/* <PanTool /> */}
+                  Deposit
                 </Button>
               </Tooltip>
               <Tooltip title='Refund' placement='bottom'>
                 <Button
                   size='sm'
-                  disabled={row.balance < 1}
+                  disabled={row.balance === 0}
                   onClick={() => {
                     this.editRow(row, false)
                   }}
-                  justIcon
-                  round
-                  color='primary'
-                  style={{ marginRight: 5 }}
+                  color='info'
+                  style={{ marginRight: 5, width: 60, minWidth: 60 }}
                 >
-                  <Payment />
+                  {/* <Payment /> */}
+                  Refund
                 </Button>
               </Tooltip>
             </Table.Cell>

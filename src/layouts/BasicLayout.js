@@ -203,8 +203,7 @@ class BasicLayout extends React.PureComponent {
     })
     dispatch({
       type: 'clinicInfo/query',
-      payload: 'Tenant_000',
-      // payload: localStorage.getItem('clinicCode'),
+      payload: localStorage.getItem('clinicCode'),
     })
     initStream()
   }

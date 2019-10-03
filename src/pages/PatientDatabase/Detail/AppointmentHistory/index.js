@@ -177,27 +177,26 @@ class AppointmentHistory extends PureComponent {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, theme } = this.props
     const { previousAppt, futureAppt } = this.state
 
     return (
-      <GridContainer>
-        <GridItem md={12}>
-          <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
-        </GridItem>
-        <GridItem md={12} className={classes.gridRow}>
-          <CommonTableGrid
-            rows={previousAppt}
-            {...this.previousApptTableParams}
-          />
-        </GridItem>
-        <GridItem md={12}>
-          <h4 style={{ marginTop: 20 }}>Current & Future Appointment</h4>
-        </GridItem>
-        <GridItem md={12} className={classes.gridRow}>
-          <CommonTableGrid rows={futureAppt} {...this.futureApptTableParams} />
-        </GridItem>
-      </GridContainer>
+      <div>
+        <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
+
+        <CommonTableGrid
+          rows={previousAppt}
+          {...this.previousApptTableParams}
+        />
+        <h4
+          style={{
+            marginTop: theme.spacing(2),
+          }}
+        >
+          Current & Future Appointment
+        </h4>
+        <CommonTableGrid rows={futureAppt} {...this.futureApptTableParams} />
+      </div>
     )
   }
 }

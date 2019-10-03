@@ -181,9 +181,23 @@ class Detail extends PureComponent {
                 name='adminCharge'
                 render={(args) => {
                   if (values.adminChargeType === 'ExactAmount') {
-                    return <NumberInput currency label='Admin Fee' {...args} />
+                    return (
+                      <NumberInput
+                        currency
+                        label='Admin Fee'
+                        defaultValue='0.00'
+                        {...args}
+                      />
+                    )
                   }
-                  return <NumberInput percentage label='Admin Fee' {...args} />
+                  return (
+                    <NumberInput
+                      percentage
+                      label='Admin Fee'
+                      defaultValue='0.00'
+                      {...args}
+                    />
+                  )
                 }}
               />
             </GridItem>
