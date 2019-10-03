@@ -141,6 +141,11 @@ const SchemePopover = ({
                 for {moment().format('MMMM')} {moment().year()}
               </GridItem>
             </GridContainer>
+            <GridContainer>
+              <GridItem>
+                <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>
+              </GridItem>
+            </GridContainer>
           </div>
         }
         trigger='click'

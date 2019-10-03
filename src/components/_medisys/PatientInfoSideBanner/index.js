@@ -56,30 +56,41 @@ const PatientInfoSideBanner = ({
           validTo,
           acuteVisitPatientBalance,
           acuteVisitClinicBalance,
+          isSuccessful,
+          statusDescription,
         } = result
         let isShowReplacementModal = false
-
-        if (oldSchemeTypeFK !== schemeTypeFk) {
-          isShowReplacementModal = true
+        if (!isSuccessful) {
+          setRefreshedSchemeData({
+            statusDescription,
+            isSuccessful,
+          })
+        } else {
+          if (oldSchemeTypeFK !== schemeTypeFk) {
+            isShowReplacementModal = true
+          }
+          setRefreshedSchemeData({
+            isShowReplacementModal,
+            oldSchemeTypeFK,
+            balance,
+            patientCoPaymentSchemeFK,
+            schemeTypeFK: schemeTypeFk,
+            validFrom,
+            validTo,
+            acuteVisitPatientBalance,
+            acuteVisitClinicBalance,
+            isSuccessful,
+          })
         }
-
-        setRefreshedSchemeData({
-          isShowReplacementModal,
-          oldSchemeTypeFK,
-          balance,
-          patientCoPaymentSchemeFK,
-          schemeTypeFK: schemeTypeFk,
-          validFrom,
-          validTo,
-          acuteVisitPatientBalance,
-          acuteVisitClinicBalance,
-        })
       }
     })
   }
 
   const getSchemeDetails = (schemeData) => {
-    if (!_.isEmpty(refreshedSchemeData)) {
+    if (
+      !_.isEmpty(refreshedSchemeData) &&
+      refreshedSchemeData.isSuccessful === true
+    ) {
       return { ...refreshedSchemeData }
     }
     // Scheme Balance
@@ -106,6 +117,7 @@ const PatientInfoSideBanner = ({
       validTo: schemeData.validTo,
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
+      statusDescription: refreshedSchemeData.statusDescription,
     }
   }
 
@@ -169,9 +181,7 @@ const PatientInfoSideBanner = ({
                 </IconButton>
 
                 <SchemePopover
-                  isShowReplacementModal={
-                    schemeData.isShowReplacementModal
-                  }
+                  isShowReplacementModal={schemeData.isShowReplacementModal}
                   handleRefreshChasBalance={() =>
                     refreshChasBalance(
                       schemeData.patientCoPaymentSchemeFK,
@@ -202,6 +212,9 @@ const PatientInfoSideBanner = ({
                       // value={o.validTo}
                       value={schemeData.validTo}
                     />
+                  </p>
+                  <p style={{ color: 'red' }}>
+                    {schemeData.statusDescription}
                   </p>
                 </div>
               )}
