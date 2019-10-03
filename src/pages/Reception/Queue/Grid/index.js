@@ -422,7 +422,7 @@ const Grid = ({
       render: (row) => <ActionButton row={row} onClick={onClick} />,
     },
   ])
-  console.log({ gridHeight })
+  // console.log({ gridHeight })
   const isLoading = showingVisitRegistration ? false : queryingData
   return (
     <div style={{ minHeight: '76vh' }}>

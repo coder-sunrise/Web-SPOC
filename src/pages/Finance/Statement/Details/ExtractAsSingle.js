@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
+import Yup from '@/utils/yup'
 
 import {
   withFormikExtend,
@@ -44,7 +44,7 @@ class ExtractAsSingle extends PureComponent {
           return (
             <GridItem xs={8}>
               <FastField
-                name={`packageValueDto[${row.rowIndex - 1}].itemValue`}
+                name={`packageValueDto[${row.rowIndex}].itemValue`}
                 render={(args) => <CodeSelect code='ctCopayer' {...args} />}
               />
             </GridItem>

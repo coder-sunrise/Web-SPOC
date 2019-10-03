@@ -78,7 +78,7 @@ class CollectPaymentConfirm extends PureComponent {
           return (
             <GridItem xs={8}>
               <FastField
-                name={`packageValueDto[${row.rowIndex - 1}].itemValue`}
+                name={`packageValueDto[${row.rowIndex}].itemValue`}
                 render={(args) => <NumberInput {...args} />}
               />
             </GridItem>

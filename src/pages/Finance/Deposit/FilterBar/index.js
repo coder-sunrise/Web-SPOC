@@ -103,7 +103,7 @@ class FilterBar extends PureComponent {
             />
           </GridItem>
 
-          {/*<GridItem xs sm={12} md={2}>
+          {/* <GridItem xs sm={12} md={2}>
             <FastField
               name='ExpenseType'
               render={(args) => {
@@ -112,7 +112,7 @@ class FilterBar extends PureComponent {
                     label={formatMessage({
                       id: 'finance.deposit.search.gender',
                     })}
-                    // noWrapper
+                    // simple
                     options={[
                       { name: 'All', value: '0' },
                       { name: 'Male', value: '1' },

@@ -46,7 +46,7 @@ const NumberEditor = (props) => {
       onChange={(event) =>
         numberOnChangeFormatter(onValueChange)(event.target.value)}
       currency
-      noWrapper
+      simple
     />
   ) : (
     <Table.Cell {...props} />

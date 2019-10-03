@@ -127,7 +127,7 @@ class AddCrNote extends Component {
     }
     const { values, setFieldValue } = this.props
     const { creditNoteItem } = values
-    creditNoteItem.splice(row.rowIndex - 1, 1)
+    creditNoteItem.splice(row.rowIndex, 1)
     setFieldValue('creditNoteItem', creditNoteItem)
     this.handleCalcCrNoteItem()
     return row

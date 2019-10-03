@@ -53,11 +53,10 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     help,
     fullWidth = true,
     children,
-    noWrapper = false,
+    simple = false,
     size = 'medium',
   } = props
   const { style, ...resetProps } = props
-
   const labelClasses = classNames({
     [` ${classes.labelRootError}`]: error,
     [` ${classes.labelRootSuccess}`]: success && !error,
@@ -72,6 +71,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     [classes.formControl]: true,
     [classes.noLabel]: !label,
     [props.className]: true,
+    [classes.simple]: simple,
     [classes.textControl]: !!text,
 
     // [classes.medium]: size === 'default' || size === 'medium' || size === 'md',
@@ -104,7 +104,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
   }
   // console.log(props)
 
-  return noWrapper ? (
+  return simple ? (
     <div style={style}>{newChildren}</div>
   ) : (
     <FormControl

@@ -659,8 +659,15 @@ const confirmBeforeReload = (e) => {
   e.returnValue = ''
 }
 
-const navigateDirtyCheck = (itemPath) => (e) => {
-  // console.log({ itemPath, e, handler: window.beforeReloadHandlerAdded })
+const _checkCb = (cb) => {
+  if (typeof cb === 'string') {
+    router.push(cb)
+  } else if (typeof cb === 'function') {
+    cb()
+  }
+}
+const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
+  // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
@@ -669,21 +676,34 @@ const navigateDirtyCheck = (itemPath) => (e) => {
         openConfirmContent: formatMessage({
           id: 'app.general.leave-without-save',
         }),
+        hasExtraConfirm: !!saveCb,
         onOpenConfirm: () => {
-          window.g_app._store.dispatch({
-            type: 'formik/updateState',
-            payload: {},
-          })
+          if (displayName) {
+            window.g_app._store.dispatch({
+              type: 'formik/updateState',
+              payload: {
+                [displayName]: undefined,
+              },
+            })
+          } else {
+            window.dirtyForms.forEach((f) => {
+              window.g_app._store.dispatch({
+                type: 'formik/updateState',
+                payload: {
+                  [f]: undefined,
+                },
+              })
+            })
+          }
           window.beforeReloadHandlerAdded = false
           window.removeEventListener('beforeunload', confirmBeforeReload)
-
-          router.push(itemPath)
+          _checkCb(cb)
         },
       },
     })
     e.preventDefault()
   } else {
-    router.push(itemPath)
+    _checkCb(cb)
   }
 }
 
@@ -746,6 +766,52 @@ const calculateItemLevelAdjustment = (
   }
 }
 
+const htmlEncode = (html) => {
+  // 1.首先动态创建一个容器标签元素，如DIV
+  let temp = document.createElement('div')
+  // 2.然后将要转换的字符串设置为这个元素的innerText(ie支持)或者textContent(火狐，google支持)
+  temp.textContent !== undefined
+    ? (temp.textContent = html)
+    : (temp.innerText = html)
+  // 3.最后返回这个元素的innerHTML，即得到经过HTML编码转换的字符串了
+  let output = temp.innerHTML
+  temp = null
+  return output
+}
+const htmlDecode = (text) => {
+  // 1.首先动态创建一个容器标签元素，如DIV
+  let temp = document.createElement('div')
+  // 2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
+  temp.innerHTML = text
+  // 3.最后返回这个元素的innerText(ie支持)或者textContent(火狐，google支持)，即得到经过HTML解码的字符串了。
+  let output = temp.innerText || temp.textContent
+  temp = null
+  return output
+}
+
+const htmlEncodeByRegExp = (str = '') => {
+  let s = ''
+  if (str.length === 0) return ''
+  s = str.replace(/&/g, '&amp;')
+  s = s.replace(/</g, '&lt;')
+  s = s.replace(/>/g, '&gt;')
+  s = s.replace(/ /g, '&nbsp;')
+  s = s.replace(/\'/g, '&#39;')
+  s = s.replace(/\"/g, '&quot;')
+  return s
+}
+const htmlDecodeByRegExp = (str = '') => {
+  let s = ''
+  if (str.length === 0) return ''
+  s = str.replace(/&amp;/g, '&')
+  s = s.replace(/&lt;/g, '<')
+  s = s.replace(/&gt;/g, '>')
+  s = s.replace(/&nbsp;/g, ' ')
+  s = s.replace(/&#39;/g, "'")
+  s = s.replace(/&quot;/g, '"')
+  return s
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -766,6 +832,10 @@ module.exports = {
   errMsgForOutOfRange,
   calculateItemLevelAdjustment,
   findGetParameter,
+  htmlEncode,
+  htmlDecode,
+  htmlEncodeByRegExp,
+  htmlDecodeByRegExp,
   // toUTC,
   // toLocal,
 }

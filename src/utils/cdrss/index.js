@@ -777,6 +777,7 @@ const commonDataWriterTransform = (data) => {
             regDate.test(v) &&
             !data[`_${field}Out`]
           ) {
+            // console.log(v, moment(v).add(-8, 'hours'))
             data[`_${field}Out`] = true
             data[field] = moment(v)
               .add(-8, 'hours')

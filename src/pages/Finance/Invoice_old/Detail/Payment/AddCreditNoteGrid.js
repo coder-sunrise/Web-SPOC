@@ -484,7 +484,7 @@ class AddCreditNoteGrid extends React.Component {
       const defaultCfg = {
         defaultValue: row.Code,
         labelField: 'name',
-        noWrapper: true,
+        simple: true,
         filterOption: (option, filter) => {
           if (!filter) return option
           if (

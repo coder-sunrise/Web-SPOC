@@ -8,7 +8,6 @@ import {
   createMuiTheme,
   withStyles,
 } from '@material-ui/core/styles'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { Button } from '@/components'
 // import Paper from '@material-ui/core/Paper'
 import { LinearProgress, Paper, Tooltip, IconButton } from '@material-ui/core'
@@ -55,6 +54,7 @@ import {
   TableFixedColumns,
   VirtualTable,
 } from '@devexpress/dx-react-grid-material-ui'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
@@ -126,7 +126,7 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
   // console.log(rows)
   return rows.map((o, i) => {
     return {
-      rowIndex: startIndex + i,
+      rowIndex: startIndex,
       ...o,
     }
   })

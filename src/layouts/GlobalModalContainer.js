@@ -2,8 +2,9 @@ import React, { PureComponent } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
 import qs from 'query-string'
+import { withStyles } from '@material-ui/core'
 import { ChangePassword } from 'medisys-components'
-import { CommonModal, SimpleModal } from '@/components'
+import { CommonModal, SimpleModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 import Consultation from '@/pages/PatientDashboard/Consultation'
@@ -13,6 +14,12 @@ import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
 
 import { sleep, getRemovedUrl } from '@/utils/utils'
+
+const styles = (theme) => ({
+  patientModal: {
+    // zIndex: '1390 !important',
+  },
+})
 
 @connect(({ global, loading, user }) => ({
   global,
@@ -62,7 +69,7 @@ class GlobalModalContainer extends PureComponent {
   }
 
   render () {
-    const { global, dispatch, loggedInUserID, history } = this.props
+    const { global, dispatch, loggedInUserID, history, classes } = this.props
 
     return (
       <div>
@@ -76,6 +83,7 @@ class GlobalModalContainer extends PureComponent {
             this.props.handleSubmit()
           }}
         /> */}
+
         <CommonModal
           open={global.showDispensePanel}
           title='Dispensing'
@@ -140,6 +148,7 @@ class GlobalModalContainer extends PureComponent {
           }}
           // onConfirm={this.toggleModal}
           fullScreen
+          className={classes.patientModal}
           showFooter={false}
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
@@ -235,6 +244,14 @@ class GlobalModalContainer extends PureComponent {
           title={global.openConfirmTitle}
           cancelText='Cancel'
           maxWidth='sm'
+          confirmText='Discard changes'
+          extraButtons={
+            global.hasExtraConfirm ? (
+              () => {
+                return <Button>Save Changes</Button>
+              }
+            ) : null
+          }
           onClose={(e) => {
             clearTimeout(this._timer)
             dispatch({
@@ -296,4 +313,6 @@ class GlobalModalContainer extends PureComponent {
     )
   }
 }
-export default GlobalModalContainer
+export default withStyles(styles, { name: 'GlobalModalContainer' })(
+  GlobalModalContainer,
+)
