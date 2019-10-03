@@ -402,7 +402,7 @@ const convertToQuery = (
   // console.log(query)
   let newQuery = {}
   const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
-  newQuery.criteria = []
+  newQuery.columnCriteria = []
   newQuery.conditionGroups = []
   // //console.log('convert to query')
   // sort[0][sortby]=patientaccountno&sort[0][order]=desc
@@ -428,7 +428,7 @@ const convertToQuery = (
             const prop = match[3] || match[2]
             const combineKey = prop.split('/')
             // console.log(match)
-            newQuery.criteria.push({
+            newQuery.columnCriteria.push({
               prop: combineKey.length > 1 ? combineKey : prop,
               val,
               opr: filterType[match[1]],
@@ -436,7 +436,7 @@ const convertToQuery = (
               // valueType: match[4] ? valueType[match[4]] : null,
             })
           } else {
-            newQuery.criteria.push({
+            newQuery.columnCriteria.push({
               prop: p,
               val,
               opr: filterType.like,
@@ -447,11 +447,14 @@ const convertToQuery = (
             const obj = convertToQuery(val[i])
             // console.log(val[i], obj, JSON.stringify(obj))
             // newQuery.conditionGroups.push(obj)
-            if (obj.criteria && obj.criteria.length > 0) {
-              obj.criteria.forEach((c, j) => {
-                newQuery[`conditionGroups[${i}].criteria[${j}][prop]`] = c.prop
-                newQuery[`conditionGroups[${i}].criteria[${j}][val]`] = c.val
-                newQuery[`conditionGroups[${i}].criteria[${j}][opr]`] = c.opr
+            if (obj.columnCriteria && obj.columnCriteria.length > 0) {
+              obj.columnCriteria.forEach((c, j) => {
+                newQuery[`conditionGroups[${i}].columnCriteria[${j}][prop]`] =
+                  c.prop
+                newQuery[`conditionGroups[${i}].columnCriteria[${j}][val]`] =
+                  c.val
+                newQuery[`conditionGroups[${i}].columnCriteria[${j}][opr]`] =
+                  c.opr
               })
               newQuery[`conditionGroups[${i}].combineCondition`] =
                 obj.combineCondition
@@ -461,7 +464,7 @@ const convertToQuery = (
         } else if (typeof val === 'object' && Object.keys(val).length === 1) {
           const v = val[Object.keys(val)[0]]
           if (v !== undefined) {
-            newQuery.criteria.push({
+            newQuery.columnCriteria.push({
               prop: `${p}.${Object.keys(val)[0]}`,
               val: v,
               opr:
@@ -477,7 +480,7 @@ const convertToQuery = (
           // let valType = null
           // if (typeof val === 'boolean') valType = valueType.b
           // else if (typeof val === 'number') valType = valType.i
-          newQuery.criteria.push({
+          newQuery.columnCriteria.push({
             prop: p,
             val,
             // valueType: valType,
@@ -511,8 +514,8 @@ const convertToQuery = (
   convertExcludeFields.forEach((p) => {
     if (customQuerys[p] !== undefined) returnVal[p] = customQuerys[p]
   })
-  // if (returnVal.criteria && returnVal.criteria.length > 0) {
-  //   returnVal.criteria = JSON.stringify(returnVal.criteria)
+  // if (returnVal.columnCriteria && returnVal.columnCriteria.length > 0) {
+  //   returnVal.columnCriteria = JSON.stringify(returnVal.columnCriteria)
   // }
   return returnVal
 }
