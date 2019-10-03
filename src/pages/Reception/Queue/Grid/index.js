@@ -152,8 +152,11 @@ const columnExtensions = [
   { columnName: 'timeOut', width: 160 },
   {
     columnName: 'gender/age',
-    render: (row) =>
-      row.gender && row.age ? `${row.gender}/${row.age < 0 ? 0 : row.age}` : '',
+    render: (row) => {
+      const age = row.age && row.age > 0 ? row.age : '-'
+      const gender = row.gender || '-'
+      return `${age}/${gender}`
+    },
     sortingEnabled: false,
   },
   {
