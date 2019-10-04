@@ -462,7 +462,8 @@ class Demographic extends PureComponent {
                   />
                 </GridItem>
               )}
-              {values.referredBy !== 'none' && (
+              {values.referredBy !== undefined &&
+              values.referredBy !== 'none' && (
                 <GridItem xs={12}>
                   <Field
                     name='referralRemarks'
