@@ -46,6 +46,11 @@ class PurchaseReceive extends Component {
   componentDidMount () {
     this.props.dispatch({
       type: 'purchaseReceiveList/query',
+      payload: {
+        sorting: [
+          { columnName: 'purchaseOrderNo', direction: 'asc' },
+        ],
+      },
     })
   }
 
@@ -99,12 +104,12 @@ class PurchaseReceive extends Component {
           purchaseOrderStatusCode: 'WRITEOFF',
           writeOffReason,
           // ** HARDCODED FIELD BELOW, remove these field once Soe updated the API
-          isGstInclusive: false,
-          AdjustmentAmount: 0,
-          GSTValue: 0,
-          GSTAmount: 0,
-          TotalAmount: 0,
-          supplierFK: 11,
+          // isGstInclusive: false,
+          // AdjustmentAmount: 0,
+          // GSTValue: 0,
+          // GSTAmount: 0,
+          // TotalAmount: 0,
+          // supplierFK: 11,
         },
       }).then((r) => {
         if (r) {
