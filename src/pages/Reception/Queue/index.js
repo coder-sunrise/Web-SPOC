@@ -167,20 +167,25 @@ class Queue extends React.Component {
     this.setState({
       showPatientSearch: override === undefined ? !showPatientSearch : override,
     })
+
     if (showPatientSearch) {
-      this.props.dispatch({
-        type: 'patientSearch/updateState',
-        payload: {
-          filter: {},
-          list: [],
-        },
-      })
+      this.resetPatientSearchResult()
     }
     this.props.history.push(
       getRemovedUrl([
         'v',
       ]),
     )
+  }
+
+  resetPatientSearchResult = () => {
+    this.props.dispatch({
+      type: 'patientSearch/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
   }
 
   onStartSession = () => {
@@ -240,6 +245,7 @@ class Queue extends React.Component {
   showSearchResult = () => {
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
+
     if (totalRecords === 1)
       return this.showVisitRegistration({
         patientID: patientSearchResult[0].id,
