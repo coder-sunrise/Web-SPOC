@@ -7,6 +7,8 @@ import { GridContainer, GridItem, notification } from '@/components'
 // sub component
 import ResetPassForm from './ResetPasswordForm'
 import NewPassForm from './NewPasswordForm'
+// medisys component
+import { LoadingWrapper } from '@/components/_medisys'
 // services
 import { getOTP, resetPassword } from '@/services/user'
 // styles
@@ -26,24 +28,32 @@ const styles = (theme) => ({
 class ForgotPassword extends React.Component {
   state = {
     step: 1,
+    gettingOTP: false,
     firstStepPayload: {},
   }
 
   handleResetClick = (values) => {
-    getOTP(values).then((response) => {
-      const { data } = response
-      if (data && data.succeeded)
-        this.setState({
-          step: 2,
-          firstStepPayload: { ...values },
-        })
-
-      if (!response) {
-        notification.error({
-          message: 'Please wait one minute to get validation code again',
-        })
-      }
+    this.setState({
+      gettingOTP: true,
     })
+    getOTP(values)
+      .then((response) => {
+        const { data } = response
+        if (data && data.succeeded)
+          this.setState({
+            step: 2,
+            gettingOTP: false,
+            firstStepPayload: { ...values },
+          })
+        else {
+          this.setState({
+            gettingOTP: false,
+          })
+        }
+      })
+      .catch((error) => {
+        console.log({ error })
+      })
   }
 
   handleCancelClick = () => {
@@ -78,7 +88,7 @@ class ForgotPassword extends React.Component {
 
   render () {
     const { classes } = this.props
-    const { firstStepPayload, step } = this.state
+    const { firstStepPayload, step, gettingOTP } = this.state
 
     return (
       <div className={classes.container}>
@@ -86,6 +96,7 @@ class ForgotPassword extends React.Component {
           <GridItem md={5}>
             {step === 1 && (
               <ResetPassForm
+                loading={gettingOTP}
                 payload={firstStepPayload}
                 onCancelClick={this.handleCancelClick}
                 onResetClick={this.handleResetClick}
