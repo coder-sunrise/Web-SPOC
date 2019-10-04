@@ -26,24 +26,27 @@ export default createFormViewModel({
           entity[humps.camelize(p.settingKey)] = {
             ...p,
           }
+          const key = humps.camelize(p.settingKey)
+          const value = p.settingValue
           switch (p.dataType) {
             case 'Boolean': {
-              const value = p.settingValue === 'true'
-              settings[humps.camelize(p.settingKey)] = value
+              const booleanValue = value === 'true'
+              settings[key] = value
+              sessionStorage.setItem(key, booleanValue)
               break
             }
             case 'Decimal': {
-              settings[humps.camelize(p.settingKey)] = parseFloat(
-                p.settingValue,
-              )
-              settings[humps.camelize(`${p.settingKey}Int`)] = parseInt(
-                p.settingValue * 100,
-                10,
-              )
+              const decimalValue = parseFloat(value)
+              const decimalIntValue = parseInt(value * 100, 10)
+              settings[key] = decimalValue
+              settings[`${key}Int`] = decimalIntValue
+              sessionStorage.setItem(key, decimalValue)
+              sessionStorage.setItem(`${key}Int`, decimalIntValue)
               break
             }
             default: {
-              settings[humps.camelize(p.settingKey)] = p.settingValue
+              settings[key] = value
+              sessionStorage.setItem(key, value)
             }
           }
 
