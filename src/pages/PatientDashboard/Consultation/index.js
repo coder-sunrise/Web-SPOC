@@ -218,7 +218,7 @@ class Consultation extends PureComponent {
   pauseConsultation = () => {
     saveConsultation({
       props: this.props,
-      confirmMessage: 'Confirm pause current consultation?',
+      confirmMessage: 'Pause consultation?',
       successMessage: 'Consultation paused',
       action: 'pause',
     })

@@ -83,6 +83,7 @@ class Queue extends React.Component {
     this.state = {
       showPatientSearch: false,
       showEndSessionSummary: false,
+      search: '',
     }
     this._timer = null
   }
@@ -278,6 +279,22 @@ class Queue extends React.Component {
     SendNotification({ test: '123' })
   }
 
+  // toggleFilterSelfOnly = () => {
+  //   const { queueLog, dispatch } = this.props
+  //   dispatch({
+  //     type: 'queueLog/updateState',
+  //     payload: {
+  //       selfOnly: !queueLog.selfOnly,
+  //     },
+  //   })
+  // }
+
+  setSearch = (v) => {
+    this.setState({
+      search: v,
+    })
+  }
+
   render () {
     const { classes, queueLog, loading, history } = this.props
     const { showEndSessionSummary, showPatientSearch } = this.state
@@ -339,6 +356,7 @@ class Queue extends React.Component {
                   // onSwitchClick={this.toggleFilterSelfOnly}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
+                  setSearch={this.setSearch}
                 />
                 <DetailsGrid
                   onViewPatientProfileClick={this.onViewPatientProfileClick}
@@ -359,6 +377,7 @@ class Queue extends React.Component {
               overrideLoading
             >
               <PatientSearchModal
+                search={this.state.search}
                 handleRegisterVisitClick={this.showVisitRegistration}
                 onViewPatientProfileClick={this.onViewPatientProfileClick}
               />

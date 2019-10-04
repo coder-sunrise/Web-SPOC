@@ -1,5 +1,6 @@
 import moment from 'moment'
 import React from 'react'
+import _ from 'lodash'
 import nzh from 'nzh/cn'
 import router from 'umi/router'
 import { formatMessage, setLocale, getLocale } from 'umi/locale'
@@ -815,6 +816,25 @@ const htmlDecodeByRegExp = (str = '') => {
   return s
 }
 
+const getRefreshChasBalanceStatus = (status = []) => {
+  let defaultResponse = { isSuccessful: false, statusDescription: '' }
+  if (_.isEmpty(status)) {
+    return { ...defaultResponse }
+  }
+
+  const successCode = 'SC100'
+  const { statusCode, statusDescription } = status[0]
+
+  if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
+    return {
+      ...defaultResponse,
+      statusDescription,
+    }
+  }
+
+  return { ...defaultResponse, isSuccessful: true }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -839,6 +859,7 @@ module.exports = {
   htmlDecode,
   htmlEncodeByRegExp,
   htmlDecodeByRegExp,
+  getRefreshChasBalanceStatus,
   // toUTC,
   // toLocal,
 }

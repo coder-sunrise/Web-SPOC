@@ -40,35 +40,85 @@ const PatientInfoSideBanner = ({
     setRefreshedSchemeData,
   ] = useState({})
 
-  const refreshChasBalance = (selectedSchemeTypeFK) => {
+  const refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
     dispatch({
       type: 'patient/refreshChasBalance',
-      payload: entity,
+      payload: {
+        ...entity,
+        patientCoPaymentSchemeFK,
+      },
     }).then((result) => {
       if (result) {
         const {
           balance,
-          patientCoPaymentSchemeFk,
           schemeTypeFk,
           validFrom,
           validTo,
+          acuteVisitPatientBalance,
+          acuteVisitClinicBalance,
+          isSuccessful,
+          statusDescription,
         } = result
         let isShowReplacementModal = false
-
-        if (selectedSchemeTypeFK !== schemeTypeFk) {
-          isShowReplacementModal = true
+        if (!isSuccessful) {
+          setRefreshedSchemeData({
+            statusDescription,
+            isSuccessful,
+          })
+        } else {
+          if (oldSchemeTypeFK !== schemeTypeFk) {
+            isShowReplacementModal = true
+          }
+          setRefreshedSchemeData({
+            isShowReplacementModal,
+            oldSchemeTypeFK,
+            balance,
+            patientCoPaymentSchemeFK,
+            schemeTypeFK: schemeTypeFk,
+            validFrom,
+            validTo,
+            acuteVisitPatientBalance,
+            acuteVisitClinicBalance,
+            isSuccessful,
+          })
         }
-
-        setRefreshedSchemeData({
-          oldSchemeTypeFK: selectedSchemeTypeFK,
-          schemeTypeFK: schemeTypeFk,
-          balance,
-          validFrom,
-          validTo,
-          isShowReplacementModal,
-        })
       }
     })
+  }
+
+  const getSchemeDetails = (schemeData) => {
+    if (
+      !_.isEmpty(refreshedSchemeData) &&
+      refreshedSchemeData.isSuccessful === true
+    ) {
+      return { ...refreshedSchemeData }
+    }
+    // Scheme Balance
+    const balance =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].balance
+    // Patient Acute Visit Patient Balance
+    const acuteVPBal =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
+    // Patient Acute Visit Clinic Balance
+    const acuteVCBal =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
+
+    return {
+      balance,
+      patientCoPaymentSchemeFK: schemeData.id,
+      schemeTypeFK: schemeData.schemeTypeFK,
+      validFrom: schemeData.validFrom,
+      validTo: schemeData.validTo,
+      acuteVisitPatientBalance: acuteVPBal,
+      acuteVisitClinicBalance: acuteVCBal,
+      statusDescription: refreshedSchemeData.statusDescription,
+    }
   }
 
   return entity && entity.id ? (
@@ -109,66 +159,43 @@ const PatientInfoSideBanner = ({
         style={{ maxHeight: height - 455 - 20 }}
       >
         {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
-          // console.log('patientScheme', o)
-          const schemeTypeFK = _.isEmpty(refreshedSchemeData)
-            ? o.schemeTypeFK
-            : refreshedSchemeData.schemeTypeFK
-          const balance =
-            o.patientSchemeBalance.length <= 0
-              ? ''
-              : o.patientSchemeBalance[0].balance
-          const validFrom = _.isEmpty(refreshedSchemeData)
-            ? o.validFrom
-            : refreshedSchemeData.validFrom
-          const validTo = _.isEmpty(refreshedSchemeData)
-            ? o.validTo
-            : refreshedSchemeData.validTo
+          const schemeData = getSchemeDetails(o)
 
           return (
             <div style={{ marginBottom: theme.spacing(1) }}>
               <p style={{ fontWeight: 500 }}>
                 {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
-                <CodeSelect text code='ctSchemeType' value={schemeTypeFK} />
+                <CodeSelect
+                  text
+                  code='ctSchemeType'
+                  value={schemeData.schemeTypeFK}
+                />
                 <IconButton>
-                  <Refresh onClick={() => refreshChasBalance(o.schemeTypeFK)} />
+                  <Refresh
+                    onClick={() =>
+                      refreshChasBalance(
+                        schemeData.patientCoPaymentSchemeFK,
+                        schemeData.schemeTypeFK,
+                      )}
+                  />
                 </IconButton>
 
                 <SchemePopover
-                  isShowReplacementModal={
-                    refreshedSchemeData.isShowReplacementModal
-                  }
+                  isShowReplacementModal={schemeData.isShowReplacementModal}
                   handleRefreshChasBalance={() =>
-                    refreshChasBalance(o.schemeTypeFK)}
-                  data={o}
+                    refreshChasBalance(
+                      schemeData.patientCoPaymentSchemeFK,
+                      schemeData.schemeTypeFK,
+                    )}
                   entity={entity}
-                  schemeTypeFK={schemeTypeFK}
-                  refreshedSchemeData={refreshedSchemeData}
-                  balanceValue={
-                    _.isEmpty(refreshedSchemeData) ? (
-                      balance
-                    ) : (
-                      refreshedSchemeData.balance
-                    )
-                  }
-                  dateFrom={validFrom}
-                  dateTo={validTo}
+                  schemeData={schemeData}
                 />
               </p>
-              {validFrom && (
+              {schemeData.validFrom && (
                 <div>
                   <p>
                     Balance:{' '}
-                    <NumberInput
-                      text
-                      currency
-                      value={
-                        _.isEmpty(refreshedSchemeData) ? (
-                          balance
-                        ) : (
-                          refreshedSchemeData.balance
-                        )
-                      }
-                    />
+                    <NumberInput text currency value={schemeData.balance} />
                   </p>
                   <p>
                     Validity:{' '}
@@ -176,15 +203,18 @@ const PatientInfoSideBanner = ({
                       text
                       format={dateFormatLong}
                       // value={o.validFrom}
-                      value={validFrom}
+                      value={schemeData.validFrom}
                     />{' '}
                     -{' '}
                     <DatePicker
                       text
                       format={dateFormatLong}
                       // value={o.validTo}
-                      value={validTo}
+                      value={schemeData.validTo}
                     />
+                  </p>
+                  <p style={{ color: 'red' }}>
+                    {schemeData.statusDescription}
                   </p>
                 </div>
               )}

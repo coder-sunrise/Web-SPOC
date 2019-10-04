@@ -62,7 +62,7 @@ import styles from './style'
 )
 @withFormikExtend({
   displayName: 'AppointmentForm',
-  // enableReinitialize: true,
+  enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
@@ -203,6 +203,7 @@ class Form extends React.PureComponent {
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
     const { id, patientAccountNo, name, mobileNo } = patientProfile
     const { values, setValues } = this.props
+    console.log('patientProfile', patientProfile)
     await setValues({
       ...values,
       patientAccountNo,
@@ -241,6 +242,7 @@ class Form extends React.PureComponent {
 
   onConfirmCreatePatient = async () => {
     const { patientProfile, dispatch } = this.props
+    console.log('onConfirmCreatePatient', this.props)
     const { id, name, contact, patientAccountNo } = patientProfile
     const payload = {
       id,
@@ -251,6 +253,7 @@ class Form extends React.PureComponent {
     dispatch({
       type: 'patient/closePatientModal',
     })
+    console.log('payload', payload)
     this.togglePatientProfileModal()
     const doneUpdateFields = await this.onSelectPatientClick(payload, true)
     if (doneUpdateFields) {

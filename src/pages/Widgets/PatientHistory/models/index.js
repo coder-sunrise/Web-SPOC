@@ -44,13 +44,14 @@ export default createListViewModel({
           const { visit } = visitRegistration.entity
           if (!visit) return
           patientID = visit.patientProfileFK
+          yield
         }
 
-        yield put({
-          type: 'patient/query',
-          payload: { id: patientID, version },
-        })
-        yield take('patient/query/@@end')
+        // yield put({
+        //   type: 'patient/query',
+        //   payload: { id: patientID, version },
+        // })
+        // yield take('patient/query/@@end')
 
         yield put({
           type: 'query',
@@ -65,6 +66,14 @@ export default createListViewModel({
             version,
           },
         })
+
+        // yield put({
+        //   type: 'patientHistory/queryOne',
+        //   payload: o.id,
+        // })
+        // console.log("****")
+        // console.log(test)
+
         yield put({
           type: 'updateState',
           payload: {
@@ -72,7 +81,32 @@ export default createListViewModel({
           },
         })
       },
+      *queryDone ({ payload }, { call, put, select, take }) {
+        console.log(payload)
+
+        if (payload.data.data.length > 0) {
+          yield put({
+            type: 'queryOne',
+            payload: payload.data.data[0].id,
+          })
+        }
+      },
     },
-    reducers: {},
+    reducers: {
+      querySingleDone (st, { payload }) {
+        const { data } = payload
+        console.log("++++")
+        console.log(payload)
+        console.log(st.list)
+        let sortedPatientHistory = st.list
+          ? st.list.filter((o) => o.coHistory.length >= 1)
+          : ''
+        return {
+          ...st,
+          selected: sortedPatientHistory.length > 0 ? sortedPatientHistory[0]  : '',
+          selectedSubRow: sortedPatientHistory.length > 0 ? sortedPatientHistory[0].coHistory[0]  : '',
+        }
+      },
+    },
   },
 })

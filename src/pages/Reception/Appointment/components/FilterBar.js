@@ -17,7 +17,11 @@ import {
   CodeSelect,
 } from '@/components'
 // sub components
-import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
+import {
+  AppointmentTypeLabel,
+  DoctorLabel,
+  DoctorProfileSelect,
+} from '@/components/_medisys'
 
 const styles = () => ({
   selectorContainer: {
@@ -79,6 +83,9 @@ const FilterBar = ({
                 // code='clinicianprofile'
                 // labelField='name'
                 // valueField='id'
+                filter={{
+                  'clinicianProfile.isActive': true,
+                }}
                 code='doctorprofile'
                 labelField='clinicianProfile.name'
                 valueField='clinicianProfile.id'

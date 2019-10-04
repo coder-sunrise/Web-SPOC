@@ -98,16 +98,16 @@ const Detail = ({
         options={VaccinationDetailOption(detailProps, stockProps)}
       />
       <div className={classes.actionDiv}>
-        <ProgressButton
-          submitKey='vaccinationDetail/submit'
-          onClick={handleSubmit}
-        />
         <Button
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=2')}
         >
           Cancel
         </Button>
+        <ProgressButton
+          submitKey='vaccinationDetail/submit'
+          onClick={handleSubmit}
+        />
       </div>
     </React.Fragment>
   )

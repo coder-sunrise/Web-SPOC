@@ -446,7 +446,7 @@ class DODetails extends PureComponent {
   render () {
     const isEditable = true
     const { props } = this
-    const { footer, values } = props
+    const { footer, values, theme } = props
     const { rows } = values
 
     const tableParas = {
@@ -577,102 +577,105 @@ class DODetails extends PureComponent {
 
     return (
       <React.Fragment>
-        <GridContainer>
-          <GridItem xs={12} md={5}>
-            <GridContainer>
-              <GridItem xs={12}>
-                <FastField
-                  name='deliveryOrderNo'
-                  render={(args) => {
-                    return (
-                      <TextField
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.dod.deliveryOrderNo',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem xs={12}>
-                <FastField
-                  name='deliveryOrderDate'
-                  render={(args) => {
-                    return (
-                      <DatePicker
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.dod.deliveryOrderDate',
-                        })}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
+        <div style={{ margin: theme.spacing(2) }}>
+          <GridContainer>
+            <GridItem xs={12} md={5}>
+              <GridContainer>
+                <GridItem xs={12}>
+                  <FastField
+                    name='deliveryOrderNo'
+                    render={(args) => {
+                      return (
+                        <TextField
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.dod.deliveryOrderNo',
+                          })}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={12}>
+                  <FastField
+                    name='deliveryOrderDate'
+                    render={(args) => {
+                      return (
+                        <DatePicker
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.dod.deliveryOrderDate',
+                          })}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              </GridContainer>
+            </GridItem>
+
+            <GridItem xs={12} md={1} />
+
+            <GridItem xs={12} md={5}>
+              <GridContainer>
+                <GridItem xs={12}>
+                  <FastField
+                    name='remark'
+                    render={(args) => {
+                      return (
+                        <OutlinedTextField
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.dod.remarks',
+                          })}
+                          multiline
+                          rowsMax={2}
+                          rows={2}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              </GridContainer>
+            </GridItem>
+          </GridContainer>
+
+          <GridItem xs={12} md={11}>
+            <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
+              {formatMessage({
+                id: 'inventory.pr.detail.dod.receivingDetails',
+              })}
+            </h4>
           </GridItem>
-
-          <GridItem xs={12} md={1} />
-
-          <GridItem xs={12} md={5}>
-            <GridContainer>
-              <GridItem xs={12}>
-                <FastField
-                  name='remark'
-                  render={(args) => {
-                    return (
-                      <OutlinedTextField
-                        label={formatMessage({
-                          id: 'inventory.pr.detail.dod.remarks',
-                        })}
-                        multiline
-                        rowsMax={2}
-                        rows={2}
-                        {...args}
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
-            </GridContainer>
-          </GridItem>
-        </GridContainer>
-
-        <GridItem xs={12} md={11}>
-          <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
-            {formatMessage({
-              id: 'inventory.pr.detail.dod.receivingDetails',
+          <div style={{ margin: theme.spacing(2) }}>
+            <EditableTableGrid
+              getRowId={(r) => r.uid}
+              rows={rows}
+              schema={receivingDetailsSchema}
+              FuncProps={{
+                // edit: isEditable,
+                pager: false,
+              }}
+              EditingProps={{
+                showAddCommand: isEditable,
+                showEditCommand: isEditable,
+                showDeleteCommand: isEditable,
+                onCommitChanges: this.onCommitChanges,
+                onAddedRowsChange: this.onAddedRowsChange,
+              }}
+              {...tableParas}
+            />
+          </div>
+          {footer &&
+            footer({
+              align: 'center',
+              onConfirm: props.handleSubmit,
+              confirmBtnText: 'Save',
+              confirmProps: {
+                disabled: false,
+              },
             })}
-          </h4>
-        </GridItem>
-
-        <EditableTableGrid
-          getRowId={(r) => r.uid}
-          rows={rows}
-          schema={receivingDetailsSchema}
-          FuncProps={{
-            // edit: isEditable,
-            pager: false,
-          }}
-          EditingProps={{
-            showAddCommand: isEditable,
-            showEditCommand: isEditable,
-            showDeleteCommand: isEditable,
-            onCommitChanges: this.onCommitChanges,
-            onAddedRowsChange: this.onAddedRowsChange,
-          }}
-          {...tableParas}
-        />
-        {footer &&
-          footer({
-            align: 'center',
-            onConfirm: props.handleSubmit,
-            confirmBtnText: 'Save',
-            confirmProps: {
-              disabled: false,
-            },
-          })}
+        </div>
       </React.Fragment>
     )
   }

@@ -128,6 +128,7 @@ const Detail = ({
     dispatch,
     setFieldValue,
     showTransfer: false,
+    errors: props.errors,
   }
 
   const [
@@ -218,13 +219,13 @@ const Detail = ({
         options={PackageDetailOption(detailProps, typeListingProps)}
       />
       <div className={classes.actionDiv}>
-        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
         <Button
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=3')}
         >
           Cancel
         </Button>
+        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
       </div>
     </React.Fragment>
   )

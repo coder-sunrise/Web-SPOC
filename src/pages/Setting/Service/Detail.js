@@ -236,7 +236,7 @@ class Detail extends PureComponent {
       ],
     }
     //console.log('detail', props)
-    console.log('asd', this.props.values.ctServiceCenter_ServiceNavigation)
+    // console.log('asd', this.props.values.ctServiceCenter_ServiceNavigation)
 
     return (
       <React.Fragment>

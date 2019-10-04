@@ -1,4 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
+import humps from 'humps'
 import * as service from '../services/clinicSettings'
 
 export default createFormViewModel({
@@ -22,25 +23,27 @@ export default createFormViewModel({
         const settings = {}
         let entity = {}
         data.forEach((p) => {
-          entity[p.settingKey] = {
+          entity[humps.camelize(p.settingKey)] = {
             ...p,
           }
           switch (p.dataType) {
             case 'Boolean': {
               const value = p.settingValue === 'true'
-              settings[p.settingKey] = value
+              settings[humps.camelize(p.settingKey)] = value
               break
             }
             case 'Decimal': {
-              settings[p.settingKey] = parseFloat(p.settingValue)
-              settings[`${p.settingKey}Int`] = parseInt(
+              settings[humps.camelize(p.settingKey)] = parseFloat(
+                p.settingValue,
+              )
+              settings[humps.camelize(`${p.settingKey}Int`)] = parseInt(
                 p.settingValue * 100,
                 10,
               )
               break
             }
             default: {
-              settings[p.settingKey] = p.settingValue
+              settings[humps.camelize(p.settingKey)] = p.settingValue
             }
           }
 

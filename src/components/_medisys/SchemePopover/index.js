@@ -19,13 +19,8 @@ import {
 const SchemePopover = ({
   isBanner = false,
   isShowReplacementModal = false,
-  refreshedSchemeData,
-  data,
+  schemeData,
   entity,
-  schemeTypeFK,
-  balanceValue,
-  dateFrom,
-  dateTo,
   handleRefreshChasBalance,
 }) => {
   const [
@@ -63,7 +58,11 @@ const SchemePopover = ({
                     paddingLeft: 0,
                   }}
                 >
-                  <CodeSelect text code='ctSchemeType' value={schemeTypeFK} />
+                  <CodeSelect
+                    text
+                    code='ctSchemeType'
+                    value={schemeData.schemeTypeFK}
+                  />
 
                   <div
                     style={{ display: 'inline-block', position: 'absolute' }}
@@ -81,21 +80,30 @@ const SchemePopover = ({
               <GridItem>
                 <p>
                   Validity:{' '}
-                  <DatePicker text format={dateFormatLong} value={dateFrom} />
+                  <DatePicker
+                    text
+                    format={dateFormatLong}
+                    value={schemeData.validFrom}
+                  />
                   {' - '}
-                  <DatePicker text format={dateFormatLong} value={dateTo} />
+                  <DatePicker
+                    text
+                    format={dateFormatLong}
+                    value={schemeData.validTo}
+                  />
                 </p>
               </GridItem>
             </GridContainer>
             <GridContainer>
               <GridItem>
                 {' '}
-                Balance: <NumberInput text currency value={balanceValue} />
+                Balance:{' '}
+                <NumberInput text currency value={schemeData.balance} />
               </GridItem>
             </GridContainer>
             <GridContainer>
               <GridItem>
-                Patient Visit Balance:{' '}
+                Patient Acute Visit Balance:{' '}
                 <div
                   style={{
                     fontWeight: 500,
@@ -103,10 +111,10 @@ const SchemePopover = ({
                     paddingLeft: 2,
                   }}
                 >
-                  {data.patientSchemeBalance.length <= 0 ? (
+                  {schemeData.acuteVisitPatientBalance ? (
                     ''
                   ) : (
-                    data.patientSchemeBalance[0].acuteVisitPatientBalance
+                    schemeData.acuteVisitPatientBalance
                   )}{' '}
                   Remaining{' '}
                 </div>{' '}
@@ -115,7 +123,7 @@ const SchemePopover = ({
             </GridContainer>
             <GridContainer>
               <GridItem>
-                Patient Clinic Balance:
+                Patient Acute Clinic Balance:
                 <div
                   style={{
                     fontWeight: 500,
@@ -123,14 +131,19 @@ const SchemePopover = ({
                     paddingLeft: 2,
                   }}
                 >
-                  {data.patientSchemeBalance.length <= 0 ? (
+                  {schemeData.acuteVisitClinicBalance <= 0 ? (
                     ''
                   ) : (
-                    data.patientSchemeBalance[0].acuteVisitClinicBalance
+                    schemeData.acuteVisitClinicBalance
                   )}{' '}
                   Remaining
                 </div>{' '}
                 for {moment().format('MMMM')} {moment().year()}
+              </GridItem>
+            </GridContainer>
+            <GridContainer>
+              <GridItem>
+                <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>
               </GridItem>
             </GridContainer>
           </div>
@@ -165,7 +178,7 @@ const SchemePopover = ({
       >
         <CHASCardReplacement
           entity={entity}
-          refreshedSchemeData={refreshedSchemeData}
+          refreshedSchemeData={schemeData}
           handleOnClose={() => handleReplacementModalVisibility(false)}
         />
       </CommonModal>

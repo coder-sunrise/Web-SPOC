@@ -62,6 +62,19 @@ const Transfer = ({
     ],
   )
 
+  const initAddedItems = (initialItems) => {
+    setRemovedList(initialItems)
+
+    const tempList = addedList.filter(
+      (x) =>
+        !initialItems.find(
+          (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
+        ),
+    )
+
+    setAddedList(tempList)
+  }
+
   useEffect(
     () => {
       if (addedItems) {
@@ -77,19 +90,6 @@ const Transfer = ({
       addedItems,
     ],
   )
-
-  const initAddedItems = (items) => {
-    setRemovedList(items)
-
-    const tempList = addedList.filter(
-      (x) =>
-        !items.find(
-          (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
-        ),
-    )
-
-    setAddedList(tempList)
-  }
 
   const addClick = (index) => () => {
     const tempList = [
@@ -140,10 +140,7 @@ const Transfer = ({
           <GridItem xs={12}>
             <TextField
               label='Search'
-              // onChange={(event) => setSearchField(event.target.value)}
-              // value={searchField}
               onChange={(event) => setSearch(event.target.value)}
-              value={search}
             />{' '}
           </GridItem>
           <GridItem xs={12}>

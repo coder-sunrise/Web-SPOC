@@ -7,9 +7,9 @@ import { getBizSession } from '@/services/queue'
 
 import Yup from '@/utils/yup'
 import {
-  currencies,
-  currencyRounding,
-  currencyRoundingToTheClosest,
+  currenciesList,
+  currencyRoundingList,
+  currencyRoundingToTheClosestList,
 } from '@/utils/codes'
 
 import {
@@ -38,14 +38,14 @@ const styles = (theme) => ({
   mapPropsToValues: ({ clinicSettings }) => {
     if (
       clinicSettings.entity &&
-      clinicSettings.entity.ShowConsultationVersioning
+      clinicSettings.entity.showConsultationVersioning
     ) {
-      const { ShowConsultationVersioning } = clinicSettings.entity
+      const { showConsultationVersioning } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
-        ShowConsultationVersioning: {
-          ...ShowConsultationVersioning,
-          settingValue: ShowConsultationVersioning.settingValue === 'true',
+        showConsultationVersioning: {
+          ...showConsultationVersioning,
+          settingValue: showConsultationVersioning.settingValue === 'true',
         },
       }
     }
@@ -54,24 +54,24 @@ const styles = (theme) => ({
 
   handleSubmit: (values, { props }) => {
     const {
-      SystemCurrency,
-      CurrencyRounding,
-      CurrencyRoundingToTheClosest,
-      ShowConsultationVersioning,
+      systemCurrency,
+      currencyRounding,
+      currencyRoundingToTheClosest,
+      showConsultationVersioning,
     } = values
 
     const payload = [
       {
-        ...SystemCurrency,
+        ...systemCurrency,
       },
       {
-        ...CurrencyRounding,
+        ...currencyRounding,
       },
       {
-        ...CurrencyRoundingToTheClosest,
+        ...currencyRoundingToTheClosest,
       },
       {
-        ...ShowConsultationVersioning,
+        ...showConsultationVersioning,
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -140,12 +140,12 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='SystemCurrency.settingValue'
+                name='systemCurrency.settingValue'
                 render={(args) => (
                   <Select
                     label='System Currency'
                     {...args}
-                    options={currencies}
+                    options={currenciesList}
                     disabled
                   />
                 )}
@@ -155,11 +155,11 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='CurrencyRounding.settingValue'
+                name='currencyRounding.settingValue'
                 render={(args) => (
                   <Select
                     label='Currency Rounding'
-                    options={currencyRounding}
+                    options={currencyRoundingList}
                     {...args}
                     disabled={!!hasActiveSession}
                   />
@@ -169,11 +169,11 @@ class GeneralSetting extends PureComponent {
 
             <GridItem md={3}>
               <Field
-                name='CurrencyRoundingToTheClosest.settingValue'
+                name='currencyRoundingToTheClosest.settingValue'
                 render={(args) => (
                   <Select
                     label='To The Closest'
-                    options={currencyRoundingToTheClosest}
+                    options={currencyRoundingToTheClosestList}
                     {...args}
                     disabled={!!hasActiveSession}
                   />
@@ -198,7 +198,7 @@ class GeneralSetting extends PureComponent {
             </GridItem> */}
             <GridItem md={3}>
               <Field
-                name='ShowConsultationVersioning.settingValue'
+                name='showConsultationVersioning.settingValue'
                 render={(args) => (
                   <Switch
                     label='Show Consultation Versioning'
