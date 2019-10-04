@@ -176,7 +176,7 @@ const columnExtensions = [
   },
   {
     columnName: 'doctor',
-    render: (row) => <DoctorLabel doctor={row.doctor} />,
+    render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
   },
 ]
 
@@ -195,8 +195,17 @@ const Grid = ({
   onRegisterPatientClick,
   onViewPatientProfileClick,
   handleActualizeAppointment,
-  deleteQueue,
+  // deleteQueue,
 }) => {
+  const deleteQueue = (id) => {
+    dispatch({
+      type: 'queueLog/deleteQueueByQueueID',
+      payload: {
+        id,
+      },
+    })
+  }
+
   const onRowDoubleClick = (row) =>
     handleEditVisitClick({
       visitID: row.id,
