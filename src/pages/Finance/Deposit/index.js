@@ -23,6 +23,11 @@ class Deposit extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'deposit/query',
+      payload: {
+        apiCriteria: {
+          onlyWithDeposit: false,
+        },
+      },
     })
   }
 

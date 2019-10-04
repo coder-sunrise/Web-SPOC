@@ -81,7 +81,7 @@ class FilterBar extends PureComponent {
 
           <GridItem xs sm={6} md={3}>
             <FastField
-              name='TansactionOnly'
+              name='transactionOnly'
               render={(args) => {
                 return (
                   <Tooltip
@@ -109,21 +109,26 @@ class FilterBar extends PureComponent {
                 variant='contained'
                 color='primary'
                 onClick={() => {
-                  const { transactionDates, ExpenseType } = this.props.values
+                  const {
+                    transactionDates,
+                    ExpenseType,
+                    transactionOnly,
+                  } = this.props.values
 
+                  const showTransactionOnly = transactionOnly === true
+                  console.log('showTransactionOnly', showTransactionOnly)
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
-                      // patientDepositTransaction: {
-
-                      // },
                       'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
                         ? transactionDates[0]
                         : undefined,
                       'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
                         ? transactionDates[1]
                         : undefined,
-
+                      apiCriteria: {
+                        OnlyWithDeposit: showTransactionOnly,
+                      },
                       group: [
                         {
                           'contactFkNavigation.contactNumber.number': ExpenseType,
