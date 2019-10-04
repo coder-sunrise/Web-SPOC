@@ -295,10 +295,10 @@ export default createListViewModel({
             }
           }
           console.log({ savePayload, json: JSON.stringify(savePayload) })
-          // return yield put({
-          //   type: actionKey,
-          //   payload: savePayload,
-          // })
+          return yield put({
+            type: actionKey,
+            payload: savePayload,
+          })
         } catch (error) {
           console.log({ error })
         }

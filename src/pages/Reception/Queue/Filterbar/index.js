@@ -11,9 +11,9 @@ import Search from '@material-ui/icons/Search'
 // custom components
 import {
   Button,
+  Checkbox,
   GridContainer,
   GridItem,
-  Switch,
   TextField,
   ProgressButton,
 } from '@/components'
@@ -37,24 +37,22 @@ const Filterbar = ({
   return (
     <GridContainer
       className={classes.actionBar}
-      justify='center'
+      justify='flex-start'
       alignItems='center'
     >
-      <GridItem xs={4} sm={4} md={4} lg={3}>
+      <GridItem xs={3} sm={3} md={3} lg={2}>
         <FastField
           name='search'
-          render={(args) => {
-            return (
-              <TextField
-                label='Patient Name, Acc No., Phone No.'
-                onChange={(e) => setSearch(e.target.value)}
-                {...args}
-              />
-            )
-          }}
+          render={(args) => (
+            <TextField
+              label='Patient Name, Acc No., Phone No.'
+              onChange={(e) => setSearch(e.target.value)}
+              {...args}
+            />
+          )}
         />
       </GridItem>
-      <GridItem xs={6} sm={6} md={6} lg={4}>
+      <GridItem xs={7} sm={7} md={7} lg={5}>
         <ProgressButton
           variant='contained'
           color='primary'
@@ -67,7 +65,7 @@ const Filterbar = ({
           size='sm'
           submitKey='patientSearch/query'
         >
-          Search
+          Create Visit
         </ProgressButton>
 
         <Button color='primary' size='sm' onClick={toggleNewPatient}>
@@ -77,9 +75,9 @@ const Filterbar = ({
           <FormattedMessage id='reception.queue.createPatient' />
         </Button>
         <div className={classes.switch}>
-          <Switch
+          <Checkbox
             label='Visit assign to me only'
-            defaultValue={selfOnly}
+            checked={selfOnly}
             onChange={onSwitchClick}
           />
         </div>

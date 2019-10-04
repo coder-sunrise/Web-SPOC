@@ -311,21 +311,20 @@ class Scribble extends React.Component {
             <div className={classes.scribbleSubject}>
               <FastField
                 name='subject'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Scribble Subject'
-                      inputProps={{ maxLength: 2 }}
-                      {...args}
-                      onChange={(e) => {
-                        const subject = e.target.value
-                        if (subject.length > 20) {
-                          setFieldValue('subject', subject.substring(0, 20))
-                        }
-                      }}
-                    />
-                  )
-                }}
+                render={(args) => (
+                  <TextField
+                    {...args}
+                    label='Scribble Subject'
+                    inputProps={{ maxLength: 20 }}
+                    maxLength={20}
+                    // onChange={(e) => {
+                    //   const subject = e.target.value
+                    //   if (subject.length > 20) {
+                    //     setFieldValue('subject', subject.substring(0, 20))
+                    //   }
+                    // }}
+                  />
+                )}
               />
             </div>
             <ToggleButtonGroup
