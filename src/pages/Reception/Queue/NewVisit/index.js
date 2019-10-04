@@ -180,6 +180,7 @@ class NewVisit extends PureComponent {
           openConfirmContent:
             'This patient already registered in current session, are you sure to continue?',
           onConfirmDiscard: handleSubmit,
+          onConfirmText: 'Confirm',
         },
       })
     return handleSubmit()

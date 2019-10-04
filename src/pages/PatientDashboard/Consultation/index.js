@@ -91,6 +91,7 @@ const saveConsultation = ({
     payload: {
       openConfirm: true,
       openConfirmContent: confirmMessage,
+      onConfirmText: 'Confirm',
       onConfirmDiscard: () => {
         const newValues = convertToConsultation(values, {
           orders,

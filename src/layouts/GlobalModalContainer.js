@@ -69,6 +69,7 @@ class GlobalModalContainer extends PureComponent {
   }
 
   closeVisitRegistration = () => {
+    const { dispatch } = this.props
     dispatch({
       type: 'visitRegistration/closeModal',
     })
@@ -262,7 +263,7 @@ class GlobalModalContainer extends PureComponent {
                   }
                 }}
               >
-                Discard changes
+                {global.onConfirmText || 'Discard changes'}
               </Button>
             ),
             onConfirm: global.onConfirmSave
