@@ -16,6 +16,7 @@ import {
   TimePicker,
   CommonModal,
   Select,
+  TextField,
 } from '@/components'
 // component
 import { ReportViewer } from '@/components/_medisys'
@@ -24,7 +25,7 @@ import { ReportViewer } from '@/components/_medisys'
 @withFormik({
   enableReinitialize: true,
   mapPropsToValues: () => ({
-    start: '14:00',
+    // start: '14:00',
     end: '13:00',
   }),
   validationSchema: Yup.object().shape({
@@ -125,7 +126,13 @@ class Report extends React.Component {
             <FastField
               name='start'
               render={(args) => (
-                <TimePicker {...args} label='Start' format='hh:mm A' />
+                <TextField
+                  {...args}
+                  label='Start'
+                  // format='hh:mm A'
+                  // inputProps={{ maxLength: 5 }}
+                  maxLength={5}
+                />
               )}
             />
           </GridItem>
