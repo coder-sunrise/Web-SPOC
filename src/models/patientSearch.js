@@ -15,7 +15,8 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history }) => {
       // history.listen((loct, method) => {
-      //   // const { pathname, search, query = {} } = loct
+      //   const { pathname, search, query = {} } = loct
+      //   if (pathname === '/patientdb/search') dispatch({ type: 'query' })
       // })
     },
     effects: {

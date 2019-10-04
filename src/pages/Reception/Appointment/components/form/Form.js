@@ -134,6 +134,15 @@ class Form extends React.PureComponent {
   toggleSearchPatientModal = () => {
     const { showSearchPatientModal } = this.state
     this.setState({ showSearchPatientModal: !showSearchPatientModal })
+    if (showSearchPatientModal) {
+      this.props.dispatch({
+        type: 'patientSearch/updateState',
+        payload: {
+          filter: {},
+          list: [],
+        },
+      })
+    }
   }
 
   togglePatientProfileModal = () => {
