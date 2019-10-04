@@ -7,7 +7,10 @@ const DoctorLabel = ({ doctor }) => {
     if (clinicianProfile === undefined) clinicianProfile = doctor
 
     const designation = clinicianProfile.title || ''
-    const mcrNo = doctorMCRNo ? `(${doctorMCRNo})` : ''
+    let mcrNo = doctorMCRNo ? `(${doctorMCRNo})` : ''
+    if (clinicianProfile.doctorProfile)
+      mcrNo = `(${clinicianProfile.doctorProfile.doctorMCRNo})`
+
     label = `${designation} ${clinicianProfile.name} ${mcrNo}`
   } catch (error) {
     // console.log({ error })

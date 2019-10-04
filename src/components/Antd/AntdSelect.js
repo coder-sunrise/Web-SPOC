@@ -326,6 +326,7 @@ class AntdSelect extends React.PureComponent {
       form,
       field,
       allValue,
+      allValueOption,
       mode,
       onChange,
       options,
@@ -341,33 +342,41 @@ class AntdSelect extends React.PureComponent {
         'tags',
       ].includes(mode)
     ) {
+      // let _allValue = Object.byString(allValueOption, allValueOption)
+      // console.log({ _allValue })
       if (val.indexOf(allValue) >= 0) {
         if (this.state.value.indexOf(allValue) >= 0) {
           newVal = _.reject(newVal, (v) => v === allValue)
         } else {
           newVal = [
             allValue,
-            ...options.map((o) => o[valueField]),
+            ...options.map((o) => Object.byString(o, valueField)),
           ]
         }
       } else if (this.state.value.indexOf(allValue) >= 0) {
         newVal = []
-      } else if (
-        val.length &&
-        val.length ===
-          val.filter((o) => options.find((m) => m[valueField] === o)).length
-      ) {
-        newVal = [
-          allValue,
-          ...options.map((o) => o[valueField]),
-        ]
       }
+      // else if (
+      //   val.length &&
+      //   val.length ===
+      //     val.filter((o) =>
+      //       options.find((m) => {
+      //         console.log({ m: Object.byString(m, valueField), o })
+      //         return Object.byString(m, valueField) === o
+      //       }),
+      //     ).length
+      // ) {
+      //   console.log('else if 1.1')
+      //   newVal = [
+      //     allValue,
+      //     ...options.map((o) => Object.byString(o, valueField)),
+      //   ]
+      // }
       if (maxSelected && newVal.length > maxSelected) {
         newVal = _.reject(newVal, (v) => v === allValue)
         newVal = newVal.slice(-maxSelected)
       }
     }
-
     let proceed = true
     if (onChange) {
       if (!mode || mode === 'default') {
@@ -483,6 +492,7 @@ class AntdSelect extends React.PureComponent {
       options,
       allValue,
       allLabel,
+      allValueOption,
       disableAll,
       classes,
       defaultValue,
@@ -511,7 +521,7 @@ class AntdSelect extends React.PureComponent {
               'tags',
             ].includes(restProps.mode) && !disableAll
               ? [
-                  {
+                  allValueOption || {
                     [valueField]: allValue,
                     [labelField]: allLabel,
                   },
@@ -519,7 +529,7 @@ class AntdSelect extends React.PureComponent {
               : []),
             ...options,
           ]
-
+    // console.log({ source })
     const cfg = {
       value: this.state.value,
     }

@@ -167,6 +167,7 @@ class Queue extends React.Component {
     this.setState({
       showPatientSearch: override === undefined ? !showPatientSearch : override,
     })
+
     this.props.history.push(
       getRemovedUrl([
         'v',
@@ -191,7 +192,7 @@ class Queue extends React.Component {
         openConfirm: true,
         openConfirmTitle: '',
         openConfirmContent: `Are you sure to end current session (${sessionNo})`,
-        onOpenConfirm: this.onConfirmEndSession,
+        onConfirmDiscard: this.onConfirmEndSession,
       },
     })
   }

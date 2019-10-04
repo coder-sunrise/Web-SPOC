@@ -842,7 +842,7 @@ const _fetchAndSaveCodeTable = async (
         { ...params, ...criteriaForTenantCodes },
         convertExcludeFields,
       )
-
+  // console.log(`fetch code: ${code}`)
   const response = await request(`${url}${code}`, {
     method: 'GET',
     body,
@@ -905,8 +905,9 @@ export const getCodes = async (payload) => {
     await db.open()
     const ct = await db.codetable.get(ctcode)
 
-    const cookies = new Cookies()
-    const lastLoginDate = cookies.get('_lastLogin')
+    // const cookies = new Cookies()
+    // const lastLoginDate = cookies.get('_lastLogin')
+    const lastLoginDate = localStorage.getItem('_lastLogin')
     const parsedLastLoginDate = moment(lastLoginDate)
 
     /* not exist in current table, make network call to retrieve data */
@@ -921,7 +922,11 @@ export const getCodes = async (payload) => {
       const { updateDate, data: existedData } = ct
       const parsedUpdateDate =
         updateDate === null ? moment('2001-01-01') : moment(updateDate)
-
+      // console.log('should update', {
+      //   ctcode,
+      //   updateDate: parsedUpdateDate.format(),
+      //   lastLogin: parsedLastLoginDate.format(),
+      // })
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
         ? _fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData

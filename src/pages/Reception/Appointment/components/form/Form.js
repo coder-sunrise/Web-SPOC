@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import moment from 'moment'
 import classnames from 'classnames'
 // formik
-import { FastField } from 'formik'
+import { Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
@@ -50,6 +50,7 @@ import styles from './style'
     patientProfileDefaultValue: patient.default,
     user: user.data,
     events: calendar.list,
+    conflicts: calendar.conflicts,
     viewingAppointment: calendar.currentViewAppointment,
     isEditedAsSingleAppointment: calendar.isEditedAsSingleAppointment,
     mode: calendar.mode,
@@ -261,7 +262,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
-    const { appointmentStatuses, values, onClose, user, dispatch } = this.props
+    const { values, onClose, user, dispatch } = this.props
     const noShowStatus = APPOINTMENT_STATUS.NOSHOW
     const cancelStatus = APPOINTMENT_STATUS.CANCELLED
 
@@ -444,7 +445,7 @@ class Form extends React.PureComponent {
           payload: {
             openConfirm: true,
             openConfirmContent: `Are you sure want to delete this draft appointment?`,
-            onOpenConfirm: () => this.deleteDraft(currentAppointment.id),
+            onConfirmDiscard: () => this.deleteDraft(currentAppointment.id),
           },
         })
       } else {
@@ -456,7 +457,7 @@ class Form extends React.PureComponent {
   }
 
   onSaveDraftClick = () => {
-    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
+    const { values, mode, viewingAppointment } = this.props
     const appointmentStatusFK = APPOINTMENT_STATUS.DRAFT
 
     const hasModifiedAsSingle = viewingAppointment.appointments.reduce(
@@ -482,7 +483,7 @@ class Form extends React.PureComponent {
   }
 
   onConfirmClick = () => {
-    const { appointmentStatuses, values, mode, viewingAppointment } = this.props
+    const { values, mode, viewingAppointment } = this.props
 
     try {
       let newAppointmentStatusFK = APPOINTMENT_STATUS.SCHEDULED
@@ -628,7 +629,7 @@ class Form extends React.PureComponent {
       values,
       isSubmitting,
       mode,
-      resetForm,
+      conflicts,
     } = this.props
 
     const {
@@ -638,20 +639,36 @@ class Form extends React.PureComponent {
       showSeriesUpdateConfirmation,
       showRescheduleForm,
       datagrid,
-      isDataGridValid,
     } = this.state
 
     const { currentAppointment = {} } = values
     const shouldDisable = this.checkShouldDisable()
-
+    // console.log({ shouldDisable })
     // console.log({ datagrid })
     // console.log({
     //   initialValues: this.props.initialValues,
     //   values: this.props.values,
     //   dirty: this.props.dirty,
     // })
-    console.log('props', this.props.patientProfile)
-
+    const _datagrid =
+      conflicts.length > 0
+        ? datagrid.reduce(
+            (data, d) => [
+              ...data,
+              {
+                ...d,
+                conflicts:
+                  conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                    ? conflicts[d.sortOrder].conflicts
+                    : [],
+              },
+            ],
+            [],
+          )
+        : [
+            ...datagrid,
+          ]
+    console.log({ _datagrid })
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
       <LoadingWrapper loading={show} text='Loading...'>
@@ -674,7 +691,7 @@ class Form extends React.PureComponent {
                 <AppointmentDateInput />
               </GridItem>
               <GridItem xs md={6} className={classnames(classes.remarksField)}>
-                <FastField
+                <Field
                   name='currentAppointment.appointmentRemarks'
                   render={(args) => (
                     <OutlinedTextField
@@ -693,7 +710,7 @@ class Form extends React.PureComponent {
                 <AppointmentDataGrid
                   disabled={shouldDisable}
                   appointmentDate={currentAppointment.appointmentDate}
-                  data={datagrid}
+                  data={_datagrid}
                   handleCommitChanges={this.onCommitChanges}
                   handleEditingRowsChange={this.onEditingRowsChange}
                 />

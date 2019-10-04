@@ -66,6 +66,7 @@ export default createListViewModel({
     service,
     state: {
       list: [],
+      conflicts: [],
       calendarEvents: [],
       currentViewDate: new Date(),
       currentViewAppointment: {
@@ -293,18 +294,28 @@ export default createListViewModel({
               },
             }
           }
-          console.log({ savePayload })
-          return yield put({
-            type: actionKey,
-            payload: savePayload,
-          })
+          console.log({ savePayload, json: JSON.stringify(savePayload) })
+          // return yield put({
+          //   type: actionKey,
+          //   payload: savePayload,
+          // })
         } catch (error) {
           console.log({ error })
         }
         return false
       },
-      *validate ({ payload }, { call }) {
-        return yield call(service.validate, payload)
+      *validate ({ payload }, { call, put }) {
+        const result = yield call(service.validate, payload)
+        const { status, data } = result
+
+        if (parseInt(status, 10) === 200) {
+          yield put({
+            type: 'saveConflict',
+            payload: {
+              conflicts: data.resourceConflict,
+            },
+          })
+        }
       },
       *refresh (_, { put }) {
         yield put({ type: 'navigateCalendar', payload: {} })
@@ -313,6 +324,7 @@ export default createListViewModel({
         const result = yield call(service.query, payload)
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
+          console.log({ data: JSON.stringify(data) })
           yield put({
             type: 'setViewAppointment',
             data,
@@ -494,6 +506,9 @@ export default createListViewModel({
       },
     },
     reducers: {
+      saveConflict (state, { payload }) {
+        return { ...state, conflicts: payload.conflicts }
+      },
       cachePayload (state, { payload }) {
         return { ...state, cachedPayload: payload }
       },

@@ -1,7 +1,12 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 // import * as service from '../services'
-import { getUniqueId, maxReducer, sumReducer } from '@/utils/utils'
+import {
+  getUniqueId,
+  maxReducer,
+  sumReducer,
+  calculateAmount,
+} from '@/utils/utils'
 
 const sharedMedicationValue = {
   quantity: 1,
@@ -163,36 +168,11 @@ export default createListViewModel({
 
       calculateAmount (state, { payload }) {
         let { finalAdjustments, rows } = state
-
-        const total = rows
-          .map((o) => o.totalAfterItemAdjustment)
-          .reduce(sumReducer, 0)
-        rows.forEach((r) => {
-          r.weightage = r.totalAfterItemAdjustment / total
-          r.totalAfterOverallAdjustment = r.totalAfterItemAdjustment
-          // console.log(r)
-        })
-        finalAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
-          rows.forEach((r) => {
-            // console.log(r.weightage * fa.adjAmount, r)
-            r.totalAfterOverallAdjustment += r.weightage * fa.adjAmount
-          })
-        })
-
-        const totalAfterAdj = rows
-          .map((o) => o.totalAfterOverallAdjustment)
-          .reduce(sumReducer, 0)
-        const gst = totalAfterAdj * 0.07
-        // console.log(totalAfterAdj, gst)
-
+        const amount = calculateAmount(rows, finalAdjustments)
+        console.log(amount)
         return {
           ...state,
-          rows,
-          summary: {
-            gst,
-            total: totalAfterAdj,
-            totalWithGST: gst + totalAfterAdj,
-          },
+          ...amount,
         }
       },
 

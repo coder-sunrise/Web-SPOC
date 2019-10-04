@@ -147,7 +147,6 @@ class CommonModal extends React.PureComponent {
               Reset
             </Button>
           )}
-
           <Button
             onClick={this.onClose}
             color='danger'
@@ -393,6 +392,7 @@ class CommonModal extends React.PureComponent {
                   Cancel
                 </Button>
                 <Button
+                  color='primary'
                   onClick={() => {
                     this.setState({
                       openConfirm: false,
@@ -407,7 +407,6 @@ class CommonModal extends React.PureComponent {
                 >
                   Discard changes
                 </Button>
-                <Button color='primary'>Save Changes</Button>
               </React.Fragment>
             </SizeContainer>
           </DialogActions>

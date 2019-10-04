@@ -4,9 +4,11 @@ import * as Yup from 'yup'
 import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
+import Info from '@material-ui/icons/Info'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
 import { AppointmentTypeLabel } from '@/components/_medisys'
+import ErrorPopover from './ErrorPopover'
 import { AppointmentTypeOptions, reduceToColorClass } from '../../setting'
 import {
   AppointmentDataColExtensions,
@@ -23,6 +25,15 @@ const validationSchema = Yup.object().shape({
 
 const styles = () => ({
   ...AppointmentTypeOptions.reduce(reduceToColorClass, {}),
+  container: {
+    position: 'relative',
+  },
+  errorIcon: {
+    position: 'absolute',
+    top: 10,
+    left: 22,
+    zIndex: 100,
+  },
   selectContainer: {
     width: '100%',
   },
@@ -152,13 +163,14 @@ class AppointmentDataGrid extends React.Component {
 
   render () {
     const {
+      classes,
       data,
       handleCommitChanges,
       disabled,
       handleEditingRowsChange,
     } = this.props
     return (
-      <div>
+      <div className={classes.container}>
         <EditableTableGrid
           disabled={disabled}
           rows={data}

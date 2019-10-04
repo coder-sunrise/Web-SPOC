@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import { routerRedux } from 'dva/router'
 import { stringify } from 'qs'
@@ -77,10 +78,12 @@ export default createFormViewModel({
           } = payload
           setAuthority(currentAuthority)
           localStorage.setItem('token', accessToken)
-          const cookies = new Cookies()
-          cookies.set('_lastLogin', new Date(), {
-            expires: new Date(9999, 11, 31),
-          })
+          localStorage.setItem('_lastLogin', moment().toDate())
+          // const cookies = new Cookies()
+          // console.log('set last login cookie')
+          // cookies.set('_lastLogin', moment().toDate(), {
+          //   expires: new Date(9999, 11, 31),
+          // })
         }
         reloadAuthorized()
         return { ...state, isInvalidLogin }

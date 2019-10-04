@@ -250,18 +250,17 @@ const Grid = ({
         openConfirm: true,
         openConfirmTitle: '',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
-        onOpenConfirm: () => deleteQueue(id),
+        onConfirmDiscard: () => deleteQueue(id),
       },
     })
   }
 
   const isAssignedDoctor = (row) => {
-    console.log({ row })
     const {
       doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
     } = row
     const { clinicianProfile: { doctorProfile } } = user
-    console.log({ user })
+
     if (!doctorProfile) {
       notification.error({
         message: 'Unauthorized Access',
@@ -402,12 +401,13 @@ const Grid = ({
         }
         break
       }
-      case '8':
+      case '8': {
         handleActualizeAppointment({
           patientID: row.patientProfileFk,
           appointmentID: row.id,
         })
         break
+      }
       case '9':
         onRegisterPatientClick()
         break
