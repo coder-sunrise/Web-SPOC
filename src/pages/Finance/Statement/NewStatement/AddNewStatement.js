@@ -41,7 +41,7 @@ const styles = () => ({
   statement,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ statement }) => statement,
+  mapPropsToValues: ({ statement }) => statement.entity || statement.default,
 
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
