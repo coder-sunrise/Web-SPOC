@@ -1,9 +1,11 @@
 import React from 'react'
+import * as Yup from 'yup'
 import classnames from 'classnames'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
+import Refresh from '@material-ui/icons/Refresh'
 // common components
 import {
   Button,
@@ -48,7 +50,7 @@ const styles = (theme) => ({
   },
 })
 
-const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
+const ResetPassForm = ({ classes, loading, handleSubmit, onCancelClick }) => {
   const headerClass = classnames({
     [classes.textCenter]: true,
     [classes.cardTitle]: true,
@@ -71,7 +73,7 @@ const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
           <GridItem md={12}>
             <FastField
               name='userName'
-              render={(args) => <TextField {...args} label='User Name' />}
+              render={(args) => <TextField {...args} label='Username' />}
             />
           </GridItem>
           <GridItem md={12}>
@@ -84,8 +86,9 @@ const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
             <Button color='danger' onClick={onCancelClick}>
               Cancel
             </Button>
-            <Button color='primary' onClick={handleSubmit}>
-              Get Validation Code
+            <Button color='primary' onClick={handleSubmit} disabled={loading}>
+              {loading && <Refresh className='spin-custom' />}
+              Get OTP
             </Button>
           </GridItem>
         </GridContainer>
@@ -99,7 +102,14 @@ const StyledResetPassForm = withStyles(styles, { name: 'ResetPassForm' })(
 )
 
 export default withFormik({
-  mapPropsToValues: () => ({}),
+  validationSchema: Yup.object().shape({
+    clinicCode: Yup.string().required('Cinic Code is a required field'),
+    userName: Yup.string().required('Username is a required field'),
+    phoneNumber: Yup.number().required('Mobile Number is a required field'),
+  }),
+  mapPropsToValues: ({ payload }) => ({
+    ...payload,
+  }),
   handleSubmit: (values, { props }) => {
     const { onResetClick } = props
     onResetClick(values)

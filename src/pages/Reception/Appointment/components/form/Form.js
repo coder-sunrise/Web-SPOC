@@ -311,6 +311,7 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
+    console.log({ rows, deleted })
     if (rows) {
       this.setState(
         {
@@ -321,9 +322,17 @@ class Form extends React.PureComponent {
     }
     if (deleted) {
       const { datagrid } = this.state
+      const newDatagrid = datagrid.filter(
+        (event) => !deleted.includes(event.id),
+      )
       this.setState(
         {
-          datagrid: datagrid.filter((event) => !deleted.includes(event.id)),
+          datagrid:
+            newDatagrid.length === 1
+              ? [
+                  { ...newDatagrid[0], isPrimaryClinician: true },
+                ]
+              : newDatagrid,
         },
         this.validateDataGrid,
       )
@@ -354,8 +363,7 @@ class Form extends React.PureComponent {
             {
               ...datagrid[0],
               isPrimaryClinician:
-                datagrid[0].isPrimaryClinician === undefined ||
-                !datagrid[0].isPrimaryClinician
+                datagrid[0].isPrimaryClinician === undefined
                   ? true
                   : datagrid[0].isPrimaryClinician,
             },
@@ -677,7 +685,7 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
-    console.log({ _datagrid })
+    // console.log({ _datagrid })
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
       <LoadingWrapper loading={show} text='Loading...'>

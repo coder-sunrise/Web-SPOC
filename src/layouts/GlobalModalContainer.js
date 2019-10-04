@@ -68,6 +68,17 @@ class GlobalModalContainer extends PureComponent {
     })
   }
 
+  closeVisitRegistration = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'visitRegistration/closeModal',
+    })
+    dispatch({
+      type: 'patient/updateState',
+      payload: { entity: null },
+    })
+  }
+
   render () {
     const { global, dispatch, loggedInUserID, history, classes } = this.props
     return (
@@ -225,16 +236,8 @@ class GlobalModalContainer extends PureComponent {
           open={global.showVisitRegistration}
           title='Visit Registration'
           overrideLoading
-          onClose={() => {
-            dispatch({
-              type: 'visitRegistration/closeModal',
-            })
-          }}
-          onConfirm={() => {
-            dispatch({
-              type: 'visitRegistration/closeModal',
-            })
-          }}
+          onClose={this.closeVisitRegistration}
+          onConfirm={this.closeVisitRegistration}
           maxWidth='lg'
           observe='VisitRegistration'
         >
@@ -263,7 +266,7 @@ class GlobalModalContainer extends PureComponent {
                   }
                 }}
               >
-                Discard changes
+                {global.onConfirmText || 'Discard changes'}
               </Button>
             ) : null,
             onConfirm: global.onConfirmSave
