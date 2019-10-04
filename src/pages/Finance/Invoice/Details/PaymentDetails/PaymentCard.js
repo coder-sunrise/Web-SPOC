@@ -1,9 +1,16 @@
 import React from 'react'
+import _ from 'lodash'
+import moment from 'moment'
 // material ui
 import { IconButton, withStyles } from '@material-ui/core'
 import Printer from '@material-ui/icons/Print'
 // common components
-import { CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  CardContainer,
+  GridContainer,
+  GridItem,
+  CodeSelect,
+} from '@/components'
 // sub component
 import PaymentRow from './PaymentRow'
 import PaymentActions from './PaymentActions'
@@ -25,26 +32,37 @@ const DefaultPaymentInfo = {
 const payerTypeToString = {
   [PayerType.PATIENT]: 'Patient',
   [PayerType.COPAYER]: 'Co-Payer',
-  [PayerType.GOVT_COPAYER]: 'Co-Payer',
+  // [PayerType.GOVT_COPAYER]: 'Co-Payer',
 }
 
 const PaymentCard = ({
   classes,
-  payerID = 'N/A',
-  payerName = 'N/A',
+  // payerID = 'N/A',
+  // payerName = 'N/A',
+  patientName = 'N/A',
   payerType = PayerType.PATIENT,
-  payments = [
-    // { ...DefaultPaymentInfo },
-  ],
+  payments = [],
   totalPaid,
   outstanding,
+  invoicePayerFK,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
   return (
     <CardContainer hideHeader>
       <p className={classes.title}>
-        {`${payerTypeToString[payerType]} (${payerName})`}
+        {payerTypeToString[payerType]} (
+        {payerType !== 1 ? (
+          <CodeSelect
+            className={classes.title}
+            text
+            code='LTInvoicePayerType'
+            value={payerType}
+          />
+        ) : (
+          patientName
+        )})
       </p>
+
       <CardContainer hideHeader size='sm'>
         {/* <IconButton
           id={payerID}
@@ -53,13 +71,28 @@ const PaymentCard = ({
         >
           <Printer />
         </IconButton> */}
-        {payments.map((payment) => (
+
+        {/* {payments.map((payment) => (
           <PaymentRow {...payment} handleVoidClick={handleVoidClick} />
-        ))}
+        ))} */}
+
+        {payments ? (
+          payments
+            .sort((a, b) => moment(a.date) - moment(b.date))
+            .map((payment) => (
+              <PaymentRow {...payment} handleVoidClick={handleVoidClick} />
+            ))
+        ) : (
+          ''
+        )}
       </CardContainer>
       <GridContainer alignItems='center'>
         <GridItem md={7}>
-          <PaymentActions type={payerType} {...buttonActions} />
+          <PaymentActions
+            type={payerType}
+            invoicePayerFK={invoicePayerFK}
+            {...buttonActions}
+          />
         </GridItem>
         <GridItem
           md={5}

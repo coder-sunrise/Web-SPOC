@@ -8,16 +8,13 @@ import { Skeleton } from 'antd'
 import { withStyles, Divider } from '@material-ui/core'
 // common components
 import Refresh from '@material-ui/icons/Sync'
-import { SchemePopover, CHASCardReplacement } from 'medisys-components'
-import More from '@material-ui/icons/MoreHoriz'
+import { SchemePopover } from 'medisys-components'
 import {
   NumberInput,
   CodeSelect,
   dateFormatLong,
   DatePicker,
   IconButton,
-  Popover,
-  CommonModal,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // assets
