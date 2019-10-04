@@ -127,6 +127,8 @@ export default createListViewModel({
             appointments: formikAppointments,
             recurrenceDto,
             overwriteEntireSeries,
+            rescheduleReason,
+            rescheduledByFK,
             ...restFormikValues
           } = formikValues
 
@@ -153,6 +155,8 @@ export default createListViewModel({
               : calendarState.mode === 'single',
             appointmentStatusFk: newAppointmentStatusFK,
             appointments_Resources: appointmentResources,
+            rescheduleReason,
+            rescheduledByFK,
           }
 
           console.log({ formikCurrentAppointment, currentAppointment })
@@ -203,6 +207,8 @@ export default createListViewModel({
                   ...updated,
                   {
                     ...appt,
+                    rescheduleReason,
+                    rescheduledByFK,
                     appointmentStatusFk: newAppointmentStatusFK,
                     appointmentRemarks: currentAppointment.appointmentRemarks,
                     appointments_Resources: [
@@ -231,6 +237,8 @@ export default createListViewModel({
                 ...updated,
                 {
                   ...appt,
+                  rescheduleReason,
+                  rescheduledByFK,
                   appointmentStatusFk: newAppointmentStatusFK,
                   appointmentRemarks: currentAppointment.appointmentRemarks,
                   appointments_Resources: [
@@ -294,7 +302,7 @@ export default createListViewModel({
               },
             }
           }
-          console.log({ savePayload, json: JSON.stringify(savePayload) })
+          console.log({ savePayload })
           return yield put({
             type: actionKey,
             payload: savePayload,

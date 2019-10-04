@@ -6,3 +6,8 @@ export const APPOINTMENT_STATUS = {
   RESCHEDULED: 5,
   NOSHOW: 6,
 }
+
+export const RESCHEDULE_BY = {
+  BYCLINIC: 1,
+  BYPATIENT: 2,
+}
