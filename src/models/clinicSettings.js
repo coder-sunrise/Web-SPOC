@@ -31,8 +31,7 @@ export default createFormViewModel({
           switch (p.dataType) {
             case 'Boolean': {
               const booleanValue = value === 'true'
-              settings[key] = value
-              sessionStorage.setItem(key, booleanValue)
+              settings[key] = booleanValue
               break
             }
             case 'Decimal': {
@@ -40,18 +39,18 @@ export default createFormViewModel({
               const decimalIntValue = parseInt(value * 100, 10)
               settings[key] = decimalValue
               settings[`${key}Int`] = decimalIntValue
-              sessionStorage.setItem(key, decimalValue)
-              sessionStorage.setItem(`${key}Int`, decimalIntValue)
               break
             }
             default: {
               settings[key] = value
-              sessionStorage.setItem(key, value)
             }
           }
 
           settings.concurrencyToken = p.concurrencyToken
         })
+
+        const clinicSettingsSessionData = JSON.stringify(settings)
+        sessionStorage.setItem('clinicSettings', clinicSettingsSessionData)
         return {
           settings,
           entity,
