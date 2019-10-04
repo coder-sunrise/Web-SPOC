@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import * as Yup from 'yup'
 import classnames from 'classnames'
 // formik
 import { withFormik, FastField } from 'formik'
@@ -71,7 +72,7 @@ const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
           <GridItem md={12}>
             <FastField
               name='userName'
-              render={(args) => <TextField {...args} label='User Name' />}
+              render={(args) => <TextField {...args} label='Username' />}
             />
           </GridItem>
           <GridItem md={12}>
@@ -99,10 +100,13 @@ const StyledResetPassForm = withStyles(styles, { name: 'ResetPassForm' })(
 )
 
 export default withFormik({
-  mapPropsToValues: () => ({
-    clinicCode: '123456789',
-    userName: 'testuser888',
-    phoneNumber: '6583895960',
+  validationSchema: Yup.object().shape({
+    clinicCode: Yup.string().required('Cinic Code is a required field'),
+    userName: Yup.string().required('Username is a required field'),
+    phoneNumber: Yup.number().required('Mobile Number is a required field'),
+  }),
+  mapPropsToValues: ({ payload }) => ({
+    ...payload,
   }),
   handleSubmit: (values, { props }) => {
     const { onResetClick } = props

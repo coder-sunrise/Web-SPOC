@@ -78,7 +78,7 @@ class ForgotPassword extends React.Component {
 
   render () {
     const { classes } = this.props
-    const { step } = this.state
+    const { firstStepPayload, step } = this.state
 
     return (
       <div className={classes.container}>
@@ -86,6 +86,7 @@ class ForgotPassword extends React.Component {
           <GridItem md={5}>
             {step === 1 && (
               <ResetPassForm
+                payload={firstStepPayload}
                 onCancelClick={this.handleCancelClick}
                 onResetClick={this.handleResetClick}
               />

@@ -118,9 +118,10 @@ const NewPasswordForm = ({
               render={(args) => (
                 <TextField
                   {...args}
-                  type='password'
-                  label='New Password'
                   inputProps={{ autoComplete: 'new-password' }}
+                  autoComplete='new-password'
+                  label='New Password'
+                  type='password'
                 />
               )}
             />
@@ -131,9 +132,10 @@ const NewPasswordForm = ({
               render={(args) => (
                 <TextField
                   {...args}
-                  type='password'
-                  label='Re-enter New Password'
                   inputProps={{ autoComplete: 'new-password' }}
+                  autoComplete='new-password'
+                  label='Re-enter New Password'
+                  type='password'
                 />
               )}
             />
