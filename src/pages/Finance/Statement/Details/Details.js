@@ -3,10 +3,8 @@ import { connect } from 'dva'
 import moment from 'moment'
 import { FastField } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Refresh, Print, Payment } from '@material-ui/icons'
+import { Refresh, Print, Payment, Delete } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
-import { Delete } from '@material-ui/icons'
-
 import {
   Button,
   GridContainer,
@@ -17,6 +15,7 @@ import {
   NavPills,
   dateFormatLong,
   timeFormatWithoutSecond,
+  withFormikExtend,
 } from '@/components'
 import CollectPayment from './CollectPayment'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
@@ -35,9 +34,6 @@ const styles = () => ({
   },
 })
 
-@connect(({ statementDetails }) => ({
-  statementDetails,
-}))
 class Details extends PureComponent {
   state = {
     showModal: false,
@@ -51,8 +47,8 @@ class Details extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'adminCharge', title: 'Admin Charge' },
       { name: 'payableAmount', title: 'Payable Amount' },
-      { name: 'outstandingBalance', title: 'Outstanding' },
-      { name: 'remarks', title: 'Remarks' },
+      { name: 'outstandingAmount', title: 'Outstanding' },
+      { name: 'remark', title: 'Remarks' },
       { name: 'action', title: 'Action' },
     ],
 
@@ -68,7 +64,7 @@ class Details extends PureComponent {
         currency: true,
       },
       {
-        columnName: 'outstandingBalance',
+        columnName: 'outstandingAmount',
         type: 'number',
         currency: true,
       },
@@ -96,164 +92,164 @@ class Details extends PureComponent {
         },
       },
     ],
-    editingRowIds: [],
-    rowChanges: {},
-    rows: [
-      {
-        id: 'PT-000001A',
-        invoiceNo: 'IV-000001',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000002A',
-        invoiceNo: 'IV-000002',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000003A',
-        invoiceNo: 'IV-000003',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000004A',
-        invoiceNo: 'IV-000004',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000005A',
-        invoiceNo: 'IV-000005A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000006A',
-        invoiceNo: 'IV-000006A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000007A',
-        invoiceNo: 'IV-000007A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000008A',
-        invoiceNo: 'IV-000008A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000009A',
-        invoiceNo: 'IV-000009A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000010A',
-        invoiceNo: 'PT-000010A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000011A',
-        invoiceNo: 'IV-000011A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000012A',
-        invoiceNo: 'IV-000012A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000013A',
-        invoiceNo: 'IV-000013A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-      {
-        id: 'PT-000014A',
-        invoiceNo: 'IV-000014A',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 10,
-        payableAmount: 100,
-        outstandingBalance: 100,
-      },
-    ],
+    // editingRowIds: [],
+    // rowChanges: {},
+    // rows: [
+    //   {
+    //     id: 'PT-000001A',
+    //     invoiceNo: 'IV-000001',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000002A',
+    //     invoiceNo: 'IV-000002',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000003A',
+    //     invoiceNo: 'IV-000003',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000004A',
+    //     invoiceNo: 'IV-000004',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000005A',
+    //     invoiceNo: 'IV-000005A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000006A',
+    //     invoiceNo: 'IV-000006A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000007A',
+    //     invoiceNo: 'IV-000007A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000008A',
+    //     invoiceNo: 'IV-000008A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000009A',
+    //     invoiceNo: 'IV-000009A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000010A',
+    //     invoiceNo: 'PT-000010A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000011A',
+    //     invoiceNo: 'IV-000011A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000012A',
+    //     invoiceNo: 'IV-000012A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000013A',
+    //     invoiceNo: 'IV-000013A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    //   {
+    //     id: 'PT-000014A',
+    //     invoiceNo: 'IV-000014A',
+    //     invoiceDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     patientName: 'Patient 01',
+    //     adminCharge: 10,
+    //     payableAmount: 100,
+    //     outstandingBalance: 100,
+    //   },
+    // ],
     FuncProps: { selectable: true },
 
     showCollectPayment: false,
@@ -287,7 +283,6 @@ class Details extends PureComponent {
   }
 
   render () {
-    console.log('state', this.state)
     const {
       rows,
       columns,
@@ -299,8 +294,13 @@ class Details extends PureComponent {
     } = this.state
 
     // const FuncProps = { pager: false }
-    const { classes, history } = this.props
-    console.log('asd', this.props)
+    const { classes, history, statement } = this.props
+
+    console.log(
+      'dettailStatement',
+      statement,
+      statement.entity.statementInvoice,
+    )
     return (
       <div>
         <GridContainer classes={{ grid: classes.gridContainer }}>
@@ -318,41 +318,9 @@ class Details extends PureComponent {
           </GridContainer>
         </GridContainer>
 
-        {/* <NavPills
-          color='info'
-          onChange={(event, active) => {
-            history.push(
-              getAppendUrl({
-                t: active,
-              }),
-            )
-          }}
-          // index={currentTab}
-          contentStyle={{}}
-          tabs={[
-            {
-              tabButton: 'Statement Details',
-              tabContent: <p />, //<DetailPanel {...detailProps} />,
-            },
-            {
-              tabButton: 'Payment Details',
-              tabContent: <p />, //<Setting {...detailProps} />,
-            },
-          ]}
-        /> */}
-        {/*
-          <EditableTableGrid
-            rows={rows}
-            columns={columns}
-            height={300}
-            currencyColumns={currencyColumns}
-            dateColumns={dateColumns}
-            FuncProps={FuncProps}
-          />
-        */}
         <CommonTableGrid
           // height={300}
-          rows={rows}
+          rows={statement.entity.statementInvoice}
           columns={columns}
           columnExtensions={columnExtensions}
           FuncProps={FuncProps}

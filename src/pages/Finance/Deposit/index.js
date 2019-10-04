@@ -25,7 +25,7 @@ class Deposit extends PureComponent {
       type: 'deposit/query',
       payload: {
         apiCriteria: {
-          onlyWithDeposit: false,
+          OnlyWithDeposit: false,
         },
       },
     })
