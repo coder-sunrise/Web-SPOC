@@ -205,7 +205,7 @@ class Queue extends React.Component {
         openConfirm: true,
         openConfirmTitle: '',
         openConfirmContent: `Are you sure to end current session (${sessionNo})`,
-        onConfirmDiscard: this.onConfirmEndSession,
+        onConfirmSave: this.onConfirmEndSession,
       },
     })
   }

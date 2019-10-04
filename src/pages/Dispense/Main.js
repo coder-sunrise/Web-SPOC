@@ -35,7 +35,6 @@ import Yup from '@/utils/yup'
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, codetable, visitRegistration } = props
     const vid = visitRegistration.entity.visit.id
-    console.log(values)
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -44,10 +43,7 @@ import Yup from '@/utils/yup'
       },
     }).then((o) => {
       if (o) {
-        dispatch({
-          type: `dispense/refresh`,
-          payload: vid,
-        })
+        this.refresh()
       }
     })
   },
@@ -100,11 +96,17 @@ class Main extends Component {
   }
 
   refresh = () => {
-    const { dispatch, dispense, visitRegistration } = this.props
+    const { dispatch, dispense, visitRegistration, resetForm } = this.props
 
     dispatch({
       type: `dispense/refresh`,
       payload: visitRegistration.entity.visit.id,
+    }).then((o) => {
+      resetForm(o)
+      dispatch({
+        type: `formik/clean`,
+        payload: 'DispensePage',
+      })
     })
   }
 

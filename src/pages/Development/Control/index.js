@@ -194,7 +194,7 @@ class ControlTest extends PureComponent {
   render () {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
-    console.log(this.props)
+    // console.log(this.props)
     const testConfig = {
       onFocus: (e) => {
         console.log(1)
@@ -513,7 +513,20 @@ class ControlTest extends PureComponent {
         }}
         title={this.title}
       >
-        <AmountSummary />
+        <GridContainer>
+          <GridItem xs={0} md={8} />
+          <GridItem xs={12} md={4}>
+            <AmountSummary
+              rows={[
+                {
+                  id: 1,
+                  totalAfterItemAdjustment: 100,
+                },
+              ]}
+            />
+          </GridItem>
+        </GridContainer>
+
         <SizeContainer size='lg'>{testComponents}</SizeContainer>
         {testComponents}
         <SizeContainer size='sm'>{testComponents}</SizeContainer>

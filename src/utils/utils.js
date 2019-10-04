@@ -686,6 +686,7 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
           id: 'app.general.leave-without-save',
         }),
         onConfirmSave: saveCb,
+        openConfirmText: 'Save Changes',
         onConfirmDiscard: () => {
           if (displayName) {
             window.g_app._store.dispatch({
@@ -846,7 +847,7 @@ const getRefreshChasBalanceStatus = (status = []) => {
 
 const calculateAmount = (
   rows,
-  finalAdjustments,
+  adjustments,
   {
     totalField = 'totalAfterItemAdjustment',
     adjustedField = 'totalAfterOverallAdjustment',
@@ -858,7 +859,7 @@ const calculateAmount = (
     r[adjustedField] = r[totalField]
     // console.log(r)
   })
-  finalAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+  adjustments.filter((o) => !o.isDeleted).forEach((fa) => {
     rows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
       r[adjustedField] += r.weightage * fa.adjAmount
@@ -876,10 +877,9 @@ const calculateAmount = (
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
   const gst = isEnableGST ? totalAfterAdj * gSTPercentage : 0
   // console.log(totalAfterAdj, gst)
-
-  // eslint-disable-next-line consistent-return
-  return {
+  const r = {
     rows,
+    adjustments,
     summary: {
       gst,
       total: totalAfterAdj,
@@ -888,6 +888,9 @@ const calculateAmount = (
       gSTPercentage,
     },
   }
+  // console.log(r)
+  // eslint-disable-next-line consistent-return
+  return r
 }
 
 module.exports = {

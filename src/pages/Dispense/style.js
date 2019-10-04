@@ -16,6 +16,9 @@ const DispenseIndexStyle = (theme) => ({
     position: 'absolute',
     top: 3,
   },
+  summaryPanel: {
+    marginTop: theme.spacing(2),
+  },
 })
 
 export default DispenseIndexStyle

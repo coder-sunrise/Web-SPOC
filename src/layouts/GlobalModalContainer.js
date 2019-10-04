@@ -86,7 +86,10 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showDispensePanel}
           title='Dispensing'
-          observe='Dispense'
+          observe={[
+            'DispensePage',
+            'ConsultationDocumentList',
+          ]}
           authority='dispense'
           bodyNoPadding
           onClose={(e) => {
@@ -243,9 +246,9 @@ class GlobalModalContainer extends PureComponent {
           title={global.openConfirmTitle}
           cancelText='Cancel'
           maxWidth='sm'
-          confirmText='Save changes'
+          confirmText={global.openConfirmText || 'Confirm'}
           footProps={{
-            extraButtons: (
+            extraButtons: global.onConfirmDiscard ? (
               <Button
                 color='primary'
                 onClick={() => {
@@ -262,7 +265,7 @@ class GlobalModalContainer extends PureComponent {
               >
                 Discard changes
               </Button>
-            ),
+            ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
                   dispatch({

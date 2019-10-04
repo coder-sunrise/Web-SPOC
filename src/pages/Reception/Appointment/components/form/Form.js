@@ -454,7 +454,7 @@ class Form extends React.PureComponent {
           payload: {
             openConfirm: true,
             openConfirmContent: `Are you sure want to delete this draft appointment?`,
-            onConfirmDiscard: () => this.deleteDraft(currentAppointment.id),
+            onConfirmSave: () => this.deleteDraft(currentAppointment.id),
           },
         })
       } else {

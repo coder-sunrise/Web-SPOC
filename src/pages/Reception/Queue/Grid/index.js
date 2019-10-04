@@ -250,7 +250,7 @@ const Grid = ({
         openConfirm: true,
         openConfirmTitle: '',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
-        onConfirmDiscard: () => deleteQueue(id),
+        onConfirmSave: () => deleteQueue(id),
       },
     })
   }
