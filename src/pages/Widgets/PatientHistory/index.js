@@ -291,6 +291,7 @@ class PatientHistory extends Component {
           return (
             <React.Fragment>
               <ListItem
+                style={{ paddingLeft: 15 }}
                 alignItems='flex-start'
                 classes={{
                   root: this.props.classes.listItemRoot,
@@ -300,7 +301,6 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  console.log('----', o.id)
                   this.props
                     .dispatch({
                       type: 'patientHistory/queryOne',
@@ -347,7 +347,12 @@ class PatientHistory extends Component {
                         </GridItem>
                         <GridItem sm={5} style={{ textAlign: 'right' }}>
                           {row.visitDate && (
-                            <DatePicker text showTime value={o.signOffDate} />
+                            <DatePicker
+                              text
+                              showTime
+                              format='DD MMM YYYY h:mm a'
+                              value={o.signOffDate}
+                            />
                           )}
                         </GridItem>
                       </GridContainer>
@@ -447,7 +452,7 @@ class PatientHistory extends Component {
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
         <GridContainer gutter={0}>
-          <GridItem md={4}>
+          <GridItem md={8}>
             <Select
               simple
               value={this.state.selectedItems}
@@ -493,7 +498,7 @@ class PatientHistory extends Component {
               </ProgressButton>
             )}
           </GridItem>
-          <GridItem>
+          <GridItem sm={2} style={{ textAlign: 'right' }}>
             Updated Date :
             {patientHistory.selectedSubRow.signOffDate && (
               <DatePicker
