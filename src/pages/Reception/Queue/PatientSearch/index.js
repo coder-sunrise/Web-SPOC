@@ -73,11 +73,14 @@ class PatientSearch extends PureComponent {
     loading: Loading,
     render: (loaded) => {
       const Component = loaded.default
+      const { search } = this.props
+      console.log('this.props', this.props)
       return (
         <Component
           renderActionFn={this.Cell}
           simple
           size='sm'
+          search={search}
           disableQueryOnLoad
           overrideTableParas={{
             columns: this.state.columns,
@@ -107,10 +110,14 @@ class PatientSearch extends PureComponent {
     const { loading } = this.props
 
     const { SearchPatient = (f) => f } = this
-    const show = loading.effects['patientSearch/query']
+    const show =
+      loading.effects['patientSearch/query'] || loading.effects['patient/query']
+
+    let text = 'Retrieving patient list...'
+    if (loading.effects['patient/query']) text = 'Loading patient profile...'
     return (
       <React.Fragment>
-        <LoadingWrapper loading={show} text='Retrieving patient list...'>
+        <LoadingWrapper loading={show} text={text}>
           <SearchPatient />
         </LoadingWrapper>
       </React.Fragment>

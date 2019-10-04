@@ -1,4 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
+import humps from 'humps'
 import * as service from '../services/clinicSettings'
 
 export default createFormViewModel({
@@ -22,30 +23,34 @@ export default createFormViewModel({
         const settings = {}
         let entity = {}
         data.forEach((p) => {
-          entity[p.settingKey] = {
+          entity[humps.camelize(p.settingKey)] = {
             ...p,
           }
+          const key = humps.camelize(p.settingKey)
+          const value = p.settingValue
           switch (p.dataType) {
             case 'Boolean': {
-              const value = p.settingValue === 'true'
-              settings[p.settingKey] = value
+              const booleanValue = value === 'true'
+              settings[key] = booleanValue
               break
             }
             case 'Decimal': {
-              settings[p.settingKey] = parseFloat(p.settingValue)
-              settings[`${p.settingKey}Int`] = parseInt(
-                p.settingValue * 100,
-                10,
-              )
+              const decimalValue = parseFloat(value)
+              const decimalIntValue = parseInt(value * 100, 10)
+              settings[key] = decimalValue
+              settings[`${key}Int`] = decimalIntValue
               break
             }
             default: {
-              settings[p.settingKey] = p.settingValue
+              settings[key] = value
             }
           }
 
           settings.concurrencyToken = p.concurrencyToken
         })
+
+        const clinicSettingsSessionData = JSON.stringify(settings)
+        sessionStorage.setItem('clinicSettings', clinicSettingsSessionData)
         return {
           settings,
           entity,

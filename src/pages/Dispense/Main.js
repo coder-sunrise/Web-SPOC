@@ -68,27 +68,35 @@ class Main extends Component {
     // this.props.history.push(`${location.pathname}/billing`)
   }
 
+  _editOrder = () => {
+    const { dispatch, dispense, visitRegistration } = this.props
+
+    dispatch({
+      type: `consultation/editOrder`,
+      payload: {
+        id: visitRegistration.entity.visit.id,
+        version: dispense.version,
+      },
+    }).then((o) => {
+      if (o) {
+        dispatch({
+          type: `dispense/updateState`,
+          payload: {
+            editingOrder: true,
+          },
+        })
+        this.refresh()
+      }
+    })
+  }
+
   editOrder = (e) => {
-    const { dispatch, dispense, visitRegistration, handleSubmit } = this.props
-    navigateDirtyCheck(() => {
-      dispatch({
-        type: `consultation/editOrder`,
-        payload: {
-          id: visitRegistration.entity.visit.id,
-          version: dispense.version,
-        },
-      }).then((o) => {
-        if (o) {
-          dispatch({
-            type: `dispense/updateState`,
-            payload: {
-              editingOrder: true,
-            },
-          })
-          this.refresh()
-        }
-      })
-    }, handleSubmit)(e)
+    const { handleSubmit } = this.props
+
+    navigateDirtyCheck(this._editOrder, () => {
+      handleSubmit()
+      this._editOrder()
+    })(e)
   }
 
   refresh = () => {

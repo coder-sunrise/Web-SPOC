@@ -83,6 +83,7 @@ class Queue extends React.Component {
     this.state = {
       showPatientSearch: false,
       showEndSessionSummary: false,
+      search: '',
     }
     this._timer = null
   }
@@ -166,11 +167,25 @@ class Queue extends React.Component {
     this.setState({
       showPatientSearch: override === undefined ? !showPatientSearch : override,
     })
+
+    if (showPatientSearch) {
+      this.resetPatientSearchResult()
+    }
     this.props.history.push(
       getRemovedUrl([
         'v',
       ]),
     )
+  }
+
+  resetPatientSearchResult = () => {
+    this.props.dispatch({
+      type: 'patientSearch/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
   }
 
   onStartSession = () => {
@@ -190,7 +205,7 @@ class Queue extends React.Component {
         openConfirm: true,
         openConfirmTitle: '',
         openConfirmContent: `Are you sure to end current session (${sessionNo})`,
-        onOpenConfirm: this.onConfirmEndSession,
+        onConfirmDiscard: this.onConfirmEndSession,
       },
     })
   }
@@ -230,6 +245,7 @@ class Queue extends React.Component {
   showSearchResult = () => {
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
+
     if (totalRecords === 1)
       return this.showVisitRegistration({
         patientID: patientSearchResult[0].id,
@@ -286,6 +302,12 @@ class Queue extends React.Component {
   //     },
   //   })
   // }
+
+  setSearch = (v) => {
+    this.setState({
+      search: v,
+    })
+  }
 
   render () {
     const { classes, queueLog, loading, history } = this.props
@@ -348,6 +370,7 @@ class Queue extends React.Component {
                   // onSwitchClick={this.toggleFilterSelfOnly}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
+                  setSearch={this.setSearch}
                 />
                 <DetailsGrid
                   onViewPatientProfileClick={this.onViewPatientProfileClick}
@@ -368,6 +391,7 @@ class Queue extends React.Component {
               overrideLoading
             >
               <PatientSearchModal
+                search={this.state.search}
                 handleRegisterVisitClick={this.showVisitRegistration}
                 onViewPatientProfileClick={this.onViewPatientProfileClick}
               />

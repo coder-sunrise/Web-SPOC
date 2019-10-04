@@ -15,6 +15,7 @@ export default createFormViewModel({
     service,
     state: {
       default: {
+        isUserMaintainable: true,
         schemeTypeFK: 11,
         companyCoPaymentSchemeDto: [
           { coPaymentSchemeFk: 1 },

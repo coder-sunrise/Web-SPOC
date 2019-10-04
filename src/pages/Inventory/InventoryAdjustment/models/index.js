@@ -36,7 +36,6 @@ export default createListViewModel({
 
       *removeRow ({ payload }, { call, put }) {
         const result = yield call(service.remove, payload)
-        console.log('reuslt', result)
         // yield put({ type: 'saveStockDetails', payload: result })
       },
     },

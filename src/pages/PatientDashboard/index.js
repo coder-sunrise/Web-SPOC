@@ -33,6 +33,7 @@ import {
   Accordion,
   Button,
   notification,
+  ProgressButton,
 } from '@/components'
 
 import avatar from '@/assets/img/faces/marc.jpg'
@@ -130,6 +131,25 @@ class PatientDashboard extends PureComponent {
         md2: 'cons',
       }),
     )
+
+    const version = Date.now()
+    this.props
+      .dispatch({
+        type: `consultation/start`,
+        payload: {
+          id: this.props.visitRegistration.entity.visit.id,
+          version,
+        },
+      })
+      .then((o) => {
+        if (o)
+          router.push(
+            getAppendUrl({
+              md2: 'cons',
+              cid: o.id,
+            }),
+          )
+      })
   }
 
   render () {
@@ -152,13 +172,14 @@ class PatientDashboard extends PureComponent {
         <Banner
           extraCmt={
             visit.visitStatus === 'WAITING' && (
-              <Button
-                color='primary'
-                onClick={this.startConsultation}
-                style={{ marginTop: 25 }}
-              >
-                Start Consultation
-              </Button>
+              <div style={{ padding: '30px 0' }}>
+                <ProgressButton
+                  color='primary'
+                  onClick={this.startConsultation}
+                >
+                  Start Consultation
+                </ProgressButton>
+              </div>
             )
           }
           {...this.props}

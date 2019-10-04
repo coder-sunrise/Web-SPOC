@@ -15,10 +15,13 @@ import {
   GridItem,
   TextField,
   CodeSelect,
-  SizeContainer,
 } from '@/components'
 // sub components
-import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
+import {
+  AppointmentTypeLabel,
+  DoctorLabel,
+  DoctorProfileSelect,
+} from '@/components/_medisys'
 
 const styles = () => ({
   selectorContainer: {
@@ -38,24 +41,12 @@ const FilterBar = ({
 }) => {
   const onFilterClick = () => handleUpdateFilter(values)
 
-  const renderDropdown = (option) => {
-    return <DoctorLabel doctor={option} />
-    // const { name, doctorProfile } = option
-    // const title = option.title || ''
-    // const mcrNo =
-    //   doctorProfile !== null && doctorProfile !== undefined
-    //     ? `(${doctorProfile.doctorMCRNo})`
-    //     : ''
-    // return <div>{`${title} ${name} ${mcrNo}`}</div>
-  }
+  const renderDropdown = (option) => <DoctorLabel doctor={option} />
+
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
-  const maxDoctorTagPlaceholder = filterByDoctor
-    ? `${filterByDoctor.filter((o) => o !== -99).length} doctors selected...`
-    : ''
-
   const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
-  const maxAppointmentTagPlaceholder = `${filterByApptType.length} appointment types selected...`
+
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -78,17 +69,26 @@ const FilterBar = ({
             render={(args) => (
               <CodeSelect
                 {...args}
+                // allLabel='All Doctors'
                 allValue={-99}
-                allLabel='All Doctors'
+                allValueOption={{
+                  clinicianProfile: {
+                    name: 'All',
+                    id: -99,
+                  },
+                }}
                 allowClear={false}
                 label='Filter by Doctor'
                 mode='multiple'
-                code='clinicianprofile'
-                labelField='name'
-                valueField='id'
-                // code='doctorprofile'
-                // labelField='clinicianProfile.name'
-                // valueField='clinicianProfile.id'
+                // code='clinicianprofile'
+                // labelField='name'
+                // valueField='id'
+                filter={{
+                  'clinicianProfile.isActive': true,
+                }}
+                code='doctorprofile'
+                labelField='clinicianProfile.name'
+                valueField='clinicianProfile.id'
                 maxTagCount={maxDoctorTagCount}
                 maxTagPlaceholder='doctors'
                 renderDropdown={renderDropdown}

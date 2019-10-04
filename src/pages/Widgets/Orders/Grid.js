@@ -19,7 +19,7 @@ import { sumReducer } from '@/utils/utils'
 // console.log(orderTypes)
 export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
   const { rows, summary, finalAdjustments } = orders
-  const { total, gst, totalWithGST } = summary
+  const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
     dispatch({
@@ -60,13 +60,16 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       columnName: 'totalAfterItemAdjustment',
       type: `${o.uid}`,
     })),
-    { columnName: 'totalAfterItemAdjustment', type: 'gst' },
-    { columnName: 'totalAfterItemAdjustment', type: 'total' },
   ]
   const messages = {
-    gst: '7.00% GST',
-    total: 'Total (GST)',
+    total: 'Total',
   }
+  if (isEnableGST) {
+    messages.gst = `${numeral(gSTPercentage * 100).format('0.00')}% GST`
+    messages.total = 'Total (GST)'
+    totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'gst' })
+  }
+  totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'total' })
   adjustments.forEach((adj) => {
     messages[adj.uid] = (
       <span>

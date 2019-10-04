@@ -198,9 +198,23 @@ class BasicLayout extends React.PureComponent {
     dispatch({
       type: 'user/fetchCurrent',
     })
-    dispatch({
-      type: 'clinicSettings/query',
-    })
+
+    const getClinicSettings = sessionStorage.getItem('clinicSettings')
+
+    if (getClinicSettings === null) {
+      dispatch({
+        type: 'clinicSettings/query',
+      })
+    } else {
+      const parsedClinicSettings = JSON.parse(getClinicSettings)
+      dispatch({
+        type: 'clinicSettings/updateState',
+        payload: {
+          settings: parsedClinicSettings,
+        },
+      })
+    }
+
     dispatch({
       type: 'clinicInfo/query',
       payload: localStorage.getItem('clinicCode'),

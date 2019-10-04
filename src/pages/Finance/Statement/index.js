@@ -17,16 +17,7 @@ import {
   DialogContent,
   DialogContentText,
 } from '@material-ui/core'
-import {
-  Button,
-  CommonHeader,
-  CommonModal,
-  CommonTableGrid,
-  Tooltip,
-  GridItem,
-  EditableTableGrid,
-  dateFormatLong,
-} from '@/components'
+import { Button, CommonTableGrid, Tooltip, dateFormatLong } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
 import AddNewStatement from './NewStatement/AddNewStatement'
@@ -57,10 +48,9 @@ const Cell = (props) => {
   return <Table.Cell {...restProps} />
 }
 
-@connect(({ corporateBilling }) => ({
-  corporateBilling,
+@connect(({ statement }) => ({
+  statement,
 }))
-@withFormik({ mapPropsToValues: () => ({}) })
 class Statement extends PureComponent {
   state = {
     selectedRows: [],
@@ -72,43 +62,49 @@ class Statement extends PureComponent {
       { name: 'statementDate', title: 'Statement Date' },
       { name: 'company', title: 'Company' },
       { name: 'payableAmount', title: 'Payable Amount' },
-      { name: 'paid', title: 'Paid' },
-      { name: 'outstanding', title: 'Outstanding' },
+      { name: 'totalPaid', title: 'Paid' },
+      { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'dueDate', title: 'Due Date' },
-      { name: 'remarks', title: 'Remarks' },
+      { name: 'remark', title: 'Remarks' },
       { name: 'action', title: 'Action' },
     ],
-    rows: [
-      {
-        id: 'SM/00001',
-        statementNo: 'SM/00001',
-        statementDate: '2019-08-14 09:50:59',
-        // moment()
-        //   .add(Math.ceil(Math.random() * 100) - 100, 'days')
-        //   .format('LLL'),
-        company: 'Prudential',
-        payableAmount: '100',
-        paid: '20',
-        outstanding: 180,
-        dueDate: '2019-09-14 09:50:59',
-        remarks: 'Remarks for this statement',
-      },
-      {
-        id: 'SM/00002',
-        statementNo: 'SM/00002',
-        statementDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        company: 'AVIVA',
-        payableAmount: 200,
-        paid: 200,
-        outstanding: 0,
-        dueDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        remarks: '',
-      },
-    ],
+    // rows: [
+    //   {
+    //     id: 'SM/00001',
+    //     statementNo: 'SM/00001',
+    //     statementDate: '2019-08-14 09:50:59',
+    //     // moment()
+    //     //   .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //     //   .format('LLL'),
+    //     company: 'Prudential',
+    //     payableAmount: '100',
+    //     paid: '20',
+    //     outstanding: 180,
+    //     dueDate: '2019-09-14 09:50:59',
+    //     remarks: 'Remarks for this statement',
+    //   },
+    //   {
+    //     id: 'SM/00002',
+    //     statementNo: 'SM/00002',
+    //     statementDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     company: 'AVIVA',
+    //     payableAmount: 200,
+    //     paid: 200,
+    //     outstanding: 0,
+    //     dueDate: moment()
+    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
+    //       .format('LLL'),
+    //     remarks: '',
+    //   },
+    // ],
+  }
+
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'statement/query',
+    })
   }
 
   handleSelectionChange = (selection) => {
@@ -154,11 +150,17 @@ class Statement extends PureComponent {
   }
 
   render () {
-    console.log('rows', this.state.rows)
+    // console.log('rows', this.state.rows)
 
-    const { history } = this.props
+    const { history, dispatch } = this.props
     const editRow = (row, e) => {
-      history.push(`/finance/statement/details?id=${row.id}`)
+      dispatch({
+        type: 'statement/updateState',
+        payload: {
+          currentId: row.id,
+        },
+      })
+      history.push(`/finance/statement/details/${row.id}`)
     }
     const { rows, columns } = this.state
     return (
@@ -170,7 +172,7 @@ class Statement extends PureComponent {
         />
         <CommonTableGrid
           style={{ margin: 0 }}
-          // type='corporateBilling'
+          type='statement'
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
           onRowDoubleClick={editRow}
@@ -179,8 +181,8 @@ class Statement extends PureComponent {
           FuncProps={{ selectable: true }}
           columnExtensions={[
             { columnName: 'payableAmount', type: 'number', currency: true },
-            { columnName: 'paid', type: 'number', currency: true },
-            { columnName: 'outstanding', type: 'number', currency: true },
+            { columnName: 'totalPaid', type: 'number', currency: true },
+            { columnName: 'outstandingAmount', type: 'number', currency: true },
             {
               columnName: 'statementDate',
               type: 'date',
@@ -218,59 +220,6 @@ class Statement extends PureComponent {
               },
             },
           ]}
-          // EditingProps={{
-          //   showAddCommand: true,
-          //   showEditCommand: true,
-          //   showDeleteCommand: true,
-          //   onCommitChanges: this.commitChanges,
-          //   onAddedRowsChange: this.onAddedRowsChange,
-          // }}
-          // columnExtensions={[
-          //   {
-          //     columnName: 'action',
-          //     align: 'center',
-          //     render: (row) => {
-          //       return (
-          //         <React.Fragment>
-          //           <Button
-          //             size='sm'
-          //             onClick={() => {
-          //               editRow(row)
-          //             }}
-          //             justIcon
-          //             color='primary'
-          //           >
-          //             <Edit />
-          //           </Button>
-          //           <Button
-          //             size='sm'
-          //             onClick={() => {
-          //               this.handleClickOpen(row)
-          //             }}
-          //             justIcon
-          //             color='primary'
-          //           >
-          //             <Delete />
-          //           </Button>
-          //         </React.Fragment>
-          //       )
-          //     },
-          //   },
-          //   { columName: 'statementDate', type: 'date', format: dateFormat },
-          //   {
-          //     columName: 'paid',
-          //     type: 'number',
-          //     currency: true,
-          //     alignment: 'right',
-          //   },
-          //   {
-          //     columName: 'outstanding',
-          //     type: 'number',
-          //     currency: true,
-          //     align: 'right',
-          //   },
-          //   { columName: 'dueDate', type: 'date', format: 'DD MMM YYYY' },
-          // ]}
         />
         <Dialog
           open={this.state.open}

@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import classnames from 'classnames'
+import * as Yup from 'yup'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -52,11 +53,41 @@ const styles = (theme) => ({
   },
 })
 
-const NewPasswordForm = ({ classes }) => {
+// let _timer
+const NewPasswordForm = ({
+  classes,
+  onBackClick,
+  handleSubmit,
+  onResendClick,
+}) => {
   const headerClass = classnames({
     [classes.textCenter]: true,
     [classes.cardTitle]: true,
   })
+  const [
+    countdownTime,
+    setCountdownTime,
+  ] = useState(60)
+
+  useEffect(
+    () => {
+      // exit early when we reach 0
+      if (!countdownTime) return () => {}
+
+      const _timer = setInterval(() => {
+        if (countdownTime > 0) setCountdownTime(countdownTime - 1)
+      }, 1000)
+      return () => clearInterval(_timer)
+    },
+    [
+      countdownTime,
+    ],
+  )
+  const handleResendClick = () => {
+    setCountdownTime(60)
+    onResendClick()
+  }
+
   return (
     <Card login>
       <CardHeader color='primary' className={headerClass}>
@@ -66,34 +97,56 @@ const NewPasswordForm = ({ classes }) => {
         <GridContainer alignItems='flex-end'>
           <GridItem md={6}>
             <FastField
-              name='OTP'
-              render={(args) => <TextField {...args} label='OTP' />}
+              name='validationCode'
+              render={(args) => <TextField {...args} autoFocus label='OTP' />}
             />
           </GridItem>
           <GridItem md={4}>
-            <Button size='sm' color='primary' className={classes.otpBtn}>
-              Resend OTP
+            <Button
+              size='sm'
+              color='primary'
+              className={classes.otpBtn}
+              disabled={countdownTime > 0}
+              onClick={handleResendClick}
+            >
+              Resend OTP ({countdownTime})
             </Button>
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='userName'
+              name='newPassword'
               render={(args) => (
-                <TextField {...args} type='password' label='New Password' />
+                <TextField
+                  {...args}
+                  inputProps={{ autoComplete: 'new-password' }}
+                  autoComplete='new-password'
+                  label='New Password'
+                  type='password'
+                />
               )}
             />
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='mobileNo'
+              name='confirmPassword'
               render={(args) => (
-                <NumberInput {...args} label='Re-enter New Password' />
+                <TextField
+                  {...args}
+                  inputProps={{ autoComplete: 'new-password' }}
+                  autoComplete='new-password'
+                  label='Re-enter New Password'
+                  type='password'
+                />
               )}
             />
           </GridItem>
           <GridItem md={12} className={classes.buttonRow}>
-            <Button color='info'>Back</Button>
-            <Button color='primary'>Change Password</Button>
+            <Button color='info' onClick={onBackClick}>
+              Back
+            </Button>
+            <Button color='primary' onClick={handleSubmit}>
+              Change Password
+            </Button>
           </GridItem>
         </GridContainer>
       </CardBody>
@@ -105,6 +158,23 @@ const StyledNewPasswordForm = withStyles(styles, { name: 'NewPasswordForm' })(
   NewPasswordForm,
 )
 
-export default withFormik({ mapPropsToValues: () => ({}) })(
-  StyledNewPasswordForm,
-)
+export default withFormik({
+  validationSchema: Yup.object().shape({
+    validationCode: Yup.string().required('OTP is a required field'),
+    newPassword: Yup.string().required('Current Password is a required field'),
+    confirmPassword: Yup.string()
+      .oneOf(
+        [
+          Yup.ref('newPassword'),
+          null,
+        ],
+        "Passwords don't match",
+      )
+      .required('Current Password is a required field'),
+  }),
+  mapPropsToValues: () => ({}),
+  handleSubmit: (values, { props }) => {
+    const { onChangePasswordClick } = props
+    onChangePasswordClick(values)
+  },
+})(StyledNewPasswordForm)

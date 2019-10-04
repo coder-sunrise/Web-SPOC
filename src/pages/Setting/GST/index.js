@@ -30,31 +30,31 @@ const styles = (theme) => ({
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ clinicSettings }) => {
-    if (clinicSettings.entity && clinicSettings.entity.IsEnableGST) {
-      const { IsEnableGST } = clinicSettings.entity
+    if (clinicSettings.entity && clinicSettings.entity.isEnableGST) {
+      const { isEnableGST } = clinicSettings.entity
       return {
         ...clinicSettings.entity,
-        IsEnableGST: {
-          ...IsEnableGST,
-          settingValue: IsEnableGST.settingValue === 'true',
+        isEnableGST: {
+          ...isEnableGST,
+          settingValue: isEnableGST.settingValue === 'true',
         },
       }
     }
     return clinicSettings.entity
   },
   handleSubmit: (values, { props }) => {
-    const { IsEnableGST, GSTRegistrationNumber, GSTPercentage } = values
+    const { isEnableGST, gSTRegistrationNumber, gSTPercentage } = values
 
     const payload = [
       {
-        ...IsEnableGST,
-        settingValue: IsEnableGST.settingValue.toString(),
+        ...isEnableGST,
+        settingValue: isEnableGST.settingValue.toString(),
       },
       {
-        ...GSTRegistrationNumber,
+        ...gSTRegistrationNumber,
       },
       {
-        ...GSTPercentage,
+        ...gSTPercentage,
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -107,8 +107,8 @@ class clinicSettings extends PureComponent {
 
   setInitialValue = (param) => {
     this.setState({
-      enableGst: param.IsEnableGST
-        ? param.IsEnableGST.settingValue.toString() === 'true'
+      enableGst: param.isEnableGST
+        ? param.isEnableGST.settingValue.toString() === 'true'
         : false,
     })
   }
@@ -131,11 +131,11 @@ class clinicSettings extends PureComponent {
     // },
     // )
     this.setState({ enableGst: event.target.value })
-    // this.props.setFieldValue('IsEnableGST.settingvalue', event.target.value)
+    // this.props.setFieldValue('isEnableGST.settingvalue', event.target.value)
     // this.props.setValues({
     //   ...this.props.values,
-    //   IsEnableGST: {
-    //     ...this.props.values.IsEnableGST,
+    //   isEnableGST: {
+    //     ...this.props.values.isEnableGST,
     //     settingValue: event.target.value,
     //   },
     // })
@@ -143,21 +143,21 @@ class clinicSettings extends PureComponent {
 
   handleOnSubmit = () => {
     const {
-      IsEnableGST,
-      GSTRegistrationNumber,
-      GSTPercentage,
+      isEnableGST,
+      gSTRegistrationNumber,
+      gSTPercentage,
     } = this.props.values
     console.log(this.props.values)
     const payload = [
       {
-        ...IsEnableGST,
-        settingValue: IsEnableGST.settingValue.toString(),
+        ...isEnableGST,
+        settingValue: isEnableGST.settingValue.toString(),
       },
       {
-        ...GSTRegistrationNumber,
+        ...gSTRegistrationNumber,
       },
       {
-        ...GSTPercentage,
+        ...gSTPercentage,
       },
     ]
     const { dispatch, onConfirm, history } = this.props
@@ -202,7 +202,7 @@ class clinicSettings extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='IsEnableGST.settingValue'
+                name='isEnableGST.settingValue'
                 render={(args) => (
                   <Checkbox
                     label='Enable GST'
@@ -217,7 +217,7 @@ class clinicSettings extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='GSTRegistrationNumber.settingValue'
+                name='gSTRegistrationNumber.settingValue'
                 render={(args) => (
                   <TextField
                     label='GST Registration Number'
@@ -231,7 +231,7 @@ class clinicSettings extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='GSTPercentage.settingValue'
+                name='gSTPercentage.settingValue'
                 render={(args) => (
                   <TextField
                     label='GST Rate'

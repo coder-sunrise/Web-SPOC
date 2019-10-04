@@ -91,7 +91,7 @@ const modalStyle = (theme) => {
     },
     modalFooter: {
       borderTop: `1px solid ${theme.palette.divider}`,
-
+      display: 'block',
       padding: theme.spacing(1),
       textAlign: 'center',
       // paddingTop: "0",

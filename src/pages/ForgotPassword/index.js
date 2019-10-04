@@ -32,15 +32,15 @@ class ForgotPassword extends React.Component {
   handleResetClick = (values) => {
     getOTP(values).then((response) => {
       const { data } = response
-      if (data.succeeded)
+      if (data && data.succeeded)
         this.setState({
           step: 2,
           firstStepPayload: { ...values },
         })
-      else {
-        console.log({ data, response })
+
+      if (!response) {
         notification.error({
-          message: 'Failed to get OTP',
+          message: 'Please wait one minute to get validation code again',
         })
       }
     })
@@ -58,12 +58,15 @@ class ForgotPassword extends React.Component {
     const { firstStepPayload } = this.state
     const { history } = this.props
     resetPassword({ ...firstStepPayload, ...values }).then((response) => {
-      console.log({ response })
       const { data } = response
-      if (data.succeeded) {
+      if (data && data.succeeded) {
+        notification.success({
+          message: 'Reset password success',
+        })
         history.push('/login')
-      } else {
-        console.log({ data, response })
+      }
+
+      if (!response) {
         notification.error({
           message: 'Failed to reset password',
         })
@@ -71,9 +74,11 @@ class ForgotPassword extends React.Component {
     })
   }
 
+  handleResendOTP = () => this.handleResetClick(this.state.firstStepPayload)
+
   render () {
     const { classes } = this.props
-    const { step } = this.state
+    const { firstStepPayload, step } = this.state
 
     return (
       <div className={classes.container}>
@@ -81,6 +86,7 @@ class ForgotPassword extends React.Component {
           <GridItem md={5}>
             {step === 1 && (
               <ResetPassForm
+                payload={firstStepPayload}
                 onCancelClick={this.handleCancelClick}
                 onResetClick={this.handleResetClick}
               />
@@ -88,6 +94,7 @@ class ForgotPassword extends React.Component {
             {step === 2 && (
               <NewPassForm
                 onBackClick={this.handleBackClick}
+                onResendClick={this.handleResendOTP}
                 onChangePasswordClick={this.handleChangePasswordClick}
               />
             )}

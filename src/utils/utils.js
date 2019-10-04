@@ -15,6 +15,7 @@ import {
   CustomInput,
   serverDateTimeFormatFull,
   serverDateFormat,
+  notification,
 } from '@/components'
 import config from './config'
 
@@ -385,6 +386,7 @@ const convertToQuery = (
     // queryExcludeFields,
     sorting = [],
     props,
+    apiCriteria,
   } = query
   let customQuerys = { ...query }
   delete customQuerys.keepFilter
@@ -399,6 +401,7 @@ const convertToQuery = (
   delete customQuerys.version
   delete customQuerys.excludeInactiveCodes
   delete customQuerys.props
+  delete customQuerys.apiCriteria
 
   // console.log(query)
   let newQuery = {}
@@ -510,6 +513,8 @@ const convertToQuery = (
     includeDeleted,
     includeParentDeleted,
     props,
+    apiCriteria,
+
     // queryExcludeFields,
   }
   convertExcludeFields.forEach((p) => {
@@ -680,8 +685,8 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
         openConfirmContent: formatMessage({
           id: 'app.general.leave-without-save',
         }),
-        hasExtraConfirm: !!saveCb,
-        onOpenConfirm: () => {
+        onConfirmSave: saveCb,
+        onConfirmDiscard: () => {
           if (displayName) {
             window.g_app._store.dispatch({
               type: 'formik/updateState',
@@ -689,6 +694,7 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
                 [displayName]: undefined,
               },
             })
+            // delete window._localFormik[displayName]
           } else {
             window.dirtyForms.forEach((f) => {
               window.g_app._store.dispatch({
@@ -698,6 +704,7 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
                 },
               })
             })
+            // delete window._localFormik[displayName]
           }
           window.beforeReloadHandlerAdded = false
           window.removeEventListener('beforeunload', confirmBeforeReload)
@@ -708,6 +715,8 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
     e.preventDefault()
   } else {
     _checkCb(cb)
+    // window._localFormik = {}
+    // console.log(window._localFormik)
   }
 }
 
@@ -835,6 +844,52 @@ const getRefreshChasBalanceStatus = (status = []) => {
   return { ...defaultResponse, isSuccessful: true }
 }
 
+const calculateAmount = (
+  rows,
+  finalAdjustments,
+  {
+    totalField = 'totalAfterItemAdjustment',
+    adjustedField = 'totalAfterOverallAdjustment',
+  } = {},
+) => {
+  const total = rows.map((o) => o[totalField]).reduce(sumReducer, 0)
+  rows.forEach((r) => {
+    r.weightage = r[totalField] / total
+    r[adjustedField] = r[totalField]
+    // console.log(r)
+  })
+  finalAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+    rows.forEach((r) => {
+      // console.log(r.weightage * fa.adjAmount, r)
+      r[adjustedField] += r.weightage * fa.adjAmount
+    })
+  })
+
+  const totalAfterAdj = rows.map((o) => o[adjustedField]).reduce(sumReducer, 0)
+  const { clinicSettings } = window.g_app._store.getState()
+  if (!clinicSettings || !clinicSettings.settings) {
+    notification.error({
+      message: 'Could not load GST Setting',
+    })
+    return
+  }
+  const { isEnableGST, gSTPercentage } = clinicSettings.settings
+  const gst = isEnableGST ? totalAfterAdj * gSTPercentage : 0
+  // console.log(totalAfterAdj, gst)
+
+  // eslint-disable-next-line consistent-return
+  return {
+    rows,
+    summary: {
+      gst,
+      total: totalAfterAdj,
+      totalWithGST: gst + totalAfterAdj,
+      isEnableGST,
+      gSTPercentage,
+    },
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -860,6 +915,7 @@ module.exports = {
   htmlEncodeByRegExp,
   htmlDecodeByRegExp,
   getRefreshChasBalanceStatus,
+  calculateAmount,
   // toUTC,
   // toLocal,
 }

@@ -240,8 +240,8 @@ class PatientHistory extends Component {
     ]
   }
 
-  componentDidMount () {
-    this.props.dispatch({
+   componentDidMount () {
+     this.props.dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
@@ -250,6 +250,15 @@ class PatientHistory extends Component {
         patientID: Number(findGetParameter('pid')) || 0,
       },
     })
+
+    this.props.dispatch({
+      type: 'patientHistory/updateState',
+      payload: {
+        selected: '',
+        selectedSubRow: '',
+      },
+    })
+
   }
 
   onSelectChange = (val) => {
@@ -263,13 +272,14 @@ class PatientHistory extends Component {
     const { selectedSubRow } = patientHistory
 
     let newArray = []
-    if (clinicSettings.settings.ShowConsultationVersioning) {
+    if (clinicSettings.settings.ShowConsultationVersioning === false) {
       if (row.coHistory.length >= 1) {
-        newArray.push(row.coHistory[row.coHistory.length - 1])
+        newArray.push(row.coHistory[0])
       }
     } else {
       newArray = row.coHistory
     }
+ 
 
     return (
       <List
@@ -292,8 +302,8 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  this.props
-                    .dispatch({
+                  console.log("----", o.id)
+                  this.props.dispatch({
                       type: 'patientHistory/queryOne',
                       payload: o.id,
                     })
@@ -326,17 +336,22 @@ class PatientHistory extends Component {
                     >
                       <GridContainer>
                         <GridItem sm={7}>
+                          <TextField text value={row.visitPurposeName} />
+                        </GridItem>
+                      </GridContainer>
+                      <GridContainer>
+                        <GridItem sm={7}>
                           <TextField
                             text
-                            value={ clinicSettings.settings.ShowConsultationVersioning ? `${o.doctorTitle} ${o.doctorName}` : `V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
+                            value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
                           />
                         </GridItem>
                         <GridItem sm={5} style={{ textAlign: 'right' }}>
-                          {o.signOffDate && (
+                          {row.visitDate && (
                             <DatePicker
                               text
-                              // showTime
-                              value={o.signOffDate}
+                              showTime
+                              value={o.signOffDate }
                             />
                           )}
                         </GridItem>
@@ -365,7 +380,7 @@ class PatientHistory extends Component {
             <p>
               <span>Consultation Visit</span>
               <div className={this.props.classes.note}>
-                V{latest.versionNumber}, {row.doctorTitle} {row.doctorName}
+                {row.doctorTitle} {row.doctorName}
               </div>
             </p>
           </GridItem>
@@ -425,6 +440,7 @@ class PatientHistory extends Component {
       widget,
     } = this.props
     const { entity, selected } = patientHistory
+
     return (
       <CardContainer
         hideHeader
@@ -457,7 +473,7 @@ class PatientHistory extends Component {
               onChange={this.onSelectChange}
             />
           </GridItem>
-          <GridItem md={4}>
+          <GridItem md={2}>
             {!widget && (
               <ProgressButton
                 color='primary'
@@ -480,6 +496,16 @@ class PatientHistory extends Component {
               >
                 Edit Consultation
               </ProgressButton>
+            )}
+          </GridItem>
+          <GridItem style={{ textAlign: 'right' }}>
+            Update Date :
+            {patientHistory.selectedSubRow.signOffDate && (
+              
+              <DatePicker
+                text
+                value={patientHistory.selectedSubRow.signOffDate}
+              />
             )}
           </GridItem>
         </GridContainer>
@@ -531,11 +557,13 @@ class PatientHistory extends Component {
       cfg.style = {}
     }
 
-    const sortedPatientHistory = patientHistory.list
+    let sortedPatientHistory = ''
+
+    sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-    console.log("*******")
-    console.log(sortedPatientHistory)
+     
+
     return (
       <div {...cfg}>
         <CardContainer
@@ -548,7 +576,9 @@ class PatientHistory extends Component {
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? !clinicSettings.settings.ShowConsultationVersioning ? (
+          0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
+            sortedPatientHistory.map((o) => this.getContent(o))
+          ) : (
             <Accordion
               defaultActive={0}
               collapses={sortedPatientHistory.map((o) => ({
@@ -556,10 +586,6 @@ class PatientHistory extends Component {
                 content: this.getContent(o),
               }))}
             />
-          ) : (
-            sortedPatientHistory.map((o) => (
-              this.getContent(o)
-            ))
           ) : (
             <p>No visit record</p>
           ) : (

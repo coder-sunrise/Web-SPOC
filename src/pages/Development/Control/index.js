@@ -31,6 +31,7 @@ import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
 import CloseIcon from '@material-ui/icons/Close'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import AmountSummary from '@/pages/Shared/AmountSummary'
 import {
   CardContainer,
   TextField,
@@ -512,6 +513,7 @@ class ControlTest extends PureComponent {
         }}
         title={this.title}
       >
+        <AmountSummary />
         <SizeContainer size='lg'>{testComponents}</SizeContainer>
         {testComponents}
         <SizeContainer size='sm'>{testComponents}</SizeContainer>

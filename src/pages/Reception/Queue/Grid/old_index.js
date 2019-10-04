@@ -162,7 +162,7 @@ class DetailsGrid extends PureComponent {
       payload: {
         openConfirm: true,
         openConfirmContent: `Are you sure want to delete this visit - (Q No. - ${queueNo})?`,
-        onOpenConfirm: () => this.deleteQueue(id),
+        onConfirmDiscard: () => this.deleteQueue(id),
       },
     })
   }
