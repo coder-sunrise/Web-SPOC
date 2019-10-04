@@ -82,25 +82,29 @@ export default createListViewModel({
         })
       },
       *queryDone ({ payload }, { call, put, select, take }) {
-        console.log(payload)
 
-        if (payload.data.data.length > 0) {
+
+        let sortedList = payload.data.data
+        ? payload.data.data.filter((o) => o.coHistory.length >= 1)
+        : ''
+
+
+        if (sortedList.length > 0 ) {
           yield put({
             type: 'queryOne',
-            payload: payload.data.data[0].id,
+            payload: sortedList[0].coHistory[0].id,
           })
         }
       },
     },
     reducers: {
       querySingleDone (st, { payload }) {
-        const { data } = payload
-        console.log("++++")
-        console.log(payload)
-        console.log(st.list)
+        // const { data } = payload
+
         let sortedPatientHistory = st.list
           ? st.list.filter((o) => o.coHistory.length >= 1)
           : ''
+
         return {
           ...st,
           selected: sortedPatientHistory.length > 0 ? sortedPatientHistory[0]  : '',

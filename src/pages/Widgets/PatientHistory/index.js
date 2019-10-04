@@ -250,8 +250,7 @@ class PatientHistory extends Component {
         patientID: Number(findGetParameter('pid')) || 0,
       },
     })
-    console.log("gggg")
-    console.log(this.props)
+
     this.props.dispatch({
       type: 'patientHistory/updateState',
       payload: {
@@ -273,7 +272,7 @@ class PatientHistory extends Component {
     const { selectedSubRow } = patientHistory
 
     let newArray = []
-    if (!clinicSettings.settings.ShowConsultationVersioning) {
+    if (clinicSettings.settings.ShowConsultationVersioning === false) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
       }
@@ -303,6 +302,7 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
+                  console.log("----", o.id)
                   this.props.dispatch({
                       type: 'patientHistory/queryOne',
                       payload: o.id,
@@ -576,7 +576,7 @@ class PatientHistory extends Component {
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? !clinicSettings.settings.ShowConsultationVersioning ? (
+          0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
             <Accordion
