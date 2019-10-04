@@ -109,7 +109,7 @@ const Invoice = (props) => {
           { columnName: 'total', type: 'number', currency: true },
         ]}
       />
-      <GridContainer>
+      <GridContainer direction='column' justify='center' alignItems='flex-end'>
         <GridItem xs={2} md={9} />
         <GridItem xs={10} md={3}>
           <NumberInput

@@ -240,8 +240,8 @@ class PatientHistory extends Component {
     ]
   }
 
-   componentDidMount () {
-     this.props.dispatch({
+  componentDidMount () {
+    this.props.dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
@@ -258,7 +258,6 @@ class PatientHistory extends Component {
         selectedSubRow: '',
       },
     })
-
   }
 
   onSelectChange = (val) => {
@@ -279,7 +278,6 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
- 
 
     return (
       <List
@@ -302,8 +300,9 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  console.log("----", o.id)
-                  this.props.dispatch({
+                  console.log('----', o.id)
+                  this.props
+                    .dispatch({
                       type: 'patientHistory/queryOne',
                       payload: o.id,
                     })
@@ -348,11 +347,7 @@ class PatientHistory extends Component {
                         </GridItem>
                         <GridItem sm={5} style={{ textAlign: 'right' }}>
                           {row.visitDate && (
-                            <DatePicker
-                              text
-                              showTime
-                              value={o.signOffDate }
-                            />
+                            <DatePicker text showTime value={o.signOffDate} />
                           )}
                         </GridItem>
                       </GridContainer>
@@ -452,7 +447,7 @@ class PatientHistory extends Component {
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
         <GridContainer gutter={0}>
-          <GridItem md={8}>
+          <GridItem md={4}>
             <Select
               simple
               value={this.state.selectedItems}
@@ -498,10 +493,9 @@ class PatientHistory extends Component {
               </ProgressButton>
             )}
           </GridItem>
-          <GridItem style={{ textAlign: 'right' }}>
-            Update Date :
+          <GridItem>
+            Updated Date :
             {patientHistory.selectedSubRow.signOffDate && (
-              
               <DatePicker
                 text
                 value={patientHistory.selectedSubRow.signOffDate}
@@ -562,43 +556,48 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-     
 
     return (
       <div {...cfg}>
-        <CardContainer
-          hideHeader
-          size='sm'
-          className={classnames({
-            [classes.leftPanel]: !widget ? true : false,
-            [classes.integratedLeftPanel]: mode === 'integrated',
-            [override.leftPanel]: !widget ? true : false,
-          })}
-        >
-          {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
-            sortedPatientHistory.map((o) => this.getContent(o))
-          ) : (
-            <Accordion
-              defaultActive={0}
-              collapses={sortedPatientHistory.map((o) => ({
-                title: this.getTitle(o),
-                content: this.getContent(o),
-              }))}
-            />
-          ) : (
-            <p>No visit record</p>
-          ) : (
-            <React.Fragment>
-              <Skeleton height={30} />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} width='80%' />
-            </React.Fragment>
-          )}
-        </CardContainer>
+        {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
+          <CardContainer
+            hideHeader
+            size='sm'
+            className={classnames({
+              [classes.leftPanel]: !widget ? true : false,
+              [classes.integratedLeftPanel]: mode === 'integrated',
+              [override.leftPanel]: !widget ? true : false,
+            })}
+          >
+            {sortedPatientHistory ? sortedPatientHistory.length >
+            0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
+              sortedPatientHistory.map((o) => this.getContent(o))
+            ) : (
+              <Accordion
+                defaultActive={0}
+                collapses={sortedPatientHistory.map((o) => ({
+                  title: this.getTitle(o),
+                  content: this.getContent(o),
+                }))}
+              />
+            ) : (
+              ' '
+            ) : (
+              <React.Fragment>
+                <Skeleton height={30} />
+                <Skeleton height={30} width='80%' />
+                <Skeleton height={30} width='80%' />
+                <Skeleton height={30} />
+                <Skeleton height={30} width='80%' />
+                <Skeleton height={30} width='80%' />
+              </React.Fragment>
+            )}
+          </CardContainer>
+        ) : (
+          ''
+        ) : (
+          ''
+        )}
         {selected && mode === 'split' && this.getDetailPanel()}
       </div>
     )
