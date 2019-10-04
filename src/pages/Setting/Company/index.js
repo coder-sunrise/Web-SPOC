@@ -28,6 +28,11 @@ class Supplier extends PureComponent {
       type: 'settingCompany/query',
       payload: {
         companyTypeFK: route.name === 'copayer' ? 1 : 2,
+        sorting: [
+          { columnName: 'effectiveEndDate', direction: 'desc' },
+          { columnName: 'coPayerTypeFK', direction: 'asc' },
+          { columnName: 'displayValue', direction: 'asc' },
+        ],
       },
     })
   }
