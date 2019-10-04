@@ -118,6 +118,7 @@ const Stock = ({
                     id: 'inventory.master.stock.currentStock',
                   })}
                   disabled
+                  format='0.0'
                   {...args}
                 />
               )
@@ -133,14 +134,7 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.reorderThreshold',
                   })}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setFieldValue(
-                        'reOrderThreshold',
-                        e.target.value.toFixed(2),
-                      )
-                    }
-                  }}
+                  format='0.00'
                   {...args}
                 />
               )
@@ -156,14 +150,7 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.criticalThreshold',
                   })}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setFieldValue(
-                        'criticalThreshold',
-                        e.target.value.toFixed(2),
-                      )
-                    }
-                  }}
+                  format='0.00'
                   {...args}
                 />
               )
