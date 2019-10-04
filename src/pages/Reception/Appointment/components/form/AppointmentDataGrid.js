@@ -4,11 +4,9 @@ import * as Yup from 'yup'
 import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
-import Info from '@material-ui/icons/Info'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
 import { AppointmentTypeLabel } from '@/components/_medisys'
-import ErrorPopover from './ErrorPopover'
 import { AppointmentTypeOptions, reduceToColorClass } from '../../setting'
 import {
   AppointmentDataColExtensions,
@@ -146,7 +144,6 @@ class AppointmentDataGrid extends React.Component {
   onRadioChange = (row, e, checked) => {
     if (checked) {
       const { data, handleCommitChanges } = this.props
-
       const newRows = data.map(
         (eachRow) =>
           eachRow.id !== row.id
@@ -156,7 +153,6 @@ class AppointmentDataGrid extends React.Component {
               }
             : { ...eachRow, isPrimaryClinician: checked },
       )
-
       handleCommitChanges({ rows: newRows })
     }
   }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import classnames from 'classnames'
 // formik
 import { withFormik, FastField } from 'formik'
@@ -99,7 +99,11 @@ const StyledResetPassForm = withStyles(styles, { name: 'ResetPassForm' })(
 )
 
 export default withFormik({
-  mapPropsToValues: () => ({}),
+  mapPropsToValues: () => ({
+    clinicCode: '123456789',
+    userName: 'testuser888',
+    phoneNumber: '6583895960',
+  }),
   handleSubmit: (values, { props }) => {
     const { onResetClick } = props
     onResetClick(values)
