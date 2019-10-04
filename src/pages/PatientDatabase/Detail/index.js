@@ -75,9 +75,12 @@ const styles = () => ({
   handleSubmit: (values, component) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
+    const cfg = {
+      message: 'Patient profile saved.',
+    }
     dispatch({
       type: 'patient/upsert',
-      payload: values,
+      payload: { ...values, cfg },
     }).then((r) => {
       if (r) {
         if (r.id) {
