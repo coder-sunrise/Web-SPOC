@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
-import { Divider } from '@material-ui/core'
+import { withStyles, Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
 import { Add } from '@material-ui/icons'
 import { connect } from 'dva'
+import numeral from 'numeral'
 
 import Adjustment from './Adjustment'
 import {
@@ -26,7 +27,8 @@ const amountProps = {
   text: true,
 }
 
-const poPrefix = 'purchaseOrder'
+const styles = (theme) => ({})
+
 @connect(({ clinicSettings, global }) => ({
   clinicSettings,
   global,
@@ -62,11 +64,11 @@ class AmountSummary extends PureComponent {
   }
 
   componentDidMount () {
-    setTimeout(() => {
-      const { rows = [], adjustments = [], config } = this.props
-      const initialAmount = calculateAmount(rows, adjustments, config)
-      console.log(initialAmount)
-    }, 1000)
+    const { rows = [], adjustments = [], config } = this.props
+    // console.log(rows, adjustments)
+    this.setState({
+      ...calculateAmount(rows, adjustments, config),
+    })
   }
 
   onChangeGstToggle = (isCheckboxClicked = false) => {
@@ -81,14 +83,25 @@ class AmountSummary extends PureComponent {
   }
 
   addAdjustment = () => {
+    const { adjustments, rows, summary } = this.state
+    const { totalWithGST } = summary
+    const { config, onValueChanged } = this.props
     this.props.dispatch({
       type: 'global/updateState',
       payload: {
         openAdjustment: true,
         openAdjustmentConfig: {
-          callbackConfig: {
-            model: 'orders',
-            reducer: 'addFinalAdjustment',
+          callbackMethod: (v) => {
+            adjustments.push({
+              index: adjustments.length,
+              ...v,
+            })
+            this.setState(
+              {
+                ...calculateAmount(rows, adjustments, config),
+              },
+              () => onValueChanged(this.state),
+            )
           },
           showRemark: true,
           showAmountPreview: false,
@@ -101,15 +114,33 @@ class AmountSummary extends PureComponent {
     })
   }
 
+  deleteAdjustment = (index) => {
+    const { adjustments, rows } = this.state
+    const { config, onValueChanged } = this.props
+    const newAdjustments = adjustments.map((o) => {
+      if (o.index === index) o.isDeleted = true
+      return o
+    })
+    this.setState(
+      {
+        ...calculateAmount(rows, newAdjustments, config),
+      },
+      onValueChanged,
+    )
+  }
+
+  onValueChanged = () => {}
+
   render () {
-    const { settingGSTEnable, settingGSTPercentage } = this.state
+    const { theme } = this.props
+    const { summary, adjustments } = this.state
+    if (!summary) return null
+    const { totalWithGST, isEnableGST, gSTPercentage, gst } = summary
     const {
       settings = {
         totalField: 'totalAfterItemAdjustment',
         adjustedField: 'totalAfterOverallAdjustment',
       },
-      adjustments = [],
-      rows = [],
       values,
       dispatch,
       // calcPurchaseOrderSummary,
@@ -117,17 +148,16 @@ class AmountSummary extends PureComponent {
     } = this.props
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
+    console.log('render', this.state)
     return (
-      <div style={{ paddingRight: 98, paddingTop: 20 }}>
-        <GridContainer style={{ paddingBottom: 8 }}>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3} container>
-            <p>
+      <div>
+        <GridContainer style={{ marginBottom: 4 }}>
+          <GridItem xs={12}>
+            <span>
               {formatMessage({
                 id: 'inventory.pr.detail.pod.summary.adjustment',
               })}
-            </p>
-            &nbsp;&nbsp;&nbsp;
+            </span>
             <Button
               color='primary'
               size='sm'
@@ -139,36 +169,30 @@ class AmountSummary extends PureComponent {
             </Button>
           </GridItem>
         </GridContainer>
+        {adjustments.map((v, i) => {
+          if (!v.isDeleted) {
+            return (
+              <Adjustment
+                key={v.id || i}
+                index={i}
+                dispatch={dispatch}
+                onDelete={this.deleteAdjustment}
+                amountProps={amountProps}
+                // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
+                {...v}
+              />
+            )
+          }
+          return null
+        })}
 
-        <FieldArray
-          name='adjustments'
-          render={(arrayHelpers) => {
-            this.arrayHelpers = arrayHelpers
-            if (!adjustments) return null
-            return adjustments.map((v, i) => {
-              if (!v.isDeleted) {
-                return (
-                  <Adjustment
-                    key={v.id}
-                    index={i}
-                    dispatch={dispatch}
-                    adjustments={adjustments}
-                    // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
-                    {...amountProps}
-                  />
-                )
-              }
-              return null
-            })
-          }}
-        />
-
-        {settingGSTEnable ? (
+        {isEnableGST ? (
           <GridContainer>
-            <GridItem xs={2} md={9} />
-            <GridItem xs={4} md={2}>
-              <span> {`GST (${settingGSTPercentage}%): `}</span>
-              <FastField
+            <GridItem xs={6}>
+              <span>
+                GST (${`${numeral(gSTPercentage * 100).format('0.00')}`}%):
+              </span>
+              {/* <FastField
                 name={`${poPrefix}.IsGSTEnabled`}
                 render={(args) => (
                   <Switch
@@ -178,70 +202,58 @@ class AmountSummary extends PureComponent {
                     {...args}
                   />
                 )}
-              />
+              /> */}
             </GridItem>
-            <GridItem xs={6} md={1}>
-              <FastField
-                name={`${poPrefix}.gstAmount`}
-                render={(args) => {
-                  return <NumberInput {...amountProps} {...args} />
-                }}
-              />
+            <GridItem xs={6}>
+              <NumberInput {...amountProps} value={gst} />
             </GridItem>
-            <GridItem xs={2} md={9} />
-            {this.state.settingGSTEnable ? (
-              <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
-                <FastField
-                  name={`${poPrefix}.IsGSTInclusive`}
-                  render={(args) => {
-                    return (
-                      <Tooltip
-                        title={formatMessage({
-                          id: 'inventory.pr.detail.pod.summary.inclusiveGST',
-                        })}
-                        placement='bottom'
-                      >
-                        <Checkbox
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.pod.summary.inclusiveGST',
-                          })}
-                          onChange={() => this.onChangeGstToggle(true)}
-                          {...args}
-                        />
-                      </Tooltip>
-                    )
-                  }}
-                />
+            {isEnableGST ? (
+              <GridItem xs={12}>
+                <Tooltip
+                  title={formatMessage({
+                    id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                  })}
+                  placement='bottom'
+                >
+                  <Checkbox
+                    label={formatMessage({
+                      id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                    })}
+                    simple
+                    onChange={() => this.onChangeGstToggle(true)}
+                  />
+                </Tooltip>
               </GridItem>
             ) : (
-              <GridItem xs={10} md={3} />
+              <GridItem xs={10} />
             )}
           </GridContainer>
         ) : (
           []
         )}
-
+        <Divider style={{ margin: theme.spacing(1) }} />
         <GridContainer>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <Divider />
-          </GridItem>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <FastField
-              name={`${poPrefix}.totalAmount`}
-              render={(args) => {
-                return (
-                  <NumberInput
-                    prefix={formatMessage({
-                      id: 'inventory.pr.detail.pod.summary.total',
-                    })}
-                    {...amountProps}
+          <GridItem xs={6}>
+            <span>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.summary.total',
+              })}
+            </span>
+
+            {/* <FastField
+                name={`${poPrefix}.IsGSTEnabled`}
+                render={(args) => (
+                  <Switch
+                    label={undefined}
+                    fullWidth={false}
+                    onChange={() => this.onChangeGstToggle()}
                     {...args}
                   />
-                )
-              }}
-            />
+                )}
+              /> */}
+          </GridItem>
+          <GridItem xs={6}>
+            <NumberInput {...amountProps} value={totalWithGST} />
           </GridItem>
         </GridContainer>
       </div>
@@ -249,4 +261,4 @@ class AmountSummary extends PureComponent {
   }
 }
 
-export default AmountSummary
+export default withStyles(styles, { withTheme: true })(AmountSummary)

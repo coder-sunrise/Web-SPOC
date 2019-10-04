@@ -19,6 +19,11 @@ export default createBasicModel({
     setting: {},
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
-    reducers: {},
+    reducers: {
+      clean (state, { payload }) {
+        window.beforeReloadHandlerAdded = false
+        return { ...state, [payload]: undefined }
+      },
+    },
   },
 })

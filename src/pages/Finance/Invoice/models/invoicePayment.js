@@ -1,6 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/invoicePayment'
 import moment from 'moment'
+import * as service from '../services/invoicePayment'
 import { InvoicePayerType } from '@/utils/codes'
 import { fakeInvoicePaymentData } from '../sampleData'
 
@@ -22,13 +22,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      default: {
-        paymentTxnList: [
-          { patientPaymentTxn: [] },
-          { coPayerPaymentTxn: [] },
-          { govCoPayerPaymentTxn: [] },
-        ],
-      },
+      default: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -41,10 +35,32 @@ export default createFormViewModel({
               // currentTab: 2,
             },
           })
+          dispatch({
+            type: 'getCurrentBizSession',
+          })
         }
       })
     },
     effects: {
+      *getCurrentBizSession (_, { put, call }) {
+        const bizSessionPayload = {
+          IsClinicSessionClosed: false,
+        }
+        const response = yield call(service.getBizSession, bizSessionPayload)
+
+        const { data } = response
+        // data = null when get session failed
+        if (data && data.totalRecords === 1) {
+          const { data: sessionData } = data
+
+          yield put({
+            type: 'setCurrentBizSession',
+            payload: { ...sessionData[0] },
+          })
+          return true
+        }
+        return false
+      },
       *submitWriteOff ({ payload }, { call, put }) {
         const response = yield call(service.writeOff, payload)
         yield put({
@@ -65,21 +81,23 @@ export default createFormViewModel({
           },
         })
       },
-      *submitAddPayment ({ payload }, { call, put }) {
-        const { paymentData } = payload
-
+      *submitAddPayment ({ payload }, { call, put, select }) {
+        const userState = yield select((state) => state.user.data)
+        const bizSessionState = yield select(
+          (state) => state.invoicePayment.currentBizSessionInfo,
+        )
+        const { paymentData, invoicePayerFK } = payload
         let addPaymentPayload = {}
         let invoicePaymentMode = []
 
         invoicePaymentMode = invoicePaymentMode.concat(
           paymentData.map((x, index) => {
+            delete x.id
             const pMode = paymentMode.filter((y) => x.type === y.type)[0]
             return {
-              // ...x,
               paymentModeFK: pMode.paymentModeFK,
               paymentMode: pMode.type,
               amt: x.amount,
-              // cashRounding
               sequence: index + 1,
               remark: x.remarks,
               [pMode.objName]: [
@@ -90,7 +108,10 @@ export default createFormViewModel({
         )
 
         addPaymentPayload = {
-          // invoicePayerFK
+          paymentReceivedByUserFK: userState.id,
+          paymentReceivedBizSessionFK: bizSessionState.id,
+          paymentCreatedBizSessionFK: bizSessionState.id,
+          invoicePayerFK,
           invoicePaymentMode,
         }
 
@@ -103,13 +124,81 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      // queryDone (state, { payload }) {
-      //   // TBD
-      //   console.log('queryDone', payload)
-      //   return {
-      //     ...state,
-      //   }
-      // },
+      queryDone (state, { payload }) {
+        const { data } = payload
+        let paymentResult
+        if (data) {
+          paymentResult = data.map((payment) => {
+            let paymentTxnList = []
+            const { invoicePayment, invoicePayerWriteOff, creditNote } = payment
+
+            // Payment
+            paymentTxnList = (paymentTxnList || []).concat(
+              (invoicePayment || []).map((z) => {
+                return {
+                  id: z.id,
+                  type: 'Payment',
+                  itemID: z.receiptNo,
+                  date: z.paymentReceivedDate,
+                  amount: z.totalAmtPaid,
+                  isCancelled: z.isCancelled,
+                }
+              }),
+            )
+
+            // Write-Off
+            paymentTxnList = (paymentTxnList || []).concat(
+              (invoicePayerWriteOff || []).map((z) => {
+                return {
+                  id: z.id,
+                  type: 'Write Off',
+                  itemID: z.writeOffCode,
+                  date: z.writeOffDate,
+                  amount: z.writeOffAmount,
+                  reason: z.writeOffReason,
+                  isCancelled: z.isCancelled,
+                }
+              }),
+            )
+
+            // Credit Note
+            paymentTxnList = (paymentTxnList || []).concat(
+              (creditNote || []).map((z) => {
+                return {
+                  id: z.id,
+                  type: 'Credit Note',
+                  itemID: z.creditNoteNo,
+                  date: z.generatedDate,
+                  amount: z.totalAftGST,
+                  reason: z.remark,
+                  isCancelled: z.isCancelled,
+                }
+              }),
+            )
+
+            return { ...payment, paymentTxnList }
+          })
+          return {
+            ...state,
+            entity: [
+              ...paymentResult,
+            ],
+          }
+        }
+
+        return {
+          ...state,
+        }
+      },
+
+      setCurrentBizSession (state, { payload }) {
+        return {
+          ...state,
+          currentBizSessionInfo: {
+            ...payload,
+          },
+        }
+      },
 
       addPaymentResult (state, { payload }) {
         // TBD

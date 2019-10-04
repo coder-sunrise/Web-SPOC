@@ -24,10 +24,11 @@ export default {
     },
     *fetchCurrent (_, { call, put }) {
       const response = yield call(queryCurrent)
-      yield put({
-        type: 'saveCurrentUser',
-        payload: response.data.userProfileDetailDto,
-      })
+      if (response.data)
+        yield put({
+          type: 'saveCurrentUser',
+          payload: response.data.userProfileDetailDto,
+        })
     },
     *fetchProfileDetails ({ id }, { call, put }) {
       const result = yield call(fetchUserProfileByID, id)

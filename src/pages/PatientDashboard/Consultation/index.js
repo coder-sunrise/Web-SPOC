@@ -91,6 +91,7 @@ const saveConsultation = ({
     payload: {
       openConfirm: true,
       openConfirmContent: confirmMessage,
+      onConfirmText: 'Confirm',
       onConfirmDiscard: () => {
         const newValues = convertToConsultation(values, {
           orders,
@@ -259,7 +260,7 @@ class Consultation extends PureComponent {
         payload: {
           openConfirm: true,
           openConfirmContent: 'Confirm to discard current consultation?',
-          onConfirmDiscard: () => {
+          onConfirmSave: () => {
             dispatch({
               type: 'consultation/discard',
               payload: values.id,

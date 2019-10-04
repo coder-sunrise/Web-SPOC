@@ -13,24 +13,20 @@ const Adjustment = ({
   index,
   adjustments,
   dispatch,
-  calcPurchaseOrderSummary,
-  ...amountProps
+  adjAmount,
+  adjRemark,
+  onDelete,
+  amountProps,
 }) => {
-  const { adjRemark } = adjustments[index]
+  // console.log('Adjustment', amountProps)
   return (
-    <GridContainer style={{ paddingLeft: 30 }}>
-      <GridItem xs={2} md={9} />
-      <GridItem xs={5} md={2}>
+    <GridContainer style={{ margin: '4px 0' }}>
+      <GridItem xs={6}>
         <GridItem>
           <Popconfirm
             title='Do you want to remove this adjustment?'
             onConfirm={() => {
-              adjustments[index].isDeleted = true
-              dispatch({
-                type: 'purchaseOrderDetails/deleteAdjustment',
-                payload: { adjustments },
-              })
-              setTimeout(() => calcPurchaseOrderSummary(), 500)
+              onDelete(index)
             }}
           >
             <Button color='danger' size='sm' aria-label='Delete' justIcon>
@@ -40,14 +36,8 @@ const Adjustment = ({
           {adjRemark}
         </GridItem>
       </GridItem>
-      <GridItem xs={5} md={1}>
-        <Field
-          // name={`adjustments[${index}].adjDisplayAmount`}
-          name={`adjustments[${index}].adjValue`}
-          render={(args) => {
-            return <NumberInput {...amountProps} {...args} />
-          }}
-        />
+      <GridItem xs={6}>
+        <NumberInput value={adjAmount} {...amountProps} />
       </GridItem>
     </GridContainer>
   )

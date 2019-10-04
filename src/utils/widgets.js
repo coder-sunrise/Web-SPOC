@@ -55,7 +55,6 @@ const widgets = [
                 <Menu>
                   <Menu.Item
                     onClick={() => {
-                      console.log(123)
                       window.g_app._store.dispatch({
                         type: 'clinicalnotes/updateState',
                         payload: {

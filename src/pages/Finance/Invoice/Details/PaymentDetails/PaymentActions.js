@@ -13,6 +13,7 @@ const PaymentActions = ({
   handleWriteOff,
   handlePrintInvoice,
   type,
+  invoicePayerFK,
 }) => {
   const ButtonProps = {
     icon: true,
@@ -23,18 +24,18 @@ const PaymentActions = ({
   return (
     <React.Fragment>
       <Button
-        {...ButtonProps}
-        onClick={handleAddPayment}
+        onClick={() => handleAddPayment(invoicePayerFK)}
         disabled={!handleAddPayment}
+        {...ButtonProps}
       >
         <Add />
         Add Payment
       </Button>
       {type !== PayerType.GOVT_COPAYER && (
         <Button
-          {...ButtonProps}
           onClick={() => handleAddCrNote(type)}
           disabled={!handleAddCrNote}
+          {...ButtonProps}
         >
           <Add />
           Add Cr. Note
@@ -42,18 +43,18 @@ const PaymentActions = ({
       )}
       {type === PayerType.PATIENT && (
         <Button
-          {...ButtonProps}
           onClick={handleWriteOff}
           disabled={!handleWriteOff}
+          {...ButtonProps}
         >
           <Add />
           Write Off
         </Button>
       )}
       <Button
-        {...ButtonProps}
         onClick={handlePrintInvoice}
         disabled={!handlePrintInvoice}
+        {...ButtonProps}
       >
         <Printer />
         Print Invoice

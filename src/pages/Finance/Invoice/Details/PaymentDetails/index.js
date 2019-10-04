@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
+import { AddPayment } from 'medisys-components'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
 import { CommonModal, withFormik } from '@/components'
 // sub components
-import { AddPayment } from 'medisys-components'
 import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
 import PaymentCard from './PaymentCard'
@@ -15,14 +15,14 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 import styles from './styles'
 import { PayerType } from './variables'
 
-@connect(({ invoiceDetail, invoicePayment }) => ({
-  invoiceDetail,
+@connect(({ invoicePayment }) => ({
   invoicePayment,
 }))
 @withFormik({
   name: 'invoicePayment',
+  enableReinitialize: true,
   mapPropsToValues: ({ invoicePayment }) => {
-    return invoicePayment.entity || invoicePayment.default
+    return invoicePayment.entity || {}
   },
 })
 class PaymentDetails extends Component {
@@ -32,13 +32,19 @@ class PaymentDetails extends Component {
     showWriteOff: false,
     showDeleteConfirmation: false,
     onVoid: {},
+    selectedInvoicePayerFK: undefined,
   }
 
-  onAddPaymentClick = () => this.setState({ showAddPayment: true })
+  onAddPaymentClick = (invoicePayerFK) =>
+    this.setState({
+      showAddPayment: true,
+      selectedInvoicePayerFK: invoicePayerFK,
+    })
 
   onWriteOffClick = () => this.setState({ showWriteOff: true })
 
-  closeAddPaymentModal = () => this.setState({ showAddPayment: false })
+  closeAddPaymentModal = () =>
+    this.setState({ showAddPayment: false, selectedInvoicePayerFK: undefined })
 
   closeAddCrNoteModal = () => this.setState({ showAddCrNote: false })
 
@@ -62,7 +68,7 @@ class PaymentDetails extends Component {
       type: 'invoiceCreditNote/mapCreditNote',
       payload: {
         invoicePayerFK: payerType,
-        invoiceDetail: invoiceDetail.entity,
+        invoiceDetail,
         creditNote: invoicePayment.entity.creditNote || [],
       },
     })
@@ -75,10 +81,12 @@ class PaymentDetails extends Component {
   }
 
   onSubmit = (paymentData) => {
+    const { selectedInvoicePayerFK } = this.state
     this.props.dispatch({
       type: 'invoicePayment/submitAddPayment',
       payload: {
         // TBD
+        invoicePayerFK: selectedInvoicePayerFK,
         paymentData: _.toArray(paymentData),
       },
     })
@@ -110,9 +118,10 @@ class PaymentDetails extends Component {
   }
 
   render () {
+    console.log('paymentDetails', this.props)
+
     const { classes, invoiceDetail, values } = this.props
-    const { entity } = invoiceDetail
-    const { paymentTxnList } = values
+    // const { paymentTxnList } = values
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -130,24 +139,46 @@ class PaymentDetails extends Component {
 
     return (
       <div className={classes.container}>
-        <PaymentCard
+        {!_.isEmpty(values) ? (
+          values
+            .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
+            .map((payment) => {
+              return (
+                <PaymentCard
+                  // payerName='CHAS'
+                  patientName={payment.patientName}
+                  payerType={payment.payerTypeFK}
+                  payments={payment.paymentTxnList}
+                  totalPaid={payment.totalPaid}
+                  outstanding={payment.outStanding}
+                  invoicePayerFK={payment.id}
+                  actions={paymentActionsProps}
+                />
+              )
+            })
+        ) : (
+          ''
+        )}
+        {/* <PaymentCard
           payerType={PayerType.PATIENT}
-          payerName={entity ? entity.patientName : 'N/A'}
-          payments={paymentTxnList.patientPaymentTxn}
+          payerName={invoiceDetail.patientName || 'N/A'}
+          // payments={paymentTxnList.patientPaymentTxn}
+          payments={[]}
           actions={paymentActionsProps}
           totalPaid={values.totalPaid}
           outstanding={values.outStanding}
         />
-        {/* <PaymentCard
+        <PaymentCard
           actions={paymentActionsProps}
           payerType={PayerType.GOVT_COPAYER}
           payerName='CHAS'
-          payments={paymentTxnList.coPayerPaymentTxn}
-        />
-        <PaymentCard
+          // payments={paymentTxnList.coPayerPaymentTxn}
+          payments={[]}
+        /> */}
+        {/* <PaymentCard
           actions={paymentActionsProps}
           payerType={PayerType.COPAYER}
-          payerName='medisys'
+          payerName='Medisys'
           payments={paymentTxnList.govCoPayerPaymentTxn}
         /> */}
         <CommonModal

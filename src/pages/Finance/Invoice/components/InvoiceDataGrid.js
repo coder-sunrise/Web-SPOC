@@ -3,7 +3,6 @@ import React from 'react'
 import { CommonTableGrid } from '@/components'
 // variables
 import {
-  InvoiceGridData,
   InvoiceGridColExtensions,
   InvoiceGridColumns,
   TableConfig,
