@@ -65,15 +65,18 @@ export default createFormViewModel({
           type: 'visitRegistration/query',
           payload: { id: queueID, version },
         })
-        yield take('visitRegistration/query/@@end')
+         yield take('visitRegistration/query/@@end')
         const visitRegistration = yield select((st) => st.visitRegistration)
         const { visit } = visitRegistration.entity
+       
         // console.log(visitRegistration, visit)
         if (!visit) return
         yield put({
           type: 'patient/query',
           payload: { id: visit.patientProfileFK, version },
         })
+
+
         yield take('patient/query/@@end')
       },
       // *queryOne ({ payload }, { call, put }) {
