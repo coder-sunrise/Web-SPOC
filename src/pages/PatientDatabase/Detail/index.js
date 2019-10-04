@@ -289,7 +289,6 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
-    console.log('Patient Profile', entity)
 
     const isCreatingPatient = entity
       ? Object.prototype.hasOwnProperty.call(entity, 'id')
