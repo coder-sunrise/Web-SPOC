@@ -40,7 +40,8 @@ export const days = [
 ]
 
 export const AppointmentDataColumn = [
-  // { name: 'conflict', title: ' ' },
+  { name: 'conflict', title: ' ' },
+  // { name: 'rowIndex', title: 'No.' },
   { name: 'clinicianFK', title: 'Doctor' },
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
@@ -49,63 +50,64 @@ export const AppointmentDataColumn = [
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
-export const AppointmentTypeOptions = [
-  {
-    name: 'All Appointment Type',
-    code: 'all',
-    color: 'primary',
-    colorValue: primaryColor,
-    colorActive: primaryColor,
-  },
-  {
-    name: 'Checkup',
-    code: 'checkup',
-    color: 'red',
-    colorValue: '#ef5350',
-    colorActive: '#e53935',
-  },
-  {
-    name: 'Aesthetic',
-    code: 'aesthetic',
-    color: 'green',
-    colorValue: '#66bb6a',
-    colorActive: '#43a047',
-  },
-  {
-    name: 'Dental',
-    code: 'dental',
-    color: 'blue',
-    colorValue: '#42a5f5',
-    colorActive: '#1976d2',
-  },
-  {
-    name: 'Consultation',
-    code: 'consultation',
-    color: 'cyan',
-    colorValue: '#26c6da',
-    colorActive: '#00acc1',
-  },
-  {
-    name: 'Pill Checks',
-    code: 'pillChecks',
-    color: 'pink',
-    colorValue: '#ec407a',
-    colorActive: '#d81b60',
-  },
-  {
-    name: 'Urgent',
-    code: 'urgent',
-    color: 'indigo',
-    colorValue: '#5c6bc0',
-    colorActive: '#3949ab',
-  },
-]
+// export const AppointmentTypeOptions = [
+//   {
+//     name: 'All Appointment Type',
+//     code: 'all',
+//     color: 'primary',
+//     colorValue: primaryColor,
+//     colorActive: primaryColor,
+//   },
+//   {
+//     name: 'Checkup',
+//     code: 'checkup',
+//     color: 'red',
+//     colorValue: '#ef5350',
+//     colorActive: '#e53935',
+//   },
+//   {
+//     name: 'Aesthetic',
+//     code: 'aesthetic',
+//     color: 'green',
+//     colorValue: '#66bb6a',
+//     colorActive: '#43a047',
+//   },
+//   {
+//     name: 'Dental',
+//     code: 'dental',
+//     color: 'blue',
+//     colorValue: '#42a5f5',
+//     colorActive: '#1976d2',
+//   },
+//   {
+//     name: 'Consultation',
+//     code: 'consultation',
+//     color: 'cyan',
+//     colorValue: '#26c6da',
+//     colorActive: '#00acc1',
+//   },
+//   {
+//     name: 'Pill Checks',
+//     code: 'pillChecks',
+//     color: 'pink',
+//     colorValue: '#ec407a',
+//     colorActive: '#d81b60',
+//   },
+//   {
+//     name: 'Urgent',
+//     code: 'urgent',
+//     color: 'indigo',
+//     colorValue: '#5c6bc0',
+//     colorActive: '#3949ab',
+//   },
+// ]
 
 export const AppointmentDataColExtensions = [
   {
     columnName: 'conflict',
     type: 'error',
     editingEnabled: false,
+    sortingEnabled: false,
     disabled: true,
     width: 60,
   },

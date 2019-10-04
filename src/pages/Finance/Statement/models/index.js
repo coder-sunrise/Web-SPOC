@@ -44,6 +44,14 @@ export default createListViewModel({
         }
       },
 
+      querySingleDone (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          entity: data,
+        }
+      },
+
       queryInvoiceDone (st, { payload }) {
         const { data } = payload
         return {

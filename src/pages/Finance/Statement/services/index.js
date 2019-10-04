@@ -8,11 +8,14 @@ const invoiceUrl = '/api/Invoice'
 
 module.exports = {
   queryList: (params) => service.queryList(url, params),
+  query: (params) => {
+    console.log('params', params)
+    return service.query(url, params)
+  },
   upsert: (params) => service.upsert(url, params),
 
   queryInvoiceList: (params) => service.queryList(invoiceUrl, params),
 
-  // query: (params) => service.query(url, params),
   // queryStockDetails: (params) => service.query(stockUrl, params),
 
   // getRunningNo: async (params) => {

@@ -25,8 +25,8 @@ import Adjustment from './Adjustment'
 class POSummary extends PureComponent {
   state = {
     gst: {
-      GSTPercentage: 0,
-      IsEnableGST: false,
+      gSTPercentage: 0,
+      isEnableGST: false,
     },
   }
 
@@ -39,8 +39,8 @@ class POSummary extends PureComponent {
         return {
           ...state,
           gst: {
-            GSTPercentage: Number(gst.GSTPercentage),
-            IsEnableGST: gst.IsEnableGST === 'true',
+            gSTPercentage: Number(gst.gSTPercentage),
+            isEnableGST: gst.isEnableGST === 'true',
           },
         }
       }
@@ -52,7 +52,7 @@ class POSummary extends PureComponent {
   render () {
     const { props } = this
     const {
-      //clinicSetting,
+      // clinicSetting,
       calculateInvoice,
       setFieldValue,
       adjustmentList,
@@ -62,11 +62,11 @@ class POSummary extends PureComponent {
       toggleInvoiceAdjustment,
     } = props
     const poPrefix = 'purchaseOrder'
-    const { GSTPercentage, IsEnableGST } = this.state.gst
+    const { gSTPercentage, isEnableGST } = this.state.gst
 
     const onChangeGstToggle = (isCheckboxClicked = false) => {
       if (!isCheckboxClicked) {
-        if (!IsEnableGST) {
+        if (!isEnableGST) {
           setFieldValue(`${poPrefix}.gstIncluded`, false)
         }
       }
@@ -91,7 +91,7 @@ class POSummary extends PureComponent {
               size='sm'
               justIcon
               key='addAdjustment'
-              //onClick={this.addAdjustment}
+              // onClick={this.addAdjustment}
               onClick={toggleInvoiceAdjustment}
             >
               <Add />
@@ -124,11 +124,11 @@ class POSummary extends PureComponent {
           }}
         />
 
-        {IsEnableGST ? (
+        {isEnableGST ? (
           <GridContainer>
             <GridItem xs={2} md={9} />
             <GridItem xs={4} md={2}>
-              <span> {`GST (${GSTPercentage}%): `}</span>
+              <span> {`GST (${gSTPercentage}%): `}</span>
               <FastField
                 name={`${poPrefix}.gstEnabled`}
                 render={(args) => (
@@ -157,7 +157,7 @@ class POSummary extends PureComponent {
             />
           </GridItem> */}
             <GridItem xs={2} md={9} />
-            {IsEnableGST ? (
+            {isEnableGST ? (
               <GridItem xs={10} md={3}>
                 <FastField
                   name={`${poPrefix}.gstIncluded`}

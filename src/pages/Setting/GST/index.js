@@ -131,11 +131,11 @@ class clinicSettings extends PureComponent {
     // },
     // )
     this.setState({ enableGst: event.target.value })
-    // this.props.setFieldValue('IsEnableGST.settingvalue', event.target.value)
+    // this.props.setFieldValue('isEnableGST.settingvalue', event.target.value)
     // this.props.setValues({
     //   ...this.props.values,
-    //   IsEnableGST: {
-    //     ...this.props.values.IsEnableGST,
+    //   isEnableGST: {
+    //     ...this.props.values.isEnableGST,
     //     settingValue: event.target.value,
     //   },
     // })

@@ -57,19 +57,19 @@ const styles = (theme) => ({
   }),
 
   handleSubmit: (values, { props }) => {
-    // const { IsEnableGST, GSTRegistrationNumber, GSTPercentage } = values
+    // const { isEnableGST, GSTRegistrationNumber, gSTPercentage } = values
     // const payload = [
     //   {
-    //     settingKey: 'IsEnableGST',
-    //     settingValue: IsEnableGST,
+    //     settingKey: 'isEnableGST',
+    //     settingValue: isEnableGST,
     //   },
     //   {
     //     settingKey: 'GSTRegistrationNumber',
     //     settingValue: GSTRegistrationNumber,
     //   },
     //   {
-    //     settingKey: 'GSTPercentage',
-    //     settingValue: GSTPercentage,
+    //     settingKey: 'gSTPercentage',
+    //     settingValue: gSTPercentage,
     //   },
     // ]
     // const { dispatch, onConfirm, history } = props

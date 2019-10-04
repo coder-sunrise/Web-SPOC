@@ -335,16 +335,10 @@ const routes = [
             component: './Finance/Statement/NewStatement/AddNewStatement',
           },
           {
-            path: '/finance/statement/details',
+            path: '/finance/statement/details/:id',
             name: 'statement/detail',
             hideInMenu: true,
-            component: './Finance/Statement/Details/StatementDetails',
-          },
-          {
-            path: '/finance/statement/details/:statementNo',
-            name: 'statement/details',
-            hideInMenu: true,
-            component: './Finance/Statement/Details/StatementDetails',
+            component: './Finance/Statement/Details',
           },
           // {
           //   path: '/finance/expense',

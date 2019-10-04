@@ -23,6 +23,15 @@ const validationSchema = Yup.object().shape({
 
 const styles = () => ({
   ...AppointmentTypeOptions.reduce(reduceToColorClass, {}),
+  container: {
+    position: 'relative',
+  },
+  errorIcon: {
+    position: 'absolute',
+    top: 10,
+    left: 22,
+    zIndex: 100,
+  },
   selectContainer: {
     width: '100%',
   },
@@ -135,7 +144,6 @@ class AppointmentDataGrid extends React.Component {
   onRadioChange = (row, e, checked) => {
     if (checked) {
       const { data, handleCommitChanges } = this.props
-
       const newRows = data.map(
         (eachRow) =>
           eachRow.id !== row.id
@@ -145,20 +153,20 @@ class AppointmentDataGrid extends React.Component {
               }
             : { ...eachRow, isPrimaryClinician: checked },
       )
-
       handleCommitChanges({ rows: newRows })
     }
   }
 
   render () {
     const {
+      classes,
       data,
       handleCommitChanges,
       disabled,
       handleEditingRowsChange,
     } = this.props
     return (
-      <div>
+      <div className={classes.container}>
         <EditableTableGrid
           disabled={disabled}
           rows={data}

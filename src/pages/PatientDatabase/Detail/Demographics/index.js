@@ -361,7 +361,7 @@ class Demographic extends PureComponent {
                       // style={{
                       //   margin: theme.spacing(2),
                       // }}
-                      label='PDPA Consent'
+                      label='PDPA Consent - Agree to receive marketing material via:'
                       horizontal
                       simple
                       // value={currentLayout.widgets}
@@ -427,6 +427,10 @@ class Demographic extends PureComponent {
                       label='Referral'
                       options={[
                         {
+                          value: 'none',
+                          label: 'None',
+                        },
+                        {
                           value: 'Company',
                           label: 'Company',
                         },
@@ -458,7 +462,7 @@ class Demographic extends PureComponent {
                   />
                 </GridItem>
               )}
-              {values.referredBy && (
+              {values.referredBy !== 'none' && (
                 <GridItem xs={12}>
                   <Field
                     name='referralRemarks'
