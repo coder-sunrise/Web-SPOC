@@ -34,57 +34,64 @@ const styles = (theme) => ({})
   global,
 }))
 class AmountSummary extends PureComponent {
-  state = {
-    settingGSTEnable: true,
-    settingGSTPercentage: 0,
-    adjustments: [],
-  }
-
   constructor (props) {
     super(props)
-    this.myRef = React.createRef()
-  }
 
-  static getDerivedStateFromProps (props, state) {
-    const { clinicSettings } = props
-    const { settings } = clinicSettings
-
-    if (settings) {
-      if (
-        settings.isEnableGST !== state.settingGSTEnable &&
-        settings.GSTPercentageInt !== state.settingGSTPercentage
-      )
-        return {
-          ...state,
-          settingGSTEnable: settings.isEnableGST,
-          settingGSTPercentage: settings.GSTPercentageInt,
-        }
-    }
-    return null
-  }
-
-  componentDidMount () {
     const { rows = [], adjustments = [], config } = this.props
     // console.log(rows, adjustments)
+    this.state = {
+      settingGSTEnable: true,
+      settingGSTPercentage: 0,
+      adjustments: [],
+      rows: [],
+      ...calculateAmount(rows, adjustments, config),
+    }
+  }
+
+  // static getDerivedStateFromProps (props, state) {
+  //   const { clinicSettings } = props
+  //   const { settings } = clinicSettings
+
+  //   if (settings) {
+  //     if (
+  //       settings.isEnableGST !== state.settingGSTEnable &&
+  //       settings.GSTPercentageInt !== state.settingGSTPercentage
+  //     )
+  //       return {
+  //         ...state,
+  //         settingGSTEnable: settings.isEnableGST,
+  //         settingGSTPercentage: settings.GSTPercentageInt,
+  //       }
+  //   }
+  //   return null
+  // }
+
+  componentDidMount () {}
+
+  // eslint-disable-next-line camelcase
+  // eslint-disable-next-line react/sort-comp
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { rows = [], adjustments = [], config } = nextProps
     this.setState({
       ...calculateAmount(rows, adjustments, config),
     })
   }
 
   onChangeGstToggle = (isCheckboxClicked = false) => {
-    // const { settingGSTEnable } = this.state
-    // const { setFieldValue, calcPurchaseOrderSummary } = this.props
-    // if (!isCheckboxClicked) {
-    //   if (!settingGSTEnable) {
-    //     setFieldValue(`${poPrefix}.IsGSTInclusive`, false)
-    //   }
-    // }
-    // setTimeout(() => calcPurchaseOrderSummary(), 1)
+    const { adjustments, rows, summary } = this.state
+    const { config, onValueChanged } = this.props
+    config.isGSTInclusive = isCheckboxClicked
+    this.setState(
+      {
+        ...calculateAmount(rows, adjustments, config),
+      },
+      () => onValueChanged(this.state),
+    )
   }
 
   addAdjustment = () => {
     const { adjustments, rows, summary } = this.state
-    const { totalWithGST } = summary
+    const { total } = summary
     const { config, onValueChanged } = this.props
     this.props.dispatch({
       type: 'global/updateState',
@@ -107,7 +114,7 @@ class AmountSummary extends PureComponent {
           showAmountPreview: false,
           defaultValues: {
             // ...this.props.orders.entity,
-            initialAmout: totalWithGST,
+            initialAmout: total,
           },
         },
       },
@@ -125,17 +132,24 @@ class AmountSummary extends PureComponent {
       {
         ...calculateAmount(rows, newAdjustments, config),
       },
-      onValueChanged,
+      (v) => {
+        onValueChanged(this.state)
+      },
     )
   }
 
-  onValueChanged = () => {}
-
   render () {
-    const { theme } = this.props
+    const { theme, gstInclusiveConfigrable } = this.props
     const { summary, adjustments } = this.state
+    console.log(this.state)
     if (!summary) return null
-    const { totalWithGST, isEnableGST, gSTPercentage, gst } = summary
+    const {
+      totalWithGST,
+      isEnableGST,
+      gSTPercentage,
+      gst,
+      isGSTInclusive,
+    } = summary
     const {
       settings = {
         totalField: 'totalAfterItemAdjustment',
@@ -148,7 +162,6 @@ class AmountSummary extends PureComponent {
     } = this.props
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
-    console.log('render', this.state)
     return (
       <div>
         <GridContainer style={{ marginBottom: 4 }}>
@@ -207,7 +220,7 @@ class AmountSummary extends PureComponent {
             <GridItem xs={6}>
               <NumberInput {...amountProps} value={gst} />
             </GridItem>
-            {isEnableGST ? (
+            {gstInclusiveConfigrable && (
               <GridItem xs={12}>
                 <Tooltip
                   title={formatMessage({
@@ -220,12 +233,13 @@ class AmountSummary extends PureComponent {
                       id: 'inventory.pr.detail.pod.summary.inclusiveGST',
                     })}
                     simple
-                    onChange={() => this.onChangeGstToggle(true)}
+                    checked={isGSTInclusive}
+                    onChange={(e) => {
+                      this.onChangeGstToggle(e.target.value)
+                    }}
                   />
                 </Tooltip>
               </GridItem>
-            ) : (
-              <GridItem xs={10} />
             )}
           </GridContainer>
         ) : (
