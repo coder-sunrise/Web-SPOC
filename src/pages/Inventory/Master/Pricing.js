@@ -138,19 +138,12 @@ const Pricing = ({
                 name='averageCostPrice'
                 render={(args) => (
                   <NumberInput
+                    currency
                     prefix='$'
+                    format='0.0000'
                     label={formatMessage({
                       id: 'inventory.master.pricing.averageCostPrice',
                     })}
-                    onChange={(e) => {
-                      setAcp(e.target.value)
-                      if (e.target.value) {
-                        setFieldValue(
-                          'averageCostPrice',
-                          e.target.value.toFixed(4),
-                        )
-                      }
-                    }}
                     {...args}
                   />
                 )}
@@ -169,12 +162,7 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.profitMarginPercentage',
                     })}
-                    onChange={(e) => {
-                      setMarkupMargin(e.target.value)
-                      if (e.target.value) {
-                        setFieldValue('markupMargin', e.target.value.toFixed(1))
-                      }
-                    }}
+                    format='0.0'
                     {...args}
                   />
                 )}
@@ -217,11 +205,7 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.maxDiscount',
                     })}
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        setFieldValue('maxDiscount', e.target.value.toFixed(1))
-                      }
-                    }}
+                    format='0.0'
                     {...args}
                   />
                 )}
