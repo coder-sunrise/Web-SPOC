@@ -6,7 +6,7 @@ import { PatientInfoSideBanner } from 'medisys-components'
 // custom components
 import { Card, CardBody } from '@/components'
 
-const PatientInfoCard = ({ entity }) => (
+const PatientInfoCard = ({ entity, dispatch }) => (
   <Card profile>
     <CardBody profile>
       <div style={{ minHeight: '100px' }}>
@@ -18,7 +18,7 @@ const PatientInfoCard = ({ entity }) => (
             entity === null
           }
         >
-          <PatientInfoSideBanner entity={entity} />
+          <PatientInfoSideBanner entity={entity} dispatch={dispatch} />
         </Skeleton>
       </div>
     </CardBody>

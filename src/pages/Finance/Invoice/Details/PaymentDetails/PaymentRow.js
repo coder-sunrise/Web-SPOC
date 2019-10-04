@@ -5,7 +5,13 @@ import Printer from '@material-ui/icons/Print'
 import Info from '@material-ui/icons/Info'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
-import { GridContainer, GridItem, Tooltip } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  Tooltip,
+  dateFormatLong,
+  DatePicker,
+} from '@/components'
 import styles from './styles'
 
 const PaymentRow = ({
@@ -51,7 +57,7 @@ const PaymentRow = ({
         <span>{itemID}</span>
       </GridItem>
       <GridItem md={2}>
-        <span>{date}</span>
+        <DatePicker text format={dateFormatLong} value={date} />
       </GridItem>
       <GridItem md={6} container justify='flex-end' alignItems='center'>
         <GridItem>

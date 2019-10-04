@@ -7,8 +7,9 @@ import { CardContainer } from '@/components'
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
 
-@connect(({ invoiceDetail }) => ({
+@connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
+  invoicePayment,
 }))
 @withFormik({
   name: 'invoiceDetail',
@@ -22,14 +23,12 @@ class InvoiceDetails extends Component {
     const { dispatch, invoiceDetail } = this.props
     dispatch({
       type: 'invoiceDetail/query',
-      // type: 'invoiceDetail/fakeQueryDone',
       payload: {
         id: invoiceDetail.currentId,
       },
     })
     dispatch({
-      // type: 'invoicePayment/query',
-      type: 'invoicePayment/fakeQueryDone',
+      type: 'invoicePayment/query',
       payload: {
         id: invoiceDetail.currentId,
       },

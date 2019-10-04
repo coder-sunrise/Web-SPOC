@@ -427,7 +427,7 @@ class Demographic extends PureComponent {
                       label='Referral'
                       options={[
                         {
-                          value: 'none',
+                          value: '',
                           label: 'None',
                         },
                         {
@@ -462,7 +462,7 @@ class Demographic extends PureComponent {
                   />
                 </GridItem>
               )}
-              {values.referredBy !== 'none' && (
+              {values.referredBy !== '' && (
                 <GridItem xs={12}>
                   <Field
                     name='referralRemarks'
