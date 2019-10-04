@@ -155,7 +155,7 @@ const columnExtensions = [
     render: (row) => {
       const age = row.age && row.age > 0 ? row.age : '-'
       const gender = row.gender || '-'
-      return `${age}/${gender}`
+      return `${gender}/${age}`
     },
     sortingEnabled: false,
   },
