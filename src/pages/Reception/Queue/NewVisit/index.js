@@ -63,13 +63,23 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, loading, visitRegistration, patient, codetable }) => ({
-  queueLog,
-  loading,
-  visitRegistration,
-  patientInfo: patient.entity,
-  doctorProfiles: codetable.doctorprofile,
-}))
+@connect(
+  ({
+    clinicInfo,
+    queueLog,
+    loading,
+    visitRegistration,
+    patient,
+    codetable,
+  }) => ({
+    clinicInfo,
+    queueLog,
+    loading,
+    visitRegistration,
+    patientInfo: patient.entity,
+    doctorProfiles: codetable.doctorprofile,
+  }),
+)
 @withFormikExtend({
   displayName: 'VisitRegistration',
   enableReinitialize: true,
@@ -208,7 +218,7 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-    console.log({ values })
+    // console.log({ values })
     return (
       <React.Fragment>
         <LoadingWrapper

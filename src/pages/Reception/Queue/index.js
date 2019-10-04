@@ -167,6 +167,7 @@ class Queue extends React.Component {
     this.setState({
       showPatientSearch: override === undefined ? !showPatientSearch : override,
     })
+
     this.props.history.push(
       getRemovedUrl([
         'v',

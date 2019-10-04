@@ -31,14 +31,13 @@ class ForgotPassword extends React.Component {
 
   handleResetClick = (values) => {
     getOTP(values).then((response) => {
-      const { data } = response
-      if (data.succeeded)
+      console.log({ response })
+      if (response === 200)
         this.setState({
           step: 2,
           firstStepPayload: { ...values },
         })
       else {
-        console.log({ data, response })
         notification.error({
           message: 'Failed to get OTP',
         })
@@ -59,11 +58,11 @@ class ForgotPassword extends React.Component {
     const { history } = this.props
     resetPassword({ ...firstStepPayload, ...values }).then((response) => {
       console.log({ response })
-      const { data } = response
-      if (data.succeeded) {
+
+      if (response === 200) {
         history.push('/login')
       } else {
-        console.log({ data, response })
+        console.log({ response })
         notification.error({
           message: 'Failed to reset password',
         })
@@ -73,7 +72,7 @@ class ForgotPassword extends React.Component {
 
   render () {
     const { classes } = this.props
-    const { step } = this.state
+    const { step, firstStepPayload } = this.state
 
     return (
       <div className={classes.container}>

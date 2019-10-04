@@ -22,10 +22,10 @@ const ActionButton = ({ row, onClick }) => {
           onClick={onClick}
           contextMenuOptions={AppointmentContextMenu.map((opt) => {
             switch (opt.id) {
-              case 8:
-                return { ...opt, disabled: row.patientProfileFk === null }
-              case 9:
-                return { ...opt, disabled: row.patientProfileFk !== null }
+              case 8: // register visit
+                return { ...opt, disabled: row.patientProfileFk === undefined }
+              case 9: // register patient
+                return { ...opt, disabled: row.patientProfileFk !== undefined }
               default:
                 return { ...opt }
             }

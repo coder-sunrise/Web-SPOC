@@ -10,6 +10,9 @@ const DoctorProfileSelect = ({ ...props }) => (
     allowClear
     label='Doctor'
     code='doctorprofile'
+    filter={{
+      'clinicianProfile.isActive': true,
+    }}
     labelField='clinicianProfile.name'
     renderDropdown={(option) => <DoctorLabel doctor={option} />}
   />

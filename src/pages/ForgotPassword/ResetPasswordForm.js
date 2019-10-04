@@ -64,6 +64,12 @@ const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
         <GridContainer>
           <GridItem md={12}>
             <FastField
+              name='clinicCode'
+              render={(args) => <TextField {...args} label='Clinic Code' />}
+            />
+          </GridItem>
+          <GridItem md={12}>
+            <FastField
               name='userName'
               render={(args) => <TextField {...args} label='User Name' />}
             />
@@ -79,7 +85,7 @@ const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
               Cancel
             </Button>
             <Button color='primary' onClick={handleSubmit}>
-              Reset Password
+              Get Validation Code
             </Button>
           </GridItem>
         </GridContainer>

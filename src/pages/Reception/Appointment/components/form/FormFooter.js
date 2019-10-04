@@ -39,7 +39,17 @@ const FormFooter = ({
   return (
     <div className={classnames(classes.footer)}>
       <GridContainer>
-        <GridItem xs md={4} container justify='flex-start'>
+        <GridItem xs md={12} container justify='flex-end'>
+          <Button onClick={onClose} color='danger'>
+            {ButtonText.CANCEL}
+          </Button>
+          <Button
+            disabled={disabled}
+            color='success'
+            onClick={handleValidateClick}
+          >
+            {ButtonText.CHECK}
+          </Button>
           <Button
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
@@ -48,19 +58,7 @@ const FormFooter = ({
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>
-        </GridItem>
 
-        <GridItem xs md={8} container justify='flex-end'>
-          <Button
-            disabled={disabled}
-            color='success'
-            onClick={handleValidateClick}
-          >
-            {ButtonText.CHECK}
-          </Button>
-          <Button onClick={onClose} color='danger'>
-            {ButtonText.CANCEL}
-          </Button>
           {(isNew || isDraft) && (
             <Button
               disabled={disabled}

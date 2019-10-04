@@ -52,7 +52,7 @@ const styles = (theme) => ({
   },
 })
 
-const NewPasswordForm = ({ classes }) => {
+const NewPasswordForm = ({ classes, onBackClick, handleSubmit }) => {
   const headerClass = classnames({
     [classes.textCenter]: true,
     [classes.cardTitle]: true,
@@ -77,23 +77,36 @@ const NewPasswordForm = ({ classes }) => {
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='userName'
+              name='password'
               render={(args) => (
-                <TextField {...args} type='password' label='New Password' />
+                <TextField
+                  {...args}
+                  type='password'
+                  label='New Password'
+                  inputProps={{ autoComplete: 'new-password' }}
+                />
               )}
             />
           </GridItem>
           <GridItem md={12}>
             <FastField
-              name='mobileNo'
+              name='confirmPassword'
               render={(args) => (
-                <NumberInput {...args} label='Re-enter New Password' />
+                <NumberInput
+                  {...args}
+                  label='Re-enter New Password'
+                  inputProps={{ autoComplete: 'new-password' }}
+                />
               )}
             />
           </GridItem>
           <GridItem md={12} className={classes.buttonRow}>
-            <Button color='info'>Back</Button>
-            <Button color='primary'>Change Password</Button>
+            <Button color='info' onClick={onBackClick}>
+              Back
+            </Button>
+            <Button color='primary' onClick={handleSubmit}>
+              Change Password
+            </Button>
           </GridItem>
         </GridContainer>
       </CardBody>
@@ -105,6 +118,10 @@ const StyledNewPasswordForm = withStyles(styles, { name: 'NewPasswordForm' })(
   NewPasswordForm,
 )
 
-export default withFormik({ mapPropsToValues: () => ({}) })(
-  StyledNewPasswordForm,
-)
+export default withFormik({
+  mapPropsToValues: () => ({}),
+  handleSubmit: (values, { props }) => {
+    const { onChangePasswordClick } = props
+    onChangePasswordClick(values)
+  },
+})(StyledNewPasswordForm)
