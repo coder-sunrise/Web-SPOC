@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { TextField, FastField, DatePicker } from '@/components'
+import Print from '@material-ui/icons/Print'
+import { TextField, FastField, DatePicker, Button, Tooltip } from '@/components'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -78,6 +79,20 @@ export const PrescriptionColumnExtensions = [
             />
           )}
         />
+      )
+    },
+  },
+  {
+    columnName: 'action',
+    align: 'center',
+    width: 80,
+    render: () => {
+      return (
+        <Tooltip title='Print'>
+          <Button color='primary' justIcon>
+            <Print />
+          </Button>
+        </Tooltip>
       )
     },
   },
@@ -179,5 +194,19 @@ export const OtherOrdersColumnExtensions = [
   {
     columnName: 'totalPrice',
     type: 'currency',
+  },
+  {
+    columnName: 'action',
+    align: 'center',
+    width: 80,
+    render: () => {
+      return (
+        <Tooltip title='Print'>
+          <Button color='primary' justIcon>
+            <Print />
+          </Button>
+        </Tooltip>
+      )
+    },
   },
 ]

@@ -41,12 +41,12 @@ class index extends Component {
 
     if (settings) {
       if (
-        settings.IsEnableGST !== state.settingGSTEnable &&
+        settings.isEnableGST !== state.settingGSTEnable &&
         settings.GSTPercentageInt !== state.settingGSTPercentage
       )
         return {
           ...state,
-          settingGSTEnable: settings.IsEnableGST,
+          settingGSTEnable: settings.isEnableGST,
           settingGSTPercentage: settings.GSTPercentageInt,
         }
     }

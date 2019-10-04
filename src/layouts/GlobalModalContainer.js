@@ -70,7 +70,6 @@ class GlobalModalContainer extends PureComponent {
 
   render () {
     const { global, dispatch, loggedInUserID, history, classes } = this.props
-
     return (
       <div>
         {/* <SimpleModal
@@ -244,14 +243,38 @@ class GlobalModalContainer extends PureComponent {
           title={global.openConfirmTitle}
           cancelText='Cancel'
           maxWidth='sm'
-          confirmText='Discard changes'
-          extraButtons={
-            global.hasExtraConfirm ? (
-              () => {
-                return <Button>Save Changes</Button>
-              }
-            ) : null
-          }
+          confirmText='Save changes'
+          footProps={{
+            extraButtons: (
+              <Button
+                color='primary'
+                onClick={() => {
+                  dispatch({
+                    type: 'global/updateAppState',
+                    payload: {
+                      openConfirm: false,
+                    },
+                  })
+                  if (global.onConfirmDiscard) {
+                    global.onConfirmDiscard()
+                  }
+                }}
+              >
+                Discard changes
+              </Button>
+            ),
+            onConfirm: global.onConfirmSave
+              ? () => {
+                  dispatch({
+                    type: 'global/updateAppState',
+                    payload: {
+                      openConfirm: false,
+                    },
+                  })
+                  global.onConfirmSave()
+                }
+              : undefined,
+          }}
           onClose={(e) => {
             clearTimeout(this._timer)
             dispatch({
@@ -260,17 +283,6 @@ class GlobalModalContainer extends PureComponent {
                 openConfirm: false,
               },
             })
-          }}
-          onConfirm={() => {
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                openConfirm: false,
-              },
-            })
-            if (global.onOpenConfirm) {
-              global.onOpenConfirm()
-            }
           }}
           showFooter
         >

@@ -83,8 +83,8 @@ class index extends PureComponent {
     const { rows, purchaseOrderAdjustment, purchaseOrder } = values
     /*-------------------------------------------*/
     // Retrieve from /api/GSTSetup
-    const IsEnableGST = gstSetup.IsEnableGST === 'true'
-    const GSTPercentage = Number(gstSetup.GSTPercentage)
+    const isEnableGST = gstSetup.isEnableGST === 'true'
+    const gSTPercentage = Number(gstSetup.gSTPercentage)
     /*-------------------------------------------*/
     const { gstEnabled, gstIncluded } = purchaseOrder || false
     let tempInvoiceTotal = 0
@@ -119,8 +119,8 @@ class index extends PureComponent {
               adj.adjValue,
               item.tempSubTotal,
               tempInvoiceTotal,
-              IsEnableGST,
-              GSTPercentage,
+              isEnableGST,
+              gSTPercentage,
               gstEnabled,
               gstIncluded,
             )
@@ -155,13 +155,13 @@ class index extends PureComponent {
       })
     } else {
       filteredPurchaseOrderItem.map((item) => {
-        if (IsEnableGST) {
+        if (isEnableGST) {
           if (!gstEnabled) {
             item.itemLevelGST = 0
           } else if (gstIncluded) {
-            item.itemLevelGST = item.tempSubTotal * (GSTPercentage / 107)
+            item.itemLevelGST = item.tempSubTotal * (gSTPercentage / 107)
           } else {
-            item.itemLevelGST = item.tempSubTotal * (GSTPercentage / 100)
+            item.itemLevelGST = item.tempSubTotal * (gSTPercentage / 100)
           }
         } else {
           item.itemLevelGST = 0
@@ -192,8 +192,8 @@ class index extends PureComponent {
     this.props.dispatch({
       type: 'purchaseOrderDetails/fakeQueryDone',
       payload: {
-        id: id,
-        type: type,
+        id,
+        type,
       },
     })
   }

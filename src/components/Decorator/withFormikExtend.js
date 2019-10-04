@@ -12,7 +12,7 @@ import Exception403 from '@/pages/Exception/403'
 
 window.beforeReloadHandlerAdded = false
 window.dirtyForms = []
-const _localFormik = {}
+// window._localFormik = {}
 const _localAuthority = {}
 let lastVersion = null
 const withFormikExtend = (props) => (Component) => {
@@ -26,25 +26,25 @@ const withFormikExtend = (props) => (Component) => {
     const { errors, dirty, values } = ps
     // console.log(Object.values(errors).length > 0, dirty)
     const _lastFormikUpdate = {
-      [displayName]: {
-        displayName,
-        errors,
-        hasError: Object.values(errors).length > 0,
-        dirty,
-        // values,
-        // str: JSON.stringify(values),
-      },
+      displayName,
+      errors,
+      hasError: Object.values(errors).length > 0,
+      dirty,
+      // values,
+      // str: JSON.stringify(values),
     }
-    if (!_.isEqual(_lastFormikUpdate, _localFormik[displayName])) {
-      // console.log(_localFormik[displayName], _lastFormikUpdate)
-      _localFormik[displayName] = _lastFormikUpdate
-    } else {
+    const ob = window.g_app._store.getState().formik[displayName]
+    if (_.isEqual(_lastFormikUpdate, ob)) {
       return
     }
+    // console.log(window._localFormik[displayName], _lastFormikUpdate)
+
     // console.log(_lastFormikUpdate)
     window.g_app._store.dispatch({
       type: 'formik/updateState',
-      payload: _lastFormikUpdate,
+      payload: {
+        [displayName]: _lastFormikUpdate,
+      },
     })
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true

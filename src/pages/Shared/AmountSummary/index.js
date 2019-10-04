@@ -2,8 +2,9 @@ import React, { PureComponent } from 'react'
 import { Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
 import { Add } from '@material-ui/icons'
-import { amountProps } from '../../variables'
-import POAdjustment from './POAdjustment'
+import { connect } from 'dva'
+
+import Adjustment from './Adjustment'
 import {
   GridContainer,
   GridItem,
@@ -16,12 +17,30 @@ import {
   FastField,
 } from '@/components'
 
-const poPrefix = 'purchaseOrder'
+import { calculateAmount } from '@/utils/utils'
 
-class POSummary extends PureComponent {
+const amountProps = {
+  noUnderline: true,
+  currency: true,
+  rightAlign: true,
+  text: true,
+}
+
+const poPrefix = 'purchaseOrder'
+@connect(({ clinicSettings, global }) => ({
+  clinicSettings,
+  global,
+}))
+class AmountSummary extends PureComponent {
   state = {
     settingGSTEnable: true,
     settingGSTPercentage: 0,
+    adjustments: [],
+  }
+
+  constructor (props) {
+    super(props)
+    this.myRef = React.createRef()
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -42,27 +61,62 @@ class POSummary extends PureComponent {
     return null
   }
 
+  componentDidMount () {
+    setTimeout(() => {
+      const { rows = [], adjustments = [], config } = this.props
+      const initialAmount = calculateAmount(rows, adjustments, config)
+      console.log(initialAmount)
+    }, 1000)
+  }
+
   onChangeGstToggle = (isCheckboxClicked = false) => {
-    const { settingGSTEnable } = this.state
-    const { setFieldValue, calcPurchaseOrderSummary } = this.props
-    if (!isCheckboxClicked) {
-      if (!settingGSTEnable) {
-        setFieldValue(`${poPrefix}.IsGSTInclusive`, false)
-      }
-    }
-    setTimeout(() => calcPurchaseOrderSummary(), 1)
+    // const { settingGSTEnable } = this.state
+    // const { setFieldValue, calcPurchaseOrderSummary } = this.props
+    // if (!isCheckboxClicked) {
+    //   if (!settingGSTEnable) {
+    //     setFieldValue(`${poPrefix}.IsGSTInclusive`, false)
+    //   }
+    // }
+    // setTimeout(() => calcPurchaseOrderSummary(), 1)
+  }
+
+  addAdjustment = () => {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openAdjustment: true,
+        openAdjustmentConfig: {
+          callbackConfig: {
+            model: 'orders',
+            reducer: 'addFinalAdjustment',
+          },
+          showRemark: true,
+          showAmountPreview: false,
+          defaultValues: {
+            // ...this.props.orders.entity,
+            initialAmout: totalWithGST,
+          },
+        },
+      },
+    })
   }
 
   render () {
     const { settingGSTEnable, settingGSTPercentage } = this.state
     const {
+      settings = {
+        totalField: 'totalAfterItemAdjustment',
+        adjustedField: 'totalAfterOverallAdjustment',
+      },
+      adjustments = [],
+      rows = [],
       values,
       dispatch,
-      calcPurchaseOrderSummary,
+      // calcPurchaseOrderSummary,
       toggleInvoiceAdjustment,
     } = this.props
-    const { purchaseOrderAdjustment, purchaseOrder } = values
-    const { IsGSTEnabled } = purchaseOrder || false
+    // const { purchaseOrder } = values
+    // const { IsGSTEnabled } = purchaseOrder || false
     return (
       <div style={{ paddingRight: 98, paddingTop: 20 }}>
         <GridContainer style={{ paddingBottom: 8 }}>
@@ -79,7 +133,7 @@ class POSummary extends PureComponent {
               size='sm'
               justIcon
               key='addAdjustment'
-              onClick={toggleInvoiceAdjustment}
+              onClick={this.addAdjustment}
             >
               <Add />
             </Button>
@@ -87,19 +141,19 @@ class POSummary extends PureComponent {
         </GridContainer>
 
         <FieldArray
-          name='purchaseOrderAdjustment'
+          name='adjustments'
           render={(arrayHelpers) => {
             this.arrayHelpers = arrayHelpers
-            if (!purchaseOrderAdjustment) return null
-            return purchaseOrderAdjustment.map((v, i) => {
+            if (!adjustments) return null
+            return adjustments.map((v, i) => {
               if (!v.isDeleted) {
                 return (
-                  <POAdjustment
+                  <Adjustment
                     key={v.id}
                     index={i}
                     dispatch={dispatch}
-                    purchaseOrderAdjustment={purchaseOrderAdjustment}
-                    calcPurchaseOrderSummary={calcPurchaseOrderSummary}
+                    adjustments={adjustments}
+                    // calcPurchaseOrderSummary={calcPurchaseOrderSummary}
                     {...amountProps}
                   />
                 )
@@ -135,7 +189,7 @@ class POSummary extends PureComponent {
               />
             </GridItem>
             <GridItem xs={2} md={9} />
-            {IsGSTEnabled ? (
+            {this.state.settingGSTEnable ? (
               <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
                   name={`${poPrefix}.IsGSTInclusive`}
@@ -195,4 +249,4 @@ class POSummary extends PureComponent {
   }
 }
 
-export default POSummary
+export default AmountSummary
