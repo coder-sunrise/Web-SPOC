@@ -15,11 +15,14 @@ export const UserProfileTableConfig = {
     {
       columnName: 'userName',
       sortBy: 'userProfileNavigation.userName',
-      render: (row) => row.userProfile.userName,
+      render: (row) => (row.userProfile ? row.userProfile.userName : ''),
     },
     {
       columnName: 'role',
-      render: (row) => (row.userProfile.role ? row.userProfile.role.name : ''),
+      render: (row) =>
+        row.userProfile && row.userProfile.role
+          ? row.userProfile.role.name
+          : '',
     },
     {
       columnName: 'isActive',
