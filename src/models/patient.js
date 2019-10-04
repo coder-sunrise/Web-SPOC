@@ -213,13 +213,6 @@ export default createFormViewModel({
         }
 
         const response = yield call(service.requestChasBalance, newPayload)
-        // const { data } = response
-        // let result
-        // if (data) {
-        //   result = data
-        // }
-
-        // return result
 
         const { data } = response
         let result = { isSuccessful: false }

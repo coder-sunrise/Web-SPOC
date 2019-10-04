@@ -38,31 +38,9 @@ const FilterBar = ({ classes, dispatch, values }) => {
               }}
             />
           </GridItem>
-          {/* <GridItem xs={6} md={3}>
-          
-
-            <FastField
-              name='invoiceDateFrom'
-              render={(args) => (
-                <DatePicker label='Invoice Date From' {...args} />
-              )}
-            />
-          </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='invoiceDateTo'
-              render={(args) => (
-                <DatePicker label='Invoice Date To' {...args} />
-              )}
-            />
-          </GridItem> */}
-          <GridItem xs={6} md={3}>
-            {/* <FastField
-              name='pataientOutstanding'
-              render={(args) => <TextField label='O/S Balance' {...args} />}
-            /> */}
-            <FastField
-              name='favouriteSupplierFK'
+              name='osBalanceStatus'
               render={(args) => {
                 return (
                   <Select
@@ -99,23 +77,16 @@ const FilterBar = ({ classes, dispatch, values }) => {
                 invoiceNo,
                 patientName,
                 patientAccountNo,
-                pataientOutstanding,
-                invoiceDates,
+                // invoiceDates,
               } = values
               dispatch({
                 type: 'invoiceList/query',
                 payload: {
-                  // [`${prefix}patientReferenceNo`]: search,
-                  // [`${prefix}name`]: search,
-                  // [`${prefix}patientAccountNo`]: search,
-                  // [`${prefix}contactFkNavigation.contactNumber.number`]: search,
-                  // combineCondition: 'or',
                   invoiceNo,
                   patientName,
                   patientAccountNo,
-                  pataientOutstanding,
-                  invoiceDateFrom: invoiceDates[0],
-                  invoiceDateTo: invoiceDates[1],
+                  // invoiceDateFrom: invoiceDates[0],
+                  // invoiceDateTo: invoiceDates[1],
                 },
               })
             }}

@@ -25,24 +25,6 @@ export default createFormViewModel({
       })
     },
     effects: {},
-    reducers: {
-      // queryDone (state, { payload }) {
-      //   // TBD
-      //   return {
-      //     ...state,
-      //   }
-      // },
-      fakeQueryDone (state, { payload }) {
-        return {
-          ...state,
-          entity: {
-            ...fakeInvoiceDetailData,
-            invoiceDate: moment(fakeInvoiceDetailData.invoiceDate).format(
-              'DD MMM YYYY',
-            ),
-          },
-        }
-      },
-    },
+    reducers: {},
   },
 })
