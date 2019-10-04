@@ -25,6 +25,11 @@ class InventoryAdjustment extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'inventoryAdjustment/query',
+      payload: {
+        sorting: [
+          { columnName: 'adjustmentTransactionNo', direction: 'asc' },
+        ],
+      },
     })
     this.props
       .dispatch({
