@@ -30,6 +30,7 @@ class Grid extends PureComponent {
         columnName: 'balance',
         type: 'number',
         currency: true,
+        sortBy: 'PatientDeposit.balance',
       },
       {
         columnName: 'lastTransactionDate',
