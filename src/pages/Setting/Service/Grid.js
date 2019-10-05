@@ -12,21 +12,24 @@ class Grid extends PureComponent {
   editRow = async (row) => {
     const { dispatch, settingClinicService } = this.props
 
-    const queryServiceDetails = async () => {
-      return await queryOne(row.serviceId)
-    }
+    // const queryServiceDetails = async () => {
+    //   return await queryOne(row.serviceId)
+    // }
+    // console.log({ row })
+    const serviceList = await dispatch({
+      type: 'settingClinicService/queryOne',
+      payload: {
+        id: row.serviceId,
+      },
+    })
 
-    const serviceList = await queryServiceDetails()
+    // const serviceList = await queryServiceDetails()
 
-    if (serviceList.status != '200') {
-      showErrorNotification('', 'Server busy. Please try again later.')
-      
-    } else {
-      let serviceInfo = serviceList.data
-
-      serviceInfo.ctServiceCenter_ServiceNavigation.map((x) => {
-        delete x.serviceCenterFKNavigation
-      })
+    if (serviceList) {
+      let serviceInfo = serviceList
+      // serviceInfo.ctServiceCenter_ServiceNavigation.map((x) => {
+      //   delete x.serviceCenterFKNavigation
+      // })
 
       serviceInfo = {
         ...serviceInfo,
@@ -63,6 +66,19 @@ class Grid extends PureComponent {
           { name: 'action', title: 'Action' },
         ]}
         columnExtensions={[
+          { columnName: 'code', sortBy: 'serviceFKNavigation.code' },
+          {
+            columnName: 'displayValue',
+            sortBy: 'serviceFKNavigation.displayValue',
+          },
+          {
+            columnName: 'description',
+            sortBy: 'serviceFKNavigation.description',
+          },
+          {
+            columnName: 'serviceCenter',
+            sortBy: 'serviceCenterFKNavigation.displayValue',
+          },
           { columnName: 'unitPrice', type: 'number', currency: true },
           {
             columnName: 'isActive',
