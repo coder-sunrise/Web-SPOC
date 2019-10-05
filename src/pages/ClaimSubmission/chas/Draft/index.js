@@ -39,10 +39,7 @@ class DraftCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'claimSubmissionDraft/fakeQueryDone',
-      payload: {
-        status: 'draft',
-      },
+      type: 'claimSubmissionDraft/query',
     })
   }
 

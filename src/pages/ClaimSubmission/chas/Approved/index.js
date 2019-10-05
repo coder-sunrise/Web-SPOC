@@ -52,13 +52,9 @@ class ApprovedCHAS extends React.Component {
   handleSelectionChange = (selection) =>
     this.setState({ selectedRows: selection })
 
-
   refreshDataGrid = () => {
     this.props.dispatch({
       type: 'claimSubmissionApproved/query',
-      payload: {
-        status: 'approved',
-      },
     })
   }
 

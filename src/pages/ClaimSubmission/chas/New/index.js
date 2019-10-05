@@ -49,9 +49,6 @@ class NewCHAS extends React.Component {
   refreshDataGrid = () => {
     this.props.dispatch({
       type: 'claimSubmissionNew/query',
-      payload: {
-        status: 'new',
-      },
     })
   }
 

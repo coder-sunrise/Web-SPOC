@@ -49,9 +49,6 @@ class SubmittedCHAS extends React.Component {
   refreshDataGrid = () => {
     this.props.dispatch({
       type: 'claimSubmissionSubmitted/query',
-      payload: {
-        status: 'submitted',
-      },
     })
   }
 

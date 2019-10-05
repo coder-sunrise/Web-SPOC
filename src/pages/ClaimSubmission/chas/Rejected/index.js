@@ -34,14 +34,11 @@ const styles = (theme) => ({
   mapPropsToValues: () => ({}),
 })
 class RejectedCHAS extends React.Component {
-  // componentDidMount () {
-  //   this.props.dispatch({
-  //     type: 'claimSubmissionDraft/query',
-  //     payload: {
-  //       status: 'rejected',
-  //     },
-  //   })
-  // }
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'claimSubmissionRejected/query',
+    })
+  }
 
   render () {
     const { classes, handleContextMenuItemClick } = this.props
