@@ -27,9 +27,11 @@ class Grid extends PureComponent {
 
     if (serviceList) {
       let serviceInfo = serviceList
-      // serviceInfo.ctServiceCenter_ServiceNavigation.map((x) => {
-      //   delete x.serviceCenterFKNavigation
-      // })
+      console.log(serviceInfo)
+      serviceInfo.ctServiceCenter_ServiceNavigation.map((x) => {
+        delete x.serviceCenterFKNavigation
+      })
+      console.log('test', serviceInfo)
 
       serviceInfo = {
         ...serviceInfo,

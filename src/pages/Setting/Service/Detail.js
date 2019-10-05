@@ -1,32 +1,34 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { withStyles, Tooltip, Divider } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
-import Delete from '@material-ui/icons/Delete'
+import { withStyles } from '@material-ui/core'
+import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
 import {
   GridContainer,
   GridItem,
-  Button,
   TextField,
   Field,
-  Checkbox,
-  Select,
-  ProgressButton,
   DateRangePicker,
   Switch,
   EditableTableGrid,
-  notification,
-  SizeContainer,
   CodeSelect,
+  withFormikExtend,
 } from '@/components'
 
 const styles = (theme) => ({
   sectionHeader: {
     fontWeight: 400,
+  },
+  serviceSettingStyle: {
+    margin: theme.spacing(2),
+    color: '#cf1322',
+    fontSize: ' 0.75rem',
+    minHeight: '1em',
+    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontWeight: 400,
+    lineHeight: '1em',
+    letterSpacing: ' 0.03333em',
   },
 })
 
@@ -36,8 +38,9 @@ const itemSchema = Yup.object().shape({
   unitPrice: Yup.number().required(),
 })
 
-@withFormik({
+@withFormikExtend({
   mapPropsToValues: ({ settingClinicService }) => {
+    // console.log('settingClinicService', settingClinicService)
     const returnValue =
       settingClinicService.entity || settingClinicService.default
     const { isAutoOrder, ctServiceCenter_ServiceNavigation } = returnValue
@@ -49,6 +52,7 @@ const itemSchema = Yup.object().shape({
         ctServiceCenter_ServiceNavigation[0].isDefault = true
       }
     }
+    // console.log('returnValue', returnValue)
     return returnValue
   },
 
@@ -59,8 +63,9 @@ const itemSchema = Yup.object().shape({
     revenueCategoryFK: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     serviceSettingItem: Yup.array().compact((v) => v.isDeleted).of(itemSchema),
-
-    //medisaveHealthScreeningDiagnosisFK: Yup.string().required(),
+    ctServiceCenter_ServiceNavigation: Yup.array().required(
+      'At least one service setting is required.',
+    ),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -100,8 +105,6 @@ const itemSchema = Yup.object().shape({
 })
 class Detail extends PureComponent {
   state = {
-    editingRowIds: [],
-    rowChanges: {},
     ddlMedisaveHealthScreening: true,
     ddlOutpatientScan: true,
     serviceSettings: this.props.values.ctServiceCenter_ServiceNavigation,
@@ -169,7 +172,7 @@ class Detail extends PureComponent {
     const { data } = result.data
 
     this.setState({
-      hasActiveSession: data ? true : false,
+      hasActiveSession: !!data,
     })
   }
 
@@ -197,14 +200,16 @@ class Detail extends PureComponent {
   }
 
   commitChanges = ({ rows, added, changed, deleted }) => {
-    //commitChanges = ({ rows }) => {
-
     const { setFieldValue, values } = this.props
+    // const checkIsDefaultExist = this.checkIsDefaultExist()
     rows.forEach((val) => {
-      ;(val.serviceFK = values.id), (val.serviceCenterFKNavigation = null)
+      val.serviceFK = values.id
+      val.serviceCenterFKNavigation = null
+      // val.isDefault = !checkIsDefaultExist
     })
 
     setFieldValue('ctServiceCenter_ServiceNavigation', rows)
+    this.setState({ serviceSettings: rows })
   }
 
   handleAutoOrder = (e) => {
@@ -221,9 +226,58 @@ class Detail extends PureComponent {
     }
   }
 
+  handleDisableAutoOrder = () => {
+    const { serviceSettings } = this.state
+
+    if (serviceSettings.length === 0) {
+      return true
+    }
+    const validRow = serviceSettings.find(
+      (o) => o.isDeleted === undefined || o.isDeleted === false,
+    )
+    if (validRow) {
+      return false
+    }
+
+    return true
+  }
+
+  checkIsDefaultExist = () => {
+    return this.state.serviceSettings.find(
+      (o) =>
+        (o.isDefault === true && o.isDeleted === undefined) ||
+        (o.isDeleted === false && o.isDefault === true),
+    )
+  }
+
+  onAddedRowsChange = (addedRows) => {
+    if (addedRows.length > 0) {
+      const newRow = addedRows[0]
+      const serviceSettingsRow = this.state.serviceSettings.length
+      if (serviceSettingsRow <= 0) {
+        newRow.isDefault = true
+      } else {
+        const checkIsDefaultExist = this.checkIsDefaultExist()
+        if (!checkIsDefaultExist) {
+          newRow.isDefault = true
+        } else {
+          newRow.isDefault = false
+        }
+      }
+    }
+    return addedRows
+  }
+
   render () {
     const { props } = this
-    const { classes, theme, footer, values, settingClinicService } = props
+    const {
+      classes,
+      theme,
+      footer,
+      values,
+      settingClinicService,
+      errors,
+    } = props
     const { hasActiveSession } = this.state
     const medisaveSettingValue = {
       MedisaveHealthScreeningValue: [
@@ -235,9 +289,7 @@ class Detail extends PureComponent {
         { value: 1, name: 'CT' },
       ],
     }
-    //console.log('detail', props)
-    // console.log('asd', this.props.values.ctServiceCenter_ServiceNavigation)
-
+    const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -255,7 +307,7 @@ class Detail extends PureComponent {
                       <TextField
                         label='Code'
                         {...args}
-                        disabled={settingClinicService.entity ? true : false}
+                        disabled={!!settingClinicService.entity}
                       />
                     )}
                   />
@@ -290,13 +342,14 @@ class Detail extends PureComponent {
                   />
                 </GridItem>
                 <GridItem xs={6}>
-                  <FastField
+                  <Field
                     name='isAutoOrder'
                     render={(args) => {
                       return (
                         <Switch
                           label='Consultation Auto Order'
                           onChange={(e) => this.handleAutoOrder(e)}
+                          // disabled={this.handleDisableAutoOrder()}
                           {...args}
                         />
                       )
@@ -430,6 +483,11 @@ class Detail extends PureComponent {
             <h4 style={{ fontWeight: 400 }}>
               <b>Service Settings</b>
             </h4>
+            {serviceSettingsErrMsg && (
+              <p className={classes.serviceSettingStyle}>
+                {serviceSettingsErrMsg}
+              </p>
+            )}
             <EditableTableGrid
               style={{ marginTop: theme.spacing(1), margin: theme.spacing(2) }}
               rows={this.state.serviceSettings}
@@ -441,6 +499,7 @@ class Detail extends PureComponent {
               EditingProps={{
                 showAddCommand: true,
                 onCommitChanges: this.commitChanges,
+                onAddedRowsChange: this.onAddedRowsChange,
               }}
               schema={itemSchema}
               {...this.tableParas}
@@ -461,4 +520,4 @@ class Detail extends PureComponent {
   }
 }
 
-export default Detail
+export default withStyles(styles, { withTheme: true })(Detail)
