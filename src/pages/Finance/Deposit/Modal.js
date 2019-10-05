@@ -229,6 +229,18 @@ class Modal extends PureComponent {
     setFieldValue('balanceAfter', finalBalance)
   }
 
+  handleMaxLengthCardNumber = (e) => {
+    const { value } = e.target
+    const stringValue = value.toString()
+    if (stringValue.length > 4) {
+      const cardNumber = Number(stringValue.substring(0, 4), 10)
+      this.props.setFieldValue(
+        'patientDepositTransaction.cardNumber',
+        cardNumber,
+      )
+    }
+  }
+
   render () {
     const { state, props } = this
     const { theme, footer, onConfirm, values, isDeposit, deposit } = props
@@ -302,7 +314,11 @@ class Modal extends PureComponent {
                 <Field
                   name='patientDepositTransaction.cardNumber'
                   render={(args) => (
-                    <NumberInput label='Card Number' {...args} />
+                    <NumberInput
+                      label='Card Number'
+                      onChange={(e) => this.handleMaxLengthCardNumber(e)}
+                      {...args}
+                    />
                   )}
                 />
               </GridItem>
