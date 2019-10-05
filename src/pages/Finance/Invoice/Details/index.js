@@ -20,6 +20,10 @@ import InvoiceContent from './Content'
 })
 class InvoiceDetails extends Component {
   componentDidMount () {
+    this.refresh()
+  }
+
+  refresh = () => {
     const { dispatch, invoiceDetail } = this.props
     dispatch({
       type: 'invoiceDetail/query',

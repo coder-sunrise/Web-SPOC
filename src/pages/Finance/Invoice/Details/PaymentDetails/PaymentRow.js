@@ -1,4 +1,5 @@
 import React from 'react'
+import moment from 'moment'
 // material ui
 import { IconButton, withStyles } from '@material-ui/core'
 import Printer from '@material-ui/icons/Print'
@@ -15,18 +16,19 @@ import {
 import styles from './styles'
 
 const PaymentRow = ({
-  id,
-  type,
-  itemID,
-  date,
-  amount,
-  reason,
-  isCancelled,
+  // id,
+  // type,
+  // itemID,
+  // date,
+  // amount,
+  // reason,
+  // isCancelled,
   classes,
   handleVoidClick,
   handlePrinterClick,
+  ...payment
 }) => {
-  const onVoidClick = () => handleVoidClick({ id, type, itemID })
+  const { id, type, itemID, date, amount, reason, isCancelled } = payment
   return (
     <GridContainer
       justify='center'
@@ -57,7 +59,8 @@ const PaymentRow = ({
         <span>{itemID}</span>
       </GridItem>
       <GridItem md={2}>
-        <DatePicker text format={dateFormatLong} value={date} />
+        <span>{moment(date).format(dateFormatLong)}</span>
+        {/* <DatePicker text format={dateFormatLong} value={date} /> */}
       </GridItem>
       <GridItem md={6} container justify='flex-end' alignItems='center'>
         <GridItem>
@@ -67,7 +70,7 @@ const PaymentRow = ({
           <Tooltip title='Void'>
             <IconButton
               id={itemID}
-              onClick={onVoidClick}
+              onClick={() => handleVoidClick(payment)}
               disabled={isCancelled}
             >
               <Cross />
