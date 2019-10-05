@@ -71,7 +71,9 @@ const Contact = (props) => {
           <GridItem md={type === 'copayer' ? 12 : 6}>
             <FastField
               name='contact.mobileContactNumber.number'
-              render={(args) => <TextField label='Contact Number' {...args} />}
+              render={(args) => (
+                <NumberInput label='Contact Number' {...args} />
+              )}
             />
           </GridItem>
           <GridItem md={6}>
