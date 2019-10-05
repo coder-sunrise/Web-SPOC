@@ -75,9 +75,12 @@ const styles = () => ({
   handleSubmit: (values, component) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
+    const cfg = {
+      message: 'Patient profile saved.',
+    }
     dispatch({
       type: 'patient/upsert',
-      payload: values,
+      payload: { ...values, cfg },
     }).then((r) => {
       if (r) {
         if (r.id) {
@@ -286,6 +289,11 @@ class PatientDetail extends PureComponent {
     } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
+
+    const isCreatingPatient = entity
+      ? Object.prototype.hasOwnProperty.call(entity, 'id')
+      : false
+
     // console.log('************** patient profile ***********')
     // console.log(this.props)
     // // console.log('patient', patient)
@@ -368,8 +376,8 @@ class PatientDetail extends PureComponent {
                     </Authorized>
                   ))}
               </MenuList>
-              {entity && <Divider light />}
-              {entity && (
+              {isCreatingPatient && <Divider light />}
+              {isCreatingPatient && (
                 <Button
                   color='primary'
                   style={{ marginTop: theme.spacing(1) }}

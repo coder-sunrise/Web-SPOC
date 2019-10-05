@@ -57,7 +57,11 @@ class TextField extends React.PureComponent {
     if (field) {
       this.setState({
         value:
-          field.value !== undefined && field.value !== '' ? field.value : '',
+          field.value !== undefined &&
+          field.value !== '' &&
+          field.value !== null
+            ? field.value
+            : '',
       })
     }
   }

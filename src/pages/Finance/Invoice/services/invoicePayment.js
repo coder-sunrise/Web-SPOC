@@ -4,6 +4,7 @@ const url = '/api/invoicePayer'
 const invoicePaymentUrl = '/api/invoicePayment'
 const writeOffUrl = '/api/InvoicePayerWriteOff'
 const creditNoteUrl = '/api/CreditNote'
+const bizSessionAPIURL = '/api/bizsession'
 
 module.exports = {
   query: (params) => service.query(url, params),
@@ -16,4 +17,5 @@ module.exports = {
   upsert: (params) => {
     return service.upsert(creditNoteUrl, params)
   },
+  getBizSession: (params) => service.queryList(bizSessionAPIURL, params),
 }

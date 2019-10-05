@@ -68,6 +68,17 @@ class GlobalModalContainer extends PureComponent {
     })
   }
 
+  closeVisitRegistration = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'visitRegistration/closeModal',
+    })
+    dispatch({
+      type: 'patient/updateState',
+      payload: { entity: null },
+    })
+  }
+
   render () {
     const { global, dispatch, loggedInUserID, history, classes } = this.props
     return (
@@ -86,7 +97,10 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showDispensePanel}
           title='Dispensing'
-          observe='Dispense'
+          observe={[
+            'DispensePage',
+            'ConsultationDocumentList',
+          ]}
           authority='dispense'
           bodyNoPadding
           onClose={(e) => {
@@ -114,6 +128,7 @@ class GlobalModalContainer extends PureComponent {
             })
           }}
           fullScreen
+          displayCloseIcon={false}
           showFooter={false}
         >
           {global.showConsultationPanel && <Consultation {...this.props} />}
@@ -222,16 +237,8 @@ class GlobalModalContainer extends PureComponent {
           open={global.showVisitRegistration}
           title='Visit Registration'
           overrideLoading
-          onClose={() => {
-            dispatch({
-              type: 'visitRegistration/closeModal',
-            })
-          }}
-          onConfirm={() => {
-            dispatch({
-              type: 'visitRegistration/closeModal',
-            })
-          }}
+          onClose={this.closeVisitRegistration}
+          onConfirm={this.closeVisitRegistration}
           maxWidth='lg'
           observe='VisitRegistration'
         >
@@ -243,9 +250,9 @@ class GlobalModalContainer extends PureComponent {
           title={global.openConfirmTitle}
           cancelText='Cancel'
           maxWidth='sm'
-          confirmText='Save changes'
+          confirmText={global.openConfirmText || 'Confirm'}
           footProps={{
-            extraButtons: (
+            extraButtons: global.onConfirmDiscard ? (
               <Button
                 color='primary'
                 onClick={() => {
@@ -260,9 +267,9 @@ class GlobalModalContainer extends PureComponent {
                   }
                 }}
               >
-                Discard changes
+                {global.onConfirmText || 'Discard changes'}
               </Button>
-            ),
+            ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
                   dispatch({

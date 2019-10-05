@@ -156,7 +156,7 @@ class NewVisit extends PureComponent {
   validatePatient = () => {
     const {
       queueLog: { list = [] } = { list: [] },
-      visitRegistration: { patientInfo },
+      patientInfo,
       dispatch,
       handleSubmit,
       errors,
@@ -170,6 +170,7 @@ class NewVisit extends PureComponent {
         !registered ? queue.patientProfileFK === patientInfo.id : registered,
       false,
     )
+
     if (!values.id && alreadyRegisteredVisit)
       return dispatch({
         type: 'global/updateAppState',
@@ -178,7 +179,7 @@ class NewVisit extends PureComponent {
           openConfirmTitle: 'Confirm Register New Visit',
           openConfirmContent:
             'This patient already registered in current session, are you sure to continue?',
-          onConfirmDiscard: handleSubmit,
+          onConfirmSave: handleSubmit,
         },
       })
     return handleSubmit()
@@ -188,7 +189,6 @@ class NewVisit extends PureComponent {
     const {
       classes,
       footer,
-
       queueLog: { list = [] } = { list: [] },
       loading,
       visitRegistration: { visitInfo, errorState },

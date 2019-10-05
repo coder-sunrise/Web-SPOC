@@ -108,7 +108,15 @@ class AntdSwitch extends React.PureComponent {
         <Switch
           className={classnames(
             classes.switchContainer,
-            onOffMode && unCheckedValue !== '$' ? '' : classes.switchUnchecked,
+            onOffMode &&
+            ![
+              '$',
+              '%',
+              '+',
+              '-',
+            ].includes(restProps.unCheckedChildren)
+              ? ''
+              : classes.switchUnchecked,
           )}
           onChange={this.handleValueChange}
           defaultValue={defaultValue}

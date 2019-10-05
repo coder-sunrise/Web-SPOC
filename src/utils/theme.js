@@ -27,12 +27,14 @@ const defaultButton = {
   fontSize: `${defaultFontSize} !important`,
   lineHeight: 1.5,
   borderRadius: '3px !important',
+  minWidth: 100,
 }
 const smallButton = {
   padding: '3px 10px !important',
   fontSize: `${smallFontSize} !important`,
   lineHeight: 1.5,
   borderRadius: '0.2rem !important',
+  minWidth: 80,
 }
 const largetButton = {
   padding: '12px 25px !important',

@@ -7,6 +7,8 @@ import { GridContainer, GridItem, notification } from '@/components'
 // sub component
 import ResetPassForm from './ResetPasswordForm'
 import NewPassForm from './NewPasswordForm'
+// medisys component
+import { LoadingWrapper } from '@/components/_medisys'
 // services
 import { getOTP, resetPassword } from '@/services/user'
 // styles
@@ -26,23 +28,32 @@ const styles = (theme) => ({
 class ForgotPassword extends React.Component {
   state = {
     step: 1,
+    gettingOTP: false,
     firstStepPayload: {},
   }
 
   handleResetClick = (values) => {
-    getOTP(values).then((response) => {
-      console.log({ response })
-      if (response === 200)
-        this.setState({
-          step: 2,
-          firstStepPayload: { ...values },
-        })
-      else {
-        notification.error({
-          message: 'Failed to get OTP',
-        })
-      }
+    this.setState({
+      gettingOTP: true,
     })
+    getOTP(values)
+      .then((response) => {
+        const { data } = response
+        if (data && data.succeeded)
+          this.setState({
+            step: 2,
+            gettingOTP: false,
+            firstStepPayload: { ...values },
+          })
+        else {
+          this.setState({
+            gettingOTP: false,
+          })
+        }
+      })
+      .catch((error) => {
+        console.log({ error })
+      })
   }
 
   handleCancelClick = () => {
@@ -57,12 +68,15 @@ class ForgotPassword extends React.Component {
     const { firstStepPayload } = this.state
     const { history } = this.props
     resetPassword({ ...firstStepPayload, ...values }).then((response) => {
-      console.log({ response })
-
-      if (response === 200) {
+      const { data } = response
+      if (data && data.succeeded) {
+        notification.success({
+          message: 'Reset password success',
+        })
         history.push('/login')
-      } else {
-        console.log({ response })
+      }
+
+      if (!response) {
         notification.error({
           message: 'Failed to reset password',
         })
@@ -70,9 +84,11 @@ class ForgotPassword extends React.Component {
     })
   }
 
+  handleResendOTP = () => this.handleResetClick(this.state.firstStepPayload)
+
   render () {
     const { classes } = this.props
-    const { step, firstStepPayload } = this.state
+    const { firstStepPayload, step, gettingOTP } = this.state
 
     return (
       <div className={classes.container}>
@@ -80,6 +96,8 @@ class ForgotPassword extends React.Component {
           <GridItem md={5}>
             {step === 1 && (
               <ResetPassForm
+                loading={gettingOTP}
+                payload={firstStepPayload}
                 onCancelClick={this.handleCancelClick}
                 onResetClick={this.handleResetClick}
               />
@@ -87,6 +105,7 @@ class ForgotPassword extends React.Component {
             {step === 2 && (
               <NewPassForm
                 onBackClick={this.handleBackClick}
+                onResendClick={this.handleResendOTP}
                 onChangePasswordClick={this.handleChangePasswordClick}
               />
             )}

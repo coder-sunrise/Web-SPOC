@@ -49,7 +49,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
           showAmountPreview: false,
           defaultValues: {
             // ...this.props.orders.entity,
-            initialAmout: totalWithGST,
+            initialAmout: total,
           },
         },
       },

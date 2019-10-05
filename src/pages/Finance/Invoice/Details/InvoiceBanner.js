@@ -9,7 +9,6 @@ import {
   DatePicker,
   GridContainer,
   GridItem,
-  TextField,
   NumberInput,
   dateFormatLong,
 } from '@/components'
@@ -35,7 +34,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           </GridItem>
           <GridItem md={8}>
             <h5 className={classes.normalText}>
-              {values.patientName}({values.patientAccountNo})
+              {values.patientName || 'N/A'}({values.patientAccountNo || 'N/A'})
             </h5>
           </GridItem>
           <GridItem md={4}>
@@ -141,76 +140,6 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
             <h5 className={classes.normalText}>&nbsp;</h5>
           </GridItem>
         </GridContainer>
-
-        {/* <GridContainer item md={9}>
-          <GridContainer item md={12}>
-            <GridItem md={3}>
-              <FastField
-                name='invoiceTotal'
-                render={(args) => (
-                  <NumberInput
-                    prefix='Invoice Amount'
-                    {...amountProps}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={1} />
-            <GridItem md={3}>
-              <FastField
-                name='writeOffAmount'
-                render={(args) => (
-                  <NumberInput
-                    prefix='Write Off Amount'
-                    {...amountProps}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={1} />
-            <GridItem md={3}>
-              <FastField
-                name='outstandingBalance'
-                render={(args) => (
-                  <NumberInput
-                    prefix='O/S Balance'
-                    {...amountProps}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-          <GridContainer item md={12}>
-            <GridItem md={3}>
-              <FastField
-                name='totalPayment'
-                render={(args) => (
-                  <NumberInput
-                    prefix='Total Payments'
-                    {...amountProps}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={1} />
-            <GridItem md={3}>
-              <FastField
-                name='totalCreditNoteAmt'
-                render={(args) => (
-                  <NumberInput
-                    prefix='Credit Note'
-                    {...amountProps}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-        </GridContainer> */}
       </GridContainer>
     </CardContainer>
   )

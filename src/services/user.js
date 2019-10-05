@@ -1,3 +1,4 @@
+import { stringify } from 'qs'
 import request from '@/utils/request'
 
 const userProfileURL = '/api/UserProfile'
@@ -22,14 +23,16 @@ export const changeUserPassword = (payload) =>
     body: payload,
   })
 
-export const getOTP = (payload) =>
+export const getOTP = async (payload) =>
   request(`${userProfileURL}/generateResetPasswordCode`, {
-    method: 'PUT',
-    body: payload,
+    method: 'POST',
+    data: stringify(payload),
+    contentType: 'application/x-www-form-urlencoded',
   })
 
 export const resetPassword = (payload) =>
   request(`${userProfileURL}/ResetPassword`, {
-    method: 'PUT',
-    body: payload,
+    method: 'POST',
+    data: stringify(payload),
+    contentType: 'application/x-www-form-urlencoded',
   })
