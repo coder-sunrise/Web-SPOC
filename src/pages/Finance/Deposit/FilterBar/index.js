@@ -116,7 +116,7 @@ class FilterBar extends PureComponent {
                   } = this.props.values
 
                   const showTransactionOnly = transactionOnly === true
-                  console.log('showTransactionOnly', showTransactionOnly)
+                  // console.log('showTransactionOnly', showTransactionOnly)
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {

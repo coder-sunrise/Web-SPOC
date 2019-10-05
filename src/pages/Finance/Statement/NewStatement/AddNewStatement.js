@@ -1,20 +1,17 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles, Divider } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import { connect } from 'dva'
-import ErrorBoundary from '@/layouts/ErrorBoundary'
 import Yup from '@/utils/yup'
 import {
   Button,
   DatePicker,
-  EditableTableGrid,
   GridContainer,
   GridItem,
   NumberInput,
-  Select,
   TextField,
   CardContainer,
   Switch,
@@ -34,6 +31,9 @@ const styles = () => ({
   },
   searchBtn: {
     paddingTop: '10px !important',
+  },
+  header: {
+    fontWeight: 400,
   },
 })
 
@@ -75,13 +75,13 @@ class AddNewStatement extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'amount', title: 'Payable Amount' },
-      { name: 'outstandingBalance', title: 'Outstanding Amount' },
-      { name: 'remarks', title: 'Remarks' },
+      { name: 'invoiceAmt', title: 'Payable Amount' },
+      { name: 'outstandingAmount', title: 'Outstanding Amount' },
+      { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
       {
-        columnName: 'amount',
+        columnName: 'invoiceAmt',
         type: 'number',
         currency: true,
       },
@@ -104,30 +104,37 @@ class AddNewStatement extends PureComponent {
     //   'invoiceDate',
     // ],
     rows: [
-      {
-        id: 'PT-000001A',
-        invoiceNo: 'IV-000001',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        amount: 100,
-        outstandingBalance: 100,
-      },
+      // {
+      //   id: 'PT-000001A',
+      //   invoiceNo: 'IV-000001',
+      //   invoiceDate: moment()
+      //     .add(Math.ceil(Math.random() * 100) - 100, 'days')
+      //     .format('LLL'),
+      //   patientName: 'Patient 01',
+      //   amount: 100,
+      //   outstandingBalance: 100,
+      // },
     ],
     selectedRows: [],
   }
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'statement/queryInvoiceList',
+    this.setState({
+      rows: this.props.values.statementInvoice,
     })
-
-    // .then((v) => console.log({ v }))
   }
 
   handleSelectionChange = (selection) => {
     this.setState({ selectedRows: selection })
+  }
+
+  getInvoiceList = (e) => {
+    this.props.dispatch({
+      type: 'statement/queryInvoiceList',
+      payload: {
+        'invoicePayer.CompanyFK': e,
+      },
+    })
   }
 
   render () {
@@ -139,12 +146,10 @@ class AddNewStatement extends PureComponent {
       dateColumns,
       columnExtensions,
     } = this.state
-    console.log(columns)
     const editRow = (row, e) => {
       history.push(`/finance/statement`)
     }
-    console.log('props', this.props)
-
+    console.log('statementInvoice', this.state.rows)
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -164,10 +169,15 @@ class AddNewStatement extends PureComponent {
             <GridContainer>
               <GridItem md={3}>
                 <FastField
-                  name='coPayer'
+                  name='copayerFK'
                   render={(args) => {
                     return (
-                      <CodeSelect label='Co-Payer' code='ctcopayer' {...args} />
+                      <CodeSelect
+                        label='Co-Payer'
+                        code='ctcopayer'
+                        onChange={(e) => this.getInvoiceList(e)}
+                        {...args}
+                      />
                     )
                   }}
                 />
@@ -175,7 +185,12 @@ class AddNewStatement extends PureComponent {
             </GridContainer>
 
             <GridItem md={3}>
-              <DatePicker label='Statement Date' />
+              <FastField
+                name='statementDate'
+                render={(args) => (
+                  <DatePicker label='Statement Date' {...args} />
+                )}
+              />
             </GridItem>
 
             <GridItem md={3}>
@@ -196,7 +211,7 @@ class AddNewStatement extends PureComponent {
             <GridContainer>
               <GridItem md={3}>
                 <Field
-                  name='xxxxx'
+                  name='adminChargeValue'
                   render={(args) => {
                     if (values.adminChargeType) {
                       return (
@@ -226,7 +241,7 @@ class AddNewStatement extends PureComponent {
 
             <GridItem md={6}>
               <FastField
-                name='remarks'
+                name='remark'
                 render={(args) => {
                   return <TextField label='Remarks' multiline {...args} />
                 }}
@@ -299,12 +314,13 @@ class AddNewStatement extends PureComponent {
             //   marginTop: theme.spacing(3),
             // }}
           >
-            <h5>
-              Select outstanding invoices to be included in this statement
-            </h5>
-            <Divider />
+            <h4 className={classes.header}>
+              <b>
+                Select outstanding invoices to be included in this statement
+              </b>
+            </h4>
           </div>
-          <GridContainer>
+          <GridContainer style={{ margin: theme.spacing(2), marginTop: 0 }}>
             {/* <GridItem
               xs
               lg={8}
@@ -382,7 +398,7 @@ class AddNewStatement extends PureComponent {
               </GridItem>
             </GridItem>
             <CommonTableGrid
-              style={{ marginTop: 10 }}
+              style={{ margin: theme.spacing(2) }}
               rows={rows}
               columns={columns}
               // currencyColumns={currencyColumns}
