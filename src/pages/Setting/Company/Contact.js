@@ -12,7 +12,7 @@ import {
 } from '@/components'
 
 const Contact = (props) => {
-  const { theme, type } = props
+  const { theme, type, isUserMaintainable } = props
   return (
     <React.Fragment>
       <div
@@ -36,21 +36,38 @@ const Contact = (props) => {
             <FastField
               name='contact.contactAddress[0].street'
               render={(args) => (
-                <TextField label='Address' multiline autoFocused {...args} />
+                <TextField
+                  label='Address'
+                  multiline
+                  autoFocused
+                  disabled={!isUserMaintainable}
+                  {...args}
+                />
               )}
             />
           </GridItem>
           <GridItem md={6}>
             <FastField
               name='contact.contactAddress[0].postcode'
-              render={(args) => <TextField label='Postal Code' {...args} />}
+              render={(args) => (
+                <TextField
+                  label='Postal Code'
+                  disabled={!isUserMaintainable}
+                  {...args}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={6}>
             <FastField
               name='contact.contactAddress[0].countryFK'
               render={(args) => (
-                <CodeSelect label='Country' code='ctCountry' {...args} />
+                <CodeSelect
+                  label='Country'
+                  code='ctCountry'
+                  disabled={!isUserMaintainable}
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -72,7 +89,11 @@ const Contact = (props) => {
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (
-                <NumberInput label='Contact Number' {...args} />
+                <NumberInput
+                  label='Contact Number'
+                  disabled={!isUserMaintainable}
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -103,13 +124,25 @@ const Contact = (props) => {
               <GridItem md={6}>
                 <FastField
                   name='contact.contactEmailAddress.emailAddress'
-                  render={(args) => <TextField label='Email' {...args} />}
+                  render={(args) => (
+                    <TextField
+                      label='Email'
+                      disabled={!isUserMaintainable}
+                      {...args}
+                    />
+                  )}
                 />
               </GridItem>
               <GridItem md={6}>
                 <FastField
                   name='contact.contactWebsite.website'
-                  render={(args) => <TextField label='URL' {...args} />}
+                  render={(args) => (
+                    <TextField
+                      label='URL'
+                      disabled={!isUserMaintainable}
+                      {...args}
+                    />
+                  )}
                 />
               </GridItem>
             </GridContainer>

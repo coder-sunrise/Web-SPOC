@@ -112,7 +112,7 @@ class Detail extends PureComponent {
     const { classes, theme, footer, values, settingCompany, route } = props
     const { name } = route
     const type = 'copayer'
-
+    const { isUserMaintainable } = values
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -125,7 +125,7 @@ class Detail extends PureComponent {
                     label={name === type ? 'Co-Payer Code' : 'Company Code'}
                     autoFocused
                     {...args}
-                    disabled={!!settingCompany.entity}
+                    disabled={!!settingCompany.entity || !isUserMaintainable}
                   />
                 )}
               />
@@ -136,6 +136,7 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <TextField
                     label={name === type ? 'Co-Payer Name' : 'Company Name'}
+                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )}
@@ -150,6 +151,7 @@ class Detail extends PureComponent {
                       format={dateFormatLong}
                       label='Effective Start Date'
                       label2='End Date'
+                      disabled={!isUserMaintainable}
                       {...args}
                     />
                   )
@@ -166,6 +168,7 @@ class Detail extends PureComponent {
                       <CodeSelect
                         label='Co-Payer Type'
                         code='ctCopayerType'
+                        disabled={!isUserMaintainable}
                         {...args}
                       />
                     )}
@@ -186,6 +189,7 @@ class Detail extends PureComponent {
                         currency
                         label='Admin Fee'
                         defaultValue='0.00'
+                        disabled={!isUserMaintainable}
                         {...args}
                       />
                     )
@@ -194,6 +198,7 @@ class Detail extends PureComponent {
                     <NumberInput
                       percentage
                       label='Admin Fee'
+                      disabled={!isUserMaintainable}
                       defaultValue='0.00'
                       {...args}
                     />
@@ -211,6 +216,7 @@ class Detail extends PureComponent {
                     unCheckedChildren='%'
                     unCheckedValue='Percentage'
                     label=' '
+                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )}
@@ -218,7 +224,11 @@ class Detail extends PureComponent {
             </GridItem>
           </GridContainer>
 
-          <Contact theme={theme} type={name} />
+          <Contact
+            theme={theme}
+            type={name}
+            isUserMaintainable={isUserMaintainable}
+          />
         </div>
         {footer &&
           footer({
