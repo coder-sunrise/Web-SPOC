@@ -54,6 +54,7 @@ const Detail = ({
     values,
     setFieldValue,
     dispatch,
+    errors,
   }
   return (
     <React.Fragment>

@@ -40,6 +40,14 @@ const amountProps = {
 class DetailsHeader extends PureComponent {
   render () {
     const { classes, history, values } = this.props
+
+    // const outstandingBalanceStyle = (v) => {
+    //   if (v > 0) {
+    //     return 'red'
+    //   }
+    //   return 'green'
+    // }
+
     return (
       <CardContainer hideHeader size='sm'>
         <GridContainer xs={12}>
@@ -121,7 +129,7 @@ class DetailsHeader extends PureComponent {
             </GridItem>
             <GridItem md={3}>
               <FastField
-                name='payableAmount'
+                name='totalAmount'
                 render={(args) => <NumberInput {...amountProps} {...args} />}
               />
             </GridItem>

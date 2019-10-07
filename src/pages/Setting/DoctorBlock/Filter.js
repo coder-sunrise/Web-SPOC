@@ -63,7 +63,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='status'
               render={(args) => {
@@ -71,7 +71,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={4}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='recurrence'
               render={(args) => {

@@ -16,13 +16,48 @@ const addContent = (type, props) => {
 }
 
 const tabHeader = (tabName, detailsProps) => {
+  const errorHeader = (
+    <span style={{ color: 'red' }}>
+      {tabName} <Error />
+    </span>
+  )
   const returnTabHeader = () => {
     if (detailsProps.errors && !_.isEmpty(detailsProps.errors)) {
-      return (
-        <span style={{ color: 'red' }}>
-          {tabName} <Error />
-        </span>
-      )
+      const {
+        code,
+        displayValue,
+        revenueCategoryFK,
+        effectiveDates,
+        uomfk,
+        averageCostPrice,
+        markupMargin,
+        sellingPrice,
+        maxDiscount,
+        reOrderThreshold,
+        criticalThreshold,
+      } = detailsProps.errors
+
+      if (
+        (code ||
+          displayValue ||
+          revenueCategoryFK ||
+          effectiveDates ||
+          uomfk) &&
+        tabName === 'General'
+      ) {
+        return errorHeader
+      }
+
+      if (
+        (averageCostPrice || markupMargin || maxDiscount || sellingPrice) &&
+        tabName === 'Pricing'
+      ) {
+        return errorHeader
+      }
+
+      if ((reOrderThreshold || criticalThreshold) && tabName === 'Stock') {
+        return errorHeader
+      }
     }
     return <span>{tabName}</span>
   }
@@ -38,12 +73,12 @@ export const ConsumableDetailOption = (detailsProps, stockProps) => [
   },
   {
     id: 2,
-    name: 'Pricing',
+    name: tabHeader('Pricing', detailsProps),
     content: addContent(2, detailsProps),
   },
   {
     id: 3,
-    name: 'Stock',
+    name: tabHeader('Stock', stockProps),
     content: addContent(3, stockProps),
   },
 ]

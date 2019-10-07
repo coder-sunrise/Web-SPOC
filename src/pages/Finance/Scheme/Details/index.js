@@ -1,22 +1,13 @@
 import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { getAppendUrl } from '@/utils/utils'
-import {
-  NavPills,
-  ProgressButton,
-  Button,
-  withFormikExtend,
-  Tabs,
-} from '@/components'
-
-import { Divider } from '@material-ui/core'
-import Yup from '@/utils/yup'
 import { compose } from 'redux'
-import DetailPanel from './Detail'
-import Setting from './Setting'
+import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
+import { navigateDirtyCheck } from '@/utils/utils'
+import Yup from '@/utils/yup'
 import { InventoryTypes } from '@/utils/codes'
 import { SchemeDetailOption } from './variables'
+
 const styles = (theme) => ({
   actionDiv: {
     margin: theme.spacing(1),
@@ -82,12 +73,7 @@ const Detail = (props) => {
         options={SchemeDetailOption(detailProps)}
       />
       <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          onClick={() => {
-            history.push('/finance/scheme')
-          }}
-        >
+        <Button color='danger' onClick={navigateDirtyCheck('/finance/scheme')}>
           Cancel
         </Button>
         <ProgressButton

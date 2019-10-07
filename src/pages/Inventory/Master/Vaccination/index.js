@@ -95,6 +95,12 @@ const Vaccination = ({
   useEffect(() => {
     dispatch({
       type: 'vaccination/query',
+      payload: {
+        sorting: [
+          { columnName: 'effectiveEndDate', direction: 'desc' },
+          { columnName: 'displayValue', direction: 'asc' },
+        ],
+      },
     })
 
     setActiveTab('2')

@@ -99,6 +99,12 @@ const Consumable = ({
   useEffect(() => {
     dispatch({
       type: 'consumable/query',
+      payload: {
+        sorting: [
+          { columnName: 'effectiveEndDate', direction: 'desc' },
+          { columnName: 'displayValue', direction: 'asc' },
+        ],
+      },
     })
 
     setActiveTab('1')
