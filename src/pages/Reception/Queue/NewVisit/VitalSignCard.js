@@ -4,15 +4,20 @@ import { Field } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
-import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
+import { NumberInput, CommonCard, GridContainer, GridItem, withFormikExtend } from '@/components'
 import FormField from './formField'
 
 class VitalSignCard extends PureComponent {
+
+  @withFormikExtend({
+    mapPropsToValues: ({ scriblenotes }) => {
+     // return scriblenotes.entity === '' ? '' : scriblenotes.entity
+    },
+  })
   
   render () {
     const { handleCalculateBMI, isReadOnly = false } = this.props
-
-    console.log(this.props)
+    console.log("========= " ,FormField['vitalsign.temperatureC'])
     return (
       <CommonCard
         size='sm'
