@@ -35,7 +35,6 @@ const styles = (theme) => ({
     left: 305,
     right: 0,
     top: 25,
-    
   },
   linkBtn: {
     position: 'absolute',
@@ -128,11 +127,11 @@ class ClinicalNotes extends Component {
   }
 
   resize = () => {
-    if(window.innerWidth >= 1812){
+    if (window.innerWidth >= 1812) {
       this.setState({
         width: window.innerWidth / 4,
       })
-    }else{
+    } else {
       this.setState({
         width: window.innerWidth / 7.8,
       })
@@ -509,7 +508,9 @@ class ClinicalNotes extends Component {
                       Scribble Note
                     </Button>
 
-                    <div style={{ display: 'inline-block', position: 'absolute' }}>
+                    <div
+                      style={{ display: 'inline-block', position: 'absolute' }}
+                    >
                       {scriblenotes.ClinicianNote.notesScribbleArray.length >
                       0 ? (
                         <GridContainer>
@@ -621,7 +622,7 @@ class ClinicalNotes extends Component {
                       )}
                     </div>
                   </div>
-                  <RichEditor label='Clinical Notes' {...args} />
+                  <RichEditor strongLabel label='Clinical Notes' {...args} />
                 </div>
               )
             }}
@@ -658,10 +659,12 @@ class ClinicalNotes extends Component {
                     >
                       Scribble Note
                     </Button>
-                    <div style={{ display: 'inline-block', position: 'absolute' }}>
+                    <div
+                      style={{ display: 'inline-block', position: 'absolute' }}
+                    >
                       {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
                         .length > 0 ? (
-                        <GridContainer>
+                          <GridContainer>
                           <div
                             className={classes.root}
                             style={{ width: this.state.width, paddingLeft: 20 }}
@@ -795,7 +798,7 @@ class ClinicalNotes extends Component {
                       )}
                     </div>
                   </div>
-                  <RichEditor label='Chief Complaints' {...args} />
+                  <RichEditor strongLabel label='Chief Complaints' {...args} />
                 </div>
               )
             }}
@@ -834,7 +837,9 @@ class ClinicalNotes extends Component {
                       Scribble Note
                     </Button>
 
-                    <div style={{ display: 'inline-block',position: 'absolute' }}>
+                    <div
+                      style={{ display: 'inline-block', position: 'absolute' }}
+                    >
                       {scriblenotes.Plan.planScribbleArray.length > 0 ? (
                         <GridContainer>
                           <div
@@ -968,7 +973,7 @@ class ClinicalNotes extends Component {
                     </div>
                   </div>
 
-                  <RichEditor label='Plan' {...args} />
+                  <RichEditor strongLabel label='Plan' {...args} />
                 </div>
               )
             }}

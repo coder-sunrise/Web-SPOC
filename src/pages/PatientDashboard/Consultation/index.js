@@ -92,7 +92,7 @@ const saveConsultation = ({
       openConfirm: true,
       openConfirmContent: confirmMessage,
       onConfirmText: 'Confirm',
-      onConfirmDiscard: () => {
+      onConfirmSave: () => {
         const newValues = convertToConsultation(values, {
           orders,
           consultationDocument,
