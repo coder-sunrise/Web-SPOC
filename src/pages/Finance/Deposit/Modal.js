@@ -53,42 +53,48 @@ const style = () => ({
     }
     return deposit.default
   },
-  validationSchema: Yup.object().shape({
-    patientDepositTransaction: Yup.object().shape({
-      transactionDate: Yup.string().required('Date is required'),
-      transactionBizSessionFK: Yup.number().required(),
-      transactionModeFK: Yup.number().required('Mode is required'),
-      amount: Yup.number().min(0.01, 'The amount should be more than 0.01'),
-      creditCardTypeFK: Yup.number().when('transactionModeFK', {
-        is: (val) => val === 1,
-        then: Yup.number().required(),
-      }),
-      cardNumber: Yup.string().nullable().when('transactionModeFK', {
-        is: (val) => val === 1,
-        then: Yup.string()
-          .nullable()
-          .length(4, 'Enter 4 digits of the card number'),
-      }),
+  validationSchema: ({ deposit }) => {
+    const balance = deposit.entity
+      ? deposit.entity.balance
+      : deposit.default.balance
+    return Yup.object().shape({
+      patientDepositTransaction: Yup.object().shape({
+        transactionDate: Yup.string().required('Date is required'),
+        transactionBizSessionFK: Yup.number().required(),
+        transactionModeFK: Yup.number().required('Mode is required'),
+        amount: Yup.number()
+          .min(0.01, 'The amount should be more than 0.01')
+          .max(balance, 'The amount should not exceed the balance.'),
+        creditCardTypeFK: Yup.number().when('transactionModeFK', {
+          is: (val) => val === 1,
+          then: Yup.number().required(),
+        }),
+        cardNumber: Yup.string().nullable().when('transactionModeFK', {
+          is: (val) => val === 1,
+          then: Yup.string()
+            .nullable()
+            .length(4, 'Enter 4 digits of the card number'),
+        }),
 
-      // cardNumber: Yup.number().when('transactionModeFK', {
-      //   is: (val) => false,
-      //   then: Yup.number().test(
-      //     'test-number', // this is used internally by yup
-      //     'Credit Card number is invalid', //validation message
-      //     (value) => valid.number(value).isValid,
-      //   ), // ret,
-      //   otherwise: Yup.number(),
-      // }),
-      //   cardNumber: Yup.string()
-      //     .test(
-      //       'test-number', // this is used internally by yup
-      //       'Credit Card number is invalid', //validation message
-      //       (value) => valid.number(value).isValid,
-      //     ) // return true false based on validation
-      //     .required(),
-    }),
-  }),
-
+        // cardNumber: Yup.number().when('transactionModeFK', {
+        //   is: (val) => false,
+        //   then: Yup.number().test(
+        //     'test-number', // this is used internally by yup
+        //     'Credit Card number is invalid', //validation message
+        //     (value) => valid.number(value).isValid,
+        //   ), // ret,
+        //   otherwise: Yup.number(),
+        // }),
+        //   cardNumber: Yup.string()
+        //     .test(
+        //       'test-number', // this is used internally by yup
+        //       'Credit Card number is invalid', //validation message
+        //       (value) => valid.number(value).isValid,
+        //     ) // return true false based on validation
+        //     .required(),
+      }),
+    })
+  },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, codetable } = props
     const { balanceAfter, patientDepositTransaction } = values
