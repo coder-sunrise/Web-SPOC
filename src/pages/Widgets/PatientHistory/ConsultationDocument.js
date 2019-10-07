@@ -2,6 +2,7 @@ import { CommonTableGrid } from '@/components'
 import { printRow } from '../ConsultationDocument'
 
 export default ({ current }) => {
+
   return (
     <CommonTableGrid
       size='sm'

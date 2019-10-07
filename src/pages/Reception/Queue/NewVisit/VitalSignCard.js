@@ -9,15 +9,8 @@ import FormField from './formField'
 
 class VitalSignCard extends PureComponent {
 
-  @withFormikExtend({
-    mapPropsToValues: ({ scriblenotes }) => {
-     // return scriblenotes.entity === '' ? '' : scriblenotes.entity
-    },
-  })
-  
   render () {
     const { handleCalculateBMI, isReadOnly = false } = this.props
-    console.log("========= " ,FormField['vitalsign.temperatureC'])
     return (
       <CommonCard
         size='sm'

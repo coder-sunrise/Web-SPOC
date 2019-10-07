@@ -155,18 +155,6 @@ class PatientHistory extends Component {
     this.widgets = [
       {
         id: '1',
-        name: 'Chief Complaints',
-        component: Loadable({
-          loader: () => import('./ChiefComplaints'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '2',
         name: 'Plan',
         component: Loadable({
           loader: () => import('./Plan'),
@@ -178,7 +166,31 @@ class PatientHistory extends Component {
         }),
       },
       {
+        id: '2',
+        name: 'Chief Complaints',
+        component: Loadable({
+          loader: () => import('./ChiefComplaints'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...props} {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
         id: '3',
+        name: 'Plan',
+        component: Loadable({
+          loader: () => import('./Plan'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...props} {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '4',
         name: 'Diagnosis',
         component: Loadable({
           loader: () => import('./Diagnosis'),
@@ -190,7 +202,7 @@ class PatientHistory extends Component {
         }),
       },
       {
-        id: '4',
+        id: '5',
         name: 'Orders',
         component: Loadable({
           loader: () => import('./Orders'),
@@ -202,7 +214,7 @@ class PatientHistory extends Component {
         }),
       },
       {
-        id: '5',
+        id: '6',
         name: 'Consultation Document',
         component: Loadable({
           loader: () => import('./ConsultationDocument'),
@@ -560,9 +572,7 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-    console.log("###############")
-    console.log(this.props)
-    console.log(mode)
+ 
     return (
       <div {...cfg}>
         {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (

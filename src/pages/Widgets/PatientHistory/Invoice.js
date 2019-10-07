@@ -128,7 +128,7 @@ const Invoice = (props) => {
         </GridItem>
         <GridItem xs={2} md={9} />
         <GridItem xs={10} md={3}>
-          <NumberInput prefix='Total:' defaultValue={203.3} {...amountProps} />
+          <NumberInput prefix='Total:' value={203.3} {...amountProps} />
         </GridItem>
       </GridContainer>
     </div>
