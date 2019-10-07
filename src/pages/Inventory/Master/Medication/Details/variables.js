@@ -30,16 +30,35 @@ const tabHeader = (tabName, detailsProps) => {
         code,
         displayValue,
         revenueCategoryFK,
-        dispensingUOMFK,
+        effectiveDates,
         prescribingUOMFK,
+        dispensingUOMFK,
+        averageCostPrice,
+        markupMargin,
+        sellingPrice,
+        maxDiscount,
+        reOrderThreshold,
+        criticalThreshold,
       } = detailsProps.errors
+
       if ((dispensingUOMFK || prescribingUOMFK) && tabName === 'Setting') {
         return errorHeader
       }
       if (
-        (code || displayValue || revenueCategoryFK) &&
+        (code || displayValue || revenueCategoryFK || effectiveDates) &&
         tabName === 'General'
       ) {
+        return errorHeader
+      }
+
+      if (
+        (averageCostPrice || markupMargin || maxDiscount || sellingPrice) &&
+        tabName === 'Pricing'
+      ) {
+        return errorHeader
+      }
+
+      if ((reOrderThreshold || criticalThreshold) && tabName === 'Stock') {
         return errorHeader
       }
     }
@@ -62,12 +81,12 @@ export const MedicationDetailOption = (detailsProps, stockProps) => [
   },
   {
     id: 2,
-    name: 'Pricing',
+    name: tabHeader('Pricing', detailsProps),
     content: addContent(3, detailsProps),
   },
   {
     id: 3,
-    name: 'Stock',
+    name: tabHeader('Stock', stockProps),
     content: addContent(4, stockProps),
   },
 ]

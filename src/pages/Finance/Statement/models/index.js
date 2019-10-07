@@ -14,6 +14,7 @@ export default createListViewModel({
       default: {
         paymentTerms: 0,
       },
+      invoiceList: [],
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -21,8 +22,8 @@ export default createListViewModel({
       })
     },
     effects: {
-      *queryInvoiceList (_, { call, put }) {
-        const response = yield call(service.queryInvoiceList)
+      *queryInvoiceList ({ payload }, { call, put }) {
+        const response = yield call(service.queryInvoiceList, payload)
         yield put({
           type: 'queryInvoiceDone',
           payload: response,

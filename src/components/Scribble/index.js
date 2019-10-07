@@ -115,7 +115,7 @@ let temp = null
 class Scribble extends React.Component {
   constructor (props) {
     super(props)
-    this.state = {
+    this.state = { 
       tool: Tools.Pencil,
       lineWidth: 10,
       lineColor: 'black',
@@ -218,7 +218,6 @@ class Scribble extends React.Component {
 
   _clear = () => {
     this._sketch.clear()
-    // this._sketch.setBackgroundFromDataUrl('')
     this.setState({
       backgroundColor: 'transparent',
       fillWithBackgroundColor: false,
@@ -228,14 +227,14 @@ class Scribble extends React.Component {
     })
   }
 
-  _test = () => {
-    this._sketch.test()
-  }
+  // _test = () => {
+  //   this._sketch.test()
+  // }
 
-  testPassValue = () => {
-    let value = this._sketch.getValue()
-    return value
-  }
+  // testPassValue = () => {
+  //   let value = this._sketch.getValue()
+  //   return value
+  // }
 
   _download = () => {
     this._sketch.downloadImage()
@@ -761,7 +760,7 @@ class Scribble extends React.Component {
 
                 <ProgressButton
                   onClick={() => {
-                    temp = this._sketch.getValue()
+                    temp = this._sketch.getAllLayerData()
                     handleSubmit()
                   }}
                 />

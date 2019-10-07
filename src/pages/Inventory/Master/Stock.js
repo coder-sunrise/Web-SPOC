@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { formatMessage } from 'umi/locale'
 import { Radio } from 'antd'
@@ -10,6 +9,7 @@ import {
   GridItem,
   NumberInput,
   CommonTableGrid,
+  Field,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -61,6 +61,19 @@ const Stock = ({
   }
 
   const [
+    stockQty,
+    setStockQty,
+  ] = useState(0)
+
+  useEffect(() => {
+    let totalQty = 0
+    values[objectType()].forEach((o) => {
+      totalQty += o.stock
+    })
+    setStockQty(totalQty)
+  }, [])
+
+  const [
     tableParas,
     setTableParas,
   ] = useState({
@@ -109,15 +122,18 @@ const Stock = ({
       </h4>
       <GridContainer className={classes.infoPanl}>
         <GridItem xs={12} md={4}>
-          <FastField
-            name={`${objectType()}.length`}
+          <Field
+            name={`${objectType()}`}
+            // name={`${objectType()}.length`}
             render={(args) => {
               return (
                 <NumberInput
                   label={formatMessage({
                     id: 'inventory.master.stock.currentStock',
                   })}
+                  value={stockQty}
                   disabled
+                  format='0.0'
                   {...args}
                 />
               )
@@ -133,14 +149,7 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.reorderThreshold',
                   })}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setFieldValue(
-                        'reOrderThreshold',
-                        e.target.value.toFixed(2),
-                      )
-                    }
-                  }}
+                  format='0.00'
                   {...args}
                 />
               )
@@ -156,14 +165,7 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.criticalThreshold',
                   })}
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setFieldValue(
-                        'criticalThreshold',
-                        e.target.value.toFixed(2),
-                      )
-                    }
-                  }}
+                  format='0.00'
                   {...args}
                 />
               )

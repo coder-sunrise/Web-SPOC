@@ -25,6 +25,11 @@ class InventoryAdjustment extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'inventoryAdjustment/query',
+      payload: {
+        sorting: [
+          { columnName: 'adjustmentTransactionNo', direction: 'asc' },
+        ],
+      },
     })
     this.props
       .dispatch({
@@ -52,7 +57,7 @@ class InventoryAdjustment extends PureComponent {
       })
       .then((v) => {
         const { data } = v
-        return data
+        this.setState({ runningNo: data })
       })
   }
 
@@ -86,7 +91,12 @@ class InventoryAdjustment extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail {...cfg} {...this.props} runningNo={this.state.runningNo} />
+          <Detail
+            {...cfg}
+            {...this.props}
+            runningNo={this.state.runningNo}
+            getRunningNo={this.getRunningNo}
+          />
         </CommonModal>
       </CardContainer>
     )

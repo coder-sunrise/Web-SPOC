@@ -99,6 +99,12 @@ const Medication = ({ dispatch, history, medication, values }) => {
   useEffect(() => {
     dispatch({
       type: 'medication/query',
+      payload: {
+        sorting: [
+          { columnName: 'effectiveEndDate', direction: 'desc' },
+          { columnName: 'displayValue', direction: 'asc' },
+        ],
+      },
     })
     // dispatch({
     //   type: 'inventoryMaster/updateState',

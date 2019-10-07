@@ -91,6 +91,7 @@ export default {
   'menu.setting.clinicinfo': 'Clinic Information',
   'menu.setting.service': 'Service',
   'menu.setting.room': 'Room',
+  'menu.setting.roomblock': 'Room Block',
   'menu.setting.clinicbreakhour': 'Clinic Break Hour',
   'menu.setting.publicholiday': 'Public Holiday',
   'menu.setting.participantrole': 'Participant Role',

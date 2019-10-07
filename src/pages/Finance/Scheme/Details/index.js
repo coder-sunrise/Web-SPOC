@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
 import { compose } from 'redux'
-import { getAppendUrl } from '@/utils/utils'
+import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import {
   NavPills,
   ProgressButton,
@@ -61,11 +61,18 @@ const Detail = (props) => {
         },
       }}
     >
-      <div>
-        <Tabs
-          style={{ marginTop: theme.spacing(1) }}
-          defaultActiveKey='0'
-          options={SchemeDetailOption(detailProps)}
+      <Tabs
+        style={{ marginTop: theme.spacing(1) }}
+        defaultActiveKey='0'
+        options={SchemeDetailOption(detailProps)}
+      />
+      <div className={classes.actionDiv}>
+        <Button color='danger' onClick={navigateDirtyCheck('/finance/scheme')}>
+          Cancel
+        </Button>
+        <ProgressButton
+          submitKey='schemeDetail/submit'
+          onClick={handleSubmit}
         />
         <div className={classes.actionDiv}>
           <Button

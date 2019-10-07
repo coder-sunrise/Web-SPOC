@@ -23,11 +23,21 @@ class Supplier extends PureComponent {
 
   componentDidMount () {
     const { route, dispatch } = this.props
-
+    const suppSorting = [
+      { columnName: 'effectiveEndDate', direction: 'desc' },
+      { columnName: 'displayValue', direction: 'asc' },
+    ]
+    const copayerSorting = [
+      { columnName: 'effectiveEndDate', direction: 'desc' },
+      { columnName: 'coPayerTypeFK', direction: 'asc' },
+      { columnName: 'displayValue', direction: 'asc' },
+    ]
+    const copayer = route.name === 'copayer'
     dispatch({
       type: 'settingCompany/query',
       payload: {
-        companyTypeFK: route.name === 'copayer' ? 1 : 2,
+        companyTypeFK: copayer ? 1 : 2,
+        sorting: copayer ? copayerSorting : suppSorting,
       },
     })
   }
