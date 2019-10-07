@@ -516,14 +516,13 @@ class PatientHistory extends Component {
           }}
         >
           {entity &&
-            this.widgets
-              .filter(
-                (o) =>
+            this.widgets.filter( (o) =>
                   this.state.selectedItems.indexOf('0') >= 0 ||
                   this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
+              ).map((o) => {
                 const Widget = o.component
+
+                console.log("******** " , entity)
                 return (
                   <div>
                     <h5>{o.name}</h5>
