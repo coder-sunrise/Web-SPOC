@@ -5,13 +5,7 @@ import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  Select,
-} from '@/components'
+import { Button, GridContainer, GridItem, Select } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -63,12 +57,18 @@ class ApprovedCHAS extends React.Component {
       classes,
       claimSubmissionApproved,
       handleContextMenuItemClick,
+      dispatch,
+      values,
     } = this.props
     const { list } = claimSubmissionApproved || []
 
     return (
-      <CardContainer hideHeader size='sm'>
-        <BaseSearchBar>
+      <React.Fragment>
+        <BaseSearchBar
+          dispatch={dispatch}
+          values={values}
+          modelsName='claimSubmissionApproved'
+        >
           <GridItem md={12}>
             <FastField
               name='claimStatus'
@@ -95,7 +95,7 @@ class ApprovedCHAS extends React.Component {
             <Button color='success'>Collect Payment</Button>
           </GridItem>
         </GridContainer>
-      </CardContainer>
+      </React.Fragment>
     )
   }
 }

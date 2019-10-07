@@ -5,7 +5,7 @@ import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -13,7 +13,6 @@ import TableGrid from '../../common/TableGrid'
 import {
   NewCHASColumnExtensions,
   NewCHASColumns,
-  NewCHASTableData,
   TableConfig,
 } from './variables'
 
@@ -34,33 +33,62 @@ const styles = (theme) => ({
   mapPropsToValues: () => ({}),
 })
 class RejectedCHAS extends React.Component {
+  state = {
+    selectedRows: [],
+  }
+
   componentDidMount () {
+    this.refreshDataGrid()
+  }
+
+  onRefreshClicked = () => this.refreshDataGrid()
+
+  refreshDataGrid = () => {
     this.props.dispatch({
       type: 'claimSubmissionRejected/query',
     })
   }
 
+  handleSelectionChange = (selection) =>
+    this.setState({ selectedRows: selection })
+
   render () {
-    const { classes, handleContextMenuItemClick } = this.props
+    const {
+      classes,
+      claimSubmissionRejected,
+      handleContextMenuItemClick,
+      dispatch,
+      values,
+    } = this.props
+    const { list } = claimSubmissionRejected || []
+
     return (
-      <CardContainer hideHeader size='sm'>
-        <BaseSearchBar />
+      <React.Fragment>
+        <BaseSearchBar
+          dispatch={dispatch}
+          values={values}
+          modelsName='claimSubmissionRejected'
+        />
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
-              data={NewCHASTableData}
+              data={list}
               columnExtensions={NewCHASColumnExtensions}
               columns={NewCHASColumns}
               tableConfig={TableConfig}
+              selection={this.state.selectedRows}
+              onSelectionChange={this.handleSelectionChange}
               onContextMenuItemClick={handleContextMenuItemClick}
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
-            <Button color='info'>Refresh</Button>
+            <Button color='info' onClick={this.onRefreshClicked}>
+              Refresh
+            </Button>
             <Button color='primary'>Re-Submit Claim</Button>
           </GridItem>
         </GridContainer>
-      </CardContainer>
+      </React.Fragment>
     )
   }
 }

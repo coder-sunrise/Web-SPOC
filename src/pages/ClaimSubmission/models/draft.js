@@ -9,7 +9,7 @@ export default createListViewModel({
     service,
     state: {
       fixedFilter: {
-        status: 'InProgress',
+        status: 'Draft',
       },
       default: {},
     },
@@ -27,13 +27,6 @@ export default createListViewModel({
           list: data.data,
         }
       },
-
-      // fakeQueryDone (st, { payload }) {
-      //   return {
-      //     ...st,
-      //     list: FakeDataClaimSubmissionCHAS(),
-      //   }
-      // },
     },
   },
 })

@@ -5,7 +5,7 @@ import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -57,12 +57,18 @@ class NewCHAS extends React.Component {
       classes,
       claimSubmissionNew,
       handleContextMenuItemClick,
+      dispatch,
+      values,
     } = this.props
     const { list } = claimSubmissionNew || []
 
     return (
-      <CardContainer hideHeader size='sm'>
-        <BaseSearchBar />
+      <React.Fragment>
+        <BaseSearchBar
+          dispatch={dispatch}
+          values={values}
+          modelsName='claimSubmissionNew'
+        />
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
@@ -76,11 +82,13 @@ class NewCHAS extends React.Component {
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
-            <Button color='info'>Refresh</Button>
+            <Button color='info' onClick={this.onRefreshClicked}>
+              Refresh
+            </Button>
             <Button color='primary'>Submit Claim</Button>
           </GridItem>
         </GridContainer>
-      </CardContainer>
+      </React.Fragment>
     )
   }
 }
