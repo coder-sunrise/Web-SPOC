@@ -52,7 +52,7 @@ class TextEditorBase extends PureComponent {
     } = cfg
 
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][row.id] || row
       : row
     if (editRender) {
       return editRender(row)
@@ -79,7 +79,7 @@ class TextEditorBase extends PureComponent {
         <TextField
           showErrorIcon
           simple
-          value={latestRow[columnName]}
+          defaultValue={latestRow[columnName]}
           onChange={submitValue}
           // onCommit={submitValue}
           // onChange={submitValue}
