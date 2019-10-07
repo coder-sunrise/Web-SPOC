@@ -176,7 +176,7 @@ const columnExtensions = [
   },
   {
     columnName: 'doctor',
-    render: (row) => <DoctorLabel doctor={row.doctor} />,
+    render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
   },
 ]
 
@@ -195,8 +195,16 @@ const Grid = ({
   onRegisterPatientClick,
   onViewPatientProfileClick,
   handleActualizeAppointment,
-  deleteQueue,
 }) => {
+  const deleteQueue = (id) => {
+    dispatch({
+      type: 'queueLog/deleteQueueByQueueID',
+      payload: {
+        id,
+      },
+    })
+  }
+
   const onRowDoubleClick = (row) =>
     handleEditVisitClick({
       visitID: row.id,
@@ -250,7 +258,7 @@ const Grid = ({
         openConfirm: true,
         openConfirmTitle: '',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
-        onConfirmDiscard: () => deleteQueue(id),
+        onConfirmSave: () => deleteQueue(id),
       },
     })
   }
@@ -431,8 +439,6 @@ const Grid = ({
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
         <CommonTableGrid
-          // style={{ maxHeight: '76.5vh', overflow: 'auto' }}
-          // height={600}
           size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}

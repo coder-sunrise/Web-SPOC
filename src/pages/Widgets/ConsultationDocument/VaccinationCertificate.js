@@ -25,8 +25,8 @@ import {
   ClinicianSelect,
 } from '@/components'
 
-@connect(({ patientDashboard }) => ({
-  patientDashboard,
+@connect(({ patient }) => ({
+  patient,
 }))
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument }) => {
@@ -78,7 +78,7 @@ class VaccinationCertificate extends PureComponent {
       footer,
       handleSubmit,
       classes,
-      patientDashboard,
+      patient,
       templateLoader,
       setFieldValue,
       codetable,
@@ -111,8 +111,8 @@ class VaccinationCertificate extends PureComponent {
               render={(args) => {
                 const { form, field } = args
                 if (!field.value) {
-                  const { patientInfo } = patientDashboard
-                  const { name, patientAccountNo, genderFK, dob } = patientInfo
+                  const { entity } = patient
+                  const { name, patientAccountNo, genderFK, dob } = entity
 
                   const { ctgender = [] } = codetable
                   if (ctgender.length > 0) {

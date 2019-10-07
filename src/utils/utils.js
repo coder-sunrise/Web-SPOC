@@ -686,6 +686,7 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
           id: 'app.general.leave-without-save',
         }),
         onConfirmSave: saveCb,
+        openConfirmText: 'Save Changes',
         onConfirmDiscard: () => {
           if (displayName) {
             window.g_app._store.dispatch({
@@ -846,19 +847,22 @@ const getRefreshChasBalanceStatus = (status = []) => {
 
 const calculateAmount = (
   rows,
-  finalAdjustments,
+  adjustments,
   {
     totalField = 'totalAfterItemAdjustment',
     adjustedField = 'totalAfterOverallAdjustment',
+    isGSTInclusive = false,
   } = {},
 ) => {
+  let gst = 0
   const total = rows.map((o) => o[totalField]).reduce(sumReducer, 0)
+
   rows.forEach((r) => {
     r.weightage = r[totalField] / total
     r[adjustedField] = r[totalField]
     // console.log(r)
   })
-  finalAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+  adjustments.filter((o) => !o.isDeleted).forEach((fa) => {
     rows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
       r[adjustedField] += r.weightage * fa.adjAmount
@@ -874,20 +878,32 @@ const calculateAmount = (
     return
   }
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
-  const gst = isEnableGST ? totalAfterAdj * gSTPercentage : 0
-  // console.log(totalAfterAdj, gst)
+  if (isEnableGST) {
+    if (isGSTInclusive) {
+      rows.forEach((r) => {
+        gst += r[adjustedField] - r[adjustedField] / (1 + gSTPercentage)
+      })
+    } else {
+      gst = totalAfterAdj * gSTPercentage
+    }
+  }
 
-  // eslint-disable-next-line consistent-return
-  return {
+  // console.log(totalAfterAdj, gst)
+  const r = {
     rows,
+    adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
       gst,
       total: totalAfterAdj,
-      totalWithGST: gst + totalAfterAdj,
+      totalWithGST: isGSTInclusive ? totalAfterAdj : gst + totalAfterAdj,
       isEnableGST,
       gSTPercentage,
+      isGSTInclusive,
     },
   }
+  // console.log(r)
+  // eslint-disable-next-line consistent-return
+  return r
 }
 
 module.exports = {

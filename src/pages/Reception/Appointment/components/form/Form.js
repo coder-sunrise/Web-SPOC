@@ -29,7 +29,7 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 // utils
-import { ValidationSchema, mapPropsToValues } from './formikUtils'
+import { ValidationSchema, mapPropsToValues } from './formUtils'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
@@ -80,6 +80,7 @@ class Form extends React.PureComponent {
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: false,
     editingRows: [],
+    _tempCallback: undefined,
   }
 
   componentDidMount () {
@@ -98,10 +99,6 @@ class Form extends React.PureComponent {
         type: 'codetable/fetchCodes',
         payload: { code: 'ltcancelreasontype' },
       }),
-      // this.props.dispatch({
-      //   type: 'codetable/fetchCodes',
-      //   payload: { code: 'LTRescheduleBy' },
-      // }),
     ])
 
     this.validateDataGrid()
@@ -212,7 +209,6 @@ class Form extends React.PureComponent {
   onSelectPatientClick = async (patientProfile, autoPopulate = false) => {
     const { id, patientAccountNo, name, mobileNo } = patientProfile
     const { values, setValues } = this.props
-    console.log('patientProfile', patientProfile)
     await setValues({
       ...values,
       patientAccountNo,
@@ -220,15 +216,6 @@ class Form extends React.PureComponent {
       patientName: name,
       patientContactNo: mobileNo,
     })
-    // await setFieldValue('patientProfileFK', id)
-    // await setFieldValue('patientAccountNo', patientAccountNo)
-    // await setFieldValue('patientName', name)
-    // await setFieldValue('patientContactNo', mobileNo)
-
-    // setFieldTouched('patientName', true)
-    // setFieldTouched('contactNo', true)
-
-    // when not auto populate, close searchPatientModal
     if (!autoPopulate) this.toggleSearchPatientModal()
 
     return true
@@ -298,16 +285,6 @@ class Form extends React.PureComponent {
         onClose()
       }
     })
-
-    // const { handleDeleteEvent, slotInfo } = this.props
-    // this.setState(
-    //   {
-    //     showDeleteConfirmationModal: false,
-    //   },
-    //   () => {
-    //     handleDeleteEvent(slotInfo.id, slotInfo._appointmentID)
-    //   },
-    // )
   }
 
   onCommitChanges = ({ rows, deleted }) => {
@@ -462,7 +439,7 @@ class Form extends React.PureComponent {
           payload: {
             openConfirm: true,
             openConfirmContent: `Are you sure want to delete this draft appointment?`,
-            onConfirmDiscard: () => this.deleteDraft(currentAppointment.id),
+            onConfirmSave: () => this.deleteDraft(currentAppointment.id),
           },
         })
       } else {
@@ -508,7 +485,10 @@ class Form extends React.PureComponent {
 
       if (
         values.currentAppointment &&
-        values.currentAppointment.appointmentStatusFk === 1
+        (values.currentAppointment.appointmentStatusFk ===
+          APPOINTMENT_STATUS.SCHEDULED ||
+          values.currentAppointment.appointmentStatusFk ===
+            APPOINTMENT_STATUS.RESCHEDULED)
       )
         newAppointmentStatusFK = rescheduleFK
 
@@ -517,6 +497,7 @@ class Form extends React.PureComponent {
           appointment.isEditedAsSingleAppointment || editedAsSingle,
         false,
       )
+
       this.setState(
         {
           tempNewAppointmentStatusFK: newAppointmentStatusFK,
@@ -527,17 +508,17 @@ class Form extends React.PureComponent {
             mode === 'series' &&
             hasModifiedAsSingle &&
             viewingAppointment.isEnableRecurrence
-          )
-            this.openSeriesUpdateConfirmation()
-          else {
+          ) {
+            this.openSeriesUpdateConfirmation(this.openRescheduleForm)
+            return true
+          }
+
+          if (newAppointmentStatusFK === APPOINTMENT_STATUS.RESCHEDULED) {
+            this.openRescheduleForm()
+          } else {
             this._submit()
           }
-          // if (isScheduled)
-          //   return !values.editSingleAppointment
-          //     ? this.openSeriesUpdateConfirmation()
-          //     : this._submit()
-
-          // return this._submit()
+          return true
         },
       )
     } catch (error) {
@@ -545,9 +526,14 @@ class Form extends React.PureComponent {
     }
   }
 
-  openSeriesUpdateConfirmation = () => {
+  openRescheduleForm = (callback) => {
+    this.setState({ showRescheduleForm: true, _tempCallback: callback })
+  }
+
+  openSeriesUpdateConfirmation = (callback) => {
     this.setState({
       showSeriesUpdateConfirmation: true,
+      _tempCallback: callback,
     })
   }
 
@@ -556,12 +542,24 @@ class Form extends React.PureComponent {
   }
 
   closeRescheduleForm = () => {
-    this.setState({ showRescheduleForm: false })
+    this.setState({ showRescheduleForm: false, _tempCallback: undefined })
   }
 
   onConfirmSeriesUpdate = async (type) => {
     await this.props.setFieldValue('overwriteEntireSeries', type === '2', false)
-    this.closeSeriesUpdateConfirmation(this._submit)
+    const { tempNewAppointmentStatusFK } = this.state
+
+    if (tempNewAppointmentStatusFK === APPOINTMENT_STATUS.RESCHEDULED) {
+      this.closeSeriesUpdateConfirmation()
+      this.openRescheduleForm()
+    } else this.closeSeriesUpdateConfirmation(this._submit)
+  }
+
+  onConfirmReschedule = async (rescheduleValues) => {
+    const { setValues, values } = this.props
+    await setValues({ ...values, ...rescheduleValues })
+    this.closeRescheduleForm()
+    this._submit()
   }
 
   onEditingRowsChange = (rows) => {
@@ -685,7 +683,7 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
-    // console.log({ _datagrid })
+
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
       <LoadingWrapper loading={show} text='Loading...'>
@@ -806,7 +804,7 @@ class Form extends React.PureComponent {
               onClose={this.closeRescheduleForm}
               maxWidth='sm'
             >
-              <RescheduleForm />
+              <RescheduleForm onConfirmReschedule={this.onConfirmReschedule} />
             </CommonModal>
           </React.Fragment>
         </SizeContainer>

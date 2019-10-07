@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
+import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   FastField,
@@ -9,6 +9,7 @@ import {
   TextField,
   CodeSelect,
   DateRangePicker,
+  notification,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -26,16 +27,20 @@ const styles = (theme) => ({})
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
-      type: 'settingServiceCenter/upsert',
+      type: 'settingServiceCenter/updateServiceCenter',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
-        //serviceCenterCategoryFK: 1,
         serviceCenterCategoryFKNavigation: null,
       },
     }).then((r) => {
       if (r) {
+        if (r.id) {
+          notification.success({ message: 'Service center created' })
+        } else {
+          notification.success({ message: 'Saved' })
+        }
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingServiceCenter/query',
@@ -50,16 +55,16 @@ class Detail extends PureComponent {
     isSaveDisabled: false,
   }
 
+  componentDidUpdate () {
+    this.checkSaveButtonStatus()
+  }
+
   checkSaveButtonStatus = () => {
     const { errors } = this.props
 
     this.setState({
-      isSaveDisabled: _.isEmpty(errors) ? false : true,
+      isSaveDisabled: !_.isEmpty(errors),
     })
-  }
-
-  componentDidUpdate () {
-    this.checkSaveButtonStatus()
   }
 
   render () {
@@ -78,7 +83,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={settingServiceCenter.entity ? true : false}
+                    disabled={!!settingServiceCenter.entity}
                   />
                 )}
               />

@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React from 'react'
+import * as Yup from 'yup'
+// formik
+import { FastField, withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Warning from '@material-ui/icons/Warning'
 // common components
-import { GridContainer, GridItem, RadioGroup } from '@/components'
+import { GridContainer, GridItem, RadioGroup, TextField } from '@/components'
 
 const styles = (theme) => ({
   title: {
@@ -19,22 +22,7 @@ const styles = (theme) => ({
   },
 })
 
-const RescheduleForm = ({ classes, footer, onConfirmClick }) => {
-  const [
-    editEntire,
-    setEditEntire,
-  ] = useState('1')
-
-  const onInputChange = (event) => {
-    const { target } = event
-    setEditEntire(target.value)
-  }
-
-  const handleConfirm = () => {
-    const editSingleAppointment = editEntire === '1'
-    onConfirmClick(editSingleAppointment)
-  }
-
+const RescheduleForm = ({ classes, footer, handleSubmit }) => {
   return (
     <React.Fragment>
       <GridContainer justify='center'>
@@ -46,35 +34,57 @@ const RescheduleForm = ({ classes, footer, onConfirmClick }) => {
             </h4>
           </div>
         </GridItem>
-        <GridItem>
-          <RadioGroup
-            label=''
-            simple
-            vertical
-            value={editEntire}
-            onChange={onInputChange}
-            options={[
-              {
-                value: '1',
-                label: 'By Clinic',
-              },
-              {
-                value: '2',
-                label: 'By Patient',
-              },
-            ]}
+        <GridItem md={8}>
+          <FastField
+            name='rescheduledByFK'
+            render={(args) => (
+              <RadioGroup
+                {...args}
+                label='Reschedule By'
+                options={[
+                  {
+                    value: 1,
+                    label: 'Clinic',
+                  },
+                  {
+                    value: 2,
+                    label: 'Patient',
+                  },
+                ]}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem md={8}>
+          <FastField
+            name='rescheduleReason'
+            render={(args) => (
+              <TextField {...args} prefix='Remarks (optional)' />
+            )}
           />
         </GridItem>
       </GridContainer>
       {footer &&
         footer({
-          onConfirm: handleConfirm,
+          onConfirm: handleSubmit,
           confirmText: 'Confirm',
         })}
     </React.Fragment>
   )
 }
 
+const RescheduleFormFormik = withFormik({
+  validationSchema: Yup.object().shape({
+    rescheduledByFK: Yup.number().required(),
+  }),
+  mapPropsToValues: () => {},
+  handleSubmit: (values, { props, resetForm }) => {
+    const { onConfirmReschedule } = props
+    resetForm()
+    onConfirmReschedule(values)
+  },
+})(RescheduleForm)
+
 export default withStyles(styles, { name: 'SeriesConfirmation' })(
-  RescheduleForm,
+  RescheduleFormFormik,
 )

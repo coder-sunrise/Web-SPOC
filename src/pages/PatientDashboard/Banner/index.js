@@ -26,8 +26,7 @@ import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
 import Block from './Block'
 
-@connect(({ patientDashboard, patient, codetable }) => ({
-  patientDashboard,
+@connect(({ patient, codetable }) => ({
   patient,
   codetable,
 }))
@@ -54,20 +53,6 @@ class Banner extends PureComponent {
         code: 'ctsalutation',
       },
     })
-  }
-
-  componentDidMount () {
-    // const { props, value } = this
-    // if (props.patientDashboard.currentId) {
-    //   setCurrentPatient(props, props.setValues, () => {
-    //     if (value && value.contact.contactAddress.length === 0) {
-    //       this.addAddress()
-    //     }
-    //   })
-    // } else {
-    //   props.setValues(props.demographic.default)
-    // }
-    // props.setValues(props.patientDashboard.entity)
   }
 
   getAllergyLink (data) {
@@ -351,7 +336,6 @@ class Banner extends PureComponent {
   render () {
     const { props } = this
     const {
-      patientDashboard = {},
       patientInfo = {},
       extraCmt,
       patient,

@@ -324,51 +324,49 @@ class AntdNumberInput extends React.PureComponent {
       max,
       min,
     }
-    if (!format) {
-      if (currency) {
-        if (!format) format = `${currencySymbol}${currencyFormat}`
+    if (currency) {
+      if (!format) format = `${currencySymbol}${currencyFormat}`
 
-        extraCfg.formatter = (v) => {
-          if (v === '') return ''
-          if (!this.state.focused) {
-            const nv = numeral(v)
-            if (nv._value < 0) return nv.format(`(${format})`)
-            return nv.format(format)
-          }
-          return `${v}`
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
+        if (!this.state.focused) {
+          const nv = numeral(v)
+          if (nv._value < 0) return nv.format(`(${format})`)
+          return nv.format(format)
         }
-        // extraCfg.precision = 2
-      } else if (percentage) {
-        if (!format) format = percentageFormat
+        return `${v}`
+      }
+      // extraCfg.precision = 2
+    } else if (percentage) {
+      if (!format) format = percentageFormat
 
-        extraCfg.formatter = (v) => {
-          if (v === '') return ''
-          if (!this.state.focused) {
-            return numeral(v / 100).format(percentageFormat)
-          }
-          return v
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
+        if (!this.state.focused) {
+          return numeral(v / 100).format(percentageFormat)
         }
+        return v
+      }
 
-        extraCfg.max = extraCfg.max || 100
-        extraCfg.min = -100
-      } else if (formatter) {
-        extraCfg.formatter = (v) => {
-          if (v === '') return ''
+      extraCfg.max = extraCfg.max || 100
+      extraCfg.min = -100
+    } else if (formatter) {
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
 
-          if (!this.state.focused) {
-            return formatter(v)
-          }
-          return v
+        if (!this.state.focused) {
+          return formatter(v)
         }
-      } else if (format) {
-        extraCfg.formatter = (v) => {
-          if (v === '') return ''
+        return v
+      }
+    } else if (format) {
+      extraCfg.formatter = (v) => {
+        if (v === '') return ''
 
-          if (!this.state.focused) {
-            return numeral(v).format(format)
-          }
-          return v
+        if (!this.state.focused) {
+          return numeral(v).format(format)
         }
+        return v
       }
     }
     if (!parser) {

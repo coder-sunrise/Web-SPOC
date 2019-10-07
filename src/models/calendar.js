@@ -16,7 +16,7 @@ import {
   filterRecurrenceDto,
   mapDatagridToAppointmentResources,
   compareDto,
-} from '@/pages/Reception/Appointment/components/form/formikUtils'
+} from '@/pages/Reception/Appointment/components/form/formUtils'
 import { getTimeObject, compare } from '@/utils/yup'
 
 const ACTION_KEYS = {
@@ -99,6 +99,10 @@ export default createListViewModel({
           put({ type: 'getPublicHolidayList', payload }),
           put({ type: 'getClinicBreakHourList', payload }),
           put({ type: 'getClinicOperationHourList', payload }),
+          put({
+            type: 'patient/updateState',
+            payload: { entity: null },
+          }),
         ])
       },
       *getActiveBizSessionQueue (_, { put, select }) {
@@ -127,6 +131,8 @@ export default createListViewModel({
             appointments: formikAppointments,
             recurrenceDto,
             overwriteEntireSeries,
+            rescheduleReason,
+            rescheduledByFK,
             ...restFormikValues
           } = formikValues
 
@@ -153,9 +159,9 @@ export default createListViewModel({
               : calendarState.mode === 'single',
             appointmentStatusFk: newAppointmentStatusFK,
             appointments_Resources: appointmentResources,
+            rescheduleReason,
+            rescheduledByFK,
           }
-
-          console.log({ formikCurrentAppointment, currentAppointment })
 
           const shouldGenerateRecurrence =
             !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
@@ -203,6 +209,8 @@ export default createListViewModel({
                   ...updated,
                   {
                     ...appt,
+                    rescheduleReason,
+                    rescheduledByFK,
                     appointmentStatusFk: newAppointmentStatusFK,
                     appointmentRemarks: currentAppointment.appointmentRemarks,
                     appointments_Resources: [
@@ -231,6 +239,8 @@ export default createListViewModel({
                 ...updated,
                 {
                   ...appt,
+                  rescheduleReason,
+                  rescheduledByFK,
                   appointmentStatusFk: newAppointmentStatusFK,
                   appointmentRemarks: currentAppointment.appointmentRemarks,
                   appointments_Resources: [
@@ -294,7 +304,7 @@ export default createListViewModel({
               },
             }
           }
-          console.log({ savePayload, json: JSON.stringify(savePayload) })
+          // console.log({ savePayload })
           return yield put({
             type: actionKey,
             payload: savePayload,
@@ -324,7 +334,6 @@ export default createListViewModel({
         const result = yield call(service.query, payload)
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
-          console.log({ data: JSON.stringify(data) })
           yield put({
             type: 'setViewAppointment',
             data,

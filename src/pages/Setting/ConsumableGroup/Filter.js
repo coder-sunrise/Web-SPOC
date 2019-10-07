@@ -33,7 +33,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='isActive'
               render={(args) => {
@@ -50,7 +50,7 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue , isActive} = this.props.values
+                  const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingConsumableGroup/query',
                     payload: {

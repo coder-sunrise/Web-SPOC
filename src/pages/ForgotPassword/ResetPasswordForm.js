@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
+import Refresh from '@material-ui/icons/Refresh'
 // common components
 import {
   Button,
@@ -49,7 +50,7 @@ const styles = (theme) => ({
   },
 })
 
-const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
+const ResetPassForm = ({ classes, loading, handleSubmit, onCancelClick }) => {
   const headerClass = classnames({
     [classes.textCenter]: true,
     [classes.cardTitle]: true,
@@ -85,8 +86,9 @@ const ResetPassForm = ({ classes, handleSubmit, onCancelClick }) => {
             <Button color='danger' onClick={onCancelClick}>
               Cancel
             </Button>
-            <Button color='primary' onClick={handleSubmit}>
-              Get Validation Code
+            <Button color='primary' onClick={handleSubmit} disabled={loading}>
+              {loading && <Refresh className='spin-custom' />}
+              Get OTP
             </Button>
           </GridItem>
         </GridContainer>

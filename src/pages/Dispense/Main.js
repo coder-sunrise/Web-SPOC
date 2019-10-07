@@ -16,6 +16,20 @@ import style from './style'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 
+const refresh = (props) => {
+  const { dispatch, dispense, visitRegistration, resetForm } = props
+
+  dispatch({
+    type: `dispense/refresh`,
+    payload: visitRegistration.entity.visit.id,
+  }).then((o) => {
+    resetForm(o)
+    dispatch({
+      type: `formik/clean`,
+      payload: 'DispensePage',
+    })
+  })
+}
 @withFormikExtend({
   authority: {
     view: 'dispense.view',
@@ -32,10 +46,9 @@ import Yup from '@/utils/yup'
       }),
     ),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, ...restProps }) => {
     const { dispatch, onConfirm, codetable, visitRegistration } = props
     const vid = visitRegistration.entity.visit.id
-    console.log(values)
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -44,9 +57,9 @@ import Yup from '@/utils/yup'
       },
     }).then((o) => {
       if (o) {
-        dispatch({
-          type: `dispense/refresh`,
-          payload: vid,
+        refresh({
+          ...props,
+          ...restProps,
         })
       }
     })
@@ -85,7 +98,7 @@ class Main extends Component {
             editingOrder: true,
           },
         })
-        this.refresh()
+        refresh(this.props)
       }
     })
   }
@@ -99,15 +112,6 @@ class Main extends Component {
     })(e)
   }
 
-  refresh = () => {
-    const { dispatch, dispense, visitRegistration } = this.props
-
-    dispatch({
-      type: `dispense/refresh`,
-      payload: visitRegistration.entity.visit.id,
-    })
-  }
-
   render () {
     const { classes, dispense, handleSubmit } = this.props
 
@@ -115,7 +119,13 @@ class Main extends Component {
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
           <GridItem justify='flex-end' container>
-            <Button color='info' size='sm' onClick={this.refresh}>
+            <Button
+              color='info'
+              size='sm'
+              onClick={() => {
+                refresh(this.props)
+              }}
+            >
               <Refresh />
               Refresh
             </Button>

@@ -90,6 +90,12 @@ const Package = ({ dispatch, history, pack }) => {
   useEffect(() => {
     dispatch({
       type: 'pack/query',
+      payload: {
+        sorting: [
+          { columnName: 'effectiveEndDate', direction: 'desc' },
+          { columnName: 'displayValue', direction: 'asc' },
+        ],
+      },
     })
     dispatch({
       type: 'inventoryMaster/updateState',

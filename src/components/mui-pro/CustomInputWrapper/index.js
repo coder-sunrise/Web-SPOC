@@ -55,6 +55,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     children,
     simple = false,
     size = 'medium',
+    strongLabel,
   } = props
   const { style, ...resetProps } = props
   const labelClasses = classNames({
@@ -73,6 +74,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     [props.className]: true,
     [classes.simple]: simple,
     [classes.textControl]: !!text,
+    [classes.strongLabel]: !!strongLabel,
 
     // [classes.medium]: size === 'default' || size === 'medium' || size === 'md',
     // [classes.small]: size === 'small' || size === 'sm',

@@ -22,7 +22,12 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *updateServiceCenter ({ payload }, { call, put }) {
+        const response = yield call(service.upsertServiceCenter, payload)
+        return response
+      },
+    },
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload

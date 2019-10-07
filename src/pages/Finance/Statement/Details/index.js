@@ -11,7 +11,15 @@ const styles = () => ({})
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ statement }) => statement.entity || statement.default,
+  mapPropsToValues: ({ statement }) => {
+    const returnValue = statement.entity || statement.default
+    const outstandingBalance =
+      returnValue.totalAmount - returnValue.collectedAmount
+    return {
+      ...returnValue,
+      outstandingBalance,
+    }
+  },
 })
 class StatementDetails extends PureComponent {
   componentDidMount = () => {

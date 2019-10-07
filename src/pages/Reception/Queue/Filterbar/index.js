@@ -77,8 +77,8 @@ const Filterbar = ({
         <div className={classes.switch}>
           <Checkbox
             label='Visit assign to me only'
-            checked={selfOnly}
             onChange={onSwitchClick}
+            checked={selfOnly}
           />
         </div>
       </GridItem>
@@ -98,9 +98,9 @@ const Filterbar = ({
   )
 }
 
-const connectedFilterbar = connect(({ queueLog }) => ({ selfOnly: queueLog }))(
-  Filterbar,
-)
+const connectedFilterbar = connect(({ queueLog }) => ({
+  selfOnly: queueLog.selfOnly,
+}))(Filterbar)
 
 const FilterbarWithFormik = withFormik({
   mapPropsToValues: () => ({

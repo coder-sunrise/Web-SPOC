@@ -38,7 +38,11 @@ class TextField extends React.PureComponent {
           ? field.value
           : defaultValue,
     }
-    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
+    if (field && form) {
+      this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
+    } else {
+      this.debouncedOnChange = this._onChange
+    }
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -57,7 +61,11 @@ class TextField extends React.PureComponent {
     if (field) {
       this.setState({
         value:
-          field.value !== undefined && field.value !== '' ? field.value : '',
+          field.value !== undefined &&
+          field.value !== '' &&
+          field.value !== null
+            ? field.value
+            : '',
       })
     }
   }

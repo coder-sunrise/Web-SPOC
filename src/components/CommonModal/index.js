@@ -138,7 +138,7 @@ class CommonModal extends React.PureComponent {
           {onReset && (
             <Button
               key='reset'
-              hideIfNoEditRights
+              // hideIfNoEditRights
               aria-label='Reset'
               color='danger'
               onClick={onReset}
@@ -160,7 +160,7 @@ class CommonModal extends React.PureComponent {
           {onConfirm && (
             <ProgressButton
               color='primary'
-              hideIfNoEditRights
+              // hideIfNoEditRights
               onClick={onConfirm}
               icon={null}
               {...confirmProps}
@@ -255,6 +255,7 @@ class CommonModal extends React.PureComponent {
       overrideLoading = false,
       footProps = {},
       className,
+      displayCloseIcon = true,
     } = this.props
     if (!children || !open) return null
     // console.log(bodyNoPadding)
@@ -283,6 +284,12 @@ class CommonModal extends React.PureComponent {
       [classes.modalRoot]: true,
       [classes.modal]: true,
     }
+    const cfg = {}
+    if (displayCloseIcon) {
+      cfg.onEscapeKeyDown = this.onClose
+    } else {
+      cfg.disableEscapeKeyDown = true
+    }
     return (
       <React.Fragment>
         <Dialog
@@ -298,7 +305,8 @@ class CommonModal extends React.PureComponent {
           aria-labelledby='classic-modal-slide-title'
           aria-describedby='classic-modal-slide-description'
           style={{ overflow: 'hidden' }}
-          onEscapeKeyDown={this.onClose}
+          // onEscapeKeyDown={!displayCloseIcon && this.onClose}
+          {...cfg}
         >
           {title && (
             <DialogTitle
@@ -306,17 +314,19 @@ class CommonModal extends React.PureComponent {
               disableTypography
               className={classes.modalHeader}
             >
-              <Button
-                justIcon
-                className={classes.modalCloseButton}
-                key='close'
-                authority='none'
-                aria-label='Close'
-                color='transparent'
-                onClick={this.onClose}
-              >
-                <Close className={classes.modalClose} />
-              </Button>
+              {displayCloseIcon && (
+                <Button
+                  justIcon
+                  className={classes.modalCloseButton}
+                  key='close'
+                  authority='none'
+                  aria-label='Close'
+                  color='transparent'
+                  onClick={this.onClose}
+                >
+                  <Close className={classes.modalClose} />
+                </Button>
+              )}
               {/* <Button
                 justIcon
                 className={classes.modalMinButton}

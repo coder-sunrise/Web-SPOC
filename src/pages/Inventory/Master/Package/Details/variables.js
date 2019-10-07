@@ -20,9 +20,9 @@ const tabHeader = (tabName, detailsProps) => {
   )
   const returnTabHeader = () => {
     if (detailsProps.errors && !_.isEmpty(detailsProps.errors)) {
-      const { code, displayValue } = detailsProps.errors
+      const { code, displayValue, effectiveDates } = detailsProps.errors
 
-      if ((code || displayValue) && tabName === 'Details') {
+      if ((code || displayValue || effectiveDates) && tabName === 'Details') {
         return errorHeader
       }
     }

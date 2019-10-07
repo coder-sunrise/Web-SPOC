@@ -95,7 +95,7 @@ export default createFormViewModel({
         return response
       },
       *resume ({ payload }, { call, put }) {
-        const response = yield call(service.resume, payload.id || payload)
+        const response = yield call(service.resume, payload.id)
         if (response) {
           yield put({
             type: 'updateState',

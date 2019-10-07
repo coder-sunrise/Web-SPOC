@@ -97,6 +97,9 @@ const styles = (theme) => ({
     justify: 'center',
     alignItems: 'center',
   },
+  fabDiv: {
+    margin: theme.spacing(2),
+  },
 })
 
 export default styles

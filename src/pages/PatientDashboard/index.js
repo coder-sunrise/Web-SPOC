@@ -40,7 +40,7 @@ import avatar from '@/assets/img/faces/marc.jpg'
 import { getAppendUrl } from '@/utils/utils'
 
 import Loading from '@/components/PageLoading/index'
-import Banner from './Banner'
+import Banner from './Banner'   
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 
 const styles = (theme) => ({

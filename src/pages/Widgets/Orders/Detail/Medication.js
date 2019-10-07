@@ -234,7 +234,6 @@ class Medication extends PureComponent {
       setFieldValue,
       orders,
     } = this.props
-    // console.log(this.props)
     const commonSelectProps = {
       dropdownMatchSelectWidth: false,
       dropdownStyle: {
@@ -279,152 +278,153 @@ class Medication extends PureComponent {
                 shrink: true,
                 style: { marginLeft: theme.spacing(1) },
               }}
-            >
-              <FieldArray
-                name='corPrescriptionItemInstruction'
-                render={(arrayHelpers) => {
-                  this.descriptionArrayHelpers = arrayHelpers
-                  if (!values || !values.corPrescriptionItemInstruction)
-                    return null
-                  return values.corPrescriptionItemInstruction.map((val, i) => {
-                    return (
-                      <div key={i}>
-                        <GridContainer>
-                          {i > 0 && (
-                            <GridItem xs={2}>
-                              <FastField
-                                name={`corPrescriptionItemInstruction[${i}].stepdose`}
-                                render={(args) => {
-                                  return (
-                                    <Select
-                                      style={{
-                                        paddingLeft: 15,
-                                      }}
-                                      allowClear={false}
-                                      simple
-                                      options={[
-                                        { value: 'AND', name: 'And' },
-                                        { value: 'THEN', name: 'Then' },
-                                      ]}
-                                      {...args}
-                                    />
-                                  )
-                                }}
-                              />
-                            </GridItem>
-                          )}
-                          {i > 0 && <GridItem xs={10} />}
+            />
+            <FieldArray
+              name='corPrescriptionItemInstruction'
+              render={(arrayHelpers) => {
+                this.descriptionArrayHelpers = arrayHelpers
+                if (!values || !values.corPrescriptionItemInstruction)
+                  return null
+                return values.corPrescriptionItemInstruction.map((val, i) => {
+                  return (
+                    <div key={i}>
+                      <GridContainer>
+                        {i > 0 && (
                           <GridItem xs={2}>
                             <FastField
-                              name={`corPrescriptionItemInstruction[${i}].usageMethodFK`}
+                              name={`corPrescriptionItemInstruction[${i}].stepdose`}
                               render={(args) => {
                                 return (
-                                  <div style={{ position: 'relative' }}>
-                                    <span
-                                      style={{
-                                        position: 'absolute',
-                                        bottom: 4,
-                                      }}
-                                    >
-                                      {i + 1}.
-                                    </span>
-                                    <CodeSelect
-                                      simple
-                                      allowClear={false}
-                                      style={{ paddingLeft: 15 }}
-                                      code='ctMedicationUsage'
-                                      {...commonSelectProps}
-                                      {...args}
-                                    />
-                                  </div>
+                                  <Select
+                                    style={{
+                                      paddingLeft: 15,
+                                      marginBottom: theme.spacing(1),
+                                    }}
+                                    allowClear={false}
+                                    simple
+                                    options={[
+                                      { value: 'AND', name: 'And' },
+                                      { value: 'THEN', name: 'Then' },
+                                    ]}
+                                    {...args}
+                                  />
                                 )
                               }}
                             />
                           </GridItem>
-                          <GridItem xs={2}>
-                            <FastField
-                              name={`corPrescriptionItemInstruction[${i}].dosageFK`}
-                              render={(args) => {
-                                return (
+                        )}
+                        {i > 0 && <GridItem xs={10} />}
+                        <GridItem xs={2}>
+                          <FastField
+                            name={`corPrescriptionItemInstruction[${i}].usageMethodFK`}
+                            render={(args) => {
+                              return (
+                                <div style={{ position: 'relative' }}>
+                                  <span
+                                    style={{
+                                      position: 'absolute',
+                                      bottom: 4,
+                                    }}
+                                  >
+                                    {i + 1}.
+                                  </span>
                                   <CodeSelect
                                     simple
                                     allowClear={false}
-                                    code='ctMedicationDosage'
+                                    style={{ paddingLeft: 15 }}
+                                    code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
                                   />
-                                )
-                              }}
-                            />
-                          </GridItem>
-                          <GridItem xs={2}>
-                            <FastField
-                              name={`corPrescriptionItemInstruction[${i}].prescribeUOMFK`}
-                              render={(args) => {
-                                return (
-                                  <CodeSelect
-                                    simple
-                                    allowClear={false}
-                                    code='ctMedicationUnitOfMeasurement'
-                                    {...commonSelectProps}
-                                    {...args}
-                                  />
-                                )
-                              }}
-                            />
-                          </GridItem>
-                          <GridItem xs={2}>
-                            <FastField
-                              name={`corPrescriptionItemInstruction[${i}].drugFrequencyFK`}
-                              render={(args) => {
-                                return (
-                                  <CodeSelect
-                                    simple
-                                    allowClear={false}
-                                    code='ctMedicationFrequency'
-                                    {...commonSelectProps}
-                                    {...args}
-                                  />
-                                )
-                              }}
-                            />
-                          </GridItem>
-                          <GridItem xs={2}>
-                            <FastField
-                              name={`corPrescriptionItemInstruction[${i}].duration`}
-                              render={(args) => {
-                                return (
-                                  <NumberInput
-                                    simple
-                                    allowEmpty={false}
-                                    formatter={(v) =>
-                                      `${v} Day${v > 1 ? 's' : ''}`}
-                                    step={1}
-                                    min={1}
-                                    {...args}
-                                  />
-                                )
-                              }}
-                            />
-                          </GridItem>
-                          {this.getActionItem(
-                            i,
-                            arrayHelpers,
-                            'corPrescriptionItemInstruction',
-                            'Add step dose',
-                            {
-                              drugFrequencyFK: 1,
-                              duration: 1,
-                              stepdose: 'AND',
-                            },
-                          )}
-                        </GridContainer>
-                      </div>
-                    )
-                  })
-                }}
-              />
-            </CustomInputWrapper>
+                                </div>
+                              )
+                            }}
+                          />
+                        </GridItem>
+                        <GridItem xs={2}>
+                          <FastField
+                            name={`corPrescriptionItemInstruction[${i}].dosageFK`}
+                            render={(args) => {
+                              return (
+                                <CodeSelect
+                                  simple
+                                  allowClear={false}
+                                  code='ctMedicationDosage'
+                                  {...commonSelectProps}
+                                  {...args}
+                                />
+                              )
+                            }}
+                          />
+                        </GridItem>
+                        <GridItem xs={2}>
+                          <FastField
+                            name={`corPrescriptionItemInstruction[${i}].prescribeUOMFK`}
+                            render={(args) => {
+                              return (
+                                <CodeSelect
+                                  simple
+                                  allowClear={false}
+                                  code='ctMedicationUnitOfMeasurement'
+                                  {...commonSelectProps}
+                                  {...args}
+                                />
+                              )
+                            }}
+                          />
+                        </GridItem>
+                        <GridItem xs={2}>
+                          <FastField
+                            name={`corPrescriptionItemInstruction[${i}].drugFrequencyFK`}
+                            render={(args) => {
+                              return (
+                                <CodeSelect
+                                  simple
+                                  allowClear={false}
+                                  code='ctMedicationFrequency'
+                                  {...commonSelectProps}
+                                  {...args}
+                                />
+                              )
+                            }}
+                          />
+                        </GridItem>
+                        <GridItem xs={2}>
+                          <FastField
+                            name={`corPrescriptionItemInstruction[${i}].duration`}
+                            render={(args) => {
+                              return (
+                                <NumberInput
+                                  simple
+                                  allowEmpty={false}
+                                  formatter={(v) =>
+                                    `${v} Day${v > 1 ? 's' : ''}`}
+                                  step={1}
+                                  min={1}
+                                  {...args}
+                                />
+                              )
+                            }}
+                          />
+                        </GridItem>
+                        {this.getActionItem(
+                          i,
+                          arrayHelpers,
+                          'corPrescriptionItemInstruction',
+                          'Add step dose',
+                          {
+                            drugFrequencyFK: 1,
+                            duration: 1,
+                            stepdose: 'AND',
+                            sequence: i + 1,
+                          },
+                        )}
+                      </GridContainer>
+                    </div>
+                  )
+                })
+              }}
+            />
           </GridItem>
         </GridContainer>
 
@@ -502,6 +502,7 @@ class Medication extends PureComponent {
                               drugFrequencyFK: '1',
                               day: 1,
                               precaution: '1',
+                              sequence: i + 1,
                             },
                           )}
                         </GridContainer>

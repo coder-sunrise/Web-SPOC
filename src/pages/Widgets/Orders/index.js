@@ -29,9 +29,9 @@ import {
   Tooltip,
   NumberInput,
 } from '@/components'
-
+import { getServices } from '@/utils/codes'
 import { sumReducer } from '@/utils/utils'
-
+import { calculateAdjustAmount } from '@/utils/utils'
 import Grid from './Grid'
 import Detail from './Detail/index'
 
@@ -50,6 +50,116 @@ class Orders extends PureComponent {
     gst: 0,
     totalWithGst: 0,
     adjustments: [],
+  }
+
+  componentDidMount () {
+    const { dispatch } = this.props
+
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+        filter: {
+          'serviceFKNavigation.IsActive': true,
+          combineCondition: 'or',
+        },
+      },
+    }).then((list) => {
+      // console.log(list)
+      // eslint-disable-next-line compat/compat
+      const { services, serviceCenters, serviceCenterServices } = getServices(
+        list,
+      )
+      this.setState({
+        services,
+        serviceCenters,
+        serviceCenterServices,
+      })
+
+
+
+      let orderList = serviceCenterServices.filter( (o) => (o.isAutoOrder === true && o.isDefault === true))
+      for (let i = 0; i < orderList.length; i++) {
+        let serviceFKValue = 0
+        let serviceCenterFKValue = 0
+        let serviceNameValue = ''
+        let totalAfterItemAdjustmentValue = 0
+        let adjAmountValue = 0
+
+        for(let a = 0; a < services.length; a++){
+          if(orderList[i].displayValue === services[a].name){
+            serviceFKValue = services[a].value
+            serviceNameValue = services[a].name
+          }
+        }
+
+        for(let b = 0; b < serviceCenters.length; b++){
+          if(orderList[i].serviceCenter === serviceCenters[b].name){
+            serviceCenterFKValue = serviceCenters[b].value
+          }
+        }
+
+       
+        totalAfterItemAdjustmentValue = 0
+        adjAmountValue = 0
+
+
+        let rowRecord = {
+          sequence: i,
+          type: "3",
+          serviceFK: serviceFKValue,
+          serviceCenterFK: serviceCenterFKValue,
+          serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
+          serviceName: serviceNameValue,
+          unitPrice: orderList[i].unitPrice,
+          total: orderList[i].unitPrice,
+          quantity: 1,
+          totalAfterItemAdjustment: totalAfterItemAdjustmentValue,
+          adjAmount: adjAmountValue,
+          remark: '',
+          subject: orderList[i].displayValue,
+          uid: '',
+          weightage: 0,
+          totalAfterOverallAdjustment: 0,  
+        }
+
+        dispatch({
+          type: 'orders/upsertRow',
+          payload: rowRecord,
+        })
+      }
+    })
+
+    this.state = {
+      services: [],
+      serviceCenters: [],
+    }
+  }
+
+
+  getServiceCenterService = () => {
+    const { values, setFieldValue, setValues } = this.props
+    const { serviceFK, serviceCenterFK } = values
+
+    if (!serviceCenterFK || !serviceFK) return
+    const serviceCenterService =  
+      this.state.serviceCenterServices.find(
+        (o) =>
+          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+      ) || {}
+    if (serviceCenterService) {
+      setValues({
+        ...values,
+        serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+        serviceName: this.state.services.find((o) => o.value === serviceFK)
+          .name,
+        unitPrice: serviceCenterService.unitPrice,
+        total: serviceCenterService.unitPrice,
+        quantity: 1,
+      })
+      this.updateTotalPrice(serviceCenterService.unitPrice)
+    }
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {

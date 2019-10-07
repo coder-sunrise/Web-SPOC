@@ -227,7 +227,7 @@ class EmergencyContact extends PureComponent {
               containerExtraComponent: (
                 <Button
                   onClick={this.toggleModal}
-                  hideIfNoEditRights
+                  // hideIfNoEditRights
                   color='info'
                   link
                 >

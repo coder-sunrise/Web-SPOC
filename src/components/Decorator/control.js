@@ -40,13 +40,13 @@ const control = ({ disabledProps } = {}) => (Component) => {
                 <Component {...this.props} {...extraCfg} />,
               )
             }
-            if (!view) return <Component {...this.props} />
+            if (!view && !edit) return <Component {...this.props} />
             return (
               <Authorized
                 authority={[
                   view,
                   edit,
-                ]}
+                ].filter((o) => !!o)}
                 noMatch={() => {
                   if (!this.props.hideIfNoEditRights) {
                     if (buttonTypes.indexOf(Component.displayName) >= 0) {

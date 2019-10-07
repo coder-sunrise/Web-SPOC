@@ -240,8 +240,8 @@ class PatientHistory extends Component {
     ]
   }
 
-   componentDidMount () {
-     this.props.dispatch({
+  componentDidMount () {
+    this.props.dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
@@ -258,7 +258,6 @@ class PatientHistory extends Component {
         selectedSubRow: '',
       },
     })
-
   }
 
   onSelectChange = (val) => {
@@ -279,7 +278,6 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
- 
 
     return (
       <List
@@ -293,6 +291,7 @@ class PatientHistory extends Component {
           return (
             <React.Fragment>
               <ListItem
+                style={{ paddingLeft: 15 }}
                 alignItems='flex-start'
                 classes={{
                   root: this.props.classes.listItemRoot,
@@ -302,8 +301,8 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  console.log("----", o.id)
-                  this.props.dispatch({
+                  this.props
+                    .dispatch({
                       type: 'patientHistory/queryOne',
                       payload: o.id,
                     })
@@ -351,7 +350,8 @@ class PatientHistory extends Component {
                             <DatePicker
                               text
                               showTime
-                              value={o.signOffDate }
+                              format='DD MMM YYYY h:mm a'
+                              value={o.signOffDate}
                             />
                           )}
                         </GridItem>
@@ -446,8 +446,8 @@ class PatientHistory extends Component {
         hideHeader
         size='sm'
         className={classnames({
-          [classes.rightPanel]: !widget ? true : false,
-          [override.rightPanel]: !widget ? true : false,
+          [classes.rightPanel]: !widget,
+          [override.rightPanel]: !widget,
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
@@ -459,6 +459,7 @@ class PatientHistory extends Component {
               allValue='0'
               prefix='Filter By'
               mode='multiple'
+              maxTagCount={4}
               options={[
                 { name: 'Chief Complaints', value: '1' },
                 { name: 'Plan', value: '2' },
@@ -468,7 +469,6 @@ class PatientHistory extends Component {
                 // { name: 'Result History', value: '6' },
                 { name: 'Invoice', value: '7' },
               ]}
-              label='Filter By'
               style={{ marginBottom: theme.spacing(1) }}
               onChange={this.onSelectChange}
             />
@@ -498,10 +498,9 @@ class PatientHistory extends Component {
               </ProgressButton>
             )}
           </GridItem>
-          <GridItem style={{ textAlign: 'right' }}>
-            Update Date :
+          <GridItem sm={2} style={{ textAlign: 'right' }}>
+            Updated Date :
             {patientHistory.selectedSubRow.signOffDate && (
-              
               <DatePicker
                 text
                 value={patientHistory.selectedSubRow.signOffDate}
@@ -517,14 +516,13 @@ class PatientHistory extends Component {
           }}
         >
           {entity &&
-            this.widgets
-              .filter(
-                (o) =>
+            this.widgets.filter( (o) =>
                   this.state.selectedItems.indexOf('0') >= 0 ||
                   this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
+              ).map((o) => {
                 const Widget = o.component
+
+                console.log("******** " , entity)
                 return (
                   <div>
                     <h5>{o.name}</h5>
@@ -562,43 +560,48 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-     
 
     return (
       <div {...cfg}>
-        <CardContainer
-          hideHeader
-          size='sm'
-          className={classnames({
-            [classes.leftPanel]: !widget ? true : false,
-            [classes.integratedLeftPanel]: mode === 'integrated',
-            [override.leftPanel]: !widget ? true : false,
-          })}
-        >
-          {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
-            sortedPatientHistory.map((o) => this.getContent(o))
-          ) : (
-            <Accordion
-              defaultActive={0}
-              collapses={sortedPatientHistory.map((o) => ({
-                title: this.getTitle(o),
-                content: this.getContent(o),
-              }))}
-            />
-          ) : (
-            <p>No visit record</p>
-          ) : (
-            <React.Fragment>
-              <Skeleton height={30} />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} />
-              <Skeleton height={30} width='80%' />
-              <Skeleton height={30} width='80%' />
-            </React.Fragment>
-          )}
-        </CardContainer>
+        {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
+          <CardContainer
+            hideHeader
+            size='sm'
+            className={classnames({
+              [classes.leftPanel]: !widget ? true : false,
+              [classes.integratedLeftPanel]: mode === 'integrated',
+              [override.leftPanel]: !widget ? true : false,
+            })}
+          >
+            {sortedPatientHistory ? sortedPatientHistory.length >
+            0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
+              sortedPatientHistory.map((o) => this.getContent(o))
+            ) : (
+              <Accordion
+                defaultActive={0}
+                collapses={sortedPatientHistory.map((o) => ({
+                  title: this.getTitle(o),
+                  content: this.getContent(o),
+                }))}
+              />
+            ) : (
+              ' '
+            ) : (
+              <React.Fragment>
+                <Skeleton height={30} />
+                <Skeleton height={30} width='80%' />
+                <Skeleton height={30} width='80%' />
+                <Skeleton height={30} />
+                <Skeleton height={30} width='80%' />
+                <Skeleton height={30} width='80%' />
+              </React.Fragment>
+            )}
+          </CardContainer>
+        ) : (
+          ''
+        ) : (
+          ''
+        )}
         {selected && mode === 'split' && this.getDetailPanel()}
       </div>
     )

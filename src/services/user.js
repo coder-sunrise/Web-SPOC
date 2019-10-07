@@ -24,15 +24,11 @@ export const changeUserPassword = (payload) =>
   })
 
 export const getOTP = async (payload) =>
-  request(
-    `${userProfileURL}/generateResetPasswordCode`,
-    {
-      method: 'POST',
-      data: stringify(payload),
-      contentType: 'application/x-www-form-urlencoded',
-    },
-    false,
-  )
+  request(`${userProfileURL}/generateResetPasswordCode`, {
+    method: 'POST',
+    data: stringify(payload),
+    contentType: 'application/x-www-form-urlencoded',
+  })
 
 export const resetPassword = (payload) =>
   request(`${userProfileURL}/ResetPassword`, {

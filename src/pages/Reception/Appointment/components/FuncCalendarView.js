@@ -8,20 +8,16 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 // material ui
 import { withStyles } from '@material-ui/core'
 // components
-import {
-  serverDateFormat,
-  timeFormat24HourWithSecond,
-  Tooltip,
-} from '@/components'
+import { serverDateFormat, Tooltip } from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // setting
-import { doctorEventColorOpts } from '../setting'
+import { doctorEventColorOpts } from '../utils'
 // sub component
 import CalendarToolbar from './Toolbar'
 import Event from './Event'
 import TimeSlotComponent from './TimeSlotComponent'
-import { getFirstAppointmentType } from './form/formikUtils'
+import { getFirstAppointmentType } from './form/formUtils'
 // assets
 import { primaryColor } from '@/assets/jss'
 
@@ -154,7 +150,6 @@ const CalendarView = ({
   // --- variables ---
   calendarEvents,
   publicHolidays,
-  clinicBreakHours,
   doctorBlocks,
   resources,
   displayDate,
@@ -421,7 +416,6 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list || [],
   publicHolidays: calendar.publicHolidayList || [],
-  clinicBreakHours: calendar.clinicBreakHourList || [],
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
   loading:

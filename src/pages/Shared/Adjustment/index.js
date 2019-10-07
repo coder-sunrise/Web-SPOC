@@ -31,6 +31,7 @@ import {
   Popover,
   Switch,
   NumberInput,
+  Snackbar,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -69,6 +70,7 @@ const styles = (theme) => ({})
   }),
 
   handleSubmit: (values, { props }) => {
+    console.log(values)
     const { dispatch, global } = props
     const { openAdjustmentConfig = {} } = global
     const { callbackConfig, callbackMethod } = openAdjustmentConfig
@@ -93,7 +95,7 @@ const styles = (theme) => ({})
       })
     }
     if (callbackMethod) {
-      setTimeout(() => callbackMethod(), 500)
+      callbackMethod(newVals)
     }
     if (props.onConfirm) props.onConfirm()
   },
@@ -140,8 +142,7 @@ class Adjustment extends PureComponent {
   // }
 
   render () {
-    const { theme, footer, values, global, ...props } = this.props
-    // console.log(values)
+    const { theme, footer, values, global, errors, ...props } = this.props
     const { openAdjustmentConfig = {} } = global
     const {
       showRemark,
@@ -153,6 +154,10 @@ class Adjustment extends PureComponent {
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
+          {errors &&
+          errors.finalAmount && (
+            <Snackbar variant='warning' message={errors.finalAmount} />
+          )}
           <GridContainer>
             <GridItem xs={1}>
               <FastField
