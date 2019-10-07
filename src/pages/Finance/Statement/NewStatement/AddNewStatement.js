@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
-import moment from 'moment'
 import { FastField } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
@@ -41,30 +40,34 @@ const styles = () => ({
   statement,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ statement }) => statement.entity || statement.default,
-
+  mapPropsToValues: ({ statement }) => {
+    const returnValue = statement.entity || statement.default
+    const adminChargeValueType =
+      returnValue.adminChargeValueType || 'Percentage'
+    return {
+      ...returnValue,
+      adminChargeValueType,
+    }
+  },
   validationSchema: Yup.object().shape({
-    code: Yup.string().required(),
-    displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    copayerFK: Yup.number().required(),
+    statementDate: Yup.date().required(),
+    paymentTerm: Yup.number().required(),
   }),
 
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
-    const { dispatch, onConfirm } = props
+    const { dispatch, history } = props
+    console.log('submit', values)
+    // return
     dispatch({
       type: 'statement/upsert',
       payload: {
         ...restValues,
-        effectiveStartDate: effectiveDates[0],
-        effectiveEndDate: effectiveDates[1],
       },
     }).then((r) => {
       if (r) {
-        if (onConfirm) onConfirm()
-        dispatch({
-          type: 'statement/query',
-        })
+        history.push('/finance/statement')
       }
     })
   },
@@ -75,18 +78,32 @@ class AddNewStatement extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'patientName', title: 'Patient Name' },
-      { name: 'invoiceAmt', title: 'Payable Amount' },
-      { name: 'outstandingAmount', title: 'Outstanding Amount' },
+      {
+        name: this.props.statement.entity
+          ? 'payableAmount'
+          : 'patientPayableAmount',
+        title: 'Payable Amount',
+      },
+      {
+        name: this.props.statement.entity
+          ? 'outstandingAmount'
+          : 'patientOutstanding',
+        title: 'Outstanding Amount',
+      },
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
       {
-        columnName: 'invoiceAmt',
+        columnName: this.props.statement.entity
+          ? 'payableAmount'
+          : 'patientPayableAmount',
         type: 'number',
         currency: true,
       },
       {
-        columnName: 'outstandingBalance',
+        columnName: this.props.statement.entity
+          ? 'outstandingAmount'
+          : 'patientOutstanding',
         type: 'number',
         currency: true,
       },
@@ -103,7 +120,7 @@ class AddNewStatement extends PureComponent {
     // dateColumns: [
     //   'invoiceDate',
     // ],
-    rows: [
+    invoiceRows: [
       // {
       //   id: 'PT-000001A',
       //   invoiceNo: 'IV-000001',
@@ -119,52 +136,63 @@ class AddNewStatement extends PureComponent {
   }
 
   componentDidMount () {
+    console.log('statement', this.props.values.statement)
     this.setState({
-      rows: this.props.values.statementInvoice,
+      invoiceRows: this.props.values.statementInvoice,
+    })
+    // this.setState({
+    //   selectedRows: this.props.values.statementInvoice,
+    // })
+  }
+
+  handleSelectionChange = (rows) => {
+    const { setValues, values } = this.props
+    const { invoiceRows } = this.state
+    this.setState({ selectedRows: rows })
+    let statementInvoiceRows = []
+    rows.forEach((o) => {
+      const invoice = invoiceRows.find((r) => r.id === o)
+      invoice.invoicePayerFK = values.copayerFK
+      invoice.invoiceFK = o
+      statementInvoiceRows.push(invoice)
+    })
+    console.log('statementInvoiceRows', statementInvoiceRows)
+    setValues({
+      ...values,
+      statementInvoice: statementInvoiceRows,
     })
   }
 
-  handleSelectionChange = (selection) => {
-    this.setState({ selectedRows: selection })
-  }
-
   getInvoiceList = (e) => {
-    this.props.dispatch({
+    const { dispatch, statement } = this.props
+    dispatch({
       type: 'statement/queryInvoiceList',
       payload: {
         'invoicePayer.CompanyFK': e,
       },
+    }).then((invoiceList) => {
+      const { data } = invoiceList.data
+      this.setState({ invoiceRows: data })
     })
   }
 
   render () {
-    const { classes, footer, onConfirm, theme, values, history } = this.props
     const {
-      rows,
-      columns,
-      currencyColumns,
-      dateColumns,
-      columnExtensions,
-    } = this.state
-    const editRow = (row, e) => {
-      history.push(`/finance/statement`)
-    }
-    console.log('statementInvoice', this.state.rows)
+      classes,
+      theme,
+      values,
+      history,
+      handleSubmit,
+      statement,
+    } = this.props
+    const { invoiceRows, columns, columnExtensions } = this.state
+    // console.log('values', values)
+    console.log('state', this.state)
+    console.log('props', this.props)
+
     return (
       <React.Fragment>
         <CardContainer hideHeader>
-          {/* <GridContainer>
-          <GridItem xs lg={4}>
-            <h4>
-              <FormattedMessage id='finance.statement.detailsTitle' />
-            </h4>
-          </GridItem>
-          <GridItem xs lg={8}>
-            <h4>
-              <FormattedMessage id='finance.statement.title.selectInvoice' />
-            </h4>
-          </GridItem>
-        </GridContainer> */}
           <GridContainer>
             <GridContainer>
               <GridItem md={3}>
@@ -195,7 +223,7 @@ class AddNewStatement extends PureComponent {
 
             <GridItem md={3}>
               <FastField
-                name='PaymentTerms'
+                name='paymentTerm'
                 render={(args) => (
                   <NumberInput
                     suffix='Days'
@@ -213,7 +241,7 @@ class AddNewStatement extends PureComponent {
                 <Field
                   name='adminChargeValue'
                   render={(args) => {
-                    if (values.adminChargeType) {
+                    if (values.adminChargeType === 'ExactAmount') {
                       return (
                         <NumberInput currency label='Admin Charge' {...args} />
                       )
@@ -226,11 +254,13 @@ class AddNewStatement extends PureComponent {
               </GridItem>
               <GridItem md={3}>
                 <Field
-                  name='adminChargeType'
+                  name='adminChargeValueType'
                   render={(args) => (
                     <Switch
                       checkedChildren='$'
                       unCheckedChildren='%'
+                      checkedValue='ExactAmount'
+                      unCheckedValue='Percentage'
                       label=''
                       {...args}
                     />
@@ -399,43 +429,14 @@ class AddNewStatement extends PureComponent {
             </GridItem>
             <CommonTableGrid
               style={{ margin: theme.spacing(2) }}
-              rows={rows}
+              rows={invoiceRows}
               columns={columns}
-              // currencyColumns={currencyColumns}
-              // dateColumns={dateColumns}
               columnExtensions={columnExtensions}
-              // height={300}
-              FuncProps={{ selectable: true }}
+              FuncProps={{ selectable: !statement.entity }}
               selection={this.state.selectedRows}
               onSelectionChange={this.handleSelectionChange}
             />
-            {/* // rows={rows}
-            // columns={columns}
-            // currencyColumns={currencyColumns}
-            // dateColumns={dateColumns}
-            // height={300}
-            // />
-            {/* <GridItem classes={{ grid: classes.invoicesList }}>
-              <EditableTableGrid
-                rows={rows}
-                columns={columns}
-                currencyColumns={currencyColumns}
-                dateColumns={dateColumns}
-                height={300}
-              />
-            </GridItem> */}
-            {/* </GridItem> */}
           </GridContainer>
-          {/* {footer &&
-            footer({
-              onConfirm,
-              confirmBtnText: formatMessage({
-                id: 'form.create',
-              }),
-              confirmProps: {
-                disabled: false,
-              },
-            })} */}
           <GridItem
             container
             style={{
@@ -446,7 +447,9 @@ class AddNewStatement extends PureComponent {
             <Button color='danger' onClick={() => history.goBack()}>
               Cancel
             </Button>
-            <Button color='primary'>Save</Button>
+            <Button color='primary' onClick={() => handleSubmit()}>
+              Save
+            </Button>
           </GridItem>
         </CardContainer>
       </React.Fragment>

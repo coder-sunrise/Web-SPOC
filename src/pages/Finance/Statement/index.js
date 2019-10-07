@@ -169,6 +169,7 @@ class Statement extends PureComponent {
           history={history}
           handleSearch={this.handleSearch}
           handleAddNew={this.toggleAddNewStatementModal}
+          dispatch={dispatch}
         />
         <CommonTableGrid
           style={{ margin: 0 }}

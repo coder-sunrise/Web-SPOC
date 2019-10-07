@@ -79,35 +79,28 @@ class DetailsHeader extends PureComponent {
               <h5 className={classes.boldText}>Co-Payer: </h5>
             </GridItem>
             <GridItem md={3}>
-              <FastField
+              <Field
                 name='copayerFK'
                 render={(args) => (
                   <CodeSelect
                     code='ctcopayer'
-                    noUnderline
-                    disabled
-                    style={{
-                      right: -60,
-                    }}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={4} />
-            <GridItem md={5}>
-              <h5 className={classes.boldText}>Payment Term: </h5>
-            </GridItem>
-            <GridItem md={3}>
-              <FastField
-                name='paymentTerm'
-                render={(args) => (
-                  <CustomInput
                     disabled
                     noUnderline
                     rightAlign='true'
                     {...args}
                   />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={5}>
+              <h5 className={classes.boldText}>Payment Term: </h5>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='paymentTerm'
+                render={(args) => (
+                  <TextField disabled noUnderline rightAlign='true' {...args} />
                 )}
               />
             </GridItem>
@@ -118,9 +111,24 @@ class DetailsHeader extends PureComponent {
               <h5 className={classes.boldText}>Admin Charge:</h5>
             </GridItem>
             <GridItem md={3}>
-              <FastField
+              <Field
                 name='adminChargeValue'
-                render={(args) => <NumberInput {...amountProps} {...args} />}
+                render={(args) => {
+                  console.log(values.adminChargeValueType)
+                  if (values.adminChargeValueType === 'ExactAmount') {
+                    return <NumberInput percentage {...amountProps} {...args} />
+                  }
+                  return (
+                    <NumberInput
+                      percentage
+                      noUnderline
+                      disabled
+                      rightAlign='true'
+                      normalText='true'
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
             <GridItem md={4} />
