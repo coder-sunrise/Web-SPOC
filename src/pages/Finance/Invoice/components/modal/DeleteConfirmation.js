@@ -18,10 +18,11 @@ const DeleteConfirmation = ({
   type,
   itemID,
   onClose,
+  ...onVoid
 }) => {
   const [
-    reason,
-    setReason,
+    cancelReason,
+    setCancelReason,
   ] = useState('')
 
   return (
@@ -34,8 +35,7 @@ const DeleteConfirmation = ({
       <GridItem md={10} className={classes.spacing}>
         <TextField
           label='Reason'
-          onChange={(e) => setReason(e.target.value)}
-          defaultValue=''
+          onChange={(e) => setCancelReason(e.target.value)}
         />
       </GridItem>
       <GridItem>
@@ -44,8 +44,8 @@ const DeleteConfirmation = ({
         </Button>
         <Button
           color='primary'
-          onClick={() => handleSubmit(id, reason)}
-          disabled={reason === ''}
+          onClick={() => handleSubmit(cancelReason, onVoid)}
+          disabled={cancelReason === ''}
         >
           Confirm
         </Button>

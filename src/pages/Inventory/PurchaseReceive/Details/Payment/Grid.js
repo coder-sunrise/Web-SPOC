@@ -38,6 +38,7 @@ class Grid extends PureComponent {
       {
         columnName: 'paymentModeFK',
         type: 'codeSelect',
+        labelField: 'displayValue',
         code: 'CTPaymentMode',
       },
       {
@@ -51,12 +52,12 @@ class Grid extends PureComponent {
   onCommitChanges = ({ rows, deleted }) => {
     const { setFieldValue } = this.props
     if (deleted) {
-      console.log('onCommitChangesDelete', { deleted, rows })
+      rows.find((v) => v.id === deleted[0]).isDeleted = true
+      setFieldValue('purchaseOrderPayment', rows)
     } else {
-      console.log('onCommitChangesAdd', rows)
+      setFieldValue('purchaseOrderPayment', rows)
     }
 
-    setFieldValue('purchaseOrderPayment', rows)
     return rows
   }
 

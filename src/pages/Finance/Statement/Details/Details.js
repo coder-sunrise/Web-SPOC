@@ -9,11 +9,10 @@ import {
   Button,
   GridContainer,
   GridItem,
-  EditableTableGrid,
   CommonTableGrid,
   CommonModal,
-  NavPills,
   dateFormatLong,
+  dateFormatWithTime,
   timeFormatWithoutSecond,
   withFormikExtend,
 } from '@/components'
@@ -256,10 +255,14 @@ class Details extends PureComponent {
   }
 
   handleRefresh = () => {
-    this.setState({
-      lastRefresh: moment().format(
-        `${dateFormatLong} ${timeFormatWithoutSecond}`,
-      ),
+    const { dispatch, values, resetForm } = this.props
+    dispatch({
+      type: 'statement/refreshStatement',
+      payload: {
+        id: values.id,
+      },
+    }).then(() => {
+      resetForm()
     })
   }
 
@@ -284,23 +287,15 @@ class Details extends PureComponent {
 
   render () {
     const {
-      rows,
       columns,
       columnExtensions,
-      lastRefresh,
       showCollectPayment,
       FuncProps,
       showModal,
     } = this.state
 
-    // const FuncProps = { pager: false }
-    const { classes, history, statement } = this.props
+    const { classes, history, statement, values } = this.props
 
-    console.log(
-      'dettailStatement',
-      statement,
-      statement.entity.statementInvoice,
-    )
     return (
       <div>
         <GridContainer classes={{ grid: classes.gridContainer }}>
@@ -320,7 +315,10 @@ class Details extends PureComponent {
 
         <CommonTableGrid
           // height={300}
-          rows={statement.entity.statementInvoice}
+          rows={
+            statement.entity.statementInvoice ||
+            statement.default.statementInvoice
+          }
           columns={columns}
           columnExtensions={columnExtensions}
           FuncProps={FuncProps}
@@ -328,7 +326,13 @@ class Details extends PureComponent {
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
         />
-        <h5>{`Last Refreshed On ${lastRefresh}`}</h5>
+
+        <h5>
+          {`Last Refreshed On ${moment(values.lastRefreshTime).format(
+            dateFormatWithTime,
+          ) || '-'}`}
+        </h5>
+
         <CommonModal
           open={showCollectPayment}
           title={formatMessage({

@@ -56,7 +56,13 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { handleSubmit, classes, handleAddNew, history } = this.props
+    const {
+      handleSubmit,
+      classes,
+      handleAddNew,
+      history,
+      dispatch,
+    } = this.props
 
     const {
       allStatementDate,
@@ -190,6 +196,12 @@ class SearchBar extends PureComponent {
               variant='contained'
               color='primary'
               onClick={() => {
+                dispatch({
+                  type: 'statement/updateState',
+                  payload: {
+                    entity: undefined,
+                  },
+                })
                 history.push('/finance/statement/newstatement')
               }}
             >

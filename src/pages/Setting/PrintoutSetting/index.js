@@ -199,8 +199,8 @@ class printoutSetting extends PureComponent {
               </GridItem>
             </GridContainer>
 
-            <GridContainer>
-              <GridItem md={1} className={classes.verticalSpacing}>
+            <GridContainer className={classes.verticalSpacing}>
+              <GridItem md={1}>
                 <h4>
                   <b>Header Info</b>
                 </h4>
@@ -208,7 +208,9 @@ class printoutSetting extends PureComponent {
               <GridItem md={3}>
                 <FastField
                   name='headerInfo'
-                  render={(args) => <Switch label='' {...args} />}
+                  render={(args) => (
+                    <Switch style={{ marginTop: 0 }} {...args} />
+                  )}
                 />
               </GridItem>
             </GridContainer>
@@ -235,8 +237,8 @@ class printoutSetting extends PureComponent {
                 />
               </GridItem>
             </GridContainer>
-            <GridContainer>
-              <GridItem md={1} className={classes.verticalSpacing}>
+            <GridContainer className={classes.verticalSpacing}>
+              <GridItem md={1}>
                 <h4>
                   <b>Footer Info</b>
                 </h4>
@@ -244,7 +246,9 @@ class printoutSetting extends PureComponent {
               <GridItem md={3}>
                 <FastField
                   name='footerInfo'
-                  render={(args) => <Switch label='' {...args} />}
+                  render={(args) => (
+                    <Switch style={{ marginTop: 0 }} {...args} />
+                  )}
                 />
               </GridItem>
             </GridContainer>

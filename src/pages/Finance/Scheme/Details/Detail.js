@@ -16,8 +16,6 @@ import {
 const styles = () => ({})
 
 const Detail = ({ height, ...props }) => {
-  let { isUserMaintainable } = props.values
-  isUserMaintainable = true
   return (
     <CardContainer
       hideHeader
@@ -37,7 +35,6 @@ const Detail = ({ height, ...props }) => {
                     label={formatMessage({
                       id: 'finance.scheme.detail.code',
                     })}
-                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )
@@ -53,7 +50,6 @@ const Detail = ({ height, ...props }) => {
                     label={formatMessage({
                       id: 'finance.scheme.detail.name',
                     })}
-                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )
@@ -69,7 +65,6 @@ const Detail = ({ height, ...props }) => {
                     label={formatMessage({
                       id: 'finance.scheme.detail.description',
                     })}
-                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )
@@ -87,7 +82,6 @@ const Detail = ({ height, ...props }) => {
                     })}
                     multiline
                     rowsMax='5'
-                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )
@@ -124,7 +118,6 @@ const Detail = ({ height, ...props }) => {
                       id: 'finance.scheme.detail.category',
                     })}
                     code='ctSchemeCategory'
-                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )
@@ -155,7 +148,6 @@ const Detail = ({ height, ...props }) => {
                   })}
                   code='ctCopayer'
                   max={50}
-                  disabled={!isUserMaintainable}
                   {...args}
                 />
               )}
@@ -169,7 +161,6 @@ const Detail = ({ height, ...props }) => {
                   <DateRangePicker
                     label='Effective Start Date'
                     label2='End Date'
-                    disabled={!isUserMaintainable}
                     {...args}
                   />
                 )

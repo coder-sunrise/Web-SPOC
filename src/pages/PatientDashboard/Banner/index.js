@@ -448,9 +448,14 @@ class Banner extends PureComponent {
               header={
                 <div>
                   {'Scheme'}{' '}
-                  <IconButton onClick={this.refreshChasBalance}>
-                    <Refresh />
-                  </IconButton>
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
+                    .length > 0 ? (
+                      <IconButton onClick={this.refreshChasBalance}>
+                        <Refresh />
+                      </IconButton>
+                  ) : (
+                    ''
+                  )}
                 </div>
               }
               body={

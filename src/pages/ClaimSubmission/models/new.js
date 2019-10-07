@@ -2,14 +2,15 @@ import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'claimSubmissionDraft',
+  namespace: 'claimSubmissionNew',
   config: {},
   param: {
     service,
     state: {
-      default: {
-        isUserMaintainable: true,
+      fixedFilter: {
+        status: 'New',
       },
+      default: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

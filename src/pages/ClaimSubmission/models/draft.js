@@ -8,9 +8,10 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      default: {
-        isUserMaintainable: true,
+      fixedFilter: {
+        status: 'Draft',
       },
+      default: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -24,13 +25,6 @@ export default createListViewModel({
         return {
           ...st,
           list: data.data,
-        }
-      },
-
-      fakeQueryDone (st, { payload }) {
-        return {
-          ...st,
-          list: FakeDataClaimSubmissionCHAS(),
         }
       },
     },
