@@ -383,7 +383,7 @@ class Banner extends PureComponent {
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
-        <GridContainer style={{height: 100}}>
+        <GridContainer style={{ height: 100 }}>
           {/* <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
               <img src={avatar} alt='...' />
@@ -464,9 +464,14 @@ class Banner extends PureComponent {
               header={
                 <div>
                   {'Scheme'}{' '}
-                  <IconButton onClick={this.refreshChasBalance}>
-                    <Refresh />
-                  </IconButton>
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
+                    .length > 0 ? (
+                      <IconButton onClick={this.refreshChasBalance}>
+                        <Refresh />
+                      </IconButton>
+                  ) : (
+                    ''
+                  )}
                 </div>
               }
               body={
