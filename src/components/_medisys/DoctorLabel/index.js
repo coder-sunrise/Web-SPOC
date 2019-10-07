@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 
-const DoctorLabel = ({ doctor }) => {
+const DoctorLabel = ({ doctor, hideMCR = false }) => {
   let label = ''
   try {
     let { clinicianProfile, doctorMCRNo } = doctor
@@ -10,6 +10,8 @@ const DoctorLabel = ({ doctor }) => {
     let mcrNo = doctorMCRNo ? `(${doctorMCRNo})` : ''
     if (clinicianProfile.doctorProfile)
       mcrNo = `(${clinicianProfile.doctorProfile.doctorMCRNo})`
+
+    if (hideMCR) mcrNo = ''
 
     label = `${designation} ${clinicianProfile.name} ${mcrNo}`
   } catch (error) {

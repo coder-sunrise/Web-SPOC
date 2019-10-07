@@ -267,7 +267,7 @@ class GlobalModalContainer extends PureComponent {
                   }
                 }}
               >
-                {global.onConfirmText || 'Discard changes'}
+                Discard changes
               </Button>
             ) : null,
             onConfirm: global.onConfirmSave

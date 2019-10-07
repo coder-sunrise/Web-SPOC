@@ -20,9 +20,6 @@ const InputWeekly = ({
   const { recurrenceDaysOfTheWeek: selectedDays = [] } = recurrenceDto
 
   const maxTagCount = selectedDays.length === 1 ? 1 : 0
-  const everyDay = 'Every day'
-  const maxTagPlaceholder =
-    selectedDays.length === 7 ? everyDay : `${selectedDays.length} selected`
 
   return (
     <GridContainer item xs md={12}>
@@ -53,7 +50,7 @@ const InputWeekly = ({
               mode='multiple'
               options={WeekDays}
               maxTagCount={maxTagCount}
-              maxTagPlaceholder={maxTagPlaceholder}
+              maxTagPlaceholder='days'
             />
           )}
         />

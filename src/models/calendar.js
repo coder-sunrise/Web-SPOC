@@ -16,7 +16,7 @@ import {
   filterRecurrenceDto,
   mapDatagridToAppointmentResources,
   compareDto,
-} from '@/pages/Reception/Appointment/components/form/formikUtils'
+} from '@/pages/Reception/Appointment/components/form/formUtils'
 import { getTimeObject, compare } from '@/utils/yup'
 
 const ACTION_KEYS = {
@@ -159,8 +159,6 @@ export default createListViewModel({
             rescheduledByFK,
           }
 
-          console.log({ formikCurrentAppointment, currentAppointment })
-
           const shouldGenerateRecurrence =
             !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
 
@@ -302,7 +300,7 @@ export default createListViewModel({
               },
             }
           }
-          console.log({ savePayload })
+          // console.log({ savePayload })
           return yield put({
             type: actionKey,
             payload: savePayload,
@@ -332,7 +330,6 @@ export default createListViewModel({
         const result = yield call(service.query, payload)
         const { status, data } = result
         if (parseInt(status, 10) === 200) {
-          console.log({ data: JSON.stringify(data) })
           yield put({
             type: 'setViewAppointment',
             data,

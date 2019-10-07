@@ -1,4 +1,17 @@
 import * as Yup from 'yup'
+import { primaryColor } from 'mui-pro-jss'
+
+export const defaultColorOpts = {
+  name: 'default',
+  value: primaryColor,
+  active: primaryColor,
+}
+
+export const doctorEventColorOpts = {
+  name: 'doctorEvent',
+  value: '#999',
+  active: '#8c8c8c',
+}
 
 export const timeFormat = 'hh:mm a'
 

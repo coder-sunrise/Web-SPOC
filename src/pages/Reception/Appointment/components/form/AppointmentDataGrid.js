@@ -7,7 +7,6 @@ import { withStyles } from '@material-ui/core'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
 import { AppointmentTypeLabel } from '@/components/_medisys'
-import { AppointmentTypeOptions, reduceToColorClass } from '../../setting'
 import {
   AppointmentDataColExtensions,
   AppointmentDataColumn,
@@ -22,7 +21,6 @@ const validationSchema = Yup.object().shape({
 })
 
 const styles = () => ({
-  ...AppointmentTypeOptions.reduce(reduceToColorClass, {}),
   container: {
     position: 'relative',
   },

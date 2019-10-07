@@ -4,7 +4,7 @@ import moment from 'moment'
 // material ui
 import { Popover, withStyles } from '@material-ui/core'
 // common component
-import { CardContainer, CommonModal, serverDateFormat } from '@/components'
+import { CardContainer, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
@@ -13,8 +13,11 @@ import Form from './components/form/Form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
 // settings
-import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
-import { DoctorFormValidation, InitialPopoverEvent } from './const'
+import {
+  defaultColorOpts,
+  DoctorFormValidation,
+  InitialPopoverEvent,
+} from './utils'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // utils
 import { getRemovedUrl } from '@/utils/utils'
@@ -37,7 +40,6 @@ const styles = (theme) => ({
       backgroundColor: defaultColorOpts.activeColor,
     },
   },
-  ...AppointmentTypeAsColor,
 })
 
 export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
@@ -237,7 +239,6 @@ class Appointment extends React.PureComponent {
                 selectedAppointmentFK: selectedAppointmentID,
                 showAppointmentForm: true,
                 isDragging: false,
-                isEditedAsSingleAppointment,
               })
           })
       }
@@ -355,7 +356,6 @@ class Appointment extends React.PureComponent {
           popupAnchor: null,
           showSeriesConfirmation: false,
           showAppointmentForm: true,
-          isEditedAsSingleAppointment,
         })
     })
   }
@@ -374,7 +374,6 @@ class Appointment extends React.PureComponent {
       popoverEvent,
       filter,
       selectedAppointmentFK,
-      isEditedAsSingleAppointment: eventEditedAsSingle,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
