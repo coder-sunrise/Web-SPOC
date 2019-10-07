@@ -528,13 +528,15 @@ class PatientHistory extends Component {
           }}
         >
           {entity &&
-            this.widgets.filter( (o) =>
+            this.widgets
+              .filter(
+                (o) =>
                   this.state.selectedItems.indexOf('0') >= 0 ||
                   this.state.selectedItems.indexOf(o.id) >= 0,
-              ).map((o) => {
+              )
+              .map((o) => {
                 const Widget = o.component
-
-                console.log("******** " , entity)
+                console.log("+++++++++++++++ " ,entity )
                 return (
                   <div>
                     <h5>{o.name}</h5>
@@ -572,48 +574,43 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
- 
+
     return (
       <div {...cfg}>
-        {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
-          <CardContainer
-            hideHeader
-            size='sm'
-            className={classnames({
-              [classes.leftPanel]: !widget ? true : false,
-              [classes.integratedLeftPanel]: mode === 'integrated',
-              [override.leftPanel]: !widget ? true : false,
-            })}
-          >
-            {sortedPatientHistory ? sortedPatientHistory.length >
-            0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
-              sortedPatientHistory.map((o) => this.getContent(o))
-            ) : (
-              <Accordion
-                defaultActive={0}
-                collapses={sortedPatientHistory.map((o) => ({
-                  title: this.getTitle(o),
-                  content: this.getContent(o),
-                }))}
-              />
-            ) : (
-              ' '
-            ) : (
-              <React.Fragment>
-                <Skeleton height={30} />
-                <Skeleton height={30} width='80%' />
-                <Skeleton height={30} width='80%' />
-                <Skeleton height={30} />
-                <Skeleton height={30} width='80%' />
-                <Skeleton height={30} width='80%' />
-              </React.Fragment>
-            )}
-          </CardContainer>
-        ) : (
-          ''
-        ) : (
-          ''
-        )}
+        <CardContainer
+          hideHeader
+          size='sm'
+          className={classnames({
+            [classes.leftPanel]: !widget ? true : false,
+            [classes.integratedLeftPanel]: mode === 'integrated',
+            [override.leftPanel]: !widget ? true : false,
+          })}
+        >
+          {sortedPatientHistory ? sortedPatientHistory.length >
+          0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
+            sortedPatientHistory.map((o) => this.getContent(o))
+          ) : (
+            <Accordion
+              defaultActive={0}
+              collapses={sortedPatientHistory.map((o) => ({
+                title: this.getTitle(o),
+                content: this.getContent(o),
+              }))}
+            />
+          ) : (
+            <p>No Visit Record Found</p>
+          ) : (
+            <React.Fragment>
+              <Skeleton height={30} />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} width='80%' />
+            </React.Fragment>
+          )}
+        </CardContainer>
+
         {selected && mode === 'split' && this.getDetailPanel()}
       </div>
     )

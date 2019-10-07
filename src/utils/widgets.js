@@ -190,6 +190,10 @@ const widgets = [
     component: Loadable({
       loader: () => import('@/pages/Widgets/Orders'),
       loading: Loading,
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} widget mode='consultation' />
+      },
       // render (loaded, props) {
       //   console.log(loaded, props)
       //   let Component = loaded.default

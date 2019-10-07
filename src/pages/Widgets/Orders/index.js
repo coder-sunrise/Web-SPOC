@@ -53,97 +53,95 @@ class Orders extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch } = this.props
+    const { dispatch, mode } = this.props
 
-
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-        filter: {
-          'serviceFKNavigation.IsActive': true,
-          combineCondition: 'or',
+    if (mode === 'consultation') {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+          filter: {
+            'serviceFKNavigation.IsActive': true,
+            combineCondition: 'or',
+          },
         },
-      },
-    }).then((list) => {
-      // console.log(list)
-      // eslint-disable-next-line compat/compat
-      const { services, serviceCenters, serviceCenterServices } = getServices(
-        list,
-      )
-      this.setState({
-        services,
-        serviceCenters,
-        serviceCenterServices,
+      }).then((list) => {
+        // console.log(list)
+        // eslint-disable-next-line compat/compat
+        const { services, serviceCenters, serviceCenterServices } = getServices(
+          list,
+        )
+        this.setState({
+          services,
+          serviceCenters,
+          serviceCenterServices,
+        })
+
+        let orderList = serviceCenterServices.filter(
+          (o) => o.isAutoOrder === true && o.isDefault === true,
+        )
+        for (let i = 0; i < orderList.length; i++) {
+          let serviceFKValue = 0
+          let serviceCenterFKValue = 0
+          let serviceNameValue = ''
+          let totalAfterItemAdjustmentValue = 0
+          let adjAmountValue = 0
+
+          for (let a = 0; a < services.length; a++) {
+            if (orderList[i].displayValue === services[a].name) {
+              serviceFKValue = services[a].value
+              serviceNameValue = services[a].name
+            }
+          }
+
+          for (let b = 0; b < serviceCenters.length; b++) {
+            if (orderList[i].serviceCenter === serviceCenters[b].name) {
+              serviceCenterFKValue = serviceCenters[b].value
+            }
+          }
+
+          totalAfterItemAdjustmentValue = 0
+          adjAmountValue = 0
+
+          let rowRecord = {
+            sequence: i,
+            type: '3',
+            serviceFK: serviceFKValue,
+            serviceCenterFK: serviceCenterFKValue,
+            serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
+            serviceName: serviceNameValue,
+            unitPrice: orderList[i].unitPrice,
+            total: orderList[i].unitPrice,
+            quantity: 1,
+            totalAfterItemAdjustment: orderList[i].unitPrice,
+            adjAmount: adjAmountValue,
+            remark: '',
+            subject: orderList[i].displayValue,
+            uid: '',
+            weightage: 0,
+            totalAfterOverallAdjustment: 0,
+          }
+
+          dispatch({
+            type: 'orders/upsertRow',
+            payload: rowRecord,
+          })
+        }
       })
 
-
-
-      let orderList = serviceCenterServices.filter( (o) => (o.isAutoOrder === true && o.isDefault === true))
-      for (let i = 0; i < orderList.length; i++) {
-        let serviceFKValue = 0
-        let serviceCenterFKValue = 0
-        let serviceNameValue = ''
-        let totalAfterItemAdjustmentValue = 0
-        let adjAmountValue = 0
-
-        for(let a = 0; a < services.length; a++){
-          if(orderList[i].displayValue === services[a].name){
-            serviceFKValue = services[a].value
-            serviceNameValue = services[a].name
-          }
-        }
-
-        for(let b = 0; b < serviceCenters.length; b++){
-          if(orderList[i].serviceCenter === serviceCenters[b].name){
-            serviceCenterFKValue = serviceCenters[b].value
-          }
-        }
-
-       
-        totalAfterItemAdjustmentValue = 0
-        adjAmountValue = 0
-
-
-        let rowRecord = {
-          sequence: i,
-          type: "3",
-          serviceFK: serviceFKValue,
-          serviceCenterFK: serviceCenterFKValue,
-          serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
-          serviceName: serviceNameValue,
-          unitPrice: orderList[i].unitPrice,
-          total: orderList[i].unitPrice,
-          quantity: 1,
-          totalAfterItemAdjustment: totalAfterItemAdjustmentValue,
-          adjAmount: adjAmountValue,
-          remark: '',
-          subject: orderList[i].displayValue,
-          uid: '',
-          weightage: 0,
-          totalAfterOverallAdjustment: 0,  
-        }
-
-        dispatch({
-          type: 'orders/upsertRow',
-          payload: rowRecord,
-        })
+      this.state = {
+        services: [],
+        serviceCenters: [],
       }
-    })
-
-    this.state = {
-      services: [],
-      serviceCenters: [],
     }
   }
-
 
   getServiceCenterService = () => {
     const { values, setFieldValue, setValues } = this.props
     const { serviceFK, serviceCenterFK } = values
 
     if (!serviceCenterFK || !serviceFK) return
-    const serviceCenterService =  
+    const serviceCenterService =
       this.state.serviceCenterServices.find(
         (o) =>
           o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
@@ -323,7 +321,8 @@ class Orders extends PureComponent {
   render () {
     const { state, props } = this
     const { theme, classes, orders, className } = props
-    // console.log(props)
+    console.log('***********************')
+    console.log(this.props)
     return (
       <div className={className}>
         <Detail {...props} />

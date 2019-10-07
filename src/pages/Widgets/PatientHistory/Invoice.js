@@ -32,6 +32,8 @@ import {
   NumberInput,
 } from '@/components'
 
+import AmountSummary from '@/pages/Shared/AmountSummary'
+
 const Invoice = (props) => {
   const amountProps = {
     text: true,
@@ -67,6 +69,7 @@ const Invoice = (props) => {
             type: 'Medication',
             name: 'Biogesic tab 500 mg',
             quantity: 1,
+            adj: 3,
             total: 40,
           },
           {
@@ -74,6 +77,7 @@ const Invoice = (props) => {
             type: 'Medication',
             name: 'AMLODIPINE 5MG',
             quantity: 1,
+            adj: 3,
             total: 40,
           },
           {
@@ -81,6 +85,7 @@ const Invoice = (props) => {
             type: 'Vaccination',
             name: 'ACTACEL Vaccine Injection (0.5 mL)',
             quantity: 2,
+            adj: 3,
             total: 40,
           },
           {
@@ -88,6 +93,7 @@ const Invoice = (props) => {
             type: 'Vaccination',
             name: 'BOOSTRIX POLIO Vaccine',
             quantity: 2,
+            adj: 3,
             total: 40,
           },
           {
@@ -95,6 +101,7 @@ const Invoice = (props) => {
             type: 'Service',
             name: 'Consultation Service',
             quantity: 3,
+            adj: 3,
             total: 30,
           },
         ]}
@@ -102,33 +109,34 @@ const Invoice = (props) => {
           { name: 'type', title: 'Type' },
           { name: 'name', title: 'Name' },
           { name: 'quantity', title: 'Quantity' },
+          { name: 'adj', title: 'Adj' },
           { name: 'total', title: 'Total' },
         ]}
         FuncProps={{ pager: false }}
         columnExtensions={[
           { columnName: 'total', type: 'number', currency: true },
+          { columnName: 'adj', type: 'number', currency: true },
         ]}
       />
-      <GridContainer direction='column' justify='center' alignItems='flex-end'>
+      <GridContainer direction='column' justify='center' alignItems='flex-end' style={{paddingTop: 15}}>
         <GridItem xs={2} md={9} />
         <GridItem xs={10} md={3}>
-          <NumberInput
-            prefix='Sub Total:'
-            defaultValue={190}
-            {...amountProps}
+          <AmountSummary
+            rows={[]}
+            adjustments={[]}
+            config={{
+              // isGSTInclusive: invoice.isGSTInclusive,
+              totalField: 'totalAfterItemAdjustment',
+              adjustedField: 'totalAfterOverallAdjustment',
+            }}
+            // onValueChanged={(v) => {
+            //   setFieldValue(
+            //     'invoice.invoiceTotalAftGST',
+            //     v.summary.totalWithGST,
+            //   )
+            //   setFieldValue('invoice.invoiceAdjustment', v.adjustments)
+            // }}
           />
-        </GridItem>
-        <GridItem xs={2} md={9} />
-        <GridItem xs={10} md={3}>
-          <NumberInput
-            prefix='GST (7%):'
-            defaultValue={13.3}
-            {...amountProps}
-          />
-        </GridItem>
-        <GridItem xs={2} md={9} />
-        <GridItem xs={10} md={3}>
-          <NumberInput prefix='Total:' value={203.3} {...amountProps} />
         </GridItem>
       </GridContainer>
     </div>

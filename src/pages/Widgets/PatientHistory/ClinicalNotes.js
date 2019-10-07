@@ -18,9 +18,15 @@ export default ({ classes, current }) => {
   let htmlData = e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue
 
   return (
-    <div
-      className={classes.paragraph}
-      dangerouslySetInnerHTML={{ __html:  htmlData }}
-    />
+    <div>
+      {current.plan !== undefined ? (
+        <div
+          className={classes.paragraph}
+          dangerouslySetInnerHTML={{ __html: htmlData }}
+        />
+      ) : (
+        ''
+      )}
+    </div>
   )
 }
