@@ -1,4 +1,4 @@
-import { defaultColorOpts } from '../../setting'
+import { defaultColorOpts } from '../../utils'
 
 const styles = (theme) => ({
   loading: {

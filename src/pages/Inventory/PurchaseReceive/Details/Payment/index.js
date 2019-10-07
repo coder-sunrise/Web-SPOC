@@ -47,7 +47,6 @@ class index extends PureComponent {
   }
 
   render () {
-    console.log(this.props)
     const { purchaseOrderDetails } = this.props
     const poStatus = purchaseOrderDetails
       ? purchaseOrderDetails.purchaseOrderStatusFK

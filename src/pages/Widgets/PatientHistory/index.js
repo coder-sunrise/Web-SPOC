@@ -446,8 +446,8 @@ class PatientHistory extends Component {
         hideHeader
         size='sm'
         className={classnames({
-          [classes.rightPanel]: !widget ? true : false,
-          [override.rightPanel]: !widget ? true : false,
+          [classes.rightPanel]: !widget,
+          [override.rightPanel]: !widget,
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
@@ -459,6 +459,7 @@ class PatientHistory extends Component {
               allValue='0'
               prefix='Filter By'
               mode='multiple'
+              maxTagCount={4}
               options={[
                 { name: 'Chief Complaints', value: '1' },
                 { name: 'Plan', value: '2' },
@@ -468,7 +469,6 @@ class PatientHistory extends Component {
                 // { name: 'Result History', value: '6' },
                 { name: 'Invoice', value: '7' },
               ]}
-              label='Filter By'
               style={{ marginBottom: theme.spacing(1) }}
               onChange={this.onSelectChange}
             />

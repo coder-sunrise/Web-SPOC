@@ -128,6 +128,7 @@ class GlobalModalContainer extends PureComponent {
             })
           }}
           fullScreen
+          displayCloseIcon={false}
           showFooter={false}
         >
           {global.showConsultationPanel && <Consultation {...this.props} />}
@@ -266,7 +267,7 @@ class GlobalModalContainer extends PureComponent {
                   }
                 }}
               >
-                {global.onConfirmText || 'Discard changes'}
+                Discard changes
               </Button>
             ) : null,
             onConfirm: global.onConfirmSave

@@ -29,7 +29,7 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 // utils
-import { ValidationSchema, mapPropsToValues } from './formikUtils'
+import { ValidationSchema, mapPropsToValues } from './formUtils'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
@@ -683,7 +683,7 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
-    console.log({ state: this.state })
+
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
       <LoadingWrapper loading={show} text='Loading...'>

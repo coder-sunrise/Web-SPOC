@@ -25,6 +25,7 @@ import MoreVert from '@material-ui/icons/MoreVert'
 import MoreHoriz from '@material-ui/icons/MoreHoriz'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
+import GetApp from '@material-ui/icons/GetApp'
 import Edit from '@material-ui/icons/Edit'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
@@ -58,6 +59,7 @@ import {
   NumberInput,
   Skeleton,
   IconButton,
+  CustomInputWrapper,
   Fab,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
@@ -624,121 +626,127 @@ class Layout extends PureComponent {
     }
     return (
       <div>
-        <div
-          ref={this.layoutContainer}
-          style={{
-            height: height ? this.props.height - 116 : 'auto',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            marginTop: 1,
-          }}
-        >
-          <ResponsiveGridLayout {...layoutCfg}>
-            {state.currentLayout.widgets.map((id) => {
-              const w = widgets.find((o) => o.id === id)
-              if (!w) return <div />
-              const cfgs = state.currentLayout[state.breakpoint]
-              const cfg = cfgs.find((o) => o.i === id)
-              // console.log(cfg, id, this.props)
-              if (!cfg) return <div key={id} />
-              const LoadableComponent = w.component
-              return (
-                <div
-                  className={classnames({
-                    [classes.block]: true,
-                    [classes.fullscreen]: state.fullScreenWidget === id,
-                    [classes.hide]: state.fullScreenWidget !== id,
-                    [classes.show]:
-                      !state.fullScreenWidget || state.fullScreenWidget === id,
-                  })}
-                  key={id}
-                >
-                  <Paper {...this.generateConfig(id)}>
-                    {this.state.mode === 'edit' && (
-                      <div className={`${classes.blockHeader} dragable`}>
-                        <div style={{ height: 25 }}>
-                          <span className={classes.blockName}>{w.name}</span>
+        {true && (
+          <div
+            ref={this.layoutContainer}
+            style={{
+              height: height ? this.props.height - 116 : 'auto',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              marginTop: 1,
+            }}
+          >
+            <ResponsiveGridLayout {...layoutCfg}>
+              {state.currentLayout.widgets.map((id) => {
+                const w = widgets.find((o) => o.id === id)
+                if (!w) return <div />
+                const cfgs = state.currentLayout[state.breakpoint]
+                const cfg = cfgs.find((o) => o.i === id)
+                // console.log(cfg, id, this.props)
+                if (!cfg) return <div key={id} />
+                const LoadableComponent = w.component
+                return (
+                  <div
+                    className={classnames({
+                      [classes.block]: true,
+                      [classes.fullscreen]: state.fullScreenWidget === id,
+                      [classes.hide]: state.fullScreenWidget !== id,
+                      [classes.show]:
+                        !state.fullScreenWidget ||
+                        state.fullScreenWidget === id,
+                    })}
+                    key={id}
+                  >
+                    <Paper {...this.generateConfig(id)}>
+                      {this.state.mode === 'edit' && (
+                        <div className={`${classes.blockHeader} dragable`}>
+                          <div style={{ height: 25 }}>
+                            <span className={classes.blockName}>{w.name}</span>
 
-                          <React.Fragment>
-                            {w.toolbarAddon}
-                            {!state.fullScreenWidget && (
-                              <React.Fragment>
-                                <Tooltip title='Full-screen'>
-                                  <IconButton
-                                    aria-label='Full-screen'
-                                    size='small'
-                                    onClick={this.onFullScreenClick(id)}
-                                  >
-                                    <Fullscreen />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title='Replace'>
-                                  <Dropdown
-                                    overlay={this.widgetMenu}
-                                    trigger={[
-                                      'click',
-                                    ]}
-                                    currentWidgetId={id}
-                                    disabled={cfg.static}
-                                    onVisibleChange={(visible) => {
-                                      if (visible)
-                                        this.setState({
-                                          replaceWidget: id,
-                                        })
-                                    }}
-                                  >
+                            <React.Fragment>
+                              {w.toolbarAddon}
+                              {!state.fullScreenWidget && (
+                                <React.Fragment>
+                                  <Tooltip title='Full-screen'>
                                     <IconButton
-                                      aria-label='Replace'
+                                      aria-label='Full-screen'
                                       size='small'
+                                      onClick={this.onFullScreenClick(id)}
                                     >
-                                      <CompareArrows />
-                                    </IconButton>
-                                  </Dropdown>
-                                </Tooltip>
-
-                                <Popconfirm
-                                  title='Removing widget will remove all underlying data. Remove this widget?'
-                                  onConfirm={() => this.removeWidget(id)}
-                                >
-                                  <Tooltip title='Delete'>
-                                    <IconButton
-                                      aria-label='Delete'
-                                      size='small'
-                                      disabled={cfg.static}
-                                    >
-                                      <Clear />
+                                      <Fullscreen />
                                     </IconButton>
                                   </Tooltip>
-                                </Popconfirm>
-                              </React.Fragment>
-                            )}
-                            {state.fullScreenWidget === id && (
-                              <Tooltip title='Exit full-screen'>
-                                <IconButton
-                                  aria-label='Exit full-screen'
-                                  size='small'
-                                  onClick={this.onExitFullScreenClick}
-                                >
-                                  <FullscreenExit />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                          </React.Fragment>
+                                  <Tooltip title='Replace'>
+                                    <Dropdown
+                                      overlay={this.widgetMenu}
+                                      trigger={[
+                                        'click',
+                                      ]}
+                                      currentWidgetId={id}
+                                      disabled={cfg.static}
+                                      onVisibleChange={(visible) => {
+                                        if (visible)
+                                          this.setState({
+                                            replaceWidget: id,
+                                          })
+                                      }}
+                                    >
+                                      <IconButton
+                                        aria-label='Replace'
+                                        size='small'
+                                      >
+                                        <CompareArrows />
+                                      </IconButton>
+                                    </Dropdown>
+                                  </Tooltip>
+
+                                  <Popconfirm
+                                    title='Removing widget will remove all underlying data. Remove this widget?'
+                                    onConfirm={() => this.removeWidget(id)}
+                                  >
+                                    <Tooltip title='Delete'>
+                                      <IconButton
+                                        aria-label='Delete'
+                                        size='small'
+                                        disabled={cfg.static}
+                                      >
+                                        <Clear />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Popconfirm>
+                                </React.Fragment>
+                              )}
+                              {state.fullScreenWidget === id && (
+                                <Tooltip title='Exit full-screen'>
+                                  <IconButton
+                                    aria-label='Exit full-screen'
+                                    size='small'
+                                    onClick={this.onExitFullScreenClick}
+                                  >
+                                    <FullscreenExit />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                            </React.Fragment>
+                          </div>
+                          <Divider light />
                         </div>
-                        <Divider light />
+                      )}
+                      <div
+                        className='non-dragable'
+                        style={w.layoutConfig.style}
+                      >
+                        <SizeContainer size='sm'>
+                          <LoadableComponent {...widgetProps} />
+                        </SizeContainer>
                       </div>
-                    )}
-                    <div className='non-dragable' style={w.layoutConfig.style}>
-                      <SizeContainer size='sm'>
-                        <LoadableComponent {...widgetProps} />
-                      </SizeContainer>
-                    </div>
-                  </Paper>
-                </div>
-              )
-            })}
-          </ResponsiveGridLayout>
-        </div>
+                    </Paper>
+                  </div>
+                )
+              })}
+            </ResponsiveGridLayout>
+          </div>
+        )}
         {!state.fullScreenWidget && (
           <React.Fragment>
             <div className={classes.fabContainer}>
@@ -766,45 +774,72 @@ class Layout extends PureComponent {
               open={this.state.openDraw}
               onClose={this.toggleDrawer}
             >
-              <CheckboxGroup
-                style={{
-                  margin: theme.spacing(2),
-                }}
-                label='Manage Widgets'
-                vertical
-                simple
-                value={currentLayout.widgets}
-                valueField='id'
-                textField='name'
-                options={widgets}
-                onChange={(e, s) => {
-                  // console.log(e)
-                  // dispatch({
-                  //   type: 'consultation/updateState',
-                  //   payload: {
-                  //     selectedWidgets: e.target.value,
-                  //   },
-                  // })
-                  // console.log(e.target.value, s)
-                  this.updateWidget(e.target.value, s)
-                }}
-              />
-              <Divider />
-              <div
-                style={{
-                  padding: theme.spacing(2),
-                }}
-              >
-                <Button
-                  onClick={() => {
-                    this.changeLayout(this.getDefaultLayout())
+              <SizeContainer size='sm'>
+                <CheckboxGroup
+                  style={{
+                    margin: theme.spacing(2),
                   }}
-                  color='danger'
-                  size='sm'
+                  label='Manage Widgets'
+                  vertical
+                  strongLabel
+                  value={currentLayout.widgets}
+                  valueField='id'
+                  textField='name'
+                  options={widgets}
+                  onChange={(e, s) => {
+                    // console.log(e)
+                    // dispatch({
+                    //   type: 'consultation/updateState',
+                    //   payload: {
+                    //     selectedWidgets: e.target.value,
+                    //   },
+                    // })
+                    // console.log(e.target.value, s)
+                    this.updateWidget(e.target.value, s)
+                  }}
+                />
+                <div
+                  style={{
+                    margin: theme.spacing(2),
+                    marginTop: 0,
+                  }}
                 >
-                  Reset
-                </Button>
-              </div>
+                  <Button
+                    onClick={() => {
+                      this.changeLayout(this.getDefaultLayout())
+                    }}
+                    color='danger'
+                  >
+                    Reset
+                  </Button>
+                </div>
+                <Divider light />
+                <div
+                  style={{
+                    margin: theme.spacing(2),
+                  }}
+                >
+                  <CustomInputWrapper
+                    label='My Layout'
+                    style={{ paddingTop: 25 }}
+                    strongLabel
+                    labelProps={{
+                      shrink: true,
+                    }}
+                  >
+                    <div>
+                      <p>
+                        <ProgressButton>Save as My Favourite</ProgressButton>
+                      </p>
+                      <p>
+                        <Button color='primary'>
+                          <GetApp />Load from My Favourite
+                        </Button>
+                      </p>
+                    </div>
+                  </CustomInputWrapper>
+                </div>
+              </SizeContainer>
             </Drawer>
           </React.Fragment>
         )}

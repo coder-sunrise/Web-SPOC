@@ -92,7 +92,7 @@ const saveConsultation = ({
       openConfirm: true,
       openConfirmContent: confirmMessage,
       onConfirmText: 'Confirm',
-      onConfirmDiscard: () => {
+      onConfirmSave: () => {
         const newValues = convertToConsultation(values, {
           orders,
           consultationDocument,
@@ -288,7 +288,7 @@ class Consultation extends PureComponent {
     const { visit = {} } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
-    console.log('values', values, this.props)
+    // console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)

@@ -310,7 +310,13 @@ export default class BaseCRUDViewModel {
       },
 
       *updateAppState ({ payload }, { call, put }) {
-        yield put({ type: 'updateState', payload })
+        yield put({
+          type: 'updateState',
+          payload: {
+            onConfirmDiscard: undefined,
+            ...payload,
+          },
+        })
       },
 
       *localAdd ({ payload }, { put, select }) {
