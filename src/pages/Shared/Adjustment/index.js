@@ -143,7 +143,6 @@ class Adjustment extends PureComponent {
 
   render () {
     const { theme, footer, values, global, errors, ...props } = this.props
-    console.log(this.props)
     const { openAdjustmentConfig = {} } = global
     const {
       showRemark,

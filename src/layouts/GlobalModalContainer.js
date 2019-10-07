@@ -128,6 +128,7 @@ class GlobalModalContainer extends PureComponent {
             })
           }}
           fullScreen
+          displayCloseIcon={false}
           showFooter={false}
         >
           {global.showConsultationPanel && <Consultation {...this.props} />}

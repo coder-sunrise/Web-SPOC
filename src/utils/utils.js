@@ -851,9 +851,12 @@ const calculateAmount = (
   {
     totalField = 'totalAfterItemAdjustment',
     adjustedField = 'totalAfterOverallAdjustment',
+    isGSTInclusive = false,
   } = {},
 ) => {
+  let gst = 0
   const total = rows.map((o) => o[totalField]).reduce(sumReducer, 0)
+
   rows.forEach((r) => {
     r.weightage = r[totalField] / total
     r[adjustedField] = r[totalField]
@@ -875,17 +878,27 @@ const calculateAmount = (
     return
   }
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
-  const gst = isEnableGST ? totalAfterAdj * gSTPercentage : 0
+  if (isEnableGST) {
+    if (isGSTInclusive) {
+      rows.forEach((r) => {
+        gst += r[adjustedField] - r[adjustedField] / (1 + gSTPercentage)
+      })
+    } else {
+      gst = totalAfterAdj * gSTPercentage
+    }
+  }
+
   // console.log(totalAfterAdj, gst)
   const r = {
     rows,
-    adjustments,
+    adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
       gst,
       total: totalAfterAdj,
-      totalWithGST: gst + totalAfterAdj,
+      totalWithGST: isGSTInclusive ? totalAfterAdj : gst + totalAfterAdj,
       isEnableGST,
       gSTPercentage,
+      isGSTInclusive,
     },
   }
   // console.log(r)

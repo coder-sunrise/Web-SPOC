@@ -54,8 +54,6 @@ class PurchaseReceive extends PureComponent {
   }
 
   render () {
-    console.log(this.props)
-
     const { props } = this
     const { classes, purchasingReceiving, dispatch } = props
     const cfg = {

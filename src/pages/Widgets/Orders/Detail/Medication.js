@@ -234,7 +234,6 @@ class Medication extends PureComponent {
       setFieldValue,
       orders,
     } = this.props
-    console.log(this.props)
     const commonSelectProps = {
       dropdownMatchSelectWidth: false,
       dropdownStyle: {

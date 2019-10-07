@@ -21,7 +21,6 @@ const buttonStyle = {
   button: {
     minHeight: 'auto',
     // minWidth: 'auto',
-    minWidth: 100,
     // backgroundColor: grayColor,
     // color: '#FFFFFF',
     boxShadow:
@@ -29,7 +28,6 @@ const buttonStyle = {
     border: 'none',
     borderRadius: '3px',
     position: 'relative',
-    padding: '9px 20px',
     margin: 0, // ".3125rem 1px",
     marginRight: 8,
     fontSize: '1rem',

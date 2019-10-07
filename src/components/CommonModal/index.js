@@ -255,6 +255,7 @@ class CommonModal extends React.PureComponent {
       overrideLoading = false,
       footProps = {},
       className,
+      displayCloseIcon = true,
     } = this.props
     if (!children || !open) return null
     // console.log(bodyNoPadding)
@@ -298,7 +299,7 @@ class CommonModal extends React.PureComponent {
           aria-labelledby='classic-modal-slide-title'
           aria-describedby='classic-modal-slide-description'
           style={{ overflow: 'hidden' }}
-          onEscapeKeyDown={this.onClose}
+          onEscapeKeyDown={displayCloseIcon && this.onClose}
         >
           {title && (
             <DialogTitle
@@ -306,17 +307,19 @@ class CommonModal extends React.PureComponent {
               disableTypography
               className={classes.modalHeader}
             >
-              <Button
-                justIcon
-                className={classes.modalCloseButton}
-                key='close'
-                authority='none'
-                aria-label='Close'
-                color='transparent'
-                onClick={this.onClose}
-              >
-                <Close className={classes.modalClose} />
-              </Button>
+              {displayCloseIcon && (
+                <Button
+                  justIcon
+                  className={classes.modalCloseButton}
+                  key='close'
+                  authority='none'
+                  aria-label='Close'
+                  color='transparent'
+                  onClick={this.onClose}
+                >
+                  <Close className={classes.modalClose} />
+                </Button>
+              )}
               {/* <Button
                 justIcon
                 className={classes.modalMinButton}
