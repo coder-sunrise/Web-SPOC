@@ -11,7 +11,6 @@ import {
   GridItem,
   Tooltip,
   dateFormatLong,
-  DatePicker,
 } from '@/components'
 import styles from './styles'
 

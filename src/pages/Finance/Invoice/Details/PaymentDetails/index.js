@@ -6,7 +6,7 @@ import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { CommonModal, withFormik, dateFormatLong } from '@/components'
+import { CommonModal, withFormik } from '@/components'
 // sub components
 import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
@@ -165,8 +165,8 @@ class PaymentDetails extends Component {
         })
         .then((r) => {
           if (r) {
-            this.closeDeleteConfirmationModal()
             this.refresh()
+            this.closeDeleteConfirmationModal()
           }
         })
     }

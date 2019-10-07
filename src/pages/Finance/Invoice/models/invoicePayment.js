@@ -1,9 +1,8 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services/invoicePayment'
-import { InvoicePayerType } from '@/utils/codes'
-import { fakeInvoicePaymentData } from '../sampleData'
 import { notification } from '@/components'
+import { dateFormatLong } from '@/components'
 
 const paymentMode = [
   { type: 'Cash', objName: 'depositPayment', paymentModeFK: 1 },
@@ -222,100 +221,6 @@ export default createFormViewModel({
           ...state,
           currentBizSessionInfo: {
             ...payload,
-          },
-        }
-      },
-
-      addPaymentResult (state, { payload }) {
-        // TBD
-        return {
-          ...state,
-        }
-      },
-
-      writeOffResult (state, { payload }) {
-        // TBD
-        return {
-          ...state,
-        }
-      },
-
-      voidPaymentResult (state, { payload }) {
-        // TBD
-        return {
-          ...state,
-        }
-      },
-
-      fakeQueryDone (state, { payload }) {
-        const {
-          invoicePayment,
-          invoicePayerWriteOff,
-          creditNote,
-        } = fakeInvoicePaymentData
-        let paymentTxnList = []
-
-        InvoicePayerType.map((x) => {
-          // Payment
-          paymentTxnList[x.listName] = (paymentTxnList[x.listName] || [])
-            .concat(
-              (invoicePayment || [])
-                .filter((y) => y.invoicePayerFK === x.invoicePayerFK)
-                .map((z) => {
-                  return {
-                    id: z.id,
-                    type: 'Payment',
-                    itemID: z.receiptNo,
-                    date: moment(z.paymentReceivedDate).format('DD MMM YYYY'),
-                    amount: z.totalAmtPaid,
-                    isCancelled: z.isCancelled,
-                  }
-                }),
-            )
-
-          // Write-Off
-          paymentTxnList[x.listName] = (paymentTxnList[x.listName] || [])
-            .concat(
-              (invoicePayerWriteOff || [])
-                .filter((y) => y.invoicePayerFK === x.invoicePayerFK)
-                .map((z) => {
-                  return {
-                    id: z.id,
-                    type: 'Write Off',
-                    itemID: z.writeOffCode,
-                    date: moment(z.writeOffDate).format('DD MMM YYYY'),
-                    amount: z.writeOffAmount,
-                    reason: z.writeOffReason,
-                    isCancelled: z.isCancelled,
-                  }
-                }),
-            )
-
-          // Credit Note
-          paymentTxnList[x.listName] = (paymentTxnList[x.listName] || [])
-            .concat(
-              (creditNote || [])
-                .filter((y) => y.invoicePayerFK === x.invoicePayerFK)
-                .map((z) => {
-                  return {
-                    id: z.id,
-                    type: 'Credit Note',
-                    itemID: z.creditNoteNo,
-                    date: moment(z.generatedDate).format('DD MMM YYYY'),
-                    amount: z.totalAftGST,
-                    reason: z.remark,
-                    isCancelled: z.isCancelled,
-                  }
-                }),
-            )
-          return null
-        })
-
-        return {
-          ...state,
-          entity: {
-            ...fakeInvoicePaymentData,
-            paymentTxnList,
           },
         }
       },

@@ -20,7 +20,6 @@ const DeleteConfirmation = ({
   onClose,
   ...onVoid
 }) => {
-  console.log(onVoid)
   const [
     cancelReason,
     setCancelReason,
@@ -37,7 +36,6 @@ const DeleteConfirmation = ({
         <TextField
           label='Reason'
           onChange={(e) => setCancelReason(e.target.value)}
-          defaultValue=''
         />
       </GridItem>
       <GridItem>
