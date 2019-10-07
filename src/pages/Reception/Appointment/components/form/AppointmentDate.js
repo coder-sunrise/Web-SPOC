@@ -2,13 +2,7 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 // custom component
-import {
-  dateFormat,
-  GridContainer,
-  GridItem,
-  DatePicker,
-  TextField,
-} from '@/components'
+import { GridContainer, GridItem, DatePicker, TextField } from '@/components'
 
 const AppointmentDate = () => (
   <GridContainer item xs md={12}>

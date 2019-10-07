@@ -16,7 +16,7 @@ import {
   filterRecurrenceDto,
   mapDatagridToAppointmentResources,
   compareDto,
-} from '@/pages/Reception/Appointment/components/form/formikUtils'
+} from '@/pages/Reception/Appointment/components/form/formUtils'
 import { getTimeObject, compare } from '@/utils/yup'
 
 const ACTION_KEYS = {

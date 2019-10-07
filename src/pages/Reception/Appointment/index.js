@@ -13,8 +13,11 @@ import Form from './components/form/Form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
 // settings
-import { defaultColorOpts, AppointmentTypeAsColor } from './setting'
-import { DoctorFormValidation, InitialPopoverEvent } from './const'
+import {
+  defaultColorOpts,
+  DoctorFormValidation,
+  InitialPopoverEvent,
+} from './utils'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // utils
 import { getRemovedUrl } from '@/utils/utils'
@@ -37,7 +40,6 @@ const styles = (theme) => ({
       backgroundColor: defaultColorOpts.activeColor,
     },
   },
-  ...AppointmentTypeAsColor,
 })
 
 export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>

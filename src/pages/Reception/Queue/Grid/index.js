@@ -195,7 +195,6 @@ const Grid = ({
   onRegisterPatientClick,
   onViewPatientProfileClick,
   handleActualizeAppointment,
-  // deleteQueue,
 }) => {
   const deleteQueue = (id) => {
     dispatch({
@@ -440,8 +439,6 @@ const Grid = ({
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
         <CommonTableGrid
-          // style={{ maxHeight: '76.5vh', overflow: 'auto' }}
-          // height={600}
           size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
