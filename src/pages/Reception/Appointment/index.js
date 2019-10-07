@@ -150,6 +150,11 @@ class Appointment extends React.PureComponent {
       },
     })
 
+    dispatch({
+      type: 'patient/updateState',
+      payload: { entity: null },
+    })
+
     history.push(
       getRemovedUrl([
         'md',

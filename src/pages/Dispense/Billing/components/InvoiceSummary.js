@@ -1,10 +1,18 @@
 import React from 'react'
+// formik
+import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // ant design
 import { Divider } from 'antd'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  CardContainer,
+  GridContainer,
+  GridItem,
+  TextField,
+} from '@/components'
 
 const styles = () => ({
   rightAlign: {
@@ -19,7 +27,7 @@ const styles = () => ({
   },
 })
 
-const InvoiceSummary = ({ classes, handleAddPaymentClick }) => {
+const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
   return (
     <React.Fragment>
       <GridItem md={12}>
@@ -29,22 +37,16 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick }) => {
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>Total</h5>
+              <h5>GST ({values.gstAmount}%)</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5>$100.00 </h5>
-            </GridItem>
-            <GridItem md={6}>
-              <h5>GST (7%)</h5>
-            </GridItem>
-            <GridItem md={6} className={classes.rightAlign}>
-              <h5>$100.00 </h5>
+              <h5>${values.gstValue === 0 ? values.gstValue * 100 : 0}</h5>
             </GridItem>
             <GridItem md={6}>
               <h5>Final Bill</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5>$100.00 </h5>
+              <h5>{values.totalAftGst}</h5>
             </GridItem>
             <GridItem md={6}>
               <h5 style={{ fontWeight: 500 }}>Total Claims</h5>
