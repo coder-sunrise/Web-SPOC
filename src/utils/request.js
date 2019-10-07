@@ -320,7 +320,11 @@ const request = (url, option, showNotification = true) => {
             // console.log(codeMessage, response)
             let errorMsg = codeMessage[response.status]
 
-            if (response.status === 401) {
+            if (
+              response.status === 401 &&
+              !localStorage.getItem('debug') &&
+              process.env.NODE_ENV === 'development'
+            ) {
               /* eslint-disable no-underscore-dangle */
               window.g_app._store.dispatch({
                 type: 'login/logout',

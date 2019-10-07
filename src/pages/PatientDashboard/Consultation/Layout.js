@@ -805,6 +805,8 @@ class Layout extends PureComponent {
                   Reset
                 </Button>
               </div>
+              <Divider light />
+              <div>test</div>
             </Drawer>
           </React.Fragment>
         )}
