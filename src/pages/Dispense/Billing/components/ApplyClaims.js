@@ -28,21 +28,13 @@ const styles = (theme) => ({
   },
 })
 
-const ApplyClaims = ({
-  classes,
-  handleClaimSeqClick,
-  handleCoPaymentClick,
-}) => {
+const ApplyClaims = ({ classes, handleCoPaymentClick }) => {
   return (
     <React.Fragment>
       <GridItem md={2}>
         <h5>Apply Claims</h5>
       </GridItem>
       <GridItem md={10} container justify='flex-end'>
-        <Button color='primary' size='sm' onClick={handleClaimSeqClick}>
-          <Edit />
-          Claim Seq
-        </Button>
         <Button color='primary' size='sm' onClick={handleCoPaymentClick}>
           <Add />
           Co-Payment
