@@ -16,7 +16,8 @@ window.dirtyForms = []
 const _localAuthority = {}
 let lastVersion = null
 const withFormikExtend = (props) => (Component) => {
-  const { displayName, authority } = props
+  const { displayName, authority, notDirtyDuration = 3 } = props
+  let startDirtyChecking = false
   if (displayName) {
     _localAuthority[displayName] = {}
   }
@@ -56,6 +57,9 @@ const withFormikExtend = (props) => (Component) => {
       window.dirtyForms = _.reject(window.dirtyForms, (v) => v === displayName)
     }
   }
+
+  const _updateDirtyState = _.debounce(updateDirtyState, 250, { maxWait: 1000 })
+
   // const { mapPropsToValues } = props
   // console.log(props, lastVersion)
   @withFormik({
@@ -87,7 +91,7 @@ const withFormikExtend = (props) => (Component) => {
     //   }, 200)
     // },
   })
-  class BasicComponent extends React.Component {
+  class FormComponet extends React.Component {
     // shouldComponentUpdate (nextProps, nextStates) {
     //   return false
     // }
@@ -103,11 +107,19 @@ const withFormikExtend = (props) => (Component) => {
       if (!this.props.values.id) {
         this.props.validateForm()
       }
+      startDirtyChecking = false
+      setTimeout(() => {
+        startDirtyChecking = true
+      }, notDirtyDuration * 1000)
     }
 
     componentWillReceiveProps (nextProps) {
       // console.log(nextProps)
-      updateDirtyState(nextProps)
+      if (startDirtyChecking) _updateDirtyState(nextProps)
+    }
+
+    componentWillUnmount () {
+      startDirtyChecking = false
     }
 
     render () {
@@ -171,7 +183,7 @@ const withFormikExtend = (props) => (Component) => {
     }
   }
 
-  return BasicComponent
+  return FormComponet
 }
 
 export default withFormikExtend

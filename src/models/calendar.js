@@ -99,6 +99,10 @@ export default createListViewModel({
           put({ type: 'getPublicHolidayList', payload }),
           put({ type: 'getClinicBreakHourList', payload }),
           put({ type: 'getClinicOperationHourList', payload }),
+          put({
+            type: 'patient/updateState',
+            payload: { entity: null },
+          }),
         ])
       },
       *getActiveBizSessionQueue (_, { put, select }) {

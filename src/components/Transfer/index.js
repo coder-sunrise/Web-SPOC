@@ -140,8 +140,12 @@ const Transfer = ({
           <GridItem xs={12}>
             <TextField
               label='Search'
-              onChange={(event) => setSearch(event.target.value)}
-            />{' '}
+              value={searchField}
+              onChange={(event) => {
+                setSearch(event.target.value)
+                setSearchField(event.target.value)
+              }}
+            />
           </GridItem>
           <GridItem xs={12}>
             <Card>

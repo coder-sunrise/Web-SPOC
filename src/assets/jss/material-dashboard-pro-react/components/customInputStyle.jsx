@@ -117,9 +117,11 @@ const customInputStyle = {
     // },
   },
   strongLabel: {
-    fontWeight: 500,
-    fontSize: '1.2rem',
-    color: 'rgba(0, 0, 0, 0.8)',
+    '& > label[data-shrink="true"]': {
+      fontWeight: 500,
+      fontSize: '1.2rem',
+      color: 'rgba(0, 0, 0, 0.8)',
+    },
   },
   labelRootError: {
     color: `${dangerColor} !important`,

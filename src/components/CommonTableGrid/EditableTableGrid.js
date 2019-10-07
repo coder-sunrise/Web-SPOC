@@ -255,7 +255,7 @@ class EditableTableGrid extends PureComponent {
       <React.Fragment>
         {showAddCommand && (
           <Button
-            hideIfNoEditRights
+            // hideIfNoEditRights
             onClick={(e) => {
               setTimeout(() => {
                 window.g_app._store.dispatch({

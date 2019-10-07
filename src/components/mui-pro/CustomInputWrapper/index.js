@@ -62,7 +62,6 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     [` ${classes.labelRootError}`]: error,
     [` ${classes.labelRootSuccess}`]: success && !error,
     [classes.labelRoot]: true,
-    [classes.strongLabel]: strongLabel,
     // [classes.labelMedium]:
     //   size === 'default' || size === 'medium' || size === 'md',
     // [classes.labelSmall]: size === 'small' || size === 'sm',
@@ -75,6 +74,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     [props.className]: true,
     [classes.simple]: simple,
     [classes.textControl]: !!text,
+    [classes.strongLabel]: !!strongLabel,
 
     // [classes.medium]: size === 'default' || size === 'medium' || size === 'md',
     // [classes.small]: size === 'small' || size === 'sm',

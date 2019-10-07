@@ -138,7 +138,7 @@ class CommonModal extends React.PureComponent {
           {onReset && (
             <Button
               key='reset'
-              hideIfNoEditRights
+              // hideIfNoEditRights
               aria-label='Reset'
               color='danger'
               onClick={onReset}
@@ -160,7 +160,7 @@ class CommonModal extends React.PureComponent {
           {onConfirm && (
             <ProgressButton
               color='primary'
-              hideIfNoEditRights
+              // hideIfNoEditRights
               onClick={onConfirm}
               icon={null}
               {...confirmProps}
@@ -284,6 +284,12 @@ class CommonModal extends React.PureComponent {
       [classes.modalRoot]: true,
       [classes.modal]: true,
     }
+    const cfg = {}
+    if (displayCloseIcon) {
+      cfg.onEscapeKeyDown = this.onClose
+    } else {
+      cfg.disableEscapeKeyDown = true
+    }
     return (
       <React.Fragment>
         <Dialog
@@ -299,7 +305,8 @@ class CommonModal extends React.PureComponent {
           aria-labelledby='classic-modal-slide-title'
           aria-describedby='classic-modal-slide-description'
           style={{ overflow: 'hidden' }}
-          onEscapeKeyDown={displayCloseIcon && this.onClose}
+          // onEscapeKeyDown={!displayCloseIcon && this.onClose}
+          {...cfg}
         >
           {title && (
             <DialogTitle
