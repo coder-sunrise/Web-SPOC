@@ -9,10 +9,10 @@ import {
   NumberInput,
   EditableTableGrid,
   CommonTableGrid,
-  Select,
   TextField,
   Button,
   dateFormatLong,
+  CodeSelect,
 } from '@/components'
 
 const styles = () => ({
@@ -22,27 +22,27 @@ const styles = () => ({
   },
 })
 
-@withFormik({
-  mapPropsToValues: () => ({
-    PaymentAmount: 20,
-    Total: 20,
-  }),
-})
+// @withFormik({
+//   mapPropsToValues: () => ({
+//     PaymentAmount: 20,
+//     Total: 20,
+//   }),
+// })
 class CollectPaymentConfirm extends PureComponent {
   state = {
     rows: [
-      {
-        id: 'PT-000001A',
-        invoiceNo: 'IV-000001',
-        invoiceDate: moment()
-          .add(Math.ceil(Math.random() * 100) - 100, 'days')
-          .format('LLL'),
-        patientName: 'Patient 01',
-        adminCharge: 1.66,
-        payableAmount: 50,
-        outstandingBalance: 48.34,
-        payment: 48.34,
-      },
+      // {
+      //   id: 'PT-000001A',
+      //   invoiceNo: 'IV-000001',
+      //   invoiceDate: moment()
+      //     .add(Math.ceil(Math.random() * 100) - 100, 'days')
+      //     .format('LLL'),
+      //   patientName: 'Patient 01',
+      //   adminCharge: 1.66,
+      //   payableAmount: 50,
+      //   outstandingBalance: 48.34,
+      //   payment: 48.34,
+      // },
     ],
     columns: [
       { name: 'invoiceNo', title: 'Invoice No' },
@@ -90,7 +90,13 @@ class CollectPaymentConfirm extends PureComponent {
 
   render () {
     const { rows, columns, columnExtensions } = this.state
-    const { classes, onConfirm } = this.props
+    const { classes, onConfirm, values } = this.props
+
+    console.log(
+      'invoice',
+      values,
+      values.statementInvoice.statementInvoicePayment,
+    )
     return (
       <React.Fragment>
         {/* <GridContainer
@@ -161,13 +167,11 @@ class CollectPaymentConfirm extends PureComponent {
               <FastField
                 name='paymentMode'
                 render={(args) => (
-                  <Select
-                    {...args}
+                  <CodeSelect
                     label='Payment Mode'
-                    options={[
-                      { value: 'Giro', name: 'Giro' },
-                      { value: 'Cash', name: 'Cash' },
-                    ]}
+                    code='ctPaymentMode'
+                    labelField='displayValue'
+                    {...args}
                   />
                 )}
               />
