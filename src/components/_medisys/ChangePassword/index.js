@@ -3,7 +3,7 @@ import * as Yup from 'yup'
 // dva
 import { connect } from 'dva'
 // formik
-import { withFormik, FastField } from 'formik'
+import { withFormik, Field, FastField } from 'formik'
 // common components
 import { TextField, GridContainer, GridItem, notification } from '@/components'
 // services
@@ -54,17 +54,24 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
     }
   },
 })
-class ChangePassword extends React.Component {
+class ChangePassword extends React.PureComponent {
   render () {
     const { footer, handleSubmit } = this.props
     return (
-      <React.Fragment>
+      <div>
         <GridContainer>
           <GridItem md={12}>
-            <FastField
+            <Field
               name='currentPassword'
               render={(args) => (
-                <TextField {...args} label='Current Password' type='password' />
+                <TextField
+                  label='Current Password'
+                  type='password'
+                  inputProps={{
+                    autocomplete: 'new-change-password',
+                  }}
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -72,7 +79,14 @@ class ChangePassword extends React.Component {
             <FastField
               name='newPassword'
               render={(args) => (
-                <TextField {...args} label='New Password' type='password' />
+                <TextField
+                  {...args}
+                  label='New Password'
+                  type='password'
+                  inputProps={{
+                    autoComplete: 'new-password',
+                  }}
+                />
               )}
             />
           </GridItem>
@@ -80,7 +94,14 @@ class ChangePassword extends React.Component {
             <FastField
               name='confirmPassword'
               render={(args) => (
-                <TextField {...args} label='Confirm Password' type='password' />
+                <TextField
+                  {...args}
+                  label='Confirm Password'
+                  type='password'
+                  inputProps={{
+                    autoComplete: 'new-password',
+                  }}
+                />
               )}
             />
           </GridItem>
@@ -89,7 +110,7 @@ class ChangePassword extends React.Component {
           footer({
             onConfirm: handleSubmit,
           })}
-      </React.Fragment>
+      </div>
     )
   }
 }

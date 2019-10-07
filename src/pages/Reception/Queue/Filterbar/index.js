@@ -41,15 +41,11 @@ const Filterbar = ({
       alignItems='center'
     >
       <GridItem xs={3} sm={3} md={3} lg={2}>
-        <FastField
-          name='search'
-          render={(args) => (
-            <TextField
-              label='Patient Name, Acc No., Phone No.'
-              onChange={(e) => setSearch(e.target.value)}
-              {...args}
-            />
-          )}
+        <TextField
+          // {...args}
+          label='Patient Name, Acc No., Phone No.'
+          onChange={(e) => setSearch(e.target.value)}
+          // inputProps={{ autoComplete: 'ignore', autoFill: 'nope' }}
         />
       </GridItem>
       <GridItem xs={7} sm={7} md={7} lg={5}>

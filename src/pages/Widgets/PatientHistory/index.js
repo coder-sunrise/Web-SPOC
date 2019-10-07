@@ -147,6 +147,12 @@ class PatientHistory extends Component {
   state = {
     selectedItems: [
       '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '7',
     ],
   }
 
@@ -240,8 +246,8 @@ class PatientHistory extends Component {
     ]
   }
 
-   componentDidMount () {
-     this.props.dispatch({
+  componentDidMount () {
+    this.props.dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
@@ -258,7 +264,6 @@ class PatientHistory extends Component {
         selectedSubRow: '',
       },
     })
-
   }
 
   onSelectChange = (val) => {
@@ -279,7 +284,6 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
- 
 
     return (
       <List
@@ -302,8 +306,9 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  console.log("----", o.id)
-                  this.props.dispatch({
+                  console.log('----', o.id)
+                  this.props
+                    .dispatch({
                       type: 'patientHistory/queryOne',
                       payload: o.id,
                     })
@@ -348,11 +353,7 @@ class PatientHistory extends Component {
                         </GridItem>
                         <GridItem sm={5} style={{ textAlign: 'right' }}>
                           {row.visitDate && (
-                            <DatePicker
-                              text
-                              showTime
-                              value={o.signOffDate }
-                            />
+                            <DatePicker text showTime value={o.signOffDate} />
                           )}
                         </GridItem>
                       </GridContainer>
@@ -441,6 +442,8 @@ class PatientHistory extends Component {
     } = this.props
     const { entity, selected } = patientHistory
 
+    const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
+    console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
       <CardContainer
         hideHeader
@@ -451,13 +454,13 @@ class PatientHistory extends Component {
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
-        <GridContainer gutter={0}>
-          <GridItem md={8}>
+        <GridContainer gutter={0} alignItems='center'>
+          <GridItem md={3}>
             <Select
-              simple
+              // simple
               value={this.state.selectedItems}
               allValue='0'
-              prefix='Filter By'
+              // prefix='Filter By'
               mode='multiple'
               options={[
                 { name: 'Chief Complaints', value: '1' },
@@ -471,6 +474,7 @@ class PatientHistory extends Component {
               label='Filter By'
               style={{ marginBottom: theme.spacing(1) }}
               onChange={this.onSelectChange}
+              maxTagCount={maxItemTagCount}
             />
           </GridItem>
           <GridItem md={2}>
@@ -498,10 +502,9 @@ class PatientHistory extends Component {
               </ProgressButton>
             )}
           </GridItem>
-          <GridItem style={{ textAlign: 'right' }}>
-            Update Date :
+          <GridItem md={7} style={{ textAlign: 'right' }}>
+            Update Date:
             {patientHistory.selectedSubRow.signOffDate && (
-              
               <DatePicker
                 text
                 value={patientHistory.selectedSubRow.signOffDate}
@@ -562,7 +565,6 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-     
 
     return (
       <div {...cfg}>

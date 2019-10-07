@@ -72,6 +72,16 @@ class HeaderLinks extends React.Component {
     })
   }
 
+  openChangePasswordForm = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        showChangePasswordModal: true,
+      },
+    })
+  }
+
   updateAPIType (type) {
     updateAPIType(type)
   }
@@ -312,7 +322,10 @@ class HeaderLinks extends React.Component {
                         My Account
                       </MenuItem>
                       <MenuItem
-                        onClick={this.handleClose('ChangePassword')}
+                        onClick={this.handleClose(
+                          'ChangePassword',
+                          this.openChangePasswordForm,
+                        )}
                         className={dropdownItem}
                       >
                         Change Password
