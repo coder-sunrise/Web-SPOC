@@ -7,9 +7,10 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      default: {
-        isUserMaintainable: true,
+      fixedFilter: {
+        status: 'Approved',
       },
+      default: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

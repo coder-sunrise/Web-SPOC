@@ -99,6 +99,10 @@ class HeaderLinks extends React.Component {
       user.data && user.data.clinicianProfile
         ? user.data.clinicianProfile.name
         : ''
+    const userTitle =
+      user.data && user.data.clinicianProfile
+        ? user.data.clinicianProfile.title
+        : ''
     return (
       <div className={wrapper}>
         {/*
@@ -274,7 +278,9 @@ class HeaderLinks extends React.Component {
                 ? `${classes.links} ${classes.linksRTL}`
                 : classes.links}`}
             />
-            <span className={classes.username}>{name}</span>
+            <span className={classes.username}>
+              {userTitle} {name}
+            </span>
             <Hidden mdUp implementation='css'>
               <span className={classes.linkText}>
                 {rtlActive ? 'الملف الشخصي' : 'Profile'}

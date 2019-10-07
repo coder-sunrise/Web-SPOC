@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
-import { FakeDataInvoiceClaimCount, FakeDataQueryById } from '../variables'
+import moment from 'moment'
 import * as service from '../services'
+import { dateFormatLong, dateFormatLongWithTime } from '@/components'
 
 export default createListViewModel({
   namespace: 'claimSubmission',
@@ -10,7 +11,6 @@ export default createListViewModel({
     state: {
       default: {},
       invoiceClaimCount: [],
-      entity: {},
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -18,37 +18,42 @@ export default createListViewModel({
       })
     },
     effects: {
-      *getClaimCount (_, { call, put }) {
-        // const response = yield call(service.queryBadgeCount)
-        // const { data } = response
+      *getClaimCount ({ payload }, { put, call }) {
+        const response = yield call(service.queryBadgeCount, payload)
+        const { data } = response
         return yield put({
           type: 'setClaimCount',
-          // payload: { data },
-          payload: {},
+          payload: data || [],
         })
       },
       *queryById ({ payload }, { call, put }) {
-        // const response = yield call(service.queryById, payload.id)
-        // const { data } = response
-        return yield put({
-          type: 'setQueryClaimResult',
-          // payload: { data },
-          payload: {},
-        })
+        const response = yield call(service.queryById, payload)
+        const { data } = response
+
+        if (response.status === '200' && data !== null) {
+          return yield put({
+            type: 'setQueryById',
+            payload: data,
+          })
+        }
+        return false
       },
     },
     reducers: {
       setClaimCount (state, { payload }) {
         return {
           ...state,
-          // invoiceClaimCount: payload,
-          invoiceClaimCount: FakeDataInvoiceClaimCount,
+          invoiceClaimCount: payload,
         }
       },
-      setQueryClaimResult (state, { payload }) {
+      setQueryById (state, { payload }) {
         return {
           ...state,
-          entity: FakeDataQueryById(),
+          entity: {
+            ...payload,
+            visitDate: moment(payload.visitDate).format(dateFormatLongWithTime),
+            patientDob: moment(payload.patientDob).format(dateFormatLong),
+          },
         }
       },
     },
