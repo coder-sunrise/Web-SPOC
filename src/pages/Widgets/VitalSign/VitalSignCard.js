@@ -38,6 +38,7 @@ export default ({
             render={(args) => (
               <NumberInput
                 {...args}
+                // defaultValue={0}  
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature',
                 })}

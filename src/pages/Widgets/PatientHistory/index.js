@@ -560,7 +560,9 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-
+    console.log("###############")
+    console.log(this.props)
+    console.log(mode)
     return (
       <div {...cfg}>
         {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (

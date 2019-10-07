@@ -8,8 +8,11 @@ import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
 import FormField from './formField'
 
 class VitalSignCard extends PureComponent {
+  
   render () {
     const { handleCalculateBMI, isReadOnly = false } = this.props
+
+    console.log(this.props)
     return (
       <CommonCard
         size='sm'
@@ -24,7 +27,8 @@ class VitalSignCard extends PureComponent {
               render={(args) => (
                 <NumberInput
                   {...args}
-                  disabled={isReadOnly}
+                  format='0.0'
+                  disabled={isReadOnly}  
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.temperature',
                   })}
