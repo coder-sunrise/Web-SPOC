@@ -14,11 +14,11 @@ import { serverDateFormat } from '@/components'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
 // setting
-import { doctorEventColorOpts } from '../setting'
+import { doctorEventColorOpts } from '../utils'
 // sub component
 import CalendarToolbar from './Toolbar'
 import Event from './Event'
-import { getFirstAppointmentType } from './form/formikUtils'
+import { getFirstAppointmentType } from './form/formUtils'
 // assets
 import { primaryColor } from '@/assets/jss'
 

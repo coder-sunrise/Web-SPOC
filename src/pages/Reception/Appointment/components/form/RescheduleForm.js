@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import * as Yup from 'yup'
 // formik
 import { FastField, withFormik } from 'formik'
@@ -41,8 +41,6 @@ const RescheduleForm = ({ classes, footer, handleSubmit }) => {
               <RadioGroup
                 {...args}
                 label='Reschedule By'
-                // simple
-                // vertical
                 options={[
                   {
                     value: 1,

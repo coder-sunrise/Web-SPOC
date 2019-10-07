@@ -28,7 +28,7 @@ import {
   DoctorProfileSelect,
   computeRRule,
 } from '@/components/_medisys'
-import { filterRecurrenceDto } from './formikUtils'
+import { filterRecurrenceDto } from './formUtils'
 // styles
 import style from './style'
 // assets
