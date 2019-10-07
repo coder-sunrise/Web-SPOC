@@ -61,6 +61,8 @@ class Detail extends PureComponent {
     const { props } = this
     const { classes, theme, footer, values, settingConsumableUOM } = props
     // console.log('detail', props)
+    console.log({ values, initialValues: this.props.initialValues })
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

@@ -28,6 +28,8 @@ const styles = () => ({
 })
 
 const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
+  console.log({ values })
+  const { invoicePaymentModes } = values
   return (
     <React.Fragment>
       <GridItem md={12}>
@@ -76,24 +78,6 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
         <CardContainer hideHeader>
           <h4 style={{ fontWeight: 500 }}>Payment</h4>
           <GridContainer justify='space-between'>
-            <GridItem md={6}>
-              <h5>Credit Card</h5>
-            </GridItem>
-            <GridItem md={6} className={classes.rightAlign}>
-              <h5>$100.00 </h5>
-            </GridItem>
-            <GridItem md={6}>
-              <h5>Cash</h5>
-            </GridItem>
-            <GridItem md={6} className={classes.rightAlign}>
-              <h5>$100.00 </h5>
-            </GridItem>
-            <GridItem md={6}>
-              <h5>NETS</h5>
-            </GridItem>
-            <GridItem md={6} className={classes.rightAlign}>
-              <h5>$100.00 </h5>
-            </GridItem>
             <GridItem md={12}>
               <Divider
                 style={{

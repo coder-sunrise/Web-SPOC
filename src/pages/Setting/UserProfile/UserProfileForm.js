@@ -115,7 +115,7 @@ const styles = (theme) => ({
           Object.entries(currentSelectedUser).length <= 0
             ? [
                 moment(),
-                moment('2099-12-31'),
+                moment('2099-12-31T23:59:59').formatUTC(false),
               ]
             : [
                 currentSelectedUser.effectiveStartDate,
