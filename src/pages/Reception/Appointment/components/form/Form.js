@@ -683,7 +683,7 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
-    console.log({ state: this.state })
+
     const show = loading.effects['patientSearch/query'] || isSubmitting
     return (
       <LoadingWrapper loading={show} text='Loading...'>

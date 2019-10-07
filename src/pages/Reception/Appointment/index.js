@@ -4,7 +4,7 @@ import moment from 'moment'
 // material ui
 import { Popover, withStyles } from '@material-ui/core'
 // common component
-import { CardContainer, CommonModal, serverDateFormat } from '@/components'
+import { CardContainer, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
@@ -239,7 +239,6 @@ class Appointment extends React.PureComponent {
                 selectedAppointmentFK: selectedAppointmentID,
                 showAppointmentForm: true,
                 isDragging: false,
-                isEditedAsSingleAppointment,
               })
           })
       }
@@ -357,7 +356,6 @@ class Appointment extends React.PureComponent {
           popupAnchor: null,
           showSeriesConfirmation: false,
           showAppointmentForm: true,
-          isEditedAsSingleAppointment,
         })
     })
   }
@@ -376,7 +374,6 @@ class Appointment extends React.PureComponent {
       popoverEvent,
       filter,
       selectedAppointmentFK,
-      isEditedAsSingleAppointment: eventEditedAsSingle,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
