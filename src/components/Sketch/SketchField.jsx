@@ -167,8 +167,8 @@ class SketchField extends PureComponent {
     //  }
   }
 
-  getValue = () => {
-    return this._history.getAllList()
+  getAllLayerData = () => {
+    return this._history.getSaveLayerList()
   }
 
   initializeData = (data) => {
@@ -464,6 +464,9 @@ class SketchField extends PureComponent {
       obj,
       prevState,
     ] = history.getCurrent()
+
+    console.log("undo " , obj.__removed)
+    console.log("all ", this._fc)
 
     history.undo()
     if (obj.__removed) {

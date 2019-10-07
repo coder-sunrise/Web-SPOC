@@ -64,6 +64,12 @@ class PatientSearch extends PureComponent {
     if (!this.props.disableQueryOnLoad) {
       this.props.dispatch({
         type: 'patientSearch/query',
+        payload: {
+          sorting: [
+            { columnName: 'isActive', direction: 'asc' },
+            { columnName: 'name', direction: 'asc' },
+          ],
+        },
       })
     }
   }

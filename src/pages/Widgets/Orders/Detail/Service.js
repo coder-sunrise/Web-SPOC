@@ -53,6 +53,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       ...values,
       subject: currentType.getSubject(values),
     }
+
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -86,6 +87,10 @@ class Service extends PureComponent {
         serviceCenters,
         serviceCenterServices,
       })
+      // console.log("service ", services)
+      // console.log("serviceCenterServices ", serviceCenterServices)
+      // console.log("serviceCenters ", serviceCenters)
+
       // console.log(services, serviceCenters, serviceCenterServices)
       // this.setState((ps) => {
       //   return {
@@ -124,8 +129,9 @@ class Service extends PureComponent {
   getServiceCenterService = () => {
     const { values, setFieldValue, setValues } = this.props
     const { serviceFK, serviceCenterFK } = values
+
     if (!serviceCenterFK || !serviceFK) return
-    const serviceCenterService =
+    const serviceCenterService =  
       this.state.serviceCenterServices.find(
         (o) =>
           o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
@@ -171,6 +177,7 @@ class Service extends PureComponent {
     } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
+
     return (
       <div>
         <GridContainer>
@@ -185,13 +192,14 @@ class Service extends PureComponent {
                       (o) =>
                         !serviceCenterFK ||
                         o.serviceCenters.find(
-                          (m) => m.value === serviceCenterFK,
+                           (m) => m.value === serviceCenterFK,
                         ),
                     )}
                     onChange={() =>
                       setTimeout(() => {
                         this.getServiceCenterService()
-                      }, 1)}
+                      }, 1)
+                    }
                     {...args}
                   />
                 )

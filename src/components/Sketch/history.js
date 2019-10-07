@@ -8,11 +8,10 @@ class History {
     this.originalList = []
     this.undoList = []
     this.redoList = []
-    this.allList = []
+    this.saveLayerList = []
     this.current = null
     this.debug = debug
     this.count = 0
-    this.itemCount = 1
   }
 
   /**
@@ -42,14 +41,14 @@ class History {
     return this.originalList
   }
 
-  getAllList () {
-    return this.allList
+
+  getSaveLayerList () {
+    return this.saveLayerList
   }
 
-  getInitializeList (data, count) {
-    this.allList = data
-    // this.count = count + 1
-  }
+  // getInitializeList (data) {
+  //   this.allList = data
+  // }
 
   updateCount (count) {
     this.count = count
@@ -78,21 +77,21 @@ class History {
       // } else
 
       if (mainObject.id === 'delete' || mainObject.id === 'oldTemplate') {
-        for (let i = 0; i < this.allList.length; i++) {
+        for (let i = 0; i < this.saveLayerList.length; i++) {
           // let [
           //   arrayobject,
           // ] = this.allList[i].layerContent
-          let arrayobject = this.allList[i].layerContent
+          let arrayobject = this.saveLayerList[i].layerContent
           if (arrayobject === JSON.stringify(mainObject)) {
-            let temp = this.allList
-            this.allList = []
+            let temp = this.saveLayerList
+            this.saveLayerList = []
             for (let a = 0; a < temp.length; a++) {
               // let [
               //   tempArrayObject,
               // ] = temp[a].layerContent
               let tempArrayObject = temp[a].layerContent
               if (tempArrayObject !== JSON.stringify(mainObject)) {
-                this.allList.push(temp[a])
+                this.saveLayerList.push(temp[a])
               }
             }
           }
@@ -106,15 +105,15 @@ class History {
         delete movingJsonObject.scaleY
 
 
-        for(let i = 0; i < this.allList.length; i++){
-          let layerContent = JSON.parse(this.allList[i].layerContent)
+        for(let i = 0; i < this.saveLayerList.length; i++){
+          let layerContent = JSON.parse(this.saveLayerList[i].layerContent)
           delete layerContent.left
           delete layerContent.top
           delete layerContent.scaleX
           delete layerContent.scaleY
 
           if(JSON.stringify(movingJsonObject) === JSON.stringify(layerContent)){
-            this.allList[i].layerContent = movingObject
+            this.saveLayerList[i].layerContent = movingObject
           }
 
         }
@@ -122,7 +121,7 @@ class History {
       } else if (mainObject.id !== 'pan' || mainObject.id === null){
           this.redoList = []
           this.originalList.push(obj)
-          this.allList.push({
+          this.saveLayerList.push({
             layerType: mainObject.type,
             layerNumber: this.count,
             layerContent: JSON.stringify(mainObject),
@@ -130,8 +129,8 @@ class History {
           })
    
           this.count = 0
-          this.itemCount = this.itemCount + 1
-        
+          console.log("********* ", this.originalList)
+          console.log("******** " , this.saveLayerList)
       }
 
       if (this.current) {
@@ -141,6 +140,8 @@ class History {
         this.undoList.shift()
       }
       this.current = obj
+
+      
     } finally {
       this.print()
     }
@@ -158,17 +159,27 @@ class History {
       ] = this.current
       if (this.current) {
         this.redoList.push(this.current)
-        for (let i = 0; i < this.allList.length; i++) {
-          if (this.allList[i].layerContent === JSON.stringify(mainObject)) {
-            let temp = this.allList
-            this.allList = []
+        for (let i = 0; i < this.saveLayerList.length; i++) {
+          if (this.saveLayerList[i].layerContent === JSON.stringify(mainObject)) {
+            let temp = this.saveLayerList
+            this.saveLayerList = []
             for (let a = 0; a < temp.length; a++) {
               if (temp[a].layerContent !== JSON.stringify(mainObject)) {
-                this.allList.push(temp[a])
+                this.saveLayerList.push(temp[a])
               }
             }
           }
         }
+
+        if(this.saveLayerList === []){
+          this.saveLayerList.push({
+            layerType: mainObject.type,
+            layerNumber: this.count,
+            layerContent: JSON.stringify(mainObject),
+            templateFK: null,
+          })
+        }
+
         if (this.redoList.length > this.undoLimit) {
           this.redoList.shift()
         }
@@ -198,7 +209,7 @@ class History {
         let [
           mainObject,
         ] = this.current
-        this.allList.push({
+        this.saveLayerList.push({
           layerType: mainObject.type,
           layerNumber: this.count,
           layerContent: JSON.stringify(mainObject),
@@ -235,12 +246,26 @@ class History {
    * Clears the history maintained, can be undone
    */
   clear () {
-    this.undoList = []
+    // this.undoList = []
+    for(let i = 0 ; i < this.undoList.length ; i++){
+      let [
+        undoObj,
+      ] = this.undoList[i]
+
+      undoObj.__removed = true
+    }
+
+    let [
+      originalObj,
+    ] = this.originalList[this.originalList.length - 1]
+
+
+    originalObj.__removed = true    
+
+    this.current = this.originalList[this.originalList.length - 1]
     this.originalList = []
     this.redoList = []
-    this.allList = []
-    this.current = null
-    this.count = 0
+    this.saveLayerList = []
     this.print()
   }
 
