@@ -55,12 +55,14 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     children,
     simple = false,
     size = 'medium',
+    strongLabel,
   } = props
   const { style, ...resetProps } = props
   const labelClasses = classNames({
     [` ${classes.labelRootError}`]: error,
     [` ${classes.labelRootSuccess}`]: success && !error,
     [classes.labelRoot]: true,
+    [classes.strongLabel]: strongLabel,
     // [classes.labelMedium]:
     //   size === 'default' || size === 'medium' || size === 'md',
     // [classes.labelSmall]: size === 'small' || size === 'sm',

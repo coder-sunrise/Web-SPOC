@@ -138,19 +138,21 @@ const Pricing = ({
                 name='averageCostPrice'
                 render={(args) => (
                   <NumberInput
-                    prefix='$'
+                    // prefix='$'
+                    format='$0,0.0000'
                     label={formatMessage({
                       id: 'inventory.master.pricing.averageCostPrice',
                     })}
-                    onChange={(e) => {
-                      setAcp(e.target.value)
-                      if (e.target.value) {
-                        setFieldValue(
-                          'averageCostPrice',
-                          e.target.value.toFixed(4),
-                        )
-                      }
-                    }}
+                    currency
+                    // onChange={(e) => {
+                    //   setAcp(e.target.value)
+                    //   if (e.target.value) {
+                    //     setFieldValue(
+                    //       'averageCostPrice',
+                    //       e.target.value.toFixed(4),
+                    //     )
+                    //   }
+                    // }}
                     {...args}
                   />
                 )}

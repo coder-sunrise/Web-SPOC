@@ -240,8 +240,8 @@ class PatientHistory extends Component {
     ]
   }
 
-   componentDidMount () {
-     this.props.dispatch({
+  componentDidMount () {
+    this.props.dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
@@ -258,7 +258,6 @@ class PatientHistory extends Component {
         selectedSubRow: '',
       },
     })
-
   }
 
   onSelectChange = (val) => {
@@ -279,7 +278,6 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
- 
 
     return (
       <List
@@ -302,8 +300,9 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  console.log("----", o.id)
-                  this.props.dispatch({
+                  console.log('----', o.id)
+                  this.props
+                    .dispatch({
                       type: 'patientHistory/queryOne',
                       payload: o.id,
                     })
@@ -348,11 +347,7 @@ class PatientHistory extends Component {
                         </GridItem>
                         <GridItem sm={5} style={{ textAlign: 'right' }}>
                           {row.visitDate && (
-                            <DatePicker
-                              text
-                              showTime
-                              value={o.signOffDate }
-                            />
+                            <DatePicker text showTime value={o.signOffDate} />
                           )}
                         </GridItem>
                       </GridContainer>
@@ -446,8 +441,8 @@ class PatientHistory extends Component {
         hideHeader
         size='sm'
         className={classnames({
-          [classes.rightPanel]: !widget ? true : false,
-          [override.rightPanel]: !widget ? true : false,
+          [classes.rightPanel]: !widget,
+          [override.rightPanel]: !widget,
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
@@ -459,6 +454,7 @@ class PatientHistory extends Component {
               allValue='0'
               prefix='Filter By'
               mode='multiple'
+              maxTagCount={4}
               options={[
                 { name: 'Chief Complaints', value: '1' },
                 { name: 'Plan', value: '2' },
@@ -468,7 +464,6 @@ class PatientHistory extends Component {
                 // { name: 'Result History', value: '6' },
                 { name: 'Invoice', value: '7' },
               ]}
-              label='Filter By'
               style={{ marginBottom: theme.spacing(1) }}
               onChange={this.onSelectChange}
             />
@@ -501,7 +496,6 @@ class PatientHistory extends Component {
           <GridItem style={{ textAlign: 'right' }}>
             Update Date :
             {patientHistory.selectedSubRow.signOffDate && (
-              
               <DatePicker
                 text
                 value={patientHistory.selectedSubRow.signOffDate}
@@ -562,7 +556,6 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-     
 
     return (
       <div {...cfg}>
@@ -570,9 +563,9 @@ class PatientHistory extends Component {
           hideHeader
           size='sm'
           className={classnames({
-            [classes.leftPanel]: !widget ? true : false,
+            [classes.leftPanel]: !widget,
             [classes.integratedLeftPanel]: mode === 'integrated',
-            [override.leftPanel]: !widget ? true : false,
+            [override.leftPanel]: !widget,
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
