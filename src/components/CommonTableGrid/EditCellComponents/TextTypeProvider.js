@@ -57,6 +57,7 @@ class TextEditorBase extends PureComponent {
     if (editRender) {
       return editRender(row)
     }
+    console.log(latestRow)
     const submitValue = (e) => {
       const error = updateCellValue(
         this.props,
@@ -78,7 +79,7 @@ class TextEditorBase extends PureComponent {
         <TextField
           showErrorIcon
           simple
-          defaultValue={latestRow[columnName]}
+          value={latestRow[columnName]}
           onChange={submitValue}
           // onCommit={submitValue}
           // onChange={submitValue}

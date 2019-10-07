@@ -169,7 +169,7 @@ export default createListViewModel({
       calculateAmount (state, { payload }) {
         let { finalAdjustments, rows } = state
         const amount = calculateAmount(rows, finalAdjustments)
-        console.log(amount)
+        // console.log(amount)
         return {
           ...state,
           ...amount,
