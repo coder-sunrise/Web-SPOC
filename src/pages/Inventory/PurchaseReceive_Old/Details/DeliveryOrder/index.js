@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { Divider, withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import Add from '@material-ui/icons/Add'
 import {
   GridContainer,
   GridItem,
@@ -12,7 +13,6 @@ import {
 } from '@/components'
 import DeliveryOrderDetails from './Details/DeliveryOrderDetails'
 import Grid from './Grid'
-import Add from '@material-ui/icons/Add'
 import { showErrorNotification } from '@/utils/error'
 import { isPOStatusFinalized } from '../../variables'
 
@@ -73,14 +73,7 @@ class index extends PureComponent {
           <CommonModal
             open={deliveryOrder.showModal}
             observe='DeliveryOrderDetail'
-            title={
-              'Delivery Order Details'
-              // deliveryOrder.entity ? (
-              //   'Edit Delivery Order'
-              // ) : (
-              //     'Delivery Order Details'
-              //   )
-            }
+            title="Delivery Order Details"
             maxWidth='xl'
             bodyNoPadding
             onClose={this.toggleDeliveryOrderDetailsModal}
@@ -89,13 +82,13 @@ class index extends PureComponent {
             <DeliveryOrderDetails {...cfg} {...this.props} />
           </CommonModal>
           <Button
-            //onClick={this.toggleDeliveryOrderDetailsModal}
+            // onClick={this.toggleDeliveryOrderDetailsModal}
             disabled={!isPOStatusFinalized(poStatus)}
             onClick={() => {
               this.props.dispatch({
                 type: 'deliveryOrder/updateState',
                 payload: {
-                  //entity: undefined,
+                  // entity: undefined,
                   entity: {
                     rows: purchaseOrderOutstandingItem,
                   },
@@ -103,7 +96,7 @@ class index extends PureComponent {
               })
               this.toggleDeliveryOrderDetailsModal()
             }}
-            hideIfNoEditRights
+            // hideIfNoEditRights
             color='info'
             link
           >

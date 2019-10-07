@@ -108,7 +108,7 @@ class index extends Component {
           <Button
             disabled={!isPOStatusFinalized(poStatus)}
             onClick={this.onAddDeliveryOrderClicked}
-            hideIfNoEditRights
+            // hideIfNoEditRights
             color='info'
             link
           >

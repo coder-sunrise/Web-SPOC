@@ -462,7 +462,7 @@ class AntdSelect extends React.PureComponent {
       })
       .map((option) => (
         <Select.Option
-          data={option}
+          // data={option}
           key={option.value}
           title={option.label}
           label={

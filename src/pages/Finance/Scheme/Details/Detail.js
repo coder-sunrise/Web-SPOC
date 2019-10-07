@@ -16,8 +16,8 @@ import {
 const styles = () => ({})
 
 const Detail = ({ height, ...props }) => {
-  const { isUserMaintainable } = props.values
-
+  let { isUserMaintainable } = props.values
+  isUserMaintainable = true
   return (
     <CardContainer
       hideHeader

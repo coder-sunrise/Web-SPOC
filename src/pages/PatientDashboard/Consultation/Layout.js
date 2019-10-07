@@ -19,9 +19,10 @@ import {
   Divider,
   Slide,
   Tooltip,
-  Drawer,
+  SwipeableDrawer,
 } from '@material-ui/core'
 import MoreVert from '@material-ui/icons/MoreVert'
+import Delete from '@material-ui/icons/Delete'
 import MoreHoriz from '@material-ui/icons/MoreHoriz'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
@@ -769,78 +770,89 @@ class Layout extends PureComponent {
                 </div>
               </Slide>
             </div>
-            <Drawer
+            <SwipeableDrawer
               anchor='right'
               open={this.state.openDraw}
               onClose={this.toggleDrawer}
             >
-              <SizeContainer size='sm'>
-                <CheckboxGroup
-                  style={{
-                    margin: theme.spacing(2),
-                  }}
-                  label='Manage Widgets'
-                  vertical
-                  strongLabel
-                  value={currentLayout.widgets}
-                  valueField='id'
-                  textField='name'
-                  options={widgets}
-                  onChange={(e, s) => {
-                    // console.log(e)
-                    // dispatch({
-                    //   type: 'consultation/updateState',
-                    //   payload: {
-                    //     selectedWidgets: e.target.value,
-                    //   },
-                    // })
-                    // console.log(e.target.value, s)
-                    this.updateWidget(e.target.value, s)
-                  }}
-                />
-                <div
-                  style={{
-                    margin: theme.spacing(2),
-                    marginTop: 0,
-                  }}
-                >
-                  <Button
-                    onClick={() => {
-                      this.changeLayout(this.getDefaultLayout())
-                    }}
-                    color='danger'
-                  >
-                    Reset
-                  </Button>
-                </div>
-                <Divider light />
-                <div
-                  style={{
-                    margin: theme.spacing(2),
-                  }}
-                >
-                  <CustomInputWrapper
-                    label='My Layout'
-                    style={{ paddingTop: 25 }}
+              <div style={{ width: 260 }}>
+                <SizeContainer size='sm'>
+                  <CheckboxGroup
+                    className={classes.fabDiv}
+                    label='Manage Widgets'
+                    vertical
                     strongLabel
-                    labelProps={{
-                      shrink: true,
+                    value={currentLayout.widgets}
+                    valueField='id'
+                    textField='name'
+                    options={widgets}
+                    onChange={(e, s) => {
+                      // console.log(e)
+                      // dispatch({
+                      //   type: 'consultation/updateState',
+                      //   payload: {
+                      //     selectedWidgets: e.target.value,
+                      //   },
+                      // })
+                      // console.log(e.target.value, s)
+                      this.updateWidget(e.target.value, s)
+                    }}
+                  />
+                  <div
+                    style={{
+                      margin: theme.spacing(2),
+                      marginTop: 0,
                     }}
                   >
-                    <div>
-                      <p>
-                        <ProgressButton>Save as My Favourite</ProgressButton>
-                      </p>
-                      <p>
-                        <Button color='primary'>
-                          <GetApp />Load from My Favourite
-                        </Button>
-                      </p>
-                    </div>
-                  </CustomInputWrapper>
-                </div>
-              </SizeContainer>
-            </Drawer>
+                    <Button
+                      onClick={() => {
+                        this.changeLayout(this.getDefaultLayout())
+                      }}
+                      color='danger'
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                  <Divider light />
+                  <div className={classes.fabDiv}>
+                    <Select
+                      label='My Template'
+                      strongLabel
+                      options={[
+                        { id: 1, name: 'Template1' },
+                      ]}
+                      dropdownMatchSelectWidth={false}
+                    />
+                    <ProgressButton>Replace</ProgressButton>
+                    <ProgressButton color='danger' icon={<Delete />}>
+                      Delete
+                    </ProgressButton>
+                  </div>
+                  <Divider light />
+                  <div className={classes.fabDiv}>
+                    <CustomInputWrapper
+                      label='My Layout'
+                      style={{ paddingTop: 25 }}
+                      strongLabel
+                      labelProps={{
+                        shrink: true,
+                      }}
+                    >
+                      <div>
+                        <p>
+                          <ProgressButton>Save as My Favourite</ProgressButton>
+                        </p>
+                        <p>
+                          <Button color='primary'>
+                            <GetApp />Load from My Favourite
+                          </Button>
+                        </p>
+                      </div>
+                    </CustomInputWrapper>
+                  </div>
+                </SizeContainer>
+              </div>
+            </SwipeableDrawer>
           </React.Fragment>
         )}
       </div>

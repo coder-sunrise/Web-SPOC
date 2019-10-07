@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
+import { Divider } from '@material-ui/core'
+import { compose } from 'redux'
 import { getAppendUrl } from '@/utils/utils'
 import {
   NavPills,
@@ -9,14 +11,14 @@ import {
   withFormikExtend,
   Tabs,
 } from '@/components'
+import AuthorizedContext from '@/components/Context/Authorized'
 
-import { Divider } from '@material-ui/core'
 import Yup from '@/utils/yup'
-import { compose } from 'redux'
 import DetailPanel from './Detail'
 import Setting from './Setting'
 import { InventoryTypes } from '@/utils/codes'
 import { SchemeDetailOption } from './variables'
+
 const styles = (theme) => ({
   actionDiv: {
     margin: theme.spacing(1),
@@ -44,58 +46,44 @@ const Detail = (props) => {
     }
   }, [])
 
-  const { classes, schemeDetail, history, handleSubmit } = props
+  const { classes, schemeDetail, history, handleSubmit, theme } = props
   const detailProps = {
-    height: 'calc(100vh - 183px)',
+    height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
     ...props,
   }
   const { currentTab } = schemeDetail
   return (
-    <div>
-      {/* <NavPills
-        color='primary'
-        onChange={(event, active) => {
-          history.push(
-            getAppendUrl({
-              t: active,
-            }),
-          )
-        }}
-        index={currentTab}
-        contentStyle={{}}
-        tabs={[
-          {
-            tabButton: 'Detail',
-            tabContent: <DetailPanel {...detailProps} />,
-          },
-          {
-            tabButton: 'Setting',
-            tabContent: <Setting {...detailProps} />,
-          },
-        ]}
-      /> */}
-      {/* <Divider /> */}
-
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={SchemeDetailOption(detailProps)}
-      />
-      <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          onClick={() => {
-            history.push('/finance/scheme')
-          }}
-        >
-          Cancel
-        </Button>
-        <ProgressButton
-          submitKey='schemeDetail/submit'
-          onClick={handleSubmit}
+    <AuthorizedContext.Provider
+      value={{
+        edit: {
+          name: true ? 'schemeDetail.edit' : 'no-rights',
+          rights: 'enable',
+        },
+      }}
+    >
+      <div>
+        <Tabs
+          style={{ marginTop: theme.spacing(1) }}
+          defaultActiveKey='0'
+          options={SchemeDetailOption(detailProps)}
         />
+        <div className={classes.actionDiv}>
+          <Button
+            authority='none'
+            color='danger'
+            onClick={() => {
+              history.push('/finance/scheme')
+            }}
+          >
+            Cancel
+          </Button>
+          <ProgressButton
+            submitKey='schemeDetail/submit'
+            onClick={handleSubmit}
+          />
+        </div>
       </div>
-    </div>
+    </AuthorizedContext.Provider>
   )
 }
 export default compose(
@@ -104,6 +92,10 @@ export default compose(
     schemeDetail,
   })),
   withFormikExtend({
+    authority: {
+      view: 'schemeDetail.view',
+      edit: 'schemeDetail.edit',
+    },
     mapPropsToValues: ({ schemeDetail }) => {
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
