@@ -40,7 +40,6 @@ export default ({ classes, current, setFieldValue }) => {
     currency: true,
     rightAlign: true,
   }
-  console.log(' +++++  ', current)
 
   let invoiceItemData = []
   let invoiceAdjustmentData = []

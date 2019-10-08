@@ -536,8 +536,7 @@ class PatientHistory extends Component {
               )
               .map((o) => {
                 const Widget = o.component
-                console.log("+++++++++++++++ " ,entity )
-                console.log(" props " ,this.props)
+
                 return (
                   <div>
                     <h5>{o.name}</h5>
