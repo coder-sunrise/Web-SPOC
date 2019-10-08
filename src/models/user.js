@@ -24,11 +24,23 @@ export default {
     },
     *fetchCurrent (_, { call, put }) {
       const response = yield call(queryCurrent)
-      if (response.data)
+      if (response.data) {
+        const { userProfileDetailDto } = response.data
         yield put({
           type: 'saveCurrentUser',
-          payload: response.data.userProfileDetailDto,
+          payload: userProfileDetailDto,
         })
+
+        if (
+          !userProfileDetailDto.clinicianProfile.userProfile.hasChangedPassword
+        )
+          yield put({
+            type: 'global/updateState',
+            payload: {
+              showChangePasswordModal: true,
+            },
+          })
+      }
     },
     *fetchProfileDetails ({ id }, { call, put }) {
       const result = yield call(fetchUserProfileByID, id)

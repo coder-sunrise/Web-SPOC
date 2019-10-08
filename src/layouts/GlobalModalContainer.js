@@ -93,13 +93,31 @@ class GlobalModalContainer extends PureComponent {
             this.props.handleSubmit()
           }}
         /> */}
-        <input type='text' name='fakeid' style={{ display: 'none' }} />
-        <input
-          type='password'
-          name='fakepassword'
-          style={{ display: 'none' }}
-        />
-        <input type='hidden' value='fakeinput' />
+
+        <CommonModal
+          title='Change Password'
+          open={global.showChangePasswordModal}
+          displayCloseIcon={false}
+          onClose={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showChangePasswordModal: false,
+              },
+            })
+          }}
+          onConfirm={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showChangePasswordModal: false,
+              },
+            })
+          }}
+          maxWidth='sm'
+        >
+          <ChangePassword userID={loggedInUserID} />
+        </CommonModal>
         <CommonModal
           open={global.showDispensePanel}
           title='Dispensing'
@@ -311,30 +329,6 @@ class GlobalModalContainer extends PureComponent {
           }}
         >
           <Adjustment />
-        </CommonModal>
-        <CommonModal
-          title='Change Password'
-          open={global.showChangePasswordModal}
-          keepMounted={false}
-          onClose={() => {
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                showChangePasswordModal: false,
-              },
-            })
-          }}
-          onConfirm={() => {
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                showChangePasswordModal: false,
-              },
-            })
-          }}
-          maxWidth='sm'
-        >
-          <ChangePassword userID={loggedInUserID} />
         </CommonModal>
       </div>
     )

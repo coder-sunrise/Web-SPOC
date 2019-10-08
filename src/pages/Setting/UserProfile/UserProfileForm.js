@@ -361,7 +361,7 @@ class UserProfileForm extends React.PureComponent {
             onConfirm={this.toggleChangePasswordModal}
             maxWidth='sm'
           >
-            <ChangePassword userID={values.userProfileFK} />
+            <ChangePassword userID={values.userProfileFK} changeTargetUser />
           </CommonModal>
         )}
         {footer &&
