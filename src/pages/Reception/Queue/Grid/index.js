@@ -247,6 +247,7 @@ const Grid = ({
     selfOnly,
     calendarEvents,
     queueList,
+    user,
   ])
 
   const deleteQueueConfirmation = (row) => {
@@ -268,7 +269,7 @@ const Grid = ({
       doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
     } = row
     const { clinicianProfile: { doctorProfile } } = user
-
+    console.log({ doctorProfile })
     if (!doctorProfile) {
       notification.error({
         message: 'Unauthorized Access',

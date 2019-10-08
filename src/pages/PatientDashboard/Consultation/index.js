@@ -110,7 +110,7 @@ const saveConsultation = ({
               })
             }
             sessionStorage.removeItem(`${values.id}_consultationTimer`)
-            history.push(`/reception/queue`)
+            // history.push(`/reception/queue`)
           }
         })
       },
@@ -254,7 +254,14 @@ class Consultation extends PureComponent {
   }
 
   discardConsultation = () => {
-    const { dispatch, values, history, consultation, resetForm } = this.props
+    const {
+      dispatch,
+      values,
+      history,
+      onClose,
+      consultation,
+      resetForm,
+    } = this.props
     if (values.id) {
       dispatch({
         type: 'global/updateAppState',
@@ -267,7 +274,13 @@ class Consultation extends PureComponent {
               payload: values.id,
             }).then((r) => {
               if (r) {
-                history.push(`/reception/queue`)
+                // dispatch({
+                //   type: 'formik/updateState',
+                //   payload: {
+                //     ConsultationPage: undefined,
+                //   },
+                // })
+                // history.push(`/reception/queue`)
               }
             })
           },

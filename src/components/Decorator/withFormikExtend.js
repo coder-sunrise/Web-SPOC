@@ -40,13 +40,14 @@ const withFormikExtend = (props) => (Component) => {
     }
     // console.log(window._localFormik[displayName], _lastFormikUpdate)
 
-    // console.log(_lastFormikUpdate)
+    // console.log({ _lastFormikUpdate })
     window.g_app._store.dispatch({
       type: 'formik/updateState',
       payload: {
         [displayName]: _lastFormikUpdate,
       },
     })
+
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
       window.dirtyForms.push(displayName)
