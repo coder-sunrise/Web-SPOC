@@ -26,31 +26,32 @@ const Pricing = ({
   const [
     acp,
     setAcp,
-  ] = useState(0.0)
+  ] = useState(values.averageCostPrice || 0.0)
   const [
     markupMargin,
     setMarkupMargin,
-  ] = useState(0.0)
+  ] = useState(values.markupMargin || 0.0)
 
   const calculate = () => {
     const suggestedSellingPrice =
       parseFloat(acp) * (1 + parseFloat(markupMargin) / 100)
+    console.log({ suggestedSellingPrice })
     setFieldValue('suggestSellingPrice', suggestedSellingPrice)
   }
 
-  useEffect(() => {
-    if (medicationDetail) {
-      return setFieldValue('averageCostPrice', 0.0)
-    }
-    if (vaccinationDetail) {
-      return setFieldValue('averageCostPrice', 0.0)
-    }
+  // useEffect(() => {
+  //   if (medicationDetail) {
+  //     return setFieldValue('averageCostPrice', 0.0)
+  //   }
+  //   if (vaccinationDetail) {
+  //     return setFieldValue('averageCostPrice', 0.0)
+  //   }
 
-    if (consumableDetail) {
-      return setFieldValue('averageCostPrice', 0.0)
-    }
-    return undefined
-  }, [])
+  //   if (consumableDetail) {
+  //     return setFieldValue('averageCostPrice', 0.0)
+  //   }
+  //   return undefined
+  // }, [])
 
   const isEditMode = () => {
     if (medicationDetail && medicationDetail.entity) {
@@ -68,7 +69,9 @@ const Pricing = ({
   }
   useEffect(
     () => {
+      console.log('check', values, acp, markupMargin)
       if (acp && markupMargin) {
+        console.log('hi')
         calculate()
       }
       // console.log('values', acp, markupMargin)
@@ -142,6 +145,7 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.averageCostPrice',
                     })}
+                    onChange={(e) => setAcp(e.target.value)}
                     currency
                     {...args}
                   />
@@ -161,6 +165,8 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.profitMarginPercentage',
                     })}
+                    onChange={(e) => setMarkupMargin(e.target.value)}
+                    defaultValue='0.0'
                     format='0.0'
                     {...args}
                   />
@@ -176,6 +182,7 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.suggestedSellingPrice',
                     })}
+                    defaultValue='0.0000'
                     disabled
                     {...args}
                   />
