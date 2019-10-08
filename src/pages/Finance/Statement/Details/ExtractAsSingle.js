@@ -1,30 +1,61 @@
 import React, { PureComponent } from 'react'
-import _ from 'lodash'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
 
 import {
   withFormikExtend,
   FastField,
-  GridContainer,
   GridItem,
-  TextField,
-  DateRangePicker,
   CommonTableGrid,
   CodeSelect,
   dateFormatLong,
 } from '@/components'
 
 const styles = (theme) => ({})
+@connect(({ statement }) => ({
+  statement,
+}))
+@withFormikExtend({
+  mapPropsToValues: ({ selectedRows }) => selectedRows,
+  // validationSchema: Yup.object().shape({
+  //   code: Yup.string().required(),
+  //   displayValue: Yup.string().required(),
+  //   effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+  // }),
+  handleSubmit: (values, { props }) => {
+    const invoiceExtractionDetails = values.map((o) => {
+      return {
+        invoiceId: o.id,
+        copayerFK: o.copayerFK,
+      }
+    })
 
+    const { dispatch, onConfirm, statement } = props
+    dispatch({
+      type: 'statement/extractAsSingle',
+      payload: {
+        id: statement.entity.id,
+        invoiceExtractionDetails,
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'statement/query',
+        })
+      }
+    })
+  },
+  displayName: 'statementExtract',
+})
 class ExtractAsSingle extends PureComponent {
   state = {
     columns: [
       { name: 'patientName', title: 'Patient Name' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
-      { name: 'invoiceAmount', title: 'Invoice Amount' },
+      { name: 'invoiceAmt', title: 'Invoice Amount' },
       { name: 'coPayer', title: 'Co-Payer' },
     ],
     columnExtensions: [
@@ -34,7 +65,7 @@ class ExtractAsSingle extends PureComponent {
         format: { dateFormatLong },
       },
       {
-        columnName: 'invoiceAmount',
+        columnName: 'invoiceAmt',
         type: 'number',
         currency: true,
       },
@@ -44,7 +75,7 @@ class ExtractAsSingle extends PureComponent {
           return (
             <GridItem xs={8}>
               <FastField
-                name={`packageValueDto[${row.rowIndex}].itemValue`}
+                name={`[${row.rowIndex}].copayerFK`}
                 render={(args) => <CodeSelect code='ctCopayer' {...args} />}
               />
             </GridItem>
@@ -57,11 +88,10 @@ class ExtractAsSingle extends PureComponent {
   render () {
     const { props } = this
     const { columns, columnExtensions } = this.state
-    const { classes, theme, footer, values, selectedRows } = props
-    console.log('detail', selectedRows)
+    const { theme, footer, selectedRows } = props
     return (
       <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
+        <div style={{ margin: theme.spacing(2) }}>
           <CommonTableGrid
             rows={selectedRows}
             columns={columns}
@@ -70,10 +100,9 @@ class ExtractAsSingle extends PureComponent {
           />
         </div>
         {footer &&
+          selectedRows.length > 0 &&
           footer({
-            onConfirm: () => {
-              if (props.onConfirm) props.onConfirm()
-            },
+            onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
               disabled: false,

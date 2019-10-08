@@ -1,19 +1,17 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
 import { FastField, Field, withFormik } from 'formik'
-import { Typography, withStyles } from '@material-ui/core'
-import { Search, AddBox, Print } from '@material-ui/icons'
+import { withStyles } from '@material-ui/core'
+import { Search } from '@material-ui/icons'
 import {
   GridContainer,
   GridItem,
   TextField,
-  DatePicker,
   Checkbox,
   Button,
-  CustomDropdown,
-  Tooltip,
   DateRangePicker,
-  Select,
+  CodeSelect,
+  ProgressButton,
 } from '@/components'
 
 const styles = () => ({
@@ -32,8 +30,7 @@ const styles = () => ({
 
 @withFormik({
   mapPropsToValues: () => ({
-    StatementDueStartDate: '',
-    AllCompanies: 'allCompany',
+    copayerFK: 'All Company',
   }),
   handleSubmit: (values, { setSubmitting, props }) => {
     // submit statementNo, statementDate, statementDueDate and company
@@ -62,20 +59,21 @@ class SearchBar extends PureComponent {
       handleAddNew,
       history,
       dispatch,
+      values,
     } = this.props
 
-    const {
-      allStatementDate,
-      isAllDateChecked,
-      isAllDueDateChecked,
-    } = this.state
-    console.log(isAllDateChecked)
+    // const {
+    //   allStatementDate,
+    //   isAllDateChecked,
+    //   isAllDueDateChecked,
+    // } = this.state
+    // console.log(isAllDateChecked)
     return (
       <GridContainer className={classes.container}>
         <GridItem container xs md={12}>
           <GridItem md={3}>
             <FastField
-              name='StatementNo'
+              name='statementNo'
               render={(args) => <TextField label='Statement No.' {...args} />}
             />
           </GridItem>
@@ -85,7 +83,7 @@ class SearchBar extends PureComponent {
               render={(args) => {
                 return (
                   <DateRangePicker
-                    disabled={isAllDateChecked}
+                    disabled={values.isAllDateChecked}
                     label='Statement From Date'
                     label2='Statement To Date'
                     {...args}
@@ -99,58 +97,19 @@ class SearchBar extends PureComponent {
             <FastField
               name='isAllDateChecked'
               render={(args) => {
-                return (
-                  <Checkbox
-                    label='All Date'
-                    checked={isAllDateChecked}
-                    onChange={this.handleOnChange(
-                      'isAllDateChecked',
-                      isAllDateChecked,
-                    )}
-                    {...args}
-                  />
-                )
+                return <Checkbox label='All Date' {...args} />
               }}
             />
           </GridItem>
         </GridItem>
         <GridItem container xs md={12}>
           <GridItem xs sm={3} md={3} style={{ position: 'relative' }}>
-            {/* <Field
-              name='Company'
-              render={(args) => (
-                <TextField
-                  disabled={allCompanies}
-                  label={formatMessage({ id: 'finance.statement.company' })}
-                  {...args}
-                />
-              )}
-            /> */}
-            {/* <div className={classes.allCompaniesCheck}> */}
             <FastField
-              name='AllCompanies'
+              name='copayerFK'
               render={(args) => {
-                return (
-                  // <Tooltip title='AllCompanies' placement='top-end'>
-                  //   <Checkbox
-                  //     simple
-                  //     onClick={this.onAllDateClick('allCompanies')}
-                  //     {...args}
-                  //   />
-                  // </Tooltip>
-                  <Select
-                    {...args}
-                    label='Company'
-                    options={[
-                      { name: 'All Company', value: 'allCompany' },
-                      { name: 'AIA', value: 'AIA' },
-                      { name: '3M', value: '3M' },
-                    ]}
-                  />
-                )
+                return <CodeSelect {...args} label='Company' code='ctCopayer' />
               }}
             />
-            {/* </div> */}
           </GridItem>
 
           <GridItem md={6}>
@@ -159,7 +118,7 @@ class SearchBar extends PureComponent {
               render={(args) => {
                 return (
                   <DateRangePicker
-                    disabled={isAllDueDateChecked}
+                    disabled={values.isAllDueDateChecked}
                     label='Statement Due From Date'
                     label2='Statement Due To Date'
                     {...args}
@@ -173,25 +132,63 @@ class SearchBar extends PureComponent {
             <FastField
               name='isAllDueDateChecked'
               render={(args) => {
-                return (
-                  <Checkbox
-                    label='All Date'
-                    onChange={this.handleOnChange(
-                      'isAllDueDateChecked',
-                      isAllDueDateChecked,
-                    )}
-                    {...args}
-                  />
-                )
+                return <Checkbox label='All Date' {...args} />
               }}
             />
           </GridItem>
 
           <GridItem xs sm={6} md={6} lg={8}>
-            <Button color='primary' onClick={handleSubmit}>
+            <ProgressButton
+              color='primary'
+              onClick={() => {
+                const {
+                  statementNo,
+                  copayerFK,
+                  isAllDateChecked,
+                  isAllDueDateChecked,
+                  statementDates,
+                  statementDueDates,
+                } = this.props.values
+                let statementDateFrom
+                let statementDateTo
+                let statementDueDateFrom
+                let statementDueDateTo
+
+                if (!isAllDateChecked && statementDates) {
+                  const [
+                    from,
+                    to,
+                  ] = statementDates
+                  statementDateFrom = from
+                  statementDateTo = to
+                }
+
+                if (!isAllDueDateChecked && statementDueDates) {
+                  const [
+                    from,
+                    to,
+                  ] = statementDueDates
+                  statementDueDateFrom = from
+                  statementDueDateTo = to
+                }
+
+                this.props.dispatch({
+                  type: 'statement/query',
+                  payload: {
+                    statementNo,
+                    copayerFK: Number.isNaN(copayerFK) ? copayerFK : undefined,
+                    lgteql_statementDate: statementDateFrom,
+                    lsteql_statementDate: statementDateTo,
+                    // paymentTerm: 5,
+                    // lgteql_dueDate: statementDueDateFrom,
+                    // lsteql_dueDate: statementDueDateTo,
+                  },
+                })
+              }}
+            >
               <Search />
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
             <Button
               variant='contained'
               color='primary'
