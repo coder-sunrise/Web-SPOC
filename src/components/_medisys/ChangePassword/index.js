@@ -75,14 +75,10 @@ class ChangePassword extends React.PureComponent {
       <div>
         {!changeTargetUser &&
         !currentUser.clinicianProfile.userProfile.hasChangedPassword && (
-          <Danger>
-            <h4 style={{ textAlign: 'center' }}>
-              This is your first time login.
-            </h4>
-            <h4 style={{ textAlign: 'center' }}>
-              You must change your password in order to use the system
-            </h4>
-          </Danger>
+          <p style={{ textAlign: 'center' }}>
+            The user&apos;s password must be changed before logging in the first
+            time.
+          </p>
         )}
 
         <GridContainer>
