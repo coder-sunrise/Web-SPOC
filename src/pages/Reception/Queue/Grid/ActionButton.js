@@ -58,14 +58,17 @@ const ActionButton = ({ row, onClick }) => {
   const newContextMenuOptions = useMemo(
     () =>
       ContextMenuOptions.map((opt) => {
-        console.log(opt)
         switch (opt.id) {
           case 0: // view visit
             return { ...opt, hidden: !isStatusWaiting }
           case 0.1: // edit visit
             return { ...opt, hidden: isStatusWaiting }
           case 1: // dispense
-            return { ...opt, disabled: !isStatusDispense }
+            return {
+              ...opt,
+              disabled: !isStatusDispense,
+              authority: 'queue.dispense',
+            }
           case 1.1: // billing
             return { ...opt, disabled: !enableBilling }
           case 2: // delete visit
@@ -96,7 +99,6 @@ const ActionButton = ({ row, onClick }) => {
       row.visitStatus,
     ],
   )
-
   return (
     <Tooltip title='More Actions'>
       <GridButton

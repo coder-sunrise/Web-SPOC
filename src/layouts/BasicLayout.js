@@ -138,12 +138,12 @@ class BasicLayout extends React.PureComponent {
         payload: localStorage.getItem('clinicCode'),
       })
 
-      // console.log(routes)
+      // console.log(routes, authority)
       dispatch({
         type: 'menu/getMenuData',
         payload: { routes, authority },
       }).then((menus) => {
-        console.log(d, menus)
+        // console.log(d, menus)
         this.getBreadcrumbNameMap = memoizeOne(
           this.getBreadcrumbNameMap,
           isEqual,
