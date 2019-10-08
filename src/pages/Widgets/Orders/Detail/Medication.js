@@ -452,11 +452,16 @@ class Medication extends PureComponent {
                               name={`corPrescriptionItemPrecaution[${i}].medicationPrecautionFK`}
                               render={(args) => {
                                 return (
-                                  <div style={{ position: 'relative' }}>
+                                  <div
+                                    style={{
+                                      position: 'relative',
+                                      marginBottom: theme.spacing(1),
+                                    }}
+                                  >
                                     <span
                                       style={{
                                         position: 'absolute',
-                                        top: 5,
+                                        top: 3,
                                       }}
                                     >
                                       {i + 1}.

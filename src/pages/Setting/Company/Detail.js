@@ -118,10 +118,7 @@ class Detail extends PureComponent {
       <React.Fragment>
         <AuthorizedContext.Provider
           value={{
-            edit: {
-              name: isUserMaintainable ? 'settingCompany.edit' : 'no-rights',
-              rights: 'enable',
-            },
+            rights: isUserMaintainable ? 'enable' : 'disable',
           }}
         >
           <div style={{ margin: theme.spacing(1) }}>

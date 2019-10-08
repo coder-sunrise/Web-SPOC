@@ -49,7 +49,9 @@ const checkPermissions = (
   if (Array.isArray(authority)) {
     // console.log(authority, currentAuthority)
     match = authority.filter((o) =>
-      currentAuthority.find((m) => o.name === m.name && o.rights === m.rights),
+      currentAuthority.find(
+        (m) => o.name === m.name && (o.rights === m.rights || !o.rights),
+      ),
     )
     if (match.length > 0) {
       return typeof target === 'function' && type !== 'decorator'
@@ -76,6 +78,7 @@ const checkPermissions = (
         (o) =>
           [
             'enable',
+            'readwrite',
           ].indexOf(o.rights) >= 0,
       )
       if (match)
@@ -98,8 +101,9 @@ const checkPermissions = (
             'disable',
           ].indexOf(o.rights) >= 0,
       )
+      // console.log(match)
       if (match) {
-        return typeof type === 'function' && type !== 'decorator'
+        return typeof target === 'function' && type !== 'decorator'
           ? target(match)
           : React.cloneElement(target, {
               disabled: true,

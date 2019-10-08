@@ -30,6 +30,7 @@ import { modelKey } from './variables'
 // utils
 import { getAppendUrl, getRemovedUrl } from '@/utils/utils'
 import { SendNotification } from '@/utils/notification'
+import Authorized from '@/utils/Authorized'
 
 const drawerWidth = 400
 
@@ -342,14 +343,16 @@ class Queue extends React.Component {
                 >
                   Send Notification
                 </Button> */}
-                <Button
-                  color='danger'
-                  size='sm'
-                  onClick={this.onEndSessionClick}
-                >
-                  <Stop />
-                  <FormattedMessage id='reception.queue.endSession' />
-                </Button>
+                <Authorized authority='queue.endsession'>
+                  <Button
+                    color='danger'
+                    size='sm'
+                    onClick={this.onEndSessionClick}
+                  >
+                    <Stop />
+                    <FormattedMessage id='reception.queue.endSession' />
+                  </Button>
+                </Authorized>
               </div>
             )}
           </CardHeader>

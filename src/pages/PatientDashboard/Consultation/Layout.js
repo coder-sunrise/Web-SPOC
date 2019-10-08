@@ -63,7 +63,6 @@ import {
   CustomInputWrapper,
   Fab,
 } from '@/components'
-import AuthorizedContext from '@/components/Context/Authorized'
 import { sendNotification } from '@/utils/realtime'
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'

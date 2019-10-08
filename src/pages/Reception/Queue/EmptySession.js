@@ -7,6 +7,7 @@ import { LinearProgress, withStyles } from '@material-ui/core'
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline'
 // custom components
 import { Button, Danger } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const STYLES = () => ({
   emptyStateContainer: {
@@ -50,10 +51,12 @@ class EmptySession extends PureComponent {
               <h3>
                 <FormattedMessage id='reception.queue.emptyState' />
               </h3>
-              <Button color='primary' onClick={this.onStartClick}>
-                <PlayCircleOutline />
-                <FormattedMessage id='reception.queue.startSession' />
-              </Button>
+              <Authorized authority='queue.startsession'>
+                <Button color='primary' onClick={this.onStartClick}>
+                  <PlayCircleOutline />
+                  <FormattedMessage id='reception.queue.startSession' />
+                </Button>
+              </Authorized>
             </React.Fragment>
           )}
         </div>

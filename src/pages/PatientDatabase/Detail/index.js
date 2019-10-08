@@ -60,10 +60,7 @@ const styles = () => ({
   global,
 }))
 @withFormikExtend({
-  authority: {
-    view: 'patient.view',
-    edit: 'patient.edit',
-  },
+  authority: 'patientdatabase.patientprofiledetails',
   // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
     // console.log({ patient })
@@ -307,6 +304,7 @@ class PatientDetail extends PureComponent {
     const CurrentComponent = currentMenu.component
     // console.log(resetProps)
     // console.log({ values })
+
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={2}>
@@ -321,59 +319,59 @@ class PatientDetail extends PureComponent {
                       Number(o.id) <= 4,
                   )
                   .map((o) => (
-                    <Authorized authority={o.access}>
-                      <MenuItem
-                        key={o.name}
-                        className={classes.menuItem}
-                        selected={currentMenu.name === o.name}
-                        disabled={
-                          global.disableSave && currentMenu.name !== o.name
+                    // <Authorized authority={o.access}>
+                    <MenuItem
+                      key={o.name}
+                      className={classes.menuItem}
+                      selected={currentMenu.name === o.name}
+                      disabled={
+                        global.disableSave && currentMenu.name !== o.name
+                      }
+                      onClick={(e) => {
+                        onMenuClick(e, o)
+                        // console.log('here', entity, values)
+                        dispatch({
+                          type: 'patient/updateState',
+                          payload: {
+                            entity: entity || undefined,
+                          },
+                        })
+                        this.setState({
+                          selectedMenu: o.id,
+                        })
+                        // this.props.history.push(
+                        //   getAppendUrl({
+                        //     md: 'pt',
+                        //     cmt: o.id,
+                        //   }),
+                        // )
+                      }}
+                    >
+                      <ListItemIcon style={{ minWidth: 25 }}>
+                        <KeyboardArrowRight />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <span
+                            style={{
+                              color: menuErrors[o.id] ? 'red' : 'inherit',
+                            }}
+                          >
+                            {o.name}
+                            {menuErrors[o.id] ? (
+                              <Error
+                                style={{
+                                  position: 'relative',
+                                  top: 5,
+                                  left: 6,
+                                }}
+                              />
+                            ) : null}
+                          </span>
                         }
-                        onClick={(e) => {
-                          onMenuClick(e, o)
-                          // console.log('here', entity, values)
-                          dispatch({
-                            type: 'patient/updateState',
-                            payload: {
-                              entity: entity || undefined,
-                            },
-                          })
-                          this.setState({
-                            selectedMenu: o.id,
-                          })
-                          // this.props.history.push(
-                          //   getAppendUrl({
-                          //     md: 'pt',
-                          //     cmt: o.id,
-                          //   }),
-                          // )
-                        }}
-                      >
-                        <ListItemIcon style={{ minWidth: 25 }}>
-                          <KeyboardArrowRight />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <span
-                              style={{
-                                color: menuErrors[o.id] ? 'red' : 'inherit',
-                              }}
-                            >
-                              {o.name}
-                              {menuErrors[o.id] ? (
-                                <Error
-                                  style={{
-                                    position: 'relative',
-                                    top: 5,
-                                    left: 6,
-                                  }}
-                                />
-                              ) : null}
-                            </span>
-                          }
-                        />
-                      </MenuItem>
-                    </Authorized>
+                      />
+                    </MenuItem>
+                    // </Authorized>
                   ))}
               </MenuList>
               {isCreatingPatient && <Divider light />}
