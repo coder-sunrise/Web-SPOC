@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
+import { withFormik } from 'formik'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
@@ -13,7 +14,6 @@ import DispenseDetails from '../DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // page modal
-import EditClaimSeq from './modal/EditClaimSeq'
 import CoPayment from './modal/CoPayment'
 // import AddPayment from './AddPayment'
 // model
@@ -31,10 +31,21 @@ const styles = (theme) => ({
   },
 })
 
+const bannerStyle = {
+  zIndex: 1000,
+  paddingLeft: 16,
+  paddingRight: 16,
+}
+
 @connect(({ billing, dispense }) => ({ billing, dispense }))
+@withFormik({
+  mapPropsToValues: ({ billing }) => billing.entity || billing.default,
+  handleSubmit: (values, formikBag) => {
+    console.log({ values })
+  },
+})
 class Billing extends Component {
   state = {
-    showClaimSeqModal: false,
     showCoPaymentModal: false,
     showAddPaymentModal: false,
   }
@@ -42,11 +53,6 @@ class Billing extends Component {
   backToDispense = () => {
     const { history } = this.props
     console.log({ history })
-  }
-
-  toggleClaimSequenceModal = () => {
-    const { showClaimSeqModal } = this.state
-    this.setState({ showClaimSeqModal: !showClaimSeqModal })
   }
 
   toggleCoPaymentModal = () => {
@@ -64,15 +70,12 @@ class Billing extends Component {
   }
 
   render () {
-    const {
-      showClaimSeqModal,
-      showCoPaymentModal,
-      showAddPaymentModal,
-    } = this.state
-    const { classes, billing } = this.props
+    const { showCoPaymentModal, showAddPaymentModal } = this.state
+    const { classes, values } = this.props
+    console.log({ values })
     return (
       <div>
-        <PatientBanner style={{}} patientInfo={billing.patientInfo} />
+        <PatientBanner style={bannerStyle} />
         <div style={{ padding: 8 }}>
           <Accordion
             leftIcon
@@ -94,13 +97,14 @@ class Billing extends Component {
           <GridContainer justify='center' alignItems='flex-start'>
             <GridContainer item md={8}>
               <ApplyClaims
-                handleClaimSeqClick={this.toggleClaimSequenceModal}
                 handleCoPaymentClick={this.toggleCoPaymentModal}
+                values={values}
               />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary
                 handleAddPaymentClick={this.toggleAddPaymentModal}
+                values={values}
               />
             </GridContainer>
           </GridContainer>
@@ -111,14 +115,6 @@ class Billing extends Component {
           </Button>
           <Button color='primary'>Complete Payment</Button>
         </div>
-        <CommonModal
-          open={showClaimSeqModal}
-          title='Edit Claim Sequence'
-          onConfirm={this.toggleClaimSequenceModal}
-          onClose={this.toggleClaimSequenceModal}
-        >
-          <EditClaimSeq />
-        </CommonModal>
         <CommonModal
           open={showCoPaymentModal}
           title='Add Copayer'

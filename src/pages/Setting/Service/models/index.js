@@ -11,8 +11,8 @@ export default createListViewModel({
       default: {
         isUserMaintainable: true,
         effectiveDates: [
-          moment(),
-          moment('2099-12-31'),
+          moment().formatUTC(),
+          moment('2099-12-31T23:59:59').formatUTC(false),
         ],
         ctServiceCenter_ServiceNavigation: [],
         description: '',
@@ -39,6 +39,14 @@ export default createListViewModel({
               ],
             }
           }),
+        }
+      },
+      querySingleDone (st, { payload }) {
+        const { data } = payload
+        console.log('single', data)
+        return {
+          ...st,
+          entity: data,
         }
       },
     },

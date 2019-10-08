@@ -82,7 +82,6 @@ const saveConsultation = ({
     values,
     history,
     consultation,
-    patientDashboard,
     consultationDocument = {},
     orders = {},
   } = props
@@ -139,7 +138,6 @@ const saveConsultation = ({
     global,
     consultationDocument,
     orders,
-    patientDashboard,
     visitRegistration,
     formik,
   }) => ({
@@ -147,7 +145,6 @@ const saveConsultation = ({
     global,
     consultationDocument,
     orders,
-    patientDashboard,
     visitRegistration,
     formik,
   }),
@@ -233,16 +230,20 @@ class Consultation extends PureComponent {
       consultation,
       resetForm,
       user,
-      patientDashboard,
+      visitRegistration,
     } = this.props
     dispatch({
       type: 'consultation/resume',
-      payload: consultation.visitID,
+      payload: {
+        id: visitRegistration.entity.visit.id,
+        // version: Date.now(),
+      },
     }).then((r) => {
       if (r) {
         notification.success({
           message: 'Consultation resumed',
         })
+        resetForm(r)
         history.push(
           getAppendUrl({
             v: Date.now(),
@@ -480,7 +481,6 @@ class Consultation extends PureComponent {
       dispatch,
       values,
       visitRegistration,
-      patientDashboard = {},
       consultation = {},
       orders = {},
       formik,
@@ -504,7 +504,17 @@ class Consultation extends PureComponent {
           extraCmt={this.getExtraComponent()}
           {...this.props}
         />
-        <Layout {...this.props} />
+        <AuthorizedContext.Provider
+          value={{
+            edit: {
+              name:
+                values.status !== 'Paused' ? 'consultation.edit' : 'no-rights',
+              rights: 'enable',
+            },
+          }}
+        >
+          <Layout {...this.props} />
+        </AuthorizedContext.Provider>
       </div>
     )
   }

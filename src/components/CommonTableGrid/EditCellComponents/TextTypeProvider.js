@@ -52,11 +52,12 @@ class TextEditorBase extends PureComponent {
     } = cfg
 
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || {}
+      ? window.$tempGridRow[gridId][row.id] || row
       : row
     if (editRender) {
       return editRender(row)
     }
+    console.log(latestRow)
     const submitValue = (e) => {
       const error = updateCellValue(
         this.props,

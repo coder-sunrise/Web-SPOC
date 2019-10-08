@@ -75,17 +75,20 @@ export const mapPropsToValues = ({
   user,
   clinicianProfiles,
 }) => {
+  let _patientProfileFK
   let _patientContactNo
   let _patientName
   let _patientAccountNo
   if (patientEntity) {
-    const { name, patientAccountNo: accNo, contact } = patientEntity
+    const { id, name, patientAccountNo: accNo, contact } = patientEntity
     _patientContactNo = contact.mobileContactNumber.number
     _patientName = name
     _patientAccountNo = accNo
+    _patientProfileFK = id
   }
 
   let values = {
+    patientProfileFK: _patientProfileFK,
     patientContactNo: _patientContactNo,
     patientName: _patientName,
     patientAccountNo: _patientAccountNo,

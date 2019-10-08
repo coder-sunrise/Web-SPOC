@@ -5,6 +5,17 @@ import { CommonTableGrid, Button } from '@/components'
 import { status } from '@/utils/codes'
 
 class Grid extends PureComponent {
+  FuncConfig = {
+    sort: true,
+    sortConfig: {
+      defaultSorting: [
+        { columnName: 'isActive', direction: 'asc' },
+        { columnName: 'coPayerTypeName', direction: 'asc' },
+        // { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  }
+
   editRow = (row, e) => {
     const { dispatch, settingCompany } = this.props
 
@@ -28,6 +39,7 @@ class Grid extends PureComponent {
         style={{ margin: 0 }}
         type='settingCompany'
         onRowDoubleClick={this.editRow}
+        FuncProps={this.FuncConfig}
         columns={
           name === 'copayer' ? (
             [
@@ -79,7 +91,7 @@ class Grid extends PureComponent {
         // FuncProps={{ pager: false }}
         columnExtensions={[
           name === 'copayer'
-            ? {
+            ? ({
                 columnName: 'url',
 
                 render: (row) => (
@@ -103,7 +115,11 @@ class Grid extends PureComponent {
                     )}
                   </a>
                 ),
-              }
+              },
+              {
+                columnName: 'coPayerTypeName',
+                sortBy: 'coPayerTypeFK',
+              })
             : {
                 columnName: 'officeNum',
                 sortingEnabled: false,

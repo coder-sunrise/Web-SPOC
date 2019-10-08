@@ -1101,7 +1101,7 @@ const tagList = [
     text: 'PatientName',
     url: '',
     getter: () => {
-      const { patient, patientDashboard } = window.g_app._store.getState()
+      const { patient } = window.g_app._store.getState()
       if (patient && patient.entity) {
         return patient.entity.name
       }
@@ -1139,7 +1139,7 @@ const tagList = [
     text: 'PatientCallingName',
     url: '',
     getter: () => {
-      const { patient, patientDashboard } = window.g_app._store.getState()
+      const { patient } = window.g_app._store.getState()
       if (patient && patient.entity) {
         return patient.entity.callingName
       }

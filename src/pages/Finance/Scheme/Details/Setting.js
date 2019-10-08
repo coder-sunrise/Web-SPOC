@@ -14,7 +14,7 @@ import {
   Switch,
 } from '@/components'
 
-const CPSwitch = (label, isUserMaintainable) => (args) => {
+const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
   }
@@ -25,18 +25,16 @@ const CPSwitch = (label, isUserMaintainable) => (args) => {
       unCheckedChildren='%'
       unCheckedValue='Percentage'
       label={label}
-      disabled={!isUserMaintainable}
       {...args}
     />
   )
 }
-const CPNumber = (label, type, isUserMaintainable) => (args) => {
+const CPNumber = (label, type) => (args) => {
   return (
     <NumberInput
       label={label}
       currency={type === 'ExactAmount'}
       percentage={type === 'Percentage'}
-      disabled={!isUserMaintainable}
       {...args}
     />
   )
@@ -44,7 +42,6 @@ const CPNumber = (label, type, isUserMaintainable) => (args) => {
 const Setting = (props) => {
   const { schemeDetail, height, classes, values, setFieldValue } = props
 
-  const { isUserMaintainable } = values
   return (
     <CardContainer
       hideHeader
@@ -61,14 +58,13 @@ const Setting = (props) => {
               render={CPNumber(
                 'Minimum Patient Payable Amount',
                 values.patientMinCoPaymentAmountType,
-                isUserMaintainable,
               )}
             />
           </GridItem>
           <GridItem xs={4} md={1}>
             <Field
               name='patientMinCoPaymentAmountType'
-              render={CPSwitch(' ', isUserMaintainable)}
+              render={CPSwitch(' ')}
             />
           </GridItem>
         </GridContainer>

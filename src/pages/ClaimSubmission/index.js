@@ -5,7 +5,6 @@ import { Badge, withStyles } from '@material-ui/core'
 import Note from '@material-ui/icons/EventNote'
 // common components
 import { Button, GridContainer, GridItem } from '@/components'
-import { SchemeType } from './variables'
 
 const styles = (theme) => ({
   container: {
@@ -22,8 +21,16 @@ const styles = (theme) => ({
 }))
 class ClaimSubmission extends React.Component {
   componentDidMount () {
+    const data = {
+      'ClaimCountListDto[0].SchemeType': 'CHAS',
+      'ClaimCountListDto[0].Status': 'New',
+      // 'ClaimCountListDto[1].SchemeType': 'Corporate',
+      // 'ClaimCountListDto[1].Status': 'New',
+    }
+
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',
+      payload: data,
     })
   }
 
@@ -35,20 +42,14 @@ class ClaimSubmission extends React.Component {
 
   render () {
     const { classes, claimSubmission } = this.props
-    const { invoiceClaimCount } = claimSubmission
-    
+    const { invoiceClaimCount } = claimSubmission || []
     return (
       <GridContainer className={classes.container}>
-        {SchemeType.map((type) => {
-          const claimCount = invoiceClaimCount.find(
-            (x) =>
-              x.schemeType.trim().toLowerCase() ===
-              type.value.trim().toLowerCase(),
-          )
+        {invoiceClaimCount.map((scheme) => {
           return (
             <GridItem md={2}>
               <Badge
-                badgeContent={claimCount ? claimCount.count : 0}
+                badgeContent={scheme.count}
                 color='error'
                 className={classes.badge}
               >
@@ -58,10 +59,10 @@ class ClaimSubmission extends React.Component {
                   color='primary'
                   variant='outlined'
                   onClick={this.navigate}
-                  id={type.value}
+                  id={scheme.schemeType}
                 >
                   <Note />
-                  {type.name}
+                  {scheme.schemeType}
                 </Button>
               </Badge>
             </GridItem>

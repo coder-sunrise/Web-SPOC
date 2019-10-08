@@ -11,6 +11,7 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  ProgressButton,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -20,7 +21,14 @@ const styles = (theme) => ({
   },
 })
 
-const BaseSearchBar = ({ classes, children, hideInvoiceDate }) => {
+const BaseSearchBar = ({
+  classes,
+  children,
+  hideInvoiceDate,
+  modelsName,
+  dispatch,
+  values,
+}) => {
   return (
     <React.Fragment>
       <GridContainer>
@@ -33,7 +41,7 @@ const BaseSearchBar = ({ classes, children, hideInvoiceDate }) => {
           </GridItem>
           <GridItem md={6}>
             <FastField
-              name='patientAccNo'
+              name='patientAccountNo'
               render={(args) => <TextField {...args} label='Ref. No/Acc. No' />}
             />
           </GridItem>
@@ -52,9 +60,49 @@ const BaseSearchBar = ({ classes, children, hideInvoiceDate }) => {
             )}
           </GridItem>
           <GridItem md={6} className={classes.searchButton}>
-            <Button color='primary' size='sm'>
-              <Search />Search
-            </Button>
+            <ProgressButton
+              color='primary'
+              text='Search'
+              icon={null}
+              onClick={() => {
+                const { patientName, patientAccountNo, invoiceNo } = values
+                dispatch({
+                  type: `${modelsName}/query`,
+                  payload: {
+                    group: [
+                      {
+                        patientName,
+                        patientAccountNo,
+                        invoiceNo,
+                        combineCondition: 'or',
+                      },
+                    ],
+                  },
+                })
+              }}
+              // onClick={() => {
+              //   const {
+              //     codeDisplayValue,
+              //     isActive,
+              //     serviceCenterFK,
+              //   } = this.props.values
+              //   this.props.dispatch({
+              //     type: 'settingClinicService/query',
+              //     payload: {
+              //       //[`${prefix}name`]: this.props.values.search
+              //       isActive,
+              //       group: [
+              //         {
+              //           code: codeDisplayValue,
+              //           displayValue: codeDisplayValue,
+              //           serviceCenterFK: serviceCenterFK,
+              //           combineCondition: 'or',
+              //         },
+              //       ],
+              //     },
+              //   })
+              // }}
+            />
           </GridItem>
         </GridItem>
         <GridItem container md={4}>

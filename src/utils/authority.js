@@ -11,6 +11,10 @@ const roleAccessRightsMapping = {
     { name: 'consultation.edit', rights: 'enable' },
     { name: 'dispense.view', rights: 'enable' },
     { name: 'dispense.edit', rights: 'enable' },
+    { name: 'schemeDetail.view', rights: 'enable' },
+    { name: 'schemeDetail.edit', rights: 'enable' },
+    { name: 'settingCompany.view', rights: 'enable' },
+    { name: 'settingCompany.edit', rights: 'enable' },
   ],
   editor: [
     { name: 'editor', rights: 'enable' },

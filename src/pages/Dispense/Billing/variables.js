@@ -1,4 +1,6 @@
 import moment from 'moment'
+// common components
+import { NumberInput, FastField } from '@/components'
 
 export const ItemTableColumn = [
   { name: 'name', title: 'Name' },
@@ -10,6 +12,15 @@ export const ItemTableColumn = [
 export const ItemTableColumnExtensions = [
   { columnName: 'payableAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },
+  {
+    columnName: 'claimAmount',
+    render: (row) => (
+      <FastField
+        name={`claims[${row.rowIndex}]claimAmount`}
+        render={(args) => <NumberInput {...args} />}
+      />
+    ),
+  },
 ]
 
 const generateItemData = () => {

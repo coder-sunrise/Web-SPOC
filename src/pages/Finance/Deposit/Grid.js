@@ -30,6 +30,7 @@ class Grid extends PureComponent {
         columnName: 'balance',
         type: 'number',
         currency: true,
+        sortBy: 'PatientDeposit.balance',
       },
       {
         columnName: 'lastTransactionDate',
@@ -85,7 +86,7 @@ class Grid extends PureComponent {
               <Tooltip title='Refund' placement='bottom'>
                 <Button
                   size='sm'
-                  disabled={row.balance === 0}
+                  disabled={row.balance <= 0}
                   onClick={() => {
                     this.editRow(row, false)
                   }}

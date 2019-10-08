@@ -5,7 +5,6 @@ import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal } from '@/components'
-
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
@@ -23,11 +22,21 @@ class Supplier extends PureComponent {
 
   componentDidMount () {
     const { route, dispatch } = this.props
-
+    const suppSorting = [
+      { columnName: 'effectiveEndDate', direction: 'desc' },
+      { columnName: 'displayValue', direction: 'asc' },
+    ]
+    const copayerSorting = [
+      { columnName: 'effectiveEndDate', direction: 'desc' },
+      { columnName: 'coPayerTypeFK', direction: 'asc' },
+      { columnName: 'displayValue', direction: 'asc' },
+    ]
+    const copayer = route.name === 'copayer'
     dispatch({
       type: 'settingCompany/query',
       payload: {
-        companyTypeFK: route.name === 'copayer' ? 1 : 2,
+        companyTypeFK: copayer ? 1 : 2,
+        sorting: copayer ? copayerSorting : suppSorting,
       },
     })
   }

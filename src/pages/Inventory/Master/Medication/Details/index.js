@@ -48,6 +48,7 @@ const Detail = ({
     values,
     setFieldValue,
     dispatch,
+    errors: props.errors,
   }
 
   return (

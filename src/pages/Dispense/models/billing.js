@@ -1,18 +1,33 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
-import { createListViewModel } from 'medisys-model'
+import { createFormViewModel } from 'medisys-model'
 import { getRemovedUrl } from '@/utils/utils'
 import * as service from '../services'
 import { query as queryPatient } from '@/services/patient'
 
-export default createListViewModel({
+export default createFormViewModel({
   namespace: 'billing',
   config: {
     queryOnLoad: false,
   },
   param: {
     service,
-    state: {},
+    state: {
+      default: {
+        invoice: {
+          invoiceNo: '',
+          invoiceRemark: '',
+          totalAftAdj: 0,
+          gstValue: 0,
+          gstAmount: 0,
+          totalAftGst: 0,
+          invoiceItems: [],
+        },
+        invoicePayers: [],
+        applicableSchemes: [],
+        invoicePaymentModes: [],
+      },
+    },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
         const { query, pathname } = location
@@ -21,14 +36,23 @@ export default createListViewModel({
 
           if (md2 === 'bill') {
             dispatch({
-              type: 'fetchPatientInfo',
-              payload: { id: pid },
+              type: 'initState',
+              payload: { pid, vis },
             })
           }
         }
       })
     },
     effects: {
+      *initState ({ payload }, { put }) {
+        // yield put({
+        //   type: 'query',
+        // })
+        yield put({
+          type: 'patient/query',
+          payload: { id: payload.pid },
+        })
+      },
       *closeBillingModal (_, { put }) {
         router.push(
           getRemovedUrl([
@@ -51,6 +75,10 @@ export default createListViewModel({
             showBillingPanel: false,
             fullscreen: false,
           },
+        })
+        yield put({
+          type: 'patient/updateState',
+          payload: { entity: null },
         })
         router.push('/reception/queue')
       },

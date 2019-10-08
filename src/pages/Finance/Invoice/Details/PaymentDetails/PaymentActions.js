@@ -43,7 +43,7 @@ const PaymentActions = ({
       )}
       {type === PayerType.PATIENT && (
         <Button
-          onClick={handleWriteOff}
+          onClick={() => handleWriteOff(invoicePayerFK)}
           disabled={!handleWriteOff}
           {...ButtonProps}
         >

@@ -151,7 +151,7 @@ const widgets = [
                     type: 'consultationDocument/updateState',
                     payload: {
                       showModal: true,
-                      type: '2',
+                      type: '3',
                       entity: undefined,
                     },
                   })

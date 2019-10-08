@@ -369,3 +369,16 @@
   background-color: #7d7d7d;
   color: white;
 }
+
+// --- IMPORTANT: do not remove this css class ---
+// search visually-hidden to see the usage
+.visually-hidden {
+  margin: -1px;
+  padding: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip: rect(0, 0, 0, 0);
+  position: absolute;
+}

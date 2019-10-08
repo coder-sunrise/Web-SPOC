@@ -29,6 +29,7 @@ const _toMoment = (value, isLocal, i, showTime) => {
     if (i === 0) {
       m = m.set({ hour: 0, minute: 0, second: 0 })
     } else if (i === 1) {
+      console.log('changed', { value, isLocal, i, showTime })
       m = m.set({ hour: 23, minute: 59, second: 59 })
     }
   }
@@ -148,7 +149,7 @@ class AntdDateRangePicker extends PureComponent {
   }
 
   handleChange = (dateArray, dateString) => {
-    console.log(dateArray, dateString)
+    // console.log(dateArray, dateString)
     const { form, field, onChange, showTime, dateOnly } = this.props
     const v = Array.isArray(dateArray)
       ? dateArray.map((o, i) => {

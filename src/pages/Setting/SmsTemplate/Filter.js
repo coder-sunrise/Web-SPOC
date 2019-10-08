@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
 import { status } from '@/utils/codes'
 import {
   withFormikExtend,
@@ -8,15 +8,12 @@ import {
   GridItem,
   Button,
   TextField,
-  Checkbox,
   Select,
   ProgressButton,
-  CodeSelect,
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingSmsTemplate }) =>
-  settingSmsTemplate.filter || {},
+  mapPropsToValues: ({ settingSmsTemplate }) => settingSmsTemplate.filter || {},
   handleSubmit: () => {},
   displayName: 'TemplateMessageFilter',
 })
@@ -34,6 +31,14 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
+          <GridItem xs={6} md={2}>
+            <FastField
+              name='isActive'
+              render={(args) => {
+                return <Select label='Status' options={status} {...args} />
+              }}
+            />
+          </GridItem>
         </GridContainer>
 
         <GridContainer>
@@ -43,10 +48,11 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue } = this.props.values
+                  const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingSmsTemplate/query',
                     payload: {
+                      isActive,
                       group: [
                         {
                           code: codeDisplayValue,

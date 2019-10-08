@@ -54,7 +54,6 @@ export default createListViewModel({
 
       querySingleDone (st, { payload }) {
         const { data } = payload
-        console.log('single', payload)
         return {
           ...st,
           entity: data,

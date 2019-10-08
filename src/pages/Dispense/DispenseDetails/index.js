@@ -26,9 +26,10 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 // })
 
 const DispenseDetails = ({ classes, dispense, setFieldValue, values }) => {
-  const { prescription, vaccination, otherOrder, invoice } = values || {}
+  const { prescription, vaccination, otherOrder, invoice } = values || {
+    invoice: { invoiceItem: [] },
+  }
   const { invoiceItem = [], invoiceAdjustment = [] } = invoice
-
   return (
     <React.Fragment>
       <GridItem>
