@@ -352,7 +352,7 @@ class ClinicalNotes extends Component {
 
         return [
           ...attachments,
-          { ...item },
+          { ...item },  
         ]
       }, [])
 
@@ -996,19 +996,24 @@ class ClinicalNotes extends Component {
           />
         </div>
 
-        <h6 style={{ marginTop: 10 }}>Attachment</h6>
+        
+
+        <h6 style={{ marginTop: 10 }}></h6>
         <FastField
           name='corAttachment'
           render={(args) => {
             this.form = args.form
+
+          //   <Attachment
+          //   attachmentType='ClinicalNotes'
+          //   handleUpdateAttachments={this.updateAttachments(args)}
+          //   attachments={args.field.value}
+          //   label=''
+          //   isReadOnly
+          // />
+
             return (
-              <Attachment
-                attachmentType='ClinicalNotes'
-                handleUpdateAttachments={this.updateAttachments(args)}
-                attachments={args.field.value}
-                label=''
-                isReadOnly
-              />
+              <UploadAttachment updateAttachments={this.updateAttachments} />
             )
           }}
         />
@@ -1032,6 +1037,7 @@ class ClinicalNotes extends Component {
         >
           <UploadAttachment updateAttachments={this.updateAttachments} />
         </CommonModal>
+        
         <CommonModal
           open={scriblenotes.showScribbleModal}
           title='Scribble'

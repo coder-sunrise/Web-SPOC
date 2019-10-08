@@ -50,37 +50,38 @@ const widgets = [
         {(r) => {
           if (r.edit.rights === 'disable') return null
           return (
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item
-                    onClick={() => {
-                      window.g_app._store.dispatch({
-                        type: 'clinicalnotes/updateState',
-                        payload: {
-                          showAttachmentModal: true,
-                        },
-                      })
-                    }}
-                  >
-                    Upload Attachment
-                  </Menu.Item>
-                </Menu>
-              }
-              trigger={[
-                'click',
-              ]}
-            >
-              <Button
-                justIcon
-                round
-                color='primary'
-                size='sm'
-                style={{ float: 'left' }}
-              >
-                <MoreVert />
-              </Button>
-            </Dropdown>
+            // <Dropdown
+            //   overlay={
+            //     <Menu>
+            //       <Menu.Item
+            //         onClick={() => {
+            //           window.g_app._store.dispatch({
+            //             type: 'clinicalnotes/updateState',
+            //             payload: {
+            //               showAttachmentModal: true,
+            //             },
+            //           })
+            //         }}
+            //       >
+            //         Upload Attachment
+            //       </Menu.Item>
+            //     </Menu>
+            //   }
+            //   trigger={[
+            //     'click',
+            //   ]}
+            // >
+            //   <Button
+            //     justIcon
+            //     round
+            //     color='primary'
+            //     size='sm'
+            //     style={{ float: 'left' }}
+            //   >
+            //     <MoreVert />
+            //   </Button>
+            // </Dropdown>
+            null
           )
         }}
       </AuthorizedContext>
