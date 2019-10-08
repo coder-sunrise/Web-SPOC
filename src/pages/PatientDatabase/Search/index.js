@@ -66,7 +66,7 @@ class PatientSearch extends PureComponent {
         type: 'patientSearch/query',
         payload: {
           sorting: [
-            { columnName: 'isActive', direction: 'asc' },
+            // { columnName: 'isActive', direction: 'asc' },
             { columnName: 'name', direction: 'asc' },
           ],
         },
