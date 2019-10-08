@@ -172,20 +172,12 @@ class SketchField extends PureComponent {
     let filterList = this._history.getSaveLayerList()
     let objects = canvas.getObjects();
     let exist = false;
-    console.log(objects)
-    console.log("before")
-    console.log(filterList)
 
-    for(let p = 0; p < objects.length; p++){
-
-      console.log(JSON.stringify(objects[p].__originalState))
-    }
 
     for(let i = 0; i < filterList.length; i++){
       for(let a = 0; a < objects.length; a++ ){
   
         if(filterList[i].layerContent === JSON.stringify(objects[a].__originalState)){
-          console.log("same")
           exist = true
         }
       }
@@ -194,12 +186,6 @@ class SketchField extends PureComponent {
       }
       exist = false
     }
-
-    console.log("after")
-    console.log(filterList)
-
-
-
     return filterList
   }
 
