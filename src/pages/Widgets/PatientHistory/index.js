@@ -537,6 +537,7 @@ class PatientHistory extends Component {
               .map((o) => {
                 const Widget = o.component
                 console.log("+++++++++++++++ " ,entity )
+                console.log(" props " ,this.props)
                 return (
                   <div>
                     <h5>{o.name}</h5>
@@ -561,6 +562,8 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
+
+
     const { entity, visitInfo, selected } = patientHistory
     const cfg = {}
     if (mode === 'split') {

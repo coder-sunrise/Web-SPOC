@@ -28,8 +28,6 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 const DispenseDetails = ({ classes, dispense, setFieldValue, values }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {}
   const { invoiceItem = [], invoiceAdjustment = [] } = invoice
-  console.log("--------------")
-  console.log( values)
 
   return (
     <React.Fragment>
