@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import { FastField } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Refresh, Print, Payment, Delete } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
@@ -13,12 +12,9 @@ import {
   CommonModal,
   dateFormatLong,
   dateFormatWithTime,
-  timeFormatWithoutSecond,
-  withFormikExtend,
+  ProgressButton,
 } from '@/components'
-import CollectPayment from './CollectPayment'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import ExtractAsSingle from './ExtractAsSingle'
 
 const styles = () => ({
@@ -33,13 +29,14 @@ const styles = () => ({
   },
 })
 
+@connect(({ statement }) => ({
+  statement,
+}))
 class Details extends PureComponent {
   state = {
     showModal: false,
     selectedRows: [],
-    lastRefresh: moment()
-      .add(-1, 'months')
-      .format(`${dateFormatLong} ${timeFormatWithoutSecond}`),
+    extractRows: [],
     columns: [
       { name: 'invoiceNo', title: 'Invoice No' },
       { name: 'invoiceDate', title: 'Invoice Date' },
@@ -51,46 +48,6 @@ class Details extends PureComponent {
       { name: 'action', title: 'Action' },
     ],
 
-    columnExtensions: [
-      {
-        columnName: 'adminCharge',
-        type: 'number',
-        currency: true,
-      },
-      {
-        columnName: 'payableAmount',
-        type: 'number',
-        currency: true,
-      },
-      {
-        columnName: 'outstandingAmount',
-        type: 'number',
-        currency: true,
-      },
-      {
-        columnName: 'invoiceDate',
-        type: 'date',
-        format: { dateFormatLong },
-      },
-      {
-        columnName: 'action',
-        align: 'center',
-        render: (row) => {
-          return (
-            <Button
-              size='sm'
-              // onClick={() => {
-              //   editRow(row)
-              // }}
-              justIcon
-              color='primary'
-            >
-              <Delete />
-            </Button>
-          )
-        },
-      },
-    ],
     // editingRowIds: [],
     // rowChanges: {},
     // rows: [
@@ -280,6 +237,14 @@ class Details extends PureComponent {
   }
 
   handleClick = () => {
+    const { statement } = this.props
+    let rows = []
+    this.state.selectedRows.forEach((o) => {
+      rows.push(
+        statement.entity.statementInvoice.find((r) => r.invoiceNo === o),
+      )
+    })
+    this.setState({ extractRows: rows })
     this.setState((prevState) => {
       return { showModal: !prevState.showModal }
     })
@@ -293,18 +258,16 @@ class Details extends PureComponent {
       FuncProps,
       showModal,
     } = this.state
-
-    const { classes, history, statement, values } = this.props
-
+    const { classes, statement, values, type } = this.props
     return (
       <div>
         <GridContainer classes={{ grid: classes.gridContainer }}>
           <GridContainer direction='row' justify='flex-end'>
             <GridItem style={{ marginRight: -16 }}>
-              <Button color='primary' onClick={this.handleRefresh}>
+              <ProgressButton color='primary' onClick={this.handleRefresh}>
                 <Refresh />
                 <FormattedMessage id='finance.statement.details.refreshStatement' />
-              </Button>
+              </ProgressButton>
               <Button color='primary'>
                 <Print />
                 <FormattedMessage id='finance.statement.details.printStatement' />
@@ -314,13 +277,48 @@ class Details extends PureComponent {
         </GridContainer>
 
         <CommonTableGrid
-          // height={300}
-          rows={
-            statement.entity.statementInvoice ||
-            statement.default.statementInvoice
-          }
+          rows={statement.entity ? statement.entity.statementInvoice : []}
           columns={columns}
-          columnExtensions={columnExtensions}
+          columnExtensions={[
+            {
+              columnName: 'adminCharge',
+              type: 'number',
+              currency: type === 'ExactAmount',
+            },
+            {
+              columnName: 'payableAmount',
+              type: 'number',
+              currency: true,
+            },
+            {
+              columnName: 'outstandingAmount',
+              type: 'number',
+              currency: true,
+            },
+            {
+              columnName: 'invoiceDate',
+              type: 'date',
+              format: { dateFormatLong },
+            },
+            {
+              columnName: 'action',
+              align: 'center',
+              render: (row) => {
+                return (
+                  <Button
+                    size='sm'
+                    // onClick={() => {
+                    //   editRow(row)
+                    // }}
+                    justIcon
+                    color='primary'
+                  >
+                    <Delete />
+                  </Button>
+                )
+              },
+            },
+          ]}
           FuncProps={FuncProps}
           getRowId={this.gridGetRowID}
           selection={this.state.selectedRows}
@@ -343,19 +341,18 @@ class Details extends PureComponent {
           maxWidth='lg'
           showFooter={false}
         >
-          {/*
-            <CollectPayment />
-          */}
           <CollectPaymentConfirm />
         </CommonModal>
         <CommonModal
+          title='Extract As Single'
           open={showModal}
           maxWidth='md'
           bodyNoPadding
           onClose={this.handleClick}
           onConfirm={this.handleClick}
+          observe='statementExtract'
         >
-          <ExtractAsSingle selectedRows={this.state.selectedRows} />
+          <ExtractAsSingle selectedRows={this.state.extractRows} />
         </CommonModal>
         <Button
           style={{ marginTop: 10 }}

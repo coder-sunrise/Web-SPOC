@@ -622,7 +622,12 @@ class ClinicalNotes extends Component {
                       )}
                     </div>
                   </div>
-                  <RichEditor strongLabel label='Clinical Notes' {...args} />
+                  <RichEditor
+                    handlePastedText={() => false}
+                    strongLabel
+                    label='Clinical Notes'
+                    {...args}
+                  />
                 </div>
               )
             }}
@@ -664,7 +669,7 @@ class ClinicalNotes extends Component {
                     >
                       {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
                         .length > 0 ? (
-                          <GridContainer>
+                        <GridContainer>
                           <div
                             className={classes.root}
                             style={{ width: this.state.width, paddingLeft: 20 }}
@@ -798,7 +803,12 @@ class ClinicalNotes extends Component {
                       )}
                     </div>
                   </div>
-                  <RichEditor strongLabel label='Chief Complaints' {...args} />
+                  <RichEditor
+                    handlePastedText={() => false}
+                    strongLabel
+                    label='Chief Complaints'
+                    {...args}
+                  />
                 </div>
               )
             }}
@@ -973,7 +983,13 @@ class ClinicalNotes extends Component {
                     </div>
                   </div>
 
-                  <RichEditor strongLabel label='Plan' {...args} />
+                  <RichEditor
+                    handlePastedText={() => false}
+                    strongLabel
+                    label='Plan'
+                    {...args}
+
+                  />
                 </div>
               )
             }}

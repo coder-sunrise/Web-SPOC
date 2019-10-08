@@ -161,6 +161,18 @@ class PatientHistory extends Component {
     this.widgets = [
       {
         id: '1',
+        name: 'Clinician Note',
+        component: Loadable({
+          loader: () => import('./ClinicalNotes'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...props} {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '2',
         name: 'Chief Complaints',
         component: Loadable({
           loader: () => import('./ChiefComplaints'),
@@ -172,7 +184,7 @@ class PatientHistory extends Component {
         }),
       },
       {
-        id: '2',
+        id: '3',
         name: 'Plan',
         component: Loadable({
           loader: () => import('./Plan'),
@@ -184,7 +196,7 @@ class PatientHistory extends Component {
         }),
       },
       {
-        id: '3',
+        id: '4',
         name: 'Diagnosis',
         component: Loadable({
           loader: () => import('./Diagnosis'),
@@ -196,7 +208,7 @@ class PatientHistory extends Component {
         }),
       },
       {
-        id: '4',
+        id: '5',
         name: 'Orders',
         component: Loadable({
           loader: () => import('./Orders'),
@@ -208,7 +220,7 @@ class PatientHistory extends Component {
         }),
       },
       {
-        id: '5',
+        id: '6',
         name: 'Consultation Document',
         component: Loadable({
           loader: () => import('./ConsultationDocument'),
@@ -533,7 +545,6 @@ class PatientHistory extends Component {
               .map((o) => {
                 const Widget = o.component
 
-                // console.log("******** " , entity)
                 return (
                   <div>
                     <h5>{o.name}</h5>
@@ -558,6 +569,8 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
+
+
     const { entity, visitInfo, selected } = patientHistory
     const cfg = {}
     if (mode === 'split') {
@@ -574,45 +587,40 @@ class PatientHistory extends Component {
 
     return (
       <div {...cfg}>
-        {sortedPatientHistory ? sortedPatientHistory.length > 0 ? (
-          <CardContainer
-            hideHeader
-            size='sm'
-            className={classnames({
-              [classes.leftPanel]: !widget ? true : false,
-              [classes.integratedLeftPanel]: mode === 'integrated',
-              [override.leftPanel]: !widget ? true : false,
-            })}
-          >
-            {sortedPatientHistory ? sortedPatientHistory.length >
-            0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
-              sortedPatientHistory.map((o) => this.getContent(o))
-            ) : (
-              <Accordion
-                defaultActive={0}
-                collapses={sortedPatientHistory.map((o) => ({
-                  title: this.getTitle(o),
-                  content: this.getContent(o),
-                }))}
-              />
-            ) : (
-              ' '
-            ) : (
-              <React.Fragment>
-                <Skeleton height={30} />
-                <Skeleton height={30} width='80%' />
-                <Skeleton height={30} width='80%' />
-                <Skeleton height={30} />
-                <Skeleton height={30} width='80%' />
-                <Skeleton height={30} width='80%' />
-              </React.Fragment>
-            )}
-          </CardContainer>
-        ) : (
-          ''
-        ) : (
-          ''
-        )}
+        <CardContainer
+          hideHeader
+          size='sm'
+          className={classnames({
+            [classes.leftPanel]: !widget ? true : false,
+            [classes.integratedLeftPanel]: mode === 'integrated',
+            [override.leftPanel]: !widget ? true : false,
+          })}
+        >
+          {sortedPatientHistory ? sortedPatientHistory.length >
+          0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
+            sortedPatientHistory.map((o) => this.getContent(o))
+          ) : (
+            <Accordion
+              defaultActive={0}
+              collapses={sortedPatientHistory.map((o) => ({
+                title: this.getTitle(o),
+                content: this.getContent(o),
+              }))}
+            />
+          ) : (
+            <p>No Visit Record Found</p>
+          ) : (
+            <React.Fragment>
+              <Skeleton height={30} />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} />
+              <Skeleton height={30} width='80%' />
+              <Skeleton height={30} width='80%' />
+            </React.Fragment>
+          )}
+        </CardContainer>
+
         {selected && mode === 'split' && this.getDetailPanel()}
       </div>
     )

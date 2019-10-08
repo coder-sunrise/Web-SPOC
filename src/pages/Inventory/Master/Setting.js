@@ -81,7 +81,8 @@ const Setting = ({
         minHeight: 700,
         maxHeight: 700,
 
-        overflow: showTransfer ? 'auto' : 'hidden',
+        // overflow: showTransfer ? 'auto' : 'hidden',
+        overflow: 'hidden',
       }}
     >
       <h4 style={{ fontWeight: 400 }}>

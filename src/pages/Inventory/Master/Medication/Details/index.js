@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -51,6 +51,40 @@ const Detail = ({
     errors: props.errors,
   }
 
+  useEffect(() => {
+    console.log('id', medicationDetail.currentId)
+    if (medicationDetail.currentId) {
+      dispatch({
+        type: 'medicationDetail/query',
+        payload: {
+          id: medicationDetail.currentId,
+        },
+      }).then((med) => {
+        const { sddfk } = med
+        if (sddfk) {
+          dispatch({
+            type: 'sddDetail/queryOne',
+            payload: {
+              id: sddfk,
+            },
+          }).then((sdd) => {
+            console.log({ sdd })
+            const { data } = sdd
+            const { code, name } = data[0]
+            console.log(data[0])
+            dispatch({
+              type: 'medicationDetail/updateState',
+              payload: {
+                sddCode: code,
+                sddDescription: name,
+              },
+            })
+          })
+        }
+      })
+    }
+  }, [])
+
   return (
     <React.Fragment>
       {/* <NavPills
@@ -93,6 +127,8 @@ const Detail = ({
         style={{
           margin: theme.spacing(2),
         }}
+
+        
       > */}
       <Tabs
         style={{ marginTop: 20 }}
@@ -157,6 +193,8 @@ export default compose(
       return {
         ...returnValue,
         chas,
+        sddCode: medicationDetail.sddCode,
+        sddDescription: medicationDetail.sddDescription,
       }
     },
     validationSchema: Yup.object().shape({

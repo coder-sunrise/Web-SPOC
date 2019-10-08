@@ -93,6 +93,7 @@ const VisitInfoCard = ({
             render={(args) => (
               <NumberInput
                 {...args}
+                format='0.0'
                 disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.queueNo',

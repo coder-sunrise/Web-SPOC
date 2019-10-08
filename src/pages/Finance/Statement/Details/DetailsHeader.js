@@ -114,7 +114,6 @@ class DetailsHeader extends PureComponent {
               <Field
                 name='adminChargeValue'
                 render={(args) => {
-                  console.log(values.adminChargeValueType)
                   if (values.adminChargeValueType === 'ExactAmount') {
                     return <NumberInput percentage {...amountProps} {...args} />
                   }
