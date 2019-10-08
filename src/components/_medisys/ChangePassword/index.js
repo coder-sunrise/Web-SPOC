@@ -76,7 +76,7 @@ class ChangePassword extends React.PureComponent {
     return (
       <div>
         {!changeTargetUser &&
-        !currentUser.clinicianProfile.userProfile.hasChangedPassword && (
+        !currentUser.clinicianProfile.userProfile.lastPasswordChangedDate && (
           <p style={{ textAlign: 'center' }}>
             The user&apos;s password must be changed before logging in the first
             time.
@@ -148,7 +148,8 @@ class ChangePassword extends React.PureComponent {
             cancelProps: {
               disabled:
                 !changeTargetUser &&
-                !currentUser.clinicianProfile.userProfile.hasChangedPassword,
+                !currentUser.clinicianProfile.userProfile
+                  .lastPasswordChangedDate,
             },
             onConfirm: handleSubmit,
             confirmBtnText: 'Submit',
