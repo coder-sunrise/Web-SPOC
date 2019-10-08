@@ -12,12 +12,12 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
-      type: '2',
+      type: '3',
       defaultMedicalCertificate: {
         type: '3',
         mcDays: 1,
         mcStartEndDate: [
-          moment(),
+          moment().formatUTC(),
           moment(),
         ],
         mcIssueDate: moment(),

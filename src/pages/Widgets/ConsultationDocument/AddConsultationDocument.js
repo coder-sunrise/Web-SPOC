@@ -206,6 +206,7 @@ class AddConsultationDocument extends PureComponent {
       codetable,
     } = props
     const { entity = {}, type } = consultationDocument
+
     const cfg = {
       ...props,
       loadFromCodes,

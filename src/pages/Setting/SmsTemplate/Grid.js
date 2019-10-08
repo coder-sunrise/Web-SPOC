@@ -46,8 +46,7 @@ class Grid extends PureComponent {
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
           { name: 'templateMessage', title: 'Template Message' },
-          { name: 'effectiveStartDate', title: 'Effective Start Date' },
-          { name: 'effectiveEndDate', title: 'Effective End Date' },
+          { name: 'isActive', title: 'Status' },
           {
             name: 'action',
             title: 'Action',
@@ -55,6 +54,14 @@ class Grid extends PureComponent {
         ]}
         // FuncProps={{ pager: false }}
         columnExtensions={[
+          {
+            columnName: 'isActive',
+            sortingEnabled: false,
+            type: 'select',
+            options: status,
+            align: 'center',
+            width: 100,
+          },
           {
             columnName: 'displayValue',
             width: 500,
@@ -99,7 +106,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
-                    style={{marginLeft: 0}}
+                    style={{ marginLeft: 0 }}
                   >
                     <Edit />
                   </Button>

@@ -10,8 +10,6 @@ import {
 } from '@/components'
 
 const CoverageCap = ({ values, classes, setFieldValue }) => {
-  const { isUserMaintainable } = values
-
   const onRadioButtonChange = (event) => {
     const { target } = event
 
@@ -59,7 +57,6 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
                   label: '',
                 },
               ]}
-              disabled={!isUserMaintainable}
               {...args}
             />
           )}
@@ -70,10 +67,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='coverageMaxCap'
           render={(args) => (
             <NumberInput
-              disabled={
-                values.itemGroupMaxCapacityDtoRdoValue !== 'all' ||
-                isUserMaintainable === false
-              }
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'all'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapAll',
               })}
@@ -85,10 +79,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
-              disabled={
-                values.itemGroupMaxCapacityDtoRdoValue !== 'sub' ||
-                isUserMaintainable === false
-              }
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapConsumables',
               })}
@@ -100,10 +91,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
-              disabled={
-                values.itemGroupMaxCapacityDtoRdoValue !== 'sub' ||
-                isUserMaintainable === false
-              }
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapMedications',
               })}
@@ -115,10 +103,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
-              disabled={
-                values.itemGroupMaxCapacityDtoRdoValue !== 'sub' ||
-                isUserMaintainable === false
-              }
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapVaccines',
               })}
@@ -130,10 +115,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
-              disabled={
-                values.itemGroupMaxCapacityDtoRdoValue !== 'sub' ||
-                isUserMaintainable === false
-              }
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapServices',
               })}
@@ -145,10 +127,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
-              disabled={
-                values.itemGroupMaxCapacityDtoRdoValue !== 'sub' ||
-                isUserMaintainable === false
-              }
+              disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'sub'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapPackages',
               })}

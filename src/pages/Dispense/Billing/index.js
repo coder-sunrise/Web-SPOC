@@ -96,7 +96,10 @@ class Billing extends Component {
         <Paper className={classes.paperContent}>
           <GridContainer justify='center' alignItems='flex-start'>
             <GridContainer item md={8}>
-              <ApplyClaims handleCoPaymentClick={this.toggleCoPaymentModal} />
+              <ApplyClaims
+                handleCoPaymentClick={this.toggleCoPaymentModal}
+                values={values}
+              />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary

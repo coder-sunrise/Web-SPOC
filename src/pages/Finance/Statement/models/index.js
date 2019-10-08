@@ -13,6 +13,8 @@ export default createListViewModel({
     state: {
       default: {
         paymentTerms: 0,
+        adminChargeValueType: 'Percentage',
+        statementInvoice: [],
       },
       invoiceList: [],
     },
@@ -24,10 +26,22 @@ export default createListViewModel({
     effects: {
       *queryInvoiceList ({ payload }, { call, put }) {
         const response = yield call(service.queryInvoiceList, payload)
-        yield put({
-          type: 'queryInvoiceDone',
-          payload: response,
-        })
+        return response
+        // yield put({
+        //   type: 'queryInvoiceDone',
+        //   payload: response,
+        // })
+      },
+
+      *refreshStatement ({ payload }, { call, put }) {
+        const response = yield call(service.refresh, payload)
+        if (response === 204) {
+          const res = yield call(service.query, payload)
+          yield put({
+            type: 'querySingleDone',
+            payload: res,
+          })
+        }
       },
     },
     reducers: {
@@ -62,6 +76,13 @@ export default createListViewModel({
               ...o,
             }
           }),
+        }
+      },
+      refreshDone (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          entity: data,
         }
       },
     },

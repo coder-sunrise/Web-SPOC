@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { Divider } from '@material-ui/core'
@@ -35,15 +35,42 @@ const styles = (theme) => ({
 })
 
 const Detail = (props) => {
-  useEffect(() => {
-    if (props.schemeDetail.currentId) {
-      props.dispatch({
+  const [
+    editable,
+    setEditable,
+  ] = useState(true)
+
+  const [
+    data,
+    setData,
+  ] = useState()
+
+  useEffect(
+    () => {
+      const { entity } = props.schemeDetail
+      if (entity) {
+        setEditable(entity.isUserMaintainable)
+      } else setEditable(props.schemeDetail.default.isUserMaintainable)
+    },
+    [
+      data,
+    ],
+  )
+
+  const getSchemeDetails = async (prop) => {
+    if (prop.schemeDetail.currentId) {
+      await prop.dispatch({
         type: 'schemeDetail/querySchemeDetails',
         payload: {
-          id: props.schemeDetail.currentId,
+          id: prop.schemeDetail.currentId,
         },
       })
+      setData(props.schemeDetail)
     }
+  }
+
+  useEffect(() => {
+    getSchemeDetails(props)
   }, [])
 
   const { classes, schemeDetail, history, handleSubmit, theme } = props
@@ -51,12 +78,12 @@ const Detail = (props) => {
     height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
     ...props,
   }
-  const { currentTab } = schemeDetail
+
   return (
     <AuthorizedContext.Provider
       value={{
         edit: {
-          name: true ? 'schemeDetail.edit' : 'no-rights',
+          name: editable ? 'schemeDetail.edit' : 'no-rights',
           rights: 'enable',
         },
       }}
@@ -66,29 +93,19 @@ const Detail = (props) => {
         defaultActiveKey='0'
         options={SchemeDetailOption(detailProps)}
       />
+
       <div className={classes.actionDiv}>
-        <Button color='danger' onClick={navigateDirtyCheck('/finance/scheme')}>
+        <Button
+          authority='none'
+          color='danger'
+          onClick={navigateDirtyCheck('/finance/scheme')}
+        >
           Cancel
         </Button>
         <ProgressButton
           submitKey='schemeDetail/submit'
           onClick={handleSubmit}
         />
-        <div className={classes.actionDiv}>
-          <Button
-            authority='none'
-            color='danger'
-            onClick={() => {
-              history.push('/finance/scheme')
-            }}
-          >
-            Cancel
-          </Button>
-          <ProgressButton
-            submitKey='schemeDetail/submit'
-            onClick={handleSubmit}
-          />
-        </div>
       </div>
     </AuthorizedContext.Provider>
   )

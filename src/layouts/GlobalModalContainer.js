@@ -95,6 +95,30 @@ class GlobalModalContainer extends PureComponent {
         /> */}
 
         <CommonModal
+          title='Change Password'
+          open={global.showChangePasswordModal}
+          displayCloseIcon={false}
+          onClose={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showChangePasswordModal: false,
+              },
+            })
+          }}
+          onConfirm={() => {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showChangePasswordModal: false,
+              },
+            })
+          }}
+          maxWidth='sm'
+        >
+          <ChangePassword userID={loggedInUserID} />
+        </CommonModal>
+        <CommonModal
           open={global.showDispensePanel}
           title='Dispensing'
           observe={[
@@ -168,29 +192,7 @@ class GlobalModalContainer extends PureComponent {
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
           {/* {global.currentPatientId} */}
         </CommonModal>
-        <CommonModal
-          title='Change Password'
-          open={global.showChangePasswordModal}
-          onClose={() => {
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                showChangePasswordModal: false,
-              },
-            })
-          }}
-          onConfirm={() => {
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                showChangePasswordModal: false,
-              },
-            })
-          }}
-          maxWidth='sm'
-        >
-          <ChangePassword userID={loggedInUserID} />
-        </CommonModal>
+
         <CommonModal
           title='My Account'
           open={global.showUserProfile}

@@ -68,14 +68,22 @@ class MedicalCertificate extends PureComponent {
       const startDate = moment(values.mcStartEndDate[0])
       setFieldValue('mcStartEndDate', [
         startDate,
-        startDate,
+        startDate.clone().add('days', Math.ceil(e.target.value - 1)),
       ])
     }
   }
 
+  onDayRangeChange = (dateArray, moments) => {
+    const { values, setFieldValue } = this.props
+
+    setFieldValue(
+      'mcDays',
+      Math.ceil(moment.duration(moments[1].diff(moments[0])).asDays()),
+    )
+  }
+
   render () {
     const { footer, handleSubmit, classes, values } = this.props
-    console.log(values)
     return (
       <div>
         {values.mcReferenceNo && (
@@ -114,7 +122,9 @@ class MedicalCertificate extends PureComponent {
                 return (
                   <NumberInput
                     step={0.5}
-                    min={1}
+                    format='0.0'
+                    min={0.5}
+                    max={365}
                     label='Day(s)'
                     onChange={this.onDaysChange}
                     {...args}
@@ -127,7 +137,14 @@ class MedicalCertificate extends PureComponent {
             <FastField
               name='mcStartEndDate'
               render={(args) => {
-                return <DateRangePicker label='From' label2='To' {...args} />
+                return (
+                  <DateRangePicker
+                    label='From'
+                    label2='To'
+                    onChange={this.onDayRangeChange}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

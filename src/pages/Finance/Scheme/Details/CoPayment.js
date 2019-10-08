@@ -11,17 +11,13 @@ import {
 } from '@/components'
 
 const CoPayment = ({ values, classes, setFieldValue }) => {
-  const { isUserMaintainable } = values
   const CPNumber = (label, type, radType) => (args) => {
     return (
       <NumberInput
         label={label}
         currency={type === 'ExactAmount'}
         percentage={type === 'Percentage'}
-        disabled={
-          values.itemGroupValueDtoRdoValue !== radType ||
-          isUserMaintainable === false
-        }
+        disabled={values.itemGroupValueDtoRdoValue !== radType}
         {...args}
       />
     )
@@ -38,10 +34,7 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
         unCheckedChildren='%'
         unCheckedValue='Percentage'
         label=' '
-        disabled={
-          values.itemGroupValueDtoRdoValue !== type ||
-          isUserMaintainable === false
-        }
+        disabled={values.itemGroupValueDtoRdoValue !== type}
         {...args}
       />
     )
@@ -121,7 +114,6 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
                   label: '',
                 },
               ]}
-              disabled={!isUserMaintainable}
               {...args}
             />
           )}

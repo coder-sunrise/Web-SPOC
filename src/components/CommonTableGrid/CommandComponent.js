@@ -120,7 +120,7 @@ const isDisabled = (props) => {
   const { onExecute, editingRowIds, row, schema, gridId, getRowId } = props
   let disabled = false
   const latestRow = window.$tempGridRow[gridId]
-    ? window.$tempGridRow[gridId][getRowId(row)] || {}
+    ? window.$tempGridRow[gridId][getRowId(row)] || row
     : row
   if (schema) {
     try {
