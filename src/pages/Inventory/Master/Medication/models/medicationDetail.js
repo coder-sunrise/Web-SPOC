@@ -49,6 +49,8 @@ export default createFormViewModel({
             payload: {
               currentId: '',
               entity: undefined,
+              sddCode: undefined,
+              sddDescription: undefined,
             },
           })
         }

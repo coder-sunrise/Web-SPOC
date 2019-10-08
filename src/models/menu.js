@@ -1,15 +1,15 @@
 import memoizeOne from 'memoize-one'
 import isEqual from 'lodash/isEqual'
 import { formatMessage } from 'umi/locale'
-import Authorized from '@/utils/Authorized'
 import update from 'immutability-helper'
+import Authorized from '@/utils/Authorized'
 
 const { check } = Authorized
 
 // Conversion router to menu.
 function formatter (data, parentAuthority, parentName) {
   return data
-    .map(item => {
+    .map((item) => {
       if (!item.name || !item.path) {
         return null
       }
@@ -35,7 +35,7 @@ function formatter (data, parentAuthority, parentName) {
       delete result.routes
       return result
     })
-    .filter(item => item)
+    .filter((item) => item)
 }
 
 const memoizeOneFormatter = memoizeOne(formatter, isEqual)
@@ -43,9 +43,13 @@ const memoizeOneFormatter = memoizeOne(formatter, isEqual)
 /**
  * get SubMenu or Item
  */
-const getSubMenu = item => {
+const getSubMenu = (item) => {
   // doc: add hideChildrenInMenu
-  if (item.children && !item.hideChildrenInMenu && item.children.some(child => child.name)) {
+  if (
+    item.children &&
+    !item.hideChildrenInMenu &&
+    item.children.some((child) => child.name)
+  ) {
     return {
       ...item,
       children: filterMenuData(item.children), // eslint-disable-line
@@ -57,19 +61,20 @@ const getSubMenu = item => {
 /**
  * filter menuData
  */
-const filterMenuData = menuData => {
+const filterMenuData = (menuData) => {
   if (!menuData) {
     return []
   }
-  const filtered=menuData
-  .filter(item => item.name )// && !item.hideInMenu)
-  .map(item => {
-    // make dom
-    const ItemDom = getSubMenu(item)
-    const data = check(item.authority, ItemDom)
-    return data
-  })
-  .filter(item => item)
+  const filtered = menuData
+    .filter((item) => item.name) // && !item.hideInMenu)
+    .map((item) => {
+      // make dom
+      // console.log(item)
+      const ItemDom = getSubMenu(item)
+      const data = check(item.authority, ItemDom)
+      return data
+    })
+    .filter((item) => item)
   // console.log(filtered)
   return filtered
 }
@@ -79,13 +84,13 @@ export default {
 
   state: {
     menuData: [],
-    breadcrumb:{},
+    breadcrumb: {},
   },
 
   effects: {
     *getMenuData ({ payload }, { put }) {
       const { routes, authority } = payload
-      const menus=filterMenuData(memoizeOneFormatter(routes, authority))
+      const menus = filterMenuData(memoizeOneFormatter(routes, authority))
       yield put({
         type: 'save',
         payload: menus,
@@ -96,9 +101,9 @@ export default {
 
   reducers: {
     updateBreadcrumb (state, action) {
-      const {breadcrumb} = state
-      breadcrumb[action.payload.href]=action.payload.name
-      sessionStorage.setItem(action.payload.href,action.payload.name)
+      const { breadcrumb } = state
+      breadcrumb[action.payload.href] = action.payload.name
+      sessionStorage.setItem(action.payload.href, action.payload.name)
       return {
         ...state,
         breadcrumb,

@@ -532,8 +532,7 @@ class PatientHistory extends Component {
 
         <AuthorizedContext.Provider
           value={{
-            view: 'default',
-            edit: 'none',
+            rights: 'disable',
           }}
         >
           {entity &&

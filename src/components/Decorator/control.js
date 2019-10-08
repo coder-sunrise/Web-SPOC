@@ -32,7 +32,8 @@ const control = ({ disabledProps } = {}) => (Component) => {
       // console.log(props, this.props, Component)
       return (
         <Authorized.Context.Consumer>
-          {({ view, edit, disabled, matches }) => {
+          {(matches) => {
+            // console.log(Component, matches)
             if (matches) {
               return Authorized.generalCheck(
                 matches,
@@ -40,32 +41,32 @@ const control = ({ disabledProps } = {}) => (Component) => {
                 <Component {...this.props} {...extraCfg} />,
               )
             }
-            if (!view && !edit) return <Component {...this.props} />
-            return (
-              <Authorized
-                authority={[
-                  view,
-                  edit,
-                ].filter((o) => !!o)}
-                noMatch={() => {
-                  if (!this.props.hideIfNoEditRights) {
-                    if (buttonTypes.indexOf(Component.displayName) >= 0) {
-                      return null
-                    }
-                    return <Component {...this.props} disabled {...extraCfg} />
-                  }
-                  return null
-                }}
-              >
-                {(m) => {
-                  return Authorized.generalCheck(
-                    m,
-                    this.props,
-                    <Component {...this.props} {...extraCfg} />,
-                  )
-                }}
-              </Authorized>
-            )
+            return <Component {...this.props} />
+            // return (
+            //   <Authorized
+            //     authority={[
+            //       view,
+            //       edit,
+            //     ].filter((o) => !!o)}
+            //     noMatch={() => {
+            //       if (!this.props.hideIfNoEditRights) {
+            //         if (buttonTypes.indexOf(Component.displayName) >= 0) {
+            //           return null
+            //         }
+            //         return <Component {...this.props} disabled {...extraCfg} />
+            //       }
+            //       return null
+            //     }}
+            //   >
+            //     {(m) => {
+            //       return Authorized.generalCheck(
+            //         m,
+            //         this.props,
+            //         <Component {...this.props} {...extraCfg} />,
+            //       )
+            //     }}
+            //   </Authorized>
+            // )
           }}
         </Authorized.Context.Consumer>
       )

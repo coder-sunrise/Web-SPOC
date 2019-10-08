@@ -1,18 +1,19 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
-import { formatMessage, FormattedMessage } from 'umi/locale'
 import {
   GridContainer,
   GridItem,
   NumberInput,
-  EditableTableGrid,
   CommonTableGrid,
   TextField,
   Button,
   dateFormatLong,
   CodeSelect,
+  Field,
+  DatePicker,
+  Select,
 } from '@/components'
 
 const styles = () => ({
@@ -22,27 +23,11 @@ const styles = () => ({
   },
 })
 
-// @withFormik({
-//   mapPropsToValues: () => ({
-//     PaymentAmount: 20,
-//     Total: 20,
-//   }),
-// })
 class CollectPaymentConfirm extends PureComponent {
   state = {
+    totalAmount: '',
     rows: [
-      // {
-      //   id: 'PT-000001A',
-      //   invoiceNo: 'IV-000001',
-      //   invoiceDate: moment()
-      //     .add(Math.ceil(Math.random() * 100) - 100, 'days')
-      //     .format('LLL'),
-      //   patientName: 'Patient 01',
-      //   adminCharge: 1.66,
-      //   payableAmount: 50,
-      //   outstandingBalance: 48.34,
-      //   payment: 48.34,
-      // },
+      this.props.values.statementInvoice,
     ],
     columns: [
       { name: 'invoiceNo', title: 'Invoice No' },
@@ -50,7 +35,7 @@ class CollectPaymentConfirm extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'adminCharge', title: 'Admin Charge' },
       { name: 'payableAmount', title: 'Payable Amount' },
-      { name: 'outstandingBalance', title: 'Outstanding' },
+      { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'payment', title: 'Payment' },
     ],
     columnExtensions: [
@@ -65,21 +50,26 @@ class CollectPaymentConfirm extends PureComponent {
         currency: true,
       },
       {
-        columnName: 'outstandingBalance',
+        columnName: 'outstandingAmount',
         type: 'number',
         currency: true,
       },
       { columnName: 'invoiceDate', type: 'date', format: { dateFormatLong } },
       {
         columnName: 'payment',
-        // type: 'number',
         currency: true,
         render: (row) => {
           return (
             <GridItem xs={8}>
               <FastField
-                name={`packageValueDto[${row.rowIndex}].itemValue`}
-                render={(args) => <NumberInput {...args} />}
+                name={`statementInvoice[${row.rowIndex}].invoicePayment.totalAmtPaid`}
+                render={(args) => (
+                  <NumberInput
+                    {...args}
+                    currency
+                    onChange={(e) => this.handlePaymentAmount(e, 'grid')}
+                  />
+                )}
               />
             </GridItem>
           )
@@ -88,98 +78,181 @@ class CollectPaymentConfirm extends PureComponent {
     ],
   }
 
+  componentDidMount () {
+    const { statement, setValues, values } = this.props
+    const { statementInvoice } = statement.entity
+    let total = 0
+    const newStatementInvoice = statementInvoice.map((o) => {
+      const { statementInvoicePayment, ...restStatementValues } = o
+      total += o.outstandingAmount
+      const invoicePayment = {
+        totalAmtPaid: o.outstandingAmount,
+        receiptNo: o.invoiceNo,
+        invoicePayerFK: o.invoicePayerFK,
+      }
+      return {
+        ...o,
+        invoicePayment,
+        statementInvoicePayment: [
+          {
+            ...restStatementValues,
+            invoicePayment,
+          },
+        ],
+      }
+    })
+    this.getBizList(moment().formatUTC('YYMMDD'))
+
+    setValues({
+      ...values,
+      paymentDate: moment(),
+      amount: total,
+      maxAmount: total,
+      paymentMode: 5,
+      statementInvoice: newStatementInvoice,
+    })
+    this.setState({
+      rows: newStatementInvoice,
+    })
+  }
+
+  handlePaymentAmount = (e, from) => {
+    const { setFieldValue, statement, values, setValues } = this.props
+    console.log('statement', values)
+
+    if (from === 'grid') {
+      this.setState({ totalAmount: e.target.value })
+      setFieldValue('amount', e.target.value)
+      return
+    }
+    this.setState({ totalAmount: e.target.value })
+    let tempAmount = e.target.value
+    const test = values.statementInvoice.map((o) => {
+      let totalAmtPaid
+      const newStatementInvoicePayment = o.statementInvoicePayment.map((i) => {
+        if (tempAmount >= i.outstandingAmount) {
+          totalAmtPaid = i.outstandingAmount
+          tempAmount -= i.outstandingAmount
+        } else {
+          totalAmtPaid = tempAmount
+        }
+        return {
+          ...i,
+          invoicePayment: {
+            totalAmtPaid,
+            receiptNo: i.invoiceNo,
+            invoicePayerFK: i.invoicePayerFK,
+          },
+        }
+      })
+      return {
+        ...o,
+        statementInvoicePayment: newStatementInvoicePayment,
+        invoicePayment: {
+          totalAmtPaid,
+        },
+      }
+    })
+
+    console.log('testt', test)
+    setValues({
+      ...values,
+      statementInvoice: test,
+    })
+  }
+
+  onChangeDate = (event) => {
+    const selectedDate = moment(event).format('YYMMDD')
+    this.getBizList(selectedDate)
+  }
+
+  getBizList = (e) => {
+    const { dispatch, setFieldValue } = this.props
+    dispatch({
+      type: 'statement/bizSessionList',
+      payload: {
+        sessionNoPrefix: e,
+        pagesize: 999999,
+      },
+    }).then(() => {
+      const { bizSessionList } = this.props.statement
+      setFieldValue(
+        'paymentCreatedBizSessionFK',
+        bizSessionList.length === 0 || bizSessionList === undefined
+          ? undefined
+          : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
+      )
+    })
+  }
+
   render () {
     const { rows, columns, columnExtensions } = this.state
-    const { classes, onConfirm, values } = this.props
-
-    console.log(
-      'invoice',
-      values,
-      values.statementInvoice.statementInvoicePayment,
-    )
+    const { values, statement, handleSubmit } = this.props
+    const { bizSessionList } = statement
     return (
       <React.Fragment>
-        {/* <GridContainer
-          direction='column'
-          justify='space-between'
-          alignItems='center'
-        >
-          <GridItem className={classes.grid} xs md={6}>
-            <FastField
-              name='PaymentAmount'
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  disabled
-                  currency
-                  prefixProps={{ style: { width: '65%' } }}
-                  prefix={formatMessage({
-                    id: 'finance.collectPayment.paymentAmount',
-                  })}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs> */}
         <CommonTableGrid
           rows={rows}
           columns={columns}
           columnExtensions={columnExtensions}
           FuncProps={{ pager: false }}
-          // height={300}
         />
-        {/* </GridItem>
-        </GridContainer>
-        <GridContainer
-          classes={{ grid: classes.grid }}
-          direction='column'
-          justify='flex-end'
-          alignItems='flex-end'
-        >
-          <GridItem xs md={6}>
-            <FastField
-              name='Total'
-              render={(args) => (
-                <NumberInput
-                  {...args}
-                  disabled
-                  currency
-                  prefix={formatMessage({
-                    id: 'finance.collectPayment.total',
-                  })}
-                />
-              )}
-            />
-          </GridItem> */}
-        {/* </GridContainer> */}
 
         <GridContainer style={{ marginTop: 20 }}>
-          <GridItem container>
+          <GridItem direction='column' md={6}>
             <GridItem md={6}>
               <FastField
                 name='amount'
                 render={(args) => (
-                  <NumberInput {...args} disabled currency label='Amount' />
+                  <NumberInput
+                    {...args}
+                    currency
+                    label='Amount'
+                    onChange={this.handlePaymentAmount}
+                  />
                 )}
               />
             </GridItem>
+
             <GridItem md={6}>
-              <FastField
-                name='paymentMode'
+              <Field
+                name='paymentDate'
                 render={(args) => (
-                  <CodeSelect
-                    label='Payment Mode'
-                    code='ctPaymentMode'
-                    labelField='displayValue'
+                  <DatePicker
+                    timeFomat={false}
+                    onChange={this.onChangeDate}
+                    disabledDate={(d) => !d || d.isAfter(moment())}
+                    label='Date'
                     {...args}
                   />
                 )}
               />
             </GridItem>
-          </GridItem>
 
-          <GridItem container>
-            <GridItem md={12}>
+            <GridItem md={6}>
+              <Field
+                name='paymentCreatedBizSessionFK'
+                render={(args) => (
+                  <Select label='Session' options={bizSessionList} {...args} />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={6}>
+              <FastField
+                name='paymentMode'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    label='Payment Mode'
+                    code='ctPaymentMode'
+                    labelField='displayValue'
+                  />
+                )}
+              />
+            </GridItem>
+
+            <GridItem md={6}>
               <FastField
                 name='remarks'
                 render={(args) => (
@@ -187,13 +260,14 @@ class CollectPaymentConfirm extends PureComponent {
                 )}
               />
             </GridItem>
+
+            <GridItem style={{ marginTop: 10 }} md={6}>
+              <Button color='primary' onClick={handleSubmit}>
+                Confirm Payment
+              </Button>
+            </GridItem>
           </GridItem>
         </GridContainer>
-        <GridItem container>
-          <GridItem style={{ marginTop: 10 }}>
-            <Button color='primary'>Confirm Payment</Button>
-          </GridItem>
-        </GridItem>
       </React.Fragment>
     )
   }

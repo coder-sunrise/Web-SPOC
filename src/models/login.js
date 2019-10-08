@@ -26,7 +26,7 @@ export default createFormViewModel({
         const response = yield call(login, credentialPayload)
         // const { status } = response
         // console.log({ status })
-        reloadAuthorized()
+        // reloadAuthorized()
 
         return yield put({
           type: 'updateLoginStatus',
@@ -85,7 +85,7 @@ export default createFormViewModel({
           //   expires: new Date(9999, 11, 31),
           // })
         }
-        reloadAuthorized()
+        // reloadAuthorized()
         return { ...state, isInvalidLogin }
       },
     },
