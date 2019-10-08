@@ -58,6 +58,7 @@ const ActionButton = ({ row, onClick }) => {
   const newContextMenuOptions = useMemo(
     () =>
       ContextMenuOptions.map((opt) => {
+        console.log(opt)
         switch (opt.id) {
           case 0: // view visit
             return { ...opt, hidden: !isStatusWaiting }

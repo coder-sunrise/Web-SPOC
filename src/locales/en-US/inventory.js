@@ -64,7 +64,7 @@ export default {
 
   'inventory.master.setting.dosage': 'Dosage',
   'inventory.master.setting.frequency': 'Frequency',
-  'inventory.master.setting.duration': 'Duration',
+  'inventory.master.setting.duration': 'Duration (days)',
   'inventory.master.setting.uom': 'UOM',
   'inventory.master.setting.usage': 'Usage',
   'inventory.master.setting.quantity': 'Quantity',

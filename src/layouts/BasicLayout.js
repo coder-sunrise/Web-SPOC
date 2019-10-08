@@ -3,6 +3,7 @@ import NProgress from 'nprogress'
 import $ from 'jquery'
 import _ from 'lodash'
 import moment from 'moment'
+
 // import { renderWhenReady} from '@sencha/ext-react'
 // import { Panel } from '@sencha/ext-modern'
 import router from 'umi/router'
@@ -16,8 +17,6 @@ import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
-import { initStream } from '@/utils/realtime'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
@@ -38,7 +37,9 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import appStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx'
 import Header from 'mui-pro-components/Header'
 import Footer from 'mui-pro-components/Footer'
-import Authorized from '@/utils/Authorized'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
+import { initStream } from '@/utils/realtime'
+import Authorized, { reloadAuthorized } from '@/utils/Authorized'
 
 // import Footer from './Footer'
 // import Header from './Header'
@@ -106,29 +107,62 @@ class BasicLayout extends React.PureComponent {
     super(props)
     this.state = {
       mobileOpen: false,
-      miniActive: props.collapsed,
     }
     this.resizeFunction = this.resizeFunction.bind(this)
 
     const { dispatch, route: { routes, authority } } = this.props
-    // console.log(routes)
-    dispatch({
-      type: 'menu/getMenuData',
-      payload: { routes, authority },
-    }).then((menus) => {
-      this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
-      this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
-      // console.log(this.breadcrumbNameMap)
 
-      this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
-      this.getPageTitle = memoizeOne(this.getPageTitle)
-      this.menus = menus
-      this.forceUpdate()
+    dispatch({
+      type: 'user/fetchCurrent',
+    }).then((d) => {
+      if (!d) return
+      reloadAuthorized()
+      const getClinicSettings = sessionStorage.getItem('clinicSettings')
+
+      if (getClinicSettings === null) {
+        dispatch({
+          type: 'clinicSettings/query',
+        })
+      } else {
+        const parsedClinicSettings = JSON.parse(getClinicSettings)
+        dispatch({
+          type: 'clinicSettings/updateState',
+          payload: {
+            settings: parsedClinicSettings,
+          },
+        })
+      }
+
+      dispatch({
+        type: 'clinicInfo/query',
+        payload: localStorage.getItem('clinicCode'),
+      })
+
+      // console.log(routes)
+      dispatch({
+        type: 'menu/getMenuData',
+        payload: { routes, authority },
+      }).then((menus) => {
+        console.log(d, menus)
+        this.getBreadcrumbNameMap = memoizeOne(
+          this.getBreadcrumbNameMap,
+          isEqual,
+        )
+        this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
+        // console.log(this.breadcrumbNameMap)
+
+        this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
+        this.getPageTitle = memoizeOne(this.getPageTitle)
+        this.menus = menus
+        this.forceUpdate()
+      })
+
+      dispatch({
+        type: 'global/getUserSettings',
+      }).then((response) => {})
     })
 
-    dispatch({
-      type: 'global/getUserSettings',
-    }).then((response) => {})
+    initStream()
 
     let sessionTimeOutTimer = null
     const resetSessionTimeOut = (e) => {
@@ -194,32 +228,6 @@ class BasicLayout extends React.PureComponent {
     window.addEventListener('resize', this.resizeFunction)
 
     const { dispatch, route: { routes, authority } } = this.props
-
-    dispatch({
-      type: 'user/fetchCurrent',
-    })
-
-    const getClinicSettings = sessionStorage.getItem('clinicSettings')
-
-    if (getClinicSettings === null) {
-      dispatch({
-        type: 'clinicSettings/query',
-      })
-    } else {
-      const parsedClinicSettings = JSON.parse(getClinicSettings)
-      dispatch({
-        type: 'clinicSettings/updateState',
-        payload: {
-          settings: parsedClinicSettings,
-        },
-      })
-    }
-
-    dispatch({
-      type: 'clinicInfo/query',
-      payload: localStorage.getItem('clinicCode'),
-    })
-    initStream()
   }
 
   componentDidUpdate (e) {
