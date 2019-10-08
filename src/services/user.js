@@ -18,7 +18,7 @@ export const changeCurrentUserPassword = (payload) =>
   })
 
 export const changeUserPassword = (payload) =>
-  request(`${userProfileURL}`, {
+  request(`${userProfileURL}/ChangePassworByUserId`, {
     method: 'PUT',
     body: payload,
   })
