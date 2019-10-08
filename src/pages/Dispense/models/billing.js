@@ -32,9 +32,9 @@ export default createFormViewModel({
       history.listen(async (location) => {
         const { query, pathname } = location
         if (pathname === '/reception/queue') {
-          const { pid, vis, md2 } = query
+          const { pid, vis, md3 } = query
 
-          if (md2 === 'bill') {
+          if (md3 === 'bill') {
             dispatch({
               type: 'initState',
               payload: { pid, vis },
@@ -48,15 +48,11 @@ export default createFormViewModel({
         // yield put({
         //   type: 'query',
         // })
-        yield put({
-          type: 'patient/query',
-          payload: { id: payload.pid },
-        })
       },
       *closeBillingModal (_, { put }) {
         router.push(
           getRemovedUrl([
-            'md2',
+            'md3',
             'cmt',
             // 'pid',
             'new',

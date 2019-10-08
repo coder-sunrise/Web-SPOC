@@ -5,13 +5,7 @@ import { connect } from 'dva'
 // formik
 import { withFormik, FastField } from 'formik'
 // common components
-import {
-  Danger,
-  TextField,
-  GridContainer,
-  GridItem,
-  notification,
-} from '@/components'
+import { TextField, GridContainer, GridItem, notification } from '@/components'
 // services
 import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
 
@@ -76,7 +70,7 @@ class ChangePassword extends React.PureComponent {
     return (
       <div>
         {!changeTargetUser &&
-        !currentUser.clinicianProfile.userProfile.hasChangedPassword && (
+        !currentUser.clinicianProfile.userProfile.lastPasswordChangedDate && (
           <p style={{ textAlign: 'center' }}>
             The user&apos;s password must be changed before logging in the first
             time.
@@ -148,7 +142,8 @@ class ChangePassword extends React.PureComponent {
             cancelProps: {
               disabled:
                 !changeTargetUser &&
-                !currentUser.clinicianProfile.userProfile.hasChangedPassword,
+                !currentUser.clinicianProfile.userProfile
+                  .lastPasswordChangedDate,
             },
             onConfirm: handleSubmit,
             confirmBtnText: 'Submit',

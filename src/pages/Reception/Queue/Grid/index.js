@@ -313,7 +313,7 @@ const Grid = ({
         }).then((o) => {
           if (o)
             router.push(
-              `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md3=dsps`,
+              `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md2=dsps`,
             )
         })
 

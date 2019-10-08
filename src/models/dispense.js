@@ -34,7 +34,7 @@ export default createFormViewModel({
             payload: {
               version: Number(query.v) || undefined,
               visitID: Number(query.vid),
-              md: query.md3,
+              md: query.md2,
             },
           })
         }
@@ -145,7 +145,7 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
-        router.push('/reception/queue')
+        // router.push('/reception/queue')
       },
       // *queryDone ({ payload }, { call, put, select }) {
       //   // console.log('queryDone', payload)

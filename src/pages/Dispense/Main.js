@@ -68,13 +68,13 @@ const refresh = (props) => {
 })
 class Main extends Component {
   makePayment = () => {
-    const { dispatch, dispense } = this.props
-    const { patientInfo } = dispense
+    const { dispatch, patient } = this.props
+
     dispatch({
-      type: 'dispense/closeDispenseModal',
+      type: 'dispense/closeModal',
     })
     const parameters = {
-      pid: patientInfo.id,
+      pid: patient.id,
       md2: 'bill',
     }
     router.push(getAppendUrl(parameters, '/reception/queue'))
