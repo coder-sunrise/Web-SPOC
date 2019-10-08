@@ -19,9 +19,6 @@ class CHAS extends React.Component {
     claimDetails: {},
   }
 
-  // openClaimDetails = ({ claimDetails }) =>
-  //   this.setState({ showClaimDetails: true, claimDetails })
-
   openClaimDetails = () => this.setState({ showClaimDetails: true })
 
   closeClaimDetails = () =>
@@ -41,13 +38,15 @@ class CHAS extends React.Component {
       case '0':
         dispatch({
           type: 'claimSubmission/queryById',
-          payload: row.id,
+          payload: {
+            id: row.id,
+          },
+        }).then((r) => {
+          if (r) this.openClaimDetails()
         })
-        // this.openClaimDetails({ claimDetails: row })
-        this.openClaimDetails()
         break
       case '1':
-        this.navigateToInvoiceDetails(row)
+        this.navigateToInvoiceDetails(row.id)
         break
       default:
         break
@@ -59,7 +58,7 @@ class CHAS extends React.Component {
     return (
       <CardContainer hideHeader size='sm'>
         <NavPills
-          active={0}
+          active={1}
           tabs={[
             {
               tabButton: 'Draft',

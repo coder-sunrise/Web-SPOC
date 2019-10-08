@@ -21,20 +21,24 @@ import { isPOStatusFinalized } from '../../variables'
     return podoPayment
   },
   handleSubmit: (values, { props }) => {
-    const { rows, ...restValues } = values
-    const { dispatch, onConfirm } = props
+    const { purchaseOrderPayment, currentBizSessionInfo } = values
+    const { dispatch } = props
+    purchaseOrderPayment.filter((x) => x.isNew).map((x) => {
+      delete x.id
+      const paymentPayload = {
+        purchaseOrderFK: values.id,
+        sequence: 1,
+        clinicPaymentDto: {
+          ...x,
+          createdOnBizSessionFK: currentBizSessionInfo.id,
+          clinicPaymentTypeFK: 1,
+        },
+      }
 
-    console.log('handleSubmit1', values)
-
-    const paymentPayload = {
-      purchaseOrderFK: values.id,
-      sequence: 1,
-      clinicPaymentDto: {},
-    }
-
-    dispatch({
-      type: 'podoPayment/upsert',
-      payload: { ...paymentPayload },
+      dispatch({
+        type: 'podoPayment/upsert',
+        payload: { ...paymentPayload },
+      })
     })
   },
 })
@@ -63,9 +67,9 @@ class index extends PureComponent {
             onClick={this.props.handleSubmit}
             disabled={isEditable}
           />
-          <Button color='danger' disabled={isEditable}>
+          {/* <Button color='danger' disabled={isEditable}>
             Cancel
-          </Button>
+          </Button> */}
         </div>
       </React.Fragment>
     )

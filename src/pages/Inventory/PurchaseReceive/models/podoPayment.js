@@ -1,15 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services'
-import moment from 'moment'
-import { fakePodoPaymentData } from '../variables'
-
-const InitialPurchaseOrder = {
-  purchaseOrderNo: 'PO/000001',
-  purchaseOrderDate: '',
-  purchaseOrderStatus: 'Draft',
-  totalAmount: 0,
-  outstandingAmount: 0,
-}
+import * as service from '../services/podoPayment'
 
 export default createFormViewModel({
   namespace: 'podoPayment',
@@ -19,7 +9,6 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      purchaseOrderDetails: { ...InitialPurchaseOrder },
       purchaseOrderPayment: [],
       default: {},
     },
@@ -34,10 +23,32 @@ export default createFormViewModel({
               id: Number(query.id),
             },
           })
+          dispatch({
+            type: 'getCurrentBizSession',
+          })
         }
       })
     },
     effects: {
+      *getCurrentBizSession (_, { put, call }) {
+        const bizSessionPayload = {
+          IsClinicSessionClosed: false,
+        }
+        const response = yield call(service.getBizSession, bizSessionPayload)
+
+        const { data } = response
+        // data = null when get session failed
+        if (data && data.totalRecords === 1) {
+          const { data: sessionData } = data
+
+          yield put({
+            type: 'setCurrentBizSession',
+            payload: { ...sessionData[0] },
+          })
+          return true
+        }
+        return false
+      },
       *queryPodoPayment ({ payload }, { call, put }) {
         return yield put({
           type: 'setPodoPayment',
@@ -56,6 +67,16 @@ export default createFormViewModel({
           purchaseOrderStatus,
         } = purchaseOrder
 
+        let newPurchaseOrderPayment
+        if (purchaseOrderPayment.length >= 1) {
+          newPurchaseOrderPayment = purchaseOrderPayment.map((x) => {
+            return {
+              ...x.clinicPaymentDto,
+              ...x,
+            }
+          })
+        }
+
         return {
           ...state,
           purchaseOrderDetails: {
@@ -65,7 +86,15 @@ export default createFormViewModel({
             purchaseOrderStatus,
             outstandingAmount: totalAmount,
           },
-          purchaseOrderPayment,
+          purchaseOrderPayment: newPurchaseOrderPayment,
+        }
+      },
+      setCurrentBizSession (state, { payload }) {
+        return {
+          ...state,
+          currentBizSessionInfo: {
+            ...payload,
+          },
         }
       },
     },

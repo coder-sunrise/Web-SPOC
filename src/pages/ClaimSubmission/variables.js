@@ -1,32 +1,6 @@
 import moment from 'moment'
 import { dateFormat } from '@/components'
 
-export const SchemeType = [
-  {
-    value: 'chas',
-    name: 'CHAS',
-    id: 1,
-  },
-  // {
-  //   value: 'medisave',
-  //   name: 'MEDISAVE',
-  //   id: 2,
-  // },
-]
-
-export const FakeDataInvoiceClaimCount = [
-  {
-    schemeType: 'CHAS',
-    status: 'ACTIVE',
-    count: 99,
-  },
-  {
-    schemeType: 'Medisave',
-    status: 'ACTIVE',
-    count: 9,
-  },
-]
-
 export const FakeDataClaimSubmissionCHAS = () => {
   let data = []
   for (let i = 0; i < 15; i++) {

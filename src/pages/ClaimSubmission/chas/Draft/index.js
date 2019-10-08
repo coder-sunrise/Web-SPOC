@@ -5,7 +5,8 @@ import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import NearMe from '@material-ui/icons/NearMe'
+import { Button, GridContainer, GridItem } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -39,26 +40,37 @@ class DraftCHAS extends React.Component {
 
   refreshDataGrid = () => {
     this.props.dispatch({
-      type: 'claimSubmissionDraft/fakeQueryDone',
-      payload: {
-        status: 'draft',
-      },
+      type: 'claimSubmissionDraft/query',
     })
   }
 
   onRefreshClicked = () => this.refreshDataGrid()
 
   render () {
+    const overrideContextMenuOptions = [
+      {
+        id: 0,
+        label: 'Claim Details',
+        Icon: NearMe,
+      },
+    ]
     const {
       classes,
       claimSubmissionDraft,
       handleContextMenuItemClick,
+      values,
+      dispatch,
     } = this.props
     const { list } = claimSubmissionDraft || []
 
     return (
-      <CardContainer hideHeader size='sm'>
-        <BaseSearchBar hideInvoiceDate />
+      <React.Fragment>
+        <BaseSearchBar
+          hideInvoiceDate
+          dispatch={dispatch}
+          values={values}
+          modelsName='claimSubmissionDraft'
+        />
         <GridContainer>
           <GridItem md={12}>
             <TableGrid
@@ -67,6 +79,8 @@ class DraftCHAS extends React.Component {
               columns={NewCHASColumns}
               tableConfig={TableConfig}
               onContextMenuItemClick={handleContextMenuItemClick}
+              contextMenuOptions={overrideContextMenuOptions}
+              isDraft
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
@@ -75,7 +89,7 @@ class DraftCHAS extends React.Component {
             </Button>
           </GridItem>
         </GridContainer>
-      </CardContainer>
+      </React.Fragment>
     )
   }
 }

@@ -125,7 +125,7 @@ class Detail extends PureComponent {
   // }
 
   render () {
-    console.log('ad', this.props)
+    // console.log('ad', this.props)
 
     const { props } = this
     const { classes, theme, footer, values, settingClinicBreakHour } = props
@@ -158,7 +158,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
-                      format={dateFormatLong}
+                      // format={dateFormatLong}
                       label='Effective Start Date'
                       label2='Effective End Date'
                       {...args}

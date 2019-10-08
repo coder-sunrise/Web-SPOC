@@ -14,6 +14,7 @@ import {
   SizeContainer,
   FastField,
   withFormikExtend,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -39,7 +40,6 @@ const styles = (theme) => ({
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ claimSubmission }) => {
-    console.log(claimSubmission)
     return claimSubmission.entity || {}
   },
 })
@@ -49,10 +49,9 @@ class ClaimDetails extends Component {
       classes,
       onConfirm,
       onClose,
-      claimDetails,
       renderClaimDetails,
+      values,
     } = this.props
-    // console.log(this.props)
 
     const { readOnly } = true
     return (
@@ -101,7 +100,7 @@ class ClaimDetails extends Component {
               </GridItem>
               <GridItem md={12}>
                 <FastField
-                  name='visitDoctorName'
+                  name='visitDoctorProfileFK'
                   render={(args) => (
                     <TextField {...args} disabled label='Doctor' />
                   )}
@@ -132,7 +131,7 @@ class ClaimDetails extends Component {
               </GridItem>
               <GridItem md={12}>
                 <FastField
-                  name='visitDate'
+                  name='invoiceDate'
                   render={(args) => (
                     <DatePicker {...args} disabled label='Invoice Date' />
                   )}
@@ -191,19 +190,11 @@ class ClaimDetails extends Component {
                 <GridItem md={4} />
                 <GridItem md={5}>
                   <FastField
-                    name='schemeType'
-                    render={(args) => (
-                      <TextField {...args} disabled label='Scheme Type' />
-                    )}
-                  />
-                </GridItem>
-                <GridItem md={7} />
-                <GridItem md={5}>
-                  <FastField
                     name='diagnosis'
                     render={(args) => (
                       <Select
                         {...args}
+                        disabled={values.status === 'Draft'}
                         label='Diagnosis'
                         options={[
                           { name: 'Asthma', value: 'asthma' },
@@ -235,9 +226,13 @@ class ClaimDetails extends Component {
               <Button color='danger' onClick={onClose}>
                 Close
               </Button>
-              <Button color='primary' onClick={onConfirm}>
-                Confirm
-              </Button>
+              {values.status !== 'Draft' ? (
+                <Button color='primary' onClick={onConfirm}>
+                  Save
+                </Button>
+              ) : (
+                ''
+              )}
             </GridItem>
           </GridContainer>
         </React.Fragment>

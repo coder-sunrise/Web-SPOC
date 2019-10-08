@@ -1,8 +1,8 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services/invoicePayment'
-import { InvoicePayerType } from '@/utils/codes'
-import { fakeInvoicePaymentData } from '../sampleData'
+import { notification } from '@/components'
+import { dateFormatLong } from '@/components'
 
 const paymentMode = [
   { type: 'Cash', objName: 'depositPayment', paymentModeFK: 1 },
@@ -63,23 +63,14 @@ export default createFormViewModel({
       },
       *submitWriteOff ({ payload }, { call, put }) {
         const response = yield call(service.writeOff, payload)
-        yield put({
-          type: 'writeOffResult',
-          payload: {
-            // TBD
-            response,
-          },
-        })
-      },
-      *submitVoidPayment ({ payload }, { call, put }) {
-        const response = yield call(service.writeOff, payload)
-        yield put({
-          type: 'voidPaymentResult',
-          payload: {
-            // TBD
-            response,
-          },
-        })
+        const { status } = response
+        if (status === '200') {
+          notification.success({
+            message: 'Saved',
+          })
+          return true
+        }
+        return false
       },
       *submitAddPayment ({ payload }, { call, put, select }) {
         const userState = yield select((state) => state.user.data)
@@ -116,11 +107,42 @@ export default createFormViewModel({
         }
 
         const response = yield call(service.addPayment, addPaymentPayload)
+        const { status } = response
 
-        yield put({
-          type: 'addPaymentResult',
-          response,
-        })
+        if (status === '200') {
+          notification.success({
+            message: 'Saved',
+          })
+          return true
+        }
+
+        return false
+      },
+      *submitVoidPayment ({ payload }, { call }) {
+        const response = yield call(service.voidPayment, payload)
+        const { status } = response
+
+        if (status === '200') {
+          notification.success({
+            message: 'Saved',
+          })
+          return true
+        }
+
+        return false
+      },
+      *submitVoidWriteOff ({ payload }, { call }) {
+        const response = yield call(service.voidWriteOff, payload)
+        const { status } = response
+
+        if (status === '200') {
+          notification.success({
+            message: 'Saved',
+          })
+          return true
+        }
+
+        return false
       },
     },
     reducers: {
@@ -136,6 +158,7 @@ export default createFormViewModel({
             paymentTxnList = (paymentTxnList || []).concat(
               (invoicePayment || []).map((z) => {
                 return {
+                  ...z,
                   id: z.id,
                   type: 'Payment',
                   itemID: z.receiptNo,
@@ -150,6 +173,7 @@ export default createFormViewModel({
             paymentTxnList = (paymentTxnList || []).concat(
               (invoicePayerWriteOff || []).map((z) => {
                 return {
+                  ...z,
                   id: z.id,
                   type: 'Write Off',
                   itemID: z.writeOffCode,
@@ -165,6 +189,7 @@ export default createFormViewModel({
             paymentTxnList = (paymentTxnList || []).concat(
               (creditNote || []).map((z) => {
                 return {
+                  ...z,
                   id: z.id,
                   type: 'Credit Note',
                   itemID: z.creditNoteNo,
@@ -196,100 +221,6 @@ export default createFormViewModel({
           ...state,
           currentBizSessionInfo: {
             ...payload,
-          },
-        }
-      },
-
-      addPaymentResult (state, { payload }) {
-        // TBD
-        return {
-          ...state,
-        }
-      },
-
-      writeOffResult (state, { payload }) {
-        // TBD
-        return {
-          ...state,
-        }
-      },
-
-      voidPaymentResult (state, { payload }) {
-        // TBD
-        return {
-          ...state,
-        }
-      },
-
-      fakeQueryDone (state, { payload }) {
-        const {
-          invoicePayment,
-          invoicePayerWriteOff,
-          creditNote,
-        } = fakeInvoicePaymentData
-        let paymentTxnList = []
-
-        InvoicePayerType.map((x) => {
-          // Payment
-          paymentTxnList[x.listName] = (paymentTxnList[x.listName] || [])
-            .concat(
-              (invoicePayment || [])
-                .filter((y) => y.invoicePayerFK === x.invoicePayerFK)
-                .map((z) => {
-                  return {
-                    id: z.id,
-                    type: 'Payment',
-                    itemID: z.receiptNo,
-                    date: moment(z.paymentReceivedDate).format('DD MMM YYYY'),
-                    amount: z.totalAmtPaid,
-                    isCancelled: z.isCancelled,
-                  }
-                }),
-            )
-
-          // Write-Off
-          paymentTxnList[x.listName] = (paymentTxnList[x.listName] || [])
-            .concat(
-              (invoicePayerWriteOff || [])
-                .filter((y) => y.invoicePayerFK === x.invoicePayerFK)
-                .map((z) => {
-                  return {
-                    id: z.id,
-                    type: 'Write Off',
-                    itemID: z.writeOffCode,
-                    date: moment(z.writeOffDate).format('DD MMM YYYY'),
-                    amount: z.writeOffAmount,
-                    reason: z.writeOffReason,
-                    isCancelled: z.isCancelled,
-                  }
-                }),
-            )
-
-          // Credit Note
-          paymentTxnList[x.listName] = (paymentTxnList[x.listName] || [])
-            .concat(
-              (creditNote || [])
-                .filter((y) => y.invoicePayerFK === x.invoicePayerFK)
-                .map((z) => {
-                  return {
-                    id: z.id,
-                    type: 'Credit Note',
-                    itemID: z.creditNoteNo,
-                    date: moment(z.generatedDate).format('DD MMM YYYY'),
-                    amount: z.totalAftGST,
-                    reason: z.remark,
-                    isCancelled: z.isCancelled,
-                  }
-                }),
-            )
-          return null
-        })
-
-        return {
-          ...state,
-          entity: {
-            ...fakeInvoicePaymentData,
-            paymentTxnList,
           },
         }
       },

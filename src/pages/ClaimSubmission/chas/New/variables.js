@@ -63,30 +63,6 @@ export const NewCHASColumnExtensions = [
   { columnName: 'claimAmount', type: 'currency', currency: true },
 ]
 
-// const generateNewCHASData = () => {
-//   let data = []
-//   for (let i = 0; i < 15; i++) {
-//     data.push({
-//       id: i,
-//       visitDate: moment().formatUTC({ dateFormatLong }),
-//       accountNo: 'S1234567D',
-//       patientName: 'Tan Kok Wei',
-//       doctor: 'Dr Levine',
-//       diagnosis: 'Asthma',
-//       schemeType: 'CHAS Blue',
-//       schemeCategory: 'Chronic',
-//       invoiceNo: `INV/0000${i}`,
-//       invoiceDate: moment().formatUTC('DD MM YYYY'),
-//       invoiceAmount: 100,
-//       claimAmount: 80,
-//       rejectionReason: '',
-//     })
-//   }
-//   return data
-// }
-
-// export const NewCHASTableData = generateNewCHASData()
-
 export const TableConfig = {
   FuncProps: {
     selectable: true,
