@@ -36,10 +36,10 @@ const styles = () => ({
   },
 })
 
+// @Authorized.Secured('patientdatabase.patientprofiledetails')
 @connect(({ streetAddress }) => ({
   streetAddress,
 }))
-@Authorized.Secured('patient.view')
 class Demographic extends PureComponent {
   state = {}
 
