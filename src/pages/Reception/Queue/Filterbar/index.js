@@ -45,9 +45,12 @@ const Filterbar = ({
           name='search'
           render={(args) => (
             <TextField
+              {...args}
+              inputProps={{
+                autocomplete: 'queue-listing-filterbar-search',
+              }}
               label='Patient Name, Acc No., Phone No.'
               onChange={(e) => setSearch(e.target.value)}
-              {...args}
             />
           )}
         />

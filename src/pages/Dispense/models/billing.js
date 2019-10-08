@@ -76,6 +76,10 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
+        yield put({
+          type: 'patient/updateState',
+          payload: { entity: null },
+        })
         router.push('/reception/queue')
       },
       *fetchPatientInfo ({ payload }, { call, put }) {

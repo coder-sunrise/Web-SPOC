@@ -147,6 +147,12 @@ class PatientHistory extends Component {
   state = {
     selectedItems: [
       '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '7',
     ],
   }
 
@@ -441,6 +447,8 @@ class PatientHistory extends Component {
     } = this.props
     const { entity, selected } = patientHistory
 
+    const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
+    console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
       <CardContainer
         hideHeader
@@ -451,13 +459,13 @@ class PatientHistory extends Component {
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
-        <GridContainer gutter={0}>
-          <GridItem md={8}>
+        <GridContainer gutter={0} alignItems='center'>
+          <GridItem md={3}>
             <Select
-              simple
+              // simple
               value={this.state.selectedItems}
               allValue='0'
-              prefix='Filter By'
+              // prefix='Filter By'
               mode='multiple'
               maxTagCount={4}
               options={[
@@ -471,6 +479,7 @@ class PatientHistory extends Component {
               ]}
               style={{ marginBottom: theme.spacing(1) }}
               onChange={this.onSelectChange}
+              maxTagCount={maxItemTagCount}
             />
           </GridItem>
           <GridItem md={2}>
@@ -498,8 +507,8 @@ class PatientHistory extends Component {
               </ProgressButton>
             )}
           </GridItem>
-          <GridItem sm={2} style={{ textAlign: 'right' }}>
-            Updated Date :
+          <GridItem md={7} style={{ textAlign: 'right' }}>
+            Update Date:
             {patientHistory.selectedSubRow.signOffDate && (
               <DatePicker
                 text

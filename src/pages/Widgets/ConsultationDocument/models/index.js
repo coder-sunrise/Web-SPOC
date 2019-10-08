@@ -17,7 +17,7 @@ export default createFormViewModel({
         type: '3',
         mcDays: 1,
         mcStartEndDate: [
-          moment(),
+          moment().formatUTC(),
           moment(),
         ],
         mcIssueDate: moment(),
