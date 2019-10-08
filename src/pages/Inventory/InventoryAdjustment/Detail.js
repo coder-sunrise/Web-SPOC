@@ -546,7 +546,6 @@ class Detail extends PureComponent {
           (j) =>
             j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
         )
-
         if (defaultStock) {
           row.batchNo = defaultStock.id
           row.stock = defaultStock.stock
@@ -638,23 +637,24 @@ class Detail extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
-    let returnRows
+    let returnRows = addedRows
     if (this.state.selectedItem) {
+      console.log('selectedItem', this.state.selectedItem)
       const { option } = this.state.selectedItem
       const { uom, expiryDate, stock } = option
       if (uom) {
-        returnRows = addedRows.map((r) => ({
+        returnRows = returnRows.map((r) => ({
           ...r,
-          uomDisplayValue: 123,
+          uomDisplayValue: uom,
         }))
       } else {
-        returnRows = addedRows.map((r) => ({
+        returnRows = returnRows.map((r) => ({
           ...r,
           stock,
           expiryDate,
         }))
       }
-
+      console.log('cehcl', this.state.selectedBatch, returnRows)
       if (this.state.selectedBatch && returnRows) {
         // const { stock } = this.state.selectedItem
         returnRows = returnRows.map((r) => ({
@@ -663,6 +663,7 @@ class Detail extends PureComponent {
           batchNoString: this.state.selectedBatch.batchNo,
         }))
       }
+      console.log({ returnRows })
       return returnRows
     }
 

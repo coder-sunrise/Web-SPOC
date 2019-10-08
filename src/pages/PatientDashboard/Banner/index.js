@@ -261,26 +261,6 @@ class Banner extends PureComponent {
   }
 
   displayMedicalProblemData (entity) {
-    // {entity.patientHistoryDiagnosis.length ? (
-    //   `${entity.patientHistoryDiagnosis[0].diagnosisDescription.length > 8
-    //     ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(
-    //         0,
-    //         8,
-    //       )}... `
-    //     : entity.patientHistoryDiagnosis[0].diagnosisDescription} `
-    // ) : (
-    //   '-'
-    // )}
-    // {entity.patientHistoryDiagnosis.length >= 2 ? (
-    //   `${entity.patientHistoryDiagnosis[1].diagnosisDescription.length > 8
-    //     ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(
-    //         0,
-    //         8,
-    //       )}...`
-    //     : `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription}`}`
-    // ) : (
-    //   ''
-    // )}
     let medicalProblemData = ''
 
     if (entity.patientHistoryDiagnosis.length) {
@@ -372,7 +352,7 @@ class Banner extends PureComponent {
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
-        <GridContainer style={{ height: 120 }}>
+        <GridContainer style={{ height: 130 }}>
           {/* <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
               <img src={avatar} alt='...' />
@@ -465,59 +445,54 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
-                    .length > 0 ? (
-                    entity.patientScheme
-                      .filter((o) => o.schemeTypeFK <= 5)
-                      .map((o) => {
-                        const schemeData = this.getSchemeDetails(o)
-                        return (
-                          <div>
-                            <CodeSelect
-                              text
-                              code='ctSchemeType'
-                              value={schemeData.schemeTypeFK}
-                            />
+                  {entity.patientScheme.length ? '' : '-'}
+                  {entity.patientScheme
+                    .filter((o) => o.schemeTypeFK <= 5)
+                    .map((o) => {
+                      const schemeData = this.getSchemeDetails(o)
+                      return (
+                        <div>
+                          <CodeSelect
+                            text
+                            code='ctSchemeType'
+                            value={schemeData.schemeTypeFK}
+                          />
 
-                            <div
-                              style={{
-                                fontWeight: 500,
-                                display: 'inline-block',
-                              }}
-                            >
-                              :{' '}
-                              <NumberInput
-                                text
-                                currency
-                                value={schemeData.balance}
-                              />
-                            </div>
-                            <br />
-                            <SchemePopover
-                              isBanner
-                              isShowReplacementModal={
-                                schemeData.isShowReplacementModal
-                              }
-                              handleRefreshChasBalance={() =>
-                                this.refreshChasBalance(
-                                  schemeData.patientCoPaymentSchemeFK,
-                                  schemeData.schemeTypeFK,
-                                )}
-                              entity={entity}
-                              schemeData={schemeData}
+                          <div
+                            style={{
+                              fontWeight: 500,
+                              display: 'inline-block',
+                            }}
+                          >
+                            :{' '}
+                            <NumberInput
+                              text
+                              currency
+                              value={schemeData.balance}
                             />
-                            <p style={{ color: 'red' }}>
-                              {schemeData.statusDescription}
-                            </p>
                           </div>
-                        )
-                      })
-                  ) : (
-                    ' - '
-                  )}
+                          <br />
+                          <SchemePopover
+                            isBanner
+                            isShowReplacementModal={
+                              schemeData.isShowReplacementModal
+                            }
+                            handleRefreshChasBalance={() =>
+                              this.refreshChasBalance(
+                                schemeData.patientCoPaymentSchemeFK,
+                                schemeData.schemeTypeFK,
+                              )}
+                            entity={entity}
+                            schemeData={schemeData}
+                          />
+                          <p style={{ color: 'red' }}>
+                            {schemeData.statusDescription}
+                          </p>
+                        </div>
+                      )
+                    })}
                 </div>
               }
-
               // body={
               //   <div>
               //     {entity.patientScheme.filter(

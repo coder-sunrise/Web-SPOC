@@ -38,7 +38,7 @@ class TextField extends React.PureComponent {
           ? field.value
           : defaultValue,
     }
-    console.log(this.state.value)
+    // console.log(this.state.value)
     if (field && form) {
       this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
     } else {

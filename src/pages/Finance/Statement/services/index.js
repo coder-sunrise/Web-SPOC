@@ -4,6 +4,9 @@ import request from '@/utils/request'
 const url = '/api/Statement'
 const invoiceUrl = '/api/Invoice/InvoicesNotInsideStatment'
 const refreshUrl = '/api/Statement/Refresh'
+const extractUrl = '/api/Statement/ExtractAsSingle'
+const bizSessionUrl = '/api/bizSession'
+
 // const runningNoUrl = '/api/InventoryAdjustment/GenerateRunningNo'
 // const stockUrl = '/api/InventoryAdjustment/StockDetails'
 
@@ -27,6 +30,19 @@ module.exports = {
     }
     return r
   },
+
+  extract: async (params) => {
+    let r
+    if (params.id) {
+      r = await request(`${extractUrl}/${params.id}`, {
+        method: 'PUT',
+        body: params,
+      })
+    }
+    return r
+  },
+
+  queryBizSession: (params) => service.queryList(bizSessionUrl, params),
 
   // getRunningNo: async (params) => {
   //   const r = await request(`${runningNoUrl}`, {

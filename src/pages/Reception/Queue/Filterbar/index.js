@@ -19,6 +19,7 @@ import {
 } from '@/components'
 // sub component
 import StatusFilterButton from './StatusFilterButton'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
@@ -70,13 +71,15 @@ const Filterbar = ({
         >
           Create Visit
         </ProgressButton>
+        <Authorized authority='queue.registervisit'>
+          <Button color='primary' size='sm' onClick={toggleNewPatient}>
+            <Hidden mdDown>
+              <PersonAdd />
+            </Hidden>
+            <FormattedMessage id='reception.queue.createPatient' />
+          </Button>
+        </Authorized>
 
-        <Button color='primary' size='sm' onClick={toggleNewPatient}>
-          <Hidden mdDown>
-            <PersonAdd />
-          </Hidden>
-          <FormattedMessage id='reception.queue.createPatient' />
-        </Button>
         <div className={classes.switch}>
           <Checkbox
             label='Visit assign to me only'

@@ -46,12 +46,12 @@ const routes = [
     Routes: [
       'src/pages/Authorized',
     ],
-    authority: [
-      { name: 'admin', rights: 'enable' },
-      { name: 'user', rights: 'enable' },
-      { name: 'guest', rights: 'enable' },
-      { name: 'tester', rights: 'enable' },
-    ],
+    // authority: [
+    //   { name: 'admin', rights: 'enable' },
+    //   { name: 'user', rights: 'enable' },
+    //   { name: 'guest', rights: 'enable' },
+    //   { name: 'tester', rights: 'enable' },
+    // ],
     routes: [
       // Main Landing Page.
       { path: '/', redirect: '/reception/queue' },
@@ -60,6 +60,9 @@ const routes = [
         path: '/reception',
         icon: 'local_hospital',
         name: 'reception',
+        authority: [
+          { name: 'reception' },
+        ],
         routes: [
           {
             path: '/reception/queue',
@@ -67,6 +70,9 @@ const routes = [
             component: './Reception/Queue',
             // mini: 'QE',
             exact: true,
+            authority: [
+              { name: 'reception/queue' },
+            ],
           },
           // {
           //   path: '/reception/queue/dispense',
@@ -87,6 +93,9 @@ const routes = [
             name: 'appointment',
             // mini: 'AP',
             component: './Reception/Appointment',
+            authority: [
+              { name: 'reception/appointment' },
+            ],
           },
           {
             hideInMenu: true,
@@ -108,6 +117,9 @@ const routes = [
         path: '/patientdb',
         icon: 'group',
         name: 'patient',
+        authority: [
+          { name: 'patientdatabase' },
+        ],
         routes: [
           // {
           //   path: '/patientdb/new',
@@ -143,6 +155,9 @@ const routes = [
             name: 'search',
             // mini: 'SP',
             component: './PatientDatabase/Search',
+            authority: [
+              { name: 'patientdatabase' },
+            ],
           },
         ],
       },
@@ -153,11 +168,17 @@ const routes = [
         icon: 'sms',
         name: 'communication',
         system: 'CMS',
+        authority: [
+          { name: 'communication' },
+        ],
         routes: [
           {
             path: '/communication/sms',
             name: 'sms',
             component: './sms',
+            authority: [
+              { name: 'communication/sms' },
+            ],
           },
           // {
           //   path: '/sms/adhoc',
@@ -173,11 +194,17 @@ const routes = [
         icon: 'kitchen',
         name: 'inventory',
         // component: './inventory',
+        authority: [
+          { name: 'inventory' },
+        ],
         routes: [
           {
             path: '/inventory/master',
             name: 'master',
             component: './Inventory/Master',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
             // mini: 'IM',
           },
           {
@@ -185,48 +212,72 @@ const routes = [
             name: 'consumable.consumable',
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           {
             path: '/inventory/master/editconsumable',
             name: 'consumable.editconsumable',
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           {
             path: '/inventory/master/medication',
             name: 'medication.medication',
             hideInMenu: true,
             component: './Inventory/Master/Medication/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           {
             path: '/inventory/master/editmedication',
             name: 'medication.editmedication',
             hideInMenu: true,
             component: './Inventory/Master/Medication/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           {
             path: '/inventory/master/vaccination',
             name: 'vaccination.vaccination',
             hideInMenu: true,
             component: './Inventory/Master/Vaccination/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           {
             path: '/inventory/master/editvaccination',
             name: 'vaccination.editvaccination',
             hideInMenu: true,
             component: './Inventory/Master/Vaccination/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           {
             path: '/inventory/master/package',
             name: 'package.package',
             hideInMenu: true,
             component: './Inventory/Master/Package/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           {
             path: '/inventory/master/editpackage',
             name: 'package.editpackage',
             hideInMenu: true,
             component: './Inventory/Master/Package/Details',
+            authority: [
+              { name: 'inventory/inventorymaster' },
+            ],
           },
           // {
           //   path: '/inventory/pd',
@@ -244,6 +295,9 @@ const routes = [
             path: '/inventory/pr',
             name: 'pd',
             component: './Inventory/PurchaseReceive',
+            authority: [
+              { name: 'inventory/purchasingandreceiving' },
+            ],
             // mini: 'PR',
           },
           {
@@ -251,11 +305,17 @@ const routes = [
             name: 'pd.detail',
             hideInMenu: true,
             component: './Inventory/PurchaseReceive/Details',
+            authority: [
+              { name: 'inventory/purchasingandreceiving' },
+            ],
           },
           {
             path: '/inventory/inventoryadjustment',
             name: 'inventoryadjustment',
             component: './Inventory/InventoryAdjustment',
+            authority: [
+              { name: 'inventory/purchasingandreceiving' },
+            ],
             // mini: 'IA',
           },
         ],
@@ -269,6 +329,9 @@ const routes = [
         path: '/finance',
         icon: 'attach_money',
         name: 'finance',
+        authority: [
+          { name: 'finance' },
+        ],
         routes: [
           {
             path: '/finance/invoice',
@@ -276,17 +339,26 @@ const routes = [
             component: './Finance/Invoice',
             // mini: 'IP',
             exact: true,
+            authority: [
+              { name: 'finance/invoicepayment' },
+            ],
           },
           {
             path: '/finance/invoice/details',
             name: 'invoice/detail',
             hideInMenu: true,
             component: './Finance/Invoice/Details',
+            authority: [
+              { name: 'finance/invoicepayment' },
+            ],
           },
           {
             path: '/finance/note',
             name: 'credit/debitnote',
             hideInMenu: true,
+            authority: [
+              { name: 'finance/invoicepayment' },
+            ],
             // component: './Finance/CreditDebitNote',
             // mini: 'CD',
           },
@@ -301,6 +373,9 @@ const routes = [
             path: '/finance/billing/:companyName',
             name: 'corporate-billing/detail',
             hideInMenu: true,
+            authority: [
+              { name: 'finance/corporatebilling' },
+            ],
             // component:
             //   './Finance/CorporateBilling/Detail/CorporateBillingDetail',
           },
@@ -309,36 +384,54 @@ const routes = [
             name: 'deposit',
             // mini: 'DP',
             component: './Finance/Deposit',
+            authority: [
+              { name: 'finance/deposit' },
+            ],
           },
           {
             path: '/finance/deposit/:depositNo',
             name: 'invoice/detail',
             hideInMenu: true,
             component: './Finance/Deposit/Detail/index.js',
+            authority: [
+              { name: 'finance/deposit' },
+            ],
           },
           {
             path: '/finance/statement',
             name: 'statement',
             // mini: 'ST',
             component: './Finance/Statement',
+            authority: [
+              { name: 'finance/statement' },
+            ],
           },
           {
             path: '/finance/statement/newstatement',
             name: 'statement/newstatement',
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
+            authority: [
+              { name: 'finance/statement' },
+            ],
           },
           {
             path: '/finance/statement/editstatement',
             name: 'statement/editstatement',
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
+            authority: [
+              { name: 'finance/statement' },
+            ],
           },
           {
             path: '/finance/statement/details/:id',
             name: 'statement/detail',
             hideInMenu: true,
             component: './Finance/Statement/Details',
+            authority: [
+              { name: 'finance/statement' },
+            ],
           },
           // {
           //   path: '/finance/expense',
@@ -352,12 +445,18 @@ const routes = [
             name: 'scheme',
             // mini: 'SC',
             component: './Finance/Scheme',
+            authority: [
+              { name: 'finance/scheme' },
+            ],
           },
           {
             path: '/finance/scheme/details',
             name: 'scheme/detail',
             hideInMenu: true,
             component: './Finance/Scheme/Details',
+            authority: [
+              { name: 'finance/scheme' },
+            ],
           },
           {
             path: '/finance/copayer',
@@ -392,7 +491,9 @@ const routes = [
         icon: 'library_books',
         name: 'report',
         hideChildrenInMenu: true,
-
+        authority: [
+          { name: 'report' },
+        ],
         routes: [
           {
             path: '/report',
@@ -454,6 +555,9 @@ const routes = [
         icon: 'receipt',
         name: 'claimSubmission',
         hideChildrenInMenu: true,
+        authority: [
+          { name: 'claimsubmission' },
+        ],
         routes: [
           {
             path: '/claim-submission',
@@ -491,6 +595,9 @@ const routes = [
         path: '/setting',
         icon: 'settings',
         name: 'setting',
+        authority: [
+          { name: 'settings' },
+        ],
         hideChildrenInMenu: true,
         routes: [
           {
