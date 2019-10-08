@@ -54,8 +54,17 @@ class Orders extends PureComponent {
 
   componentDidMount () {
     const { dispatch, mode } = this.props
+    console.log("fghgh")
+
+    dispatch({
+      type: 'orders/updateState',
+      payload: {
+       rows: [],
+      },
+    })
 
     if (mode === 'consultation') {
+      console.log("hhhh " , mode)
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
@@ -321,8 +330,7 @@ class Orders extends PureComponent {
   render () {
     const { state, props } = this
     const { theme, classes, orders, className } = props
-    console.log('***********************')
-    console.log(this.props)
+
     return (
       <div className={className}>
         <Detail {...props} />
