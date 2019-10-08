@@ -53,6 +53,8 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
       notification.success({
         message: 'Change password success.',
       })
+
+      // fetch again to refresh
       dispatch({ type: 'user/fetchCurrent' })
       onConfirm()
     } else {
