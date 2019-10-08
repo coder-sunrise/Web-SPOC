@@ -155,9 +155,9 @@ class PatientHistory extends Component {
     this.widgets = [
       {
         id: '1',
-        name: 'Plan',
+        name: 'Clinician Note',
         component: Loadable({
-          loader: () => import('./Plan'),
+          loader: () => import('./ClinicalNotes'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...props} {...p} />
