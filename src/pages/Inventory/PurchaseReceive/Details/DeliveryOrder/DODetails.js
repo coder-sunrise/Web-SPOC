@@ -34,6 +34,7 @@ const receivingDetailsSchema = Yup.object().shape({
 
 @withFormikExtend({
   mapPropsToValues: ({ deliveryOrderDetails }) => {
+    // console.log('DODetails', deliveryOrderDetails)
     return deliveryOrderDetails.entity
   },
   enableReinitialize: true,
@@ -63,12 +64,10 @@ const receivingDetailsSchema = Yup.object().shape({
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
-        batchNo: x.batchNo[0],
+        // batchNo: x.batchNo[0],
         expiryDate: x.expiryDate,
         sortOrder: index + 1,
-        inventoryTransactionItemDto: {
-          // inventoryTypeFK: itemType.value,
-        },
+        inventoryTransactionItemDto: {},
       }
     })
 

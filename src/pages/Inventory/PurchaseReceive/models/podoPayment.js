@@ -86,7 +86,7 @@ export default createFormViewModel({
             purchaseOrderStatus,
             outstandingAmount: totalAmount,
           },
-          purchaseOrderPayment: newPurchaseOrderPayment,
+          purchaseOrderPayment: newPurchaseOrderPayment || [],
         }
       },
       setCurrentBizSession (state, { payload }) {
