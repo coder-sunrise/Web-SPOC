@@ -32,7 +32,8 @@ export default {
         })
 
         if (
-          !userProfileDetailDto.clinicianProfile.userProfile.hasChangedPassword
+          !userProfileDetailDto.clinicianProfile.userProfile
+            .lastPasswordChangedDate
         )
           yield put({
             type: 'global/updateState',

@@ -9,9 +9,9 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      fixedFilter: {
-        isActive: true,
-      },
+      // fixedFilter: {
+      //   isActive: true,
+      // },
     },
     subscriptions: ({ dispatch, history }) => {
       // history.listen((loct, method) => {
