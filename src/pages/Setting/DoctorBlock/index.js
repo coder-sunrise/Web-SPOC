@@ -1,10 +1,14 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import * as Yup from 'yup'
-
+// material ui
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+// common component
 import { CardContainer, CommonModal } from '@/components'
+// medisys component
+import { LoadingWrapper } from '@/components/_medisys'
+// sub component
 import Filter from './Filter'
 import Grid from './Grid'
 import DoctorBlockForm from '@/pages/Reception/Appointment/components/form/DoctorBlock'
@@ -21,8 +25,9 @@ const DoctorFormValidation = Yup.object().shape({
   eventTime: Yup.string().required(),
 })
 
-@connect(({ doctorBlock }) => ({
+@connect(({ doctorBlock, loading }) => ({
   doctorBlock,
+  loading: loading.effects['doctorBlock/query'],
 }))
 class DoctorBlock extends PureComponent {
   state = {
@@ -54,18 +59,44 @@ class DoctorBlock extends PureComponent {
       })
   }
 
+  confirmDelete = (id) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'doctorBlock/delete',
+      payload: { id },
+    }).then(() => {
+      dispatch({
+        type: 'doctorBlock/refresh',
+      })
+    })
+  }
+
+  handleDelete = (id) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: 'Are you sure want to delete this doctor block?',
+        onConfirmSave: () => this.confirmDelete(id),
+      },
+    })
+  }
+
   render () {
     const { showModal } = this.state
-    const { classes, doctorBlock, dispatch, theme, ...restProps } = this.props
-
-    const cfg = {
-      toggleModal: this.toggleModal,
-    }
+    const { doctorBlock, loading, dispatch } = this.props
 
     return (
       <CardContainer hideHeader>
         <Filter toggleModal={this.toggleModal} dispatch={dispatch} />
-        <Grid onEditClick={this.handleEdit} dataSource={doctorBlock.list} />
+        <LoadingWrapper loading={loading} text='Refreshing list...'>
+          <Grid
+            onEditClick={this.handleEdit}
+            onDeleteClick={this.handleDelete}
+            dataSource={doctorBlock.list}
+          />
+        </LoadingWrapper>
         <CommonModal
           open={showModal}
           observe='DoctorBlockForm'

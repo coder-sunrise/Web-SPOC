@@ -339,6 +339,10 @@ export default compose(
             dispatch({
               type: 'calendar/refresh',
             })
+            dispatch({
+              type: 'formik/clean',
+              payload: 'DoctorBlockForm',
+            })
             resetForm()
             onClose()
           }

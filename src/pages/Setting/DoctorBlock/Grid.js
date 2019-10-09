@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 // material ui
 import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
 // common components
 import {
   dateFormatLong,
@@ -10,35 +11,12 @@ import {
   CommonTableGrid,
   Tooltip,
 } from '@/components'
-import { DoctorLabel } from '@/components/_medisys'
-
-const GroupCellContent = ({ column, row }) => {
-  return <span style={{ verticalAlign: 'middle' }}>{}</span>
-}
-
-const groupingCriteria = (value) => {
-  console.log({ value })
-  return { key: value }
-}
+import { DoctorLabel, LoadingWrapper } from '@/components/_medisys'
 
 const TableParams = {
   FuncProps: {
     page: false,
     grouping: true,
-    groupingConfig: {
-      state: {
-        grouping: [
-          { columnName: 'doctorBlockGroupFK' },
-          // { columnName: 'doctorName' },
-        ],
-      },
-      // columnExtensions: [
-      //   { columnName: 'doctorBlockGroupFK', criteria: groupingCriteria },
-      // ],
-      // row: {
-      //   contentComponent: GroupCellContent,
-      // },
-    },
   },
   columns: [
     { name: 'doctorBlockGroupFK', title: 'Recurrence Group' },
@@ -52,8 +30,52 @@ const TableParams = {
   ],
 }
 
-export default ({ dataSource, onEditClick }) => {
+export default ({ dataSource, onEditClick, onDeleteClick }) => {
+  const GroupCellContent = ({ row }) => {
+    let label = 'Doctor'
+    const data = dataSource.find(
+      (item) => item.doctorBlockGroupFK === row.value,
+    )
+    if (data) {
+      const { title = '', name } = data.doctor.clinicianProfile
+      label = `${title} ${name}`
+    }
+    return (
+      <span style={{ verticalAlign: 'middle', paddingRight: 8 }}>{label}</span>
+    )
+  }
+
+  const [
+    tableConfig,
+    setTableConfig,
+  ] = useState(TableParams)
+  useEffect(
+    () => {
+      const tempTableConfig = {
+        ...TableParams,
+        FuncProps: {
+          ...TableParams.FuncProps,
+          groupingConfig: {
+            state: {
+              grouping: [
+                { columnName: 'doctorBlockGroupFK' },
+              ],
+            },
+            row: {
+              contentComponent: GroupCellContent,
+            },
+          },
+        },
+      }
+      setTableConfig(tempTableConfig)
+    },
+    [
+      dataSource,
+    ],
+  )
   const editDoctorBlock = (event) => onEditClick(event.currentTarget.id)
+
+  const deleteDoctorBlock = (event) => onDeleteClick(event.currentTarget.id)
 
   const columnExtensions = [
     {
@@ -86,19 +108,34 @@ export default ({ dataSource, onEditClick }) => {
       columnName: 'action',
       // width: 240,
       render: (row) => (
-        <Tooltip title='Edit Doctor Block'>
-          <Button
-            className='noPadding'
-            color='primary'
-            size='sm'
-            id={row.id}
-            justIcon
-            rounded
-            onClick={editDoctorBlock}
-          >
-            <Edit />
-          </Button>
-        </Tooltip>
+        <React.Fragment>
+          <Tooltip title='Edit Doctor Block'>
+            <Button
+              className='noPadding'
+              color='primary'
+              size='sm'
+              id={row.id}
+              justIcon
+              rounded
+              onClick={editDoctorBlock}
+            >
+              <Edit />
+            </Button>
+          </Tooltip>
+          <Tooltip title='Delete Doctor Block'>
+            <Button
+              className='noPadding'
+              color='danger'
+              size='sm'
+              id={row.id}
+              justIcon
+              rounded
+              onClick={deleteDoctorBlock}
+            >
+              <Delete />
+            </Button>
+          </Tooltip>
+        </React.Fragment>
       ),
     },
   ]
@@ -107,8 +144,8 @@ export default ({ dataSource, onEditClick }) => {
     <CommonTableGrid
       style={{ margin: 0 }}
       rows={dataSource}
-      {...TableParams}
       columnExtensions={columnExtensions}
+      {...tableConfig}
     />
   )
 }
