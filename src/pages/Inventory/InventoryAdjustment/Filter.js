@@ -154,7 +154,7 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <Button
+              <ProgressButton
                 color='primary'
                 onClick={() => {
                   const { inventoryAdjustment } = this.props
@@ -172,7 +172,7 @@ class Filter extends PureComponent {
                 }}
               >
                 Add New
-              </Button>
+              </ProgressButton>
               <Button
                 color='primary'
                 onClick={this.handleToggle}
