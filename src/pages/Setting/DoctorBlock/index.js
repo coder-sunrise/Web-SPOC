@@ -1,15 +1,24 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import * as Yup from 'yup'
+
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import { CardContainer, CommonModal } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
-import Detail from './Detail'
 import DoctorBlockForm from '@/pages/Reception/Appointment/components/form/DoctorBlock'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
+})
+
+const DoctorFormValidation = Yup.object().shape({
+  doctorBlockUserFk: Yup.string().required(),
+  durationHour: Yup.string().required(),
+  durationMinute: Yup.string().required(),
+  eventDate: Yup.string().required(),
+  eventTime: Yup.string().required(),
 })
 
 @connect(({ doctorBlock }) => ({
@@ -55,17 +64,18 @@ class DoctorBlock extends PureComponent {
 
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
+        <Filter toggleModal={this.toggleModal} dispatch={dispatch} />
         <Grid onEditClick={this.handleEdit} dataSource={doctorBlock.list} />
         <CommonModal
           open={showModal}
-          title='Add Doctor Block'
+          observe='DoctorBlockForm'
+          title='Doctor Block'
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <DoctorBlockForm />
+          <DoctorBlockForm validationSchema={DoctorFormValidation} />
         </CommonModal>
       </CardContainer>
     )

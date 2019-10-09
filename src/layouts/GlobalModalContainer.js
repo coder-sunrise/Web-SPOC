@@ -166,7 +166,7 @@ class GlobalModalContainer extends PureComponent {
           bodyNoPadding
           onClose={(e) => {
             dispatch({
-              type: 'billing/closeBillingModal',
+              type: 'billing/closeModal',
             })
           }}
           fullScreen

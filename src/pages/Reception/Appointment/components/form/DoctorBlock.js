@@ -220,7 +220,6 @@ const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
         footer({
           confirmText: 'Confirm',
           onConfirm: handleSubmit,
-          extraButtons: <Button color='success'>Check Availability</Button>,
         })}
     </div>
   )
@@ -255,6 +254,7 @@ export default compose(
   })),
   withFormikExtend({
     displayName: 'DoctorBlockForm',
+    notDirtyDuration: 0.1,
     enableReinitialize: true,
     validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
       validationSchema,
