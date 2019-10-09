@@ -570,7 +570,6 @@ class PatientHistory extends Component {
       mode = 'split',
     } = this.props
 
-
     const { entity, visitInfo, selected } = patientHistory
     const cfg = {}
     if (mode === 'split') {

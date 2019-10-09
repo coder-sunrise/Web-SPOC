@@ -13,9 +13,13 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      totalWithGST: 0,
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
+        invoice: {
+          invoiceItem: [],
+        },
       },
       selectedWidgets: [
         '1',
@@ -74,24 +78,9 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          yield put({
-            type: 'queryDone',
-            payload: {
-              data: response,
-            },
-          })
-          sendNotification('QueueListing', {
-            message: `Dispense started`,
-          })
-        }
-        return response
-      },
-      *pause ({ payload }, { call, put }) {
-        const response = yield call(service.pause, payload)
-        if (response) {
-          sendNotification('QueueListing', {
-            message: `Dispense paused`,
-          })
+          // sendNotification('QueueListing', {
+          //   message: `Dispense started`,
+          // })
         }
         return response
       },

@@ -57,7 +57,6 @@ class TextEditorBase extends PureComponent {
     if (editRender) {
       return editRender(row)
     }
-    console.log(latestRow)
     const submitValue = (e) => {
       const error = updateCellValue(
         this.props,

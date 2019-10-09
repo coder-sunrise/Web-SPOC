@@ -19,6 +19,13 @@ import {
 } from '@/components'
 import config from './config'
 
+setTimeout(() => {
+  window.addEventListener('unhandledrejection', (event) => {
+    console.log(event)
+    event.preventDefault()
+  })
+}, 10000)
+
 document.addEventListener('click', () => {
   window.alreadyFocused = false
 })

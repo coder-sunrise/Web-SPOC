@@ -54,16 +54,14 @@ class DateEditorBase extends PureComponent {
       getRowId,
       ...restProps
     } = cfg
-
+    const lastestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][getRowId(row)] || {}
+      : row
     const commonCfg = {
       text,
       onChange,
-      disabled: isDisabled(
-        window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][getRowId(row)] || {}
-          : row,
-      ),
-      defaultValue: value,
+      disabled: isDisabled(lastestRow),
+      defaultValue: lastestRow[columnName],
     }
     if (text && !format) {
       commonCfg.format = dateFormatLong

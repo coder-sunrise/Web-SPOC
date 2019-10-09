@@ -1,5 +1,5 @@
 import React, { PureComponent, Suspense } from 'react'
-
+import { connect } from 'dva'
 import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
 
 import _ from 'lodash'
@@ -19,7 +19,7 @@ import {
   Divider,
   Slide,
   Tooltip,
-  SwipeableDrawer,
+  Drawer,
 } from '@material-ui/core'
 import MoreVert from '@material-ui/icons/MoreVert'
 import Delete from '@material-ui/icons/Delete'
@@ -69,6 +69,7 @@ import Authorized from '@/utils/Authorized'
 import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import styles from './style'
+import Templates from './Templates'
 
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
@@ -76,7 +77,9 @@ const sizes = Object.keys(breakpoints)
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 let lasActivedWidget = null
-
+// @connect(({ cestemplate }) => ({
+//   cestemplate,
+// }))
 class Layout extends PureComponent {
   constructor (props) {
     super(props)
@@ -335,16 +338,16 @@ class Layout extends PureComponent {
     const { associatedProps = [], onRemove, model } = wg
     associatedProps.forEach((ap) => {
       const v = values[ap]
-      console.log(ap, v)
+      // console.log(ap, v)
       if (v) {
         if (Array.isArray(v)) {
           // eslint-disable-next-line no-return-assign
-          console.log(
-            v.map((o) => ({
-              ...o,
-              isDeleted: true,
-            })),
-          )
+          // console.log(
+          //   v.map((o) => ({
+          //     ...o,
+          //     isDeleted: true,
+          //   })),
+          // )
           setFieldValue(
             ap,
             v.map((o) => ({
@@ -486,6 +489,12 @@ class Layout extends PureComponent {
 
   toggleDrawer = (event) => {
     this.setState((prevState) => ({ openDraw: !prevState.openDraw }))
+    const { cestemplate, dispatch } = this.props
+    if (cestemplate && !cestemplate.list) {
+      dispatch({
+        type: 'cestemplate/query',
+      })
+    }
   }
 
   compareNodeLayoutChange = (a, b) => {
@@ -566,7 +575,14 @@ class Layout extends PureComponent {
   render () {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, theme, height, values } = props
+    const {
+      classes,
+      theme,
+      height,
+      values,
+      cestemplate,
+      onSaveLayout = (f) => f,
+    } = props
     const widgetProps = {
       parentProps: props,
     }
@@ -624,9 +640,10 @@ class Layout extends PureComponent {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
       },
     }
+    console.log(this.props)
     return (
       <div>
-        {true && (
+        {false && (
           <div
             ref={this.layoutContainer}
             style={{
@@ -769,7 +786,7 @@ class Layout extends PureComponent {
                 </div>
               </Slide>
             </div>
-            <SwipeableDrawer
+            <Drawer
               anchor='right'
               open={this.state.openDraw}
               onClose={this.toggleDrawer}
@@ -814,18 +831,7 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <Select
-                      label='My Template'
-                      strongLabel
-                      options={[
-                        { id: 1, name: 'Template1' },
-                      ]}
-                      dropdownMatchSelectWidth={false}
-                    />
-                    <ProgressButton>Replace</ProgressButton>
-                    <ProgressButton color='danger' icon={<Delete />}>
-                      Delete
-                    </ProgressButton>
+                    <Templates />
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
@@ -839,7 +845,13 @@ class Layout extends PureComponent {
                     >
                       <div>
                         <p>
-                          <ProgressButton>Save as My Favourite</ProgressButton>
+                          <ProgressButton
+                            onClick={() => {
+                              onSaveLayout(this.state.currentLayout)
+                            }}
+                          >
+                            Save as My Favourite
+                          </ProgressButton>
                         </p>
                         <p>
                           <Button color='primary'>
@@ -851,7 +863,7 @@ class Layout extends PureComponent {
                   </div>
                 </SizeContainer>
               </div>
-            </SwipeableDrawer>
+            </Drawer>
           </React.Fragment>
         )}
       </div>
