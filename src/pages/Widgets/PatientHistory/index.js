@@ -496,31 +496,35 @@ class PatientHistory extends Component {
             />
           </GridItem>
           <GridItem md={3}>
-            {(!widget || showEditPatient)&& (
+            {(!widget || showEditPatient) && (
               <ProgressButton
                 color='primary'
                 style={{ marginLeft: theme.spacing(2) }}
                 size='sm'
                 onClick={() => {
-                  dispatch({
-                    type: `consultation/edit`,
-                    payload: {
-                      id: selected.id,
-                      version: patientHistory.version,
-                    },
-                  }).then((o) => {
-                    if (o)
-                      router.push(
-                        `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                      )
-                  })
+                  if (showEditPatient) {
+                    dispatch({
+                      type: 'patient/closePatientModal',
+                    })
+                  } else {
+                    dispatch({
+                      type: `consultation/edit`,
+                      payload: {
+                        id: selected.id,
+                        version: patientHistory.version,
+                      },
+                    }).then((o) => {
+                      if (o)
+                        router.push(
+                          `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                        )
+                    })
+                  }
                 }}
               >
                 Edit Consultation
               </ProgressButton>
             )}
-            
-
           </GridItem>
           <GridItem md={7} style={{ textAlign: 'right' }}>
             Update Date:
@@ -572,7 +576,6 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
-
 
     const { entity, visitInfo, selected } = patientHistory
     const cfg = {}
