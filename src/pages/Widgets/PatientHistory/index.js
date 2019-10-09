@@ -473,7 +473,7 @@ class PatientHistory extends Component {
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
         <GridContainer gutter={0} alignItems='center'>
-          <GridItem md={3}>
+          <GridItem md={2}>
             <Select
               // simple
               value={this.state.selectedItems}
@@ -495,8 +495,8 @@ class PatientHistory extends Component {
               maxTagCount={maxItemTagCount}
             />
           </GridItem>
-          <GridItem md={2}>
-            {!widget && (
+          <GridItem md={3}>
+            {(!widget || showEditPatient)&& (
               <ProgressButton
                 color='primary'
                 style={{ marginLeft: theme.spacing(2) }}
