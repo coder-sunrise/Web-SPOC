@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import * as Yup from 'yup'
 import DoctorBlock from '@/pages/Reception/Appointment/components/form/DoctorBlock'
 // import Edit from '@material-ui/icons/Edit'
 // import Delete from '@material-ui/icons/Delete'
@@ -16,6 +17,13 @@ import DoctorBlock from '@/pages/Reception/Appointment/components/form/DoctorBlo
 // } from '@/components'
 
 const styles = (theme) => ({})
+const DoctorFormValidation = Yup.object().shape({
+  doctorBlockUserFk: Yup.string().required(),
+  durationHour: Yup.string().required(),
+  durationMinute: Yup.string().required(),
+  eventDate: Yup.string().required(),
+  eventTime: Yup.string().required(),
+})
 
 class Detail extends PureComponent {
   state = {
@@ -39,11 +47,10 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { classes, theme, footer, values } = props
-    console.log('detail', props)
 
     return (
       <React.Fragment>
-        <DoctorBlock />
+        <DoctorBlock validationSchema={DoctorFormValidation} />
         {footer &&
           footer({
             onConfirm: props.handleSubmit,

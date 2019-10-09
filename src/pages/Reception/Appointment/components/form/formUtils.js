@@ -3,6 +3,7 @@ import * as Yup from 'yup'
 import { serverDateFormat, timeFormat, timeFormat24Hour } from '@/components'
 import { computeRRule } from '@/components/_medisys'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { getTimeObject, compare } from '@/utils/yup'
 
 const initDailyRecurrence = {
   recurrencePatternFK: 1,
@@ -290,4 +291,13 @@ export const filterRecurrenceDto = (recurrenceDto) => {
     }
   }
   return { ...recurrenceDto }
+}
+
+export const sortDataGrid = (a, b) => {
+  const start = getTimeObject(a.startTime)
+  const end = getTimeObject(b.startTime)
+  const aLessThanB = compare(start, end)
+  if (aLessThanB) return -1
+  if (!aLessThanB) return 1
+  return 0
 }

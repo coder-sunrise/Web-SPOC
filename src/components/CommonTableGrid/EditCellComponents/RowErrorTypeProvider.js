@@ -24,7 +24,7 @@ const RowErrorStyles = () => ({
 })
 
 const ListTypeError = ({ errors }) => {
-  console.log({ errors })
+  // console.log({ errors })
 
   return (
     <ul>
