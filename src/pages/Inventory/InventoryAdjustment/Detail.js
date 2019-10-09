@@ -316,39 +316,40 @@ class Detail extends PureComponent {
       this.setState({ stockList: newStockList })
     } else if (inventoryAdjustment.entity) {
       const { inventoryAdjustmentItems } = inventoryAdjustment.entity
-      const newList = inventoryAdjustmentItems.map((o) => {
-        const getType = type(o.inventoryTypeFK)
-        return {
-          ...o,
-          code: o[getType.typeName][getType.itemFK],
-          displayValue: o[getType.typeName][getType.itemFK],
-          batchNo: o[getType.typeName][getType.stockFK],
-          expiryDate: this.state[getType.stateName].find(
-            (i) => i.id === o[getType.typeName][getType.stockFK],
-          ).expiryDate,
-          stock: this.state[getType.stateName].find(
-            (i) => i.id === o[getType.typeName][getType.stockFK],
-          ).stock,
-          restValues: o[getType.typeName],
-        }
-      })
-      this.setState({ inventoryAdjustmentItems: newList })
+      if (inventoryAdjustmentItems) {
+        const newList = inventoryAdjustmentItems.map((o) => {
+          const getType = type(o.inventoryTypeFK)
+          return {
+            ...o,
+            code: o[getType.typeName][getType.itemFK],
+            displayValue: o[getType.typeName][getType.itemFK],
+            batchNo: o[getType.typeName][getType.stockFK],
+            expiryDate: this.state[getType.stateName].find(
+              (i) => i.id === o[getType.typeName][getType.stockFK],
+            ).expiryDate,
+            stock: this.state[getType.stateName].find(
+              (i) => i.id === o[getType.typeName][getType.stockFK],
+            ).stock,
+            restValues: o[getType.typeName],
+          }
+        })
+        this.setState({ inventoryAdjustmentItems: newList })
+        values.inventoryAdjustmentItems.forEach((o) => {
+          const getType = type(o.inventoryTypeFK)
+          const stockId = o[getType.typeName][getType.stockFK]
+          this.setState((prevState) => {
+            return {
+              [getType.filterStateName]: prevState[
+                getType.filterStateName
+              ].filter((j) => j.id !== stockId),
+            }
+          })
+        })
+      }
       // await setValues({
       //   ...values,
       //   inventoryAdjustmentItems: newList,
       // })
-
-      values.inventoryAdjustmentItems.forEach((o) => {
-        const getType = type(o.inventoryTypeFK)
-        const stockId = o[getType.typeName][getType.stockFK]
-        this.setState((prevState) => {
-          return {
-            [getType.filterStateName]: prevState[
-              getType.filterStateName
-            ].filter((j) => j.id !== stockId),
-          }
-        })
-      })
     }
   }
 
@@ -491,11 +492,12 @@ class Detail extends PureComponent {
     const { option, row } = e
     if (option) {
       const { expiryDate, stock, value, batchNo } = option
+      console.log('handleSelectedBatch', option, row)
+      this.setState({ selectedItem: e })
       row.batchNo = value
       row.expiryDate = expiryDate
-      // row.stock = stock
+      row.stock = stock
       row.batchNoString = batchNo
-      this.setState({ selectedItem: e })
     }
 
     this.props.dispatch({
@@ -533,20 +535,27 @@ class Detail extends PureComponent {
     const { option, row } = e
     if (option) {
       const { uom, value, code, name } = option
-      this.setState({ selectedItem: e })
       row.code = value
       row.displayValue = value
       row.uomDisplayValue = uom
       row.codeString = code
       row.displayValueString = name
-
+      row.batchNo = undefined
+      row.batchNoString = undefined
+      row.expiryDate = undefined
+      row.stock = undefined
+      console.log({ row })
+      this.setState({ selectedItem: e })
+      this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
         const getState = this.type(row.inventoryTypeFK)
         const defaultStock = this.state[getState.filteredStateName].find(
           (j) =>
             j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
         )
+        console.log({ defaultStock })
         if (defaultStock) {
+          console.log('defaultStock', defaultStock)
           row.batchNo = defaultStock.id
           row.stock = defaultStock.stock
 
@@ -637,22 +646,32 @@ class Detail extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
+    console.log({ addedRows })
     let returnRows = addedRows
     if (this.state.selectedItem) {
       console.log('selectedItem', this.state.selectedItem)
       const { option } = this.state.selectedItem
       const { uom, expiryDate, stock } = option
       if (uom) {
+        console.log('gtUOM', returnRows)
         returnRows = returnRows.map((r) => ({
           ...r,
           uomDisplayValue: uom,
+          stock: undefined,
+          expiryDate: undefined,
         }))
       } else {
-        returnRows = returnRows.map((r) => ({
-          ...r,
-          stock,
-          expiryDate,
-        }))
+        console.log('noUOM', returnRows, expiryDate, stock)
+        returnRows = returnRows.map((r) => {
+          const { uomDisplayValue } = r
+          console.log('distructure', r)
+          return {
+            ...r,
+            uomDisplayValue,
+            expiryDate,
+            stock,
+          }
+        })
       }
       console.log('cehcl', this.state.selectedBatch, returnRows)
       if (this.state.selectedBatch && returnRows) {
@@ -661,13 +680,21 @@ class Detail extends PureComponent {
           ...r,
           stock: this.state.selectedBatch.stock,
           batchNoString: this.state.selectedBatch.batchNo,
+          expiryDate,
         }))
       }
-      console.log({ returnRows })
+      console.log('returnRows1', returnRows)
+      // this.props.dispatch({
+      //   // force current edit row components to update
+      //   type: 'global/updateState',
+      //   payload: {
+      //     commitCount: (commitCount += 1),
+      //   },
+      // })
       return returnRows
     }
-
-    return addedRows
+    console.log('returnRows2', returnRows)
+    return returnRows
   }
 
   handleCancel = () => {
