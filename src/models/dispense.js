@@ -124,7 +124,7 @@ export default createFormViewModel({
         }
         return response
       },
-      *closeModal ({ payload }, { call, put }) {
+      *closeModal ({ payload = { toBillingPage: false } }, { call, put }) {
         const { toBillingPage = false } = payload
         // router.push(
         //   getRemovedUrl([

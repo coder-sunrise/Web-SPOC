@@ -22,11 +22,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   }
   if (type === 'Action') {
     // test only
-    if (name === 'queue.dispense') {
-      return [
-        { name, rights: 'hidden' },
-      ]
-    }
+    // if (name === 'queue.dispense') {
+    //   return [
+    //     { name, rights: 'hidden' },
+    //   ]
+    // }
     return [
       {
         name,
@@ -69,6 +69,7 @@ export default {
           },
           [],
         )
+        console.log({ data: response.data, accessRights })
         yield put({
           type: 'saveCurrentUser',
           payload: {
@@ -111,6 +112,7 @@ export default {
       }
     },
     saveCurrentUser (state, { payload }) {
+      console.log({ payload })
       sessionStorage.setItem(
         'accessRights',
         JSON.stringify(payload.accessRights),

@@ -171,13 +171,14 @@ export default createListViewModel({
             payload: {
               combineCondition: 'and',
               eql_appointmentDate: today,
-              group: [
-                {
-                  appointmentStatusFk: 5,
-                  eql_appointmentStatusFk: '1',
-                  combineCondition: 'or',
-                },
-              ],
+              in_appointmentStatusFk: '1|2|5',
+              // group: [
+              //   {
+              //     appointmentStatusFk: 5,
+              //     eql_appointmentStatusFk: '1',
+              //     combineCondition: 'or',
+              //   },
+              // ],
             },
           })
         }

@@ -34,6 +34,7 @@ export default (theme) => ({
   paymentSummary: {
     textAlign: 'right',
     marginTop: theme.spacing.unit * 2,
+    fontSize: '1rem',
   },
   addPaymentActionButtons: {
     textAlign: 'right',

@@ -189,7 +189,8 @@ const Grid = ({
   filter = StatusIndicator.ALL,
   selfOnly = false,
   queueList = [],
-  queryingData = false,
+  queryingList = false,
+  queryingFormData = false,
   showingVisitRegistration = false,
   handleEditVisitClick,
   onRegisterPatientClick,
@@ -440,10 +441,17 @@ const Grid = ({
       render: (row) => <ActionButton row={row} onClick={onClick} />,
     },
   ])
-  const isLoading = showingVisitRegistration ? false : queryingData
+  const isLoading = showingVisitRegistration ? false : queryingList
+  let loadingText = 'Refreshing queue...'
+  if (!queryingList && queryingFormData) loadingText = ''
+
   return (
     <div style={{ minHeight: '76vh' }}>
-      <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
+      <LoadingWrapper
+        linear
+        loading={isLoading || queryingFormData}
+        text={loadingText}
+      >
         <CommonTableGrid
           size='sm'
           TableProps={{ height: gridHeight }}
@@ -465,9 +473,10 @@ export default connect(({ queueLog, calendar, global, loading, user }) => ({
   queueList: queueLog.list || [],
   calendarEvents: calendar.list || [],
   showingVisitRegistration: global.showVisitRegistration,
-  queryingData:
+  queryingList:
     loading.effects['queueLog/refresh'] ||
     loading.effects['queueLog/getSessionInfo'] ||
     loading.effects['queueLog/query'] ||
     loading.effects['calendar/getCalendarList'],
+  queryingFormData: loading.effects['dispense/initState'],
 }))(Grid)
