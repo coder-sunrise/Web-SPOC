@@ -30,12 +30,14 @@ import { getAppendUrl } from '@/utils/utils'
     consultation,
     consultationDocument,
     orders,
+    patient,
   }) => ({
     dispense,
     visitRegistration,
     consultation,
     consultationDocument,
     orders,
+    patient: patient.entity,
   }),
 )
 class Dispense extends Component {

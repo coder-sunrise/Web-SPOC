@@ -189,7 +189,8 @@ const Grid = ({
   filter = StatusIndicator.ALL,
   selfOnly = false,
   queueList = [],
-  queryingData = false,
+  queryingList = false,
+  queryingFormData = false,
   showingVisitRegistration = false,
   handleEditVisitClick,
   onRegisterPatientClick,
@@ -247,6 +248,7 @@ const Grid = ({
     selfOnly,
     calendarEvents,
     queueList,
+    user,
   ])
 
   const deleteQueueConfirmation = (row) => {
@@ -268,7 +270,7 @@ const Grid = ({
       doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
     } = row
     const { clinicianProfile: { doctorProfile } } = user
-
+    console.log({ doctorProfile })
     if (!doctorProfile) {
       notification.error({
         message: 'Unauthorized Access',
@@ -313,7 +315,7 @@ const Grid = ({
         }).then((o) => {
           if (o)
             router.push(
-              `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md3=dsps`,
+              `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md2=dsps`,
             )
         })
 
@@ -321,12 +323,17 @@ const Grid = ({
       }
       case '1.1': {
         // billing
+        const version = Date.now()
         const parameters = {
-          vis: row.id,
+          qid: row.id,
+          vid: row.visitFK.id,
           pid: row.patientProfileFK,
+          v: version,
           md2: 'bill',
         }
-        router.push(getAppendUrl(parameters, '/reception/queue'))
+        router.push(
+          getAppendUrl(parameters, '/reception/queue/patientdashboard'),
+        )
         break
       }
       case '2': // delete visit
@@ -434,10 +441,17 @@ const Grid = ({
       render: (row) => <ActionButton row={row} onClick={onClick} />,
     },
   ])
-  const isLoading = showingVisitRegistration ? false : queryingData
+  const isLoading = showingVisitRegistration ? false : queryingList
+  let loadingText = 'Refreshing queue...'
+  if (!queryingList && queryingFormData) loadingText = ''
+
   return (
     <div style={{ minHeight: '76vh' }}>
-      <LoadingWrapper linear loading={isLoading} text='Refreshing queue...'>
+      <LoadingWrapper
+        linear
+        loading={isLoading || queryingFormData}
+        text={loadingText}
+      >
         <CommonTableGrid
           size='sm'
           TableProps={{ height: gridHeight }}
@@ -459,9 +473,10 @@ export default connect(({ queueLog, calendar, global, loading, user }) => ({
   queueList: queueLog.list || [],
   calendarEvents: calendar.list || [],
   showingVisitRegistration: global.showVisitRegistration,
-  queryingData:
+  queryingList:
     loading.effects['queueLog/refresh'] ||
     loading.effects['queueLog/getSessionInfo'] ||
     loading.effects['queueLog/query'] ||
     loading.effects['calendar/getCalendarList'],
+  queryingFormData: loading.effects['dispense/initState'],
 }))(Grid)

@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core'
 // custom component
 import { Button, GridContainer, GridItem } from '@/components'
-
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 import style from './style'
 
 const ButtonText = {
@@ -29,6 +29,7 @@ const FormFooter = ({
 }) => {
   const isNew = appointmentStatusFK === undefined
   const isDraft = appointmentStatusFK === 2
+  const isTurnedUp = appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP
 
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,
@@ -54,7 +55,7 @@ const FormFooter = ({
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
             onClick={handleCancelOrDeleteClick}
-            disabled={disabled}
+            disabled={disabled || isTurnedUp}
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>
@@ -69,7 +70,7 @@ const FormFooter = ({
             </Button>
           )}
           <Button
-            disabled={disabled}
+            disabled={disabled || isTurnedUp}
             onClick={handleConfirmClick}
             color='primary'
           >

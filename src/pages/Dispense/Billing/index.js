@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import router from 'umi/router'
 import { connect } from 'dva'
 import { withFormik } from 'formik'
 // material ui
@@ -14,10 +15,12 @@ import DispenseDetails from '../DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // page modal
-import CoPayment from './modal/CoPayment'
+import CoPayer from './modal/CoPayer'
 // import AddPayment from './AddPayment'
 // model
 import model from '../models/billing'
+// utils
+import { getAppendUrl } from '@/utils/utils'
 
 window.g_app.replaceModel(model)
 
@@ -37,7 +40,10 @@ const bannerStyle = {
   paddingRight: 16,
 }
 
-@connect(({ billing, dispense }) => ({ billing, dispense }))
+@connect(({ billing, dispense, patient }) => ({
+  billing,
+  dispense,
+}))
 @withFormik({
   mapPropsToValues: ({ billing }) => billing.entity || billing.default,
   handleSubmit: (values, formikBag) => {
@@ -51,11 +57,22 @@ class Billing extends Component {
   }
 
   backToDispense = () => {
-    const { history } = this.props
-    console.log({ history })
+    const { dispatch } = this.props
+    const parameters = {
+      md2: 'dsps',
+      // pid: patient.id,
+      // qid: '',
+    }
+    router.push(getAppendUrl(parameters), '/reception/queue/patientdashboard')
+    dispatch({
+      type: 'billing/closeModal',
+      payload: {
+        toDispensePage: true,
+      },
+    })
   }
 
-  toggleCoPaymentModal = () => {
+  toggleCopayerModal = () => {
     const { showCoPaymentModal } = this.state
     this.setState({ showCoPaymentModal: !showCoPaymentModal })
   }
@@ -97,7 +114,7 @@ class Billing extends Component {
           <GridContainer justify='center' alignItems='flex-start'>
             <GridContainer item md={8}>
               <ApplyClaims
-                handleCoPaymentClick={this.toggleCoPaymentModal}
+                handleAddCopayerClick={this.toggleCopayerModal}
                 values={values}
               />
             </GridContainer>
@@ -118,10 +135,10 @@ class Billing extends Component {
         <CommonModal
           open={showCoPaymentModal}
           title='Add Copayer'
-          onConfirm={this.toggleCoPaymentModal}
-          onClose={this.toggleCoPaymentModal}
+          onConfirm={this.toggleCopayerModal}
+          onClose={this.toggleCopayerModal}
         >
-          <CoPayment />
+          <CoPayer />
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}

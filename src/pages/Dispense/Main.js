@@ -65,17 +65,18 @@ const reloadDispense = (props, effect = 'query') => {
 })
 class Main extends Component {
   makePayment = () => {
-    const { dispatch, dispense } = this.props
-    const { patientInfo } = dispense
+    const { dispatch } = this.props
+
     dispatch({
-      type: 'dispense/closeDispenseModal',
+      type: 'dispense/closeModal',
+      payload: {
+        toBillingPage: true,
+      },
     })
     const parameters = {
-      pid: patientInfo.id,
       md2: 'bill',
     }
-    router.push(getAppendUrl(parameters, '/reception/queue'))
-    // this.props.history.push(`${location.pathname}/billing`)
+    router.push(getAppendUrl(parameters, '/reception/queue/patientdashboard'))
   }
 
   _editOrder = () => {

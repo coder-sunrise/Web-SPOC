@@ -39,7 +39,8 @@ const ActionButton = ({ row, onClick }) => {
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
   )
-  const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
+  // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
+
   const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.DISPENSE,
@@ -50,9 +51,13 @@ const ActionButton = ({ row, onClick }) => {
     VISIT_STATUS.PAUSED,
   ].includes(row.visitStatus)
 
+  const enableDispense = [
+    VISIT_STATUS.DISPENSE,
+    VISIT_STATUS.ORDER_UPDATED,
+  ].includes(row.visitStatus)
+
   const enableBilling = [
     VISIT_STATUS.BILLING,
-    VISIT_STATUS.ORDER_UPDATED,
   ].includes(row.visitStatus)
 
   const newContextMenuOptions = useMemo(
@@ -66,7 +71,7 @@ const ActionButton = ({ row, onClick }) => {
           case 1: // dispense
             return {
               ...opt,
-              disabled: !isStatusDispense,
+              disabled: !enableDispense,
             }
           case 1.1: // billing
             return { ...opt, disabled: !enableBilling }

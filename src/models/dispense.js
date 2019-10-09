@@ -31,14 +31,15 @@ export default createFormViewModel({
 
         if (
           pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
-          Number(query.vid)
+          Number(query.vid) &&
+          query.md2 === 'dsps'
         ) {
           dispatch({
             type: 'initState',
             payload: {
               version: Number(query.v) || undefined,
               visitID: Number(query.vid),
-              md: query.md3,
+              md: query.md2,
             },
           })
         }
@@ -102,14 +103,25 @@ export default createFormViewModel({
 
         return response
       },
-      *closeModal ({ payload }, { call, put }) {
-        router.push(
-          getRemovedUrl([
-            'md2',
-            'cmt',
-            'vid',
-          ]),
-        )
+      *discard ({ payload }, { call, put }) {
+        const response = yield call(service.remove, payload)
+
+        if (response) {
+          sendNotification('QueueListing', {
+            message: `Dispense discarded`,
+          })
+        }
+        return response
+      },
+      *closeModal ({ payload = { toBillingPage: false } }, { call, put }) {
+        const { toBillingPage = false } = payload
+        // router.push(
+        //   getRemovedUrl([
+        //     'md2',
+        //     // 'cmt',
+        //     // 'vid',
+        //   ]),
+        // )
         yield put({
           type: 'updateState',
           payload: {
@@ -124,7 +136,7 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
-        router.push('/reception/queue')
+        if (!toBillingPage) router.push('/reception/queue')
       },
       // *queryDone ({ payload }, { call, put, select }) {
       //   // console.log('queryDone', payload)
