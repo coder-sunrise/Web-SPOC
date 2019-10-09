@@ -37,14 +37,18 @@ export default createListViewModel({
     },
     subscriptions: ({ dispatch, history }) => {
       // history.listen((location) => {
-      //   const { pathname } = location
+      //   const { pathname, query } = location
       //   const allowedPaths = [
       //     '/reception/queue',
       //   ]
-      //   if (allowedPaths.includes(pathname)) {
-      //     dispatch({
-      //       type: 'initState',
-      //     })
+
+      //   if (
+      //     allowedPaths.includes(pathname) &&
+      //     Object.keys(query).length === 0
+      //   ) {
+      //     // dispatch({
+      //     //   type: 'initState',
+      //     // })
       //   }
       // })
       subscribeNotification('QueueListing', {
@@ -167,13 +171,14 @@ export default createListViewModel({
             payload: {
               combineCondition: 'and',
               eql_appointmentDate: today,
-              group: [
-                {
-                  appointmentStatusFk: 5,
-                  eql_appointmentStatusFk: '1',
-                  combineCondition: 'or',
-                },
-              ],
+              in_appointmentStatusFk: '1|2|5',
+              // group: [
+              //   {
+              //     appointmentStatusFk: 5,
+              //     eql_appointmentStatusFk: '1',
+              //     combineCondition: 'or',
+              //   },
+              // ],
             },
           })
         }

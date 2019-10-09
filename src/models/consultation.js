@@ -91,6 +91,7 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation paused`,
           })
+          yield put({ type: 'closeModal' })
         }
         return response
       },
@@ -141,6 +142,7 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation signed`,
           })
+          yield put({ type: 'closeModal' })
         }
         return response
       },
@@ -151,6 +153,7 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation discarded`,
           })
+          yield put({ type: 'closeModal' })
         }
         return response
       },
@@ -178,13 +181,21 @@ export default createFormViewModel({
         console.log(response)
         return response
       },
-      *closeModal ({ payload }, { call, put }) {
+      *closeModal ({ payload }, { call, put, take }) {
         yield put({
           type: 'global/updateAppState',
           payload: {
             disableSave: false,
             showConsultationPanel: false,
             fullscreen: false,
+          },
+        })
+        yield take('global/updateAppState/@@end')
+        yield put({
+          type: 'formik/updateState',
+          payload: {
+            ConsultationPage: undefined,
+            ConsultationDocumentList: undefined,
           },
         })
         router.push('/reception/queue')

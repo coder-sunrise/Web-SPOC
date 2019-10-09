@@ -67,18 +67,31 @@ const generateClaimSequenceData = () => {
 
 export const ClaimSequenceData = generateClaimSequenceData()
 
-export const CoPaymentColumns = [
+export const CoPayerColumns = [
   { name: 'name', title: 'Name' },
   { name: 'payableAmount', title: 'Payable Amount' },
-  { name: 'claimAmount', title: 'Claim Amount' },
+  {
+    name: 'claimAmount',
+    title: 'Claim Amount',
+  },
 ]
 
-export const CoPaymentColExtensions = [
+export const CoPayerColExtensions = [
   { columnName: 'payableAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
+  {
+    columnName: 'claimAmount',
+    // type: 'currency',
+    // currency: true,
+    render: (row) => (
+      <FastField
+        name={`coPayer[${row.rowIndex}]claimAmount`}
+        render={(args) => <NumberInput {...args} size='sm' />}
+      />
+    ),
+  },
 ]
 
-const generateCoPaymentData = () => {
+const generateCoPayerData = () => {
   let data = []
   for (let i = 0; i < 4; i++) {
     data.push({
@@ -91,4 +104,4 @@ const generateCoPaymentData = () => {
   return data
 }
 
-export const CoPaymentData = generateCoPaymentData()
+export const CoPayerData = generateCoPayerData()

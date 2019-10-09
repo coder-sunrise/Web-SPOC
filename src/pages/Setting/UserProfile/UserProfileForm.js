@@ -156,6 +156,7 @@ const styles = (theme) => ({
 class UserProfileForm extends React.PureComponent {
   state = {
     showChangePassword: false,
+    canEditDoctorMCR: false,
   }
 
   toggleChangePasswordModal = () => {
@@ -164,11 +165,20 @@ class UserProfileForm extends React.PureComponent {
     }))
   }
 
+  onRoleChange = (value) => {
+    const { ctRole } = this.props
+    const role = ctRole.find((item) => item.id === value)
+
+    this.setState({
+      canEditDoctorMCR: role.name === 'Doctor' || role.name === 'Doctor Owner',
+    })
+  }
+
   render () {
     const { classes, footer, handleSubmit, values } = this.props
-    const { showChangePassword } = this.state
+    const { showChangePassword, canEditDoctorMCR } = this.state
     const isEdit = values.id !== undefined
-    console.log({ values })
+
     return (
       <React.Fragment>
         <GridContainer
@@ -275,13 +285,13 @@ class UserProfileForm extends React.PureComponent {
               />
             </GridItem>
             <GridItem md={6}>
-              <FastField
+              <Field
                 name='doctorProfile.doctorMCRNo'
                 render={(args) => (
                   <TextField
                     {...args}
                     label='Doctor MCR No.'
-                    disabled={isEdit}
+                    disabled={!canEditDoctorMCR}
                   />
                 )}
               />
@@ -347,7 +357,12 @@ class UserProfileForm extends React.PureComponent {
               <Field
                 name='role'
                 render={(args) => (
-                  <CodeSelect {...args} label='Role' code='role' />
+                  <CodeSelect
+                    {...args}
+                    label='Role'
+                    code='role'
+                    onChange={this.onRoleChange}
+                  />
                 )}
               />
             </GridItem>
