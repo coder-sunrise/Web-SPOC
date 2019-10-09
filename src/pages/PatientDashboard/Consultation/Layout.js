@@ -640,10 +640,10 @@ class Layout extends PureComponent {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
       },
     }
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div>
-        {false && (
+        {true && (
           <div
             ref={this.layoutContainer}
             style={{

@@ -104,7 +104,6 @@ class EditableTableGrid extends PureComponent {
 
   onRowDoubleClick = (row, e) => {
     const { getRowId = (r) => r.id } = this.props
-    console.log(row)
     if (
       [
         'svg',
