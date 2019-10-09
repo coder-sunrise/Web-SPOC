@@ -2,7 +2,7 @@ import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { GridItem } from '@/components'
+import { GridItem, FastField, NumberInput } from '@/components'
 // styling
 import styles from './styles'
 
@@ -20,7 +20,12 @@ const PaymentSummary = ({ classes }) => (
       <GridItem md={6}>Collectable Amount: </GridItem>
       <GridItem md={6}>$ 0.00</GridItem>
       <GridItem md={6}>Cash Received: </GridItem>
-      <GridItem md={6}>$ 0.00</GridItem>
+      <GridItem md={6}>
+        <FastField
+          name='cashReceived'
+          render={(args) => <NumberInput {...args} />}
+        />
+      </GridItem>
       <GridItem md={6}>Cash Returned: </GridItem>
       <GridItem md={6}>$ 0.00</GridItem>
     </GridItem>

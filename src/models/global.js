@@ -49,21 +49,13 @@ export default createFormViewModel({
           //   },
           // })
         } else if (query.md2 === 'disp') {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              fullscreen: true,
-              showDispensePanel: true,
-            },
-          })
-        } else if (query.md2 === 'bill') {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              fullscreen: true,
-              showBillingPanel: true,
-            },
-          })
+          // dispatch({
+          //   type: 'updateState',
+          //   payload: {
+          //     fullscreen: true,
+          //     showDispensePanel: true,
+          //   },
+          // })
         } else {
           dispatch({
             type: 'updateState',

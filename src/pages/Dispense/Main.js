@@ -68,17 +68,18 @@ const refresh = (props) => {
 })
 class Main extends Component {
   makePayment = () => {
-    const { dispatch, patient } = this.props
+    const { dispatch } = this.props
 
     dispatch({
       type: 'dispense/closeModal',
+      payload: {
+        toBillingPage: true,
+      },
     })
     const parameters = {
-      pid: patient.id,
       md2: 'bill',
     }
-    router.push(getAppendUrl(parameters, '/reception/queue'))
-    // this.props.history.push(`${location.pathname}/billing`)
+    router.push(getAppendUrl(parameters, '/reception/queue/patientdashboard'))
   }
 
   _editOrder = () => {
@@ -114,7 +115,7 @@ class Main extends Component {
 
   render () {
     const { classes, dispense, handleSubmit } = this.props
-
+    console.log({ values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>

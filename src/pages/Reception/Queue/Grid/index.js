@@ -322,12 +322,17 @@ const Grid = ({
       }
       case '1.1': {
         // billing
+        const version = Date.now()
         const parameters = {
-          vis: row.id,
+          qid: row.id,
+          vid: row.visitFK.id,
           pid: row.patientProfileFK,
+          v: version,
           md2: 'bill',
         }
-        router.push(getAppendUrl(parameters, '/reception/queue'))
+        router.push(
+          getAppendUrl(parameters, '/reception/queue/patientdashboard'),
+        )
         break
       }
       case '2': // delete visit

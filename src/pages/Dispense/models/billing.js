@@ -31,10 +31,10 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
         const { query, pathname } = location
-        if (pathname === '/reception/queue') {
-          const { pid, vis, md3 } = query
+        if (pathname === '/reception/queue/patientdashboard') {
+          const { pid, vis, md2 } = query
 
-          if (md3 === 'bill') {
+          if (md2 === 'bill') {
             dispatch({
               type: 'initState',
               payload: { pid, vis },
@@ -48,16 +48,23 @@ export default createFormViewModel({
         // yield put({
         //   type: 'query',
         // })
+        yield put({
+          type: 'global/updateAppState',
+          payload: {
+            fullscreen: true,
+            showBillingPanel: true,
+          },
+        })
       },
-      *closeBillingModal (_, { put }) {
-        router.push(
-          getRemovedUrl([
-            'md3',
-            'cmt',
-            // 'pid',
-            'new',
-          ]),
-        )
+      *closeModal ({ payload }, { put }) {
+        const { toDispensePage = false } = payload
+        // router.push(
+        //   getRemovedUrl([
+        //     'md2',
+        //     'cmt',
+        //     'vid',
+        //   ]),
+        // )
         yield put({
           type: 'updateState',
           payload: {
@@ -72,11 +79,13 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
-        yield put({
-          type: 'patient/updateState',
-          payload: { entity: null },
-        })
-        router.push('/reception/queue')
+        if (!toDispensePage) {
+          yield put({
+            type: 'patient/updateState',
+            payload: { entity: null },
+          })
+          router.push('/reception/queue')
+        }
       },
       *fetchPatientInfo ({ payload }, { call, put }) {
         const response = yield call(queryPatient, payload)
