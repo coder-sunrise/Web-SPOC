@@ -45,167 +45,8 @@ class Details extends PureComponent {
       { name: 'payableAmount', title: 'Payable Amount' },
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'remark', title: 'Remarks' },
-      { name: 'action', title: 'Action' },
     ],
 
-    // editingRowIds: [],
-    // rowChanges: {},
-    // rows: [
-    //   {
-    //     id: 'PT-000001A',
-    //     invoiceNo: 'IV-000001',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000002A',
-    //     invoiceNo: 'IV-000002',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000003A',
-    //     invoiceNo: 'IV-000003',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000004A',
-    //     invoiceNo: 'IV-000004',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000005A',
-    //     invoiceNo: 'IV-000005A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000006A',
-    //     invoiceNo: 'IV-000006A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000007A',
-    //     invoiceNo: 'IV-000007A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000008A',
-    //     invoiceNo: 'IV-000008A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000009A',
-    //     invoiceNo: 'IV-000009A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000010A',
-    //     invoiceNo: 'PT-000010A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000011A',
-    //     invoiceNo: 'IV-000011A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000012A',
-    //     invoiceNo: 'IV-000012A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000013A',
-    //     invoiceNo: 'IV-000013A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    //   {
-    //     id: 'PT-000014A',
-    //     invoiceNo: 'IV-000014A',
-    //     invoiceDate: moment()
-    //       .add(Math.ceil(Math.random() * 100) - 100, 'days')
-    //       .format('LLL'),
-    //     patientName: 'Patient 01',
-    //     adminCharge: 10,
-    //     payableAmount: 100,
-    //     outstandingBalance: 100,
-    //   },
-    // ],
     FuncProps: { selectable: true },
 
     showCollectPayment: false,
@@ -251,13 +92,7 @@ class Details extends PureComponent {
   }
 
   render () {
-    const {
-      columns,
-      columnExtensions,
-      showCollectPayment,
-      FuncProps,
-      showModal,
-    } = this.state
+    const { columns, showCollectPayment, FuncProps, showModal } = this.state
     const { classes, statement, values, type } = this.props
     return (
       <div>
@@ -299,24 +134,6 @@ class Details extends PureComponent {
               columnName: 'invoiceDate',
               type: 'date',
               format: { dateFormatLong },
-            },
-            {
-              columnName: 'action',
-              align: 'center',
-              render: (row) => {
-                return (
-                  <Button
-                    size='sm'
-                    // onClick={() => {
-                    //   editRow(row)
-                    // }}
-                    justIcon
-                    color='primary'
-                  >
-                    <Delete />
-                  </Button>
-                )
-              },
             },
           ]}
           FuncProps={FuncProps}

@@ -104,6 +104,9 @@ class Statement extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'statement/query',
+      payload: {
+        isCancelled: false,
+      },
     })
   }
 
@@ -134,19 +137,33 @@ class Statement extends PureComponent {
     })
   }
 
+  confirmDelete = () => {
+    this.setState((prevState) => {
+      return { open: !prevState.open }
+    })
+
+    const { dispatch, statement } = this.props
+    const rowId = statement.entity.list.find(
+      (o) => o.statementNo === this.state.selectedStatementNo,
+    ).id
+
+    dispatch({
+      type: 'statement/removeRow',
+      payload: {
+        id: rowId,
+        cancelReason: 'Statement Cancelled',
+      },
+    }).then(() => {
+      this.props.dispatch({
+        type: 'statement/query',
+      })
+    })
+  }
+
   handleClose = (e) => {
-    this.setState(
-      (prevState) => {
-        return { open: false }
-      },
-      () => {
-        return {
-          rows: this.state.rows.filter(
-            (row) => row.statementNo !== this.state.selectedStatementNo,
-          ),
-        }
-      },
-    )
+    this.setState((prevState) => {
+      return { open: !prevState.open }
+    })
   }
 
   render () {
@@ -239,7 +256,7 @@ class Statement extends PureComponent {
               No
             </Button>
             <Button
-              onClick={this.handleClose}
+              onClick={this.confirmDelete}
               value='true'
               color='primary'
               autoFocus
