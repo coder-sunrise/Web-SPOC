@@ -148,6 +148,7 @@ class Detail extends PureComponent {
     filterStockVaccination: [], // vaccination
     filterStockConsumable: [], // consumable
     stockList: [],
+    editingRowIds: [],
   }
 
   tableParas = {
@@ -455,7 +456,41 @@ class Detail extends PureComponent {
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
 
-      return row.id ? this.state.stockMedication : x
+      const tempStockMedication = [
+        ...this.state.stockMedication,
+      ]
+      const filteredTempStockMedication = tempStockMedication.filter(
+        (o) => o.inventoryItemFK === row.code,
+      )
+
+      const tableRows =
+        this.state.inventoryAdjustmentItems.length === 0
+          ? this.state.stockList
+          : this.state.inventoryAdjustmentItems
+
+      const edittingRowId =
+        this.state.editingRowIds.length > 0
+          ? this.state.editingRowIds[0]
+          : undefined
+      let test = filteredTempStockMedication
+      if (edittingRowId) {
+        const batchNoId = tableRows.find((o) => o.id === edittingRowId).batchNo
+        console.log('tesbatchNoIdt', batchNoId, edittingRowId)
+        const edittingBatchNo = this.state.stockMedication.find(
+          (o) => o.id === batchNoId,
+        )
+
+        test = [
+          ...x,
+          edittingBatchNo,
+        ]
+        console.log('test', test)
+      }
+      console.log('cehck', tableRows, this.state.editingRowIds)
+
+      console.log('as', this.state.editingRows)
+      console.log('check', x, array)
+      return row.id ? test : x
     }
     if (row.inventoryTypeFK === 2) {
       let array = [
@@ -480,9 +515,9 @@ class Detail extends PureComponent {
       const getState = this.type(row.inventoryTypeFK)
       this.setState((prevState) => {
         return {
-          [getState.filteredStateName]: prevState[getState.stateName].filter(
-            (o) => o.id !== row.batchNo,
-          ),
+          [getState.filteredStateName]: prevState[
+            getState.filteredStateName
+          ].filter((o) => o.id !== row.batchNo),
         }
       })
     }
@@ -714,7 +749,13 @@ class Detail extends PureComponent {
     handleSubmit()
   }
 
+  changeEditingRowIds = (editingRowIds) => {
+    console.log('editingRowIds', editingRowIds)
+    this.setState({ editingRowIds })
+  }
+
   render () {
+    console.log('state', this.state)
     const { props } = this
     const { theme, values, handleSubmit, getRunningNo, footer } = props
     const cfg = {}
@@ -803,14 +844,15 @@ class Detail extends PureComponent {
               addNewLabelName: 'New Inventory Adjustment',
             }}
             schema={inventoryAdjustmentSchema}
+            // onRowDoubleClick={this.onEditingRowsChange}
             EditingProps={{
               showAddCommand: values.inventoryAdjustmentStatusFK === 1,
               showEditCommand: values.inventoryAdjustmentStatusFK === 1,
               showDeleteCommand: values.inventoryAdjustmentStatusFK === 1,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,
-              // columnEditingEnabled: false,
-              // editingEnabled: false,
+              onEditingRowIdsChange: this.changeEditingRowIds,
+              editingRowIds: this.state.editingRowIds,
             }}
             {...cfg}
             rows={
