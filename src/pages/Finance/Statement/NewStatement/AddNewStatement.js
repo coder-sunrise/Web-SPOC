@@ -197,13 +197,15 @@ class AddNewStatement extends PureComponent {
       type: 'statement/queryInvoiceList',
       payload,
     }).then((invoiceList) => {
-      const { data } = invoiceList.data
-      this.setState((prevState) => {
-        return [
-          ...prevState.invoiceRows,
-          data,
-        ]
-      })
+      if (invoiceList) {
+        const { data } = invoiceList.data
+        this.setState((prevState) => {
+          return [
+            ...prevState.invoiceRows,
+            data,
+          ]
+        })
+      }
     })
   }
 

@@ -11,7 +11,7 @@ import {
   CommonTableGrid,
   CommonModal,
   dateFormatLong,
-  dateFormatWithTime,
+  dateFormatLongWithTime,
   ProgressButton,
 } from '@/components'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
@@ -144,7 +144,7 @@ class Details extends PureComponent {
 
         <h5>
           {`Last Refreshed On ${moment(values.lastRefreshTime).format(
-            dateFormatWithTime,
+            dateFormatLongWithTime,
           ) || '-'}`}
         </h5>
 

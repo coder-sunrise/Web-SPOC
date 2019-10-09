@@ -198,15 +198,38 @@ class Statement extends PureComponent {
           columns={columns}
           FuncProps={{ selectable: true }}
           columnExtensions={[
-            { columnName: 'payableAmount', type: 'number', currency: true },
-            { columnName: 'totalPaid', type: 'number', currency: true },
-            { columnName: 'outstandingAmount', type: 'number', currency: true },
+            {
+              columnName: 'company',
+              sortBy: 'CopayerFKNavigation.displayValue',
+            },
+            {
+              columnName: 'payableAmount',
+              type: 'number',
+              currency: true,
+              sortBy: 'totalAmount',
+            },
+            {
+              columnName: 'totalPaid',
+              type: 'number',
+              currency: true,
+              sortBy: 'CollectedAmount',
+            },
+            {
+              columnName: 'outstandingAmount',
+              type: 'number',
+              currency: true,
+            },
             {
               columnName: 'statementDate',
               type: 'date',
               format: { dateFormatLong },
             },
-            { columnName: 'dueDate', type: 'date', format: { dateFormatLong } },
+            {
+              columnName: 'dueDate',
+              type: 'date',
+              format: { dateFormatLong },
+              sortBy: 'DueDate',
+            },
             {
               columnName: 'action',
               align: 'center',
