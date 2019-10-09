@@ -456,18 +456,20 @@ class PatientHistory extends Component {
       patientHistory,
       dispatch,
       widget,
+      showEditPatient,
     } = this.props
     const { entity, selected } = patientHistory
 
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
-    console.log({ maxItemTagCount, selected: this.state.selectedItems })
+   // console.log({ maxItemTagCount, selected: this.state.selectedItems })
+
     return (
       <CardContainer
         hideHeader
         size='sm'
         className={classnames({
-          [classes.rightPanel]: !widget,
-          [override.rightPanel]: !widget,
+          [classes.rightPanel]: true,
+          [override.rightPanel]: true,
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
@@ -518,6 +520,8 @@ class PatientHistory extends Component {
                 Edit Consultation
               </ProgressButton>
             )}
+            
+
           </GridItem>
           <GridItem md={7} style={{ textAlign: 'right' }}>
             Update Date:

@@ -21,6 +21,10 @@ import { Attachment } from '@/components/_medisys'
 import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
+import {
+  errMsgForOutOfRange as errMsg,
+  navigateDirtyCheck,
+} from '@/utils/utils'
 
 let size = 0
 
@@ -317,6 +321,7 @@ class ClinicalNotes extends Component {
         showScribbleModal: !scriblenotes.showScribbleModal,
       },
     })
+    console.log("close")
   }
 
   getScribbleValue = (test) => {
@@ -1043,7 +1048,8 @@ class ClinicalNotes extends Component {
           title='Scribble'
           fullScreen
           bodyNoPadding
-          onClose={() => this.toggleScribbleModal()}
+          observe='scribbleNotePage'
+          onClose={() => navigateDirtyCheck(this.toggleScribbleModal())}
         >
           <ScribbleNote
             {...this.props}

@@ -26,7 +26,9 @@ import InVisibility from '@material-ui/icons/VisibilityOff'
 import MaterialTextField from '@material-ui/core/TextField'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import { Radio } from 'antd'
+import { Divider } from '@material-ui/core'
 import Yup from '@/utils/yup'
+
 import {
   GridContainer,
   GridItem,
@@ -41,6 +43,11 @@ import {
   withFormikExtend,
   FastField,
 } from '@/components'
+
+import {
+  errMsgForOutOfRange as errMsg,
+  navigateDirtyCheck,
+} from '@/utils/utils'
 
 const styles = () => ({
   container: {
@@ -100,6 +107,7 @@ const styles = () => ({
 
 let temp = null
 @withFormikExtend({
+  notDirtyDuration: 0.5,
   mapPropsToValues: ({ scriblenotes }) => {
     return scriblenotes.entity === '' ? '' : scriblenotes.entity
   },
@@ -112,6 +120,7 @@ let temp = null
     props.addScribble(values.subject, temp)
     props.toggleScribbleModal()
   },
+  displayName: 'scribbleNotePage',
 })
 class Scribble extends React.Component {
   constructor (props) {
@@ -305,31 +314,43 @@ class Scribble extends React.Component {
   toolHandleClickAway = () => {
     const { toolsColor } = this.state
     this.setState({
-      toolsColor: !toolsColor,
+      toolsColor: false,
+      selectColorColor: false,
+      imageColor: false,
+      textColor: false,
     })
   }
 
   colorHandleClickAway = () => {
     const { selectColorColor } = this.state
     this.setState({
-      selectColorColor: !selectColorColor,
+      toolsColor: false,
+      selectColorColor: false,
+      imageColor: false,
+      textColor: false,
     })
   }
 
   imageHandleClickAway = () => {
     const { imageColor } = this.state
     this.setState({
-      imageColor: !imageColor,
+      toolsColor: false,
+      selectColorColor: false,
+      imageColor: false,
+      textColor: false,
     })
   }
 
   textHandleClickAway = () => {
     const { textColor } = this.state
     this.setState({
-      textColor: !textColor,
+      toolsColor: false,
+      selectColorColor: false,
+      imageColor: false,
+      textColor: false,
     })
   }
-
+  
   render () {
     const {
       classes,
@@ -338,6 +359,8 @@ class Scribble extends React.Component {
       deleteScribbleNote,
       setFieldValue,
     } = this.props
+
+    console.log("test " , this.props)
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -389,6 +412,10 @@ class Scribble extends React.Component {
                       tool: 'select',
                       eraserColor: false,
                       selectColor: true,
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
                     })
                   }}
                 >
@@ -401,6 +428,11 @@ class Scribble extends React.Component {
                 content={
                   <ClickAwayListener onClickAway={this.toolHandleClickAway}>
                     <div>
+                      <div style={{ paddingBottom: 10 }}>
+                        <Typography>Select Tools</Typography>
+                        <Divider />
+                      </div>
+
                       <div>
                         <Typography>Please select Canvas Tool</Typography>
                         <br />
@@ -492,7 +524,7 @@ class Scribble extends React.Component {
                     </div>
                   </ClickAwayListener>
                 }
-                title='Select Tools'
+                // title='Select Tools'
                 trigger='click'
                 placement='bottomLeft'
                 visible={this.state.toolsVisible}
@@ -500,7 +532,10 @@ class Scribble extends React.Component {
                 onClick={() => {
                   const { toolsColor } = this.state
                   this.setState(() => ({
-                    toolsColor: !toolsColor,
+                    toolsColor: true,
+                    selectColorColor: false,
+                    imageColor: false,
+                    textColor: false,
                   }))
                 }}
               >
@@ -516,6 +551,10 @@ class Scribble extends React.Component {
                 content={
                   <ClickAwayListener onClickAway={this.colorHandleClickAway}>
                     <div>
+                      <div style={{ paddingBottom: 10 }}>
+                        <Typography>Colors</Typography>
+                        <Divider />
+                      </div>
                       <Typography>Line Color</Typography>
                       <CompactPicker
                         id='lineColor'
@@ -547,7 +586,7 @@ class Scribble extends React.Component {
                     </div>
                   </ClickAwayListener>
                 }
-                title='Colors'
+                // title='Colors'
                 trigger='click'
                 placement='bottomLeft'
                 visible={this.state.colorVisible}
@@ -555,13 +594,18 @@ class Scribble extends React.Component {
                 onClick={() => {
                   const { selectColorColor } = this.state
                   this.setState(() => ({
-                    selectColorColor: !selectColorColor,
+                    toolsColor: false,
+                    selectColorColor: true,
+                    imageColor: false,
+                    textColor: false,
                   }))
                 }}
               >
                 <Tooltip title='Colors'>
                   <ToggleButton key={3}>
-                    <ColorLens color={this.state.selectColorColor ? 'primary' : ''}/>
+                    <ColorLens
+                      color={this.state.selectColorColor ? 'primary' : ''}
+                    />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
@@ -571,6 +615,10 @@ class Scribble extends React.Component {
                 content={
                   <ClickAwayListener onClickAway={this.imageHandleClickAway}>
                     <div>
+                      <div style={{ paddingBottom: 10 }}>
+                        <Typography>Select Image</Typography>
+                        <Divider />
+                      </div>
                       <Paper className={classes.templateImage}>
                         <List>
                           <div className={classes.imageOption}>
@@ -692,7 +740,7 @@ class Scribble extends React.Component {
                     </div>
                   </ClickAwayListener>
                 }
-                title='Select Image'
+                // title='Select Image'
                 trigger='click'
                 placement='bottomLeft'
                 visible={this.state.imageVisible}
@@ -700,13 +748,18 @@ class Scribble extends React.Component {
                 onClick={() => {
                   const { imageColor } = this.state
                   this.setState(() => ({
-                    imageColor: !imageColor,
+                    toolsColor: false,
+                    selectColorColor: false,
+                    imageColor: true,
+                    textColor: false,
                   }))
                 }}
               >
                 <Tooltip title='Insert Image'>
                   <ToggleButton key={4}>
-                    <InsertPhoto color={this.state.imageColor ? 'primary' : ''}/>
+                    <InsertPhoto
+                      color={this.state.imageColor ? 'primary' : ''}
+                    />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
@@ -716,6 +769,10 @@ class Scribble extends React.Component {
                   content={
                     <ClickAwayListener onClickAway={this.textHandleClickAway}>
                       <div>
+                        <div style={{ paddingBottom: 10 }}>
+                          <Typography>Text</Typography>
+                          <Divider />
+                        </div>
                         <MaterialTextField
                           label='Text'
                           helperText='Add text to Sketch'
@@ -730,7 +787,7 @@ class Scribble extends React.Component {
                       </div>
                     </ClickAwayListener>
                   }
-                  title='Text'
+                  // title='Text'
                   trigger='click'
                   placement='bottomLeft'
                   // visible={this.state.colorVisible}
@@ -738,13 +795,16 @@ class Scribble extends React.Component {
                   onClick={() => {
                     const { textColor } = this.state
                     this.setState(() => ({
-                      textColor: !textColor,
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: true,
                     }))
                   }}
                 >
                   <Tooltip title='Colors'>
                     <ToggleButton key={3}>
-                      <Title color={this.state.textColor ? 'primary' : ''}/>
+                      <Title color={this.state.textColor ? 'primary' : ''} />
                     </ToggleButton>
                   </Tooltip>
                 </Popover>
@@ -758,6 +818,10 @@ class Scribble extends React.Component {
                       tool: 'eraser',
                       eraserColor: true,
                       selectColor: false,
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
                     })
                   }}
                 >
@@ -765,7 +829,19 @@ class Scribble extends React.Component {
                 </ToggleButton>
               </Tooltip>
               <Tooltip title='Save'>
-                <ToggleButton key={6} onClick={this._download}>
+                <ToggleButton
+                  key={6}
+                  onClick={() => {
+                    this._download()
+
+                    this.setState({
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
+                    })
+                  }}
+                >
                   <Save />
                 </ToggleButton>
               </Tooltip>
@@ -774,7 +850,16 @@ class Scribble extends React.Component {
                   key={7}
                   color='primary'
                   disabled={!this.state.canUndo}
-                  onClick={this._undo}
+                  onClick={() => {
+                    this._undo()
+
+                    this.setState({
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
+                    })
+                  }}
                 >
                   <UndoIcon
                     color={this.state.canUndo ? 'primary' : 'disabled'}
@@ -786,7 +871,16 @@ class Scribble extends React.Component {
                   key={8}
                   color='primary'
                   disabled={!this.state.canRedo}
-                  onClick={this._redo}
+                  onClick={() => {
+                    this._redo()
+
+                    this.setState({
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
+                    })
+                  }}
                 >
                   <RedoIcon
                     color={this.state.canRedo ? 'primary' : 'disabled'}
@@ -798,7 +892,16 @@ class Scribble extends React.Component {
                   key={9}
                   color='primary'
                   disabled={!this.state.canClear}
-                  onClick={this._clear}
+                  onClick={() => {
+                    this._clear()
+
+                    this.setState({
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
+                    })
+                  }}
                 >
                   <DeleteIcon
                     color={this.state.canClear ? 'primary' : 'disabled'}
@@ -809,7 +912,16 @@ class Scribble extends React.Component {
                 <ToggleButton
                   key={10}
                   checked={this.state.hideEnable}
-                  onClick={this._hideDrawing}
+                  onClick={() => {
+                    this._hideDrawing()
+
+                    this.setState({
+                      toolsColor: false,
+                      selectColorColor: false,
+                      imageColor: false,
+                      textColor: false,
+                    })
+                  }}
                 >
                   {this.state.hideEnable ? (
                     <InVisibility color='disabled' />
@@ -836,7 +948,7 @@ class Scribble extends React.Component {
                     handleSubmit()
                   }}
                 />
-                <Button color='danger' onClick={toggleScribbleModal}>
+                <Button color='danger' onClick={navigateDirtyCheck(toggleScribbleModal)}>
                   Cancel
                 </Button>
               </div>

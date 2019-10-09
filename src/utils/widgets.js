@@ -142,8 +142,10 @@ const widgets = [
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
-          if (r.rights !== 'enable') return null
 
+          if(r !== undefined){
+          if (r.rights !== 'enable') return null
+          }
           return (
             <Tooltip title='Add Consultation Document'>
               <IconButton
@@ -194,7 +196,7 @@ const widgets = [
       loading: Loading,
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...p} widget mode='consultation' />
+        return <Cmpnet {...p} widget />
       },
       // render (loaded, props) {
       //   console.log(loaded, props)

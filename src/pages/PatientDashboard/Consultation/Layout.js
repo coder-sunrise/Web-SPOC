@@ -566,7 +566,10 @@ class Layout extends PureComponent {
   render () {
     const { state, props } = this
     const { currentLayout } = state
-    const { classes, theme, height, values } = props
+    const { classes, theme, height, values, visitRegistration } = props
+    const { entity: vistEntity } = visitRegistration
+    if (!vistEntity) return null
+    const { visit = {} } = vistEntity
     const widgetProps = {
       parentProps: props,
     }
@@ -737,7 +740,7 @@ class Layout extends PureComponent {
                         style={w.layoutConfig.style}
                       >
                         <SizeContainer size='sm'>
-                          <LoadableComponent {...widgetProps} />
+                          <LoadableComponent {...widgetProps} status='consultation' visitStatus={visit.visitStatus} />
                         </SizeContainer>
                       </div>
                     </Paper>
