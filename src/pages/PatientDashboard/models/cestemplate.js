@@ -1,7 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import router from 'umi/router'
 import * as service from '../services/cestemplate'
-import { sleep, getRemovedUrl } from '@/utils/utils'
+import { sleep, removeFields } from '@/utils/utils'
 
 export default createListViewModel({
   namespace: 'cestemplate',
@@ -34,16 +34,19 @@ export default createListViewModel({
         delete entity.corPatientNoteVitalSign
         delete entity.visitConsultationTemplate
         delete entity.concurrencyToken
-        const response = yield call(service.create, user.data.id, name, entity)
-        if (response) {
-          console.log(response)
-          // yield put({
-          //   type: 'updateState',
-          //   payload: {
-          //     list: response.data,
-          //   },
-          // })
-        }
+
+        removeFields(entity, [
+          'id',
+          'clinicalObjectRecordFK',
+          'concurrencyToken',
+        ])
+
+        return yield call(service.create, user.data.id, name, entity)
+      },
+      *delete ({ payload }, { call, put, select, take }) {
+        const user = yield select((st) => st.user)
+
+        return yield call(service.delete, payload, user.data.id)
       },
     },
     reducers: {},

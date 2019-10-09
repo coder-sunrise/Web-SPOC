@@ -843,22 +843,13 @@ class Layout extends PureComponent {
                         shrink: true,
                       }}
                     >
-                      <div>
-                        <p>
-                          <ProgressButton
-                            onClick={() => {
-                              onSaveLayout(this.state.currentLayout)
-                            }}
-                          >
-                            Save as My Favourite
-                          </ProgressButton>
-                        </p>
-                        <p>
-                          <Button color='primary'>
-                            <GetApp />Load from My Favourite
-                          </Button>
-                        </p>
-                      </div>
+                      <ProgressButton
+                        onClick={() => {
+                          onSaveLayout(this.state.currentLayout)
+                        }}
+                      >
+                        Save as My Favourite
+                      </ProgressButton>
                     </CustomInputWrapper>
                   </div>
                 </SizeContainer>
