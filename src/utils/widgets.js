@@ -141,7 +141,7 @@ const widgets = [
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
-          if (r.rights !== 'enable') return null
+          if (r && r.rights !== 'enable') return null
 
           return (
             <Tooltip title='Add Consultation Document'>

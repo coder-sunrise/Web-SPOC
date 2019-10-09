@@ -22,11 +22,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   }
   if (type === 'Action') {
     // test only
-    if (name === 'queue.dispense') {
-      return [
-        { name, rights: 'hidden' },
-      ]
-    }
+    // if (name === 'queue.dispense') {
+    //   return [
+    //     { name, rights: 'hidden' },
+    //   ]
+    // }
     return [
       {
         name,

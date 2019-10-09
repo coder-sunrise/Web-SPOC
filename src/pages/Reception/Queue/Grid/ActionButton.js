@@ -67,7 +67,6 @@ const ActionButton = ({ row, onClick }) => {
             return {
               ...opt,
               disabled: !isStatusDispense,
-              authority: 'queue.dispense',
             }
           case 1.1: // billing
             return { ...opt, disabled: !enableBilling }
