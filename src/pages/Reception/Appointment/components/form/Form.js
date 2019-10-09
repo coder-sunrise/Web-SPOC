@@ -185,7 +185,7 @@ class Form extends React.PureComponent {
           {
             [`${prefix}name`]: values.patientName,
             [`${prefix}patientAccountNo`]: values.patientName,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: values.patientContactNo,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo}`,
             combineCondition: 'or',
           },
         ],
@@ -401,6 +401,10 @@ class Form extends React.PureComponent {
               },
             })
           } else {
+            dispatch({
+              type: 'formik/clean',
+              payload: 'AppointmentForm',
+            })
             resetForm()
             onClose()
           }
@@ -624,15 +628,49 @@ class Form extends React.PureComponent {
       APPOINTMENT_STATUS.CANCELLED,
       APPOINTMENT_STATUS.TURNEDUP,
     ]
-
+    console.log({
+      values,
+      isDataGridValid,
+      _disabledStatus,
+      currentAppointment,
+    })
     if (values.id === undefined) return false
-
+    console.log('1')
     if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
       return true
+    console.log('2')
+    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
+      return true
+    console.log('3')
+    return false
+  }
 
+  shouldDisablePatientInfo = () => {
+    const { values } = this.props
+
+    return values.id !== undefined
+  }
+
+  shouldDisableButtonAction = () => {
+    const { values } = this.props
+    const { isDataGridValid } = this.state
     if (!isDataGridValid || !values.patientName || !values.patientContactNo)
       return true
 
+    return false
+  }
+
+  shouldDisableDatagrid = () => {
+    const { values } = this.props
+
+    const { currentAppointment = {} } = values
+
+    const _disabledStatus = [
+      APPOINTMENT_STATUS.CANCELLED,
+      APPOINTMENT_STATUS.TURNEDUP,
+    ]
+    if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
+      return true
     return false
   }
 
@@ -658,13 +696,10 @@ class Form extends React.PureComponent {
 
     const { currentAppointment = {} } = values
     const shouldDisable = this.checkShouldDisable()
-    // console.log({ shouldDisable })
-    // console.log({ datagrid })
-    // console.log({
-    //   initialValues: this.props.initialValues,
-    //   values: this.props.values,
-    //   dirty: this.props.dirty,
-    // })
+    const disablePatientInfo = this.shouldDisablePatientInfo()
+    const disableFooterButton = this.shouldDisableButtonAction()
+    const disableDataGrid = this.shouldDisableDatagrid()
+
     const _datagrid =
       conflicts.length > 0
         ? datagrid.reduce(
@@ -692,7 +727,8 @@ class Form extends React.PureComponent {
             <GridContainer className={classnames(classes.formContent)}>
               <GridItem container xs md={6}>
                 <PatientInfoInput
-                  disabled={shouldDisable}
+                  disabled={disablePatientInfo}
+                  isEdit={values.id}
                   onViewPatientProfileClick={this.onViewPatientProfile}
                   onSearchPatientClick={this.onSearchPatient}
                   onCreatePatientClick={this.togglePatientProfileModal}
@@ -700,7 +736,6 @@ class Form extends React.PureComponent {
                   patientContactNo={values.patientContactNo}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
-                  isEdit={values.id}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
                 />
                 <AppointmentDateInput />
@@ -711,7 +746,7 @@ class Form extends React.PureComponent {
                   render={(args) => (
                     <OutlinedTextField
                       {...args}
-                      disabled={shouldDisable}
+                      disabled={disableDataGrid}
                       multiline
                       rowsMax={3}
                       rows={3}
@@ -723,7 +758,7 @@ class Form extends React.PureComponent {
 
               <GridItem xs md={12} className={classes.verticalSpacing}>
                 <AppointmentDataGrid
-                  disabled={shouldDisable}
+                  disabled={disableDataGrid}
                   appointmentDate={currentAppointment.appointmentDate}
                   data={_datagrid}
                   handleCommitChanges={this.onCommitChanges}
@@ -745,7 +780,7 @@ class Form extends React.PureComponent {
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
               onClose={onClose}
-              disabled={shouldDisable}
+              disabled={disableFooterButton}
               handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
               handleSaveDraftClick={this.onSaveDraftClick}
               handleConfirmClick={this.onConfirmClick}

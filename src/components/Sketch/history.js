@@ -159,26 +159,18 @@ class History {
       ] = this.current
       if (this.current) {
         this.redoList.push(this.current)
-        for (let i = 0; i < this.saveLayerList.length; i++) {
-          if (this.saveLayerList[i].layerContent === JSON.stringify(mainObject)) {
-            let temp = this.saveLayerList
-            this.saveLayerList = []
-            for (let a = 0; a < temp.length; a++) {
-              if (temp[a].layerContent !== JSON.stringify(mainObject)) {
-                this.saveLayerList.push(temp[a])
-              }
-            }
-          }
-        }
+        // for (let i = 0; i < this.saveLayerList.length; i++) {
+        //   if (this.saveLayerList[i].layerContent === JSON.stringify(mainObject)) {
+        //     let temp = this.saveLayerList
+        //     this.saveLayerList = []
+        //     for (let a = 0; a < temp.length; a++) {
+        //       if (temp[a].layerContent !== JSON.stringify(mainObject)) {
+        //         this.saveLayerList.push(temp[a])
+        //       }
+        //     }
+        //   }
+        // }
 
-        if(this.saveLayerList === []){
-          this.saveLayerList.push({
-            layerType: mainObject.type,
-            layerNumber: this.count,
-            layerContent: JSON.stringify(mainObject),
-            templateFK: null,
-          })
-        }
 
         if (this.redoList.length > this.undoLimit) {
           this.redoList.shift()
@@ -209,13 +201,13 @@ class History {
         let [
           mainObject,
         ] = this.current
-        this.saveLayerList.push({
-          layerType: mainObject.type,
-          layerNumber: this.count,
-          layerContent: JSON.stringify(mainObject),
-          templateFK: null,
-        })
-        this.count = 0
+        // this.saveLayerList.push({
+        //   layerType: mainObject.type,
+        //   layerNumber: this.count,
+        //   layerContent: JSON.stringify(mainObject),
+        //   templateFK: null,
+        // })
+        // this.count = 0
         return this.current
       }
       return null

@@ -115,7 +115,7 @@ class FilterBar extends PureComponent {
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
-              <Authorized authority='patient.edit'>
+              <Authorized authority='patientdatabase.newpatient'>
                 {!disableAdd && (
                   <Button
                     variant='contained'

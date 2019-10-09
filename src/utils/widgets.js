@@ -141,7 +141,7 @@ const widgets = [
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
-          if (r.rights !== 'enable') return null
+          if (r && r.rights !== 'enable') return null
 
           return (
             <Tooltip title='Add Consultation Document'>
@@ -191,6 +191,10 @@ const widgets = [
     component: Loadable({
       loader: () => import('@/pages/Widgets/Orders'),
       loading: Loading,
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} widget mode='consultation' />
+      },
       // render (loaded, props) {
       //   console.log(loaded, props)
       //   let Component = loaded.default

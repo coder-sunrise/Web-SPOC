@@ -139,9 +139,9 @@ class AmountSummary extends PureComponent {
   }
 
   render () {
-    const { theme, gstInclusiveConfigrable } = this.props
+    const { theme, gstInclusiveConfigrable, showAdjustment } = this.props
     const { summary, adjustments } = this.state
-    console.log(this.state)
+    // console.log(this.state)
     if (!summary) return null
     const {
       totalWithGST,
@@ -165,22 +165,26 @@ class AmountSummary extends PureComponent {
     return (
       <div>
         <GridContainer style={{ marginBottom: 4 }}>
-          <GridItem xs={12}>
-            <span>
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.summary.adjustment',
-              })}
-            </span>
-            <Button
-              color='primary'
-              size='sm'
-              justIcon
-              key='addAdjustment'
-              onClick={this.addAdjustment}
-            >
-              <Add />
-            </Button>
-          </GridItem>
+          {showAdjustment === false ? (
+            ''
+          ) : (
+            <GridItem xs={12}>
+              <span>
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.summary.adjustment',
+                })}
+              </span>
+              <Button
+                color='primary'
+                size='sm'
+                justIcon
+                key='addAdjustment'
+                onClick={this.addAdjustment}
+              >
+                <Add />
+              </Button>
+            </GridItem>
+          )}
         </GridContainer>
         {adjustments.map((v, i) => {
           if (!v.isDeleted) {

@@ -4,10 +4,11 @@ import { Field } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
-import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
+import { NumberInput, CommonCard, GridContainer, GridItem, withFormikExtend } from '@/components'
 import FormField from './formField'
 
 class VitalSignCard extends PureComponent {
+
   render () {
     const { handleCalculateBMI, isReadOnly = false } = this.props
     return (
@@ -24,7 +25,8 @@ class VitalSignCard extends PureComponent {
               render={(args) => (
                 <NumberInput
                   {...args}
-                  disabled={isReadOnly}
+                  format='0.0'
+                  disabled={isReadOnly}  
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.temperature',
                   })}

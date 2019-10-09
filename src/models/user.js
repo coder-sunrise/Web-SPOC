@@ -22,11 +22,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   }
   if (type === 'Action') {
     // test only
-    if (name === 'patientdatabase.patientprofiledetails') {
-      return [
-        { name, rights: 'disable' },
-      ]
-    }
+    // if (name === 'queue.dispense') {
+    //   return [
+    //     { name, rights: 'hidden' },
+    //   ]
+    // }
     return [
       {
         name,
@@ -63,16 +63,18 @@ export default {
       const response = yield call(queryCurrent)
       if (response.data) {
         const { userProfileDetailDto } = response.data
+        const accessRights = response.data.userClientAccessRightDto.reduce(
+          (a, b) => {
+            return a.concat(convertServerRights(b))
+          },
+          [],
+        )
+        console.log({ data: response.data, accessRights })
         yield put({
           type: 'saveCurrentUser',
           payload: {
             data: response.data.userProfileDetailDto,
-            accessRights: response.data.userClientAccessRightDto.reduce(
-              (a, b) => {
-                return a.concat(convertServerRights(b))
-              },
-              [],
-            ),
+            accessRights,
           },
         })
 
@@ -110,6 +112,11 @@ export default {
       }
     },
     saveCurrentUser (state, { payload }) {
+      console.log({ payload })
+      sessionStorage.setItem(
+        'accessRights',
+        JSON.stringify(payload.accessRights),
+      )
       return {
         ...state,
         ...payload,

@@ -465,8 +465,14 @@ class SketchField extends PureComponent {
       prevState,
     ] = history.getCurrent()
 
+
+
+    let objects = canvas.getObjects();
+
     console.log("undo " , obj.__removed)
-    console.log("all ", this._fc)
+    // console.log("all ", objects[1].__originalState)
+
+   
 
     history.undo()
     if (obj.__removed) {
@@ -518,6 +524,19 @@ class SketchField extends PureComponent {
             }
           }
           obj.__version = 1
+        })
+      }else if (obj.__removed) {
+        this.setState({ action: false }, () => {
+          this._fc.add(obj)
+          if (obj.zindex != null) {
+            if(obj.zindex === -100){
+              canvas.sendToBack(obj)
+            }else{
+              canvas.moveTo(obj, obj.zindex)
+            }
+          }
+          obj.__version -= 1
+          obj.__removed = false
         })
       } else {
         obj.__version += 1
