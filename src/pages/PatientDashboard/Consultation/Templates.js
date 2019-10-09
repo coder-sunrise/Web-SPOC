@@ -48,8 +48,7 @@ const Templates = ({ cestemplate, dispatch }) => {
           setCurrentId(v)
         }}
       />
-      {cestemplate &&
-      cestemplate.currentId && (
+      {currentId && (
         <React.Fragment>
           <ProgressButton>Replace</ProgressButton>
           <ProgressButton color='danger' icon={<Delete />}>
@@ -57,8 +56,7 @@ const Templates = ({ cestemplate, dispatch }) => {
           </ProgressButton>
         </React.Fragment>
       )}
-      {cestemplate &&
-      !cestemplate.currentId && (
+      {!currentId && (
         <React.Fragment>
           <TextField
             label='Template Name'

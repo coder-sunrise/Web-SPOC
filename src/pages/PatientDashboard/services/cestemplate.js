@@ -20,4 +20,15 @@ module.exports = {
       body: params,
     })
   },
+  update: (id, params) => {
+    return request(`${url}/update/${id}`, {
+      method: 'PUT',
+      body: params,
+    })
+  },
+  delete: (id, userId) => {
+    return request(`${url}/${id}?userid=${userId}`, {
+      method: 'DELETE',
+    })
+  },
 }

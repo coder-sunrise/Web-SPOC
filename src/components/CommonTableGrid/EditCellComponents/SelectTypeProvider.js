@@ -30,24 +30,14 @@ class SelectEditor extends PureComponent {
 
   componentDidMount () {
     const { columnExtensions, row, column: { name: columnName } } = this.props
-    // console.log('componentDidMount', columnName)
     const cfg =
       columnExtensions.find(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
     const { gridId, getRowId } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
-    // console.log(latestRow, row, getRowId(row), window.$tempGridRow, gridId)
-    // console.log(
-    //   columnName,
-    //   latestRow,
-    //   latestRow[columnName],
-    //   window.$tempGridRow,
-    //   gridId,
-    // )
-    // console.log({ cfg, latestRow, columnName, props: this.props })
     this.setState({
       error: updateCellValue(
         this.props,
@@ -89,7 +79,7 @@ class SelectEditor extends PureComponent {
       error,
     })
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
     if (!error) {
       if (onChange)
@@ -128,7 +118,7 @@ class SelectEditor extends PureComponent {
       ...restProps
     } = cfg
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
     // const _onChange = (val, option) => {

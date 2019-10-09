@@ -643,7 +643,7 @@ class Layout extends PureComponent {
     console.log(this.props)
     return (
       <div>
-        {false && (
+        {true && (
           <div
             ref={this.layoutContainer}
             style={{
