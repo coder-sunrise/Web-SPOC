@@ -31,10 +31,7 @@ const refresh = (props) => {
   })
 }
 @withFormikExtend({
-  authority: {
-    view: 'dispense.view',
-    edit: 'dispense.edit',
-  },
+  authority: 'queue.dispense',
   mapPropsToValues: ({ dispense = {} }) => {
     return dispense.entity || dispense.default
   },

@@ -13,6 +13,7 @@ Authorized.check = check
 Authorized.Context = AuthorizedContext
 Authorized.generalCheck = (matches, props, component, disabledComponent) => {
   // console.log(matches, props, component, disabledComponent)
+  if (!matches) return component
   const rights = Array.isArray(matches)
     ? matches
     : [
@@ -22,9 +23,10 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
   if (
     rights.find(
       (o) =>
-        o.name.endsWith('.edit') &&
+        // o.name.endsWith('.edit') &&
         [
           'enable',
+          'readwrite',
         ].indexOf(o.rights) >= 0,
     )
   ) {

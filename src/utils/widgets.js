@@ -48,7 +48,7 @@ const widgets = [
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
-          if (r.edit.rights === 'disable') return null
+          if (r.rights !== 'enable') return null
           return (
             <Dropdown
               overlay={
@@ -107,7 +107,7 @@ const widgets = [
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
-          if (r.edit.rights === 'disable') return null
+          if (r.rights !== 'enable') return null
           return (
             <Tooltip title='Add Diagnosis'>
               <IconButton
@@ -141,7 +141,8 @@ const widgets = [
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
-          if (r.edit.rights === 'disable') return null
+          if (r.rights !== 'enable') return null
+
           return (
             <Tooltip title='Add Consultation Document'>
               <IconButton
@@ -190,6 +191,10 @@ const widgets = [
     component: Loadable({
       loader: () => import('@/pages/Widgets/Orders'),
       loading: Loading,
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} widget mode='consultation' />
+      },
       // render (loaded, props) {
       //   console.log(loaded, props)
       //   let Component = loaded.default

@@ -256,26 +256,7 @@ class Banner extends PureComponent {
   }
 
   displayMedicalProblemData (entity) {
-    // {entity.patientHistoryDiagnosis.length ? (
-    //   `${entity.patientHistoryDiagnosis[0].diagnosisDescription.length > 8
-    //     ? `${entity.patientHistoryDiagnosis[0].diagnosisDescription.substring(
-    //         0,
-    //         8,
-    //       )}... `
-    //     : entity.patientHistoryDiagnosis[0].diagnosisDescription} `
-    // ) : (
-    //   '-'
-    // )}
-    // {entity.patientHistoryDiagnosis.length >= 2 ? (
-    //   `${entity.patientHistoryDiagnosis[1].diagnosisDescription.length > 8
-    //     ? `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription.substring(
-    //         0,
-    //         8,
-    //       )}...`
-    //     : `, ${entity.patientHistoryDiagnosis[1].diagnosisDescription}`}`
-    // ) : (
-    //   ''
-    // )}
+ 
     let medicalProblemData = ''
 
     if (entity.patientHistoryDiagnosis.length) {
@@ -460,6 +441,7 @@ class Banner extends PureComponent {
               }
               body={
                 <div>
+                  {entity.patientScheme.length ? '' : '-'}
                   {entity.patientScheme
                     .filter((o) => o.schemeTypeFK <= 5)
                     .map((o) => {

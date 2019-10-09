@@ -30,7 +30,6 @@ const DispenseDetails = ({ classes, dispense, setFieldValue, values }) => {
     invoice: { invoiceItem: [] },
   }
   const { invoiceItem = [], invoiceAdjustment = [] } = invoice
-  // console.log({ values })
   return (
     <React.Fragment>
       <GridItem>

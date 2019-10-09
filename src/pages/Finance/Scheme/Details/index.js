@@ -82,10 +82,7 @@ const Detail = (props) => {
   return (
     <AuthorizedContext.Provider
       value={{
-        edit: {
-          name: editable ? 'schemeDetail.edit' : 'no-rights',
-          rights: 'enable',
-        },
+        rights: editable ? 'enable' : 'disable',
       }}
     >
       <Tabs
@@ -116,10 +113,7 @@ export default compose(
     schemeDetail,
   })),
   withFormikExtend({
-    authority: {
-      view: 'schemeDetail.view',
-      edit: 'schemeDetail.edit',
-    },
+    authority: 'finance/scheme',
     mapPropsToValues: ({ schemeDetail }) => {
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },

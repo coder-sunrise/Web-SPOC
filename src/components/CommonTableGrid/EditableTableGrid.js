@@ -457,25 +457,14 @@ class EditableTableGrid extends PureComponent {
 
     const element = (
       <Authorized.Context.Consumer>
-        {({ view, edit, behavior }) => (
-          <Authorized
-            authority={[
-              view,
-              edit,
-            ]}
-          >
-            {(matches) => {
-              // console.log('EditableTableGrid', view, edit, behavior)
-
-              return Authorized.generalCheck(
-                matches,
-                this.props,
-                <CommonTableGrid {...sharedCfg} {...editableCfg} />,
-                <CommonTableGrid {...sharedCfg} />,
-              )
-            }}
-          </Authorized>
-        )}
+        {(matches) => {
+          return Authorized.generalCheck(
+            matches,
+            this.props,
+            <CommonTableGrid {...sharedCfg} {...editableCfg} />,
+            <CommonTableGrid {...sharedCfg} />,
+          )
+        }}
       </Authorized.Context.Consumer>
     )
     return (

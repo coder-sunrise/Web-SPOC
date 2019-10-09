@@ -69,7 +69,11 @@ const ActionButton = ({ row, onClick }) => {
           case 0.1: // edit visit
             return { ...opt, hidden: isStatusWaiting }
           case 1: // dispense
-            return { ...opt, disabled: !enableDispense }
+            return {
+              ...opt,
+              disabled: !enableDispense,
+              authority: 'queue.dispense',
+            }
           case 1.1: // billing
             return { ...opt, disabled: !enableBilling }
           case 2: // delete visit
@@ -100,7 +104,6 @@ const ActionButton = ({ row, onClick }) => {
       row.visitStatus,
     ],
   )
-
   return (
     <Tooltip title='More Actions'>
       <GridButton

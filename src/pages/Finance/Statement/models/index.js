@@ -43,6 +43,24 @@ export default createListViewModel({
           })
         }
       },
+
+      *extractAsSingle ({ payload }, { call, put }) {
+        const response = yield call(service.extract, payload)
+        if (response === 204) {
+          const res = yield call(service.query, payload)
+          yield put({
+            type: 'querySingleDone',
+            payload: res,
+          })
+        }
+      },
+      *bizSessionList ({ payload }, { call, put }) {
+        const response = yield call(service.queryBizSession, payload)
+        yield put({
+          type: 'updateBizSessionList',
+          payload: response.status === '200' ? response.data : {},
+        })
+      },
     },
     reducers: {
       queryDone (st, { payload }) {
@@ -83,6 +101,18 @@ export default createListViewModel({
         return {
           ...st,
           entity: data,
+        }
+      },
+      updateBizSessionList (state, { payload }) {
+        const { data } = payload
+        return {
+          ...state,
+          bizSessionList: data.map((x) => {
+            return {
+              value: x.id,
+              name: x.sessionNo,
+            }
+          }),
         }
       },
     },

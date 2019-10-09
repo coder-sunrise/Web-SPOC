@@ -6,8 +6,9 @@ import withStyles from '@material-ui/core/styles/withStyles'
 // material ui icons
 import MoreVert from '@material-ui/icons/MoreVert'
 // common components
-import { Button } from '@/components'
 import { primaryColor } from 'mui-pro-jss'
+import { Button } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const style = (theme) => ({
   leftAlign: {
@@ -58,15 +59,25 @@ const GridContextMenuButton = ({
   const MenuItemsOverlay = (
     <Menu onClick={handleClick} className={classes.menu}>
       {contextMenuOptions.map(
-        ({ disabled, label, Icon, id, isDivider, hidden }, index) => {
+        (
+          { disabled, label, Icon, id, isDivider, hidden, authority },
+          index,
+        ) => {
           if (isDivider) return <Menu.Divider key={`divider-${index}`} />
 
-          return hidden ? null : (
-            <Menu.Item key={id} id={id} disabled={disabled}>
+          const { rights } = Authorized.check(authority)
+          const menu = (
+            <Menu.Item
+              key={id}
+              id={id}
+              disabled={disabled || rights === 'disable'}
+            >
               <Icon className={classes.icon} />
               <span>{label}</span>
             </Menu.Item>
           )
+          // eslint-disable-next-line no-nested-ternary
+          return hidden || rights === 'hidden' ? null : menu
         },
       )}
     </Menu>

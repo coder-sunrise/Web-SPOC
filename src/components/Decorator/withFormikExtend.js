@@ -136,45 +136,60 @@ const withFormikExtend = (props) => (Component) => {
           rights.edit = { name: authority.edit, rights: 'enable' }
         }
       }
-      if (_localAuthority[displayName].matches)
+      if (_localAuthority[displayName].matches) {
         return (
           <AuthorizedContext.Provider
-            value={{ ...rights, matches: _localAuthority[displayName].matches }}
+            value={_localAuthority[displayName].matches}
           >
-            <Component {...this.props} />
+            <Component
+              {...this.props}
+              rights={_localAuthority[displayName].matches.rights}
+            />
           </AuthorizedContext.Provider>
         )
+      }
 
       return authority ? (
         <Authorized
-          authority={[
-            rights.view,
-            rights.edit,
-          ]}
+          authority={
+            typeof authority === 'string' ? (
+              authority
+            ) : (
+              [
+                rights.view,
+                rights.edit,
+              ]
+            )
+          }
           noMatch={() => {
-            console.log('nomatch', this.props)
+            // console.log('nomatch', this.props)
 
             return <Exception403 />
           }}
         >
           {(matches) => {
+            // console.log(matches)
             window.g_app._store.dispatch({
               type: 'components/updateState',
               payload: {
-                [displayName]: {
-                  matches,
-                  view: !!matches.find((o) => o.name.indexOf('.view') >= 0),
-                  edit: !!matches.find((o) => o.name.indexOf('.edit') >= 0),
-                },
+                [displayName]: matches,
+                // [displayName]: {
+                //   matches,
+                //   view: !!matches.find((o) => o.name.indexOf('.view') >= 0),
+                //   edit: !!matches.find((o) => o.name.indexOf('.edit') >= 0),
+                // },
               },
             })
             _localAuthority[displayName].matches = matches
-            return Authorized.generalCheck(
-              matches,
-              this.props,
-              <AuthorizedContext.Provider value={{ ...rights, matches }}>
-                <Component {...this.props} />
-              </AuthorizedContext.Provider>,
+
+            return (
+              <AuthorizedContext.Provider value={matches}>
+                {Authorized.generalCheck(
+                  matches,
+                  this.props,
+                  <Component {...this.props} rights={matches.rights} />,
+                )}
+              </AuthorizedContext.Provider>
             )
           }}
         </Authorized>

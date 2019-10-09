@@ -54,7 +54,7 @@ import {
   NumberInput,
   Skeleton,
 } from '@/components'
-import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl } from '@/utils/utils'
@@ -150,10 +150,7 @@ const saveConsultation = ({
   }),
 )
 @withFormikExtend({
-  authority: {
-    view: 'consultation.view',
-    edit: 'consultation.edit',
-  },
+  authority: 'patientdashboard.startresumeconsultation',
   mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
     // console.log(consultation.entity, consultation.default)
@@ -497,6 +494,7 @@ class Consultation extends PureComponent {
       consultation = {},
       orders = {},
       formik,
+      rights,
       ...resetProps
     } = this.props
 
@@ -510,6 +508,12 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
+    const matches = {
+      rights:
+        rights === 'enable' && values.status !== 'Paused'
+          ? 'enable'
+          : 'disable',
+    }
     return (
       <div className={classes.root} ref={this.container}>
         <Banner
@@ -517,17 +521,9 @@ class Consultation extends PureComponent {
           extraCmt={this.getExtraComponent()}
           {...this.props}
         />
-        <AuthorizedContext.Provider
-          value={{
-            edit: {
-              name:
-                values.status !== 'Paused' ? 'consultation.edit' : 'no-rights',
-              rights: 'enable',
-            },
-          }}
-        >
+        <Authorized.Context.Provider value={matches}>
           <Layout {...this.props} />
-        </AuthorizedContext.Provider>
+        </Authorized.Context.Provider>
       </div>
     )
   }
