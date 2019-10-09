@@ -73,12 +73,12 @@ const Detail = (props) => {
     getSchemeDetails(props)
   }, [])
 
-  const { classes, schemeDetail, history, handleSubmit, theme } = props
+  const { classes, schemeDetail, history, handleSubmit, theme, values } = props
   const detailProps = {
     height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
     ...props,
   }
-
+  console.log('values', values)
   return (
     <AuthorizedContext.Provider
       value={{
