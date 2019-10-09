@@ -6,7 +6,13 @@ import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem, SizeContainer } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  SizeContainer,
+  NumberInput,
+} from '@/components'
 // sub component
 import Banner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
@@ -34,7 +40,28 @@ import { getAppendUrl } from '@/utils/utils'
 )
 class Dispense extends Component {
   getExtraComponent = () => {
-    return <div>test</div>
+    const { classes, dispense, values } = this.props
+    const { entity, totalWithGST } = dispense
+    return (
+      <GridContainer
+        // className={classes.actionPanel}
+        direction='column'
+        justify='space-evenly'
+        alignItems='center'
+      >
+        <h4 style={{ position: 'relative', marginTop: 0 }}>
+          Total Invoice
+          <span>
+            &nbsp;:&nbsp;
+            <NumberInput
+              text
+              currency
+              value={totalWithGST || entity.invoice.invoiceTotalAftGST}
+            />
+          </span>
+        </h4>
+      </GridContainer>
+    )
   }
 
   render () {

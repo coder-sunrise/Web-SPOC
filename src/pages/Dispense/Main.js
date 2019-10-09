@@ -16,11 +16,11 @@ import style from './style'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 
-const refresh = (props) => {
+const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, visitRegistration, resetForm } = props
 
   dispatch({
-    type: `dispense/refresh`,
+    type: `dispense/${effect}`,
     payload: visitRegistration.entity.visit.id,
   }).then((o) => {
     resetForm(o)
@@ -54,7 +54,7 @@ const refresh = (props) => {
       },
     }).then((o) => {
       if (o) {
-        refresh({
+        reloadDispense({
           ...props,
           ...restProps,
         })
@@ -95,7 +95,7 @@ class Main extends Component {
             editingOrder: true,
           },
         })
-        refresh(this.props)
+        reloadDispense(this.props)
       }
     })
   }
@@ -120,7 +120,7 @@ class Main extends Component {
               color='info'
               size='sm'
               onClick={() => {
-                refresh(this.props)
+                reloadDispense(this.props, 'refresh')
               }}
             >
               <Refresh />

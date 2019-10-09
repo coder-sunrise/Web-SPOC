@@ -92,6 +92,7 @@ class TextField extends React.PureComponent {
       onChange(v)
     }
     this.setState({
+      value: v.target.value,
       isDebouncing: false,
     })
   }
@@ -203,6 +204,8 @@ class TextField extends React.PureComponent {
       cfg.rawError = error || rawError
     } else if (value) {
       cfg.value = value
+    } else {
+      cfg.value = state.value
     }
     if (!preventDefaultChangeEvent) {
       cfg.onChange = this.onChange

@@ -460,7 +460,7 @@ class PatientHistory extends Component {
     const { entity, selected } = patientHistory
 
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
-    console.log({ maxItemTagCount, selected: this.state.selectedItems })
+    // console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
       <CardContainer
         hideHeader
@@ -569,7 +569,6 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
-
 
     const { entity, visitInfo, selected } = patientHistory
     const cfg = {}
