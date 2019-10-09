@@ -21,8 +21,22 @@ class DateEditorBase extends PureComponent {
   }
 
   componentDidMount () {
+    const { columnExtensions, row, column: { name: columnName } } = this.props
+    const cfg =
+      columnExtensions.find(
+        ({ columnName: currentColumnName }) => currentColumnName === columnName,
+      ) || {}
+    const { gridId, getRowId } = cfg
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
+      : row
+
     this.setState({
-      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+      error: updateCellValue(
+        this.props,
+        this.myRef.current,
+        latestRow[columnName],
+      ),
     })
   }
 
@@ -55,7 +69,7 @@ class DateEditorBase extends PureComponent {
       ...restProps
     } = cfg
     const lastestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
     const commonCfg = {
       text,
