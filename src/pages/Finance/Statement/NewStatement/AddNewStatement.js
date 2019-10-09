@@ -175,7 +175,7 @@ class AddNewStatement extends PureComponent {
   }
 
   getInvoiceList = (e) => {
-    const { dispatch, values } = this.props
+    const { dispatch, values, statement } = this.props
     const { InvoiceNo, effectiveDates, copayerFK } = values
 
     const payload = {
@@ -200,10 +200,19 @@ class AddNewStatement extends PureComponent {
       if (invoiceList) {
         const { data } = invoiceList.data
         this.setState((prevState) => {
-          return [
-            ...prevState.invoiceRows,
-            data,
-          ]
+          if (statement.entity) {
+            const updatedInvoiceRows = [
+              ...prevState.invoiceRows,
+              ...data,
+            ]
+            return {
+              invoiceRows: updatedInvoiceRows,
+            }
+          }
+
+          return {
+            invoiceRows: data,
+          }
         })
       }
     })
@@ -221,7 +230,7 @@ class AddNewStatement extends PureComponent {
     const { invoiceRows, columns, columnExtensions } = this.state
     // console.log('values', values)
     // console.log('state', this.state)
-    console.log('props', this.props)
+    // console.log('props', this.props)
 
     return (
       <React.Fragment>

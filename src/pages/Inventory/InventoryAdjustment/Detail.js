@@ -454,7 +454,7 @@ class Detail extends PureComponent {
         ...this.state.filterStockMedication,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-      // return this.state.stockMedication
+
       return row.id ? this.state.stockMedication : x
     }
     if (row.inventoryTypeFK === 2) {
