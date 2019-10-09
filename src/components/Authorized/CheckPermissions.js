@@ -93,7 +93,9 @@ const checkPermissions = (
           ].indexOf(o.rights) >= 0,
       )
       if (match) {
-        return null
+        return typeof target === 'function' && type !== 'decorator'
+          ? target(match)
+          : null
       }
       match = r.find(
         (o) =>
@@ -154,7 +156,7 @@ const checkPermissions = (
 
 export { checkPermissions }
 
-const CheckPermissions = (authority, target, Exception, type) => {
+const CheckPermissions = (authority, target = (f) => f, Exception, type) => {
   // console.log(authority, CURRENT, target, Exception)
   return checkPermissions(authority, CURRENT, target, Exception, type)
 }

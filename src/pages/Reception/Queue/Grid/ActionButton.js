@@ -39,7 +39,8 @@ const ActionButton = ({ row, onClick }) => {
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
   )
-  const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
+  // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
+
   const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.DISPENSE,
@@ -50,22 +51,28 @@ const ActionButton = ({ row, onClick }) => {
     VISIT_STATUS.PAUSED,
   ].includes(row.visitStatus)
 
+  const enableDispense = [
+    VISIT_STATUS.DISPENSE,
+    VISIT_STATUS.ORDER_UPDATED,
+  ].includes(row.visitStatus)
+
   const enableBilling = [
     VISIT_STATUS.BILLING,
-    VISIT_STATUS.ORDER_UPDATED,
   ].includes(row.visitStatus)
 
   const newContextMenuOptions = useMemo(
     () =>
       ContextMenuOptions.map((opt) => {
-        console.log(opt)
         switch (opt.id) {
           case 0: // view visit
             return { ...opt, hidden: !isStatusWaiting }
           case 0.1: // edit visit
             return { ...opt, hidden: isStatusWaiting }
           case 1: // dispense
-            return { ...opt, disabled: !isStatusDispense }
+            return {
+              ...opt,
+              disabled: !enableDispense,
+            }
           case 1.1: // billing
             return { ...opt, disabled: !enableBilling }
           case 2: // delete visit
@@ -96,7 +103,6 @@ const ActionButton = ({ row, onClick }) => {
       row.visitStatus,
     ],
   )
-
   return (
     <Tooltip title='More Actions'>
       <GridButton

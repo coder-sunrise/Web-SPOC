@@ -5,13 +5,7 @@ import { connect } from 'dva'
 // formik
 import { withFormik, FastField } from 'formik'
 // common components
-import {
-  Danger,
-  TextField,
-  GridContainer,
-  GridItem,
-  notification,
-} from '@/components'
+import { TextField, GridContainer, GridItem, notification } from '@/components'
 // services
 import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
 

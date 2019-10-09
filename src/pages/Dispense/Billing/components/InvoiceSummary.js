@@ -28,7 +28,6 @@ const styles = () => ({
 })
 
 const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
-  console.log({ values })
   const { invoicePaymentModes = [] } = values
   return (
     <React.Fragment>

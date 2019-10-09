@@ -29,7 +29,6 @@ const _toMoment = (value, isLocal, i, showTime) => {
     if (i === 0) {
       m = m.set({ hour: 0, minute: 0, second: 0 })
     } else if (i === 1) {
-      console.log('changed', { value, isLocal, i, showTime })
       m = m.set({ hour: 23, minute: 59, second: 59 })
     }
   }
