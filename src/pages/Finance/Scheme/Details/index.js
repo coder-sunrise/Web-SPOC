@@ -78,7 +78,6 @@ const Detail = (props) => {
     height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
     ...props,
   }
-  console.log('values', values)
   return (
     <AuthorizedContext.Provider
       value={{
