@@ -21,6 +21,10 @@ import { Attachment } from '@/components/_medisys'
 import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
+import {
+  errMsgForOutOfRange as errMsg,
+  navigateDirtyCheck,
+} from '@/utils/utils'
 
 let size = 0
 
@@ -317,6 +321,7 @@ class ClinicalNotes extends Component {
         showScribbleModal: !scriblenotes.showScribbleModal,
       },
     })
+    console.log("close")
   }
 
   getScribbleValue = (test) => {
@@ -352,7 +357,7 @@ class ClinicalNotes extends Component {
 
         return [
           ...attachments,
-          { ...item },
+          { ...item },  
         ]
       }, [])
 
@@ -996,19 +1001,24 @@ class ClinicalNotes extends Component {
           />
         </div>
 
-        <h6 style={{ marginTop: 10 }}>Attachment</h6>
+        
+
+        <h6 style={{ marginTop: 10 }}></h6>
         <FastField
           name='corAttachment'
           render={(args) => {
             this.form = args.form
+
+          //   <Attachment
+          //   attachmentType='ClinicalNotes'
+          //   handleUpdateAttachments={this.updateAttachments(args)}
+          //   attachments={args.field.value}
+          //   label=''
+          //   isReadOnly
+          // />
+
             return (
-              <Attachment
-                attachmentType='ClinicalNotes'
-                handleUpdateAttachments={this.updateAttachments(args)}
-                attachments={args.field.value}
-                label=''
-                isReadOnly
-              />
+              <UploadAttachment updateAttachments={this.updateAttachments} />
             )
           }}
         />
@@ -1032,12 +1042,14 @@ class ClinicalNotes extends Component {
         >
           <UploadAttachment updateAttachments={this.updateAttachments} />
         </CommonModal>
+        
         <CommonModal
           open={scriblenotes.showScribbleModal}
           title='Scribble'
           fullScreen
           bodyNoPadding
-          onClose={() => this.toggleScribbleModal()}
+          observe='scribbleNotePage'
+          onClose={() => navigateDirtyCheck(this.toggleScribbleModal())}
         >
           <ScribbleNote
             {...this.props}

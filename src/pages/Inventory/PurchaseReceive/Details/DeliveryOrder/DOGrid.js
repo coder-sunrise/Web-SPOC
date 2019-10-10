@@ -2,13 +2,13 @@ import React from 'react'
 import { CardContainer, CommonTableGrid, Button } from '@/components'
 import Edit from '@material-ui/icons/Edit'
 
-const DOGrid = ({
-  setFieldValue,
-  onEditDeliveryOrderClicked,
-  deliveryOrderDetails,
-}) => {
+const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
   const { list } = deliveryOrderDetails
-  console.log('DOGrid', list)
+  list.map((x) => {
+    x.total = 0
+    x.outstanding = 0
+    return x
+  })
 
   const editRow = (row, e) => {
     onEditDeliveryOrderClicked(row)

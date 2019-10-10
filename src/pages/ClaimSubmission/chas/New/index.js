@@ -52,6 +52,13 @@ class NewCHAS extends React.Component {
     })
   }
 
+  onSubmitClaimClicked = () => {
+    const { selectedRows } = this.state
+    const { dispatch } = this.props
+
+    console.log({ selectedRows })
+  }
+
   render () {
     const {
       classes,
@@ -85,7 +92,9 @@ class NewCHAS extends React.Component {
             <Button color='info' onClick={this.onRefreshClicked}>
               Refresh
             </Button>
-            <Button color='primary'>Submit Claim</Button>
+            <Button color='primary' onClick={this.onSubmitClaimClicked}>
+              Submit Claim
+            </Button>
           </GridItem>
         </GridContainer>
       </React.Fragment>

@@ -179,9 +179,11 @@ class SearchBar extends PureComponent {
                     copayerFK: Number.isNaN(copayerFK) ? copayerFK : undefined,
                     lgteql_statementDate: statementDateFrom,
                     lsteql_statementDate: statementDateTo,
-                    // paymentTerm: 5,
-                    // lgteql_dueDate: statementDueDateFrom,
-                    // lsteql_dueDate: statementDueDateTo,
+                    isCancelled: false,
+                    apiCriteria: {
+                      DueDateFrom: statementDueDateFrom,
+                      DueDateTo: statementDueDateTo,
+                    },
                   },
                 })
               }}

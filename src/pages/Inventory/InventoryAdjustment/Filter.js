@@ -52,13 +52,15 @@ class Filter extends PureComponent {
       type: 'inventoryAdjustment/updateState',
       payload: {
         entity: undefined,
-        showModal: !inventoryAdjustment.showModal,
+        // showModal: !inventoryAdjustment.showModal,
         default: {
           ...inventoryAdjustment.default,
           stockList: result.data,
         },
       },
     })
+
+    this.props.toggleModal()
   }
 
   render () {
@@ -154,7 +156,7 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <Button
+              <ProgressButton
                 color='primary'
                 onClick={() => {
                   const { inventoryAdjustment } = this.props
@@ -172,8 +174,8 @@ class Filter extends PureComponent {
                 }}
               >
                 Add New
-              </Button>
-              <Button
+              </ProgressButton>
+              <ProgressButton
                 color='primary'
                 onClick={this.handleToggle}
                 buttonRef={(node) => {
@@ -181,7 +183,7 @@ class Filter extends PureComponent {
                 }}
               >
                 Mass Adjustment
-              </Button>
+              </ProgressButton>
               <Popper
                 open={open}
                 anchorEl={this.anchorElAccount}

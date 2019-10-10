@@ -456,6 +456,7 @@ class PatientHistory extends Component {
       patientHistory,
       dispatch,
       widget,
+      showEditPatient,
     } = this.props
     const { entity, selected } = patientHistory
 
@@ -466,13 +467,13 @@ class PatientHistory extends Component {
         hideHeader
         size='sm'
         className={classnames({
-          [classes.rightPanel]: !widget,
-          [override.rightPanel]: !widget,
+          [classes.rightPanel]: true,
+          [override.rightPanel]: true,
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
         <GridContainer gutter={0} alignItems='center'>
-          <GridItem md={3}>
+          <GridItem md={2}>
             <Select
               // simple
               value={this.state.selectedItems}
@@ -494,25 +495,31 @@ class PatientHistory extends Component {
               maxTagCount={maxItemTagCount}
             />
           </GridItem>
-          <GridItem md={2}>
-            {!widget && (
+          <GridItem md={3}>
+            {(!widget || showEditPatient) && (
               <ProgressButton
                 color='primary'
                 style={{ marginLeft: theme.spacing(2) }}
                 size='sm'
                 onClick={() => {
-                  dispatch({
-                    type: `consultation/edit`,
-                    payload: {
-                      id: selected.id,
-                      version: patientHistory.version,
-                    },
-                  }).then((o) => {
-                    if (o)
-                      router.push(
-                        `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                      )
-                  })
+                  if (showEditPatient) {
+                    dispatch({
+                      type: 'patient/closePatientModal',
+                    })
+                  } else {
+                    dispatch({
+                      type: `consultation/edit`,
+                      payload: {
+                        id: selected.id,
+                        version: patientHistory.version,
+                      },
+                    }).then((o) => {
+                      if (o)
+                        router.push(
+                          `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                        )
+                    })
+                  }
                 }}
               >
                 Edit Consultation

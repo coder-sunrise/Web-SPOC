@@ -50,37 +50,38 @@ const widgets = [
         {(r) => {
           if (r.rights !== 'enable') return null
           return (
-            <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item
-                    onClick={() => {
-                      window.g_app._store.dispatch({
-                        type: 'clinicalnotes/updateState',
-                        payload: {
-                          showAttachmentModal: true,
-                        },
-                      })
-                    }}
-                  >
-                    Upload Attachment
-                  </Menu.Item>
-                </Menu>
-              }
-              trigger={[
-                'click',
-              ]}
-            >
-              <Button
-                justIcon
-                round
-                color='primary'
-                size='sm'
-                style={{ float: 'left' }}
-              >
-                <MoreVert />
-              </Button>
-            </Dropdown>
+            // <Dropdown
+            //   overlay={
+            //     <Menu>
+            //       <Menu.Item
+            //         onClick={() => {
+            //           window.g_app._store.dispatch({
+            //             type: 'clinicalnotes/updateState',
+            //             payload: {
+            //               showAttachmentModal: true,
+            //             },
+            //           })
+            //         }}
+            //       >
+            //         Upload Attachment
+            //       </Menu.Item>
+            //     </Menu>
+            //   }
+            //   trigger={[
+            //     'click',
+            //   ]}
+            // >
+            //   <Button
+            //     justIcon
+            //     round
+            //     color='primary'
+            //     size='sm'
+            //     style={{ float: 'left' }}
+            //   >
+            //     <MoreVert />
+            //   </Button>
+            // </Dropdown>
+            null
           )
         }}
       </AuthorizedContext>
@@ -193,7 +194,7 @@ const widgets = [
       loading: Loading,
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...p} widget mode='consultation' />
+        return <Cmpnet {...p} widget />
       },
       // render (loaded, props) {
       //   console.log(loaded, props)

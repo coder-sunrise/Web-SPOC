@@ -62,8 +62,13 @@ class Banner extends PureComponent {
     const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
+    // const da = ctdrugallergy.filter((o) =>
+    //   patientAllergy.find((m) => m.allergyFK === o.id),
+    // )
+
+    const filter = patientAllergy.filter((o) => o.type === 'Allergy')
     const da = ctdrugallergy.filter((o) =>
-      patientAllergy.find((m) => m.allergyFK === o.id),
+      filter.find((m) => m.allergyFK === o.id),
     )
 
     let allergyData = ' '
@@ -256,7 +261,6 @@ class Banner extends PureComponent {
   }
 
   displayMedicalProblemData (entity) {
- 
     let medicalProblemData = ''
 
     if (entity.patientHistoryDiagnosis.length) {
@@ -348,7 +352,7 @@ class Banner extends PureComponent {
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
-        <GridContainer style={{ height: 100 }}>
+        <GridContainer style={{ height: 130 }}>
           {/* <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
               <img src={avatar} alt='...' />
@@ -431,9 +435,9 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                      <IconButton onClick={this.refreshChasBalance}>
-                        <Refresh />
-                      </IconButton>
+                    <IconButton onClick={this.refreshChasBalance}>
+                      <Refresh />
+                    </IconButton>
                   ) : (
                     ''
                   )}
@@ -489,7 +493,6 @@ class Banner extends PureComponent {
                     })}
                 </div>
               }
-
               // body={
               //   <div>
               //     {entity.patientScheme.filter(

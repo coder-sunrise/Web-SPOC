@@ -14,12 +14,14 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ inventoryAdjustment }) => ({
+@connect(({ inventoryAdjustment, global }) => ({
   inventoryAdjustment,
+  global,
 }))
 class InventoryAdjustment extends PureComponent {
   state = {
     runningNo: '',
+    open: false,
   }
 
   componentDidMount () {
@@ -41,13 +43,30 @@ class InventoryAdjustment extends PureComponent {
       })
   }
 
-  toggleModal = () => {
-    this.props.dispatch({
-      type: 'inventoryAdjustment/updateState',
-      payload: {
-        showModal: !this.props.inventoryAdjustment.showModal,
-      },
+  toggleModal = async () => {
+    const { dispatch, inventoryAdjustment } = this.props
+
+    // await dispatch({
+    //   type: 'inventoryAdjustment/updateState',
+    //   payload: {
+    //     showModal: !inventoryAdjustment.showModal,
+    //   },
+    // })
+    this.setState((prevState) => {
+      return {
+        open: !prevState.open,
+      }
     })
+    console.log('asd', this.state.open)
+
+    if (this.state.open) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
+    }
   }
 
   getRunningNo = () => {
@@ -74,10 +93,10 @@ class InventoryAdjustment extends PureComponent {
     }
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
+        <Filter {...cfg} {...this.props} toggleModel={this.toggleModal} />
         <Grid {...cfg} {...this.props} />
         <CommonModal
-          open={inventoryAdjustment.showModal}
+          open={this.state.open}
           observe='InventoryAdjustment'
           title={
             inventoryAdjustment.entity ? (

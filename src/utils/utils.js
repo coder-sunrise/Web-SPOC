@@ -681,7 +681,7 @@ const _checkCb = (cb) => {
   }
 }
 const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
-  // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
+   // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
