@@ -23,7 +23,7 @@ const styles = (theme) => ({
 
 @connect(({ global, loading, user }) => ({
   global,
-  loggedInUserID: user.data.id,
+  loggedInUserID: user.data && user.data.id,
 }))
 class GlobalModalContainer extends PureComponent {
   // componentDidMount () {
@@ -166,11 +166,12 @@ class GlobalModalContainer extends PureComponent {
           bodyNoPadding
           onClose={(e) => {
             dispatch({
-              type: 'billing/closeBillingModal',
+              type: 'billing/closeModal',
             })
           }}
           fullScreen
           showFooter={false}
+          overrideLoading
         >
           {global.showBillingPanel && <Billing />}
         </CommonModal>
@@ -203,6 +204,7 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
+          overrideLoading
           open={global.showSessionTimeout}
           title='Session Timeout'
           maxWidth='sm'

@@ -28,6 +28,7 @@ export default ({
     show,
     setShow,
   ] = useState(false)
+  console.log("index " , index)
 
   return (
     <React.Fragment>
@@ -41,6 +42,7 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature',
                 })}
+                format='0.0'
                 max={200}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature.suffix',

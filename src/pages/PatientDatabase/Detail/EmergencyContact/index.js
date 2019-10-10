@@ -129,6 +129,7 @@ class EmergencyContact extends PureComponent {
     this.setState({
       editingRowIds: ids,
     })
+    return ids
   }
 
   commitChanges = ({ rows }) => {
@@ -221,7 +222,7 @@ class EmergencyContact extends PureComponent {
           rows={values.patientEmergencyContact}
           schema={schema}
           showRowNumber
-          onRowDoubleClick={this.onRowDoubleClick}
+          // onRowDoubleClick={this.onRowDoubleClick}
           FuncProps={{
             pagerConfig: {
               containerExtraComponent: (

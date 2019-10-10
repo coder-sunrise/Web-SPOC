@@ -29,7 +29,7 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 // utils
-import { ValidationSchema, mapPropsToValues } from './formUtils'
+import { ValidationSchema, mapPropsToValues, sortDataGrid } from './formUtils'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
@@ -288,7 +288,6 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    console.log({ rows, deleted })
     if (rows) {
       this.setState(
         {
@@ -618,33 +617,6 @@ class Form extends React.PureComponent {
     )
   }
 
-  checkShouldDisable = () => {
-    const { values } = this.props
-    const { isDataGridValid } = this.state
-
-    const { currentAppointment = {} } = values
-
-    const _disabledStatus = [
-      APPOINTMENT_STATUS.CANCELLED,
-      APPOINTMENT_STATUS.TURNEDUP,
-    ]
-    console.log({
-      values,
-      isDataGridValid,
-      _disabledStatus,
-      currentAppointment,
-    })
-    if (values.id === undefined) return false
-    console.log('1')
-    if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
-      return true
-    console.log('2')
-    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
-      return true
-    console.log('3')
-    return false
-  }
-
   shouldDisablePatientInfo = () => {
     const { values } = this.props
 
@@ -695,26 +667,28 @@ class Form extends React.PureComponent {
     } = this.state
 
     const { currentAppointment = {} } = values
-    const shouldDisable = this.checkShouldDisable()
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
 
     const _datagrid =
       conflicts.length > 0
-        ? datagrid.reduce(
-            (data, d) => [
-              ...data,
-              {
-                ...d,
-                conflicts:
-                  conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                    ? conflicts[d.sortOrder].conflicts
-                    : [],
-              },
-            ],
-            [],
-          )
+        ? datagrid
+            .sort(sortDataGrid)
+            .map((item, index) => ({ ...item, sortOrder: index }))
+            .reduce(
+              (data, d) => [
+                ...data,
+                {
+                  ...d,
+                  conflicts:
+                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                      ? conflicts[d.sortOrder].conflicts
+                      : undefined,
+                },
+              ],
+              [],
+            )
         : [
             ...datagrid,
           ]

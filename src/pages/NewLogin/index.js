@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 import { connect } from 'dva'
 import * as Yup from 'yup'
@@ -11,7 +11,6 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import LockOpen from '@material-ui/icons/LockOpen'
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
@@ -69,7 +68,7 @@ const LoginSchema = Yup.object().shape({
 
 const submitKey = 'login/getToken'
 
-@connect(({ login }) => ({ login }))
+@connect(({ login, routing }) => ({ login, routing }))
 @withFormik({
   mapPropsToValues: () => {
     if (process.env.NODE_ENV === 'development')
@@ -82,8 +81,16 @@ const submitKey = 'login/getToken'
   },
   handleSubmit: (values, { props }) => {
     const { username, password, clinicCode } = values
-    const { dispatch } = props
+    const { dispatch, routing } = props
+    const { location } = routing
+
     const credential = { username, password, clinic_code: clinicCode }
+    let loginDestination = '/'
+    if (location.query && location.query.redirect !== undefined) {
+      console.log({ location })
+      loginDestination = location.query.redirect
+    }
+    console.log({ loginDestination })
     dispatch({
       type: 'login/getToken',
       credentialPayload: credential,
@@ -94,13 +101,13 @@ const submitKey = 'login/getToken'
 
         if (validLogin) {
           localStorage.setItem('clinicCode', clinicCode)
-          router.push('/')
+
+          router.push(loginDestination)
         }
       })
       .catch((error) => {
         console.log('error', error)
       })
-    // handleLogin(username, password, clinicCode)
   },
   validationSchema: LoginSchema,
 })

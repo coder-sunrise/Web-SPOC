@@ -19,11 +19,11 @@ const DispenseIndexStyle = (theme) => ({
   summaryPanel: {
     marginTop: theme.spacing(2),
   },
-  gridRow: {
-    '&:not(:first-child)': {
-      marginTop: theme.spacing(2),
-    },
-  },
+  // gridRow: {
+  //   '&:not(:first-child)': {
+  //     marginTop: theme.spacing(2),
+  //   },
+  // },
 })
 
 export default DispenseIndexStyle

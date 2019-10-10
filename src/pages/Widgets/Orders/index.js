@@ -41,8 +41,9 @@ const styles = (theme) => ({
   },
 })
 // @skeleton()
-@connect(({ orders }) => ({
+@connect(({ orders, visitRegistration }) => ({
   orders,
+  visitRegistration,
 }))
 class Orders extends PureComponent {
   state = {
@@ -53,18 +54,18 @@ class Orders extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch, mode } = this.props
-    console.log("fghgh")
+    const { dispatch, status, visitRegistration } = this.props
+    const { entity: vistEntity } = visitRegistration
+    const { visit = {} } = vistEntity
 
-    dispatch({
-      type: 'orders/updateState',
-      payload: {
-       rows: [],
-      },
-    })
+    if (status === 'consultation' && visit.visitStatus === 'WAITING') {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          rows: [],
+        },
+      })
 
-    if (mode === 'consultation') {
-      console.log("hhhh " , mode)
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
@@ -89,6 +90,7 @@ class Orders extends PureComponent {
         let orderList = serviceCenterServices.filter(
           (o) => o.isAutoOrder === true && o.isDefault === true,
         )
+        let order = []
         for (let i = 0; i < orderList.length; i++) {
           let serviceFKValue = 0
           let serviceCenterFKValue = 0
@@ -135,13 +137,23 @@ class Orders extends PureComponent {
             type: 'orders/upsertRow',
             payload: rowRecord,
           })
+
+          order.push(rowRecord)
         }
+        console.log('final order  ', order)
       })
 
       this.state = {
         services: [],
         serviceCenters: [],
       }
+    } else {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          rows: [],
+        },
+      })
     }
   }
 

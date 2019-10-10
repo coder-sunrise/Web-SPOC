@@ -36,14 +36,7 @@ class index extends Component {
   }
 
   componentDidMount () {
-    // this.props.dispatch({
-    //   type: 'deliveryOrderDetails/queryDeliveryOrder',
-    // })
-
-    this.props.dispatch({
-      type: 'deliveryOrderDetails/getOutstandingPOItem',
-      payload: this.props.purchaseOrderDetails,
-    })
+    this.refreshDeliveryOrder()
   }
 
   refreshDeliveryOrder = () => {
@@ -65,8 +58,8 @@ class index extends Component {
     const { dispatch } = this.props
     this.setState({ showDeliveryOrderDetails: true })
     dispatch({
-      type: 'deliveryOrderDetails/editDeliveryOrder',
-      payload: { ...row },
+      type: 'deliveryOrderDetails/queryDeliveryOrder',
+      payload: { id: row.id },
     })
   }
 
@@ -106,7 +99,7 @@ class index extends Component {
             />
           </CommonModal>
           <Button
-            disabled={!isPOStatusFinalized(poStatus)}
+            // disabled={!isPOStatusFinalized(poStatus)}
             onClick={this.onAddDeliveryOrderClicked}
             // hideIfNoEditRights
             color='info'

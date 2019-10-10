@@ -2,7 +2,12 @@ import React, { Component } from 'react'
 // import { connect } from 'dva'
 import Yup from '@/utils/yup'
 import { formatMessage } from 'umi/locale'
-import { withFormikExtend, GridContainer, GridItem, Button } from '@/components'
+import {
+  withFormikExtend,
+  GridContainer,
+  GridItem,
+  ProgressButton,
+} from '@/components'
 import POForm from './POForm'
 import POGrid from './POGrid'
 // import POSummary from './POSummary'
@@ -42,12 +47,12 @@ class index extends Component {
     if (settings) {
       if (
         settings.isEnableGST !== state.settingGSTEnable &&
-        settings.GSTPercentageInt !== state.settingGSTPercentage
+        settings.gSTPercentageInt !== state.settingGSTPercentage
       )
         return {
           ...state,
           settingGSTEnable: settings.isEnableGST,
-          settingGSTPercentage: settings.GSTPercentageInt,
+          settingGSTPercentage: settings.gSTPercentageInt,
         }
     }
     return null
@@ -443,7 +448,7 @@ class index extends Component {
         />
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          isEditable={!isPOStatusFinalized(poStatus)}
+          isEditable={isPOStatusDraft(poStatus)}
           {...this.props}
         />
         <POSummary
@@ -457,48 +462,65 @@ class index extends Component {
           setFieldValue={setFieldValue}
           // {...this.props}
         />
-        <GridContainer direction='row' style={{ marginTop: 20 }}>
-          <GridItem xs={4} md={8} />
-          <GridItem xs={8} md={4}>
-            {isPOStatusDraft(poStatus) ? (
-              <Button
-                color='danger'
-                onClick={() =>
-                  this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-              >
-                {formatMessage({
-                  id: 'inventory.pr.detail.pod.cancelpo',
-                })}
-              </Button>
-            ) : (
-              ''
-            )}
-            <Button
-              color='primary'
-              onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
-            >
+
+        <GridContainer
+          style={{
+            marginTop: 20,
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <ProgressButton
+            color='danger'
+            icon={null}
+            onClick={() => this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+          >
+            {formatMessage({
+              id: 'inventory.pr.detail.pod.cancelpo',
+            })}
+          </ProgressButton>
+          <ProgressButton
+            color='primary'
+            icon={null}
+            onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+          >
+            {formatMessage({
+              id: 'inventory.pr.detail.pod.save',
+            })}
+          </ProgressButton>
+          {!isPOStatusDraft(poStatus) ? (
+            <ProgressButton color='success' icon={null}>
               {formatMessage({
-                id: 'inventory.pr.detail.pod.save',
+                id: 'inventory.pr.detail.pod.complete',
               })}
-            </Button>
-            <Button
+            </ProgressButton>
+          ) : (
+            ''
+          )}
+          {isPOStatusDraft(poStatus) ? (
+            <ProgressButton
               color='success'
+              icon={null}
               onClick={() =>
                 this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
             >
               {formatMessage({
                 id: 'inventory.pr.detail.pod.finalize',
               })}
-            </Button>
-            <Button
-              color='info'
-              onClick={() => this.onSubmitButtonClicked(poSubmitAction.PRINT)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.print',
-              })}
-            </Button>
-          </GridItem>
+            </ProgressButton>
+          ) : (
+            ''
+          )}
+
+          <ProgressButton
+            color='info'
+            icon={null}
+            onClick={() => this.onSubmitButtonClicked(poSubmitAction.PRINT)}
+          >
+            {formatMessage({
+              id: 'inventory.pr.detail.print',
+            })}
+          </ProgressButton>
         </GridContainer>
       </div>
     )

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
@@ -220,12 +220,11 @@ const Grid = ({
 
   const computeQueueListingData = () => {
     if (filter === StatusIndicator.APPOINTMENT) return calendarData
-
     let data = [
       ...queueList,
     ]
 
-    const { clinicianProfile: { doctorProfile } } = user
+    const { clinicianProfile: { doctorProfile } } = user.data
 
     if (selfOnly)
       data = data.filter((item) => {
@@ -267,10 +266,13 @@ const Grid = ({
 
   const isAssignedDoctor = (row) => {
     const {
-      doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
+      doctor: {
+        clinicianProfile: { doctorProfile: assignedDoctorProfile, title, name },
+      },
+      visitStatus,
     } = row
-    const { clinicianProfile: { doctorProfile } } = user
-    console.log({ doctorProfile })
+    const { clinicianProfile: { doctorProfile } } = user.data
+
     if (!doctorProfile) {
       notification.error({
         message: 'Unauthorized Access',
@@ -278,9 +280,25 @@ const Grid = ({
       return false
     }
 
+    if (visitStatus === 'IN CONS') {
+      if (assignedDoctorProfile.id !== doctorProfile.id) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmTitle: '',
+            openConfirmContent: `Are you sure to overwrite ${title ||
+              ''} ${name} consultation?`,
+            onConfirmSave: () => null,
+          },
+        })
+        return false
+      }
+    }
+
     if (assignedDoctorProfile.id !== doctorProfile.id) {
       notification.error({
-        message: `You cannot start other doctor's consultation`,
+        message: `You cannot resume other doctor's consultation.`,
       })
       return false
     }
@@ -431,16 +449,6 @@ const Grid = ({
     }
   }
 
-  const [
-    colExtensions,
-  ] = useState([
-    ...columnExtensions,
-    {
-      columnName: 'action',
-      align: 'center',
-      render: (row) => <ActionButton row={row} onClick={onClick} />,
-    },
-  ])
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
@@ -456,7 +464,16 @@ const Grid = ({
           size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
-          columnExtensions={colExtensions}
+          columnExtensions={[
+            ...columnExtensions,
+            {
+              columnName: 'action',
+              align: 'center',
+              render: (row) => {
+                return <ActionButton row={row} onClick={onClick} />
+              },
+            },
+          ]}
           FuncProps={FuncConfig}
           onRowDoubleClick={onRowDoubleClick}
           {...TableConfig}
@@ -467,7 +484,7 @@ const Grid = ({
 }
 
 export default connect(({ queueLog, calendar, global, loading, user }) => ({
-  user: user.data,
+  user,
   filter: queueLog.currentFilter,
   selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],

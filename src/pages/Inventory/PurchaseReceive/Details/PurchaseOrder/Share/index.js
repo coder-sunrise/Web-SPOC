@@ -38,7 +38,7 @@ class InvoiceSummary extends PureComponent {
         return {
           ...state,
           settingGSTEnable: settings.isEnableGST,
-          settingGSTPercentage: settings.GSTPercentageInt,
+          settingGSTPercentage: settings.gSTPercentageInt,
         }
     }
     return null

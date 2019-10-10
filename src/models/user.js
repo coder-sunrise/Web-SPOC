@@ -2,6 +2,7 @@ import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
+  // const orgName = accessRight
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
   if (type === 'Module') {
@@ -9,6 +10,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
       {
         name,
         rights,
+        // orgName,
       },
       // {
       //   name: `${name}.view`,
@@ -31,6 +33,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
       {
         name,
         rights,
+        // orgName,
       },
     ]
   }
@@ -38,17 +41,21 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   return []
 }
 
+const defaultState = {
+  accessRights: [],
+  data: {
+    clinicianProfile: {
+      userProfile: {},
+    },
+  },
+  profileDetails: undefined,
+}
+
 export default {
   namespace: 'user',
 
   state: {
-    accessRights: [],
-    data: {
-      clinicianProfile: {
-        userProfile: {},
-      },
-    },
-    profileDetails: undefined,
+    ...defaultState,
   },
 
   effects: {
@@ -69,13 +76,20 @@ export default {
           },
           [],
         )
-        console.log({ data: response.data, accessRights })
+        // accessRights.forEach((a) => {
+        //   console.log(a.name)
+        // })
+        // console.log({ data: response.data, accessRights })
         yield put({
           type: 'saveCurrentUser',
           payload: {
             data: response.data.userProfileDetailDto,
             accessRights,
           },
+        })
+
+        yield put({
+          type: 'queueLog/refresh',
         })
 
         if (
@@ -105,6 +119,9 @@ export default {
   },
 
   reducers: {
+    reset (_) {
+      return { ...defaultState }
+    },
     save (state, action) {
       return {
         ...state,
@@ -112,7 +129,7 @@ export default {
       }
     },
     saveCurrentUser (state, { payload }) {
-      console.log({ payload })
+      // console.log({ payload })
       sessionStorage.setItem(
         'accessRights',
         JSON.stringify(payload.accessRights),

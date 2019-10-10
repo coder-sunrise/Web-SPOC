@@ -681,7 +681,7 @@ const _checkCb = (cb) => {
   }
 }
 const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
-  // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
+   // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
@@ -911,6 +911,26 @@ const calculateAmount = (
   return r
 }
 
+const removeFields = (obj, fields = []) => {
+  if (Array.isArray(obj)) {
+    obj.forEach((v) => {
+      removeFields(v, fields)
+    })
+  } else if (typeof obj === 'object') {
+    for (let [
+      key, // dun remove
+      value,
+    ] of Object.entries(obj)) {
+      if (Array.isArray(value)) {
+        removeFields(value, fields)
+      }
+    }
+    fields.forEach((o) => {
+      delete obj[o]
+    })
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -937,6 +957,7 @@ module.exports = {
   htmlDecodeByRegExp,
   getRefreshChasBalanceStatus,
   calculateAmount,
+  removeFields,
   // toUTC,
   // toLocal,
 }

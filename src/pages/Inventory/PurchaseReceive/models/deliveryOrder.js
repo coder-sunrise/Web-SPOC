@@ -51,15 +51,18 @@ export default createFormViewModel({
 
     effects: {
       *queryDeliveryOrder ({ payload }, { call, put }) {
-        // Call API to query delivery order listing
-        let data = fakeDOQueryDoneData
+        const response = yield call(service.queryById, payload)
 
-        return yield put({
-          type: 'setDeliveryOrder',
-          payload: { data },
-        })
+        if (response.status === '200') {
+          const { data } = response
+          return yield put({
+            type: 'setDeliveryOrder',
+            payload: { data },
+          })
+        }
+
+        return false
       },
-
       *getOutstandingPOItem ({ payload }, { call, put }) {
         const { rows, purchaseOrder } = payload
         const { purchaseOrderStatusFK } = purchaseOrder
@@ -112,21 +115,6 @@ export default createFormViewModel({
     },
 
     reducers: {
-      editDeliveryOrder (state, { payload }) {
-        const { purchaseOrderDetails } = state
-        const {
-          purchaseOrder,
-          // purchaseOrderOutstandingItem,
-        } = purchaseOrderDetails
-        return {
-          ...state,
-          entity: {
-            ...payload,
-            // rows: purchaseOrderOutstandingItem,
-          },
-        }
-      },
-
       setAddNewDeliveryOrder (state, { payload }) {
         const { deliveryOrderNo } = payload
         const { purchaseOrderDetails } = state
@@ -148,9 +136,31 @@ export default createFormViewModel({
 
       setDeliveryOrder (state, { payload }) {
         const { data } = payload
+        const { deliveryOrderItem } = data
+
+        const itemRows = deliveryOrderItem.map((x) => {
+          const itemType = podoOrderType.find(
+            (y) => y.value === x.inventoryTypeFK,
+          )
+
+          return {
+            ...x,
+            uid: getUniqueId(),
+            type: x.inventoryTypeFK,
+            
+            // [itemType.itemFKName]: x[itemType.prop][itemType.itemFKName],
+            // code: x[itemType.prop][itemType.itemFKName],
+            // name: x[itemType.prop][itemType.itemFKName],
+            // uom: x[itemType.prop][itemType.itemFKName],
+          }
+        })
+        
         return {
           ...state,
-          list: data,
+          entity: {
+            ...data,
+            rows: itemRows || [],
+          },
         }
       },
 

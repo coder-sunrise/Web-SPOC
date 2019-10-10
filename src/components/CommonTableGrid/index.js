@@ -894,7 +894,11 @@ class CommonTableGrid extends PureComponent {
             {tree && <TreeDataState />}
             {extraState.map((o) => o)}
 
-            {grouping && <IntegratedGrouping />}
+            {grouping && (
+              <IntegratedGrouping
+                columnExtensions={groupingConfig.columnExtensions || []}
+              />
+            )}
             {/* <IntegratedFiltering /> */}
             {sort &&
             !type && (

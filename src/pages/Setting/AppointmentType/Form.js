@@ -18,7 +18,7 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
   const onColorChange = (color) => {
     if (color) setFieldValue('tagColorHex', color.hex)
   }
-
+  const isEdit = values.id !== undefined
   return (
     <Fragment>
       <GridContainer alignItems='flex-start'>
@@ -26,7 +26,9 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
           <GridItem md={12}>
             <FastField
               name='code'
-              render={(args) => <TextField {...args} label='Code' />}
+              render={(args) => (
+                <TextField {...args} disabled={isEdit} label='Code' />
+              )}
             />
           </GridItem>
 
@@ -80,6 +82,7 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
 
 export default withFormikExtend({
   displayName: 'AppointmentTypeSettingForm',
+  notDirtyDuration: 0.5,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -101,7 +104,8 @@ export default withFormikExtend({
       if (response) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingAppointmentType/query',
+          type: 'settingAppointmentType/updateState',
+          payload: { entity: null },
         })
       }
     })

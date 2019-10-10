@@ -584,6 +584,7 @@ class Layout extends PureComponent {
       onSaveLayout = (f) => f,
     } = props
     const widgetProps = {
+      status: 'consultation',
       parentProps: props,
     }
     // console.log(state.currentLayout)
@@ -640,7 +641,7 @@ class Layout extends PureComponent {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
       },
     }
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div>
         {true && (
@@ -843,22 +844,13 @@ class Layout extends PureComponent {
                         shrink: true,
                       }}
                     >
-                      <div>
-                        <p>
-                          <ProgressButton
-                            onClick={() => {
-                              onSaveLayout(this.state.currentLayout)
-                            }}
-                          >
-                            Save as My Favourite
-                          </ProgressButton>
-                        </p>
-                        <p>
-                          <Button color='primary'>
-                            <GetApp />Load from My Favourite
-                          </Button>
-                        </p>
-                      </div>
+                      <ProgressButton
+                        onClick={() => {
+                          onSaveLayout(this.state.currentLayout)
+                        }}
+                      >
+                        Save as My Favourite
+                      </ProgressButton>
                     </CustomInputWrapper>
                   </div>
                 </SizeContainer>

@@ -102,6 +102,9 @@ const query = {
   },
 }
 
+const sessionTimeoutTimer = 30 * 60 * 1000
+// const sessionTimeoutTimer = 500
+
 class BasicLayout extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -175,7 +178,7 @@ class BasicLayout extends React.PureComponent {
             showSessionTimeout: true,
           },
         })
-      }, 30 * 60 * 1000)
+      }, sessionTimeoutTimer)
     }
     const debouncedRST = _.debounce(resetSessionTimeOut, 10000)
     $(document).on('click', debouncedRST)
