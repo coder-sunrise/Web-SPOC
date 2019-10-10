@@ -42,15 +42,19 @@ export default createFormViewModel({
           },
           mobileContactNumber: {
             number: '',
+            countryCodeFK: 1,
           },
           homeContactNumber: {
             number: '',
+            countryCodeFK: 1,
           },
           officeContactNumber: {
             number: '',
+            countryCodeFK: 1,
           },
           faxContactNumber: {
             number: '',
+            countryCodeFK: 1,
           },
           contactWebsite: {
             website: '',
@@ -61,9 +65,7 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
-        // console.log({ pathname })
-        // console.log(loct, method)
-        // console.log(query)
+
         setTimeout(() => {
           if (query.md === 'pt' && query.cmt) {
             dispatch({
@@ -77,7 +79,7 @@ export default createFormViewModel({
               payload: {
                 md: query.md,
                 version: Number(query.v) || undefined,
-                currentId: Number(query.pid) || 0,
+                currentId: Number(query.pid) || undefined,
               },
             })
           }
@@ -107,7 +109,6 @@ export default createFormViewModel({
           patient.version !== version ||
           (patient.entity && patient.entity.id !== currentId)
         ) {
-          console.log({ payload })
           yield put({
             type: 'query',
             payload: {
