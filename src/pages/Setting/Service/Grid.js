@@ -1,12 +1,7 @@
 import React, { PureComponent } from 'react'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { status, isAutoOrder } from '@/utils/codes'
 import { CommonTableGrid, Button } from '@/components'
-import { queryOne } from './services'
-import request from '@/utils/request'
-import { showErrorNotification } from '@/utils/error'
 
 class Grid extends PureComponent {
   editRow = async (row) => {
@@ -46,7 +41,6 @@ class Grid extends PureComponent {
         payload: {
           showModal: true,
           entity: serviceInfo,
-          //entity: list.find((o) => o.id === row.id),
         },
       })
     }
@@ -64,6 +58,7 @@ class Grid extends PureComponent {
           { name: 'description', title: 'Description' },
           { name: 'serviceCenter', title: 'Service Center' },
           { name: 'unitPrice', title: 'Unit Selling Price' },
+          { name: 'isAutoOrder', title: 'Auto Order' },
           { name: 'isActive', title: 'Status' },
           { name: 'action', title: 'Action' },
         ]}
@@ -83,14 +78,24 @@ class Grid extends PureComponent {
           },
           { columnName: 'unitPrice', type: 'number', currency: true },
           {
+            columnName: 'isAutoOrder',
+            align: 'center',
+            width: 120,
+            type: 'select',
+            options: isAutoOrder,
+          },
+          {
             columnName: 'isActive',
             sortingEnabled: false,
             type: 'select',
             options: status,
+            align: 'center',
+            width: 120,
           },
           {
             columnName: 'action',
             align: 'center',
+            width: 100,
             render: (row) => {
               return (
                 <Button
@@ -100,6 +105,7 @@ class Grid extends PureComponent {
                   }}
                   justIcon
                   color='primary'
+                  style={{ marginRight: 0 }}
                 >
                   <Edit />
                 </Button>
