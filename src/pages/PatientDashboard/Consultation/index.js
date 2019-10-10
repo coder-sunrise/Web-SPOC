@@ -303,7 +303,7 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
-    console.log("status " , visit.visitStatus)
+
     return (
       <SizeContainer size='sm'>
         <div
