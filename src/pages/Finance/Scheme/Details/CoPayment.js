@@ -46,7 +46,7 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
     const { target } = event
 
     if (target.value === 'sub') {
-      setFieldValue('overalCoPaymentValue', 0.0)
+      setFieldValue('overalCoPaymentValue', undefined)
       setFieldValue('overalCoPaymentValueType', 'ExactAmount')
     } else {
       setFieldValue(
