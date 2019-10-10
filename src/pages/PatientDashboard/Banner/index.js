@@ -352,7 +352,8 @@ class Banner extends PureComponent {
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
-        <GridContainer style={{ height: 130 }}>
+        {/* Please do not change the height below (By default is 100) */}
+        <GridContainer style={{ height: 100 }}>
           {/* <GridItem xs={6} md={1} gutter={0}>
             <CardAvatar testimonial square>
               <img src={avatar} alt='...' />
@@ -485,9 +486,32 @@ class Banner extends PureComponent {
                             entity={entity}
                             schemeData={schemeData}
                           />
-                          <p style={{ color: 'red' }}>
+                          {schemeData.statusDescription ? (
+                            <div
+                              style={{
+                                fontWeight: 500,
+                                display: 'inline-block',
+                              }}
+                            >
+                              <Tooltip
+                                title={
+                                  <p style={{ color: 'red', fontSize: 14 }}>
+                                    {schemeData.statusDescription}
+                                  </p>
+                                }
+                                placement='bottom-end'
+                              >
+                                <IconButton>
+                                  <Warining color='error' />
+                                </IconButton>
+                              </Tooltip>
+                            </div>
+                          ) : (
+                            ''
+                          )}
+                          {/* <p style={{ color: 'red' }}>
                             {schemeData.statusDescription}
-                          </p>
+                          </p> */}
                         </div>
                       )
                     })}
