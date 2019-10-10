@@ -26,6 +26,10 @@ export default createListViewModel({
         }
       },
 
+      *queryOne ({ payload }, { call, put, select, take }) {
+        return yield call(service.queryOne, payload)
+      },
+
       *create ({ payload }, { call, put, select, take }) {
         const { name } = payload
         const consultation = yield select((st) => st.consultation)

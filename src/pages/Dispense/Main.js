@@ -15,6 +15,7 @@ import style from './style'
 // utils
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
+import Authorized from '@/utils/Authorized'
 
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, visitRegistration, resetForm } = props
@@ -138,15 +139,21 @@ class Main extends Component {
           </GridItem>
           <DispenseDetails {...this.props} />
           <GridItem justify='flex-end' container className={classes.footerRow}>
-            <Button color='success' size='sm' onClick={handleSubmit}>
-              Save Dispense
-            </Button>
-            <Button color='primary' size='sm' onClick={this.editOrder}>
-              Edit Order
-            </Button>
-            <Button color='primary' size='sm' onClick={this.makePayment}>
-              Make Payment
-            </Button>
+            <Authorized authority='queue.dispense.savedispense'>
+              <Button color='success' size='sm' onClick={handleSubmit}>
+                Save Dispense
+              </Button>
+            </Authorized>
+            <Authorized authority='queue.dispense.editorder'>
+              <Button color='primary' size='sm' onClick={this.editOrder}>
+                Edit Order
+              </Button>
+            </Authorized>
+            <Authorized authority='queue.dispense.makepayment'>
+              <Button color='primary' size='sm' onClick={this.makePayment}>
+                Make Payment
+              </Button>
+            </Authorized>
           </GridItem>
         </GridContainer>
       </div>

@@ -74,6 +74,20 @@ const Templates = ({ cestemplate, dispatch, theme }) => {
       }
     })
   }
+
+  const loadTemplate = () => {
+    dispatch({
+      type: 'cestemplate/queryOne',
+      payload: currentId,
+    }).then((o) => {
+      if (o) {
+        notification.success({
+          message: `Template ${templateName} loaded`,
+        })
+        console.log(o)
+      }
+    })
+  }
   return (
     <div>
       <GridContainer gutter={0} style={{ marginBottom: theme.spacing(1) }}>
@@ -92,7 +106,11 @@ const Templates = ({ cestemplate, dispatch, theme }) => {
           />
         </GridItem>
         <GridItem xs={6} alignItems='flex-end' justify='flex-end' container>
-          <ProgressButton icon={<GetApp />} disabled={!currentId}>
+          <ProgressButton
+            icon={<GetApp />}
+            disabled={!currentId}
+            onClick={loadTemplate}
+          >
             Load
           </ProgressButton>
         </GridItem>

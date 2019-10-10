@@ -152,7 +152,10 @@ const saveConsultation = ({
   }),
 )
 @withFormikExtend({
-  authority: 'patientdashboard.startresumeconsultation',
+  authority: [
+    'patientdashboard.startresumeconsultation',
+    'patientdashboard.editconsultation',
+  ],
   mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
     // console.log(consultation.entity, consultation.default)
@@ -430,28 +433,33 @@ class Consultation extends PureComponent {
                   Discard
                 </ProgressButton>
               )}
-              {values.status !== 'Paused' &&
-              [
-                'IN CONS',
-                'WAITING',
-              ].includes(visit.visitStatus) && (
-                <ProgressButton
-                  onClick={this.pauseConsultation}
-                  color='info'
-                  icon={null}
-                >
-                  Pause
-                </ProgressButton>
-              )}
-              {values.status === 'Paused' && (
-                <ProgressButton
-                  onClick={this.resumeConsultation}
-                  color='info'
-                  icon={null}
-                >
-                  Resume
-                </ProgressButton>
-              )}
+              <Authorized authority='patientdashboard.startresumeconsultation'>
+                <React.Fragment>
+                  {values.status !== 'Paused' &&
+                  [
+                    'IN CONS',
+                    'WAITING',
+                  ].includes(visit.visitStatus) && (
+                    <ProgressButton
+                      onClick={this.pauseConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Pause
+                    </ProgressButton>
+                  )}
+                  {values.status === 'Paused' && (
+                    <ProgressButton
+                      onClick={this.resumeConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Resume
+                    </ProgressButton>
+                  )}
+                </React.Fragment>
+              </Authorized>
+
               <ProgressButton
                 color='primary'
                 onClick={this.props.handleSubmit}
@@ -524,12 +532,10 @@ class Consultation extends PureComponent {
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
-    // console.log(state.currentLayout)
+    // console.log(rights)
     const matches = {
       rights:
-        rights === 'enable' && values.status !== 'Paused'
-          ? 'enable'
-          : 'disable',
+        rights === 'enable' && values.status !== 'Paused' ? 'enable' : rights,
     }
     return (
       <div className={classes.root} ref={this.container}>
@@ -539,7 +545,11 @@ class Consultation extends PureComponent {
           {...this.props}
         />
         <Authorized.Context.Provider value={matches}>
-          <Layout {...this.props} onSaveLayout={this.saveLayout} />
+          <Layout
+            {...this.props}
+            onSaveLayout={this.saveLayout}
+            userDefaultLayout={values.visitConsultationTemplate}
+          />
         </Authorized.Context.Provider>
       </div>
     )

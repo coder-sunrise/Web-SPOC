@@ -10,6 +10,53 @@ function isPromise (obj) {
   )
 }
 
+const checkSinglePermission = (currentAuthority, authority, target, type) => {
+  let match = null
+
+  const r = currentAuthority.filter((o) => o.name === authority)
+  if (r.length > 0) {
+    match = r.find(
+      (o) =>
+        [
+          'enable',
+          'readwrite',
+        ].indexOf(o.rights) >= 0,
+    )
+    if (match)
+      return typeof target === 'function' && type !== 'decorator'
+        ? target(match)
+        : target
+
+    match = r.find(
+      (o) =>
+        [
+          'hidden',
+        ].indexOf(o.rights) >= 0,
+    )
+    if (match) {
+      return typeof target === 'function' && type !== 'decorator'
+        ? target(match)
+        : null
+    }
+    match = r.find(
+      (o) =>
+        [
+          'disable',
+        ].indexOf(o.rights) >= 0,
+    )
+    if (match) {
+      return typeof target === 'function' && type !== 'decorator'
+        ? target(match)
+        : React.cloneElement(target, {
+            disabled: true,
+          })
+    }
+
+    return null
+  }
+  return null
+}
+
 /**
  * 通用权限检查方法
  * Common check permissions method
@@ -47,84 +94,28 @@ const checkPermissions = (
   // 数组处理
   let match = null
   if (Array.isArray(authority)) {
-    // console.log(authority, currentAuthority)
-    match = authority.filter((o) =>
-      currentAuthority.find(
-        (m) => o.name === m.name && (o.rights === m.rights || !o.rights),
-      ),
-    )
-    if (match.length > 0) {
-      return typeof target === 'function' && type !== 'decorator'
-        ? target(match)
-        : target
+    for (let index = 0; index < authority.length; index++) {
+      const a = authority[index]
+      const r = currentAuthority.filter((o) => o.name === a)
+      if (r.length > 0) {
+        match = r.find(
+          (o) =>
+            [
+              'enable',
+              'readwrite',
+            ].indexOf(o.rights) >= 0,
+        )
+        if (match) {
+          return checkSinglePermission(currentAuthority, a, target, type)
+        }
+      }
     }
-    // if (Array.isArray(currentAuthority)) {
-    //   for (let i = 0; i < currentAuthority.length; i += 1) {
-    //     const element = currentAuthority[i]
-    //     if (authority.indexOf(element) >= 0) {
-    //       return target
-    //     }
-    //   }
-    // }
-    return typeof Exception === 'function' && type !== 'decorator'
-      ? Exception()
-      : Exception
+
+    return checkSinglePermission(currentAuthority, authority[0], target, type)
   }
   // string 处理
   if (typeof authority === 'string') {
-    const r = currentAuthority.filter((o) => o.name === authority)
-    if (r.length > 0) {
-      match = r.find(
-        (o) =>
-          [
-            'enable',
-            'readwrite',
-          ].indexOf(o.rights) >= 0,
-      )
-      if (match)
-        return typeof target === 'function' && type !== 'decorator'
-          ? target(match)
-          : target
-
-      match = r.find(
-        (o) =>
-          [
-            'hidden',
-          ].indexOf(o.rights) >= 0,
-      )
-      if (match) {
-        return typeof target === 'function' && type !== 'decorator'
-          ? target(match)
-          : null
-      }
-      match = r.find(
-        (o) =>
-          [
-            'disable',
-          ].indexOf(o.rights) >= 0,
-      )
-      // console.log(match)
-      if (match) {
-        return typeof target === 'function' && type !== 'decorator'
-          ? target(match)
-          : React.cloneElement(target, {
-              disabled: true,
-            })
-      }
-
-      return null
-    }
-    // if (Array.isArray(currentAuthority)) {
-    //   for (let i = 0; i < currentAuthority.length; i += 1) {
-    //     const element = currentAuthority[i]
-    //     if (authority === element) {
-    //       return target
-    //     }
-    //   }
-    // }
-    return typeof Exception === 'function' && type !== 'decorator'
-      ? Exception()
-      : Exception
+    return checkSinglePermission(currentAuthority, authority, target, type)
   }
 
   // Promise 处理
