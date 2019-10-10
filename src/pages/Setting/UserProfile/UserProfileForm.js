@@ -296,7 +296,19 @@ class UserProfileForm extends React.PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={6}>
+            <GridItem md={2}>
+              <FastField
+                name='userProfile.countryCodeFK'
+                render={(args) => (
+                  <CodeSelect
+                    label='Country Code'
+                    code='ctcountrycode'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={4}>
               <FastField
                 name='phoneNumber'
                 render={(args) => <NumberInput {...args} label='Contact No.' />}
