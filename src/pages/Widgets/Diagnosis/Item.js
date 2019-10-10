@@ -88,13 +88,15 @@ export default ({
                     const { setFieldValue } = form
                     if (op) {
                       setFieldValue(
+                        `corDiagnosis[${index}]diagnosisDescription`,
+                        op.displayvalue,
+                      )
+
+                      setFieldValue(
                         `corDiagnosis[${index}]diagnosisCode`,
                         op.code,
                       )
-                      setFieldValue(
-                        `corDiagnosis[${index}]diagnosisDescription`,
-                        op.name,
-                      )
+                      
 
                       if (op.complication && op.complication.length) {
                         setFieldValue(
