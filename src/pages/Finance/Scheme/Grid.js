@@ -28,6 +28,20 @@ const Grid = ({ history }) => {
 
   const colExtenstions = [
     {
+      columnName: 'coPayerType',
+      type: 'codeSelect',
+      code: 'ctCopayerType',
+      labelField: 'displayValue',
+      sortBy: 'CopayerFKNavigation.copayerTypeFK',
+    },
+    {
+      columnName: 'coPayerName',
+      type: 'codeSelect',
+      code: 'ctCopayer',
+      labelField: 'displayValue',
+      sortBy: 'CopayerFKNavigation.displayValue',
+    },
+    {
       columnName: 'isActive',
       sortingEnabled: false,
       type: 'select',

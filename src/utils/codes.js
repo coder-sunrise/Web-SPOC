@@ -11,6 +11,11 @@ const status = [
   { value: true, name: 'Active', color: 'green' },
 ]
 
+const isAutoOrder = [
+  { value: false, name: 'False' },
+  { value: true, name: 'True' },
+]
+
 const osBalanceStatus = [
   { value: 'all', name: 'All(Yes/No)', color: 'all' },
   { value: 'yes', name: 'Yes', color: 'yes' },
@@ -1247,7 +1252,7 @@ module.exports = {
   // countries,
   // schemes,
   status,
-
+  isAutoOrder,
   addressTypes,
   orderTypes,
   currenciesList,

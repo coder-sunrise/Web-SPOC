@@ -8,7 +8,11 @@ export default createFormViewModel({
   },
   param: {
     service,
-    state: {},
+    state: {
+      default: {
+        reportFK: undefined,
+      },
+    },
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
         const { pathname } = loct
@@ -24,26 +28,23 @@ export default createFormViewModel({
     },
 
     effects: {
-      *getPrintoutSetting (_, { call, put }) {
-        const response = yield call(service.query)
-
-        yield put({
-          type: 'save',
-          payload: response,
-        })
-      },
+      // *getPrintoutSetting ({ payload }, { call, put }) {
+      //   const response = yield call(service.query, payload)
+      //   yield put({
+      //     type: 'save',
+      //     payload: response,
+      //   })
+      // },
     },
     reducers: {
-      save (state, { payload }) {
-        const { data } = payload
-        const gst = {}
-        data.forEach((p) => {
-          gst[p.settingKey] = p.settingValue
-        })
-        return {
-          gst,
-        }
-      },
+      // save (state, { payload }) {
+      //   const { data } = payload
+      //   console.log({ data })
+      //   const gst = {}
+      //   return {
+      //     gst,
+      //   }
+      // },
     },
   },
 })
