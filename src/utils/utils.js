@@ -19,6 +19,11 @@ import {
 } from '@/components'
 import config from './config'
 
+window.addEventListener('unhandledrejection', (event) => {
+  console.log(event)
+  event.preventDefault()
+})
+
 document.addEventListener('click', () => {
   window.alreadyFocused = false
 })
@@ -906,6 +911,26 @@ const calculateAmount = (
   return r
 }
 
+const removeFields = (obj, fields = []) => {
+  if (Array.isArray(obj)) {
+    obj.forEach((v) => {
+      removeFields(v, fields)
+    })
+  } else if (typeof obj === 'object') {
+    for (let [
+      key, // dun remove
+      value,
+    ] of Object.entries(obj)) {
+      if (Array.isArray(value)) {
+        removeFields(value, fields)
+      }
+    }
+    fields.forEach((o) => {
+      delete obj[o]
+    })
+  }
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -932,6 +957,7 @@ module.exports = {
   htmlDecodeByRegExp,
   getRefreshChasBalanceStatus,
   calculateAmount,
+  removeFields,
   // toUTC,
   // toLocal,
 }

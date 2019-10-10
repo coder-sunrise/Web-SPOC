@@ -29,7 +29,7 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 // utils
-import { ValidationSchema, mapPropsToValues } from './formUtils'
+import { ValidationSchema, mapPropsToValues, sortDataGrid } from './formUtils'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
@@ -185,7 +185,7 @@ class Form extends React.PureComponent {
           {
             [`${prefix}name`]: values.patientName,
             [`${prefix}patientAccountNo`]: values.patientName,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: values.patientContactNo,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo}`,
             combineCondition: 'or',
           },
         ],
@@ -288,7 +288,6 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    console.log({ rows, deleted })
     if (rows) {
       this.setState(
         {
@@ -401,6 +400,10 @@ class Form extends React.PureComponent {
               },
             })
           } else {
+            dispatch({
+              type: 'formik/clean',
+              payload: 'AppointmentForm',
+            })
             resetForm()
             onClose()
           }
@@ -614,9 +617,23 @@ class Form extends React.PureComponent {
     )
   }
 
-  checkShouldDisable = () => {
+  shouldDisablePatientInfo = () => {
+    const { values } = this.props
+
+    return values.id !== undefined
+  }
+
+  shouldDisableButtonAction = () => {
     const { values } = this.props
     const { isDataGridValid } = this.state
+    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
+      return true
+
+    return false
+  }
+
+  shouldDisableDatagrid = () => {
+    const { values } = this.props
 
     const { currentAppointment = {} } = values
 
@@ -624,15 +641,8 @@ class Form extends React.PureComponent {
       APPOINTMENT_STATUS.CANCELLED,
       APPOINTMENT_STATUS.TURNEDUP,
     ]
-
-    if (values.id === undefined) return false
-
     if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
       return true
-
-    if (!isDataGridValid || !values.patientName || !values.patientContactNo)
-      return true
-
     return false
   }
 
@@ -657,29 +667,28 @@ class Form extends React.PureComponent {
     } = this.state
 
     const { currentAppointment = {} } = values
-    const shouldDisable = this.checkShouldDisable()
-    // console.log({ shouldDisable })
-    // console.log({ datagrid })
-    // console.log({
-    //   initialValues: this.props.initialValues,
-    //   values: this.props.values,
-    //   dirty: this.props.dirty,
-    // })
+    const disablePatientInfo = this.shouldDisablePatientInfo()
+    const disableFooterButton = this.shouldDisableButtonAction()
+    const disableDataGrid = this.shouldDisableDatagrid()
+
     const _datagrid =
       conflicts.length > 0
-        ? datagrid.reduce(
-            (data, d) => [
-              ...data,
-              {
-                ...d,
-                conflicts:
-                  conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                    ? conflicts[d.sortOrder].conflicts
-                    : [],
-              },
-            ],
-            [],
-          )
+        ? datagrid
+            .sort(sortDataGrid)
+            .map((item, index) => ({ ...item, sortOrder: index }))
+            .reduce(
+              (data, d) => [
+                ...data,
+                {
+                  ...d,
+                  conflicts:
+                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                      ? conflicts[d.sortOrder].conflicts
+                      : undefined,
+                },
+              ],
+              [],
+            )
         : [
             ...datagrid,
           ]
@@ -692,7 +701,8 @@ class Form extends React.PureComponent {
             <GridContainer className={classnames(classes.formContent)}>
               <GridItem container xs md={6}>
                 <PatientInfoInput
-                  disabled={shouldDisable}
+                  disabled={disablePatientInfo}
+                  isEdit={values.id}
                   onViewPatientProfileClick={this.onViewPatientProfile}
                   onSearchPatientClick={this.onSearchPatient}
                   onCreatePatientClick={this.togglePatientProfileModal}
@@ -700,7 +710,6 @@ class Form extends React.PureComponent {
                   patientContactNo={values.patientContactNo}
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
-                  isEdit={values.id}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
                 />
                 <AppointmentDateInput />
@@ -711,7 +720,7 @@ class Form extends React.PureComponent {
                   render={(args) => (
                     <OutlinedTextField
                       {...args}
-                      disabled={shouldDisable}
+                      disabled={disableDataGrid}
                       multiline
                       rowsMax={3}
                       rows={3}
@@ -723,7 +732,7 @@ class Form extends React.PureComponent {
 
               <GridItem xs md={12} className={classes.verticalSpacing}>
                 <AppointmentDataGrid
-                  disabled={shouldDisable}
+                  disabled={disableDataGrid}
                   appointmentDate={currentAppointment.appointmentDate}
                   data={_datagrid}
                   handleCommitChanges={this.onCommitChanges}
@@ -745,7 +754,7 @@ class Form extends React.PureComponent {
               // isNew={slotInfo.type === 'add'}
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
               onClose={onClose}
-              disabled={shouldDisable}
+              disabled={disableFooterButton}
               handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
               handleSaveDraftClick={this.onSaveDraftClick}
               handleConfirmClick={this.onConfirmClick}

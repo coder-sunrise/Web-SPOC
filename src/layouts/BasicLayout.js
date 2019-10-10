@@ -102,6 +102,9 @@ const query = {
   },
 }
 
+const sessionTimeoutTimer = 30 * 60 * 1000
+// const sessionTimeoutTimer = 500
+
 class BasicLayout extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -138,12 +141,12 @@ class BasicLayout extends React.PureComponent {
         payload: localStorage.getItem('clinicCode'),
       })
 
-      // console.log(routes)
+      // console.log(routes, authority)
       dispatch({
         type: 'menu/getMenuData',
         payload: { routes, authority },
       }).then((menus) => {
-        console.log(d, menus)
+        // console.log(d, menus)
         this.getBreadcrumbNameMap = memoizeOne(
           this.getBreadcrumbNameMap,
           isEqual,
@@ -175,7 +178,7 @@ class BasicLayout extends React.PureComponent {
             showSessionTimeout: true,
           },
         })
-      }, 30 * 60 * 1000)
+      }, sessionTimeoutTimer)
     }
     const debouncedRST = _.debounce(resetSessionTimeOut, 10000)
     $(document).on('click', debouncedRST)

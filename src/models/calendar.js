@@ -101,7 +101,7 @@ export default createListViewModel({
           put({ type: 'getClinicOperationHourList', payload }),
           put({
             type: 'patient/updateState',
-            payload: { entity: null },
+            payload: { entity: null, conflicts: [] },
           }),
         ])
       },
@@ -304,11 +304,11 @@ export default createListViewModel({
               },
             }
           }
-          // console.log({ savePayload })
-          return yield put({
-            type: actionKey,
-            payload: savePayload,
-          })
+          console.log({ savePayload })
+          // return yield put({
+          //   type: actionKey,
+          //   payload: savePayload,
+          // })
         } catch (error) {
           console.log({ error })
         }

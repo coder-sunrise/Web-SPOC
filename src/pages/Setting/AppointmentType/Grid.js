@@ -3,7 +3,7 @@ import { connect } from 'dva'
 // material ui
 import Edit from '@material-ui/icons/Edit'
 // common component
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 // utils
 import { status } from '@/utils/codes'
 
@@ -44,8 +44,8 @@ class Grid extends React.PureComponent {
         columnName: 'action',
         sortingEnabled: false,
         align: 'center',
-        render: (row) => {
-          return (
+        render: (row) => (
+          <Tooltip title='Edit Appointment Type'>
             <Button
               size='sm'
               onClick={() => this.editRow(row)}
@@ -54,8 +54,8 @@ class Grid extends React.PureComponent {
             >
               <Edit />
             </Button>
-          )
-        },
+          </Tooltip>
+        ),
       },
     ],
   }

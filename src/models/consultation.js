@@ -91,6 +91,7 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation paused`,
           })
+          yield put({ type: 'closeModal' })
         }
         return response
       },
@@ -141,6 +142,7 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation signed`,
           })
+          yield put({ type: 'closeModal' })
         }
         return response
       },
@@ -151,7 +153,16 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation discarded`,
           })
+          yield put({ type: 'closeModal' })
         }
+        return response
+      },
+      *saveLayout ({ payload }, { call, put, select }) {
+        const user = yield select((st) => st.user)
+        const response = yield call(service.saveLayout, user.data.id, {
+          userPreferenceDetails: JSON.stringify(payload),
+        })
+
         return response
       },
       *editOrder ({ payload }, { call, put }) {
@@ -178,7 +189,7 @@ export default createFormViewModel({
         console.log(response)
         return response
       },
-      *closeModal ({ payload }, { call, put }) {
+      *closeModal ({ payload }, { call, put, take }) {
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -187,12 +198,20 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
+        yield take('global/updateAppState/@@end')
+        yield put({
+          type: 'formik/updateState',
+          payload: {
+            ConsultationPage: undefined,
+            ConsultationDocumentList: undefined,
+          },
+        })
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
         // console.log('queryDone', payload)
         const { data } = payload
-        if (!data) return
+        if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
           cdRows = cdRows.concat(
@@ -265,7 +284,7 @@ export default createFormViewModel({
         //     remarks: '',
         //   })
         // }
-        console.log(payload)
+        // console.log(payload)
         return payload
       },
     },

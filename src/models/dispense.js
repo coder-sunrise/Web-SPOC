@@ -13,9 +13,13 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      totalWithGST: 0,
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
+        invoice: {
+          invoiceItem: [],
+        },
       },
       selectedWidgets: [
         '1',
@@ -27,14 +31,15 @@ export default createFormViewModel({
 
         if (
           pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
-          Number(query.vid)
+          Number(query.vid) &&
+          query.md2 === 'dsps'
         ) {
           dispatch({
             type: 'initState',
             payload: {
               version: Number(query.v) || undefined,
               visitID: Number(query.vid),
-              md: query.md3,
+              md: query.md2,
             },
           })
         }
@@ -73,24 +78,9 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          yield put({
-            type: 'queryDone',
-            payload: {
-              data: response,
-            },
-          })
-          sendNotification('QueueListing', {
-            message: `Dispense started`,
-          })
-        }
-        return response
-      },
-      *pause ({ payload }, { call, put }) {
-        const response = yield call(service.pause, payload)
-        if (response) {
-          sendNotification('QueueListing', {
-            message: `Dispense paused`,
-          })
+          // sendNotification('QueueListing', {
+          //   message: `Dispense started`,
+          // })
         }
         return response
       },
@@ -123,14 +113,15 @@ export default createFormViewModel({
         }
         return response
       },
-      *closeModal ({ payload }, { call, put }) {
-        router.push(
-          getRemovedUrl([
-            'md2',
-            'cmt',
-            'vid',
-          ]),
-        )
+      *closeModal ({ payload = { toBillingPage: false } }, { call, put }) {
+        const { toBillingPage = false } = payload
+        // router.push(
+        //   getRemovedUrl([
+        //     'md2',
+        //     // 'cmt',
+        //     // 'vid',
+        //   ]),
+        // )
         yield put({
           type: 'updateState',
           payload: {
@@ -145,7 +136,7 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
-        router.push('/reception/queue')
+        if (!toBillingPage) router.push('/reception/queue')
       },
       // *queryDone ({ payload }, { call, put, select }) {
       //   // console.log('queryDone', payload)

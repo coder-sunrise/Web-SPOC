@@ -32,15 +32,20 @@ const AppointmentType = ({
       type: 'settingAppointmentType/query',
     })
   }, [])
+
   const toggleModal = () => {
     dispatch({
       type: 'settingAppointmentType/updateState',
       payload: {
         showModal: !settingAppointmentType.showModal,
+        entity: settingAppointmentType.showModal
+          ? null
+          : settingAppointmentType.entity,
       },
     })
   }
-
+  const formTitlePrefix =
+    settingAppointmentType.entity === null ? 'Add' : 'Edit'
   return (
     <CardContainer hideHeader>
       <Filter
@@ -58,7 +63,7 @@ const AppointmentType = ({
       <CommonModal
         open={settingAppointmentType.showModal}
         observe='AppointmentTypeSettingForm'
-        title='Appointment Type Setting'
+        title={`${formTitlePrefix} Appointment Type`}
         maxWidth='md'
         bodyNoPadding
         onClose={toggleModal}

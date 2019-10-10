@@ -21,8 +21,22 @@ class TextEditorBase extends PureComponent {
   }
 
   componentDidMount () {
+    const { columnExtensions, row, column: { name: columnName } } = this.props
+    const cfg =
+      columnExtensions.find(
+        ({ columnName: currentColumnName }) => currentColumnName === columnName,
+      ) || {}
+    const { gridId, getRowId } = cfg
+    const latestRow = window.$tempGridRow[gridId]
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
+      : row
+
     this.setState({
-      error: updateCellValue(this.props, this.myRef.current, this.props.value),
+      error: updateCellValue(
+        this.props,
+        this.myRef.current,
+        latestRow[columnName],
+      ),
     })
   }
 
@@ -57,7 +71,6 @@ class TextEditorBase extends PureComponent {
     if (editRender) {
       return editRender(row)
     }
-    console.log(latestRow)
     const submitValue = (e) => {
       const error = updateCellValue(
         this.props,

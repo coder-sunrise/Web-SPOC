@@ -110,7 +110,7 @@ const saveConsultation = ({
               })
             }
             sessionStorage.removeItem(`${values.id}_consultationTimer`)
-            history.push(`/reception/queue`)
+            // history.push(`/reception/queue`)
           }
         })
       },
@@ -140,6 +140,7 @@ const saveConsultation = ({
     orders,
     visitRegistration,
     formik,
+    cestemplate,
   }) => ({
     consultation,
     global,
@@ -147,6 +148,7 @@ const saveConsultation = ({
     orders,
     visitRegistration,
     formik,
+    cestemplate,
   }),
 )
 @withFormikExtend({
@@ -251,7 +253,14 @@ class Consultation extends PureComponent {
   }
 
   discardConsultation = () => {
-    const { dispatch, values, history, consultation, resetForm } = this.props
+    const {
+      dispatch,
+      values,
+      history,
+      onClose,
+      consultation,
+      resetForm,
+    } = this.props
     if (values.id) {
       dispatch({
         type: 'global/updateAppState',
@@ -264,7 +273,13 @@ class Consultation extends PureComponent {
               payload: values.id,
             }).then((r) => {
               if (r) {
-                history.push(`/reception/queue`)
+                // dispatch({
+                //   type: 'formik/updateState',
+                //   payload: {
+                //     ConsultationPage: undefined,
+                //   },
+                // })
+                // history.push(`/reception/queue`)
               }
             })
           },
@@ -450,6 +465,20 @@ class Consultation extends PureComponent {
     )
   }
 
+  saveLayout = (layout) => {
+    this.props
+      .dispatch({
+        type: 'consultation/saveLayout',
+        payload: layout,
+      })
+      .then((o) => {
+        if (o)
+          notification.success({
+            message: 'My favourite widget layout saved',
+          })
+      })
+  }
+
   // // eslint-disable-next-line camelcase
   // UNSAFE_componentWillReceiveProps (nextProps) {
   //   // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
@@ -509,7 +538,7 @@ class Consultation extends PureComponent {
           {...this.props}
         />
         <Authorized.Context.Provider value={matches}>
-          <Layout {...this.props} />
+          <Layout {...this.props} onSaveLayout={this.saveLayout} />
         </Authorized.Context.Provider>
       </div>
     )

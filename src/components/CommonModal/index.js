@@ -180,12 +180,13 @@ class CommonModal extends React.PureComponent {
       : [
           this.props.observe,
         ]
-    //  console.log(obs)
+    // console.log({ obs })
     for (let i = 0; i < obs.length; i++) {
       const o = obs[i]
       const ob = window.g_app._store.getState().formik[o]
       // console.log(ob,this.props.observe)
       if (ob) {
+        console.log({ ob, force })
         if (ob.dirty && force !== true) {
           this.setState({
             openConfirm: true,

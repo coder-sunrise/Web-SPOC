@@ -104,14 +104,15 @@ class EditableTableGrid extends PureComponent {
 
   onRowDoubleClick = (row, e) => {
     const { getRowId = (r) => r.id } = this.props
-    console.log(row)
     if (
       [
         'svg',
       ].indexOf(e.target.nodeName) < 0 &&
       !this.state.editingRowIds.find((o) => o === getRowId(row))
     ) {
-      const { onRowDoubleClick } = this.props
+      const { onRowDoubleClick, EditingProps, rows } = this.props
+      const { onEditingRowIdsChange } = EditingProps
+
       if (onRowDoubleClick) {
         onRowDoubleClick()
       } else {
@@ -126,6 +127,9 @@ class EditableTableGrid extends PureComponent {
                 disableSave: true,
               },
             })
+          }
+          if (onEditingRowIdsChange) {
+            this._onEditingRowIdsChange(ids)
           }
           return {
             editingRowIds: ids,
@@ -485,7 +489,7 @@ EditableTableGrid.propTypes = {
   EditingProps: PropTypes.shape({
     // editingRowIds: PropTypes.array,
     // rowChanges: PropTypes.object,
-    onEdionEditingRowIdsChange: PropTypes.func,
+    onEditingRowIdsChange: PropTypes.func,
     onRowChangesChange: PropTypes.func,
     onCommitChanges: PropTypes.func,
     EditCell: PropTypes.oneOfType([

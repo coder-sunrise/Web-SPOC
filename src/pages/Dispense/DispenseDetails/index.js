@@ -25,7 +25,13 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 //   },
 // })
 
-const DispenseDetails = ({ classes, dispense, setFieldValue, values }) => {
+const DispenseDetails = ({
+  classes,
+  dispense,
+  setFieldValue,
+  values,
+  dispatch,
+}) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -79,6 +85,12 @@ const DispenseDetails = ({ classes, dispense, setFieldValue, values }) => {
                   v.summary.totalWithGST,
                 )
                 setFieldValue('invoice.invoiceAdjustment', v.adjustments)
+                dispatch({
+                  type: `dispense/updateState`,
+                  payload: {
+                    totalWithGST: v.summary.totalWithGST,
+                  },
+                })
               }}
             />
           </GridItem>

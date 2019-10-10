@@ -67,12 +67,13 @@ class AddPayment extends Component {
   }
 
   render () {
-    const { classes, onClose } = this.props
+    const { classes, onClose, values } = this.props
     const { paymentList } = this.state
 
     const validationSchema = Yup.object().shape({
       ...paymentList.reduce(mapPaymentListToValidationScheme, {}),
     })
+    console.log({ values })
     return (
       <div>
         <PayerHeader />

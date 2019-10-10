@@ -22,7 +22,6 @@ export default createListViewModel({
     effects: {
       *fetchList ({ payload }, { call, put }) {
         const response = yield call(service.queryList)
-        console.log('patientsearch/search', response)
         yield put({
           type: 'updateState',
           payload: {
