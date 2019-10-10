@@ -125,6 +125,7 @@ class FilterBar extends PureComponent {
                         type: 'patient/updateState',
                         payload: {
                           entity: undefined,
+                          version: undefined,
                         },
                       })
                       dispatch({

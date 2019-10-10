@@ -171,6 +171,7 @@ class GlobalModalContainer extends PureComponent {
           }}
           fullScreen
           showFooter={false}
+          overrideLoading
         >
           {global.showBillingPanel && <Billing />}
         </CommonModal>

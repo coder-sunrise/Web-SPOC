@@ -62,7 +62,7 @@ export default createListViewModel({
         let user = yield select((state) => state.user.data)
 
         let { clinicianProfile: { userProfile: { role: userRole } } } = user
-        // console.log({ userRole })
+        console.log({ userRole })
         if (userRole === undefined) {
           // console.log('fetch user')
           yield take('user/fetchCurrent/@@end')
@@ -128,7 +128,8 @@ export default createListViewModel({
           IsClinicSessionClosed: false,
         }
         const response = yield call(service.getBizSession, bizSessionPayload)
-
+        // test onError catch
+        const x = f
         const { data } = response
         // data = null when get session failed
         if (data && data.totalRecords === 1) {

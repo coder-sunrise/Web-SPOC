@@ -67,7 +67,7 @@ export default createFormViewModel({
           })
         }
       },
-      *closeModal ({ payload }, { put }) {
+      *closeModal ({ payload = { toDispensePage: false } }, { put }) {
         const { toDispensePage = false } = payload
         // router.push(
         //   getRemovedUrl([

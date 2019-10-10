@@ -25,7 +25,7 @@ const withFormikExtend = (props) => (Component) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
 
     const { errors, dirty, values } = ps
-    // console.log(Object.values(errors).length > 0, dirty)
+
     const _lastFormikUpdate = {
       displayName,
       errors,
@@ -35,13 +35,10 @@ const withFormikExtend = (props) => (Component) => {
       // str: JSON.stringify(values),
     }
     const ob = window.g_app._store.getState().formik[displayName]
-    console.log({ ob, _lastFormikUpdate })
+
     if (_.isEqual(_lastFormikUpdate, ob)) {
       return
     }
-    // console.log(window._localFormik[displayName], _lastFormikUpdate)
-
-    console.log({ displayName, _lastFormikUpdate })
     window.g_app._store.dispatch({
       type: 'formik/updateState',
       payload: {
