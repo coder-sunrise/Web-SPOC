@@ -768,6 +768,7 @@ const InventoryTypeListing = ({
               onRowChangesChange={onRowChangesChange()}
               schema={medicationSchema}
               rows={medicationRows}
+              onRowDoubleClick={undefined}
               FuncProps={{ pager: false }}
               EditingProps={{
                 messages: {
@@ -789,6 +790,7 @@ const InventoryTypeListing = ({
               schema={consumableSchema}
               rows={consumableRows}
               FuncProps={{ pager: false }}
+              onRowDoubleClick={undefined}
               EditingProps={{
                 messages: {
                   deleteCommand: 'Delete consumable',
@@ -809,6 +811,7 @@ const InventoryTypeListing = ({
               schema={vaccinationSchema}
               rows={vaccinationRows}
               FuncProps={{ pager: false }}
+              onRowDoubleClick={undefined}
               EditingProps={{
                 messages: {
                   deleteCommand: 'Delete vaccination',
@@ -829,6 +832,7 @@ const InventoryTypeListing = ({
               schema={serviceSchema}
               rows={serviceRows}
               FuncProps={{ pager: false }}
+              onRowDoubleClick={undefined}
               EditingProps={{
                 messages: {
                   deleteCommand: 'Delete service',

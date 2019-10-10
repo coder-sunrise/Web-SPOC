@@ -78,7 +78,7 @@ class DetailsHeader extends PureComponent {
             <GridItem md={5}>
               <h5 className={classes.boldText}>Co-Payer: </h5>
             </GridItem>
-            <GridItem md={3}>
+            <GridItem md={3} style={{ textAlign: 'right' }}>
               <Field
                 name='copayerFK'
                 render={(args) => (
@@ -86,6 +86,7 @@ class DetailsHeader extends PureComponent {
                     code='ctcopayer'
                     disabled
                     noUnderline
+                    align='right'
                     rightAlign='true'
                     {...args}
                   />

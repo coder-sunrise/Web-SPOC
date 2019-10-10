@@ -48,14 +48,23 @@ export default createFormViewModel({
         localStorage.removeItem('token')
         reloadAuthorized()
 
-        yield put(
-          routerRedux.push({
-            pathname: '/login',
-            search: stringify({
-              redirect: routing.location.pathname,
+        const redirect =
+          routing.location.pathname !== '/login'
+            ? routing.location.pathname
+            : ''
+
+        if (routing.location.pathname === '/login') {
+          yield put(routerRedux.push({ pathname: '/login' }))
+        } else {
+          yield put(
+            routerRedux.push({
+              pathname: '/login',
+              search: stringify({
+                redirect,
+              }),
             }),
-          }),
-        )
+          )
+        }
         return true
       },
     },

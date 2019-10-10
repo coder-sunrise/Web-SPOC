@@ -43,12 +43,10 @@ module.exports = {
   },
 
   queryBizSession: (params) => service.queryList(bizSessionUrl, params),
-
-  // getRunningNo: async (params) => {
-  //   const r = await request(`${runningNoUrl}`, {
-  //     method: 'POST',
-  //   })
-  //   return r
-  // },
-  // remove: (params) => service.remove(url, params),
+  remove: (params) => {
+    return request(`${url}/${params.id}`, {
+      method: 'DELETE',
+      body: 'Statement cancelled',
+    })
+  },
 }

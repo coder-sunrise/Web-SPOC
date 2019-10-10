@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
+import { notification } from '@/components'
 
 export default createListViewModel({
   namespace: 'inventoryAdjustment',
@@ -36,7 +37,9 @@ export default createListViewModel({
 
       *removeRow ({ payload }, { call, put }) {
         const result = yield call(service.remove, payload)
-        // yield put({ type: 'saveStockDetails', payload: result })
+        if (result === 204) {
+          notification.success({ message: 'Deleted' })
+        }
       },
     },
     reducers: {

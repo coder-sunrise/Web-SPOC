@@ -55,6 +55,7 @@ class Grid extends PureComponent {
       rows.find((v) => v.id === deleted[0]).isDeleted = true
       setFieldValue('purchaseOrderPayment', rows)
     } else {
+      rows[0].isDeleted = false
       setFieldValue('purchaseOrderPayment', rows)
     }
 
@@ -70,7 +71,7 @@ class Grid extends PureComponent {
           rows={values.purchaseOrderPayment}
           schema={purchaseOrderPaymentSchema}
           FuncProps={{
-            edit: isEditable,
+            edit: false,
             pager: false,
           }}
           EditingProps={{
