@@ -57,7 +57,7 @@ const description = {
 }
 
 const BrowseImage = (props) => {
-  const { title, setImageBase64, fieldName } = props
+  const { title, setImageBase64, fieldName, field, selected } = props
 
   const [
     files,
@@ -68,6 +68,28 @@ const BrowseImage = (props) => {
     base64,
     setBase64,
   ] = useState()
+
+  const base64Header = 'data:image/jpeg;base64,'
+  useEffect(
+    () => {
+      if (field.value && field.value !== '') {
+        setFiles([
+          field.name,
+        ])
+        if (field.value.includes(base64Header)) {
+          setBase64(field.value)
+        } else {
+          setBase64(`${base64Header}${field.value}`)
+        }
+      } else {
+        setFiles([])
+        setBase64()
+      }
+    },
+    [
+      field,
+    ],
+  )
 
   const encodeImageFileAsURL = (element) => {
     const reader = new FileReader()
@@ -129,13 +151,18 @@ const BrowseImage = (props) => {
 
   const removeAll = () => {
     setFiles([])
+    setBase64()
+    field.value = undefined
   }
 
   return (
     <section style={container}>
       <div
-        style={{ cursor: 'pointer' }}
-        {...getRootProps({ className: 'dropzone' })}
+        style={{ cursor: selected ? 'pointer' : 'no-drop' }}
+        {...getRootProps({
+          className: 'dropzone',
+          onClick: (event) => (selected ? {} : event.stopPropagation()),
+        })}
       >
         <input {...getInputProps()} />
         <p style={description}>
