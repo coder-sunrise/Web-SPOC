@@ -219,13 +219,14 @@ const Grid = ({
   )
 
   const computeQueueListingData = () => {
+    console.log('compute queue listing data')
     if (filter === StatusIndicator.APPOINTMENT) return calendarData
 
     let data = [
       ...queueList,
     ]
 
-    const { clinicianProfile: { doctorProfile } } = user
+    const { clinicianProfile: { doctorProfile } } = user.data
 
     if (selfOnly)
       data = data.filter((item) => {
@@ -272,42 +273,44 @@ const Grid = ({
       },
       visitStatus,
     } = row
-    const { clinicianProfile: { doctorProfile } } = user
-    console.log({ doctorProfile })
-    if (!doctorProfile) {
-      notification.error({
-        message: 'Unauthorized Access',
-      })
-      return false
-    }
+    const { clinicianProfile: { doctorProfile } } = user.data
+    console.log({ row, doctorProfile, user })
+    return false
+    // if (!doctorProfile) {
+    //   notification.error({
+    //     message: 'Unauthorized Access',
+    //   })
+    //   return false
+    // }
 
-    if (visitStatus === 'IN CONS') {
-      if (assignedDoctorProfile.id !== doctorProfile.id) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            openConfirmTitle: '',
-            openConfirmContent: `Are you sure to overwrite ${title ||
-              ''} ${name} consultation?`,
-            onConfirmSave: () => null,
-          },
-        })
-        return false
-      }
-    }
+    // if (visitStatus === 'IN CONS') {
+    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
+    //     dispatch({
+    //       type: 'global/updateAppState',
+    //       payload: {
+    //         openConfirm: true,
+    //         openConfirmTitle: '',
+    //         openConfirmContent: `Are you sure to overwrite ${title ||
+    //           ''} ${name} consultation?`,
+    //         onConfirmSave: () => null,
+    //       },
+    //     })
+    //     return false
+    //   }
+    // }
 
-    if (assignedDoctorProfile.id !== doctorProfile.id) {
-      notification.error({
-        message: `You cannot resume other doctor's consultation.`,
-      })
-      return false
-    }
+    // if (assignedDoctorProfile.id !== doctorProfile.id) {
+    //   notification.error({
+    //     message: `You cannot resume other doctor's consultation.`,
+    //   })
+    //   return false
+    // }
 
-    return true
+    // return true
   }
 
   const onClick = (row, id) => {
+    console.log('onclick', { user })
     switch (id) {
       case '0': // edit visit
       case '0.1': // view visit
@@ -450,40 +453,36 @@ const Grid = ({
     }
   }
 
-  const [
-    colExtensions,
-    setColExtensions,
-  ] = useState([
-    ...columnExtensions,
-    {
-      columnName: 'action',
-      align: 'center',
-      render: (row) => <ActionButton row={row} onClick={onClick} />,
-    },
-  ])
+  // const [
+  //   colExtensions,
+  //   setColExtensions,
+  // ] = useState()
 
-  useEffect(
-    () => {
-      setColExtensions([
-        ...columnExtensions,
-        {
-          columnName: 'action',
-          align: 'center',
-          render: (row) => <ActionButton row={row} onClick={onClick} />,
-        },
-      ])
-    },
-    [
-      user,
-      filter,
-      queueList,
-    ],
-  )
+  // let colExtensions =
+
+  // useEffect(
+  //   () => {
+  //     console.log('setColumnExtensions')
+  //     setColExtensions([
+  //       ...columnExtensions,
+  //       {
+  //         columnName: 'action',
+  //         align: 'center',
+  //         render: (row) => <ActionButton row={row} onClick={onClick(user)} />,
+  //       },
+  //     ])
+  //   },
+  //   [
+  //     user,
+  //     filter,
+  //     queueList,
+  //   ],
+  // )
 
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-
+  // console.log({ user })
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper
@@ -495,7 +494,17 @@ const Grid = ({
           size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
-          columnExtensions={colExtensions}
+          columnExtensions={[
+            ...columnExtensions,
+            {
+              columnName: 'action',
+              align: 'center',
+              render: (row) => {
+                console.log({ row, user })
+                return <ActionButton row={row} onClick={onClick} />
+              },
+            },
+          ]}
           FuncProps={FuncConfig}
           onRowDoubleClick={onRowDoubleClick}
           {...TableConfig}
@@ -506,7 +515,7 @@ const Grid = ({
 }
 
 export default connect(({ queueLog, calendar, global, loading, user }) => ({
-  user: user.data,
+  user,
   filter: queueLog.currentFilter,
   selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],
