@@ -129,7 +129,7 @@ export default createListViewModel({
         }
         const response = yield call(service.getBizSession, bizSessionPayload)
         // test onError catch
-        const x = f
+        // yield put({ type: 'TESTRESET'})
         const { data } = response
         // data = null when get session failed
         if (data && data.totalRecords === 1) {
