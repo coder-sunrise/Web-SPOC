@@ -754,7 +754,7 @@ class Layout extends PureComponent {
                         style={w.layoutConfig.style}
                       >
                         <SizeContainer size='sm'>
-                          <LoadableComponent {...widgetProps} />
+                          <LoadableComponent {...widgetProps} status='consultation' visitStatus={visit.visitStatus} />
                         </SizeContainer>
                       </div>
                     </Paper>

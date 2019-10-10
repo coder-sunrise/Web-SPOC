@@ -305,6 +305,7 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
+
     return (
       <SizeContainer size='sm'>
         <div

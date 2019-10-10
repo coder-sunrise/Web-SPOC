@@ -201,7 +201,7 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} widget mode='integrated' />
+            return <Cmpnet {...p} widget mode='integrated'/>
           },
           loading: Loading,
         }),
@@ -218,7 +218,7 @@ class PatientDetail extends PureComponent {
   //           id: this.props.patient.currentId,
   //         },
   //       })
-  //       .then((o) => {
+  //       .then((o) => {   
   //         this.props.resetForm(o)
   //       })
   //   }

@@ -53,18 +53,21 @@ class Orders extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch, mode } = this.props
+    const { dispatch, status, visitStatus } = this.props
     console.log("fghgh")
 
-    dispatch({
-      type: 'orders/updateState',
-      payload: {
-       rows: [],
-      },
-    })
+    
+    console.log("++++ " , this.props)
+    if ( (status === 'consultation' && visitStatus === 'WAITING') || ( status === 'consultation' && visitStatus === 'IN CONS')) {
+      console.log("hhhh " , this.props)
 
-    if (mode === 'consultation') {
-      console.log("hhhh " , mode)
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+         rows: [],
+        },
+      })
+
       dispatch({
         type: 'codetable/fetchCodes',
         payload: {
@@ -89,6 +92,7 @@ class Orders extends PureComponent {
         let orderList = serviceCenterServices.filter(
           (o) => o.isAutoOrder === true && o.isDefault === true,
         )
+        let order =[]
         for (let i = 0; i < orderList.length; i++) {
           let serviceFKValue = 0
           let serviceCenterFKValue = 0
@@ -135,13 +139,23 @@ class Orders extends PureComponent {
             type: 'orders/upsertRow',
             payload: rowRecord,
           })
-        }
-      })
 
+          order.push(rowRecord)
+        }
+        console.log("final order  ",order )
+      })
+      
       this.state = {
         services: [],
         serviceCenters: [],
       }
+    }else{
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+         rows: [],
+        },
+      })
     }
   }
 
