@@ -1,32 +1,26 @@
-import defaultSettings from '@/defaultSettings'
+const initialState = {}
+const models = []
+models.push(require('@/models/setting'))
+models.push(require('@/models/menu'))
+models.push(require('@/models/global'))
+models.push(require('@/models/user'))
 
-const initialState = {
-  setting: defaultSettings,
-  menu: {
-    menuData: [],
-    breadcrumb: {},
-  },
-  loading: {
-    global: false,
-    models: {},
-    effects: {},
-  },
-  global: {
-    collapsed:
-      localStorage.getItem('menuCollapsed') !== undefined
-        ? localStorage.getItem('menuCollapsed') === '1'
-        : true,
-    notices: [],
-    currencySymbol: '$',
-  },
-}
+models.forEach((model) => {
+  initialState[model.namespace] = model.state
+})
 
 export const dva = {
   config: {
     onError (e, ...args) {
       e.preventDefault()
-      console.log({ args })
-      console.log({ e })
+      const [
+        action,
+        { key, effectArgs },
+      ] = args
+      // console.log({ e, effectArgs })
+
+      const message = `Error occured in  effects: ${key}, with payload:`
+      console.log(message, { ...effectArgs })
     },
     onReducer (reducer) {
       return (state, action) => {

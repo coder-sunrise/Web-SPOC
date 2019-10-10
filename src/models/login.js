@@ -39,7 +39,6 @@ export default createFormViewModel({
       },
       *logout (_, { select, put }) {
         const routing = yield select((st) => st.routing)
-        const states = yield select((st) => st)
 
         yield put({
           type: 'global/updateState',
@@ -52,7 +51,7 @@ export default createFormViewModel({
 
         const redirect =
           routing.location.pathname !== '/login'
-            ? routing.location.pathname
+            ? routing.location.pathname + routing.location.search
             : ''
 
         if (routing.location.pathname === '/login') {

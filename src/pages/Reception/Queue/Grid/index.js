@@ -220,7 +220,6 @@ const Grid = ({
 
   const computeQueueListingData = () => {
     if (filter === StatusIndicator.APPOINTMENT) return calendarData
-
     let data = [
       ...queueList,
     ]
