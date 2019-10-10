@@ -319,7 +319,7 @@ const request = (url, option, showNotification = true) => {
             }
             // console.log(codeMessage, response)
             let errorMsg = codeMessage[response.status]
-            console.log({ env: process.env.NODE_ENV })
+
             if (
               response.status === 401
               /* use this to bypass login on development mode */
