@@ -44,7 +44,7 @@ class UploadAttachment extends PureComponent {
       updateAttachments,
       ...props
     } = this.props
-    console.log(values)
+
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>

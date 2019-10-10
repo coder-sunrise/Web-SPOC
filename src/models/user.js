@@ -88,6 +88,10 @@ export default {
           },
         })
 
+        yield put({
+          type: 'queueLog/refresh',
+        })
+
         if (
           !userProfileDetailDto.clinicianProfile.userProfile
             .lastPasswordChangedDate

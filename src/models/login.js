@@ -67,9 +67,10 @@ export default createFormViewModel({
             }),
           )
         }
-        yield put({
-          type: 'user/reset',
-        })
+        // yield put({
+        //   type: 'user/reset',
+        // })
+        yield put({ type: 'RESET_APP_STATE' })
         return true
       },
     },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
@@ -219,7 +219,6 @@ const Grid = ({
   )
 
   const computeQueueListingData = () => {
-    console.log('compute queue listing data')
     if (filter === StatusIndicator.APPOINTMENT) return calendarData
 
     let data = [
@@ -274,8 +273,6 @@ const Grid = ({
       visitStatus,
     } = row
     const { clinicianProfile: { doctorProfile } } = user.data
-    // console.log({ row, doctorProfile, user })
-    // return false
 
     if (!doctorProfile) {
       notification.error({
@@ -311,7 +308,6 @@ const Grid = ({
   }
 
   const onClick = (row, id) => {
-    console.log('onclick', { user })
     switch (id) {
       case '0': // edit visit
       case '0.1': // view visit
@@ -454,34 +450,10 @@ const Grid = ({
     }
   }
 
-  // const [
-  //   colExtensions,
-  //   setColExtensions,
-  // ] = useState()
-
-  // useEffect(
-  //   () => {
-  //     console.log('setColumnExtensions')
-  //     setColExtensions([
-  //       ...columnExtensions,
-  //       {
-  //         columnName: 'action',
-  //         align: 'center',
-  //         render: (row) => <ActionButton row={row} onClick={onClick(user)} />,
-  //       },
-  //     ])
-  //   },
-  //   [
-  //     user,
-  //     filter,
-  //     queueList,
-  //   ],
-  // )
-
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-  // console.log({ user })
+
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper
@@ -499,7 +471,6 @@ const Grid = ({
               columnName: 'action',
               align: 'center',
               render: (row) => {
-                console.log({ row, user })
                 return <ActionButton row={row} onClick={onClick} />
               },
             },
