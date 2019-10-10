@@ -86,6 +86,14 @@ class Billing extends Component {
     console.log('addpayment', { values })
   }
 
+  onExpandDispenseDetails = (event, panel, expanded) => {
+    if (expanded) {
+      this.props.dispatch({
+        type: 'billing/showDispenseDetails',
+      })
+    }
+  }
+
   render () {
     const { showCoPaymentModal, showAddPaymentModal } = this.state
     const { classes, values } = this.props
@@ -97,6 +105,7 @@ class Billing extends Component {
           <Accordion
             leftIcon
             expandIcon={<SolidExpandMore fontSize='large' />}
+            onChange={this.onExpandDispenseDetails}
             collapses={[
               {
                 title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
