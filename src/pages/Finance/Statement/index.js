@@ -104,6 +104,9 @@ class Statement extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'statement/query',
+      payload: {
+        isCancelled: false,
+      },
     })
   }
 
@@ -134,19 +137,33 @@ class Statement extends PureComponent {
     })
   }
 
+  confirmDelete = () => {
+    this.setState((prevState) => {
+      return { open: !prevState.open }
+    })
+
+    const { dispatch, statement } = this.props
+    const rowId = statement.entity.list.find(
+      (o) => o.statementNo === this.state.selectedStatementNo,
+    ).id
+
+    dispatch({
+      type: 'statement/removeRow',
+      payload: {
+        id: rowId,
+        cancelReason: 'Statement Cancelled',
+      },
+    }).then(() => {
+      this.props.dispatch({
+        type: 'statement/query',
+      })
+    })
+  }
+
   handleClose = (e) => {
-    this.setState(
-      (prevState) => {
-        return { open: false }
-      },
-      () => {
-        return {
-          rows: this.state.rows.filter(
-            (row) => row.statementNo !== this.state.selectedStatementNo,
-          ),
-        }
-      },
-    )
+    this.setState((prevState) => {
+      return { open: !prevState.open }
+    })
   }
 
   render () {
@@ -181,15 +198,38 @@ class Statement extends PureComponent {
           columns={columns}
           FuncProps={{ selectable: true }}
           columnExtensions={[
-            { columnName: 'payableAmount', type: 'number', currency: true },
-            { columnName: 'totalPaid', type: 'number', currency: true },
-            { columnName: 'outstandingAmount', type: 'number', currency: true },
+            {
+              columnName: 'company',
+              sortBy: 'CopayerFKNavigation.displayValue',
+            },
+            {
+              columnName: 'payableAmount',
+              type: 'number',
+              currency: true,
+              sortBy: 'totalAmount',
+            },
+            {
+              columnName: 'totalPaid',
+              type: 'number',
+              currency: true,
+              sortBy: 'CollectedAmount',
+            },
+            {
+              columnName: 'outstandingAmount',
+              type: 'number',
+              currency: true,
+            },
             {
               columnName: 'statementDate',
               type: 'date',
               format: { dateFormatLong },
             },
-            { columnName: 'dueDate', type: 'date', format: { dateFormatLong } },
+            {
+              columnName: 'dueDate',
+              type: 'date',
+              format: { dateFormatLong },
+              sortBy: 'DueDate',
+            },
             {
               columnName: 'action',
               align: 'center',
@@ -239,7 +279,7 @@ class Statement extends PureComponent {
               No
             </Button>
             <Button
-              onClick={this.handleClose}
+              onClick={this.confirmDelete}
               value='true'
               color='primary'
               autoFocus

@@ -13,27 +13,27 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
   const onRadioButtonChange = (event) => {
     const { target } = event
 
-    if (target.value === 'sub') setFieldValue('coverageMaxCap', undefined)
+    if (target.value === 'sub') setFieldValue('coverageMaxCap', 0.0)
     else {
       setFieldValue(
         'itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue',
-        undefined,
+        0.0,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue',
-        undefined,
+        0.0,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue',
-        undefined,
+        0.0,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue',
-        undefined,
+        0.0,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue',
-        undefined,
+        0.0,
       )
     }
   }
@@ -71,6 +71,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapAll',
               })}
+              format='0.00'
+              defaultValue='0.00'
               {...args}
             />
           )}
@@ -83,6 +85,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapConsumables',
               })}
+              format='0.00'
+              defaultValue='0.00'
               {...args}
             />
           )}
@@ -95,6 +99,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapMedications',
               })}
+              format='0.00'
+              defaultValue='0.00'
               {...args}
             />
           )}
@@ -107,6 +113,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapVaccines',
               })}
+              format='0.00'
+              defaultValue='0.00'
               {...args}
             />
           )}
@@ -119,6 +127,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapServices',
               })}
+              format='0.00'
+              defaultValue='0.00'
               {...args}
             />
           )}
@@ -131,6 +141,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapPackages',
               })}
+              format='0.00'
+              defaultValue='0.00'
               {...args}
             />
           )}

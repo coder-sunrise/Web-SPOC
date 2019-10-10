@@ -201,19 +201,38 @@ class Detail extends PureComponent {
 
   commitChanges = ({ rows, added, changed, deleted }) => {
     const { setFieldValue, values } = this.props
-    // const checkIsDefaultExist = this.checkIsDefaultExist()
-    rows.forEach((val) => {
+
+    rows.forEach((val, i) => {
       val.serviceFK = values.id
       val.serviceCenterFKNavigation = null
-      // val.isDefault = !checkIsDefaultExist
     })
 
+    const isDefaultExists = rows.find(
+      (o) =>
+        (o.isDefault === true && o.isDeleted === undefined) ||
+        (o.isDeleted === false && o.isDefault === true),
+    )
+    // console.log({ isDefaultExists })
+    if (!isDefaultExists) {
+      const getRow = rows.find(
+        (o) =>
+          (o.isDeleted === undefined || o.isDeleted === false) && !o.isDefault,
+      )
+      // console.log({ getRow })
+      if (getRow) {
+        getRow.isDefault = true
+      }
+    }
+
     setFieldValue('ctServiceCenter_ServiceNavigation', rows)
-    this.setState({ serviceSettings: rows })
+    this.setState(() => {
+      return {
+        serviceSettings: rows,
+      }
+    })
   }
 
   handleAutoOrder = (e) => {
-    console.log({ e })
     if (e) {
       const { serviceSettings } = this.state
       const checkDefaultExist = serviceSettings.find(

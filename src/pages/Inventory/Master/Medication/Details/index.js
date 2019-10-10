@@ -137,16 +137,16 @@ const Detail = ({
       />
       {/* </CardContainer> */}
       <div className={classes.actionDiv}>
-        <ProgressButton
-          submitKey='medicationDetail/submit'
-          onClick={handleSubmit}
-        />
         <Button
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=0')}
         >
           Cancel
         </Button>
+        <ProgressButton
+          submitKey='medicationDetail/submit'
+          onClick={handleSubmit}
+        />
       </div>
     </React.Fragment>
   )
