@@ -672,11 +672,6 @@ class Detail extends PureComponent {
       this.filterStockOption(this.state.selectedItem)
     }
 
-    // console.log('rows', rows, rows.length > 0)
-    // console.log('rowlength1', rows)
-
-    // // if (rows.length > 0) {
-    // console.log('rowlength2')
     // let filteredStockOptions = []
     // rows.forEach((o) => {
     //   const getState = this.type(o.inventoryTypeFK)
@@ -684,25 +679,18 @@ class Detail extends PureComponent {
 
     //   if (o.batchNo) {
     //     const tempStockOptions = [
-    //       ...getState.stateName,
+    //       ...this.state[getState.stateName],
     //     ]
     //     filteredStockOptions = tempStockOptions.filter(
     //       (j) => j.id !== o.batchNo,
     //     )
     //     console.log('filteredStockOptions', filteredStockOptions)
 
-    // const defaultStock = this.state[getState.filteredStateName].find(
-    //   (j) =>
-    //     j.inventoryItemFK === o.code && j.batchNo === 'Not Applicable',
-    // )
+    //     this.setState({ [getState.filteredStateName]: filteredStockOptions })
+    //   }
 
-    // o.batchNo = defaultStock.id
-    // o.stock = defaultStock.stock
-    // }
-    //   console.log('final', filteredStockOptions)
-    //   this.setState({ [getState.filteredStateName]: filteredStockOptions })
+    //   return rows
     // })
-    // }
 
     this.setState({ inventoryAdjustmentItems: rows })
     setValues({
@@ -712,8 +700,6 @@ class Detail extends PureComponent {
 
     this.setState({ selectedBatch: undefined })
     this.setState({ selectedItem: undefined })
-
-    return rows
   }
 
   onAddedRowsChange = (addedRows) => {
