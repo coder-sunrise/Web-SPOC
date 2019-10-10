@@ -86,49 +86,9 @@ const convertReccurenceDaysOfTheWeek = (week = '') =>
 
 const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
   const { hasConflict } = values
-  const [
-    anchorEl,
-    setAnchorEl,
-  ] = useState(null)
-
-  const handlePopoverOpen = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null)
-  }
-
-  const showPopup = Boolean(anchorEl)
 
   return (
     <div style={{ padding: 8 }}>
-      <Popover
-        id='event-popup'
-        className={classes.popover}
-        open={showPopup}
-        anchorEl={anchorEl}
-        onClose={handlePopoverClose}
-        placement='top-start'
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        disableRestoreFocus
-      >
-        <div className={classes.tooltip}>
-          <ul>
-            <li>
-              The selected slot: 26 July 2019 11:45AM - 12:00PM already had an
-              appointment with: Tan Mei Ling
-            </li>
-          </ul>
-        </div>
-      </Popover>
       <GridContainer>
         <GridItem xs md={12}>
           <Field
@@ -168,17 +128,6 @@ const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
               )}
             />
           </GridItem>
-          {hasConflict && (
-            <GridItem md={1} className={classes.conflictIcon}>
-              <SizeContainer size='lg'>
-                <Info
-                  color='error'
-                  onMouseEnter={handlePopoverOpen}
-                  onMouseLeave={handlePopoverClose}
-                />
-              </SizeContainer>
-            </GridItem>
-          )}
         </GridContainer>
         <GridContainer item xs md={12}>
           <GridItem xs md={4}>
