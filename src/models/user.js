@@ -2,6 +2,7 @@ import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
+  // const orgName = accessRight
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
   if (type === 'Module') {
@@ -9,6 +10,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
       {
         name,
         rights,
+        // orgName,
       },
       // {
       //   name: `${name}.view`,
@@ -31,6 +33,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
       {
         name,
         rights,
+        // orgName,
       },
     ]
   }
@@ -69,6 +72,9 @@ export default {
           },
           [],
         )
+        // accessRights.forEach((a) => {
+        //   console.log(a.name)
+        // })
         // console.log({ data: response.data, accessRights })
         yield put({
           type: 'saveCurrentUser',

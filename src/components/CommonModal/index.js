@@ -68,11 +68,12 @@ class CommonModal extends React.PureComponent {
     ]),
   }
 
-  // constructor (props) {
-  //   super(props)
-  //   // console.log(this.state, props)
-  //   const { loading, classes, theme } = props
-  // }
+  constructor (props) {
+    super(props)
+    // console.log(this.state, props)
+    // const { loading, classes, theme } = props
+    this.myRef = React.createRef()
+  }
 
   static getDerivedStateFromProps (nextProps, preState) {
     const { open } = nextProps
@@ -87,12 +88,12 @@ class CommonModal extends React.PureComponent {
     window.addEventListener('resize', this.resize.bind(this))
   }
 
-  componentWillUnmount () {
-    if (navigator.platform.indexOf('Win') > -1 && ps) {
-      ps.destroy()
-      ps = null
-    }
-  }
+  // componentWillUnmount () {
+  //   if (navigator.platform.indexOf('Win') > -1 && ps) {
+  //     ps.destroy()
+  //     ps = null
+  //   }
+  // }
   // static getDerivedStateFromProps (nextProps, preState){
   //     // console.log(nextProps, preState)
   //     if(nextProps.open && !preState.open){
@@ -260,17 +261,16 @@ class CommonModal extends React.PureComponent {
     } = this.props
     if (!children || !open) return null
     // console.log(bodyNoPadding)
-    if (
-      navigator.platform.indexOf('Win') > -1 &&
-      this.refs.modalContent &&
-      !ps
-    ) {
-      ps = new PerfectScrollbar(this.refs.modalContent, {
-        suppressScrollX: true,
-        suppressScrollY: false,
-      })
-    }
-
+    // if (
+    //   navigator.platform.indexOf('Win') > -1 &&
+    //   this.refs.modalContent &&
+    //   !ps
+    // ) {
+    //   ps = new PerfectScrollbar(this.refs.modalContent, {
+    //     suppressScrollX: true,
+    //     suppressScrollY: false,
+    //   })
+    // }
     const childrenWithProps = React.Children.map(children, (child) =>
       React.cloneElement(child, {
         onConfirm: this.onConfirm,
@@ -355,26 +355,19 @@ class CommonModal extends React.PureComponent {
                   position: 'absolute',
                   width: '100%',
                   zIndex: 99999,
-                  height: '100%',
+                  height: `${this.myRef.current
+                    ? this.myRef.current.offsetHeight
+                    : this.state.height}px`,
                   backgroundColor: 'rgba(0, 0, 0, 0.2)',
                   margin: bodyNoPadding ? 0 : -12,
                 }}
               />
             ) : null}
-            {/* <div
-            ref='modalContent'
-            style={{
-              height: this.getHeight(),
-              position: 'relative',
-            }}
-          >
-            
-          </div> */}
-            {open ? (
-              <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
-            ) : (
-              <div />
-            )}
+            <div ref={this.myRef}>
+              {open ? (
+                <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
+              ) : null}
+            </div>
           </DialogContent>
           {showFooter &&
             this.footer({
