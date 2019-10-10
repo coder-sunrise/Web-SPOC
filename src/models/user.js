@@ -41,17 +41,21 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   return []
 }
 
+const defaultState = {
+  accessRights: [],
+  data: {
+    clinicianProfile: {
+      userProfile: {},
+    },
+  },
+  profileDetails: undefined,
+}
+
 export default {
   namespace: 'user',
 
   state: {
-    accessRights: [],
-    data: {
-      clinicianProfile: {
-        userProfile: {},
-      },
-    },
-    profileDetails: undefined,
+    ...defaultState,
   },
 
   effects: {
@@ -111,6 +115,9 @@ export default {
   },
 
   reducers: {
+    reset (_) {
+      return { ...defaultState }
+    },
     save (state, action) {
       return {
         ...state,

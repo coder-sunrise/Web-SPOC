@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
@@ -452,6 +452,7 @@ const Grid = ({
 
   const [
     colExtensions,
+    setColExtensions,
   ] = useState([
     ...columnExtensions,
     {
@@ -460,6 +461,25 @@ const Grid = ({
       render: (row) => <ActionButton row={row} onClick={onClick} />,
     },
   ])
+
+  useEffect(
+    () => {
+      setColExtensions([
+        ...columnExtensions,
+        {
+          columnName: 'action',
+          align: 'center',
+          render: (row) => <ActionButton row={row} onClick={onClick} />,
+        },
+      ])
+    },
+    [
+      user,
+      filter,
+      queueList,
+    ],
+  )
+
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''

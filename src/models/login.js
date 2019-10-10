@@ -67,6 +67,9 @@ export default createFormViewModel({
             }),
           )
         }
+        yield put({
+          type: 'user/reset',
+        })
         return true
       },
     },
