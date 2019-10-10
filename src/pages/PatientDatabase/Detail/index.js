@@ -79,6 +79,7 @@ const styles = () => ({
       type: 'patient/upsert',
       payload: { ...values, cfg },
     }).then((r) => {
+      // create new patient will return patient entity, r === true
       if (r) {
         if (r.id) {
           history.push(
@@ -91,6 +92,10 @@ const styles = () => ({
               }),
             ),
           )
+        } else {
+          dispatch({
+            type: 'patient/closePatientModal',
+          })
         }
         dispatch({
           type: 'patient/query',
@@ -101,9 +106,6 @@ const styles = () => ({
           resetForm(value)
         })
         if (onConfirm) onConfirm()
-        dispatch({
-          type: 'patient/closePatientModal',
-        })
       }
     })
   },
@@ -201,7 +203,7 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p} widget mode='integrated'/>
+            return <Cmpnet {...p} widget mode='integrated' />
           },
           loading: Loading,
         }),
@@ -218,7 +220,7 @@ class PatientDetail extends PureComponent {
   //           id: this.props.patient.currentId,
   //         },
   //       })
-  //       .then((o) => {   
+  //       .then((o) => {
   //         this.props.resetForm(o)
   //       })
   //   }
