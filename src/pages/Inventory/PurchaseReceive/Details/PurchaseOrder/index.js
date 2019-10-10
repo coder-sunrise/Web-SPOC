@@ -435,7 +435,7 @@ class index extends Component {
 
   render () {
     const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
-    const { purchaseOrder: po } = purchaseOrderDetails
+    const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
     const { IsGSTEnabled } = purchaseOrder || false
@@ -444,6 +444,7 @@ class index extends Component {
       <div>
         <POForm
           isPOFinalized={!isPOStatusFinalized(poStatus)}
+          isPODraft={isPOStatusDraft(poStatus)}
           {...this.props}
         />
         <POGrid
@@ -470,15 +471,19 @@ class index extends Component {
             justifyContent: 'flex-end',
           }}
         >
-          <ProgressButton
-            color='danger'
-            icon={null}
-            onClick={() => this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-          >
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.cancelpo',
-            })}
-          </ProgressButton>
+          {isPOStatusDraft(poStatus) && type === 'edit' ? (
+            <ProgressButton
+              color='danger'
+              icon={null}
+              onClick={() => this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+            >
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.cancelpo',
+              })}
+            </ProgressButton>
+          ) : (
+            ''
+          )}
           <ProgressButton
             color='primary'
             icon={null}
@@ -497,7 +502,7 @@ class index extends Component {
           ) : (
             ''
           )}
-          {isPOStatusDraft(poStatus) ? (
+          {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
             <ProgressButton
               color='success'
               icon={null}

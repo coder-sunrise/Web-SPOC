@@ -9,20 +9,30 @@ import Submitted from './Submitted'
 import Approved from './Approved'
 import Rejected from './Rejected'
 import ClaimDetails from '../common/ClaimDetails'
+import SubmitClaimStatus from '../common/SubmitClaimStatus'
 
-@connect(({ claimSubmission }) => ({
+@connect(({ claimSubmission, global }) => ({
   claimSubmission,
+  global,
 }))
 class CHAS extends React.Component {
   state = {
     showClaimDetails: false,
+    showSubmitClaimStatus: false,
+    failedCount: 0,
     claimDetails: {},
   }
 
   openClaimDetails = () => this.setState({ showClaimDetails: true })
 
+  openSubmitClaimStatus = (count) =>
+    this.setState({ showSubmitClaimStatus: true, failedCount: count })
+
   closeClaimDetails = () =>
     this.setState({ showClaimDetails: false, claimDetails: {} })
+
+  closeSubmitClaimStatus = () =>
+    this.setState({ showSubmitClaimStatus: false, failedCount: 0 })
 
   navigateToInvoiceDetails = (row) => {
     const { history } = this.props
@@ -54,7 +64,12 @@ class CHAS extends React.Component {
   }
 
   render () {
-    const { showClaimDetails, claimDetails } = this.state
+    const {
+      showClaimDetails,
+      showSubmitClaimStatus,
+      failedCount,
+      claimDetails,
+    } = this.state
     return (
       <CardContainer hideHeader size='sm'>
         <NavPills
@@ -72,6 +87,7 @@ class CHAS extends React.Component {
               tabButton: 'New',
               tabContent: (
                 <New
+                  handleSubmitClaimStatus={this.openSubmitClaimStatus}
                   handleContextMenuItemClick={this.handleContextMenuItemClick}
                 />
               ),
@@ -109,6 +125,16 @@ class CHAS extends React.Component {
           onConfirm={this.closeClaimDetails}
         >
           <ClaimDetails claimDetails={claimDetails} />
+        </CommonModal>
+
+        <CommonModal
+          title='Submit Claim Status'
+          maxWidth='xs'
+          open={showSubmitClaimStatus}
+          onClose={this.closeSubmitClaimStatus}
+          onConfirm={this.closeSubmitClaimStatus}
+        >
+          <SubmitClaimStatus count={failedCount} />
         </CommonModal>
       </CardContainer>
     )

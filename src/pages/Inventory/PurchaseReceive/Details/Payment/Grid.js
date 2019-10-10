@@ -25,7 +25,7 @@ class Grid extends PureComponent {
       { name: 'paymentModeFK', title: 'Payment Mode' },
       { name: 'referenceNo', title: 'Reference' },
       { name: 'paymentAmount', title: 'Payment Amount' },
-      { name: 'remarks', title: 'Remarks' },
+      { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
       {

@@ -1160,14 +1160,13 @@ export const getInventoryItem = (
   rows = [],
   outstandingItem = undefined,
 ) => {
-  let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
+  let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
   if (outstandingItem) {
     const filterOutstandingItem = outstandingItem.filter(
-      (x) => x.type === value && !x.isDeleted,
+      (x) => x.type === value,
     )
-
     inventoryItemList = _.intersectionBy(
       inventoryItemList,
       filterOutstandingItem,
