@@ -64,6 +64,20 @@ const BrowseImage = (props) => {
     setFiles,
   ] = useState([])
 
+  const [
+    headBase64,
+    setHeadBase64,
+  ] = useState()
+
+  const encodeImageFileAsURL = (element) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      // console.log('RESULT', reader.result)
+      setHeadBase64(reader.result)
+    }
+    reader.readAsDataURL(element)
+  }
+
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
     onDrop: (acceptedFiles) => {
@@ -84,19 +98,22 @@ const BrowseImage = (props) => {
         acceptedFiles.map((file) =>
           Object.assign(file, {
             preview: URL.createObjectURL(file),
+            base64: encodeImageFileAsURL(file),
           }),
         ),
       )
     },
   })
 
-  const thumbs = files.map((file) => (
-    <div style={thumb} key={file.name}>
-      <div style={thumbInner}>
-        <img src={file.preview} style={img} alt={file.name} />
+  const thumbs = files.map((file) => {
+    return (
+      <div style={thumb} key={file.name}>
+        <div style={thumbInner}>
+          <img src={file.preview} style={img} alt={file.name} />
+        </div>
       </div>
-    </div>
-  ))
+    )
+  })
 
   useEffect(
     () => () => {
