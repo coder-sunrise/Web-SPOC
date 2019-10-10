@@ -17,9 +17,7 @@ export default createFormViewModel({
       default: {
         isUserMaintainable: true,
         schemeTypeFK: 11,
-        companyCoPaymentSchemeDto: [
-          { coPaymentSchemeFk: 1 },
-        ],
+        copayerTypeFK: 1,
         effectiveDates: [
           moment().formatUTC(),
           moment('2099-12-31T23:59:59').formatUTC(false),
