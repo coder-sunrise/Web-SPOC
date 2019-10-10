@@ -293,8 +293,8 @@ const Grid = ({
             onConfirmSave: () => null,
           },
         })
+        return false
       }
-      return false
     }
 
     if (assignedDoctorProfile.id !== doctorProfile.id) {

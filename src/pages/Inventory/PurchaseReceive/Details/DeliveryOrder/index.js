@@ -99,7 +99,7 @@ class index extends Component {
             />
           </CommonModal>
           <Button
-            disabled={!isPOStatusFinalized(poStatus)}
+            // disabled={!isPOStatusFinalized(poStatus)}
             onClick={this.onAddDeliveryOrderClicked}
             // hideIfNoEditRights
             color='info'
