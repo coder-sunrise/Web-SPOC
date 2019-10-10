@@ -368,6 +368,8 @@ class Banner extends PureComponent {
                       cmt: 1,
                       pid: info.id,
                     })}
+
+                    
                   >
                     <div>
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
