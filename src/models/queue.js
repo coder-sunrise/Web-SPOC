@@ -62,9 +62,7 @@ export default createListViewModel({
         let user = yield select((state) => state.user.data)
 
         let { clinicianProfile: { userProfile: { role: userRole } } } = user
-        // console.log({ userRole })
         if (userRole === undefined) {
-          // console.log('fetch user')
           yield take('user/fetchCurrent/@@end')
           user = yield select((state) => state.user.data)
           userRole = user.clinicianProfile.userProfile.role
@@ -121,8 +119,14 @@ export default createListViewModel({
       },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },
-        { call, put, all },
+        { call, put, all, select, take },
       ) {
+        let user = yield select((state) => state.user.data)
+        let { clinicianProfile: { userProfile: { role: userRole } } } = user
+        if (userRole === undefined) {
+          yield take('user/fetchCurrent/@@end')
+        }
+
         const { shouldGetTodayAppointments = true } = payload
         const bizSessionPayload = {
           IsClinicSessionClosed: false,
@@ -153,8 +157,6 @@ export default createListViewModel({
               },
             }),
           ])
-
-          // if (shouldGetTodayAppointments)
 
           return true
         }

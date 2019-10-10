@@ -90,7 +90,6 @@ class Queue extends React.Component {
   }
 
   componentWillMount = () => {
-    console.log('will mount')
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
     if (Object.keys(query).length === 0) {
@@ -329,6 +328,7 @@ class Queue extends React.Component {
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
             </h3>
+
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
                 <ProgressButton

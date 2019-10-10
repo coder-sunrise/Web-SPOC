@@ -109,6 +109,7 @@ export default {
   'inventory.pr.detail.pod.addItem': 'Add Item',
   'inventory.pr.detail.pod.cancelpo': 'Cancel PO',
   'inventory.pr.detail.pod.save': 'Save',
+  'inventory.pr.detail.pod.complete': 'Complete PO',
   'inventory.pr.detail.pod.finalize': 'Finalize Order',
   'inventory.pr.detail.pod.summary.subTotal': 'Sub Total:',
   'inventory.pr.detail.pod.summary.adjustment': 'Adjustment: ',

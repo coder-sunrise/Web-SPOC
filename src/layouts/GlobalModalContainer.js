@@ -23,7 +23,7 @@ const styles = (theme) => ({
 
 @connect(({ global, loading, user }) => ({
   global,
-  loggedInUserID: user.data.id,
+  loggedInUserID: user.data && user.data.id,
 }))
 class GlobalModalContainer extends PureComponent {
   // componentDidMount () {
@@ -171,6 +171,7 @@ class GlobalModalContainer extends PureComponent {
           }}
           fullScreen
           showFooter={false}
+          overrideLoading
         >
           {global.showBillingPanel && <Billing />}
         </CommonModal>
