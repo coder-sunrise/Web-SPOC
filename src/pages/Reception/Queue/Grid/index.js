@@ -274,39 +274,40 @@ const Grid = ({
       visitStatus,
     } = row
     const { clinicianProfile: { doctorProfile } } = user.data
-    console.log({ row, doctorProfile, user })
-    return false
-    // if (!doctorProfile) {
-    //   notification.error({
-    //     message: 'Unauthorized Access',
-    //   })
-    //   return false
-    // }
+    // console.log({ row, doctorProfile, user })
+    // return false
 
-    // if (visitStatus === 'IN CONS') {
-    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
-    //     dispatch({
-    //       type: 'global/updateAppState',
-    //       payload: {
-    //         openConfirm: true,
-    //         openConfirmTitle: '',
-    //         openConfirmContent: `Are you sure to overwrite ${title ||
-    //           ''} ${name} consultation?`,
-    //         onConfirmSave: () => null,
-    //       },
-    //     })
-    //     return false
-    //   }
-    // }
+    if (!doctorProfile) {
+      notification.error({
+        message: 'Unauthorized Access',
+      })
+      return false
+    }
 
-    // if (assignedDoctorProfile.id !== doctorProfile.id) {
-    //   notification.error({
-    //     message: `You cannot resume other doctor's consultation.`,
-    //   })
-    //   return false
-    // }
+    if (visitStatus === 'IN CONS') {
+      if (assignedDoctorProfile.id !== doctorProfile.id) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmTitle: '',
+            openConfirmContent: `Are you sure to overwrite ${title ||
+              ''} ${name} consultation?`,
+            onConfirmSave: () => null,
+          },
+        })
+        return false
+      }
+    }
 
-    // return true
+    if (assignedDoctorProfile.id !== doctorProfile.id) {
+      notification.error({
+        message: `You cannot resume other doctor's consultation.`,
+      })
+      return false
+    }
+
+    return true
   }
 
   const onClick = (row, id) => {
@@ -457,8 +458,6 @@ const Grid = ({
   //   colExtensions,
   //   setColExtensions,
   // ] = useState()
-
-  // let colExtensions =
 
   // useEffect(
   //   () => {
