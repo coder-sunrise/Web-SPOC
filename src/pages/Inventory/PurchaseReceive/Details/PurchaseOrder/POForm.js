@@ -94,7 +94,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       })}
                       disabledDate={(d) =>
                         !d || d.isBefore(moment().add('days', -1))}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )
@@ -110,7 +110,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceDate',
                       })}
-                      disabled={isPOFinalized}
+                      // disabled={isPOFinalized}
                       {...args}
                     />
                   )
@@ -133,7 +133,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.poDate',
                       })}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )
@@ -152,7 +152,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       multiline
                       rowsMax={2}
                       rows={2}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )
@@ -168,7 +168,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceNo',
                       })}
-                      disabled={isPOFinalized}
+                      // disabled={isPOFinalized}
                       {...args}
                     />
                   )
@@ -203,7 +203,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       onChange={(v, opts) => {
                         setSupplierDetails(opts)
                       }}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )
@@ -219,7 +219,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.contactPerson',
                       })}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )
@@ -238,7 +238,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       multiline
                       rowsMax={2}
                       rows={2}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )
@@ -261,7 +261,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.contactNo',
                       })}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )
@@ -277,7 +277,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.faxNo',
                       })}
-                      disabled={!isPODraft}
+                      // disabled={!isPODraft}
                       {...args}
                     />
                   )

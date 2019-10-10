@@ -30,9 +30,6 @@ import { podoOrderType } from '@/utils/codes'
   mapPropsToValues: ({ purchaseOrderDetails }) => {
     return purchaseOrderDetails
   },
-  // validationSchema: Yup.object().shape({
-  //   ['purchaseOrder.supplierFK']: Yup.string().required(),
-  // }),
 })
 class index extends Component {
   state = {
