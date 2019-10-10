@@ -61,7 +61,7 @@ const RadioEditorBase = React.memo(
     const commonCfg = {
       disabled: isDisabled(
         window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][getRowId(row)] || {}
+          ? window.$tempGridRow[gridId][getRowId(row)] || row
           : row,
       ),
     }

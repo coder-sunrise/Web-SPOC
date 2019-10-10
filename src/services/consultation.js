@@ -56,4 +56,11 @@ module.exports = {
     })
     return r
   },
+  saveLayout: async (userId, params) => {
+    const r = await request(`${url}/savewidget/${userId}`, {
+      method: 'PUT',
+      body: params,
+    })
+    return r
+  },
 }

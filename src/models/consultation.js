@@ -157,6 +157,14 @@ export default createFormViewModel({
         }
         return response
       },
+      *saveLayout ({ payload }, { call, put, select }) {
+        const user = yield select((st) => st.user)
+        const response = yield call(service.saveLayout, user.data.id, {
+          userPreferenceDetails: JSON.stringify(payload),
+        })
+
+        return response
+      },
       *editOrder ({ payload }, { call, put }) {
         const response = yield call(service.editOrder, payload.id)
         if (response) {
@@ -203,7 +211,7 @@ export default createFormViewModel({
       *queryDone ({ payload }, { call, put, select }) {
         // console.log('queryDone', payload)
         const { data } = payload
-        if (!data) return
+        if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
           cdRows = cdRows.concat(
@@ -276,7 +284,7 @@ export default createFormViewModel({
         //     remarks: '',
         //   })
         // }
-        console.log(payload)
+        // console.log(payload)
         return payload
       },
     },

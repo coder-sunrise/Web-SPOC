@@ -32,22 +32,19 @@ export default createFormViewModel({
       history.listen(async (location) => {
         const { query, pathname } = location
         if (pathname === '/reception/queue/patientdashboard') {
-          const { pid, vis, md2 } = query
+          const { qid, vid, v, md2 } = query
 
           if (md2 === 'bill') {
             dispatch({
               type: 'initState',
-              payload: { pid, vis },
+              payload: { qid, vid, v },
             })
           }
         }
       })
     },
     effects: {
-      *initState ({ payload }, { put }) {
-        // yield put({
-        //   type: 'query',
-        // })
+      *initState ({ payload }, { select, put }) {
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -55,6 +52,20 @@ export default createFormViewModel({
             showBillingPanel: true,
           },
         })
+      },
+      *showDispenseDetails ({ payload }, { select, put }) {
+        const routing = yield select((st) => st.routing)
+        const dispense = yield select((st) => st.dispense)
+
+        if (dispense && !dispense.entity) {
+          yield put({
+            type: 'dispense/initState',
+            payload: {
+              visitID: routing.location.query.vid,
+              version: routing.location.query.v,
+            },
+          })
+        }
       },
       *closeModal ({ payload }, { put }) {
         const { toDispensePage = false } = payload

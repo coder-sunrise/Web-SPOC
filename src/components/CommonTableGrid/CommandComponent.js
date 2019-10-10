@@ -151,7 +151,7 @@ class CommitButton extends React.PureComponent {
   static getDerivedStateFromProps (nextProps, preState) {
     const { row, schema, gridId, getRowId } = nextProps
     const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || {}
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
     if (schema && !_.isEqual(preState.row, latestRow)) {
       return isDisabled(nextProps)

@@ -37,15 +37,8 @@ export default createFormViewModel({
         //   yield put(router.push('reception/queue'))
         // }
       },
-      *logout (_, { put }) {
-        console.log('logout')
-        // yield put({
-        //   type: 'changeLoginStatus',
-        //   payload: {
-        //     status: false,
-        //     currentAuthority: 'guest',
-        //   },
-        // })
+      *logout (_, { select, put }) {
+        const routing = yield select((st) => st.routing)
         yield put({
           type: 'global/updateState',
           payload: {
@@ -54,11 +47,12 @@ export default createFormViewModel({
         })
         localStorage.removeItem('token')
         reloadAuthorized()
+
         yield put(
           routerRedux.push({
             pathname: '/login',
             search: stringify({
-              redirect: window.location.href,
+              redirect: routing.location.pathname,
             }),
           }),
         )

@@ -140,6 +140,7 @@ const saveConsultation = ({
     orders,
     visitRegistration,
     formik,
+    cestemplate,
   }) => ({
     consultation,
     global,
@@ -147,6 +148,7 @@ const saveConsultation = ({
     orders,
     visitRegistration,
     formik,
+    cestemplate,
   }),
 )
 @withFormikExtend({
@@ -464,6 +466,20 @@ class Consultation extends PureComponent {
     )
   }
 
+  saveLayout = (layout) => {
+    this.props
+      .dispatch({
+        type: 'consultation/saveLayout',
+        payload: layout,
+      })
+      .then((o) => {
+        if (o)
+          notification.success({
+            message: 'My favourite widget layout saved',
+          })
+      })
+  }
+
   // // eslint-disable-next-line camelcase
   // UNSAFE_componentWillReceiveProps (nextProps) {
   //   // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
@@ -523,7 +539,7 @@ class Consultation extends PureComponent {
           {...this.props}
         />
         <Authorized.Context.Provider value={matches}>
-          <Layout {...this.props} />
+          <Layout {...this.props} onSaveLayout={this.saveLayout} />
         </Authorized.Context.Provider>
       </div>
     )

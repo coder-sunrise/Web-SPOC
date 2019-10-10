@@ -319,11 +319,11 @@ const request = (url, option, showNotification = true) => {
             }
             // console.log(codeMessage, response)
             let errorMsg = codeMessage[response.status]
-
+            console.log({ env: process.env.NODE_ENV })
             if (
-              response.status === 401 &&
-              !localStorage.getItem('debug') &&
-              process.env.NODE_ENV === 'development'
+              response.status === 401
+              /* use this to bypass login on development mode */
+              // && process.env.NODE_ENV !== 'development'
             ) {
               /* eslint-disable no-underscore-dangle */
               window.g_app._store.dispatch({

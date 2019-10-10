@@ -37,6 +37,14 @@ export default createListViewModel({
       //   }
       //   return false
       // },
+      *refresh (_, { call, put }) {
+        yield put({
+          type: 'query',
+          payload: {
+            pagesize: 99999,
+          },
+        })
+      },
       *update ({ payload }, { call }) {
         const result = yield call(service.save, payload)
         if (result) {
