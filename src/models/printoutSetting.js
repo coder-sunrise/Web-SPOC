@@ -36,10 +36,8 @@ export default createFormViewModel({
     reducers: {
       save (state, { payload }) {
         const { data } = payload
+        console.log({ data })
         const gst = {}
-        data.forEach((p) => {
-          gst[p.settingKey] = p.settingValue
-        })
         return {
           gst,
         }

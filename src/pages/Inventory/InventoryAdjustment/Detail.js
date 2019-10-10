@@ -463,48 +463,71 @@ class Detail extends PureComponent {
         (o) => o.inventoryItemFK === row.code,
       )
 
-      const tableRows =
-        this.state.inventoryAdjustmentItems.length === 0
-          ? this.state.stockList
-          : this.state.inventoryAdjustmentItems
-
-      const edittingRowId =
-        this.state.editingRowIds.length > 0
-          ? this.state.editingRowIds[0]
-          : undefined
-      let test = filteredTempStockMedication
-      if (edittingRowId) {
-        const batchNoId = tableRows.find((o) => o.id === edittingRowId).batchNo
-        console.log('tesbatchNoIdt', batchNoId, edittingRowId)
+      let filteredStockOptions = filteredTempStockMedication
+      if (row.id) {
         const edittingBatchNo = this.state.stockMedication.find(
-          (o) => o.id === batchNoId,
+          (o) => o.id === row.batchNo,
         )
 
-        test = [
+        filteredStockOptions = [
           ...x,
           edittingBatchNo,
         ]
-        console.log('test', test)
       }
-      console.log('cehck', tableRows, this.state.editingRowIds)
 
-      console.log('as', this.state.editingRows)
-      console.log('check', x, array)
-      return row.id ? test : x
+      return row.id ? filteredStockOptions : x
     }
     if (row.inventoryTypeFK === 2) {
       let array = [
         ...this.state.filterStockVaccination,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return row.id ? this.state.stockVaccination : x
+
+      const tempStockVaccination = [
+        ...this.state.stockVaccination,
+      ]
+      const filteredTempStockVaccination = tempStockVaccination.filter(
+        (o) => o.inventoryItemFK === row.code,
+      )
+
+      let filteredStockOptions = filteredTempStockVaccination
+      if (row.id) {
+        const edittingBatchNo = this.state.stockVaccination.find(
+          (o) => o.id === row.batchNo,
+        )
+
+        filteredStockOptions = [
+          ...x,
+          edittingBatchNo,
+        ]
+      }
+      return row.id ? filteredStockOptions : x
     }
     if (row.inventoryTypeFK === 3) {
       let array = [
         ...this.state.filterStockConsumable,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return row.id ? this.state.stockConsumable : x
+
+      const tempStockConsumable = [
+        ...this.state.stockConsumable,
+      ]
+      const filteredTempStockConsumable = tempStockConsumable.filter(
+        (o) => o.inventoryItemFK === row.code,
+      )
+
+      let filteredStockOptions = filteredTempStockConsumable
+      if (row.id) {
+        const edittingBatchNo = this.state.stockConsumable.find(
+          (o) => o.id === row.batchNo,
+        )
+
+        filteredStockOptions = [
+          ...x,
+          edittingBatchNo,
+        ]
+      }
+      return row.id ? filteredStockOptions : x
     }
     return []
   }
@@ -527,7 +550,6 @@ class Detail extends PureComponent {
     const { option, row } = e
     if (option) {
       const { expiryDate, stock, value, batchNo } = option
-      console.log('handleSelectedBatch', option, row)
       this.setState({ selectedItem: e })
       row.batchNo = value
       row.expiryDate = expiryDate
@@ -579,7 +601,6 @@ class Detail extends PureComponent {
       row.batchNoString = undefined
       row.expiryDate = undefined
       row.stock = undefined
-      console.log({ row })
       this.setState({ selectedItem: e })
       this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
@@ -588,9 +609,7 @@ class Detail extends PureComponent {
           (j) =>
             j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
         )
-        console.log({ defaultStock })
         if (defaultStock) {
-          console.log('defaultStock', defaultStock)
           row.batchNo = defaultStock.id
           row.stock = defaultStock.stock
 
@@ -653,19 +672,36 @@ class Detail extends PureComponent {
       this.filterStockOption(this.state.selectedItem)
     }
 
-    // if (rows.length > 0) {
-    //   rows.forEach((o) => {
-    //     if (o.id < 0 && !o.batchNo) {
-    //       const getState = type(o.inventoryTypeFK)
-    //       const defaultStock = this.state[getState.filteredStateName].find(
-    //         (j) =>
-    //           j.inventoryItemFK === o.code && j.batchNo === 'Not Applicable',
-    //       )
+    // console.log('rows', rows, rows.length > 0)
+    // console.log('rowlength1', rows)
 
-    //       o.batchNo = defaultStock.id
-    //       o.stock = defaultStock.stock
-    //     }
-    //   })
+    // // if (rows.length > 0) {
+    // console.log('rowlength2')
+    // let filteredStockOptions = []
+    // rows.forEach((o) => {
+    //   const getState = this.type(o.inventoryTypeFK)
+    //   console.log('rowlength', o.batchNo)
+
+    //   if (o.batchNo) {
+    //     const tempStockOptions = [
+    //       ...getState.stateName,
+    //     ]
+    //     filteredStockOptions = tempStockOptions.filter(
+    //       (j) => j.id !== o.batchNo,
+    //     )
+    //     console.log('filteredStockOptions', filteredStockOptions)
+
+    // const defaultStock = this.state[getState.filteredStateName].find(
+    //   (j) =>
+    //     j.inventoryItemFK === o.code && j.batchNo === 'Not Applicable',
+    // )
+
+    // o.batchNo = defaultStock.id
+    // o.stock = defaultStock.stock
+    // }
+    //   console.log('final', filteredStockOptions)
+    //   this.setState({ [getState.filteredStateName]: filteredStockOptions })
+    // })
     // }
 
     this.setState({ inventoryAdjustmentItems: rows })
@@ -681,14 +717,11 @@ class Detail extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
-    console.log({ addedRows })
     let returnRows = addedRows
     if (this.state.selectedItem) {
-      console.log('selectedItem', this.state.selectedItem)
       const { option } = this.state.selectedItem
       const { uom, expiryDate, stock } = option
       if (uom) {
-        console.log('gtUOM', returnRows)
         returnRows = returnRows.map((r) => ({
           ...r,
           uomDisplayValue: uom,
@@ -696,10 +729,8 @@ class Detail extends PureComponent {
           expiryDate: undefined,
         }))
       } else {
-        console.log('noUOM', returnRows, expiryDate, stock)
         returnRows = returnRows.map((r) => {
           const { uomDisplayValue } = r
-          console.log('distructure', r)
           return {
             ...r,
             uomDisplayValue,
@@ -708,7 +739,6 @@ class Detail extends PureComponent {
           }
         })
       }
-      console.log('cehcl', this.state.selectedBatch, returnRows)
       if (this.state.selectedBatch && returnRows) {
         // const { stock } = this.state.selectedItem
         returnRows = returnRows.map((r) => ({
@@ -718,17 +748,9 @@ class Detail extends PureComponent {
           expiryDate,
         }))
       }
-      console.log('returnRows1', returnRows)
-      // this.props.dispatch({
-      //   // force current edit row components to update
-      //   type: 'global/updateState',
-      //   payload: {
-      //     commitCount: (commitCount += 1),
-      //   },
-      // })
+
       return returnRows
     }
-    console.log('returnRows2', returnRows)
     return returnRows
   }
 

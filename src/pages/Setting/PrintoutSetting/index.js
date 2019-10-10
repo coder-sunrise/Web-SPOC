@@ -1,7 +1,6 @@
 import React, { PureComponent, useEffect } from 'react'
 import { connect } from 'dva'
-import { withStyles, Divider, Tooltip } from '@material-ui/core'
-import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import { withStyles } from '@material-ui/core'
 // import NumberFormat from 'react-number-format'
 import Yup from '@/utils/yup'
 import {
@@ -16,6 +15,7 @@ import {
   Select,
   Switch,
   NumberInput,
+  CodeSelect,
 } from '@/components'
 import BrowseImage from './BrowseImage'
 
@@ -37,6 +37,7 @@ const styles = (theme) => ({
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ printoutSetting }) => {
+    console.log({ printoutSetting })
     return {
       ...printoutSetting,
       letterHead: true,
@@ -83,24 +84,18 @@ const styles = (theme) => ({
 class printoutSetting extends PureComponent {
   state = {}
 
-  // componentDidMount =  () => {
-  //    this.props.dispatch({
-  //     type: 'printoutSetting/query',
-  //   })
-  // }
+  componentDidMount = () => {
+    this.props.dispatch({
+      type: 'printoutSetting/query',
+    })
+  }
 
-  handleOnChange = () => {
-    this.setState(
-      (prevState) => {
-        return {
-          enableGst: !prevState.enableGst,
-        }
-      },
-      // (v) => {
-      //   if (!this.state.enableGst) {
-      //     this.props.setFieldValue('inclusiveGst', false)
-      //   }
-      // },
+  setImageBase64 = (type, v) => {
+    this.props.setFieldValue(
+      [
+        type,
+      ],
+      v,
     )
   }
 
@@ -119,6 +114,7 @@ class printoutSetting extends PureComponent {
     // const { } = this.state
 
     // console.log('inclusiveGst', this.props.values)
+    console.log('state', this.state, this.props.values)
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -127,19 +123,9 @@ class printoutSetting extends PureComponent {
               <FastField
                 name='printoutReport'
                 render={(args) => (
-                  <Select
+                  <CodeSelect
                     label='Select Printout'
-                    options={[
-                      {
-                        value: 'patientListingReport',
-                        name: 'Patient Listing Report',
-                      },
-                      {
-                        value: 'generalReport',
-                        name: 'General Report',
-                      },
-                    ]}
-                    // onChange={this.handleOnChange}
+                    code='ctPrinterType'
                     {...args}
                   />
                 )}
@@ -176,14 +162,7 @@ class printoutSetting extends PureComponent {
                     <NumberInput
                       label='Letter Head Height'
                       suffix='cm'
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setFieldValue(
-                            'letterHeadHeight',
-                            e.target.value.toFixed(1),
-                          )
-                        }
-                      }}
+                      format='0.0'
                       {...args}
                     />
                   )}
@@ -193,7 +172,12 @@ class printoutSetting extends PureComponent {
                 <FastField
                   name='letterHeadImage'
                   render={(args) => (
-                    <BrowseImage title='Letter Head Image' {...args} />
+                    <BrowseImage
+                      title='Letter Head Image'
+                      setImageBase64={this.setImageBase64}
+                      fieldName='letterHeadImage'
+                      {...args}
+                    />
                   )}
                 />
               </GridItem>
@@ -223,14 +207,7 @@ class printoutSetting extends PureComponent {
                     <NumberInput
                       label='Header Info Height'
                       suffix='cm'
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setFieldValue(
-                            'headerInfoHeight',
-                            e.target.value.toFixed(1),
-                          )
-                        }
-                      }}
+                      format='0.0'
                       {...args}
                     />
                   )}
@@ -261,14 +238,7 @@ class printoutSetting extends PureComponent {
                     <NumberInput
                       label='Footer Info Height'
                       suffix='cm'
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setFieldValue(
-                            'footerInfoHeight',
-                            e.target.value.toFixed(1),
-                          )
-                        }
-                      }}
+                      format='0.0'
                       {...args}
                     />
                   )}
@@ -281,14 +251,7 @@ class printoutSetting extends PureComponent {
                     <NumberInput
                       label='Footer Disclaimer Height'
                       suffix='cm'
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setFieldValue(
-                            'footerDisclaimerHeight',
-                            e.target.value.toFixed(1),
-                          )
-                        }
-                      }}
+                      format='0.0'
                       {...args}
                     />
                   )}
@@ -298,7 +261,12 @@ class printoutSetting extends PureComponent {
                 <FastField
                   name='footerDisclaimerImage'
                   render={(args) => (
-                    <BrowseImage title='Footer Disclaimer Image' {...args} />
+                    <BrowseImage
+                      title='Footer Disclaimer Image'
+                      setImageBase64={this.setImageBase64}
+                      fieldName='footerDisclaimerImage'
+                      {...args}
+                    />
                   )}
                 />
               </GridItem>

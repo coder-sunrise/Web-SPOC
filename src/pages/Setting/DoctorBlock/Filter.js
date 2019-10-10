@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { standardRowHeight } from 'mui-pro-jss'
+import { status } from '@/utils/codes'
 import {
   CodeSelect,
   GridContainer,
@@ -32,6 +33,21 @@ const styles = (theme) => ({
     right: 0,
   },
 })
+
+const recurrenceTypes = [
+  {
+    id: 'daily',
+    name: 'Daily',
+  },
+  {
+    id: 'weekly',
+    name: 'Weekly',
+  },
+  {
+    id: 'monthly',
+    name: 'Monthly',
+  },
+]
 
 @withFormik({
   handleSubmit: () => {},
@@ -67,7 +83,7 @@ class Filter extends PureComponent {
             <FastField
               name='status'
               render={(args) => {
-                return <Select label='Status' {...args} />
+                return <Select label='Status' options={status} {...args} />
               }}
             />
           </GridItem>
@@ -75,7 +91,13 @@ class Filter extends PureComponent {
             <FastField
               name='recurrence'
               render={(args) => {
-                return <Select label='Recurrence Type' {...args} />
+                return (
+                  <Select
+                    label='Recurrence Type'
+                    options={recurrenceTypes}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

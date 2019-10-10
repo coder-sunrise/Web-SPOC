@@ -57,7 +57,7 @@ const description = {
 }
 
 const BrowseImage = (props) => {
-  const { title } = props
+  const { title, setImageBase64, fieldName } = props
 
   const [
     files,
@@ -65,15 +65,17 @@ const BrowseImage = (props) => {
   ] = useState([])
 
   const [
-    headBase64,
-    setHeadBase64,
+    base64,
+    setBase64,
   ] = useState()
 
   const encodeImageFileAsURL = (element) => {
     const reader = new FileReader()
     reader.onloadend = () => {
       // console.log('RESULT', reader.result)
-      setHeadBase64(reader.result)
+      const data = reader.result
+      setBase64(data)
+      setImageBase64(fieldName, data)
     }
     reader.readAsDataURL(element)
   }
@@ -109,7 +111,7 @@ const BrowseImage = (props) => {
     return (
       <div style={thumb} key={file.name}>
         <div style={thumbInner}>
-          <img src={file.preview} style={img} alt={file.name} />
+          <img src={base64} style={img} alt={file.name} />
         </div>
       </div>
     )
