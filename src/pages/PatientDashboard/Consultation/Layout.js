@@ -584,6 +584,7 @@ class Layout extends PureComponent {
       onSaveLayout = (f) => f,
     } = props
     const widgetProps = {
+      status: 'consultation',
       parentProps: props,
     }
     // console.log(state.currentLayout)
@@ -754,7 +755,7 @@ class Layout extends PureComponent {
                         style={w.layoutConfig.style}
                       >
                         <SizeContainer size='sm'>
-                          <LoadableComponent {...widgetProps} status='consultation' visitStatus={visit.visitStatus} />
+                          <LoadableComponent {...widgetProps} />
                         </SizeContainer>
                       </div>
                     </Paper>
