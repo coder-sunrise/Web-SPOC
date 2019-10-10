@@ -34,8 +34,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmission }) => ({
+@connect(({ claimSubmission, codetable }) => ({
   claimSubmission,
+  codetable,
 }))
 @withFormikExtend({
   enableReinitialize: true,
@@ -44,6 +45,17 @@ const styles = (theme) => ({
   },
 })
 class ClaimDetails extends Component {
+  constructor (props) {
+    super(props)
+    const { dispatch } = props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctgender',
+      },
+    })
+  }
+
   render () {
     const {
       classes,
@@ -51,7 +63,20 @@ class ClaimDetails extends Component {
       onClose,
       renderClaimDetails,
       values,
+      codetable,
     } = this.props
+    const { ctgender = [] } = codetable
+    const {
+      clinicianProfile: { title, name, doctorProfile },
+      patientDetail: { age, genderFK },
+      patientName,
+    } = values
+    let patientGender = ctgender.find((x) => x.id === genderFK)
+    const { doctorMCRNo } = doctorProfile
+    let doctorNameLabel = `${title} ${name} (${doctorMCRNo})`
+    let patientNameLabel = `${patientName} (${patientGender
+      ? patientGender.code
+      : ''}/${age})`
 
     const { readOnly } = true
     return (
@@ -65,7 +90,7 @@ class ClaimDetails extends Component {
             <GridItem md={5} container>
               <GridItem md={12}>
                 <FastField
-                  name='refNo'
+                  name='patientDetail.patientReferenceNo'
                   render={(args) => (
                     <TextField {...args} disabled label='Patient Ref No.' />
                   )}
@@ -80,11 +105,10 @@ class ClaimDetails extends Component {
                 />
               </GridItem>
               <GridItem md={12}>
-                <FastField
-                  name='patientName'
-                  render={(args) => (
-                    <TextField {...args} disabled label='Patient Name' />
-                  )}
+                <TextField
+                  value={patientNameLabel}
+                  disabled
+                  label='Patient Name'
                 />
               </GridItem>
             </GridItem>
@@ -99,12 +123,7 @@ class ClaimDetails extends Component {
                 />
               </GridItem>
               <GridItem md={12}>
-                <FastField
-                  name='visitDoctorProfileFK'
-                  render={(args) => (
-                    <TextField {...args} disabled label='Doctor' />
-                  )}
-                />
+                <TextField disabled label='Doctor' value={doctorNameLabel} />
               </GridItem>
               <GridItem md={12}>
                 <FastField
