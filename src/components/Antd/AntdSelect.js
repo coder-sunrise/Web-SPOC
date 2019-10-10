@@ -439,7 +439,9 @@ class AntdSelect extends React.PureComponent {
       this.setState({
         data: _.filter(
           options,
-          (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
+          // (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
+          (o) =>
+            Object.byString(o, labelField).toLowerCase().indexOf(search) >= 0,
         ).splice(0, max),
         fetching: false,
       })

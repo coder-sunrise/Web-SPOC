@@ -1,6 +1,9 @@
 import React from 'react'
+import NProgress from 'nprogress'
 // material ui
 import { withStyles } from '@material-ui/core'
+// umi
+import router from 'umi/router'
 // common component
 import { SizeContainer } from '@/components'
 // medisys
@@ -14,11 +17,19 @@ const styles = (theme) => ({
 })
 
 class LandingLayout extends React.Component {
+  componentWillMount () {
+    const token = localStorage.getItem('token')
+    if (token !== null) {
+      router.push('/')
+    }
+  }
+
   getBgImage = () => {
     return loginBackground
   }
 
   render () {
+    NProgress.done()
     const { children, classes } = this.props
     return (
       <div className={classes.wrapper}>

@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
+import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import {
   CodeSelect,
@@ -34,11 +35,14 @@ const styles = (theme) => ({
 })
 
 @withFormik({
+  mapPropsToValues: () => ({
+    doctorName: [],
+  }),
   handleSubmit: () => {},
 })
 class Filter extends PureComponent {
   render () {
-    const { classes } = this.props
+    const { classes, values } = this.props
 
     return (
       <div className={classes.filterBar}>
@@ -46,7 +50,22 @@ class Filter extends PureComponent {
           <GridItem xs={6} md={4}>
             <FastField
               name='doctorName'
-              render={(args) => <DoctorProfileSelect {...args} />}
+              render={(args) => (
+                <DoctorProfileSelect
+                  mode='multiple'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    clinicianProfile: {
+                      name: 'All',
+                      id: -99,
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
+                  valueField='clinicianProfile.id'
+                  maxTagCount={values.doctorName.length > 1 ? 0 : 1}
+                />
+              )}
             />
           </GridItem>
           <GridItem xs={6} md={4}>
@@ -60,14 +79,6 @@ class Filter extends PureComponent {
                     {...args}
                   />
                 )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} md={2}>
-            <FastField
-              name='status'
-              render={(args) => {
-                return <Select label='Status' {...args} />
               }}
             />
           </GridItem>
@@ -91,10 +102,14 @@ class Filter extends PureComponent {
                   const prefix = this.props.values.isExactSearch
                     ? 'eql_'
                     : 'like_'
+
                   this.props.dispatch({
-                    type: 'settingDoctorBlock/query',
+                    type: 'doctorBlock/query',
                     payload: {
-                      [`${prefix}name`]: this.props.values.search,
+                      // [`${prefix}name`]: values.doctorName,
+                      lgteql_startDateTime: values.dates[0],
+                      lsteql_endDateTime: values.dates[1],
+                      combineCondition: 'and',
                     },
                   })
                 }}
@@ -121,4 +136,4 @@ class Filter extends PureComponent {
   }
 }
 
-export default Filter
+export default withStyles(styles, { name: 'DoctorBlockSetting' })(Filter)

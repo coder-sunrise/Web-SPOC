@@ -65,14 +65,16 @@ const PatientInfoInput = ({
               >
                 Search
               </ProgressButton>
-              <Button
-                size='sm'
-                color='primary'
-                disabled={disabled}
-                onClick={onCreatePatientClick}
-              >
-                Create Patient
-              </Button>
+              {!isEdit && (
+                <Button
+                  size='sm'
+                  color='primary'
+                  disabled={disabled}
+                  onClick={onCreatePatientClick}
+                >
+                  Create Patient
+                </Button>
+              )}
             </React.Fragment>
           ) : (
             <React.Fragment>

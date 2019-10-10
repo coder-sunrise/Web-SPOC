@@ -53,8 +53,11 @@ class HeaderLinks extends React.Component {
   }
 
   logout = () => {
-    localStorage.removeItem('token')
-    location.href = '/login'
+    // localStorage.removeItem('token')
+    // location.href = '/login'
+    this.props.dispatch({
+      type: 'login/logout',
+    })
   }
 
   openUserProfileForm = () => {

@@ -1,19 +1,33 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import * as Yup from 'yup'
+// material ui
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+// common component
 import { CardContainer, CommonModal } from '@/components'
+// medisys component
+import { LoadingWrapper } from '@/components/_medisys'
+// sub component
 import Filter from './Filter'
 import Grid from './Grid'
-import Detail from './Detail'
 import DoctorBlockForm from '@/pages/Reception/Appointment/components/form/DoctorBlock'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ doctorBlock }) => ({
+const DoctorFormValidation = Yup.object().shape({
+  doctorBlockUserFk: Yup.string().required(),
+  durationHour: Yup.string().required(),
+  durationMinute: Yup.string().required(),
+  eventDate: Yup.string().required(),
+  eventTime: Yup.string().required(),
+})
+
+@connect(({ doctorBlock, loading }) => ({
   doctorBlock,
+  loading: loading.effects['doctorBlock/query'],
 }))
 class DoctorBlock extends PureComponent {
   state = {
@@ -45,27 +59,54 @@ class DoctorBlock extends PureComponent {
       })
   }
 
+  confirmDelete = (id) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'doctorBlock/delete',
+      payload: { id },
+    }).then(() => {
+      dispatch({
+        type: 'doctorBlock/refresh',
+      })
+    })
+  }
+
+  handleDelete = (id) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: 'Are you sure want to delete this doctor block?',
+        onConfirmSave: () => this.confirmDelete(id),
+      },
+    })
+  }
+
   render () {
     const { showModal } = this.state
-    const { classes, doctorBlock, dispatch, theme, ...restProps } = this.props
-
-    const cfg = {
-      toggleModal: this.toggleModal,
-    }
+    const { doctorBlock, loading, dispatch } = this.props
 
     return (
       <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid onEditClick={this.handleEdit} dataSource={doctorBlock.list} />
+        <Filter toggleModal={this.toggleModal} dispatch={dispatch} />
+        <LoadingWrapper loading={loading} text='Refreshing list...'>
+          <Grid
+            onEditClick={this.handleEdit}
+            onDeleteClick={this.handleDelete}
+            dataSource={doctorBlock.list}
+          />
+        </LoadingWrapper>
         <CommonModal
           open={showModal}
-          title='Add Doctor Block'
+          observe='DoctorBlockForm'
+          title='Doctor Block'
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <DoctorBlockForm />
+          <DoctorBlockForm validationSchema={DoctorFormValidation} />
         </CommonModal>
       </CardContainer>
     )
