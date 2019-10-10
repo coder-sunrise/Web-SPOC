@@ -48,7 +48,7 @@ export default createFormViewModel({
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
         const { version, visitID, md2 } = payload
-        console.log('dispense/initstate')
+
         yield put({
           type: 'query',
           payload: {
@@ -57,7 +57,7 @@ export default createFormViewModel({
           },
         })
         yield take('query/@@end')
-        console.log({ payload })
+
         if (md2 === 'dsps') {
           yield put({
             type: 'global/updateState',
