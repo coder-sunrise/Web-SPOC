@@ -1,21 +1,21 @@
-import React, { createElement } from 'react';
-import classNames from 'classnames';
-import { Button } from 'antd';
-import config from './typeConfig';
-import styles from './index.less';
+import React, { createElement } from 'react'
+import classNames from 'classnames'
+import { Button } from 'antd'
+import config from './typeConfig'
+import styles from './index.less'
 
 class Exception extends React.PureComponent {
   static defaultProps = {
     backText: 'back to home',
     redirect: '/',
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {};
   }
 
-  render() {
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
+
+  render () {
     const {
       className,
       backText,
@@ -27,9 +27,9 @@ class Exception extends React.PureComponent {
       actions,
       redirect,
       ...rest
-    } = this.props;
-    const pageType = type in config ? type : '404';
-    const clsString = classNames(styles.exception, className);
+    } = this.props
+    const pageType = type in config ? type : '404'
+    const clsString = classNames(styles.exception, className)
     return (
       <div className={clsString} {...rest}>
         <div className={styles.imgBlock}>
@@ -49,13 +49,13 @@ class Exception extends React.PureComponent {
                   to: redirect,
                   href: redirect,
                 },
-                <Button type="primary">{backText}</Button>
+                // <Button type="primary">{backText}</Button>
               )}
           </div>
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default Exception;
+export default Exception

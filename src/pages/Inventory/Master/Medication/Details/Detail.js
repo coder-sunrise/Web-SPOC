@@ -295,7 +295,12 @@ const Detail = ({
         onClose={toggleModal}
         onConfirm={toggleModal}
       >
-        <Sdd dispatch={dispatch} handleSelectSdd={handleSelectSdd} {...props} />
+        <Sdd
+          dispatch={dispatch}
+          handleSelectSdd={handleSelectSdd}
+          theme={theme}
+          {...props}
+        />
       </CommonModal>
     </CardContainer>
   )

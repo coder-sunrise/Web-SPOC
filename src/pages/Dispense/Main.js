@@ -6,7 +6,13 @@ import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem, withFormikExtend } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  withFormikExtend,
+  notification,
+} from '@/components'
 // sub component
 // import PatientBanner from './components/PatientBanner'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -15,6 +21,7 @@ import style from './style'
 // utils
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
+import Authorized from '@/utils/Authorized'
 
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, visitRegistration, resetForm } = props
@@ -54,6 +61,9 @@ const reloadDispense = (props, effect = 'query') => {
       },
     }).then((o) => {
       if (o) {
+        notification.success({
+          message: 'Dispense saved',
+        })
         reloadDispense({
           ...props,
           ...restProps,
@@ -138,15 +148,21 @@ class Main extends Component {
           </GridItem>
           <DispenseDetails {...this.props} />
           <GridItem justify='flex-end' container className={classes.footerRow}>
-            <Button color='success' size='sm' onClick={handleSubmit}>
-              Save Dispense
-            </Button>
-            <Button color='primary' size='sm' onClick={this.editOrder}>
-              Edit Order
-            </Button>
-            <Button color='primary' size='sm' onClick={this.makePayment}>
-              Make Payment
-            </Button>
+            <Authorized authority='queue.dispense.savedispense'>
+              <Button color='success' size='sm' onClick={handleSubmit}>
+                Save Dispense
+              </Button>
+            </Authorized>
+            <Authorized authority='queue.dispense.editorder'>
+              <Button color='primary' size='sm' onClick={this.editOrder}>
+                Edit Order
+              </Button>
+            </Authorized>
+            <Authorized authority='queue.dispense.makepayment'>
+              <Button color='primary' size='sm' onClick={this.makePayment}>
+                Make Payment
+              </Button>
+            </Authorized>
           </GridItem>
         </GridContainer>
       </div>

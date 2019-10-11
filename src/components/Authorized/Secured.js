@@ -1,6 +1,8 @@
 import React from 'react'
 import Exception from '../Exception'
 import CheckPermissions from './CheckPermissions'
+import Authorized from '@/utils/Authorized'
+
 /**
  * 默认不能访问任何页面
  * default is "NULL"
@@ -11,7 +13,31 @@ const Exception403 = () => <Exception type='403' />
 // AuthorizedRoute is already instantiated
 // Authorized  render is already instantiated, children is no instantiated
 // Secured is not instantiated
-const checkIsInstantiation = (target) => {
+const checkIsInstantiation = (target, orgTarget) => {
+  if (target === null) return () => <div />
+  // if (typeof target === 'string') {
+  //   const disabledComponet = (Component) => {
+  //     console.log(Component)
+  //     console.log(Component)
+  //     class test extends React.Component {
+  //       render () {
+  //         return orgTarget
+  //       }
+  //     }
+  //     return test
+  //   }
+  //   if (!React.isValidElement(orgTarget)) {
+  //     return disabledComponet
+  //   }
+  //   return () => orgTarget
+  //   console.log(disabledComponet)
+  //   return disabledComponet
+  // }
+  // return (
+  //   <Authorized.Context.Provider value={{ rights: target }}>
+  //     {orgTarget}
+  //   </Authorized.Context.Provider>
+  // )
   if (!React.isValidElement(target)) {
     return target
   }
@@ -54,7 +80,8 @@ const authorize = (authority, error) => {
       classError || Exception403,
       'decorator',
     )
-    return checkIsInstantiation(component)
+    console.log(component)
+    return checkIsInstantiation(component, target)
   }
 }
 

@@ -9,7 +9,10 @@ import { convertToConsultation } from '@/pages/PatientDashboard/Consultation/uti
 // utils
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
+import Authorized from '@/utils/Authorized'
+
 // model
+@Authorized.Secured('queue.dispense.editorder')
 class EditOrder extends Component {
   makePayment = () => {
     const { dispatch, dispense } = this.props
@@ -98,7 +101,7 @@ class EditOrder extends Component {
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>
-            <Order className={classes.orderPanel} status={''} />
+            <Order className={classes.orderPanel} status='' />
           </GridItem>
           <GridItem xs={12} md={6}>
             <h5>

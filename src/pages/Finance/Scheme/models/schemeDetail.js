@@ -17,9 +17,7 @@ export default createFormViewModel({
       default: {
         isUserMaintainable: true,
         schemeTypeFK: 11,
-        companyCoPaymentSchemeDto: [
-          { coPaymentSchemeFk: 1 },
-        ],
+        copayerTypeFK: 1,
         effectiveDates: [
           moment().formatUTC(),
           moment('2099-12-31T23:59:59').formatUTC(false),
@@ -29,7 +27,7 @@ export default createFormViewModel({
         patientMinCoPaymentAmountType: 'ExactAmount',
         overalCoPaymentValueType: 'ExactAmount',
         patientMinCoPaymentAmount: 0.0,
-        coverageMaxCap: 0.0,
+        // coverageMaxCap: 0.0,
         itemGroupMaxCapacityDto: {
           consumableMaxCapacity: {
             maxCapValue: 0.0,
@@ -47,7 +45,7 @@ export default createFormViewModel({
             maxCapValue: 0.0,
           },
         },
-        overalCoPaymentValue: 0.0,
+        // overalCoPaymentValue: 0.0,
         itemGroupValueDto: {
           consumableGroupValue: {
             itemGroupValue: 0.0,

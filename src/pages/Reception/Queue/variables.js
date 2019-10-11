@@ -72,6 +72,7 @@ export const ContextMenuOptions = [
     label: 'Edit Visit',
     Icon: Edit,
     disabled: false,
+    authority: 'queue.visitregistrationdetails',
   },
   {
     id: 0.1,
@@ -79,6 +80,7 @@ export const ContextMenuOptions = [
     Icon: Assignment,
     disabled: false,
     hidden: true,
+    authority: 'queue.visitregistrationdetails',
   },
   {
     id: 1,
@@ -98,6 +100,7 @@ export const ContextMenuOptions = [
     label: 'Delete Visit',
     Icon: Delete,
     disabled: false,
+    authority: 'queue.deletevisitregistration',
   },
   { isDivider: true },
   {
@@ -118,6 +121,7 @@ export const ContextMenuOptions = [
     label: 'Start Consultation',
     Icon: Play,
     disabled: false,
+    authority: 'patientdashboard.startresumeconsultation',
   },
   {
     id: 6,
@@ -125,6 +129,7 @@ export const ContextMenuOptions = [
     Icon: PlayCircle,
     disabled: true,
     hidden: true,
+    authority: 'patientdashboard.startresumeconsultation',
   },
   {
     id: 7,
@@ -132,5 +137,6 @@ export const ContextMenuOptions = [
     Icon: Edit,
     disabled: true,
     hidden: false,
+    authority: 'patientdashboard.editconsultation',
   },
 ]

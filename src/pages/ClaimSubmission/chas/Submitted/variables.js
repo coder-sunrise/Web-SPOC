@@ -1,9 +1,6 @@
-import moment from 'moment'
-import { dateFormatLong } from '@/components'
-
 export const NewCHASColumns = [
   {
-    name: 'vistDate',
+    name: 'visitDate',
     title: 'Visit Date',
   },
   {
@@ -66,5 +63,8 @@ export const NewCHASColumnExtensions = [
 export const TableConfig = {
   FuncProps: {
     selectable: true,
+    selectConfig: {
+      showSelectAll: true,
+    },
   },
 }

@@ -30,8 +30,8 @@ import {
   NumberInput,
 } from '@/components'
 import { getServices } from '@/utils/codes'
-import { sumReducer } from '@/utils/utils'
-import { calculateAdjustAmount } from '@/utils/utils'
+import { sumReducer , calculateAdjustAmount } from '@/utils/utils'
+
 import Grid from './Grid'
 import Detail from './Detail/index'
 

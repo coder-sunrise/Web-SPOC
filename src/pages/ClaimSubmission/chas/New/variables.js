@@ -1,6 +1,3 @@
-import moment from 'moment'
-import { dateFormatLong } from '@/components'
-
 export const NewCHASColumns = [
   {
     name: 'visitDate',

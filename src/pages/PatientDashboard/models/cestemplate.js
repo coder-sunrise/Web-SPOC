@@ -26,10 +26,23 @@ export default createListViewModel({
         }
       },
 
+      *queryOne ({ payload }, { call, put, select, take }) {
+        const response = yield call(service.queryOne, Number(payload))
+        if (response.data) {
+          const entity = response.data
+          removeFields(entity, [
+            'id',
+            'clinicalObjectRecordFK',
+            'concurrencyToken',
+          ])
+          return entity
+        }
+        return null
+      },
+
       *create ({ payload }, { call, put, select, take }) {
         const { name } = payload
         const consultation = yield select((st) => st.consultation)
-        const user = yield select((st) => st.user)
         const { entity } = consultation
         delete entity.corPatientNoteVitalSign
         delete entity.visitConsultationTemplate
@@ -41,12 +54,25 @@ export default createListViewModel({
           'concurrencyToken',
         ])
 
-        return yield call(service.create, user.data.id, name, entity)
+        return yield call(service.create, name, entity)
+      },
+      *update ({ payload }, { call, put, select, take }) {
+        const consultation = yield select((st) => st.consultation)
+        const { entity } = consultation
+        delete entity.corPatientNoteVitalSign
+        delete entity.visitConsultationTemplate
+        delete entity.concurrencyToken
+
+        removeFields(entity, [
+          'id',
+          'clinicalObjectRecordFK',
+          'concurrencyToken',
+        ])
+
+        return yield call(service.update, Number(payload), entity)
       },
       *delete ({ payload }, { call, put, select, take }) {
-        const user = yield select((st) => st.user)
-
-        return yield call(service.delete, payload, user.data.id)
+        return yield call(service.delete, payload)
       },
     },
     reducers: {},

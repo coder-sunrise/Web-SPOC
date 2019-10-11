@@ -30,24 +30,53 @@ const styles = (theme) => ({
     return podoPayment
   },
   handleSubmit: (values, { props }) => {
-    const { purchaseOrderPayment, currentBizSessionInfo } = values
-    const { dispatch } = props
-    purchaseOrderPayment.filter((x) => x.isNew).map((x) => {
-      delete x.id
-      const paymentPayload = {
+    const {
+      purchaseOrderPayment,
+      currentBizSessionInfo,
+      purchaseOrderDetails,
+    } = values
+    const { dispatch, refreshPodoPayment, onConfirm } = props
+    const {
+      purchaseOrderNo,
+      purchaseOrderDate,
+      purchaseOrderStatusFK,
+      supplierFK,
+      concurrencyToken,
+    } = purchaseOrderDetails
+    let poPaymentPayload
+
+    poPaymentPayload = purchaseOrderPayment.map((x, index) => {
+      return {
         purchaseOrderFK: values.id,
-        sequence: 1,
+        sequence: index + 1,
         clinicPaymentDto: {
           ...x,
           createdOnBizSessionFK: currentBizSessionInfo.id,
           clinicPaymentTypeFK: 1,
         },
       }
+    })
 
-      dispatch({
-        type: 'podoPayment/upsert',
-        payload: { ...paymentPayload },
-      })
+    dispatch({
+      type: 'podoPayment/upsert',
+      payload: {
+        purchaseOrderNo,
+        purchaseOrderDate,
+        purchaseOrderStatusFK,
+        supplierFK,
+        concurrencyToken,
+        purchaseOrderPayment: poPaymentPayload,
+      },
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        dispatch({
+          type: 'purchaseOrderDetails/refresh',
+          payload: {
+            id: props.values.id,
+          },
+        }).then(setTimeout(() => refreshPodoPayment(), 500))
+      }
     })
   },
   // handleSubmit: (values, { props }) => {

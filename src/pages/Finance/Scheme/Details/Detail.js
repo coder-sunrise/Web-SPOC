@@ -126,7 +126,7 @@ const Detail = ({ height, ...props }) => {
           </GridItem>
           <GridItem xs={9}>
             <FastField
-              name='companyCoPaymentSchemeDto[0].coPaymentSchemeFk'
+              name='copayerTypeFK'
               render={(args) => (
                 <CodeSelect
                   label='Co-Payer Type'
@@ -140,7 +140,7 @@ const Detail = ({ height, ...props }) => {
 
           <GridItem xs={9}>
             <FastField
-              name='companyCoPaymentSchemeDto[0].companyFk'
+              name='copayerFK'
               render={(args) => (
                 <CodeSelect
                   label={formatMessage({

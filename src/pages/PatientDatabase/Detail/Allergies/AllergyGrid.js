@@ -54,14 +54,9 @@ class AllergyGrid extends PureComponent {
         },
         {
           columnName: 'allergyReaction',
-          type: 'select',
+          type: 'codeSelect',
           label: 'Allergic Reaction',
-          options: [
-            { value: 'Allergy' },
-            { value: 'Adverse Drug Reaction' },
-            { value: 'Uncertain' },
-          ],
-          labelField: 'value',
+          code: 'CTAllergyReaction',
         },
         {
           columnName: 'patientAllergyStatusFK',

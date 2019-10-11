@@ -6,6 +6,7 @@ import { FormattedMessage } from 'umi/locale'
 import { Divider, withStyles } from '@material-ui/core'
 // custom components
 import { Button, CommonTableGrid } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const rowData = [
   {

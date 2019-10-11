@@ -77,7 +77,6 @@ const styles = (theme) => ({
   loading,
   user: user.data,
 }))
-@withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends React.Component {
   constructor (props) {
     super(props)
@@ -348,14 +347,14 @@ class Queue extends React.Component {
                   Send Notification
                 </Button> */}
                 <Authorized authority='queue.endsession'>
-                  <Button
+                  <ProgressButton
+                    icon={<Stop />}
                     color='danger'
                     size='sm'
                     onClick={this.onEndSessionClick}
                   >
-                    <Stop />
                     <FormattedMessage id='reception.queue.endSession' />
-                  </Button>
+                  </ProgressButton>
                 </Authorized>
               </div>
             )}

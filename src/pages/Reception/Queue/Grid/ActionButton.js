@@ -41,21 +41,11 @@ const ActionButton = ({ row, onClick }) => {
   )
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
 
-  const enableStarConsultation = [
-    VISIT_STATUS.ORDER_UPDATED,
-  ].includes(row.visitStatus)
-
-
-  let isStatusCompleted = [
+  const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.DISPENSE,
+    VISIT_STATUS.ORDER_UPDATED,
   ].includes(row.visitStatus)
-
-  if(enableStarConsultation){
-    isStatusCompleted =  false
-  }else{
-    isStatusCompleted = true
-  }
 
   const hideResumeButton = ![
     VISIT_STATUS.IN_CONS,
@@ -70,8 +60,6 @@ const ActionButton = ({ row, onClick }) => {
   const enableBilling = [
     VISIT_STATUS.BILLING,
   ].includes(row.visitStatus)
-
-  
 
   const newContextMenuOptions = useMemo(
     () =>
@@ -104,8 +92,8 @@ const ActionButton = ({ row, onClick }) => {
           case 7: // edit consultation
             return {
               ...opt,
-              disabled: isStatusCompleted,
-              hidden: isStatusCompleted,
+              disabled: !isStatusCompleted,
+              hidden: !isStatusCompleted,
             }
           default:
             return { ...opt }

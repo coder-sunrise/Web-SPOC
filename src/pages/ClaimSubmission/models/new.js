@@ -17,7 +17,16 @@ export default createListViewModel({
         const { pathname, search, query = {} } = loct
       })
     },
-    effects: {},
+    effects: {
+      *submitChasClaim ({ payload }, { put, call }) {
+        const response = yield call(service.submitChasClaim, payload)
+        const { data, status } = response
+        if (status === '200') {
+          return data
+        }
+        return false
+      },
+    },
     reducers: {
       queryDone (st, { payload }) {
         const { data } = payload

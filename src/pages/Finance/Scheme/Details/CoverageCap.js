@@ -13,7 +13,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
   const onRadioButtonChange = (event) => {
     const { target } = event
 
-    if (target.value === 'sub') setFieldValue('coverageMaxCap', 0.0)
+    if (target.value === 'sub') setFieldValue('coverageMaxCap', undefined)
     else {
       setFieldValue(
         'itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue',
