@@ -25,6 +25,7 @@ export default createFormViewModel({
         },
         invoicePayers: [],
         applicableSchemes: [],
+        claimableSchemes: [],
         invoicePaymentModes: [],
       },
     },
@@ -37,7 +38,7 @@ export default createFormViewModel({
           if (md2 === 'bill') {
             dispatch({
               type: 'initState',
-              payload: { qid, vid, v },
+              payload: { qid, visitID: vid, v },
             })
           }
         }
@@ -45,6 +46,13 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { select, put }) {
+        const patientInfo = yield select((st) => st.patient)
+        yield put({
+          type: 'query',
+          payload: {
+            id: payload.visitID,
+          },
+        })
         yield put({
           type: 'global/updateAppState',
           payload: {

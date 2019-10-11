@@ -1,13 +1,19 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-import { withFormik } from 'formik'
+
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { Accordion, Button, CommonModal, GridContainer } from '@/components'
+import {
+  Accordion,
+  Button,
+  CommonModal,
+  GridContainer,
+  withFormikExtend,
+} from '@/components'
 import { AddPayment, LoadingWrapper } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -45,7 +51,8 @@ const bannerStyle = {
   dispense,
   loading,
 }))
-@withFormik({
+@withFormikExtend({
+  enableReinitialize: true,
   mapPropsToValues: ({ billing }) => billing.entity || billing.default,
   handleSubmit: (values, formikBag) => {
     console.log({ values })
@@ -97,7 +104,7 @@ class Billing extends Component {
 
   render () {
     const { showCoPaymentModal, showAddPaymentModal } = this.state
-    const { classes, values, loading } = this.props
+    const { classes, values, billing, loading } = this.props
     console.log({ values })
     return (
       <div>
@@ -130,7 +137,8 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleAddCopayerClick={this.toggleCopayerModal}
-                values={values}
+                // values={values}
+                {...this.props}
               />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
@@ -153,7 +161,7 @@ class Billing extends Component {
           onConfirm={this.toggleCopayerModal}
           onClose={this.toggleCopayerModal}
         >
-          <CoPayer />
+          <CoPayer invoiceItems={values.invoice.invoiceItems} />
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}

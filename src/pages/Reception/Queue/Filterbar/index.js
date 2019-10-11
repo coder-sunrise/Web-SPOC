@@ -81,20 +81,17 @@ const Filterbar = ({
           Create Visit
         </ProgressButton>
         <Authorized authority='queue.registervisit'>
-          <ProgressButton
+          <Button
             icon={null}
             color='primary'
             size='sm'
-            onClick={() => {
-              console.log('create patient click')
-              toggleNewPatient()
-            }}
+            onClick={toggleNewPatient}
           >
             <Hidden mdDown>
               <PersonAdd />
             </Hidden>
             <FormattedMessage id='reception.queue.createPatient' />
-          </ProgressButton>
+          </Button>
         </Authorized>
         {shouldShowSelfOnlyCheckbox.includes(
           user.clinicianProfile.userProfile.role.id,

@@ -344,7 +344,7 @@ const Grid = ({
         const version = Date.now()
         const parameters = {
           qid: row.id,
-          vid: row.visitFK.id,
+          vid: row.visitFK,
           pid: row.patientProfileFK,
           v: version,
           md2: 'bill',

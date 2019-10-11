@@ -69,7 +69,6 @@ class BaseInput extends React.PureComponent {
         if (newTarget.length === 0) break
         const btn = newTarget.find("button[data-button-type='progress']")
         if (btn.length > 0) {
-          const first = btn[0]
           if (this.props.onCommit) {
             this.props.onCommit({
               target: {
@@ -77,11 +76,11 @@ class BaseInput extends React.PureComponent {
               },
             })
             setTimeout(() => {
-              first.trigger('click')
+              btn.trigger('click')
             }, 200)
           } else {
             setTimeout(() => {
-              first.trigger('click')
+              btn.trigger('click')
             }, 200)
           }
           break

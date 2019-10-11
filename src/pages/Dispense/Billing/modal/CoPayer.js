@@ -55,7 +55,7 @@ class CoPayer extends Component {
   }
 
   render () {
-    const { classes, onConfirm } = this.props
+    const { classes, onConfirm, invoiceItems } = this.props
     const { selectedRows, coPayer } = this.state
     return (
       <div className={classes.container}>
@@ -70,17 +70,9 @@ class CoPayer extends Component {
           <GridItem md={12}>
             <CommonTableGrid
               size='sm'
-              rows={CoPayerData}
+              rows={invoiceItems}
               columns={CoPayerColumns}
               columnExtensions={CoPayerColExtensions}
-              // onRowDoubleClick={this.onRowDoubleClick}
-              // EditingProps={{
-              //   editingRowIds: this.state.editingRowIds,
-              //   rowChanges: this.state.rowChanges,
-              //   onEditingRowIdsChange: this.changeEditingRowIds,
-              //   onRowChangesChange: this.changeRowChanges,
-              //   onCommitChanges: this.commitChanges,
-              // }}
               selection={selectedRows}
               onSelectionChange={this.handleSelectionChange}
               FuncProps={{
