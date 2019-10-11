@@ -5,7 +5,14 @@ import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem, Select } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
+import {
+  ProgressButton,
+  GridContainer,
+  GridItem,
+  Select,
+  notification,
+} from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -35,6 +42,7 @@ const styles = (theme) => ({
 class ApprovedCHAS extends React.Component {
   state = {
     selectedRows: [],
+    isLoading: false,
   }
 
   componentDidMount () {
@@ -42,6 +50,9 @@ class ApprovedCHAS extends React.Component {
   }
 
   onRefreshClicked = () => this.refreshDataGrid()
+
+  handleLoadingVisibility = (visibility = false) =>
+    this.setState({ isLoading: visibility })
 
   handleSelectionChange = (selection) =>
     this.setState({ selectedRows: selection })
@@ -52,6 +63,27 @@ class ApprovedCHAS extends React.Component {
     })
   }
 
+  handleGetStatusClicked = () => {
+    const { selectedRows } = this.state
+    if (selectedRows.length > 0) {
+      this.handleLoadingVisibility(true)
+      this.props
+        .dispatch({
+          type: 'claimSubmissionApproved/getApprovedStatus',
+          payload: { claimIds: selectedRows },
+        })
+        .then((r) => {
+          this.handleLoadingVisibility(false)
+          if (r) {
+            notification.success({
+              message: 'Get Status Success.',
+            })
+            this.refreshDataGrid()
+          }
+        })
+    }
+  }
+
   render () {
     const {
       classes,
@@ -60,6 +92,7 @@ class ApprovedCHAS extends React.Component {
       dispatch,
       values,
     } = this.props
+    const { isLoading } = this.state
     const { list } = claimSubmissionApproved || []
 
     return (
@@ -77,24 +110,34 @@ class ApprovedCHAS extends React.Component {
               )}
             />
           </GridItem>
-        </BaseSearchBar>
-        <GridContainer>
-          <GridItem md={12}>
-            <TableGrid
-              data={list}
-              columnExtensions={NewCHASColumnExtensions}
-              columns={NewCHASColumns}
-              tableConfig={TableConfig}
-              selection={this.state.selectedRows}
-              onSelectionChange={this.handleSelectionChange}
-              onContextMenuItemClick={handleContextMenuItemClick}
-            />
-          </GridItem>
-          <GridItem md={4} className={classes.buttonGroup}>
-            <Button color='primary'>Get Status</Button>
-            <Button color='success'>Collect Payment</Button>
-          </GridItem>
-        </GridContainer>
+        </BaseSearchBar>{' '}
+        <LoadingWrapper linear loading={isLoading} text='Get status...'>
+          <GridContainer>
+            <GridItem md={12}>
+              <TableGrid
+                data={list}
+                columnExtensions={NewCHASColumnExtensions}
+                columns={NewCHASColumns}
+                tableConfig={TableConfig}
+                selection={this.state.selectedRows}
+                onSelectionChange={this.handleSelectionChange}
+                onContextMenuItemClick={handleContextMenuItemClick}
+              />
+            </GridItem>
+            <GridItem md={4} className={classes.buttonGroup}>
+              <ProgressButton
+                icon={null}
+                color='primary'
+                onClick={this.handleGetStatusClicked}
+              >
+                Get Status
+              </ProgressButton>
+              <ProgressButton icon={null} color='success'>
+                Collect Payment
+              </ProgressButton>
+            </GridItem>
+          </GridContainer>
+        </LoadingWrapper>
       </React.Fragment>
     )
   }

@@ -146,15 +146,20 @@ export default createFormViewModel({
           return {
             ...x,
             uid: getUniqueId(),
-            type: x.inventoryTypeFK,
-            
             // [itemType.itemFKName]: x[itemType.prop][itemType.itemFKName],
-            // code: x[itemType.prop][itemType.itemFKName],
-            // name: x[itemType.prop][itemType.itemFKName],
-            // uom: x[itemType.prop][itemType.itemFKName],
+            type: x.inventoryTypeFK,
+            code: x.inventoryItemFK,
+            name: x.inventoryItemFK,
+            uom: x.inventoryItemFK,
+            orderQuantity: x.orderQty,
+            quantityReceived: x.totalQtyReceived,
+            bonusQuantity: x.bonusQty,
+            currentReceivingQty: x.recevingQuantity,
+            currentReceivingBonusQty: x.bonusQuantity,
+            expiryDate: null,
           }
         })
-        
+
         return {
           ...state,
           entity: {
@@ -217,6 +222,8 @@ export default createFormViewModel({
       deleteRow (state, { payload }) {
         const { rows } = state.entity
         rows.find((v) => v.uid === payload).isDeleted = true
+        // let newRows = rows.filter((v) => v.uid !== payload)
+
         return { ...state, entity: { ...state.entity, rows } }
       },
     },
