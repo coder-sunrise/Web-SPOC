@@ -12,6 +12,7 @@ class History {
     this.current = null
     this.debug = debug
     this.count = 0
+    this.templateId = ''
   }
 
   /**
@@ -50,8 +51,9 @@ class History {
   //   this.allList = data
   // }
 
-  updateCount (count) {
+  updateCount (count, id) {
     this.count = count
+    this.templateId = id
   }
 
   /**
@@ -125,9 +127,9 @@ class History {
             layerType: mainObject.type,
             layerNumber: this.count,
             layerContent: JSON.stringify(mainObject),
-            templateFK: null,
+            templateFK: this.templateId,
           })
-   
+          this.templateId = ''
           this.count = 0
       }
 

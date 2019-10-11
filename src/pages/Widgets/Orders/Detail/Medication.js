@@ -81,6 +81,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       ...values,
       subject: currentType.getSubject(values),
     }
+    console.log("medication data ", data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -384,6 +385,11 @@ class Medication extends PureComponent {
                                   code='ctMedicationFrequency'
                                   {...commonSelectProps}
                                   {...args}
+                                  onChange={(v, option = {}) => {
+                                    console.log("frequency")
+                                     console.log(v, option)
+                                   
+                                  }}
                                 />
                               )
                             }}
@@ -610,7 +616,32 @@ class Medication extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={12} className={classes.editor}>
+          <GridItem xs={2} className={classes.editor}>
+            <FastField
+              name='batchNo'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Batch No'
+                    allowClear={false}
+                    code='ctMedicationUnitOfMeasurement'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={2} className={classes.editor}>
+            <FastField
+              name='expiryDate'
+              render={(args) => {
+                return (
+                  <DatePicker label='Expire Date' {...args} />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} className={classes.editor}>
             {/* <Button link className={classes.editorBtn}>
               Add Diagnosis
             </Button> */}

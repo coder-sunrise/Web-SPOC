@@ -820,7 +820,7 @@ class SketchField extends PureComponent {
     // img.src = dataUrl
   }
 
-  setTemplate = (dataUrl) => {
+  setTemplate = (dataUrl, id) => {
     let { templateSet } = this.state
     let history = this._history
     let allList = history.getOriginalList()
@@ -869,7 +869,7 @@ class SketchField extends PureComponent {
         canvas.requestRenderAll()
       }
     }
-    history.updateCount(-100)
+    history.updateCount(-100, id)
     let canvas = this._fc
     const image = new Image()
 
