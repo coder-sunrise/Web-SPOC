@@ -1,29 +1,15 @@
-import React, { Component, PureComponent, useState } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import { withStyles, Divider, Paper } from '@material-ui/core'
+import React, { useState } from 'react'
+import { FastField } from 'formik'
+import { Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
-
 import {
   Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
   GridContainer,
   GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
   TextField,
-  notification,
-  Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
   Checkbox,
   Popover,
   Tooltip,
@@ -88,12 +74,13 @@ export default ({
                     const { setFieldValue } = form
                     if (op) {
                       setFieldValue(
+                        `corDiagnosis[${index}]diagnosisDescription`,
+                        op.displayvalue,
+                      )
+
+                      setFieldValue(
                         `corDiagnosis[${index}]diagnosisCode`,
                         op.code,
-                      )
-                      setFieldValue(
-                        `corDiagnosis[${index}]diagnosisDescription`,
-                        op.name,
                       )
 
                       if (op.complication && op.complication.length) {

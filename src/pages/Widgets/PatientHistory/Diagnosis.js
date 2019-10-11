@@ -10,6 +10,7 @@ export default ({ current, classes, theme }) => (
           paddingLeft: theme.spacing(2),
         }}
       >
+      {console.log("current.diagnosis ", current.diagnosis)}
         {current.diagnosis.map((o, i) => (
           <li key={i}>
             {o.diagnosisDescription} (<DatePicker

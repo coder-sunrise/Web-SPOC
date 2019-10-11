@@ -1,28 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Card,
-  CardHeader,
-  CardText,
-  CardBody,
-  GridContainer,
-  GridItem,
-  Select,
-  TextField,
-  Transfer,
-  CodeSelect,
-  FastField,
-  Button,
-  CommonTableGrid,
-  withFormikExtend,
-  ProgressButton,
-} from '@/components'
 import { FormattedMessage } from 'umi/locale'
 import { compose } from 'redux'
 import { connect } from 'dva'
+import {
+  GridContainer,
+  GridItem,
+  TextField,
+  FastField,
+  Button,
+  CommonTableGrid,
+  ProgressButton,
+} from '@/components'
 
-const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
+const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
   useEffect(() => {
-    console.log('sddduseeffect')
+    // console.log('sddduseeffect')
     dispatch({
       type: 'sddDetail/query',
       payload: {
@@ -64,8 +56,8 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
         render: (row) => {
           return (
             <Button
-              link
-              justIcon
+              size='sm'
+              style={{ width: 70, minWidth: 70, marginRight: 0 }}
               onClick={() => {
                 selectRow(row)
               }}
@@ -80,17 +72,18 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
   }
 
   return (
-    <GridContainer>
-      <GridItem xs={5}>
-        <FastField
-          name='sddIdName'
-          render={(args) => {
-            return <TextField label='SDD ID/Description' {...args} />
-          }}
-        />
-      </GridItem>
-      <GridItem xs={3} style={{ marginTop: 10, marginBottom: 10 }}>
-        {/* <Button
+    <div style={{ margin: theme.spacing(2) }}>
+      <GridContainer>
+        <GridItem xs={5}>
+          <FastField
+            name='sddIdName'
+            render={(args) => {
+              return <TextField label='SDD ID/Description' {...args} />
+            }}
+          />
+        </GridItem>
+        <GridItem xs={3} style={{ marginTop: 10, marginBottom: 10 }}>
+          {/* <Button
           variant='contained'
           color='primary'
           // onClick={() => {
@@ -102,40 +95,41 @@ const Sdd = ({ dispatch, handleSelectSdd, ...props }) => {
           Search
         </Button> */}
 
-        <ProgressButton
-          color='primary'
-          icon={null}
-          onClick={() => {
-            console.log('search', props.values)
+          <ProgressButton
+            color='primary'
+            icon={null}
+            onClick={() => {
+              console.log('search', props.values)
 
-            const { sddIdName } = props.values
+              const { sddIdName } = props.values
 
-            dispatch({
-              type: 'sddDetail/query',
-              payload: {
-                group: [
-                  {
-                    code: sddIdName,
-                    displayValue: sddIdName,
-                    combineCondition: 'or',
-                  },
-                ],
-              },
-            })
-          }}
-        >
-          <FormattedMessage id='form.search' />
-        </ProgressButton>
-      </GridItem>
+              dispatch({
+                type: 'sddDetail/query',
+                payload: {
+                  group: [
+                    {
+                      code: sddIdName,
+                      displayValue: sddIdName,
+                      combineCondition: 'or',
+                    },
+                  ],
+                },
+              })
+            }}
+          >
+            <FormattedMessage id='form.search' />
+          </ProgressButton>
+        </GridItem>
 
-      <CommonTableGrid
-        // onRowDoubleClick={(row) => showDetail(row)}
-        // columnExtensions={colExtensions}
-        // ActionProps={ActionProps}
-        FuncProps={{ pager: true }}
-        {...tableParas}
-      />
-    </GridContainer>
+        <CommonTableGrid
+          // onRowDoubleClick={(row) => showDetail(row)}
+          // columnExtensions={colExtensions}
+          // ActionProps={ActionProps}
+          FuncProps={{ pager: true }}
+          {...tableParas}
+        />
+      </GridContainer>
+    </div>
   )
 }
 

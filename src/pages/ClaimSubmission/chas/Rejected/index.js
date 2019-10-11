@@ -5,7 +5,13 @@ import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem } from '@/components'
+import {
+  ProgressButton,
+  GridContainer,
+  GridItem,
+  notification,
+} from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -35,6 +41,7 @@ const styles = (theme) => ({
 class RejectedCHAS extends React.Component {
   state = {
     selectedRows: [],
+    isLoading: false,
   }
 
   componentDidMount () {
@@ -52,6 +59,35 @@ class RejectedCHAS extends React.Component {
   handleSelectionChange = (selection) =>
     this.setState({ selectedRows: selection })
 
+  handleLoadingVisibility = (visibility = false) =>
+    this.setState({ isLoading: visibility })
+
+  onReSubmitClaimClicked = () => {
+    const { selectedRows } = this.state
+    if (selectedRows.length > 0) {
+      this.handleLoadingVisibility(true)
+      this.props
+        .dispatch({
+          type: 'claimSubmissionRejected/reSubmitChasClaim',
+          payload: { claimIds: selectedRows },
+        })
+        .then((r) => {
+          this.handleLoadingVisibility(false)
+          if (r) {
+            if (r.failedCount !== 0) {
+              this.props.handleSubmitClaimStatus(r.failedCount)
+            } else {
+              notification.success({
+                message: 'Claim Re-Submission Success.',
+              })
+            }
+
+            this.refreshDataGrid()
+          }
+        })
+    }
+  }
+
   render () {
     const {
       classes,
@@ -60,6 +96,7 @@ class RejectedCHAS extends React.Component {
       dispatch,
       values,
     } = this.props
+    const { isLoading } = this.state
     const { list } = claimSubmissionRejected || []
 
     return (
@@ -70,23 +107,35 @@ class RejectedCHAS extends React.Component {
           modelsName='claimSubmissionRejected'
         />
         <GridContainer>
-          <GridItem md={12}>
-            <TableGrid
-              data={list}
-              columnExtensions={NewCHASColumnExtensions}
-              columns={NewCHASColumns}
-              tableConfig={TableConfig}
-              selection={this.state.selectedRows}
-              onSelectionChange={this.handleSelectionChange}
-              onContextMenuItemClick={handleContextMenuItemClick}
-            />
-          </GridItem>
-          <GridItem md={4} className={classes.buttonGroup}>
-            <Button color='info' onClick={this.onRefreshClicked}>
-              Refresh
-            </Button>
-            <Button color='primary'>Re-Submit Claim</Button>
-          </GridItem>
+          <LoadingWrapper linear loading={isLoading} text='Get status...'>
+            <GridItem md={12}>
+              <TableGrid
+                data={list}
+                columnExtensions={NewCHASColumnExtensions}
+                columns={NewCHASColumns}
+                tableConfig={TableConfig}
+                selection={this.state.selectedRows}
+                onSelectionChange={this.handleSelectionChange}
+                onContextMenuItemClick={handleContextMenuItemClick}
+              />
+            </GridItem>
+            <GridItem md={4} className={classes.buttonGroup}>
+              <ProgressButton
+                icon={null}
+                color='info'
+                onClick={this.onRefreshClicked}
+              >
+                Refresh
+              </ProgressButton>
+              <ProgressButton
+                icon={null}
+                color='primary'
+                onClick={this.onReSubmitClaimClicked}
+              >
+                Re-Submit Claim
+              </ProgressButton>
+            </GridItem>
+          </LoadingWrapper>
         </GridContainer>
       </React.Fragment>
     )

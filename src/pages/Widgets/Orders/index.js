@@ -57,8 +57,10 @@ class Orders extends PureComponent {
     const { dispatch, status, visitRegistration } = this.props
     const { entity: vistEntity } = visitRegistration
     const { visit = {} } = vistEntity
-
+    console.log("consultation ", this.props)
+    console.log("visit.visitStatus ", visit.visitStatus)
     if (status === 'consultation' && visit.visitStatus === 'WAITING') {
+      console.log("yes")
       dispatch({
         type: 'orders/updateState',
         payload: {

@@ -496,17 +496,17 @@ class PatientHistory extends Component {
             />
           </GridItem>
           <GridItem md={3}>
-            {(!widget || showEditPatient) && (
+            {(!widget || !findGetParameter('cid')) && (
               <ProgressButton
                 color='primary'
                 style={{ marginLeft: theme.spacing(2) }}
                 size='sm'
                 onClick={() => {
-                  if (showEditPatient) {
-                    dispatch({
-                      type: 'patient/closePatientModal',
-                    })
-                  } else {
+                  // if (showEditPatient) {
+                  //   dispatch({
+                  //     type: 'patient/closePatientModal',
+                  //   })
+                  // } else {
                     dispatch({
                       type: `consultation/edit`,
                       payload: {
@@ -519,7 +519,7 @@ class PatientHistory extends Component {
                           `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
                         )
                     })
-                  }
+                 // }
                 }}
               >
                 Edit Consultation

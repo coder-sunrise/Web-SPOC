@@ -11,6 +11,11 @@ const status = [
   { value: true, name: 'Active', color: 'green' },
 ]
 
+const isAutoOrder = [
+  { value: false, name: 'False' },
+  { value: true, name: 'True' },
+]
+
 const osBalanceStatus = [
   { value: 'all', name: 'All(Yes/No)', color: 'all' },
   { value: 'yes', name: 'Yes', color: 'yes' },
@@ -1160,14 +1165,13 @@ export const getInventoryItem = (
   rows = [],
   outstandingItem = undefined,
 ) => {
-  let newRows = rows.filter((x) => x.type === value && !x.isDeleted)
+  let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
   if (outstandingItem) {
     const filterOutstandingItem = outstandingItem.filter(
-      (x) => x.type === value && !x.isDeleted,
+      (x) => x.type === value,
     )
-
     inventoryItemList = _.intersectionBy(
       inventoryItemList,
       filterOutstandingItem,
@@ -1247,7 +1251,7 @@ module.exports = {
   // countries,
   // schemes,
   status,
-
+  isAutoOrder,
   addressTypes,
   orderTypes,
   currenciesList,

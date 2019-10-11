@@ -99,8 +99,10 @@ const styles = () => ({
     alignItems: 'center',
   },
   imageOption: {
-    padding: 20,
-    width: 100,
+    width: 402.27,
+    alignItems: 'center',
+    textAlign: 'center',
+    display:'block',
   },
   rightButton: {
     display: 'flex',
@@ -114,7 +116,7 @@ const styles = () => ({
 
 let temp = null
 @withFormikExtend({
-  notDirtyDuration: 0.5,
+  
   mapPropsToValues: ({ scriblenotes }) => {
     return scriblenotes.entity === '' ? '' : scriblenotes.entity
   },
@@ -123,6 +125,7 @@ let temp = null
       .required()
       .max(20, 'Subject should not exceed 20 characters'),
   }),
+  notDirtyDuration: 0.5,
   handleSubmit: (values, { props }) => {
     props.addScribble(values.subject, temp)
     props.toggleScribbleModal()
@@ -185,6 +188,7 @@ class Scribble extends React.Component {
       this.setState({
         templateList: templateList.data.data,
       })
+
     })
 
     if (this.props.scribbleData !== '') {
@@ -324,8 +328,8 @@ class Scribble extends React.Component {
     }
   }
 
-  _setTemplate = (layerContent) => {
-    this._sketch.setTemplate(layerContent)
+  _setTemplate = (layerContent, id) => {
+    this._sketch.setTemplate(layerContent, id)
   }
 
   toolHandleClickAway = () => {
@@ -387,7 +391,7 @@ class Scribble extends React.Component {
                   <TextField
                     {...args}
                     label='Scribble Subject'
-                    inputProps={{ maxLength: 20 }}
+                    inputProps={{ maxLength: 20}}
                     maxLength={20}
                     // onChange={(e) => {
                     //   const subject = e.target.value
@@ -545,7 +549,7 @@ class Scribble extends React.Component {
                 visible={this.state.toolsVisible}
                 onVisibleChange={this.handleToolsVisibleChange}
                 onClick={() => {
-                  const { toolsColor } = this.state
+
                   this.setState(() => ({
                     toolsColor: true,
                     selectColorColor: false,
@@ -607,7 +611,6 @@ class Scribble extends React.Component {
                 visible={this.state.colorVisible}
                 onVisibleChange={this.handleColorVisibleChange}
                 onClick={() => {
-                  const { selectColorColor } = this.state
                   this.setState(() => ({
                     toolsColor: false,
                     selectColorColor: true,
@@ -642,7 +645,10 @@ class Scribble extends React.Component {
                                 <Button
                                   color='primary'
                                   onClick={() => {
-                                    this._setTemplate(item.layerContent)
+                                    this._setTemplate(item.layerContent, item.id)
+                                  }}
+                                  style={{
+                                    margin: 10,
                                   }}
                                 >
                                   {item.description}

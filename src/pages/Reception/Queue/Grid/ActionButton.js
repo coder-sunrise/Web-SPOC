@@ -44,6 +44,7 @@ const ActionButton = ({ row, onClick }) => {
   const isStatusCompleted = [
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.DISPENSE,
+    VISIT_STATUS.ORDER_UPDATED,
   ].includes(row.visitStatus)
 
   const hideResumeButton = ![

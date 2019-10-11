@@ -417,7 +417,7 @@ class Demographic extends PureComponent {
                         },
                       ]}
                       onChange={(e, s) => {
-                        // console.log(e)
+                        // console.log({ e })
                         // dispatch({
                         //   type: 'consultation/updateState',
                         //   payload: {
@@ -492,6 +492,20 @@ class Demographic extends PureComponent {
                   />
                 </GridItem>
               )}
+              {/* <GridItem xs={12}>
+                <Field
+                  name='languageFK'
+                  render={(args) => {
+                    return (
+                      <CodeSelect
+                        label='Translation'
+                        code='ctlanguage'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem> */}
             </GridContainer>
           </GridItem>
         </GridContainer>

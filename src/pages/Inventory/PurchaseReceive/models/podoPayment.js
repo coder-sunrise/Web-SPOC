@@ -65,6 +65,9 @@ export default createFormViewModel({
           purchaseOrderDate,
           totalAmount,
           purchaseOrderStatus,
+          supplierFK,
+          purchaseOrderStatusFK,
+          concurrencyToken,
         } = purchaseOrder
 
         let newPurchaseOrderPayment
@@ -85,6 +88,9 @@ export default createFormViewModel({
             totalAmount,
             purchaseOrderStatus,
             outstandingAmount: totalAmount,
+            supplierFK,
+            purchaseOrderStatusFK,
+            concurrencyToken,
           },
           purchaseOrderPayment: newPurchaseOrderPayment || [],
         }

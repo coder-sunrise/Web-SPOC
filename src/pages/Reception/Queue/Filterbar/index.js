@@ -72,12 +72,17 @@ const Filterbar = ({
           Create Visit
         </ProgressButton>
         <Authorized authority='queue.registervisit'>
-          <Button color='primary' size='sm' onClick={toggleNewPatient}>
+          <ProgressButton
+            icon={null}
+            color='primary'
+            size='sm'
+            onClick={toggleNewPatient}
+          >
             <Hidden mdDown>
               <PersonAdd />
             </Hidden>
             <FormattedMessage id='reception.queue.createPatient' />
-          </Button>
+          </ProgressButton>
         </Authorized>
 
         <div className={classes.switch}>

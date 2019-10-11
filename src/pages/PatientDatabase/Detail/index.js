@@ -305,7 +305,7 @@ class PatientDetail extends PureComponent {
       ) || {}
     const CurrentComponent = currentMenu.component
     // console.log(resetProps)
-    // console.log({ values })
+    console.log({ values })
 
     return (
       <GridContainer>

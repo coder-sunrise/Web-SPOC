@@ -90,7 +90,6 @@ class Queue extends React.Component {
   }
 
   componentWillMount = () => {
-    console.log('will mount')
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
     if (Object.keys(query).length === 0) {
@@ -329,6 +328,7 @@ class Queue extends React.Component {
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
             </h3>
+
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
                 <ProgressButton
@@ -348,14 +348,14 @@ class Queue extends React.Component {
                   Send Notification
                 </Button> */}
                 <Authorized authority='queue.endsession'>
-                  <Button
+                  <ProgressButton
+                    icon={<Stop />}
                     color='danger'
                     size='sm'
                     onClick={this.onEndSessionClick}
                   >
-                    <Stop />
                     <FormattedMessage id='reception.queue.endSession' />
-                  </Button>
+                  </ProgressButton>
                 </Authorized>
               </div>
             )}
