@@ -77,7 +77,6 @@ const styles = (theme) => ({
   loading,
   user: user.data,
 }))
-@withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends React.Component {
   constructor (props) {
     super(props)

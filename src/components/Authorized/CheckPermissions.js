@@ -51,11 +51,14 @@ const checkSinglePermission = (
         ].indexOf(o.rights) >= 0,
     )
     if (match) {
+      // eslint-disable-next-line no-nested-ternary
       return typeof target === 'function' && type !== 'decorator'
         ? target(match)
-        : React.cloneElement(target, {
-            disabled: true,
-          })
+        : type !== 'decorator'
+          ? React.cloneElement(target, {
+              disabled: true,
+            })
+          : 'disable'
     }
 
     return null
