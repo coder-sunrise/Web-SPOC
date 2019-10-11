@@ -24,11 +24,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   }
   if (type === 'Action') {
     // test only
-    if (name === 'patientdashboard.startresumeconsultation') {
-      return [
-        { name, rights: 'hidden' },
-      ]
-    }
+    // if (name === 'queue.dispense.editorder') {
+    //   return [
+    //     { name, rights: 'hidden' },
+    //   ]
+    // }
     // if (name === 'patientdashboard.editconsultation') {
     //   return [
     //     { name, rights: 'hidden' },

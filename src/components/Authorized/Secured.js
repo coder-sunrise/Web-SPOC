@@ -54,6 +54,7 @@ const authorize = (authority, error) => {
       classError || Exception403,
       'decorator',
     )
+    console.log(component)
     return checkIsInstantiation(component)
   }
 }

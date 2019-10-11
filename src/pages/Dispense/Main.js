@@ -6,7 +6,13 @@ import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem, withFormikExtend } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  withFormikExtend,
+  notification,
+} from '@/components'
 // sub component
 // import PatientBanner from './components/PatientBanner'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -55,6 +61,9 @@ const reloadDispense = (props, effect = 'query') => {
       },
     }).then((o) => {
       if (o) {
+        notification.success({
+          message: 'Dispense saved',
+        })
         reloadDispense({
           ...props,
           ...restProps,

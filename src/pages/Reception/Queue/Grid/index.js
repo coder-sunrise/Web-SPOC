@@ -284,28 +284,28 @@ const Grid = ({
       return false
     }
 
-    if (visitStatus === 'IN CONS') {
-      if (assignedDoctorProfile.id !== doctorProfile.id) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            openConfirmTitle: '',
-            openConfirmContent: `Are you sure to overwrite ${title ||
-              ''} ${name} consultation?`,
-            onConfirmSave: () => null,
-          },
-        })
-        return false
-      }
-    }
+    // if (visitStatus === 'IN CONS') {
+    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
+    //     dispatch({
+    //       type: 'global/updateAppState',
+    //       payload: {
+    //         openConfirm: true,
+    //         openConfirmTitle: '',
+    //         openConfirmContent: `Are you sure to overwrite ${title ||
+    //           ''} ${name} consultation?`,
+    //         onConfirmSave: () => null,
+    //       },
+    //     })
+    //     return false
+    //   }
+    // }
 
-    if (assignedDoctorProfile.id !== doctorProfile.id) {
-      notification.error({
-        message: `You cannot resume other doctor's consultation.`,
-      })
-      return false
-    }
+    // if (assignedDoctorProfile.id !== doctorProfile.id) {
+    //   notification.error({
+    //     message: `You cannot resume other doctor's consultation.`,
+    //   })
+    //   return false
+    // }
 
     return true
   }
@@ -499,7 +499,7 @@ const Grid = ({
               columnName: 'action',
               align: 'center',
               render: (row) => {
-                console.log({ row, user })
+                // console.log({ row, user })
                 return <ActionButton row={row} onClick={onClick} />
               },
             },

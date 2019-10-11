@@ -10,14 +10,12 @@ module.exports = {
     })
   },
   queryOne: (params) => {
-    console.log(params)
     return service.query(url, params)
   },
   remove: (params) => service.remove(url, params),
 
-  create: (id, name, params) => {
-    console.log(id, name, params)
-    return request(`${url}/${id}?name=${name}`, {
+  create: (name, params) => {
+    return request(`${url}?name=${name}`, {
       method: 'POST',
       body: params,
     })

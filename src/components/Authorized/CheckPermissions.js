@@ -10,7 +10,13 @@ function isPromise (obj) {
   )
 }
 
-const checkSinglePermission = (currentAuthority, authority, target, type) => {
+const checkSinglePermission = (
+  currentAuthority,
+  authority,
+  target,
+  type,
+  Exception,
+) => {
   let match = null
 
   const r = currentAuthority.filter((o) => o.name === authority)
@@ -54,7 +60,9 @@ const checkSinglePermission = (currentAuthority, authority, target, type) => {
 
     return null
   }
-  return null
+  return typeof Exception === 'function' && type !== 'decorator'
+    ? Exception()
+    : Exception
 }
 
 /**
@@ -106,16 +114,34 @@ const checkPermissions = (
             ].indexOf(o.rights) >= 0,
         )
         if (match) {
-          return checkSinglePermission(currentAuthority, a, target, type)
+          return checkSinglePermission(
+            currentAuthority,
+            a,
+            target,
+            type,
+            Exception,
+          )
         }
       }
     }
 
-    return checkSinglePermission(currentAuthority, authority[0], target, type)
+    return checkSinglePermission(
+      currentAuthority,
+      authority[0],
+      target,
+      type,
+      Exception,
+    )
   }
   // string 处理
   if (typeof authority === 'string') {
-    return checkSinglePermission(currentAuthority, authority, target, type)
+    return checkSinglePermission(
+      currentAuthority,
+      authority,
+      target,
+      type,
+      Exception,
+    )
   }
 
   // Promise 处理

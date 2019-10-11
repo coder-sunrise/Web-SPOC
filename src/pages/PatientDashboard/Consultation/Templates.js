@@ -27,7 +27,13 @@ import {
 import { getCodes } from '@/utils/codes'
 
 const styles = () => ({})
-const Templates = ({ cestemplate, dispatch, theme }) => {
+const Templates = ({
+  cestemplate,
+  dispatch,
+  theme,
+  onLoadTemplate,
+  onSaveTemplate,
+}) => {
   const [
     templateName,
     setTemplateName,
@@ -40,6 +46,7 @@ const Templates = ({ cestemplate, dispatch, theme }) => {
   const { list = [] } = cestemplate
 
   const saveTemplate = () => {
+    if (onSaveTemplate) onSaveTemplate()
     dispatch({
       type: 'cestemplate/create',
       payload: {
@@ -54,6 +61,23 @@ const Templates = ({ cestemplate, dispatch, theme }) => {
           type: 'cestemplate/query',
         })
         setTemplateName('')
+      }
+    })
+  }
+
+  const updateTemplate = () => {
+    notification.warning({
+      message: 'Function not ready yet',
+    })
+    return
+    dispatch({
+      type: 'cestemplate/update',
+      payload: currentId,
+    }).then((o) => {
+      if (o) {
+        notification.success({
+          message: `Template ${templateName} saved`,
+        })
       }
     })
   }
@@ -84,7 +108,7 @@ const Templates = ({ cestemplate, dispatch, theme }) => {
         notification.success({
           message: `Template ${templateName} loaded`,
         })
-        console.log(o)
+        if (onLoadTemplate) onLoadTemplate(o)
       }
     })
   }
@@ -119,7 +143,7 @@ const Templates = ({ cestemplate, dispatch, theme }) => {
       {currentId && (
         <GridContainer gutter={0}>
           <GridItem xs={6}>
-            <ProgressButton>Replace</ProgressButton>
+            <ProgressButton onClick={updateTemplate}>Replace</ProgressButton>
           </GridItem>
           <GridItem xs={6} justify='flex-end' container>
             <Popconfirm onConfirm={deleteTemplate}>

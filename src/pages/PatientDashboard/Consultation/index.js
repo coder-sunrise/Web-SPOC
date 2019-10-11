@@ -274,19 +274,13 @@ class Consultation extends PureComponent {
             dispatch({
               type: 'consultation/discard',
               payload: values.id,
-            }).then((r) => {
-              if (r) {
-                // dispatch({
-                //   type: 'formik/updateState',
-                //   payload: {
-                //     ConsultationPage: undefined,
-                //   },
-                // })
-                // history.push(`/reception/queue`)
-              }
             })
           },
         },
+      })
+    } else {
+      dispatch({
+        type: 'consultation/discard',
       })
     }
   }
@@ -488,6 +482,75 @@ class Consultation extends PureComponent {
       })
   }
 
+  loadTemplate = (v) => {
+    const exist = this.props.values
+    // console.log(exist, v)
+    // v.id = exist.id
+    // v.concurrencyToken = exist.concurrencyToken
+    const mergeArrayProps = [
+      'corCertificateOfAttendance',
+      'corConsumable',
+      'corDiagnosis',
+      'corMedicalCertificate',
+      'corMemo',
+      'corOrderAdjustment',
+      'corOtherDocuments',
+      'corPrescriptionItem',
+      'corReferralLetter',
+      'corService',
+      'corVaccinationCert',
+      'corVaccinationItem',
+    ]
+    mergeArrayProps.forEach((p) => {
+      exist[p] = [
+        ...exist[p],
+        ...v[p],
+      ]
+    })
+    if (v.corDoctorNote && v.corDoctorNote.length) {
+      if (exist.corDoctorNote && exist.corDoctorNote.length) {
+        exist.corDoctorNote[0].chiefComplaints = `${exist.corDoctorNote[0]
+          .chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
+        exist.corDoctorNote[0].clinicianNote = `${exist.corDoctorNote[0]
+          .clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
+        exist.corDoctorNote[0].plan = `${exist.corDoctorNote[0].plan}<br/>${v
+          .corDoctorNote[0].plan}`
+      } else {
+        exist.corDoctorNote = [
+          ...v.corDoctorNote,
+        ]
+      }
+    }
+    // console.log(exist)
+    // this.props.resetForm(v)
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: exist,
+        version: Date.now(),
+      },
+    })
+    this.props.dispatch({
+      type: 'consultation/queryDone',
+      payload: {
+        data: exist,
+      },
+    })
+  }
+
+  saveTemplate = () => {
+    const { dispatch, orders, consultationDocument, values } = this.props
+    dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: convertToConsultation(values, {
+          orders,
+          consultationDocument,
+        }),
+      },
+    })
+  }
+
   // // eslint-disable-next-line camelcase
   // UNSAFE_componentWillReceiveProps (nextProps) {
   //   // console.log('UNSAFE_componentWillReceiveProps', this.props, nextProps)
@@ -548,6 +611,8 @@ class Consultation extends PureComponent {
           <Layout
             {...this.props}
             onSaveLayout={this.saveLayout}
+            onLoadTemplate={this.loadTemplate}
+            onSaveTemplate={this.saveTemplate}
             userDefaultLayout={values.visitConsultationTemplate}
           />
         </Authorized.Context.Provider>

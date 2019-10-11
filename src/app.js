@@ -7,7 +7,7 @@ export const dva = {
   config: {
     onError (e) {
       e.preventDefault()
-      console.log(e.message)
+      console.error(e)
     },
     // onReducer (reducer) {
     //   return (state, action) => {

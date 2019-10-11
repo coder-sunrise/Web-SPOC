@@ -188,6 +188,7 @@ class Layout extends PureComponent {
     const { userDefaultLayout } = props
     this.pageDefaultWidgets = _defaultLayout
     let defaultLayout
+    // console.log('userDefaultLayout', userDefaultLayout)
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
     } else if (!localStorage.getItem('consultationLayout')) {
@@ -838,7 +839,7 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <Templates />
+                    <Templates {...this.props} />
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>

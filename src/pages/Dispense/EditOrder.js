@@ -101,7 +101,7 @@ class EditOrder extends Component {
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>
-            <Order className={classes.orderPanel} status="" />
+            <Order className={classes.orderPanel} status='' />
           </GridItem>
           <GridItem xs={12} md={6}>
             <h5>

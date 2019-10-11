@@ -506,7 +506,12 @@ class Demographic extends PureComponent {
                 name='contact.contactAddress'
                 render={(arrayHelpers) => {
                   this.arrayHelpers = arrayHelpers
-                  if (!values || !values.contact) return null
+                  if (
+                    !values ||
+                    !values.contact ||
+                    !values.contact.contactAddres
+                  )
+                    return null
                   return (
                     <div>
                       {values.contact.contactAddress.map((val, i) => {
