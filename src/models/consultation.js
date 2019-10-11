@@ -4,7 +4,11 @@ import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
 import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
+import {
+  consultationDocumentTypes,
+  orderTypes,
+  getServices,
+} from '@/utils/codes'
 import { sendNotification } from '@/utils/realtime'
 
 export default createFormViewModel({
@@ -62,10 +66,13 @@ export default createFormViewModel({
         }
       },
 
-      *start ({ payload }, { call, put }) {
+      *start ({ payload }, { call, put, select }) {
         const response = yield call(service.create, payload.id)
         const { id } = response
+        let orders = []
         if (id) {
+          
+
           yield put({
             type: 'updateState',
             payload: {
@@ -73,12 +80,90 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
+
+          let codetableState
+
+          codetableState = yield select((state) => state.codetable)
+
+          const {
+            services,
+            serviceCenters,
+            serviceCenterServices,
+          } = getServices(codetableState.ctservice)
+
+
+          let orderList = serviceCenterServices.filter(
+            (o) => (o.isAutoOrder === true && o.isDefault === true),
+          )
+
+          for (let i = 0; i < orderList.length; i++) {
+            let serviceFKValue = 0
+            let serviceCenterFKValue = 0
+            let serviceNameValue = ''
+            let totalAfterItemAdjustmentValue = 0
+            let adjAmountValue = 0
+
+            for (let a = 0; a < services.length; a++) {
+              if (orderList[i].displayValue === services[a].name) {
+                serviceFKValue = services[a].value
+                serviceNameValue = services[a].name
+              }
+            }
+
+            for (let b = 0; b < serviceCenters.length; b++) {
+              if (orderList[i].serviceCenter === serviceCenters[b].name) {
+                serviceCenterFKValue = serviceCenters[b].value
+              }
+            }
+
+            totalAfterItemAdjustmentValue = 0
+            adjAmountValue = 0
+
+            let rowRecord = {
+              sequence: i,
+              type: '3',
+              serviceFK: serviceFKValue,
+              serviceCenterFK: serviceCenterFKValue,
+              serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
+              serviceName: serviceNameValue,
+              unitPrice: orderList[i].unitPrice,
+              total: orderList[i].unitPrice,
+              quantity: 1,
+              totalAfterItemAdjustment: orderList[i].unitPrice,
+              adjAmount: adjAmountValue,
+              remark: '',
+              subject: orderList[i].displayValue,
+              uid: '',
+              weightage: 0,
+              totalAfterOverallAdjustment: 0,
+            }
+
+            // dispatch({
+            //   type: 'orders/upsertRow',
+            //   payload: rowRecord,
+            // })
+
+            orders.push(rowRecord)
+          }
+
+          console.log('rows ', orders)
+
+          // yield put({
+          //   type: 'orders/updateState',
+          //   payload: {
+          //     rows: orders,
+          //   },
+          // })
+
           yield put({
             type: 'queryDone',
             payload: {
               data: response,
+              autoOrderList: orders,
             },
           })
+
+
           sendNotification('QueueListing', {
             message: `Consultation started`,
           })
@@ -209,8 +294,9 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-        // console.log('queryDone', payload)
-        const { data } = payload
+        console.log("***********************")
+         console.log('queryDone', payload)
+        const { data , autoOrderList} = payload
         if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
@@ -253,7 +339,7 @@ export default createFormViewModel({
         yield put({
           type: 'orders/updateState',
           payload: {
-            rows: _.sortBy(oRows, 'sequence'),
+            rows: autoOrderList === undefined ?  _.sortBy(oRows, 'sequence') :  _.sortBy(autoOrderList, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,
               uid: o.id,

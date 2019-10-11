@@ -527,7 +527,7 @@ class PatientHistory extends Component {
             )}
           </GridItem>
           <GridItem md={7} style={{ textAlign: 'right' }}>
-            Update Date:
+            Updated Date:
             {patientHistory.selectedSubRow.signOffDate && (
               <DatePicker
                 text

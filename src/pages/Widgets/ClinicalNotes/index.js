@@ -321,7 +321,7 @@ class ClinicalNotes extends Component {
         showScribbleModal: !scriblenotes.showScribbleModal,
       },
     })
-    console.log("close")
+  
   }
 
   getScribbleValue = (test) => {

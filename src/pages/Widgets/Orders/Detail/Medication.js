@@ -621,12 +621,7 @@ class Medication extends PureComponent {
               name='batchNo'
               render={(args) => {
                 return (
-                  <CodeSelect
-                    label='Batch No'
-                    allowClear={false}
-                    code='ctMedicationUnitOfMeasurement'
-                    {...args}
-                  />
+                  <TextField label='Batch No' rowsMax='1' {...args} />
                 )
               }}
             />

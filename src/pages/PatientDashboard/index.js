@@ -20,6 +20,7 @@ import router from 'umi/router'
 import { unstable_Box as Box } from '@material-ui/core/Box'
 import { Icon, Input, AutoComplete, Form } from 'antd'
 import Loadable from 'react-loadable'
+import { findGetParameter } from '@/utils/utils'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
 import {
   PictureUpload,
@@ -126,11 +127,25 @@ class PatientDashboard extends PureComponent {
     // const { visitRegistration = {} } = this.props
     // const { visitInfo = {} } = visitRegistration
 
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+        filter: {
+          'serviceFKNavigation.IsActive': true,
+          combineCondition: 'or',
+        },
+      },
+    })
+
+
     this.props.history.push(
       getAppendUrl({
         md2: 'cons',
       }),
     )
+
+    
 
     const version = Date.now()
     this.props
@@ -143,11 +158,15 @@ class PatientDashboard extends PureComponent {
       })
       .then((o) => {
         if (o)
+          // router.push(
+          //   getAppendUrl({
+          //     md2: 'cons',
+          //     cid: o.id,
+          //   }),
+          // )
+
           router.push(
-            getAppendUrl({
-              md2: 'cons',
-              cid: o.id,
-            }),
+            `/reception/queue/patientdashboard?qid=${findGetParameter('qid')}&cid=${o.id}&v=${version}&md2=cons`,
           )
       })
   }
