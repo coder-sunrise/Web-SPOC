@@ -22,7 +22,7 @@ import {
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
-import DetailsActionBar from './Filterbar'
+import DetailsActionBar from './FilterBar'
 import DetailsGrid from './Grid'
 import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'

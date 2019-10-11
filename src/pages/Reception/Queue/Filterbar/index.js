@@ -20,17 +20,25 @@ import {
 // sub component
 import StatusFilterButton from './StatusFilterButton'
 import Authorized from '@/utils/Authorized'
+import { USER_ROLE } from '@/utils/constants'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
   switch: { display: 'inline-block', minWidth: '200px' },
 })
+
+const shouldShowSelfOnlyCheckbox = [
+  USER_ROLE.DOCTOR,
+  USER_ROLE.DOCTOR_OWNER,
+]
+
 const Filterbar = ({
   classes,
   dispatch,
   toggleNewPatient,
   handleSubmit,
   selfOnly,
+  user,
   setSearch,
 }) => {
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
@@ -84,14 +92,17 @@ const Filterbar = ({
             <FormattedMessage id='reception.queue.createPatient' />
           </ProgressButton>
         </Authorized>
-
-        <div className={classes.switch}>
-          <Checkbox
-            label='Visit assign to me only'
-            onChange={onSwitchClick}
-            checked={selfOnly}
-          />
-        </div>
+        {shouldShowSelfOnlyCheckbox.includes(
+          user.clinicianProfile.userProfile.role.id,
+        ) && (
+          <div className={classes.switch}>
+            <Checkbox
+              label='Visit assign to me only'
+              onChange={onSwitchClick}
+              checked={selfOnly}
+            />
+          </div>
+        )}
       </GridItem>
 
       <GridItem
@@ -109,8 +120,9 @@ const Filterbar = ({
   )
 }
 
-const connectedFilterbar = connect(({ queueLog }) => ({
+const connectedFilterbar = connect(({ queueLog, user }) => ({
   selfOnly: queueLog.selfOnly,
+  user: user.data,
 }))(Filterbar)
 
 const FilterbarWithFormik = withFormik({

@@ -452,7 +452,7 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-
+  console.log({ queryingFormData })
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper
