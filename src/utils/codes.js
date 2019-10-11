@@ -971,8 +971,10 @@ export const refreshCodetable = async (url) => {
 
 export const checkIsCodetableAPI = (url) => {
   try {
-    const isTenantCodes = tenantCodes.indexOf(url) > 0
     const paths = url.split('/')
+
+    const isTenantCodes =
+      paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
 
     return isTenantCodes || isCodetable

@@ -161,6 +161,7 @@ class Queue extends React.Component {
   }
 
   toggleRegisterNewPatient = () => {
+    console.log('toggle register new patient')
     this.props.dispatch({
       type: 'patient/openPatientModal',
     })
@@ -227,6 +228,7 @@ class Queue extends React.Component {
   }
 
   onEnterPressed = async (searchQuery) => {
+    console.log('on enter pressed')
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -247,6 +249,7 @@ class Queue extends React.Component {
   }
 
   showSearchResult = () => {
+    console.log('show search result')
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
 

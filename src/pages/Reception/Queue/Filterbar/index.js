@@ -60,6 +60,7 @@ const Filterbar = ({
               }}
               label='Patient Name, Acc No., Phone No.'
               onChange={(e) => setSearch(e.target.value)}
+              bind='patientSearch/query'
             />
           )}
         />
@@ -84,7 +85,10 @@ const Filterbar = ({
             icon={null}
             color='primary'
             size='sm'
-            onClick={toggleNewPatient}
+            onClick={() => {
+              console.log('create patient click')
+              toggleNewPatient()
+            }}
           >
             <Hidden mdDown>
               <PersonAdd />

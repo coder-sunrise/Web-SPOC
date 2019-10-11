@@ -116,10 +116,7 @@ class Billing extends Component {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
                     <GridContainer direction='column'>
-                      <DispenseDetails
-                        viewOnly
-                        values={this.props.dispense.entity}
-                      />
+                      <DispenseDetails viewOnly values={values} />
                     </GridContainer>
                   ),
                 },

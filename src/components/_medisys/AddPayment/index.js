@@ -67,13 +67,12 @@ class AddPayment extends Component {
   }
 
   render () {
-    const { classes, onClose, values } = this.props
+    const { classes, onClose } = this.props
     const { paymentList } = this.state
 
     const validationSchema = Yup.object().shape({
       ...paymentList.reduce(mapPaymentListToValidationScheme, {}),
     })
-    console.log({ values })
     return (
       <div>
         <PayerHeader />
@@ -83,6 +82,7 @@ class AddPayment extends Component {
           validationSchema={validationSchema}
           onSubmit={this.onConfirmClick}
           render={({ values, handleSubmit, ...restProps }) => {
+            console.log({ values })
             return (
               <React.Fragment>
                 <PaymentType
