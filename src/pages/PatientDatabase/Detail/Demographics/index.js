@@ -523,7 +523,7 @@ class Demographic extends PureComponent {
                   if (
                     !values ||
                     !values.contact ||
-                    !values.contact.contactAddres
+                    !values.contact.contactAddress
                   )
                     return null
                   return (
