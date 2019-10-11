@@ -101,6 +101,13 @@ export const isPOStatusFinalized = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
+export const isPOStatusFulfilled = (status) => {
+  const allowedStatus = [
+    5,
+  ]
+  return allowedStatus.indexOf(status) > -1
+}
+
 export const getPurchaseOrderStatusFK = (status) => {
   let purchaseOrderStatusFK = {}
   if (typeof status === 'number') {
