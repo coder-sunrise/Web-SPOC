@@ -9,10 +9,19 @@ import { PurchaseReceiveDetailOption } from '../variables'
   clinicInfo,
 }))
 class index extends Component {
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
+  }
+
   render () {
     const { purchaseOrderDetails } = this.props
     const { purchaseOrder } = purchaseOrderDetails
-    const poStatus = (purchaseOrder) ? purchaseOrder.purchaseOrderStatusFK : 1
+    const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
     return (
       <CardContainer hideHeader>
         <Tabs
