@@ -206,10 +206,16 @@ const Grid = ({
     })
   }
 
-  const onRowDoubleClick = (row) =>
-    handleEditVisitClick({
-      visitID: row.id,
-    })
+  const onRowDoubleClick = (row) => {
+    const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
+    const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
+    // if (isInCons) {
+    // } else if (isPaused) {
+    // }
+    // handleEditVisitClick({
+    //   visitID: row.id,
+    // })
+  }
 
   const calendarData = useMemo(
     () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
@@ -296,12 +302,12 @@ const Grid = ({
     //   }
     // }
 
-    // if (assignedDoctorProfile.id !== doctorProfile.id) {
-    //   notification.error({
-    //     message: `You cannot resume other doctor's consultation.`,
-    //   })
-    //   return false
-    // }
+    if (assignedDoctorProfile.id !== doctorProfile.id) {
+      notification.error({
+        message: `You cannot resume other doctor's consultation.`,
+      })
+      return false
+    }
 
     return true
   }

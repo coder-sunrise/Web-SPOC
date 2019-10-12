@@ -82,16 +82,17 @@ const styles = () => ({
       // create new patient will return patient entity, r === true
       if (r) {
         if (r.id) {
-          history.push(
-            getRemovedUrl(
-              [
-                'new',
-              ],
-              getAppendUrl({
-                pid: r.id,
-              }),
-            ),
-          )
+          if (!patient.callback)
+            history.push(
+              getRemovedUrl(
+                [
+                  'new',
+                ],
+                getAppendUrl({
+                  pid: r.id,
+                }),
+              ),
+            )
         } else {
           dispatch({
             type: 'patient/closePatientModal',
@@ -104,6 +105,7 @@ const styles = () => ({
           },
         }).then((value) => {
           resetForm(value)
+          if (patient.callback) patient.callback()
         })
         if (onConfirm) onConfirm()
       }

@@ -317,6 +317,7 @@ class Demographic extends PureComponent {
                   name='contact.mobileContactNumber.countryCodeFK'
                   render={(args) => (
                     <CodeSelect
+                      allowClear={false}
                       label='Country Code'
                       code='ctcountrycode'
                       {...args}

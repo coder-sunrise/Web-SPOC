@@ -81,7 +81,7 @@ class Memo extends PureComponent {
             <Field
               name='issuedByUserFK'
               render={(args) => {
-                return <ClinicianSelect label='From' {...args} />
+                return <ClinicianSelect label='From' disabled {...args} />
               }}
             />
           </GridItem>

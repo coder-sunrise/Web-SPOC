@@ -39,6 +39,7 @@ import {
     issuedByUserFK: Yup.number().required(),
     subject: Yup.string().required(),
     content: Yup.string().required(),
+    certificateDate: Yup.string().required(),
   }),
 
   handleSubmit: (values, { props }) => {
@@ -101,7 +102,7 @@ class VaccinationCertificate extends PureComponent {
             <Field
               name='issuedByUserFK'
               render={(args) => {
-                return <ClinicianSelect label='From' {...args} />
+                return <ClinicianSelect label='From' disabled {...args} />
               }}
             />
           </GridItem>

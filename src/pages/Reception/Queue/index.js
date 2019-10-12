@@ -71,11 +71,12 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, patientSearch, loading, user }) => ({
+@connect(({ queueLog, patientSearch, loading, user, patient }) => ({
   patientSearchResult: patientSearch.list,
   queueLog,
   loading,
   user: user.data,
+  patient: patient.entity,
 }))
 class Queue extends React.Component {
   constructor (props) {
@@ -159,9 +160,24 @@ class Queue extends React.Component {
     })
   }
 
+  redirectToVisitRegistration = () => {
+    const { patient } = this.props
+    this.showVisitRegistration({
+      patientID: patient.id,
+    })
+  }
+
   toggleRegisterNewPatient = () => {
     this.props.dispatch({
       type: 'patient/openPatientModal',
+      payload: {
+        callback: () => {
+          this.props.dispatch({
+            type: 'patient/closePatientModal',
+          })
+          this.redirectToVisitRegistration()
+        },
+      },
     })
   }
 

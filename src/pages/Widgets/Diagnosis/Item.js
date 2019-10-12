@@ -157,7 +157,9 @@ export default ({
           <FastField
             name={`corDiagnosis[${index}].onsetDate`}
             render={(args) => {
-              return <DatePicker label='Order Date' {...args} />
+              return (
+                <DatePicker label='Order Date' allowClear={false} {...args} />
+              )
             }}
           />
         </GridItem>
