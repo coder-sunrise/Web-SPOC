@@ -15,7 +15,7 @@ import {
 } from '@/components'
 import styles from '../styles'
 
-const Cash = ({ classes, payment, handleDeletePayment }) => {
+const Cash = ({ classes, payment, handleDeletePayment, handleChange }) => {
   return (
     <CardContainer hideHeader>
       <h5 className={classes.paymentItemHeader}>Cash</h5>

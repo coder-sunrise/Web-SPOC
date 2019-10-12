@@ -18,3 +18,15 @@ export const USER_ROLE = {
   DOCTOR: 3,
   CLINIC_ASSISTANT: 4,
 }
+
+export const COPAYER_TYPE = {
+  CORPORATE: 1,
+  GOVERNMENT: 2,
+}
+
+export const INVOICE_PAYER_TYPE = {
+  PATIENT: 1,
+  SCHEME: 2,
+  PAYERACCOUNT: 3,
+  COMPANY: 4,
+}

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import * as Yup from 'yup'
+import { connect } from 'dva'
 // formik
 import { Formik } from 'formik'
 // material ui
@@ -19,6 +20,7 @@ import {
   ValidationScheme,
   InitialValue,
 } from './variables'
+import { rounding } from './utils'
 
 const mapPaymentListToValidationScheme = (schemes, payment) => {
   return {
@@ -27,6 +29,7 @@ const mapPaymentListToValidationScheme = (schemes, payment) => {
   }
 }
 
+@connect(({ clinicSettings }) => ({ clinicSettings }))
 class AddPayment extends Component {
   state = {
     paymentList: [],
@@ -67,22 +70,48 @@ class AddPayment extends Component {
   }
 
   render () {
-    const { classes, onClose } = this.props
+    const { classes, onClose, invoice = {} } = this.props
     const { paymentList } = this.state
 
     const validationSchema = Yup.object().shape({
       ...paymentList.reduce(mapPaymentListToValidationScheme, {}),
     })
+
     return (
       <div>
-        <PayerHeader />
+        <PayerHeader invoice={invoice} />
         <Formik
           enableReinitialize
-          initialValues={paymentList.reduce(mapPaymentListToValues, {})}
+          initialValues={{
+            cashReceived: 0,
+            ...paymentList.reduce(mapPaymentListToValues, {}),
+          }}
           validationSchema={validationSchema}
           onSubmit={this.onConfirmClick}
-          render={({ values, handleSubmit, ...restProps }) => {
-            console.log({ values })
+          render={({ values, handleSubmit, setFieldValue, ...restProps }) => {
+            const hasCash = Object.keys(values).reduce(
+              (hasCashMode, key) =>
+                values[key].type === 'Cash' ? true : hasCashMode,
+              false,
+            )
+            const _collectableExactAmount = Object.keys(values).reduce(
+              (total, key) => total + (values[key].amount || 0),
+              0,
+            )
+            const collectableAmountAfterRounding = rounding(
+              {},
+              _collectableExactAmount,
+            )
+            const cashRounding = hasCash
+              ? Math.abs(
+                  _collectableExactAmount - collectableAmountAfterRounding,
+                )
+              : 0
+
+            const cashReturned =
+              values.cashReceived - collectableAmountAfterRounding
+
+            const totalPaymentAfterRounding = rounding({}, invoice.finalPayable)
             return (
               <React.Fragment>
                 <PaymentType
@@ -94,7 +123,13 @@ class AddPayment extends Component {
                 />
 
                 <GridContainer alignItems='flex-end'>
-                  <PaymentSummary />
+                  <PaymentSummary
+                    hasCash={hasCash}
+                    totalPayment={totalPaymentAfterRounding}
+                    collectableAmount={collectableAmountAfterRounding}
+                    cashRounding={cashRounding}
+                    cashReturned={cashReturned}
+                  />
                   <GridItem md={12} className={classes.addPaymentActionButtons}>
                     <Button color='danger' onClick={onClose}>
                       Cancel

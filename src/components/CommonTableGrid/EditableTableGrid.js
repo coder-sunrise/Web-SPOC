@@ -378,7 +378,7 @@ class EditableTableGrid extends PureComponent {
       ...props,
     }
     // console.log(rowChanges, addedRows)
-    // console.log(editingRowIds)
+    // console.log({ columnExtensions })
     const editableCfg = {
       getRowId,
       extraState: [

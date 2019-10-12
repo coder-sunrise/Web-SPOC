@@ -104,10 +104,14 @@ class Billing extends Component {
 
   render () {
     const { showCoPaymentModal, showAddPaymentModal } = this.state
-    const { classes, values, billing, loading } = this.props
+    const { classes, values, billing, loading, setFieldValue } = this.props
     console.log({ values })
+    const formikBag = {
+      values,
+      setFieldValue,
+    }
     return (
-      <div>
+      <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
         <div style={{ padding: 8 }}>
           <LoadingWrapper
@@ -138,7 +142,7 @@ class Billing extends Component {
               <ApplyClaims
                 handleAddCopayerClick={this.toggleCopayerModal}
                 // values={values}
-                {...this.props}
+                {...formikBag}
               />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
@@ -168,9 +172,16 @@ class Billing extends Component {
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
         >
-          <AddPayment handleSubmit={this.onSubmit} />
+          <AddPayment
+            handleSubmit={this.onSubmit}
+            invoice={{
+              ...values.invoice,
+              finalPayable: 727.5,
+              outstandingBalance: values.outstandingBalance,
+            }}
+          />
         </CommonModal>
-      </div>
+      </LoadingWrapper>
     )
   }
 }
