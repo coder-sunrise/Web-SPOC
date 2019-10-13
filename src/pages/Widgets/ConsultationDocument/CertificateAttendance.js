@@ -1,25 +1,12 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
   notification,
-  Select,
-  CodeSelect,
   DatePicker,
-  DateRangePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  NumberInput,
-  RichEditor,
   TimePicker,
   withFormikExtend,
   FastField,
@@ -29,11 +16,15 @@ import {
 import * as service from '@/services/common'
 
 @withFormikExtend({
-  mapPropsToValues: ({ consultationDocument }) => {
-    return (
-      consultationDocument.entity ||
-      consultationDocument.defaultCertOfAttendance
-    )
+  mapPropsToValues: ({ consultationDocument, visitEntity }) => {
+    const values = {
+      ...(consultationDocument.entity ||
+        consultationDocument.defaultCertOfAttendance),
+      attendanceStartTime: visitEntity.visit
+        ? moment(visitEntity.visit.visitDate).format('HH:mm')
+        : moment().format('HH:mm'),
+    }
+    return values
   },
   validationSchema: Yup.object().shape({
     issueDate: Yup.date().required(),
@@ -66,20 +57,23 @@ import * as service from '@/services/common'
 })
 class CertificateAttendance extends PureComponent {
   componentDidMount () {
-    const { setFieldValue } = this.props
-    service.runningNumber('coa').then((o) => {
-      if (o && o.data) {
-        setFieldValue('referenceNo', o.data)
-      } else {
-        notification.error({
-          message: 'Generate Reference Number fail',
-        })
-      }
-    })
+    const { setFieldValue, values } = this.props
+    // console.log({ values })
+    if (values.referenceNo === '-')
+      service.runningNumber('coa').then((o) => {
+        if (o && o.data) {
+          setFieldValue('referenceNo', o.data)
+        } else {
+          notification.error({
+            message: 'Generate Reference Number fail',
+          })
+        }
+      })
   }
 
   render () {
     const { footer, handleSubmit, classes, values } = this.props
+    console.log({ props: this.props })
     return (
       <div>
         {values.referenceNo && (
@@ -108,7 +102,7 @@ class CertificateAttendance extends PureComponent {
             <Field
               name='issuedByUserFK'
               render={(args) => {
-                return <ClinicianSelect label='Issue By' {...args} />
+                return <ClinicianSelect label='Issue By' disabled {...args} />
               }}
             />
           </GridItem>
@@ -141,7 +135,14 @@ class CertificateAttendance extends PureComponent {
               name='remarks'
               render={(args) => {
                 return (
-                  <TextField label='Remarks' multiline rowsMax='4' {...args} />
+                  <TextField
+                    label='Remarks'
+                    multiline
+                    rowsMax='4'
+                    {...args}
+                    inputProps={{ maxLength: 1900 }}
+                    maxLength={1900}
+                  />
                 )
               }}
             />

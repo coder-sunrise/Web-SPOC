@@ -5,17 +5,17 @@ const url = '/api/cestemplate'
 
 module.exports = {
   queryList: (userId) => {
-    return request(`${url}/list/${userId}`, {
+    return request(`${url}/list`, {
       method: 'GET',
     })
   },
-  remove: (params) => service.remove(url, params),
-  query: (params) => {
+  queryOne: (params) => {
     return service.query(url, params)
   },
-  create: (id, name, params) => {
-    console.log(id, name, params)
-    return request(`${url}/${id}?name=${name}`, {
+  remove: (params) => service.remove(url, params),
+
+  create: (name, params) => {
+    return request(`${url}?name=${name}`, {
       method: 'POST',
       body: params,
     })
@@ -27,7 +27,7 @@ module.exports = {
     })
   },
   delete: (id, userId) => {
-    return request(`${url}/${id}?userid=${userId}`, {
+    return request(`${url}/${id}`, {
       method: 'DELETE',
     })
   },

@@ -1,25 +1,14 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
-  Select,
   CodeSelect,
   DatePicker,
   DateRangePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
   NumberInput,
-  RichEditor,
-  dateFormatLong,
   withFormikExtend,
   FastField,
   Field,
@@ -51,7 +40,7 @@ import {
       mcStartDate: mcStartEndDate[0],
       mcEndDate: mcStartEndDate[1],
     }
-    console.log(mcStartEndDate)
+    // console.log(mcStartEndDate)
     data.subject = currentType.getSubject(data)
     dispatch({
       type: 'consultationDocument/upsertRow',
@@ -74,7 +63,7 @@ class MedicalCertificate extends PureComponent {
   }
 
   onDayRangeChange = (dateArray, moments) => {
-    const { values, setFieldValue } = this.props
+    const { setFieldValue } = this.props
 
     setFieldValue(
       'mcDays',
@@ -111,7 +100,7 @@ class MedicalCertificate extends PureComponent {
             <Field
               name='issuedByUserFK'
               render={(args) => {
-                return <ClinicianSelect label='Issue By' {...args} />
+                return <ClinicianSelect label='Issue By' disabled {...args} />
               }}
             />
           </GridItem>

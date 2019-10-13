@@ -150,16 +150,7 @@ const withFormikExtend = (props) => (Component) => {
 
       return authority ? (
         <Authorized
-          authority={
-            typeof authority === 'string' ? (
-              authority
-            ) : (
-              [
-                rights.view,
-                rights.edit,
-              ]
-            )
-          }
+          authority={authority}
           noMatch={() => {
             // console.log('nomatch', this.props)
 
@@ -167,7 +158,6 @@ const withFormikExtend = (props) => (Component) => {
           }}
         >
           {(matches) => {
-            // console.log(matches)
             window.g_app._store.dispatch({
               type: 'components/updateState',
               payload: {
@@ -181,13 +171,14 @@ const withFormikExtend = (props) => (Component) => {
             })
             _localAuthority[displayName].matches = matches
 
+            const r = Authorized.generalCheck(
+              matches,
+              this.props,
+              <Component {...this.props} rights={matches.rights} />,
+            )
             return (
               <AuthorizedContext.Provider value={matches}>
-                {Authorized.generalCheck(
-                  matches,
-                  this.props,
-                  <Component {...this.props} rights={matches.rights} />,
-                )}
+                {r}
               </AuthorizedContext.Provider>
             )
           }}

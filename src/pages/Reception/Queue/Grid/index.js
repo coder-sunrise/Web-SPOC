@@ -206,10 +206,16 @@ const Grid = ({
     })
   }
 
-  const onRowDoubleClick = (row) =>
-    handleEditVisitClick({
-      visitID: row.id,
-    })
+  const onRowDoubleClick = (row) => {
+    const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
+    const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
+    // if (isInCons) {
+    // } else if (isPaused) {
+    // }
+    // handleEditVisitClick({
+    //   visitID: row.id,
+    // })
+  }
 
   const calendarData = useMemo(
     () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
@@ -280,21 +286,21 @@ const Grid = ({
       return false
     }
 
-    if (visitStatus === 'IN CONS') {
-      if (assignedDoctorProfile.id !== doctorProfile.id) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            openConfirmTitle: '',
-            openConfirmContent: `Are you sure to overwrite ${title ||
-              ''} ${name} consultation?`,
-            onConfirmSave: () => null,
-          },
-        })
-        return false
-      }
-    }
+    // if (visitStatus === 'IN CONS') {
+    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
+    //     dispatch({
+    //       type: 'global/updateAppState',
+    //       payload: {
+    //         openConfirm: true,
+    //         openConfirmTitle: '',
+    //         openConfirmContent: `Are you sure to overwrite ${title ||
+    //           ''} ${name} consultation?`,
+    //         onConfirmSave: () => null,
+    //       },
+    //     })
+    //     return false
+    //   }
+    // }
 
     if (assignedDoctorProfile.id !== doctorProfile.id) {
       notification.error({

@@ -32,6 +32,17 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
   ) {
     return component
   }
+  if (
+    rights.find(
+      (o) =>
+        [
+          'hidden',
+        ].indexOf(o.rights) >= 0,
+    ) ||
+    props.hideIfNoEditRights
+  ) {
+    return null
+  }
   if (!props.hideIfNoEditRights) {
     if (buttonTypes.indexOf(component.type.displayName) >= 0) {
       return null
@@ -45,18 +56,6 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
     return React.cloneElement(component, {
       disabled: true,
     })
-  }
-  if (
-    rights.find(
-      (o) =>
-        o.name.endsWith('.view') &&
-        [
-          'hidden',
-        ].indexOf(o.rights) >= 0,
-    ) ||
-    props.hideIfNoEditRights
-  ) {
-    return null
   }
 
   if (disabledComponent) {

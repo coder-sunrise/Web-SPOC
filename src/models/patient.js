@@ -182,9 +182,21 @@ export default createFormViewModel({
             currentPatientId: null,
           },
         })
+        yield put({
+          type: 'updateState',
+          paylad: {
+            callback: undefined,
+          },
+        })
       },
 
-      openPatientModal ({ payload }, { call, put }) {
+      *openPatientModal ({ payload = { callback: undefined } }, { call, put }) {
+        if (payload.callback) {
+          yield put({
+            type: 'updateState',
+            payload: { callback: payload.callback },
+          })
+        }
         router.push(
           getAppendUrl({
             md: 'pt',

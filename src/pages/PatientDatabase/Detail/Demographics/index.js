@@ -317,6 +317,7 @@ class Demographic extends PureComponent {
                   name='contact.mobileContactNumber.countryCodeFK'
                   render={(args) => (
                     <CodeSelect
+                      allowClear={false}
                       label='Country Code'
                       code='ctcountrycode'
                       {...args}
@@ -520,7 +521,12 @@ class Demographic extends PureComponent {
                 name='contact.contactAddress'
                 render={(arrayHelpers) => {
                   this.arrayHelpers = arrayHelpers
-                  if (!values || !values.contact) return null
+                  if (
+                    !values ||
+                    !values.contact ||
+                    !values.contact.contactAddress
+                  )
+                    return null
                   return (
                     <div>
                       {values.contact.contactAddress.map((val, i) => {
