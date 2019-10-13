@@ -12,7 +12,6 @@ export const RESCHEDULE_BY = {
   BYPATIENT: 2,
 }
 
-<<<<<<< HEAD
 export const USER_ROLE = {
   ADMINISTRATOR: 1,
   DOCTOR_OWNER: 2,
@@ -30,7 +29,8 @@ export const INVOICE_PAYER_TYPE = {
   SCHEME: 2,
   PAYERACCOUNT: 3,
   COMPANY: 4,
-=======
+}
+
 export const UNFIT_TYPE = {
   1: 'Unfit for Work',
   2: 'Unfit for School',
@@ -42,5 +42,4 @@ export const UNFIT_TYPE = {
   8: 'Unfit for PE',
   9: 'Unfit for wearing shoes',
   10: 'Excuse Chit',
->>>>>>> dev
 }
