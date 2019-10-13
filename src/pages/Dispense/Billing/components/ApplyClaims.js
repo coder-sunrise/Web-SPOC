@@ -98,6 +98,33 @@ const invoiceItemColExtensions = [
   },
 ]
 
+const getValidationScheme = (claimSchemeCfg) => {
+  if (!claimSchemeCfg) return Yup.object().shape({})
+
+  const {
+    coverageMaxCap,
+    overAllCoPaymentValue,
+    overAllCoPaymentValueType,
+    isBalanceCheckRequired,
+    isCoverageMaxCapCheckRequired,
+  } = claimSchemeCfg
+
+  let _validationSchema = Yup.object().shape({})
+
+  if (isCoverageMaxCapCheckRequired) {
+    _validationSchema = Yup.object().shape({
+      claimAmount: Yup.number().max(
+        Yup.ref('totalAftGst'),
+        'Claim amount cannot exceed Payable Amount',
+      ),
+    })
+  }
+
+  console.log({ _validationSchema })
+
+  return _validationSchema
+}
+
 const ApplyClaims = ({
   classes,
   values,
@@ -246,12 +273,6 @@ const ApplyClaims = ({
   }
 
   const handleAppliedSchemeSaveClick = (index) => () => {
-    // const passValidation = _validateInvoicePayerItems(
-    //   index
-    // )
-    // let newInvoicePayer = [
-    //   ...tempInvoicePayer,
-    // ]
     const updatedRow = {
       ...tempInvoicePayer[index],
       _isConfirmed: true,
@@ -259,39 +280,6 @@ const ApplyClaims = ({
       _isDeleted: false,
     }
     _updateTempInvoicePayer(index, updatedRow)
-
-    // newInvoicePayer = tempInvoicePayer.map(
-    //   (item, oriIndex) =>
-    //     index === oriIndex ? { ...updatedRow } : { ...item },
-    // )
-
-    // const hasUnappliedSchemes =
-    //   tempInvoicePayer.length !== claimableSchemes.length
-
-    // if (hasUnappliedSchemes && nextIndex < claimableSchemes.length) {
-    //   const invoicePayer = {
-    //     _indexInClaimableSchemes: nextIndex,
-    //     _hasEditingRow: false,
-    //     _isConfirmed: false,
-    //     _isDeleted: false,
-    //     _isEditing: true,
-    //     _coverageMaxCap: 0,
-    //     copaymentSchemeFK: undefined,
-    //     name: '',
-    //     payerDistributedAmt: 0,
-    //     claimableSchemes: claimableSchemes[nextIndex],
-    //     invoicePayerItems: [],
-    //     sequence: 0,
-    //     payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
-    //   }
-    //   newInvoicePayer = [
-    //     ...newInvoicePayer,
-    //     invoicePayer,
-    //   ]
-    // }
-    // console.log({ newInvoicePayer })
-    // setTempInvoicePayer(newInvoicePayer)
-    // setNextIndex(nextIndex + 1)
   }
 
   const handleAppliedSchemeEditClick = (index) => () => {
@@ -356,10 +344,9 @@ const ApplyClaims = ({
       false,
     )
   }
-  // console.log({
-  //   tempInvoicePayer,
-  //   shouldDisableAddApplicableClaim: shouldDisableAddApplicableClaim(),
-  // })
+  console.log({
+    tempInvoicePayer,
+  })
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -439,7 +426,11 @@ const ApplyClaims = ({
                       onEditingRowIdsChange: handleEditingRowIdsChange(index),
                       onCommitChanges: handleCommitChanges(index),
                     }}
-                    schema={validationSchema}
+                    schema={getValidationScheme(
+                      invoicePayer.claimableSchemes.find(
+                        (item) => item.id === invoicePayer.copaymentSchemeFK,
+                      ),
+                    )}
                     columns={ItemTableColumn}
                     columnExtensions={invoiceItemColExtensions}
                     rows={invoicePayer.invoicePayerItems}

@@ -87,6 +87,7 @@ export default createListViewModel({
         ]
 
         if (allowedPaths.includes(pathname)) {
+          console.log('calendar subscription')
           dispatch({
             type: 'getActiveBizSessionQueue',
           })

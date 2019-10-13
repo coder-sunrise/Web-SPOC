@@ -19,7 +19,11 @@ import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
 import style from './style'
 // utils
-import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
+import {
+  getAppendUrl,
+  navigateDirtyCheck,
+  roundToTwoDecimals,
+} from '@/utils/utils'
 import Yup from '@/utils/yup'
 import Authorized from '@/utils/Authorized'
 
@@ -39,8 +43,51 @@ const reloadDispense = (props, effect = 'query') => {
 }
 @withFormikExtend({
   authority: 'queue.dispense',
-  mapPropsToValues: ({ dispense = {} }) => {
-    return dispense.entity || dispense.default
+  enableReinitialize: true,
+  mapPropsToValues: ({ dispense = {}, clinicSettings }) => {
+    const _temp = dispense.entity || dispense.default
+    const { settings } = clinicSettings
+    const invoiceTotal = roundToTwoDecimals(
+      _temp.invoice.invoiceItem.reduce(
+        (sum, item) => sum + item.totalAfterItemAdjustment,
+        0,
+      ),
+    )
+    let invoiceGSTAmt = 0
+
+    if (settings.isEnableGST) {
+      if (_temp.isGSTInclusive) {
+        invoiceGSTAmt = roundToTwoDecimals(
+          _temp.invoice.invoiceItem.reduce(
+            (gstamt, item) =>
+              gstamt +
+              item.totalAfterOverallAdjustment -
+              item.totalAfterOverallAdjustment / (1 + settings.gSTPercentage),
+            0,
+          ),
+        )
+      } else {
+        invoiceGSTAmt = roundToTwoDecimals(
+          invoiceTotal * settings.gSTPercentage,
+        )
+      }
+    }
+
+    const invoiceTotalAftGST = _temp.isGSTInclusive
+      ? invoiceTotal
+      : roundToTwoDecimals(invoiceGSTAmt + invoiceTotal)
+
+    // console.log({ invoiceTotal, invoiceGSTAmt, invoiceTotalAftGST })
+
+    return {
+      ...(dispense.entity || dispense.default),
+      invoice: {
+        ...(dispense.entity.invoice || dispense.default.invoice),
+        invoiceTotal,
+        invoiceGSTAmt,
+        invoiceTotalAftGST,
+      },
+    }
   },
   validationSchema: Yup.object().shape({
     prescription: Yup.array().of(
@@ -122,7 +169,7 @@ class Main extends Component {
 
   render () {
     const { classes, dispense, handleSubmit } = this.props
-
+    console.log({ values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>

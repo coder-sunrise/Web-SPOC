@@ -13,6 +13,8 @@ import {
   GridItem,
   TextField,
 } from '@/components'
+// utils
+import { roundToTwoDecimals } from '@/utils/utils'
 
 const styles = () => ({
   rightAlign: {
@@ -39,10 +41,10 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>GST ({gstAmount}%)</h5>
+              <h5>GST ({roundToTwoDecimals(gstValue * 100)}%)</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5>$ {gstValue > 0 ? gstValue * 100 : 0}</h5>
+              <h5>$ {roundToTwoDecimals(gstAmount)}</h5>
             </GridItem>
             <GridItem md={6}>
               <h5>Final Bill</h5>

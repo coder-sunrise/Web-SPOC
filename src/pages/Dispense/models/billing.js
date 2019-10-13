@@ -75,6 +75,12 @@ export default createFormViewModel({
           })
         }
       },
+      *refresh ({ payload }, { put }) {
+        yield put({
+          type: 'query',
+          payload: { id: payload.visitID },
+        })
+      },
       *closeModal ({ payload = { toDispensePage: false } }, { put }) {
         const { toDispensePage = false } = payload
         // router.push(
@@ -105,17 +111,6 @@ export default createFormViewModel({
           })
           router.push('/reception/queue')
         }
-      },
-      *fetchPatientInfo ({ payload }, { call, put }) {
-        const response = yield call(queryPatient, payload)
-        const { data } = response
-
-        yield put({
-          type: 'updateState',
-          payload: {
-            patientInfo: { ...data },
-          },
-        })
       },
     },
     reducers: {

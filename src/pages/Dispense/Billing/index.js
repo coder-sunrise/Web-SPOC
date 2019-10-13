@@ -104,7 +104,14 @@ class Billing extends Component {
 
   render () {
     const { showCoPaymentModal, showAddPaymentModal } = this.state
-    const { classes, values, billing, loading, setFieldValue } = this.props
+    const {
+      classes,
+      values,
+      billing,
+      dispense,
+      loading,
+      setFieldValue,
+    } = this.props
     console.log({ values })
     const formikBag = {
       values,
@@ -127,7 +134,7 @@ class Billing extends Component {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
                     <GridContainer direction='column'>
-                      <DispenseDetails viewOnly values={values} />
+                      <DispenseDetails viewOnly values={dispense.entity} />
                     </GridContainer>
                   ),
                 },
