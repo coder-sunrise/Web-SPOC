@@ -5,10 +5,16 @@ import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
 import { dateFormatLong, CodeSelect } from '@/components'
+import { UNFIT_TYPE } from '@/utils/constants'
 
 const status = [
   { value: false, name: 'Inactive', color: 'red' },
   { value: true, name: 'Active', color: 'green' },
+]
+
+const isAutoOrder = [
+  { value: false, name: 'False' },
+  { value: true, name: 'True' },
 ]
 
 const osBalanceStatus = [
@@ -597,6 +603,7 @@ const consultationDocumentTypes = [
           MedicalCertificateDetails: [
             {
               ...row,
+              unfitType: UNFIT_TYPE[row.unfitTypeFK],
               mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
               mcStartDate: moment(row.mcIssueDate).format(dateFormatLong),
               mcEndDate: moment(row.mcIssueDate).format(dateFormatLong),
@@ -639,6 +646,17 @@ const consultationDocumentTypes = [
     value: '1',
     name: 'Referral Letter',
     prop: 'corReferralLetter',
+    downloadConfig: {
+      id: 9,
+      key: 'referralletterid',
+      draft: (row) => {
+        return {
+          ReferralLetterDetails: [
+            { ...row },
+          ],
+        }
+      },
+    },
   },
   {
     value: '2',
@@ -777,6 +795,7 @@ const tenantCodes = [
   // 'ctsnomeddiagnosis',
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
+  'ctMedicationFrequency',
 ]
 
 // const codes = [
@@ -1246,7 +1265,7 @@ module.exports = {
   // countries,
   // schemes,
   status,
-
+  isAutoOrder,
   addressTypes,
   orderTypes,
   currenciesList,

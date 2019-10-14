@@ -73,12 +73,11 @@ const Detail = (props) => {
     getSchemeDetails(props)
   }, [])
 
-  const { classes, schemeDetail, history, handleSubmit, theme } = props
+  const { classes, schemeDetail, history, handleSubmit, theme, values } = props
   const detailProps = {
     height: `calc(100vh - ${183 + theme.spacing(1)}px)`,
     ...props,
   }
-
   return (
     <AuthorizedContext.Provider
       value={{
@@ -121,11 +120,7 @@ export default compose(
       code: Yup.string().required(),
       name: Yup.string().required(),
       schemeCategoryFK: Yup.number().required(),
-      companyCoPaymentSchemeDto: Yup.array().of(
-        Yup.object().shape({
-          companyFk: Yup.number().required(),
-        }),
-      ),
+      copayerFK: Yup.number().required(),
     }),
     enableReinitialize: true,
     handleSubmit: (values, { props }) => {

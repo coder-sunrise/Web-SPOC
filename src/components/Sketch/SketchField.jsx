@@ -168,7 +168,25 @@ class SketchField extends PureComponent {
   }
 
   getAllLayerData = () => {
-    return this._history.getSaveLayerList()
+    let canvas = this._fc
+    let filterList = this._history.getSaveLayerList()
+    let objects = canvas.getObjects();
+    let exist = false;
+
+
+    for(let i = 0; i < filterList.length; i++){
+      for(let a = 0; a < objects.length; a++ ){
+  
+        if(filterList[i].layerContent === JSON.stringify(objects[a].__originalState)){
+          exist = true
+        }
+      }
+      if(exist === false){
+        filterList.splice(i,1)
+      }
+      exist = false
+    }
+    return filterList
   }
 
   initializeData = (data) => {
@@ -513,6 +531,13 @@ class SketchField extends PureComponent {
         obj,
         currState,
       ] = history.redo()
+      
+
+      if(obj.removeObject === true){
+        this._fc.remove(obj)
+        return
+      }
+
       if (obj.__version === 0) {
         this.setState({ action: false }, () => {
           canvas.add(obj)
@@ -525,20 +550,7 @@ class SketchField extends PureComponent {
           }
           obj.__version = 1
         })
-      }else if (obj.__removed) {
-        this.setState({ action: false }, () => {
-          this._fc.add(obj)
-          if (obj.zindex != null) {
-            if(obj.zindex === -100){
-              canvas.sendToBack(obj)
-            }else{
-              canvas.moveTo(obj, obj.zindex)
-            }
-          }
-          obj.__version -= 1
-          obj.__removed = false
-        })
-      } else {
+      }else  {
         obj.__version += 1
         obj.setOptions(JSON.parse(currState))
       }
@@ -808,7 +820,7 @@ class SketchField extends PureComponent {
     // img.src = dataUrl
   }
 
-  setTemplate = (dataUrl) => {
+  setTemplate = (dataUrl, id) => {
     let { templateSet } = this.state
     let history = this._history
     let allList = history.getOriginalList()
@@ -857,7 +869,7 @@ class SketchField extends PureComponent {
         canvas.requestRenderAll()
       }
     }
-    history.updateCount(-100)
+    history.updateCount(-100, id)
     let canvas = this._fc
     const image = new Image()
 

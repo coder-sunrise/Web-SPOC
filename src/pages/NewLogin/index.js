@@ -86,10 +86,11 @@ const submitKey = 'login/getToken'
 
     const credential = { username, password, clinic_code: clinicCode }
     let loginDestination = '/'
-    if (location.query) {
+    if (location.query && location.query.redirect !== undefined) {
+      console.log({ location })
       loginDestination = location.query.redirect
     }
-
+    console.log({ loginDestination })
     dispatch({
       type: 'login/getToken',
       credentialPayload: credential,
@@ -100,6 +101,7 @@ const submitKey = 'login/getToken'
 
         if (validLogin) {
           localStorage.setItem('clinicCode', clinicCode)
+
           router.push(loginDestination)
         }
       })

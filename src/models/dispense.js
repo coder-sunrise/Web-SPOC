@@ -39,7 +39,7 @@ export default createFormViewModel({
             payload: {
               version: Number(query.v) || undefined,
               visitID: Number(query.vid),
-              md: query.md2,
+              md2: query.md2,
             },
           })
         }
@@ -47,7 +47,8 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { version, visitID, md } = payload
+        const { version, visitID, md2 } = payload
+
         yield put({
           type: 'query',
           payload: {
@@ -56,7 +57,8 @@ export default createFormViewModel({
           },
         })
         yield take('query/@@end')
-        if (md === 'dsps') {
+
+        if (md2 === 'dsps') {
           yield put({
             type: 'global/updateState',
             payload: {
@@ -68,6 +70,7 @@ export default createFormViewModel({
       },
 
       *start ({ payload }, { call, put }) {
+        console.log('dispense/start')
         const response = yield call(service.create, payload.id)
         const { id } = response
         if (id) {

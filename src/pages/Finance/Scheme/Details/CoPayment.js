@@ -18,6 +18,8 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
         currency={type === 'ExactAmount'}
         percentage={type === 'Percentage'}
         disabled={values.itemGroupValueDtoRdoValue !== radType}
+        defaultValue='0.00'
+        format='$0,0.00'
         {...args}
       />
     )
@@ -49,7 +51,7 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
     } else {
       setFieldValue(
         'itemGroupValueDto.consumableGroupValue.itemGroupValue',
-        undefined,
+        0.0,
       )
       setFieldValue(
         'itemGroupValueDto.consumableGroupValue.groupValueType',
@@ -58,7 +60,7 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
 
       setFieldValue(
         'itemGroupValueDto.medicationGroupValue.itemGroupValue',
-        undefined,
+        0.0,
       )
       setFieldValue(
         'itemGroupValueDto.medicationGroupValue.groupValueType',
@@ -67,29 +69,23 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
 
       setFieldValue(
         'itemGroupValueDto.vaccinationGroupValue.itemGroupValue',
-        undefined,
+        0.0,
       )
       setFieldValue(
         'itemGroupValueDto.vaccinationGroupValue.groupValueType',
-        undefined,
+        'ExactAmount',
       )
 
-      setFieldValue(
-        'itemGroupValueDto.serviceGroupValue.itemGroupValue',
-        undefined,
-      )
+      setFieldValue('itemGroupValueDto.serviceGroupValue.itemGroupValue', 0.0)
       setFieldValue(
         'itemGroupValueDto.serviceGroupValue.groupValueType',
-        undefined,
+        'ExactAmount',
       )
 
-      setFieldValue(
-        'itemGroupValueDto.packageGroupValue.itemGroupValue',
-        undefined,
-      )
+      setFieldValue('itemGroupValueDto.packageGroupValue.itemGroupValue', 0.0)
       setFieldValue(
         'itemGroupValueDto.packageGroupValue.groupValueType',
-        undefined,
+        'ExactAmount',
       )
     }
   }

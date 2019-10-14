@@ -207,7 +207,7 @@ class AmountSummary extends PureComponent {
           <GridContainer>
             <GridItem xs={6}>
               <span>
-                GST (${`${numeral(gSTPercentage * 100).format('0.00')}`}%):
+                {`${numeral(gSTPercentage * 100).format('0.00')}`}% GST:
               </span>
               {/* <FastField
                 name={`${poPrefix}.IsGSTEnabled`}

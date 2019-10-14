@@ -39,6 +39,7 @@ export default createFormViewModel({
       },
       *logout (_, { select, put }) {
         const routing = yield select((st) => st.routing)
+
         yield put({
           type: 'global/updateState',
           payload: {
@@ -48,14 +49,27 @@ export default createFormViewModel({
         localStorage.removeItem('token')
         reloadAuthorized()
 
-        yield put(
-          routerRedux.push({
-            pathname: '/login',
-            search: stringify({
-              redirect: routing.location.pathname,
+        const redirect =
+          routing.location.pathname !== '/login'
+            ? routing.location.pathname + routing.location.search
+            : ''
+
+        if (routing.location.pathname === '/login') {
+          yield put(routerRedux.push({ pathname: '/login' }))
+        } else {
+          yield put(
+            routerRedux.push({
+              pathname: '/login',
+              search: stringify({
+                redirect,
+              }),
             }),
-          }),
-        )
+          )
+        }
+        // yield put({
+        //   type: 'user/reset',
+        // })
+        yield put({ type: 'RESET_APP_STATE' })
         return true
       },
     },
@@ -73,13 +87,8 @@ export default createFormViewModel({
           setAuthority(currentAuthority)
           localStorage.setItem('token', accessToken)
           localStorage.setItem('_lastLogin', moment().toDate())
-          // const cookies = new Cookies()
-          // console.log('set last login cookie')
-          // cookies.set('_lastLogin', moment().toDate(), {
-          //   expires: new Date(9999, 11, 31),
-          // })
         }
-        // reloadAuthorized()
+
         return { ...state, isInvalidLogin }
       },
     },

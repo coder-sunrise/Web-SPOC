@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
 // material ui
@@ -40,7 +40,16 @@ import { getAppendUrl } from '@/utils/utils'
     patient: patient.entity,
   }),
 )
-class Dispense extends Component {
+class Dispense extends PureComponent {
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'dispense/updateState',
+      payload: {
+        editingOrder: false,
+      },
+    })
+  }
+
   getExtraComponent = () => {
     const { classes, dispense, values } = this.props
     const { entity, totalWithGST } = dispense

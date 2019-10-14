@@ -57,12 +57,50 @@ const description = {
 }
 
 const BrowseImage = (props) => {
-  const { title } = props
+  const { title, setImageBase64, fieldName, field, selected } = props
 
   const [
     files,
     setFiles,
   ] = useState([])
+
+  const [
+    base64,
+    setBase64,
+  ] = useState()
+
+  const base64Header = 'data:image/jpeg;base64,'
+  useEffect(
+    () => {
+      if (field.value && field.value !== '') {
+        setFiles([
+          field.name,
+        ])
+        if (field.value.includes(base64Header)) {
+          setBase64(field.value)
+        } else {
+          setBase64(`${base64Header}${field.value}`)
+        }
+      } else {
+        setFiles([])
+        setBase64()
+      }
+    },
+    [
+      field,
+    ],
+  )
+
+  const encodeImageFileAsURL = (element) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      // console.log('RESULT', reader.result)
+      const data = reader.result
+      setBase64(data)
+      setImageBase64(fieldName, data)
+    }
+    reader.readAsDataURL(element)
+  }
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
@@ -84,19 +122,22 @@ const BrowseImage = (props) => {
         acceptedFiles.map((file) =>
           Object.assign(file, {
             preview: URL.createObjectURL(file),
+            base64: encodeImageFileAsURL(file),
           }),
         ),
       )
     },
   })
 
-  const thumbs = files.map((file) => (
-    <div style={thumb} key={file.name}>
-      <div style={thumbInner}>
-        <img src={file.preview} style={img} alt={file.name} />
+  const thumbs = files.map((file) => {
+    return (
+      <div style={thumb} key={file.name}>
+        <div style={thumbInner}>
+          <img src={base64} style={img} alt={file.name} />
+        </div>
       </div>
-    </div>
-  ))
+    )
+  })
 
   useEffect(
     () => () => {
@@ -110,13 +151,18 @@ const BrowseImage = (props) => {
 
   const removeAll = () => {
     setFiles([])
+    setBase64()
+    field.value = undefined
   }
 
   return (
     <section style={container}>
       <div
-        style={{ cursor: 'pointer' }}
-        {...getRootProps({ className: 'dropzone' })}
+        style={{ cursor: selected ? 'pointer' : 'no-drop' }}
+        {...getRootProps({
+          className: 'dropzone',
+          onClick: (event) => (selected ? {} : event.stopPropagation()),
+        })}
       >
         <input {...getInputProps()} />
         <p style={description}>

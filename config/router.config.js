@@ -61,7 +61,7 @@ const routes = [
         icon: 'local_hospital',
         name: 'reception',
         authority: [
-          { name: 'reception' },
+          'reception',
         ],
         routes: [
           {
@@ -71,7 +71,7 @@ const routes = [
             // mini: 'QE',
             exact: true,
             authority: [
-              { name: 'reception/queue' },
+              'reception/queue',
             ],
           },
           // {
@@ -94,7 +94,8 @@ const routes = [
             // mini: 'AP',
             component: './Reception/Appointment',
             authority: [
-              { name: 'reception/appointment' },
+              'reception/appointment',
+              // { name: 'reception/appointment' },
             ],
           },
           {
@@ -118,7 +119,7 @@ const routes = [
         icon: 'group',
         name: 'patient',
         authority: [
-          { name: 'patientdatabase' },
+          'patientdatabase',
         ],
         routes: [
           // {
@@ -156,7 +157,7 @@ const routes = [
             // mini: 'SP',
             component: './PatientDatabase/Search',
             authority: [
-              { name: 'patientdatabase' },
+              'patientdatabase',
             ],
           },
         ],
@@ -169,7 +170,7 @@ const routes = [
         name: 'communication',
         system: 'CMS',
         authority: [
-          { name: 'communication' },
+          'communication',
         ],
         routes: [
           {
@@ -177,7 +178,7 @@ const routes = [
             name: 'sms',
             component: './sms',
             authority: [
-              { name: 'communication/sms' },
+              'communication/sms',
             ],
           },
           // {
@@ -195,7 +196,7 @@ const routes = [
         name: 'inventory',
         // component: './inventory',
         authority: [
-          { name: 'inventory' },
+          'inventory',
         ],
         routes: [
           {
@@ -203,7 +204,7 @@ const routes = [
             name: 'master',
             component: './Inventory/Master',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
             // mini: 'IM',
           },
@@ -213,7 +214,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           {
@@ -222,7 +223,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Consumable/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           {
@@ -231,7 +232,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Medication/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           {
@@ -240,7 +241,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Medication/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           {
@@ -249,7 +250,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Vaccination/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           {
@@ -258,7 +259,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Vaccination/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           {
@@ -267,7 +268,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Package/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           {
@@ -276,7 +277,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/Master/Package/Details',
             authority: [
-              { name: 'inventory/inventorymaster' },
+              'inventory/inventorymaster',
             ],
           },
           // {
@@ -296,7 +297,7 @@ const routes = [
             name: 'pd',
             component: './Inventory/PurchaseReceive',
             authority: [
-              { name: 'inventory/purchasingandreceiving' },
+              'inventory/purchasingandreceiving',
             ],
             // mini: 'PR',
           },
@@ -306,7 +307,7 @@ const routes = [
             hideInMenu: true,
             component: './Inventory/PurchaseReceive/Details',
             authority: [
-              { name: 'inventory/purchasingandreceiving' },
+              'inventory/purchasingandreceiving',
             ],
           },
           {
@@ -314,7 +315,7 @@ const routes = [
             name: 'inventoryadjustment',
             component: './Inventory/InventoryAdjustment',
             authority: [
-              { name: 'inventory/purchasingandreceiving' },
+              'inventory/purchasingandreceiving',
             ],
             // mini: 'IA',
           },
@@ -330,7 +331,7 @@ const routes = [
         icon: 'attach_money',
         name: 'finance',
         authority: [
-          { name: 'finance' },
+          'finance',
         ],
         routes: [
           {
@@ -340,7 +341,7 @@ const routes = [
             // mini: 'IP',
             exact: true,
             authority: [
-              { name: 'finance/invoicepayment' },
+              'finance/invoicepayment',
             ],
           },
           {
@@ -349,7 +350,7 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Invoice/Details',
             authority: [
-              { name: 'finance/invoicepayment' },
+              'finance/invoicepayment',
             ],
           },
           {
@@ -357,7 +358,7 @@ const routes = [
             name: 'credit/debitnote',
             hideInMenu: true,
             authority: [
-              { name: 'finance/invoicepayment' },
+              'finance/invoicepayment',
             ],
             // component: './Finance/CreditDebitNote',
             // mini: 'CD',
@@ -374,7 +375,7 @@ const routes = [
             name: 'corporate-billing/detail',
             hideInMenu: true,
             authority: [
-              { name: 'finance/corporatebilling' },
+              'finance/corporatebilling',
             ],
             // component:
             //   './Finance/CorporateBilling/Detail/CorporateBillingDetail',
@@ -385,7 +386,7 @@ const routes = [
             // mini: 'DP',
             component: './Finance/Deposit',
             authority: [
-              { name: 'finance/deposit' },
+              'finance/deposit',
             ],
           },
           {
@@ -394,7 +395,7 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Deposit/Detail/index.js',
             authority: [
-              { name: 'finance/deposit' },
+              'finance/deposit',
             ],
           },
           {
@@ -403,7 +404,7 @@ const routes = [
             // mini: 'ST',
             component: './Finance/Statement',
             authority: [
-              { name: 'finance/statement' },
+              'finance/statement',
             ],
           },
           {
@@ -412,7 +413,7 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
             authority: [
-              { name: 'finance/statement' },
+              'finance/statement',
             ],
           },
           {
@@ -421,7 +422,7 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Statement/NewStatement/AddNewStatement',
             authority: [
-              { name: 'finance/statement' },
+              'finance/statement',
             ],
           },
           {
@@ -430,7 +431,7 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Statement/Details',
             authority: [
-              { name: 'finance/statement' },
+              'finance/statement',
             ],
           },
           // {
@@ -446,7 +447,7 @@ const routes = [
             // mini: 'SC',
             component: './Finance/Scheme',
             authority: [
-              { name: 'finance/scheme' },
+              'finance/scheme',
             ],
           },
           {
@@ -455,7 +456,7 @@ const routes = [
             hideInMenu: true,
             component: './Finance/Scheme/Details',
             authority: [
-              { name: 'finance/scheme' },
+              'finance/scheme',
             ],
           },
           {
@@ -492,7 +493,7 @@ const routes = [
         name: 'report',
         hideChildrenInMenu: true,
         authority: [
-          { name: 'report' },
+          'report',
         ],
         routes: [
           {
@@ -556,7 +557,7 @@ const routes = [
         name: 'claimSubmission',
         hideChildrenInMenu: true,
         authority: [
-          { name: 'claimsubmission' },
+          'claimsubmission',
         ],
         routes: [
           {
@@ -596,7 +597,7 @@ const routes = [
         icon: 'settings',
         name: 'setting',
         authority: [
-          { name: 'settings' },
+          'settings',
         ],
         hideChildrenInMenu: true,
         routes: [

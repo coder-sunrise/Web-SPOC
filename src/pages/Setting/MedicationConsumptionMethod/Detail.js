@@ -10,6 +10,7 @@ import {
   TextField,
   DateRangePicker,
   dateFormatLong,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -120,6 +121,30 @@ class Detail extends PureComponent {
                       rowsMax={4}
                       {...args}
                     />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={4}>
+              <FastField
+                name='translationLanguage'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Translation Language'
+                      code='ctLanguage'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={8}>
+              <FastField
+                name='translatedDisplayValue'
+                render={(args) => {
+                  return (
+                    <TextField label='Translated Display Value' {...args} />
                   )
                 }}
               />

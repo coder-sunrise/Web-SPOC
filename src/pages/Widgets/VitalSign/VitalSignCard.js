@@ -28,11 +28,12 @@ export default ({
     show,
     setShow,
   ] = useState(false)
+  console.log('index ', index)
 
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs md={3}>
+        <GridItem xs sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].temperatureC`}
             render={(args) => (
@@ -41,6 +42,7 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature',
                 })}
+                format='0.0'
                 max={200}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature.suffix',
@@ -49,7 +51,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs md={3}>
+        <GridItem xs sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bpSysMMHG`}
             render={(args) => (
@@ -64,7 +66,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs md={3}>
+        <GridItem xs sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bpDiaMMHG`}
             render={(args) => (
@@ -79,7 +81,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs md={3}>
+        <GridItem xs sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].pulseRateBPM`}
             render={(args) => (
@@ -96,12 +98,13 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs md={3}>
+        <GridItem xs sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].weightKG`}
             render={(args) => (
               <NumberInput
                 {...args}
+                format='0.00'
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.weight',
                 })}
@@ -114,7 +117,7 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs md={3}>
+        <GridItem xs sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].heightCM`}
             render={(args) => (
@@ -133,8 +136,8 @@ export default ({
             )}
           />
         </GridItem>
-        <GridItem xs md={4} />
-        <GridItem xs md={3}>
+        <GridItem xs sm={6} md={4} />
+        <GridItem xs sm={4} md={3}>
           <FastField
             name={`corPatientNoteVitalSign[${index}].bmi`}
             render={(args) => (

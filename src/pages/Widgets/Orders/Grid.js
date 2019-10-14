@@ -66,7 +66,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
   }
   if (isEnableGST) {
     messages.gst = `${numeral(gSTPercentage * 100).format('0.00')}% GST`
-    messages.total = 'Total (GST)'
+    messages.total = 'Total '
     totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'gst' })
   }
   totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'total' })

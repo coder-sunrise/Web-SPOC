@@ -25,7 +25,9 @@ import {
 import { getAppendUrl } from '@/utils/utils'
 // import model from '../models/demographic'
 import Block from './Block'
+import { control } from '@/components/Decorator'
 
+@control()
 @connect(({ patient, codetable }) => ({
   patient,
   codetable,
@@ -369,6 +371,8 @@ class Banner extends PureComponent {
                       cmt: 1,
                       pid: info.id,
                     })}
+
+                    
                   >
                     <div>
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
@@ -436,7 +440,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                    <IconButton onClick={this.refreshChasBalance}>
+                      <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (

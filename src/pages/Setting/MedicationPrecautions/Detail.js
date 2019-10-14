@@ -118,7 +118,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={6}>
+            <GridItem md={4}>
               <FastField
                 name='translationLanguage'
                 render={(args) => {
@@ -132,7 +132,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={6}>
+            <GridItem md={8}>
               <FastField
                 name='translatedDisplayValue'
                 render={(args) => {

@@ -147,6 +147,7 @@ const schemaDemographic = {
     }),
     mobileContactNumber: Yup.object().shape({
       number: Yup.string().required(),
+      countryCodeFK: Yup.string().required(),
     }),
   }),
 }

@@ -71,13 +71,13 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, patientSearch, loading, user }) => ({
+@connect(({ queueLog, patientSearch, loading, user, patient }) => ({
   patientSearchResult: patientSearch.list,
   queueLog,
   loading,
   user: user.data,
+  patient: patient.entity,
 }))
-@withFormik({ mapPropsToValues: () => ({}) })
 class Queue extends React.Component {
   constructor (props) {
     super(props)
@@ -90,7 +90,6 @@ class Queue extends React.Component {
   }
 
   componentWillMount = () => {
-    console.log('will mount')
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
     if (Object.keys(query).length === 0) {
@@ -161,9 +160,24 @@ class Queue extends React.Component {
     })
   }
 
+  redirectToVisitRegistration = () => {
+    const { patient } = this.props
+    this.showVisitRegistration({
+      patientID: patient.id,
+    })
+  }
+
   toggleRegisterNewPatient = () => {
     this.props.dispatch({
       type: 'patient/openPatientModal',
+      payload: {
+        callback: () => {
+          this.props.dispatch({
+            type: 'patient/closePatientModal',
+          })
+          this.redirectToVisitRegistration()
+        },
+      },
     })
   }
 
@@ -329,6 +343,7 @@ class Queue extends React.Component {
             <h3 className={classNames(classes.sessionNo)}>
               {`Session No.: ${sessionNo}`}
             </h3>
+
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
                 <ProgressButton

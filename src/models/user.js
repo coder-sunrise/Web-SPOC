@@ -2,13 +2,20 @@ import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
+  // const orgName = accessRight
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
+  // if (name === 'reception/queue') {
+  //   return [
+  //     { name, rights: 'disable' },
+  //   ]
+  // }
   if (type === 'Module') {
     return [
       {
         name,
         rights,
+        // orgName,
       },
       // {
       //   name: `${name}.view`,
@@ -20,9 +27,15 @@ const convertServerRights = ({ accessRight, type, permission }) => {
       // },
     ]
   }
+
   if (type === 'Action') {
     // test only
-    // if (name === 'queue.dispense') {
+    // if (name === 'queue.dispense.editorder') {
+    //   return [
+    //     { name, rights: 'hidden' },
+    //   ]
+    // }
+    // if (name === 'patientdashboard.editconsultation') {
     //   return [
     //     { name, rights: 'hidden' },
     //   ]
@@ -31,6 +44,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
       {
         name,
         rights,
+        // orgName,
       },
     ]
   }
@@ -38,17 +52,21 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   return []
 }
 
+const defaultState = {
+  accessRights: [],
+  data: {
+    clinicianProfile: {
+      userProfile: {},
+    },
+  },
+  profileDetails: undefined,
+}
+
 export default {
   namespace: 'user',
 
   state: {
-    accessRights: [],
-    data: {
-      clinicianProfile: {
-        userProfile: {},
-      },
-    },
-    profileDetails: undefined,
+    ...defaultState,
   },
 
   effects: {
@@ -69,6 +87,9 @@ export default {
           },
           [],
         )
+        // accessRights.forEach((a) => {
+        //   console.log(a.name)
+        // })
         // console.log({ data: response.data, accessRights })
         yield put({
           type: 'saveCurrentUser',
@@ -76,6 +97,10 @@ export default {
             data: response.data.userProfileDetailDto,
             accessRights,
           },
+        })
+
+        yield put({
+          type: 'queueLog/refresh',
         })
 
         if (
@@ -105,6 +130,9 @@ export default {
   },
 
   reducers: {
+    reset (_) {
+      return { ...defaultState }
+    },
     save (state, action) {
       return {
         ...state,

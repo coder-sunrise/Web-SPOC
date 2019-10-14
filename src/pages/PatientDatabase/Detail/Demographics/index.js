@@ -118,6 +118,7 @@ class Demographic extends PureComponent {
   render () {
     const { props } = this
     const { values, theme, setFieldValue, classes } = props
+    // console.log('demographics', { values })
     return (
       <div>
         <GridContainer gutter={0}>
@@ -311,19 +312,32 @@ class Demographic extends PureComponent {
           <GridItem xs={12} md={2} />
           <GridItem xs={12} md={5}>
             <GridContainer className={classes.autoHeight}>
-              <GridItem xs={4}>
+              <GridItem xs={3}>
+                <FastField
+                  name='contact.mobileContactNumber.countryCodeFK'
+                  render={(args) => (
+                    <CodeSelect
+                      allowClear={false}
+                      label='Country Code'
+                      code='ctcountrycode'
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs={3}>
                 <FastField
                   name='contact.mobileContactNumber.number'
                   render={(args) => <TextField label='Mobile' {...args} />}
                 />
               </GridItem>
-              <GridItem xs={4}>
+              <GridItem xs={3}>
                 <FastField
                   name='contact.homeContactNumber.number'
                   render={(args) => <TextField label='Home' {...args} />}
                 />
               </GridItem>
-              <GridItem xs={4}>
+              <GridItem xs={3}>
                 <FastField
                   name='contact.officeContactNumber.number'
                   render={(args) => <TextField label='Office' {...args} />}
@@ -404,7 +418,7 @@ class Demographic extends PureComponent {
                         },
                       ]}
                       onChange={(e, s) => {
-                        // console.log(e)
+                        // console.log({ e })
                         // dispatch({
                         //   type: 'consultation/updateState',
                         //   payload: {
@@ -479,6 +493,20 @@ class Demographic extends PureComponent {
                   />
                 </GridItem>
               )}
+              {/* <GridItem xs={12}>
+                <Field
+                  name='languageFK'
+                  render={(args) => {
+                    return (
+                      <CodeSelect
+                        label='Translation'
+                        code='ctlanguage'
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem> */}
             </GridContainer>
           </GridItem>
         </GridContainer>
@@ -493,7 +521,12 @@ class Demographic extends PureComponent {
                 name='contact.contactAddress'
                 render={(arrayHelpers) => {
                   this.arrayHelpers = arrayHelpers
-                  if (!values || !values.contact) return null
+                  if (
+                    !values ||
+                    !values.contact ||
+                    !values.contact.contactAddress
+                  )
+                    return null
                   return (
                     <div>
                       {values.contact.contactAddress.map((val, i) => {

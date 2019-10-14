@@ -25,12 +25,21 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 //   },
 // })
 
+const styles = (theme) => ({
+  gridRow: {
+    '&:not(:first-child)': {
+      marginTop: theme.spacing(2),
+    },
+  },
+})
+
 const DispenseDetails = ({
   classes,
   dispense,
   setFieldValue,
   values,
   dispatch,
+  viewOnly = false,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
@@ -68,36 +77,40 @@ const DispenseDetails = ({
             />
           </GridItem>
         </GridContainer>
-        <GridContainer className={classes.summaryPanel}>
-          <GridItem xs={2} md={9} />
-          <GridItem xs={10} md={3}>
-            <AmountSummary
-              rows={invoiceItem}
-              adjustments={invoiceAdjustment}
-              config={{
-                isGSTInclusive: invoice.isGSTInclusive,
-                totalField: 'totalAfterItemAdjustment',
-                adjustedField: 'totalAfterOverallAdjustment',
-              }}
-              onValueChanged={(v) => {
-                setFieldValue(
-                  'invoice.invoiceTotalAftGST',
-                  v.summary.totalWithGST,
-                )
-                setFieldValue('invoice.invoiceAdjustment', v.adjustments)
-                dispatch({
-                  type: `dispense/updateState`,
-                  payload: {
-                    totalWithGST: v.summary.totalWithGST,
-                  },
-                })
-              }}
-            />
-          </GridItem>
-        </GridContainer>
+        {!viewOnly && (
+          <GridContainer className={classes.summaryPanel}>
+            <GridItem xs={2} md={9} />
+            <GridItem xs={10} md={3}>
+              <AmountSummary
+                rows={invoiceItem}
+                adjustments={invoiceAdjustment}
+                config={{
+                  isGSTInclusive: invoice.isGSTInclusive,
+                  totalField: 'totalAfterItemAdjustment',
+                  adjustedField: 'totalAfterOverallAdjustment',
+                }}
+                onValueChanged={(v) => {
+                  setFieldValue(
+                    'invoice.invoiceTotalAftGST',
+                    v.summary.totalWithGST,
+                  )
+                  setFieldValue('invoice.invoiceAdjustment', v.adjustments)
+                  dispatch({
+                    type: `dispense/updateState`,
+                    payload: {
+                      totalWithGST: v.summary.totalWithGST,
+                    },
+                  })
+                }}
+              />
+            </GridItem>
+          </GridContainer>
+        )}
       </GridItem>
     </React.Fragment>
   )
 }
 
-export default DispenseDetails
+export default withStyles(styles, { name: 'DispenseDetailsGrid' })(
+  DispenseDetails,
+)

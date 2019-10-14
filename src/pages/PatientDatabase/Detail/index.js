@@ -79,18 +79,24 @@ const styles = () => ({
       type: 'patient/upsert',
       payload: { ...values, cfg },
     }).then((r) => {
+      // create new patient will return patient entity, r === true
       if (r) {
         if (r.id) {
-          history.push(
-            getRemovedUrl(
-              [
-                'new',
-              ],
-              getAppendUrl({
-                pid: r.id,
-              }),
-            ),
-          )
+          if (!patient.callback)
+            history.push(
+              getRemovedUrl(
+                [
+                  'new',
+                ],
+                getAppendUrl({
+                  pid: r.id,
+                }),
+              ),
+            )
+        } else {
+          dispatch({
+            type: 'patient/closePatientModal',
+          })
         }
         dispatch({
           type: 'patient/query',
@@ -99,11 +105,9 @@ const styles = () => ({
           },
         }).then((value) => {
           resetForm(value)
+          if (patient.callback) patient.callback()
         })
         if (onConfirm) onConfirm()
-        dispatch({
-          type: 'patient/closePatientModal',
-        })
       }
     })
   },
@@ -303,7 +307,7 @@ class PatientDetail extends PureComponent {
       ) || {}
     const CurrentComponent = currentMenu.component
     // console.log(resetProps)
-    // console.log({ values })
+    console.log({ values })
 
     return (
       <GridContainer>

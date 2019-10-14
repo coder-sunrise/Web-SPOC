@@ -271,19 +271,13 @@ class Consultation extends PureComponent {
             dispatch({
               type: 'consultation/discard',
               payload: values.id,
-            }).then((r) => {
-              if (r) {
-                // dispatch({
-                //   type: 'formik/updateState',
-                //   payload: {
-                //     ConsultationPage: undefined,
-                //   },
-                // })
-                // history.push(`/reception/queue`)
-              }
             })
           },
         },
+      })
+    } else {
+      dispatch({
+        type: 'consultation/discard',
       })
     }
   }
@@ -305,6 +299,7 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
+
     return (
       <SizeContainer size='sm'>
         <div
@@ -321,94 +316,100 @@ class Consultation extends PureComponent {
             justify='space-evenly'
             alignItems='center'
           >
-            {[
-              'IN CONS',
-              'WAITING',
-            ].includes(visit.visitStatus) && (
-              <GridItem>
-                <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
-                  <Timer
-                    initialTime={
-                      Number(
-                        sessionStorage.getItem(
-                          `${values.id}_consultationTimer`,
-                        ),
-                      ) ||
-                      values.duration ||
-                      0
-                    }
-                    direction='forward'
-                    startImmediately={this.state.recording}
-                  >
-                    {({
-                      start,
-                      resume,
-                      pause,
-                      stop,
-                      reset,
-                      getTimerState,
-                      getTime,
-                    }) => {
-                      sessionStorage.setItem(
-                        `${values.id}_consultationTimer`,
-                        getTime(),
-                      )
-                      return (
-                        <React.Fragment>
-                          <TimerIcon
-                            style={{
-                              height: 17,
-                              top: 2,
-                              left: -5,
-                              position: 'relative',
-                            }}
-                          />
-                          <Timer.Hours
-                            formatValue={(value) =>
-                              `${numeral(value).format('00')} : `}
-                          />
-                          <Timer.Minutes
-                            formatValue={(value) =>
-                              `${numeral(value).format('00')} : `}
-                          />
-                          <Timer.Seconds
-                            formatValue={(value) =>
-                              `${numeral(value).format('00')}`}
-                          />
+            <Authorized authority='patientdashboard.startresumeconsultation'>
+              {({ rights }) => {
+                return rights === 'enable'
+                  ? [
+                      'IN CONS',
+                      'WAITING',
+                    ].includes(visit.visitStatus) && (
+                      <GridItem>
+                        <h5 style={{ marginTop: -3, fontWeight: 'bold' }}>
+                          <Timer
+                            initialTime={
+                              Number(
+                                sessionStorage.getItem(
+                                  `${values.id}_consultationTimer`,
+                                ),
+                              ) ||
+                              values.duration ||
+                              0
+                            }
+                            direction='forward'
+                            startImmediately={this.state.recording}
+                          >
+                            {({
+                              start,
+                              resume,
+                              pause,
+                              stop,
+                              reset,
+                              getTimerState,
+                              getTime,
+                            }) => {
+                              sessionStorage.setItem(
+                                `${values.id}_consultationTimer`,
+                                getTime(),
+                              )
+                              return (
+                                <React.Fragment>
+                                  <TimerIcon
+                                    style={{
+                                      height: 17,
+                                      top: 2,
+                                      left: -5,
+                                      position: 'relative',
+                                    }}
+                                  />
+                                  <Timer.Hours
+                                    formatValue={(value) =>
+                                      `${numeral(value).format('00')} : `}
+                                  />
+                                  <Timer.Minutes
+                                    formatValue={(value) =>
+                                      `${numeral(value).format('00')} : `}
+                                  />
+                                  <Timer.Seconds
+                                    formatValue={(value) =>
+                                      `${numeral(value).format('00')}`}
+                                  />
 
-                          {/* {!this.state.recording && (
-                    <IconButton
-                      style={{ padding: 0, top: -1, right: -6 }}
-                      onClick={() => {
-                        resume()
-                        this.setState({
-                          recording: true,
-                        })
-                      }}
-                    >
-                      <PlayArrow />
-                    </IconButton>
-                  )}
-                  {this.state.recording && (
-                    <IconButton
-                      style={{ padding: 0, top: -1, right: -6 }}
-                      onClick={() => {
-                        pause()
-                        this.setState({
-                          recording: false,
-                        })
-                      }}
-                    >
-                      <Pause />
-                    </IconButton>
-                  )} */}
-                        </React.Fragment>
-                      )
-                    }}
-                  </Timer>
-                </h5>
-              </GridItem>
-            )}
+                                  {/* {!this.state.recording && (
+                      <IconButton
+                        style={{ padding: 0, top: -1, right: -6 }}
+                        onClick={() => {
+                          resume()
+                          this.setState({
+                            recording: true,
+                          })
+                        }}
+                      >
+                        <PlayArrow />
+                      </IconButton>
+                    )}
+                    {this.state.recording && (
+                      <IconButton
+                        style={{ padding: 0, top: -1, right: -6 }}
+                        onClick={() => {
+                          pause()
+                          this.setState({
+                            recording: false,
+                          })
+                        }}
+                      >
+                        <Pause />
+                      </IconButton>
+                    )} */}
+                                </React.Fragment>
+                              )
+                            }}
+                          </Timer>
+                        </h5>
+                      </GridItem>
+                    )
+                  : null
+              }}
+            </Authorized>
             <GridItem>
               <h4 style={{ position: 'relative', marginTop: 0 }}>
                 Total Invoice
@@ -429,28 +430,33 @@ class Consultation extends PureComponent {
                   Discard
                 </ProgressButton>
               )}
-              {values.status !== 'Paused' &&
-              [
-                'IN CONS',
-                'WAITING',
-              ].includes(visit.visitStatus) && (
-                <ProgressButton
-                  onClick={this.pauseConsultation}
-                  color='info'
-                  icon={null}
-                >
-                  Pause
-                </ProgressButton>
-              )}
-              {values.status === 'Paused' && (
-                <ProgressButton
-                  onClick={this.resumeConsultation}
-                  color='info'
-                  icon={null}
-                >
-                  Resume
-                </ProgressButton>
-              )}
+              <Authorized authority='patientdashboard.startresumeconsultation'>
+                <React.Fragment>
+                  {values.status !== 'Paused' &&
+                  [
+                    'IN CONS',
+                    'WAITING',
+                  ].includes(visit.visitStatus) && (
+                    <ProgressButton
+                      onClick={this.pauseConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Pause
+                    </ProgressButton>
+                  )}
+                  {values.status === 'Paused' && (
+                    <ProgressButton
+                      onClick={this.resumeConsultation}
+                      color='info'
+                      icon={null}
+                    >
+                      Resume
+                    </ProgressButton>
+                  )}
+                </React.Fragment>
+              </Authorized>
+
               <ProgressButton
                 color='primary'
                 onClick={this.props.handleSubmit}
@@ -477,6 +483,75 @@ class Consultation extends PureComponent {
             message: 'My favourite widget layout saved',
           })
       })
+  }
+
+  loadTemplate = (v) => {
+    const exist = this.props.values
+    // console.log(exist, v)
+    // v.id = exist.id
+    // v.concurrencyToken = exist.concurrencyToken
+    const mergeArrayProps = [
+      'corCertificateOfAttendance',
+      'corConsumable',
+      'corDiagnosis',
+      'corMedicalCertificate',
+      'corMemo',
+      'corOrderAdjustment',
+      'corOtherDocuments',
+      'corPrescriptionItem',
+      'corReferralLetter',
+      'corService',
+      'corVaccinationCert',
+      'corVaccinationItem',
+    ]
+    mergeArrayProps.forEach((p) => {
+      exist[p] = [
+        ...exist[p],
+        ...v[p],
+      ]
+    })
+    if (v.corDoctorNote && v.corDoctorNote.length) {
+      if (exist.corDoctorNote && exist.corDoctorNote.length) {
+        exist.corDoctorNote[0].chiefComplaints = `${exist.corDoctorNote[0]
+          .chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
+        exist.corDoctorNote[0].clinicianNote = `${exist.corDoctorNote[0]
+          .clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
+        exist.corDoctorNote[0].plan = `${exist.corDoctorNote[0].plan}<br/>${v
+          .corDoctorNote[0].plan}`
+      } else {
+        exist.corDoctorNote = [
+          ...v.corDoctorNote,
+        ]
+      }
+    }
+    // console.log(exist)
+    // this.props.resetForm(v)
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: exist,
+        version: Date.now(),
+      },
+    })
+    this.props.dispatch({
+      type: 'consultation/queryDone',
+      payload: {
+        data: exist,
+      },
+    })
+  }
+
+  saveTemplate = () => {
+    const { dispatch, orders, consultationDocument, values } = this.props
+    dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: convertToConsultation(values, {
+          orders,
+          consultationDocument,
+        }),
+      },
+    })
   }
 
   // // eslint-disable-next-line camelcase
@@ -523,12 +598,10 @@ class Consultation extends PureComponent {
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
-    // console.log(state.currentLayout)
+    // console.log(rights)
     const matches = {
       rights:
-        rights === 'enable' && values.status !== 'Paused'
-          ? 'enable'
-          : 'disable',
+        rights === 'enable' && values.status === 'Paused' ? 'disable' : rights,
     }
     return (
       <div className={classes.root} ref={this.container}>
@@ -538,7 +611,13 @@ class Consultation extends PureComponent {
           {...this.props}
         />
         <Authorized.Context.Provider value={matches}>
-          <Layout {...this.props} onSaveLayout={this.saveLayout} />
+          <Layout
+            {...this.props}
+            onSaveLayout={this.saveLayout}
+            onLoadTemplate={this.loadTemplate}
+            onSaveTemplate={this.saveTemplate}
+            userDefaultLayout={values.visitConsultationTemplate}
+          />
         </Authorized.Context.Provider>
       </div>
     )

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
@@ -206,10 +206,16 @@ const Grid = ({
     })
   }
 
-  const onRowDoubleClick = (row) =>
-    handleEditVisitClick({
-      visitID: row.id,
-    })
+  const onRowDoubleClick = (row) => {
+    const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
+    const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
+    // if (isInCons) {
+    // } else if (isPaused) {
+    // }
+    // handleEditVisitClick({
+    //   visitID: row.id,
+    // })
+  }
 
   const calendarData = useMemo(
     () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
@@ -220,12 +226,11 @@ const Grid = ({
 
   const computeQueueListingData = () => {
     if (filter === StatusIndicator.APPOINTMENT) return calendarData
-
     let data = [
       ...queueList,
     ]
 
-    const { clinicianProfile: { doctorProfile } } = user
+    const { clinicianProfile: { doctorProfile } } = user.data
 
     if (selfOnly)
       data = data.filter((item) => {
@@ -272,8 +277,8 @@ const Grid = ({
       },
       visitStatus,
     } = row
-    const { clinicianProfile: { doctorProfile } } = user
-    console.log({ doctorProfile })
+    const { clinicianProfile: { doctorProfile } } = user.data
+
     if (!doctorProfile) {
       notification.error({
         message: 'Unauthorized Access',
@@ -281,21 +286,21 @@ const Grid = ({
       return false
     }
 
-    if (visitStatus === 'IN CONS') {
-      if (assignedDoctorProfile.id !== doctorProfile.id) {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            openConfirm: true,
-            openConfirmTitle: '',
-            openConfirmContent: `Are you sure to overwrite ${title ||
-              ''} ${name} consultation?`,
-            onConfirmSave: () => null,
-          },
-        })
-        return false
-      }
-    }
+    // if (visitStatus === 'IN CONS') {
+    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
+    //     dispatch({
+    //       type: 'global/updateAppState',
+    //       payload: {
+    //         openConfirm: true,
+    //         openConfirmTitle: '',
+    //         openConfirmContent: `Are you sure to overwrite ${title ||
+    //           ''} ${name} consultation?`,
+    //         onConfirmSave: () => null,
+    //       },
+    //     })
+    //     return false
+    //   }
+    // }
 
     if (assignedDoctorProfile.id !== doctorProfile.id) {
       notification.error({
@@ -371,6 +376,17 @@ const Grid = ({
         const valid = isAssignedDoctor(row)
         if (valid) {
           const version = Date.now()
+          dispatch({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: 'ctservice',
+              filter: {
+                'serviceFKNavigation.IsActive': true,
+                combineCondition: 'or',
+              },
+            },
+          })
+
           dispatch({
             type: `consultation/start`,
             payload: {
@@ -450,16 +466,6 @@ const Grid = ({
     }
   }
 
-  const [
-    colExtensions,
-  ] = useState([
-    ...columnExtensions,
-    {
-      columnName: 'action',
-      align: 'center',
-      render: (row) => <ActionButton row={row} onClick={onClick} />,
-    },
-  ])
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
@@ -475,7 +481,16 @@ const Grid = ({
           size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
-          columnExtensions={colExtensions}
+          columnExtensions={[
+            ...columnExtensions,
+            {
+              columnName: 'action',
+              align: 'center',
+              render: (row) => {
+                return <ActionButton row={row} onClick={onClick} />
+              },
+            },
+          ]}
           FuncProps={FuncConfig}
           onRowDoubleClick={onRowDoubleClick}
           {...TableConfig}
@@ -486,7 +501,7 @@ const Grid = ({
 }
 
 export default connect(({ queueLog, calendar, global, loading, user }) => ({
-  user: user.data,
+  user,
   filter: queueLog.currentFilter,
   selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],

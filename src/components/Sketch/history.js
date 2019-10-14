@@ -12,6 +12,7 @@ class History {
     this.current = null
     this.debug = debug
     this.count = 0
+    this.templateId = ''
   }
 
   /**
@@ -50,8 +51,9 @@ class History {
   //   this.allList = data
   // }
 
-  updateCount (count) {
+  updateCount (count, id) {
     this.count = count
+    this.templateId = id
   }
 
   /**
@@ -119,18 +121,16 @@ class History {
         }
 
       } else if (mainObject.id !== 'pan' || mainObject.id === null){
-          this.redoList = []
+         // this.redoList = []
           this.originalList.push(obj)
           this.saveLayerList.push({
             layerType: mainObject.type,
             layerNumber: this.count,
             layerContent: JSON.stringify(mainObject),
-            templateFK: null,
+            templateFK: this.templateId,
           })
-   
+          this.templateId = ''
           this.count = 0
-          console.log("********* ", this.originalList)
-          console.log("******** " , this.saveLayerList)
       }
 
       if (this.current) {
@@ -159,6 +159,11 @@ class History {
       ] = this.current
       if (this.current) {
         this.redoList.push(this.current)
+
+        let [
+          mainObject2,
+        ] = this.current
+
         // for (let i = 0; i < this.saveLayerList.length; i++) {
         //   if (this.saveLayerList[i].layerContent === JSON.stringify(mainObject)) {
         //     let temp = this.saveLayerList
@@ -194,6 +199,8 @@ class History {
    * @returns the new current value after the redo operation, or null if no redo operation was possible
    */
   redo () {
+    console.log("88888")
+    console.log(this.redoList[0])
     try {
       if (this.redoList.length > 0) {
         if (this.current) this.undoList.push(this.current)
@@ -245,6 +252,9 @@ class History {
       ] = this.undoList[i]
 
       undoObj.__removed = true
+      undoObj.set({
+        removeObject: true,
+      }) 
     }
 
     let [
@@ -252,12 +262,15 @@ class History {
     ] = this.originalList[this.originalList.length - 1]
 
 
-    originalObj.__removed = true    
+    originalObj.__removed = true   
+    originalObj.set({
+      removeObject: true,
+    }) 
 
     this.current = this.originalList[this.originalList.length - 1]
-    this.originalList = []
+    // this.originalList = []
     this.redoList = []
-    this.saveLayerList = []
+    // this.saveLayerList = []
     this.print()
   }
 

@@ -8,7 +8,7 @@ import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
 import { Accordion, Button, CommonModal, GridContainer } from '@/components'
-import { AddPayment } from '@/components/_medisys'
+import { AddPayment, LoadingWrapper } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '../DispenseDetails'
@@ -40,9 +40,10 @@ const bannerStyle = {
   paddingRight: 16,
 }
 
-@connect(({ billing, dispense, patient }) => ({
+@connect(({ billing, dispense, loading, patient }) => ({
   billing,
   dispense,
+  loading,
 }))
 @withFormik({
   mapPropsToValues: ({ billing }) => billing.entity || billing.default,
@@ -86,28 +87,45 @@ class Billing extends Component {
     console.log('addpayment', { values })
   }
 
+  onExpandDispenseDetails = (event, panel, expanded) => {
+    if (expanded) {
+      this.props.dispatch({
+        type: 'billing/showDispenseDetails',
+      })
+    }
+  }
+
   render () {
     const { showCoPaymentModal, showAddPaymentModal } = this.state
-    const { classes, values } = this.props
+    const { classes, values, loading } = this.props
     console.log({ values })
     return (
       <div>
         <PatientBanner style={bannerStyle} />
         <div style={{ padding: 8 }}>
-          <Accordion
-            leftIcon
-            expandIcon={<SolidExpandMore fontSize='large' />}
-            collapses={[
-              {
-                title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
-                content: (
-                  <GridContainer direction='column'>
-                    <DispenseDetails {...this.props} />
-                  </GridContainer>
-                ),
-              },
-            ]}
-          />
+          <LoadingWrapper
+            linear
+            loading={loading.effects['dispense/initState']}
+          >
+            <Accordion
+              leftIcon
+              expandIcon={<SolidExpandMore fontSize='large' />}
+              onChange={this.onExpandDispenseDetails}
+              collapses={[
+                {
+                  title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
+                  content: (
+                    <GridContainer direction='column'>
+                      <DispenseDetails
+                        viewOnly
+                        values={this.props.dispense.entity}
+                      />
+                    </GridContainer>
+                  ),
+                },
+              ]}
+            />
+          </LoadingWrapper>
         </div>
 
         <Paper className={classes.paperContent}>

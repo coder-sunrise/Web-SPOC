@@ -30,8 +30,8 @@ import {
   NumberInput,
 } from '@/components'
 import { getServices } from '@/utils/codes'
-import { sumReducer } from '@/utils/utils'
-import { calculateAdjustAmount } from '@/utils/utils'
+import { sumReducer , calculateAdjustAmount } from '@/utils/utils'
+
 import Grid from './Grid'
 import Detail from './Detail/index'
 
@@ -41,8 +41,9 @@ const styles = (theme) => ({
   },
 })
 // @skeleton()
-@connect(({ orders }) => ({
+@connect(({ orders, visitRegistration }) => ({
   orders,
+  visitRegistration,
 }))
 class Orders extends PureComponent {
   state = {
@@ -53,96 +54,107 @@ class Orders extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch, mode } = this.props
-    console.log("fghgh")
+    const { dispatch, status, visitRegistration } = this.props
+    const { entity: vistEntity } = visitRegistration
+    const { visit = {} } = vistEntity
 
-    dispatch({
-      type: 'orders/updateState',
-      payload: {
-       rows: [],
-      },
-    })
+    // if (status === 'consultation' && visit.visitStatus === 'WAITING') {
+    //   dispatch({
+    //     type: 'orders/updateState',
+    //     payload: {
+    //       rows: [],
+    //     },
+    //   })
 
-    if (mode === 'consultation') {
-      console.log("hhhh " , mode)
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctservice',
-          filter: {
-            'serviceFKNavigation.IsActive': true,
-            combineCondition: 'or',
-          },
-        },
-      }).then((list) => {
-        // console.log(list)
-        // eslint-disable-next-line compat/compat
-        const { services, serviceCenters, serviceCenterServices } = getServices(
-          list,
-        )
-        this.setState({
-          services,
-          serviceCenters,
-          serviceCenterServices,
-        })
+    //   dispatch({
+    //     type: 'codetable/fetchCodes',
+    //     payload: {
+    //       code: 'ctservice',
+    //       filter: {
+    //         'serviceFKNavigation.IsActive': true,
+    //         combineCondition: 'or',
+    //       },
+    //     },
+    //   }).then((list) => {
+    //     // console.log(list)
+    //     // eslint-disable-next-line compat/compat
+    //     const { services, serviceCenters, serviceCenterServices } = getServices(
+    //       list,
+    //     )
 
-        let orderList = serviceCenterServices.filter(
-          (o) => o.isAutoOrder === true && o.isDefault === true,
-        )
-        for (let i = 0; i < orderList.length; i++) {
-          let serviceFKValue = 0
-          let serviceCenterFKValue = 0
-          let serviceNameValue = ''
-          let totalAfterItemAdjustmentValue = 0
-          let adjAmountValue = 0
+    //     this.setState({
+    //       services,
+    //       serviceCenters,
+    //       serviceCenterServices,
+    //     })
 
-          for (let a = 0; a < services.length; a++) {
-            if (orderList[i].displayValue === services[a].name) {
-              serviceFKValue = services[a].value
-              serviceNameValue = services[a].name
-            }
-          }
+    //     let orderList = serviceCenterServices.filter(
+    //       (o) => o.isAutoOrder === true && o.isDefault === true,
+    //     )
+    //     let orders = []
+    //     for (let i = 0; i < orderList.length; i++) {
+    //       let serviceFKValue = 0
+    //       let serviceCenterFKValue = 0
+    //       let serviceNameValue = ''
+    //       let totalAfterItemAdjustmentValue = 0
+    //       let adjAmountValue = 0
 
-          for (let b = 0; b < serviceCenters.length; b++) {
-            if (orderList[i].serviceCenter === serviceCenters[b].name) {
-              serviceCenterFKValue = serviceCenters[b].value
-            }
-          }
+    //       for (let a = 0; a < services.length; a++) {
+    //         if (orderList[i].displayValue === services[a].name) {
+    //           serviceFKValue = services[a].value
+    //           serviceNameValue = services[a].name
+    //         }
+    //       }
 
-          totalAfterItemAdjustmentValue = 0
-          adjAmountValue = 0
+    //       for (let b = 0; b < serviceCenters.length; b++) {
+    //         if (orderList[i].serviceCenter === serviceCenters[b].name) {
+    //           serviceCenterFKValue = serviceCenters[b].value
+    //         }
+    //       }
 
-          let rowRecord = {
-            sequence: i,
-            type: '3',
-            serviceFK: serviceFKValue,
-            serviceCenterFK: serviceCenterFKValue,
-            serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
-            serviceName: serviceNameValue,
-            unitPrice: orderList[i].unitPrice,
-            total: orderList[i].unitPrice,
-            quantity: 1,
-            totalAfterItemAdjustment: orderList[i].unitPrice,
-            adjAmount: adjAmountValue,
-            remark: '',
-            subject: orderList[i].displayValue,
-            uid: '',
-            weightage: 0,
-            totalAfterOverallAdjustment: 0,
-          }
+    //       totalAfterItemAdjustmentValue = 0
+    //       adjAmountValue = 0
 
-          dispatch({
-            type: 'orders/upsertRow',
-            payload: rowRecord,
-          })
-        }
-      })
+    //       let rowRecord = {
+    //         sequence: i,
+    //         type: '3',
+    //         serviceFK: serviceFKValue,
+    //         serviceCenterFK: serviceCenterFKValue,
+    //         serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
+    //         serviceName: serviceNameValue,
+    //         unitPrice: orderList[i].unitPrice,
+    //         total: orderList[i].unitPrice,
+    //         quantity: 1,
+    //         totalAfterItemAdjustment: orderList[i].unitPrice,
+    //         adjAmount: adjAmountValue,
+    //         remark: '',
+    //         subject: orderList[i].displayValue,
+    //         uid: '',
+    //         weightage: 0,
+    //         totalAfterOverallAdjustment: 0,
+    //       }
 
-      this.state = {
-        services: [],
-        serviceCenters: [],
-      }
-    }
+    //       dispatch({
+    //         type: 'orders/upsertRow',
+    //         payload: rowRecord,
+    //       })
+
+    //       orders.push(rowRecord)
+    //     }
+    //   })
+
+    //   this.state = {
+    //     services: [],
+    //     serviceCenters: [],
+    //   }
+    // } else {
+    //   dispatch({
+    //     type: 'orders/updateState',
+    //     payload: {
+    //       rows: [],
+    //     },
+    //   })
+    // }
   }
 
   getServiceCenterService = () => {
@@ -329,7 +341,7 @@ class Orders extends PureComponent {
 
   render () {
     const { state, props } = this
-    const { theme, classes, orders, className } = props
+    const { theme, classes, orders, className, visitRegistration } = props
 
     return (
       <div className={className}>
