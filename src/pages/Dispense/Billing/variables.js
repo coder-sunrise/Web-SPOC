@@ -5,12 +5,17 @@ import { NumberInput, FastField } from '@/components'
 export const ItemTableColumn = [
   { name: 'itemCode', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
-  { name: 'totalAftGst', title: 'Payable Amount ($)' },
+  { name: 'totalAfterGst', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
 ]
 
 export const ItemTableColumnExtensions = (index) => [
-  { columnName: 'totalAftGst', type: 'currency', currency: true },
+  {
+    columnName: 'totalAftGst',
+    type: 'number',
+    currency: true,
+    format: '0.00',
+  },
   // { columnName: 'claimAmount', type: 'currency', currency: true },
   {
     columnName: 'claimAmount',

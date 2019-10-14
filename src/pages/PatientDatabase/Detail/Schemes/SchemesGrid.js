@@ -69,7 +69,7 @@ class SchemesGrid extends PureComponent {
               ctSchemeType.toLowerCase()
             ]
             const st = ctSchemeTypes.find((o) => o.id === val)
-            // console.log(st)
+            console.log('schemesgrid', { rows, st })
             const rs = rows.filter(
               (o) =>
                 !o.isDeleted &&

@@ -122,18 +122,30 @@ const reloadDispense = (props, effect = 'query') => {
 })
 class Main extends Component {
   makePayment = () => {
-    const { dispatch } = this.props
+    const { dispatch, visitRegistration, values } = this.props
 
+    // dispatch({
+    //   type: 'dispense/closeModal',
+    //   payload: {
+    //     toBillingPage: true,
+    //   },
+    // })
     dispatch({
-      type: 'dispense/closeModal',
+      type: 'dispense/finalize',
       payload: {
-        toBillingPage: true,
+        id: visitRegistration.entity.visit.id,
+        values,
       },
+    }).then((response) => {
+      if (response) {
+        const parameters = {
+          md2: 'bill',
+        }
+        router.push(
+          getAppendUrl(parameters, '/reception/queue/patientdashboard'),
+        )
+      }
     })
-    const parameters = {
-      md2: 'bill',
-    }
-    router.push(getAppendUrl(parameters, '/reception/queue/patientdashboard'))
   }
 
   _editOrder = () => {

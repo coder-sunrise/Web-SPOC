@@ -1,3 +1,7 @@
+/**
+ * ENUM constants that maps with SEMR Gen2 codeset
+ */
+
 export const APPOINTMENT_STATUS = {
   SCHEDULED: 1,
   DRAFT: 2,

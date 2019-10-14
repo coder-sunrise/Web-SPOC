@@ -29,6 +29,7 @@ import {
 } from '../variables'
 // constants
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { roundToTwoDecimals } from '@/utils/utils'
 
 const validationSchema = Yup.object().shape({
   claimAmount: Yup.number().min(0.1, ''),
@@ -64,16 +65,24 @@ const getInvoiceItems = (schemeID, oriInvoiceItems, curInvoiceItems) => {
       ]
 
     const existed = curInvoiceItems.find((curItem) => curItem.id === item.id)
-
+    // const totalAfterGst = item._claimedAmount
+    //   ? item.totalAfterGst - item._claimedAmount
+    //   : item.totalAfterGst
     if (existed)
       return [
         ...newList,
-        { ...existed },
+        {
+          ...existed,
+          // totalAfterGst,
+        },
       ]
 
     return [
       ...newList,
-      { ...item },
+      {
+        ...item,
+        // totalAfterGst,
+      },
     ]
   }, [])
 
@@ -84,9 +93,9 @@ const getInvoiceItems = (schemeID, oriInvoiceItems, curInvoiceItems) => {
 
 const invoiceItemColExtensions = [
   { columnName: 'itemCode', disabled: true },
-  { columnName: 'coverage', type: 'number', disabled: true },
+  // { columnName: 'coverage', type: 'number', disabled: true },
   {
-    columnName: 'totalAftGst',
+    columnName: 'totalAfterGst',
     type: 'currency',
     currency: true,
     disabled: true,
@@ -97,6 +106,23 @@ const invoiceItemColExtensions = [
     currency: true,
   },
 ]
+
+const getInvoiceItemsColumnExtensions = (schemeConfig) => {
+  if (!schemeConfig) return invoiceItemColExtensions
+  const { overAllCoPaymentValueType = 'Percentage' } = schemeConfig
+
+  return [
+    ...invoiceItemColExtensions,
+    {
+      columnName: 'coverage',
+      type:
+        overAllCoPaymentValueType.toLowerCase() === 'percentage'
+          ? 'text'
+          : 'currency',
+      disabled: true,
+    },
+  ]
+}
 
 const getValidationScheme = (claimSchemeCfg) => {
   if (!claimSchemeCfg) return Yup.object().shape({})
@@ -114,13 +140,13 @@ const getValidationScheme = (claimSchemeCfg) => {
   if (isCoverageMaxCapCheckRequired) {
     _validationSchema = Yup.object().shape({
       claimAmount: Yup.number().max(
-        Yup.ref('totalAftGst'),
+        Yup.ref('totalAfterGst'),
         'Claim amount cannot exceed Payable Amount',
       ),
     })
   }
 
-  console.log({ _validationSchema })
+  // console.log({ _validationSchema })
 
   return _validationSchema
 }
@@ -142,7 +168,53 @@ const ApplyClaims = ({
     setTempInvoicePayer,
   ] = useState([])
 
+  const [
+    tempInvoiceItems,
+    setTempInvoiceItems,
+  ] = useState([])
+
+  const updateOriginalInvoiceItemList = () => {
+    const _resultInvoiceItems = values.invoice.invoiceItems.map((item) => {
+      const _subtotal = tempInvoicePayer.reduce((subtotal, invoicePayer) => {
+        const {
+          claimableSchemes: invoicePayerSchemes,
+          copaymentSchemeFK,
+        } = invoicePayer
+
+        if (!copaymentSchemeFK) return subtotal
+
+        const _selectedScheme = invoicePayerSchemes.find(
+          (scheme) => scheme.id === copaymentSchemeFK,
+        )
+
+        const _invoicePayerItem = invoicePayer.invoicePayerItems.find(
+          (payerItem) => payerItem.id === item.id,
+        )
+
+        if (_invoicePayerItem)
+          return roundToTwoDecimals(subtotal + _invoicePayerItem.claimAmount)
+
+        return roundToTwoDecimals(subtotal)
+      }, 0)
+
+      return { ...item, _claimedAmount: _subtotal }
+    })
+
+    return _resultInvoiceItems
+  }
+
   const _updateTempInvoicePayer = (index, updatedRow) => {
+    // const _newTempInvoicePayer = tempInvoicePayer.map(
+    //   (item, oriIndex) =>
+    //     index === oriIndex ? { ...updatedRow } : { ...item },
+    // )
+
+    // const _newTempInvoicePayer2 = _newTempInvoicePayer.map((invoicePayer, invoicePayerIndex) => {
+    //   const { invoicePayerItems } = invoicePayer
+    //   const newInvoicePayerItems = _newT
+    //   return { ...invoicePayer }
+    // })
+
     setTempInvoicePayer(
       tempInvoicePayer.map(
         (item, oriIndex) =>
@@ -161,23 +233,27 @@ const ApplyClaims = ({
 
   useEffect(
     () => {
-      const finalClaim =
-        Math.round(
-          tempInvoicePayer.reduce(
-            (sum, payer) =>
-              sum +
-              payer.invoicePayerItems.reduce(
-                (subtotal, item) =>
-                  subtotal + (item.claimAmount ? item.claimAmount : 0),
-                0,
-              ),
-            0,
-          ) * 100,
-        ) / 100
+      const finalClaim = roundToTwoDecimals(
+        tempInvoicePayer.reduce(
+          (sum, payer) =>
+            payer._isConfirmed
+              ? sum +
+                payer.invoicePayerItems.reduce(
+                  (subtotal, item) =>
+                    subtotal + (item.claimAmount ? item.claimAmount : 0),
+                  0,
+                )
+              : sum,
+          0,
+        ),
+      )
 
-      const finalPayable = invoice.totalAftGst - finalClaim
+      const finalPayable = roundToTwoDecimals(invoice.totalAftGst - finalClaim)
+      const updatedInvoiceItems = updateOriginalInvoiceItemList()
+
       setFieldValue('finalClaim', finalClaim)
       setFieldValue('finalPayable', finalPayable)
+      setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
     },
     [
       tempInvoicePayer,
@@ -193,7 +269,9 @@ const ApplyClaims = ({
           _isConfirmed: false,
           _isDeleted: false,
           _isEditing: true,
+          _isValid: true,
           _coverageMaxCap: 0,
+          _balance: null,
           copaymentSchemeFK: undefined,
           name: '',
           payerDistributedAmt: 0,
@@ -205,6 +283,7 @@ const ApplyClaims = ({
         setTempInvoicePayer([
           _invoicePayer,
         ])
+        setTempInvoiceItems(values.invoice.invoiceItems)
       }
     },
     [
@@ -212,7 +291,66 @@ const ApplyClaims = ({
     ],
   )
 
-  const onSchemeChange = (index) => (value) => {
+  const getApplicableClaimAmount = (
+    invoicePayerItem,
+    scheme,
+    remainingCoverageMaxCap,
+  ) => {
+    const {
+      coPaymentByCategory,
+      coPaymentByItem,
+      isCoverageMaxCapCheckRequired,
+    } = scheme
+    let returnClaimAmount = 0
+
+    if (invoicePayerItem.totalAfterGst === 0)
+      return [
+        0,
+        remainingCoverageMaxCap,
+      ]
+
+    if (coPaymentByItem.length > 0) {
+      returnClaimAmount = 0
+    } else if (coPaymentByCategory.length > 0) {
+      const itemCategory = coPaymentByCategory.find(
+        (category) =>
+          category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
+      )
+      const itemRemainingAmount = invoicePayerItem._claimedAmount
+        ? invoicePayerItem.totalAfterGst - invoicePayerItem._claimedAmount
+        : invoicePayerItem.totalAfterGst
+
+      if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
+        returnClaimAmount =
+          itemRemainingAmount * (itemCategory.itemGroupValue / 100)
+      } else {
+        returnClaimAmount =
+          itemCategory.itemGroupValue > itemRemainingAmount
+            ? itemRemainingAmount
+            : itemCategory.itemGroupValue
+      }
+    } else {
+      returnClaimAmount = invoicePayerItem.totalAfterGst
+    }
+
+    if (isCoverageMaxCapCheckRequired) {
+      if (returnClaimAmount > remainingCoverageMaxCap) {
+        returnClaimAmount = remainingCoverageMaxCap
+        remainingCoverageMaxCap = 0
+      } else if (returnClaimAmount < remainingCoverageMaxCap) {
+        remainingCoverageMaxCap -= returnClaimAmount
+      } else {
+        returnClaimAmount = remainingCoverageMaxCap
+      }
+    }
+
+    return [
+      returnClaimAmount,
+      remainingCoverageMaxCap,
+    ]
+  }
+
+  const handleSchemeChange = (index) => (value) => {
     const flattenSchemes = claimableSchemes.reduce(
       (schemes, cs) => [
         ...schemes,
@@ -220,36 +358,67 @@ const ApplyClaims = ({
       ],
       [],
     )
+    const schemeConfig = flattenSchemes.find((item) => item.id === value)
     const {
+      balance = null,
       coverageMaxCap = 0,
       overAllCoPaymentValue = 0,
+      overAllCoPaymentValueType = 'Percentage',
       coPaymentSchemeName = '',
       id,
-    } = flattenSchemes.find((item) => item.id === value)
+    } = schemeConfig
+
+    let remainingCoverageMaxCap = coverageMaxCap
 
     const newInvoiceItems = getInvoiceItems(
       id,
       values.invoice.invoiceItems,
       tempInvoicePayer[index].invoicePayerItems,
     )
+    // console.log({ newInvoiceItems })
 
     const updatedRow = {
       ...tempInvoicePayer[index],
       _coverageMaxCap: coverageMaxCap,
-      payerDistributedAmt: overAllCoPaymentValue,
+      _balance: balance,
+      // payerDistributedAmt: overAllCoPaymentValue,
       name: coPaymentSchemeName,
       copaymentSchemeFK: id,
-      invoicePayerItems: [
-        ...newInvoiceItems,
-      ],
-    }
+      invoicePayerItems: newInvoiceItems.map((item) => {
+        let claimAmount = item.totalAfterGst
+        let proceedForChecking = true
 
-    setTempInvoicePayer(
-      tempInvoicePayer.map(
-        (item, oriIndex) =>
-          index === oriIndex ? { ...updatedRow } : { ...item },
-      ),
-    )
+        if (item._claimedAmount === item.totalAfterGst) {
+          proceedForChecking = false
+          claimAmount = 0
+        } else if (item._claimedAmount > 0) {
+          claimAmount = item.totalAfterGst - item._claimedAmount
+        }
+
+        if (proceedForChecking)
+          [
+            claimAmount,
+            remainingCoverageMaxCap,
+          ] = getApplicableClaimAmount(
+            item,
+            schemeConfig,
+            remainingCoverageMaxCap,
+          )
+
+        return {
+          ...item,
+          coverage:
+            overAllCoPaymentValueType.toLowerCase() === 'percentage'
+              ? `${overAllCoPaymentValue}%`
+              : overAllCoPaymentValue,
+          claimAmount: roundToTwoDecimals(claimAmount),
+
+          // claimAmount:
+          //   index === 0 ? item.totalAfterGst : getMaximumClaimable(item),
+        }
+      }),
+    }
+    _updateTempInvoicePayer(index, updatedRow)
   }
 
   const handleCommitChanges = (index) => ({ rows }) => {
@@ -310,6 +479,7 @@ const ApplyClaims = ({
       _isConfirmed: false,
       _isDeleted: false,
       _isEditing: true,
+      _isValid: true,
       _coverageMaxCap: 0,
       copaymentSchemeFK: undefined,
       name: '',
@@ -344,13 +514,13 @@ const ApplyClaims = ({
       false,
     )
   }
-  console.log({
-    tempInvoicePayer,
-  })
+  // console.log({
+  //   tempInvoicePayer,
+  // })
   return (
     <React.Fragment>
       <GridItem md={2}>
-        <h5>Apply Claims</h5>
+        <h5 style={{ paddingLeft: 8 }}>Apply Claims</h5>
       </GridItem>
       <GridItem md={10} container justify='flex-end'>
         {tempInvoicePayer.length !== claimableSchemes.length && (
@@ -383,14 +553,19 @@ const ApplyClaims = ({
           if (invoicePayer._isDeleted) return null
 
           return (
-            <Paper className={classes.gridRow}>
-              <GridContainer style={{ marginBottom: 16 }}>
-                <GridItem md={3}>
+            <Paper
+              key={`invoicePayer-${index}`}
+              className={classes.gridRow}
+              elevation={4}
+            >
+              <GridContainer style={{ marginBottom: 16 }} alignItems='center'>
+                <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
                   <Select
+                    size='sm'
                     allowClear={false}
                     simple
                     valueField='id'
-                    onChange={onSchemeChange(index)}
+                    onChange={handleSchemeChange(index)}
                     value={invoicePayer.copaymentSchemeFK}
                     options={[
                       ...invoicePayer.claimableSchemes.map((item) => ({
@@ -400,15 +575,15 @@ const ApplyClaims = ({
                     ]}
                   />
                 </GridItem>
-                <GridItem>
+                {/* <GridItem style={{ marginTop: 8, marginBottom: 8 }}>
                   <NumberInput
                     currency
                     text
                     prefix='Balance:'
-                    value={invoicePayer.payerDistributedAmt}
+                    value={invoicePayer._balance}
                   />
-                </GridItem>
-                <GridItem>
+                </GridItem> */}
+                <GridItem style={{ marginTop: 8, marginBottom: 8 }}>
                   <NumberInput
                     currency
                     text
@@ -432,7 +607,12 @@ const ApplyClaims = ({
                       ),
                     )}
                     columns={ItemTableColumn}
-                    columnExtensions={invoiceItemColExtensions}
+                    columnExtensions={getInvoiceItemsColumnExtensions(
+                      tempInvoicePayer[index].claimableSchemes.find(
+                        (item) =>
+                          item.id === tempInvoicePayer[index].copaymentSchemeFK,
+                      ),
+                    )}
                     rows={invoicePayer.invoicePayerItems}
                   />
                 </GridItem>

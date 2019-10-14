@@ -103,7 +103,6 @@ export default createFormViewModel({
 
       *save ({ payload }, { call, put }) {
         const response = yield call(service.save, payload)
-
         return response
       },
       *discard ({ payload }, { call, put }) {
@@ -116,6 +115,17 @@ export default createFormViewModel({
         }
         return response
       },
+      *finalize ({ payload }, { call, put }) {
+        const response = yield call(service.finalize, payload)
+        if (response)
+          yield put({
+            type: 'closeModal',
+            payload: {
+              toBillingPage: true,
+            },
+          })
+        return response
+      },
       *closeModal ({ payload = { toBillingPage: false } }, { call, put }) {
         const { toBillingPage = false } = payload
         // router.push(
@@ -125,12 +135,7 @@ export default createFormViewModel({
         //     // 'vid',
         //   ]),
         // )
-        yield put({
-          type: 'updateState',
-          payload: {
-            entity: undefined,
-          },
-        })
+
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -139,7 +144,15 @@ export default createFormViewModel({
             fullscreen: false,
           },
         })
-        if (!toBillingPage) router.push('/reception/queue')
+        if (!toBillingPage) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: undefined,
+            },
+          })
+          router.push('/reception/queue')
+        }
       },
       // *queryDone ({ payload }, { call, put, select }) {
       //   // console.log('queryDone', payload)
