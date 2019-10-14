@@ -9,7 +9,7 @@ import Yup from '@/utils/yup'
 import moment from 'moment'
 
 const purchaseOrderPaymentSchema = Yup.object().shape({
-  paymentNo: Yup.string().required(),
+  // paymentNo: Yup.string().required(),
   // paymentDate: Yup.string().required(),
   paymentModeFK: Yup.string().required(),
   // reference: Yup.string().required(),
@@ -28,6 +28,10 @@ class Grid extends PureComponent {
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
+      {
+        columnName: 'paymentNo',
+        disabled: true,
+      },
       {
         columnName: 'paymentDate',
         type: 'date',
@@ -64,7 +68,6 @@ class Grid extends PureComponent {
 
   render () {
     const { values, isEditable } = this.props
-
     return (
       <GridContainer>
         <EditableTableGrid
