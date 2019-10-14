@@ -23,7 +23,7 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
         { name: 'deliveryOrderDate', title: 'Delivery Order Date' },
         { name: 'deliveryOrderNo', title: 'Delivery Order No.' },
         { name: 'total', title: 'Total Qty Received' },
-        { name: 'outstanding', title: 'Outstanding Qty' },
+        // { name: 'outstanding', title: 'Outstanding Qty' },
         { name: 'remark', title: 'Remarks' },
         {
           name: 'action',
@@ -39,10 +39,10 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
           columnName: 'total',
           type: 'number',
         },
-        {
-          columnName: 'outstanding',
-          type: 'number',
-        },
+        // {
+        //   columnName: 'outstanding',
+        //   type: 'number',
+        // },
         {
           columnName: 'action',
           sortingEnabled: false,
