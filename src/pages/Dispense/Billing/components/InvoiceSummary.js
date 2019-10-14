@@ -13,6 +13,8 @@ import {
   GridItem,
   TextField,
 } from '@/components'
+// utils
+import { roundToTwoDecimals } from '@/utils/utils'
 
 const styles = () => ({
   rightAlign: {
@@ -25,35 +27,42 @@ const styles = () => ({
     paddingRight: 0,
     marginRight: 0,
   },
+  currencyValue: {
+    fontWeight: 500,
+    color: 'darkblue',
+  },
 })
 
 const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
-  const { invoicePaymentModes = [] } = values
+  const { invoicePaymentModes = [], invoice } = values
+  const { gstValue, gstAmount, totalAftGst, invoiceNo } = invoice
   return (
     <React.Fragment>
       <GridItem md={12}>
-        <h4 style={{ textAlign: 'center' }}>Invoice Summary: IVC0000111</h4>
+        <h4 style={{ textAlign: 'center' }}>Invoice Summary: {invoiceNo}</h4>
       </GridItem>
       <GridItem md={10}>
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>GST ({values.gstAmount}%)</h5>
+              <h5>GST ({roundToTwoDecimals(gstValue * 100)}%)</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5>${values.gstValue === 0 ? values.gstValue * 100 : 0}</h5>
+              <h5 className={classes.currencyValue}>
+                $ {roundToTwoDecimals(gstAmount)}
+              </h5>
             </GridItem>
             <GridItem md={6}>
               <h5>Final Bill</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5>{values.totalAftGst}</h5>
+              <h5 className={classes.currencyValue}>${totalAftGst}</h5>
             </GridItem>
             <GridItem md={6}>
               <h5 style={{ fontWeight: 500 }}>Total Claims</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5>$</h5>
+              <h5 className={classes.currencyValue}>$ {values.finalClaim}</h5>
             </GridItem>
             <GridItem md={12}>
               <Divider
@@ -68,7 +77,7 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
               <h5 style={{ fontWeight: 500 }}>Final Payable</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5>$</h5>
+              <h5 className={classes.currencyValue}>$ {values.finalPayable}</h5>
             </GridItem>
           </GridContainer>
         </CardContainer>
@@ -84,7 +93,7 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
                     <h5>{item.paymentMode}</h5>
                   </GridItem>
                   <GridItem md={6} className={classes.rightAlign}>
-                    <h5>${item.amt}</h5>
+                    <h5>$ {item.amt}</h5>
                   </GridItem>
                 </GridContainer>
               ))}

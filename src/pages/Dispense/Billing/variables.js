@@ -3,21 +3,26 @@ import moment from 'moment'
 import { NumberInput, FastField } from '@/components'
 
 export const ItemTableColumn = [
-  { name: 'name', title: 'Name' },
+  { name: 'itemCode', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
-  { name: 'payableAmount', title: 'Payable Amount ($)' },
+  { name: 'totalAfterGst', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
 ]
 
-export const ItemTableColumnExtensions = [
-  { columnName: 'payableAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
+export const ItemTableColumnExtensions = (index) => [
+  {
+    columnName: 'totalAftGst',
+    type: 'number',
+    currency: true,
+    format: '0.00',
+  },
+  // { columnName: 'claimAmount', type: 'currency', currency: true },
   {
     columnName: 'claimAmount',
     render: (row) => (
       <FastField
-        name={`claims[${row.rowIndex}]claimAmount`}
-        render={(args) => <NumberInput {...args} />}
+        name={`claims[${index}]${row.id}`}
+        render={(args) => <NumberInput {...args} currency />}
       />
     ),
   },
@@ -68,8 +73,8 @@ const generateClaimSequenceData = () => {
 export const ClaimSequenceData = generateClaimSequenceData()
 
 export const CoPayerColumns = [
-  { name: 'name', title: 'Name' },
-  { name: 'payableAmount', title: 'Payable Amount' },
+  { name: 'itemCode', title: 'Name' },
+  { name: 'totalAftGst', title: 'Payable Amount' },
   {
     name: 'claimAmount',
     title: 'Claim Amount',
@@ -77,7 +82,7 @@ export const CoPayerColumns = [
 ]
 
 export const CoPayerColExtensions = [
-  { columnName: 'payableAmount', type: 'currency', currency: true },
+  { columnName: 'totalAftGst', type: 'currency', currency: true },
   {
     columnName: 'claimAmount',
     // type: 'currency',

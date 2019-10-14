@@ -37,10 +37,19 @@ const VisitListingColumns = [
   { name: 'coPayerName', title: 'Copayer Name' },
 ]
 
-const InvoicePayerColumns = [
+const PastPaymentCollectionTableColumn = [
   // { name: 'invoicePayerDetail', title: 'Invoice Payer Detail' },
-  { name: 'coPayer', title: 'Copayer' },
+  { name: 'payerName', title: 'Payer Name' },
+  { name: 'doctorCode', title: 'Doctor' },
+  { name: 'invoiceNo', title: 'Invoice No' },
+  { name: 'invoiceDate', title: 'Invoice Date' },
+  { name: 'mode', title: 'Payment Mode' },
+  { name: 'invoiceAmt', title: 'Invoice Amt' },
   { name: 'coPayerPayable', title: 'Copayer Payable' },
+]
+
+const PastPaymentCollectionTableColumnExtension = [
+  { columnName: 'invoiceDate', type: 'date' },
 ]
 
 const fileName = 'Queue Listing Report'
@@ -50,7 +59,7 @@ const initialState = {
   isLoading: false,
   activePanel: -1,
   visitListingData: [],
-  invoicePayerData: [],
+  pastPaymentsCollection: [],
 }
 
 const reducer = (state, action) => {
@@ -107,6 +116,13 @@ const QueueListing = ({ values, validateForm }) => {
           id: `qListing-${index}-${item.visitReferenceNo}`,
         }),
       )
+      const pastPaymentsCollection = queueListingResult.PastInvoicePaymentDetails.map(
+        (item, index) => ({
+          ...item,
+          id: `qListing-${index}-${item.invoiceNo}`,
+        }),
+      )
+
       dispatch({
         type: 'updateState',
         payload: {
@@ -114,6 +130,7 @@ const QueueListing = ({ values, validateForm }) => {
           loaded: true,
           isLoading: false,
           visitListingData,
+          pastPaymentsCollection,
         },
       })
     } else {
@@ -168,11 +185,14 @@ const QueueListing = ({ values, validateForm }) => {
                   ),
                 },
                 {
-                  title: <AccordionTitle title='Invoice Payer' />,
+                  title: <AccordionTitle title='Past Payments Collection' />,
                   content: (
                     <ReportDataGrid
-                      data={state.invoicePayerData}
-                      columns={InvoicePayerColumns}
+                      data={state.pastPaymentsCollection}
+                      columns={PastPaymentCollectionTableColumn}
+                      columnExtensions={
+                        PastPaymentCollectionTableColumnExtension
+                      }
                     />
                   ),
                 },

@@ -120,7 +120,7 @@ const SessionSummary = ({ match }) => {
   }, [])
 
   const { sessionDetails } = state
-
+  console.log({ sessionDetails })
   return (
     <CardContainer hideHeader>
       <GridContainer>

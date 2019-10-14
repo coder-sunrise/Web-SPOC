@@ -6,7 +6,14 @@ import { GridItem, FastField, SizeContainer, NumberInput } from '@/components'
 // styling
 import styles from './styles'
 
-const PaymentSummary = ({ classes }) => (
+const PaymentSummary = ({
+  classes,
+  hasCash,
+  totalPayment,
+  collectableAmount,
+  cashReturned,
+  cashRounding,
+}) => (
   <React.Fragment>
     <GridItem md={6} className={classes.paymentSummary}>
       <h4>Outstanding balance after payment: $0.00</h4>
@@ -14,24 +21,15 @@ const PaymentSummary = ({ classes }) => (
     <GridItem md={6} container className={classes.paymentSummary}>
       <GridItem md={6}>Total Payment: </GridItem>
       <GridItem md={6}>
-        <FastField
-          name='totalPayment'
-          render={(args) => <NumberInput {...args} text currency />}
-        />
+        <NumberInput text currency value={totalPayment} />
       </GridItem>
       <GridItem md={6}>Cash Rounding: </GridItem>
       <GridItem md={6}>
-        <FastField
-          name='cashRounding'
-          render={(args) => <NumberInput {...args} text currency />}
-        />
+        <NumberInput value={cashRounding} text currency />
       </GridItem>
       <GridItem md={6}>Collectable Amount: </GridItem>
       <GridItem md={6}>
-        <FastField
-          name='collectableAmount'
-          render={(args) => <NumberInput {...args} text currency />}
-        />
+        <NumberInput value={collectableAmount} text currency />
       </GridItem>
       <GridItem md={6}>Cash Received: </GridItem>
       <GridItem md={3} />
@@ -42,6 +40,7 @@ const PaymentSummary = ({ classes }) => (
             <NumberInput
               style={{ textAlign: 'right' }}
               simple
+              disabled={!hasCash}
               currency
               size='sm'
               {...args}
@@ -51,10 +50,7 @@ const PaymentSummary = ({ classes }) => (
       </GridItem>
       <GridItem md={6}>Cash Returned: </GridItem>
       <GridItem md={6}>
-        <FastField
-          name='cashReturned'
-          render={(args) => <NumberInput {...args} text currency />}
-        />
+        <NumberInput value={cashReturned} text currency />
       </GridItem>
     </GridItem>
   </React.Fragment>

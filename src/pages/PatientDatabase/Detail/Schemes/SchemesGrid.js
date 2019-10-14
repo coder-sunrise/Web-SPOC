@@ -69,7 +69,7 @@ class SchemesGrid extends PureComponent {
               ctSchemeType.toLowerCase()
             ]
             const st = ctSchemeTypes.find((o) => o.id === val)
-            // console.log(st)
+            console.log('schemesgrid', { rows, st })
             const rs = rows.filter(
               (o) =>
                 !o.isDeleted &&
@@ -298,7 +298,7 @@ class SchemesGrid extends PureComponent {
 
       onCommitChanges: this.commitChanges,
     }
-
+    console.log({ props: this.props })
     return (
       <EditableTableGrid
         rows={this.getSortedRows(rows)}

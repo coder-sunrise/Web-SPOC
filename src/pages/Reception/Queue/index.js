@@ -22,7 +22,7 @@ import {
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
-import DetailsActionBar from './Filterbar'
+import DetailsActionBar from './FilterBar'
 import DetailsGrid from './Grid'
 import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'
@@ -90,6 +90,7 @@ class Queue extends React.Component {
   }
 
   componentWillMount = () => {
+    console.log('queue will mount')
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
     if (Object.keys(query).length === 0) {
@@ -168,6 +169,7 @@ class Queue extends React.Component {
   }
 
   toggleRegisterNewPatient = () => {
+    console.log('toggle register new patient')
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {
@@ -242,6 +244,7 @@ class Queue extends React.Component {
   }
 
   onEnterPressed = async (searchQuery) => {
+    console.log('on enter pressed')
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -262,6 +265,7 @@ class Queue extends React.Component {
   }
 
   showSearchResult = () => {
+    console.log('show search result')
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
 
