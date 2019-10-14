@@ -139,16 +139,17 @@ export default createFormViewModel({
       },
       *upsertWithStatusCode ({ payload }, { call }) {
         const r = yield call(service.upsertWithStatusCode, payload)
-        let message = r ? 'Saved' : 'Server busy. Please try again later.'
+        let message = r ? 'Saved' : ''
         if (r) {
           notification.success({
             message,
           })
-        } else {
-          notification.error({
-            message,
-          })
-        }
+        } 
+        // else {
+        //   notification.error({
+        //     message,
+        //   })
+        // }
         return r
       },
     },
