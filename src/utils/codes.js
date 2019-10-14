@@ -795,6 +795,7 @@ const tenantCodes = [
   // 'ctsnomeddiagnosis',
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
+  'ctMedicationFrequency',
 ]
 
 // const codes = [

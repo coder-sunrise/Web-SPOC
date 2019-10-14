@@ -331,6 +331,8 @@ class Modal extends PureComponent {
                     <NumberInput
                       label='Card Number'
                       onChange={(e) => this.handleMaxLengthCardNumber(e)}
+                      inputProps={{ maxLength: 4}}
+                      maxLength={4}
                       {...args}
                     />
                   )}

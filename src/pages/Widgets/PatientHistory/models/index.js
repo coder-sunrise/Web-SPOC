@@ -82,12 +82,9 @@ export default createListViewModel({
         })
       },
       *queryDone ({ payload }, { call, put, select, take }) {
-
-
         let sortedList = payload.data.data
         ? payload.data.data.filter((o) => o.coHistory.length >= 1)
         : ''
-
 
         if (sortedList.length > 0 ) {
           yield put({

@@ -377,6 +377,17 @@ const Grid = ({
         if (valid) {
           const version = Date.now()
           dispatch({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: 'ctservice',
+              filter: {
+                'serviceFKNavigation.IsActive': true,
+                combineCondition: 'or',
+              },
+            },
+          })
+
+          dispatch({
             type: `consultation/start`,
             payload: {
               id: row.visitFK,
