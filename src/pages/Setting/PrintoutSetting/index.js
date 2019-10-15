@@ -43,29 +43,25 @@ const styles = (theme) => ({
     printoutSetting.entity || printoutSetting.default,
 
   validationSchema: Yup.object().shape({
-    customLetterHeadHeight: Yup.number().required(),
-    standardHeaderInfoHeight: Yup.number().required(),
-    footerInfoHeight: Yup.number().required(),
-    footerDisclaimerHeight: Yup.number().required(),
+    customLetterHeadHeight: Yup.number().when('isDisplayCustomLetterHead', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
+    standardHeaderInfoHeight: Yup.number().when('isDisplayStandardHeader', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
+    footerInfoHeight: Yup.number().when('isDisplayFooterInfo', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
+    footerDisclaimerHeight: Yup.number().when('isDisplayFooterInfo', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
     customLetterHeadImage: Yup.string().required(),
   }),
-
   handleSubmit: (values, { props }) => {
-    // const { isEnableGST, GSTRegistrationNumber, gSTPercentage } = values
-    // const payload = [
-    //   {
-    //     settingKey: 'isEnableGST',
-    //     settingValue: isEnableGST,
-    //   },
-    //   {
-    //     settingKey: 'GSTRegistrationNumber',
-    //     settingValue: GSTRegistrationNumber,
-    //   },
-    //   {
-    //     settingKey: 'gSTPercentage',
-    //     settingValue: gSTPercentage,
-    //   },
-    // ]
     const { dispatch, history } = props
     const { customLetterHeadImage, footerDisclaimerImage } = values
     const noHeaderBase64 = (v) => {
