@@ -75,7 +75,7 @@ const styles = (theme) => ({
         customLetterHeadImage: noHeaderBase64(customLetterHeadImage),
         footerDisclaimerImage: noHeaderBase64(footerDisclaimerImage),
       },
-    }).then(history.push('/setting'))
+    })
   },
   displayName: 'printoutSettingInfo',
 })
