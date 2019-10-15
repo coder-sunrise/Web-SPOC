@@ -33,16 +33,16 @@ const Grid = ({ history }) => {
     },
     {
       columnName: 'coPayerType',
-      type: 'codeSelect',
-      code: 'ctCopayerType',
-      labelField: 'displayValue',
+      // type: 'codeSelect',
+      // code: 'ctCopayerType',
+      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.copayerTypeFK',
     },
     {
       columnName: 'coPayerName',
-      type: 'codeSelect',
-      code: 'ctCopayer',
-      labelField: 'displayValue',
+      // type: 'codeSelect',
+      // code: 'ctCopayer',
+      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.displayValue',
     },
     {
