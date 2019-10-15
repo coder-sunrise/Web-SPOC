@@ -610,8 +610,7 @@ export const updateCellValue = (
           abortEarly: false,
         },
       )
-      // console.log({ t2: window.$tempGridRow })
-      // console.log({ r })
+
       $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
       return ''
@@ -631,7 +630,7 @@ export const updateCellValue = (
       //   }
       // }
       // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
-      // console.log(er)
+
       const actualError = (er.inner || []).find((o) => o.path === columnName)
       return actualError ? actualError.message : ''
       // row._$error = true
