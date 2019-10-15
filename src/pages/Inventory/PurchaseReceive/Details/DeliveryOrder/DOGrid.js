@@ -4,12 +4,6 @@ import Edit from '@material-ui/icons/Edit'
 
 const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
   const { list } = deliveryOrderDetails
-  list.map((x) => {
-    x.total = 0
-    x.outstanding = 0
-    return x
-  })
-
   const editRow = (row, e) => {
     onEditDeliveryOrderClicked(row)
   }
@@ -22,7 +16,7 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
       columns={[
         { name: 'deliveryOrderDate', title: 'Delivery Order Date' },
         { name: 'deliveryOrderNo', title: 'Delivery Order No.' },
-        { name: 'total', title: 'Total Qty Received' },
+        { name: 'totalQty', title: 'Total Qty Received' },
         // { name: 'outstanding', title: 'Outstanding Qty' },
         { name: 'remark', title: 'Remarks' },
         {
@@ -36,7 +30,7 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
           type: 'date',
         },
         {
-          columnName: 'total',
+          columnName: 'totalQty',
           type: 'number',
         },
         // {

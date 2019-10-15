@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 // import { connect } from 'dva'
+import _ from 'lodash'
 import { formatMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import {
@@ -116,7 +117,7 @@ class index extends Component {
     let processedPayload = {}
     const isFormValid = await validateForm()
     let validation = false
-    if (isFormValid) {
+    if (!_.isEmpty(isFormValid)) {
       validation = false
     } else {
       switch (action) {
@@ -132,7 +133,8 @@ class index extends Component {
           processedPayload = this.processSubmitPayload(false, 2)
           break
         case poSubmitAction.COMPLETE:
-          //
+          dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+          processedPayload = this.processSubmitPayload(false, 6)
           break
         case poSubmitAction.PRINT:
           //
@@ -148,6 +150,10 @@ class index extends Component {
         },
       }).then((r) => {
         if (r) {
+          dispatch({
+            type: `formik/clean`,
+            payload: 'purchaseOrderDetails',
+          })
           history.push('/inventory/pr')
         }
       })
@@ -222,7 +228,11 @@ class index extends Component {
       if (!isSaveAction) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
       } else {
-        newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
+        if (purchaseOrderStatusFK === 6) {
+          newPurchaseOrderStatusFK = purchaseOrderStatusFK
+        } else {
+          newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
+        }
       }
 
       purchaseOrderItem = rows.map((x) => {
@@ -448,6 +458,8 @@ class index extends Component {
             <ProgressButton
               color='success'
               icon={null}
+              onClick={() =>
+                this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
               disabled={!isPOStatusFulfilled(poStatus)}
             >
               {formatMessage({

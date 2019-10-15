@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/podoPayment'
+import { notification } from '@/components'
 
 export default createFormViewModel({
   namespace: 'podoPayment',
@@ -55,6 +56,14 @@ export default createFormViewModel({
           payload: { ...payload },
         })
       },
+      *upsertPodoPayment ({ payload }, { call }) {
+        const r = yield call(service.updatePodoPayment, payload)
+        if (r === 204) {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return r
+      },
     },
     reducers: {
       setPodoPayment (state, { payload }) {
@@ -70,14 +79,20 @@ export default createFormViewModel({
           concurrencyToken,
         } = purchaseOrder
 
+        let totalPaidAmount = 0
         let newPurchaseOrderPayment
         if (purchaseOrderPayment.length >= 1) {
-          newPurchaseOrderPayment = purchaseOrderPayment.map((x) => {
-            return {
-              ...x.clinicPaymentDto,
-              ...x,
-            }
-          })
+          newPurchaseOrderPayment = purchaseOrderPayment
+            .filter((x) => x.clinicPaymentDto.isCancelled === false)
+            .map((x) => {
+              x.cpId = x.clinicPaymentDto.id
+              x.cpConcurrencyToken = x.clinicPaymentDto.concurrencyToken
+              totalPaidAmount += x.clinicPaymentDto.paymentAmount
+              return {
+                ...x.clinicPaymentDto,
+                ...x,
+              }
+            })
         }
 
         return {
@@ -87,7 +102,7 @@ export default createFormViewModel({
             purchaseOrderDate,
             totalAmount,
             purchaseOrderStatus,
-            outstandingAmount: totalAmount,
+            outstandingAmount: totalAmount - totalPaidAmount,
             supplierFK,
             purchaseOrderStatusFK,
             concurrencyToken,

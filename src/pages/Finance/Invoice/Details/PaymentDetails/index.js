@@ -68,7 +68,8 @@ class PaymentDetails extends Component {
   closeAddPaymentModal = () =>
     this.setState({ showAddPayment: false, selectedInvoicePayerFK: undefined })
 
-  closeAddCrNoteModal = () => this.setState({ showAddCrNote: false })
+  closeAddCrNoteModal = () =>
+    this.setState({ showAddCrNote: false, selectedInvoicePayerFK: undefined })
 
   closeWriteOffModal = () => {
     this.setState({ showWriteOff: false, selectedInvoicePayerFK: undefined })
@@ -84,14 +85,14 @@ class PaymentDetails extends Component {
     })
   }
 
-  onAddCrNoteClick = (payerType) => {
+  onAddCrNoteClick = (invoicePayerFK) => {
     const { dispatch, invoiceDetail, invoicePayment } = this.props
     dispatch({
       type: 'invoiceCreditNote/mapCreditNote',
       payload: {
-        invoicePayerFK: payerType,
-        invoiceDetail,
-        creditNote: invoicePayment.entity.creditNote || [],
+        invoicePayerFK,
+        invoiceDetail: invoiceDetail.entity || {},
+        invoicePaymentDetails: invoicePayment.entity || {},
       },
     })
 
@@ -173,8 +174,8 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    const { classes, invoiceDetail, values } = this.props
-    // const { paymentTxnList } = values
+    console.log('PaymentIndex', this.props)
+    const { classes, values } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -248,7 +249,7 @@ class PaymentDetails extends Component {
           onClose={this.closeAddCrNoteModal}
           maxWidth='lg'
         >
-          <AddCrNote />
+          <AddCrNote onRefresh={this.refresh} />
         </CommonModal>
 
         <CommonModal
