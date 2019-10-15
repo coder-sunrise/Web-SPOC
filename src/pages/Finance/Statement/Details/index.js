@@ -17,10 +17,17 @@ const styles = () => ({})
     const returnValue = statement.entity || statement.default
     const outstandingBalance =
       returnValue.totalAmount - returnValue.collectedAmount
+    let adminChargeValue = 0
+    if (returnValue.statementInvoice) {
+      returnValue.statementInvoice.forEach((o) => {
+        adminChargeValue += o.adminCharge
+      })
+    }
 
     return {
       ...returnValue,
       outstandingBalance,
+      adminChargeValue,
     }
   },
   validationSchema: Yup.object().shape({
