@@ -71,8 +71,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapAll',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
               {...args}
             />
           )}
@@ -85,8 +84,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapConsumables',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
               {...args}
             />
           )}
@@ -99,8 +97,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapMedications',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
               {...args}
             />
           )}
@@ -113,8 +110,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapVaccines',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
               {...args}
             />
           )}
@@ -127,8 +123,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapServices',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
               {...args}
             />
           )}
@@ -141,8 +136,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapPackages',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
               {...args}
             />
           )}
