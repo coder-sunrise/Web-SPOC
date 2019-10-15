@@ -48,7 +48,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='schemeTypeName'
+            name='schemeTypeFK'
             render={(args) => {
               return (
                 <CodeSelect
@@ -126,7 +126,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
               onClick={() => {
                 const {
                   name,
-                  schemeNameType,
+                  schemeTypeFK,
                   schemeCategory,
                   coPayerFK,
                   copayerTypeFK,
@@ -136,7 +136,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                   type: 'copaymentScheme/query',
                   payload: {
                     name,
-                    schemeNameType,
+                    schemeTypeFK,
                     schemeCategory,
                     coPayerFK,
                     'CopayerFKNavigation.copayerTypeFK': copayerTypeFK,
