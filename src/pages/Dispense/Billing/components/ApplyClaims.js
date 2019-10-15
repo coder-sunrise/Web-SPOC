@@ -175,6 +175,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       )
       const existed = curInvoiceItems.find((curItem) => curItem.id === item.id)
       let coverage = 0
+      let schemeCoverageType = 'percentage'
+      let schemeCoverage = 0
       if (scheme.coPaymentByItem.length > 0) {
         coverage = 0
       } else if (scheme.coPaymentByCategory.length > 0) {
@@ -185,7 +187,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           itemCategory.groupValueType.toLowerCase() === 'percentage'
             ? `${itemCategory.itemGroupValue}%`
             : `$${itemCategory.itemGroupValue}`
+        schemeCoverage = itemCategory.itemGroupValue
+        schemeCoverageType = itemCategory.groupValueType
       } else {
+        schemeCoverageType = scheme.overAllCoPaymentValueType
+        schemeCoverage = scheme.overAllCoPaymentValue
         coverage =
           scheme.overAllCoPaymentValueType.toLowerCase() === 'percentage'
             ? `${scheme.overAllCoPaymentValue}%`
@@ -198,6 +204,9 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           {
             ...existed,
             coverage,
+            schemeCoverageType,
+            schemeCoverage,
+            itemName: existed.itemDescription,
           },
         ]
 
@@ -206,6 +215,9 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         {
           ...item,
           coverage,
+          schemeCoverageType,
+          schemeCoverage,
+          itemName: item.itemDescription,
         },
       ]
     }, [])
@@ -339,6 +351,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       setFieldValue('finalClaim', finalClaim)
       setFieldValue('finalPayable', finalPayable)
       setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
+      setFieldValue('invoicePayers', tempInvoicePayer)
       handleIsEditing(hasEditing())
     },
     [

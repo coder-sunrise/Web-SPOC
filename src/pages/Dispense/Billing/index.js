@@ -111,6 +111,7 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
+    console.log({ values })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -176,7 +177,7 @@ class Billing extends Component {
             handleSubmit={this.handleAddPayment}
             invoice={{
               ...values.invoice,
-              finalPayable: 727.5,
+              finalPayable: values.finalPayable,
               outstandingBalance: values.outstandingBalance,
             }}
           />
