@@ -11,8 +11,8 @@ const Grid = ({ history }) => {
   ] = useState({
     columns: [
       { name: 'coPayerType', title: 'Co-Payer Type' },
-      { name: 'name', title: 'Scheme Name' },
       { name: 'code', title: 'Scheme Code' },
+      { name: 'name', title: 'Scheme Name' },
       { name: 'schemeTypeName', title: 'Scheme Type' },
       { name: 'coPayerName', title: 'Co-Payer Name' },
       { name: 'schemeCategoryName', title: 'Scheme Category' },
