@@ -164,6 +164,7 @@ const ItemList = ({
       {
         columnName: 'cpAmount',
         render: (row) => {
+          console.log('check', values.rows, Array.isArray(values.rows))
           return (
             <GridContainer>
               <GridItem xs={8}>
@@ -175,9 +176,12 @@ const ItemList = ({
                   name={`rows[${row.rowIndex}].itemValue`}
                   render={CPNumber(
                     undefined,
-                    Array.isArray(values.rows) && values.rows.length >= 1
-                      ? values.rows[row.rowIndex].itemValueType
-                      : 'ExactAmount',
+                    row.itemValueType === 'ExactAmount'
+                      ? 'ExactAmount'
+                      : 'Percentage',
+                    // Array.isArray(values.rows) && values.rows.length >= 1
+                    //   ? values.rows[row.rowIndex].itemValueType
+                    //   : 'ExactAmount',
                   )}
                 />
               </GridItem>

@@ -343,6 +343,7 @@ class AntdNumberInput extends React.PureComponent {
       extraCfg.formatter = (v) => {
         if (v === '') return ''
         if (!this.state.focused) {
+          if (v > 100) v = 100
           return numeral(v / 100).format(percentageFormat)
         }
         return v
