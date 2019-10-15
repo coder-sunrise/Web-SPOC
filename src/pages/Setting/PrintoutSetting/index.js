@@ -16,7 +16,9 @@ import {
   Switch,
   NumberInput,
   CodeSelect,
+  notification,
 } from '@/components'
+import { navigateDirtyCheck } from '@/utils/utils'
 import BrowseImage from './BrowseImage'
 import AuthorizedContext from '@/components/Context/Authorized'
 
@@ -111,12 +113,18 @@ class printoutSetting extends PureComponent {
             id: e,
           },
         })
-        .then(() => {
-          this.setState(() => {
-            return {
-              selected: true,
-            }
-          })
+        .then((v) => {
+          if (v) {
+            this.setState(() => {
+              return {
+                selected: true,
+              }
+            })
+          } else {
+            notification.warn({
+              message: 'No default setting for the selected report in database',
+            })
+          }
         })
     } else {
       this.setState(() => {
@@ -325,9 +333,7 @@ class printoutSetting extends PureComponent {
               <Button
                 color='danger'
                 authority='none'
-                onClick={() => {
-                  this.props.history.push('/setting')
-                }}
+                onClick={navigateDirtyCheck('/setting')}
               >
                 Cancel
               </Button>
