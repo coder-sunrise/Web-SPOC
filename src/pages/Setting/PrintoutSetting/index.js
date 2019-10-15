@@ -116,27 +116,31 @@ class printoutSetting extends PureComponent {
   }
 
   getSelectedReportSetting = (e) => {
+    console.log({ e })
     if (e) {
-      this.props
-        .dispatch({
-          type: 'printoutSetting/query',
-          payload: {
-            id: e,
-          },
-        })
-        .then((v) => {
-          if (v) {
-            this.setState(() => {
-              return {
-                selected: true,
-              }
-            })
-          } else {
-            notification.warn({
-              message: 'No default setting for the selected report in database',
-            })
-          }
-        })
+      navigateDirtyCheck(
+        this.props
+          .dispatch({
+            type: 'printoutSetting/query',
+            payload: {
+              id: e,
+            },
+          })
+          .then((v) => {
+            if (v) {
+              this.setState(() => {
+                return {
+                  selected: true,
+                }
+              })
+            } else {
+              notification.warn({
+                message:
+                  'No default setting for the selected report in database',
+              })
+            }
+          }),
+      )
     } else {
       this.setState(() => {
         return {
@@ -172,6 +176,7 @@ class printoutSetting extends PureComponent {
                     code='report'
                     {...args}
                     onChange={(e) => this.getSelectedReportSetting(e)}
+                    // onChange={(e) => this.getSelectedReportSetting(e)}
                   />
                 )}
               />

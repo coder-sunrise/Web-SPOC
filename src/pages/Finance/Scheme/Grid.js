@@ -15,7 +15,6 @@ const Grid = ({ history }) => {
       { name: 'name', title: 'Scheme Name' },
       { name: 'schemeTypeName', title: 'Scheme Type' },
       { name: 'coPayerName', title: 'Co-Payer Name' },
-      { name: 'schemeCategoryName', title: 'Scheme Category' },
       { name: 'isActive', title: 'Status' },
       { name: 'description', title: 'Description' },
       { name: 'action', title: 'Action' },

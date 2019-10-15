@@ -64,22 +64,6 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='schemeCategoryName'
-            render={(args) => {
-              return (
-                <CodeSelect
-                  label={formatMessage({
-                    id: 'finance.scheme.search.category',
-                  })}
-                  code='ctSchemeCategory'
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={6} md={4}>
-          <FastField
             name='coPayerFK'
             render={(args) => {
               return (
