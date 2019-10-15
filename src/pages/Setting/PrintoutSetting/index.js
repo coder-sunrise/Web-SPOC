@@ -17,6 +17,7 @@ import {
   NumberInput,
   CodeSelect,
   notification,
+  ProgressButton,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
 import BrowseImage from './BrowseImage'
@@ -31,6 +32,19 @@ const styles = (theme) => ({
   },
   indent: {
     paddingLeft: theme.spacing(2),
+  },
+
+  errorMsg: {
+    color: '#cf1322',
+    margin: 0,
+    fontSize: '0.75rem',
+    marginTop: 8,
+    minHeight: '1em',
+    textAlign: 'left',
+    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontWeight: 400,
+    lineHeight: '1em',
+    letterSpacing: '0.03333em',
   },
 })
 
@@ -65,7 +79,8 @@ const styles = (theme) => ({
     const { dispatch, history } = props
     const { customLetterHeadImage, footerDisclaimerImage } = values
     const noHeaderBase64 = (v) => {
-      return v.split(',')[1] || v
+      if (v) return v.split(',')[1] || v
+      return undefined
     }
 
     dispatch({
@@ -205,7 +220,7 @@ class printoutSetting extends PureComponent {
                   </GridItem>
                   <GridItem md={6}>
                     {letterHeadImgRequired && (
-                      <span style={{ color: 'red' }}>
+                      <span className={classes.errorMsg}>
                         Letter Head Image is required.
                       </span>
                     )}
@@ -334,9 +349,9 @@ class printoutSetting extends PureComponent {
                 Cancel
               </Button>
 
-              <Button color='primary' onClick={handleSubmit}>
+              <ProgressButton color='primary' onClick={handleSubmit}>
                 Save
-              </Button>
+              </ProgressButton>
             </div>
           </AuthorizedContext.Provider>
         </CardContainer>
