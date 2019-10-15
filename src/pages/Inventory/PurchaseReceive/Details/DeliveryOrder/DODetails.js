@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
+import _ from 'lodash'
 import Yup from '@/utils/yup'
 import {
   GridContainer,
@@ -67,7 +68,6 @@ const receivingDetailsSchema = Yup.object().shape({
         // batchNo: x.batchNo[0],
         // expiryDate: x.expiryDate,
         sortOrder: index + 1,
-        inventoryTransactionItemDto: {},
       }
     })
 
@@ -76,7 +76,7 @@ const receivingDetailsSchema = Yup.object().shape({
       payload: {
         ...restValues,
         sequence: list ? list.length + 1 : 1,
-        inventoryTransactionFK: 26, // Temporary hard code, will remove once Soe fix the API
+        // inventoryTransactionFK: 26, // Temporary hard code, will remove once Soe fix the API
         deliveryOrderStatusFK: 1, // Temporary hard code, will remove once Soe fix the API
         deliveryOrderItem,
       },
@@ -326,7 +326,6 @@ class DODetails extends PureComponent {
   onAddedRowsChange = (addedRows) => {
     let newAddedRows = addedRows
     if (addedRows.length > 0) {
-      
       if (!addedRows.isFocused) {
         const { onClickColumn, selectedItem } = this.state
         let tempRow = addedRows[0]
@@ -447,10 +446,10 @@ class DODetails extends PureComponent {
   }
 
   render () {
-    console.log(this.props)
+    console.log('DODetails', this.props)
     const isEditable = true
     const { props } = this
-    const { footer, values, theme } = props
+    const { footer, values, theme, refreshDeliveryOrder } = props
     const { rows } = values
 
     const tableParas = {
