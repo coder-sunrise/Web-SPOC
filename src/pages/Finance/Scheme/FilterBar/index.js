@@ -80,7 +80,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='coPayerName'
+            name='coPayerFK'
             render={(args) => {
               return (
                 <CodeSelect
@@ -96,7 +96,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='coPayerType'
+            name='copayerTypeFK'
             render={(args) => {
               return (
                 <CodeSelect
@@ -128,8 +128,8 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                   name,
                   schemeNameType,
                   schemeCategory,
-                  coPayerName,
-                  coPayerType,
+                  coPayerFK,
+                  copayerTypeFK,
                   isActive,
                 } = values
                 dispatch({
@@ -138,8 +138,8 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                     name,
                     schemeNameType,
                     schemeCategory,
-                    coPayerName,
-                    coPayerType,
+                    coPayerFK,
+                    'CopayerFKNavigation.copayerTypeFK': copayerTypeFK,
                     isActive,
                   },
                 })
