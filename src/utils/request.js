@@ -319,7 +319,13 @@ const request = (url, option, showNotification = true) => {
             }
             // console.log(codeMessage, response)
             let errorMsg = codeMessage[response.status]
-
+            console.log({ token })
+            if (response.status === 400 && token === null) {
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+              })
+              return false
+            }
             if (
               response.status === 401
               /* use this to bypass login on development mode */

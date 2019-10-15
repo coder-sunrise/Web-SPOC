@@ -2,7 +2,16 @@ import moment from 'moment'
 // common components
 import { NumberInput, FastField } from '@/components'
 
-export const ItemTableColumn = [
+export const SchemeInvoicePayerColumn = [
+  { name: 'rowIndex', title: 'No.' },
+  { name: 'itemCode', title: 'Name' },
+  { name: 'coverage', title: 'Coverage' },
+  { name: 'totalAfterGst', title: 'Payable Amount ($)' },
+  { name: 'claimAmount', title: 'Claim Amount ($)' },
+]
+
+export const CompanyInvoicePayerColumn = [
+  { name: 'rowIndex', title: 'No.' },
   { name: 'itemCode', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
   { name: 'totalAfterGst', title: 'Payable Amount ($)' },
@@ -74,7 +83,7 @@ export const ClaimSequenceData = generateClaimSequenceData()
 
 export const CoPayerColumns = [
   { name: 'itemCode', title: 'Name' },
-  { name: 'totalAftGst', title: 'Payable Amount' },
+  { name: 'totalAfterGst', title: 'Payable Amount' },
   {
     name: 'claimAmount',
     title: 'Claim Amount',
@@ -82,17 +91,20 @@ export const CoPayerColumns = [
 ]
 
 export const CoPayerColExtensions = [
-  { columnName: 'totalAftGst', type: 'currency', currency: true },
+  {
+    columnName: 'itemCode',
+    disabled: true,
+  },
+  {
+    columnName: 'totalAfterGst',
+    type: 'number',
+    currency: true,
+    disabled: true,
+  },
   {
     columnName: 'claimAmount',
-    // type: 'currency',
-    // currency: true,
-    render: (row) => (
-      <FastField
-        name={`coPayer[${row.rowIndex}]claimAmount`}
-        render={(args) => <NumberInput {...args} size='sm' />}
-      />
-    ),
+    type: 'number',
+    currency: true,
   },
 ]
 

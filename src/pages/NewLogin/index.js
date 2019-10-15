@@ -155,7 +155,7 @@ class NewLogin extends React.Component {
   }
 
   render () {
-    const { classes, login } = this.props
+    const { classes, login = { isInvalidLogin: false } } = this.props
     const { isInvalidLogin } = login
     const { cardAnimation } = this.state
     return (
