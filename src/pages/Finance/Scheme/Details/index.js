@@ -121,6 +121,7 @@ export default compose(
       name: Yup.string().required(),
       schemeCategoryFK: Yup.number().required(),
       copayerFK: Yup.number().required(),
+      coverageMaxCap: Yup.number().positive(),
     }),
     enableReinitialize: true,
     handleSubmit: (values, { props }) => {
