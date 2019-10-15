@@ -17,7 +17,7 @@ class CHAS extends React.Component {
     showSubmitClaimStatus: false,
     failedCount: 0,
     claimDetails: {},
-    activeTab: '4',
+    activeTab: '2',
   }
 
   openClaimDetails = () => this.setState({ showClaimDetails: true })
@@ -83,7 +83,7 @@ class CHAS extends React.Component {
         <Tabs
           style={{ marginTop: 20 }}
           activeKey={activeTab}
-          defaultActivekey='4'
+          defaultActivekey='2'
           onChange={this.onChangeTab}
           options={ClaimSubmissionChasTabOption(claimSubmissionActionProps)}
         />

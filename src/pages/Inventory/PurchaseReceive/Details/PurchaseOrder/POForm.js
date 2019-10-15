@@ -18,22 +18,22 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
   const setSupplierDetails = (opts) => {
     let conPerson
     let faxNo
-    let officeNo
+    let contactNo
     let address
 
     if (opts) {
       const { contactPerson, contact } = opts
-      const { faxContactNumber, officeContactNumber, contactAddress } = contact
+      const { faxContactNumber, mobileContactNumber, contactAddress } = contact
       const { street } = contactAddress[0]
       conPerson = contactPerson
       faxNo = faxContactNumber.number
-      officeNo = officeContactNumber.number
+      contactNo = mobileContactNumber.number
       address = street
     }
 
     setFieldValue(`${prefix}.contactPerson`, conPerson)
     setFieldValue(`${prefix}.faxNo`, faxNo)
-    setFieldValue(`${prefix}.contactNo`, officeNo)
+    setFieldValue(`${prefix}.contactNo`, contactNo)
     setFieldValue(`${prefix}.supplierAddress`, address)
   }
   return (

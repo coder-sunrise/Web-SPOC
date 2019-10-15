@@ -7,6 +7,7 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import styles from './styles'
 import {
   CommonTableGrid,
+  SizeContainer,
   Field,
   NumberInput,
   withFormikExtend,
@@ -48,10 +49,10 @@ class CollectPaymentModal extends PureComponent {
 
     if (rows || rows.length > 0) {
       rows.map((payment) => {
-        invoiceAmountSubTotal += payment.invoiceAmount
-        claimAmountSubTotal += payment.claimAmount
-        approvedAmountSubTotal += payment.approvedAmount
-        amountReceivedSubTotal += payment.amountReceived
+        invoiceAmountSubTotal += payment.invoiceAmount || 0
+        claimAmountSubTotal += payment.claimAmount || 0
+        approvedAmountSubTotal += payment.approvedAmount || 0
+        amountReceivedSubTotal += payment.amountReceived || 0
         return payment
       })
     }
@@ -70,111 +71,125 @@ class CollectPaymentModal extends PureComponent {
 
     return (
       <React.Fragment>
-        <CommonTableGrid
-          className={classes.colPayTableGrid}
-          rows={rows}
-          columns={CollectPaymentColumns}
-          columnExtensions={[
-            {
-              columnName: 'invoiceAmount',
-              type: 'currency',
-            },
-            {
-              columnName: 'claimAmount',
-              type: 'currency',
-            },
-            {
-              columnName: 'approvedAmount',
-              type: 'currency',
-            },
-            {
-              columnName: 'amountReceived',
-              render: (row) => {
-                return (
-                  <Field
-                    name={`rows[${row.rowIndex}].amountReceived`}
-                    render={(args) => {
-                      return (
-                        <NumberInput label={undefined} currency {...args} />
-                      )
-                    }}
-                  />
-                )
+        <GridContainer>
+          <CommonTableGrid
+            size='sm'
+            className={classes.colPayTableGrid}
+            rows={rows}
+            columns={CollectPaymentColumns}
+            columnExtensions={[
+              {
+                columnName: 'invoiceAmount',
+                type: 'currency',
               },
-            },
-          ]}
-          // {...CollectPaymentTableConfig}
-          FuncProps={{
-            pager: true,
-            summary: true,
-            summaryConfig: {
-              state: {
-                totalItems: [],
+              {
+                columnName: 'claimAmount',
+                type: 'currency',
               },
-              integrated: {
-                calculator: (type, r, getValue) => {
-                  return IntegratedSummary.defaultCalculator(type, r, getValue)
-                },
+              {
+                columnName: 'approvedAmount',
+                type: 'currency',
               },
-              row: {
-                messages: {},
-                totalRowComponent: (p) => {
-                  const {
-                    invoiceAmountSubTotal,
-                    claimAmountSubTotal,
-                    approvedAmountSubTotal,
-                    amountReceivedSubTotal,
-                  } = this.calculateSummarySubTotal()
-                  const newChildren = [
-                    <Table.Cell colSpan={4} key={1}>
-                      <span
-                        style={{
-                          float: 'right',
-                          fontWeight: 'bold',
+              {
+                columnName: 'amountReceived',
+                render: (row) => {
+                  return (
+                    <SizeContainer size='sm'>
+                      <FastField
+                        name={`rows[${row.rowIndex}].amountReceived`}
+                        render={(args) => {
+                          return (
+                            <NumberInput
+                              size='sm'
+                              label={undefined}
+                              currency
+                              {...args}
+                            />
+                          )
                         }}
-                      >
-                        Total:
-                      </span>
-                    </Table.Cell>,
-                    <Table.Cell colSpan={1} key={1}>
-                      <NumberInput
-                        value={invoiceAmountSubTotal}
-                        disabled
-                        currency
-                        {...amountProps}
                       />
-                    </Table.Cell>,
-                    <Table.Cell colSpan={1} key={1}>
-                      <NumberInput
-                        value={claimAmountSubTotal}
-                        disabled
-                        currency
-                        {...amountProps}
-                      />
-                    </Table.Cell>,
-                    <Table.Cell colSpan={1} key={1}>
-                      <NumberInput
-                        value={approvedAmountSubTotal}
-                        disabled
-                        currency
-                        {...amountProps}
-                      />
-                    </Table.Cell>,
-                    <Table.Cell colSpan={1} key={1}>
-                      <NumberInput
-                        value={amountReceivedSubTotal}
-                        disabled
-                        currency
-                        {...amountProps}
-                      />
-                    </Table.Cell>,
-                  ]
-                  return <Table.Row>{newChildren}</Table.Row>
+                    </SizeContainer>
+                  )
                 },
               },
-            },
-          }}
-        />
+            ]}
+            // {...CollectPaymentTableConfig}
+            FuncProps={{
+              pager: false,
+              summary: true,
+              summaryConfig: {
+                state: {
+                  totalItems: [],
+                },
+                integrated: {
+                  calculator: (type, r, getValue) => {
+                    return IntegratedSummary.defaultCalculator(
+                      type,
+                      r,
+                      getValue,
+                    )
+                  },
+                },
+                row: {
+                  messages: {},
+                  totalRowComponent: (p) => {
+                    const {
+                      invoiceAmountSubTotal,
+                      claimAmountSubTotal,
+                      approvedAmountSubTotal,
+                      amountReceivedSubTotal,
+                    } = this.calculateSummarySubTotal()
+                    const newChildren = [
+                      <Table.Cell colSpan={4} key={1}>
+                        <span
+                          style={{
+                            float: 'right',
+                            fontWeight: 'bold',
+                          }}
+                        >
+                          Total:
+                        </span>
+                      </Table.Cell>,
+                      <Table.Cell colSpan={1} key={1}>
+                        <NumberInput
+                          value={invoiceAmountSubTotal}
+                          disabled
+                          currency
+                          {...amountProps}
+                        />
+                      </Table.Cell>,
+                      <Table.Cell colSpan={1} key={1}>
+                        <NumberInput
+                          value={claimAmountSubTotal}
+                          disabled
+                          currency
+                          {...amountProps}
+                        />
+                      </Table.Cell>,
+                      <Table.Cell colSpan={1} key={1}>
+                        <NumberInput
+                          value={approvedAmountSubTotal}
+                          disabled
+                          currency
+                          {...amountProps}
+                        />
+                      </Table.Cell>,
+                      <Table.Cell colSpan={1} key={1}>
+                        <NumberInput
+                          value={amountReceivedSubTotal}
+                          disabled
+                          currency
+                          {...amountProps}
+                        />
+                      </Table.Cell>,
+                    ]
+                    return <Table.Row>{newChildren}</Table.Row>
+                  },
+                },
+              },
+            }}
+          />
+        </GridContainer>
         <GridContainer className={classes.paymentDetails}>
           <GridItem xs={4}>
             <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>

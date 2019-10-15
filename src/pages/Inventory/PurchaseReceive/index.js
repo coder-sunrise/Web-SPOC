@@ -32,6 +32,7 @@ const styles = (theme) => ({
   name: 'purchaseReceiveList',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseReceiveList }) => {
+    // console.log('purchaseReceiveList', purchaseReceiveList)
     return purchaseReceiveList
   },
 })
@@ -150,7 +151,7 @@ class PurchaseReceive extends Component {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, dispatch } = this.props
     const actionProps = {
       handleWriteOff: this.onWriteOffClick,
       handleDuplicatePO: this.onDuplicatePOClick,
@@ -171,7 +172,11 @@ class PurchaseReceive extends Component {
           loading={isLoading}
           text='Processing Write-Off...'
         >
-          <FilterBar actions={actionProps} {...this.props} />
+          <FilterBar
+            actions={actionProps}
+            dispatch={dispatch}
+            classes={classes}
+          />
           <PurchaseReceiveDataGrid
             selectedRows={selectedRows}
             actions={actionProps}

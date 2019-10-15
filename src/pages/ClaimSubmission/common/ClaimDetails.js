@@ -56,6 +56,11 @@ class ClaimDetails extends Component {
     })
   }
 
+  onSelectChange = (val) => {
+    const { setFieldValue } = this.props
+    setFieldValue('setFieldValue', val)
+  }
+
   render () {
     const {
       classes,
@@ -223,7 +228,7 @@ class ClaimDetails extends Component {
 
                       <Select
                         // value={this.state.selectedItems}
-                        allValue='0'
+                        // allValue='0'
                         mode='multiple'
                         options={[
                           { name: 'Chief Complaints', value: '1' },
@@ -233,8 +238,9 @@ class ClaimDetails extends Component {
                           { name: 'Orders', value: '5' },
                           { name: 'Invoice', value: '7' },
                         ]}
-                        // onChange={this.onSelectChange}
-                        maxTagCount={0}
+                        onChange={this.onSelectChange}
+                        maxTagCount={3}
+                        {...args}
                       />
                     )}
                   />

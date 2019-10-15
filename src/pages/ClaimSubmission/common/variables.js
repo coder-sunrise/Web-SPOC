@@ -1,6 +1,6 @@
 export const CollectPaymentColumns = [
   { name: 'invoiceNo', title: 'Invoice No' },
-  { name: 'referenceNo', title: 'Ref No.' },
+  { name: 'patientReferenceNo', title: 'Ref No.' },
   { name: 'patientAccountNo', title: 'Account No.' },
   { name: 'patientName', title: 'Patient Name' },
   { name: 'invoiceAmount', title: 'Invoice Amount' },
