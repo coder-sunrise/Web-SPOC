@@ -122,6 +122,7 @@ export default compose(
       schemeCategoryFK: Yup.number().required(),
       copayerFK: Yup.number().required(),
       coverageMaxCap: Yup.number().positive(),
+      effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     }),
     enableReinitialize: true,
     handleSubmit: (values, { props }) => {
