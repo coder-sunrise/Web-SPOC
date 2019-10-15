@@ -117,8 +117,8 @@ export default compose(
       return schemeDetail.entity ? schemeDetail.entity : schemeDetail.default
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
-      name: Yup.string().required(),
+      code: Yup.string().required().max(30),
+      name: Yup.string().required().max(100),
       schemeCategoryFK: Yup.number().required(),
       copayerFK: Yup.number().required(),
       coverageMaxCap: Yup.number().positive(),
