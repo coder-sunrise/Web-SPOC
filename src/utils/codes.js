@@ -12,6 +12,11 @@ const status = [
   { value: true, name: 'Active', color: 'green' },
 ]
 
+const statusString = [
+  { value: 'Inactive', name: 'Inactive', color: 'red' },
+  { value: 'Active', name: 'Active', color: 'green' },
+]
+
 const isAutoOrder = [
   { value: false, name: 'False' },
   { value: true, name: 'True' },
@@ -1267,6 +1272,7 @@ module.exports = {
   // countries,
   // schemes,
   status,
+  statusString,
   isAutoOrder,
   addressTypes,
   orderTypes,
