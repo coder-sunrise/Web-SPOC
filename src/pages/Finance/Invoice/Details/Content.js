@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import Printer from '@material-ui/icons/Print'
 // common components
-import { Button, NavPills } from '@/components'
+import { Button, Tabs } from '@/components'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
 import PaymentDetails from './PaymentDetails'
@@ -15,7 +15,7 @@ const Content = ({ classes, ...restProps }) => {
   const [
     active,
     setActive,
-  ] = useState(0)
+  ] = useState('1')
 
   const onTabChange = (event, activeTab) => {
     setActive(activeTab)
@@ -26,12 +26,36 @@ const Content = ({ classes, ...restProps }) => {
     [classes.hidden]: active !== 0,
   })
 
+  const addContent = (type) => {
+    switch (type) {
+      case 1:
+        return <InvoiceDetails {...restProps} />
+      case 2:
+        return <PaymentDetails invoiceDetail={restProps.values} />
+      default:
+        return <InvoiceDetails {...restProps} />
+    }
+  }
+
+  const InvoicePaymentTabOption = () => [
+    {
+      id: 1,
+      name: 'Invoice',
+      content: addContent(1),
+    },
+    {
+      id: 2,
+      name: 'Payment',
+      content: addContent(2),
+    },
+  ]
+
   return (
     <React.Fragment>
       <Button className={invoiceButtonClass} size='sm' color='primary' icon>
         <Printer />Print Invoice
       </Button>
-      <NavPills
+      {/* <NavPills
         color='primary'
         active={active}
         onChange={onTabChange}
@@ -45,6 +69,14 @@ const Content = ({ classes, ...restProps }) => {
             tabContent: <PaymentDetails invoiceDetail={restProps.values} />,
           },
         ]}
+      /> */}
+
+      <Tabs
+        style={{ marginTop: 20 }}
+        activeKey={active}
+        defaultActivekey='1'
+        onChange={(e) => setActive(e)}
+        options={InvoicePaymentTabOption()}
       />
     </React.Fragment>
   )

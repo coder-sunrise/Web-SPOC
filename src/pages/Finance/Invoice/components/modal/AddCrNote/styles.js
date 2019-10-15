@@ -5,6 +5,7 @@ export default (theme) => ({
   summary: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(2),
+    paddingRight: 80,
   },
   misc: {
     marginTop: theme.spacing(1),
