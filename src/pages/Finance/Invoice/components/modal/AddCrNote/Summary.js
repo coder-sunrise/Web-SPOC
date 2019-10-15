@@ -54,7 +54,7 @@ const Summary = ({ classes }) => {
             <GridItem md={1} />
           </GridItem> */}
 
-          <GridItem md={8} />
+          <GridItem md={9} />
           <GridItem md={3}>
             <FastField
               name='finalCredit'
@@ -71,7 +71,6 @@ const Summary = ({ classes }) => {
                 />
               )}
             />
-            <GridItem md={1} />
           </GridItem>
         </GridContainer>
       </React.Fragment>

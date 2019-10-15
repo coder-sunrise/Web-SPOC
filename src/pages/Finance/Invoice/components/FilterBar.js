@@ -40,7 +40,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='osBalanceStatus'
+              name='outstandingBalanceStatus'
               render={(args) => {
                 return (
                   <Select
@@ -77,16 +77,29 @@ const FilterBar = ({ classes, dispatch, values }) => {
                 invoiceNo,
                 patientName,
                 patientAccountNo,
-                // invoiceDates,
+                invoiceDates,
+                outstandingBalanceStatus,
               } = values
               dispatch({
                 type: 'invoiceList/query',
                 payload: {
-                  invoiceNo,
-                  patientName,
-                  patientAccountNo,
-                  // invoiceDateFrom: invoiceDates[0],
-                  // invoiceDateTo: invoiceDates[1],
+                  lgteql_invoiceDate: invoiceDates
+                    ? invoiceDates[0]
+                    : undefined,
+                  lsteql_invoiceDate: invoiceDates
+                    ? invoiceDates[1]
+                    : undefined,
+                  // apiCriteria: {
+                  //   OnlyWithDeposit: showTransactionOnly,
+                  // },
+                  group: [
+                    {
+                      invoiceNo,
+                      patientName,
+                      patientAccountNo,
+                      combineCondition: 'or',
+                    },
+                  ],
                 },
               })
             }}

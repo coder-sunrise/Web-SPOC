@@ -99,6 +99,12 @@ export default createFormViewModel({
         )
 
         addPaymentPayload = {
+          totalAmtPaid: 1, // Will be removed
+          // totalAmtPaid: 0,
+          // totalAmtPaid: 0,
+          // cashReceived: 0,
+          // cashReturned: 0,
+          paymentReceivedDate: moment().formatUTC(false),
           paymentReceivedByUserFK: userState.id,
           paymentReceivedBizSessionFK: bizSessionState.id,
           paymentCreatedBizSessionFK: bizSessionState.id,
@@ -133,6 +139,19 @@ export default createFormViewModel({
       },
       *submitVoidWriteOff ({ payload }, { call }) {
         const response = yield call(service.voidWriteOff, payload)
+        const { status } = response
+
+        if (status === '200') {
+          notification.success({
+            message: 'Saved',
+          })
+          return true
+        }
+
+        return false
+      },
+      *submitVoidCreditNote ({ payload }, { call }) {
+        const response = yield call(service.voidCreditNote, payload)
         const { status } = response
 
         if (status === '200') {

@@ -35,13 +35,18 @@ export default createFormViewModel({
     effects: {},
     reducers: {
       mapCreditNote (state, { payload }) {
-        const { invoicePayerFK, invoiceDetail, creditNote } = payload
-        const {
-          invoiceTotalAftGST,
-          totalPayment: creditNoteBalance,
-          invoiceItem,
-        } = invoiceDetail
+        const { invoicePayerFK, invoiceDetail, invoicePaymentDetails } = payload
+
+        const { invoiceTotalAftGST, invoiceItem } = invoiceDetail
         const sum = (a) => a.reduce((x, y) => x + y)
+
+        const filterInvPayment = invoicePaymentDetails.filter(
+          (x) => x.id === invoicePayerFK,
+        )
+
+        const creditNoteBalance = filterInvPayment[0].totalPaid
+        const { creditNote } = filterInvPayment[0]
+
         const filteredCreditNote = creditNote.filter(
           (x) => x.invoicePayerFK === invoicePayerFK && !x.isCancelled,
         )
@@ -55,40 +60,53 @@ export default createFormViewModel({
           }, [])
           .reduce(
             (itemSubtotal, item) =>
-              itemSubtotal[item.itemName] !== undefined
+              itemSubtotal[item.itemCode] !== undefined
                 ? {
                     ...itemSubtotal,
-                    [item.itemName]:
-                      itemSubtotal[item.itemName] + item.quantity,
+                    [item.itemCode]:
+                      itemSubtotal[item.itemCode] + item.quantity,
                   }
-                : { [item.itemName]: item.quantity },
+                : { [item.itemCode]: item.quantity },
             {},
           )
 
         const remainingItems = invoiceItem.map((item) => {
-          const pastItemQuantity = pastCreditNoteItems[item.itemName]
+          const pastItemQuantity = pastCreditNoteItems[item.itemCode]
           if (pastItemQuantity) {
             const remainingQty = item.quantity - pastItemQuantity
             return {
               ...item,
+              invoiceItemFK: item.id,
+              itemTypeFK: item.invoiceItemTypeFK,
               quantity: remainingQty,
               originRemainingQty: remainingQty,
               // totalAfterItemAdjustment: remaining quantity multiply unit price
-              totalAfterItemAdjustment: (item.quantity - pastItemQuantity) * 10,
+              totalAfterItemAdjustment:
+                (item.quantity - pastItemQuantity) * item.unitPrice,
             }
           }
-          return { ...item }
+          return {
+            ...item,
+            invoiceItemFK: item.id,
+            itemTypeFK: item.invoiceItemTypeFK,
+            originRemainingQty: item.quantity,
+            totalAfterItemAdjustment: item.quantity * item.unitPrice,
+          }
         })
 
-        const totalCreditNote = sum(
-          filteredCreditNote.map((x) => Number(x.totalAftGST)),
-        )
+        let totalCreditNote
+        totalCreditNote =
+          filteredCreditNote.length > 0
+            ? sum(filteredCreditNote.map((x) => Number(x.totalAftGST)))
+            : 0
 
         return {
           ...InitialCreditNote,
           invoicePayerFK,
           invoiceTotal: invoiceTotalAftGST,
-          creditNoteItem: remainingItems,
+          creditNoteItem: remainingItems
+            ? remainingItems.filter((x) => x.originRemainingQty > 0)
+            : [],
           creditNoteBalance: creditNoteBalance - totalCreditNote,
         }
       },

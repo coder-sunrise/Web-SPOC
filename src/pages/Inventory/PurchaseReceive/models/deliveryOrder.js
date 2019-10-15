@@ -65,25 +65,21 @@ export default createFormViewModel({
       },
       *getOutstandingPOItem ({ payload }, { call, put }) {
         const { rows, purchaseOrder } = payload
-        const { purchaseOrderStatusFK } = purchaseOrder
         let outstandingItem = []
-
-        // If PO status = Finalized, filter outstanding PO items
-        if (isPOStatusFinalized(purchaseOrderStatusFK)) {
-          const tempList = rows.filter(
-            (x) => x.totalQuantity - x.quantityReceived > 0,
-          )
-          if (!_.isEmpty(tempList)) {
-            outstandingItem = tempList.map((x) => {
-              return {
-                ...x,
-                orderQuantity: x.orderQuantity,
-                totalBonusReceived: x.bonusReceived,
-                currentReceivingQty: x.orderQuantity - x.quantityReceived,
-                currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
-              }
-            })
-          }
+        console.log('getOutstandingPOItem', rows)
+        const tempList = rows.filter(
+          (x) => x.totalQuantity - x.quantityReceived - x.bonusReceived > 0,
+        )
+        if (!_.isEmpty(tempList)) {
+          outstandingItem = tempList.map((x) => {
+            return {
+              ...x,
+              orderQuantity: x.orderQuantity,
+              totalBonusReceived: x.bonusReceived,
+              currentReceivingQty: x.orderQuantity - x.quantityReceived,
+              currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
+            }
+          })
         }
 
         return yield put({
@@ -139,14 +135,9 @@ export default createFormViewModel({
         const { deliveryOrderItem } = data
 
         const itemRows = deliveryOrderItem.map((x) => {
-          const itemType = podoOrderType.find(
-            (y) => y.value === x.inventoryTypeFK,
-          )
-
           return {
             ...x,
             uid: getUniqueId(),
-            // [itemType.itemFKName]: x[itemType.prop][itemType.itemFKName],
             type: x.inventoryTypeFK,
             code: x.inventoryItemFK,
             name: x.inventoryItemFK,
@@ -172,9 +163,21 @@ export default createFormViewModel({
       setOutstandingPOItem (state, { payload }) {
         const { outstandingItem, rows, purchaseOrder } = payload
         const { deliveryOrder } = purchaseOrder
+        let newDeliveryOrder = deliveryOrder.map((x) => {
+          let totalQty = 0
+          x.deliveryOrderItem.map((y) => {
+            totalQty += y.recevingQuantity + y.bonusQuantity
+          })
+
+          return {
+            ...x,
+            totalQty,
+          }
+        })
+
         return {
           ...state,
-          list: deliveryOrder,
+          list: newDeliveryOrder,
           purchaseOrderDetails: {
             purchaseOrder: { ...purchaseOrder },
             purchaseOrderItem: rows,

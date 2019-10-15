@@ -33,7 +33,8 @@ const PaymentActions = ({
       </Button>
       {type !== PayerType.GOVT_COPAYER && (
         <Button
-          onClick={() => handleAddCrNote(type)}
+          // onClick={() => handleAddCrNote(type)}
+          onClick={() => handleAddCrNote(invoicePayerFK)}
           disabled={!handleAddCrNote}
           {...ButtonProps}
         >

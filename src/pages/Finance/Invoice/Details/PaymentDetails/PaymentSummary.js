@@ -19,7 +19,7 @@ const PaymentSummary = ({ totalPaid = 0.0, outstanding = 0.0 }) => {
         <GridItem xs={6} md={12}>
           <NumberInput
             prefix='Total Paid:'
-            defaultValue={totalPaid}
+            value={totalPaid}
             size='sm'
             {...amountProps}
           />
@@ -27,7 +27,7 @@ const PaymentSummary = ({ totalPaid = 0.0, outstanding = 0.0 }) => {
         <GridItem xs={6} md={12}>
           <NumberInput
             prefix='Outstanding:'
-            defaultValue={outstanding}
+            value={outstanding}
             size='sm'
             {...amountProps}
           />

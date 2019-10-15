@@ -91,7 +91,9 @@ const FilterBar = ({
           name='invoiceStatus'
           render={(args) => {
             return (
-              <Select
+              <CodeSelect
+                code='LTInvoiceStatus'
+                labelField='name'
                 label={formatMessage({
                   id: 'inventory.pr.invoiceStatus',
                 })}
@@ -103,7 +105,7 @@ const FilterBar = ({
       </GridItem>
       <GridItem xs={6} md={3}>
         <FastField
-          name='supplier'
+          name='supplierFK'
           render={(args) => {
             return (
               <CodeSelect
@@ -120,10 +122,12 @@ const FilterBar = ({
       </GridItem>
       <GridItem xs={6} md={3}>
         <FastField
-          name='poStatus'
+          name='purchaseOrderStatus'
           render={(args) => {
             return (
-              <Select
+              <CodeSelect
+                code='LTPurchaseOrderStatus'
+                labelField='name'
                 label={formatMessage({
                   id: 'inventory.pr.poStatus',
                 })}
@@ -139,16 +143,32 @@ const FilterBar = ({
             color='primary'
             icon={null}
             onClick={() => {
-              // const {
-              //   purchaseOrderNo,
-              //   invoiceStatus,
-              //   transactionDates,
-              //   supplier,
-              //   poStatus,
-              // } = values
+              const {
+                purchaseOrderNo,
+                invoiceStatus,
+                purchaseOrderStatus,
+                transactionDates,
+                supplierFK,
+              } = values
               dispatch({
                 type: 'purchaseReceiveList/query',
-                // payload: {}
+                payload: {
+                  lgteql_purchaseOrderDate: transactionDates
+                    ? transactionDates[0]
+                    : undefined,
+                  lsteql_purchaseOrderDate: transactionDates
+                    ? transactionDates[1]
+                    : undefined,
+                  group: [
+                    {
+                      purchaseOrderNo,
+                      invoiceStatus,
+                      purchaseOrderStatus,
+                      supplierFK,
+                      combineCondition: 'or',
+                    },
+                  ],
+                },
               })
             }}
           >
