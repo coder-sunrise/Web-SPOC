@@ -31,7 +31,7 @@ const tabHeader = (tabName, detailsProps) => {
 export const SchemeDetailOption = (detailsProps) => [
   {
     id: 0,
-    name: tabHeader('Detail', detailsProps),
+    name: tabHeader('Details', detailsProps),
     content: addContent(1, detailsProps),
   },
   {
