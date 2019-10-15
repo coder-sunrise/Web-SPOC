@@ -10,6 +10,7 @@ import {
   GridContainer,
   GridItem,
   notification,
+  CardContainer,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // sub components
@@ -96,11 +97,17 @@ class RejectedCHAS extends React.Component {
       dispatch,
       values,
     } = this.props
-    const { isLoading } = this.state
+    const { isLoading, selectedRows } = this.state
     const { list } = claimSubmissionRejected || []
 
     return (
-      <React.Fragment>
+      <CardContainer
+        hideHeader
+        style={{
+          marginLeft: 5,
+          marginRight: 5,
+        }}
+      >
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
@@ -130,6 +137,7 @@ class RejectedCHAS extends React.Component {
               <ProgressButton
                 icon={null}
                 color='primary'
+                disabled={selectedRows.length <= 0}
                 onClick={this.onReSubmitClaimClicked}
               >
                 Re-Submit Claim
@@ -137,7 +145,7 @@ class RejectedCHAS extends React.Component {
             </GridItem>
           </LoadingWrapper>
         </GridContainer>
-      </React.Fragment>
+      </CardContainer>
     )
   }
 }
