@@ -39,10 +39,12 @@ class Grid extends PureComponent {
       dispatch({
         type: 'settingClinicService/updateState',
         payload: {
-          showModal: true,
+          // showModal: true,
           entity: serviceInfo,
         },
       })
+
+      this.props.toggleModal()
     }
   }
 
