@@ -69,6 +69,7 @@ class ClaimDetails extends Component {
       renderClaimDetails,
       values,
       codetable,
+      allowEdit,
     } = this.props
     const { ctgender = [] } = codetable
     const {
@@ -218,6 +219,7 @@ class ClaimDetails extends Component {
                     name='diagnosisList'
                     render={(args) => (
                       <Select
+                        disabled={!allowEdit}
                         maxSelected={maxDiagnosisSelectionCount}
                         mode='multiple'
                         options={[
@@ -257,7 +259,7 @@ class ClaimDetails extends Component {
               <Button color='danger' onClick={onClose}>
                 Close
               </Button>
-              {values.status !== 'Draft' ? (
+              {allowEdit ? (
                 <Button color='primary' onClick={onConfirm}>
                   Save
                 </Button>

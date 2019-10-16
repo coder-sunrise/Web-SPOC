@@ -123,7 +123,8 @@ class NewCHAS extends React.Component {
                 tableConfig={TableConfig}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
-                onContextMenuItemClick={handleContextMenuItemClick}
+                onContextMenuItemClick={(row, id) =>
+                  handleContextMenuItemClick(row, id, true)}
               />
             </GridItem>
             <GridItem md={4} className={classes.buttonGroup}>

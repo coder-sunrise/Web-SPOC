@@ -34,10 +34,12 @@ import { podoOrderType } from '@/utils/codes'
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
-      supplierFK: Yup.number().required(),
+      supplierFK: Yup.string().required(),
       purchaseOrderDate: Yup.date().required(),
     }),
+    rows: Yup.array().required('At least one item is required.'),
   }),
+  handleSubmit: (values, { props }) => {},
 })
 class index extends Component {
   state = {
@@ -120,6 +122,7 @@ class index extends Component {
     let validation = false
     if (!_.isEmpty(isFormValid)) {
       validation = false
+      this.props.handleSubmit()
     } else {
       switch (action) {
         case poSubmitAction.SAVE:
@@ -400,12 +403,18 @@ class index extends Component {
   }
 
   render () {
-    const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
+    // console.log('PORender', this.props)
+    const {
+      purchaseOrderDetails,
+      values,
+      dispatch,
+      setFieldValue,
+    } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
     const { IsGSTEnabled } = purchaseOrder || false
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div>
         <POForm isReadOnly={!isPOStatusDraft(poStatus)} {...this.props} />
