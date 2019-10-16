@@ -287,6 +287,7 @@ class GlobalModalContainer extends PureComponent {
               : undefined,
           }}
           onClose={(e) => {
+            global.onConfirmClose ? global.onConfirmClose() : null
             clearTimeout(this._timer)
             dispatch({
               type: 'global/updateAppState',

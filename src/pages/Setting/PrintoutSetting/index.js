@@ -48,8 +48,10 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ printoutSetting }) => ({
+@connect(({ printoutSetting, formik, global }) => ({
   printoutSetting,
+  formik,
+  global,
 }))
 @withFormikExtend({
   enableReinitialize: true,
@@ -95,7 +97,7 @@ const styles = (theme) => ({
   displayName: 'printoutSettingInfo',
 })
 class printoutSetting extends PureComponent {
-  state = { selected: !!this.props.values.reportFK }
+  state = { selected: !!this.props.values.reportFK, prevSelectedIndex: '' }
 
   componentDidMount = () => {
     this.props.dispatch({
@@ -115,32 +117,53 @@ class printoutSetting extends PureComponent {
     )
   }
 
+  checkFormIsDirty = (e) => {
+    const { formik, dispatch, setFieldValue } = this.props
+    if (formik.printoutSettingInfo.dirty) {
+      dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmContent: 'Are you sure want to discard the changes?',
+          onConfirmDiscard: () => {
+            this.getSelectedReportSetting(e)
+          },
+          onConfirmClose: () => {
+            setFieldValue('reportFK', this.state.prevSelectedIndex)
+          },
+
+          openConfirmText: 'Discard Changes',
+        },
+      })
+    } else {
+      this.getSelectedReportSetting(e)
+    }
+  }
+
   getSelectedReportSetting = (e) => {
-    console.log({ e })
     if (e) {
-      navigateDirtyCheck(
-        this.props
-          .dispatch({
-            type: 'printoutSetting/query',
-            payload: {
-              id: e,
-            },
-          })
-          .then((v) => {
-            if (v) {
-              this.setState(() => {
-                return {
-                  selected: true,
-                }
-              })
-            } else {
-              notification.warn({
-                message:
-                  'No default setting for the selected report in database',
-              })
+      const { dispatch } = this.props
+
+      dispatch({
+        type: 'printoutSetting/query',
+        payload: {
+          id: e,
+        },
+      }).then((v) => {
+        if (v) {
+          this.setState(() => {
+            return {
+              selected: true,
             }
-          }),
-      )
+          })
+        } else {
+          notification.warn({
+            message: 'No default setting for the selected report in database',
+          })
+        }
+      })
+
+      this.setState({ prevSelectedIndex: e })
     } else {
       this.setState(() => {
         return {
@@ -175,8 +198,7 @@ class printoutSetting extends PureComponent {
                     label='Select Printout'
                     code='report'
                     {...args}
-                    onChange={(e) => this.getSelectedReportSetting(e)}
-                    // onChange={(e) => this.getSelectedReportSetting(e)}
+                    onChange={(e) => this.checkFormIsDirty(e)}
                   />
                 )}
               />
