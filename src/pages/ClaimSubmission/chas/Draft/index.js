@@ -6,7 +6,12 @@ import { withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common components
 import NearMe from '@material-ui/icons/NearMe'
-import { ProgressButton, GridContainer, GridItem } from '@/components'
+import {
+  ProgressButton,
+  GridContainer,
+  GridItem,
+  CardContainer,
+} from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -65,7 +70,13 @@ class DraftCHAS extends React.Component {
     const { list } = claimSubmissionDraft || []
 
     return (
-      <React.Fragment>
+      <CardContainer
+        hideHeader
+        style={{
+          marginLeft: 5,
+          marginRight: 5,
+        }}
+      >
         <BaseSearchBar
           hideInvoiceDate
           dispatch={dispatch}
@@ -94,7 +105,7 @@ class DraftCHAS extends React.Component {
             </ProgressButton>
           </GridItem>
         </GridContainer>
-      </React.Fragment>
+      </CardContainer>
     )
   }
 }

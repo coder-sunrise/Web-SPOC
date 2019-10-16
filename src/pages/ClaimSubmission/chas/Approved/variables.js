@@ -51,15 +51,15 @@ export const NewCHASColumns = [
     title: 'Submission Date',
   },
   {
-    name: 'claimStatus',
+    name: 'chasClaimStatusDescription',
     title: 'Claim Status',
   },
   {
-    name: 'claimAmount',
+    name: 'approvedAmount',
     title: 'Approved Amt.',
   },
   {
-    name: 'collectedAmount',
+    name: 'collectedPayment',
     title: 'Collected Amt.',
   },
   {

@@ -11,13 +11,12 @@ export default createListViewModel({
     service,
     state: {
       list: [],
-      default: {
-        purchaseOrderNo: '',
+      filterSearch: {
+        isAllDateChecked: false,
         transactionDates: [
-          // moment().format('YYYY-MM-01'),
-          // moment(),
+          moment().format('YYYY-MM-01'),
+          moment(),
         ],
-        // allDate: false,
       },
     },
     subscriptions: ({ dispatch, history }) => {},

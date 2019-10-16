@@ -12,6 +12,7 @@ import {
   GridItem,
   notification,
   ProgressButton,
+  CardContainer,
 } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
@@ -100,7 +101,13 @@ class SubmittedCHAS extends React.Component {
     const { list } = claimSubmissionSubmitted || []
 
     return (
-      <React.Fragment>
+      <CardContainer
+        hideHeader
+        style={{
+          marginLeft: 5,
+          marginRight: 5,
+        }}
+      >
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
@@ -130,7 +137,7 @@ class SubmittedCHAS extends React.Component {
             </GridItem>
           </LoadingWrapper>
         </GridContainer>
-      </React.Fragment>
+      </CardContainer>
     )
   }
 }

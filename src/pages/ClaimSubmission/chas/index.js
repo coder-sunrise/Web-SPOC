@@ -1,15 +1,11 @@
 import React from 'react'
 import { connect } from 'dva'
 // common components
-import { CommonModal, CardContainer, NavPills } from '@/components'
+import { CommonModal, Tabs } from '@/components'
 // sub components
-import Draft from './Draft'
-import New from './New'
-import Submitted from './Submitted'
-import Approved from './Approved'
-import Rejected from './Rejected'
 import ClaimDetails from '../common/ClaimDetails'
 import SubmitClaimStatus from '../common/SubmitClaimStatus'
+import { ClaimSubmissionChasTabOption } from './variables'
 
 @connect(({ claimSubmission, global }) => ({
   claimSubmission,
@@ -21,6 +17,7 @@ class CHAS extends React.Component {
     showSubmitClaimStatus: false,
     failedCount: 0,
     claimDetails: {},
+    activeTab: '2',
   }
 
   openClaimDetails = () => this.setState({ showClaimDetails: true })
@@ -63,6 +60,10 @@ class CHAS extends React.Component {
     }
   }
 
+  onChangeTab = (e) => {
+    this.setState({ activeTab: e })
+  }
+
   render () {
     const {
       showClaimDetails,
@@ -70,9 +71,23 @@ class CHAS extends React.Component {
       failedCount,
       claimDetails,
     } = this.state
+    const claimSubmissionActionProps = {
+      handleContextMenuItemClick: this.handleContextMenuItemClick,
+      handleSubmitClaimStatus: this.openSubmitClaimStatus,
+    }
+    const { activeTab } = this.state
+
     return (
-      <CardContainer hideHeader size='sm'>
-        <NavPills
+      // <CardContainer hideHeader size='sm'>
+      <React.Fragment>
+        <Tabs
+          style={{ marginTop: 20 }}
+          activeKey={activeTab}
+          defaultActivekey='2'
+          onChange={this.onChangeTab}
+          options={ClaimSubmissionChasTabOption(claimSubmissionActionProps)}
+        />
+        {/* <NavPills
           active={1}
           tabs={[
             {
@@ -117,7 +132,7 @@ class CHAS extends React.Component {
               ),
             },
           ]}
-        />
+        /> */}
         <CommonModal
           title='Claim Details'
           open={showClaimDetails}
@@ -136,7 +151,8 @@ class CHAS extends React.Component {
         >
           <SubmitClaimStatus count={failedCount} />
         </CommonModal>
-      </CardContainer>
+      </React.Fragment>
+      // </CardContainer>
     )
   }
 }

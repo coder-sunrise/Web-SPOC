@@ -221,7 +221,8 @@ class Service extends PureComponent {
                     onChange={() =>
                       setTimeout(() => {
                         this.getServiceCenterService()
-                      }, 1)}
+                      }, 1)
+                    }
                     {...args}
                   />
                 )

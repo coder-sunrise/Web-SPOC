@@ -56,6 +56,11 @@ class ClaimDetails extends Component {
     })
   }
 
+  onSelectChange = (val) => {
+    const { setFieldValue } = this.props
+    setFieldValue('setFieldValue', val)
+  }
+
   render () {
     const {
       classes,
@@ -211,14 +216,31 @@ class ClaimDetails extends Component {
                   <FastField
                     name='diagnosis'
                     render={(args) => (
+                      // <Select
+                      //   {...args}
+                      //   disabled={values.status === 'Draft'}
+                      //   label='Diagnosis'
+                      //   options={[
+                      //     { name: 'Asthma', value: 'asthma' },
+                      //     { name: 'Hypertension', value: 'hypertension' },
+                      //   ]}
+                      // />
+
                       <Select
-                        {...args}
-                        disabled={values.status === 'Draft'}
-                        label='Diagnosis'
+                        // value={this.state.selectedItems}
+                        // allValue='0'
+                        mode='multiple'
                         options={[
-                          { name: 'Asthma', value: 'asthma' },
-                          { name: 'Hypertension', value: 'hypertension' },
+                          { name: 'Chief Complaints', value: '1' },
+                          { name: 'Plan', value: '2' },
+                          { name: 'Diagnosis', value: '3' },
+                          { name: 'Consultation Document', value: '4' },
+                          { name: 'Orders', value: '5' },
+                          { name: 'Invoice', value: '7' },
                         ]}
+                        onChange={this.onSelectChange}
+                        maxTagCount={3}
+                        {...args}
                       />
                     )}
                   />
