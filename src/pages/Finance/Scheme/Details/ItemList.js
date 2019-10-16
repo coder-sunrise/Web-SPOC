@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Delete from '@material-ui/icons/Delete'
 import { Tooltip } from '@material-ui/core'
 import {
@@ -21,6 +21,7 @@ const ItemList = ({
   setFieldValue,
   dispatch,
   values,
+  setValues,
   // ...props
 }) => {
   function callback (key) {
@@ -37,6 +38,20 @@ const ItemList = ({
     setFieldValue('tempSelectedItemSellingPrice', '')
     setFieldValue('tempSelectedItemTotalPrice', '')
   }
+
+  const [
+    itemList,
+    setItemList,
+  ] = useState(values.rows)
+
+  useEffect(
+    () => {
+      setItemList(values.rows)
+    },
+    [
+      values,
+    ],
+  )
 
   const onClickAdd = (type) => {
     const itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
@@ -175,9 +190,12 @@ const ItemList = ({
                   name={`rows[${row.rowIndex}].itemValue`}
                   render={CPNumber(
                     undefined,
-                    Array.isArray(values.rows) && values.rows.length >= 1
-                      ? values.rows[row.rowIndex].itemValueType
-                      : 'ExactAmount',
+                    row.itemValueType === 'ExactAmount'
+                      ? 'ExactAmount'
+                      : 'Percentage',
+                    // Array.isArray(values.rows) && values.rows.length >= 1
+                    //   ? values.rows[row.rowIndex].itemValueType
+                    //   : 'ExactAmount',
                   )}
                 />
               </GridItem>
@@ -197,13 +215,23 @@ const ItemList = ({
         render: (row) => {
           return (
             <Popconfirm
-              onConfirm={() =>
-                dispatch({
-                  type: 'schemeDetail/deleteRow',
-                  payload: {
-                    id: row.uid,
-                  },
-                })}
+              onConfirm={() => {
+                const deletedRow = itemList.find((o) => o.itemFK === row.itemFK)
+                if (deletedRow) {
+                  deletedRow.isDeleted = true
+                }
+                const newRows = itemList.filter(
+                  (o) => o.isDeleted === false || o.isDeleted === undefined,
+                )
+                setItemList(newRows)
+
+                // dispatch({
+                //   type: 'schemeDetail/deleteRow',
+                //   payload: {
+                //     id: row.uid,
+                //   },
+                // })
+              }}
               // onConfirm={() => onClickDelete(row)}
             >
               <Tooltip title='Delete'>
@@ -228,7 +256,7 @@ const ItemList = ({
     <div>
       <Tabs defaultActiveKey='1' options={options()} onChange={callback} />
 
-      <CommonTableGrid rows={values.rows} {...tableConfigs} />
+      <CommonTableGrid rows={itemList} {...tableConfigs} />
     </div>
   )
 }

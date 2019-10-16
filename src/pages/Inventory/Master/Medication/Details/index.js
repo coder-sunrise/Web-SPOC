@@ -198,7 +198,7 @@ export default compose(
       }
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
+      // code: Yup.string().required(),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),

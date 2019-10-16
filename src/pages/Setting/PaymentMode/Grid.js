@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react'
-
-import { CommonTableGrid, Button } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import * as service from './services'
+import { Tooltip } from '@material-ui/core'
+import { status } from '@/utils/codes'
+import { CommonTableGrid, Button } from '@/components'
 
 class Grid extends PureComponent {
   configs = {
@@ -21,31 +18,37 @@ class Grid extends PureComponent {
       },
     ],
     columnExtensions: [
-      // {
-      //   columnName: 'paymentCharges',
-      //   type: 'number',
-      // },
+      {
+        columnName: 'paymentCharges',
+        // type: 'number',
+        width: 200,
+      },
       {
         columnName: 'isActive',
         sortingEnabled: false,
         type: 'select',
         options: status,
+        width: 120,
+        align: 'center',
       },
       {
         columnName: 'action',
         align: 'center',
         render: (row) => {
           return (
-            <Button
-              size='sm'
-              onClick={() => {
-                this.editRow(row)
-              }}
-              justIcon
-              color='primary'
-            >
-              <Edit />
-            </Button>
+            <Tooltip title='Edit Payment Mode' placement='bottom'>
+              <Button
+                size='sm'
+                onClick={() => {
+                  this.editRow(row)
+                }}
+                justIcon
+                color='primary'
+                style={{ marginRight: 0 }}
+              >
+                <Edit />
+              </Button>
+            </Tooltip>
           )
         },
       },

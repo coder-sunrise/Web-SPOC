@@ -16,7 +16,10 @@ import {
   Switch,
   NumberInput,
   CodeSelect,
+  notification,
+  ProgressButton,
 } from '@/components'
+import { navigateDirtyCheck } from '@/utils/utils'
 import BrowseImage from './BrowseImage'
 import AuthorizedContext from '@/components/Context/Authorized'
 
@@ -30,6 +33,19 @@ const styles = (theme) => ({
   indent: {
     paddingLeft: theme.spacing(2),
   },
+
+  errorMsg: {
+    color: '#cf1322',
+    margin: 0,
+    fontSize: '0.75rem',
+    marginTop: 8,
+    minHeight: '1em',
+    textAlign: 'left',
+    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontWeight: 400,
+    lineHeight: '1em',
+    letterSpacing: '0.03333em',
+  },
 })
 
 @connect(({ printoutSetting }) => ({
@@ -41,33 +57,30 @@ const styles = (theme) => ({
     printoutSetting.entity || printoutSetting.default,
 
   validationSchema: Yup.object().shape({
-    customLetterHeadHeight: Yup.number().required(),
-    standardHeaderInfoHeight: Yup.number().required(),
-    footerInfoHeight: Yup.number().required(),
-    footerDisclaimerHeight: Yup.number().required(),
+    customLetterHeadHeight: Yup.number().when('isDisplayCustomLetterHead', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
+    standardHeaderInfoHeight: Yup.number().when('isDisplayStandardHeader', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
+    footerInfoHeight: Yup.number().when('isDisplayFooterInfo', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
+    footerDisclaimerHeight: Yup.number().when('isDisplayFooterInfo', {
+      is: (v) => v === true,
+      then: Yup.number().required(),
+    }),
     customLetterHeadImage: Yup.string().required(),
   }),
-
   handleSubmit: (values, { props }) => {
-    // const { isEnableGST, GSTRegistrationNumber, gSTPercentage } = values
-    // const payload = [
-    //   {
-    //     settingKey: 'isEnableGST',
-    //     settingValue: isEnableGST,
-    //   },
-    //   {
-    //     settingKey: 'GSTRegistrationNumber',
-    //     settingValue: GSTRegistrationNumber,
-    //   },
-    //   {
-    //     settingKey: 'gSTPercentage',
-    //     settingValue: gSTPercentage,
-    //   },
-    // ]
     const { dispatch, history } = props
     const { customLetterHeadImage, footerDisclaimerImage } = values
     const noHeaderBase64 = (v) => {
-      return v.split(',')[1] || v
+      if (v) return v.split(',')[1] || v
+      return undefined
     }
 
     dispatch({
@@ -77,7 +90,7 @@ const styles = (theme) => ({
         customLetterHeadImage: noHeaderBase64(customLetterHeadImage),
         footerDisclaimerImage: noHeaderBase64(footerDisclaimerImage),
       },
-    }).then(history.push('/setting'))
+    })
   },
   displayName: 'printoutSettingInfo',
 })
@@ -103,21 +116,31 @@ class printoutSetting extends PureComponent {
   }
 
   getSelectedReportSetting = (e) => {
+    console.log({ e })
     if (e) {
-      this.props
-        .dispatch({
-          type: 'printoutSetting/query',
-          payload: {
-            id: e,
-          },
-        })
-        .then(() => {
-          this.setState(() => {
-            return {
-              selected: true,
-            }
+      navigateDirtyCheck(
+        this.props
+          .dispatch({
+            type: 'printoutSetting/query',
+            payload: {
+              id: e,
+            },
           })
-        })
+          .then((v) => {
+            if (v) {
+              this.setState(() => {
+                return {
+                  selected: true,
+                }
+              })
+            } else {
+              notification.warn({
+                message:
+                  'No default setting for the selected report in database',
+              })
+            }
+          }),
+      )
     } else {
       this.setState(() => {
         return {
@@ -153,6 +176,7 @@ class printoutSetting extends PureComponent {
                     code='report'
                     {...args}
                     onChange={(e) => this.getSelectedReportSetting(e)}
+                    // onChange={(e) => this.getSelectedReportSetting(e)}
                   />
                 )}
               />
@@ -201,7 +225,7 @@ class printoutSetting extends PureComponent {
                   </GridItem>
                   <GridItem md={6}>
                     {letterHeadImgRequired && (
-                      <span style={{ color: 'red' }}>
+                      <span className={classes.errorMsg}>
                         Letter Head Image is required.
                       </span>
                     )}
@@ -325,16 +349,14 @@ class printoutSetting extends PureComponent {
               <Button
                 color='danger'
                 authority='none'
-                onClick={() => {
-                  this.props.history.push('/setting')
-                }}
+                onClick={navigateDirtyCheck('/setting')}
               >
                 Cancel
               </Button>
 
-              <Button color='primary' onClick={handleSubmit}>
+              <ProgressButton color='primary' onClick={handleSubmit}>
                 Save
-              </Button>
+              </ProgressButton>
             </div>
           </AuthorizedContext.Provider>
         </CardContainer>

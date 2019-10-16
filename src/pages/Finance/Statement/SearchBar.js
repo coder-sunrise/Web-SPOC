@@ -140,6 +140,7 @@ class SearchBar extends PureComponent {
           <GridItem xs sm={6} md={6} lg={8}>
             <ProgressButton
               color='primary'
+              icon={<p />}
               onClick={() => {
                 const {
                   statementNo,

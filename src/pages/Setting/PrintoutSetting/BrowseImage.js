@@ -152,7 +152,7 @@ const BrowseImage = (props) => {
   const removeAll = () => {
     setFiles([])
     setBase64()
-    field.value = undefined
+    setImageBase64(fieldName, undefined)
   }
 
   return (

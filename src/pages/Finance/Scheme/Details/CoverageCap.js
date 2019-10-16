@@ -67,13 +67,13 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='coverageMaxCap'
           render={(args) => (
             <NumberInput
+              {...args}
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'all'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapAll',
               })}
-              format='0.00'
-              defaultValue='0.00'
-              {...args}
+              currency
+              min={0}
             />
           )}
         />
@@ -85,8 +85,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapConsumables',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
+              min={0}
               {...args}
             />
           )}
@@ -99,8 +99,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapMedications',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
+              min={0}
               {...args}
             />
           )}
@@ -113,8 +113,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapVaccines',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
+              min={0}
               {...args}
             />
           )}
@@ -127,8 +127,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapServices',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
+              min={0}
               {...args}
             />
           )}
@@ -141,8 +141,8 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapPackages',
               })}
-              format='0.00'
-              defaultValue='0.00'
+              currency
+              min={0}
               {...args}
             />
           )}

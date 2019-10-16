@@ -18,8 +18,9 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
         currency={type === 'ExactAmount'}
         percentage={type === 'Percentage'}
         disabled={values.itemGroupValueDtoRdoValue !== radType}
-        defaultValue='0.00'
+        // defaultValue='0.00'
         format='$0,0.00'
+        min={0}
         {...args}
       />
     )
