@@ -19,6 +19,7 @@ import {
   IconButton,
   Tooltip,
   Popconfirm,
+  SizeContainer,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
 import { notification } from '@/components'
@@ -216,6 +217,7 @@ class AddCrNote extends Component {
       <div>
         <CrNoteForm />
         <CommonTableGrid
+          size='sm'
           {...TableConfig}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
@@ -231,8 +233,9 @@ class AddCrNote extends Component {
                     name={`creditNoteItem[${row.rowIndex}].quantity`}
                     render={(args) => {
                       return (
-                        <div>
+                        <SizeContainer size='sm'>
                           <NumberInput
+                            size='sm'
                             style={{ width: '92%' }}
                             disabled={row.itemType.toLowerCase() === 'misc'}
                             onChange={() => this.handleOnChangeQuantity()}
@@ -255,7 +258,7 @@ class AddCrNote extends Component {
                           ) : (
                             ''
                           )}
-                        </div>
+                        </SizeContainer>
                       )
                     }}
                   />
@@ -300,94 +303,6 @@ class AddCrNote extends Component {
             },
           ]}
         />
-
-        {/* <EditableTableGrid
-          {...TableConfig}
-          selection={this.state.selectedRows}
-          onSelectionChange={this.handleSelectionChange}
-          onSelectRow={undefined}
-          schema={crNoteItemSchema}
-          rows={creditNoteItem}
-          columns={CrNoteColumns}
-          columnExtensions={[
-            { columnName: 'itemType', disabled: true },
-            { columnName: 'itemName', disabled: true },
-            {
-              columnName: 'quantity',
-              render: (row) => {
-                return (
-                  <Field
-                    name={`creditNoteItem[${row.rowIndex - 1}].quantity`}
-                    render={(args) => {
-                      return <NumberInput {...args} />
-                    }}
-                  />
-                )
-              },
-            },
-            {
-              columnName: 'unitPrice',
-              type: 'currency',
-              currency: true,
-              disabled: true,
-            },
-
-            {
-              columnName: 'totalAfterItemAdjustment',
-              type: 'currency',
-              currency: true,
-              disabled: true,
-            },
-            {
-              columnName: 'action',
-              align: 'center',
-              width: 78,
-              render: (row) => {
-                return (
-                  <div>
-                    {row.itemType.toLowerCase() === 'misc' ? (
-                      ''
-                    ) : (
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          // this.handleEditRow(row)
-                        }}
-                        justIcon
-                        color='primary'
-                      >
-                        <Edit />
-                      </Button>
-                    )}
-
-                    {row.itemType.toLowerCase() === 'misc' ? (
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          // this.handleDeleteRow(row)
-                        }}
-                        justIcon
-                        color='danger'
-                      >
-                        <Delete />
-                      </Button>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                )
-              },
-            },
-          ]}
-          EditingProps={{
-            showAddCommand: false,
-            showEditCommand: false,
-            showDeleteCommand: false,
-            // onCommitChanges: this.onCommitChanges,
-            // onAddedRowsChange: this.onAddedRowsChange,
-            // onRowChangesChange: this.onRowChangesChange,
-          }}
-        /> */}
 
         <Summary />
         <MiscCrNote
