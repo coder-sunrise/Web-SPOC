@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -12,10 +13,13 @@ import {
   GridItem,
   Select,
   notification,
+  CardContainer,
+  CommonModal,
 } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
+import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
 import {
   NewCHASColumnExtensions,
@@ -43,6 +47,7 @@ class ApprovedCHAS extends React.Component {
   state = {
     selectedRows: [],
     isLoading: false,
+    showCollectPayment: false,
   }
 
   componentDidMount () {
@@ -84,6 +89,30 @@ class ApprovedCHAS extends React.Component {
     }
   }
 
+  onClickCollectPayment = () => {
+    const { dispatch, claimSubmissionApproved } = this.props
+    const { selectedRows } = this.state
+    const { list } = claimSubmissionApproved || []
+    const rows = []
+    selectedRows.map((selected) => {
+      const row = list.find((x) => x.id === selected)
+      return rows.push(row)
+    })
+
+    dispatch({
+      type: 'claimSubmissionApproved/updateState',
+      payload: {
+        entity: {
+          rows,
+          paymentDate: moment(),
+        },
+      },
+    })
+    this.setState({ showCollectPayment: true })
+  }
+
+  onCloseCollectPayment = () => this.setState({ showCollectPayment: false })
+
   render () {
     const {
       classes,
@@ -94,9 +123,17 @@ class ApprovedCHAS extends React.Component {
     } = this.props
     const { isLoading } = this.state
     const { list } = claimSubmissionApproved || []
+    const { showCollectPayment } = this.state
+    const { selectedRows } = this.state
 
     return (
-      <React.Fragment>
+      <CardContainer
+        hideHeader
+        style={{
+          marginLeft: 5,
+          marginRight: 5,
+        }}
+      >
         <BaseSearchBar
           dispatch={dispatch}
           values={values}
@@ -132,13 +169,27 @@ class ApprovedCHAS extends React.Component {
               >
                 Get Status
               </ProgressButton>
-              <ProgressButton icon={null} color='success'>
+              <ProgressButton
+                icon={null}
+                color='success'
+                onClick={this.onClickCollectPayment}
+                disabled={selectedRows.length <= 0}
+              >
                 Collect Payment
               </ProgressButton>
             </GridItem>
           </GridContainer>
         </LoadingWrapper>
-      </React.Fragment>
+        <CommonModal
+          title='Collect Payment'
+          maxWidth='lg'
+          open={showCollectPayment}
+          onClose={this.onCloseCollectPayment}
+          onConfirm={this.onCloseCollectPayment}
+        >
+          <CollectPaymentModal />
+        </CommonModal>
+      </CardContainer>
     )
   }
 }

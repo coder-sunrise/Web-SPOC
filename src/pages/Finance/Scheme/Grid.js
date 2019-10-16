@@ -11,11 +11,10 @@ const Grid = ({ history }) => {
   ] = useState({
     columns: [
       { name: 'coPayerType', title: 'Co-Payer Type' },
-      { name: 'name', title: 'Scheme Name' },
       { name: 'code', title: 'Scheme Code' },
+      { name: 'name', title: 'Scheme Name' },
       { name: 'schemeTypeName', title: 'Scheme Type' },
       { name: 'coPayerName', title: 'Co-Payer Name' },
-      { name: 'schemeCategoryName', title: 'Scheme Category' },
       { name: 'isActive', title: 'Status' },
       { name: 'description', title: 'Description' },
       { name: 'action', title: 'Action' },
@@ -28,17 +27,21 @@ const Grid = ({ history }) => {
 
   const colExtenstions = [
     {
+      columnName: 'schemeTypeName',
+      sortBy: 'SchemeTypeFKNavigation.displayValue',
+    },
+    {
       columnName: 'coPayerType',
-      type: 'codeSelect',
-      code: 'ctCopayerType',
-      labelField: 'displayValue',
+      // type: 'codeSelect',
+      // code: 'ctCopayerType',
+      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.copayerTypeFK',
     },
     {
       columnName: 'coPayerName',
-      type: 'codeSelect',
-      code: 'ctCopayer',
-      labelField: 'displayValue',
+      // type: 'codeSelect',
+      // code: 'ctCopayer',
+      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.displayValue',
     },
     {

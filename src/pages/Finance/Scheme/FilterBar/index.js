@@ -48,7 +48,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='schemeTypeName'
+            name='schemeTypeFK'
             render={(args) => {
               return (
                 <CodeSelect
@@ -64,23 +64,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='schemeCategoryName'
-            render={(args) => {
-              return (
-                <CodeSelect
-                  label={formatMessage({
-                    id: 'finance.scheme.search.category',
-                  })}
-                  code='ctSchemeCategory'
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={6} md={4}>
-          <FastField
-            name='coPayerName'
+            name='coPayerFK'
             render={(args) => {
               return (
                 <CodeSelect
@@ -96,7 +80,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={6} md={4}>
           <FastField
-            name='coPayerType'
+            name='copayerTypeFK'
             render={(args) => {
               return (
                 <CodeSelect
@@ -126,20 +110,20 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
               onClick={() => {
                 const {
                   name,
-                  schemeNameType,
+                  schemeTypeFK,
                   schemeCategory,
-                  coPayerName,
-                  coPayerType,
+                  coPayerFK,
+                  copayerTypeFK,
                   isActive,
                 } = values
                 dispatch({
                   type: 'copaymentScheme/query',
                   payload: {
                     name,
-                    schemeNameType,
+                    schemeTypeFK,
                     schemeCategory,
-                    coPayerName,
-                    coPayerType,
+                    coPayerFK,
+                    'CopayerFKNavigation.copayerTypeFK': copayerTypeFK,
                     isActive,
                   },
                 })
