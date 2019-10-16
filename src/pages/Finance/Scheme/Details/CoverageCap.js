@@ -67,12 +67,13 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
           name='coverageMaxCap'
           render={(args) => (
             <NumberInput
+              {...args}
               disabled={values.itemGroupMaxCapacityDtoRdoValue !== 'all'}
               label={formatMessage({
                 id: 'finance.scheme.setting.maximumCapAll',
               })}
               currency
-              {...args}
+              min={0}
             />
           )}
         />
@@ -85,6 +86,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
                 id: 'finance.scheme.setting.maximumCapConsumables',
               })}
               currency
+              min={0}
               {...args}
             />
           )}
@@ -98,6 +100,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
                 id: 'finance.scheme.setting.maximumCapMedications',
               })}
               currency
+              min={0}
               {...args}
             />
           )}
@@ -111,6 +114,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
                 id: 'finance.scheme.setting.maximumCapVaccines',
               })}
               currency
+              min={0}
               {...args}
             />
           )}
@@ -124,6 +128,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
                 id: 'finance.scheme.setting.maximumCapServices',
               })}
               currency
+              min={0}
               {...args}
             />
           )}
@@ -137,6 +142,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
                 id: 'finance.scheme.setting.maximumCapPackages',
               })}
               currency
+              min={0}
               {...args}
             />
           )}

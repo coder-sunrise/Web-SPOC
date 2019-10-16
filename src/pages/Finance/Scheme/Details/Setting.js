@@ -36,6 +36,7 @@ const CPNumber = (label, type) => (args) => {
       currency={type === 'ExactAmount'}
       percentage={type === 'Percentage'}
       // format={type === 'ExactAmount' ? '$0,0.00' : '0.00'}
+      min={0}
       defaultValue='0.00'
       {...args}
     />
