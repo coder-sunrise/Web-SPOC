@@ -22,11 +22,11 @@ class Grid extends PureComponent {
 
     if (serviceList) {
       let serviceInfo = serviceList
-      console.log(serviceInfo)
+      // console.log(serviceInfo)
       serviceInfo.ctServiceCenter_ServiceNavigation.map((x) => {
         delete x.serviceCenterFKNavigation
       })
-      console.log('test', serviceInfo)
+      // console.log('test', serviceInfo)
 
       serviceInfo = {
         ...serviceInfo,
