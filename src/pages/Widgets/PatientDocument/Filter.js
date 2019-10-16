@@ -23,7 +23,6 @@ import { findGetParameter } from '@/utils/utils'
 //   displayName: 'DocumentTemplateFilter',
 // })
 class Filter extends PureComponent {
-
   updateAttachments = (args) => ({ added, deleted }) => {
     // console.log({ added, deleted }, args)
     const { dispatch } = this.props
@@ -54,28 +53,25 @@ class Filter extends PureComponent {
 
         return [
           ...attachments,
-          { ...item },  
+          { ...item },
         ]
       }, [])
 
-
-      const sortIndex = this.props.patientAttachment.list.length
-      dispatch({
-        type: 'patientAttachment/upsert',
-        payload: {
-          patientProfileFK: findGetParameter('pid'),
-          sortOrder: sortIndex + 1,
-          fileIndexFK: updated[0].fileIndexFK,
-        },
-      }).then((r) => {
-        if (r) {
-          dispatch({
-            type: 'patientAttachment/query',
-          })
-        }
-      })
-
-
+    const sortIndex = this.props.patientAttachment.list.length
+    dispatch({
+      type: 'patientAttachment/upsert',
+      payload: {
+        patientProfileFK: findGetParameter('pid'),
+        sortOrder: sortIndex + 1,
+        fileIndexFK: updated[0].fileIndexFK,
+      },
+    }).then((r) => {
+      if (r) {
+        dispatch({
+          type: 'patientAttachment/query',
+        })
+      }
+    })
 
     // form.setFieldValue('corAttachment', updated)
   }
@@ -135,26 +131,24 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-             
+              <GridItem xs={6} md={4}>
+                <FastField
+                  name='corAttachment'
+                  render={(args) => {
+                    this.form = args.form
 
-              <FastField
-                name='corAttachment'
-                render={(args) => {
-                  this.form = args.form
-
-                  return (
-                    <Attachment
-                      attachmentType='ClinicalNotes'
-                      handleUpdateAttachments={this.updateAttachments(args)}
-                      attachments={args.field.value}
-                      label=''
-                     // isReadOnly
-                    />
-                  )
-                }}
-              />
-
-              
+                    return (
+                      <Attachment
+                        attachmentType='ClinicalNotes'
+                        handleUpdateAttachments={this.updateAttachments(args)}
+                        attachments={args.field.value}
+                        label=''
+                        // isReadOnly
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
             </div>
           </GridItem>
         </GridContainer>
@@ -164,7 +158,6 @@ class Filter extends PureComponent {
 }
 
 export default Filter
-
 
 // <Button
 // color='primary'
