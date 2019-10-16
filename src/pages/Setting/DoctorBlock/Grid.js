@@ -77,6 +77,8 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
 
   const deleteDoctorBlock = (event) => onDeleteClick(event.currentTarget.id)
 
+  const handleDoubleClick = (row) => onEditClick(row.id)
+
   const columnExtensions = [
     {
       columnName: 'doctorName',
@@ -144,6 +146,7 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
     <CommonTableGrid
       style={{ margin: 0 }}
       rows={dataSource}
+      onRowDoubleClick={handleDoubleClick}
       columnExtensions={columnExtensions}
       {...tableConfig}
     />

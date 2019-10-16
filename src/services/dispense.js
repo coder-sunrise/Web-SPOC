@@ -24,6 +24,13 @@ module.exports = {
     })
     return r
   },
+  finalize: async (params) => {
+    const r = await request(`${url}/finalize/${params.id}`, {
+      method: 'PUT',
+      body: params.values,
+    })
+    return r
+  },
   refresh: async (id) => {
     const r = await request(`${url}/refresh/${id}`, {
       method: 'PUT',

@@ -1,13 +1,19 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-import { withFormik } from 'formik'
+
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { Accordion, Button, CommonModal, GridContainer } from '@/components'
+import {
+  Accordion,
+  Button,
+  CommonModal,
+  GridContainer,
+  withFormikExtend,
+} from '@/components'
 import { AddPayment, LoadingWrapper } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
@@ -45,7 +51,8 @@ const bannerStyle = {
   dispense,
   loading,
 }))
-@withFormik({
+@withFormikExtend({
+  enableReinitialize: true,
   mapPropsToValues: ({ billing }) => billing.entity || billing.default,
   handleSubmit: (values, formikBag) => {
     console.log({ values })
@@ -97,10 +104,21 @@ class Billing extends Component {
 
   render () {
     const { showCoPaymentModal, showAddPaymentModal } = this.state
-    const { classes, values, loading } = this.props
+    const {
+      classes,
+      values,
+      billing,
+      dispense,
+      loading,
+      setFieldValue,
+    } = this.props
     console.log({ values })
+    const formikBag = {
+      values,
+      setFieldValue,
+    }
     return (
-      <div>
+      <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
         <div style={{ padding: 8 }}>
           <LoadingWrapper
@@ -116,10 +134,7 @@ class Billing extends Component {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
                     <GridContainer direction='column'>
-                      <DispenseDetails
-                        viewOnly
-                        values={this.props.dispense.entity}
-                      />
+                      <DispenseDetails viewOnly values={dispense.entity} />
                     </GridContainer>
                   ),
                 },
@@ -133,7 +148,8 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleAddCopayerClick={this.toggleCopayerModal}
-                values={values}
+                // values={values}
+                {...formikBag}
               />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
@@ -156,16 +172,23 @@ class Billing extends Component {
           onConfirm={this.toggleCopayerModal}
           onClose={this.toggleCopayerModal}
         >
-          <CoPayer />
+          <CoPayer invoiceItems={values.invoice.invoiceItems} />
         </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
         >
-          <AddPayment handleSubmit={this.onSubmit} />
+          <AddPayment
+            handleSubmit={this.onSubmit}
+            invoice={{
+              ...values.invoice,
+              finalPayable: 727.5,
+              outstandingBalance: values.outstandingBalance,
+            }}
+          />
         </CommonModal>
-      </div>
+      </LoadingWrapper>
     )
   }
 }

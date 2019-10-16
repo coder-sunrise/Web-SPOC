@@ -87,6 +87,7 @@ export default createListViewModel({
         ]
 
         if (allowedPaths.includes(pathname)) {
+          console.log('calendar subscription')
           dispatch({
             type: 'getActiveBizSessionQueue',
           })
@@ -304,7 +305,7 @@ export default createListViewModel({
               },
             }
           }
-          // console.log({ savePayload })
+          console.log({ savePayload })
           return yield put({
             type: actionKey,
             payload: savePayload,

@@ -19,6 +19,8 @@ export default createFormViewModel({
       menuErrors: {},
       currentComponent: '1',
       default: {
+        effectiveStartDate: moment().formatUTC(),
+        effectiveEndDate: moment('2099-12-31').formatUTC(),
         patientAccountNo: '',
         patientEmergencyContact: [],
         patientAllergy: [],

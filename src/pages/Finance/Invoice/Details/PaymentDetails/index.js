@@ -190,7 +190,7 @@ class PaymentDetails extends Component {
       showDeleteConfirmation,
       onVoid,
     } = this.state
-
+    console.log({ values })
     return (
       <div className={classes.container}>
         {!_.isEmpty(values) ? (

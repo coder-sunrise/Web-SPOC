@@ -31,6 +31,7 @@ import { getAppendUrl } from '@/utils/utils'
     consultationDocument,
     orders,
     patient,
+    clinicSettings,
   }) => ({
     dispense,
     visitRegistration,
@@ -38,6 +39,7 @@ import { getAppendUrl } from '@/utils/utils'
     consultationDocument,
     orders,
     patient: patient.entity,
+    clinicSettings,
   }),
 )
 class Dispense extends PureComponent {

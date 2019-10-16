@@ -76,6 +76,8 @@ moment.prototype.formatUTC = function (dateOnly = true) {
 //   return this.clone().add(-8, 'hours')
 // }
 
+export const roundToTwoDecimals = (amount) => Math.round(amount * 100) / 100
+
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
 }
@@ -681,7 +683,7 @@ const _checkCb = (cb) => {
   }
 }
 const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
-   // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
+  // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
@@ -856,6 +858,8 @@ const calculateAmount = (
   {
     totalField = 'totalAfterItemAdjustment',
     adjustedField = 'totalAfterOverallAdjustment',
+    gstField = 'totalAfterGST',
+    gstAmtField = 'gstAmount',
     isGSTInclusive = false,
   } = {},
 ) => {
@@ -865,6 +869,7 @@ const calculateAmount = (
   rows.forEach((r) => {
     r.weightage = r[totalField] / total
     r[adjustedField] = r[totalField]
+
     // console.log(r)
   })
   adjustments.filter((o) => !o.isDeleted).forEach((fa) => {
@@ -890,6 +895,10 @@ const calculateAmount = (
       })
     } else {
       gst = totalAfterAdj * gSTPercentage
+      rows.forEach((r) => {
+        r[gstAmtField] = roundToTwoDecimals(r[totalField] * gSTPercentage)
+        r[gstField] = roundToTwoDecimals(r[totalField] * (1 + gSTPercentage))
+      })
     }
   }
 

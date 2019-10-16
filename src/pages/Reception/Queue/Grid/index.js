@@ -350,7 +350,7 @@ const Grid = ({
         const version = Date.now()
         const parameters = {
           qid: row.id,
-          vid: row.visitFK.id,
+          vid: row.visitFK,
           pid: row.patientProfileFK,
           v: version,
           md2: 'bill',
@@ -469,7 +469,7 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-
+  console.log({ queryingFormData })
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper
