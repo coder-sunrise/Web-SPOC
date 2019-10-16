@@ -73,9 +73,9 @@ const submitKey = 'login/getToken'
   mapPropsToValues: () => {
     if (process.env.NODE_ENV === 'development')
       return {
-        username: 'medisys',
-        password: 'Medi$y$Innovati0n',
-        clinicCode: '123456789',
+        username: 'Administrator',
+        password: 'admin1234567',
+        clinicCode: '249991e76',
       }
     return { username: '', password: '', clinicCode: '' }
   },
@@ -87,10 +87,9 @@ const submitKey = 'login/getToken'
     const credential = { username, password, clinic_code: clinicCode }
     let loginDestination = '/'
     if (location.query && location.query.redirect !== undefined) {
-      console.log({ location })
       loginDestination = location.query.redirect
     }
-    console.log({ loginDestination })
+
     dispatch({
       type: 'login/getToken',
       credentialPayload: credential,

@@ -25,6 +25,8 @@ const styles = () => ({
   },
 })
 
+const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
+
 const InvoiceSummary = ({
   classes,
   handleAddPaymentClick,
@@ -42,24 +44,32 @@ const InvoiceSummary = ({
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>GST ({roundToTwoDecimals(gstValue * 100)}%)</h5>
+              <h5>
+                GST ({parseToTwoDecimalString(
+                  roundToTwoDecimals(gstValue * 100),
+                )}%)
+              </h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                $ {roundToTwoDecimals(gstAmount)}
+                $ {parseToTwoDecimalString(roundToTwoDecimals(gstAmount))}
               </h5>
             </GridItem>
             <GridItem md={6}>
               <h5>Final Bill</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5 className={classes.currencyValue}>${totalAftGst}</h5>
+              <h5 className={classes.currencyValue}>
+                ${parseToTwoDecimalString(roundToTwoDecimals(totalAftGst))}
+              </h5>
             </GridItem>
             <GridItem md={6}>
               <h5 style={{ fontWeight: 500 }}>Total Claims</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5 className={classes.currencyValue}>$ {values.finalClaim}</h5>
+              <h5 className={classes.currencyValue}>
+                $ {parseToTwoDecimalString(values.finalClaim)}
+              </h5>
             </GridItem>
             <GridItem md={12}>
               <Divider
@@ -74,7 +84,9 @@ const InvoiceSummary = ({
               <h5 style={{ fontWeight: 500 }}>Final Payable</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5 className={classes.currencyValue}>$ {values.finalPayable}</h5>
+              <h5 className={classes.currencyValue}>
+                $ {parseToTwoDecimalString(values.finalPayable)}
+              </h5>
             </GridItem>
           </GridContainer>
         </CardContainer>

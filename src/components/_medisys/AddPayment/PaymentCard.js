@@ -12,22 +12,25 @@ import CreditCardPayment from './paymentTypes/CreditCard'
 import ChequePayment from './paymentTypes/Cheque'
 import GiroPayment from './paymentTypes/Giro'
 import styles from './styles'
-import { paymentTypes } from './variables'
+import { PAYMENT_MODE } from '@/utils/constants'
 
 const MapPaymentType = {
-  [paymentTypes.cash]: (props) => <CashPayment {...props} />,
-  [paymentTypes.nets]: (props) => <NetsPayment {...props} />,
-  [paymentTypes.creditCard]: (props) => <CreditCardPayment {...props} />,
-  [paymentTypes.cheque]: (props) => <ChequePayment {...props} />,
-  [paymentTypes.giro]: (props) => <GiroPayment {...props} />,
+  [PAYMENT_MODE.CASH]: (props) => <CashPayment {...props} />,
+  [PAYMENT_MODE.NETS]: (props) => <NetsPayment {...props} />,
+  [PAYMENT_MODE.CREDIT_CARD]: (props) => <CreditCardPayment {...props} />,
+  [PAYMENT_MODE.CHEQUE]: (props) => <ChequePayment {...props} />,
+  [PAYMENT_MODE.GIRO]: (props) => <GiroPayment {...props} />,
 }
 
 class PaymentCard extends Component {
   MapPaymentTypeToComponent = (payment, index) => (
     <GridItem md={12} key={`addpayment-paymentCard-${index}`}>
-      {MapPaymentType[payment.type]({
+      {MapPaymentType[payment.paymentModeFK]({
         payment,
+        index,
         handleDeletePayment: this.props.handleDeletePayment,
+        handleAmountChange: this.props.handleAmountChange,
+        setFieldValue: this.props.setFieldValue,
       })}
     </GridItem>
   )

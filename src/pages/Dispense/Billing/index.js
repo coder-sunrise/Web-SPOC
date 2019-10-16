@@ -88,8 +88,11 @@ class Billing extends Component {
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
 
-  handleAddPayment = (values) => {
-    console.log('addpayment', { values })
+  handleAddPayment = (payment) => {
+    console.log('addpayment', { payment })
+    const { setFieldValue } = this.props
+
+    setFieldValue('payment', payment)
   }
 
   onExpandDispenseDetails = (event, panel, expanded) => {
@@ -111,7 +114,7 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-    console.log({ values })
+    // console.log({ values })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -165,7 +168,10 @@ class Billing extends Component {
           >
             <ArrowBack />Dispense
           </Button>
-          <Button color='primary' disabled={this.state.isEditing}>
+          <Button
+            color='primary'
+            disabled={this.state.isEditing || values.id === undefined}
+          >
             Complete Payment
           </Button>
         </div>
@@ -178,7 +184,7 @@ class Billing extends Component {
             handleSubmit={this.handleAddPayment}
             invoice={{
               ...values.invoice,
-              finalPayable: values.finalPayable,
+              finalPayable: values.invoice.totalAftGst,
               outstandingBalance: values.finalPayable,
             }}
           />

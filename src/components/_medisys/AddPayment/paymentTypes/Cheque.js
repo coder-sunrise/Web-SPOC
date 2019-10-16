@@ -15,7 +15,13 @@ import {
 } from '@/components'
 import styles from '../styles'
 
-const Cheque = ({ classes, payment, handleDeletePayment }) => {
+const Cheque = ({
+  classes,
+  payment,
+  index,
+  handleDeletePayment,
+  handleAmountChange,
+}) => {
   return (
     <CardContainer hideHeader>
       <h5 className={classes.paymentItemHeader}>Cheque</h5>
@@ -31,19 +37,26 @@ const Cheque = ({ classes, payment, handleDeletePayment }) => {
       <GridContainer justify='flex-end'>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.amount`}
-            render={(args) => <NumberInput label='Amount' {...args} currency />}
+            name={`paymentList[${index}].amt`}
+            render={(args) => (
+              <NumberInput
+                label='Amount'
+                {...args}
+                currency
+                onChange={handleAmountChange}
+              />
+            )}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.chequeNo`}
+            name={`paymentList[${index}].chequeNo`}
             render={(args) => <TextField label='Cheque No.' {...args} />}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.remarks`}
+            name={`paymentList[${index}].remarks`}
             render={(args) => <TextField label='Remarks' {...args} />}
           />
         </GridItem>

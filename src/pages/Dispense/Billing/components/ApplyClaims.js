@@ -556,7 +556,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           onClick={handleAddClaimClick}
         >
           <Add />
-          Applicable Claim
+          Claimable Schemes
         </Button>
         <Button
           color='primary'
@@ -704,13 +704,13 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           )
         })}
       </GridItem>
-      <GridItem md={12}>
+      {/* <GridItem md={12}>
         <Paper className={classes.gridRow}>
           <Primary>
             <h5>This patient still has applicable schemes</h5>
           </Primary>
         </Paper>
-      </GridItem>
+      </GridItem> */}
       <CommonModal
         open={showClaimableSchemesSelection}
         title='Claimable Schemes'
