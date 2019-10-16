@@ -30,6 +30,16 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
+const corPrescriptionItemInstructionSchema = Yup.object().shape({
+  usageMethodFK: Yup.number().required(),
+        dosageFK: Yup.number().required(),
+        prescribeUOMFK: Yup.number().required(),
+        drugFrequencyFK: Yup.number().required(),
+        duration: Yup.number().required(),
+        sequence: Yup.number().required(),
+        stepdose: Yup.string().required(),
+})
+
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, ...resetProps }) => {
@@ -302,6 +312,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    console.log("+++++++++++ ", this.props)
     return (
       <div>
         <GridContainer>
@@ -310,7 +321,7 @@ class Medication extends PureComponent {
               <FastField
                 name='drugName'
                 render={(args) => {
-                  return <TextField label='Name' {...args} />
+                  return <TextField label='Name2' {...args} />
                 }}
               />
             ) : (

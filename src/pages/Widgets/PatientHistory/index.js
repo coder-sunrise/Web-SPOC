@@ -139,9 +139,10 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'PatientHistory',
 // })
-@connect(({ patientHistory, clinicSettings }) => ({
+@connect(({ patientHistory, clinicSettings, codetable }) => ({
   patientHistory,
   clinicSettings,
+  codetable,
 }))
 class PatientHistory extends Component {
   state = {
@@ -259,7 +260,15 @@ class PatientHistory extends Component {
   }
 
   componentDidMount () {
-    this.props.dispatch({
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctComplication',
+      },
+    })
+
+    dispatch({
       type: 'patientHistory/initState',
       payload: {
         queueID: Number(findGetParameter('qid')) || 0,
@@ -269,7 +278,7 @@ class PatientHistory extends Component {
       },
     })
 
-    this.props.dispatch({
+    dispatch({
       type: 'patientHistory/updateState',
       payload: {
         selected: '',
@@ -480,7 +489,7 @@ class PatientHistory extends Component {
               allValue='0'
               // prefix='Filter By'
               mode='multiple'
-              maxTagCount={4}
+             // maxTagCount={4}
               options={[
                 { name: 'Chief Complaints', value: '1' },
                 { name: 'Plan', value: '2' },
@@ -502,11 +511,6 @@ class PatientHistory extends Component {
                 style={{ marginLeft: theme.spacing(2) }}
                 size='sm'
                 onClick={() => {
-                  // if (showEditPatient) {
-                  //   dispatch({
-                  //     type: 'patient/closePatientModal',
-                  //   })
-                  // } else {
                     dispatch({
                       type: `consultation/edit`,
                       payload: {
@@ -519,7 +523,6 @@ class PatientHistory extends Component {
                           `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
                         )
                     })
-                 // }
                 }}
               >
                 Edit Consultation
@@ -551,7 +554,6 @@ class PatientHistory extends Component {
               )
               .map((o) => {
                 const Widget = o.component
-
                 return (
                   <div>
                     <h5>{o.name}</h5>
@@ -590,7 +592,7 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-
+    console.log("ggggg ", this.props)
     return (
       <div {...cfg}>
         <CardContainer
