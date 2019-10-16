@@ -242,13 +242,6 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
                         uid: row.uid,
                       },
                     })
-
-                    dispatch({
-                      type: 'orders/deleteRow',
-                      payload: {
-                        uid: row.uid,
-                      },
-                    })
                    
                   }
                   

@@ -13,6 +13,7 @@ class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingDocumentTemplate } = this.props
 
+    
     const { list } = settingDocumentTemplate
 
     dispatch({

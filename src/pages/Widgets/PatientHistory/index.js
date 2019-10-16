@@ -592,7 +592,6 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
-    console.log("ggggg ", this.props)
     return (
       <div {...cfg}>
         <CardContainer
