@@ -268,6 +268,7 @@ export default createFormViewModel({
             type: 'queryDone',
             payload: {
               data: response,
+              page: 'edit order',
             },
           })
         }
@@ -300,7 +301,7 @@ export default createFormViewModel({
       *queryDone ({ payload }, { call, put, select }) {
         console.log("***********************")
          console.log('queryDone', payload)
-        const { data , autoOrderList} = payload
+        const { data , autoOrderList, page} = payload
         if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
@@ -324,21 +325,24 @@ export default createFormViewModel({
         })
 
         let oRows = []
-        orderTypes.forEach((p) => {
-          const datas =
-            (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
-          oRows = oRows.concat(
-            datas.map((o) => {
-              const d = {
-                uid: getUniqueId(),
-                type: p.value,
-                subject: p.getSubject ? p.getSubject(o) : '',
-                ...o,
-              }
-              return p.convert ? p.convert(d) : d
-            }),
-          )
-        })
+        if(page !== 'edit order'){
+          orderTypes.forEach((p) => {
+            const datas =
+              (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
+            oRows = oRows.concat(
+              datas.map((o) => {
+                const d = {
+                  uid: getUniqueId(),
+                  type: p.value,
+                  subject: p.getSubject ? p.getSubject(o) : '',
+                  ...o,
+                }
+                return p.convert ? p.convert(d) : d
+              }),
+            )
+          })
+        }
+        
 
         yield put({
           type: 'orders/updateState',
