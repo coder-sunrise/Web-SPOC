@@ -80,7 +80,7 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -88,6 +88,21 @@ class Detail extends PureComponent {
                     <DateRangePicker
                       label='Effective Start Date'
                       label2='End Date'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='paymentCharges'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Payment Charges'
+                      suffix='%'
+                      max={100}
                       {...args}
                     />
                   )
@@ -106,16 +121,6 @@ class Detail extends PureComponent {
                       rowsMax={4}
                       {...args}
                     />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='paymentCharges'
-                render={(args) => {
-                  return (
-                    <NumberInput label='Payment Charges' suffix='%' {...args} />
                   )
                 }}
               />
