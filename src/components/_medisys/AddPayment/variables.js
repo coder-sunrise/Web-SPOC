@@ -1,4 +1,5 @@
 import * as Yup from 'yup'
+import { PAYMENT_MODE } from '@/utils/constants'
 
 export const paymentTypes = {
   cash: 'Cash',
@@ -9,94 +10,31 @@ export const paymentTypes = {
 }
 
 export const InitialValue = {
-  [paymentTypes.cash]: {
-    amount: null,
+  [PAYMENT_MODE.CASH]: {
+    amt: null,
     remarks: '',
   },
-  [paymentTypes.nets]: {
-    amount: null,
+  [PAYMENT_MODE.NETS]: {
+    amt: null,
     remarks: '',
   },
-  [paymentTypes.creditCard]: {
-    amount: null,
+  [PAYMENT_MODE.CREDIT_CARD]: {
+    amt: null,
+    remarks: '',
+    creditCardTypeFK: undefined,
+    creditCardNo: null,
+  },
+  [PAYMENT_MODE.CHEQUE]: {
+    amt: null,
+    chequeNo: null,
     remarks: '',
   },
-  [paymentTypes.cheque]: {
-    amount: null,
+  [PAYMENT_MODE.GIRO]: {
+    amt: null,
     remarks: '',
-  },
-  [paymentTypes.giro]: {
-    amount: null,
-    remarks: '',
+    referrenceNo: null,
   },
 }
-
-export const ValidationScheme = {
-  [paymentTypes.cash]: Yup.object().shape({
-    amount: Yup.number()
-      .positive()
-      .transform((value) => {
-        if (Number.isNaN(value)) {
-          return undefined
-        }
-        return value
-      })
-      .required('Amount is required'),
-  }),
-  [paymentTypes.nets]: Yup.object().shape({
-    amount: Yup.number()
-      .positive()
-      .transform((value) => {
-        if (Number.isNaN(value)) {
-          return undefined
-        }
-        return value
-      })
-      .required('Amount is required'),
-  }),
-  [paymentTypes.creditCard]: Yup.object().shape({
-    cardType: Yup.string().required('Card Type is required'),
-    cardNo: Yup.string().required('Card No. is required'),
-    amount: Yup.number()
-      .positive()
-      .transform((value) => {
-        if (Number.isNaN(value)) {
-          return undefined
-        }
-        return value
-      })
-      .required('Amount is required'),
-  }),
-  [paymentTypes.cheque]: Yup.object().shape({
-    chequeNo: Yup.number().required('Cheque No. is required'),
-    amount: Yup.number()
-      .positive()
-      .transform((value) => {
-        if (Number.isNaN(value)) {
-          return undefined
-        }
-        return value
-      })
-      .required('Amount is required'),
-  }),
-  [paymentTypes.giro]: Yup.object().shape({
-    referrenceNo: Yup.number().required('Referrence No. is required'),
-    amount: Yup.number()
-      .positive()
-      .transform((value) => {
-        if (Number.isNaN(value)) {
-          return undefined
-        }
-        return value
-      })
-      .required('Amount is required'),
-  }),
-}
-
-export const mapPaymentListToValues = (acc, payment) => ({
-  ...acc,
-  [payment.id]: { ...payment },
-})
 
 export const getLargestID = (list) => {
   return list.reduce(

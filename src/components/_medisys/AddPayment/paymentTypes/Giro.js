@@ -15,7 +15,13 @@ import {
 } from '@/components'
 import styles from '../styles'
 
-const Giro = ({ classes, payment, handleDeletePayment }) => {
+const Giro = ({
+  classes,
+  payment,
+  index,
+  handleDeletePayment,
+  handleAmountChange,
+}) => {
   return (
     <CardContainer hideHeader>
       <h5 className={classes.paymentItemHeader}>Giro</h5>
@@ -31,19 +37,26 @@ const Giro = ({ classes, payment, handleDeletePayment }) => {
       <GridContainer justify='flex-end'>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.amount`}
-            render={(args) => <NumberInput label='Amount' {...args} currency />}
+            name={`paymentList[${index}].amt`}
+            render={(args) => (
+              <NumberInput
+                label='Amount'
+                {...args}
+                onChange={handleAmountChange}
+                currency
+              />
+            )}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.referrenceNo`}
+            name={`paymentList[${index}].referrenceNo`}
             render={(args) => <TextField label='Referrence No.' {...args} />}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.remarks`}
+            name={`paymentList[${index}].remarks`}
             render={(args) => <TextField label='Remarks' {...args} />}
           />
         </GridItem>

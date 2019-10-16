@@ -1,16 +1,19 @@
 import React, { Component } from 'react'
+import { connect } from 'dva'
+import * as Yup from 'yup'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
-  CommonTableGrid,
+  EditableTableGrid,
   GridContainer,
   GridItem,
   CodeSelect,
 } from '@/components'
 // data table variable
-import { CoPayerColumns, CoPayerColExtensions, CoPayerData } from '../variables'
+import { CoPayerColumns, CoPayerColExtensions } from '../variables'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   container: {
@@ -26,24 +29,20 @@ const styles = (theme) => ({
   },
 })
 
+const validationSchema = Yup.object().shape({
+  totalAfterGst: Yup.number(),
+  claimAmount: Yup.number()
+    .min(0)
+    .max(Yup.ref('totalAfterGst'), 'Claim Amount cannot exceed Total Payable'),
+})
+
+@connect(({ codetable }) => ({ codetable }))
 class CoPayer extends Component {
   state = {
     editingRowIds: [],
-    rowChanges: [],
     selectedRows: [],
-    coPayer: 'AIA',
-  }
-
-  changeEditingRowIds = (editingRowIds) => {
-    this.setState({ editingRowIds })
-  }
-
-  changeRowChanges = (rowChanges) => {
-    this.setState({ rowChanges })
-  }
-
-  commitChanges = ({ rows, added, changed, deleted }) => {
-    console.log(rows, added, changed, deleted)
+    coPayer: undefined,
+    invoiceItems: this.props.invoiceItems || [],
   }
 
   handleSelectionChange = (selection) => {
@@ -54,9 +53,59 @@ class CoPayer extends Component {
     this.setState({ coPayer: value })
   }
 
+  onConfirmClick = () => {
+    const { codetable } = this.props
+    const { coPayer, selectedRows, invoiceItems } = this.state
+    const invoicePayerItems = invoiceItems.filter((item) =>
+      selectedRows.includes(item.id),
+    )
+    const copayer = codetable.ctcopayer.find((item) => item.id === coPayer)
+    const returnValue = {
+      invoicePayerItems,
+      payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
+      name: copayer.name,
+      companyFK: copayer.id,
+      _isConfirmed: true,
+      _isEditing: false,
+      _isDeleted: false,
+    }
+    this.props.onAddCoPayerClick(returnValue)
+  }
+
+  handleCommitChanges = ({ rows }) => {
+    this.setState({
+      invoiceItems: [
+        ...rows,
+      ],
+    })
+  }
+
+  handleEditingRowIdsChange = (rows) => {
+    this.setState({
+      editingRowIds: rows,
+    })
+    return rows
+  }
+
+  shouldDisableAddCopayer = () => {
+    const { coPayer, selectedRows, editingRowIds, invoiceItems } = this.state
+    const subtotalAmount = invoiceItems.reduce(
+      (subtotal, item) =>
+        item.claimAmount === undefined ? subtotal : subtotal + item.claimAmount,
+      0,
+    )
+    return (
+      subtotalAmount <= 0 ||
+      editingRowIds.length > 0 ||
+      selectedRows.length === 0 ||
+      !coPayer
+    )
+  }
+
   render () {
-    const { classes, onConfirm, invoiceItems } = this.props
-    const { selectedRows, coPayer } = this.state
+    const { classes, onClose } = this.props
+    const { selectedRows, invoiceItems } = this.state
+
     return (
       <div className={classes.container}>
         <GridContainer>
@@ -68,24 +117,40 @@ class CoPayer extends Component {
             />
           </GridItem>
           <GridItem md={12}>
-            <CommonTableGrid
+            <EditableTableGrid
               size='sm'
-              rows={invoiceItems}
+              rows={invoiceItems.map((item) => ({
+                ...item,
+                disabled: !selectedRows.includes(item.id),
+              }))}
               columns={CoPayerColumns}
               columnExtensions={CoPayerColExtensions}
               selection={selectedRows}
               onSelectionChange={this.handleSelectionChange}
               FuncProps={{
+                pager: false,
                 selectable: true,
                 selectConfig: { showSelectAll: true },
               }}
-              // errors={errors.patientEmergencyContact}
-              // schema={pecValidationSchema}
+              EditingProps={{
+                showAddCommand: false,
+                showDeleteCommand: false,
+                onCommitChanges: this.handleCommitChanges,
+                onEditingRowIdsChange: this.handleEditingRowIdsChange,
+              }}
+              schema={validationSchema}
             />
           </GridItem>
         </GridContainer>
         <div className={classes.saveChangesButton}>
-          <Button color='primary' onClick={onConfirm}>
+          <Button color='danger' onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            color='primary'
+            onClick={this.onConfirmClick}
+            disabled={this.shouldDisableAddCopayer()}
+          >
             Add Copayer
           </Button>
         </div>

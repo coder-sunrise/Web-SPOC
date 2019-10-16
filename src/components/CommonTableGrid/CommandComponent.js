@@ -11,7 +11,7 @@ import { Button, Tooltip } from '@/components'
 import { updateGlobalVariable, getGlobalVariable } from '@/utils/utils'
 
 let commitCount = 0
-const EditButton = ({ onExecute, text, editingRowIds }) => (
+const EditButton = ({ onExecute, text, editingRowIds, disabled = false }) => (
   <Tooltip title={text} placement='top'>
     <Button
       size='sm'
@@ -32,6 +32,7 @@ const EditButton = ({ onExecute, text, editingRowIds }) => (
       }}
       justIcon
       color='primary'
+      disabled={disabled}
     >
       <Edit />
     </Button>
@@ -243,9 +244,9 @@ const commandComponents = {
   cancel: CancelButton,
 }
 
-const CommandComponent = ({ id, onExecute, ...resetProps }) => {
+const CommandComponent = ({ id, onExecute, ...restProps }) => {
   const CommandButton = commandComponents[id]
-  return <CommandButton onExecute={onExecute} {...resetProps} />
+  return <CommandButton onExecute={onExecute} {...restProps} />
 }
 
 export default CommandComponent
