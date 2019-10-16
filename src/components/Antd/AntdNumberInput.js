@@ -224,6 +224,10 @@ class AntdNumberInput extends React.PureComponent {
       e.preventDefault()
     }
 
+    if (this.props.min === 0 && e.keyCode === 189) {
+      e.preventDefault()
+    }
+
     if (
       e.ctrlKey &&
       ![
@@ -343,6 +347,7 @@ class AntdNumberInput extends React.PureComponent {
       extraCfg.formatter = (v) => {
         if (v === '') return ''
         if (!this.state.focused) {
+          if (v > 100) v = 100
           return numeral(v / 100).format(percentageFormat)
         }
         return v

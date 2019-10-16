@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import { status, isAutoOrder } from '@/utils/codes'
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 
 class Grid extends PureComponent {
   editRow = async (row) => {
@@ -39,10 +39,12 @@ class Grid extends PureComponent {
       dispatch({
         type: 'settingClinicService/updateState',
         payload: {
-          showModal: true,
+          // showModal: true,
           entity: serviceInfo,
         },
       })
+
+      this.props.toggleModal()
     }
   }
 
@@ -76,7 +78,12 @@ class Grid extends PureComponent {
             columnName: 'serviceCenter',
             sortBy: 'serviceCenterFKNavigation.displayValue',
           },
-          { columnName: 'unitPrice', type: 'number', currency: true },
+          {
+            columnName: 'unitPrice',
+            type: 'number',
+            currency: true,
+            width: 150,
+          },
           {
             columnName: 'isAutoOrder',
             align: 'center',
@@ -90,25 +97,27 @@ class Grid extends PureComponent {
             type: 'select',
             options: status,
             align: 'center',
-            width: 120,
+            width: 100,
           },
           {
             columnName: 'action',
             align: 'center',
-            width: 100,
+            width: 80,
             render: (row) => {
               return (
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row)
-                  }}
-                  justIcon
-                  color='primary'
-                  style={{ marginRight: 0 }}
-                >
-                  <Edit />
-                </Button>
+                <Tooltip title='Edit Service'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row)
+                    }}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 0 }}
+                  >
+                    <Edit />
+                  </Button>
+                </Tooltip>
               )
             },
           },

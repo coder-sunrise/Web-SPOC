@@ -97,9 +97,9 @@ class Filter extends PureComponent {
                       isActive,
                       group: [
                         {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
-                          serviceCenterFK: serviceCenterFK,
+                          'ServiceFKNavigation.Code': codeDisplayValue,
+                          'ServiceFKNavigation.DisplayValue': codeDisplayValue,
+                          serviceCenterFK,
                           combineCondition: 'or',
                         },
                       ],

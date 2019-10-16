@@ -675,15 +675,16 @@ const confirmBeforeReload = (e) => {
   e.returnValue = ''
 }
 
-const _checkCb = (cb) => {
+const _checkCb = (cb, e) => {
+  console.log('e', e)
   if (typeof cb === 'string') {
     router.push(cb)
   } else if (typeof cb === 'function') {
-    cb()
+    cb(e)
   }
 }
 const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
-  // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
+  console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
@@ -716,13 +717,13 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
           }
           window.beforeReloadHandlerAdded = false
           window.removeEventListener('beforeunload', confirmBeforeReload)
-          _checkCb(cb)
+          _checkCb(cb, e)
         },
       },
     })
     e.preventDefault()
   } else {
-    _checkCb(cb)
+    _checkCb(cb, e)
     // window._localFormik = {}
     // console.log(window._localFormik)
   }

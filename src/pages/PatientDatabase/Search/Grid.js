@@ -4,8 +4,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Tooltip, withStyles } from '@material-ui/core'
 import { AccountCircle } from '@material-ui/icons'
 import { getAppendUrl } from '@/utils/utils'
-import { status } from '@/utils/codes'
-
+import { statusString } from '@/utils/codes'
 import { Button, CommonModal, CommonTableGrid } from '@/components'
 
 class Grid extends PureComponent {
@@ -56,7 +55,13 @@ class Grid extends PureComponent {
             return renderActionFn(row)
           },
         },
-        { columnName: 'status', sortBy: 'isActive' },
+        {
+          columnName: 'status',
+          sortBy: 'isActive',
+          type: 'select',
+          options: statusString,
+          align: 'center',
+        },
         {
           columnName: 'nationality',
           sortBy: 'nationalityFkNavigation.displayValue',
