@@ -541,7 +541,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
-  console.log({ tempInvoicePayer, invoiceItems: invoice.invoiceItems })
+  // console.log({ tempInvoicePayer, invoiceItems: invoice.invoiceItems })
 
   return (
     <React.Fragment>

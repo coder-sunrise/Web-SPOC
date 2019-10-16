@@ -150,6 +150,7 @@ class Billing extends Component {
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary
+                disabled={this.state.isEditing}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 values={values}
               />
@@ -178,7 +179,7 @@ class Billing extends Component {
             invoice={{
               ...values.invoice,
               finalPayable: values.finalPayable,
-              outstandingBalance: values.outstandingBalance,
+              outstandingBalance: values.finalPayable,
             }}
           />
         </CommonModal>
