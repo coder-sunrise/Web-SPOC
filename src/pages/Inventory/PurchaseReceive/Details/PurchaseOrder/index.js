@@ -35,6 +35,7 @@ import { podoOrderType } from '@/utils/codes'
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
       supplierFK: Yup.number().required(),
+      purchaseOrderDate: Yup.date().required(),
     }),
   }),
 })
