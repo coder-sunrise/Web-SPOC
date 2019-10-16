@@ -1,47 +1,51 @@
 import { createListViewModel } from 'medisys-model'
-import moment from 'moment'
+import { notification } from '@/components'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'settingRoomBlock',
-  config: {},
+  namespace: 'roomBlock',
+  config: {
+    queryOnLoad: false,
+  },
   param: {
     service,
     state: {
-      default: {
-        isUserMaintainable: true,
-        effectiveDates: [
-          moment().formatUTC(),
-          moment('2099-12-31T23:59:59').formatUTC(false),
-        ],
-        enableRecurrence: true,
-        recurrencePattern: 'daily',
-        description: '',
-      },
+      currentViewRoomBlock: {},
     },
     subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
+      history.listen(async (location) => {
+        const { pathname } = location
+        if (pathname === '/setting/roomblock') {
+          dispatch({
+            type: 'query',
+            payload: {
+              pagesize: 99999,
+            },
+          })
+        }
       })
     },
-    effects: {},
-    reducers: {
-      queryDone (st, { payload }) {
-        const { data } = payload
-
-        return {
-          ...st,
-          list: data.data.map((o) => {
-            return {
-              ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
-              parentId: o.id === 30 ? null : 30,
-            }
-          }),
+    effects: {
+      *refresh (_, { call, put }) {
+        yield put({
+          type: 'query',
+          payload: {
+            pagesize: 99999,
+          },
+        })
+      },
+      *update ({ payload }, { call }) {
+        const result = yield call(service.save, payload)
+        if (result) {
+          notification.success({ message: 'Room Block(s) updated' })
+          return true
         }
+        return false
+      },
+    },
+    reducers: {
+      querySingleDone (state, { payload }) {
+        return { ...state, currentViewRoomBlock: payload.data }
       },
     },
   },
