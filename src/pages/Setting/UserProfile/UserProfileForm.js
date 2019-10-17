@@ -3,7 +3,7 @@ import * as Yup from 'yup'
 import moment from 'moment'
 import { connect } from 'dva'
 // formik
-import { FastField, Field, withFormik } from 'formik'
+import { FastField, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Key from '@material-ui/icons/VpnKey'
@@ -18,6 +18,7 @@ import {
   GridItem,
   NumberInput,
   TextField,
+  withFormikExtend,
 } from '@/components'
 import { ChangePassword } from '@/components/_medisys'
 // utils
@@ -47,7 +48,8 @@ const styles = (theme) => ({
   currentUser: user.profileDetails,
   ctRole: codetable.role,
 }))
-@withFormik({
+@withFormikExtend({
+  displayName: 'UserProfile',
   enableReinitialize: true,
   validationSchema: (props) => {
     const { settingUserProfile, currentUser } = props
@@ -59,6 +61,7 @@ const styles = (theme) => ({
       (currentUser && currentUser.userProfile.userName)
     const baseValidationRule = {
       userProfile: Yup.object().shape({
+        countryCodeFK: Yup.string().required(),
         userName: Yup.string().required('Login ID is a required field'),
       }),
       name: Yup.string().required('Name is a required field'),
@@ -90,11 +93,10 @@ const styles = (theme) => ({
   },
   mapPropsToValues: (props) => {
     const { settingUserProfile, currentUser } = props
-    console.log({ settingUserProfile, currentUser })
+
     if (currentUser) {
       return {
         ...currentUser,
-        // ...currentUser.userProfile,
         effectiveDates: [
           currentUser.effectiveStartDate,
           currentUser.effectiveEndDate,
@@ -109,8 +111,9 @@ const styles = (theme) => ({
       const { currentSelectedUser = {} } = settingUserProfile
       return {
         ...currentSelectedUser,
-        // ...currentSelectedUser.userProfile,
-        // ...currentSelectedUser.doctorProfile,
+        userProfile: {
+          countryCodeFK: 1,
+        },
         effectiveDates:
           Object.entries(currentSelectedUser).length <= 0
             ? [
@@ -126,7 +129,11 @@ const styles = (theme) => ({
           : undefined,
       }
     }
-    return {}
+    return {
+      userProfile: {
+        countryCodeFK: 1,
+      },
+    }
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, ctRole, onConfirm } = props
@@ -304,6 +311,7 @@ class UserProfileForm extends React.PureComponent {
                 name='userProfile.countryCodeFK'
                 render={(args) => (
                   <CodeSelect
+                    allowClear={false}
                     label='Country Code'
                     code='ctcountrycode'
                     {...args}

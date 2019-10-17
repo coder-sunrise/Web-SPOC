@@ -36,6 +36,7 @@ export const ValidationSchema = Yup.object().shape({
   // 'appointment.appointmentDate': Yup.string().required(
   //   'Appointment Date is required',
   // ),
+  'appointment.appointmentDate': Yup.string().required(),
   isEnableRecurrence: Yup.boolean(),
   recurrenceDto: Yup.object().when('isEnableRecurrence', {
     is: true,

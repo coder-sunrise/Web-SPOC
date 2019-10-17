@@ -95,7 +95,8 @@ class CheckboxGroup extends React.Component {
     if (form && field) {
       v.target.name = field.name
       field.onChange(v, newVal)
-    } else if (onChange) {
+    }
+    if (onChange) {
       onChange(v, newVal)
     }
     // let { selectedValue = [] } = this.state

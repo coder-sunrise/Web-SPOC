@@ -45,7 +45,7 @@ const FormFooter = ({
             {ButtonText.CANCEL}
           </Button>
           <Button
-            disabled={disabled}
+            disabled={disabled || isTurnedUp}
             color='success'
             onClick={handleValidateClick}
           >

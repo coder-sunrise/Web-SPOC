@@ -199,6 +199,7 @@ class GlobalModalContainer extends PureComponent {
           open={global.showUserProfile}
           onClose={this.closeUserProfile}
           onConfirm={this.closeUserProfile}
+          observe='UserProfile'
         >
           <UserProfileForm />
         </CommonModal>
