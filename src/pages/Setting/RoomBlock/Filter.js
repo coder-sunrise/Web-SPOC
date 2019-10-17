@@ -3,7 +3,7 @@ import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
+import { recurrenceTypes } from '@/utils/codes'
 import {
   CodeSelect,
   GridContainer,
@@ -35,23 +35,12 @@ const styles = (theme) => ({
   },
 })
 
-const recurrenceTypes = [
-  {
-    id: 'daily',
-    name: 'Daily',
-  },
-  {
-    id: 'weekly',
-    name: 'Weekly',
-  },
-  {
-    id: 'monthly',
-    name: 'Monthly',
-  },
-]
-
 @withFormik({
-  mapPropsToValues: () => ({}),
+  mapPropsToValues: () => {
+    return {
+      code: [],
+    }
+  },
   handleSubmit: () => {},
 })
 class Filter extends PureComponent {
@@ -65,29 +54,36 @@ class Filter extends PureComponent {
             <FastField
               name='code'
               render={(args) => {
-                return <CodeSelect label='Room' code='ctRoom' {...args} />
+                return (
+                  <CodeSelect
+                    label='Room'
+                    code='ctRoom'
+                    mode='multiple'
+                    // allValue={-99}
+                    maxTagCount={values.code.length > 1 ? 0 : 1}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={4}>
             <FastField
-              name='dateFrom'
+              name='dates'
               render={(args) => {
-                return <DatePicker label='Date From' {...args} />
-              }}
-            />
-          </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='dateTo'
-              render={(args) => {
-                return <DatePicker label='Date To' {...args} />
+                return (
+                  <DateRangePicker
+                    label='Start Date'
+                    label2='End Date'
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
           <GridItem xs={6} md={2}>
             <FastField
-              name='isActive'
+              name='recurrence'
               render={(args) => {
                 return (
                   <Select
@@ -139,14 +135,9 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const prefix = this.props.values.isExactSearch
-                    ? 'eql_'
-                    : 'like_'
-
                   this.props.dispatch({
                     type: 'roomBlock/query',
                     payload: {
-                      // [`${prefix}name`]: values.doctorName,
                       lgteql_startDateTime: values.dates
                         ? values.dates[0]
                         : undefined,

@@ -80,7 +80,7 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
   const columnExtensions = [
     {
       columnName: 'roomName',
-      render: (row) => <p>{row.room.displayValue}</p>,
+      render: (row) => <p>Room {row.room.displayValue}</p>,
     },
     {
       columnName: 'startDate',
