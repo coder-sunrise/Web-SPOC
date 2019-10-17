@@ -73,9 +73,12 @@ const submitKey = 'login/getToken'
   mapPropsToValues: () => {
     if (process.env.NODE_ENV === 'development')
       return {
-        username: 'Administrator',
-        password: 'admin1234567',
-        clinicCode: '249991e76',
+        // username: 'Administrator',
+        // password: 'admin1234567',
+        // clinicCode: '249991e76',
+        username: 'medisys',
+        password: 'Medi$y$Innovati0n',
+        clinicCode: '123456789',
       }
     return { username: '', password: '', clinicCode: '' }
   },
