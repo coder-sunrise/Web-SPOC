@@ -468,7 +468,7 @@ class PatientHistory extends Component {
       showEditPatient,
     } = this.props
     const { entity, selected } = patientHistory
-
+    console.log("^^^^^^^^^^^^^^^^^^^^^^^ ", patientHistory)
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
@@ -520,7 +520,7 @@ class PatientHistory extends Component {
                     }).then((o) => {
                       if (o)
                         router.push(
-                          `/reception/queue/patientdashboard?qid=${patientHistory.queueID}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                          `/reception/queue/patientdashboard?qid=${findGetParameter('qid')}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
                         )
                     })
                 }}
