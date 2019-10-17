@@ -1,5 +1,4 @@
 import { createListViewModel } from 'medisys-model'
-import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({

@@ -1,6 +1,7 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import moment from 'moment'
 // common components
 import {
   Button,
@@ -11,6 +12,7 @@ import {
   TextField,
   Select,
 } from '@/components'
+
 import { osBalanceStatus } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
@@ -32,6 +34,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                   <DateRangePicker
                     label='Invoice Date From'
                     label2='Invoice Date To'
+                    disabledDate={(d) => !d || d.isAfter(moment())}
                     {...args}
                   />
                 )
