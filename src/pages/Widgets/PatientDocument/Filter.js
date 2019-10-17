@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { status } from '@/utils/codes'
+import { FormattedMessage } from 'umi/locale'
 import {
   FastField,
   GridContainer,
@@ -8,62 +7,17 @@ import {
   TextField,
   ProgressButton,
   DateRangePicker,
+  withFormikExtend,
 } from '@/components'
-import { Attachment } from '@/components/_medisys'
-import { findGetParameter } from '@/utils/utils'
 
+@withFormikExtend({
+  mapPropsToValues: ({ patientAttachment }) =>
+  patientAttachment.filter || {},
+  handleSubmit: () => {},
+  displayName: 'DocumentTemplateFilter',
+})
 class Filter extends PureComponent {
-  updateAttachments = (args) => ({ added, deleted }) => {
-    // console.log({ added, deleted }, args)
-    const { dispatch } = this.props
-    const { form, field } = args
-
-    let updated = [
-      ...(field.value || []),
-    ]
-    if (added)
-      updated = [
-        ...updated,
-        ...added.map((o) => ({
-          ...o,
-          fileIndexFK: o.id,
-        })),
-      ]
-
-    if (deleted)
-      updated = updated.reduce((attachments, item) => {
-        if (
-          (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
-          (item.fileIndexFK === undefined && item.id === deleted)
-        )
-          return [
-            ...attachments,
-            { ...item, isDeleted: true },
-          ]
-
-        return [
-          ...attachments,
-          { ...item },
-        ]
-      }, [])
-
-    const sortIndex = this.props.patientAttachment.list.length
-    dispatch({
-      type: 'patientAttachment/upsert',
-      payload: {
-        patientProfileFK: findGetParameter('pid'),
-        sortOrder: sortIndex + 1,
-        fileIndexFK: updated[0].fileIndexFK,
-      },
-    }).then((r) => {
-      if (r) {
-        dispatch({
-          type: 'patientAttachment/query',
-        })
-      }
-    })
-
-  }
+  
 
   render () {
     const { classes } = this.props
@@ -119,25 +73,6 @@ class Filter extends PureComponent {
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
-
-              <GridItem xs={6} md={4}>
-                <FastField
-                  name='patientAttachment'
-                  render={(args) => {
-                    this.form = args.form
-
-                    return (
-                      <Attachment
-                        attachmentType='patientAttachment'
-                        handleUpdateAttachments={this.updateAttachments(args)}
-                        attachments={args.field.value}
-                        label=''
-                        // isReadOnly
-                      />
-                    )
-                  }}
-                />
-              </GridItem>
             </div>
           </GridItem>
         </GridContainer>

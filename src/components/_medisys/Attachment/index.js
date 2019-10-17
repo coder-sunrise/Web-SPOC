@@ -63,6 +63,10 @@ const getFileExtension = (filename) => {
   return filename.split('.').pop()
 }
 
+const getFileName = (filename) => {
+  return filename.split('.')[0]
+}
+
 const Attachment = ({
   classes,
   handleUpdateAttachments,
@@ -108,7 +112,7 @@ const Attachment = ({
     )
 
     const uploadObject = {
-      fileName: file.name,
+      fileName: getFileName(file.name),
       fileSize: file.size,
       fileExtension: getFileExtension(file.name),
       fileCategoryFK: 1,

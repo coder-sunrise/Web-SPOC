@@ -335,7 +335,14 @@ class ConsultationDocument extends PureComponent {
               <ProgressButton
                 color='primary'
                 disabled={!this.state.acknowledged}
-                onClick={this.props.handleSubmit}
+                onClick={() => {
+                  this.props.handleSubmit()
+
+                  dispatch({
+                    type: `formik/clean`,
+                    payload: 'OrderPage',
+                  })
+                }}
               >
                 Save
               </ProgressButton>

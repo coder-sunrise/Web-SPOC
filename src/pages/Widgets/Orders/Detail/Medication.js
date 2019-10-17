@@ -56,10 +56,11 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
-    stockDrugFK: Yup.string().when('type', {
-      is: true,
-      then: Yup.string().required(),
-    }),
+    stockDrugFK: Yup.number().required(),
+    // stockDrugFK: Yup.string().when('type', {
+    //   is: true,
+    //   then: Yup.string().required(),
+    // }),
     drugName: Yup.string().when('type', {
       is: (val) => val === '5',
       then: Yup.string().required(),
