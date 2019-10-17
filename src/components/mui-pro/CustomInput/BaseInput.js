@@ -236,7 +236,7 @@ class BaseInput extends React.PureComponent {
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
     }
-    // console.log(error, showErrorIcon)
+    // console.log({ error, showErrorIcon })
     if (error && showErrorIcon) {
       cfg.endAdornment = (
         <InputAdornment position='end'>

@@ -20,6 +20,7 @@ const ApplicableClaims = ({
   const selectedClaims = currentClaims.map(
     (item) => item._indexInClaimableSchemes,
   )
+  const invoicePayersName = currentClaims.map((item) => item.name)
   const selectableList = claimableSchemes.reduce(
     (schemes, item, index) =>
       selectedClaims.includes(index)
@@ -34,28 +35,36 @@ const ApplicableClaims = ({
   )
   return (
     <GridContainer>
-      {claimableSchemes.map((schemes, index) => (
-        <React.Fragment>
-          <GridItem md={2}>
-            <span>{index + 1}</span>
-          </GridItem>
-          <GridItem md={7}>
-            <span>
-              {schemes.map((scheme) => scheme.coPaymentSchemeName).join(', ')}
-            </span>
-          </GridItem>
-          <GridItem md={3} className={classes.row}>
-            <Button
-              color='primary'
-              size='sm'
-              disabled={selectedClaims.includes(index)}
-              onClick={handleSelectClick(index)}
-            >
-              Add
-            </Button>
-          </GridItem>
-        </React.Fragment>
-      ))}
+      {claimableSchemes.map((schemes, index) => {
+        const isCHAS = schemes[0].coPaymentSchemeName.startsWith('CHAS')
+        let shouldDisable = selectedClaims.includes(index)
+        if (isCHAS && currentClaims.length > 0) {
+          shouldDisable = !invoicePayersName[index].startsWith('CHAS')
+        }
+
+        return (
+          <React.Fragment>
+            <GridItem md={2}>
+              <span>{index + 1}</span>
+            </GridItem>
+            <GridItem md={7}>
+              <span>
+                {schemes.map((scheme) => scheme.coPaymentSchemeName).join(', ')}
+              </span>
+            </GridItem>
+            <GridItem md={3} className={classes.row}>
+              <Button
+                color='primary'
+                size='sm'
+                disabled={shouldDisable}
+                onClick={handleSelectClick(index)}
+              >
+                Add
+              </Button>
+            </GridItem>
+          </React.Fragment>
+        )
+      })}
     </GridContainer>
   )
 }

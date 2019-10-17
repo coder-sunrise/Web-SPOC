@@ -47,3 +47,19 @@ export const UNFIT_TYPE = {
   9: 'Unfit for wearing shoes',
   10: 'Excuse Chit',
 }
+
+export const PAYMENT_MODE = {
+  CASH: 1,
+  NETS: 2,
+  CREDIT_CARD: 3,
+  CHEQUE: 4,
+  GIRO: 5,
+}
+
+export const CREDIT_CARD_TYPE = {
+  1: 'VISA',
+  2: 'MASTER',
+  3: 'AMEX',
+  4: 'DINER',
+  5: 'JCB',
+}

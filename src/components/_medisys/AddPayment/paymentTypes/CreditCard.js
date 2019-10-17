@@ -6,17 +6,25 @@ import { withStyles, IconButton } from '@material-ui/core'
 import TrashBin from '@material-ui/icons/Delete'
 // common component
 import {
+  CodeSelect,
   CardContainer,
   GridContainer,
   GridItem,
   NumberInput,
-  Select,
   TextField,
   Tooltip,
 } from '@/components'
 import styles from '../styles'
+import { CREDIT_CARD_TYPE } from '@/utils/constants'
 
-const CreditCard = ({ classes, payment, handleDeletePayment }) => {
+const CreditCard = ({
+  classes,
+  payment,
+  index,
+  handleAmountChange,
+  handleDeletePayment,
+  setFieldValue,
+}) => {
   return (
     <CardContainer hideHeader>
       <h5 className={classes.paymentItemHeader}>Credit Card</h5>
@@ -32,22 +40,25 @@ const CreditCard = ({ classes, payment, handleDeletePayment }) => {
       <GridContainer>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.cardType`}
+            name={`paymentList[${index}].creditCardTypeFK`}
             render={(args) => (
-              <Select
+              <CodeSelect
                 {...args}
                 label='Card Type'
-                options={[
-                  { name: 'Credit Card', value: 'creditCard' },
-                  { name: 'Visa', value: 'visa' },
-                ]}
+                code='ctcreditcardtype'
+                onChange={(value) => {
+                  setFieldValue(
+                    `paymentList[${index}].creditCardType`,
+                    CREDIT_CARD_TYPE[value],
+                  )
+                }}
               />
             )}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.cardNo`}
+            name={`paymentList[${index}].creditCardNo`}
             render={(args) => <TextField label='Card No.' {...args} />}
           />
         </GridItem>
@@ -55,13 +66,20 @@ const CreditCard = ({ classes, payment, handleDeletePayment }) => {
       <GridContainer>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.amount`}
-            render={(args) => <NumberInput label='Amount' {...args} currency />}
+            name={`paymentList[${index}].amt`}
+            render={(args) => (
+              <NumberInput
+                label='Amount'
+                {...args}
+                currency
+                onChange={handleAmountChange}
+              />
+            )}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.remarks`}
+            name={`paymentList[${index}].remarks`}
             render={(args) => <TextField label='Remarks' {...args} />}
           />
         </GridItem>

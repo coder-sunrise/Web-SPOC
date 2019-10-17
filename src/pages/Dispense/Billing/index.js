@@ -20,9 +20,6 @@ import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '../DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
-// page modal
-import CoPayer from './modal/CoPayer'
-// import AddPayment from './AddPayment'
 // model
 import model from '../models/billing'
 // utils
@@ -46,7 +43,7 @@ const bannerStyle = {
   paddingRight: 16,
 }
 
-@connect(({ billing, dispense, loading, patient }) => ({
+@connect(({ billing, dispense, loading }) => ({
   billing,
   dispense,
   loading,
@@ -62,6 +59,7 @@ class Billing extends Component {
   state = {
     showCoPaymentModal: false,
     showAddPaymentModal: false,
+    isEditing: false,
   }
 
   backToDispense = () => {
@@ -90,8 +88,11 @@ class Billing extends Component {
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
 
-  onSubmit = (values) => {
-    console.log('addpayment', { values })
+  handleAddPayment = (payment) => {
+    console.log('addpayment', { payment })
+    const { setFieldValue } = this.props
+
+    setFieldValue('payment', payment)
   }
 
   onExpandDispenseDetails = (event, panel, expanded) => {
@@ -102,21 +103,18 @@ class Billing extends Component {
     }
   }
 
+  handleIsEditing = (editing) => {
+    this.setState({ isEditing: editing })
+  }
+
   render () {
-    const { showCoPaymentModal, showAddPaymentModal } = this.state
-    const {
-      classes,
-      values,
-      billing,
-      dispense,
-      loading,
-      setFieldValue,
-    } = this.props
-    console.log({ values })
+    const { showAddPaymentModal } = this.state
+    const { classes, values, dispense, loading, setFieldValue } = this.props
     const formikBag = {
       values,
       setFieldValue,
     }
+    // console.log({ values })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -148,12 +146,14 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleAddCopayerClick={this.toggleCopayerModal}
+                handleIsEditing={this.handleIsEditing}
                 // values={values}
                 {...formikBag}
               />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary
+                disabled={this.state.isEditing}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 values={values}
               />
@@ -161,30 +161,31 @@ class Billing extends Component {
           </GridContainer>
         </Paper>
         <div className={classes.paymentButton}>
-          <Button color='info' onClick={this.backToDispense}>
+          <Button
+            color='info'
+            onClick={this.backToDispense}
+            disabled={this.state.isEditing}
+          >
             <ArrowBack />Dispense
           </Button>
-          <Button color='primary'>Complete Payment</Button>
+          <Button
+            color='primary'
+            disabled={this.state.isEditing || values.id === undefined}
+          >
+            Complete Payment
+          </Button>
         </div>
-        <CommonModal
-          open={showCoPaymentModal}
-          title='Add Copayer'
-          onConfirm={this.toggleCopayerModal}
-          onClose={this.toggleCopayerModal}
-        >
-          <CoPayer invoiceItems={values.invoice.invoiceItems} />
-        </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
         >
           <AddPayment
-            handleSubmit={this.onSubmit}
+            handleSubmit={this.handleAddPayment}
             invoice={{
               ...values.invoice,
-              finalPayable: 727.5,
-              outstandingBalance: values.outstandingBalance,
+              finalPayable: values.invoice.totalAftGst,
+              outstandingBalance: values.finalPayable,
             }}
           />
         </CommonModal>
