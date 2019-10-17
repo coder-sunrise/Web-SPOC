@@ -367,6 +367,7 @@ class AddNewStatement extends PureComponent {
                 <ProgressButton
                   color='primary'
                   onClick={() => this.getInvoiceList()}
+                  icon={<p />}
                 >
                   <Search />
                   <FormattedMessage id='form.search' />
