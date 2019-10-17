@@ -234,7 +234,7 @@ class AddNewStatement extends PureComponent {
       statement,
     } = this.props
     const { invoiceRows, columns, columnExtensions } = this.state
-    console.log('values', values)
+    // console.log('values', values)
     // console.log('state', this.state)
     // console.log('props', this.props)
 
