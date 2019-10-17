@@ -169,7 +169,6 @@ class Queue extends React.Component {
   }
 
   toggleRegisterNewPatient = () => {
-    console.log('toggle register new patient')
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {

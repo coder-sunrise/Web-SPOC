@@ -114,7 +114,7 @@ const styles = (theme) => ({
         effectiveDates:
           Object.entries(currentSelectedUser).length <= 0
             ? [
-                moment(),
+                moment().formatUTC(),
                 moment('2099-12-31T23:59:59').formatUTC(false),
               ]
             : [
@@ -132,15 +132,18 @@ const styles = (theme) => ({
     const { dispatch, ctRole, onConfirm } = props
     const { effectiveDates, role: roleFK, ...restValues } = values
     const role = ctRole.find((item) => item.id === roleFK)
+    const isDoctor = roleFK === 2 || roleFK === 3
+
     const userProfile = constructUserProfile(values, role)
 
     const payload = {
       ...restValues,
+      doctorProfile: isDoctor ? restValues.doctorProfile : undefined,
       effectiveStartDate: values.effectiveDates[0],
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
     }
-    // console.log({ values, str: JSON.stringify(values) })
+
     dispatch({
       type: 'settingUserProfile/upsert',
       payload,

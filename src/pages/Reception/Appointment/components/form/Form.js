@@ -61,6 +61,7 @@ import styles from './style'
   }),
 )
 @withFormikExtend({
+  notDirtyDuration: 0.5,
   displayName: 'AppointmentForm',
   enableReinitialize: true,
   validationSchema: ValidationSchema,
