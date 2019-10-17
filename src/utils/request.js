@@ -17,7 +17,11 @@ import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 // export const baseUrl = 'http://localhost/SEMR_V2'
 export const baseUrl = process.env.url
 
+// let baseUrl = _baseUrl
+
 let dynamicURL = baseUrl
+if (process.env.NODE_ENV === 'development')
+  dynamicURL = ' https://8fc94f82.ngrok.io'
 
 // const codeMessage = {
 //   200: '服务器成功返回请求的数据。',
@@ -317,11 +321,17 @@ const request = (url, option, showNotification = true) => {
             let returnObj = {
               title: codeMessage[response.status],
             }
-            // console.log(codeMessage, response)
-            let errorMsg = codeMessage[response.status]
 
+            let errorMsg = codeMessage[response.status]
+            if (response.status === 400 && token === null) {
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+              })
+              return false
+            }
             if (
-              response.status === 401
+              response.status === 401 &&
+              url !== '/connect/token'
               /* use this to bypass login on development mode */
               // && process.env.NODE_ENV !== 'development'
             ) {

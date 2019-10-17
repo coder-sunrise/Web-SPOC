@@ -264,6 +264,7 @@ const Grid = ({
       payload: {
         openConfirm: true,
         openConfirmTitle: '',
+        openConfirmText: 'Confirm',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
         onConfirmSave: () => deleteQueue(id),
       },

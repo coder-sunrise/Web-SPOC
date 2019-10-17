@@ -419,6 +419,7 @@ class EditableTableGrid extends PureComponent {
                     // console.log(12311231,o.props)
                     return React.cloneElement(o, {
                       row: p.row,
+                      disabled: p.row.disabled,
                       editingRowIds,
                       getRowId,
                       key: o.props.id,

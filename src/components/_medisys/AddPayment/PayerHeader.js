@@ -7,6 +7,8 @@ import { GridContainer, GridItem } from '@/components'
 // styling
 import styles from './styles'
 
+const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
+
 const PayerHeader = ({ classes, patient, invoice }) => (
   <GridContainer justify='space-between' className={classes.payerHeader}>
     <GridItem md={3} className={classes.leftAlignText}>
@@ -15,11 +17,11 @@ const PayerHeader = ({ classes, patient, invoice }) => (
     </GridItem>
     <GridItem md={3} className={classes.centerText}>
       <h4>Total Payable: </h4>
-      <h4>$ {invoice.finalPayable}</h4>
+      <h4>$ {parseToTwoDecimalString(invoice.totalAftGst)}</h4>
     </GridItem>
     <GridItem md={3} className={classes.centerText}>
       <h4>Outstanding: </h4>
-      <h4>$ {invoice.outstandingBalance}</h4>
+      <h4>$ {parseToTwoDecimalString(invoice.outstandingBalance)}</h4>
     </GridItem>
   </GridContainer>
 )

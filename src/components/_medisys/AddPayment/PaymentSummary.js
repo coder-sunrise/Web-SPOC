@@ -2,26 +2,33 @@ import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { GridItem, FastField, SizeContainer, NumberInput } from '@/components'
+import { GridItem, Field, NumberInput } from '@/components'
 // styling
 import styles from './styles'
+import { PAYMENT_MODE } from '@/utils/constants'
 
 const PaymentSummary = ({
   classes,
-  hasCash,
-  totalPayment,
+  totalAftGst,
   collectableAmount,
   cashReturned,
   cashRounding,
+  outstandingAfterPayment,
+  paymentList,
 }) => (
   <React.Fragment>
     <GridItem md={6} className={classes.paymentSummary}>
-      <h4>Outstanding balance after payment: $0.00</h4>
+      <h4>
+        Outstanding balance after payment:&nbsp;
+        <span style={{ color: 'darkblue', fontWeight: 500 }}>
+          ${outstandingAfterPayment}
+        </span>
+      </h4>
     </GridItem>
     <GridItem md={6} container className={classes.paymentSummary}>
       <GridItem md={6}>Total Payment: </GridItem>
       <GridItem md={6}>
-        <NumberInput text currency value={totalPayment} />
+        <NumberInput text currency value={totalAftGst} />
       </GridItem>
       <GridItem md={6}>Cash Rounding: </GridItem>
       <GridItem md={6}>
@@ -34,13 +41,19 @@ const PaymentSummary = ({
       <GridItem md={6}>Cash Received: </GridItem>
       <GridItem md={3} />
       <GridItem md={3}>
-        <FastField
+        <Field
           name='cashReceived'
           render={(args) => (
             <NumberInput
               style={{ textAlign: 'right' }}
               simple
-              disabled={!hasCash}
+              disabled={paymentList.reduce(
+                (noCashPaymentMode, payment) =>
+                  payment.paymentModeFK === PAYMENT_MODE.CASH
+                    ? false
+                    : noCashPaymentMode,
+                true,
+              )}
               currency
               size='sm'
               {...args}

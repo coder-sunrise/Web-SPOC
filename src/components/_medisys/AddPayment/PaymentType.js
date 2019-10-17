@@ -7,8 +7,9 @@ import { Button, GridContainer, GridItem } from '@/components'
 // styling
 import styles from './styles'
 import { paymentTypes } from './variables'
+import { PAYMENT_MODE } from '@/utils/constants'
 
-const PayerHeader = ({ classes, handlePaymentTypeClick }) => (
+const PayerHeader = ({ classes, disableCash, handlePaymentTypeClick }) => (
   <GridContainer alignItems='center' className={classes.paymentTypeRow}>
     <GridItem className={classes.leftAlignText}>
       <h4>Payment Type: </h4>
@@ -17,7 +18,8 @@ const PayerHeader = ({ classes, handlePaymentTypeClick }) => (
       <Button
         color='primary'
         size='sm'
-        id={paymentTypes.cash}
+        disabled={disableCash}
+        id={PAYMENT_MODE.CASH}
         onClick={handlePaymentTypeClick}
       >
         <Add />
@@ -26,7 +28,7 @@ const PayerHeader = ({ classes, handlePaymentTypeClick }) => (
       <Button
         color='primary'
         size='sm'
-        id={paymentTypes.nets}
+        id={PAYMENT_MODE.NETS}
         onClick={handlePaymentTypeClick}
       >
         <Add />
@@ -35,7 +37,7 @@ const PayerHeader = ({ classes, handlePaymentTypeClick }) => (
       <Button
         color='primary'
         size='sm'
-        id={paymentTypes.creditCard}
+        id={PAYMENT_MODE.CREDIT_CARD}
         onClick={handlePaymentTypeClick}
       >
         <Add />
@@ -44,7 +46,7 @@ const PayerHeader = ({ classes, handlePaymentTypeClick }) => (
       <Button
         color='primary'
         size='sm'
-        id={paymentTypes.cheque}
+        id={PAYMENT_MODE.CHEQUE}
         onClick={handlePaymentTypeClick}
       >
         <Add />
@@ -53,7 +55,7 @@ const PayerHeader = ({ classes, handlePaymentTypeClick }) => (
       <Button
         color='primary'
         size='sm'
-        id={paymentTypes.giro}
+        id={PAYMENT_MODE.GIRO}
         onClick={handlePaymentTypeClick}
       >
         <Add />
