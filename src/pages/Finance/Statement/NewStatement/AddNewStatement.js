@@ -234,7 +234,7 @@ class AddNewStatement extends PureComponent {
       statement,
     } = this.props
     const { invoiceRows, columns, columnExtensions } = this.state
-    // console.log('values', values)
+    console.log('values', values)
     // console.log('state', this.state)
     // console.log('props', this.props)
 
@@ -251,7 +251,7 @@ class AddNewStatement extends PureComponent {
                       <CodeSelect
                         label='Co-Payer'
                         code='ctcopayer'
-                        onChange={(e) => this.getInvoiceList(e)}
+                        // onChange={(e) => this.getInvoiceList(e)}
                         disabled={statement.entity}
                         {...args}
                       />
@@ -366,6 +366,7 @@ class AddNewStatement extends PureComponent {
               <GridItem classes={{ grid: classes.searchBtn }} xs md={3}>
                 <ProgressButton
                   color='primary'
+                  disabled={!values.copayerFK}
                   onClick={() => this.getInvoiceList()}
                   icon={<p />}
                 >
@@ -388,7 +389,7 @@ class AddNewStatement extends PureComponent {
             container
             style={{
               marginTop: 10,
-              justifyContent: 'flex-end',
+              justifyContent: 'center',
             }}
           >
             <Button
