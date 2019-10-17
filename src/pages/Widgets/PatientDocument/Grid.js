@@ -1,38 +1,16 @@
 import React, { PureComponent } from 'react'
-
-import { CommonTableGrid, Button, Tooltip, Popconfirm } from '@/components'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
-import Edit from '@material-ui/icons/Edit'
-//import * as service from './services'
-import htmlToText from 'html-to-text'
+import { CommonTableGrid, Button, Tooltip, Popconfirm } from '@/components'
+// import * as service from './services'
+
+import { downloadAttachment } from '@/services/file'
 
 class Grid extends PureComponent {
-  editRow = (row, e) => {
-    const { dispatch, settingDocumentTemplate } = this.props
-
-    const { list } = settingDocumentTemplate
-
-    dispatch({
-      type: 'settingDocumentTemplate/updateState',
-      payload: {
-        showModal: true,
-        entity: list.find((o) => o.id === row.id),
-      },
-    })
+  downloadFile = (row, e) => {
+    console.log("row ", row)  
+    console.log("e ", e)
+    downloadAttachment(row)
   }
-
-  // getTooltipTitle = () => {
-  //   const pathname = window.location.pathname.trim().toLowerCase()
-
-  //   const modalTitle =
-  //     pathname == '/setting/smstemplate'
-  //       ? 'SMS Template'
-  //       : 'Document Template'
-
-  //   return `Edit ${modalTitle}`
-  // }
 
   render () {
     const { patientAttachment, dispatch } = this.props
@@ -41,7 +19,7 @@ class Grid extends PureComponent {
       <CommonTableGrid
         style={{ margin: 0 }}
         rows={list !== undefined ? list : []}
-        onRowDoubleClick={this.editRow}
+        onRowDoubleClick={this.downloadFile}
         columns={[
           { name: 'fileName', title: 'Document' },
           { name: 'createDate', title: 'Create Date' },
@@ -58,7 +36,7 @@ class Grid extends PureComponent {
           {
             columnName: 'createDate',
             type: 'date',
-            format: 'DD MMM YYYY',
+            format: 'DD MMM YYYY h:mm a',
           },
           {
             columnName: 'action',
@@ -67,17 +45,14 @@ class Grid extends PureComponent {
               return (
                 <Popconfirm
                   onConfirm={() => {
-
-             
-                    this.props
-                      .dispatch({
+                      dispatch({
                         type: 'patientAttachment/removeRow',
                         payload: {
                           id: row.id,
                         },
                       })
                       .then(() => {
-                        this.props.dispatch({
+                        dispatch({
                           type: 'patientAttachment/query',
                         })
                       })

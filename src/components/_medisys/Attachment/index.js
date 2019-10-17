@@ -188,6 +188,7 @@ const Attachment = ({
   }
 
   const onClick = (attachment) => {
+    console.log("********* ", attachment)
     downloadAttachment(attachment)
   }
   const labelClass = classnames({

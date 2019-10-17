@@ -2,26 +2,16 @@ import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { status } from '@/utils/codes'
 import {
-  withFormikExtend,
   FastField,
   GridContainer,
   GridItem,
-  Button,
   TextField,
-  Checkbox,
-  Select,
   ProgressButton,
-  CodeSelect,
   DateRangePicker,
 } from '@/components'
 import { Attachment } from '@/components/_medisys'
 import { findGetParameter } from '@/utils/utils'
-// @withFormikExtend({
-//   mapPropsToValues: ({ settingDocumentTemplate }) =>
-//     settingDocumentTemplate.filter || {},
-//   handleSubmit: () => {},
-//   displayName: 'DocumentTemplateFilter',
-// })
+
 class Filter extends PureComponent {
   updateAttachments = (args) => ({ added, deleted }) => {
     // console.log({ added, deleted }, args)
@@ -73,7 +63,6 @@ class Filter extends PureComponent {
       }
     })
 
-    // form.setFieldValue('corAttachment', updated)
   }
 
   render () {
@@ -133,13 +122,13 @@ class Filter extends PureComponent {
 
               <GridItem xs={6} md={4}>
                 <FastField
-                  name='corAttachment'
+                  name='patientAttachment'
                   render={(args) => {
                     this.form = args.form
 
                     return (
                       <Attachment
-                        attachmentType='ClinicalNotes'
+                        attachmentType='patientAttachment'
                         handleUpdateAttachments={this.updateAttachments(args)}
                         attachments={args.field.value}
                         label=''

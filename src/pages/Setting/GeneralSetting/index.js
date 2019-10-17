@@ -75,7 +75,7 @@ const styles = (theme) => ({
       },
     ]
     const { dispatch, onConfirm, history } = props
-
+  
     dispatch({
       type: 'clinicSettings/upsert',
       payload,

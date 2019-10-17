@@ -100,10 +100,8 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   },
   displayName: 'OrderPage',
 })
+
 class Medication extends PureComponent {
-  state = {
-    totalQuantity: 0,
-  }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (
@@ -119,10 +117,7 @@ class Medication extends PureComponent {
       })
     }
   }
-
-  componentDidMount () {
-    // this.calcualteQuantity()
-  }
+  
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
     const { theme, values } = this.props

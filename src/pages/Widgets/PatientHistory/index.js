@@ -298,7 +298,7 @@ class PatientHistory extends Component {
     const { selectedSubRow } = patientHistory
 
     let newArray = []
-    if (clinicSettings.settings.ShowConsultationVersioning === false) {
+    if (clinicSettings.settings.ShowConsultationVersioning === false || clinicSettings.settings.ShowConsultationVersioning === undefined) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
       }
@@ -604,7 +604,7 @@ class PatientHistory extends Component {
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? clinicSettings.settings.ShowConsultationVersioning === false ? (
+          0 ? (clinicSettings.settings.ShowConsultationVersioning === false || clinicSettings.settings.ShowConsultationVersioning === undefined)? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
             <Accordion
