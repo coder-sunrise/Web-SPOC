@@ -226,6 +226,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
             )
 
             if (!_existed) return { ...ip }
+
             return {
               ...ip,
               totalAfterGst:
@@ -541,7 +542,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
-  // console.log({ tempInvoicePayer, invoiceItems: invoice.invoiceItems })
+  // console.log({ tempInvoicePayer })
 
   return (
     <React.Fragment>
