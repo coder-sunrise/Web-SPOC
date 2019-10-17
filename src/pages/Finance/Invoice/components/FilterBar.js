@@ -93,7 +93,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                     ? invoiceDates[1]
                     : undefined,
                   // apiCriteria: {
-                  //   OnlyWithDeposit: showTransactionOnly,
+                  //   OnlyWithDeposit: outstandingBalanceStatus,
                   // },
                   group: [
                     {

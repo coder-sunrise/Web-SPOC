@@ -10,4 +10,6 @@ module.exports = {
   queryList: (params) => service.queryList(url, params),
   upsert: (params) => service.upsert(url, params),
   save: (params) => request(url, { method: 'PUT', body: params }),
+  remove: (params) =>
+    request(`${url}/${params.id}/false`, { method: 'DELETE' }),
 }

@@ -89,7 +89,6 @@ class RoomBlock extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
-    console.log('asd', this.state.showModal)
     return (
       <CardContainer hideHeader>
         <Filter toggleModal={this.toggleModal} dispatch={dispatch} />

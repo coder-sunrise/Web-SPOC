@@ -3,16 +3,13 @@ import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { recurrenceTypes } from '@/utils/codes'
 import {
   CodeSelect,
   GridContainer,
   GridItem,
   Button,
-  Select,
   ProgressButton,
   DateRangePicker,
-  DatePicker,
 } from '@/components'
 // medisys components
 
@@ -38,7 +35,7 @@ const styles = (theme) => ({
 @withFormik({
   mapPropsToValues: () => {
     return {
-      code: [],
+      roomBlockGroupFK: [],
     }
   },
   handleSubmit: () => {},
@@ -52,7 +49,7 @@ class Filter extends PureComponent {
         <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
-              name='code'
+              name='roomBlockGroupFK'
               render={(args) => {
                 return (
                   <CodeSelect
@@ -60,7 +57,7 @@ class Filter extends PureComponent {
                     code='ctRoom'
                     mode='multiple'
                     // allValue={-99}
-                    maxTagCount={values.code.length > 1 ? 0 : 1}
+                    maxTagCount={values.roomBlockGroupFK.length > 1 ? 0 : 1}
                     {...args}
                   />
                 )
@@ -83,12 +80,12 @@ class Filter extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={2}>
             <FastField
-              name='recurrence'
+              name='roomBlockRecurrenceFK'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label='Recurrence Type'
-                    options={recurrenceTypes}
+                    code='LTRecurrencePattern'
                     {...args}
                   />
                 )
@@ -135,16 +132,30 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
+                  const {
+                    dates,
+                    roomBlockRecurrenceFK,
+                    roomBlockGroupFK,
+                  } = this.props.values
+
+                  let stringRoomBlockGroupFK = Number(roomBlockGroupFK)
+                  let type = 'RoomBlockGroupFkNavigation.RoomFK'
+                  if (roomBlockGroupFK.length > 1) {
+                    type = 'in_RoomBlockGroupFkNavigation.RoomFK'
+                    stringRoomBlockGroupFK = roomBlockGroupFK.join('|')
+                  }
+
                   this.props.dispatch({
                     type: 'roomBlock/query',
                     payload: {
-                      lgteql_startDateTime: values.dates
-                        ? values.dates[0]
-                        : undefined,
-                      lsteql_endDateTime: values.dates
-                        ? values.dates[1]
-                        : undefined,
-                      combineCondition: 'and',
+                      [type]:
+                        stringRoomBlockGroupFK === 0
+                          ? undefined
+                          : stringRoomBlockGroupFK,
+
+                      'RoomBlockGroupFkNavigation.RoomBlockRecurrenceFkNavigation.RecurrencePatternFK': roomBlockRecurrenceFK,
+                      lgteql_startDateTime: dates ? dates[0] : undefined,
+                      lsteql_endDateTime: dates ? dates[1] : undefined,
                     },
                   })
                 }}
@@ -156,9 +167,9 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.toggleModal()
-                  this.props.dispatch({
-                    type: 'roomBlock/reset',
-                  })
+                  // this.props.dispatch({
+                  //   type: 'roomBlock/reset',
+                  // })
                 }}
               >
                 Add New
