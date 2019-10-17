@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
+import { navigateDirtyCheck } from '@/utils/utils'
 import {
   Button,
   DatePicker,
@@ -41,6 +42,7 @@ const styles = () => ({
   statement,
 }))
 @withFormikExtend({
+  enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement.default
     const adminChargeValueType =
@@ -55,7 +57,7 @@ const styles = () => ({
     statementDate: Yup.date().required(),
     paymentTerm: Yup.number().required(),
   }),
-
+  notDirtyDuration: 0.5,
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, history } = props
@@ -218,6 +220,10 @@ class AddNewStatement extends PureComponent {
     })
   }
 
+  goBackToPreviousPage = () => {
+    this.props.history.goBack()
+  }
+
   render () {
     const {
       classes,
@@ -274,6 +280,7 @@ class AddNewStatement extends PureComponent {
                     label={formatMessage({
                       id: 'finance.statement.paymentTerms',
                     })}
+                    max={999}
                     {...args}
                   />
                 )}
@@ -383,7 +390,10 @@ class AddNewStatement extends PureComponent {
               justifyContent: 'flex-end',
             }}
           >
-            <Button color='danger' onClick={() => history.goBack()}>
+            <Button
+              color='danger'
+              onClick={navigateDirtyCheck(this.goBackToPreviousPage)}
+            >
               Cancel
             </Button>
             <Button color='primary' onClick={() => handleSubmit()}>
