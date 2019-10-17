@@ -23,7 +23,7 @@ import {
 const mapPaymentListToValidationScheme = (schemes, payment) => {
   return {
     ...schemes,
-    [payment.id]: ValidationScheme[payment.type],
+    [payment.id]: ValidationScheme[payment.paymentModeFK],
   }
 }
 

@@ -1,4 +1,11 @@
-const initialState = {}
+const initialState = {
+  loading: {
+    global: false,
+    models: {},
+    effects: {},
+  },
+}
+
 const models = []
 models.push(require('@/models/setting'))
 models.push(require('@/models/menu'))

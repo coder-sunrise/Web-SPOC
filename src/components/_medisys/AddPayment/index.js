@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import * as Yup from 'yup'
 import { connect } from 'dva'
 // formik
-import { Formik } from 'formik'
+import { Formik, withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -14,135 +14,181 @@ import PaymentCard from './PaymentCard'
 import PaymentSummary from './PaymentSummary'
 // styling
 import styles from './styles'
-import {
-  getLargestID,
-  mapPaymentListToValues,
-  ValidationScheme,
-  InitialValue,
-} from './variables'
+import { getLargestID, InitialValue } from './variables'
 import { rounding } from './utils'
+import { roundToTwoDecimals } from '@/utils/utils'
+import { PAYMENT_MODE } from '@/utils/constants'
 
-const mapPaymentListToValidationScheme = (schemes, payment) => {
-  return {
-    ...schemes,
-    [payment.id]: ValidationScheme[payment.type],
-  }
-}
+@connect(({ clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+}))
+@withFormik({
+  mapPropsToValues: ({ invoice, clinicSettings }) => {
+    const collectableAmount = rounding(
+      clinicSettings,
+      invoice.outstandingBalance,
+    )
+    const cashRounding = collectableAmount - invoice.outstandingBalance
 
-@connect(({ clinicSettings }) => ({ clinicSettings }))
+    return {
+      outstandingAfterPayment: 0,
+      cashReturned: 0,
+      cashReceived: 0,
+      paymentList: [],
+      cashRounding,
+      collectableAmount,
+      ...invoice,
+    }
+  },
+  validationSchema: Yup.object().shape({
+    cashReceived: Yup.number(),
+    paymentList: Yup.array().of(
+      Yup.object().shape({
+        id: Yup.number(),
+        amt: Yup.number().positive().required(),
+        paymentModeFK: Yup.number().required(),
+        creditCardTypeFK: Yup.string().when('paymentModeFK', {
+          is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
+          then: Yup.string().required(),
+        }),
+        creditCardNo: Yup.string().when('paymentModeFK', {
+          is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
+          then: Yup.string().required(),
+        }),
+        chequeNo: Yup.number().when('paymentModeFK', {
+          is: (val) => val === PAYMENT_MODE.CHEQUE,
+          then: Yup.number().required(),
+        }),
+        referrenceNo: Yup.string().when('paymentModeFK', {
+          is: (val) => val === PAYMENT_MODE.GIRO,
+          then: Yup.string().required(),
+        }),
+      }),
+    ),
+  }),
+  handleSubmit: (values, { props }) => {
+    const { handleSubmit } = props
+    const { paymentList, cashReceived, cashReturned, totalAmtPaid } = values
+    const returnValue = {
+      paymentModes: paymentList.map((payment, index) => ({
+        ...payment,
+        sequence: index,
+        id: undefined,
+      })),
+      cashReceived,
+      cashReturned,
+      totalAmtPaid,
+    }
+    handleSubmit(returnValue)
+  },
+})
 class AddPayment extends Component {
-  state = {
-    paymentList: [],
-  }
-
-  onPaymentTypeClick = (values) => (event) => {
+  onPaymentTypeClick = (event) => {
+    const { values, setFieldValue } = this.props
     const { currentTarget: { id: type } } = event
-
-    const { paymentList } = this.state
+    const paymentMode = Object.keys(PAYMENT_MODE).find(
+      (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
+    )
     const payment = {
-      id: getLargestID(paymentList) + 1,
-      type,
+      id: getLargestID(values.paymentList) + 1,
+      paymentModeFK: parseInt(type, 10),
+      paymentMode,
       ...InitialValue[type],
     }
-
-    const newPaymentList = paymentList.map((item) => values[item.id])
-    this.setState({
-      paymentList: [
-        ...newPaymentList,
-        payment,
-      ],
-    })
+    const newPaymentList = [
+      ...values.paymentList,
+      payment,
+    ]
+    setFieldValue('paymentList', newPaymentList)
   }
 
   onDeleteClick = (event) => {
     const { currentTarget: { id } } = event
-    const { paymentList } = this.state
-    this.setState({
-      paymentList: paymentList.filter(
-        (payment) => payment.id !== parseInt(id, 10),
-      ),
-    })
+    const { values, setFieldValue } = this.props
+    const newPaymentList = values.paymentList.filter(
+      (payment) => payment.id !== parseFloat(id, 10),
+    )
+    const hasCash = newPaymentList.reduce(
+      (noCashPaymentMode, payment) =>
+        payment.paymentModeFK === PAYMENT_MODE.CASH || noCashPaymentMode,
+      false,
+    )
+
+    setFieldValue('paymentList', newPaymentList)
+    if (!hasCash) setFieldValue('cashReceived', 0)
+
+    if (newPaymentList.length === 0) setFieldValue('outstandingAfterPayment', 0)
   }
 
-  onConfirmClick = (values, formikBag) => {
-    this.props.handleSubmit(values)
-    this.props.onClose && this.props.onClose()
+  handleAmountChange = () => {
+    const { values, setFieldValue } = this.props
+    const { paymentList, collectableAmount } = values
+    const totalPaid = paymentList.reduce(
+      (total, payment) => total + (payment.amt || 0),
+      0,
+    )
+    const cashPayment = paymentList.find(
+      (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
+    )
+
+    if (cashPayment) setFieldValue('cashReceived', cashPayment.amt)
+
+    setFieldValue(
+      'outstandingAfterPayment',
+      roundToTwoDecimals(collectableAmount - totalPaid),
+    )
+    setFieldValue('totalAmtPaid', totalPaid)
+
+    if (totalPaid > collectableAmount && cashPayment) {
+      const { amt: cashAmount } = cashPayment
+      // const cashReturned = collectableAmount - cashAmount
+      // setFieldValue('cashReturned', cashReturned)
+    }
   }
 
   render () {
-    const { classes, onClose, invoice = {} } = this.props
-    const { paymentList } = this.state
-
-    const validationSchema = Yup.object().shape({
-      ...paymentList.reduce(mapPaymentListToValidationScheme, {}),
-    })
+    const {
+      classes,
+      onClose,
+      invoice = {},
+      clinicSettings,
+      values,
+      handleSubmit,
+    } = this.props
+    const { paymentList } = values
 
     return (
       <div>
         <PayerHeader invoice={invoice} />
-        <Formik
-          enableReinitialize
-          initialValues={{
-            cashReceived: 0,
-            ...paymentList.reduce(mapPaymentListToValues, {}),
-          }}
-          validationSchema={validationSchema}
-          onSubmit={this.onConfirmClick}
-          render={({ values, handleSubmit, setFieldValue, ...restProps }) => {
-            const hasCash = Object.keys(values).reduce(
-              (hasCashMode, key) =>
-                values[key].type === 'Cash' ? true : hasCashMode,
+        <React.Fragment>
+          <PaymentType
+            disableCash={values.paymentList.reduce(
+              (noCashPaymentMode, payment) =>
+                payment.paymentModeFK === PAYMENT_MODE.CASH ||
+                noCashPaymentMode,
               false,
-            )
-            const _collectableExactAmount = Object.keys(values).reduce(
-              (total, key) => total + (values[key].amount || 0),
-              0,
-            )
-            const collectableAmountAfterRounding = rounding(
-              {},
-              _collectableExactAmount,
-            )
-            const cashRounding = hasCash
-              ? Math.abs(
-                  _collectableExactAmount - collectableAmountAfterRounding,
-                )
-              : 0
+            )}
+            handlePaymentTypeClick={this.onPaymentTypeClick}
+          />
+          <PaymentCard
+            paymentList={paymentList}
+            handleDeletePayment={this.onDeleteClick}
+            handleAmountChange={this.handleAmountChange}
+            setFieldValue={this.props.setFieldValue}
+          />
 
-            const cashReturned =
-              values.cashReceived - collectableAmountAfterRounding
-
-            const totalPaymentAfterRounding = rounding({}, invoice.finalPayable)
-            return (
-              <React.Fragment>
-                <PaymentType
-                  handlePaymentTypeClick={this.onPaymentTypeClick(values)}
-                />
-                <PaymentCard
-                  paymentList={paymentList}
-                  handleDeletePayment={this.onDeleteClick}
-                />
-
-                <GridContainer alignItems='flex-end'>
-                  <PaymentSummary
-                    hasCash={hasCash}
-                    totalPayment={totalPaymentAfterRounding}
-                    collectableAmount={collectableAmountAfterRounding}
-                    cashRounding={cashRounding}
-                    cashReturned={cashReturned}
-                  />
-                  <GridItem md={12} className={classes.addPaymentActionButtons}>
-                    <Button color='danger' onClick={onClose}>
-                      Cancel
-                    </Button>
-                    <Button color='primary' onClick={handleSubmit}>
-                      Confirm
-                    </Button>
-                  </GridItem>
-                </GridContainer>
-              </React.Fragment>
-            )
-          }}
-        />
+          <GridContainer alignItems='flex-end'>
+            <PaymentSummary clinicSettings={clinicSettings} {...values} />
+            <GridItem md={12} className={classes.addPaymentActionButtons}>
+              <Button color='danger' onClick={onClose}>
+                Cancel
+              </Button>
+              <Button color='primary' onClick={handleSubmit}>
+                Confirm
+              </Button>
+            </GridItem>
+          </GridContainer>
+        </React.Fragment>
       </div>
     )
   }

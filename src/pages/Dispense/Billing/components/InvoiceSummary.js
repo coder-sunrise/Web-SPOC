@@ -1,18 +1,10 @@
 import React from 'react'
-// formik
-import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // ant design
 import { Divider } from 'antd'
 // common components
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  TextField,
-} from '@/components'
+import { Button, CardContainer, GridContainer, GridItem } from '@/components'
 // utils
 import { roundToTwoDecimals } from '@/utils/utils'
 
@@ -33,7 +25,14 @@ const styles = () => ({
   },
 })
 
-const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
+const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
+
+const InvoiceSummary = ({
+  classes,
+  handleAddPaymentClick,
+  disabled,
+  values,
+}) => {
   const { invoicePaymentModes = [], invoice } = values
   const { gstValue, gstAmount, totalAftGst, invoiceNo } = invoice
   return (
@@ -45,24 +44,32 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>GST ({roundToTwoDecimals(gstValue * 100)}%)</h5>
+              <h5>
+                GST ({parseToTwoDecimalString(
+                  roundToTwoDecimals(gstValue * 100),
+                )}%)
+              </h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                $ {roundToTwoDecimals(gstAmount)}
+                $ {parseToTwoDecimalString(roundToTwoDecimals(gstAmount))}
               </h5>
             </GridItem>
             <GridItem md={6}>
               <h5>Final Bill</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5 className={classes.currencyValue}>${totalAftGst}</h5>
+              <h5 className={classes.currencyValue}>
+                ${parseToTwoDecimalString(roundToTwoDecimals(totalAftGst))}
+              </h5>
             </GridItem>
             <GridItem md={6}>
               <h5 style={{ fontWeight: 500 }}>Total Claims</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5 className={classes.currencyValue}>$ {values.finalClaim}</h5>
+              <h5 className={classes.currencyValue}>
+                $ {parseToTwoDecimalString(values.finalClaim)}
+              </h5>
             </GridItem>
             <GridItem md={12}>
               <Divider
@@ -77,7 +84,9 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
               <h5 style={{ fontWeight: 500 }}>Final Payable</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
-              <h5 className={classes.currencyValue}>$ {values.finalPayable}</h5>
+              <h5 className={classes.currencyValue}>
+                $ {parseToTwoDecimalString(values.finalPayable)}
+              </h5>
             </GridItem>
           </GridContainer>
         </CardContainer>
@@ -112,7 +121,7 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
                 simple
                 size='sm'
                 className={classes.invoiceButton}
-                disabled
+                disabled={disabled}
               >
                 Print Invoice
               </Button>
@@ -124,6 +133,7 @@ const InvoiceSummary = ({ classes, handleAddPaymentClick, values }) => {
                 size='sm'
                 className={classes.addPaymentButton}
                 onClick={handleAddPaymentClick}
+                disabled={disabled}
               >
                 Add Payment
               </Button>
