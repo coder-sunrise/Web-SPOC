@@ -17,7 +17,11 @@ import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 // export const baseUrl = 'http://localhost/SEMR_V2'
 export const baseUrl = process.env.url
 
+// let baseUrl = _baseUrl
+
 let dynamicURL = baseUrl
+if (process.env.NODE_ENV === 'development')
+  dynamicURL = ' https://8fc94f82.ngrok.io'
 
 // const codeMessage = {
 //   200: '服务器成功返回请求的数据。',
