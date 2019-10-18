@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { AddPayment } from 'medisys-components'
+import { AddPayment, WarningSnackbar } from 'medisys-components'
 import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
@@ -14,7 +14,6 @@ import PaymentCard from './PaymentCard'
 import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 // styles
 import styles from './styles'
-import { PayerType } from './variables'
 
 @connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
@@ -174,8 +173,8 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    console.log('PaymentIndex', this.props)
-    const { classes, values } = this.props
+    // console.log('PaymentIndex', this.props)
+    const { classes, values, readOnly } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -190,9 +189,20 @@ class PaymentDetails extends Component {
       showDeleteConfirmation,
       onVoid,
     } = this.state
-    console.log({ values })
+    // console.log({ values })
     return (
       <div className={classes.container}>
+        {readOnly ? (
+          <div style={{ paddingTop: 5 }}>
+            <WarningSnackbar
+              variant='warning'
+              className={classes.margin}
+              message='All action is not allowed due to no active session was found.'
+            />
+          </div>
+        ) : (
+          ''
+        )}
         {!_.isEmpty(values) ? (
           values
             .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
@@ -206,6 +216,7 @@ class PaymentDetails extends Component {
                   outstanding={payment.outStanding}
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
+                  readOnly={readOnly}
                 />
               )
             })

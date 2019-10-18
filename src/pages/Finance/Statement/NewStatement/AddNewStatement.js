@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
+import { navigateDirtyCheck } from '@/utils/utils'
 import {
   Button,
   DatePicker,
@@ -41,6 +42,7 @@ const styles = () => ({
   statement,
 }))
 @withFormikExtend({
+  enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement.default
     const adminChargeValueType =
@@ -56,6 +58,7 @@ const styles = () => ({
     paymentTerm: Yup.number().required(),
   }),
 
+  notDirtyDuration: 3,
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, history } = props
@@ -72,6 +75,7 @@ const styles = () => ({
       }
     })
   },
+  displayName: 'statementDetails',
 })
 class AddNewStatement extends PureComponent {
   state = {
@@ -218,6 +222,10 @@ class AddNewStatement extends PureComponent {
     })
   }
 
+  goBackToPreviousPage = () => {
+    this.props.history.goBack()
+  }
+
   render () {
     const {
       classes,
@@ -245,7 +253,7 @@ class AddNewStatement extends PureComponent {
                       <CodeSelect
                         label='Co-Payer'
                         code='ctcopayer'
-                        onChange={(e) => this.getInvoiceList(e)}
+                        // onChange={(e) => this.getInvoiceList(e)}
                         disabled={statement.entity}
                         {...args}
                       />
@@ -274,6 +282,7 @@ class AddNewStatement extends PureComponent {
                     label={formatMessage({
                       id: 'finance.statement.paymentTerms',
                     })}
+                    max={999}
                     {...args}
                   />
                 )}
@@ -359,7 +368,9 @@ class AddNewStatement extends PureComponent {
               <GridItem classes={{ grid: classes.searchBtn }} xs md={3}>
                 <ProgressButton
                   color='primary'
+                  disabled={!values.copayerFK}
                   onClick={() => this.getInvoiceList()}
+                  icon={<p />}
                 >
                   <Search />
                   <FormattedMessage id='form.search' />
@@ -380,10 +391,13 @@ class AddNewStatement extends PureComponent {
             container
             style={{
               marginTop: 10,
-              justifyContent: 'flex-end',
+              justifyContent: 'center',
             }}
           >
-            <Button color='danger' onClick={() => history.goBack()}>
+            <Button
+              color='danger'
+              onClick={navigateDirtyCheck(this.goBackToPreviousPage)}
+            >
               Cancel
             </Button>
             <Button color='primary' onClick={() => handleSubmit()}>

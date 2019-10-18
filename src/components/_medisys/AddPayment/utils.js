@@ -11,6 +11,9 @@ export const rounding = (config, amount) => {
 
   if (currencyRounding.toLowerCase() === 'up') {
     switch (roundingPoint) {
+      case 0.05:
+        cents = cents < roundingPoint ? roundingPoint : 0.1
+        break
       case 0.1:
         cents = Math.floor(cents * 10) / 10 + roundingPoint
         break
@@ -25,6 +28,9 @@ export const rounding = (config, amount) => {
     }
   } else {
     switch (roundingPoint) {
+      case 0.05:
+        cents = cents < roundingPoint ? 0.0 : roundingPoint
+        break
       case 0.1:
         cents = Math.floor(cents * 10) / 10
         break

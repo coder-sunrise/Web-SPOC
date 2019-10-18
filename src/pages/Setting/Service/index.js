@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
-
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-
+import Yup from '@/utils/yup'
 import { CardContainer, CommonModal } from '@/components'
-
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
@@ -65,7 +62,6 @@ class Service extends PureComponent {
   render () {
     const { settingClinicService } = this.props
     const { open } = this.state
-    console.log('open', open)
     const cfg = {
       toggleModal: this.toggleModal,
     }

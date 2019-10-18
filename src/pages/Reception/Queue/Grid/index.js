@@ -30,6 +30,8 @@ const compareQueueNo = (a, b) => {
 }
 
 const compareString = (a, b) => a.localeCompare(b)
+const compareDoctor = (a, b) =>
+  a.clinicianProfile.name.localeCompare(b.clinicianProfile.name)
 
 const FuncConfig = {
   pager: false,
@@ -176,6 +178,7 @@ const columnExtensions = [
   },
   {
     columnName: 'doctor',
+    compare: compareDoctor,
     render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
   },
 ]
@@ -287,21 +290,14 @@ const Grid = ({
       return false
     }
 
-    // if (visitStatus === 'IN CONS') {
-    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
-    //     dispatch({
-    //       type: 'global/updateAppState',
-    //       payload: {
-    //         openConfirm: true,
-    //         openConfirmTitle: '',
-    //         openConfirmContent: `Are you sure to overwrite ${title ||
-    //           ''} ${name} consultation?`,
-    //         onConfirmSave: () => null,
-    //       },
-    //     })
-    //     return false
-    //   }
-    // }
+    if (visitStatus === 'IN CONS') {
+      if (assignedDoctorProfile.id !== doctorProfile.id) {
+        notification.error({
+          message: `You cannot resume other doctor's consultation.`,
+        })
+        return false
+      }
+    }
 
     // if (assignedDoctorProfile.id !== doctorProfile.id) {
     //   notification.error({

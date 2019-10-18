@@ -70,7 +70,7 @@ const itemSchema = Yup.object().shape({
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-    console.log('handleSubmit', values)
+    // console.log('handleSubmit', values)
     dispatch({
       type: 'settingClinicService/upsert',
       payload: {
@@ -238,7 +238,7 @@ class Detail extends PureComponent {
       const checkDefaultExist = serviceSettings.find(
         (o) => o.isDefault === true,
       )
-      console.log({ checkDefaultExist })
+      // console.log({ checkDefaultExist })
       if (!checkDefaultExist && serviceSettings.length > 0) {
         serviceSettings[0].isDefault = true
       }

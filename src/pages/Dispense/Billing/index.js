@@ -50,14 +50,46 @@ const bannerStyle = {
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ billing }) => billing.entity || billing.default,
-  handleSubmit: (values, formikBag) => {
-    console.log({ values })
+  mapPropsToValues: ({ billing }) => {
+    if (billing.entity) {
+      return { ...billing.entity, payment: { paymentModes: [] } }
+    }
+    return billing.default
+  },
+  handleSubmit: (values, { props, resetForm }) => {
+    const { dispatch } = props
+    const {
+      concurrencyToken,
+      visitId,
+      invoice,
+      invoicePayers,
+      payment,
+    } = values
+
+    const payload = {
+      concurrencyToken,
+      visitId,
+      invoice,
+      payment,
+      invoicePayers: invoicePayers.map((payer) => ({
+        ...payer,
+        invoicePayerItems: payer.invoicePayerItems.map((item) => ({
+          ...item,
+          payableBalance: item.totalAfterGst,
+        })),
+      })),
+    }
+    console.log({ values, payload })
+    dispatch({
+      type: 'billing/upsert',
+      payload,
+    }).then((response) => {
+      console.log({ response })
+    })
   },
 })
 class Billing extends Component {
   state = {
-    showCoPaymentModal: false,
     showAddPaymentModal: false,
     isEditing: false,
   }
@@ -78,21 +110,15 @@ class Billing extends Component {
     })
   }
 
-  toggleCopayerModal = () => {
-    const { showCoPaymentModal } = this.state
-    this.setState({ showCoPaymentModal: !showCoPaymentModal })
-  }
-
   toggleAddPaymentModal = () => {
     const { showAddPaymentModal } = this.state
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
 
   handleAddPayment = (payment) => {
-    console.log('addpayment', { payment })
     const { setFieldValue } = this.props
-
     setFieldValue('payment', payment)
+    this.toggleAddPaymentModal()
   }
 
   onExpandDispenseDetails = (event, panel, expanded) => {
@@ -109,7 +135,14 @@ class Billing extends Component {
 
   render () {
     const { showAddPaymentModal } = this.state
-    const { classes, values, dispense, loading, setFieldValue } = this.props
+    const {
+      classes,
+      values,
+      dispense,
+      loading,
+      setFieldValue,
+      handleSubmit,
+    } = this.props
     const formikBag = {
       values,
       setFieldValue,
@@ -171,6 +204,7 @@ class Billing extends Component {
           <Button
             color='primary'
             disabled={this.state.isEditing || values.id === undefined}
+            onClick={handleSubmit}
           >
             Complete Payment
           </Button>
