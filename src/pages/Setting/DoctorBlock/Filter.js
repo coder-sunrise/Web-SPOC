@@ -3,13 +3,11 @@ import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
 import {
-  CodeSelect,
   GridContainer,
   GridItem,
   Button,
-  Select,
+  CodeSelect,
   ProgressButton,
   DateRangePicker,
 } from '@/components'

@@ -121,6 +121,7 @@ class POSummary extends PureComponent {
                     label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
+                    disabled={`${poPrefix}.IsGSTInclusive`}
                     {...args}
                   />
                 )}

@@ -58,8 +58,7 @@ const styles = () => ({
     paymentTerm: Yup.number().required(),
   }),
 
-  notDirtyDuration: 3,
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, history } = props
     console.log('submit', values)
@@ -71,6 +70,7 @@ const styles = () => ({
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         history.push('/finance/statement')
       }
     })
@@ -223,7 +223,9 @@ class AddNewStatement extends PureComponent {
   }
 
   goBackToPreviousPage = () => {
-    this.props.history.goBack()
+    const { history, resetForm } = this.props
+    resetForm()
+    history.goBack()
   }
 
   render () {
@@ -398,7 +400,7 @@ class AddNewStatement extends PureComponent {
               color='danger'
               onClick={navigateDirtyCheck(this.goBackToPreviousPage)}
             >
-              Cancel
+              Close
             </Button>
             <Button color='primary' onClick={() => handleSubmit()}>
               Save
