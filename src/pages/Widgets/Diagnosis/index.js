@@ -95,13 +95,13 @@ class Diagnosis extends PureComponent {
   addDiagnosis = () => {
     // console.log('addDiagnosis')
     this.arrayHelpers.push({
-      onsetDate: moment(),
+     // onsetDate: moment(),
       uid: getUniqueGUID(),
     })
   }
 
   render () {
-    const { theme, components } = this.props
+    const { theme, components, diagnosis } = this.props
     return (
       <div>
         <FieldArray
@@ -109,10 +109,22 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
+            let diagnosises = []
 
             this.arrayHelpers = arrayHelpers
-            if (!values || !values.corDiagnosis) return null
-            const diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            // if (!values || !values.corDiagnosis) return null
+            console.log("++++++++++++ " , diagnosis.default.corDiagnosis)
+            console.log("***** ", values.corDiagnosis.length)
+            if(values.corDiagnosis.length <= 0){
+              console.log("no")
+              // this.addDiagnosis()
+               diagnosises = diagnosis.default.corDiagnosis
+            }else{
+              console.log("yes")
+               diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            }
+
+            
             if (diagnosises.length === 0) {
               // if(!values.disabled)
               if (components.ConsultationPage.edit) {
