@@ -57,7 +57,8 @@ const styles = () => ({
     statementDate: Yup.date().required(),
     paymentTerm: Yup.number().required(),
   }),
-  notDirtyDuration: 0.5,
+
+  notDirtyDuration: 3,
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, history } = props
@@ -74,6 +75,7 @@ const styles = () => ({
       }
     })
   },
+  displayName: 'statementDetails',
 })
 class AddNewStatement extends PureComponent {
   state = {
