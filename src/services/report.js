@@ -50,3 +50,20 @@ export const getPatientListingReport = async (payload) => {
     ]),
   })
 }
+
+export const postPDF = async (reportID, payload) => {
+  const baseURL = '/api/reports'
+  var response = request(`${baseURL}/${reportID}`, {
+    method: 'POST',
+    contentType: 'application/x-www-form-urlencoded',
+    xhrFields: {
+      responseType: 'arraybuffer',
+    },
+    data: {
+      reportContent: JSON.stringify(
+        payload,
+      ),
+    },
+  })
+  return response
+}

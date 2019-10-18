@@ -46,7 +46,8 @@ export const PrescriptionColumns = [
   },
 ]
 
-export const PrescriptionColumnExtensions = [
+export const PrescriptionColumnExtensions = (handleClickPrintDrugLabel) =>{
+  return([
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
@@ -86,17 +87,22 @@ export const PrescriptionColumnExtensions = [
     columnName: 'action',
     align: 'center',
     width: 80,
-    render: () => {
+    render: (row) => {
       return (
         <Tooltip title='Print'>
-          <Button color='primary' justIcon>
+          <Button color='primary'
+           onClick={() => {
+            handleClickPrintDrugLabel(row)
+          }}
+          justIcon>
             <Print />
           </Button>
         </Tooltip>
       )
     },
   },
-]
+])
+}
 
 export const VaccinationColumn = [
   {
