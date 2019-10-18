@@ -137,6 +137,7 @@ const Setting = ({
                   id: 'inventory.master.setting.frequency',
                 })}
                 code='ctMedicationFrequency'
+                labelField='displayValue'
                 {...args}
               />
             )}
