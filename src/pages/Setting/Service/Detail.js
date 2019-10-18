@@ -67,7 +67,7 @@ const itemSchema = Yup.object().shape({
       'At least one service setting is required.',
     ),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     // console.log('handleSubmit', values)
@@ -80,6 +80,7 @@ const itemSchema = Yup.object().shape({
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingClinicService/query',

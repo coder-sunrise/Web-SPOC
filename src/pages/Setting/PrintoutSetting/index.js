@@ -77,7 +77,7 @@ const styles = (theme) => ({
     }),
     customLetterHeadImage: Yup.string().required(),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, history } = props
     const { customLetterHeadImage, footerDisclaimerImage } = values
     const noHeaderBase64 = (v) => {
@@ -92,6 +92,10 @@ const styles = (theme) => ({
         customLetterHeadImage: noHeaderBase64(customLetterHeadImage),
         footerDisclaimerImage: noHeaderBase64(footerDisclaimerImage),
       },
+    }).then((r) => {
+      if (r) {
+        resetForm()
+      }
     })
   },
   displayName: 'printoutSettingInfo',
