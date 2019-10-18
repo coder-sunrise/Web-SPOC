@@ -19,10 +19,6 @@ const purchaseOrderPaymentSchema = (outstandingAmount) =>
   })
 
 class Grid extends PureComponent {
-  state = {
-    outstandingAmount: 0,
-  }
-
   tableParas = {
     columns: [
       { name: 'paymentNo', title: 'Payment No.' },
@@ -59,33 +55,18 @@ class Grid extends PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    const { setFieldValue } = this.props
+    const { setFieldValue, recalculateOutstandingAmount } = this.props
     if (deleted) {
       rows.find((v) => v.id === deleted[0]).isDeleted = true
-      this.setState((prevState) => {
-        return {
-          outstandingAmount:
-            prevState.outstandingAmount - deleted[0].paymentAmount,
-        }
-      })
+      recalculateOutstandingAmount('delete', deleted[0].paymentAmount)
       setFieldValue('purchaseOrderPayment', rows)
     } else {
       rows[0].isDeleted = false
-      this.setState((prevState) => {
-        return {
-          outstandingAmount:
-            prevState.outstandingAmount - rows[0].paymentAmount,
-        }
-      })
+      recalculateOutstandingAmount('add', rows[0].paymentAmount)
       setFieldValue('purchaseOrderPayment', rows)
     }
 
     return rows
-  }
-
-  componentDidMount = () => {
-    const { outstandingAmount } = this.props.values.purchaseOrderDetails
-    this.setState({ outstandingAmount })
   }
 
   render () {
@@ -95,7 +76,7 @@ class Grid extends PureComponent {
       <GridContainer>
         <EditableTableGrid
           rows={values.purchaseOrderPayment}
-          schema={purchaseOrderPaymentSchema(this.state.outstandingAmount)}
+          schema={purchaseOrderPaymentSchema(values.outstandingAmt)}
           FuncProps={{
             edit: false,
             pager: false,
