@@ -21,9 +21,15 @@ import {
 let commitCount = 2201 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
-  type: Yup.string().required(),
-  code: Yup.string().required(),
-  name: Yup.string().required(),
+  type: Yup.number().required(),
+  code: Yup.number().required(),
+  name: Yup.number().required(),
+  batchNo: Yup.number().when('expiryDate', {
+    is: (v) => v !== undefined,
+    then: Yup.number().required(),
+  }),
+  expiryDate: Yup.date(),
+
   // orderQty: Yup.number().required(),
   // bonusQty: Yup.number().required(),
   // quantityReceived: Yup.number().min(0).required(),
@@ -185,6 +191,9 @@ class DODetails extends PureComponent {
   }
 
   setOption = (m, v, c) => {
+    if (!m.data || !v.data || !c.data) {
+      return
+    }
     const mOptions = m.data.map((o) => {
       return {
         ...o,
