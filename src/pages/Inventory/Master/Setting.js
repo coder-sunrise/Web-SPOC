@@ -184,6 +184,7 @@ const Setting = ({
                   label={formatMessage({
                     id: 'inventory.master.setting.quantity',
                   })}
+                  format='0.0'
                   {...args}
                 />
               )
