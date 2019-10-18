@@ -18,7 +18,7 @@ import {
 
 const styles = (theme) => ({
   reasonTextBox: {
-    paddingTop: `${theme.spacing.unit * 4.75}px !important`,
+    paddingTop: `${theme.spacing(2)}px !important`,
   },
   title: {
     display: 'flex',
@@ -26,7 +26,7 @@ const styles = (theme) => ({
     alignItems: 'center',
   },
   warningIcon: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
   },
 })
 
@@ -124,15 +124,13 @@ const DeleteConfirmation = ({
           </h4>
         </div>
       </GridItem>
-      <GridItem>
+      <GridItem md={8}>
         <Field
           name='reasonType'
           render={(args) => (
             <RadioGroup
               {...args}
               label=''
-              simple
-              vertical
               options={ltCancelReason}
               textField='name'
               valueField='id'
@@ -140,7 +138,7 @@ const DeleteConfirmation = ({
           )}
         />
       </GridItem>
-      <GridItem xs md={6} className={classnames(classes.reasonTextBox)}>
+      <GridItem xs md={8}>
         <Field
           name='reason'
           render={(args) => (

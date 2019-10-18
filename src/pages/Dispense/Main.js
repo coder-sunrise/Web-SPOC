@@ -115,6 +115,7 @@ const reloadDispense = (props, effect = 'query') => {
           ...props,
           ...restProps,
         })
+        
       }
     })
   },
@@ -172,7 +173,7 @@ class Main extends Component {
 
   editOrder = (e) => {
     const { handleSubmit } = this.props
-    //this._editOrder
+
     navigateDirtyCheck(this._editOrder, () => {
       handleSubmit()
       this._editOrder()

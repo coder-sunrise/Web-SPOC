@@ -1,26 +1,25 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
-import { status } from '@/utils/codes'
 import {
-  withFormikExtend,
   FastField,
   GridContainer,
   GridItem,
-  Button,
   TextField,
   ProgressButton,
-  Select,
+  DateRangePicker,
+  withFormikExtend,
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingServiceCategory }) =>
-    settingServiceCategory.filter || {},
+  mapPropsToValues: ({ patientAttachment }) =>
+  patientAttachment.filter || {},
   handleSubmit: () => {},
-  displayName: 'ServiceCenterFilter',
+  displayName: 'DocumentTemplateFilter',
 })
 class Filter extends PureComponent {
+  
+
   render () {
-    // console.log({ props: this.props.values })
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -29,36 +28,42 @@ class Filter extends PureComponent {
             <FastField
               name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code / Display Value' {...args} />
+                return <TextField label='Document' {...args} />
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={2}>
+          <GridItem xs={7} md={4}>
             <FastField
-              name='isActive'
+              name='effectiveDates'
               render={(args) => {
-                return <Select label='Status' options={status} {...args} />
+                return (
+                  <DateRangePicker label='Create Date' label2='To' {...args} />
+                )
               }}
             />
           </GridItem>
         </GridContainer>
 
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={4}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue, isActive } = this.props.values
+                  const { codeDisplayValue, effectiveDates } = this.props.values
                   this.props.dispatch({
-                    type: 'settingServiceCategory/query',
+                    type: 'patientAttachment/query',
                     payload: {
-                      isActive,
+                      lgteql_createDate: effectiveDates
+                        ? effectiveDates[0]
+                        : undefined,
+                      lsteql_createDate: effectiveDates
+                        ? effectiveDates[1]
+                        : undefined,
                       group: [
                         {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
+                          'FileIndexFKNavigation.FileName': codeDisplayValue,
                           combineCondition: 'or',
                         },
                       ],
@@ -68,21 +73,6 @@ class Filter extends PureComponent {
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
-
-              <Button
-                color='primary'
-                onClick={() => {
-                  this.props.dispatch({
-                    type: 'settingServiceCategory/updateState',
-                    payload: {
-                      entity: undefined,
-                    },
-                  })
-                  this.props.toggleModal()
-                }}
-              >
-                Add New
-              </Button>
             </div>
           </GridItem>
         </GridContainer>
@@ -92,3 +82,18 @@ class Filter extends PureComponent {
 }
 
 export default Filter
+
+// <Button
+// color='primary'
+// onClick={() => {
+//   this.props.dispatch({
+//     type: 'settingDocumentTemplate/updateState',
+//     payload: {
+//       entity: undefined,
+//     },
+//   })
+//   this.props.toggleModal()
+// }}
+// >
+// Upload
+// </Button>

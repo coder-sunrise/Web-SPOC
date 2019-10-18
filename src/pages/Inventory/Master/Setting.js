@@ -136,7 +136,9 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.frequency',
                 })}
+                labelField='displayValue'
                 code='ctMedicationFrequency'
+                labelField='displayValue'
                 {...args}
               />
             )}

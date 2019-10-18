@@ -372,24 +372,15 @@ class Demographic extends PureComponent {
                   name='pdpaConsent'
                   render={(args) => (
                     <CheckboxGroup
-                      // style={{
-                      //   margin: theme.spacing(2),
-                      // }}
                       label='PDPA Consent - Agree to receive marketing material via:'
                       horizontal
                       simple
-                      // value={currentLayout.widgets}
                       valueField='id'
                       textField='name'
                       options={[
                         {
                           id: '1',
                           name: 'Phone Call',
-                          // component: Loadable({
-                          //   loader: () =>
-                          //     import('@/pages/Widgets/ResultHistory'),
-                          //   loading: Loading,
-                          // }),
                           layoutConfig: {
                             style: {},
                           },
@@ -397,10 +388,6 @@ class Demographic extends PureComponent {
                         {
                           id: '2',
                           name: 'Text Message',
-                          // component: Loadable({
-                          //   loader: () => import('@/pages/Widgets/TestWidget'),
-                          //   loading: Loading,
-                          // }),
                           layoutConfig: {
                             style: {},
                           },
@@ -408,27 +395,30 @@ class Demographic extends PureComponent {
                         {
                           id: '3',
                           name: 'Email',
-                          // component: Loadable({
-                          //   loader: () => import('@/pages/Widgets/TestWidget'),
-                          //   loading: Loading,
-                          // }),
                           layoutConfig: {
                             style: {},
                           },
                         },
                       ]}
                       onChange={(e, s) => {
-                        const { pdpaConsent } = values
-                        setFieldValue('patientPdpaConsent', [])
-                        // console.log({ e })
-                        // dispatch({
-                        //   type: 'consultation/updateState',
-                        //   payload: {
-                        //     selectedWidgets: e.target.value,
-                        //   },
-                        // })
-                        // console.log(e.target.value, s)
-                        // this.updateWidget(e.target.value, s)
+                        const { pdpaConsent, patientPdpaConsent } = values
+                        const _patientPdpaConsent = patientPdpaConsent.reduce(
+                          (consents, item) => {
+                            if (e.includes(item.pdpaConsentTypeFK)) {
+                              return [
+                                ...consents,
+                                { ...item, isConsent: true },
+                              ]
+                            }
+                            return [
+                              ...consents,
+                              { ...item, isConsent: false },
+                            ]
+                          },
+                          [],
+                        )
+                        console.log({ _patientPdpaConsent })
+                        setFieldValue('patientPdpaConsent', _patientPdpaConsent)
                       }}
                       {...args}
                     />

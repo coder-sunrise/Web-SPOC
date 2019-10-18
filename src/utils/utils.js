@@ -694,7 +694,7 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
           id: 'app.general.leave-without-save',
         }),
         onConfirmSave: saveCb,
-        openConfirmText: 'Save Changes',
+        openConfirmText: saveCb ? 'Save Changes' : 'Confirm',
         onConfirmDiscard: () => {
           if (displayName) {
             window.g_app._store.dispatch({
