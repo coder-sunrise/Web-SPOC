@@ -78,6 +78,12 @@ export default createFormViewModel({
             errorState: {},
           },
         })
+        yield put({
+          type: 'patient/updateState',
+          payload: {
+            callback: undefined,
+          },
+        })
         return yield put(closeModal)
       },
       *fetchVisitInfo ({ payload }, { call, put, take }) {

@@ -61,6 +61,7 @@ import styles from './style'
   }),
 )
 @withFormikExtend({
+  notDirtyDuration: 0.5,
   displayName: 'AppointmentForm',
   enableReinitialize: true,
   validationSchema: ValidationSchema,
@@ -694,6 +695,7 @@ class Form extends React.PureComponent {
           ]
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
+    console.log({ values })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>

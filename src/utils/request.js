@@ -20,8 +20,9 @@ export const baseUrl = process.env.url
 // let baseUrl = _baseUrl
 
 let dynamicURL = baseUrl
+
 if (process.env.NODE_ENV === 'development')
-  dynamicURL = ' http://localhost:55314'
+  dynamicURL = 'http://localhost:55314'
 
 // const codeMessage = {
 //   200: '服务器成功返回请求的数据。',

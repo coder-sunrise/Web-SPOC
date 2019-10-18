@@ -21,7 +21,8 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
     const lastChar = value[value.length - 1] || ''
     let outputChars = []
     switch (typeFK) {
-      case 1: // fin
+      // case 1: // fin
+      case 4: // SO
         if (firstChar === 'F')
           // prettier-ignore
           outputChars = ['X','W','U','T','R','Q','P','N','M','L','K']
@@ -29,13 +30,16 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
           // prettier-ignore
           outputChars = ['R','Q','P','N','M','L','K','X','W','U','T']
         break
-      case 5:
-      case 6:
-      case 10:
-      case 11:
-      case 12:
-      case 13:
-        // nric
+      // case 5:
+      // case 6:
+      // case 10:
+      // case 11:
+      // case 12:
+      // case 13: // nric
+
+      case 1: // SP
+      case 2: // SH
+      case 3: // SB
         if (firstChar === 'S')
           // prettier-ignore
           outputChars = ['J','Z','I','H','G','F','E','D','C','B','A']
@@ -79,13 +83,16 @@ Yup.addMethod(Yup.string, 'NRIC', function (message) {
       const mDob = moment(dob)
 
       switch (typeFK) {
-        case 5:
-        case 6:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-          // nric
+        // case 5:
+        // case 6:
+        // case 10:
+        // case 11:
+        // case 12:
+        // case 13:
+        //   // nric
+        case 1: // SP
+        case 2: // SH
+        case 3: // SB
           if (mDob.year() >= 2000) {
             if (firstChar !== 'T') {
               return createError({
