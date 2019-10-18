@@ -17,10 +17,7 @@ import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 // export const baseUrl = 'http://localhost/SEMR_V2'
 export const baseUrl = process.env.url
 
-// let baseUrl = _baseUrl
-
 let dynamicURL = baseUrl
-
 if (process.env.NODE_ENV === 'development')
   dynamicURL = 'http://localhost:55314'
 
@@ -59,6 +56,10 @@ const codeMessage = {
   502: 'Bad Gateway',
   503: 'Server overloadded',
   504: 'Request timeout',
+}
+
+const _errorMessageMapping = {
+  V00031: 'Invalid password format',
 }
 
 export function updateAPIType (type) {
@@ -324,24 +325,18 @@ const request = (url, option, showNotification = true) => {
             }
 
             let errorMsg = codeMessage[response.status]
-            if (response.status === 400 && token === null) {
-              window.g_app._store.dispatch({
-                type: 'login/logout',
-              })
-              return false
-            }
+
             if (
-              response.status === 401 &&
+              ((response.status === 400 && token === null) ||
+                response.status === 401) &&
               url !== '/connect/token'
-              /* use this to bypass login on development mode */
-              // && process.env.NODE_ENV !== 'development'
             ) {
-              /* eslint-disable no-underscore-dangle */
               window.g_app._store.dispatch({
                 type: 'login/logout',
               })
               return false
             }
+
             if (s === 'timeout') {
               errorMsg = 'The request timeout'
             }
@@ -363,12 +358,17 @@ const request = (url, option, showNotification = true) => {
 
             notification.destroy()
             if (response.responseJSON) {
+              const overwriteMessage =
+                _errorMessageMapping[response.responseJSON.status]
+
+              const description =
+                overwriteMessage ||
+                response.responseJSON.message ||
+                response.responseJSON.title
+
               showNotification &&
                 notification.error({
-                  // message: response.responseJSON.status,
-                  description:
-                    response.responseJSON.message ||
-                    response.responseJSON.title,
+                  description,
                   duration: 15,
                 })
             } else {

@@ -1,25 +1,16 @@
 import React, { PureComponent } from 'react'
 
+import { isNumber } from 'util'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import moment from 'moment'
-import * as colorManipulator from '@material-ui/core/styles/colorManipulator'
 import {
   MuiThemeProvider,
   createMuiTheme,
   withStyles,
 } from '@material-ui/core/styles'
 // import Paper from '@material-ui/core/Paper'
-import { LinearProgress, Paper, Tooltip, IconButton } from '@material-ui/core'
-import {
-  primaryColor,
-  dangerColor,
-  roseColor,
-  grayColor,
-  fontColor,
-  hoverColor,
-  tableEvenRowColor,
-} from 'mui-pro-jss'
+import { Paper, Tooltip, IconButton } from '@material-ui/core'
+import { hoverColor, tableEvenRowColor } from 'mui-pro-jss'
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown'
 import ArrowDropUp from '@material-ui/icons/ArrowDropUp'
 
@@ -37,11 +28,9 @@ import {
   SelectionState,
   SortingState,
   SummaryState,
-  DataTypeProvider,
   CustomPaging,
   TreeDataState,
   CustomTreeData,
-  TableColumnResizing,
 } from '@devexpress/dx-react-grid'
 
 import {
@@ -59,19 +48,16 @@ import {
   VirtualTable,
   TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
-import { Button } from '@/components'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
+import { smallTheme, defaultTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
 import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
 import RangeDateTypeProvider from './EditCellComponents/RangeDateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
-import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
-import { watchForElementChange } from '@/utils/utils'
-import { isNumber } from 'util'
+import { LoadingWrapper } from '@/components/_medisys'
 
 window.$tempGridRow = {}
 
@@ -485,7 +471,7 @@ class CommonTableGrid extends PureComponent {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query' } = this.props
-    console.log({ payload, type, query })
+
     if (query) {
       query({
         callback: (data) => {
@@ -511,7 +497,6 @@ class CommonTableGrid extends PureComponent {
         ...this.state.entity.pagination,
         ...payload,
       }
-      console.log({ p, entity: this.state })
       dispatch({
         type: `${type}/${queryMethod}`,
         payload: p,
@@ -534,6 +519,7 @@ class CommonTableGrid extends PureComponent {
       //   //   payload.sorting[0].direction === 'asc' ? 'desc' : 'asc'
       // }
       // payload.current &&
+      console.log('none of the above')
       this.setState({
         pagination: {
           ...pagination,
@@ -654,6 +640,7 @@ class CommonTableGrid extends PureComponent {
       schema,
       editingRowIds,
       global,
+      loading,
       gridId,
     } = this.props
 
@@ -820,6 +807,7 @@ class CommonTableGrid extends PureComponent {
     }
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
+    const _loading = type ? loading.effects[`${type}/query`] : false
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -833,139 +821,143 @@ class CommonTableGrid extends PureComponent {
             // height,
           }}
         >
-          {isLoading && (
+          {/* isLoading && (
             <div>
               <LinearProgress />
               <span>{loadingMessage}</span>
             </div>
-          )}
-          <DevGrid
-            rows={getIndexedRows(
-              this.state.entity
-                ? this.state.entity.list
-                : rows.filter((o) => !o.isDeleted),
-              this.state.pagination,
-            )} // this.state.data ||
-            columns={newColumns}
-            getRowId={getRowId}
-            rootComponent={Root}
-          >
-            {filter && (
-              <FilteringState
-                defaultFilters={defaultFilters}
-                onFiltersChange={onFiltersChange}
-                columnExtensions={filterColumnExtensions}
-              />
-            )}
-            {sort && (
-              <SortingState
-                sorting={this.state.pagination.sorting}
-                defaultSorting={defaultSorting}
-                onSortingChange={(sorting) => {
-                  sorting.forEach((o) => {
-                    const c = newColumExtensions.find(
-                      (m) => m.columnName === o.columnName,
-                    )
-                    o.sortBy = c.sortBy
-                  })
-                  this.search({
-                    sorting,
-                  })
-                }}
-                columnExtensions={newColumExtensions}
-                {...sortConfig}
-              />
-            )}
-            {selectable && (
-              <SelectionState
-                selection={selection}
-                onSelectionChange={onSelectionChange}
-              />
-            )}
-            {summary && <SummaryState {...summaryConfig.state} />}
-            {grouping && <GroupingState {...groupingConfig.state} />}
-            {pager && (
-              <PagingState
-                currentPage={this.state.pagination.current - 1}
-                pageSize={this.state.pagination.pagesize}
-                {...pagerStateConfig}
-              />
-            )}
-            {tree && <TreeDataState />}
-            {extraState.map((o) => o)}
+          ) */}
+          <LoadingWrapper loading={_loading} linear text='Loading...'>
+            <DevGrid
+              rows={getIndexedRows(
+                this.state.entity
+                  ? this.state.entity.list
+                  : rows.filter((o) => !o.isDeleted),
+                this.state.pagination,
+              )} // this.state.data ||
+              columns={newColumns}
+              getRowId={getRowId}
+              rootComponent={Root}
+            >
+              {filter && (
+                <FilteringState
+                  defaultFilters={defaultFilters}
+                  onFiltersChange={onFiltersChange}
+                  columnExtensions={filterColumnExtensions}
+                />
+              )}
+              {sort && (
+                <SortingState
+                  sorting={this.state.pagination.sorting}
+                  defaultSorting={defaultSorting}
+                  onSortingChange={(sorting) => {
+                    sorting.forEach((o) => {
+                      const c = newColumExtensions.find(
+                        (m) => m.columnName === o.columnName,
+                      )
+                      o.sortBy = c.sortBy
+                    })
+                    this.search({
+                      sorting,
+                    })
+                  }}
+                  columnExtensions={newColumExtensions}
+                  {...sortConfig}
+                />
+              )}
+              {selectable && (
+                <SelectionState
+                  selection={selection}
+                  onSelectionChange={onSelectionChange}
+                />
+              )}
+              {summary && <SummaryState {...summaryConfig.state} />}
+              {grouping && <GroupingState {...groupingConfig.state} />}
+              {pager && (
+                <PagingState
+                  currentPage={this.state.pagination.current - 1}
+                  pageSize={this.state.pagination.pagesize}
+                  {...pagerStateConfig}
+                />
+              )}
+              {tree && <TreeDataState />}
+              {extraState.map((o) => o)}
 
-            {grouping && (
-              <IntegratedGrouping
-                columnExtensions={groupingConfig.columnExtensions || []}
-              />
-            )}
-            {/* <IntegratedFiltering /> */}
-            {sort &&
-            !type && (
-              <IntegratedSorting columnExtensions={newColumExtensions} />
-            )}
-            {summary && <IntegratedSummary {...summaryConfig.integrated} />}
-            {pager && !this.state.entity && <IntegratedPaging />}
-            {pager &&
-            this.state.entity && (
-              <CustomPaging totalCount={this.state.pagination.totalRecords} />
-            )}
-            {selectable && <IntegratedSelection />}
-            <TextTypeProvider {...cellComponentConfig} />
-            <SelectTypeProvider {...cellComponentConfig} />
-            <NumberTypeProvider {...cellComponentConfig} />
-            <DateTypeProvider {...cellComponentConfig} />
-            <RangeDateTypeProvider {...cellComponentConfig} />
-            <RadioTypeProvider {...cellComponentConfig} />
+              {grouping && (
+                <IntegratedGrouping
+                  columnExtensions={groupingConfig.columnExtensions || []}
+                />
+              )}
+              {/* <IntegratedFiltering /> */}
+              {sort &&
+              !type && (
+                <IntegratedSorting columnExtensions={newColumExtensions} />
+              )}
+              {summary && <IntegratedSummary {...summaryConfig.integrated} />}
+              {pager && !this.state.entity && <IntegratedPaging />}
+              {pager &&
+              this.state.entity && (
+                <CustomPaging totalCount={this.state.pagination.totalRecords} />
+              )}
+              {selectable && <IntegratedSelection />}
+              <TextTypeProvider {...cellComponentConfig} />
+              <SelectTypeProvider {...cellComponentConfig} />
+              <NumberTypeProvider {...cellComponentConfig} />
+              <DateTypeProvider {...cellComponentConfig} />
+              <RangeDateTypeProvider {...cellComponentConfig} />
+              <RadioTypeProvider {...cellComponentConfig} />
 
-            <TimeTypeProvider {...cellComponentConfig} />
-            <RowErrorTypeProvider {...cellComponentConfig} />
+              <TimeTypeProvider {...cellComponentConfig} />
+              <RowErrorTypeProvider {...cellComponentConfig} />
 
-            {grouping && <DragDropProvider />}
-            {tree && <CustomTreeData getChildRows={this.getChildRows} />}
+              {grouping && <DragDropProvider />}
+              {tree && <CustomTreeData getChildRows={this.getChildRows} />}
 
-            <TableBase
-              // height={height}
-              rowComponent={this.TableRow}
-              {...tableProps}
-            />
-            {selectable && (
-              <TableSelection
-                highlightRow
-                // selectByRowClick={allowSelectRowByClick}
-                showSelectionColumn
+              <TableBase
+                // height={height}
                 rowComponent={this.TableRow}
-                {...selectConfig}
+                {...tableProps}
               />
-            )}
+              {selectable && (
+                <TableSelection
+                  highlightRow
+                  // selectByRowClick={allowSelectRowByClick}
+                  showSelectionColumn
+                  rowComponent={this.TableRow}
+                  {...selectConfig}
+                />
+              )}
 
-            {header && <HeaderRow showSortingControls />}
-            {extraRow.map((o) => o)}
-            {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
+              {header && <HeaderRow showSortingControls />}
+              {extraRow.map((o) => o)}
+              {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
 
-            {grouping && <TableGroupRow {...groupingConfig.row} />}
-            {grouping && groupingConfig.showToolbar && <Toolbar />}
-            {grouping &&
-            groupingConfig.showToolbar && <GroupingPanel showSortingControls />}
-            {summary && <TableSummaryRow {...summaryConfig.row} />}
-            {tree && <TableTreeColumn {...treeColumnConfig} />}
-            {extraColumn.map((o) => o)}
-            <TableFixedColumns
-              rightColumns={
-                rightColumns.length > 0 ? (
-                  rightColumns
-                ) : (
-                  [
-                    'action',
-                    'Action',
-                    'editCommand',
-                  ]
-                )
-              }
-              leftColumns={newLeftCols}
-            />
-            {extraGetter.map((o) => o)}
-          </DevGrid>
+              {grouping && <TableGroupRow {...groupingConfig.row} />}
+              {grouping && groupingConfig.showToolbar && <Toolbar />}
+              {grouping &&
+              groupingConfig.showToolbar && (
+                <GroupingPanel showSortingControls />
+              )}
+              {summary && <TableSummaryRow {...summaryConfig.row} />}
+              {tree && <TableTreeColumn {...treeColumnConfig} />}
+              {extraColumn.map((o) => o)}
+              <TableFixedColumns
+                rightColumns={
+                  rightColumns.length > 0 ? (
+                    rightColumns
+                  ) : (
+                    [
+                      'action',
+                      'Action',
+                      'editCommand',
+                    ]
+                  )
+                }
+                leftColumns={newLeftCols}
+              />
+              {extraGetter.map((o) => o)}
+            </DevGrid>
+          </LoadingWrapper>
         </Paper>
       </MuiThemeProvider>
     )

@@ -43,10 +43,13 @@ class ProgressButton extends React.PureComponent {
       onClick,
       ...rest
     } = props
+
+    const _disabled =
+      disabled || loading.global || (global && global.disableSave)
     return (
       <RegularButton
         color={color}
-        disabled={disabled || loading.global || global.disableSave}
+        disabled={_disabled}
         data-button-type='progress'
         {...rest}
         onClick={onClick}

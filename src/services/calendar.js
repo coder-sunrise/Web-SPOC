@@ -49,7 +49,7 @@ export const queryList = (params) =>
   commonService.queryList(url, {
     pagesize: 9999,
     ...params,
-    // isCancelled: false,
+    isCancelled: false,
   })
 
 export const deleteDraft = (payload) => commonService.remove(url, payload)

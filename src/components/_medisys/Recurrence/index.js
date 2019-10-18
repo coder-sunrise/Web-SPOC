@@ -165,7 +165,11 @@ const Recurrence = ({
                   <FastField
                     name='recurrenceDto.recurrenceEndDate'
                     render={(args) => (
-                      <DatePicker disabled={disabled} {...args} />
+                      <DatePicker
+                        disabled={disabled}
+                        recurrenceRestrict
+                        {...args}
+                      />
                     )}
                   />
                 )}

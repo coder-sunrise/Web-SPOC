@@ -16,6 +16,8 @@ models.forEach((model) => {
   initialState[model.namespace] = model.state
 })
 
+console.log({ models })
+
 export const dva = {
   config: {
     onError (e, ...args) {
