@@ -249,10 +249,9 @@ export default compose(
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     }),
 
-    handleSubmit: (values, { props }) => {
+    handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history, codetable } = props
       const { servicePackageItem } = values
-      console.log('submit', values)
 
       const newServicePackageArray = servicePackageItem.map((o) => {
         return {
@@ -272,6 +271,7 @@ export default compose(
         },
       }).then((r) => {
         if (r) {
+          resetForm()
           history.push('/inventory/master?t=3')
         }
       })

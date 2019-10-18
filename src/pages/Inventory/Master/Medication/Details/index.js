@@ -52,7 +52,6 @@ const Detail = ({
   }
 
   useEffect(() => {
-    console.log('id', medicationDetail.currentId)
     if (medicationDetail.currentId) {
       dispatch({
         type: 'medicationDetail/query',
@@ -68,10 +67,8 @@ const Detail = ({
               id: sddfk,
             },
           }).then((sdd) => {
-            console.log({ sdd })
             const { data } = sdd
             const { code, name } = data[0]
-            console.log(data[0])
             dispatch({
               type: 'medicationDetail/updateState',
               payload: {
@@ -274,6 +271,7 @@ export default compose(
           // dispatch({
           //   type: 'medicationDetail/query',
           // })
+          resetForm()
           history.push('/inventory/master')
         }
       })
