@@ -128,7 +128,7 @@ const Attachment = ({
   }
 
   const validateFileSize = (files) => {
-    const maxMB = 5242880
+    const maxMB = 31457280
     const skippedFiles = Object.keys(files).reduce(
       (skipped, key) =>
         files[key].size > maxMB
@@ -155,13 +155,34 @@ const Attachment = ({
     try {
       setUploading(true)
       const { files } = event.target
-      const numberOfNewFiles = Object.keys(files).length
-      if (numberOfNewFiles + attachments.length > 5) {
-        setErrorText('Cannot upload more than 5 attachments')
+      // const numberOfNewFiles = Object.keys(files).length
+      let totalFilesSize = 0
+      const maxUploadSize = 31457280
+      const filesArray = [
+        ...files,
+      ]
+
+      filesArray &&
+        filesArray.forEach((o) => {
+          totalFilesSize += o.size
+        })
+      attachments.forEach((o) => {
+        totalFilesSize += o.fileSize
+      })
+
+      if (totalFilesSize > maxUploadSize) {
+        setErrorText('Cannot upload more than 30MB')
         setUploading(false)
         return
       }
-      const skipped = validateFileSize(files)
+
+      // if (numberOfNewFiles + attachments.length > 5) {
+      //   setErrorText('Cannot upload more than 5 attachments')
+      //   setUploading(false)
+      //   return
+      // }
+      // const skipped = validateFileSize(files)
+      const skipped = []
 
       const selectedFiles = await Promise.all(
         Object.keys(files)
@@ -237,7 +258,7 @@ const Attachment = ({
             color='rose'
             size='sm'
             onClick={onUploadClick}
-            disabled={uploading || fileAttachments.length >= 5}
+            disabled={uploading}
           >
             <AttachFile />
             Upload
