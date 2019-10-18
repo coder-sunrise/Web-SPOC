@@ -3,9 +3,7 @@ import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
 import {
-  CodeSelect,
   GridContainer,
   GridItem,
   Button,
@@ -98,14 +96,7 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={2}>
-            <FastField
-              name='status'
-              render={(args) => {
-                return <Select label='Status' options={status} {...args} />
-              }}
-            />
-          </GridItem>
+
           <GridItem xs={6} md={2}>
             <FastField
               name='recurrence'
@@ -129,14 +120,10 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const prefix = this.props.values.isExactSearch
-                    ? 'eql_'
-                    : 'like_'
-
                   this.props.dispatch({
                     type: 'doctorBlock/query',
                     payload: {
-                      // [`${prefix}name`]: values.doctorName,
+                      // [`${prefix}name`]: values.doctorName
                       lgteql_startDateTime: values.dates[0],
                       lsteql_endDateTime: values.dates[1],
                       combineCondition: 'and',
