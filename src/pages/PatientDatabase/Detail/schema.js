@@ -206,10 +206,15 @@ const schemaSchemes = {
         coPaymentSchemeFK: Yup.number().when('schemeTypeFK', {
           is: (val) => {
             // return false
-            return val === schemeTypes.find((o) => o.code === 'Corporate').id
+
+            return (
+              val ===
+              schemeTypes.find((o) => o.code.toUpperCase() === 'CORPORATE').id
+            )
           },
 
           then: Yup.number().required(),
+          otherwise: Yup.number(),
         }),
         validRange: Yup.array().when('schemeTypeFK', {
           is: (val) => {
