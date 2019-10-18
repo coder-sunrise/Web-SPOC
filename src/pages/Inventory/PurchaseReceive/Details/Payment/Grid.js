@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 import {
   GridContainer,
   EditableTableGrid,
@@ -6,18 +7,22 @@ import {
   dateFormatLong,
 } from '@/components'
 import Yup from '@/utils/yup'
-import moment from 'moment'
 
-const purchaseOrderPaymentSchema = Yup.object().shape({
-  // paymentNo: Yup.string().required(),
-  // paymentDate: Yup.string().required(),
-  paymentModeFK: Yup.string().required(),
-  // reference: Yup.string().required(),
-  paymentAmount: Yup.number().min(0).required(),
-  // Remarks: Yup.string().required(),
-})
+const purchaseOrderPaymentSchema = (outstandingAmount) =>
+  Yup.object().shape({
+    // paymentNo: Yup.string().required(),
+    // paymentDate: Yup.string().required(),
+    paymentModeFK: Yup.string().required(),
+    // reference: Yup.string().required(),
+    paymentAmount: Yup.number().min(0).max(outstandingAmount).required(),
+    // Remarks: Yup.string().required(),
+  })
 
 class Grid extends PureComponent {
+  state = {
+    outstandingAmount: 0,
+  }
+
   tableParas = {
     columns: [
       { name: 'paymentNo', title: 'Payment No.' },
@@ -57,22 +62,40 @@ class Grid extends PureComponent {
     const { setFieldValue } = this.props
     if (deleted) {
       rows.find((v) => v.id === deleted[0]).isDeleted = true
+      this.setState((prevState) => {
+        return {
+          outstandingAmount:
+            prevState.outstandingAmount - deleted[0].paymentAmount,
+        }
+      })
       setFieldValue('purchaseOrderPayment', rows)
     } else {
       rows[0].isDeleted = false
+      this.setState((prevState) => {
+        return {
+          outstandingAmount:
+            prevState.outstandingAmount - rows[0].paymentAmount,
+        }
+      })
       setFieldValue('purchaseOrderPayment', rows)
     }
 
     return rows
   }
 
+  componentDidMount = () => {
+    const { outstandingAmount } = this.props.values.purchaseOrderDetails
+    this.setState({ outstandingAmount })
+  }
+
   render () {
     const { values, isEditable } = this.props
+
     return (
       <GridContainer>
         <EditableTableGrid
           rows={values.purchaseOrderPayment}
-          schema={purchaseOrderPaymentSchema}
+          schema={purchaseOrderPaymentSchema(this.state.outstandingAmount)}
           FuncProps={{
             edit: false,
             pager: false,
