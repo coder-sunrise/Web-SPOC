@@ -84,7 +84,6 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  //const prefix = this.props.values.isExactSearch ? 'eql_' : 'like_'
                   const {
                     codeDisplayValue,
                     isActive,
@@ -93,8 +92,7 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingClinicService/query',
                     payload: {
-                      //[`${prefix}name`]: this.props.values.search
-                      isActive,
+                      'ServiceFKNavigation.isActive': isActive,
                       group: [
                         {
                           'ServiceFKNavigation.Code': codeDisplayValue,

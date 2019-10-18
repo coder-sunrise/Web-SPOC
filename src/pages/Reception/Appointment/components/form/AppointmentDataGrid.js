@@ -122,9 +122,11 @@ class AppointmentDataGrid extends React.Component {
             )
           },
           renderDropdown: (option) => {
-            const color = option.tagColorHex.includes('#')
-              ? option.tagColorHex
-              : `#${option.tagColorHex}`
+            let color
+            if (option.tagColorHex)
+              color = option.tagColorHex.includes('#')
+                ? option.tagColorHex
+                : `#${option.tagColorHex}`
             return (
               <AppointmentTypeLabel color={color} label={option.displayValue} />
             )

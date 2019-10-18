@@ -86,7 +86,7 @@ class Detail extends PureComponent {
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -101,7 +101,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='sortOrder'
                 render={(args) => {

@@ -118,7 +118,7 @@ class Demographic extends PureComponent {
   render () {
     const { props } = this
     const { values, theme, setFieldValue, classes } = props
-    // console.log('demographics', { values })
+    console.log('demographics', { values })
     return (
       <div>
         <GridContainer gutter={0}>
@@ -418,6 +418,8 @@ class Demographic extends PureComponent {
                         },
                       ]}
                       onChange={(e, s) => {
+                        const { pdpaConsent } = values
+                        setFieldValue('patientPdpaConsent', [])
                         // console.log({ e })
                         // dispatch({
                         //   type: 'consultation/updateState',

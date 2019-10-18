@@ -1,4 +1,5 @@
 import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
 import { notification } from '@/components'
 import * as service from '../services'
 
@@ -14,6 +15,8 @@ export default createListViewModel({
         paymentTerms: 0,
         adminChargeValueType: 'Percentage',
         statementInvoice: [],
+        statementDate: moment(),
+        adminChargeValue: 0.0,
       },
       invoiceList: [],
     },

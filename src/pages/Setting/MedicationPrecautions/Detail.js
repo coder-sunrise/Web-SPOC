@@ -8,6 +8,7 @@ import {
   TextField,
   DateRangePicker,
   CodeSelect,
+  NumberInput,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -29,6 +30,10 @@ const styles = (theme) => ({})
         'The number should between -2,147,483,648 and 2,147,483,647',
       )
       .nullable(),
+    translatedDisplayValue: Yup.number().when('translationLanguage', {
+      is: (v) => v !== undefined,
+      then: Yup.number().required(),
+    }),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -62,7 +67,7 @@ class Detail extends PureComponent {
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
-            <GridItem md={4}>
+            <GridItem md={6}>
               <FastField
                 name='code'
                 render={(args) => (
@@ -75,21 +80,14 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={4}>
+            <GridItem md={6}>
               <FastField
                 name='displayValue'
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
-            <GridItem md={4}>
-              <FastField
-                name='sortOrder'
-                render={(args) => (
-                  <TextField label='Sort Order' autoFocused {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem md={12}>
+
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -101,6 +99,13 @@ class Detail extends PureComponent {
                     />
                   )
                 }}
+              />
+            </GridItem>
+
+            <GridItem md={6}>
+              <FastField
+                name='sortOrder'
+                render={(args) => <NumberInput label='Sort Order' {...args} />}
               />
             </GridItem>
             <GridItem md={12}>

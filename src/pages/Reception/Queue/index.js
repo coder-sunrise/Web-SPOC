@@ -169,7 +169,6 @@ class Queue extends React.Component {
   }
 
   toggleRegisterNewPatient = () => {
-    console.log('toggle register new patient')
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {
@@ -303,28 +302,8 @@ class Queue extends React.Component {
   }
 
   sendNotification = () => {
-    // this.props.dispatch({
-    //   type: 'global/sendNotification',
-    //   payload: {
-    //     type: 'QueueListing',
-    //     data: {
-    //       sender: 'queue_listing',
-    //       message: 'test test',
-    //     },
-    //   },
-    // })
     SendNotification({ test: '123' })
   }
-
-  // toggleFilterSelfOnly = () => {
-  //   const { queueLog, dispatch } = this.props
-  //   dispatch({
-  //     type: 'queueLog/updateState',
-  //     payload: {
-  //       selfOnly: !queueLog.selfOnly,
-  //     },
-  //   })
-  // }
 
   setSearch = (v) => {
     this.setState({
@@ -359,13 +338,7 @@ class Queue extends React.Component {
                 >
                   Refresh
                 </ProgressButton>
-                {/* <Button
-                  color='success'
-                  size='sm'
-                  onClick={this.sendNotification}
-                >
-                  Send Notification
-                </Button> */}
+
                 <Authorized authority='queue.endsession'>
                   <ProgressButton
                     icon={<Stop />}

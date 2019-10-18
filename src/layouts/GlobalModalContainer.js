@@ -199,6 +199,7 @@ class GlobalModalContainer extends PureComponent {
           open={global.showUserProfile}
           onClose={this.closeUserProfile}
           onConfirm={this.closeUserProfile}
+          observe='UserProfile'
         >
           <UserProfileForm />
         </CommonModal>
@@ -287,6 +288,7 @@ class GlobalModalContainer extends PureComponent {
               : undefined,
           }}
           onClose={(e) => {
+            global.onConfirmClose ? global.onConfirmClose() : null
             clearTimeout(this._timer)
             dispatch({
               type: 'global/updateAppState',

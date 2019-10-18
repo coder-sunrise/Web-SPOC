@@ -80,7 +80,7 @@ const authorize = (authority, error) => {
       classError || Exception403,
       'decorator',
     )
-    console.log(component)
+    // console.log(component)
     return checkIsInstantiation(component, target)
   }
 }

@@ -2,48 +2,82 @@ import React, { PureComponent } from 'react'
 import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { formatMessage, FormattedMessage } from 'umi/locale'
+import moment from 'moment'
 import {
   withFormikExtend,
   FastField,
   GridContainer,
   GridItem,
   TextField,
+  CodeSelect,
   DateRangePicker,
   NumberInput,
+  DatePicker,
+  TimePicker,
+  Checkbox,
+  fullDateTime,
+  FieldSet,
 } from '@/components'
+
+// import Recurrence from '@/pages/Reception/BigCalendar/components/form/Recurrence'
+import { Recurrence } from '@/components/_medisys'
 
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingPaymentMode }) =>
-    settingPaymentMode.entity || settingPaymentMode.default,
-  validationSchema: Yup.object().shape({
-    code: Yup.string().required(),
-    displayValue: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    paymentCharges: Yup.number(),
-    // description: Yup.string().required(),
-  }),
+  mapPropsToValues: ({ settingRoomBlock }) =>
+    settingRoomBlock.entity || settingRoomBlock.default,
+  validationSchema: Yup.object().shape(
+    {
+      // code: Yup.string().required(),
+      // displayValue: Yup.string().required(),
+      // effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    },
+  ),
   handleSubmit: (values, { props }) => {
-    const { effectiveDates, ...restValues } = values
+    const {
+      effectiveDates,
+      eventDate,
+      duration,
+      remarks,
+      ...restValues
+    } = values
     const { dispatch, onConfirm } = props
+    const hours = duration.split(':')[0]
+    const minutes = duration.split(':')[1]
+    const endDate = moment(eventDate, 'YYYY-MM-DDTHH:mm:ssZ')
+      .add(6, 'hours')
+      .add(1, 'minutes')
+
+    // console.log('check', hours, minutes, eventDate, moment(), endDate, duration)
+    const roomBlock = {
+      // startDateTime: eventDate + duration,
+      startDateTime: eventDate,
+      endDateTime: eventDate,
+      remarks,
+    }
+
     dispatch({
-      type: 'settingPaymentMode/upsert',
+      type: 'settingRoomBlock/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        roomStatusFK: 1,
+        roomBlock: [
+          roomBlock,
+        ],
       },
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingPaymentMode/query',
+          type: 'settingRoomBlock/query',
         })
       }
     })
   },
-  displayName: 'PaymentModeDetail',
+  displayName: 'RoomDetail',
 })
 class Detail extends PureComponent {
   state = {}
@@ -55,54 +89,47 @@ class Detail extends PureComponent {
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
-            <GridItem md={6}>
+            <GridItem md={12}>
               <FastField
-                name='code'
+                name='roomFK'
                 render={(args) => (
-                  <TextField
-                    label='Code'
-                    autoFocused
-                    disabled={!!values.id}
-                    {...args}
-                  />
+                  <CodeSelect label='Room' code='ctRoom' {...args} />
                 )}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
-                name='displayValue'
+                name='eventDate'
                 render={(args) => (
-                  <TextField
-                    label='Display Value'
-                    disabled={!!values.id}
+                  <DatePicker
+                    label='Event Date'
+                    format={fullDateTime}
+                    showTime={{ format: 'HH:mm' }}
                     {...args}
                   />
                 )}
               />
             </GridItem>
+
             <GridItem md={6}>
               <FastField
-                name='effectiveDates'
+                name='duration'
                 render={(args) => {
                   return (
-                    <DateRangePicker
-                      label='Effective Start Date'
-                      label2='End Date'
-                      {...args}
-                    />
+                    <TimePicker use12Hours={false} label='Duration' {...args} />
                   )
                 }}
               />
             </GridItem>
-            <GridItem md={6}>
+            <GridItem md={12}>
               <FastField
-                name='paymentCharges'
+                name='remarks'
                 render={(args) => {
                   return (
-                    <NumberInput
-                      label='Payment Charges'
-                      suffix='%'
-                      max={100}
+                    <TextField
+                      label='Remarks'
+                      multiline
+                      rowsMax={4}
                       {...args}
                     />
                   )
@@ -110,19 +137,11 @@ class Detail extends PureComponent {
               />
             </GridItem>
             <GridItem md={12}>
-              <FastField
-                name='description'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Description'
-                      multiline
-                      disabled={!!values.id}
-                      rowsMax={4}
-                      {...args}
-                    />
-                  )
-                }}
+              <Recurrence
+                block
+                disabled={values.id !== undefined}
+                formValues={values}
+                recurrenceDto={values.recurrenceDto}
               />
             </GridItem>
           </GridContainer>

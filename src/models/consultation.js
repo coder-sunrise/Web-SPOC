@@ -71,8 +71,6 @@ export default createFormViewModel({
         const { id } = response
         let orders = []
         if (id) {
-          
-
           yield put({
             type: 'updateState',
             payload: {
@@ -91,9 +89,8 @@ export default createFormViewModel({
             serviceCenterServices,
           } = getServices(codetableState.ctservice)
 
-
           let orderList = serviceCenterServices.filter(
-            (o) => (o.isAutoOrder === true && o.isDefault === true),
+            (o) => o.isAutoOrder === true && o.isDefault === true,
           )
 
           for (let i = 0; i < orderList.length; i++) {
@@ -162,7 +159,6 @@ export default createFormViewModel({
               autoOrderList: orders,
             },
           })
-
 
           sendNotification('QueueListing', {
             message: `Consultation started`,
@@ -299,9 +295,9 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-        console.log("***********************")
-         console.log('queryDone', payload)
-        const { data , autoOrderList, page} = payload
+        console.log('***********************')
+        console.log('queryDone', payload)
+        const { data, autoOrderList, page } = payload
         if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
@@ -325,7 +321,7 @@ export default createFormViewModel({
         })
 
         let oRows = []
-        if(page !== 'edit order'){
+        if (page !== 'edit order') {
           orderTypes.forEach((p) => {
             const datas =
               (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
@@ -342,12 +338,14 @@ export default createFormViewModel({
             )
           })
         }
-        
 
         yield put({
           type: 'orders/updateState',
           payload: {
-            rows: autoOrderList === undefined ?  _.sortBy(oRows, 'sequence') :  _.sortBy(autoOrderList, 'sequence'),
+            rows:
+              autoOrderList === undefined
+                ? _.sortBy(oRows, 'sequence')
+                : _.sortBy(autoOrderList, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,
               uid: o.id,

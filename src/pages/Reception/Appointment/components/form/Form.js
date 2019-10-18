@@ -61,6 +61,7 @@ import styles from './style'
   }),
 )
 @withFormikExtend({
+  notDirtyDuration: 0.5,
   displayName: 'AppointmentForm',
   enableReinitialize: true,
   validationSchema: ValidationSchema,
@@ -238,7 +239,6 @@ class Form extends React.PureComponent {
 
   onConfirmCreatePatient = async () => {
     const { patientProfile, dispatch } = this.props
-    console.log('onConfirmCreatePatient', this.props)
     const { id, name, contact, patientAccountNo } = patientProfile
     const payload = {
       id,
@@ -249,7 +249,6 @@ class Form extends React.PureComponent {
     dispatch({
       type: 'patient/closePatientModal',
     })
-    console.log('payload', payload)
     this.togglePatientProfileModal()
     const doneUpdateFields = await this.onSelectPatientClick(payload, true)
     if (doneUpdateFields) {
@@ -694,6 +693,7 @@ class Form extends React.PureComponent {
           ]
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
+    console.log({ values, errors: this.props.errors })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>
