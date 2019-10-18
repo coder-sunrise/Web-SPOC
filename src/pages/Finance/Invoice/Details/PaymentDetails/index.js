@@ -5,8 +5,9 @@ import { AddPayment } from 'medisys-components'
 import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
+import Printer from '@material-ui/icons/Print'
 // common components
-import { CommonModal, withFormik, WarningSnackbar } from '@/components'
+import { CommonModal, withFormik, WarningSnackbar, Button } from '@/components'
 // sub components
 import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
@@ -52,11 +53,21 @@ class PaymentDetails extends Component {
     })
   }
 
-  onAddPaymentClick = (invoicePayerFK) =>
-    this.setState({
-      showAddPayment: true,
-      selectedInvoicePayerFK: invoicePayerFK,
+  onAddPaymentClick = (invoicePayerFK) => {
+    const { dispatch, values } = this.props
+
+    dispatch({
+      type: 'patient/query',
+      // payload: { id: values.patientProfileFK },
+      payload: { id: 4 },
+    }).then((r) => {
+      if (r)
+        this.setState({
+          showAddPayment: true,
+          selectedInvoicePayerFK: invoicePayerFK,
+        })
     })
+  }
 
   onWriteOffClick = (invoicePayerFK) =>
     this.setState({
@@ -76,6 +87,9 @@ class PaymentDetails extends Component {
 
   closeDeleteConfirmationModal = () =>
     this.setState({ showDeleteConfirmation: false, onVoid: {} })
+
+  closeAddPaymentModal = () =>
+    this.setState({ showAddPayment: false, selectedInvoicePayerFK: undefined })
 
   onVoidClick = (entity) => {
     this.setState({
@@ -103,14 +117,14 @@ class PaymentDetails extends Component {
   }
 
   // submitAddPayment
-  onSubmit = (paymentData) => {
+  onSubmitAddPayment = (invoicePaymentList) => {
     const { selectedInvoicePayerFK } = this.state
     this.props
       .dispatch({
         type: 'invoicePayment/submitAddPayment',
         payload: {
           invoicePayerFK: selectedInvoicePayerFK,
-          paymentData: _.toArray(paymentData),
+          invoicePaymentList,
         },
       })
       .then((r) => {
@@ -174,7 +188,7 @@ class PaymentDetails extends Component {
 
   render () {
     // console.log('PaymentIndex', this.props)
-    const { classes, values, readOnly } = this.props
+    const { classes, values, readOnly, invoiceDetail } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -251,7 +265,15 @@ class PaymentDetails extends Component {
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
         >
-          <AddPayment handleSubmit={this.onSubmit} />
+          {/* <AddPayment handleSubmit={this.onSubmit} /> */}
+          <AddPayment
+            handleSubmit={this.onSubmitAddPayment}
+            onClose={this.closeAddPaymentModal}
+            invoice={{
+              ...invoiceDetail.entity,
+              totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
+            }}
+          />
         </CommonModal>
         <CommonModal
           open={showAddCrNote}

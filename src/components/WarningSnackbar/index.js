@@ -10,7 +10,7 @@ const WarningSnackbar = (props) => {
     warning: WarningIcon,
   }
 
-  const useStyles1 = makeStyles((theme) => ({
+  const useStyles = makeStyles((theme) => ({
     warning: {
       backgroundColor: amber[700],
     },
@@ -27,7 +27,7 @@ const WarningSnackbar = (props) => {
     },
   }))
 
-  const classes1 = useStyles1()
+  const classes1 = useStyles()
   const { className, message, onClose, variant, ...other } = props
   const Icon = variantIcon[variant]
 
