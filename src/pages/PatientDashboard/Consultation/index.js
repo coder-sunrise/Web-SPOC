@@ -90,7 +90,7 @@ const saveConsultation = ({
     payload: {
       openConfirm: true,
       openConfirmContent: confirmMessage,
-      onConfirmText: 'Confirm',
+      openConfirmText: 'Confirm',
       onConfirmSave: () => {
         const newValues = convertToConsultation(values, {
           orders,

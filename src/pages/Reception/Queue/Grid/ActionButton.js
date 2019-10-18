@@ -17,20 +17,28 @@ const ActionButton = ({ row, onClick }) => {
   if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
     return (
       <Tooltip title='More Actions'>
-        <GridButton
-          row={row}
-          onClick={onClick}
-          contextMenuOptions={AppointmentContextMenu.map((opt) => {
-            switch (opt.id) {
-              case 8: // register visit
-                return { ...opt, disabled: row.patientProfileFk === undefined }
-              case 9: // register patient
-                return { ...opt, disabled: row.patientProfileFk !== undefined }
-              default:
-                return { ...opt }
-            }
-          })}
-        />
+        <div>
+          <GridButton
+            row={row}
+            onClick={onClick}
+            contextMenuOptions={AppointmentContextMenu.map((opt) => {
+              switch (opt.id) {
+                case 8: // register visit
+                  return {
+                    ...opt,
+                    disabled: row.patientProfileFk === undefined,
+                  }
+                case 9: // register patient
+                  return {
+                    ...opt,
+                    disabled: row.patientProfileFk !== undefined,
+                  }
+                default:
+                  return { ...opt }
+              }
+            })}
+          />
+        </div>
       </Tooltip>
     )
   }
@@ -106,11 +114,13 @@ const ActionButton = ({ row, onClick }) => {
   )
   return (
     <Tooltip title='More Actions'>
-      <GridButton
-        row={row}
-        onClick={onClick}
-        contextMenuOptions={newContextMenuOptions}
-      />
+      <div>
+        <GridButton
+          row={row}
+          onClick={onClick}
+          contextMenuOptions={newContextMenuOptions}
+        />
+      </div>
     </Tooltip>
   )
 }

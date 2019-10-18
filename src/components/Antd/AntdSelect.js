@@ -219,7 +219,7 @@ class AntdSelect extends React.PureComponent {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
             allValue,
-            ...options.map((o) => o[valueField]),
+            ...options.map((o) => Object.byString(o, valueField)),
           ]
           if (maxSelected) {
             v = v.slice(Math.max(v.length - maxSelected, 1))
@@ -252,7 +252,7 @@ class AntdSelect extends React.PureComponent {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
             allValue,
-            ...options.map((o) => o[valueField]),
+            ...options.map((o) => Object.byString(o, valueField)),
           ]
         }
       }
@@ -336,6 +336,7 @@ class AntdSelect extends React.PureComponent {
       maxSelected,
     } = this.props
     let newVal = val
+    console.log({ newVal, val })
     if (
       [
         'multiple',

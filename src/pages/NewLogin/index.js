@@ -76,9 +76,9 @@ const submitKey = 'login/getToken'
         // username: 'Administrator',
         // password: 'admin1234567',
         // clinicCode: '249991e76',
-        username: 'medisys',
-        password: 'Medi$y$Innovati0n',
-        clinicCode: '123456789',
+        username: '',
+        password: '',
+        clinicCode: 'kikilala',
       }
     return { username: '', password: '', clinicCode: '' }
   },
