@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from 'react'
 // custom components
-import { Tooltip } from '@/components'
+import { Tooltip, withStyles } from '@material-ui/core'
 // medisys component
 import { GridContextMenuButton as GridButton } from '@/components/_medisys'
 import {
@@ -16,21 +16,23 @@ const ActionButton = ({ row, onClick }) => {
 
   if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
     return (
-      <Tooltip title='More Actions'>
-        <GridButton
-          row={row}
-          onClick={onClick}
-          contextMenuOptions={AppointmentContextMenu.map((opt) => {
-            switch (opt.id) {
-              case 8: // register visit
-                return { ...opt, disabled: row.patientProfileFk === undefined }
-              case 9: // register patient
-                return { ...opt, disabled: row.patientProfileFk !== undefined }
-              default:
-                return { ...opt }
-            }
-          })}
-        />
+      <Tooltip title='More Actions' placement='bottom'>
+        <span>
+          <GridButton
+            row={row}
+            onClick={onClick}
+            contextMenuOptions={AppointmentContextMenu.map((opt) => {
+              switch (opt.id) {
+                case 8: // register visit
+                  return { ...opt, disabled: row.patientProfileFk === undefined }
+                case 9: // register patient
+                  return { ...opt, disabled: row.patientProfileFk !== undefined }
+                default:
+                  return { ...opt }
+              }
+            })}
+          />
+        </span>
       </Tooltip>
     )
   }
@@ -105,12 +107,14 @@ const ActionButton = ({ row, onClick }) => {
     ],
   )
   return (
-    <Tooltip title='More Actions'>
-      <GridButton
-        row={row}
-        onClick={onClick}
-        contextMenuOptions={newContextMenuOptions}
-      />
+    <Tooltip title='More Actions' placement='bottom'>
+      <span>
+        <GridButton
+          row={row}
+          onClick={onClick}
+          contextMenuOptions={newContextMenuOptions}
+        />
+      </span>
     </Tooltip>
   )
 }
