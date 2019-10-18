@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { AddPayment, WarningSnackbar } from 'medisys-components'
+import { AddPayment } from 'medisys-components'
 import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { CommonModal, withFormik } from '@/components'
+import { CommonModal, withFormik, WarningSnackbar } from '@/components'
 // sub components
 import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
