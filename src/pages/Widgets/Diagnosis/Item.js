@@ -3,7 +3,6 @@ import { FastField } from 'formik'
 import { Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
-import moment from 'moment'
 import {
   Button,
   GridContainer,
@@ -162,9 +161,7 @@ export default ({
                 <DatePicker
                   label='Order Date'
                   allowClear={false}
-                  {...args}
-                  // format='DD MMM YYYY h:mm a'
-                  value={moment()}
+                  {...args}     
                 />
               )
             }}

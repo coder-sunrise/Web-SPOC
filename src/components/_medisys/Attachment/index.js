@@ -112,7 +112,7 @@ const Attachment = ({
     )
 
     const uploadObject = {
-      fileName: getFileName(file.name),
+      fileName: file.name,
       fileSize: file.size,
       fileExtension: getFileExtension(file.name),
       fileCategoryFK: 1,
@@ -192,7 +192,6 @@ const Attachment = ({
   }
 
   const onClick = (attachment) => {
-    console.log("********* ", attachment)
     downloadAttachment(attachment)
   }
   const labelClass = classnames({

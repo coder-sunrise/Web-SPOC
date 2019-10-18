@@ -9,7 +9,6 @@ import { downloadAttachment } from '@/services/file'
 
 class Grid extends PureComponent {
   downloadFile = (row) => {
-    console.log('row ', row)
     downloadAttachment(row)
   }
 
