@@ -468,7 +468,6 @@ class PatientHistory extends Component {
       showEditPatient,
     } = this.props
     const { entity, selected } = patientHistory
-    console.log("^^^^^^^^^^^^^^^^^^^^^^^ ", patientHistory)
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
