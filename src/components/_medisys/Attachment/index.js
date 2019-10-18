@@ -63,6 +63,10 @@ const getFileExtension = (filename) => {
   return filename.split('.').pop()
 }
 
+const getFileName = (filename) => {
+  return filename.split('.')[0]
+}
+
 const Attachment = ({
   classes,
   handleUpdateAttachments,

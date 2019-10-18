@@ -366,7 +366,7 @@ const Grid = ({
         deleteQueueConfirmation(row)
         break
       case '3': // view patient profile
-        onViewPatientProfileClick(row.patientProfileFK)
+        onViewPatientProfileClick(row.patientProfileFK, row.id)
         break
       case '4': // patient dashboard
         router.push(

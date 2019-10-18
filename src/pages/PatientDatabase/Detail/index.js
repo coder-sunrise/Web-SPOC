@@ -210,6 +210,19 @@ class PatientDetail extends PureComponent {
           loading: Loading,
         }),
       },
+      {
+        id: '7',
+        name: 'Patient Document',
+        access: 'patient.view',
+        component: Loadable({
+          loader: () => import('./PatientDocument'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p}   />
+          },
+          loading: Loading,
+        }),
+      },
     ]
   }
 

@@ -72,6 +72,7 @@ export default ({
                   }}
                   onChange={(v, op) => {
                     const { setFieldValue } = form
+
                     if (op) {
                       setFieldValue(
                         `corDiagnosis[${index}]diagnosisDescription`,
@@ -158,7 +159,11 @@ export default ({
             name={`corDiagnosis[${index}].onsetDate`}
             render={(args) => {
               return (
-                <DatePicker label='Order Date' allowClear={false} {...args} />
+                <DatePicker
+                  label='Order Date'
+                  allowClear={false}
+                  {...args}     
+                />
               )
             }}
           />
