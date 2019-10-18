@@ -405,6 +405,9 @@ class Detail extends PureComponent {
   }
 
   setOption = (m, v, c) => {
+    if (!m.data || !v.data || !c.data) {
+      return
+    }
     const mOptions = m.data.map((o) => {
       return {
         ...o,
