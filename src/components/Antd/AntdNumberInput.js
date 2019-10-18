@@ -224,7 +224,7 @@ class AntdNumberInput extends React.PureComponent {
       e.preventDefault()
     }
 
-    if (this.props.min === 0 && e.keyCode === 189) {
+    if ((this.props.min === 0 || this.props.min === 1) && e.keyCode === 189) {
       e.preventDefault()
     }
 

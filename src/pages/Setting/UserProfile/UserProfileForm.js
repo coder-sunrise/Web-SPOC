@@ -113,6 +113,7 @@ const styles = (theme) => ({
         ...currentSelectedUser,
         userProfile: {
           countryCodeFK: 1,
+          ...currentSelectedUser.userProfile,
         },
         effectiveDates:
           Object.entries(currentSelectedUser).length <= 0

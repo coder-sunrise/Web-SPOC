@@ -55,7 +55,7 @@ const TableConfig = {
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceAmount', title: 'Invoice Amount' },
     { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'patientAccountNo', title: 'Acc No.' },
+    { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gst', title: 'GST' },
     { name: 'payment', title: 'Payment' },
     { name: 'paymentMode', title: 'Payment Mode' },
@@ -206,6 +206,11 @@ const Grid = ({
       payload: {
         id,
       },
+    }).then((response) => {
+      if (response === 204)
+        notification.success({
+          message: 'Visit deleted',
+        })
     })
   }
 
@@ -361,7 +366,7 @@ const Grid = ({
         deleteQueueConfirmation(row)
         break
       case '3': // view patient profile
-        onViewPatientProfileClick(row.patientProfileFK)
+        onViewPatientProfileClick(row.patientProfileFK, row.id)
         break
       case '4': // patient dashboard
         router.push(

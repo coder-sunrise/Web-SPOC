@@ -290,12 +290,13 @@ class Queue extends React.Component {
     })
   }
 
-  onViewPatientProfileClick = (patientProfileFK) => {
+  onViewPatientProfileClick = (patientProfileFK, qid) => {
     this.props.history.push(
       getAppendUrl({
         md: 'pt',
         cmt: '1',
         pid: patientProfileFK,
+        qid,
         v: Date.now(),
       }),
     )

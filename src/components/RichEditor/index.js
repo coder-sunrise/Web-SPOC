@@ -79,7 +79,7 @@ class RichEditor extends React.PureComponent {
           // 'embedded',
           // 'emoji',
           // 'image',
-          'remove',
+          // 'remove',
           'history',
         ],
         inline: { inDropdown: true },

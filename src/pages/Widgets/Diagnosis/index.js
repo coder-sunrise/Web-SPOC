@@ -101,7 +101,7 @@ class Diagnosis extends PureComponent {
   }
 
   render () {
-    const { theme, components } = this.props
+    const { theme, components, diagnosis } = this.props
     return (
       <div>
         <FieldArray
@@ -109,10 +109,18 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
+            let diagnosises = []
 
             this.arrayHelpers = arrayHelpers
-            if (!values || !values.corDiagnosis) return null
-            const diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            // if (!values || !values.corDiagnosis) return null
+
+            if(values.corDiagnosis.length <= 0){
+               diagnosises = diagnosis.default.corDiagnosis
+            }else{
+               diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            }
+
+            
             if (diagnosises.length === 0) {
               // if(!values.disabled)
               if (components.ConsultationPage.edit) {
