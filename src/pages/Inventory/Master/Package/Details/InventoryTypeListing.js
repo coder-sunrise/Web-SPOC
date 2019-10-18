@@ -582,7 +582,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryMedicationFK',
         type: 'select',
-        labelField: 'code',
+        labelField: 'name',
         options: medicationList,
         onChange: handleItemOnChange,
       },
