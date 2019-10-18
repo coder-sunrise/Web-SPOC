@@ -337,11 +337,6 @@ class ConsultationDocument extends PureComponent {
                 disabled={!this.state.acknowledged}
                 onClick={() => {
                   this.props.handleSubmit()
-
-                  dispatch({
-                    type: `formik/clean`,
-                    payload: 'OrderPage',
-                  })
                 }}
               >
                 Save

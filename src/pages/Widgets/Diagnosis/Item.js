@@ -72,6 +72,7 @@ export default ({
                   }}
                   onChange={(v, op) => {
                     const { setFieldValue } = form
+
                     if (op) {
                       setFieldValue(
                         `corDiagnosis[${index}]diagnosisDescription`,
