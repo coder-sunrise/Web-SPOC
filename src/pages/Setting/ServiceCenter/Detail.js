@@ -75,7 +75,7 @@ class Detail extends PureComponent {
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
-            <GridItem md={4}>
+            <GridItem md={6}>
               <FastField
                 name='code'
                 render={(args) => (
@@ -88,25 +88,14 @@ class Detail extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem md={4}>
+            <GridItem md={6}>
               <FastField
                 name='displayValue'
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
-            <GridItem md={4}>
-              <FastField
-                name='serviceCenterCategoryFK'
-                render={(args) => (
-                  <CodeSelect
-                    label='Service Center Category'
-                    code='CTServiceCenterCategory'
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={12}>
+
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -118,6 +107,19 @@ class Detail extends PureComponent {
                     />
                   )
                 }}
+              />
+            </GridItem>
+
+            <GridItem md={6}>
+              <FastField
+                name='serviceCenterCategoryFK'
+                render={(args) => (
+                  <CodeSelect
+                    label='Service Center Category'
+                    code='CTServiceCenterCategory'
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
             <GridItem md={12}>

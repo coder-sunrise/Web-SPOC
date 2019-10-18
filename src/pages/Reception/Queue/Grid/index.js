@@ -30,6 +30,8 @@ const compareQueueNo = (a, b) => {
 }
 
 const compareString = (a, b) => a.localeCompare(b)
+const compareDoctor = (a, b) =>
+  a.clinicianProfile.name.localeCompare(b.clinicianProfile.name)
 
 const FuncConfig = {
   pager: false,
@@ -176,6 +178,7 @@ const columnExtensions = [
   },
   {
     columnName: 'doctor',
+    compare: compareDoctor,
     render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
   },
 ]

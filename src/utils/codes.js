@@ -1244,6 +1244,20 @@ export const InvoicePayerType = [
   //   listName: 'govCoPayerPaymentTxn',
   // },
 ]
+export const recurrenceTypes = [
+  {
+    value: 'daily',
+    name: 'Daily',
+  },
+  {
+    value: 'weekly',
+    name: 'Weekly',
+  },
+  {
+    value: 'monthly',
+    name: 'Monthly',
+  },
+]
 
 module.exports = {
   // paymentMethods,
@@ -1271,6 +1285,7 @@ module.exports = {
   // preferredContactMode,
   // countries,
   // schemes,
+  recurrenceTypes,
   status,
   statusString,
   isAutoOrder,

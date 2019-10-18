@@ -61,23 +61,23 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={5}>
             <h5 className={classes.boldText}>Invoice Amount: </h5>
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={4}>
             <FastField
               name='invoiceTotalAftGST'
               render={(args) => <NumberInput {...amountProps} {...args} />}
             />
           </GridItem>
-          <GridItem md={4} />
+          <GridItem md={3} />
           <GridItem md={5}>
             <h5 className={classes.boldText}>Total Payments: </h5>
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={4}>
             <FastField
               name='totalPayment'
               render={(args) => <NumberInput {...amountProps} {...args} />}
             />
           </GridItem>
-          <GridItem md={4} />
+          <GridItem md={3} />
           <GridItem md={5}>
             <h5 className={classes.boldText}>&nbsp;</h5>
           </GridItem>

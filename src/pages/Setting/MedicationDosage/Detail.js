@@ -11,6 +11,7 @@ import {
   DateRangePicker,
   NumberInput,
   dateFormatLong,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -36,6 +37,11 @@ const styles = (theme) => ({})
         'The number should between -2,147,483,648 and 2,147,483,647',
       )
       .nullable(),
+
+    translatedDisplayValue: Yup.number().when('translationLanguage', {
+      is: (v) => v !== undefined,
+      then: Yup.number().required(),
+    }),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -88,7 +94,7 @@ class Detail extends PureComponent {
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -103,32 +109,19 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='multiplier'
-                render={(args) => <NumberInput label='Multiplier' {...args} />}
-              />
-            </GridItem>
-            {/* <GridItem md={6}>
-							<FastField
-								name='shortcutKey'
-								render={(args) => (
-									<TextField
-										label='Shortcut Key'
-										{...args}
-									/>
-								)}
-							/>
-						</GridItem> */}
 
             <GridItem md={6}>
               <FastField
                 name='sortOrder'
                 render={(args) => {
-                  return (
-                    <NumberInput label='Sort Order' rowsMax={4} {...args} />
-                  )
+                  return <NumberInput label='Sort Order' {...args} />
                 }}
+              />
+            </GridItem>
+            <GridItem md={12}>
+              <FastField
+                name='multiplier'
+                render={(args) => <NumberInput label='Multiplier' {...args} />}
               />
             </GridItem>
             <GridItem md={12}>
@@ -142,6 +135,30 @@ class Detail extends PureComponent {
                       rowsMax={4}
                       {...args}
                     />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={4}>
+              <FastField
+                name='translationLanguage'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Translation Language'
+                      code='ctLanguage'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={8}>
+              <FastField
+                name='translatedDisplayValue'
+                render={(args) => {
+                  return (
+                    <TextField label='Translated Display Value' {...args} />
                   )
                 }}
               />

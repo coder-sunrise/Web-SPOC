@@ -65,7 +65,7 @@ const Content = ({ classes, ...restProps }) => {
     },
     {
       id: 2,
-      name: 'Payment',
+      name: 'Payment Details',
       content: addContent(2),
       disabled: isInvoiceCurrentBizSession(),
     },
