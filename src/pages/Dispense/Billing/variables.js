@@ -1,75 +1,41 @@
-import moment from 'moment'
-// common components
-import { NumberInput, FastField } from '@/components'
+import * as Yup from 'yup'
 
-export const ItemTableColumn = [
-  { name: 'name', title: 'Name' },
+export const SchemeInvoicePayerColumn = [
+  { name: 'itemCode', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
-  { name: 'payableAmount', title: 'Payable Amount ($)' },
+  { name: 'totalAfterGst', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
 ]
 
-export const ItemTableColumnExtensions = [
-  { columnName: 'payableAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
+export const CompanyInvoicePayerColumn = [
+  { name: 'itemCode', title: 'Name' },
+  { name: 'totalAfterGst', title: 'Payable Amount ($)' },
+  { name: 'claimAmount', title: 'Claim Amount ($)' },
+]
+
+export const ApplyClaimsColumnExtension = [
+  { columnName: 'itemCode', disabled: true },
+  {
+    columnName: 'coverage',
+    align: 'right',
+    disabled: true,
+  },
+  {
+    columnName: 'totalAfterGst',
+    type: 'currency',
+    currency: true,
+    disabled: true,
+  },
   {
     columnName: 'claimAmount',
-    render: (row) => (
-      <FastField
-        name={`claims[${row.rowIndex}]claimAmount`}
-        render={(args) => <NumberInput {...args} />}
-      />
-    ),
+    type: 'currency',
+    currency: true,
   },
 ]
 
-const generateItemData = () => {
-  let data = []
-  for (let i = 0; i < 4; i++) {
-    data.push({
-      id: i,
-      name: 'Aspirin',
-      coverage: '',
-      payableAmount: 20,
-      claimAmount: 10,
-    })
-  }
-  return data
-}
-
-export const ItemData = generateItemData()
-
-export const ClaimSequenceColumns = [
-  { name: 'company', title: 'Company' },
-  { name: 'cardOrAccountNo', title: 'Card/AccountNo' },
-  { name: 'validFrom', title: 'Valid From' },
-  { name: 'validTo', title: 'Valid To' },
-]
-
-export const ClaimSequenceColExtensions = [
-  { columnName: 'validFrom', type: 'date' },
-  { columnName: 'validTo', type: 'date' },
-]
-
-const generateClaimSequenceData = () => {
-  let data = []
-  for (let i = 0; i < 4; i++) {
-    data.push({
-      id: i,
-      company: `CHAS PA ${i}`,
-      cardOrAccountNo: 'G1234567D',
-      validFrom: moment(),
-      validTo: moment(),
-    })
-  }
-  return data
-}
-
-export const ClaimSequenceData = generateClaimSequenceData()
-
 export const CoPayerColumns = [
-  { name: 'name', title: 'Name' },
-  { name: 'payableAmount', title: 'Payable Amount' },
+  { name: 'itemCode', title: 'Name' },
+  { name: 'totalAfterGst', title: 'Payable Amount' },
   {
     name: 'claimAmount',
     title: 'Claim Amount',
@@ -77,31 +43,43 @@ export const CoPayerColumns = [
 ]
 
 export const CoPayerColExtensions = [
-  { columnName: 'payableAmount', type: 'currency', currency: true },
+  {
+    columnName: 'itemCode',
+    disabled: true,
+  },
+  {
+    columnName: 'totalAfterGst',
+    type: 'number',
+    currency: true,
+    disabled: true,
+  },
   {
     columnName: 'claimAmount',
-    // type: 'currency',
-    // currency: true,
-    render: (row) => (
-      <FastField
-        name={`coPayer[${row.rowIndex}]claimAmount`}
-        render={(args) => <NumberInput {...args} size='sm' />}
-      />
-    ),
+    type: 'number',
+    currency: true,
   },
 ]
 
-const generateCoPayerData = () => {
-  let data = []
-  for (let i = 0; i < 4; i++) {
-    data.push({
-      id: i,
-      name: `CHAS PA ${i}`,
-      payableAmount: 100,
-      claimAmount: 20,
-    })
-  }
-  return data
-}
-
-export const CoPayerData = generateCoPayerData()
+export const validationSchema = Yup.object().shape({
+  coverage: Yup.string(),
+  totalAfterGst: Yup.number(),
+  claimAmount: Yup.number().when(
+    [
+      'coverage',
+      'totalAfterGst',
+    ],
+    (coverage, totalAfterGst, schema) => {
+      const isPercentage = coverage.indexOf('%') > 0
+      let _absoluteValue = 0
+      if (isPercentage) {
+        const percentage = parseFloat(coverage.slice(0, -1))
+        _absoluteValue = totalAfterGst * percentage / 100
+      } else _absoluteValue = coverage.slice(1)
+      const message =
+        _absoluteValue === totalAfterGst
+          ? 'Claim Amount cannot exceed Total Payable'
+          : `Claim Amount cannot exceed Coverage amount ($${_absoluteValue})`
+      return schema.min(0).max(_absoluteValue, message)
+    },
+  ),
+})

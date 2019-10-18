@@ -235,13 +235,14 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
                   </Button>
                 </Tooltip>
                 <Popconfirm
-                  onConfirm={() =>
+                  onConfirm={() => {
                     dispatch({
                       type: 'orders/deleteRow',
                       payload: {
                         uid: row.uid,
                       },
-                    })}
+                    })
+                  }}
                 >
                   <Tooltip title='Delete'>
                     <Button size='sm' color='danger' justIcon>

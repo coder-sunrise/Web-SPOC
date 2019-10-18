@@ -2,12 +2,14 @@ import React, { Component } from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
+import Printer from '@material-ui/icons/Print'
 import {
   CommonTableGrid,
   GridContainer,
   GridItem,
   OutlinedTextField,
   FastField,
+  Button,
 } from '@/components'
 // sub component
 import Summary from './Summary'
@@ -25,6 +27,11 @@ class InvoiceDetails extends Component {
     const { classes, values } = this.props
     return (
       <div className={classes.cardContainer}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button size='sm' color='primary' icon>
+            <Printer />Print Invoice
+          </Button>
+        </div>
         <CommonTableGrid
           size='sm'
           height={300}

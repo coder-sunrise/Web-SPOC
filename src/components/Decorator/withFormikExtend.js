@@ -16,7 +16,7 @@ window.dirtyForms = []
 const _localAuthority = {}
 let lastVersion = null
 const withFormikExtend = (props) => (Component) => {
-  const { displayName, authority, notDirtyDuration = 3 } = props
+  const { displayName, authority, notDirtyDuration = 1.5 } = props
   let startDirtyChecking = false
   if (displayName) {
     _localAuthority[displayName] = {}
@@ -24,8 +24,8 @@ const withFormikExtend = (props) => (Component) => {
   const updateDirtyState = (ps) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
 
-    const { errors, dirty, values } = ps
-
+    const { errors, dirty, initialValues, values } = ps
+    // console.log({ initialValues, values })
     const _lastFormikUpdate = {
       displayName,
       errors,

@@ -115,10 +115,11 @@ const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
 //   handleSubmit: () => {},
 //   displayName: 'AddConsultationDocument',
 // })
-@connect(({ consultationDocument, user, codetable }) => ({
+@connect(({ consultationDocument, user, codetable, visitRegistration }) => ({
   consultationDocument,
   user,
   codetable,
+  visitEntity: visitRegistration.entity || {},
 }))
 class AddConsultationDocument extends PureComponent {
   constructor (props) {

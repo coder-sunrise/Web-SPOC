@@ -223,7 +223,7 @@ const Detail = ({
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=3')}
         >
-          Cancel
+          Close
         </Button>
         <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
       </div>
@@ -244,15 +244,14 @@ export default compose(
     },
 
     validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
+      // code: Yup.string().required(),
       displayValue: Yup.string().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     }),
 
-    handleSubmit: (values, { props }) => {
+    handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history, codetable } = props
       const { servicePackageItem } = values
-      console.log('submit', values)
 
       const newServicePackageArray = servicePackageItem.map((o) => {
         return {
@@ -272,6 +271,7 @@ export default compose(
         },
       }).then((r) => {
         if (r) {
+          resetForm()
           history.push('/inventory/master?t=3')
         }
       })

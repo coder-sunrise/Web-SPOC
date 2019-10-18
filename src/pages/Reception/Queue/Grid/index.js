@@ -30,6 +30,8 @@ const compareQueueNo = (a, b) => {
 }
 
 const compareString = (a, b) => a.localeCompare(b)
+const compareDoctor = (a, b) =>
+  a.clinicianProfile.name.localeCompare(b.clinicianProfile.name)
 
 const FuncConfig = {
   pager: false,
@@ -53,7 +55,7 @@ const TableConfig = {
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceAmount', title: 'Invoice Amount' },
     { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'patientAccountNo', title: 'Acc No.' },
+    { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gst', title: 'GST' },
     { name: 'payment', title: 'Payment' },
     { name: 'paymentMode', title: 'Payment Mode' },
@@ -176,6 +178,7 @@ const columnExtensions = [
   },
   {
     columnName: 'doctor',
+    compare: compareDoctor,
     render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
   },
 ]
@@ -203,13 +206,24 @@ const Grid = ({
       payload: {
         id,
       },
+    }).then((response) => {
+      if (response === 204)
+        notification.success({
+          message: 'Visit deleted',
+        })
     })
   }
 
-  const onRowDoubleClick = (row) =>
-    handleEditVisitClick({
-      visitID: row.id,
-    })
+  const onRowDoubleClick = (row) => {
+    const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
+    const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
+    // if (isInCons) {
+    // } else if (isPaused) {
+    // }
+    // handleEditVisitClick({
+    //   visitID: row.id,
+    // })
+  }
 
   const calendarData = useMemo(
     () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
@@ -258,6 +272,7 @@ const Grid = ({
       payload: {
         openConfirm: true,
         openConfirmTitle: '',
+        openConfirmText: 'Confirm',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
         onConfirmSave: () => deleteQueue(id),
       },
@@ -280,21 +295,14 @@ const Grid = ({
       return false
     }
 
-    // if (visitStatus === 'IN CONS') {
-    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
-    //     dispatch({
-    //       type: 'global/updateAppState',
-    //       payload: {
-    //         openConfirm: true,
-    //         openConfirmTitle: '',
-    //         openConfirmContent: `Are you sure to overwrite ${title ||
-    //           ''} ${name} consultation?`,
-    //         onConfirmSave: () => null,
-    //       },
-    //     })
-    //     return false
-    //   }
-    // }
+    if (visitStatus === 'IN CONS') {
+      if (assignedDoctorProfile.id !== doctorProfile.id) {
+        notification.error({
+          message: `You cannot resume other doctor's consultation.`,
+        })
+        return false
+      }
+    }
 
     // if (assignedDoctorProfile.id !== doctorProfile.id) {
     //   notification.error({
@@ -344,7 +352,7 @@ const Grid = ({
         const version = Date.now()
         const parameters = {
           qid: row.id,
-          vid: row.visitFK.id,
+          vid: row.visitFK,
           pid: row.patientProfileFK,
           v: version,
           md2: 'bill',
@@ -358,7 +366,7 @@ const Grid = ({
         deleteQueueConfirmation(row)
         break
       case '3': // view patient profile
-        onViewPatientProfileClick(row.patientProfileFK)
+        onViewPatientProfileClick(row.patientProfileFK, row.id)
         break
       case '4': // patient dashboard
         router.push(
@@ -370,6 +378,17 @@ const Grid = ({
         const valid = isAssignedDoctor(row)
         if (valid) {
           const version = Date.now()
+          dispatch({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: 'ctservice',
+              filter: {
+                'serviceFKNavigation.IsActive': true,
+                combineCondition: 'or',
+              },
+            },
+          })
+
           dispatch({
             type: `consultation/start`,
             payload: {
@@ -452,7 +471,7 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-
+  console.log({ queryingFormData })
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper

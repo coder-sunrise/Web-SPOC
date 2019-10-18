@@ -59,7 +59,7 @@ const RescheduleForm = ({ classes, footer, handleSubmit }) => {
           <FastField
             name='rescheduleReason'
             render={(args) => (
-              <TextField {...args} prefix='Remarks (optional)' />
+              <TextField {...args} label='Remarks (optional)' />
             )}
           />
         </GridItem>

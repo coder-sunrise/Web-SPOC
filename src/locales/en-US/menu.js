@@ -38,7 +38,7 @@ export default {
 
   'menu.finance': 'Finance',
   'menu.finance.invoice/list': 'Invoice/Payment',
-  'menu.finance.invoice/detail': 'Invoice',
+  'menu.finance.invoice/detail': 'Invoice Details',
   'menu.finance.deposit': 'Deposit',
   'menu.finance.doctor-expense': 'Doctor Expense',
   'menu.finance.credit/debitnote': 'Credit / Debit Note',

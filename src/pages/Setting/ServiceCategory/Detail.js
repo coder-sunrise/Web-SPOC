@@ -21,7 +21,7 @@ const styles = (theme) => ({})
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
@@ -33,6 +33,7 @@ const styles = (theme) => ({})
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingServiceCategory/query',
@@ -72,7 +73,7 @@ class Detail extends PureComponent {
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {

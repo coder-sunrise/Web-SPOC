@@ -52,7 +52,6 @@ const Detail = ({
   }
 
   useEffect(() => {
-    console.log('id', medicationDetail.currentId)
     if (medicationDetail.currentId) {
       dispatch({
         type: 'medicationDetail/query',
@@ -68,10 +67,8 @@ const Detail = ({
               id: sddfk,
             },
           }).then((sdd) => {
-            console.log({ sdd })
             const { data } = sdd
             const { code, name } = data[0]
-            console.log(data[0])
             dispatch({
               type: 'medicationDetail/updateState',
               payload: {
@@ -141,7 +138,7 @@ const Detail = ({
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=0')}
         >
-          Cancel
+          Close
         </Button>
         <ProgressButton
           submitKey='medicationDetail/submit'
@@ -198,7 +195,7 @@ export default compose(
       }
     },
     validationSchema: Yup.object().shape({
-      code: Yup.string().required(),
+      // code: Yup.string().required(),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
@@ -274,6 +271,7 @@ export default compose(
           // dispatch({
           //   type: 'medicationDetail/query',
           // })
+          resetForm()
           history.push('/inventory/master')
         }
       })

@@ -5,10 +5,16 @@ import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
 import { dateFormatLong, CodeSelect } from '@/components'
+import { UNFIT_TYPE } from '@/utils/constants'
 
 const status = [
   { value: false, name: 'Inactive', color: 'red' },
   { value: true, name: 'Active', color: 'green' },
+]
+
+const statusString = [
+  { value: 'Inactive', name: 'Inactive', color: 'red' },
+  { value: 'Active', name: 'Active', color: 'green' },
 ]
 
 const isAutoOrder = [
@@ -602,6 +608,7 @@ const consultationDocumentTypes = [
           MedicalCertificateDetails: [
             {
               ...row,
+              unfitType: UNFIT_TYPE[row.unfitTypeFK],
               mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
               mcStartDate: moment(row.mcIssueDate).format(dateFormatLong),
               mcEndDate: moment(row.mcIssueDate).format(dateFormatLong),
@@ -644,6 +651,17 @@ const consultationDocumentTypes = [
     value: '1',
     name: 'Referral Letter',
     prop: 'corReferralLetter',
+    downloadConfig: {
+      id: 9,
+      key: 'referralletterid',
+      draft: (row) => {
+        return {
+          ReferralLetterDetails: [
+            { ...row },
+          ],
+        }
+      },
+    },
   },
   {
     value: '2',
@@ -782,6 +800,7 @@ const tenantCodes = [
   // 'ctsnomeddiagnosis',
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
+  'ctMedicationFrequency',
 ]
 
 // const codes = [
@@ -804,7 +823,7 @@ const defaultParams = {
 }
 
 const convertExcludeFields = [
-  'excludeInactiveCodes',
+  // 'excludeInactiveCodes',
 ]
 
 const _fetchAndSaveCodeTable = async (
@@ -816,8 +835,8 @@ const _fetchAndSaveCodeTable = async (
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
-  const generalCodetableURL = `${baseURL}?ctnames=`
-  const searchURL = `${baseURL}/search?ctname=`
+  const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
+  const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
   let url = useGeneral ? generalCodetableURL : searchURL
   let criteriaForTenantCodes = noIsActiveProp.reduce(
@@ -971,8 +990,10 @@ export const refreshCodetable = async (url) => {
 
 export const checkIsCodetableAPI = (url) => {
   try {
-    const isTenantCodes = tenantCodes.indexOf(url) > 0
     const paths = url.split('/')
+
+    const isTenantCodes =
+      paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
 
     return isTenantCodes || isCodetable
@@ -1223,6 +1244,20 @@ export const InvoicePayerType = [
   //   listName: 'govCoPayerPaymentTxn',
   // },
 ]
+export const recurrenceTypes = [
+  {
+    value: 'daily',
+    name: 'Daily',
+  },
+  {
+    value: 'weekly',
+    name: 'Weekly',
+  },
+  {
+    value: 'monthly',
+    name: 'Monthly',
+  },
+]
 
 module.exports = {
   // paymentMethods,
@@ -1250,7 +1285,9 @@ module.exports = {
   // preferredContactMode,
   // countries,
   // schemes,
+  recurrenceTypes,
   status,
+  statusString,
   isAutoOrder,
   addressTypes,
   orderTypes,

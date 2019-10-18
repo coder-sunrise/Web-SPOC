@@ -25,6 +25,7 @@ const styles = () => ({
 
 class CollectPaymentConfirm extends PureComponent {
   state = {
+    isCardPayment: false,
     totalAmount: '',
     rows: [
       this.props.values.statementInvoice,
@@ -185,8 +186,22 @@ class CollectPaymentConfirm extends PureComponent {
     })
   }
 
+  onChangePaymentMode = (event) => {
+    const { setFieldValue } = this.props
+    const selectedValue = event || ''
+
+    if (selectedValue === 1) {
+      this.setState({ isCardPayment: true })
+      setFieldValue('patientDepositTransaction.creditCardTypeFK', 1)
+    } else {
+      this.setState({ isCardPayment: false })
+      setFieldValue('patientDepositTransaction.cardNumber', '')
+      setFieldValue('patientDepositTransaction.creditCardTypeFK', undefined)
+    }
+  }
+
   render () {
-    const { rows, columns, columnExtensions } = this.state
+    const { rows, columns, columnExtensions, isCardPayment } = this.state
     const { values, statement, handleSubmit } = this.props
     const { bizSessionList } = statement
     return (
@@ -198,9 +213,9 @@ class CollectPaymentConfirm extends PureComponent {
           FuncProps={{ pager: false }}
         />
 
-        <GridContainer style={{ marginTop: 20 }}>
-          <GridItem direction='column' md={6}>
-            <GridItem md={6}>
+        <GridContainer style={{ marginTop: 20 }} justify='flex-end'>
+          <GridItem direction='column' justify='flex-end' md={3}>
+            <GridItem>
               <FastField
                 name='amount'
                 render={(args) => (
@@ -214,7 +229,7 @@ class CollectPaymentConfirm extends PureComponent {
               />
             </GridItem>
 
-            <GridItem md={6}>
+            <GridItem>
               <Field
                 name='paymentDate'
                 render={(args) => (
@@ -229,7 +244,7 @@ class CollectPaymentConfirm extends PureComponent {
               />
             </GridItem>
 
-            <GridItem md={6}>
+            <GridItem>
               <Field
                 name='paymentCreatedBizSessionFK'
                 render={(args) => (
@@ -238,7 +253,7 @@ class CollectPaymentConfirm extends PureComponent {
               />
             </GridItem>
 
-            <GridItem md={6}>
+            <GridItem>
               <FastField
                 name='paymentMode'
                 render={(args) => (
@@ -247,12 +262,43 @@ class CollectPaymentConfirm extends PureComponent {
                     label='Payment Mode'
                     code='ctPaymentMode'
                     labelField='displayValue'
+                    onChange={(e) => this.onChangePaymentMode(e)}
                   />
                 )}
               />
             </GridItem>
 
-            <GridItem md={6}>
+            {isCardPayment && (
+              <React.Fragment>
+                <GridItem>
+                  <Field
+                    name='patientDepositTransaction.creditCardTypeFK'
+                    render={(args) => (
+                      <CodeSelect
+                        label='Card Type'
+                        code='ctCreditCardType'
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem>
+                  <Field
+                    name='patientDepositTransaction.cardNumber'
+                    render={(args) => (
+                      <NumberInput
+                        label='Card Number'
+                        inputProps={{ maxLength: 4 }}
+                        maxLength={4}
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </React.Fragment>
+            )}
+
+            <GridItem>
               <FastField
                 name='remarks'
                 render={(args) => (
@@ -261,7 +307,7 @@ class CollectPaymentConfirm extends PureComponent {
               />
             </GridItem>
 
-            <GridItem style={{ marginTop: 10 }} md={6}>
+            <GridItem style={{ float: 'right', padding: 0, marginTop: 10 }}>
               <Button color='primary' onClick={handleSubmit}>
                 Confirm Payment
               </Button>

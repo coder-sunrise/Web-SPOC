@@ -85,6 +85,11 @@ class EditOrder extends Component {
         notification.success({
           message: 'Order signed',
         })
+
+        dispatch({
+          type: `formik/clean`,
+          payload: 'OrderPage',
+        })
       }
     })
   }
@@ -95,7 +100,7 @@ class EditOrder extends Component {
     const cdWidget = widgets.find((o) => o.id === '3')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
-
+    console.log('edit order', { values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer>

@@ -128,7 +128,7 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
-    text: 'Medication Precautions',
+    text: 'Medication Precaution',
     url: '/setting/medicationprecautions',
   },
   {

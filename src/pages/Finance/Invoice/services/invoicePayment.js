@@ -20,4 +20,5 @@ module.exports = {
   getBizSession: (params) => service.queryList(bizSessionAPIURL, params),
   voidWriteOff: (params) => service.upsert(writeOffUrl, params),
   voidPayment: (params) => service.upsert(invoicePaymentUrl, params),
+  voidCreditNote: (params) => service.upsert(creditNoteUrl, params),
 }

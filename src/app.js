@@ -1,4 +1,11 @@
-const initialState = {}
+const initialState = {
+  loading: {
+    global: false,
+    models: {},
+    effects: {},
+  },
+}
+
 const models = []
 models.push(require('@/models/setting'))
 models.push(require('@/models/menu'))
@@ -17,7 +24,7 @@ export const dva = {
         action,
         { key, effectArgs },
       ] = args
-      // console.log({ e, effectArgs })
+      console.log({ e, effectArgs })
 
       const message = `Error occured in  effects: ${key}, with payload:`
       console.log(message, { ...effectArgs })

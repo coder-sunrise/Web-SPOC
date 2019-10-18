@@ -1,6 +1,5 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
-import { FakeDataClaimSubmissionCHAS } from '../variables'
 
 export default createListViewModel({
   namespace: 'claimSubmissionDraft',

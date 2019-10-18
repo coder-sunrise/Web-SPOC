@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
-
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-
+import Yup from '@/utils/yup'
 import { CardContainer, CommonModal } from '@/components'
-
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
@@ -29,7 +26,7 @@ const styles = (theme) => ({
   global,
 }))
 class Service extends PureComponent {
-  state = {}
+  state = { open: false }
 
   componentDidMount () {
     this.props.dispatch({
@@ -38,16 +35,33 @@ class Service extends PureComponent {
   }
 
   toggleModal = () => {
-    this.props.dispatch({
-      type: 'settingClinicService/updateState',
-      payload: {
-        showModal: !this.props.settingClinicService.showModal,
-      },
+    const { dispatch } = this.props
+    // dispatch({
+    //   type: 'settingClinicService/updateState',
+    //   payload: {
+    //     showModal: !this.props.settingClinicService.showModal,
+    //   },
+    // })
+
+    this.setState((prevState) => {
+      return { open: !prevState.open }
     })
+
+    if (this.state.open) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
+    }
+
+    console.log(this.state.open)
   }
 
   render () {
     const { settingClinicService } = this.props
+    const { open } = this.state
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -55,9 +69,9 @@ class Service extends PureComponent {
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <Grid {...cfg} {...this.props} toggleModal={this.toggleModal} />
         <CommonModal
-          open={settingClinicService.showModal}
+          open={open}
           observe='ServiceModal'
           title={settingClinicService.entity ? 'Edit Service' : 'Add Service'}
           maxWidth='md'

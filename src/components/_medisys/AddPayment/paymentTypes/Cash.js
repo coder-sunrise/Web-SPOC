@@ -15,7 +15,13 @@ import {
 } from '@/components'
 import styles from '../styles'
 
-const Cash = ({ classes, payment, handleDeletePayment }) => {
+const Cash = ({
+  classes,
+  payment,
+  index,
+  handleDeletePayment,
+  handleAmountChange,
+}) => {
   return (
     <CardContainer hideHeader>
       <h5 className={classes.paymentItemHeader}>Cash</h5>
@@ -31,13 +37,20 @@ const Cash = ({ classes, payment, handleDeletePayment }) => {
       <GridContainer>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.amount`}
-            render={(args) => <NumberInput label='Amount' {...args} currency />}
+            name={`paymentList[${index}].amt`}
+            render={(args) => (
+              <NumberInput
+                label='Amount'
+                {...args}
+                currency
+                onChange={handleAmountChange}
+              />
+            )}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`${payment.id}.remarks`}
+            name={`paymentList[${index}].remarks`}
             render={(args) => <TextField label='Remarks' {...args} />}
           />
         </GridItem>

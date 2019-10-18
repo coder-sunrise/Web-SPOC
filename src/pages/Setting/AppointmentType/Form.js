@@ -104,9 +104,12 @@ export default withFormikExtend({
       if (response) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingAppointmentType/updateState',
-          payload: { entity: null },
+          type: 'settingAppointmentType/query',
         })
+        // dispatch({
+        //   type: 'settingAppointmentType/updateState',
+        //   payload: { entity: null },
+        // })
       }
     })
   },

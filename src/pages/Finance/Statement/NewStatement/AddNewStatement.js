@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
+import { navigateDirtyCheck } from '@/utils/utils'
 import {
   Button,
   DatePicker,
@@ -41,6 +42,7 @@ const styles = () => ({
   statement,
 }))
 @withFormikExtend({
+  enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement.default
     const adminChargeValueType =
@@ -56,7 +58,7 @@ const styles = () => ({
     paymentTerm: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, history } = props
     console.log('submit', values)
@@ -68,10 +70,12 @@ const styles = () => ({
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         history.push('/finance/statement')
       }
     })
   },
+  displayName: 'statementDetails',
 })
 class AddNewStatement extends PureComponent {
   state = {
@@ -218,6 +222,12 @@ class AddNewStatement extends PureComponent {
     })
   }
 
+  goBackToPreviousPage = () => {
+    const { history, resetForm } = this.props
+    resetForm()
+    history.goBack()
+  }
+
   render () {
     const {
       classes,
@@ -245,7 +255,7 @@ class AddNewStatement extends PureComponent {
                       <CodeSelect
                         label='Co-Payer'
                         code='ctcopayer'
-                        onChange={(e) => this.getInvoiceList(e)}
+                        // onChange={(e) => this.getInvoiceList(e)}
                         disabled={statement.entity}
                         {...args}
                       />
@@ -274,6 +284,7 @@ class AddNewStatement extends PureComponent {
                     label={formatMessage({
                       id: 'finance.statement.paymentTerms',
                     })}
+                    max={999}
                     {...args}
                   />
                 )}
@@ -359,7 +370,9 @@ class AddNewStatement extends PureComponent {
               <GridItem classes={{ grid: classes.searchBtn }} xs md={3}>
                 <ProgressButton
                   color='primary'
+                  disabled={!values.copayerFK}
                   onClick={() => this.getInvoiceList()}
+                  icon={<p />}
                 >
                   <Search />
                   <FormattedMessage id='form.search' />
@@ -380,11 +393,14 @@ class AddNewStatement extends PureComponent {
             container
             style={{
               marginTop: 10,
-              justifyContent: 'flex-end',
+              justifyContent: 'center',
             }}
           >
-            <Button color='danger' onClick={() => history.goBack()}>
-              Cancel
+            <Button
+              color='danger'
+              onClick={navigateDirtyCheck(this.goBackToPreviousPage)}
+            >
+              Close
             </Button>
             <Button color='primary' onClick={() => handleSubmit()}>
               Save

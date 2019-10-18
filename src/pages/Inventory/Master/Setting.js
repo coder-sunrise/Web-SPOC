@@ -136,7 +136,9 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.frequency',
                 })}
+                labelField='displayValue'
                 code='ctMedicationFrequency'
+                labelField='displayValue'
                 {...args}
               />
             )}
@@ -202,13 +204,15 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.uom',
                 })}
-                code={
-                  showTransfer ? (
-                    'ctmedicationunitofmeasurement'
-                  ) : (
-                    'ctvaccinationunitofmeasurement'
-                  )
-                }
+                // code={
+                //   showTransfer ? (
+                //     'ctmedicationunitofmeasurement'
+                //   ) : (
+                //     'ctvaccinationunitofmeasurement'
+                //   )
+                // }
+                // Fix work item ID: 10993
+                code='ctmedicationunitofmeasurement'
                 {...args}
               />
             )}

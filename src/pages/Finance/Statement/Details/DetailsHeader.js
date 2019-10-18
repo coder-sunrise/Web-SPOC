@@ -58,9 +58,7 @@ class DetailsHeader extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='statementNo'
-                render={(args) => (
-                  <TextField disabled noUnderline rightAlign='true' {...args} />
-                )}
+                render={(args) => <TextField disabled noUnderline {...args} />}
               />
             </GridItem>
             <GridItem md={5}>
@@ -78,18 +76,11 @@ class DetailsHeader extends PureComponent {
             <GridItem md={5}>
               <h5 className={classes.boldText}>Co-Payer: </h5>
             </GridItem>
-            <GridItem md={3} style={{ textAlign: 'right' }}>
+            <GridItem md={3}>
               <Field
                 name='copayerFK'
                 render={(args) => (
-                  <CodeSelect
-                    code='ctcopayer'
-                    disabled
-                    noUnderline
-                    align='right'
-                    rightAlign='true'
-                    {...args}
-                  />
+                  <CodeSelect code='ctcopayer' disabled noUnderline {...args} />
                 )}
               />
             </GridItem>
@@ -100,9 +91,7 @@ class DetailsHeader extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='paymentTerm'
-                render={(args) => (
-                  <TextField disabled noUnderline rightAlign='true' {...args} />
-                )}
+                render={(args) => <TextField disabled noUnderline {...args} />}
               />
             </GridItem>
           </GridContainer>
@@ -115,19 +104,7 @@ class DetailsHeader extends PureComponent {
               <Field
                 name='adminChargeValue'
                 render={(args) => {
-                  if (values.adminChargeValueType === 'ExactAmount') {
-                    return <NumberInput percentage {...amountProps} {...args} />
-                  }
-                  return (
-                    <NumberInput
-                      percentage
-                      noUnderline
-                      disabled
-                      rightAlign='true'
-                      normalText='true'
-                      {...args}
-                    />
-                  )
+                  return <NumberInput {...amountProps} {...args} />
                 }}
               />
             </GridItem>

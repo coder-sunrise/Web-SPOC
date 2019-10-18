@@ -94,7 +94,8 @@ const routes = [
             // mini: 'AP',
             component: './Reception/Appointment',
             authority: [
-              { name: 'reception/appointment' },
+              'reception/appointment',
+              // { name: 'reception/appointment' },
             ],
           },
           {

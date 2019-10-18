@@ -22,7 +22,7 @@ const styles = (theme) => ({})
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     paymentCharges: Yup.number(),
-    description: Yup.string().required(),
+    // description: Yup.string().required(),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -50,7 +50,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values, setFieldValue } = props
+    const { classes, theme, footer, values } = props
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -71,10 +71,16 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={(args) => (
+                  <TextField
+                    label='Display Value'
+                    disabled={!!values.id}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -82,6 +88,21 @@ class Detail extends PureComponent {
                     <DateRangePicker
                       label='Effective Start Date'
                       label2='End Date'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='paymentCharges'
+                render={(args) => {
+                  return (
+                    <NumberInput
+                      label='Payment Charges'
+                      suffix='%'
+                      max={100}
                       {...args}
                     />
                   )
@@ -96,19 +117,10 @@ class Detail extends PureComponent {
                     <TextField
                       label='Description'
                       multiline
+                      disabled={!!values.id}
                       rowsMax={4}
                       {...args}
                     />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='paymentCharges'
-                render={(args) => {
-                  return (
-                    <NumberInput label='Payment Charges' suffix='%' {...args} />
                   )
                 }}
               />

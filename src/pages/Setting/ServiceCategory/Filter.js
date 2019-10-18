@@ -9,6 +9,7 @@ import {
   Button,
   TextField,
   ProgressButton,
+  Select,
 } from '@/components'
 
 @withFormikExtend({
@@ -19,7 +20,7 @@ import {
 })
 class Filter extends PureComponent {
   render () {
-    console.log({ props: this.props.values })
+    // console.log({ props: this.props.values })
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
@@ -32,6 +33,14 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
+          <GridItem xs={6} md={2}>
+            <FastField
+              name='isActive'
+              render={(args) => {
+                return <Select label='Status' options={status} {...args} />
+              }}
+            />
+          </GridItem>
         </GridContainer>
 
         <GridContainer>
@@ -41,10 +50,11 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
-                  const { codeDisplayValue } = this.props.values
+                  const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingServiceCategory/query',
                     payload: {
+                      isActive,
                       group: [
                         {
                           code: codeDisplayValue,

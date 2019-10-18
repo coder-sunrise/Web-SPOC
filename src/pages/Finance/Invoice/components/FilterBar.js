@@ -1,6 +1,7 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import moment from 'moment'
 // common components
 import {
   Button,
@@ -11,6 +12,7 @@ import {
   TextField,
   Select,
 } from '@/components'
+
 import { osBalanceStatus } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
@@ -32,6 +34,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                   <DateRangePicker
                     label='Invoice Date From'
                     label2='Invoice Date To'
+                    disabledDate={(d) => !d || d.isAfter(moment())}
                     {...args}
                   />
                 )
@@ -40,7 +43,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
           </GridItem>
           <GridItem xs={6} md={3}>
             <FastField
-              name='osBalanceStatus'
+              name='outstandingBalanceStatus'
               render={(args) => {
                 return (
                   <Select
@@ -77,16 +80,36 @@ const FilterBar = ({ classes, dispatch, values }) => {
                 invoiceNo,
                 patientName,
                 patientAccountNo,
-                // invoiceDates,
+                invoiceDates,
+                outstandingBalanceStatus,
               } = values
               dispatch({
                 type: 'invoiceList/query',
                 payload: {
-                  invoiceNo,
-                  patientName,
-                  patientAccountNo,
-                  // invoiceDateFrom: invoiceDates[0],
-                  // invoiceDateTo: invoiceDates[1],
+                  lgteql_invoiceDate: invoiceDates
+                    ? invoiceDates[0]
+                    : undefined,
+                  lsteql_invoiceDate: invoiceDates
+                    ? invoiceDates[1]
+                    : undefined,
+                  lgt_OutstandingBalance:
+                    outstandingBalanceStatus === 'yes' &&
+                    outstandingBalanceStatus !== 'all'
+                      ? '0'
+                      : undefined,
+                  lsteql_OutstandingBalance:
+                    outstandingBalanceStatus === 'no' &&
+                    outstandingBalanceStatus !== 'all'
+                      ? '0'
+                      : undefined,
+                  group: [
+                    {
+                      invoiceNo,
+                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
+                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
+                      combineCondition: 'or',
+                    },
+                  ],
                 },
               })
             }}

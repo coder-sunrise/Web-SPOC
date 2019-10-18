@@ -32,10 +32,9 @@ const Pricing = ({
     setMarkupMargin,
   ] = useState(values.markupMargin || 0.0)
 
-  const calculate = () => {
+  const calculateSuggestSellingPrice = () => {
     const suggestedSellingPrice =
       parseFloat(acp) * (1 + parseFloat(markupMargin) / 100)
-    console.log({ suggestedSellingPrice })
     setFieldValue('suggestSellingPrice', suggestedSellingPrice)
   }
 
@@ -69,16 +68,9 @@ const Pricing = ({
   }
   useEffect(
     () => {
-      console.log('check', values, acp, markupMargin)
       if (acp && markupMargin) {
-        console.log('hi')
-        calculate()
+        calculateSuggestSellingPrice()
       }
-      // console.log('values', acp, markupMargin)
-      // setValues({
-      //   averageCostPrice: acp,
-      //   markupMargin: markupMargin,
-      // })
       setFieldValue('averageCostPrice', acp)
       setFieldValue('markupMargin', markupMargin)
     },

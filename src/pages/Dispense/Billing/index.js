@@ -1,22 +1,25 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-import { withFormik } from 'formik'
+
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { Accordion, Button, CommonModal, GridContainer } from '@/components'
+import {
+  Accordion,
+  Button,
+  CommonModal,
+  GridContainer,
+  withFormikExtend,
+} from '@/components'
 import { AddPayment, LoadingWrapper } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '../DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
-// page modal
-import CoPayer from './modal/CoPayer'
-// import AddPayment from './AddPayment'
 // model
 import model from '../models/billing'
 // utils
@@ -40,21 +43,55 @@ const bannerStyle = {
   paddingRight: 16,
 }
 
-@connect(({ billing, dispense, loading, patient }) => ({
+@connect(({ billing, dispense, loading }) => ({
   billing,
   dispense,
   loading,
 }))
-@withFormik({
-  mapPropsToValues: ({ billing }) => billing.entity || billing.default,
-  handleSubmit: (values, formikBag) => {
-    console.log({ values })
+@withFormikExtend({
+  enableReinitialize: true,
+  mapPropsToValues: ({ billing }) => {
+    if (billing.entity) {
+      return { ...billing.entity, payment: { paymentModes: [] } }
+    }
+    return billing.default
+  },
+  handleSubmit: (values, { props, resetForm }) => {
+    const { dispatch } = props
+    const {
+      concurrencyToken,
+      visitId,
+      invoice,
+      invoicePayers,
+      payment,
+    } = values
+
+    const payload = {
+      concurrencyToken,
+      visitId,
+      invoice,
+      payment,
+      invoicePayers: invoicePayers.map((payer) => ({
+        ...payer,
+        invoicePayerItems: payer.invoicePayerItems.map((item) => ({
+          ...item,
+          payableBalance: item.totalAfterGst,
+        })),
+      })),
+    }
+    console.log({ values, payload })
+    dispatch({
+      type: 'billing/upsert',
+      payload,
+    }).then((response) => {
+      console.log({ response })
+    })
   },
 })
 class Billing extends Component {
   state = {
-    showCoPaymentModal: false,
     showAddPaymentModal: false,
+    isEditing: false,
   }
 
   backToDispense = () => {
@@ -73,18 +110,15 @@ class Billing extends Component {
     })
   }
 
-  toggleCopayerModal = () => {
-    const { showCoPaymentModal } = this.state
-    this.setState({ showCoPaymentModal: !showCoPaymentModal })
-  }
-
   toggleAddPaymentModal = () => {
     const { showAddPaymentModal } = this.state
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
 
-  onSubmit = (values) => {
-    console.log('addpayment', { values })
+  handleAddPayment = (payment) => {
+    const { setFieldValue } = this.props
+    setFieldValue('payment', payment)
+    this.toggleAddPaymentModal()
   }
 
   onExpandDispenseDetails = (event, panel, expanded) => {
@@ -95,12 +129,27 @@ class Billing extends Component {
     }
   }
 
+  handleIsEditing = (editing) => {
+    this.setState({ isEditing: editing })
+  }
+
   render () {
-    const { showCoPaymentModal, showAddPaymentModal } = this.state
-    const { classes, values, loading } = this.props
-    console.log({ values })
+    const { showAddPaymentModal } = this.state
+    const {
+      classes,
+      values,
+      dispense,
+      loading,
+      setFieldValue,
+      handleSubmit,
+    } = this.props
+    const formikBag = {
+      values,
+      setFieldValue,
+    }
+    // console.log({ values })
     return (
-      <div>
+      <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
         <div style={{ padding: 8 }}>
           <LoadingWrapper
@@ -116,10 +165,7 @@ class Billing extends Component {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
                     <GridContainer direction='column'>
-                      <DispenseDetails
-                        viewOnly
-                        values={this.props.dispense.entity}
-                      />
+                      <DispenseDetails viewOnly values={dispense.entity} />
                     </GridContainer>
                   ),
                 },
@@ -133,11 +179,14 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleAddCopayerClick={this.toggleCopayerModal}
-                values={values}
+                handleIsEditing={this.handleIsEditing}
+                // values={values}
+                {...formikBag}
               />
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary
+                disabled={this.state.isEditing}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 values={values}
               />
@@ -145,27 +194,36 @@ class Billing extends Component {
           </GridContainer>
         </Paper>
         <div className={classes.paymentButton}>
-          <Button color='info' onClick={this.backToDispense}>
+          <Button
+            color='info'
+            onClick={this.backToDispense}
+            disabled={this.state.isEditing}
+          >
             <ArrowBack />Dispense
           </Button>
-          <Button color='primary'>Complete Payment</Button>
+          <Button
+            color='primary'
+            disabled={this.state.isEditing || values.id === undefined}
+            onClick={handleSubmit}
+          >
+            Complete Payment
+          </Button>
         </div>
-        <CommonModal
-          open={showCoPaymentModal}
-          title='Add Copayer'
-          onConfirm={this.toggleCopayerModal}
-          onClose={this.toggleCopayerModal}
-        >
-          <CoPayer />
-        </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
         >
-          <AddPayment handleSubmit={this.onSubmit} />
+          <AddPayment
+            handleSubmit={this.handleAddPayment}
+            invoice={{
+              ...values.invoice,
+              finalPayable: values.invoice.totalAftGst,
+              outstandingBalance: values.finalPayable,
+            }}
+          />
         </CommonModal>
-      </div>
+      </LoadingWrapper>
     )
   }
 }

@@ -93,7 +93,7 @@ class Details extends PureComponent {
 
   render () {
     const { columns, showCollectPayment, FuncProps, showModal } = this.state
-    const { classes, statement, values, type } = this.props
+    const { classes, statement, values, theme } = this.props
     return (
       <div>
         <GridContainer classes={{ grid: classes.gridContainer }}>
@@ -118,7 +118,7 @@ class Details extends PureComponent {
             {
               columnName: 'adminCharge',
               type: 'number',
-              currency: type === 'ExactAmount',
+              currency: true,
             },
             {
               columnName: 'payableAmount',
@@ -142,11 +142,11 @@ class Details extends PureComponent {
           onSelectionChange={this.handleSelectionChange}
         />
 
-        <h5>
+        <p style={{ margin: theme.spacing(1) }}>
           {`Last Refreshed On ${moment(values.lastRefreshTime).format(
             dateFormatLongWithTime,
           ) || '-'}`}
-        </h5>
+        </p>
 
         <CommonModal
           open={showCollectPayment}

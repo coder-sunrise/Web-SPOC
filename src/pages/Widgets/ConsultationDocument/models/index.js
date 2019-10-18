@@ -31,7 +31,7 @@ export default createFormViewModel({
         type: '4',
         issueDate: moment(),
         referenceNo: '-',
-        attendanceStartTime: moment().format('HH:mm'),
+        // attendanceStartTime: moment().format('HH:mm'),
         attendanceEndTime: moment().add(30, 'minutes').format('HH:mm'),
       },
       defaultReferralLetter: {

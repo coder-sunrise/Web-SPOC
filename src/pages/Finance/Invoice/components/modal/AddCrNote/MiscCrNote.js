@@ -21,10 +21,11 @@ import styles from './styles'
     total: Yup.number().min(1),
   }),
   handleSubmit: (values, { props }) => {
-    console.log({ values, props })
     let newCreditNoteItem = props.values.creditNoteItem || []
     const miscItem = {
       itemType: 'Misc',
+      itemCode: 'MISC',
+      itemTypeFK: 6,
       itemName: values.description,
       quantity: 1,
       unitPrice: values.total,

@@ -34,6 +34,7 @@ import { queryDrugLabelDetails } from '@/services/Dispense'
     consultationDocument,
     orders,
     patient,
+    clinicSettings,
   }) => ({
     dispense,
     visitRegistration,
@@ -41,6 +42,7 @@ import { queryDrugLabelDetails } from '@/services/Dispense'
     consultationDocument,
     orders,
     patient: patient.entity,
+    clinicSettings,
   }),
 )
 class Dispense extends PureComponent {

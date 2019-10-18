@@ -82,16 +82,17 @@ const styles = () => ({
       // create new patient will return patient entity, r === true
       if (r) {
         if (r.id) {
-          history.push(
-            getRemovedUrl(
-              [
-                'new',
-              ],
-              getAppendUrl({
-                pid: r.id,
-              }),
-            ),
-          )
+          if (!patient.callback)
+            history.push(
+              getRemovedUrl(
+                [
+                  'new',
+                ],
+                getAppendUrl({
+                  pid: r.id,
+                }),
+              ),
+            )
         } else {
           dispatch({
             type: 'patient/closePatientModal',
@@ -104,6 +105,7 @@ const styles = () => ({
           },
         }).then((value) => {
           resetForm(value)
+          if (patient.callback) patient.callback()
         })
         if (onConfirm) onConfirm()
       }
@@ -204,6 +206,19 @@ class PatientDetail extends PureComponent {
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...p} widget mode='integrated' />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '7',
+        name: 'Patient Document',
+        access: 'patient.view',
+        component: Loadable({
+          loader: () => import('./PatientDocument'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p}   />
           },
           loading: Loading,
         }),

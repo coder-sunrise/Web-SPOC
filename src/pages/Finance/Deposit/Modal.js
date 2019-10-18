@@ -158,11 +158,27 @@ class Modal extends PureComponent {
       // isSessionRequired: isDeposit ? false : true,
       isSessionRequired: false,
       isCardPayment: false,
+      paymentMode: [],
     }
   }
 
   componentDidMount () {
+    const { dispatch, isDeposit } = this.props
+
     this.getBizList(moment().format('YYMMDD'))
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctpaymentmode',
+      },
+    }).then((v) => {
+      let paymentMode = v
+      if (isDeposit) {
+        paymentMode = v.filter((o) => o.code !== 'DEPOSIT')
+      }
+      this.setState({ paymentMode })
+    })
   }
 
   onChangeDate = (event) => {
@@ -259,7 +275,7 @@ class Modal extends PureComponent {
     const { state, props } = this
     const { theme, footer, onConfirm, values, isDeposit, deposit } = props
     const { bizSessionList, entity } = deposit
-    const { isSessionRequired, isCardPayment } = this.state
+    const { isSessionRequired, isCardPayment, paymentMode } = this.state
     const commonAmountOpts = {
       currency: true,
       prefixProps: {
@@ -299,13 +315,21 @@ class Modal extends PureComponent {
               <Field
                 name='patientDepositTransaction.transactionModeFK'
                 render={(args) => (
-                  <CodeSelect
+                  <Select
                     label='Mode'
-                    labelField='displayValue'
                     onChange={(e) => this.onChangePaymentMode(e)}
-                    code='ctpaymentmode'
+                    options={paymentMode}
+                    labelField='displayValue'
+                    valueField='id'
                     {...args}
                   />
+                  //    <CodeSelect
+                  //   label='Mode'
+                  //   labelField='displayValue'
+                  //   onChange={(e) => this.onChangePaymentMode(e)}
+                  //   code='ctpaymentmode'
+                  //   {...args}
+                  // />
                 )}
               />
             </GridItem>
@@ -331,6 +355,8 @@ class Modal extends PureComponent {
                     <NumberInput
                       label='Card Number'
                       onChange={(e) => this.handleMaxLengthCardNumber(e)}
+                      inputProps={{ maxLength: 4 }}
+                      maxLength={4}
                       {...args}
                     />
                   )}

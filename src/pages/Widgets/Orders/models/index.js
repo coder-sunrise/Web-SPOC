@@ -111,6 +111,7 @@ export default createListViewModel({
         })
       },
     },
+
     reducers: {
       upsertRowState (state, { payload }) {
         let { rows } = state
@@ -142,7 +143,16 @@ export default createListViewModel({
       },
 
       deleteRow (state, { payload }) {
-        const { rows } = state
+        const {finalAdjustments, rows } = state
+        let tempRows = rows
+        
+
+        tempRows.map((o , index) => {
+          if (!payload || o.uid === payload.uid) tempRows.splice(index,1)
+          return o
+        })
+
+        const amount = calculateAmount(tempRows, finalAdjustments)
 
         return {
           ...state,
@@ -150,6 +160,7 @@ export default createListViewModel({
             if (!payload || o.uid === payload.uid) o.isDeleted = true
             return o
           }),
+          ...amount,
         }
       },
 

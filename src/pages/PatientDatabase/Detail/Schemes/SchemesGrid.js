@@ -69,7 +69,7 @@ class SchemesGrid extends PureComponent {
               ctSchemeType.toLowerCase()
             ]
             const st = ctSchemeTypes.find((o) => o.id === val)
-            // console.log(st)
+            console.log('schemesgrid', { rows, st })
             const rs = rows.filter(
               (o) =>
                 !o.isDeleted &&
@@ -144,6 +144,8 @@ class SchemesGrid extends PureComponent {
             { value: 3, name: 'Test 03' },
           ],
           isDisabled: (row) => {
+            const isCorporate = this.isCorporate(row)
+            console.log({ isCorporate })
             return !this.isCorporate(row)
           },
           onChange: ({ val, option, row, onValueChange }) => {
@@ -214,7 +216,7 @@ class SchemesGrid extends PureComponent {
     const { codetable } = this.props
     const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
     const r = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
-    return r && r.code === 'Corporate'
+    return r && r.code.toUpperCase() === 'CORPORATE'
   }
 
   isCHAS = (schemeTypeFK) => {
@@ -298,7 +300,7 @@ class SchemesGrid extends PureComponent {
 
       onCommitChanges: this.commitChanges,
     }
-
+    // console.log({ props: this.props })
     return (
       <EditableTableGrid
         rows={this.getSortedRows(rows)}

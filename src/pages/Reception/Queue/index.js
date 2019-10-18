@@ -22,7 +22,7 @@ import {
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
-import DetailsActionBar from './Filterbar'
+import DetailsActionBar from './FilterBar'
 import DetailsGrid from './Grid'
 import EndSessionSummary from './SessionSummary'
 import PatientSearchModal from './PatientSearch'
@@ -71,11 +71,12 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, patientSearch, loading, user }) => ({
+@connect(({ queueLog, patientSearch, loading, user, patient }) => ({
   patientSearchResult: patientSearch.list,
   queueLog,
   loading,
   user: user.data,
+  patient: patient.entity,
 }))
 class Queue extends React.Component {
   constructor (props) {
@@ -89,6 +90,7 @@ class Queue extends React.Component {
   }
 
   componentWillMount = () => {
+    console.log('queue will mount')
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
     if (Object.keys(query).length === 0) {
@@ -159,9 +161,24 @@ class Queue extends React.Component {
     })
   }
 
+  redirectToVisitRegistration = () => {
+    const { patient } = this.props
+    this.showVisitRegistration({
+      patientID: patient.id,
+    })
+  }
+
   toggleRegisterNewPatient = () => {
     this.props.dispatch({
       type: 'patient/openPatientModal',
+      payload: {
+        callback: () => {
+          this.props.dispatch({
+            type: 'patient/closePatientModal',
+          })
+          this.redirectToVisitRegistration()
+        },
+      },
     })
   }
 
@@ -226,6 +243,7 @@ class Queue extends React.Component {
   }
 
   onEnterPressed = async (searchQuery) => {
+    console.log('on enter pressed')
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -246,6 +264,7 @@ class Queue extends React.Component {
   }
 
   showSearchResult = () => {
+    console.log('show search result')
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
 
@@ -271,40 +290,21 @@ class Queue extends React.Component {
     })
   }
 
-  onViewPatientProfileClick = (patientProfileFK) => {
+  onViewPatientProfileClick = (patientProfileFK, qid) => {
     this.props.history.push(
       getAppendUrl({
         md: 'pt',
         cmt: '1',
         pid: patientProfileFK,
+        qid,
         v: Date.now(),
       }),
     )
   }
 
   sendNotification = () => {
-    // this.props.dispatch({
-    //   type: 'global/sendNotification',
-    //   payload: {
-    //     type: 'QueueListing',
-    //     data: {
-    //       sender: 'queue_listing',
-    //       message: 'test test',
-    //     },
-    //   },
-    // })
     SendNotification({ test: '123' })
   }
-
-  // toggleFilterSelfOnly = () => {
-  //   const { queueLog, dispatch } = this.props
-  //   dispatch({
-  //     type: 'queueLog/updateState',
-  //     payload: {
-  //       selfOnly: !queueLog.selfOnly,
-  //     },
-  //   })
-  // }
 
   setSearch = (v) => {
     this.setState({
@@ -339,13 +339,7 @@ class Queue extends React.Component {
                 >
                   Refresh
                 </ProgressButton>
-                {/* <Button
-                  color='success'
-                  size='sm'
-                  onClick={this.sendNotification}
-                >
-                  Send Notification
-                </Button> */}
+
                 <Authorized authority='queue.endsession'>
                   <ProgressButton
                     icon={<Stop />}

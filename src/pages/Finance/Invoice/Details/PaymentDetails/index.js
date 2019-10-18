@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { AddPayment } from 'medisys-components'
+import { AddPayment, WarningSnackbar } from 'medisys-components'
 import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
@@ -14,7 +14,6 @@ import PaymentCard from './PaymentCard'
 import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 // styles
 import styles from './styles'
-import { PayerType } from './variables'
 
 @connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
@@ -68,7 +67,8 @@ class PaymentDetails extends Component {
   closeAddPaymentModal = () =>
     this.setState({ showAddPayment: false, selectedInvoicePayerFK: undefined })
 
-  closeAddCrNoteModal = () => this.setState({ showAddCrNote: false })
+  closeAddCrNoteModal = () =>
+    this.setState({ showAddCrNote: false, selectedInvoicePayerFK: undefined })
 
   closeWriteOffModal = () => {
     this.setState({ showWriteOff: false, selectedInvoicePayerFK: undefined })
@@ -84,14 +84,14 @@ class PaymentDetails extends Component {
     })
   }
 
-  onAddCrNoteClick = (payerType) => {
+  onAddCrNoteClick = (invoicePayerFK) => {
     const { dispatch, invoiceDetail, invoicePayment } = this.props
     dispatch({
       type: 'invoiceCreditNote/mapCreditNote',
       payload: {
-        invoicePayerFK: payerType,
-        invoiceDetail,
-        creditNote: invoicePayment.entity.creditNote || [],
+        invoicePayerFK,
+        invoiceDetail: invoiceDetail.entity || {},
+        invoicePaymentDetails: invoicePayment.entity || {},
       },
     })
 
@@ -173,8 +173,8 @@ class PaymentDetails extends Component {
   }
 
   render () {
-    const { classes, invoiceDetail, values } = this.props
-    // const { paymentTxnList } = values
+    // console.log('PaymentIndex', this.props)
+    const { classes, values, readOnly } = this.props
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -189,9 +189,20 @@ class PaymentDetails extends Component {
       showDeleteConfirmation,
       onVoid,
     } = this.state
-
+    // console.log({ values })
     return (
       <div className={classes.container}>
+        {readOnly ? (
+          <div style={{ paddingTop: 5 }}>
+            <WarningSnackbar
+              variant='warning'
+              className={classes.margin}
+              message='All action is not allowed due to no active session was found.'
+            />
+          </div>
+        ) : (
+          ''
+        )}
         {!_.isEmpty(values) ? (
           values
             .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
@@ -205,6 +216,7 @@ class PaymentDetails extends Component {
                   outstanding={payment.outStanding}
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
+                  readOnly={readOnly}
                 />
               )
             })
@@ -248,7 +260,7 @@ class PaymentDetails extends Component {
           onClose={this.closeAddCrNoteModal}
           maxWidth='lg'
         >
-          <AddCrNote />
+          <AddCrNote onRefresh={this.refresh} />
         </CommonModal>
 
         <CommonModal

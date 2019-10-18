@@ -3,9 +3,7 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { subscribeNotification } from '@/utils/realtime'
 import * as service from '../services/queue'
-import { save as updateAppt } from '@/services/calendar'
 import { StatusIndicator } from '@/pages/Reception/Queue/variables'
-import { serverDateTimeFormatFull } from '@/components'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -35,22 +33,7 @@ export default createListViewModel({
         message: '',
       },
     },
-    subscriptions: ({ dispatch, history }) => {
-      // history.listen((location) => {
-      //   const { pathname, query } = location
-      //   const allowedPaths = [
-      //     '/reception/queue',
-      //   ]
-
-      //   if (
-      //     allowedPaths.includes(pathname) &&
-      //     Object.keys(query).length === 0
-      //   ) {
-      //     // dispatch({
-      //     //   type: 'initState',
-      //     // })
-      //   }
-      // })
+    subscriptions: ({ dispatch }) => {
       subscribeNotification('QueueListing', {
         callback: () => {
           dispatch({ type: 'refresh' })
@@ -174,22 +157,16 @@ export default createListViewModel({
               combineCondition: 'and',
               eql_appointmentDate: today,
               in_appointmentStatusFk: '1|2|5',
-              // group: [
-              //   {
-              //     appointmentStatusFk: 5,
-              //     eql_appointmentStatusFk: '1',
-              //     combineCondition: 'or',
-              //   },
-              // ],
             },
           })
         }
       },
       *deleteQueueByQueueID ({ payload }, { call, put }) {
-        yield call(service.deleteQueue, payload)
+        const result = yield call(service.deleteQueue, payload)
         yield put({
           type: 'refresh',
         })
+        return result
       },
       *refresh ({ payload }, { put }) {
         yield put({

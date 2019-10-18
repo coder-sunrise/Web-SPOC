@@ -38,6 +38,10 @@ const styles = (theme) => ({})
         'The number should between -2,147,483,648 and 2,147,483,647',
       )
       .nullable(),
+    translatedDisplayValue: Yup.number().when('translationLanguage', {
+      is: (v) => v !== undefined,
+      then: Yup.number().required(),
+    }),
   }),
   handleSubmit: (values, { props }) => {
     const { effectiveDates, ...restValues } = values
@@ -90,27 +94,8 @@ class Detail extends PureComponent {
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
+
             <GridItem md={6}>
-              <FastField
-                name='sortOrder'
-                render={(args) => (
-                  <NumberInput label='Sort Order' autoFocused {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem md={6}>
-              <FastField
-                name='multiplier'
-                render={(args) => <NumberInput label='Multiplier' {...args} />}
-              />
-            </GridItem>
-            {/* <GridItem md={4}>
-              <FastField
-                name='shortcutKey'
-                render={(args) => <TextField label='Shortcut Key' {...args} />}
-              />
-            </GridItem> */}
-            <GridItem md={12}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {
@@ -123,6 +108,21 @@ class Detail extends PureComponent {
                     />
                   )
                 }}
+              />
+            </GridItem>
+
+            <GridItem md={6}>
+              <FastField
+                name='sortOrder'
+                render={(args) => (
+                  <NumberInput label='Sort Order' autoFocused {...args} />
+                )}
+              />
+            </GridItem>
+            <GridItem md={12}>
+              <FastField
+                name='multiplier'
+                render={(args) => <NumberInput label='Multiplier' {...args} />}
               />
             </GridItem>
             <GridItem md={12}>

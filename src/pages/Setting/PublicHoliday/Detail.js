@@ -80,7 +80,7 @@ class Detail extends PureComponent {
     const { props } = this
     const { classes, theme, footer, values, settingPublicHoliday } = props
 
-    console.log('detail', props)
+    // console.log('detail', props)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -103,7 +103,7 @@ class Detail extends PureComponent {
                 render={(args) => <TextField label='Display Value' {...args} />}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='dates'
                 render={(args) => {
@@ -117,7 +117,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
+            <GridItem md={6}>
               <FastField
                 name='effectiveDates'
                 render={(args) => {

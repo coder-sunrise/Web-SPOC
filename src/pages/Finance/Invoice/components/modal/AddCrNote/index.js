@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
+import moment from 'moment'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
+import Warning from '@material-ui/icons/Error'
 import Yup from '@/utils/yup'
 // common components
 import {
@@ -14,6 +16,10 @@ import {
   Button,
   Field,
   NumberInput,
+  IconButton,
+  Tooltip,
+  Popconfirm,
+  SizeContainer,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
 import { notification } from '@/components'
@@ -40,14 +46,15 @@ const crNoteItemSchema = Yup.object().shape({
     const { creditNoteBalance, finalCredit } = values
     const errors = {}
     if (creditNoteBalance - finalCredit < 0) {
-      errors.finalCredit =
-        'Total Credit Notes amount cannot be more than Net Amount.'
+      errors.finalCredit = `Total Credit Notes amount cannot be more than Net Amount. (Balance: $${creditNoteBalance.toFixed(
+        2,
+      )})`
     }
     return errors
   },
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm } = props
-    // console.log({ values })
+    const { dispatch, onConfirm, onRefresh } = props
+    // console.log({ values, props })
     const {
       creditNoteItem,
       invoicePayerFK,
@@ -55,21 +62,36 @@ const crNoteItemSchema = Yup.object().shape({
       remark,
       finalCredit,
     } = values
+
     dispatch({
       type: 'invoiceCreditNote/upsert',
       payload: {
+        generatedDate: moment().formatUTC(false),
         invoicePayerFK,
         isStockIn,
         remark,
         total: finalCredit,
         totalAftGST: finalCredit,
-        creditNoteItem: creditNoteItem.filter((x) => x.isSelected),
+        creditNoteItem: creditNoteItem
+          .filter((x) => x.isSelected)
+          .map((selectedItem) => {
+            if (selectedItem.itemType.toLowerCase() === 'misc') {
+              selectedItem.isInventoryItem = false
+              selectedItem.itemDescription = selectedItem.itemName
+            } else {
+              selectedItem.isInventoryItem = true
+            }
+            delete selectedItem.id
+            delete selectedItem.concurrencyToken
+            selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
+            return { ...selectedItem }
+          }),
       },
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
         // Refresh invoice & invoicePayer
-
+        onRefresh()
         // dispatch({
         //   type: 'settingClinicService/query',
         // })
@@ -191,11 +213,11 @@ class AddCrNote extends Component {
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
-    console.log(values)
     return (
       <div>
         <CrNoteForm />
         <CommonTableGrid
+          size='sm'
           {...TableConfig}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
@@ -205,18 +227,38 @@ class AddCrNote extends Component {
             {
               columnName: 'quantity',
               render: (row) => {
+                const { quantity, originRemainingQty } = row
                 return (
                   <Field
-                    name={`creditNoteItem[${row.rowIndex - 1}].quantity`}
+                    name={`creditNoteItem[${row.rowIndex}].quantity`}
                     render={(args) => {
                       return (
-                        <NumberInput
-                          disabled={row.itemType.toLowerCase() === 'misc'}
-                          onChange={() => this.handleOnChangeQuantity()}
-                          min={0}
-                          max={row.originRemainingQty}
-                          {...args}
-                        />
+                        <SizeContainer size='sm'>
+                          <NumberInput
+                            size='sm'
+                            style={{ width: '92%' }}
+                            disabled={row.itemType.toLowerCase() === 'misc'}
+                            onChange={() => this.handleOnChangeQuantity()}
+                            min={1}
+                            // max={row.originRemainingQty}
+                            {...args}
+                          />
+                          {quantity > originRemainingQty ? (
+                            <Tooltip
+                              title={
+                                <p style={{ color: 'red', fontSize: 12 }}>
+                                  {`Item exceed quantity limits. (Maximum: ${originRemainingQty})`}
+                                </p>
+                              }
+                            >
+                              <IconButton>
+                                <Warning color='error' />
+                              </IconButton>
+                            </Tooltip>
+                          ) : (
+                            ''
+                          )}
+                        </SizeContainer>
                       )
                     }}
                   />
@@ -242,31 +284,16 @@ class AddCrNote extends Component {
                 return (
                   <div>
                     {row.itemType.toLowerCase() === 'misc' ? (
-                      ''
-                    ) : (
-                      // <Button
-                      //   size='sm'
-                      //   onClick={() => {
-                      //     this.handleEditRow(row)
-                      //   }}
-                      //   justIcon
-                      //   color='primary'
-                      // >
-                      //   <Edit />
-                      // </Button>
-                      ''
-                    )}
-                    {row.itemType.toLowerCase() === 'misc' ? (
-                      <Button
-                        size='sm'
-                        onClick={() => {
+                      <Popconfirm
+                        title='Are you sure you want to delete the selected item?'
+                        onConfirm={() => {
                           this.handleDeleteRow(row)
                         }}
-                        justIcon
-                        color='danger'
                       >
-                        <Delete />
-                      </Button>
+                        <Button size='sm' justIcon color='danger'>
+                          <Delete />
+                        </Button>
+                      </Popconfirm>
                     ) : (
                       ''
                     )}
@@ -276,94 +303,6 @@ class AddCrNote extends Component {
             },
           ]}
         />
-
-        {/* <EditableTableGrid
-          {...TableConfig}
-          selection={this.state.selectedRows}
-          onSelectionChange={this.handleSelectionChange}
-          onSelectRow={undefined}
-          schema={crNoteItemSchema}
-          rows={creditNoteItem}
-          columns={CrNoteColumns}
-          columnExtensions={[
-            { columnName: 'itemType', disabled: true },
-            { columnName: 'itemName', disabled: true },
-            {
-              columnName: 'quantity',
-              render: (row) => {
-                return (
-                  <Field
-                    name={`creditNoteItem[${row.rowIndex - 1}].quantity`}
-                    render={(args) => {
-                      return <NumberInput {...args} />
-                    }}
-                  />
-                )
-              },
-            },
-            {
-              columnName: 'unitPrice',
-              type: 'currency',
-              currency: true,
-              disabled: true,
-            },
-
-            {
-              columnName: 'totalAfterItemAdjustment',
-              type: 'currency',
-              currency: true,
-              disabled: true,
-            },
-            {
-              columnName: 'action',
-              align: 'center',
-              width: 78,
-              render: (row) => {
-                return (
-                  <div>
-                    {row.itemType.toLowerCase() === 'misc' ? (
-                      ''
-                    ) : (
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          // this.handleEditRow(row)
-                        }}
-                        justIcon
-                        color='primary'
-                      >
-                        <Edit />
-                      </Button>
-                    )}
-
-                    {row.itemType.toLowerCase() === 'misc' ? (
-                      <Button
-                        size='sm'
-                        onClick={() => {
-                          // this.handleDeleteRow(row)
-                        }}
-                        justIcon
-                        color='danger'
-                      >
-                        <Delete />
-                      </Button>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                )
-              },
-            },
-          ]}
-          EditingProps={{
-            showAddCommand: false,
-            showEditCommand: false,
-            showDeleteCommand: false,
-            // onCommitChanges: this.onCommitChanges,
-            // onAddedRowsChange: this.onAddedRowsChange,
-            // onRowChangesChange: this.onRowChangesChange,
-          }}
-        /> */}
 
         <Summary />
         <MiscCrNote
@@ -379,7 +318,12 @@ class AddCrNote extends Component {
             <Button
               color='primary'
               onClick={handleSubmit}
-              disabled={finalCredit <= 0}
+              disabled={
+                finalCredit <= 0 ||
+                creditNoteItem.filter(
+                  (x) => x.quantity > x.originRemainingQty && x.isSelected,
+                ).length > 0
+              }
             >
               Save
             </Button>

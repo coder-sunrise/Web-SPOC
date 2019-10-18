@@ -1,15 +1,11 @@
 import React from 'react'
 import { connect } from 'dva'
 // common components
-import { CommonModal, CardContainer, NavPills } from '@/components'
+import { CommonModal, Tabs } from '@/components'
 // sub components
-import Draft from './Draft'
-import New from './New'
-import Submitted from './Submitted'
-import Approved from './Approved'
-import Rejected from './Rejected'
 import ClaimDetails from '../common/ClaimDetails'
 import SubmitClaimStatus from '../common/SubmitClaimStatus'
+import { ClaimSubmissionChasTabOption } from './variables'
 
 @connect(({ claimSubmission, global }) => ({
   claimSubmission,
@@ -21,15 +17,22 @@ class CHAS extends React.Component {
     showSubmitClaimStatus: false,
     failedCount: 0,
     claimDetails: {},
+    activeTab: '2',
+    allowEdit: false,
   }
 
-  openClaimDetails = () => this.setState({ showClaimDetails: true })
+  openClaimDetails = (allowEdit) =>
+    this.setState({ showClaimDetails: true, allowEdit })
 
   openSubmitClaimStatus = (count) =>
     this.setState({ showSubmitClaimStatus: true, failedCount: count })
 
   closeClaimDetails = () =>
-    this.setState({ showClaimDetails: false, claimDetails: {} })
+    this.setState({
+      showClaimDetails: false,
+      claimDetails: {},
+      allowEdit: false,
+    })
 
   closeSubmitClaimStatus = () =>
     this.setState({ showSubmitClaimStatus: false, failedCount: 0 })
@@ -42,7 +45,7 @@ class CHAS extends React.Component {
     history.push(`/claim-submission/chas/invoice/${processedInvoiceNo}`)
   }
 
-  handleContextMenuItemClick = (row, id) => {
+  handleContextMenuItemClick = (row, id, allowEdit = false) => {
     const { dispatch } = this.props
     switch (id) {
       case '0':
@@ -52,7 +55,7 @@ class CHAS extends React.Component {
             id: row.id,
           },
         }).then((r) => {
-          if (r) this.openClaimDetails()
+          if (r) this.openClaimDetails(allowEdit)
         })
         break
       case '1':
@@ -63,16 +66,35 @@ class CHAS extends React.Component {
     }
   }
 
+  onChangeTab = (e) => {
+    this.setState({ activeTab: e })
+  }
+
   render () {
     const {
       showClaimDetails,
       showSubmitClaimStatus,
       failedCount,
       claimDetails,
+      allowEdit,
     } = this.state
+    const claimSubmissionActionProps = {
+      handleContextMenuItemClick: this.handleContextMenuItemClick,
+      handleSubmitClaimStatus: this.openSubmitClaimStatus,
+    }
+    const { activeTab } = this.state
+
     return (
-      <CardContainer hideHeader size='sm'>
-        <NavPills
+      // <CardContainer hideHeader size='sm'>
+      <React.Fragment>
+        <Tabs
+          style={{ marginTop: 20 }}
+          activeKey={activeTab}
+          defaultActivekey='2'
+          onChange={this.onChangeTab}
+          options={ClaimSubmissionChasTabOption(claimSubmissionActionProps)}
+        />
+        {/* <NavPills
           active={1}
           tabs={[
             {
@@ -117,14 +139,14 @@ class CHAS extends React.Component {
               ),
             },
           ]}
-        />
+        /> */}
         <CommonModal
           title='Claim Details'
           open={showClaimDetails}
           onClose={this.closeClaimDetails}
           onConfirm={this.closeClaimDetails}
         >
-          <ClaimDetails claimDetails={claimDetails} />
+          <ClaimDetails claimDetails={claimDetails} allowEdit={allowEdit} />
         </CommonModal>
 
         <CommonModal
@@ -136,7 +158,8 @@ class CHAS extends React.Component {
         >
           <SubmitClaimStatus count={failedCount} />
         </CommonModal>
-      </CardContainer>
+      </React.Fragment>
+      // </CardContainer>
     )
   }
 }

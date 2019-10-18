@@ -2,6 +2,7 @@ import React, { PureComponent, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles, Divider, Tooltip } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import {  WarningSnackbar } from 'medisys-components'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
 
@@ -16,7 +17,7 @@ import {
   TextField,
   Button,
 } from '@/components'
-import WarningSnackbar from '../GeneralSetting/WarningSnackbar'
+
 import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
@@ -147,7 +148,7 @@ class clinicSettings extends PureComponent {
       gSTRegistrationNumber,
       gSTPercentage,
     } = this.props.values
-    console.log(this.props.values)
+    // console.log(this.props.values)
     const payload = [
       {
         ...isEnableGST,

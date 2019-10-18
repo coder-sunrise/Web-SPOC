@@ -13,7 +13,7 @@ import {
 } from '@/components'
 import DOGrid from './DOGrid'
 import DODetails from './DODetails'
-import { isPOStatusFinalized } from '../../variables'
+import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -99,7 +99,7 @@ class index extends Component {
             />
           </CommonModal>
           <Button
-            // disabled={!isPOStatusFinalized(poStatus)}
+            // disabled={isPOStatusFulfilled(poStatus)}
             onClick={this.onAddDeliveryOrderClicked}
             // hideIfNoEditRights
             color='info'

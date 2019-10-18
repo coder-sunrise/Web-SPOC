@@ -65,6 +65,7 @@ class BaseInput extends React.PureComponent {
       let target = $(e.target)
       while (loop < 100) {
         const newTarget = $(target.parents('div,tr')[0])
+
         if (newTarget.length === 0) break
         const btn = newTarget.find("button[data-button-type='progress']")
         if (btn.length > 0) {
@@ -235,7 +236,7 @@ class BaseInput extends React.PureComponent {
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
     }
-    // console.log(error, showErrorIcon)
+    // console.log({ error, showErrorIcon })
     if (error && showErrorIcon) {
       cfg.endAdornment = (
         <InputAdornment position='end'>

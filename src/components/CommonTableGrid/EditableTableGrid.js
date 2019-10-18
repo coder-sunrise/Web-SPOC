@@ -378,7 +378,7 @@ class EditableTableGrid extends PureComponent {
       ...props,
     }
     // console.log(rowChanges, addedRows)
-    // console.log(editingRowIds)
+    // console.log({ columnExtensions })
     const editableCfg = {
       getRowId,
       extraState: [
@@ -419,6 +419,7 @@ class EditableTableGrid extends PureComponent {
                     // console.log(12311231,o.props)
                     return React.cloneElement(o, {
                       row: p.row,
+                      disabled: p.row.disabled,
                       editingRowIds,
                       getRowId,
                       key: o.props.id,

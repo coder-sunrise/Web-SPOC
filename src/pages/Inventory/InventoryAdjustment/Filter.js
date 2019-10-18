@@ -69,7 +69,7 @@ class Filter extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='transactionNo'
               render={(args) => {
@@ -78,7 +78,7 @@ class Filter extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={5}>
             <Field
               name='transDates'
               render={(args) => {
@@ -94,7 +94,7 @@ class Filter extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={1}>
+          <GridItem xs={6} md={2}>
             <Field
               name='allDate'
               render={(args) => {
@@ -103,7 +103,7 @@ class Filter extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={2}>
             <FastField
               name='status'
               render={(args) => {
@@ -177,6 +177,7 @@ class Filter extends PureComponent {
               </ProgressButton>
               <ProgressButton
                 color='primary'
+                icon={null}
                 onClick={this.handleToggle}
                 buttonRef={(node) => {
                   this.anchorElAccount = node

@@ -76,6 +76,8 @@ moment.prototype.formatUTC = function (dateOnly = true) {
 //   return this.clone().add(-8, 'hours')
 // }
 
+export const roundToTwoDecimals = (amount) => Math.round(amount * 100) / 100
+
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
 }
@@ -528,6 +530,7 @@ const convertToQuery = (
   // if (returnVal.columnCriteria && returnVal.columnCriteria.length > 0) {
   //   returnVal.columnCriteria = JSON.stringify(returnVal.columnCriteria)
   // }
+
   return returnVal
 }
 
@@ -608,8 +611,7 @@ export const updateCellValue = (
           abortEarly: false,
         },
       )
-      // console.log({ t2: window.$tempGridRow })
-      // console.log({ r })
+
       $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
       return ''
@@ -629,7 +631,7 @@ export const updateCellValue = (
       //   }
       // }
       // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
-      // console.log(er)
+
       const actualError = (er.inner || []).find((o) => o.path === columnName)
       return actualError ? actualError.message : ''
       // row._$error = true
@@ -673,15 +675,16 @@ const confirmBeforeReload = (e) => {
   e.returnValue = ''
 }
 
-const _checkCb = (cb) => {
+const _checkCb = (cb, e) => {
+  console.log('e', e)
   if (typeof cb === 'string') {
     router.push(cb)
   } else if (typeof cb === 'function') {
-    cb()
+    cb(e)
   }
 }
 const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
-   // console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
+  console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
@@ -691,7 +694,7 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
           id: 'app.general.leave-without-save',
         }),
         onConfirmSave: saveCb,
-        openConfirmText: 'Save Changes',
+        openConfirmText: saveCb ? 'Save Changes' : 'Confirm',
         onConfirmDiscard: () => {
           if (displayName) {
             window.g_app._store.dispatch({
@@ -714,13 +717,13 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
           }
           window.beforeReloadHandlerAdded = false
           window.removeEventListener('beforeunload', confirmBeforeReload)
-          _checkCb(cb)
+          _checkCb(cb, e)
         },
       },
     })
     e.preventDefault()
   } else {
-    _checkCb(cb)
+    _checkCb(cb, e)
     // window._localFormik = {}
     // console.log(window._localFormik)
   }
@@ -856,6 +859,8 @@ const calculateAmount = (
   {
     totalField = 'totalAfterItemAdjustment',
     adjustedField = 'totalAfterOverallAdjustment',
+    gstField = 'totalAfterGST',
+    gstAmtField = 'gstAmount',
     isGSTInclusive = false,
   } = {},
 ) => {
@@ -865,6 +870,7 @@ const calculateAmount = (
   rows.forEach((r) => {
     r.weightage = r[totalField] / total
     r[adjustedField] = r[totalField]
+
     // console.log(r)
   })
   adjustments.filter((o) => !o.isDeleted).forEach((fa) => {
@@ -890,6 +896,10 @@ const calculateAmount = (
       })
     } else {
       gst = totalAfterAdj * gSTPercentage
+      rows.forEach((r) => {
+        r[gstAmtField] = roundToTwoDecimals(r[totalField] * gSTPercentage)
+        r[gstField] = roundToTwoDecimals(r[totalField] * (1 + gSTPercentage))
+      })
     }
   }
 

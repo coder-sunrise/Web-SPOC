@@ -39,9 +39,7 @@ export const cancel = (params) =>
   request(cancelURL, { method: 'POST', body: params })
 
 export const query = (payload) => {
-  console.log({ payload })
   const urlPrefix = `/${payload.mode}`
-  // if (payload.alwaysSingle) urlPrefix = '/single'
   return request(`${url}${urlPrefix}/${payload.id}`, { method: 'GET' })
 }
 
@@ -49,7 +47,7 @@ export const queryList = (params) =>
   commonService.queryList(url, {
     pagesize: 9999,
     ...params,
-    // isCancelled: false,
+    isCancelled: false,
   })
 
 export const deleteDraft = (payload) => commonService.remove(url, payload)

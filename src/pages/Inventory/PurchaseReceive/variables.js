@@ -92,11 +92,27 @@ export const isPOStatusDraft = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
+export const tabbedPaneAvailability = (status) => {
+  const allowedStatus = [
+    // 'Draft',
+    1,
+    4,
+  ]
+  return allowedStatus.indexOf(status) > -1
+}
+
 export const isPOStatusFinalized = (status) => {
   const allowedStatus = [
     // 'Finalized',
     2,
     3,
+  ]
+  return allowedStatus.indexOf(status) > -1
+}
+
+export const isPOStatusFulfilled = (status) => {
+  const allowedStatus = [
+    5,
   ]
   return allowedStatus.indexOf(status) > -1
 }
@@ -185,7 +201,7 @@ export const PurchaseReceiveDetailOption = (poStatus, props) => [
       id: 'inventory.pr.detail.dod',
     }),
     content: addContent(2, props),
-    disabled: isPOStatusDraft(poStatus),
+    disabled: tabbedPaneAvailability(poStatus),
   },
   {
     id: 2,
@@ -193,7 +209,7 @@ export const PurchaseReceiveDetailOption = (poStatus, props) => [
       id: 'inventory.pr.detail.payment',
     }),
     content: addContent(3, props),
-    disabled: isPOStatusDraft(poStatus),
+    disabled: tabbedPaneAvailability(poStatus),
   },
 ]
 

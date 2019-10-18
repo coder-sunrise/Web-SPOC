@@ -41,6 +41,17 @@ const InventoryTypeListing = ({
   totalPrice,
   theme,
 }) => {
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
+    }
+  }, [])
+
   const {
     medicationPackageItem,
     consumablePackageItem,

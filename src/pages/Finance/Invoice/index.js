@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
+import moment from 'moment'
 // common components
 import { CardContainer, withFormikExtend } from '@/components'
 // sub components
@@ -10,13 +11,20 @@ import InvoiceDataGrid from './components/InvoiceDataGrid'
 // styles
 import styles from './styles'
 
-@withFormikExtend({
-  mapPropsToValues: () => {},
-})
 @connect(({ invoiceList, global }) => ({
   invoiceList,
   global,
 }))
+@withFormikExtend({
+  mapPropsToValues: () => {
+    return {
+      invoiceDates: [
+        moment(),
+        moment(),
+      ],
+    }
+  },
+})
 class Invoice extends React.Component {
   componentDidMount () {
     this.props.dispatch({

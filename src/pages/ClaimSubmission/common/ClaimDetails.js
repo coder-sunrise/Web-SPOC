@@ -56,6 +56,11 @@ class ClaimDetails extends Component {
     })
   }
 
+  onSelectChange = (val) => {
+    const { setFieldValue } = this.props
+    setFieldValue('setFieldValue', val)
+  }
+
   render () {
     const {
       classes,
@@ -64,12 +69,14 @@ class ClaimDetails extends Component {
       renderClaimDetails,
       values,
       codetable,
+      allowEdit,
     } = this.props
     const { ctgender = [] } = codetable
     const {
       clinicianProfile: { title, name, doctorProfile },
       patientDetail: { age, genderFK },
       patientName,
+      tier: maxDiagnosisSelectionCount,
     } = values
     let patientGender = ctgender.find((x) => x.id === genderFK)
     const { doctorMCRNo } = doctorProfile
@@ -209,16 +216,23 @@ class ClaimDetails extends Component {
                 <GridItem md={4} />
                 <GridItem md={5}>
                   <FastField
-                    name='diagnosis'
+                    name='diagnosisList'
                     render={(args) => (
                       <Select
-                        {...args}
-                        disabled={values.status === 'Draft'}
-                        label='Diagnosis'
+                        disabled={!allowEdit}
+                        maxSelected={maxDiagnosisSelectionCount}
+                        mode='multiple'
                         options={[
-                          { name: 'Asthma', value: 'asthma' },
-                          { name: 'Hypertension', value: 'hypertension' },
+                          { name: 'Chief Complaints', value: '1' },
+                          { name: 'Plan', value: '2' },
+                          { name: 'Diagnosis', value: '3' },
+                          { name: 'Consultation Document', value: '4' },
+                          { name: 'Orders', value: '5' },
+                          { name: 'Invoice', value: '7' },
                         ]}
+                        onChange={this.onSelectChange}
+                        maxTagCount={2}
+                        {...args}
                       />
                     )}
                   />
@@ -245,7 +259,7 @@ class ClaimDetails extends Component {
               <Button color='danger' onClick={onClose}>
                 Close
               </Button>
-              {values.status !== 'Draft' ? (
+              {allowEdit ? (
                 <Button color='primary' onClick={onConfirm}>
                   Save
                 </Button>

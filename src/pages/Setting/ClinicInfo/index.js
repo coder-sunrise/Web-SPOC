@@ -16,6 +16,7 @@ import {
   Select,
 } from '@/components'
 import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -109,7 +110,7 @@ class ClinicInfo extends PureComponent {
       ...restProps
     } = this.props
     const { primaryClinician, doctorProfile } = this.state
-    console.log(values)
+    // console.log(values)
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -248,12 +249,7 @@ class ClinicInfo extends PureComponent {
           className={classes.actionBtn}
           style={{ display: 'flex', justifyContent: 'center' }}
         >
-          <Button
-            color='danger'
-            onClick={() => {
-              this.props.history.push('/setting')
-            }}
-          >
+          <Button color='danger' onClick={navigateDirtyCheck('/setting')}>
             Cancel
           </Button>
 

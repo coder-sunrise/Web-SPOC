@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Add from '@material-ui/icons/Add'
@@ -30,93 +31,57 @@ const styles = (theme) => ({
     return podoPayment
   },
   handleSubmit: (values, { props }) => {
-    const {
-      purchaseOrderPayment,
-      currentBizSessionInfo,
-      purchaseOrderDetails,
-    } = values
-    const { dispatch, refreshPodoPayment, onConfirm } = props
-    const {
-      purchaseOrderNo,
-      purchaseOrderDate,
-      purchaseOrderStatusFK,
-      supplierFK,
-      concurrencyToken,
-    } = purchaseOrderDetails
-    let poPaymentPayload
+    const { dispatch, onConfirm, history } = props
+    const { purchaseOrderPayment, currentBizSessionInfo } = values
 
-    poPaymentPayload = purchaseOrderPayment.map((x, index) => {
+    let paymentData = purchaseOrderPayment.map((x, index) => {
+      x.isCancelled = x.isDeleted
+      delete x.isDeleted
+
+      if (_.has(x, 'isNew')) {
+        return {
+          purchaseOrderFK: values.id,
+          sequence: index + 1,
+          clinicPaymentDto: {
+            ...x,
+            id: x.cpId,
+            concurrencyToken: x.cpConcurrencyToken,
+            createdOnBizSessionFK: currentBizSessionInfo.id,
+            clinicPaymentTypeFK: 1,
+            transactionOnBizSessionFK: currentBizSessionInfo.id,
+            // isCancelled: x.isCancelled,
+          },
+        }
+      }
+
       return {
-        purchaseOrderFK: values.id,
-        sequence: index + 1,
+        ...x,
         clinicPaymentDto: {
-          ...x,
-          createdOnBizSessionFK: currentBizSessionInfo.id,
-          clinicPaymentTypeFK: 1,
+          ...x.clinicPaymentDto,
+          // isCancelled: x.isCancelled,
         },
       }
     })
 
     dispatch({
-      type: 'podoPayment/upsert',
+      type: 'podoPayment/upsertPodoPayment',
       payload: {
-        purchaseOrderNo,
-        purchaseOrderDate,
-        purchaseOrderStatusFK,
-        supplierFK,
-        concurrencyToken,
-        purchaseOrderPayment: poPaymentPayload,
+        purchaseOrderId: values.id,
+        paymentData,
       },
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
-        dispatch({
-          type: 'purchaseOrderDetails/refresh',
-          payload: {
-            id: props.values.id,
-          },
-        }).then(setTimeout(() => refreshPodoPayment(), 500))
+        if (r) {
+          history.push('/inventory/pr')
+          dispatch({
+            type: `formik/clean`,
+            payload: 'purchaseOrderDetails',
+          })
+        }
       }
     })
   },
-  // handleSubmit: (values, { props }) => {
-  // const { purchaseOrderPayment } = values
-  // const {
-  //   paymentNo,
-  //   paymentDate,
-  //   paymentModeFK,
-  //   paymentAmount,
-  //   referenceNo,
-  // } = purchaseOrderPayment
-  // const { dispatch, onConfirm, refreshPodoPayment } = props
-
-  // dispatch({
-  //   type: 'podoPayment/upsert',
-  //   payload: {
-  //     purchaseOrderFK: props.values.id,
-  //     sequence: 1,
-  //     clinicPaymentDto: {
-  //       createdOnBizSessionFK: props.values.currentBizSessionInfo.id,
-  //       clinicPaymentTypeFK: 1,
-  //       paymentNo,
-  //       paymentDate,
-  //       paymentModeFK,
-  //       paymentAmount,
-  //       referenceNo,
-  //     },
-  //   },
-  // }).then((r) => {
-  //   if (r) {
-  //     if (onConfirm) onConfirm()
-  //     dispatch({
-  //       type: 'purchaseOrderDetails/refresh',
-  //       payload: {
-  //         id: props.values.id,
-  //       },
-  //     }).then(setTimeout(() => refreshPodoPayment(), 500))
-  //   }
-  // })
-  // },
 })
 class index extends PureComponent {
   // state = {
@@ -132,6 +97,17 @@ class index extends PureComponent {
       type: 'podoPayment/queryPodoPayment',
       payload: this.props.purchaseOrderDetails,
     })
+  }
+
+  onClickCancelPayment = () => {
+    const { dispatch, values, resetForm } = this.props
+    resetForm()
+    dispatch({
+      type: 'purchaseOrderDetails/refresh',
+      payload: {
+        id: values.id,
+      },
+    }).then(setTimeout(() => this.refreshPodoPayment(), 500))
   }
 
   // onClickAddPayment = () => this.setState({ showPODOPaymentModal: true })
@@ -179,9 +155,14 @@ class index extends PureComponent {
             onClick={this.props.handleSubmit}
             disabled={isEditable}
           />
-          <Button color='danger' disabled={isEditable}>
+          <ProgressButton
+            color='danger'
+            icon={null}
+            disabled={isEditable}
+            onClick={this.onClickCancelPayment}
+          >
             Cancel
-          </Button>
+          </ProgressButton>
         </div>
       </React.Fragment>
     )

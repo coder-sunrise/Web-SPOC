@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import Printer from '@material-ui/icons/Print'
 // common components
-import { Button, NavPills } from '@/components'
+import { Button, Tabs } from '@/components'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
 import PaymentDetails from './PaymentDetails'
@@ -12,40 +12,77 @@ import PaymentDetails from './PaymentDetails'
 import styles from './styles'
 
 const Content = ({ classes, ...restProps }) => {
+  const { invoiceDetail, invoicePayment } = restProps
+  const { currentBizSessionInfo } = invoicePayment
+  const { entity } = invoiceDetail
+  const currentBizSessionFK = currentBizSessionInfo
+    ? currentBizSessionInfo.id
+    : undefined
+  const invoiceBizSessionFK = entity ? entity.bizSessionFK : undefined
+
   const [
     active,
     setActive,
-  ] = useState(0)
-
-  const onTabChange = (event, activeTab) => {
-    setActive(activeTab)
-  }
+  ] = useState('1')
 
   const invoiceButtonClass = classnames({
     [classes.printInvoiceBtn]: true,
     [classes.hidden]: active !== 0,
   })
 
+  const isInvoiceCurrentBizSession = () => {
+    if (currentBizSessionFK && invoiceBizSessionFK) {
+      if (currentBizSessionFK === invoiceBizSessionFK) {
+        return true
+      }
+      return false
+    }
+
+    return false
+  }
+
+  const addContent = (type) => {
+    switch (type) {
+      case 1:
+        return <InvoiceDetails {...restProps} />
+      case 2:
+        return (
+          <PaymentDetails
+            invoiceDetail={restProps.values}
+            readOnly={!currentBizSessionFK}
+          />
+        )
+      default:
+        return <InvoiceDetails {...restProps} />
+    }
+  }
+
+  const InvoicePaymentTabOption = () => [
+    {
+      id: 1,
+      name: 'Invoice',
+      content: addContent(1),
+    },
+    {
+      id: 2,
+      name: 'Payment Details',
+      content: addContent(2),
+      disabled: isInvoiceCurrentBizSession(),
+    },
+  ]
+
   return (
     <React.Fragment>
+      <Tabs
+        style={{ marginTop: 20 }}
+        activeKey={active}
+        defaultActivekey='1'
+        onChange={(e) => setActive(e)}
+        options={InvoicePaymentTabOption()}
+      />
       <Button className={invoiceButtonClass} size='sm' color='primary' icon>
         <Printer />Print Invoice
       </Button>
-      <NavPills
-        color='primary'
-        active={active}
-        onChange={onTabChange}
-        tabs={[
-          {
-            tabButton: 'Invoice',
-            tabContent: <InvoiceDetails {...restProps} />,
-          },
-          {
-            tabButton: 'Payment',
-            tabContent: <PaymentDetails invoiceDetail={restProps.values} />,
-          },
-        ]}
-      />
     </React.Fragment>
   )
 }

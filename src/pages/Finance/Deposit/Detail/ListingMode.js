@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+  import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Payment } from '@material-ui/icons'

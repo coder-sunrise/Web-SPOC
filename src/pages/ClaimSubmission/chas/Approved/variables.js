@@ -1,6 +1,3 @@
-import moment from 'moment'
-import { dateFormatLong } from '@/components'
-
 export const NewCHASColumns = [
   {
     name: 'visitDate',
@@ -51,15 +48,15 @@ export const NewCHASColumns = [
     title: 'Submission Date',
   },
   {
-    name: 'claimStatus',
+    name: 'chasClaimStatusDescription',
     title: 'Claim Status',
   },
   {
-    name: 'claimAmount',
+    name: 'approvedAmount',
     title: 'Approved Amt.',
   },
   {
-    name: 'collectedAmount',
+    name: 'collectedPayment',
     title: 'Collected Amt.',
   },
   {
@@ -69,7 +66,7 @@ export const NewCHASColumns = [
 ]
 
 export const NewCHASColumnExtensions = [
-  { columnName: 'vistDate', type: 'date' },
+  { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'submissionDate', type: 'date' },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },

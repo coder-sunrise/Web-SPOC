@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 // import { connect } from 'dva'
-import Yup from '@/utils/yup'
+import _ from 'lodash'
 import { formatMessage } from 'umi/locale'
+import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   GridContainer,
@@ -12,12 +13,13 @@ import POForm from './POForm'
 import POGrid from './POGrid'
 // import POSummary from './POSummary'
 import POSummary from './Share/index'
-import { calculateItemLevelAdjustment, sumReducer } from '@/utils/utils'
+import { calculateItemLevelAdjustment } from '@/utils/utils'
 import {
   isPOStatusDraft,
   isPOStatusFinalized,
   poSubmitAction,
   getPurchaseOrderStatusFK,
+  isPOStatusFulfilled,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 
@@ -30,6 +32,14 @@ import { podoOrderType } from '@/utils/codes'
   mapPropsToValues: ({ purchaseOrderDetails }) => {
     return purchaseOrderDetails
   },
+  validationSchema: Yup.object().shape({
+    purchaseOrder: Yup.object().shape({
+      supplierFK: Yup.string().required(),
+      purchaseOrderDate: Yup.date().required(),
+    }),
+    rows: Yup.array().required('At least one item is required.'),
+  }),
+  handleSubmit: (values, { props }) => {},
 })
 class index extends Component {
   state = {
@@ -104,43 +114,56 @@ class index extends Component {
     })
   }
 
-  onSubmitButtonClicked = (action) => {
-    const { dispatch, history } = this.props
+  onSubmitButtonClicked = async (action) => {
+    const { dispatch, history, validateForm } = this.props
     let dispatchType = 'purchaseOrderDetails/upsert'
     let processedPayload = {}
-
-    switch (action) {
-      case poSubmitAction.SAVE:
-        processedPayload = this.processSubmitPayload(true)
-        break
-      case poSubmitAction.CANCEL:
-        dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-        processedPayload = this.processSubmitPayload(false, 4)
-        break
-      case poSubmitAction.FINALIZE:
-        dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-        processedPayload = this.processSubmitPayload(false, 2)
-        break
-      case poSubmitAction.COMPLETE:
-        //
-        break
-      case poSubmitAction.PRINT:
-        //
-        break
-      default:
-      // case block
-    }
-
-    dispatch({
-      type: dispatchType,
-      payload: {
-        ...processedPayload,
-      },
-    }).then((r) => {
-      if (r) {
-        history.push('/inventory/pr')
+    const isFormValid = await validateForm()
+    let validation = false
+    if (!_.isEmpty(isFormValid)) {
+      validation = false
+      this.props.handleSubmit()
+    } else {
+      switch (action) {
+        case poSubmitAction.SAVE:
+          processedPayload = this.processSubmitPayload(true)
+          break
+        case poSubmitAction.CANCEL:
+          dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+          processedPayload = this.processSubmitPayload(false, 4)
+          break
+        case poSubmitAction.FINALIZE:
+          dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+          processedPayload = this.processSubmitPayload(false, 2)
+          break
+        case poSubmitAction.COMPLETE:
+          dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+          processedPayload = this.processSubmitPayload(false, 6)
+          break
+        case poSubmitAction.PRINT:
+          //
+          break
+        default:
+        // case block
       }
-    })
+
+      dispatch({
+        type: dispatchType,
+        payload: {
+          ...processedPayload,
+        },
+      }).then((r) => {
+        if (r) {
+          dispatch({
+            type: `formik/clean`,
+            payload: 'purchaseOrderDetails',
+          })
+          history.push('/inventory/pr')
+        }
+      })
+      validation = true
+    }
+    return validation
   }
 
   processSubmitPayload = (isSaveAction = false, purchaseOrderStatusFK) => {
@@ -209,7 +232,11 @@ class index extends Component {
       if (!isSaveAction) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
       } else {
-        newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
+        if (purchaseOrderStatusFK === 6) {
+          newPurchaseOrderStatusFK = purchaseOrderStatusFK
+        } else {
+          newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
+        }
       }
 
       purchaseOrderItem = rows.map((x) => {
@@ -257,43 +284,6 @@ class index extends Component {
           return adj
         }),
       ],
-    }
-  }
-
-  calculateAmount = ({
-    adjustmentList = [],
-    rows = [],
-    IsGSTEnabled = false,
-    IsGSTInclusive = false,
-    clinicSettings: { settingGSTEnable, settingGSTPercentage },
-  }) => {
-    let processedRows = rows
-
-    const total = processedRows
-      .map((o) => o.totalAfterItemAdjustment)
-      .reduce(sumReducer, 0)
-    processedRows.forEach((r) => {
-      r.weightage = r.totalAfterItemAdjustment / total
-      r.totalAfterOverallAdjustment = r.totalAfterItemAdjustment
-    })
-    adjustmentList.filter((o) => !o.isDeleted).forEach((fa) => {
-      processedRows.forEach((r) => {
-        r.totalAfterOverallAdjustment += r.weightage * fa.adjAmount
-      })
-    })
-
-    const totalAfterAdj = processedRows
-      .map((o) => o.totalAfterOverallAdjustment)
-      .reduce(sumReducer, 0)
-    const gst = totalAfterAdj * settingGSTPercentage / 100
-
-    return {
-      processedRows,
-      summary: {
-        gst,
-        total: totalAfterAdj,
-        totalWithGST: gst + totalAfterAdj,
-      },
     }
   }
 
@@ -405,24 +395,6 @@ class index extends Component {
     setTimeout(() => {
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
     }, 1)
-
-    // {
-    //   adjustmentList = [],
-    //   rows = [],
-    //   IsGSTEnabled = false,
-    //   IsGSTInclusive = false,
-    //   clinicSettings: { settingGSTEnable, settingGSTPercentage
-    // }
-
-    const result = this.calculateAmount({
-      rows,
-      adjustmentList: purchaseOrderAdjustment,
-      IsGSTEnabled,
-      IsGSTInclusive,
-      clinicSettings: { settingGSTEnable, settingGSTPercentage },
-    })
-
-    console.log('calculateAmount', result)
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
@@ -431,19 +403,21 @@ class index extends Component {
   }
 
   render () {
-    const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
+    // console.log('PORender', this.props)
+    const {
+      purchaseOrderDetails,
+      values,
+      dispatch,
+      setFieldValue,
+    } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
     const { IsGSTEnabled } = purchaseOrder || false
-
+    // console.log(this.props)
     return (
       <div>
-        <POForm
-          isPOFinalized={!isPOStatusFinalized(poStatus)}
-          isPODraft={isPOStatusDraft(poStatus)}
-          {...this.props}
-        />
+        <POForm isReadOnly={!isPOStatusDraft(poStatus)} {...this.props} />
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           isEditable={isPOStatusDraft(poStatus)}
@@ -491,7 +465,13 @@ class index extends Component {
             })}
           </ProgressButton>
           {!isPOStatusDraft(poStatus) ? (
-            <ProgressButton color='success' icon={null}>
+            <ProgressButton
+              color='success'
+              icon={null}
+              onClick={() =>
+                this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
+              disabled={!isPOStatusFulfilled(poStatus)}
+            >
               {formatMessage({
                 id: 'inventory.pr.detail.pod.complete',
               })}

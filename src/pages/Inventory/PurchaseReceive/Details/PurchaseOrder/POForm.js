@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 import { formatMessage } from 'umi/locale'
 import { Divider } from '@material-ui/core'
@@ -14,29 +14,28 @@ import {
 
 const prefix = 'purchaseOrder'
 
-const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
+const POForm = ({ setFieldValue, isReadOnly = false }) => {
   const setSupplierDetails = (opts) => {
     let conPerson
     let faxNo
-    let officeNo
+    let contactNo
     let address
 
     if (opts) {
       const { contactPerson, contact } = opts
-      const { faxContactNumber, officeContactNumber, contactAddress } = contact
+      const { faxContactNumber, mobileContactNumber, contactAddress } = contact
       const { street } = contactAddress[0]
       conPerson = contactPerson
       faxNo = faxContactNumber.number
-      officeNo = officeContactNumber.number
+      contactNo = mobileContactNumber.number
       address = street
     }
 
     setFieldValue(`${prefix}.contactPerson`, conPerson)
     setFieldValue(`${prefix}.faxNo`, faxNo)
-    setFieldValue(`${prefix}.contactNo`, officeNo)
+    setFieldValue(`${prefix}.contactNo`, contactNo)
     setFieldValue(`${prefix}.supplierAddress`, address)
   }
-
   return (
     <div>
       <GridContainer gutter={0}>
@@ -94,7 +93,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       })}
                       disabledDate={(d) =>
                         !d || d.isBefore(moment().add('days', -1))}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -110,7 +109,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceDate',
                       })}
-                      // disabled={isPOFinalized}
+                      // disabled={isReadOnly}
                       {...args}
                     />
                   )
@@ -133,7 +132,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.poDate',
                       })}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -152,7 +151,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       multiline
                       rowsMax={2}
                       rows={2}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -168,7 +167,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceNo',
                       })}
-                      // disabled={isPOFinalized}
+                      // disabled={isReadOnly}
                       {...args}
                     />
                   )
@@ -203,7 +202,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       onChange={(v, opts) => {
                         setSupplierDetails(opts)
                       }}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -219,7 +218,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.contactPerson',
                       })}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -238,7 +237,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       multiline
                       rowsMax={2}
                       rows={2}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -261,7 +260,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.contactNo',
                       })}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -277,7 +276,7 @@ const POForm = ({ setFieldValue, isPOFinalized, isPODraft }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.faxNo',
                       })}
-                      // disabled={!isPODraft}
+                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )

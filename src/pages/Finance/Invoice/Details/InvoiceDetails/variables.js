@@ -7,9 +7,15 @@ export const DataGridColumns = [
 ]
 
 export const DataGridColExtensions = [
-  { columnName: 'quantity', type: 'number', currency: false },
-  { columnName: 'adjAmt', type: 'currency', currency: true },
-  { columnName: 'totalAfterItemAdjustment', type: 'currency', currency: true },
+  { columnName: 'itemType', width: 300 },
+  { columnName: 'quantity', type: 'number', currency: false, width: 180 },
+  { columnName: 'adjAmt', type: 'currency', currency: true, width: 180 },
+  {
+    columnName: 'totalAfterItemAdjustment',
+    type: 'currency',
+    currency: true,
+    width: 200,
+  },
 ]
 
 export const TableConfig = {

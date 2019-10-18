@@ -3,6 +3,7 @@ import { FormattedMessage } from 'umi/locale'
 import { FastField, Field, withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
+import moment from 'moment'
 import {
   GridContainer,
   GridItem,
@@ -31,6 +32,14 @@ const styles = () => ({
 @withFormik({
   mapPropsToValues: () => ({
     copayerFK: 'All Company',
+    statementDates: [
+      moment().startOf('month'),
+      moment().endOf('month'),
+    ],
+    statementDueDates: [
+      moment().startOf('month'),
+      moment().endOf('month'),
+    ],
   }),
   handleSubmit: (values, { setSubmitting, props }) => {
     // submit statementNo, statementDate, statementDueDate and company
@@ -47,20 +56,12 @@ class SearchBar extends PureComponent {
   }
 
   handleOnChange = (name, checked) => (event) => {
-    console.log('xx')
     this.setState({ [name]: !checked })
     // if AllDate is checked, set datetime to max range
   }
 
   render () {
-    const {
-      handleSubmit,
-      classes,
-      handleAddNew,
-      history,
-      dispatch,
-      values,
-    } = this.props
+    const { classes, history, dispatch, values } = this.props
 
     // const {
     //   allStatementDate,
@@ -140,6 +141,7 @@ class SearchBar extends PureComponent {
           <GridItem xs sm={6} md={6} lg={8}>
             <ProgressButton
               color='primary'
+              icon={<p />}
               onClick={() => {
                 const {
                   statementNo,

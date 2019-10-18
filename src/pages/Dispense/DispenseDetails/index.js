@@ -89,11 +89,23 @@ const DispenseDetails = ({
                   isGSTInclusive: invoice.isGSTInclusive,
                   totalField: 'totalAfterItemAdjustment',
                   adjustedField: 'totalAfterOverallAdjustment',
+                  gstField: 'totalAfterGST',
+                  gstAmtField: 'gstAmount',
                 }}
                 onValueChanged={(v) => {
                   setFieldValue(
                     'invoice.invoiceTotalAftGST',
                     v.summary.totalWithGST,
+                  )
+                  // console.log({ v })
+                  setFieldValue(
+                    'invoice.invoiceTotal',
+                    Math.round((v.summary.totalWithGST - v.summary.gst) * 100) /
+                      100,
+                  )
+                  setFieldValue(
+                    'invoice.invoiceGSTAmt',
+                    Math.round(v.summary.gst * 100) / 100,
                   )
                   setFieldValue('invoice.invoiceAdjustment', v.adjustments)
                   dispatch({

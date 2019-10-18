@@ -19,6 +19,8 @@ export default createFormViewModel({
       menuErrors: {},
       currentComponent: '1',
       default: {
+        effectiveStartDate: moment().formatUTC(),
+        effectiveEndDate: moment('2099-12-31').formatUTC(),
         patientAccountNo: '',
         patientEmergencyContact: [],
         patientAllergy: [],
@@ -180,9 +182,21 @@ export default createFormViewModel({
             currentPatientId: null,
           },
         })
+        yield put({
+          type: 'updateState',
+          paylad: {
+            callback: undefined,
+          },
+        })
       },
 
-      openPatientModal ({ payload }, { call, put }) {
+      *openPatientModal ({ payload = { callback: undefined } }, { call, put }) {
+        if (payload.callback) {
+          yield put({
+            type: 'updateState',
+            payload: { callback: payload.callback },
+          })
+        }
         router.push(
           getAppendUrl({
             md: 'pt',

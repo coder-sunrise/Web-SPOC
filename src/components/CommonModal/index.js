@@ -409,7 +409,7 @@ class CommonModal extends React.PureComponent {
                     this.onClose(true)
                   }}
                 >
-                  Discard changes
+                  Confirm
                 </Button>
               </React.Fragment>
             </SizeContainer>
