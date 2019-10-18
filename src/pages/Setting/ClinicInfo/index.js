@@ -110,7 +110,7 @@ class ClinicInfo extends PureComponent {
       ...restProps
     } = this.props
     const { primaryClinician, doctorProfile } = this.state
-    console.log(values)
+    // console.log(values)
     return (
       <CardContainer hideHeader>
         <GridContainer>

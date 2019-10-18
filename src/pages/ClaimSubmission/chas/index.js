@@ -18,15 +18,21 @@ class CHAS extends React.Component {
     failedCount: 0,
     claimDetails: {},
     activeTab: '2',
+    allowEdit: false,
   }
 
-  openClaimDetails = () => this.setState({ showClaimDetails: true })
+  openClaimDetails = (allowEdit) =>
+    this.setState({ showClaimDetails: true, allowEdit })
 
   openSubmitClaimStatus = (count) =>
     this.setState({ showSubmitClaimStatus: true, failedCount: count })
 
   closeClaimDetails = () =>
-    this.setState({ showClaimDetails: false, claimDetails: {} })
+    this.setState({
+      showClaimDetails: false,
+      claimDetails: {},
+      allowEdit: false,
+    })
 
   closeSubmitClaimStatus = () =>
     this.setState({ showSubmitClaimStatus: false, failedCount: 0 })
@@ -39,7 +45,7 @@ class CHAS extends React.Component {
     history.push(`/claim-submission/chas/invoice/${processedInvoiceNo}`)
   }
 
-  handleContextMenuItemClick = (row, id) => {
+  handleContextMenuItemClick = (row, id, allowEdit = false) => {
     const { dispatch } = this.props
     switch (id) {
       case '0':
@@ -49,7 +55,7 @@ class CHAS extends React.Component {
             id: row.id,
           },
         }).then((r) => {
-          if (r) this.openClaimDetails()
+          if (r) this.openClaimDetails(allowEdit)
         })
         break
       case '1':
@@ -70,6 +76,7 @@ class CHAS extends React.Component {
       showSubmitClaimStatus,
       failedCount,
       claimDetails,
+      allowEdit,
     } = this.state
     const claimSubmissionActionProps = {
       handleContextMenuItemClick: this.handleContextMenuItemClick,
@@ -139,7 +146,7 @@ class CHAS extends React.Component {
           onClose={this.closeClaimDetails}
           onConfirm={this.closeClaimDetails}
         >
-          <ClaimDetails claimDetails={claimDetails} />
+          <ClaimDetails claimDetails={claimDetails} allowEdit={allowEdit} />
         </CommonModal>
 
         <CommonModal
