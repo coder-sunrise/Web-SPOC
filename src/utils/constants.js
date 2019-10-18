@@ -63,3 +63,9 @@ export const CREDIT_CARD_TYPE = {
   4: 'DINER',
   5: 'JCB',
 }
+
+export const PDPA_CONSENT_TYPE = {
+  1: 'PDPAPHONE',
+  2: 'PDPAMESSAGE',
+  3: 'PDPAEMAIL',
+}
