@@ -6,12 +6,7 @@ import Printer from '@material-ui/icons/Print'
 import Info from '@material-ui/icons/Info'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
-import {
-  GridContainer,
-  GridItem,
-  Tooltip,
-  dateFormatLong,
-} from '@/components'
+import { GridContainer, GridItem, Tooltip, dateFormatLong } from '@/components'
 import styles from './styles'
 
 const PaymentRow = ({
@@ -25,6 +20,7 @@ const PaymentRow = ({
   classes,
   handleVoidClick,
   handlePrinterClick,
+  readOnly,
   ...payment
 }) => {
   const { id, type, itemID, date, amount, reason, isCancelled } = payment
@@ -66,11 +62,16 @@ const PaymentRow = ({
           <span className={classes.currency}>${amount}</span>
         </GridItem>
         <GridItem>
-          <Tooltip title='Void'>
+          <Tooltip
+            title='Void'
+            style={{
+              visibility: isCancelled === undefined ? 'hidden' : 'visible',
+            }}
+          >
             <IconButton
               id={itemID}
               onClick={() => handleVoidClick(payment)}
-              disabled={isCancelled}
+              disabled={isCancelled || readOnly}
             >
               <Cross />
             </IconButton>

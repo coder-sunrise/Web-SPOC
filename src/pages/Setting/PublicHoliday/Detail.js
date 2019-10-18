@@ -80,7 +80,7 @@ class Detail extends PureComponent {
     const { props } = this
     const { classes, theme, footer, values, settingPublicHoliday } = props
 
-    console.log('detail', props)
+    // console.log('detail', props)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

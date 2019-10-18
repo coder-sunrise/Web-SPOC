@@ -21,4 +21,8 @@ export default (theme) => ({
   rowContainer: {
     paddingLeft: theme.spacing(4),
   },
+  errorMessage: {
+    color: 'red',
+    fontWeight: 500,
+  },
 })

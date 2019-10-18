@@ -92,14 +92,21 @@ const FilterBar = ({ classes, dispatch, values }) => {
                   lsteql_invoiceDate: invoiceDates
                     ? invoiceDates[1]
                     : undefined,
-                  // apiCriteria: {
-                  //   OnlyWithDeposit: outstandingBalanceStatus,
-                  // },
+                  lgt_OutstandingBalance:
+                    outstandingBalanceStatus === 'yes' &&
+                    outstandingBalanceStatus !== 'all'
+                      ? '0'
+                      : undefined,
+                  lsteql_OutstandingBalance:
+                    outstandingBalanceStatus === 'no' &&
+                    outstandingBalanceStatus !== 'all'
+                      ? '0'
+                      : undefined,
                   group: [
                     {
                       invoiceNo,
-                      patientName,
-                      patientAccountNo,
+                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
+                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
                       combineCondition: 'or',
                     },
                   ],

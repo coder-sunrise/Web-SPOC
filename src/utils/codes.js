@@ -823,7 +823,7 @@ const defaultParams = {
 }
 
 const convertExcludeFields = [
-  'excludeInactiveCodes',
+  // 'excludeInactiveCodes',
 ]
 
 const _fetchAndSaveCodeTable = async (
@@ -835,8 +835,8 @@ const _fetchAndSaveCodeTable = async (
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
-  const generalCodetableURL = `${baseURL}?ctnames=`
-  const searchURL = `${baseURL}/search?ctname=`
+  const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
+  const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
   let url = useGeneral ? generalCodetableURL : searchURL
   let criteriaForTenantCodes = noIsActiveProp.reduce(

@@ -2,7 +2,6 @@ import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services/invoicePayment'
 import { notification } from '@/components'
-import { dateFormatLong } from '@/components'
 
 const paymentMode = [
   { type: 'Cash', objName: 'depositPayment', paymentModeFK: 1 },
@@ -99,7 +98,7 @@ export default createFormViewModel({
         )
 
         addPaymentPayload = {
-          totalAmtPaid: 1, // Will be removed
+          totalAmtPaid: 10, // Will be removed
           // totalAmtPaid: 0,
           // totalAmtPaid: 0,
           // cashReceived: 0,
@@ -171,14 +170,19 @@ export default createFormViewModel({
         if (data) {
           paymentResult = data.map((payment) => {
             let paymentTxnList = []
-            const { invoicePayment, invoicePayerWriteOff, creditNote } = payment
+            const {
+              invoicePayment,
+              invoicePayerWriteOff,
+              creditNote,
+              statementInvoice,
+            } = payment
 
             // Payment
             paymentTxnList = (paymentTxnList || []).concat(
               (invoicePayment || []).map((z) => {
                 return {
                   ...z,
-                  id: z.id,
+                  // id: z.id,
                   type: 'Payment',
                   itemID: z.receiptNo,
                   date: z.paymentReceivedDate,
@@ -193,7 +197,7 @@ export default createFormViewModel({
               (invoicePayerWriteOff || []).map((z) => {
                 return {
                   ...z,
-                  id: z.id,
+                  // id: z.id,
                   type: 'Write Off',
                   itemID: z.writeOffCode,
                   date: z.writeOffDate,
@@ -209,7 +213,7 @@ export default createFormViewModel({
               (creditNote || []).map((z) => {
                 return {
                   ...z,
-                  id: z.id,
+                  // id: z.id,
                   type: 'Credit Note',
                   itemID: z.creditNoteNo,
                   date: z.generatedDate,
@@ -218,6 +222,24 @@ export default createFormViewModel({
                   isCancelled: z.isCancelled,
                 }
               }),
+            )
+
+            // Statement Invoice
+            paymentTxnList = (paymentTxnList || []).concat(
+              (statementInvoice || [])
+                .filter((x) => x.adminCharge > 0)
+                .map((z) => {
+                  return {
+                    ...z,
+                    // id: z.id,
+                    type: 'Admin Charge',
+                    itemID: z.statementNo,
+                    date: z.statementDate,
+                    amount: z.adminCharge,
+                    reason: '',
+                    isCancelled: undefined,
+                  }
+                }),
             )
 
             return { ...payment, paymentTxnList }
