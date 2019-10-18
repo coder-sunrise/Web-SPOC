@@ -530,7 +530,7 @@ const convertToQuery = (
   // if (returnVal.columnCriteria && returnVal.columnCriteria.length > 0) {
   //   returnVal.columnCriteria = JSON.stringify(returnVal.columnCriteria)
   // }
-  console.log({ returnVal })
+
   return returnVal
 }
 
