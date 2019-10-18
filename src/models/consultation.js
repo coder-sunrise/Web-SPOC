@@ -86,7 +86,7 @@ export default createFormViewModel({
           const {
             services,
             serviceCenters,
-            serviceCenterServices,
+            serviceCenterServices = [],
           } = getServices(codetableState.ctservice)
 
           let orderList = serviceCenterServices.filter(
