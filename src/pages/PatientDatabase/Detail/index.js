@@ -63,9 +63,23 @@ const styles = () => ({
   authority: 'patientdatabase.patientprofiledetails',
   // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
-    // console.log({ patient })
-    // console.log(patient.entity, patient.default)
-    return patient.entity || patient.default
+    const mappedValues = {
+      ...(patient.entity || patient.default),
+      pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
+        .reduce(
+          (consents, item) =>
+            item.isConsent
+              ? [
+                  ...consents,
+                  item.pdpaConsentTypeFK,
+                ]
+              : [
+                  ...consents,
+                ],
+          [],
+        ),
+    }
+    return mappedValues
   },
   validationSchema: schema,
 
@@ -218,7 +232,7 @@ class PatientDetail extends PureComponent {
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
-            return <Cmpnet {...p}   />
+            return <Cmpnet {...p} />
           },
           loading: Loading,
         }),
@@ -319,8 +333,6 @@ class PatientDetail extends PureComponent {
         (o) => o.id === (this.state.selectedMenu || currentComponent),
       ) || {}
     const CurrentComponent = currentMenu.component
-    // console.log(resetProps)
-    console.log({ values })
 
     return (
       <GridContainer>

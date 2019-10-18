@@ -118,7 +118,7 @@ class Demographic extends PureComponent {
   render () {
     const { props } = this
     const { values, theme, setFieldValue, classes } = props
-    console.log('demographics', { values })
+
     return (
       <div>
         <GridContainer gutter={0}>
@@ -401,22 +401,43 @@ class Demographic extends PureComponent {
                         },
                       ]}
                       onChange={(e, s) => {
-                        const { pdpaConsent, patientPdpaConsent } = values
-                        const _patientPdpaConsent = patientPdpaConsent.reduce(
-                          (consents, item) => {
-                            if (e.includes(item.pdpaConsentTypeFK)) {
+                        const { value } = e.target
+                        const { patientPdpaConsent } = values
+                        let _patientPdpaConsent = []
+                        const _intValue = value.map((v) => parseInt(v, 10))
+
+                        if (patientPdpaConsent.length < 3) {
+                          _patientPdpaConsent = [
+                            {
+                              pdpaConsentTypeFK: 1,
+                              isConsent: _intValue.includes(1),
+                            },
+                            {
+                              pdpaConsentTypeFK: 2,
+                              isConsent: _intValue.includes(2),
+                            },
+                            {
+                              pdpaConsentTypeFK: 3,
+                              isConsent: _intValue.includes(3),
+                            },
+                          ]
+                        } else
+                          _patientPdpaConsent = patientPdpaConsent.reduce(
+                            (consents, item) => {
+                              if (_intValue.includes(item.pdpaConsentTypeFK)) {
+                                return [
+                                  ...consents,
+                                  { ...item, isConsent: true },
+                                ]
+                              }
+
                               return [
                                 ...consents,
-                                { ...item, isConsent: true },
+                                { ...item, isConsent: false },
                               ]
-                            }
-                            return [
-                              ...consents,
-                              { ...item, isConsent: false },
-                            ]
-                          },
-                          [],
-                        )
+                            },
+                            [],
+                          )
                         console.log({ _patientPdpaConsent })
                         setFieldValue('patientPdpaConsent', _patientPdpaConsent)
                       }}
