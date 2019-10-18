@@ -398,7 +398,7 @@ class AddNewStatement extends PureComponent {
               color='danger'
               onClick={navigateDirtyCheck(this.goBackToPreviousPage)}
             >
-              Cancel
+              Close
             </Button>
             <Button color='primary' onClick={() => handleSubmit()}>
               Save

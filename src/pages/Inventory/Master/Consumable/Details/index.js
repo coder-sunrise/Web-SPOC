@@ -99,7 +99,7 @@ const Detail = ({
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=1')}
         >
-          Cancel
+          Close
         </Button>
         <ProgressButton
           submitKey='consumableDetail/submit'
