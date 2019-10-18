@@ -56,13 +56,13 @@ class Allergies extends PureComponent {
               name='patientAllergyMetaData[0].isG6PDConfirmed'
               render={(args) => (
                 <Select
-                  style={{ top: -6 }}
+                  style={{ top: -25 }}
                   {...args}
                   options={[
                     { name: 'Yes', value: true },
                     { name: 'No', value: false },
                   ]}
-                  prefix='G6PD Deficiency: '
+                  label='G6PD Deficiency:'
                 />
               )}
             />
