@@ -113,7 +113,6 @@ class Diagnosis extends PureComponent {
   
   render () {
     const { theme, components, diagnosis } = this.props
-    console.log("test ------", this.props)
     return (
       <div>
         <FieldArray

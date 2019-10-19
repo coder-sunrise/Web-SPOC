@@ -81,7 +81,6 @@ export default ({
     }
   }
 
-  console.log('before return', { props })
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
@@ -149,7 +148,7 @@ export default ({
                   (o) => o.complicationFK,
                 )
               }
-              console.log({ _complication: fm.values.corDiagnosis[index]._complication })
+              // console.log({ _complication: fm.values.corDiagnosis[index]._complication })
               return (
                 <Select
                   label='Complication'
