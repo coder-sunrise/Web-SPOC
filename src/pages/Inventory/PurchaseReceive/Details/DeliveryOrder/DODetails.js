@@ -37,6 +37,7 @@ const receivingDetailsSchema = Yup.object().shape({
 
   currentReceivingQty: Yup.number()
     .min(0, 'Value must be greater than 0')
+    .max(Yup.ref('maxCurrentReceivingQty'))
     .required(),
   currentReceivingBonusQty: Yup.number().min(0).required(),
 })
@@ -464,7 +465,6 @@ class DODetails extends PureComponent {
     const { props } = this
     const { footer, values, theme, refreshDeliveryOrder } = props
     const { rows } = values
-
     const tableParas = {
       columns: [
         { name: 'type', title: 'Type' },
