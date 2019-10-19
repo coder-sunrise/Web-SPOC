@@ -37,8 +37,8 @@ export default createFormViewModel({
               break
             }
             case 'Decimal': {
-              const decimalValue = parseFloat(value)
-              const decimalIntValue = parseInt(value / 100, 10)
+              const decimalValue = parseFloat(value / 100)
+              const decimalIntValue = parseInt(value, 10)
               settings[key] = decimalValue
               settings[`${key}Int`] = decimalIntValue
               break

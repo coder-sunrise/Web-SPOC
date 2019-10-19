@@ -122,7 +122,6 @@ class SchemesGrid extends PureComponent {
               row.validFrom = undefined
               row.validTo = undefined
             }
-            console.log(row)
             this.props.dispatch({
               // force current edit row components to update
               type: 'global/updateState',
@@ -135,19 +134,9 @@ class SchemesGrid extends PureComponent {
         {
           columnName: 'coPaymentSchemeFK',
           sortingEnabled: false,
-          // type: 'codeSelect',
-          // code: 'ctSchemeCategory',
-          type: 'select', // TODO: get from api
-          options: [
-            { value: 1, name: 'Test 01' },
-            { value: 2, name: 'Test 02' },
-            { value: 3, name: 'Test 03' },
-          ],
-          isDisabled: (row) => {
-            const isCorporate = this.isCorporate(row)
-            console.log({ isCorporate })
-            return !this.isCorporate(row)
-          },
+          type: 'codeSelect',
+          code: 'ctschemecategory',
+          isDisabled: (row) => !this.isCorporate(row),
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
             if (!row.id) {

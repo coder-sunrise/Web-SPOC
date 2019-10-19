@@ -20,27 +20,28 @@ const ApplicableClaims = ({
   const selectedClaims = currentClaims.map(
     (item) => item._indexInClaimableSchemes,
   )
+  const selectedSchemeIDs = currentClaims.map((item) => item.copaymentSchemeFK)
   const invoicePayersName = currentClaims.map((item) => item.name)
-  const selectableList = claimableSchemes.reduce(
-    (schemes, item, index) =>
-      selectedClaims.includes(index)
-        ? [
-            ...schemes,
-          ]
-        : [
-            ...schemes,
-            item,
-          ],
-    [],
-  )
+
   return (
     <GridContainer>
       {claimableSchemes.map((schemes, index) => {
         const isCHAS = schemes[0].coPaymentSchemeName.startsWith('CHAS')
-        let shouldDisable = selectedClaims.includes(index)
-        console.log({ selectedClaims, index, invoicePayersName })
-        if (isCHAS && currentClaims.length > 0) {
-          shouldDisable = invoicePayersName[index].startsWith('CHAS')
+
+        let shouldDisable = false
+        if (selectedClaims.includes(index)) {
+          shouldDisable = true
+        } else if (isCHAS && currentClaims.length > 0) {
+          shouldDisable =
+            invoicePayersName[index] &&
+            invoicePayersName[index].startsWith('CHAS')
+        } else {
+          const { notClaimableWithSchemeIds } = schemes[0]
+          shouldDisable = notClaimableWithSchemeIds.reduce(
+            (notCompatible, id) =>
+              selectedSchemeIDs.includes(id) ? true : notCompatible,
+            false,
+          )
         }
 
         return (

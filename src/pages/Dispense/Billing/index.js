@@ -52,7 +52,7 @@ const bannerStyle = {
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     if (billing.entity) {
-      return { ...billing.entity, payment: { paymentModes: [] } }
+      return { ...billing.entity, payments: [] }
     }
     return billing.default
   },
@@ -80,12 +80,12 @@ const bannerStyle = {
       })),
     }
     console.log({ values, payload })
-    dispatch({
-      type: 'billing/upsert',
-      payload,
-    }).then((response) => {
-      console.log({ response })
-    })
+    // dispatch({
+    //   type: 'billing/upsert',
+    //   payload,
+    // }).then((response) => {
+    //   console.log({ response })
+    // })
   },
 })
 class Billing extends Component {
@@ -117,7 +117,14 @@ class Billing extends Component {
 
   handleAddPayment = (payment) => {
     const { setFieldValue } = this.props
-    setFieldValue('payment', payment)
+    const { paymentModes = [], cashRounding, ...rest } = payment
+    const payments = paymentModes.map((paymentMode) => ({
+      paymentModes: [
+        { ...paymentMode, cashRounding },
+      ],
+      ...rest,
+    }))
+    setFieldValue('payments', payments)
     this.toggleAddPaymentModal()
   }
 
@@ -147,7 +154,7 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-    // console.log({ values })
+    console.log({ values })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />

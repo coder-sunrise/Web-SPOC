@@ -74,7 +74,7 @@ const styles = (theme) => ({})
       }),
     }),
 
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
 
     const { dispatch, onConfirm, settingCompany } = props
@@ -93,6 +93,7 @@ const styles = (theme) => ({})
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingCompany/query',

@@ -66,7 +66,6 @@ export default createFormViewModel({
       *getOutstandingPOItem ({ payload }, { call, put }) {
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
-        // console.log('getOutstandingPOItem', rows)
         const tempList = rows.filter(
           (x) => x.totalQuantity - x.quantityReceived - x.bonusReceived > 0,
         )
@@ -78,6 +77,7 @@ export default createFormViewModel({
               totalBonusReceived: x.bonusReceived,
               currentReceivingQty: x.orderQuantity - x.quantityReceived,
               currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
+              maxCurrentReceivingQty: x.orderQuantity - x.quantityReceived,
             }
           })
         }

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 import {
   GridContainer,
   EditableTableGrid,
@@ -6,16 +7,16 @@ import {
   dateFormatLong,
 } from '@/components'
 import Yup from '@/utils/yup'
-import moment from 'moment'
 
-const purchaseOrderPaymentSchema = Yup.object().shape({
-  // paymentNo: Yup.string().required(),
-  // paymentDate: Yup.string().required(),
-  paymentModeFK: Yup.string().required(),
-  // reference: Yup.string().required(),
-  paymentAmount: Yup.number().min(0).required(),
-  // Remarks: Yup.string().required(),
-})
+const purchaseOrderPaymentSchema = (outstandingAmount) =>
+  Yup.object().shape({
+    // paymentNo: Yup.string().required(),
+    // paymentDate: Yup.string().required(),
+    paymentModeFK: Yup.string().required(),
+    // reference: Yup.string().required(),
+    paymentAmount: Yup.number().min(0).max(outstandingAmount).required(),
+    // Remarks: Yup.string().required(),
+  })
 
 class Grid extends PureComponent {
   tableParas = {
@@ -54,12 +55,14 @@ class Grid extends PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted }) => {
-    const { setFieldValue } = this.props
+    const { setFieldValue, recalculateOutstandingAmount } = this.props
     if (deleted) {
       rows.find((v) => v.id === deleted[0]).isDeleted = true
+      recalculateOutstandingAmount('delete', deleted[0].paymentAmount)
       setFieldValue('purchaseOrderPayment', rows)
     } else {
       rows[0].isDeleted = false
+      recalculateOutstandingAmount('add', rows[0].paymentAmount)
       setFieldValue('purchaseOrderPayment', rows)
     }
 
@@ -68,11 +71,12 @@ class Grid extends PureComponent {
 
   render () {
     const { values, isEditable } = this.props
+
     return (
       <GridContainer>
         <EditableTableGrid
           rows={values.purchaseOrderPayment}
-          schema={purchaseOrderPaymentSchema}
+          schema={purchaseOrderPaymentSchema(values.outstandingAmt)}
           FuncProps={{
             edit: false,
             pager: false,

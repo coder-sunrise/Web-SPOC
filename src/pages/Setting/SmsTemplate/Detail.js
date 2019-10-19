@@ -30,7 +30,7 @@ const styles = (theme) => ({})
       .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     // console.log(restValues)
@@ -44,6 +44,7 @@ const styles = (theme) => ({})
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingSmsTemplate/query',

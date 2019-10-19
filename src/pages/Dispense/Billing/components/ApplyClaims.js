@@ -225,10 +225,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           computeInvoiceItemSubtotal,
           [],
         )
-
-        const _newInvoicePayer = {
-          ...invoicePayer,
-          invoicePayerItems: invoicePayer.invoicePayerItems.map((ip) => {
+        const _newInvoicePayerItems = invoicePayer.invoicePayerItems.map(
+          (ip) => {
             const _existed = previousIndexesInvoiceItemsWithSubtotal.find(
               (_i) => _i.id === ip.id,
             )
@@ -240,7 +238,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
               totalAfterGst:
                 _existed.totalAfterGst - _existed._prevClaimedAmount,
             }
-          }),
+          },
+        )
+        const _newInvoicePayer = {
+          ...invoicePayer,
+          invoicePayerItems: _newInvoicePayerItems,
         }
         return [
           ..._newInvoicePayers,
@@ -410,7 +412,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       ...tempInvoicePayer[index],
       _coverageMaxCap: coverageMaxCap,
       _balance: balance,
-      // payerDistributedAmt: overAllCoPaymentValue,
       name: coPaymentSchemeName,
       copaymentSchemeFK: id,
       invoicePayerItems: newInvoiceItems.map((item) => {
@@ -444,11 +445,15 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   }
 
   const handleCommitChanges = (index) => ({ rows }) => {
+    const payerDistributedAmt = roundToTwoDecimals(
+      rows.reduce((sum, item) => sum + item.claimAmount, 0),
+    )
     const updatedRow = {
       ...tempInvoicePayer[index],
       invoicePayerItems: [
         ...rows,
       ],
+      payerDistributedAmt,
     }
     _updateTempInvoicePayer(index, updatedRow)
   }
