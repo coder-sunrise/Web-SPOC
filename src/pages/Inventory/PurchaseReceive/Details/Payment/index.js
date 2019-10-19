@@ -15,6 +15,7 @@ import Header from './Header'
 import Grid from './Grid'
 import { isPOStatusFinalized } from '../../variables'
 import PaymentDetails from './PaymentDetails'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -41,10 +42,9 @@ const styles = (theme) => ({
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history } = props
     const { purchaseOrderPayment, currentBizSessionInfo } = values
-
     let paymentData = purchaseOrderPayment.map((x, index) => {
       x.isCancelled = x.isDeleted
-      delete x.isDeleted
+      // delete x.isDeleted
 
       if (_.has(x, 'isNew')) {
         return {
@@ -104,14 +104,17 @@ class index extends PureComponent {
   }
 
   onClickCancelPayment = () => {
-    const { dispatch, values, resetForm } = this.props
+    const { dispatch, values, resetForm, history } = this.props
     resetForm()
     dispatch({
       type: 'purchaseOrderDetails/refresh',
       payload: {
         id: values.id,
       },
-    }).then(setTimeout(() => this.refreshPodoPayment(), 500))
+    }).then(() => {
+      setTimeout(() => this.refreshPodoPayment(), 500)
+      history.push('/inventory/pr')
+    })
   }
 
   // onClickAddPayment = () => this.setState({ showPODOPaymentModal: true })
@@ -177,17 +180,17 @@ class index extends PureComponent {
         </Button> */}
         <div style={{ textAlign: 'center' }}>
           <ProgressButton
-            onClick={this.props.handleSubmit}
-            disabled={isEditable}
-          />
-          <ProgressButton
             color='danger'
             icon={null}
             disabled={isEditable}
-            onClick={this.onClickCancelPayment}
+            onClick={navigateDirtyCheck(this.onClickCancelPayment)}
           >
             Cancel
           </ProgressButton>
+          <ProgressButton
+            onClick={this.props.handleSubmit}
+            disabled={isEditable}
+          />
         </div>
       </React.Fragment>
     )
