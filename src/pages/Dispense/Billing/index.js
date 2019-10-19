@@ -74,24 +74,32 @@ const bannerStyle = {
       visitId,
       payments,
       invoice: restInvoice,
-      invoicePayers: invoicePayers.map((payer) => {
+      invoicePayers: invoicePayers.map((payer, index) => {
         const { claimableSchemes, ...restPayer } = payer
         const _payer = {
           ...restPayer,
+          sequence: index,
           invoicePayerItems: payer.invoicePayerItems
             .filter((item) => item.claimAmount > 0)
             .map((item) => {
               const {
+                _claimedAmount,
+                disabled,
+                itemCode,
+                rowIndex,
                 notClaimableBySchemeIds,
-                invoiceItemTypeFK,
+                invoiceItemTypeFk,
                 itemDescription,
                 coverage,
                 totalAfterGst,
+                id,
                 ...restItem
               } = item
               const _invoicePayerItem = {
                 ...restItem,
-                itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
+                invoiceItemFK: id,
+                payableBalance: totalAfterGst,
+                itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFk],
                 itemName: itemDescription,
               }
               return _invoicePayerItem

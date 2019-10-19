@@ -78,7 +78,7 @@ const DiagnosisItem = ({
       }
     }
   }
-
+  const { values } = form
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>

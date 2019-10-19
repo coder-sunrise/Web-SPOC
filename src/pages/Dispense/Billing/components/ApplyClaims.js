@@ -759,6 +759,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           onAddCoPayerClick={handleAddCoPayer}
           invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
             ...invoiceItem,
+            schemeCoverage: 0,
+            schemeCoverageType: 'percentage',
             totalAfterGst:
               invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
           }))}
