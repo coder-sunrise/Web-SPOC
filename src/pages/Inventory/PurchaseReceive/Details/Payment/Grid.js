@@ -62,6 +62,13 @@ class Grid extends PureComponent {
       setFieldValue('purchaseOrderPayment', rows)
     } else {
       rows[0].isDeleted = false
+      if (rows[0].referenceNo === undefined) {
+        rows[0].referenceNo = ''
+      }
+
+      if (rows[0].remark === undefined) {
+        rows[0].remark = ''
+      }
       recalculateOutstandingAmount('add', rows[0].paymentAmount)
       setFieldValue('purchaseOrderPayment', rows)
     }
