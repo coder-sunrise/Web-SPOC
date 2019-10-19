@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FastField } from 'formik'
+import { Field, FastField } from 'formik'
 import { Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
@@ -13,6 +13,7 @@ import {
   Checkbox,
   Popover,
   Tooltip,
+  Select,
 } from '@/components'
 
 export default ({
@@ -28,13 +29,59 @@ export default ({
     show,
     setShow,
   ] = useState(false)
+
+  const [
+    ctComplication,
+    setCtComplication,
+  ] = useState([])
   const { form } = arrayHelpers
+  // let ctComplication = []
   // if (codetable['codetable/ctsnomeddiagnosis'])
   //   console.log(
   //     codetable['codetable/ctsnomeddiagnosis'].filter(
   //       (o) => o.complication.length > 0,
   //     ),
   //   )
+  // console.log('props ++++ ', codetable)
+  const onDiagnosisChange = (v, op) => {
+    const { setFieldValue } = form
+    console.log('test 1 ', v)
+    console.log('test 2 ', op)
+    if (op) {
+      if (op.complication.length > 0) {
+        // ctComplication = op.complication
+        setCtComplication(op.complication)
+
+        setFieldValue(`corDiagnosis[${index}]_complication`, op.complication)
+      }
+      setFieldValue(
+        `corDiagnosis[${index}]diagnosisDescription`,
+        op.displayvalue,
+      )
+
+      setFieldValue(`corDiagnosis[${index}]diagnosisCode`, op.code)
+
+      if (op.complication && op.complication.length) {
+        setFieldValue(
+          `corDiagnosis[${index}]complication`,
+          op.complication.map((o) => o.id),
+        )
+        // console.log(
+        //   op.complication.map((o) => ({
+        //     complicationFK: o,
+        //   })),
+        // )
+        setFieldValue(
+          `corDiagnosis[${index}]corComplication`,
+          op.complication.map((o) => ({
+            complicationFK: o.id,
+          })),
+        )
+      }
+    }
+  }
+
+  console.log('before return', { props })
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
@@ -49,6 +96,7 @@ export default ({
                   filter={{
                     props:
                       'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
+                    // sorting: [ { columnName: 'displayvalue', direction: 'asc' }, ],
                   }}
                   labelField='displayvalue'
                   autoComplete
@@ -70,40 +118,7 @@ export default ({
                       </span>
                     )
                   }}
-                  onChange={(v, op) => {
-                    const { setFieldValue } = form
-                    console.log("test 1 ", v)
-                    console.log("test 2 ", op)
-                    if (op) {
-                      setFieldValue(
-                        `corDiagnosis[${index}]diagnosisDescription`,
-                        op.displayvalue,
-                      )
-
-                      setFieldValue(
-                        `corDiagnosis[${index}]diagnosisCode`,
-                        op.code,
-                      )
-
-                      if (op.complication && op.complication.length) {
-                        setFieldValue(
-                          `corDiagnosis[${index}]complication`,
-                          op.complication.map((o) => o.id),
-                        )
-                        // console.log(
-                        //   op.complication.map((o) => ({
-                        //     complicationFK: o,
-                        //   })),
-                        // )
-                        setFieldValue(
-                          `corDiagnosis[${index}]corComplication`,
-                          op.complication.map((o) => ({
-                            complicationFK: o.id,
-                          })),
-                        )
-                      }
-                    }
-                  }}
+                  onChange={onDiagnosisChange}
                   {...args}
                 />
               )
@@ -111,11 +126,12 @@ export default ({
           />
         </GridItem>
         <GridItem xs={12}>
-          <FastField
+          <Field
             name={`corDiagnosis[${index}].complication`}
             render={(args) => {
               const { form: fm, field: fd } = args
               // console.log(fd, fm)
+              let ctComplicationOptions = []
               if (
                 !fd.value &&
                 fm.values.corDiagnosis &&
@@ -127,16 +143,20 @@ export default ({
                 //   fm.values.corDiagnosis,
                 //   fm.values.corDiagnosis[index],
                 // )
+                ctComplicationOptions =
+                  fm.values.corDiagnosis[index]._complication || []
                 fd.value = fm.values.corDiagnosis[index].corComplication.map(
                   (o) => o.complicationFK,
                 )
               }
-              // console.log(fd.value)
+              console.log({ _complication: fm.values.corDiagnosis[index]._complication })
               return (
-                <CodeSelect
+                <Select
                   label='Complication'
                   mode='multiple'
-                  code='ctComplication'
+                  // code='ctComplication'
+                  options={[]}
+                  labelField='displayValue'
                   maxTagCount={2}
                   disableAll
                   onChange={(v, opts) => {

@@ -66,15 +66,26 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'Diagnosis',
 // })
-@connect(({ diagnosis, components }) => ({
+@connect(({ diagnosis, components, codetable }) => ({
   diagnosis,
   components,
+  codetable,
 }))
 class Diagnosis extends PureComponent {
   // constructor (props) {
   //   super(props)
   //   // console.log(this.state, props)
   // }
+
+  componentDidMount () {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctComplication',
+      },
+    })
+  }
 
   componentWillReceiveProps (nextProps) {
     if (
@@ -99,9 +110,10 @@ class Diagnosis extends PureComponent {
       uid: getUniqueGUID(),
     })
   }
-
+  
   render () {
     const { theme, components, diagnosis } = this.props
+    console.log("test ------", this.props)
     return (
       <div>
         <FieldArray
@@ -133,6 +145,7 @@ class Diagnosis extends PureComponent {
                 <div key={v.uid}>
                   <Item
                     {...this.props}
+                    ctCompilation={this.props.codetable}
                     index={i}
                     arrayHelpers={arrayHelpers}
                     diagnosises={diagnosises}
