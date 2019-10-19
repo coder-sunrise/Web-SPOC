@@ -35,7 +35,9 @@ const receivingDetailsSchema = Yup.object().shape({
   // quantityReceived: Yup.number().min(0).required(),
   // totalBonusReceived: Yup.number().min(0).required(),
 
-  currentReceivingQty: Yup.number().min(0).required(),
+  currentReceivingQty: Yup.number()
+    .min(0)
+    .required('Value must be greater than 0'),
   currentReceivingBonusQty: Yup.number().min(0).required(),
 })
 
