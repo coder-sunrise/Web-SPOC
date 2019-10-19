@@ -629,6 +629,7 @@ class ClinicalNotes extends Component {
                   </div>
                   <RichEditor
                    // handlePastedText={() => false}
+                    handlePastedText={() => false}
                     strongLabel
                     label='Clinical Notes'
                     {...args}
@@ -809,7 +810,7 @@ class ClinicalNotes extends Component {
                     </div>
                   </div>
                   <RichEditor
-                   // handlePastedText={() => false}
+                    handlePastedText={() => false}
                     strongLabel
                     label='Chief Complaints'
                     {...args}
@@ -989,7 +990,7 @@ class ClinicalNotes extends Component {
                   </div>
 
                   <RichEditor
-                   // handlePastedText={() => false}
+                    handlePastedText={() => false}
                     strongLabel
                     label='Plan'
                     {...args}

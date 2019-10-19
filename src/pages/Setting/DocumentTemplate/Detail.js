@@ -148,7 +148,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <RichEditor
-                      toolbarHidden={() => true}
+                      // toolbarHidden={() => true}
                       handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}

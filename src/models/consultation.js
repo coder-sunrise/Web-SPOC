@@ -130,7 +130,7 @@ export default createFormViewModel({
               adjAmount: adjAmountValue,
               remark: '',
               subject: orderList[i].displayValue,
-              uid: '',
+              uid: getUniqueId(),
               weightage: 0,
               totalAfterOverallAdjustment: 0,
             }
