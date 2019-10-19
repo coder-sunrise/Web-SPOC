@@ -38,8 +38,9 @@ const ApplicableClaims = ({
       {claimableSchemes.map((schemes, index) => {
         const isCHAS = schemes[0].coPaymentSchemeName.startsWith('CHAS')
         let shouldDisable = selectedClaims.includes(index)
+        console.log({ selectedClaims, index, invoicePayersName })
         if (isCHAS && currentClaims.length > 0) {
-          shouldDisable = !invoicePayersName[index].startsWith('CHAS')
+          shouldDisable = invoicePayersName[index].startsWith('CHAS')
         }
 
         return (
