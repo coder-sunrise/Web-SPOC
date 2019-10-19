@@ -127,6 +127,7 @@ class DODetails extends PureComponent {
   }
 
   componentDidMount = async () => {
+    await this.props.refreshDeliveryOrder()
     await this.initializeStateItemList()
   }
 
