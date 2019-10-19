@@ -24,6 +24,7 @@ import InvoiceSummary from './components/InvoiceSummary'
 import model from '../models/billing'
 // utils
 import { getAppendUrl } from '@/utils/utils'
+import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 window.g_app.replaceModel(model)
 
@@ -63,29 +64,49 @@ const bannerStyle = {
       visitId,
       invoice,
       invoicePayers,
-      payment,
+      payments,
     } = values
+
+    const { invoiceItems, ...restInvoice } = invoice
 
     const payload = {
       concurrencyToken,
       visitId,
-      invoice,
-      payment,
-      invoicePayers: invoicePayers.map((payer) => ({
-        ...payer,
-        invoicePayerItems: payer.invoicePayerItems.map((item) => ({
-          ...item,
-          payableBalance: item.totalAfterGst,
-        })),
-      })),
+      payments,
+      invoice: restInvoice,
+      invoicePayers: invoicePayers.map((payer) => {
+        const { claimableSchemes, ...restPayer } = payer
+        const _payer = {
+          ...restPayer,
+          invoicePayerItems: payer.invoicePayerItems
+            .filter((item) => item.claimAmount > 0)
+            .map((item) => {
+              const {
+                notClaimableBySchemeIds,
+                invoiceItemTypeFK,
+                itemDescription,
+                coverage,
+                totalAfterGst,
+                ...restItem
+              } = item
+              const _invoicePayerItem = {
+                ...restItem,
+                itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
+                itemName: itemDescription,
+              }
+              return _invoicePayerItem
+            }),
+        }
+        return _payer
+      }),
     }
     console.log({ values, payload })
-    // dispatch({
-    //   type: 'billing/upsert',
-    //   payload,
-    // }).then((response) => {
-    //   console.log({ response })
-    // })
+    dispatch({
+      type: 'billing/upsert',
+      payload,
+    }).then((response) => {
+      console.log({ response })
+    })
   },
 })
 class Billing extends Component {

@@ -69,3 +69,11 @@ export const PDPA_CONSENT_TYPE = {
   2: 'PDPAMESSAGE',
   3: 'PDPAEMAIL',
 }
+
+export const INVOICE_ITEM_TYPE = {
+  1: 'Medication',
+  2: 'Consumable',
+  3: 'Vaccination',
+  4: 'Service',
+  5: 'Package',
+}
