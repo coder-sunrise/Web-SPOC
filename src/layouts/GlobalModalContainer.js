@@ -294,6 +294,8 @@ class GlobalModalContainer extends PureComponent {
               type: 'global/updateAppState',
               payload: {
                 openConfirm: false,
+                openConfirmTitle: undefined,
+                openConfirmText: 'Confirm',
               },
             })
           }}
