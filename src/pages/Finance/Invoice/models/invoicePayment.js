@@ -76,20 +76,23 @@ export default createFormViewModel({
         const bizSessionState = yield select(
           (state) => state.invoicePayment.currentBizSessionInfo,
         )
-        const { paymentData, invoicePayerFK } = payload
+        const { invoicePaymentList, invoicePayerFK } = payload
         let addPaymentPayload = {}
         let invoicePaymentMode = []
+        const {
+          cashReceived,
+          cashReturned,
+          totalAmtPaid,
+          paymentModes,
+        } = invoicePaymentList
 
         invoicePaymentMode = invoicePaymentMode.concat(
-          paymentData.map((x, index) => {
-            delete x.id
-            const pMode = paymentMode.filter((y) => x.type === y.type)[0]
+          paymentModes.map((x) => {
+            const pMode = paymentMode.filter(
+              (y) => x.paymentModeFK === y.paymentModeFK,
+            )[0]
             return {
-              paymentModeFK: pMode.paymentModeFK,
-              paymentMode: pMode.type,
-              amt: x.amount,
-              sequence: index + 1,
-              remark: x.remarks,
+              ...x,
               [pMode.objName]: [
                 { ...x },
               ],
@@ -98,11 +101,9 @@ export default createFormViewModel({
         )
 
         addPaymentPayload = {
-          totalAmtPaid: 10, // Will be removed
-          // totalAmtPaid: 0,
-          // totalAmtPaid: 0,
-          // cashReceived: 0,
-          // cashReturned: 0,
+          totalAmtPaid,
+          cashReceived,
+          cashReturned,
           paymentReceivedDate: moment().formatUTC(false),
           paymentReceivedByUserFK: userState.id,
           paymentReceivedBizSessionFK: bizSessionState.id,
