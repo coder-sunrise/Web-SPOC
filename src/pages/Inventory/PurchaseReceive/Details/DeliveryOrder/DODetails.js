@@ -52,6 +52,7 @@ const receivingDetailsSchema = Yup.object().shape({
     deliveryOrderNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
     rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
+    remark: Yup.string().max(500),
   }),
   handleSubmit: (values, { props }) => {
     const { rows, ...restValues } = values
