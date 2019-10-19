@@ -219,7 +219,7 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-   console.log("************** ", this.props)
+    console.log("clinicInfo ", this.props)
     return (
       <React.Fragment>
         <LoadingWrapper

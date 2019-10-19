@@ -97,7 +97,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       </span>
     )
   })
-  console.log("row ", rows)
+
   return (
     <CommonTableGrid
       size='sm'

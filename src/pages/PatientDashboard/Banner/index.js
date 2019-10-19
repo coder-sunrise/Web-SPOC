@@ -336,8 +336,7 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
-    // console.log('************** banner ***********')
-    // console.log(this.props)
+
     const { entity } = patient
 
     if (!entity)

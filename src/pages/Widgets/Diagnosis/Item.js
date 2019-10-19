@@ -150,12 +150,12 @@ export default ({
               }
               // console.log({ _complication: fm.values.corDiagnosis[index]._complication })
               return (
-                <Select
+                <CodeSelect
                   label='Complication'
                   mode='multiple'
-                  // code='ctComplication'
-                  options={[]}
-                  labelField='displayValue'
+                  code='ctComplication'
+                  //options={[]}
+                 // labelField='displayValue'
                   maxTagCount={2}
                   disableAll
                   onChange={(v, opts) => {
