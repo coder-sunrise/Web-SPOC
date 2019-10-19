@@ -27,7 +27,7 @@ const styles = (theme) => ({})
     dates: Yup.array().of(Yup.date()).min(2).required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { isActive, dates, effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
@@ -47,6 +47,7 @@ const styles = (theme) => ({})
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingPublicHoliday/query',

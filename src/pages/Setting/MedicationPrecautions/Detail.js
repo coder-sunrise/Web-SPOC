@@ -35,7 +35,7 @@ const styles = (theme) => ({})
       then: Yup.number().required(),
     }),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
@@ -47,6 +47,7 @@ const styles = (theme) => ({})
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingMedicationPrecautions/query',
