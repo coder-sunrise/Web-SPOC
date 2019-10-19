@@ -364,21 +364,19 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               h3={
-                <Tooltip title={name}>
-                  <Link
-                    to={getAppendUrl({
-                      md: 'pt',
-                      cmt: 1,
-                      pid: info.id,
-                    })}
-
-                    
-                  >
-                    <div>
+                <Link
+                  to={getAppendUrl({
+                    md: 'pt',
+                    cmt: 1,
+                    pid: info.id,
+                  })}
+                >
+                  <div>
+                    <Tooltip title={name}>
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
-                    </div>
-                  </Link>
-                </Tooltip>
+                    </Tooltip>
+                  </div>
+                </Link>
               }
               body={
                 <div>
@@ -440,7 +438,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                      <IconButton onClick={this.refreshChasBalance}>
+                    <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
