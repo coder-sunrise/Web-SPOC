@@ -66,7 +66,7 @@ class Grid extends PureComponent {
 
   render () {
     const { values, isEditable } = this.props
-    console.log({ values })
+
     return (
       <GridContainer>
         <EditableTableGrid

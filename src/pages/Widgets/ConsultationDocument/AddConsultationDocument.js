@@ -146,13 +146,16 @@ class AddConsultationDocument extends PureComponent {
     })
   }
 
-  getLoader = (editor, setFieldValue) => {
+  getLoader = (editor, setFieldValue, currentType) => {
     const { classes, parentProps, codetable } = this.props
     const { documenttemplate } = codetable
+    const documentType = parseInt(currentType.value, 10) || -1
     return (
       <div className={classes.editorBtn}>
         <ButtonSelect
-          options={documenttemplate}
+          options={documenttemplate.filter(
+            (template) => template.documentTemplateTypeFK === documentType,
+          )}
           textField='displayValue'
           onClick={(option) => {
             let msg = option.templateContent
@@ -214,6 +217,7 @@ class AddConsultationDocument extends PureComponent {
       currentType: types.find((o) => o.value === type),
       templateLoader: this.getLoader,
     }
+
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
