@@ -1,11 +1,6 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
-import {
-  GridContainer,
-  EditableTableGrid,
-  withFormikExtend,
-  dateFormatLong,
-} from '@/components'
+import { GridContainer, EditableTableGrid, dateFormatLong } from '@/components'
 import Yup from '@/utils/yup'
 
 const purchaseOrderPaymentSchema = (outstandingAmount) =>
@@ -71,7 +66,7 @@ class Grid extends PureComponent {
 
   render () {
     const { values, isEditable } = this.props
-
+    console.log({ values })
     return (
       <GridContainer>
         <EditableTableGrid
