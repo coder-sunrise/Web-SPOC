@@ -196,6 +196,7 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
         payload,
       }).then((response) => {
         if (response) {
+          resetForm()
           if (onConfirm) onConfirm()
           dispatch({
             type: 'roomBlock/query',

@@ -31,7 +31,7 @@ const styles = (theme) => ({})
       )
       .nullable(),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
@@ -43,6 +43,7 @@ const styles = (theme) => ({})
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingConsumableGroup/query',

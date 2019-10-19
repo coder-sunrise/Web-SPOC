@@ -116,6 +116,24 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                 }}
               />
             </GridItem>
+            <GridItem xs={12}>
+              <FastField
+                name={`${prefix}.remark`}
+                render={(args) => {
+                  return (
+                    <TextField
+                      label={formatMessage({
+                        id: 'inventory.pr.detail.pod.remarks',
+                      })}
+                      multiline
+                      rowsMax={4}
+                      // disabled={isReadOnly}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
           </GridContainer>
         </GridItem>
 
