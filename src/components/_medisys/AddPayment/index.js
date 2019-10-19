@@ -33,7 +33,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
     )
 
     return {
-      outstandingAfterPayment: 0,
+      outstandingAfterPayment: collectableAmount,
       cashReturned: 0,
       cashReceived: 0,
       paymentList: [],

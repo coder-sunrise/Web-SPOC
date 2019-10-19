@@ -7,6 +7,8 @@ import { GridItem, Field, NumberInput } from '@/components'
 import styles from './styles'
 import { PAYMENT_MODE } from '@/utils/constants'
 
+const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
+
 const PaymentSummary = ({
   classes,
   totalAftGst,
@@ -21,7 +23,7 @@ const PaymentSummary = ({
       <h4>
         Outstanding balance after payment:&nbsp;
         <span style={{ color: 'darkblue', fontWeight: 500 }}>
-          ${outstandingAfterPayment}
+          ${parseToTwoDecimalString(outstandingAfterPayment)}
         </span>
       </h4>
     </GridItem>
