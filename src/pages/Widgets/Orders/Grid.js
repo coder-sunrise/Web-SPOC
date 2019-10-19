@@ -242,10 +242,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
                         uid: row.uid,
                       },
                     })
-                   
-                  }
-                  
-                  }
+                  }}
                 >
                   <Tooltip title='Delete'>
                     <Button size='sm' color='danger' justIcon>

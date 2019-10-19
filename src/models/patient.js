@@ -62,6 +62,20 @@ export default createFormViewModel({
             website: '',
           },
         },
+        patientPdpaConsent: [
+          {
+            pdpaConsentTypeFK: 1,
+            isConsent: true,
+          },
+          {
+            pdpaConsentTypeFK: 2,
+            isConsent: false,
+          },
+          {
+            pdpaConsentTypeFK: 3,
+            isConsent: false,
+          },
+        ],
       },
     },
     subscriptions: ({ dispatch, history }) => {

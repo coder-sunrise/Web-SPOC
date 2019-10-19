@@ -138,6 +138,7 @@ const Setting = ({
                 })}
                 labelField='displayValue'
                 code='ctMedicationFrequency'
+                labelField='displayValue'
                 {...args}
               />
             )}

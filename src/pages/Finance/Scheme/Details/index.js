@@ -96,7 +96,7 @@ const Detail = (props) => {
           color='danger'
           onClick={navigateDirtyCheck('/finance/scheme')}
         >
-          Cancel
+          Close
         </Button>
         <ProgressButton
           submitKey='schemeDetail/submit'

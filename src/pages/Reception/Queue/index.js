@@ -296,7 +296,7 @@ class Queue extends React.Component {
         md: 'pt',
         cmt: '1',
         pid: patientProfileFK,
-        qid: qid,
+        qid,
         v: Date.now(),
       }),
     )

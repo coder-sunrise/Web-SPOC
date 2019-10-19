@@ -99,7 +99,7 @@ const Detail = ({
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=1')}
         >
-          Cancel
+          Close
         </Button>
         <ProgressButton
           submitKey='consumableDetail/submit'
@@ -168,7 +168,7 @@ export default compose(
         .max(999999.99, errMsg('Critical Threshold')),
     }),
 
-    handleSubmit: (values, { props }) => {
+    handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history } = props
       const { id, consumableStock, effectiveDates, ...restValues } = values
       let defaultConsumableStock = consumableStock
@@ -205,6 +205,7 @@ export default compose(
         },
       }).then((r) => {
         if (r) {
+          resetForm()
           history.push('/inventory/master?t=1')
         }
       })
