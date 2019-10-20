@@ -16,6 +16,8 @@ import {
   Select,
   Tooltip,
 } from '@/components'
+// sub components
+import MaxCapInfo from './MaxCapInfo'
 // page modal
 import ApplicableClaims from '../modal/ApplicableClaims'
 import CoPayer from '../modal/CoPayer'
@@ -303,6 +305,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           _isValid: true,
           _coverageMaxCap: 0,
           _balance: 0,
+          _patientMinPayable: 0,
+          _patientMinPayableType: 'ExactAmount',
           copaymentSchemeFK: undefined,
           name: '',
           payerDistributedAmt: 0,
@@ -396,6 +400,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       balance = null,
       coverageMaxCap = 0,
       coPaymentSchemeName = '',
+      patientMinCoPaymentAmount = 0,
+      patientMinCoPaymentAmountType = 'ExactAmount',
       id,
     } = schemeConfig
 
@@ -412,6 +418,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       ...tempInvoicePayer[index],
       _coverageMaxCap: coverageMaxCap,
       _balance: balance,
+      _patientMinPayable: patientMinCoPaymentAmount,
+      _patientMinPayableType: patientMinCoPaymentAmountType,
       name: coPaymentSchemeName,
       copaymentSchemeFK: id,
       invoicePayerItems: newInvoiceItems.map((item) => {
@@ -530,6 +538,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       _isEditing: true,
       _isValid: true,
       _coverageMaxCap: 0,
+      _patientMinPayable: 0,
+      _patientMinPayableType: 'ExactAmount',
       copaymentSchemeFK: undefined,
       name: '',
       payerDistributedAmt: 0,
@@ -644,10 +654,17 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                       currency
                       text
                       prefix='Max Cap.:'
+                      suffix={
+                        <MaxCapInfo
+                          claimableSchemes={invoicePayer.claimableSchemes}
+                          copaymentSchemeFK={invoicePayer.copaymentSchemeFK}
+                        />
+                      }
                       value={invoicePayer._coverageMaxCap}
                     />
                   )}
                 </GridItem>
+
                 <GridItem md={1} style={{ textAlign: 'right' }}>
                   <Tooltip title='Remove this scheme'>
                     <Button

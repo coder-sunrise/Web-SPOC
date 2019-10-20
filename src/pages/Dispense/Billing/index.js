@@ -172,6 +172,33 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
+  shouldDisableCompletePayment = () => {
+    const { values } = this.props
+    const { invoicePayers, finalPayable, payments = [] } = values
+
+    if (payments.length === 0) return true
+
+    if (invoicePayers.length === 0) return false
+
+    const minPatientPaymentAmount = invoicePayers.reduce((minAmt, payer) => {
+      const { _patientMinPayable, _patientMinPayableType } = payer
+      const amount =
+        _patientMinPayableType === 'ExactAmount'
+          ? _patientMinPayable
+          : finalPayable * _patientMinPayable / 100
+
+      if (amount <= minAmt) return amount
+
+      return minAmt
+    }, 999)
+
+    const totalPayment = payments[0].totalAmtPaid
+
+    if (totalPayment < minPatientPaymentAmount) return true
+
+    return false
+  }
+
   render () {
     const { showAddPaymentModal } = this.state
     const {
@@ -186,7 +213,7 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-    console.log({ values })
+
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -242,7 +269,11 @@ class Billing extends Component {
           </Button>
           <Button
             color='primary'
-            disabled={this.state.isEditing || values.id === undefined}
+            disabled={
+              this.state.isEditing ||
+              values.id === undefined ||
+              this.shouldDisableCompletePayment()
+            }
             onClick={handleSubmit}
           >
             Complete Payment
