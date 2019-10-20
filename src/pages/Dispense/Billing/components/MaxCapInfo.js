@@ -9,6 +9,7 @@ const styles = (theme) => ({
   },
   blueText: {
     color: 'darkblue',
+    fontWeight: 500,
   },
   container: {
     padding: theme.spacing(1),
