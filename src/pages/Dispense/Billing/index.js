@@ -50,6 +50,7 @@ const bannerStyle = {
   loading,
 }))
 @withFormikExtend({
+  displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     if (billing.entity) {
@@ -108,12 +109,17 @@ const bannerStyle = {
         return _payer
       }),
     }
-    console.log({ values, payload })
     dispatch({
       type: 'billing/upsert',
       payload,
     }).then((response) => {
-      console.log({ response })
+      const { status } = response
+      if (status === '200') {
+        resetForm()
+        dispatch({
+          type: 'billing/closeModal',
+        })
+      }
     })
   },
 })
@@ -146,14 +152,11 @@ class Billing extends Component {
 
   handleAddPayment = (payment) => {
     const { setFieldValue } = this.props
-    const { paymentModes = [], cashRounding, ...rest } = payment
-    const payments = paymentModes.map((paymentMode) => ({
-      paymentModes: [
-        { ...paymentMode, cashRounding },
-      ],
-      ...rest,
-    }))
-    setFieldValue('payments', payments)
+    const { outstandingBalance, ...rest } = payment
+    setFieldValue('payments', [
+      rest,
+    ])
+    setFieldValue('invoice.outstandingBalance', outstandingBalance)
     this.toggleAddPaymentModal()
   }
 
