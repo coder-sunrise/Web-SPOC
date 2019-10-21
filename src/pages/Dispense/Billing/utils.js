@@ -187,3 +187,63 @@ export const getApplicableClaimAmount = (
     remainingCoverageMaxCap,
   ]
 }
+
+export const validateClaimAmount = (schemeRow, totalPayable) => {
+  let isValid = true
+
+  const {
+    _balance,
+    _patientMinPayable,
+    _patientMinPayableType,
+    _coverageMaxCap,
+    invoicePayerItems,
+    isCoverageMaxCapCheckRequired,
+    medicationCoverageMaxCap,
+    consumableCoverageMaxCap,
+    serviceCoverageMaxCap,
+    vaccinationCoverageMaxCap,
+  } = schemeRow
+
+  let limit = 0
+  const listOfLimits = [
+    _balance,
+  ]
+
+  if (_patientMinPayable !== 0) {
+    const amount =
+      _patientMinPayableType === 'ExactAmount'
+        ? _patientMinPayable
+        : totalPayable * (_patientMinPayable / 100)
+    listOfLimits.push(_patientMinPayable)
+  }
+
+  if (isCoverageMaxCapCheckRequired) {
+    listOfLimits.push(_coverageMaxCap)
+  } else {
+    // check for each item category
+    // return isValid = false early
+  }
+
+  // if (_patientMinPayable === 0 && _coverageMaxCap === 0) {
+  //   // skip checking
+  //   return { isValid: true, limitType: undefined }
+  // }
+
+  // const totalClaimAmount = invoicePayerItems.reduce(
+  //   (totalClaim, item) => totalClaim + (item.claimAmount || 0),
+  //   0,
+  // )
+
+  // const amount =
+  //   _patientMinPayableType === 'ExactAmount'
+  //     ? _patientMinPayable
+  //     : totalPayable * (_patientMinPayable / 100)
+  // const patientMinPayable = totalPayable - amount
+
+  // const maximumLimit = Math.min(patientMinPayable, _coverageMaxCap)
+
+  // const limitType = patientMinPayable < _coverageMaxCap ? 'patient' : 'maxcap'
+  // if (maximumLimit > 0) isValid = totalClaimAmount <= maximumLimit
+
+  // return { isValid, limitType }
+}

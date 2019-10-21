@@ -32,6 +32,7 @@ import {
   computeTotalForAllSavedClaim,
   getCoverageAmountAndType,
   getApplicableClaimAmount,
+  validateClaimAmount,
 } from '../utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { roundToTwoDecimals } from '@/utils/utils'
@@ -71,6 +72,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     showErrorPrompt,
     setShowErrorPrompt,
   ] = useState(false)
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState('')
+
   const [
     initialState,
     setInitialState,
@@ -258,7 +265,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   }
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
-  const toggleErrorPrompt = () => setShowErrorPrompt(!showErrorPrompt)
+  const toggleErrorPrompt = () => {
+    if (showErrorPrompt) setErrorMessage('')
+    setShowErrorPrompt(!showErrorPrompt)
+  }
 
   useEffect(
     () => {
@@ -313,96 +323,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       values.id,
     ],
   )
-
-  const validateClaimAmount = (schemeRow) => {
-    let isValid = true
-
-    const {
-      _patientMinPayable,
-      _patientMinPayableType,
-      _coverageMaxCap,
-      invoicePayerItems,
-    } = schemeRow
-    const totalClaimAmount = invoicePayerItems.reduce(
-      (totalClaim, item) => totalClaim + (item.claimAmount || 0),
-      0,
-    )
-
-    let patientMinPayable = 0
-    if (_patientMinPayable > 0) {
-      patientMinPayable =
-        _patientMinPayableType === 'ExactAmount'
-          ? _patientMinPayable
-          : values.finalPayable * (_patientMinPayable / 100)
-    }
-
-    if (patientMinPayable > 0 && _coverageMaxCap > 0) {
-      if (patientMinPayable > _coverageMaxCap) {
-        isValid = totalClaimAmount < patientMinPayable
-      } else isValid = totalClaimAmount < _coverageMaxCap
-    }
-
-    return isValid
-  }
-
-  // const getApplicableClaimAmount = (
-  //   invoicePayerItem,
-  //   scheme,
-  //   remainingCoverageMaxCap,
-  // ) => {
-  //   const {
-  //     coPaymentByCategory,
-  //     coPaymentByItem,
-  //     isCoverageMaxCapCheckRequired,
-  //   } = scheme
-  //   let returnClaimAmount = 0
-
-  //   if (invoicePayerItem.totalAfterGst === 0)
-  //     return [
-  //       0,
-  //       remainingCoverageMaxCap,
-  //     ]
-
-  //   if (coPaymentByItem.length > 0) {
-  //     returnClaimAmount = 0
-  //   } else if (coPaymentByCategory.length > 0) {
-  //     const itemCategory = coPaymentByCategory.find(
-  //       (category) =>
-  //         category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
-  //     )
-  //     const itemRemainingAmount =
-  //       invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
-
-  //     if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
-  //       returnClaimAmount =
-  //         itemRemainingAmount * (itemCategory.itemGroupValue / 100)
-  //     } else {
-  //       returnClaimAmount =
-  //         itemCategory.itemGroupValue > itemRemainingAmount
-  //           ? itemRemainingAmount
-  //           : itemCategory.itemGroupValue
-  //     }
-  //   } else {
-  //     returnClaimAmount =
-  //       invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
-  //   }
-
-  //   if (isCoverageMaxCapCheckRequired) {
-  //     if (returnClaimAmount > remainingCoverageMaxCap) {
-  //       returnClaimAmount = remainingCoverageMaxCap
-  //       remainingCoverageMaxCap = 0
-  //     } else if (returnClaimAmount < remainingCoverageMaxCap) {
-  //       remainingCoverageMaxCap -= returnClaimAmount
-  //     } else {
-  //       returnClaimAmount = remainingCoverageMaxCap
-  //     }
-  //   }
-
-  //   return [
-  //     returnClaimAmount,
-  //     remainingCoverageMaxCap,
-  //   ]
-  // }
 
   const handleSchemeChange = (index) => (value) => {
     const flattenSchemes = claimableSchemes.reduce(
@@ -513,10 +433,17 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       _isEditing: false,
       _isDeleted: false,
     }
-    const isClaimAmountValid = validateClaimAmount(updatedRow)
+    const { isValid, limitType } = validateClaimAmount(
+      updatedRow,
+      values.finalPayable,
+    )
 
-    if (isClaimAmountValid) _updateTempInvoicePayer(index, updatedRow)
-    else toggleErrorPrompt()
+    if (isValid) _updateTempInvoicePayer(index, updatedRow)
+    else {
+      const suffix = limitType === 'patient' ? '' : 'maximum cap.'
+      setErrorMessage(`Total claim amount cannot exceed ${suffix}`)
+      toggleErrorPrompt()
+    }
   }
 
   const handleAppliedSchemeCancelClick = (index) => () => {
@@ -597,8 +524,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       ).length < invoice.claimableSchemes
     return isEditing || hasUnappliedScheme
   }
-
-  // console.log({ tempInvoicePayer })
 
   return (
     <React.Fragment>
@@ -701,17 +626,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                 </GridItem>
 
                 <GridItem md={1} style={{ textAlign: 'right' }}>
-                  {/*  <Tooltip title='Remove this scheme'>
-                    <Button
-                      size='sm'
-                      color='danger'
-                      justIcon
-                      onClick={handleAppliedSchemeRemoveClick(index)}
-                    >
-                      <Delete />
-                    </Button>
-                  </Tooltip> */}
-
                   <DeleteWithPopover
                     index={index}
                     onConfirmDelete={handleAppliedSchemeRemoveClick}
@@ -824,9 +738,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         />
       </CommonModal>
       <CommonModal
-        title='Invalid'
+        title='Invalid amount'
         open={showErrorPrompt}
         onClose={toggleErrorPrompt}
+        size='sm'
       >
         <div>Invalid amount</div>
       </CommonModal>
