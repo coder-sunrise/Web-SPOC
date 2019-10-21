@@ -141,7 +141,7 @@ class index extends Component {
           break
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          processedPayload = this.processSubmitPayload(false, 6)
+          processedPayload = this.processSubmitPayload(false, 5)
           break
         // case poSubmitAction.PRINT:
         //   this.toggleReport()
