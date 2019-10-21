@@ -7,7 +7,7 @@ import {
   GridContainer,
   GridItem,
   Button,
-  Select,
+  CodeSelect,
   ProgressButton,
   DateRangePicker,
 } from '@/components'
@@ -51,6 +51,8 @@ const recurrenceTypes = [
 @withFormik({
   mapPropsToValues: () => ({
     doctorName: [],
+    dates: [],
+    recurrence: undefined,
   }),
   handleSubmit: () => {},
 })
@@ -76,7 +78,7 @@ class Filter extends PureComponent {
                     },
                   }}
                   labelField='clinicianProfile.name'
-                  valueField='clinicianProfile.id'
+                  // valueField='clinicianProfile.id'
                   maxTagCount={values.doctorName.length > 1 ? 0 : 1}
                 />
               )}
@@ -96,15 +98,14 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-
           <GridItem xs={6} md={2}>
             <FastField
               name='recurrence'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label='Recurrence Type'
-                    options={recurrenceTypes}
+                    code='LTRecurrencePattern'
                     {...args}
                   />
                 )
@@ -120,12 +121,18 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={null}
                 onClick={() => {
+                  const prefix =
+                    this.props.values.doctorName.length === 1 ? 'eql_' : 'in_'
+                  const doctorIDs = values.doctorName.join('|')
                   this.props.dispatch({
                     type: 'doctorBlock/query',
                     payload: {
-                      // [`${prefix}name`]: values.doctorName
-                      lgteql_startDateTime: values.dates[0],
-                      lsteql_endDateTime: values.dates[1],
+                      // [`${prefix}name`]: values.doctorName,
+                      [`${prefix}DoctorBlockGroupFKNavigation.DoctorBlockUserFkNavigation.ClinicianProfile.DoctorProfileFkNavigation.Id`]: doctorIDs,
+                      lgteql_startDateTime: values.dates[0] || '',
+                      lsteql_endDateTime: values.dates[1] || '',
+                      'DoctorBlockGroupFKNavigation.DoctorBlockRecurrenceFKNavigation.RecurrencePatternFKNavigation.Id':
+                        values.recurrence,
                       combineCondition: 'and',
                     },
                   })

@@ -97,6 +97,10 @@ const DispenseDetails = ({
                     'invoice.invoiceTotalAftGST',
                     v.summary.totalWithGST,
                   )
+                  setFieldValue(
+                    'invoice.outstandingBalance',
+                    v.summary.totalWithGST,
+                  )
                   // console.log({ v })
                   setFieldValue(
                     'invoice.invoiceTotal',

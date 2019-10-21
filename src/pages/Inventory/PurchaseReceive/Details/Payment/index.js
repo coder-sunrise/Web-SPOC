@@ -28,40 +28,50 @@ const styles = (theme) => ({
   displayName: 'podoPayment',
   enableReinitialize: true,
   mapPropsToValues: ({ podoPayment }) => {
-    return podoPayment
+    let outstandingAmt = 0
+    if (podoPayment.purchaseOrderDetails) {
+      const { outstandingAmount } = podoPayment.purchaseOrderDetails
+      outstandingAmt = outstandingAmount
+    }
+    return {
+      ...podoPayment,
+      outstandingAmt,
+    }
   },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history } = props
     const { purchaseOrderPayment, currentBizSessionInfo } = values
 
-    let paymentData = purchaseOrderPayment.map((x, index) => {
-      x.isCancelled = x.isDeleted
-      delete x.isDeleted
+    let paymentData = purchaseOrderPayment
+      .filter((item) => !item.isDeleted)
+      .map((x, index) => {
+        x.isCancelled = x.isDeleted
+        delete x.isDeleted
 
-      if (_.has(x, 'isNew')) {
+        if (_.has(x, 'isNew')) {
+          return {
+            purchaseOrderFK: values.id,
+            sequence: index + 1,
+            clinicPaymentDto: {
+              ...x,
+              id: x.cpId,
+              concurrencyToken: x.cpConcurrencyToken,
+              createdOnBizSessionFK: currentBizSessionInfo.id,
+              clinicPaymentTypeFK: 1,
+              transactionOnBizSessionFK: currentBizSessionInfo.id,
+              // isCancelled: x.isCancelled,
+            },
+          }
+        }
+
         return {
-          purchaseOrderFK: values.id,
-          sequence: index + 1,
+          ...x,
           clinicPaymentDto: {
-            ...x,
-            id: x.cpId,
-            concurrencyToken: x.cpConcurrencyToken,
-            createdOnBizSessionFK: currentBizSessionInfo.id,
-            clinicPaymentTypeFK: 1,
-            transactionOnBizSessionFK: currentBizSessionInfo.id,
+            ...x.clinicPaymentDto,
             // isCancelled: x.isCancelled,
           },
         }
-      }
-
-      return {
-        ...x,
-        clinicPaymentDto: {
-          ...x.clinicPaymentDto,
-          // isCancelled: x.isCancelled,
-        },
-      }
-    })
+      })
 
     dispatch({
       type: 'podoPayment/upsertPodoPayment',
@@ -84,10 +94,6 @@ const styles = (theme) => ({
   },
 })
 class index extends PureComponent {
-  // state = {
-  //   showPODOPaymentModal: false,
-  // }
-
   componentDidMount () {
     this.refreshPodoPayment()
   }
@@ -114,6 +120,23 @@ class index extends PureComponent {
 
   // onCloseAddPayment = () => this.setState({ showPODOPaymentModal: false })
 
+  recalculateOutstandingAmount = (type, value) => {
+    const { values, setValues } = this.props
+    if (type === 'add') {
+      const outstandingAmt = values.outstandingAmt - value
+      setValues({
+        ...values,
+        outstandingAmt,
+      })
+    } else {
+      const outstandingAmt = values.outstandingAmt + value
+      setValues({
+        ...values,
+        outstandingAmt,
+      })
+    }
+  }
+
   render () {
     const { purchaseOrderDetails } = this.props
     // const { showPODOPaymentModal } = this.state
@@ -125,7 +148,11 @@ class index extends PureComponent {
       <React.Fragment>
         <GridContainer>
           <Header {...this.props} />
-          <Grid isEditable={!isEditable} {...this.props} />
+          <Grid
+            isEditable={!isEditable}
+            {...this.props}
+            recalculateOutstandingAmount={this.recalculateOutstandingAmount}
+          />
         </GridContainer>
         {/* <CommonModal
           open={showPODOPaymentModal}

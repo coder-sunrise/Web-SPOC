@@ -189,6 +189,7 @@ class index extends Component {
           totalPrice: x.totalPrice,
           totalAfterAdjustments: x.totalAfterAdjustments,
           totalAfterGst: x.totalAfterGst,
+          unitPrice: x.unitPrice,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
           [itemType.prop]: {
@@ -404,12 +405,7 @@ class index extends Component {
 
   render () {
     // console.log('PORender', this.props)
-    const {
-      purchaseOrderDetails,
-      values,
-      dispatch,
-      setFieldValue,
-    } = this.props
+    const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values

@@ -28,7 +28,6 @@ export default ({
     show,
     setShow,
   ] = useState(false)
-  console.log('index ', index)
 
   return (
     <React.Fragment>

@@ -24,6 +24,9 @@ const styles = () => ({
       borderBottomLeftRadius: '4px !important',
     },
   },
+  rightEnd: {
+    marginRight: 0,
+  },
   number: {
     padding: '0px 10px',
     fontWeight: 500,
@@ -198,7 +201,13 @@ const StatusFilterButton = ({
           {StatusIndicator.COMPLETED}
         </Button>
       </Paper>
-      <Paper elevation={6} className={classnames(classes.container)}>
+      <Paper
+        elevation={6}
+        className={classnames({
+          [classes.container]: true,
+          [classes.rightEnd]: true,
+        })}
+      >
         <h4
           className={classnames([
             classes.number,

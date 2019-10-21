@@ -161,7 +161,7 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showBillingPanel}
           title='Billing'
-          observe='Billing'
+          observe='BillingForm'
           authority='billing'
           bodyNoPadding
           onClose={(e) => {
@@ -294,6 +294,8 @@ class GlobalModalContainer extends PureComponent {
               type: 'global/updateAppState',
               payload: {
                 openConfirm: false,
+                openConfirmTitle: undefined,
+                openConfirmText: 'Confirm',
               },
             })
           }}

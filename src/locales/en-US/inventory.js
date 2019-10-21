@@ -98,6 +98,7 @@ export default {
 
   'inventory.pr.detail.pod.expectedDeliveryDate': 'Expected Delivery Date',
   'inventory.pr.detail.pod.invoiceDate': 'Invoice Date',
+  'inventory.pr.detail.pod.remarks': 'Remarks',
   'inventory.pr.detail.pod.poDate': 'Purchase Order Date',
   'inventory.pr.detail.pod.shippingAdd': 'Shipping Address',
   'inventory.pr.detail.pod.invoiceNo': 'Invoice No.',
