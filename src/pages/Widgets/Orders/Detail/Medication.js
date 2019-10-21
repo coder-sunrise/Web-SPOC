@@ -57,7 +57,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
     totalPrice: Yup.number().required(),
     type: Yup.string(),
     stockDrugFK: Yup.number().when('type', {
-      is: (val) => val !== '5',     
+      is: (val) => val !== '5',
       then: Yup.number().required(),
     }),
     drugName: Yup.string().when('type', {
@@ -85,7 +85,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, orders, currentType } = props
     const { rows } = orders
-    
+
     const data = {
       sequence: rows.length,
       ...values,
@@ -100,9 +100,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   },
   displayName: 'OrderPage',
 })
-
 class Medication extends PureComponent {
-
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
@@ -117,7 +115,6 @@ class Medication extends PureComponent {
       })
     }
   }
-  
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
     const { theme, values } = this.props
@@ -323,7 +320,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log("kkkkk ", this.props)
+    console.log('kkkkk ', this.props)
     return (
       <div>
         <GridContainer>
@@ -414,7 +411,7 @@ class Medication extends PureComponent {
                                     {i + 1}.
                                   </span>
                                   <CodeSelect
-                                    simple
+                                    // simple
                                     allowClear={false}
                                     style={{ paddingLeft: 15 }}
                                     code='ctMedicationUsage'
@@ -432,7 +429,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  simple
+                                  // simple
                                   allowClear={false}
                                   code='ctMedicationDosage'
                                   {...commonSelectProps}
@@ -453,7 +450,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  simple
+                                  // simple
                                   allowClear={false}
                                   code='ctMedicationUnitOfMeasurement'
                                   {...commonSelectProps}
@@ -469,7 +466,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  simple
+                                  // simple
                                   labelField='displayValue'
                                   allowClear={false}
                                   code='ctMedicationFrequency'
@@ -491,7 +488,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <NumberInput
-                                  simple
+                                  // simple
                                   allowEmpty={false}
                                   formatter={(v) =>
                                     `${v} Day${v > 1 ? 's' : ''}`}
@@ -572,7 +569,7 @@ class Medication extends PureComponent {
                                         paddingLeft: 15,
                                       }}
                                       // label='Precaution'
-                                      simple
+                                      // simple
                                       code='ctMedicationPrecaution'
                                       onChange={(v, option = {}) => {
                                         // console.log(v, option)
