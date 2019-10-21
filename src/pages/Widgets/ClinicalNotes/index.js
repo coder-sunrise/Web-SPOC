@@ -273,19 +273,19 @@ class ClinicalNotes extends Component {
       },
     })
 
-    previousData = []
+    // previousData = []
 
-    for (let i = 0; i < clinicianArray.length; i++) {
-      previousData.push(clinicianArray[i])
-    }
+    // for (let i = 0; i < clinicianArray.length; i++) {
+    //   previousData.push(clinicianArray[i])
+    // }
 
-    for (let i = 0; i < chiefComplaintsArray.length; i++) {
-      previousData.push(chiefComplaintsArray[i])
-    }
+    // for (let i = 0; i < chiefComplaintsArray.length; i++) {
+    //   previousData.push(chiefComplaintsArray[i])
+    // }
 
-    for (let i = 0; i < planArray.length; i++) {
-      previousData.push(planArray[i])
-    }
+    // for (let i = 0; i < planArray.length; i++) {
+    //   previousData.push(planArray[i])
+    // }
 
     for (let i = 0; i < previousData.length; i++) {
       if (JSON.stringify(previousData[i]) === JSON.stringify(deleteItem)) {

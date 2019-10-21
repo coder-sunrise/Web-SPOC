@@ -137,7 +137,7 @@ const DiagnosisItem = ({
                 )
               }
               return (
-                <Select
+                <CodeSelect
                   label='Complication'
                   mode='multiple'
                   // code='ctComplication'
