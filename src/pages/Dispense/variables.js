@@ -46,7 +46,7 @@ export const PrescriptionColumns = [
   },
 ]
 
-export const PrescriptionColumnExtensions = (handleClickPrintDrugLabel, viewOnly = false) => [
+export const PrescriptionColumnExtensions = ( viewOnly = false, handleClickPrintDrugLabel) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
@@ -113,8 +113,7 @@ export const PrescriptionColumnExtensions = (handleClickPrintDrugLabel, viewOnly
       )
     },
   },
-])
-}
+]
 
 export const VaccinationColumn = [
   {

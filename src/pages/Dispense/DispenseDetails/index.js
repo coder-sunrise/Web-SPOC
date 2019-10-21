@@ -55,7 +55,7 @@ const DispenseDetails = ({
               title='Prescription'
               height={200}
               columns={PrescriptionColumns}
-                          colExtensions={PrescriptionColumnExtensions(PrescriptionColumnExtensions, viewOnly)}
+                          colExtensions={PrescriptionColumnExtensions(viewOnly, PrescriptionColumnExtensions)}
               data={prescription}
             />
           </GridItem>
