@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 // material ui
 import { Popover, withStyles } from '@material-ui/core'
 import Info from '@material-ui/icons/Info'
+import { convertAmountToPercentOrCurrency } from '../utils'
+import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   popover: {
@@ -22,7 +24,12 @@ const parseToPercentOrDollar = (type, value) => {
   return `${value}%`
 }
 
-const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
+const MaxCapInfo = ({
+  classes,
+  claimableSchemes = [],
+  coPaymentByCategory = [],
+  copaymentSchemeFK,
+}) => {
   const [
     anchorEl,
     setAnchorEl,
@@ -83,6 +90,17 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
             Patient Minimum Payable Amount:{' '}
             <span className={classes.blueText}>{patientMinPayable}</span>
           </p>
+          {coPaymentByCategory.map((itemCategory) => (
+            <p>
+              {INVOICE_ITEM_TYPE[itemCategory.itemTypeFk]}:{' '}
+              <span className={classes.blueText}>
+                {convertAmountToPercentOrCurrency(
+                  itemCategory.groupValueType,
+                  itemCategory.itemGroupValue,
+                )}
+              </span>
+            </p>
+          ))}
         </div>
       </Popover>
     </div>

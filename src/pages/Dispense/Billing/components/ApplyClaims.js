@@ -658,6 +658,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                         <MaxCapInfo
                           claimableSchemes={invoicePayer.claimableSchemes}
                           copaymentSchemeFK={invoicePayer.copaymentSchemeFK}
+                          coPaymentByCategory={invoicePayer.coPaymentByCategory}
+                          coPaymentByItem={invoicePayer.coPaymentByItem}
                         />
                       }
                       value={invoicePayer._coverageMaxCap}
