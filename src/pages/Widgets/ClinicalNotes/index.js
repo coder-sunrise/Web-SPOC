@@ -628,6 +628,7 @@ class ClinicalNotes extends Component {
                     </div>
                   </div>
                   <RichEditor
+                   // handlePastedText={() => false}
                     handlePastedText={() => false}
                     strongLabel
                     label='Clinical Notes'

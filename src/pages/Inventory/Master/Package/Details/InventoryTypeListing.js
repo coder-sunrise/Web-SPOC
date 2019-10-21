@@ -582,7 +582,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryMedicationFK',
         type: 'select',
-        labelField: 'code',
+        labelField: 'name',
         options: medicationList,
         onChange: handleItemOnChange,
       },
@@ -590,6 +590,7 @@ const InventoryTypeListing = ({
         columnName: 'quantity',
         width: 150,
         type: 'number',
+        format: '0.0',
         onChange: (e) => calSubtotal(e),
       },
       {
@@ -623,7 +624,7 @@ const InventoryTypeListing = ({
         options: vaccinationList,
         onChange: handleItemOnChange,
       },
-      { columnName: 'quantity', width: 150, type: 'number' },
+      { columnName: 'quantity', width: 150, type: 'number', format: '0.0' },
       {
         columnName: 'unitPrice',
         width: 150,
@@ -656,7 +657,7 @@ const InventoryTypeListing = ({
         options: consumableList,
         onChange: handleItemOnChange,
       },
-      { columnName: 'quantity', width: 150, type: 'number' },
+      { columnName: 'quantity', width: 150, type: 'number', format: '0.0' },
       {
         columnName: 'unitPrice',
         width: 150,

@@ -2,7 +2,6 @@ import React, { PureComponent, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import {  WarningSnackbar } from 'medisys-components'
 
 import { getBizSession } from '@/services/queue'
 
@@ -22,6 +21,7 @@ import {
   Select,
   Button,
   Switch,
+  WarningSnackbar,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -75,7 +75,7 @@ const styles = (theme) => ({
       },
     ]
     const { dispatch, onConfirm, history } = props
-
+  
     dispatch({
       type: 'clinicSettings/upsert',
       payload,

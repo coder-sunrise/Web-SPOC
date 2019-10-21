@@ -76,8 +76,7 @@ const reloadDispense = (props, effect = 'query') => {
     const invoiceTotalAftGST = _temp.isGSTInclusive
       ? invoiceTotal
       : roundToTwoDecimals(invoiceGSTAmt + invoiceTotal)
-
-    // console.log({ invoiceTotal, invoiceGSTAmt, invoiceTotalAftGST })
+    const outstandingBalance = invoiceTotalAftGST
 
     return {
       ...(dispense.entity || dispense.default),
@@ -86,6 +85,7 @@ const reloadDispense = (props, effect = 'query') => {
         invoiceTotal,
         invoiceGSTAmt,
         invoiceTotalAftGST,
+        outstandingBalance,
       },
     }
   },
@@ -172,7 +172,7 @@ class Main extends Component {
 
   editOrder = (e) => {
     const { handleSubmit } = this.props
-    //this._editOrder
+
     navigateDirtyCheck(this._editOrder, () => {
       handleSubmit()
       this._editOrder()

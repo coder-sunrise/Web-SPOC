@@ -5,17 +5,12 @@ import { compose } from 'redux'
 import { formatMessage } from 'umi/locale'
 
 import {
-  Card,
-  CardHeader,
-  CardText,
-  CardBody,
   GridContainer,
   GridItem,
-  Select,
-  TextField,
   Transfer,
   CodeSelect,
   CardContainer,
+  NumberInput,
 } from '@/components'
 
 const styles = () => ({})
@@ -136,7 +131,9 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.frequency',
                 })}
+                labelField='displayValue'
                 code='ctMedicationFrequency'
+                labelField='displayValue'
                 {...args}
               />
             )}
@@ -147,7 +144,7 @@ const Setting = ({
             name='duration'
             render={(args) => {
               return (
-                <TextField
+                <NumberInput
                   label={formatMessage({
                     id: 'inventory.master.setting.duration',
                   })}
@@ -184,10 +181,11 @@ const Setting = ({
             name='dispensingQuantity'
             render={(args) => {
               return (
-                <TextField
+                <NumberInput
                   label={formatMessage({
                     id: 'inventory.master.setting.quantity',
                   })}
+                  format='0.0'
                   {...args}
                 />
               )

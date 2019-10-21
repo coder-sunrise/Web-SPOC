@@ -90,7 +90,7 @@ export default withFormikExtend({
   }),
   mapPropsToValues: ({ settingAppointmentType }) =>
     settingAppointmentType.entity || settingAppointmentType.default,
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     dispatch({
@@ -102,6 +102,7 @@ export default withFormikExtend({
       },
     }).then((response) => {
       if (response) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingAppointmentType/query',

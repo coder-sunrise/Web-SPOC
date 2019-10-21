@@ -74,3 +74,5 @@ export { default as Scribble } from './Scribble'
 export IconButton from './Button/IconButton'
 export Fab from './Button/Fab'
 export Snackbar from './Snackbar'
+export WarningSnackbar from './WarningSnackbar'
+

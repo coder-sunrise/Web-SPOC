@@ -30,6 +30,16 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
+const corPrescriptionItemInstructionSchema = Yup.object().shape({
+  usageMethodFK: Yup.number().required(),
+  dosageFK: Yup.number().required(),
+  prescribeUOMFK: Yup.number().required(),
+  drugFrequencyFK: Yup.number().required(),
+  duration: Yup.number().required(),
+  sequence: Yup.number().required(),
+  stepdose: Yup.string().required(),
+})
+
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, ...resetProps }) => {
@@ -42,15 +52,13 @@ import { calculateAdjustAmount } from '@/utils/utils'
   enableReinitialize: true,
 
   validationSchema: Yup.object().shape({
-    expiryDate: Yup.string().required(),
-    batchNo: Yup.string().required(),
     quantity: Yup.number().required(),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
-    stockDrugFK: Yup.string().when('type', {
-      is: true,
-      then: Yup.string().required(),
+    stockDrugFK: Yup.number().when('type', {
+      is: (val) => val !== '5',
+      then: Yup.number().required(),
     }),
     drugName: Yup.string().when('type', {
       is: (val) => val === '5',
@@ -93,10 +101,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
   displayName: 'OrderPage',
 })
 class Medication extends PureComponent {
-  state = {
-    totalQuantity: 0,
-  }
-
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
@@ -110,10 +114,6 @@ class Medication extends PureComponent {
         },
       })
     }
-  }
-
-  componentDidMount () {
-    // this.calcualteQuantity()
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
@@ -130,7 +130,9 @@ class Medication extends PureComponent {
         {values[prop].length > 1 && (
           <Popconfirm
             title='Are you sure delete this item?'
-            onConfirm={() => {arrayHelpers.remove(i)}}
+            onConfirm={() => {
+              arrayHelpers.remove(i)
+            }}
             // okText='Yes'
             // cancelText='No'
           >
@@ -157,7 +159,6 @@ class Medication extends PureComponent {
   }
 
   calcualteQuantity = () => {
-    let { totalQuantity } = this.state
     const { codetable, setFieldValue } = this.props
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
@@ -178,7 +179,6 @@ class Medication extends PureComponent {
         for (let a = 0; a < dosageUsageList.length; a++) {
           if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
             dosageValue = dosageUsageList[a].name
-
           }
         }
 
@@ -188,29 +188,28 @@ class Medication extends PureComponent {
             prescriptionItem[i].drugFrequencyFK
           ) {
             multipler = medicationFrequencyList[b].multiplier
-   
           }
         }
 
-        newTotalQuantity += dosageValue * multipler * prescriptionItem[i].duration
+        newTotalQuantity +=
+          dosageValue * multipler * prescriptionItem[i].duration
       }
     }
 
-    if (newTotalQuantity === 0) {
-      setFieldValue(`quantity`, 0)
-    } else {
-      setFieldValue(`quantity`, newTotalQuantity)
-    }
-
-    this.setState({
-      totalQuantity: newTotalQuantity,
-    })
+    let rounded = Math.round(newTotalQuantity * 10) / 10
+    setFieldValue(`quantity`, rounded)
   }
 
   changeMedication = (v, op = {}) => {
     console.log(v, op)
-    const { setFieldValue, values } = this.props
-    setFieldValue('quantity', 0)
+    const { setFieldValue, values, codetable } = this.props
+    const dosageUsageList = codetable.ctmedicationdosage
+    const medicationFrequencyList = codetable.ctmedicationfrequency
+
+    let dosageValue = 0
+    let multipler = 0
+    let newTotalQuantity = 0
+
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
       op.medicationUsage ? op.medicationUsage.id : undefined,
@@ -230,6 +229,25 @@ class Medication extends PureComponent {
       op.medicationFrequency ? op.medicationFrequency.id : undefined,
     )
     setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
+
+    if (op.duration && op.medicationFrequency.id && op.prescribingDosage.id) {
+      for (let a = 0; a < dosageUsageList.length; a++) {
+        if (dosageUsageList[a].id === op.prescribingDosage.id) {
+          dosageValue = dosageUsageList[a].name
+        }
+      }
+
+      for (let b = 0; b < medicationFrequencyList.length; b++) {
+        if (medicationFrequencyList[b].id === op.medicationFrequency.id) {
+          multipler = medicationFrequencyList[b].multiplier
+        }
+      }
+
+      newTotalQuantity += dosageValue * multipler * op.duration
+
+      let rounded = Math.round(newTotalQuantity * 10) / 10
+      setFieldValue(`quantity`, rounded)
+    }
 
     if (
       op.inventoryMedication_MedicationPrecaution &&
@@ -302,6 +320,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    console.log('kkkkk ', this.props)
     return (
       <div>
         <GridContainer>
@@ -392,7 +411,7 @@ class Medication extends PureComponent {
                                     {i + 1}.
                                   </span>
                                   <CodeSelect
-                                    simple
+                                    // simple
                                     allowClear={false}
                                     style={{ paddingLeft: 15 }}
                                     code='ctMedicationUsage'
@@ -410,7 +429,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  simple
+                                  // simple
                                   allowClear={false}
                                   code='ctMedicationDosage'
                                   {...commonSelectProps}
@@ -431,7 +450,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  simple
+                                  // simple
                                   allowClear={false}
                                   code='ctMedicationUnitOfMeasurement'
                                   {...commonSelectProps}
@@ -447,7 +466,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  simple
+                                  // simple
                                   labelField='displayValue'
                                   allowClear={false}
                                   code='ctMedicationFrequency'
@@ -469,7 +488,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <NumberInput
-                                  simple
+                                  // simple
                                   allowEmpty={false}
                                   formatter={(v) =>
                                     `${v} Day${v > 1 ? 's' : ''}`}
@@ -550,7 +569,7 @@ class Medication extends PureComponent {
                                         paddingLeft: 15,
                                       }}
                                       // label='Precaution'
-                                      simple
+                                      // simple
                                       code='ctMedicationPrecaution'
                                       onChange={(v, option = {}) => {
                                         // console.log(v, option)
@@ -609,7 +628,8 @@ class Medication extends PureComponent {
                     label='Quantity'
                     // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
-                    min={0}
+                    min={0.1}
+                    format='0.0'
                     onChange={(e) => {
                       if (values.unitPrice) {
                         const total = e.target.value * values.unitPrice

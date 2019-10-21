@@ -103,7 +103,7 @@ const Detail = ({
           color='danger'
           onClick={navigateDirtyCheck('/inventory/master?t=2')}
         >
-          Cancel
+          Close
         </Button>
         <ProgressButton
           submitKey='vaccinationDetail/submit'
@@ -172,7 +172,7 @@ export default compose(
         .min(0, errMsg('Critical Threshold'))
         .max(999999.99, errMsg('Critical Threshold')),
     }),
-    handleSubmit: (values, { props }) => {
+    handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history } = props
       const { id, vaccinationStock, effectiveDates, ...restValues } = values
       let defaultVaccinationStock = vaccinationStock
@@ -210,6 +210,7 @@ export default compose(
         },
       }).then((r) => {
         if (r) {
+          resetForm()
           history.push('/inventory/master?t=2')
         }
       })

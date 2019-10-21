@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import * as Yup from 'yup'
 import { connect } from 'dva'
 // formik
-import { Formik, withFormik } from 'formik'
+import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -28,10 +28,12 @@ import { PAYMENT_MODE } from '@/utils/constants'
       clinicSettings,
       invoice.outstandingBalance,
     )
-    const cashRounding = collectableAmount - invoice.outstandingBalance
+    const cashRounding = roundToTwoDecimals(
+      collectableAmount - invoice.outstandingBalance,
+    )
 
     return {
-      outstandingAfterPayment: 0,
+      outstandingAfterPayment: collectableAmount,
       cashReturned: 0,
       cashReceived: 0,
       paymentList: [],
@@ -58,7 +60,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
               paymentModeFK: Yup.number().required(),
               amt: Yup.number().when(
                 'paymentModeFK',
-                (paymentModeFK, amtSchema) =>
+                (paymentModeFK) =>
                   paymentModeFK !== PAYMENT_MODE.CASH
                     ? Yup.number()
                         .min(0)
@@ -116,13 +118,22 @@ import { PAYMENT_MODE } from '@/utils/constants'
   }),
   handleSubmit: (values, { props }) => {
     const { handleSubmit } = props
-    const { paymentList, cashReceived, cashReturned, totalAmtPaid } = values
+    const {
+      paymentList,
+      cashRounding,
+      cashReceived,
+      cashReturned,
+      totalAmtPaid,
+      collectableAmount,
+    } = values
     const returnValue = {
       paymentModes: paymentList.map((payment, index) => ({
         ...payment,
         sequence: index,
         id: undefined,
       })),
+      outstandingBalance: collectableAmount - totalAmtPaid,
+      cashRounding,
       cashReceived,
       cashReturned,
       totalAmtPaid,

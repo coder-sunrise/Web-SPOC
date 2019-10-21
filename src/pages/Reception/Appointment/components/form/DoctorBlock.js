@@ -244,6 +244,7 @@ export default compose(
             doctorBlock,
           )
         }
+        console.log({ doctorBlocks })
 
         // compute startTime and endTime on all recurrence
         doctorBlocks = doctorBlocks.map((item) => {

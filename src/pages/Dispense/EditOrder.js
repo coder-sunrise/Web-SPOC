@@ -85,6 +85,11 @@ class EditOrder extends Component {
         notification.success({
           message: 'Order signed',
         })
+
+        dispatch({
+          type: `formik/clean`,
+          payload: 'OrderPage',
+        })
       }
     })
   }

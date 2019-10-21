@@ -224,7 +224,7 @@ class AntdNumberInput extends React.PureComponent {
       e.preventDefault()
     }
 
-    if (this.props.min === 0 && e.keyCode === 189) {
+    if ((this.props.min === 0 || this.props.min === 1) && e.keyCode === 189) {
       e.preventDefault()
     }
 
@@ -456,11 +456,14 @@ class AntdNumberInput extends React.PureComponent {
 
     if (field) {
       this.setState({
-        value: field.value === undefined ? '' : field.value,
+        value:
+          field.value === undefined || Number.isNaN(field.value)
+            ? ''
+            : field.value,
       })
     } else if (value) {
       this.setState({
-        value: value === undefined ? '' : value,
+        value: value === undefined || Number.isNaN(field.value) ? '' : value,
       })
     } else {
       this.setState({

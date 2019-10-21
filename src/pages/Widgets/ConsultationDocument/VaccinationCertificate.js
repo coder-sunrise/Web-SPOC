@@ -81,6 +81,7 @@ class VaccinationCertificate extends PureComponent {
       classes,
       patient,
       templateLoader,
+      currentType,
       setFieldValue,
       codetable,
     } = this.props
@@ -130,7 +131,7 @@ class VaccinationCertificate extends PureComponent {
             />
           </GridItem>
           <GridItem xs={12} className={classes.editor}>
-            {templateLoader(this.editorReferece, setFieldValue)}
+            {templateLoader(this.editorReferece, setFieldValue, currentType)}
 
             <FastField
               name='content'
