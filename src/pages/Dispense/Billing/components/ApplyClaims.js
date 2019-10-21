@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { Paper, withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
-import Delete from '@material-ui/icons/Delete'
 // common components
 import {
   Button,
@@ -12,9 +11,7 @@ import {
   GridContainer,
   GridItem,
   NumberInput,
-  Popover,
   Select,
-  Tooltip,
 } from '@/components'
 // sub components
 import MaxCapInfo from './MaxCapInfo'
@@ -33,7 +30,8 @@ import {
   flattenInvoicePayersInvoiceItemList,
   computeInvoiceItemSubtotal,
   computeTotalForAllSavedClaim,
-  convertAmountToPercentOrCurrency,
+  getCoverageAmountAndType,
+  getApplicableClaimAmount,
 } from '../utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { roundToTwoDecimals } from '@/utils/utils'
@@ -69,6 +67,10 @@ const styles = (theme) => ({
 
 const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   const { invoice, claimableSchemes } = values
+  const [
+    showErrorPrompt,
+    setShowErrorPrompt,
+  ] = useState(false)
   const [
     initialState,
     setInitialState,
@@ -116,37 +118,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         (selectedScheme) => selectedScheme.id === schemeID,
       )
       const existed = curInvoiceItems.find((curItem) => curItem.id === item.id)
-      let coverage = 0
-      let schemeCoverageType = 'percentage'
-      let schemeCoverage = 0
-      if (scheme.coPaymentByItem.length > 0) {
-        const coPaymentItem = scheme.coPaymentByItem.find(
-          (_coPaymentItem) => _coPaymentItem.itemFk === item.id,
-        )
 
-        coverage = convertAmountToPercentOrCurrency(
-          coPaymentItem.itemValueType,
-          coPaymentItem.itemValue,
-        )
-      } else if (scheme.coPaymentByCategory.length > 0) {
-        const itemCategory = scheme.coPaymentByCategory.find(
-          (category) => category.itemTypeFk === item.invoiceItemTypeFk,
-        )
-        coverage = convertAmountToPercentOrCurrency(
-          itemCategory.groupValueType,
-          itemCategory.itemGroupValue,
-        )
-
-        schemeCoverage = itemCategory.itemGroupValue
-        schemeCoverageType = itemCategory.groupValueType
-      } else {
-        schemeCoverageType = scheme.overAllCoPaymentValueType
-        schemeCoverage = scheme.overAllCoPaymentValue
-        coverage = convertAmountToPercentOrCurrency(
-          scheme.overAllCoPaymentValueType,
-          scheme.overAllCoPaymentValue,
-        )
-      }
+      let {
+        coverage, // for display purpose only, value will be $100 or 100%
+        schemeCoverage, // for sending to backend
+        schemeCoverageType, // for sending to backend
+      } = getCoverageAmountAndType(scheme, item)
 
       if (existed)
         return [
@@ -281,6 +258,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   }
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
+  const toggleErrorPrompt = () => setShowErrorPrompt(!showErrorPrompt)
 
   useEffect(
     () => {
@@ -336,64 +314,95 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     ],
   )
 
-  const getApplicableClaimAmount = (
-    invoicePayerItem,
-    scheme,
-    remainingCoverageMaxCap,
-  ) => {
+  const validateClaimAmount = (schemeRow) => {
+    let isValid = true
+
     const {
-      coPaymentByCategory,
-      coPaymentByItem,
-      isCoverageMaxCapCheckRequired,
-    } = scheme
-    let returnClaimAmount = 0
+      _patientMinPayable,
+      _patientMinPayableType,
+      _coverageMaxCap,
+      invoicePayerItems,
+    } = schemeRow
+    const totalClaimAmount = invoicePayerItems.reduce(
+      (totalClaim, item) => totalClaim + (item.claimAmount || 0),
+      0,
+    )
 
-    if (invoicePayerItem.totalAfterGst === 0)
-      return [
-        0,
-        remainingCoverageMaxCap,
-      ]
-
-    if (coPaymentByItem.length > 0) {
-      returnClaimAmount = 0
-    } else if (coPaymentByCategory.length > 0) {
-      const itemCategory = coPaymentByCategory.find(
-        (category) =>
-          category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
-      )
-      const itemRemainingAmount =
-        invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
-
-      if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
-        returnClaimAmount =
-          itemRemainingAmount * (itemCategory.itemGroupValue / 100)
-      } else {
-        returnClaimAmount =
-          itemCategory.itemGroupValue > itemRemainingAmount
-            ? itemRemainingAmount
-            : itemCategory.itemGroupValue
-      }
-    } else {
-      returnClaimAmount =
-        invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+    let patientMinPayable = 0
+    if (_patientMinPayable > 0) {
+      patientMinPayable =
+        _patientMinPayableType === 'ExactAmount'
+          ? _patientMinPayable
+          : values.finalPayable * (_patientMinPayable / 100)
     }
 
-    if (isCoverageMaxCapCheckRequired) {
-      if (returnClaimAmount > remainingCoverageMaxCap) {
-        returnClaimAmount = remainingCoverageMaxCap
-        remainingCoverageMaxCap = 0
-      } else if (returnClaimAmount < remainingCoverageMaxCap) {
-        remainingCoverageMaxCap -= returnClaimAmount
-      } else {
-        returnClaimAmount = remainingCoverageMaxCap
-      }
+    if (patientMinPayable > 0 && _coverageMaxCap > 0) {
+      if (patientMinPayable > _coverageMaxCap) {
+        isValid = totalClaimAmount < patientMinPayable
+      } else isValid = totalClaimAmount < _coverageMaxCap
     }
 
-    return [
-      returnClaimAmount,
-      remainingCoverageMaxCap,
-    ]
+    return isValid
   }
+
+  // const getApplicableClaimAmount = (
+  //   invoicePayerItem,
+  //   scheme,
+  //   remainingCoverageMaxCap,
+  // ) => {
+  //   const {
+  //     coPaymentByCategory,
+  //     coPaymentByItem,
+  //     isCoverageMaxCapCheckRequired,
+  //   } = scheme
+  //   let returnClaimAmount = 0
+
+  //   if (invoicePayerItem.totalAfterGst === 0)
+  //     return [
+  //       0,
+  //       remainingCoverageMaxCap,
+  //     ]
+
+  //   if (coPaymentByItem.length > 0) {
+  //     returnClaimAmount = 0
+  //   } else if (coPaymentByCategory.length > 0) {
+  //     const itemCategory = coPaymentByCategory.find(
+  //       (category) =>
+  //         category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
+  //     )
+  //     const itemRemainingAmount =
+  //       invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+
+  //     if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
+  //       returnClaimAmount =
+  //         itemRemainingAmount * (itemCategory.itemGroupValue / 100)
+  //     } else {
+  //       returnClaimAmount =
+  //         itemCategory.itemGroupValue > itemRemainingAmount
+  //           ? itemRemainingAmount
+  //           : itemCategory.itemGroupValue
+  //     }
+  //   } else {
+  //     returnClaimAmount =
+  //       invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+  //   }
+
+  //   if (isCoverageMaxCapCheckRequired) {
+  //     if (returnClaimAmount > remainingCoverageMaxCap) {
+  //       returnClaimAmount = remainingCoverageMaxCap
+  //       remainingCoverageMaxCap = 0
+  //     } else if (returnClaimAmount < remainingCoverageMaxCap) {
+  //       remainingCoverageMaxCap -= returnClaimAmount
+  //     } else {
+  //       returnClaimAmount = remainingCoverageMaxCap
+  //     }
+  //   }
+
+  //   return [
+  //     returnClaimAmount,
+  //     remainingCoverageMaxCap,
+  //   ]
+  // }
 
   const handleSchemeChange = (index) => (value) => {
     const flattenSchemes = claimableSchemes.reduce(
@@ -413,7 +422,20 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       id,
     } = schemeConfig
 
+    const _patientMinPayment =
+      patientMinCoPaymentAmountType === 'ExactAmount'
+        ? patientMinCoPaymentAmount
+        : values.finalPayable * patientMinCoPaymentAmount / 100
+
+    // let remainingCoverageMaxCap = coverageMaxCap
     let remainingCoverageMaxCap = coverageMaxCap
+    if (_patientMinPayment > 0) {
+      const isLessThanMaxCap =
+        values.finalPayable - _patientMinPayment < coverageMaxCap
+      remainingCoverageMaxCap = isLessThanMaxCap
+        ? values.finalPayable - _patientMinPayment
+        : coverageMaxCap
+    }
 
     const newInvoiceItems = getInvoiceItems(
       id,
@@ -491,7 +513,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       _isEditing: false,
       _isDeleted: false,
     }
-    _updateTempInvoicePayer(index, updatedRow)
+    const isClaimAmountValid = validateClaimAmount(updatedRow)
+
+    if (isClaimAmountValid) _updateTempInvoicePayer(index, updatedRow)
+    else toggleErrorPrompt()
   }
 
   const handleAppliedSchemeCancelClick = (index) => () => {
@@ -797,6 +822,13 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
               invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
           }))}
         />
+      </CommonModal>
+      <CommonModal
+        title='Invalid'
+        open={showErrorPrompt}
+        onClose={toggleErrorPrompt}
+      >
+        <div>Invalid amount</div>
       </CommonModal>
     </React.Fragment>
   )
