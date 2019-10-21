@@ -54,6 +54,7 @@ export default createFormViewModel({
             version,
           },
         })
+        console.log("init state")
         yield take('query/@@end')
         if (md === 'cons') {
           yield put({
@@ -66,7 +67,7 @@ export default createFormViewModel({
         }
       },
 
-      *start ({ payload }, { call, put, select }) {
+      *start ({ payload }, { call, put, select, take }) {
         const response = yield call(service.create, payload.id)
         const { id } = response
         let orders = []
@@ -79,9 +80,19 @@ export default createFormViewModel({
             },
           })
 
-          let codetableState
+          yield put({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: 'ctservice',
+              filter: {
+                'serviceFKNavigation.IsActive': true,
+                combineCondition: 'or',
+              },
+            },
+          })
+          yield take('codetable/fetchCodes/@@end')
 
-          codetableState = yield select((state) => state.codetable)
+          let codetableState = yield select((state) => state.codetable)
 
           const {
             services,
@@ -135,23 +146,9 @@ export default createFormViewModel({
               totalAfterOverallAdjustment: 0,
             }
 
-            // dispatch({
-            //   type: 'orders/upsertRow',
-            //   payload: rowRecord,
-            // })
-
             orders.push(rowRecord)
           }
-
-          console.log('rows ', orders)
-
-          // yield put({
-          //   type: 'orders/updateState',
-          //   payload: {
-          //     rows: orders,
-          //   },
-          // })
-
+          console.log("start")
           yield put({
             type: 'queryDone',
             payload: {
@@ -176,7 +173,8 @@ export default createFormViewModel({
         }
         return response
       },
-      *resume ({ payload }, { call, put }) {
+
+      *resume ({ payload }, { call, put, select,  }) {
         const response = yield call(service.resume, payload.id)
         if (response) {
           yield put({
@@ -186,6 +184,7 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
+          console.log("resume")
           yield put({
             type: 'queryDone',
             payload: {
@@ -198,6 +197,87 @@ export default createFormViewModel({
         }
         return response
       },
+      *addAutoOrder ({ payload }, { call, put, select, take }) {
+          let orders = []
+       
+          yield put({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: 'ctservice',
+              filter: {
+                'serviceFKNavigation.IsActive': true,
+                combineCondition: 'or',
+              },
+            },
+          })
+          yield take('codetable/fetchCodes/@@end')
+
+          let codetableState = yield select((state) => state.codetable)
+
+          const {
+            services,
+            serviceCenters,
+            serviceCenterServices = [],
+          } = getServices(codetableState.ctservice)
+
+          let orderList = serviceCenterServices.filter(
+            (o) => o.isAutoOrder === true && o.isDefault === true,
+          )
+
+          for (let i = 0; i < orderList.length; i++) {
+            let serviceFKValue = 0
+            let serviceCenterFKValue = 0
+            let serviceNameValue = ''
+            let adjAmountValue = 0
+
+            for (let a = 0; a < services.length; a++) {
+              if (orderList[i].displayValue === services[a].name) {
+                serviceFKValue = services[a].value
+                serviceNameValue = services[a].name
+              }
+            }
+
+            for (let b = 0; b < serviceCenters.length; b++) {
+              if (orderList[i].serviceCenter === serviceCenters[b].name) {
+                serviceCenterFKValue = serviceCenters[b].value
+              }
+            }
+
+            adjAmountValue = 0
+
+            let rowRecord = {
+              sequence: i,
+              type: '3',
+              serviceFK: serviceFKValue,
+              serviceCenterFK: serviceCenterFKValue,
+              serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
+              serviceName: serviceNameValue,
+              unitPrice: orderList[i].unitPrice,
+              total: orderList[i].unitPrice,
+              quantity: 1,
+              totalAfterItemAdjustment: orderList[i].unitPrice,
+              adjAmount: adjAmountValue,
+              remark: '',
+              subject: orderList[i].displayValue,
+              uid: getUniqueId(),
+              weightage: 0,
+              totalAfterOverallAdjustment: 0,
+            }
+
+            orders.push(rowRecord)
+          }
+          console.log("auto order")
+          yield put({
+            type: 'queryDone',
+            payload: {
+              autoOrderList: orders,
+              page: 'resume auto order',
+            },
+          })
+          
+        
+        return orders
+      },
       *edit ({ payload }, { call, put }) {
         const response = yield call(service.edit, payload.id)
         if (response) {
@@ -208,6 +288,7 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
+          console.log("edit")
           yield put({
             type: 'queryDone',
             payload: {
@@ -260,6 +341,7 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
+          console.log("edit order")
           yield put({
             type: 'queryDone',
             payload: {
@@ -295,8 +377,23 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-         // console.log('queryDone', payload)
-        const { data , autoOrderList, page} = payload
+        // console.log('queryDone', payload)
+        const { data, autoOrderList, page } = payload
+        console.log("query done +++++")
+        if((autoOrderList && page === 'resume auto order')){
+          console.log("1111 " , autoOrderList)
+          yield put({
+            type: 'orders/updateState',
+            payload: {
+              rows: _.sortBy(autoOrderList, 'sequence'),
+              finalAdjustments: [],
+            },
+          })
+  
+          yield put({
+            type: 'orders/calculateAmount',
+          })
+        }
         if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
@@ -318,7 +415,7 @@ export default createFormViewModel({
             rows: _.sortBy(cdRows, 'sequence'),
           },
         })
-
+        console.log("_________------------ ", payload)
         let oRows = []
         if (page !== 'edit order') {
           orderTypes.forEach((p) => {
@@ -337,7 +434,7 @@ export default createFormViewModel({
             )
           })
         }
-
+      
         yield put({
           type: 'orders/updateState',
           payload: {

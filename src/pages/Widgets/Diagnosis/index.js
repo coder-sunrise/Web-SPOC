@@ -54,7 +54,7 @@ const styles = (theme) => ({
 //     return diagnosis.entity ? diagnosis.entity : diagnosis.default
 //   },
 //   validationSchema: Yup.object().shape({
-//     diagnosises: Yup.array().of(
+//     corDiagnosis: Yup.array().of(
 //       Yup.object().shape({
 //         diagnosisFK: Yup.number().required(),
 //         // complication: Yup.array().of(Yup.string()).required().min(1),

@@ -127,16 +127,16 @@ class PatientDashboard extends PureComponent {
     // const { visitRegistration = {} } = this.props
     // const { visitInfo = {} } = visitRegistration
 
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctservice',
-        filter: {
-          'serviceFKNavigation.IsActive': true,
-          combineCondition: 'or',
-        },
-      },
-    })
+    // this.props.dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: {
+    //     code: 'ctservice',
+    //     filter: {
+    //       'serviceFKNavigation.IsActive': true,
+    //       combineCondition: 'or',
+    //     },
+    //   },
+    // })
 
 
     this.props.history.push(
