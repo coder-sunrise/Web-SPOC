@@ -322,7 +322,7 @@ class PatientDetail extends PureComponent {
       ? Object.prototype.hasOwnProperty.call(entity, 'id')
       : false
 
-    // console.log('************** patient profile ***********')
+  
     // console.log(this.props)
     // // console.log('patient', patient)
     // // console.log('xx', resetProps)

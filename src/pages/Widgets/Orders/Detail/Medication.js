@@ -320,7 +320,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log('kkkkk ', this.props)
     return (
       <div>
         <GridContainer>
