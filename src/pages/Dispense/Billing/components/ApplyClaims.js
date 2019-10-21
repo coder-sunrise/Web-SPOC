@@ -16,12 +16,9 @@ import {
   Select,
   Tooltip,
 } from '@/components'
-<<<<<<< Updated upstream
-=======
 // sub components
 import MaxCapInfo from './MaxCapInfo'
 import DeleteWithPopover from './DeleteWithPopover'
->>>>>>> Stashed changes
 // page modal
 import ApplicableClaims from '../modal/ApplicableClaims'
 import CoPayer from '../modal/CoPayer'
