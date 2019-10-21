@@ -55,7 +55,7 @@ const DispenseDetails = ({
               title='Prescription'
               height={200}
               columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(handleClickPrintDrugLabel)}
+                          colExtensions={PrescriptionColumnExtensions(PrescriptionColumnExtensions, viewOnly)}
               data={prescription}
             />
           </GridItem>
@@ -64,7 +64,7 @@ const DispenseDetails = ({
               title='Vaccination'
               height={150}
               columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions}
+              colExtensions={VaccinationColumnExtensions(viewOnly)}
               data={vaccination}
             />
           </GridItem>
@@ -73,7 +73,7 @@ const DispenseDetails = ({
               title='Other Orders'
               height={150}
               columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions}
+              colExtensions={OtherOrdersColumnExtensions(viewOnly)}
               data={otherOrder}
             />
           </GridItem>

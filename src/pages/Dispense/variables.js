@@ -46,22 +46,33 @@ export const PrescriptionColumns = [
   },
 ]
 
-export const PrescriptionColumnExtensions = (handleClickPrintDrugLabel) =>{
-  return([
+export const PrescriptionColumnExtensions = (handleClickPrintDrugLabel, viewOnly = false) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
     type: 'currency',
   },
-  { columnName: 'dispensedQuanity', type: 'number' },
-  { columnName: 'orderedQuantity', type: 'number' },
+  {
+    columnName: 'dispensedQuanity',
+    type: 'number',
+    render: (row) => {
+      return <p>{row.dispensedQuanity} Strips</p>
+    },
+  },
+  {
+    columnName: 'orderedQuantity',
+    type: 'number',
+    render: (row) => {
+      return <p>{row.orderedQuantity} Strips</p>
+    },
+  },
   {
     columnName: 'batchNo',
     render: (row) => {
       return (
         <FastField
           name={`prescription[${row.rowIndex}]batchNo`}
-          render={(args) => <TextField simple {...args} />}
+          render={(args) => <TextField simple text={viewOnly} {...args} />}
         />
       )
     },
@@ -74,6 +85,7 @@ export const PrescriptionColumnExtensions = (handleClickPrintDrugLabel) =>{
           name={`prescription[${row.rowIndex}]expiryDate`}
           render={(args) => (
             <DatePicker
+              text={viewOnly}
               disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
               simple
               {...args}
@@ -135,7 +147,7 @@ export const VaccinationColumn = [
   },
 ]
 
-export const VaccinationColumnExtensions = [
+export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'dispensedQuanity', type: 'number' },
   { columnName: 'unitPrice', type: 'currency' },
   {
@@ -148,7 +160,7 @@ export const VaccinationColumnExtensions = [
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
-          render={(args) => <TextField simple {...args} />}
+          render={(args) => <TextField simple text={viewOnly} {...args} />}
         />
       )
     },
@@ -162,6 +174,7 @@ export const VaccinationColumnExtensions = [
           render={(args) => (
             <DatePicker
               disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+              text={viewOnly}
               simple
               {...args}
             />
@@ -195,7 +208,7 @@ export const OtherOrdersColumns = [
   },
 ]
 
-export const OtherOrdersColumnExtensions = [
+export const OtherOrdersColumnExtensions = (viewOnly = false) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',

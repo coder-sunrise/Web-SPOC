@@ -3,12 +3,7 @@ import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-import {
-  Badge,
-  CommonTableGrid,
-  DateFormatter,
-  notification,
-} from '@/components'
+import { CommonTableGrid, DateFormatter, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
@@ -234,9 +229,7 @@ const Grid = ({
 
   const isAssignedDoctor = (row) => {
     const {
-      doctor: {
-        clinicianProfile: { doctorProfile: assignedDoctorProfile, title, name },
-      },
+      doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
       visitStatus,
     } = row
     const { clinicianProfile: { doctorProfile } } = user.data
@@ -248,14 +241,14 @@ const Grid = ({
       return false
     }
 
-    if (visitStatus === 'IN CONS') {
-      if (assignedDoctorProfile.id !== doctorProfile.id) {
-        notification.error({
-          message: `You cannot resume other doctor's consultation.`,
-        })
-        return false
-      }
-    }
+    // if (visitStatus === 'IN CONS') {
+    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
+    //     notification.error({
+    //       message: `You cannot resume other doctor's consultation.`,
+    //     })
+    //     return false
+    //   }
+    // }
 
     // if (assignedDoctorProfile.id !== doctorProfile.id) {
     //   notification.error({
@@ -331,16 +324,16 @@ const Grid = ({
         const valid = isAssignedDoctor(row)
         if (valid) {
           const version = Date.now()
-          dispatch({
-            type: 'codetable/fetchCodes',
-            payload: {
-              code: 'ctservice',
-              filter: {
-                'serviceFKNavigation.IsActive': true,
-                combineCondition: 'or',
-              },
-            },
-          })
+          // dispatch({
+          //   type: 'codetable/fetchCodes',
+          //   payload: {
+          //     code: 'ctservice',
+          //     filter: {
+          //       'serviceFKNavigation.IsActive': true,
+          //       combineCondition: 'or',
+          //     },
+          //   },
+          // })
 
           dispatch({
             type: `consultation/start`,
@@ -377,9 +370,14 @@ const Grid = ({
                 )
             })
           } else {
-            router.push(
-              `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-            )
+            dispatch({
+               type: `consultation/addAutoOrder`,
+            }).then((o) => {
+              if (o)
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                )
+            })
           }
         }
 
@@ -424,7 +422,7 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-  console.log({ queryingFormData })
+
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper

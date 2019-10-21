@@ -1,10 +1,11 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
+import { InventoryTypes } from '@/utils/codes'
+import { getUniqueId } from '@/utils/utils'
+
 const { upsert } = service
 const { queryOne } = service
-import { getUniqueId } from '@/utils/utils'
-import { InventoryTypes } from '@/utils/codes'
 
 export default createFormViewModel({
   namespace: 'schemeDetail',
@@ -130,8 +131,6 @@ export default createFormViewModel({
           )
         })
 
-        console.log('schemeDetailsResult', { ...data, rows: itemRows })
-
         return {
           ...state,
           entity: {
@@ -140,10 +139,12 @@ export default createFormViewModel({
               data.effectiveStartDate,
               data.effectiveEndDate,
             ],
-            itemGroupMaxCapacityDtoRdoValue: data.itemGroupMaxCapacityDto
-              ? 'sub'
-              : 'all',
-            itemGroupValueDtoRdoValue: data.itemGroupValueDto ? 'sub' : 'all',
+            itemGroupMaxCapacityDtoRdoValue: data.coverageMaxCap
+              ? 'all'
+              : 'sub',
+            itemGroupValueDtoRdoValue: data.overalCoPaymentValue
+              ? 'all'
+              : 'sub',
             rows: itemRows,
           },
         }
