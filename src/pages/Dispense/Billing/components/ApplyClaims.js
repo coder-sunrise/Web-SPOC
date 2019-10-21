@@ -8,14 +8,20 @@ import Delete from '@material-ui/icons/Delete'
 import {
   Button,
   CommonModal,
-  Danger,
   EditableTableGrid,
   GridContainer,
   GridItem,
   NumberInput,
+  Popover,
   Select,
   Tooltip,
 } from '@/components'
+<<<<<<< Updated upstream
+=======
+// sub components
+import MaxCapInfo from './MaxCapInfo'
+import DeleteWithPopover from './DeleteWithPopover'
+>>>>>>> Stashed changes
 // page modal
 import ApplicableClaims from '../modal/ApplicableClaims'
 import CoPayer from '../modal/CoPayer'
@@ -117,7 +123,14 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       let schemeCoverageType = 'percentage'
       let schemeCoverage = 0
       if (scheme.coPaymentByItem.length > 0) {
-        coverage = 0
+        const coPaymentItem = scheme.coPaymentByItem.find(
+          (_coPaymentItem) => _coPaymentItem.itemFk === item.id,
+        )
+
+        coverage = convertAmountToPercentOrCurrency(
+          coPaymentItem.itemValueType,
+          coPaymentItem.itemValue,
+        )
       } else if (scheme.coPaymentByCategory.length > 0) {
         const itemCategory = scheme.coPaymentByCategory.find(
           (category) => category.itemTypeFk === item.invoiceItemTypeFk,
@@ -499,7 +512,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     _updateTempInvoicePayer(index, updatedRow)
   }
 
-  const handleAppliedSchemeRemoveClick = (index) => () => {
+  const handleAppliedSchemeRemoveClick = (index) => {
     const updatedRow = { ...tempInvoicePayer[index], _isDeleted: true }
     _updateTempInvoicePayer(index, updatedRow)
   }
@@ -586,7 +599,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           Reset
         </Button>
       </GridItem>
-      <GridItem md={12} style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+      <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
           if (invoicePayer._isDeleted) return null
 
@@ -649,7 +662,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                   )}
                 </GridItem>
                 <GridItem md={1} style={{ textAlign: 'right' }}>
-                  <Tooltip title='Remove this scheme'>
+                  {/*  <Tooltip title='Remove this scheme'>
                     <Button
                       size='sm'
                       color='danger'
@@ -658,7 +671,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                     >
                       <Delete />
                     </Button>
-                  </Tooltip>
+                  </Tooltip> */}
+
+                  <DeleteWithPopover
+                    index={index}
+                    onConfirmDelete={handleAppliedSchemeRemoveClick}
+                  />
                 </GridItem>
                 <GridItem md={12}>
                   <EditableTableGrid
