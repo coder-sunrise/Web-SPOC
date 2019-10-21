@@ -66,15 +66,26 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'Diagnosis',
 // })
-@connect(({ diagnosis, components }) => ({
+@connect(({ diagnosis, components, codetable }) => ({
   diagnosis,
   components,
+  codetable,
 }))
 class Diagnosis extends PureComponent {
   // constructor (props) {
   //   super(props)
   //   // console.log(this.state, props)
   // }
+
+  componentDidMount () {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctComplication',
+      },
+    })
+  }
 
   componentWillReceiveProps (nextProps) {
     if (
@@ -102,6 +113,7 @@ class Diagnosis extends PureComponent {
 
   render () {
     const { theme, components, diagnosis } = this.props
+
     return (
       <div>
         <FieldArray
@@ -114,13 +126,12 @@ class Diagnosis extends PureComponent {
             this.arrayHelpers = arrayHelpers
             // if (!values || !values.corDiagnosis) return null
 
-            if(values.corDiagnosis.length <= 0){
-               diagnosises = diagnosis.default.corDiagnosis
-            }else{
-               diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            if (values.corDiagnosis.length <= 0) {
+              diagnosises = diagnosis.default.corDiagnosis
+            } else {
+              diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             }
 
-            
             if (diagnosises.length === 0) {
               // if(!values.disabled)
               if (components.ConsultationPage.edit) {
@@ -133,6 +144,7 @@ class Diagnosis extends PureComponent {
                 <div key={v.uid}>
                   <Item
                     {...this.props}
+                    ctCompilation={this.props.codetable}
                     index={i}
                     arrayHelpers={arrayHelpers}
                     diagnosises={diagnosises}

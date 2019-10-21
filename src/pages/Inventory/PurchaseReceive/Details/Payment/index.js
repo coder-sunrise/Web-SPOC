@@ -42,34 +42,37 @@ const styles = (theme) => ({
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history } = props
     const { purchaseOrderPayment, currentBizSessionInfo } = values
-    let paymentData = purchaseOrderPayment.map((x, index) => {
-      x.isCancelled = x.isDeleted
-      // delete x.isDeleted
 
-      if (_.has(x, 'isNew')) {
+    let paymentData = purchaseOrderPayment
+      .filter((item) => !item.isDeleted)
+      .map((x, index) => {
+        x.isCancelled = x.isDeleted
+        delete x.isDeleted
+
+        if (_.has(x, 'isNew')) {
+          return {
+            purchaseOrderFK: values.id,
+            sequence: index + 1,
+            clinicPaymentDto: {
+              ...x,
+              id: x.cpId,
+              concurrencyToken: x.cpConcurrencyToken,
+              createdOnBizSessionFK: currentBizSessionInfo.id,
+              clinicPaymentTypeFK: 1,
+              transactionOnBizSessionFK: currentBizSessionInfo.id,
+              // isCancelled: x.isCancelled,
+            },
+          }
+        }
+
         return {
-          purchaseOrderFK: values.id,
-          sequence: index + 1,
+          ...x,
           clinicPaymentDto: {
-            ...x,
-            id: x.cpId,
-            concurrencyToken: x.cpConcurrencyToken,
-            createdOnBizSessionFK: currentBizSessionInfo.id,
-            clinicPaymentTypeFK: 1,
-            transactionOnBizSessionFK: currentBizSessionInfo.id,
+            ...x.clinicPaymentDto,
             // isCancelled: x.isCancelled,
           },
         }
-      }
-
-      return {
-        ...x,
-        clinicPaymentDto: {
-          ...x.clinicPaymentDto,
-          // isCancelled: x.isCancelled,
-        },
-      }
-    })
+      })
 
     dispatch({
       type: 'podoPayment/upsertPodoPayment',

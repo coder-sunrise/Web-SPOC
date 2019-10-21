@@ -61,6 +61,7 @@ class Memo extends PureComponent {
       loadFromCodes,
       parentProps,
       templateLoader,
+      currentType,
     } = this.props
     // console.log(this.props.values, this.props.dirty, this.props)
 
@@ -106,7 +107,7 @@ class Memo extends PureComponent {
           </GridItem>
 
           <GridItem xs={12} className={classes.editor}>
-            {templateLoader(this.editorReferece, setFieldValue)}
+            {templateLoader(this.editorReferece, setFieldValue, currentType)}
             <FastField
               name='content'
               render={(args) => {

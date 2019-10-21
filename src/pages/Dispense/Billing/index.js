@@ -24,6 +24,7 @@ import InvoiceSummary from './components/InvoiceSummary'
 import model from '../models/billing'
 // utils
 import { getAppendUrl } from '@/utils/utils'
+import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 window.g_app.replaceModel(model)
 
@@ -49,10 +50,11 @@ const bannerStyle = {
   loading,
 }))
 @withFormikExtend({
+  displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     if (billing.entity) {
-      return { ...billing.entity, payment: { paymentModes: [] } }
+      return { ...billing.entity, payments: [] }
     }
     return billing.default
   },
@@ -63,28 +65,61 @@ const bannerStyle = {
       visitId,
       invoice,
       invoicePayers,
-      payment,
+      payments,
     } = values
+
+    const { invoiceItems, ...restInvoice } = invoice
 
     const payload = {
       concurrencyToken,
       visitId,
-      invoice,
-      payment,
-      invoicePayers: invoicePayers.map((payer) => ({
-        ...payer,
-        invoicePayerItems: payer.invoicePayerItems.map((item) => ({
-          ...item,
-          payableBalance: item.totalAfterGst,
-        })),
-      })),
+      payments,
+      invoice: restInvoice,
+      invoicePayers: invoicePayers.map((payer, index) => {
+        const { claimableSchemes, ...restPayer } = payer
+        const _payer = {
+          ...restPayer,
+          sequence: index,
+          invoicePayerItems: payer.invoicePayerItems
+            .filter((item) => item.claimAmount > 0)
+            .map((item) => {
+              const {
+                _claimedAmount,
+                disabled,
+                itemCode,
+                rowIndex,
+                notClaimableBySchemeIds,
+                invoiceItemTypeFk,
+                itemDescription,
+                coverage,
+                totalAfterGst,
+                id,
+                ...restItem
+              } = item
+              const _invoicePayerItem = {
+                ...restItem,
+                invoiceItemFK: id,
+                payableBalance: totalAfterGst,
+                itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFk],
+                itemName: itemDescription,
+              }
+              return _invoicePayerItem
+            }),
+        }
+        return _payer
+      }),
     }
-    console.log({ values, payload })
     dispatch({
       type: 'billing/upsert',
       payload,
     }).then((response) => {
-      console.log({ response })
+      const { status } = response
+      if (status === '200') {
+        resetForm()
+        dispatch({
+          type: 'billing/closeModal',
+        })
+      }
     })
   },
 })
@@ -117,7 +152,11 @@ class Billing extends Component {
 
   handleAddPayment = (payment) => {
     const { setFieldValue } = this.props
-    setFieldValue('payment', payment)
+    const { outstandingBalance, ...rest } = payment
+    setFieldValue('payments', [
+      rest,
+    ])
+    setFieldValue('invoice.outstandingBalance', outstandingBalance)
     this.toggleAddPaymentModal()
   }
 
@@ -131,6 +170,33 @@ class Billing extends Component {
 
   handleIsEditing = (editing) => {
     this.setState({ isEditing: editing })
+  }
+
+  shouldDisableCompletePayment = () => {
+    const { values } = this.props
+    const { invoicePayers, finalPayable, payments = [] } = values
+
+    if (payments.length === 0) return true
+
+    if (invoicePayers.length === 0) return false
+
+    const minPatientPaymentAmount = invoicePayers.reduce((minAmt, payer) => {
+      const { _patientMinPayable, _patientMinPayableType } = payer
+      const amount =
+        _patientMinPayableType === 'ExactAmount'
+          ? _patientMinPayable
+          : finalPayable * _patientMinPayable / 100
+
+      if (amount <= minAmt) return amount
+
+      return minAmt
+    }, 999)
+
+    const totalPayment = payments[0].totalAmtPaid
+
+    if (totalPayment < minPatientPaymentAmount) return true
+
+    return false
   }
 
   render () {
@@ -147,7 +213,7 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-    // console.log({ values })
+
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -203,7 +269,11 @@ class Billing extends Component {
           </Button>
           <Button
             color='primary'
-            disabled={this.state.isEditing || values.id === undefined}
+            disabled={
+              this.state.isEditing ||
+              values.id === undefined ||
+              this.shouldDisableCompletePayment()
+            }
             onClick={handleSubmit}
           >
             Complete Payment

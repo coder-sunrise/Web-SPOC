@@ -14,9 +14,7 @@ export default createFormViewModel({
     service,
     state: {
       default: {
-        payment: {
-          paymentModes: [],
-        },
+        payments: [],
         invoice: {
           invoiceNo: '',
           invoiceRemark: '',
