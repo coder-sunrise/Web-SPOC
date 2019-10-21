@@ -149,7 +149,7 @@ class Dispense extends PureComponent {
           const base64Result = arrayBufferToBase64(result)
           if(this.iswsConnect == true)
           {
-            this.wsConnection.send(base64Result)
+            this.wsConnection.send('["' + base64Result + '"]')
           }
           else
           {
