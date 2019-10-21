@@ -22,6 +22,16 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
+        if (pathname === '/finance/deposit') {
+          dispatch({
+            type: 'deposit/query',
+            payload: {
+              apiCriteria: {
+                OnlyWithDeposit: false,
+              },
+            },
+          })
+        }
       })
     },
     effects: {

@@ -133,7 +133,7 @@ export const PurchaseReceiveGridCol = [
   { name: 'totalAmount', title: 'Total' },
   { name: 'outstanding', title: 'Outstanding' },
   { name: 'invoiceStatus', title: 'Inv. Status' },
-  { name: 'remarks', title: 'Remarks' },
+  { name: 'remark', title: 'Remarks' },
   { name: 'action', title: 'Action' },
 ]
 

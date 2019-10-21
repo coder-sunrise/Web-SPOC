@@ -620,7 +620,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryVaccinationFK',
         type: 'select',
-        labelField: 'code',
+        labelField: 'name',
         options: vaccinationList,
         onChange: handleItemOnChange,
       },
@@ -653,7 +653,7 @@ const InventoryTypeListing = ({
       {
         columnName: 'inventoryConsumableFK',
         type: 'select',
-        labelField: 'code',
+        labelField: 'name',
         options: consumableList,
         onChange: handleItemOnChange,
       },

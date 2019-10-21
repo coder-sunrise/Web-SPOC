@@ -52,8 +52,20 @@ export const PrescriptionColumnExtensions = (viewOnly = false) => [
     columnName: 'totalPrice',
     type: 'currency',
   },
-  { columnName: 'dispensedQuanity', type: 'number' },
-  { columnName: 'orderedQuantity', type: 'number' },
+  {
+    columnName: 'dispensedQuanity',
+    type: 'number',
+    render: (row) => {
+      return <p>{row.dispensedQuanity} Strips</p>
+    },
+  },
+  {
+    columnName: 'orderedQuantity',
+    type: 'number',
+    render: (row) => {
+      return <p>{row.orderedQuantity} Strips</p>
+    },
+  },
   {
     columnName: 'batchNo',
     render: (row) => {

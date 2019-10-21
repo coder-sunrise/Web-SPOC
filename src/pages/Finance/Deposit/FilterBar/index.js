@@ -43,7 +43,7 @@ const styles = (theme) => ({
 })
 class FilterBar extends PureComponent {
   render () {
-    const { classes, dispatch, theme } = this.props
+    const { classes, dispatch, theme, queryDepositListing } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -150,13 +150,16 @@ class FilterBar extends PureComponent {
                 variant='contained'
                 color='primary'
                 onClick={() => {
-                  this.props.history.push(
-                    getAppendUrl({
-                      md: 'pt',
-                      cmt: '1',
-                      new: 1,
-                    }),
-                  )
+                  this.props.dispatch({
+                    type: 'patient/openPatientModal',
+                    payload: {
+                      callback: () => {
+                        this.props.dispatch({
+                          type: 'patient/closePatientModal',
+                        })
+                      },
+                    },
+                  })
                 }}
               >
                 <PermIdentity />
