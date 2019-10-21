@@ -18,15 +18,13 @@ import { Button, Danger, GridContainer, GridItem } from '@/components'
 // utils
 import {
   arrayBufferToBase64,
-  fetchReport,
   BASE64_MARKER,
   minScale,
   maxScale,
   defaultScreenSize,
 } from './utils'
 // services
-import { downloadFile } from '@/services/file'
-import { getPDF } from '@/services/report'
+import { getPDF, exportPdfReport, exportExcelReport } from '@/services/report'
 // styles
 import styles from './styles'
 
@@ -104,16 +102,21 @@ const ReportViewer = ({
     printJS({ printable: pdfData, type: 'pdf', base64: true })
 
   const onExportClick = async ({ key }) => {
-    let result
-    let fileName = 'test'
-    let fileExtension = '.pdf'
+    // let result
+    // const fileName = REPORT_TYPE[reportID] || 'Report'
+    // let fileExtension = '.pdf'
+
+    // if (result) {
+    //   const base64Result = arrayBufferToBase64(result)
+    //   downloadFile(base64Result, `${fileName}${fileExtension}`)
+    // }
+
     if (key === 'export-excel') {
-      result = await fetchReport('excel', true)
-      fileExtension = '.xls'
+      exportExcelReport(reportID, reportParameters)
+      // fileExtension = '.xls'
     } else {
-      result = await fetchReport('', true)
+      exportPdfReport(reportID, reportParameters)
     }
-    downloadFile(result, `${fileName}${fileExtension}`)
   }
 
   const onPageNumberChange = (value) => {
@@ -234,7 +237,7 @@ const ReportViewer = ({
         )}
         {showError && (
           <Danger>
-            <h3>Failed to load report</h3>
+            <h3 style={{ fontWeight: 500 }}>Failed to load report</h3>
           </Danger>
         )}
       </div>
