@@ -3,12 +3,7 @@ import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-import {
-  Badge,
-  CommonTableGrid,
-  DateFormatter,
-  notification,
-} from '@/components'
+import { CommonTableGrid, DateFormatter, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
@@ -234,9 +229,7 @@ const Grid = ({
 
   const isAssignedDoctor = (row) => {
     const {
-      doctor: {
-        clinicianProfile: { doctorProfile: assignedDoctorProfile, title, name },
-      },
+      doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
       visitStatus,
     } = row
     const { clinicianProfile: { doctorProfile } } = user.data
@@ -429,7 +422,7 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-  console.log({ queryingFormData })
+
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper
