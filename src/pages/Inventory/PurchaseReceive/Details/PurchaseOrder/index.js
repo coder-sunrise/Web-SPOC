@@ -8,7 +8,9 @@ import {
   GridContainer,
   GridItem,
   ProgressButton,
+  CommonModal,
 } from '@/components'
+import { ReportViewer } from '@/components/_medisys'
 import POForm from './POForm'
 import POGrid from './POGrid'
 // import POSummary from './POSummary'
@@ -45,6 +47,7 @@ class index extends Component {
   state = {
     settingGSTEnable: false,
     settingGSTPercentage: 0,
+    showReport: false,
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -140,9 +143,9 @@ class index extends Component {
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           processedPayload = this.processSubmitPayload(false, 6)
           break
-        case poSubmitAction.PRINT:
-          //
-          break
+        // case poSubmitAction.PRINT:
+        //   this.toggleReport()
+        //   break
         default:
         // case block
       }
@@ -403,6 +406,12 @@ class index extends Component {
     setFieldValue('purchaseOrderAdjustment', adjustmentList)
   }
 
+  toggleReport = () => {
+    this.setState((preState) => ({
+      showReport: !preState.showReport,
+    }))
+  }
+
   render () {
     // console.log('PORender', this.props)
     const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
@@ -490,16 +499,26 @@ class index extends Component {
             ''
           )}
 
-          <ProgressButton
-            color='info'
-            icon={null}
-            onClick={() => this.onSubmitButtonClicked(poSubmitAction.PRINT)}
-          >
+          <ProgressButton color='info' icon={null} onClick={this.toggleReport}>
             {formatMessage({
               id: 'inventory.pr.detail.print',
             })}
           </ProgressButton>
         </GridContainer>
+
+        <CommonModal
+          open={this.state.showReport}
+          onClose={this.toggleReport}
+          title='Purchase Order'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={26}
+            reportParameters={{
+              PurchaseOrderId: values ? values.id : '',
+            }}
+          />
+        </CommonModal>
       </div>
     )
   }
