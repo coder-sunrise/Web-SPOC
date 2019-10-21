@@ -1,6 +1,8 @@
 import React, { memo, useMemo } from 'react'
 // custom components
-import { Tooltip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
+// components
+import { Tooltip } from '@/components'
 // medisys component
 import { GridContextMenuButton as GridButton } from '@/components/_medisys'
 import {

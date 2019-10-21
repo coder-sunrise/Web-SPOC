@@ -6,6 +6,8 @@ export const rounding = (config, amount) => {
   let returnAmount = Math.floor(amount)
   let cents = roundToTwoDecimals(amount % 1)
 
+  if (cents === 0) return returnAmount + cents
+
   const { currencyRounding, currencyRoundingToTheClosest = 0.0 } = config
   const roundingPoint = parseFloat(currencyRoundingToTheClosest)
 

@@ -40,6 +40,7 @@ const Filterbar = ({
   selfOnly,
   user,
   setSearch,
+  loading,
 }) => {
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
 
@@ -86,6 +87,7 @@ const Filterbar = ({
             color='primary'
             size='sm'
             onClick={toggleNewPatient}
+            disabled={loading.global}
           >
             <Hidden mdDown>
               <PersonAdd />
@@ -122,9 +124,10 @@ const Filterbar = ({
   )
 }
 
-const connectedFilterbar = connect(({ queueLog, user }) => ({
+const connectedFilterbar = connect(({ queueLog, user, loading }) => ({
   selfOnly: queueLog.selfOnly,
   user: user.data,
+  loading,
 }))(Filterbar)
 
 const FilterbarWithFormik = withFormik({

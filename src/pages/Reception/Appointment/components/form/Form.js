@@ -80,7 +80,11 @@ class Form extends React.PureComponent {
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: false,
-    editingRows: [],
+    editingRows: !this.props.values.id
+      ? [
+          -99,
+        ]
+      : [],
     _tempCallback: undefined,
   }
 
@@ -663,6 +667,7 @@ class Form extends React.PureComponent {
       showSeriesUpdateConfirmation,
       showRescheduleForm,
       datagrid,
+      editingRows,
     } = this.state
 
     const { currentAppointment = {} } = values
@@ -737,6 +742,7 @@ class Form extends React.PureComponent {
                   data={_datagrid}
                   handleCommitChanges={this.onCommitChanges}
                   handleEditingRowsChange={this.onEditingRowsChange}
+                  editingRows={editingRows}
                 />
               </GridItem>
 

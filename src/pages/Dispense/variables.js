@@ -46,7 +46,7 @@ export const PrescriptionColumns = [
   },
 ]
 
-export const PrescriptionColumnExtensions = [
+export const PrescriptionColumnExtensions = (viewOnly = false) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
@@ -60,7 +60,7 @@ export const PrescriptionColumnExtensions = [
       return (
         <FastField
           name={`prescription[${row.rowIndex}]batchNo`}
-          render={(args) => <TextField simple {...args} />}
+          render={(args) => <TextField simple text={viewOnly} {...args} />}
         />
       )
     },
@@ -73,6 +73,7 @@ export const PrescriptionColumnExtensions = [
           name={`prescription[${row.rowIndex}]expiryDate`}
           render={(args) => (
             <DatePicker
+              text={viewOnly}
               disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
               simple
               {...args}
@@ -129,7 +130,7 @@ export const VaccinationColumn = [
   },
 ]
 
-export const VaccinationColumnExtensions = [
+export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'dispensedQuanity', type: 'number' },
   { columnName: 'unitPrice', type: 'currency' },
   {
@@ -142,7 +143,7 @@ export const VaccinationColumnExtensions = [
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
-          render={(args) => <TextField simple {...args} />}
+          render={(args) => <TextField simple text={viewOnly} {...args} />}
         />
       )
     },
@@ -156,6 +157,7 @@ export const VaccinationColumnExtensions = [
           render={(args) => (
             <DatePicker
               disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+              text={viewOnly}
               simple
               {...args}
             />
@@ -189,7 +191,7 @@ export const OtherOrdersColumns = [
   },
 ]
 
-export const OtherOrdersColumnExtensions = [
+export const OtherOrdersColumnExtensions = (viewOnly = false) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
