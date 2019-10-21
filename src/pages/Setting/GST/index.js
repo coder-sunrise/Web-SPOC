@@ -2,7 +2,6 @@ import React, { PureComponent, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles, Divider, Tooltip } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import {  WarningSnackbar } from 'medisys-components'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
 
@@ -16,6 +15,7 @@ import {
   CardContainer,
   TextField,
   Button,
+  WarningSnackbar,
 } from '@/components'
 
 import { navigateDirtyCheck } from '@/utils/utils'

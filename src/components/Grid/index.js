@@ -102,6 +102,7 @@ const dateFormatLong = 'DD MMM YYYY'
 const dateFormat = 'DD-MM-YYYY'
 const dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
 const dateFormatLongWithTime = 'DD MMM YYYY HH:mm:ss'
+const dateFormatLongWithTimeNoSec = 'DD MMM YYYY, HH:mmA'
 // const timeFormat = 'HH:mm:ss'
 const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm a'
@@ -177,6 +178,7 @@ module.exports = {
   dateFormat,
   dateFormatWithTime,
   dateFormatLongWithTime,
+  dateFormatLongWithTimeNoSec,
   dateFormatLong,
   fullDateTime,
   serverDateFormat,

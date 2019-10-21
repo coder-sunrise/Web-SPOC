@@ -161,7 +161,7 @@ class GlobalModalContainer extends PureComponent {
         <CommonModal
           open={global.showBillingPanel}
           title='Billing'
-          observe='Billing'
+          observe='BillingForm'
           authority='billing'
           bodyNoPadding
           onClose={(e) => {

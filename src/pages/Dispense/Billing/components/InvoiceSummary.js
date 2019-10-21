@@ -96,18 +96,20 @@ const InvoiceSummary = ({
           <h4 style={{ fontWeight: 500 }}>Payment</h4>
           <GridContainer justify='space-between'>
             <GridItem container md={12}>
-              {payments.map((item) => (
-                <React.Fragment>
-                  <GridItem md={6}>
-                    <h5>{item.paymentModes[0].paymentMode}</h5>
-                  </GridItem>
-                  <GridItem md={6} className={classes.rightAlign}>
-                    <h5 className={classes.currencyValue}>
-                      $ {parseToTwoDecimalString(item.paymentModes[0].amt)}
-                    </h5>
-                  </GridItem>
-                </React.Fragment>
-              ))}
+              {payments.map((item) =>
+                item.paymentModes.map((payment) => (
+                  <React.Fragment>
+                    <GridItem md={6}>
+                      <h5>{payment.paymentMode}</h5>
+                    </GridItem>
+                    <GridItem md={6} className={classes.rightAlign}>
+                      <h5 className={classes.currencyValue}>
+                        $ {parseToTwoDecimalString(payment.amt)}
+                      </h5>
+                    </GridItem>
+                  </React.Fragment>
+                )),
+              )}
             </GridItem>
             <GridItem md={12}>
               <Divider

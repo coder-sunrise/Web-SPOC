@@ -50,6 +50,7 @@ const bannerStyle = {
   loading,
 }))
 @withFormikExtend({
+  displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     if (billing.entity) {
@@ -108,12 +109,17 @@ const bannerStyle = {
         return _payer
       }),
     }
-    console.log({ values, payload })
     dispatch({
       type: 'billing/upsert',
       payload,
     }).then((response) => {
-      console.log({ response })
+      const { status } = response
+      if (status === '200') {
+        resetForm()
+        dispatch({
+          type: 'billing/closeModal',
+        })
+      }
     })
   },
 })
@@ -146,14 +152,11 @@ class Billing extends Component {
 
   handleAddPayment = (payment) => {
     const { setFieldValue } = this.props
-    const { paymentModes = [], cashRounding, ...rest } = payment
-    const payments = paymentModes.map((paymentMode) => ({
-      paymentModes: [
-        { ...paymentMode, cashRounding },
-      ],
-      ...rest,
-    }))
-    setFieldValue('payments', payments)
+    const { outstandingBalance, ...rest } = payment
+    setFieldValue('payments', [
+      rest,
+    ])
+    setFieldValue('invoice.outstandingBalance', outstandingBalance)
     this.toggleAddPaymentModal()
   }
 
@@ -167,6 +170,33 @@ class Billing extends Component {
 
   handleIsEditing = (editing) => {
     this.setState({ isEditing: editing })
+  }
+
+  shouldDisableCompletePayment = () => {
+    const { values } = this.props
+    const { invoicePayers, finalPayable, payments = [] } = values
+
+    if (payments.length === 0) return true
+
+    if (invoicePayers.length === 0) return false
+
+    const minPatientPaymentAmount = invoicePayers.reduce((minAmt, payer) => {
+      const { _patientMinPayable, _patientMinPayableType } = payer
+      const amount =
+        _patientMinPayableType === 'ExactAmount'
+          ? _patientMinPayable
+          : finalPayable * _patientMinPayable / 100
+
+      if (amount <= minAmt) return amount
+
+      return minAmt
+    }, 999)
+
+    const totalPayment = payments[0].totalAmtPaid
+
+    if (totalPayment < minPatientPaymentAmount) return true
+
+    return false
   }
 
   render () {
@@ -183,7 +213,7 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-    console.log({ values })
+
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -239,7 +269,11 @@ class Billing extends Component {
           </Button>
           <Button
             color='primary'
-            disabled={this.state.isEditing || values.id === undefined}
+            disabled={
+              this.state.isEditing ||
+              values.id === undefined ||
+              this.shouldDisableCompletePayment()
+            }
             onClick={handleSubmit}
           >
             Complete Payment

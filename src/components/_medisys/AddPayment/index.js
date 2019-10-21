@@ -33,7 +33,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
     )
 
     return {
-      outstandingAfterPayment: 0,
+      outstandingAfterPayment: collectableAmount,
       cashReturned: 0,
       cashReceived: 0,
       paymentList: [],
@@ -124,6 +124,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       cashReceived,
       cashReturned,
       totalAmtPaid,
+      collectableAmount,
     } = values
     const returnValue = {
       paymentModes: paymentList.map((payment, index) => ({
@@ -131,6 +132,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
         sequence: index,
         id: undefined,
       })),
+      outstandingBalance: collectableAmount - totalAmtPaid,
       cashRounding,
       cashReceived,
       cashReturned,
