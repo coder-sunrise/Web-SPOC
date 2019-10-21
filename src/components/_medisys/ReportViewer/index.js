@@ -14,9 +14,10 @@ import ZoomOut from '@material-ui/icons/ZoomOut'
 import Down from '@material-ui/icons/ArrowDropDown'
 import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem, NumberInput } from '@/components'
+import { Button, Danger, GridContainer, GridItem } from '@/components'
 // utils
 import {
+  arrayBufferToBase64,
   fetchReport,
   BASE64_MARKER,
   minScale,
@@ -25,12 +26,18 @@ import {
 } from './utils'
 // services
 import { downloadFile } from '@/services/file'
+import { getPDF } from '@/services/report'
 // styles
 import styles from './styles'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
-const ReportViewer = ({ classes, showTopDivider = true }) => {
+const ReportViewer = ({
+  reportID,
+  reportParameters = {},
+  classes,
+  showTopDivider = true,
+}) => {
   const [
     scale,
     setScale,
@@ -55,9 +62,27 @@ const ReportViewer = ({ classes, showTopDivider = true }) => {
     setNumOfPages,
   ] = useState(1)
 
+  const [
+    showError,
+    setShowError,
+  ] = useState(false)
+
   useEffect(() => {
     setScreenSize({ height: window.innerHeight, width: window.innerWidth })
-    fetchReport().then((result) => setPdfData(result))
+    // fetchReport().then((result) => setPdfData(result))
+    getPDF(reportID, reportParameters).then((result) => {
+      if (result) {
+        const base64Result = arrayBufferToBase64(result)
+        setPdfData(base64Result)
+      } else {
+        setShowError(true)
+      }
+    })
+    return () => {
+      // clean up, invoke on unmounting
+      setPdfData(undefined)
+      setShowError(false)
+    }
   }, [])
 
   const zoom = (type) => () => {
@@ -70,10 +95,14 @@ const ReportViewer = ({ classes, showTopDivider = true }) => {
   const changePage = (offset) => setPageNumber(pageNumber + offset)
 
   const onDocumentLoadSuccess = ({ numPages }) => setNumOfPages(numPages)
+
   const onPreviousClick = () => changePage(-1)
+
   const onNextClick = () => changePage(1)
+
   const onPrintClick = () =>
     printJS({ printable: pdfData, type: 'pdf', base64: true })
+
   const onExportClick = async ({ key }) => {
     let result
     let fileName = 'test'
@@ -180,7 +209,7 @@ const ReportViewer = ({ classes, showTopDivider = true }) => {
         </GridItem>
       </GridContainer>
       <div className={classes.reportContainer}>
-        {pdfData ? (
+        {pdfData && (
           <Document
             // renderMode='svg'
             file={pdfData ? `${BASE64_MARKER}${pdfData}` : ''}
@@ -195,11 +224,18 @@ const ReportViewer = ({ classes, showTopDivider = true }) => {
               scale={1.25}
             />
           </Document>
-        ) : (
+        )}
+        {!pdfData &&
+        !showError && (
           <React.Fragment>
             <CircularProgress />
             <h5>Loading report...</h5>
           </React.Fragment>
+        )}
+        {showError && (
+          <Danger>
+            <h3>Failed to load report</h3>
+          </Danger>
         )}
       </div>
     </div>

@@ -53,7 +53,7 @@ const styles = () => ({
 class AppointmentDataGrid extends React.Component {
   constructor (props) {
     super(props)
-    const { appointmentDate } = this.props
+    const { appointmentDate, data } = this.props
     const columnExtensions = AppointmentDataColExtensions.map((column) => {
       if (column.columnName === 'isPrimaryClinician') {
         return {
@@ -164,7 +164,9 @@ class AppointmentDataGrid extends React.Component {
       handleCommitChanges,
       disabled,
       handleEditingRowsChange,
+      editingRows,
     } = this.props
+
     return (
       <div className={classes.container}>
         <EditableTableGrid
@@ -186,6 +188,7 @@ class AppointmentDataGrid extends React.Component {
             messages: {
               deleteCommand: 'Delete appointment slot',
             },
+            editingRowIds: editingRows,
             showAddCommand: !disabled,
             showEditCommand: !disabled,
             showDeleteCommand: !disabled && data.length !== 1,

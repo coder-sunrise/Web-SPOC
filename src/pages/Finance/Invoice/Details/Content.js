@@ -4,7 +4,8 @@ import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import Printer from '@material-ui/icons/Print'
 // common components
-import { Button, Tabs } from '@/components'
+import { Button, CommonModal, Tabs } from '@/components'
+import { ReportViewer } from '@/components/_medisys'
 // sub components
 import InvoiceDetails from './InvoiceDetails'
 import PaymentDetails from './PaymentDetails'
@@ -24,11 +25,6 @@ const Content = ({ classes, ...restProps }) => {
     active,
     setActive,
   ] = useState('1')
-
-  const invoiceButtonClass = classnames({
-    [classes.printInvoiceBtn]: true,
-    [classes.hidden]: active !== 0,
-  })
 
   const isInvoiceCurrentBizSession = () => {
     if (currentBizSessionFK && invoiceBizSessionFK) {
@@ -80,9 +76,6 @@ const Content = ({ classes, ...restProps }) => {
         onChange={(e) => setActive(e)}
         options={InvoicePaymentTabOption()}
       />
-      <Button className={invoiceButtonClass} size='sm' color='primary' icon>
-        <Printer />Print Invoice
-      </Button>
     </React.Fragment>
   )
 }
