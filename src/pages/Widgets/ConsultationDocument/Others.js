@@ -67,6 +67,7 @@ class Others extends PureComponent {
       classes,
       consultationDocument,
       templateLoader,
+      currentType,
       rowHeight,
       setFieldValue,
     } = this.props
@@ -108,7 +109,7 @@ class Others extends PureComponent {
             />
           </GridItem>
           <GridItem xs={12} className={classes.editor}>
-            {templateLoader(this.editorReferece, setFieldValue)}
+            {templateLoader(this.editorReferece, setFieldValue, currentType)}
 
             <FastField
               name='content'

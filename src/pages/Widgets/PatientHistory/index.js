@@ -298,7 +298,10 @@ class PatientHistory extends Component {
     const { selectedSubRow } = patientHistory
 
     let newArray = []
-    if (clinicSettings.settings.ShowConsultationVersioning === false || clinicSettings.settings.ShowConsultationVersioning === undefined) {
+    if (
+      clinicSettings.settings.ShowConsultationVersioning === false ||
+      clinicSettings.settings.ShowConsultationVersioning === undefined
+    ) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
       }
@@ -488,7 +491,7 @@ class PatientHistory extends Component {
               allValue='0'
               // prefix='Filter By'
               mode='multiple'
-             // maxTagCount={4}
+              // maxTagCount={4}
               options={[
                 { name: 'Chief Complaints', value: '1' },
                 { name: 'Plan', value: '2' },
@@ -510,18 +513,20 @@ class PatientHistory extends Component {
                 style={{ marginLeft: theme.spacing(2) }}
                 size='sm'
                 onClick={() => {
-                    dispatch({
-                      type: `consultation/edit`,
-                      payload: {
-                        id: selected.id,
-                        version: patientHistory.version,
-                      },
-                    }).then((o) => {
-                      if (o)
-                        router.push(
-                          `/reception/queue/patientdashboard?qid=${findGetParameter('qid')}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                        )
-                    })
+                  dispatch({
+                    type: `consultation/edit`,
+                    payload: {
+                      id: selected.id,
+                      version: patientHistory.version,
+                    },
+                  }).then((o) => {
+                    if (o)
+                      router.push(
+                        `/reception/queue/patientdashboard?qid=${findGetParameter(
+                          'qid',
+                        )}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                      )
+                  })
                 }}
               >
                 Edit Consultation
@@ -603,7 +608,8 @@ class PatientHistory extends Component {
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? (clinicSettings.settings.ShowConsultationVersioning === false || clinicSettings.settings.ShowConsultationVersioning === undefined)? (
+          0 ? clinicSettings.settings.ShowConsultationVersioning === false ||
+          clinicSettings.settings.ShowConsultationVersioning === undefined ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
             <Accordion

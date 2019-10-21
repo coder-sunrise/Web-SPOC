@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import { CardContainer, Tabs, withFormikExtend } from '@/components'
-import { formatMessage } from 'umi/locale'
 import { PurchaseReceiveDetailOption, isPOStatusDraft } from '../variables'
 
 @connect(({ purchaseOrderDetails }) => ({
@@ -34,7 +33,7 @@ class index extends Component {
 
     return null
   }
-  
+
   componentDidMount () {
     const { purchaseOrderDetails } = this.props
     const { id, type } = purchaseOrderDetails

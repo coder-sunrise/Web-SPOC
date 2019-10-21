@@ -114,6 +114,7 @@ const Filterbar = ({
         container
         justify='flex-end'
         alignItems='center'
+        style={{ paddingRight: 0 }}
       >
         <StatusFilterButton />
       </GridItem>

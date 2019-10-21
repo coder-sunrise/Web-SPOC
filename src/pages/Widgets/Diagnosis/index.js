@@ -110,7 +110,7 @@ class Diagnosis extends PureComponent {
       uid: getUniqueGUID(),
     })
   }
-  
+
   render () {
     const { theme, components, diagnosis } = this.props
     return (
@@ -125,13 +125,12 @@ class Diagnosis extends PureComponent {
             this.arrayHelpers = arrayHelpers
             // if (!values || !values.corDiagnosis) return null
 
-            if(values.corDiagnosis.length <= 0){
-               diagnosises = diagnosis.default.corDiagnosis
-            }else{
-               diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            if (values.corDiagnosis.length <= 0) {
+              diagnosises = diagnosis.default.corDiagnosis
+            } else {
+              diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             }
 
-            
             if (diagnosises.length === 0) {
               // if(!values.disabled)
               if (components.ConsultationPage.edit) {
