@@ -64,6 +64,12 @@ const styles = (theme) => ({
     fontWeight: 500,
     color: 'darkblue',
   },
+  errorPromptContainer: {
+    textAlign: 'center',
+    '& p': {
+      fontSize: '1rem',
+    },
+  },
 })
 
 const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
@@ -76,7 +82,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   const [
     errorMessage,
     setErrorMessage,
-  ] = useState('')
+  ] = useState([])
 
   const [
     initialState,
@@ -266,7 +272,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
   const toggleErrorPrompt = () => {
-    if (showErrorPrompt) setErrorMessage('')
+    if (showErrorPrompt) setErrorMessage([])
     setShowErrorPrompt(!showErrorPrompt)
   }
 
@@ -366,6 +372,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
 
     const updatedRow = {
       ...tempInvoicePayer[index],
+      schemeConfig,
       _coverageMaxCap: coverageMaxCap,
       _balance: balance,
       _patientMinPayable: patientMinCoPaymentAmount,
@@ -433,15 +440,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       _isEditing: false,
       _isDeleted: false,
     }
-    const { isValid, limitType } = validateClaimAmount(
-      updatedRow,
-      values.finalPayable,
-    )
-
-    if (isValid) _updateTempInvoicePayer(index, updatedRow)
+    const invalidMessages = validateClaimAmount(updatedRow, values.finalPayable)
+    console.log({ invalidMessages })
+    if (invalidMessages.length <= 0) _updateTempInvoicePayer(index, updatedRow)
     else {
-      const suffix = limitType === 'patient' ? '' : 'maximum cap.'
-      setErrorMessage(`Total claim amount cannot exceed ${suffix}`)
+      // const suffix = limitType === 'patient' ? '' : 'maximum cap.'
+      setErrorMessage(invalidMessages)
       toggleErrorPrompt()
     }
   }
@@ -738,12 +742,14 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         />
       </CommonModal>
       <CommonModal
-        title='Invalid amount'
+        title='Cannot save scheme'
         open={showErrorPrompt}
         onClose={toggleErrorPrompt}
-        size='sm'
+        maxWidth='sm'
       >
-        <div>Invalid amount</div>
+        <div className={classes.errorPromptContainer}>
+          {errorMessage.map((message) => <p>{message}</p>)}
+        </div>
       </CommonModal>
     </React.Fragment>
   )

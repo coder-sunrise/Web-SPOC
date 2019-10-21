@@ -1,3 +1,5 @@
+import { INVOICE_ITEM_TYPE } from '@/utils/constants'
+
 export const flattenInvoicePayersInvoiceItemList = (
   preInvoicePayerInvoiceItems,
   preInvoicePayer,
@@ -188,62 +190,104 @@ export const getApplicableClaimAmount = (
   ]
 }
 
+const getItemTypeSubtotal = (list, type) =>
+  list.reduce(
+    (subtotal, item) =>
+      item.itemTypeFk === type ? subtotal + item.claimAmount : subtotal,
+    0,
+  )
+
 export const validateClaimAmount = (schemeRow, totalPayable) => {
   let isValid = true
+  let invalidMessage = []
 
   const {
     _balance,
     _patientMinPayable,
     _patientMinPayableType,
     _coverageMaxCap,
+    schemeConfig,
     invoicePayerItems,
-    isCoverageMaxCapCheckRequired,
+  } = schemeRow
+
+  const {
     medicationCoverageMaxCap,
     consumableCoverageMaxCap,
     serviceCoverageMaxCap,
     vaccinationCoverageMaxCap,
-  } = schemeRow
+    packageCoverageMaxCap,
 
-  let limit = 0
-  const listOfLimits = [
-    _balance,
-  ]
+    isCoverageMaxCapCheckRequired,
+    isMedicationCoverageMaxCapCheckRequired,
+    isConsumableCoverageMaxCapCheckRequired,
+    isVaccinationCoverageMaxCapCheckRequired,
+    isServiceCoverageMaxCapCheckRequired,
+    isPackageCoverageMaxCapCheckRequired,
+  } = schemeConfig
 
-  if (_patientMinPayable !== 0) {
+  const listOfLimits = []
+
+  if (_balance > 0) listOfLimits.push(_balance)
+
+  if (_patientMinPayable > 0) {
     const amount =
       _patientMinPayableType === 'ExactAmount'
         ? _patientMinPayable
         : totalPayable * (_patientMinPayable / 100)
-    listOfLimits.push(_patientMinPayable)
+    listOfLimits.push(amount)
   }
-
+  console.log({ isCoverageMaxCapCheckRequired, _coverageMaxCap })
   if (isCoverageMaxCapCheckRequired) {
-    listOfLimits.push(_coverageMaxCap)
+    if (_coverageMaxCap > 0) listOfLimits.push(_coverageMaxCap)
   } else {
     // check for each item category
     // return isValid = false early
+    const medicationTotalClaim = getItemTypeSubtotal(invoicePayerItems, 1)
+    const consumableTotalClaim = getItemTypeSubtotal(invoicePayerItems, 2)
+    const vaccinationTotalClaim = getItemTypeSubtotal(invoicePayerItems, 3)
+    const serviceTotalClaim = getItemTypeSubtotal(invoicePayerItems, 4)
+    const packageTotalClaim = getItemTypeSubtotal(invoicePayerItems, 5)
+
+    if (
+      isMedicationCoverageMaxCapCheckRequired &&
+      medicationTotalClaim > medicationCoverageMaxCap
+    )
+      invalidMessage.push('Medication claim amount has exceed the max cap')
+
+    if (
+      isConsumableCoverageMaxCapCheckRequired &&
+      consumableTotalClaim > consumableCoverageMaxCap
+    )
+      invalidMessage.push('Consumable claim amount has exceed the max cap')
+
+    if (
+      isVaccinationCoverageMaxCapCheckRequired &&
+      vaccinationTotalClaim > vaccinationCoverageMaxCap
+    )
+      invalidMessage.push('Vaccination claim amount has exceed the max cap')
+
+    if (
+      isServiceCoverageMaxCapCheckRequired &&
+      serviceTotalClaim > serviceCoverageMaxCap
+    )
+      invalidMessage.push('Service total claim amount has exceed the max cap')
+
+    if (
+      isPackageCoverageMaxCapCheckRequired &&
+      packageTotalClaim > packageCoverageMaxCap
+    )
+      invalidMessage.push('Package total claim amount has exceed the max cap')
   }
 
-  // if (_patientMinPayable === 0 && _coverageMaxCap === 0) {
-  //   // skip checking
-  //   return { isValid: true, limitType: undefined }
-  // }
+  const totalClaimAmount = invoicePayerItems.reduce(
+    (totalClaim, item) => totalClaim + (item.claimAmount || 0),
+    0,
+  )
 
-  // const totalClaimAmount = invoicePayerItems.reduce(
-  //   (totalClaim, item) => totalClaim + (item.claimAmount || 0),
-  //   0,
-  // )
+  const maximumLimit = Math.min(listOfLimits)
+  console.log({ maximumLimit, listOfLimits })
+  if (maximumLimit > 0 && totalClaimAmount > maximumLimit)
+    invalidMessage.push('Total claim amount has exceed the maximum limit')
 
-  // const amount =
-  //   _patientMinPayableType === 'ExactAmount'
-  //     ? _patientMinPayable
-  //     : totalPayable * (_patientMinPayable / 100)
-  // const patientMinPayable = totalPayable - amount
-
-  // const maximumLimit = Math.min(patientMinPayable, _coverageMaxCap)
-
-  // const limitType = patientMinPayable < _coverageMaxCap ? 'patient' : 'maxcap'
-  // if (maximumLimit > 0) isValid = totalClaimAmount <= maximumLimit
-
-  // return { isValid, limitType }
+  return invalidMessage
 }
