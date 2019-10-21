@@ -19,7 +19,21 @@ export default createListViewModel({
         ],
       },
     },
-    subscriptions: ({ dispatch, history }) => {},
+    subscriptions: ({ dispatch, history }) => {
+      history.listen(async (loct, method) => {
+        const { pathname, search, query = {} } = loct
+        if (pathname === '/inventory/pr') {
+          dispatch({
+            type: 'purchaseReceiveList/query',
+            payload: {
+              sorting: [
+                { columnName: 'purchaseOrderNo', direction: 'asc' },
+              ],
+            },
+          })
+        }
+      })
+    },
     effects: {
       *batchWriteOff ({ payload }, { call }) {
         const r = yield call(service.upsertWithStatusCode, payload)
