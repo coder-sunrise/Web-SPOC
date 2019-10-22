@@ -7,7 +7,12 @@ import { formatMessage } from 'umi/locale'
 
 const PurchaseReceiveDataGrid = ({
   selectedRows,
-  actions: { handleDuplicatePO, handleNavigate, handleOnSelectionChange },
+  actions: {
+    handleDuplicatePO,
+    handleNavigate,
+    handleOnSelectionChange,
+    handlePrintPOReport,
+  },
 }) => {
   // const [
   //   selectedRows,
@@ -23,7 +28,7 @@ const PurchaseReceiveDataGrid = ({
         handleDuplicatePO(row.id)
         break
       case '2':
-        notification.info({ message: 'Print' })
+        handlePrintPOReport(row.id)
         break
       default:
         break
@@ -41,6 +46,18 @@ const PurchaseReceiveDataGrid = ({
       onRowDoubleClick={(row) => handleNavigate('edit', row.id)}
       // onRowDoubleClick={(row) => console.log(row)}
       columnExtensions={[
+        {
+          columnName: 'invoiceStatus',
+          render: (row) => {
+            const { purchaseOrderStatus, invoiceStatus } = row
+            if (
+              purchaseOrderStatus === 'Draft' ||
+              purchaseOrderStatus === 'Cancelled'
+            )
+              return <p />
+            return <p>{invoiceStatus}</p>
+          },
+        },
         {
           columnName: 'purchaseOrderDate',
           type: 'date',
