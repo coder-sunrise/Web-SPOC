@@ -24,6 +24,7 @@ export default createFormViewModel({
       selectedWidgets: [
         '1',
       ],
+      autoOrderList: [],
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -54,7 +55,7 @@ export default createFormViewModel({
             version,
           },
         })
-        console.log("init state")
+
         yield take('query/@@end')
         if (md === 'cons') {
           yield put({
@@ -70,7 +71,6 @@ export default createFormViewModel({
       *start ({ payload }, { call, put, select, take }) {
         const response = yield call(service.create, payload.id)
         const { id } = response
-        let orders = []
         if (id) {
           yield put({
             type: 'updateState',
@@ -80,80 +80,15 @@ export default createFormViewModel({
             },
           })
 
-          yield put({
-            type: 'codetable/fetchCodes',
-            payload: {
-              code: 'ctservice',
-              filter: {
-                'serviceFKNavigation.IsActive': true,
-                combineCondition: 'or',
-              },
-            },
-          })
-          yield take('codetable/fetchCodes/@@end')
+          // const orderList = yield put({
+          //   type: 'addAutoOrder',
+          // })
 
-          let codetableState = yield select((state) => state.codetable)
-
-          const {
-            services,
-            serviceCenters,
-            serviceCenterServices = [],
-          } = getServices(codetableState.ctservice)
-
-          let orderList = serviceCenterServices.filter(
-            (o) => o.isAutoOrder === true && o.isDefault === true,
-          )
-
-          for (let i = 0; i < orderList.length; i++) {
-            let serviceFKValue = 0
-            let serviceCenterFKValue = 0
-            let serviceNameValue = ''
-            let totalAfterItemAdjustmentValue = 0
-            let adjAmountValue = 0
-
-            for (let a = 0; a < services.length; a++) {
-              if (orderList[i].displayValue === services[a].name) {
-                serviceFKValue = services[a].value
-                serviceNameValue = services[a].name
-              }
-            }
-
-            for (let b = 0; b < serviceCenters.length; b++) {
-              if (orderList[i].serviceCenter === serviceCenters[b].name) {
-                serviceCenterFKValue = serviceCenters[b].value
-              }
-            }
-
-            totalAfterItemAdjustmentValue = 0
-            adjAmountValue = 0
-
-            let rowRecord = {
-              sequence: i,
-              type: '3',
-              serviceFK: serviceFKValue,
-              serviceCenterFK: serviceCenterFKValue,
-              serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
-              serviceName: serviceNameValue,
-              unitPrice: orderList[i].unitPrice,
-              total: orderList[i].unitPrice,
-              quantity: 1,
-              totalAfterItemAdjustment: orderList[i].unitPrice,
-              adjAmount: adjAmountValue,
-              remark: '',
-              subject: orderList[i].displayValue,
-              uid: getUniqueId(),
-              weightage: 0,
-              totalAfterOverallAdjustment: 0,
-            }
-
-            orders.push(rowRecord)
-          }
-          console.log("start")
           yield put({
             type: 'queryDone',
             payload: {
               data: response,
-              autoOrderList: orders,
+              // autoOrderList: orderList,
             },
           })
 
@@ -174,7 +109,7 @@ export default createFormViewModel({
         return response
       },
 
-      *resume ({ payload }, { call, put, select,  }) {
+      *resume ({ payload }, { call, put, select }) {
         const response = yield call(service.resume, payload.id)
         if (response) {
           yield put({
@@ -184,11 +119,12 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          console.log("resume")
+
           yield put({
             type: 'queryDone',
             payload: {
               data: response,
+              status: 'PAUSED',
             },
           })
           sendNotification('QueueListing', {
@@ -198,84 +134,74 @@ export default createFormViewModel({
         return response
       },
       *addAutoOrder ({ payload }, { call, put, select, take }) {
-          let orders = []
-       
-          yield put({
-            type: 'codetable/fetchCodes',
-            payload: {
-              code: 'ctservice',
-              filter: {
-                'serviceFKNavigation.IsActive': true,
-                combineCondition: 'or',
-              },
+        let orders = []
+
+        const codetable = yield put.resolve({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'ctservice',
+            filter: {
+              'serviceFKNavigation.IsActive': true,
+              combineCondition: 'or',
             },
-          })
-          yield take('codetable/fetchCodes/@@end')
+          },
+        })
+        yield take('codetable/fetchCodes/@@end')
+        let codetableState = yield select((state) => state.codetable)
 
-          let codetableState = yield select((state) => state.codetable)
+        const {
+          services,
+          serviceCenters,
+          serviceCenterServices = [],
+        } = getServices(codetableState.ctservice)
 
-          const {
-            services,
-            serviceCenters,
-            serviceCenterServices = [],
-          } = getServices(codetableState.ctservice)
+        let orderList = serviceCenterServices.filter(
+          (o) => o.isAutoOrder === true && o.isDefault === true,
+        )
 
-          let orderList = serviceCenterServices.filter(
-            (o) => o.isAutoOrder === true && o.isDefault === true,
-          )
+        for (let i = 0; i < orderList.length; i++) {
+          let serviceFKValue = 0
+          let serviceCenterFKValue = 0
+          let serviceNameValue = ''
+          let adjAmountValue = 0
 
-          for (let i = 0; i < orderList.length; i++) {
-            let serviceFKValue = 0
-            let serviceCenterFKValue = 0
-            let serviceNameValue = ''
-            let adjAmountValue = 0
-
-            for (let a = 0; a < services.length; a++) {
-              if (orderList[i].displayValue === services[a].name) {
-                serviceFKValue = services[a].value
-                serviceNameValue = services[a].name
-              }
+          for (let a = 0; a < services.length; a++) {
+            if (orderList[i].displayValue === services[a].name) {
+              serviceFKValue = services[a].value
+              serviceNameValue = services[a].name
             }
-
-            for (let b = 0; b < serviceCenters.length; b++) {
-              if (orderList[i].serviceCenter === serviceCenters[b].name) {
-                serviceCenterFKValue = serviceCenters[b].value
-              }
-            }
-
-            adjAmountValue = 0
-
-            let rowRecord = {
-              sequence: i,
-              type: '3',
-              serviceFK: serviceFKValue,
-              serviceCenterFK: serviceCenterFKValue,
-              serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
-              serviceName: serviceNameValue,
-              unitPrice: orderList[i].unitPrice,
-              total: orderList[i].unitPrice,
-              quantity: 1,
-              totalAfterItemAdjustment: orderList[i].unitPrice,
-              adjAmount: adjAmountValue,
-              remark: '',
-              subject: orderList[i].displayValue,
-              uid: getUniqueId(),
-              weightage: 0,
-              totalAfterOverallAdjustment: 0,
-            }
-
-            orders.push(rowRecord)
           }
-          console.log("auto order")
-          yield put({
-            type: 'queryDone',
-            payload: {
-              autoOrderList: orders,
-              page: 'resume auto order',
-            },
-          })
-          
-        
+
+          for (let b = 0; b < serviceCenters.length; b++) {
+            if (orderList[i].serviceCenter === serviceCenters[b].name) {
+              serviceCenterFKValue = serviceCenters[b].value
+            }
+          }
+
+          adjAmountValue = 0
+
+          let rowRecord = {
+            sequence: i,
+            type: '3',
+            serviceFK: serviceFKValue,
+            serviceCenterFK: serviceCenterFKValue,
+            serviceCenterServiceFK: orderList[i].serviceCenter_ServiceId,
+            serviceName: serviceNameValue,
+            unitPrice: orderList[i].unitPrice,
+            total: orderList[i].unitPrice,
+            quantity: 1,
+            totalAfterItemAdjustment: orderList[i].unitPrice,
+            adjAmount: adjAmountValue,
+            remark: '',
+            subject: orderList[i].displayValue,
+            uid: getUniqueId(),
+            weightage: 0,
+            totalAfterOverallAdjustment: 0,
+          }
+
+          orders.push(rowRecord)
+        }
+
         return orders
       },
       *edit ({ payload }, { call, put }) {
@@ -288,7 +214,7 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          console.log("edit")
+
           yield put({
             type: 'queryDone',
             payload: {
@@ -341,7 +267,7 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          console.log("edit order")
+
           yield put({
             type: 'queryDone',
             payload: {
@@ -376,24 +302,23 @@ export default createFormViewModel({
         })
         router.push('/reception/queue')
       },
-      *queryDone ({ payload }, { call, put, select }) {
+      *queryDone ({ payload }, { call, put, select, take }) {
         // console.log('queryDone', payload)
-        const { data, autoOrderList, page } = payload
-        console.log("query done +++++")
-        if((autoOrderList && page === 'resume auto order')){
-          console.log("1111 " , autoOrderList)
-          yield put({
-            type: 'orders/updateState',
-            payload: {
-              rows: _.sortBy(autoOrderList, 'sequence'),
-              finalAdjustments: [],
-            },
-          })
-  
-          yield put({
-            type: 'orders/calculateAmount',
+        const { data, autoOrderList, page, status } = payload
+
+        yield take('visitRegistration/query/@@end')
+        const visitRegistration = yield select((st) => st.visitRegistration)
+        const { entity } = visitRegistration
+        const { visit } = entity
+        const { visitStatus } = visit
+        let orderList = []
+
+        if (visitStatus === 'IN CONS' && status !== 'PAUSED') {
+          orderList = yield put.resolve({
+            type: 'addAutoOrder',
           })
         }
+
         if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {
@@ -415,7 +340,7 @@ export default createFormViewModel({
             rows: _.sortBy(cdRows, 'sequence'),
           },
         })
-        console.log("_________------------ ", payload)
+
         let oRows = []
         if (page !== 'edit order') {
           orderTypes.forEach((p) => {
@@ -434,14 +359,14 @@ export default createFormViewModel({
             )
           })
         }
-      
+
         yield put({
           type: 'orders/updateState',
           payload: {
             rows:
-              autoOrderList === undefined
+              orderList.length === 0
                 ? _.sortBy(oRows, 'sequence')
-                : _.sortBy(autoOrderList, 'sequence'),
+                : _.sortBy(orderList, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,
               uid: o.id,
