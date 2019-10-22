@@ -82,12 +82,16 @@ export default createFormViewModel({
         let totalPaidAmount = 0
         let newPurchaseOrderPayment
         if (purchaseOrderPayment.length >= 1) {
+          let tempId = -99
           newPurchaseOrderPayment = purchaseOrderPayment
             .filter((x) => x.clinicPaymentDto.isCancelled === false)
             .map((x) => {
               x.cpId = x.clinicPaymentDto.id
               x.cpConcurrencyToken = x.clinicPaymentDto.concurrencyToken
               totalPaidAmount += x.clinicPaymentDto.paymentAmount
+              x.clinicPaymentDto.paymentModeFK =
+                tempId - x.clinicPaymentDto.creditCardTypeFK
+
               return {
                 ...x.clinicPaymentDto,
                 ...x,

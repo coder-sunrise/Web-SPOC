@@ -241,14 +241,14 @@ const Grid = ({
       return false
     }
 
-    // if (visitStatus === 'IN CONS') {
-    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
-    //     notification.error({
-    //       message: `You cannot resume other doctor's consultation.`,
-    //     })
-    //     return false
-    //   }
-    // }
+    if (visitStatus === 'IN CONS') {
+      if (assignedDoctorProfile.id !== doctorProfile.id) {
+        notification.error({
+          message: `You cannot resume other doctor's consultation.`,
+        })
+        return false
+      }
+    }
 
     // if (assignedDoctorProfile.id !== doctorProfile.id) {
     //   notification.error({
@@ -324,16 +324,6 @@ const Grid = ({
         const valid = isAssignedDoctor(row)
         if (valid) {
           const version = Date.now()
-          // dispatch({
-          //   type: 'codetable/fetchCodes',
-          //   payload: {
-          //     code: 'ctservice',
-          //     filter: {
-          //       'serviceFKNavigation.IsActive': true,
-          //       combineCondition: 'or',
-          //     },
-          //   },
-          // })
 
           dispatch({
             type: `consultation/start`,
@@ -343,9 +333,22 @@ const Grid = ({
             },
           }).then((o) => {
             if (o)
-              router.push(
-                `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-              )
+              dispatch({
+                type: 'codetable/fetchCodes',
+                payload: {
+                  code: 'ctservice',
+                  filter: {
+                    'serviceFKNavigation.IsActive': true,
+                    combineCondition: 'or',
+                  },
+                },
+              }).then((v) => {
+                if (v) {
+                  router.push(
+                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                  )
+                }
+              })
           })
         }
         break
@@ -371,12 +374,20 @@ const Grid = ({
             })
           } else {
             dispatch({
-               type: `consultation/addAutoOrder`,
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'ctservice',
+                filter: {
+                  'serviceFKNavigation.IsActive': true,
+                  combineCondition: 'or',
+                },
+              },
             }).then((o) => {
-              if (o)
+              if (o) {
                 router.push(
                   `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
                 )
+              }
             })
           }
         }

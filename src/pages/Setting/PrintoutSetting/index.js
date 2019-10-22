@@ -55,6 +55,7 @@ const styles = (theme) => ({
 }))
 @withFormikExtend({
   enableReinitialize: true,
+  notDirtyDuration: 3,
   mapPropsToValues: ({ printoutSetting }) =>
     printoutSetting.entity || printoutSetting.default,
 
@@ -101,7 +102,7 @@ const styles = (theme) => ({
   displayName: 'printoutSettingInfo',
 })
 class printoutSetting extends PureComponent {
-  state = { selected: !!this.props.values.reportFK, prevSelectedIndex: '' }
+  state = { selected: !!this.props.values.reportFK, prevSelectedIndex: 0 }
 
   componentDidMount = () => {
     this.props.dispatch({
@@ -123,7 +124,11 @@ class printoutSetting extends PureComponent {
 
   checkFormIsDirty = (e) => {
     const { formik, dispatch, setFieldValue } = this.props
-    if (formik.printoutSettingInfo.dirty) {
+    if (this.setState.prevSelectedIndex === 0) {
+      return
+    }
+
+    if (formik.printoutSettingInfo && formik.printoutSettingInfo.dirty) {
       dispatch({
         type: 'global/updateAppState',
         payload: {
@@ -145,9 +150,9 @@ class printoutSetting extends PureComponent {
   }
 
   getSelectedReportSetting = (e) => {
-    if (e) {
-      const { dispatch } = this.props
+    const { dispatch, resetForm, formik } = this.props
 
+    if (e) {
       dispatch({
         type: 'printoutSetting/query',
         payload: {
@@ -175,6 +180,16 @@ class printoutSetting extends PureComponent {
         }
       })
     }
+
+    // dispatch({
+    //   type: 'formik/updateState',
+    //   payload: {
+    //     printoutSettingInfo: {
+    //       ...formik.printoutSettingInfo,
+    //       dirty: false,
+    //     },
+    //   },
+    // })
   }
 
   render () {

@@ -48,7 +48,7 @@ export default createFormViewModel({
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
         const { version, visitID, md2 } = payload
-
+        console.log('dispense initstate')
         yield put({
           type: 'query',
           payload: {
@@ -124,6 +124,10 @@ export default createFormViewModel({
               toBillingPage: true,
             },
           })
+        return response
+      },
+      *unlock ({ payload }, { call }) {
+        const response = yield call(service.unlock, payload)
         return response
       },
       *closeModal ({ payload = { toBillingPage: false } }, { call, put }) {

@@ -99,12 +99,12 @@ export default {
           },
         })
 
-        yield put({
-          type: 'queueLog/refresh',
-          payload: {
-            shouldGetTodayAppointments: false,
-          },
-        })
+        // yield put({
+        //   type: 'queueLog/refresh',
+        //   payload: {
+        //     shouldGetTodayAppointments: false,
+        //   },
+        // })
 
         if (
           !userProfileDetailDto.clinicianProfile.userProfile

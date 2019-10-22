@@ -7,7 +7,6 @@ import { withStyles } from '@material-ui/core'
 // common components
 import { LoadingWrapper } from '@/components/_medisys'
 import {
-  Button,
   GridContainer,
   GridItem,
   notification,

@@ -8,7 +8,6 @@ import styles from './styles'
 import {
   CommonTableGrid,
   SizeContainer,
-  Field,
   NumberInput,
   withFormikExtend,
   GridContainer,
@@ -45,6 +44,7 @@ class CollectPaymentModal extends PureComponent {
     let invoiceAmountSubTotal = 0
     let claimAmountSubTotal = 0
     let approvedAmountSubTotal = 0
+    let collectedPayment = 0
     let amountReceivedSubTotal = 0
 
     if (rows || rows.length > 0) {
@@ -52,6 +52,7 @@ class CollectPaymentModal extends PureComponent {
         invoiceAmountSubTotal += payment.invoiceAmount || 0
         claimAmountSubTotal += payment.claimAmount || 0
         approvedAmountSubTotal += payment.approvedAmount || 0
+        collectedPayment += payment.collectedPayment || 0
         amountReceivedSubTotal += payment.amountReceived || 0
         return payment
       })
@@ -61,6 +62,7 @@ class CollectPaymentModal extends PureComponent {
       invoiceAmountSubTotal,
       claimAmountSubTotal,
       approvedAmountSubTotal,
+      collectedPayment,
       amountReceivedSubTotal,
     }
   }
@@ -88,6 +90,10 @@ class CollectPaymentModal extends PureComponent {
               },
               {
                 columnName: 'approvedAmount',
+                type: 'currency',
+              },
+              {
+                columnName: 'collectedPayment',
                 type: 'currency',
               },
               {
@@ -137,6 +143,7 @@ class CollectPaymentModal extends PureComponent {
                       invoiceAmountSubTotal,
                       claimAmountSubTotal,
                       approvedAmountSubTotal,
+                      collectedPayment,
                       amountReceivedSubTotal,
                     } = this.calculateSummarySubTotal()
                     const newChildren = [
@@ -169,6 +176,14 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={approvedAmountSubTotal}
+                          disabled
+                          currency
+                          {...amountProps}
+                        />
+                      </Table.Cell>,
+                      <Table.Cell colSpan={1} key={1}>
+                        <NumberInput
+                          value={collectedPayment}
                           disabled
                           currency
                           {...amountProps}

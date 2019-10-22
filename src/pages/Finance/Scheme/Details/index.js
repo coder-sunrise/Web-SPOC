@@ -132,7 +132,7 @@ export default compose(
 
       const { effectiveDates, ...restValues } = values
       const { dispatch, history, onConfirm } = props
-
+      console.log({ restValues })
       dispatch({
         type: 'schemeDetail/upsert',
         payload: {

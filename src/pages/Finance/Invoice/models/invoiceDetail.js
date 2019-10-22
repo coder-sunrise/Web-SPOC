@@ -14,7 +14,10 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
-        if (pathname.indexOf('/finance/invoice/details') === 0) {
+        if (
+          pathname.indexOf('/finance/invoice/details') === 0 ||
+          pathname.indexOf('/claim-submission/chas/invoice/details') === 0
+        ) {
           dispatch({
             type: 'updateState',
             payload: {

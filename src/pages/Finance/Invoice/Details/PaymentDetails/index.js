@@ -13,6 +13,7 @@ import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
 import PaymentCard from './PaymentCard'
 import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
+import { ReportViewer } from '@/components/_medisys'
 // styles
 import styles from './styles'
 
@@ -35,6 +36,11 @@ class PaymentDetails extends Component {
     showDeleteConfirmation: false,
     onVoid: {},
     selectedInvoicePayerFK: undefined,
+    showReport: false,
+    reportPayload: {
+      reportID: undefined,
+      reportParameters: undefined,
+    },
   }
 
   refresh = () => {
@@ -75,9 +81,6 @@ class PaymentDetails extends Component {
       selectedInvoicePayerFK: invoicePayerFK,
     })
 
-  closeAddPaymentModal = () =>
-    this.setState({ showAddPayment: false, selectedInvoicePayerFK: undefined })
-
   closeAddCrNoteModal = () =>
     this.setState({ showAddCrNote: false, selectedInvoicePayerFK: undefined })
 
@@ -112,8 +115,44 @@ class PaymentDetails extends Component {
     this.setState({ showAddCrNote: true })
   }
 
-  onPrinterClick = ({ currentTarget }) => {
-    console.log({ printer: currentTarget })
+  onPrinterClick = (type, itemID) => {
+    const { invoicePayment } = this.props
+    switch (type) {
+      case 'Payment':
+        break
+      case 'Credit Note':
+        this.onShowReport('CreditNoteId', 18, itemID)
+        break
+      case 'TaxInvoice':
+        this.onShowReport(
+          'InvoiceId',
+          15,
+          invoicePayment ? invoicePayment.currentId : '',
+        )
+        break
+      default:
+        break
+    }
+  }
+
+  onShowReport = (paramKey, reportID, itemID) => {
+    this.setState({
+      showReport: true,
+      reportPayload: {
+        reportID,
+        reportParameters: { [paramKey]: itemID },
+      },
+    })
+  }
+
+  onCloseReport = () => {
+    this.setState({
+      showReport: false,
+      reportPayload: {
+        reportID: undefined,
+        reportParameters: undefined,
+      },
+    })
   }
 
   // submitAddPayment
@@ -128,7 +167,10 @@ class PaymentDetails extends Component {
         },
       })
       .then((r) => {
-        if (r) this.refresh()
+        if (r) {
+          this.refresh()
+          this.closeAddPaymentModal()
+        }
       })
   }
 
@@ -202,6 +244,8 @@ class PaymentDetails extends Component {
       showWriteOff,
       showDeleteConfirmation,
       onVoid,
+      showReport,
+      reportPayload,
     } = this.state
     // console.log({ values })
     return (
@@ -303,6 +347,17 @@ class PaymentDetails extends Component {
           maxWidth='sm'
         >
           <DeleteConfirmation handleSubmit={this.onSubmitVoid} {...onVoid} />
+        </CommonModal>
+        <CommonModal
+          open={showReport}
+          onClose={this.onCloseReport}
+          title='Invoice'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={reportPayload.reportID}
+            reportParameters={reportPayload.reportParameters}
+          />
         </CommonModal>
       </div>
     )

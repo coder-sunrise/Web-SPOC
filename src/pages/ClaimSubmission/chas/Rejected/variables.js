@@ -1,6 +1,6 @@
 export const NewCHASColumns = [
   {
-    name: 'vistDate',
+    name: 'visitDate',
     title: 'Visit Date',
   },
   {
