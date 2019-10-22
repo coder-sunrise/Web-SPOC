@@ -33,7 +33,9 @@ export default createListViewModel({
         if (response.status === '200' && data !== null) {
           return yield put({
             type: 'setQueryById',
-            payload: data,
+            payload: {
+              ...data,
+            },
           })
         }
         return false
@@ -51,8 +53,8 @@ export default createListViewModel({
           ...state,
           entity: {
             ...payload,
-            visitDate: moment(payload.visitDate).format(dateFormatLongWithTime),
-            patientDob: moment(payload.patientDob).format(dateFormatLong),
+            // visitDate: moment(payload.visitDate).format(dateFormatLongWithTime),
+            // patientDob: moment(payload.patientDob).format(dateFormatLong),
           },
         }
       },

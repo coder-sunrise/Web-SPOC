@@ -30,9 +30,7 @@ const WriteOff = ({ classes, handleSubmit, onClose }) => {
             color='primary'
             onClick={() => handleSubmit(reason)}
             disabled={reason === ''}
-          >
-            Confirm
-          </Button>
+          />Write-Off
         </GridItem>
       </GridContainer>
     </div>

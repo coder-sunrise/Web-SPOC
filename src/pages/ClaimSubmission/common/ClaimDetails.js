@@ -14,7 +14,8 @@ import {
   SizeContainer,
   FastField,
   withFormikExtend,
-  CodeSelect,
+  dateFormatLong,
+  dateFormatLongWithTimeNoSec,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -57,11 +58,24 @@ class ClaimDetails extends Component {
   }
 
   onSelectChange = (val) => {
-    const { setFieldValue } = this.props
-    setFieldValue('setFieldValue', val)
+    const { setFieldValue, values } = this.props
+    const { diagnosis } = values
+
+    let processedRows = []
+    processedRows = diagnosis.map((x) => {
+      return { ...x, isSelected: false }
+    })
+    val.map((x) => {
+      const data = processedRows.find((diag) => diag.value === x)
+      data.isSelected = true
+      return x
+    })
+
+    setFieldValue('diagnosis', val)
   }
 
   render () {
+    const { readOnly } = true
     const {
       classes,
       onConfirm,
@@ -76,7 +90,11 @@ class ClaimDetails extends Component {
       clinicianProfile: { title, name, doctorProfile },
       patientDetail: { age, genderFK },
       patientName,
-      tier: maxDiagnosisSelectionCount,
+      // tier: maxDiagnosisSelectionCount,
+      visitDate,
+      patientDob,
+      invoiceDate,
+      diagnosis,
     } = values
     let patientGender = ctgender.find((x) => x.id === genderFK)
     const { doctorMCRNo } = doctorProfile
@@ -85,7 +103,8 @@ class ClaimDetails extends Component {
       ? patientGender.code
       : ''}/${age})`
 
-    const { readOnly } = true
+    const maxDiagnosisSelectionCount = 2
+
     return (
       <SizeContainer size='md'>
         <React.Fragment>
@@ -122,22 +141,23 @@ class ClaimDetails extends Component {
             <GridItem md={1} />
             <GridItem md={5} container>
               <GridItem md={12}>
-                <FastField
-                  name='visitDate'
-                  render={(args) => (
-                    <TextField {...args} disabled label='Visit Date' />
-                  )}
+                <DatePicker
+                  disabled
+                  label='Visit Date'
+                  format={dateFormatLongWithTimeNoSec}
+                  value={visitDate}
+                  showTime
                 />
               </GridItem>
               <GridItem md={12}>
                 <TextField disabled label='Doctor' value={doctorNameLabel} />
               </GridItem>
               <GridItem md={12}>
-                <FastField
-                  name='patientDob'
-                  render={(args) => (
-                    <TextField {...args} disabled label='DOB' />
-                  )}
+                <DatePicker
+                  disabled
+                  label='DOB'
+                  format={dateFormatLong}
+                  value={patientDob}
                 />
               </GridItem>
             </GridItem>
@@ -156,11 +176,12 @@ class ClaimDetails extends Component {
                 />
               </GridItem>
               <GridItem md={12}>
-                <FastField
-                  name='invoiceDate'
-                  render={(args) => (
-                    <DatePicker {...args} disabled label='Invoice Date' />
-                  )}
+                <DatePicker
+                  disabled
+                  label='Invoice Date'
+                  format={dateFormatLong}
+                  value={invoiceDate}
+                  showTime
                 />
               </GridItem>
               <GridItem md={12}>
@@ -215,26 +236,45 @@ class ClaimDetails extends Component {
                 </GridItem>
                 <GridItem md={4} />
                 <GridItem md={5}>
-                  <FastField
-                    name='diagnosisList'
+                  {/* <FastField
+                    name='diagnosis'
                     render={(args) => (
                       <Select
                         disabled={!allowEdit}
                         maxSelected={maxDiagnosisSelectionCount}
                         mode='multiple'
-                        options={[
-                          { name: 'Chief Complaints', value: '1' },
-                          { name: 'Plan', value: '2' },
-                          { name: 'Diagnosis', value: '3' },
-                          { name: 'Consultation Document', value: '4' },
-                          { name: 'Orders', value: '5' },
-                          { name: 'Invoice', value: '7' },
-                        ]}
+                        // options={[
+                        //   { name: 'Chief Complaints', value: '1' },
+                        //   { name: 'Plan', value: '2' },
+                        //   { name: 'Diagnosis', value: '3' },
+                        //   { name: 'Consultation Document', value: '4' },
+                        //   { name: 'Orders', value: '5' },
+                        //   { name: 'Invoice', value: '7' },
+                        // ]}
+                        options={diagnosis}
                         onChange={this.onSelectChange}
                         maxTagCount={2}
                         {...args}
                       />
                     )}
+                  /> */}
+
+                  <Select
+                    disabled={!allowEdit}
+                    maxSelected={maxDiagnosisSelectionCount}
+                    mode='multiple'
+                    options={diagnosis}
+                    // options={[
+                    //   { name: 'Chief Complaints', value: 1 },
+                    //   { name: 'Plan', value: 2 },
+                    //   { name: 'Diagnosis', value: 3 },
+                    //   { name: 'Consultation Document', value: 4 },
+                    //   { name: 'Orders', value: 5 },
+                    //   { name: 'Invoice', value: 7 },
+                    // ]}
+                    value={[]}
+                    onChange={this.onSelectChange}
+                    maxTagCount={2}
                   />
                 </GridItem>
                 <GridItem md={7} />
