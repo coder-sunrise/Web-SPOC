@@ -26,7 +26,7 @@ class AllergyGrid extends PureComponent {
           name: type === 'Allergy' ? 'allergyFK' : 'allergyName',
           title: 'Allergy Name',
         },
-        { name: 'allergyReaction', title: 'Allergic Reaction' },
+        { name: 'allergyReactionFK', title: 'Allergic Reaction' },
         { name: 'onsetDate', title: 'Date' },
         { name: 'patientAllergyStatusFK', title: 'Status' },
       ],
@@ -57,7 +57,7 @@ class AllergyGrid extends PureComponent {
           },
         },
         {
-          columnName: 'allergyReaction',
+          columnName: 'allergyReactionFK',
           type: 'codeSelect',
           label: 'Allergic Reaction',
           code: 'CTAllergyReaction',

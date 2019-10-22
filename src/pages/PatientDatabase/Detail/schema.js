@@ -184,7 +184,7 @@ const schemaAllergies = {
       type: Yup.string().required(),
       allergyFK: Yup.number().required(),
       allergyName: Yup.string().required(),
-      allergyReaction: Yup.string().required(),
+      allergyReactionFK: Yup.number().required(),
       patientAllergyStatusFK: Yup.number().required(),
       // adverseReaction: Yup.string(),
       onsetDate: Yup.date(),
