@@ -362,7 +362,6 @@ const Grid = ({
               payload: {
                 id: row.visitFK,
                 version,
-                status: 'PAUSED',
               },
             }).then((o) => {
               if (o)

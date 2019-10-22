@@ -84,12 +84,11 @@ export default createFormViewModel({
           //   type: 'addAutoOrder',
           // })
 
-
           yield put({
             type: 'queryDone',
             payload: {
               data: response,
-             // autoOrderList: orderList,
+              // autoOrderList: orderList,
             },
           })
 
@@ -125,6 +124,7 @@ export default createFormViewModel({
             type: 'queryDone',
             payload: {
               data: response,
+              status: 'PAUSED',
             },
           })
           sendNotification('QueueListing', {
@@ -134,10 +134,9 @@ export default createFormViewModel({
         return response
       },
       *addAutoOrder ({ payload }, { call, put, select, take }) {
-        
         let orders = []
 
-        yield put.resolve({
+        const codetable = yield put.resolve({
           type: 'codetable/fetchCodes',
           payload: {
             code: 'ctservice',
@@ -314,7 +313,7 @@ export default createFormViewModel({
         const { visitStatus } = visit
         let orderList = []
 
-        if ( (visitStatus === 'IN CONS' && status !== 'PAUSED') ) {
+        if (visitStatus === 'IN CONS' && status !== 'PAUSED') {
           orderList = yield put.resolve({
             type: 'addAutoOrder',
           })
@@ -365,7 +364,7 @@ export default createFormViewModel({
           type: 'orders/updateState',
           payload: {
             rows:
-            orderList.length === 0
+              orderList.length === 0
                 ? _.sortBy(oRows, 'sequence')
                 : _.sortBy(orderList, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
