@@ -17,8 +17,9 @@ export default createFormViewModel({
     state: {
       default: {
         isUserMaintainable: true,
-        schemeTypeFK: 11,
+        schemeTypeFK: 15, // default to CORPORATE
         copayerTypeFK: 1,
+        schemeCategoryFK: 5, // default to CORPORATE
         effectiveDates: [
           moment().formatUTC(),
           moment('2099-12-31T23:59:59').formatUTC(false),
@@ -30,44 +31,44 @@ export default createFormViewModel({
         patientMinCoPaymentAmount: 0.0,
         // coverageMaxCap: 0.0,
         itemGroupMaxCapacityDto: {
-          consumableMaxCapacity: {
-            maxCapValue: 0.0,
-          },
-          medicationMaxCapacity: {
-            maxCapValue: 0.0,
-          },
-          vaccinationMaxCapacity: {
-            maxCapValue: 0.0,
-          },
-          serviceMaxCapacity: {
-            maxCapValue: 0.0,
-          },
-          packageMaxCapacity: {
-            maxCapValue: 0.0,
-          },
+          // consumableMaxCapacity: {
+          //   maxCapValue: 0.0,
+          // },
+          // medicationMaxCapacity: {
+          //   maxCapValue: 0.0,
+          // },
+          // vaccinationMaxCapacity: {
+          //   maxCapValue: 0.0,
+          // },
+          // serviceMaxCapacity: {
+          //   maxCapValue: 0.0,
+          // },
+          // packageMaxCapacity: {
+          //   maxCapValue: 0.0,
+          // },
         },
         // overalCoPaymentValue: 0.0,
         itemGroupValueDto: {
-          consumableGroupValue: {
-            itemGroupValue: 0.0,
-            groupValueType: 'ExactAmount',
-          },
-          medicationGroupValue: {
-            itemGroupValue: 0.0,
-            groupValueType: 'ExactAmount',
-          },
-          vaccinationGroupValue: {
-            itemGroupValue: 0.0,
-            groupValueType: 'ExactAmount',
-          },
-          serviceGroupValue: {
-            itemGroupValue: 0.0,
-            groupValueType: 'ExactAmount',
-          },
-          packageGroupValue: {
-            itemGroupValue: 0.0,
-            groupValueType: 'ExactAmount',
-          },
+          // consumableGroupValue: {
+          //   itemGroupValue: 0.0,
+          //   groupValueType: 'ExactAmount',
+          // },
+          // medicationGroupValue: {
+          //   itemGroupValue: 0.0,
+          //   groupValueType: 'ExactAmount',
+          // },
+          // vaccinationGroupValue: {
+          //   itemGroupValue: 0.0,
+          //   groupValueType: 'ExactAmount',
+          // },
+          // serviceGroupValue: {
+          //   itemGroupValue: 0.0,
+          //   groupValueType: 'ExactAmount',
+          // },
+          // packageGroupValue: {
+          //   itemGroupValue: 0.0,
+          //   groupValueType: 'ExactAmount',
+          // },
         },
         // consumableValueDto: [],
         // medicationValueDto: [],
@@ -109,7 +110,7 @@ export default createFormViewModel({
         const response = yield call(queryOne, payload)
         yield put({
           type: 'schemeDetailsResult',
-          payload: response.status == '200' ? response.data : {},
+          payload: response.status === '200' ? response.data : {},
         })
       },
     },
@@ -131,6 +132,8 @@ export default createFormViewModel({
           )
         })
 
+        console.log({ data })
+
         return {
           ...state,
           entity: {
@@ -142,9 +145,7 @@ export default createFormViewModel({
             itemGroupMaxCapacityDtoRdoValue: data.coverageMaxCap
               ? 'all'
               : 'sub',
-            itemGroupValueDtoRdoValue: data.overalCoPaymentValue
-              ? 'all'
-              : 'sub',
+            itemGroupValueDtoRdoValue: !data.itemGroupValueDto ? 'all' : 'sub',
             rows: itemRows,
           },
         }

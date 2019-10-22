@@ -49,7 +49,6 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
     if (target.value === 'sub') {
       setFieldValue('overalCoPaymentValue', undefined)
       setFieldValue('overalCoPaymentValueType', 'ExactAmount')
-    } else {
       setFieldValue(
         'itemGroupValueDto.consumableGroupValue.itemGroupValue',
         0.0,
@@ -88,6 +87,17 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
         'itemGroupValueDto.packageGroupValue.groupValueType',
         'ExactAmount',
       )
+    }
+
+    if (target.value === 'all') {
+      if (!values.id) setFieldValue('itemGroupValueDto', {})
+      else {
+        setFieldValue('itemGroupValueDto.medicationGroupValue.isDeleted', true)
+        setFieldValue('itemGroupValueDto.consumableGroupValue.isDeleted', true)
+        setFieldValue('itemGroupValueDto.vaccinationGroupValue.isDeleted', true)
+        setFieldValue('itemGroupValueDto.serviceGroupValue.isDeleted', true)
+        setFieldValue('itemGroupValueDto.packageGroupValue.isDeleted', true)
+      }
     }
   }
 
