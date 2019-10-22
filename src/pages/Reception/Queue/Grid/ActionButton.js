@@ -18,7 +18,7 @@ const ActionButton = ({ row, onClick }) => {
 
   if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
     return (
-      <Tooltip title='More Actions'>
+      <Tooltip title='More Options'>
         <div>
           <GridButton
             row={row}
@@ -115,7 +115,7 @@ const ActionButton = ({ row, onClick }) => {
     ],
   )
   return (
-    <Tooltip title='More Actions'>
+    <Tooltip title='More Options'>
       <div>
         <GridButton
           row={row}

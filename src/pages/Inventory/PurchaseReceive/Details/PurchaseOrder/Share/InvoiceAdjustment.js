@@ -18,7 +18,15 @@ const InvoiceAdjustment = ({
   setFieldValue,
   ...amountProps
 }) => {
-  const { adjRemark, adjValue } = adjustmentList[index]
+  const { adjType, adjRemark, adjValue } = adjustmentList[index]
+
+  if(adjType === 'Percentage') {
+    amountProps.currency   = false
+    amountProps.percentage = true
+  }else if(adjType === 'Currency'){
+    amountProps.currency   = true
+    amountProps.percentage = false
+  }
   return (
     <GridContainer style={{ paddingLeft: 30 }}>
       <GridItem xs={2} md={9} />
@@ -29,7 +37,7 @@ const InvoiceAdjustment = ({
             onConfirm={() => {
               adjustmentList[index].isDeleted = true
               setTimeout(
-                () => handleDeleteInvoiceAdjustment(),
+                () => handleDeleteInvoiceAdjustment(adjustmentList),
                 handleCalcInvoiceSummary(),
                 500,
               )

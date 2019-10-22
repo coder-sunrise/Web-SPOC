@@ -9,14 +9,14 @@ const DuplicatePO = ({ classes, onClose, purchaseReceiveList, actions: { handleN
   return (
     <div>
       <GridContainer justify='center' alignItems='center'>
-        <GridItem md={12} className={classes.reason}>
-          <h3>
+        <GridItem md={10} className={classes.reason}>
+          <h4>
             {formatMessage({
               id: 'inventory.pr.duplicatePOConfirmation',
             })}
             <b>{entity.purchaseOrderNo}</b>
             {'?'}
-          </h3>
+          </h4>
         </GridItem>
         <Button
           color='danger'
