@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { Paper, withStyles } from '@material-ui/core'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
-import Delete from '@material-ui/icons/Delete'
 // common components
 import {
   Button,
@@ -12,9 +11,7 @@ import {
   GridContainer,
   GridItem,
   NumberInput,
-  Popover,
   Select,
-  Tooltip,
 } from '@/components'
 // sub components
 import MaxCapInfo from './MaxCapInfo'
@@ -33,7 +30,9 @@ import {
   flattenInvoicePayersInvoiceItemList,
   computeInvoiceItemSubtotal,
   computeTotalForAllSavedClaim,
-  convertAmountToPercentOrCurrency,
+  getCoverageAmountAndType,
+  getApplicableClaimAmount,
+  validateClaimAmount,
 } from '../utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { roundToTwoDecimals } from '@/utils/utils'
@@ -65,10 +64,26 @@ const styles = (theme) => ({
     fontWeight: 500,
     color: 'darkblue',
   },
+  errorPromptContainer: {
+    textAlign: 'center',
+    '& p': {
+      fontSize: '1rem',
+    },
+  },
 })
 
 const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   const { invoice, claimableSchemes } = values
+  const [
+    showErrorPrompt,
+    setShowErrorPrompt,
+  ] = useState(false)
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState([])
+
   const [
     initialState,
     setInitialState,
@@ -116,37 +131,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         (selectedScheme) => selectedScheme.id === schemeID,
       )
       const existed = curInvoiceItems.find((curItem) => curItem.id === item.id)
-      let coverage = 0
-      let schemeCoverageType = 'percentage'
-      let schemeCoverage = 0
-      if (scheme.coPaymentByItem.length > 0) {
-        const coPaymentItem = scheme.coPaymentByItem.find(
-          (_coPaymentItem) => _coPaymentItem.itemFk === item.id,
-        )
 
-        coverage = convertAmountToPercentOrCurrency(
-          coPaymentItem.itemValueType,
-          coPaymentItem.itemValue,
-        )
-      } else if (scheme.coPaymentByCategory.length > 0) {
-        const itemCategory = scheme.coPaymentByCategory.find(
-          (category) => category.itemTypeFk === item.invoiceItemTypeFk,
-        )
-        coverage = convertAmountToPercentOrCurrency(
-          itemCategory.groupValueType,
-          itemCategory.itemGroupValue,
-        )
-
-        schemeCoverage = itemCategory.itemGroupValue
-        schemeCoverageType = itemCategory.groupValueType
-      } else {
-        schemeCoverageType = scheme.overAllCoPaymentValueType
-        schemeCoverage = scheme.overAllCoPaymentValue
-        coverage = convertAmountToPercentOrCurrency(
-          scheme.overAllCoPaymentValueType,
-          scheme.overAllCoPaymentValue,
-        )
-      }
+      let {
+        coverage, // for display purpose only, value will be $100 or 100%
+        schemeCoverage, // for sending to backend
+        schemeCoverageType, // for sending to backend
+      } = getCoverageAmountAndType(scheme, item)
 
       if (existed)
         return [
@@ -281,6 +271,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   }
 
   const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
+  const toggleErrorPrompt = () => {
+    if (showErrorPrompt) setErrorMessage([])
+    setShowErrorPrompt(!showErrorPrompt)
+  }
 
   useEffect(
     () => {
@@ -336,65 +330,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     ],
   )
 
-  const getApplicableClaimAmount = (
-    invoicePayerItem,
-    scheme,
-    remainingCoverageMaxCap,
-  ) => {
-    const {
-      coPaymentByCategory,
-      coPaymentByItem,
-      isCoverageMaxCapCheckRequired,
-    } = scheme
-    let returnClaimAmount = 0
-
-    if (invoicePayerItem.totalAfterGst === 0)
-      return [
-        0,
-        remainingCoverageMaxCap,
-      ]
-
-    if (coPaymentByItem.length > 0) {
-      returnClaimAmount = 0
-    } else if (coPaymentByCategory.length > 0) {
-      const itemCategory = coPaymentByCategory.find(
-        (category) =>
-          category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
-      )
-      const itemRemainingAmount =
-        invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
-
-      if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
-        returnClaimAmount =
-          itemRemainingAmount * (itemCategory.itemGroupValue / 100)
-      } else {
-        returnClaimAmount =
-          itemCategory.itemGroupValue > itemRemainingAmount
-            ? itemRemainingAmount
-            : itemCategory.itemGroupValue
-      }
-    } else {
-      returnClaimAmount =
-        invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
-    }
-
-    if (isCoverageMaxCapCheckRequired) {
-      if (returnClaimAmount > remainingCoverageMaxCap) {
-        returnClaimAmount = remainingCoverageMaxCap
-        remainingCoverageMaxCap = 0
-      } else if (returnClaimAmount < remainingCoverageMaxCap) {
-        remainingCoverageMaxCap -= returnClaimAmount
-      } else {
-        returnClaimAmount = remainingCoverageMaxCap
-      }
-    }
-
-    return [
-      returnClaimAmount,
-      remainingCoverageMaxCap,
-    ]
-  }
-
   const handleSchemeChange = (index) => (value) => {
     const flattenSchemes = claimableSchemes.reduce(
       (schemes, cs) => [
@@ -406,6 +341,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const schemeConfig = flattenSchemes.find((item) => item.id === value)
     const {
       balance = null,
+      copayerFK,
       coverageMaxCap = 0,
       coPaymentSchemeName = '',
       patientMinCoPaymentAmount = 0,
@@ -413,7 +349,20 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       id,
     } = schemeConfig
 
+    const _patientMinPayment =
+      patientMinCoPaymentAmountType === 'ExactAmount'
+        ? patientMinCoPaymentAmount
+        : values.finalPayable * patientMinCoPaymentAmount / 100
+
+    // let remainingCoverageMaxCap = coverageMaxCap
     let remainingCoverageMaxCap = coverageMaxCap
+    if (_patientMinPayment > 0) {
+      const isLessThanMaxCap =
+        values.finalPayable - _patientMinPayment < coverageMaxCap
+      remainingCoverageMaxCap = isLessThanMaxCap
+        ? values.finalPayable - _patientMinPayment
+        : coverageMaxCap
+    }
 
     const newInvoiceItems = getInvoiceItems(
       id,
@@ -424,6 +373,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
 
     const updatedRow = {
       ...tempInvoicePayer[index],
+      schemeConfig,
       _coverageMaxCap: coverageMaxCap,
       _balance: balance,
       _patientMinPayable: patientMinCoPaymentAmount,
@@ -434,7 +384,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         let claimAmount = item.totalAfterGst
         let proceedForChecking = true
 
-        if (item._claimedAmount === item.totalAfterGst || balance === null) {
+        if (
+          item._claimedAmount === item.totalAfterGst ||
+          (copayerFK === 1 && balance === null)
+        ) {
           proceedForChecking = false
           claimAmount = 0
         } else if (item._claimedAmount > 0) {
@@ -491,7 +444,14 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       _isEditing: false,
       _isDeleted: false,
     }
-    _updateTempInvoicePayer(index, updatedRow)
+    const invalidMessages = validateClaimAmount(updatedRow, values.finalPayable)
+
+    if (invalidMessages.length <= 0) _updateTempInvoicePayer(index, updatedRow)
+    else {
+      // const suffix = limitType === 'patient' ? '' : 'maximum cap.'
+      setErrorMessage(invalidMessages)
+      toggleErrorPrompt()
+    }
   }
 
   const handleAppliedSchemeCancelClick = (index) => () => {
@@ -573,8 +533,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
-  // console.log({ tempInvoicePayer })
-
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -644,19 +602,34 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                     value={invoicePayer._balance}
                   />
                 </GridItem> */}
-                <GridItem md={2}>
-                  <span>Balance: </span>
-                  {invoicePayer._balance === null ? (
-                    <span className={classes.dangerText}>
-                      Insufficient balance
-                    </span>
-                  ) : (
-                    <span className={classes.currencyText}>
-                      ${invoicePayer._balance}
-                    </span>
-                  )}
-                </GridItem>
-                <GridItem md={6} style={{ marginTop: 8, marginBottom: 8 }}>
+                {invoicePayer.schemeConfig &&
+                invoicePayer.schemeConfig.copayerFK === 1 && (
+                  <GridItem md={2}>
+                    <p>
+                      Balance:
+                      {invoicePayer._balance === null ? (
+                        <span className={classes.dangerText}>
+                          Insufficient balance
+                        </span>
+                      ) : (
+                        <span className={classes.currencyText}>
+                          ${invoicePayer._balance}
+                        </span>
+                      )}
+                    </p>
+                  </GridItem>
+                )}
+                <GridItem
+                  md={
+                    invoicePayer.schemeConfig &&
+                    invoicePayer.schemeConfig.copayerFK === 1 ? (
+                      6
+                    ) : (
+                      8
+                    )
+                  }
+                  style={{ marginTop: 8, marginBottom: 8 }}
+                >
                   {invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && (
                     <NumberInput
                       currency
@@ -666,8 +639,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                         <MaxCapInfo
                           claimableSchemes={invoicePayer.claimableSchemes}
                           copaymentSchemeFK={invoicePayer.copaymentSchemeFK}
-                          coPaymentByCategory={invoicePayer.coPaymentByCategory}
-                          coPaymentByItem={invoicePayer.coPaymentByItem}
                         />
                       }
                       value={invoicePayer._coverageMaxCap}
@@ -676,17 +647,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                 </GridItem>
 
                 <GridItem md={1} style={{ textAlign: 'right' }}>
-                  {/*  <Tooltip title='Remove this scheme'>
-                    <Button
-                      size='sm'
-                      color='danger'
-                      justIcon
-                      onClick={handleAppliedSchemeRemoveClick(index)}
-                    >
-                      <Delete />
-                    </Button>
-                  </Tooltip> */}
-
                   <DeleteWithPopover
                     index={index}
                     onConfirmDelete={handleAppliedSchemeRemoveClick}
@@ -797,6 +757,16 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
               invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
           }))}
         />
+      </CommonModal>
+      <CommonModal
+        title='Cannot save scheme'
+        open={showErrorPrompt}
+        onClose={toggleErrorPrompt}
+        maxWidth='sm'
+      >
+        <div className={classes.errorPromptContainer}>
+          {errorMessage.map((message) => <p>{message}</p>)}
+        </div>
       </CommonModal>
     </React.Fragment>
   )

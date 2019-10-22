@@ -1,6 +1,8 @@
 import * as Yup from 'yup'
+import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 export const SchemeInvoicePayerColumn = [
+  { name: 'invoiceItemTypeFk', title: 'Category' },
   { name: 'itemCode', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
   { name: 'totalAfterGst', title: 'Payable Amount ($)' },
@@ -8,12 +10,19 @@ export const SchemeInvoicePayerColumn = [
 ]
 
 export const CompanyInvoicePayerColumn = [
+  { name: 'invoiceItemTypeFk', title: 'Category' },
   { name: 'itemCode', title: 'Name' },
   { name: 'totalAfterGst', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
 ]
 
 export const ApplyClaimsColumnExtension = [
+  {
+    columnName: 'invoiceItemTypeFk',
+    // type: 'codeSelect',
+    // code: 'ltinvoiceitemtype',
+    render: (row) => INVOICE_ITEM_TYPE[row.invoiceItemTypeFk],
+  },
   { columnName: 'itemCode', disabled: true },
   {
     columnName: 'coverage',

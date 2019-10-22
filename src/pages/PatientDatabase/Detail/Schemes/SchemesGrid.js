@@ -57,6 +57,7 @@ class SchemesGrid extends PureComponent {
           columnName: 'schemeTypeFK',
           type: 'codeSelect',
           code: 'ctSchemeType',
+
           sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
@@ -135,7 +136,11 @@ class SchemesGrid extends PureComponent {
           columnName: 'coPaymentSchemeFK',
           sortingEnabled: false,
           type: 'codeSelect',
-          code: 'ctschemecategory',
+          // code: 'ctschemecategory',
+          code: 'coPaymentScheme',
+          filter: {
+            schemeCategoryFK: 5,
+          },
           isDisabled: (row) => !this.isCorporate(row),
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props

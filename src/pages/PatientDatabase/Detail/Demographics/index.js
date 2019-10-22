@@ -506,9 +506,9 @@ class Demographic extends PureComponent {
                   />
                 </GridItem>
               )}
-              {/* <GridItem xs={12}>
+              <GridItem xs={12}>
                 <Field
-                  name='languageFK'
+                  name='translationFK'
                   render={(args) => {
                     return (
                       <CodeSelect
@@ -519,7 +519,7 @@ class Demographic extends PureComponent {
                     )
                   }}
                 />
-              </GridItem> */}
+              </GridItem>
             </GridContainer>
           </GridItem>
         </GridContainer>

@@ -74,6 +74,13 @@ const styles = (theme) => ({
         }
       })
 
+    paymentData.forEach((o) => {
+      o.clinicPaymentDto.paymentModeFK =
+        o.clinicPaymentDto.creditCardId || undefined
+      o.clinicPaymentDto.creditCardTypeFK =
+        o.clinicPaymentDto.typeId || undefined
+    })
+
     dispatch({
       type: 'podoPayment/upsertPodoPayment',
       payload: {
@@ -95,7 +102,7 @@ const styles = (theme) => ({
   },
 })
 class index extends PureComponent {
-  componentDidMount () {
+  componentDidMount = () => {
     this.refreshPodoPayment()
   }
 

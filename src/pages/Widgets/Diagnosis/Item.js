@@ -3,6 +3,7 @@ import { Field, FastField } from 'formik'
 import { Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
+import moment from 'moment'
 import {
   Button,
   GridContainer,
@@ -92,7 +93,9 @@ const DiagnosisItem = ({
                 filter={{
                   props:
                     'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
-                  // sorting: [ { columnName: 'displayvalue', direction: 'asc' }, ],
+                  sorting: [
+                    { columnName: 'displayvalue', direction: 'asc' },
+                  ],
                 }}
                 labelField='displayvalue'
                 autoComplete
@@ -147,7 +150,6 @@ const DiagnosisItem = ({
                   maxTagCount={2}
                   disableAll
                   onChange={(v, opts) => {
-                    console.log({ v, opts })
                     const { setFieldValue } = form
                     setFieldValue(`corDiagnosis[${index}]corComplication`, [])
                     opts.forEach((o, i) => {
@@ -168,7 +170,21 @@ const DiagnosisItem = ({
             name={`corDiagnosis[${index}].onsetDate`}
             render={(args) => {
               return (
-                <DatePicker label='Order Date' allowClear={false} {...args} />
+                <DatePicker
+                  label='Order Date'
+                  allowClear={false}
+                  {...args}
+                  onChange={(value) => {
+                    const { setFieldValue } = form
+                    if(value === ''){
+                      setFieldValue(
+                        `corDiagnosis[${index}].onsetDate`,
+                        moment(),
+                      )
+                    }
+                    
+                  }}
+                />
               )
             }}
           />

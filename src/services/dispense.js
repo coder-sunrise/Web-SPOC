@@ -31,6 +31,12 @@ module.exports = {
     })
     return r
   },
+  unlock: async (params) => {
+    const r = await request(`${url}/unlock/${params.id}`, {
+      method: 'PUT',
+    })
+    return r
+  },
   refresh: async (id) => {
     const r = await request(`${url}/refresh/${id}`, {
       method: 'PUT',

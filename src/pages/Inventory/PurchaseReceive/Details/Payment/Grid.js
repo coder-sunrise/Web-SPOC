@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 import { GridContainer, EditableTableGrid, dateFormatLong } from '@/components'
 import Yup from '@/utils/yup'
@@ -12,9 +12,101 @@ const purchaseOrderPaymentSchema = (outstandingAmount) =>
     paymentAmount: Yup.number().min(0).max(outstandingAmount).required(),
     // Remarks: Yup.string().required(),
   })
+let commitCount = 1000 // uniqueNumber
+const Grid = ({
+  dispatch,
+  values,
+  isEditable,
+  setFieldValue,
+  recalculateOutstandingAmount,
+}) => {
+  const [
+    creditCardTypeList,
+    setCreditCardTypeList,
+  ] = useState([])
+  const [
+    paymentModeList,
+    setPaymentModeList,
+  ] = useState([])
+  const [
+    selection,
+    setSelection,
+  ] = useState([])
 
-class Grid extends PureComponent {
-  tableParas = {
+  const getCreditCardList = async () => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctCreditCardType',
+      },
+    }).then((v) => {
+      setCreditCardTypeList(v)
+    })
+  }
+
+  const getPaymentModeList = async () => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctPaymentMode',
+      },
+    }).then((v) => {
+      setPaymentModeList(v)
+    })
+  }
+
+  useEffect(
+    () => {
+      if (paymentModeList.length > 0 && creditCardTypeList.length > 0) {
+        let tempList = []
+        paymentModeList.forEach((o) => {
+          if (o.displayValue === 'Credit Card') {
+            let tempId = -99
+            creditCardTypeList.forEach((i) => {
+              tempList.push({
+                value: tempId - o.id,
+                name: `${o.displayValue} (${i.name})`,
+                typeId: i.id,
+                type: i.name,
+                creditCardId: o.id,
+              })
+              tempId -= 1
+            })
+          } else {
+            tempList.push({ value: o.id, name: o.displayValue })
+          }
+        })
+
+        setSelection(tempList)
+      }
+    },
+    [
+      paymentModeList,
+      creditCardTypeList,
+    ],
+  )
+
+  useEffect(() => {
+    getCreditCardList()
+    getPaymentModeList()
+  }, [])
+
+  useEffect(
+    () => {
+      dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+    },
+    [
+      selection,
+    ],
+  )
+
+  const tableParas = {
     columns: [
       { name: 'paymentNo', title: 'Payment No.' },
       { name: 'paymentDate', title: 'Date' },
@@ -37,9 +129,15 @@ class Grid extends PureComponent {
       },
       {
         columnName: 'paymentModeFK',
-        type: 'codeSelect',
-        labelField: 'displayValue',
-        code: 'CTPaymentMode',
+        type: 'select',
+        options: selection,
+        onChange: (p) => {
+          const { option, row } = p
+          if (option) {
+            row.typeId = option.typeId
+            row.creditCardId = option.creditCardId
+          }
+        },
       },
       {
         columnName: 'paymentAmount',
@@ -49,8 +147,7 @@ class Grid extends PureComponent {
     ],
   }
 
-  onCommitChanges = ({ rows, deleted }) => {
-    const { setFieldValue, recalculateOutstandingAmount } = this.props
+  const onCommitChanges = ({ rows, deleted }) => {
     if (deleted) {
       rows.find((v) => v.id === deleted[0]).isDeleted = true
       recalculateOutstandingAmount('delete', deleted[0].paymentAmount)
@@ -70,31 +167,26 @@ class Grid extends PureComponent {
 
     return rows
   }
-
-  render () {
-    const { values, isEditable } = this.props
-
-    return (
-      <GridContainer>
-        <EditableTableGrid
-          rows={values.purchaseOrderPayment}
-          schema={purchaseOrderPaymentSchema(values.outstandingAmt)}
-          FuncProps={{
-            edit: false,
-            pager: false,
-          }}
-          EditingProps={{
-            showAddCommand: isEditable,
-            showEditCommand: false,
-            showDeleteCommand: true,
-            onCommitChanges: this.onCommitChanges,
-            // onAddedRowsChange: this.onAddedRowsChange,
-          }}
-          {...this.tableParas}
-        />
-      </GridContainer>
-    )
-  }
+  return (
+    <GridContainer>
+      <EditableTableGrid
+        rows={values.purchaseOrderPayment}
+        schema={purchaseOrderPaymentSchema(values.outstandingAmt)}
+        FuncProps={{
+          edit: false,
+          pager: false,
+        }}
+        EditingProps={{
+          showAddCommand: isEditable,
+          showEditCommand: false,
+          showDeleteCommand: true,
+          onCommitChanges,
+          // onAddedRowsChange: this.onAddedRowsChange,
+        }}
+        {...tableParas}
+      />
+    </GridContainer>
+  )
 }
 
 export default Grid

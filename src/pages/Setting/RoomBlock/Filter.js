@@ -145,19 +145,28 @@ class Filter extends PureComponent {
                     stringRoomBlockGroupFK = roomBlockGroupFK.join('|')
                   }
 
-                  this.props.dispatch({
-                    type: 'roomBlock/query',
-                    payload: {
-                      [type]:
-                        stringRoomBlockGroupFK === 0
-                          ? undefined
-                          : stringRoomBlockGroupFK,
+                  this.props
+                    .dispatch({
+                      type: 'roomBlock/query',
+                      payload: {
+                        [type]:
+                          stringRoomBlockGroupFK === 0
+                            ? undefined
+                            : stringRoomBlockGroupFK,
 
-                      'RoomBlockGroupFkNavigation.RoomBlockRecurrenceFkNavigation.RecurrencePatternFK': roomBlockRecurrenceFK,
-                      lgteql_startDateTime: dates ? dates[0] : undefined,
-                      lsteql_endDateTime: dates ? dates[1] : undefined,
-                    },
-                  })
+                        'RoomBlockGroupFkNavigation.RoomBlockRecurrenceFkNavigation.RecurrencePatternFK': roomBlockRecurrenceFK,
+                        lgteql_startDateTime: dates ? dates[0] : undefined,
+                        lsteql_endDateTime: dates ? dates[1] : undefined,
+                      },
+                    })
+                    .then(() => {
+                      this.props.dispatch({
+                        type: 'roomBlock/updateState',
+                        payload: {
+                          filter: undefined,
+                        },
+                      })
+                    })
                 }}
               >
                 <FormattedMessage id='form.search' />
