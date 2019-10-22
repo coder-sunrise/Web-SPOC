@@ -111,7 +111,17 @@ export const mapPropsToValues = ({
     bookedByUserFK: user.id,
     currentAppointment: {
       appointmentDate: moment(selectedSlot.start).formatUTC(),
-      appointments_Resources: [],
+      appointments_Resources: [
+        {
+          id: -99,
+          conflicts: undefined,
+          clinicianFK: undefined,
+          appointmentTypeFK: undefined,
+          isPrimaryClinician: true,
+          startTime: '',
+          endTime: '',
+        },
+      ],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
     recurrenceDto: { ...initDailyRecurrence },

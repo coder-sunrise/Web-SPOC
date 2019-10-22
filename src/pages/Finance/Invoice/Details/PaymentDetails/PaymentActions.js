@@ -11,7 +11,7 @@ const PaymentActions = ({
   handleAddPayment,
   handleAddCrNote,
   handleWriteOff,
-  handlePrintInvoice,
+  handlePrinterClick,
   type,
   invoicePayerFK,
   readOnly,
@@ -54,8 +54,8 @@ const PaymentActions = ({
         </Button>
       )}
       <Button
-        onClick={handlePrintInvoice}
-        disabled={!handlePrintInvoice}
+        onClick={() => handlePrinterClick('TaxInvoice')}
+        disabled={!handlePrinterClick || readOnly}
         {...ButtonProps}
       >
         <Printer />

@@ -54,7 +54,7 @@ const styles = (theme) => ({
 //     return diagnosis.entity ? diagnosis.entity : diagnosis.default
 //   },
 //   validationSchema: Yup.object().shape({
-//     diagnosises: Yup.array().of(
+//     corDiagnosis: Yup.array().of(
 //       Yup.object().shape({
 //         diagnosisFK: Yup.number().required(),
 //         // complication: Yup.array().of(Yup.string()).required().min(1),
@@ -113,7 +113,6 @@ class Diagnosis extends PureComponent {
 
   render () {
     const { theme, components, diagnosis } = this.props
-
     return (
       <div>
         <FieldArray
@@ -127,7 +126,7 @@ class Diagnosis extends PureComponent {
             // if (!values || !values.corDiagnosis) return null
 
             if (values.corDiagnosis.length <= 0) {
-              diagnosises = diagnosis.default.corDiagnosis
+              this.addDiagnosis()
             } else {
               diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             }
@@ -139,6 +138,7 @@ class Diagnosis extends PureComponent {
                 return null
               }
             }
+        
             return diagnosises.map((v, i) => {
               return (
                 <div key={v.uid}>

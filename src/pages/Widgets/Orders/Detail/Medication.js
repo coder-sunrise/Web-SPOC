@@ -198,6 +198,8 @@ class Medication extends PureComponent {
 
     let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
+    setFieldValue('totalPrice', rounded)
+    this.updateTotalPrice(rounded)
   }
 
   changeMedication = (v, op = {}) => {
@@ -247,6 +249,8 @@ class Medication extends PureComponent {
 
       let rounded = Math.round(newTotalQuantity * 10) / 10
       setFieldValue(`quantity`, rounded)
+      setFieldValue('totalPrice', rounded)
+      this.updateTotalPrice(rounded)
     }
 
     if (
@@ -320,7 +324,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log('kkkkk ', this.props)
     return (
       <div>
         <GridContainer>

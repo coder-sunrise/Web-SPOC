@@ -118,6 +118,7 @@ const Detail = ({ height, ...props }) => {
                       id: 'finance.scheme.detail.category',
                     })}
                     code='ctSchemeCategory'
+                    disabled
                     {...args}
                   />
                 )

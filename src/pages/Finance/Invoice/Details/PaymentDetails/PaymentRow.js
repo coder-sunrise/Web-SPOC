@@ -32,12 +32,12 @@ const PaymentRow = ({
       style={isCancelled ? { textDecorationLine: 'line-through' } : {}}
     >
       <GridItem md={2}>
-        {type === 'Payment' ? (
+        {type === 'Payment' || type === 'Credit Note' ? (
           <IconButton
             // payerID='N/A'
             id={itemID}
             className={classes.printButton}
-            onClick={handlePrinterClick}
+            onClick={() => handlePrinterClick(type, id)}
           >
             <Printer />
           </IconButton>

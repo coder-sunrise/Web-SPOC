@@ -336,8 +336,7 @@ class Banner extends PureComponent {
         // maxHeight: 100,
       },
     } = props
-    // console.log('************** banner ***********')
-    // console.log(this.props)
+
     const { entity } = patient
 
     if (!entity)
@@ -364,21 +363,19 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               h3={
-                <Tooltip title={name}>
+                <div>
                   <Link
                     to={getAppendUrl({
                       md: 'pt',
                       cmt: 1,
                       pid: info.id,
                     })}
-
-                    
                   >
-                    <div>
+                    <Tooltip title={name} placement="bottom-start">
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
-                    </div>
+                    </Tooltip>
                   </Link>
-                </Tooltip>
+                </div>
               }
               body={
                 <div>
@@ -440,7 +437,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                      <IconButton onClick={this.refreshChasBalance}>
+                    <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (

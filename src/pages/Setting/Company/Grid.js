@@ -11,7 +11,6 @@ class Grid extends PureComponent {
       defaultSorting: [
         { columnName: 'isActive', direction: 'asc' },
         { columnName: 'coPayerTypeName', direction: 'asc' },
-        // { columnName: 'displayValue', direction: 'asc' },
       ],
     },
   }
@@ -34,6 +33,7 @@ class Grid extends PureComponent {
     const { settingCompany, route } = this.props
     const { name } = route
     const { companyType } = settingCompany
+
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -90,60 +90,58 @@ class Grid extends PureComponent {
         }
         // FuncProps={{ pager: false }}
         columnExtensions={[
-          name === 'copayer'
-            ? ({
-                columnName: 'url',
-
-                render: (row) => (
-                  <a
-                    rel='noopener noreferrer'
-                    target='_blank'
-                    href={
-                      row.contact &&
-                      row.contact.contactWebsite.website !== '' ? (
-                        row.contact.contactWebsite.website
-                      ) : (
-                        '-'
-                      )
-                    }
-                  >
-                    {row.contact &&
-                    row.contact.contactWebsite.website !== '' ? (
+          {
+            columnName: 'url',
+            sortingEnabled: false,
+            width: 400,
+            render: (row) => {
+              console.log('row', row)
+              return (
+                <a
+                  rel='noopener noreferrer'
+                  target='_blank'
+                  href={
+                    row.contact && row.contact.contactWebsite.website !== '' ? (
                       row.contact.contactWebsite.website
                     ) : (
                       '-'
-                    )}
-                  </a>
-                ),
-              },
-              {
-                columnName: 'coPayerTypeName',
-                sortBy: 'coPayerTypeFK',
-              })
-            : {
-                columnName: 'officeNum',
-                sortingEnabled: false,
-                width: 120,
-                render: (row) => (
-                  <span>
-                    {row.contact &&
-                    row.contact.officeContactNumber.number !== '' ? (
-                      row.contact.officeContactNumber.number
-                    ) : (
-                      '-'
-                    )}
-                  </span>
-                ),
-              },
+                    )
+                  }
+                >
+                  {row.contact && row.contact.contactWebsite.website !== '' ? (
+                    row.contact.contactWebsite.website
+                  ) : (
+                    '-'
+                  )}
+                </a>
+              )
+            },
+          },
+          {
+            columnName: 'coPayerTypeName',
+            sortBy: 'coPayerTypeFK',
+            width: 200,
+          },
+          {
+            columnName: 'officeNum',
+            sortingEnabled: false,
+            width: 120,
+            render: (row) => (
+              <span>
+                {row.contact &&
+                row.contact.officeContactNumber.number !== '' ? (
+                  row.contact.officeContactNumber.number
+                ) : (
+                  '-'
+                )}
+              </span>
+            ),
+          },
           {
             columnName: 'contactPerson',
             render: (row) => (
               <span>{row.contactPerson ? row.contactPerson : '-'}</span>
             ),
-          },
-          {
-            columnName: 'displayValue',
-            width: 500,
           },
           {
             columnName: 'faxNo',
@@ -158,6 +156,10 @@ class Grid extends PureComponent {
                 )}
               </span>
             ),
+          },
+          {
+            columnName: 'displayValue',
+            width: 500,
           },
 
           {

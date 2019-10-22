@@ -120,20 +120,28 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
       // return false
     })
 
-    if (publicHoliday.length > 0)
+    if (publicHoliday.length > 0) {
       holidayLabel = publicHoliday.map((item) => item.displayValue).join(', ')
 
+      return (
+        <Tooltip
+          title={<span style={{ wordWrap: 'break-word' }}>{holidayLabel}</span>}
+          placement='top'
+          enterDelay={500}
+          classes={{ tooltip: classes.customMaxWidth }}
+        >
+          <div className={classes.calendarHoliday}>
+            <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>
+            <a onClick={onDrillDown}>{label}</a>
+          </div>
+        </Tooltip>
+      )
+    }
     return (
-      <Tooltip
-        title={<span style={{ wordWrap: 'break-word' }}>{holidayLabel}</span>}
-        placement='top'
-        classes={{ tooltip: classes.customMaxWidth }}
-      >
-        <div className={classes.calendarHoliday}>
-          <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>
-          <a onClick={onDrillDown}>{label}</a>
-        </div>
-      </Tooltip>
+      <div className={classes.calendarHoliday}>
+        <span className={classes.calendarHolidayLabel}>{holidayLabel}</span>
+        <a onClick={onDrillDown}>{label}</a>
+      </div>
     )
   }),
 )

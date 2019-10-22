@@ -1,6 +1,7 @@
 import { stringify } from 'qs'
-import request, { baseUrl, axiosRequest } from '@/utils/request'
+import request, { download, baseUrl, axiosRequest } from '@/utils/request'
 import { convertToQuery } from '@/utils/utils'
+import { REPORT_TYPE } from '@/utils/constants'
 // static data
 // import { QueueListingDummyData } from '@/pages/Report/dummyData'
 
@@ -38,6 +39,22 @@ export const getExcel = async (reportID, payload) => {
       reportParameters: JSON.stringify({ ...payload }),
     }),
   })
+}
+
+export const exportPdfReport = async (reportID, payload) => {
+  const baseURL = '/api/report'
+  return download(
+    `${baseURL}/${reportID}?ReportFormat=pdf&ReportParameters={${payload}}`,
+    { subject: REPORT_TYPE[reportID] || 'Report', type: 'pdf' },
+  )
+}
+
+export const exportExcelReport = async (reportID, payload) => {
+  const baseURL = '/api/report'
+  return download(
+    `${baseURL}/${reportID}?ReportFormat=excel&ReportParameters={${payload}}`,
+    { subject: REPORT_TYPE[reportID] || 'Report', type: 'xls' },
+  )
 }
 
 export const getPatientListingReport = async (payload) => {

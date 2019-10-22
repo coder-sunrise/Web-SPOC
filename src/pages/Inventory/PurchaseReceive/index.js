@@ -45,14 +45,14 @@ class PurchaseReceive extends Component {
   }
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'purchaseReceiveList/query',
-      payload: {
-        sorting: [
-          { columnName: 'purchaseOrderNo', direction: 'asc' },
-        ],
-      },
-    })
+    // this.props.dispatch({
+    //   type: 'purchaseReceiveList/query',
+    //   payload: {
+    //     sorting: [
+    //       { columnName: 'purchaseOrderNo', direction: 'asc' },
+    //     ],
+    //   },
+    // })
   }
 
   onSelectionChange = (selection) => this.setState({ selectedRows: selection })
@@ -196,7 +196,7 @@ class PurchaseReceive extends Component {
           <CommonModal
             open={showDuplicatePO}
             title='Duplicate Purchase Order'
-            maxWidth='xs'
+            maxWidth='sm'
             onConfirm={this.closeDuplicatePOModal}
             onClose={this.closeDuplicatePOModal}
           >

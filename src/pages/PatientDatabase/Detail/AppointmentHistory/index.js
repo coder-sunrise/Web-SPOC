@@ -63,13 +63,16 @@ const commonExt = [
       )
       if (firstAppointment) {
         return (
-          <CodeSelect
-            text
-            code='clinicianprofile'
-            value={firstAppointment.clinicianFK}
-            labelField='name'
-            valueField='id'
-          />
+          <div>
+            Dr <span />
+            <CodeSelect
+              text
+              code='clinicianprofile'
+              value={firstAppointment.clinicianFK}
+              labelField='name'
+              valueField='id'
+            />
+          </div>
         )
       }
       return ''

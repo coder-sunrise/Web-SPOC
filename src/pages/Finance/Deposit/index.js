@@ -21,6 +21,10 @@ const styles = () => ({
 @compare('deposit')
 class Deposit extends PureComponent {
   componentDidMount () {
+    this.queryDepositListing()
+  }
+
+  queryDepositListing = () => {
     this.props.dispatch({
       type: 'deposit/query',
       payload: {
@@ -36,10 +40,10 @@ class Deposit extends PureComponent {
     const { classes, ...restProps } = props
     return (
       <CardContainer hideHeader>
-        <h4 className={classes.header}>
-          {formatMessage({ id: 'finance.deposit.title' })}
-        </h4>
-        <FilterBar {...restProps} />
+        <FilterBar
+          queryDepositListing={this.queryDepositListing}
+          {...restProps}
+        />
         <Grid {...restProps} />
       </CardContainer>
     )
