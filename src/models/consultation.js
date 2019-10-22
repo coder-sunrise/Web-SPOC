@@ -203,7 +203,6 @@ export default createFormViewModel({
           orders.push(rowRecord)
         }
 
-       console.log("orders ", orders)
         return orders
       },
       *edit ({ payload }, { call, put }) {
@@ -314,11 +313,8 @@ export default createFormViewModel({
         const { visit } = entity
         const { visitStatus } = visit
         let orderList = []
-        console.log("payload ", payload)
-        console.log("status ", visitRegistration)
-        console.log("abc ", visitStatus)
+
         if ( (visitStatus === 'IN CONS' && status !== 'PAUSED') ) {
-          console.log("auto")
           orderList = yield put.resolve({
             type: 'addAutoOrder',
           })
@@ -364,7 +360,6 @@ export default createFormViewModel({
             )
           })
         }
-        console.log("**** ", oRows)
 
         yield put({
           type: 'orders/updateState',
