@@ -141,22 +141,6 @@ class AddNewStatement extends PureComponent {
     defaultSelectedRows: [],
   }
 
-  componentDidMount () {
-    this.setState({
-      invoiceRows: this.props.values.statementInvoice,
-    })
-    let defaultIds = []
-    this.props.values.statementInvoice.forEach((o) => {
-      defaultIds.push(o.id)
-    })
-    this.setState({
-      defaultSelectedRows: defaultIds,
-    })
-    this.setState({
-      selectedRows: defaultIds,
-    })
-  }
-
   handleSelectionChange = (rows) => {
     const { setValues, values } = this.props
     const { invoiceRows, defaultSelectedRows, selectedRows } = this.state
@@ -228,6 +212,22 @@ class AddNewStatement extends PureComponent {
     history.goBack()
   }
 
+  componentDidMounts () {
+    this.setState({
+      invoiceRows: this.props.values.statementInvoice,
+    })
+    let defaultIds = []
+    this.props.values.statementInvoice.forEach((o) => {
+      defaultIds.push(o.id)
+    })
+    this.setState({
+      defaultSelectedRows: defaultIds,
+    })
+    this.setState({
+      selectedRows: defaultIds,
+    })
+  }
+
   render () {
     const {
       classes,
@@ -285,6 +285,8 @@ class AddNewStatement extends PureComponent {
                       id: 'finance.statement.paymentTerms',
                     })}
                     max={999}
+                    inputProps={{ maxLength: 3 }}
+                    maxLength={3}
                     {...args}
                   />
                 )}
@@ -301,7 +303,12 @@ class AddNewStatement extends PureComponent {
                       )
                     }
                     return (
-                      <NumberInput percentage label='Admin Charge' max={100} {...args} />
+                      <NumberInput
+                        percentage
+                        label='Admin Charge'
+                        max={100}
+                        {...args}
+                      />
                     )
                   }}
                 />
